@@ -1,0 +1,1032 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "testimonials_banner_mLxP4i": {
+      "type": "testimonials-banner",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/top_banner_D_420ae27a-d79a-496f-993d-cc7f9bffadd2.jpg",
+        "image_height": "adapt",
+        "content_position": "md:items-center md:justify-center",
+        "image_mobile": "shopify://shop_images/top_banner_M.jpg",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-center justify-center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 0,
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_w7MqwL": {
+      "type": "rich-text",
+      "blocks": {
+        "button_mTwTCk": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://pages/aetrex-shearling-orthotics",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "button_mTwTCk"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "shopify://collections/conform",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#ed975a",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_UmPNWt": {
+      "type": "rich-text",
+      "blocks": {
+        "text_4bdKN8": {
+          "type": "text",
+          "settings": {
+            "text": "<h2>How Aetrex Conform Orthotics Help With Diabetes</h2>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_4bdKN8"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#3175a6",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_V94iJC": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_HMB9nc": {
+          "type": "heading",
+          "settings": {
+            "heading": "<em>Premium Materials That Benefit Your Foot Health</em>",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_4REnWh": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Plastazote® top cover that customizes to the foot during the gait cycle and transfers pressure away from “hot spots” for extra protection.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_HMB9nc",
+        "text_4REnWh"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/Material.png",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "content_position": "align-self-center",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "#eb864b",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_bqHXEx": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_JcWAJC": {
+          "type": "heading",
+          "settings": {
+            "heading": "<em>Helps Relieve Pressure and Friction</em>",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_rbjY7M": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A molded cork blended core and a Plastazote X-Firm bottom for superior resilience and shock absorption.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_JcWAJC",
+        "text_rbjY7M"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/friction.png",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "content_position": "align-self-center",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "#eb864b",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_DYXjiq": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_MLUa7R": {
+          "type": "heading",
+          "settings": {
+            "heading": "<em><strong>Strategically Place Arch Support</strong></em>",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_TLxQzY": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The contour, position and height of Aetrex’s unique arch support aligns anatomically in the proper place to help support our bodies from the ground up.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_bG7gxV": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://collections/conform",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_MLUa7R",
+        "text_TLxQzY",
+        "button_bG7gxV"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/arch_support_8183c8bf-3da9-4b71-b296-531a8a35956a.png",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "content_position": "align-self-center",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "#eb864b",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#ea864a",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "multicolumn_TFjQe9": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_eAHhcn": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/shipping_489ecc4f-3f30-4ca0-b16f-b3a3a5c0de3d.png",
+            "image_ratio": "adapt",
+            "heading": "Ground Shipping",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_d8rLgx": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/return_edc8b2c2-bd5e-4253-bf58-c7f5cb18a895.png",
+            "image_ratio": "adapt",
+            "heading": "Easy Returns",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_4AKUxp": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/30day_4df19e0b-2fdd-43a7-b164-9e2cb56ac8af.png",
+            "image_ratio": "adapt",
+            "heading": "30 Day Comfort Guarantee",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_eAHhcn",
+        "column_d8rLgx",
+        "column_4AKUxp"
+      ],
+      "settings": {
+        "gap": "small",
+        "columns": 3,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "#efefef",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_Bad4Cj": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_CkAbCW": {
+          "type": "heading",
+          "settings": {
+            "heading": "About Diabetes & the Diabetic Foot",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_QM7eC8": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Diabetes is a highly prevalent condition globally. It is defined as a metabolic disorder, and there are two main types. Type 1 is an autoimmune disease mostly found in children where the body’s immune system destroys the insulin-producing pancreatic beta-cells. It is found in 5 to 10 percent of patients with Diabetes. Type 2 accounts for the remaining 90 to 95 percent, frequently found in people over age 45. It’s associated with the physical inactivity of adolescents and the sugar-rich diets commonly adopted today.<br/></p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_CkAbCW",
+        "text_QM7eC8"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/feet_pain.gif",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "content_position": "align-self-center",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_4XiQkT": {
+      "type": "rich-text",
+      "blocks": {
+        "text_LNmhDK": {
+          "type": "text",
+          "settings": {
+            "text": "<h5><strong>Foot Conditions associated with Diabetes include:</strong></h5>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 30,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_YPMXNi": {
+          "type": "text",
+          "settings": {
+            "text": "<ul><li><em><strong>Peripheral Sensory Neuropathy</strong></em></li></ul><p>Nerve damage in the feet</p><ul><li><em><strong>Peripheral Vascular Disease & Peripheral Arterial Disease</strong></em></li></ul><p>Plaque build-up in the arteries reducing blood flow and the ability to heal</p><ul><li><em><strong>Charcot Foot</strong></em></li></ul><p>Structural damage caused by a lack of sensation and bone weakness. The arches are lost, and the foot may become boat shaped./p&gt;</p><ul><li><em><strong>Diabetic Foot Ulcer</strong></em></li></ul><p>A sore developed when damaged skin goes unnoticed due to loss of sensation</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_LNmhDK",
+        "text_YPMXNi"
+      ],
+      "settings": {
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "#eb864b",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "image_with_text_hjPy3i": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_mAqtJV": {
+          "type": "heading",
+          "settings": {
+            "heading": "Orthotics",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_i63RN8": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Wearing the right footwear and orthotics combination can help reduce risk factors and help relieve the pressure and friction on the parts of the foot that are more prone to ulcerations. Aetrex Conform Orthotics help protect the low-risk Diabetic Foot by customizing to the foot during the gait cycle, transferring pressure away from “hot spots” and providing shock absorption for extra protection.<br/><br/></p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_nMXNFP": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://collections/conform",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_mAqtJV",
+        "text_i63RN8",
+        "button_nMXNFP"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/conformlp.jpg",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "content_position": "align-self-center",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#eb864b",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_JWGnhT": {
+      "type": "rich-text",
+      "blocks": {
+        "image_VGU8nb": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/rec_ae5886f5-71c8-4fa9-a33b-3d96c75789a7.png",
+            "image_width": "custom",
+            "image_max_width": 70,
+            "image_max_width_mobile": 40
+          }
+        },
+        "text_BjAdYr": {
+          "type": "text",
+          "settings": {
+            "text": "<p>RECOMMENDED BY DOCTORS & LOVED BY MILLIONS</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 30,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "image_VGU8nb",
+        "text_BjAdYr"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#ffffff",
+        "color_background": "#ed975a",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_PX4KRK": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_VwXUMp": {
+          "type": "heading",
+          "settings": {
+            "heading": "DOs & DONT'S",
+            "heading_size": "title-lg tracking-heading",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_VwXUMp"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "multicolumn_fMLGyW": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_dqLz8P": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "left",
+            "image_ratio": "adapt",
+            "heading": "DO",
+            "heading_size": "text-lg-2xl",
+            "text": "<ul><li>Wash feet daily. Dry carefully</li><li>If your feet feel cold at night, wear socks</li><li>Inspect your feet daily for blisters, cuts, and scratches</li><li>Wear an orthotic designed to help reduce your risk factors</li><li>Wear shoes that are designed to protect your feet from injury</li><li>Inspect the insides of your shoes daily for foreign objects and rough areas</li><li>Avoid extreme temperatures. Test water with your hands or elbow before bathing</li><li>See your physician regularly and be sure to have your feet examined at each visit</li><li>Shoes should be fitted by a footcare specialist and be comfortable at the time of purchase</li></ul>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_yLwf7g": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image_ratio": "adapt",
+            "heading": "DON'T",
+            "heading_size": "text-lg-2xl",
+            "text": "<ul><li>Soak your feet in hot water</li><li>Walk barefoot</li><li>Wear sandals with thongs between the toes</li><li>Cut corns or calluses; see your physician</li><li>Wear shoes with pointed toe areas</li><li>Walk on hot surfaces such as sandy beaches or on the cement around swimming pools</li></ul>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_dqLz8P",
+        "column_yLwf7g"
+      ],
+      "name": "Multicolumn",
+      "settings": {
+        "gap": "large",
+        "columns": 2,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#7d7f80",
+        "color_background": "#f4f4f4",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "rich_text_qgLLBw": {
+      "type": "rich-text",
+      "blocks": {
+        "text_BA9JmF": {
+          "type": "text",
+          "settings": {
+            "text": "<p><em>*If you have an advanced case of Neuropathy, please consult your doctor.</em></p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_BA9JmF"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#7f7e78",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#3175a6",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "image_with_text_overlay_8VNLXP": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "text_63CzQn": {
+          "type": "text",
+          "settings": {
+            "text": "<p><em>Don't Know Which Orthotics Are Perfect For You?</em></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_W6nLwA": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Take our easy 4 step quiz based on your shoe type and area of discomfort.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_JQBLf8": {
+          "type": "button",
+          "settings": {
+            "button_label": "TAKE QUIZ NOW",
+            "button_link": "https://irle3andv1z.typeform.com/to/gujvKvEg?typeform-source=shop.aetrex.com",
+            "button_style": "primary",
+            "button_size": "sm",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_63CzQn",
+        "text_W6nLwA",
+        "button_JQBLf8"
+      ],
+      "name": "Image with text overlay",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/quizt4.gif",
+        "image_height": "adapt",
+        "content_width": "small",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/quizt4M2.gif",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-end justify-center",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_highlight": "#ed884a",
+        "gradient_highlight": "",
+        "color_button_text": "#ffffff",
+        "color_button_background": "#ed884a",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 0,
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_JAJkGp": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_nAGMtz": {
+          "type": "text",
+          "settings": {
+            "text": "<p><em>Don't Know Which Orthotics Are Perfect For You?</em></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_M3Jdyw": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Take our easy 4 step quiz based on your shoe type and area of discomfort.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_xEkCxV": {
+          "type": "button",
+          "settings": {
+            "button_label": "TAKE QUIZ NOW",
+            "button_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_nAGMtz",
+        "text_M3Jdyw",
+        "button_xEkCxV"
+      ],
+      "disabled": true,
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/Gif_1.gif",
+        "image_height": "adapt",
+        "image_width": "medium",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "content_position": "align-self-center",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "center",
+        "color_text": "",
+        "color_background": "#f0d5c5",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "#ed884a",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#ed884a",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "testimonials_banner_mLxP4i",
+    "rich_text_w7MqwL",
+    "rich_text_UmPNWt",
+    "image_with_text_V94iJC",
+    "image_with_text_bqHXEx",
+    "image_with_text_DYXjiq",
+    "multicolumn_TFjQe9",
+    "image_with_text_Bad4Cj",
+    "rich_text_4XiQkT",
+    "image_with_text_hjPy3i",
+    "rich_text_JWGnhT",
+    "rich_text_PX4KRK",
+    "multicolumn_fMLGyW",
+    "rich_text_qgLLBw",
+    "image_with_text_overlay_8VNLXP",
+    "image_with_text_JAJkGp"
+  ]
+}

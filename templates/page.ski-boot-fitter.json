@@ -1,0 +1,194 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "testimonials_banner_Cbhq4c": {
+      "type": "testimonials-banner",
+      "name": "Testimonials banner",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/ski_boot_header_1920x496px_68ff2ce8-fb07-4d01-bc66-695e47e0df72.jpg",
+        "image_height": "adapt",
+        "content_position": "md:items-center md:justify-center",
+        "image_mobile": "shopify://shop_images/ski_boot_header_1920x496px_49b35ce1-61b5-475c-8736-3229a614d6b3.png",
+        "image_height_mobile": "300px",
+        "content_position_mobile": "items-center justify-center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 0,
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_bGVzXB": {
+      "type": "rich-text",
+      "blocks": {
+        "text_wWT86y": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Ski Boot Fitter</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_wWT86y"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#ffffff",
+        "color_background": "#97a6a9",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 8,
+        "padding_bottom": 8,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_aPTKgV": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_EtyYRJ": {
+          "type": "text",
+          "settings": {
+            "text": "<p>3D FitTech is Changing the Ski Boot Fitting Game</p>",
+            "text_font": "heading",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_EJgBch": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Introducing Aetrex Ski Boot Fitter, a game-changing solution for ski retailers and rental shops. Combining complete, accurate 3D foot measurements, including foot volume data, with analytical ski boot fit software, the program recommends best-fitting ski boot options for a customer’s unique feet within seconds.<br/><br/>The process starts with a 3D foot scan in store to collect the skier’s key 3D foot measurements, including volume (high, medium or low) plus foot size data (length, width, girth, etc). Next, the software considers the retailer’s ski boot inventory to make best-fitting ski boot matches. Boot recommendations are then provided including various styles, size per style, and flex ratings—based on a customer’s skill level—for a personalized fit.<br/><br/>The Ski Boot Fitter software delivers a seamless, personalized fitting experience. Transform your ski boot fitting experience.<br/><br/></p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_Ka6R76": {
+          "type": "button",
+          "settings": {
+            "button_label": "Book a Demo",
+            "button_link": "https://irle3andv1z.typeform.com/to/V3YAATXm",
+            "button_style": "link",
+            "button_size": "sm",
+            "button_external": true,
+            "button_icon": false
+          }
+        },
+        "button_VdNTwx": {
+          "type": "button",
+          "settings": {
+            "button_label": "View recent coverage with SGB Online on Ski Boot Fitter",
+            "button_link": "https://sgbonline.com/3d-fittech-is-changing-the-ski-boot-fitting-game/",
+            "button_style": "link",
+            "button_size": "sm",
+            "button_external": true,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_EtyYRJ",
+        "text_EJgBch",
+        "button_Ka6R76",
+        "button_VdNTwx"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/SkiBoot_Monitor-690x496px.jpg",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/SkiBoot_Monitor-690x496px.jpg",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "left",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 48,
+        "padding_bottom": 48,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "testimonials_banner_Cbhq4c",
+    "rich_text_bGVzXB",
+    "image_with_text_aPTKgV"
+  ]
+}

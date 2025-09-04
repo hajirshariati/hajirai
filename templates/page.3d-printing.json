@@ -1,0 +1,117 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "rich_text_PpYxrf": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_iBRqrf": {
+          "type": "heading",
+          "settings": {
+            "heading": "Aetrex 3D Printed Orthotics",
+            "heading_size": "title-sm",
+            "heading_tag": "h1",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_RKf9Ay": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Utilizing data captured from Aetrex’s Albert Pro – the most advanced foot scanning system available globally – Aetrex is able to translate the data captured and produce a 3D printed orthotic that matches precisely to the individual’s foot. Learn more about our 3D Printed Orthotics with our video.</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_iBRqrf",
+        "text_RKf9Ay"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "video_LCMBQh": {
+      "type": "video",
+      "name": "Video",
+      "settings": {
+        "transparent_header": false,
+        "video": "shopify://files/videos/aetrex_3d_printed_custom_orthotics.mp4",
+        "video_url": "",
+        "cover_image": "shopify://shop_images/thumb_9067aa46-d2ce-499b-af76-9ca2580fc6ee.png",
+        "description": "Aetrex 3D Printed Orthotics",
+        "enable_video_autoplay": false,
+        "enable_video_looping": false,
+        "image_height": "600px",
+        "video_url_mobile": "",
+        "cover_image_mobile": "shopify://shop_images/thumb_9067aa46-d2ce-499b-af76-9ca2580fc6ee.jpg",
+        "image_height_mobile": "adapt",
+        "padding_top": 24,
+        "padding_bottom": 48,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "rich_text_PpYxrf",
+    "video_LCMBQh"
+  ]
+}

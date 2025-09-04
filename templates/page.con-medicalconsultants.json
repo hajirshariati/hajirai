@@ -1,0 +1,221 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "rich_text_JgfXNb": {
+      "type": "rich-text",
+      "blocks": {
+        "text_DWcr98": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Our Medical Consultants</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 40,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_DWcr98"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#ffffff",
+        "color_background": "#99a4ad",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "rich_text_AhWdpk": {
+      "type": "rich-text",
+      "blocks": {
+        "text_eGXbBJ": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Aetrex partners with doctors and experts in the podiatry and orthopedic industries to garner medical advice, opinions and insights on our Orthotics and Footwear. See below to learn more.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_eGXbBJ"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h3",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_XPzLTV": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_bEW4zq": {
+          "type": "heading",
+          "settings": {
+            "heading": "DR. JANINE FERRIGNO-TADDEO",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_rjxNcU": {
+          "type": "text",
+          "settings": {
+            "text": "<p>DOCTOR OF PODIATRIC MEDICINE AND AETREX CONSULTANT</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_hBaFTz": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A graduate of California College of Podiatric Medicine in San Francisco, CA. Dr. Ferrigno-Taddeo remains active academically and also holds an attending position at St. Barnabas Medical Center, where she is able to reach the residents clinically as well as academically. She is also on staff at Spring Hills Nursing Facility, in Morristown, NJ where she provides on-site comprehensive foot care for the residents. Dr. Ferrigno-Taddeo moved to NYC in 1995 to do her residency in podiatric surgery, at Wyckoff Heights Medical Center. After her training in NYC, she moved to NJ in 1997 and started her own group practice in Millburn. Dr. Ferrigno-Taddeo is also a consultant for Aetrex, Inc. She provides expert advice and professional insight on Aetrex’s products. She is the mother of 3 children and finds time to pursue her passion for physical fitness as a member of her local volleyball and softball leagues, and is also an avid snow skier.</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_BnfwkA": {
+          "type": "button",
+          "settings": {
+            "button_label": "LinkedIn",
+            "button_link": "https://www.linkedin.com/in/janine-ferrigno-taddeo-dpm-917169b0/",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_bEW4zq",
+        "text_rjxNcU",
+        "text_hBaFTz",
+        "button_BnfwkA"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/Dr.Janine.jpg",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "content_position": "align-self-center",
+        "image_mobile": "shopify://shop_images/Dr.Janine.jpg",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "center",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#0079b8",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "rich_text_JgfXNb",
+    "rich_text_AhWdpk",
+    "image_with_text_XPzLTV"
+  ]
+}

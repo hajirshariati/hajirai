@@ -1,0 +1,385 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "rich_text_AhWdpk": {
+      "type": "rich-text",
+      "blocks": {
+        "text_eGXbBJ": {
+          "type": "text",
+          "settings": {
+            "text": "<h2>NO HASSLE RETURNS</h2><h3>Easy Returns with Our Health Guarantee!</h3>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_eGXbBJ"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h3",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "empty_space_XR7ATn": {
+      "type": "empty-space",
+      "name": "Empty space",
+      "settings": {
+        "desktop_height": 40,
+        "mobile_height": 28,
+        "color_background": "",
+        "gradient_background": ""
+      }
+    },
+    "empty_space_wqedrq": {
+      "type": "empty-space",
+      "name": "Empty space",
+      "settings": {
+        "desktop_height": 40,
+        "mobile_height": 28,
+        "color_background": "",
+        "gradient_background": ""
+      }
+    },
+    "multicolumn_BTEYMD": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_yNHhyH": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image_ratio": "adapt",
+            "heading": "Step 1",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Visit our return portal and enter your order details.</p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_rFU7Jx": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image_ratio": "adapt",
+            "heading": "Step 2",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Choose your item and reason, then select the return method.</p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_EEKnXB": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image_ratio": "adapt",
+            "heading": "Step 3",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>You can either print your label or have your QR code ready and drop off your package at the designated store.</p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_yNHhyH",
+        "column_rFU7Jx",
+        "column_EEKnXB"
+      ],
+      "name": "Multicolumn",
+      "settings": {
+        "gap": "large",
+        "columns": 3,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "rich_text_AKxUXt": {
+      "type": "rich-text",
+      "blocks": {
+        "button_KgN8WG": {
+          "type": "button",
+          "settings": {
+            "button_label": "US Customer Returns",
+            "button_link": "https://returns.aetrex.com/",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_yrnn76": {
+          "type": "button",
+          "settings": {
+            "button_label": "Non-US Customer Returns",
+            "button_link": "https://web.global-e.com/Returns/Portal/mZnr",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "button_KgN8WG",
+        "button_yrnn76"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h3",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#50575e",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#90aab7",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_4kkUMM": {
+      "type": "rich-text",
+      "blocks": {
+        "text_yw8mXy": {
+          "type": "text",
+          "settings": {
+            "text": "<p>When you choose Aetrex, you make the healthy choice. Wear the shoes or Aetrex Orthotics and if you are not completely satisfied, return them to us. If you need detailed step-by-step instructions, please visit our <a href=\"https://support.aetrex.com/hc/en-us/articles/360007223654\">FAQ page</a> for further guidance.</p><p>The refund will be processed to the original form of payment and should be reflected in your account within 5 to 7 days from the day of the drop-off.</p><p><strong>A return fee of $5.95</strong> will be automatically deducted when processing your return</p><p>Shipping charges from the original order are non-refundable.</p><p>Styles discounted 60% off or more are final sale. Products marked Final Sale are non-refundable and cannot be returned.</p><p>Plantar Fasciitis Kit cannot be partially returned. All elements within the kit - Orthotic, roller, flips & guide must be returned back together. Products cannot be swapped for other colors or SKU's.</p><p><strong>Vera Boot and Rose Boot</strong> will exhibit a status of \"Waiting for Approval.\" In such cases, the Customer Service (CS) team will need to manually issue the shipping label. If you need further assistance with returns, or if you are past your return window, please contact our customer service team by phone (888-526-2739), chat, or email at <a href=\"mailto:returns@aetrex.com\">help@aetrex.com</a>.</p><p><strong>For customers located outside the US</strong>, kindly visit this <a href=\"https://support.aetrex.com/hc/en-us/articles/23333741401499--Return-Process-for-Customers-Outside-of-the-United-States\">link</a> to access the return procedure.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_yw8mXy"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "left",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 52,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "rich_text_zbz9Rd": {
+      "type": "rich-text",
+      "blocks": {
+        "text_wN9jCm": {
+          "type": "text",
+          "settings": {
+            "text": "<h4>Exchanges</h4><p>The most efficient method for exchanging a product is to initiate a return for your initial purchase using the provided instructions, and then proceed to make a new order. This approach guarantees a swift replacement of your product and reduces the risk of it becoming unavailable due to stock limitations during the exchange process.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_Lxry8G": {
+          "type": "text",
+          "settings": {
+            "text": "<h4>Warranty</h4><p>Our 6-month warranty covers any manufacturing defects in our products. If you encounter any issues within six months of purchase, we'll gladly offer a replacement if available or store credit.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_wN9jCm",
+        "text_Lxry8G"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "rich_text_AhWdpk",
+    "empty_space_XR7ATn",
+    "empty_space_wqedrq",
+    "multicolumn_BTEYMD",
+    "rich_text_AKxUXt",
+    "rich_text_4kkUMM",
+    "rich_text_zbz9Rd"
+  ]
+}

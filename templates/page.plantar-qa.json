@@ -1,0 +1,633 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "testimonials_banner_Cbhq4c": {
+      "type": "testimonials-banner",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/drd_a23d4e35-00b6-46f5-bf8f-7aa00a284f16.jpg",
+        "image_height": "adapt",
+        "content_position": "md:items-center md:justify-center",
+        "image_mobile": "shopify://shop_images/drm.jpg",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-center justify-center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "video_with_text_Rx8HBc": {
+      "type": "video-with-text",
+      "blocks": {
+        "text_6tU9rw": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Friday, April 1<br/><em>Plantar Fasciitis</em></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_6tU9rw"
+      ],
+      "name": "Video with text",
+      "settings": {
+        "video_url": "https://vimeo.com/695825785",
+        "cover_image": "shopify://shop_images/thumb_4.jpg",
+        "description": "",
+        "enable_video_autoplay": false,
+        "enable_video_looping": false,
+        "image_height": "adapt",
+        "video_width": "large",
+        "layout": "video_first",
+        "text_alignment": "center",
+        "content_position": "align-self-center",
+        "video_url_mobile": "https://vimeo.com/695825785",
+        "cover_image_mobile": "shopify://shop_images/thumb_4.jpg",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "center",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "#90abb7",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_g7G4Nb": {
+      "type": "rich-text",
+      "blocks": {
+        "text_CmAefH": {
+          "type": "text",
+          "settings": {
+            "text": "<p><em><strong>YOUR QUESTIONS</strong></em></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_CmAefH"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "#90abb7",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_DJRdNn": {
+      "type": "rich-text",
+      "blocks": {
+        "text_nXL9rw": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Choose your topic from the list below</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_nXL9rw"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "faq_HKU8NM": {
+      "type": "faq",
+      "blocks": {
+        "question_dicKY9": {
+          "type": "question",
+          "settings": {
+            "title": "Sheila W. : What is the difference between planter fasciitis and neuropathy?",
+            "text": "<p>Dr. George Ampat: Hi Sheila! Plantar fasciitis is a very common foot ailment that often feels like a pain in the heel or arch area, usually in the morning or after sitting down for a long period of time. Neuropathy is nerve damage in the feet and is often associated with diabetes. To help re-create the natural alignment in your feet, I recommend trying orthotics to help support each step. The Aetrex L420 Compete Posted Orthotics are great for plantar fasciitis; they have arch support and a posted heel to help keep the foot in the neutral position:<a href=\"https://www.aetrex.com/compete-orthotics-l420w-L420W.html?lang=en_US\"> https://www.aetrex.com/compete-orthotics-l420w-L420W.html?lang=en_US</a> If you have neuropathy, the Aetrex L200 Conform Orthotics are a supportive choice to help comfort and protect those with diabetes related foot issues:<a href=\"https://www.aetrex.com/conform-orthotics-l200w-L200W.html?lang=en_US\"> https://www.aetrex.com/conform-orthotics-l200w-L200W.html?lang=en_US</a> As always, it’s best to reach out to a physician if you are experiencing any type on foot pain.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_DhrBHV": {
+          "type": "question",
+          "settings": {
+            "title": "Michelle D. – Hello. I have been diagnosed with plantar fascia & heel tendinitis. What can I do for this? I work at Wal-Mart & I walk all day. The heel seems to bother me more. Thank you so much.",
+            "text": "<p>Dr. George Ampat: Hi Michelle and thank you for your question. I would recommend trying the Plantar Fasciitis Kit. The Kit includes a premium orthotic that has arch support and a posted heel to help align your body and prevent overpronation, a pair of orthotic flips to continue your recovery when you’re at home, a foot roller to help relieve pressure and tension in your feet, and a stretching guide to help support your recovery plan:<a href=\"https://www.aetrex.com/plantar-fasciitis-kit/?lang=en_US\">https://www.aetrex.com/plantar-fasciitis-kit/?lang=en_US</a>. These four tools work together to help relieve pain from plantar fasciitis.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_aBqMC6": {
+          "type": "question",
+          "settings": {
+            "title": "Jayashree S. : What type of footwear must one design and custom make for plantar patients?",
+            "text": "<p>Dr. George Ampat: Hi Jayashree! If you are experiencing symptoms of plantar fasciitis, it is extremely important to wear supportive shoes. People often shop with the visual style or appearance of the shoe in mind and tend to look past the comfort features. Finding a shoe that is supportive, comfortable, and has enough room inside to insert an orthotic is the key! If you do have plantar fasciitis, I recommend reaching out to a physician to help accurately diagnose you.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_FKAYaJ": {
+          "type": "question",
+          "settings": {
+            "title": "Mitali B. : Why are Aetrex orthotics better than custom orthotics and how do they help with Plantar Fasciitis?",
+            "text": "<p>Dr. George Ampat: Hello Mitali and thank you for this great question! Our feet were originally designed to walk barefoot on soft, uneven surfaces such as dirt, sand, and grass. However, today we walk mostly on hard surfaces and aren’t able to distribute pressure evenly. Aetrex Orthotics are made with premium, supportive, yet flexible materials to help naturally align your body and help transfer pressure away from high pressure areas. Custom orthotics are commonly very hard, rigid, and can cost a few hundred dollars. Not only are Aetrex Orthotics supportive, but they are also a fraction of the price and range from $60 - $80. Before spending a lot of money on an expensive custom orthotic, I recommend trying Aetrex Orthotics and to reach out to a physician to help you if you are experiencing symptoms of plantar fasciitis.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_zFFjPa": {
+          "type": "question",
+          "settings": {
+            "title": "Edna D. : What is the best way to treat heel spur?",
+            "text": "<p>Dr. George Ampat: Hi Edna and thank you for your question. Heel spurs are quite common and at most times not necessarily painful; in medicine we actually call them an “incidental finding.” I recommend seeing a physician to have an X-ray and diagnostic testing to confirm if the heel spur is the cause of the pain first. There are many reasons for heel pain like unsupportive shoes, plantar fasciitis, tendonitis, and more. Many surgeons do operate on heel spurs, but you need to verify if whether the heel spur is the cause of your pain. The simplest way to help with heel pain is to wear an orthotic. Again, ensure that the heel spur is the cause of the pain first by seeing a physician to make sure you are not labeling the heel spur as the cause when it may be something else.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_tLDpe9": {
+          "type": "question",
+          "settings": {
+            "title": "Sally L. : I have pain on my left foot occasionally on the arch, but primarily on the back of my heel near the Achilles tendon. It's a searing, burning pain as if I have a large blister on the back of my heel. Could this be plantar fasciitis? Should I have a physician evaluate my symptoms so a diagnosis can be made?",
+            "text": "<p>Dr. George Ampat: Hello Sally! Pain from plantar fasciitis is usually felt in the arch and heel, and the worst step is the first step in the morning. Since your pain is more in the arch area and on the back of the foot, it sounds like it could be symptoms of Achilles tendinitis. The simplest solution would be to try an orthotic and to see a physician to help you get a clear diagnosis.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_yBxyxd": {
+          "type": "question",
+          "settings": {
+            "title": "Richard F. : Will replays be available as I am not able to attend the April 8th webinar?",
+            "text": "<p>Dr. George Ampat: Hi Richard! Yes, all the Live videos will be posted afterwards here and also on Facebook, Instagram, Twitter, Vimeo, and YouTube.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_jyKe3h": {
+          "type": "question",
+          "settings": {
+            "title": "Sandra C. : If my plantar fasciitis is under control now and possibly healed, can it flare back up? In other words, do I have to forever stay vigilant when shopping for shoes?",
+            "text": "<p>Dr. George Ampat: Hi Sandra! In many cases, the plantar fasciitis may not come back again and you have relief from the plantar fasciitis you have had, but you must understand if you once had plantar fasciitis you should always be aware that there is a possibility it may come back. An orthotic is a great way to continue proper foot health and is not only needed when you have pain. For example, if you have a decaying tooth, then you don’t need tooth paste and a toothbrush at that moment. You need to use them even when your teeth are not decaying to help properly take care of them throughout your lifetime. Same goes for our foot health; we need to get good miles out of our feet and make sure we have the proper support. A car tire goes about 25,000 miles in a lifetime, but our feet go 110,00 miles in a lifetime; that’s almost 4 times around the globe! Therefore, it’s important to get your feet scanned to find out the best recommended orthotics for you so you can go the extra mile. It is important for everyone to wear good shoes with supportive insoles inside them and especially if you have had a previous episode of plantar fasciitis.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_MFp6YB": {
+          "type": "question",
+          "settings": {
+            "title": "Mary O. : I have plantar fasciitis I have ordered the Aetrex insert for that. What else do I need?",
+            "text": "<p>Dr. George Ampat: Hi Mary! The inserts are a great step towards relief from your plantar fasciitis, but it’s important to also make sure you are wearing supportive shoes and properly stretching your feet. The Plantar Fasciitis Kit includes a premium orthotic that has arch support and a posted heel to help align your body and prevent overpronation, a pair of orthotic flips to continue your recovery when you’re at home, a foot roller to help relieve pressure and tension in your feet, and a stretching guide to help support your recovery plan:<a href=\"https://www.aetrex.com/plantar-fasciitis-kit/?lang=en_US\">https://www.aetrex.com/plantar-fasciitis-kit/?lang=en_US</a>. If you are experiencing symptoms of plantar fasciitis it’s best to reach out to a physician for support and a diagnosis.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_mKB84d": {
+          "type": "question",
+          "settings": {
+            "title": "Theresa S. ; Hi Dr. Ampat, I have had plantar fasciitis for 7 months. I have been to physical therapy. It did help. Then the pain came back again. What can I do to help with this situation? I have tried different shoes etc. It will help for a little while then the pain seems to always comes back. Is this something that I will always have? Will it go away?  What can I do to help with this pain? Thank you for your time.",
+            "text": "<p>Dr. George Ampat: Hi Theresa and thank you for your valid question. It is good that you are wearing supportive shoes, but sometimes even supportive shoes do not have an orthotic built-in. Nearly 90 to 95% of plantar fasciitis will resolve with appropriate orthotic support and stretching exercises. I recommend that you use an appropriate orthotic and stretch the muscles both in your feet as well as the calf twice daily. This practice, if continued regularly, is likely to resolve your pain. If you are interested, I recommend trying the Plantar Fasciitis Kit. It includes a premium orthotic, a pair of orthotic flips, a foot roller to help relieve pressure and tension in your feet, and a stretching guide to help support your recovery plan:<a href=\"https://www.aetrex.com/plantar-fasciitis-kit/?lang=en_US\">https://www.aetrex.com/plantar-fasciitis-kit/?lang=en_US</a></p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_an8L38": {
+          "type": "question",
+          "settings": {
+            "title": "Dorothy Z. : I have a talonavicular joint problem with my right foot. What insole would you recommend to buy? Thank you",
+            "text": "<p>Dr. George Ampat: Thank you for your question, Dorothy. It depends on the extent of your talonavicular joint problem, but in most cases an orthotic with an arch support to restore your normal arches would be all that is required. However, if you have fixed flat feet then orthotics may not be suitable. I recommend consulting a qualified health professional to help you.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_3DqWqf": {
+          "type": "question",
+          "settings": {
+            "title": "Lori F. : I had plantar fasciitis and went to rehab. A month later I still have heel pain. Podiatrist gave me stretching exercises and talked about trying shadow stimulation for 5 sessions. Said it only works 50% of the time. Insurance doesn't cover it. I have bought Aetrex sandals and the Plantar Fasciitis Kit. Help. Should I get more rehab from a physical therapist?",
+            "text": "<p>Dr. George Ampat: Hi Lori and thank you for your genuine question. In most cases of plantar fasciitis, an appropriate orthotic to support the arches and cradle the foot alongside stretching exercises to stretch both the muscles in the feet and the back of the calf is all that is required. Currently I do not think more rehab from a physical therapist is required as long as you can perform the stretching exercises at home twice a day and also use the orthotic. If using the orthotic regularly and performing the stretching exercises twice a day for 15 minutes does not provide adequate relief, then I recommend that you seek advice from a suitably qualified health professional like a physical therapist.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_LQrNtj": {
+          "type": "question",
+          "settings": {
+            "title": "Dana R. : I have suffered from Plantar Fasciitis on and off for years, but last year I sustained an injury that I didn't realize the extent of and thought it would heal. Flash forward after an MRI, I have plantar fasciitis, arthritis, and Baxter's Neuropathy. I have worn a boot, been through physical therapy and both have made it worse not better. Doctor seems stumped. I am now scheduled to get nerve conduction studies. Any suggestions to heal Baxter?",
+            "text": "<p>Dr. George Ampat: Hi Dana and thank you for sharing your foot ailments. Baxter’s neuropathy is rare but can cause chronic heel pain which can mimic plantar fasciitis. It is good that you are seeking help from a qualified health professional. Stretching, orthotics, medications, injections, and surgery have a role in Baxter’s neuropathy. Following the advice of your health professional is the most appropriate action.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_Je8NwX": {
+          "type": "question",
+          "settings": {
+            "title": "Cindee J. - Don't know if I have this problem. I had plantar fasciitis before and the orthotics helped me a lot, but now I'm having slight heel pain again.",
+            "text": "<p>Dr. George Ampat: Hello Cindee and thank you for sharing your story. If you have had plantar fasciitis before, there might be a possibility it will come back again. If you are currently still wearing orthotics and are still experiencing pain, it may be time to replace your orthotics. I recommend changing orthotics every 6 to 9 months, depending on how frequently they are being used. Since the support does not feel as strong as it used to, it may be time to replace them. I recommend seeing if that helps and to reach out to a physician for a diagnosis.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_jmGaE4": {
+          "type": "question",
+          "settings": {
+            "title": "Marc A. - I don't understand, as it appears to me that Aetrex is only attempting to sell to 1/2 of the market. I have plantar fasciitis, Achilles tendonitis and Haglund’s deformity and have had a very hard time finding shoes that work well. Is there a particular shoe that Aetrex has that would work for a man's 7.5 or 8? I would gratefully appreciate any direction that you could provide. Thank you.",
+            "text": "<p>Dr. George Ampat: Hi Marc and thank you for sharing your story. Aetrex Orthotics can help relieve common foot pains like plantar fasciitis, heel pain, and more. At the moment, the only men’s shoes Aetrex sells are orthotic flips like Maui and Bali. We recommend trying a pair of orthotics with a posted heel and memory foam cushioning like L2220 Men’s Memory Foam Posted Orthotics to insert inside of your shoes:<a href=\"https://www.aetrex.com/memory-foam-orthotics-l2220-orthotics-L2220M.html?lang=en_US\">https://www.aetrex.com/memory-foam-orthotics-l2220-orthotics-L2220M.html?lang=en_US</a>I also recommend seeing a physician to help you get a diagnosis.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_C9xnjL": {
+          "type": "question",
+          "settings": {
+            "title": "Darlene – What can I do to cure Plantar Fasciitis?",
+            "text": "<p>Dr. George Ampat: Hi Darlene and thank you for your question. Many people with plantar fasciitis find relief with wearing an orthotic inside their supportive shoes. The key is to make sure that both your shoes and orthotics have the proper support features to help you go the extra mile. I recommend trying the Plantar Fasciitis Kit which includes a pair of premium orthotics, a pair of orthotic flips to wear around your home (especially since the first step in the morning is usually the most painful), a foot roller to help relieve pressure and tension in your feet, and a stretching guide to help support your recovery plan:<a href=\"https://www.aetrex.com/plantar-fasciitis-kit/?lang=en_US\">https://www.aetrex.com/plantar-fasciitis-kit/?lang=en_US</a>It would also be very beneficial to see a physician for a diagnosis.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_HRTPQ3": {
+          "type": "question",
+          "settings": {
+            "title": "Carleen H. - What is your best advice for getting rid of Plantar Fasciitis. Should I discontinue walking daily?",
+            "text": "<p>Dr. George Ampat: Hi Carleen! Wearing supportive footwear with orthotics and daily stretches can help relieve pain and discomfort from plantar fasciitis. The orthotics will help re-create the natural alignment in your feet and will help support each step you take. If you are interested, I recommend trying the Plantar Fasciitis Kit:<a href=\"https://www.aetrex.com/plantar-fasciitis-kit/?lang=en_US\">https://www.aetrex.com/plantar-fasciitis-kit/?lang=en_US</a>The kit includes a pair of premium orthotics, a pair of orthotic flips, a foot roller to help relieve pressure and tension in your feet, and a stretching guide to help support your recovery plan. Walking is a very healthy and beneficial activity; therefore, I would recommend wearing orthotics in your walking shoes to see if it helps. I also recommend reaching out to a physician for a diagnosis.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "question_dicKY9",
+        "question_DhrBHV",
+        "question_aBqMC6",
+        "question_FKAYaJ",
+        "question_zFFjPa",
+        "question_tLDpe9",
+        "question_yBxyxd",
+        "question_jyKe3h",
+        "question_MFp6YB",
+        "question_mKB84d",
+        "question_an8L38",
+        "question_3DqWqf",
+        "question_LQrNtj",
+        "question_Je8NwX",
+        "question_jmGaE4",
+        "question_C9xnjL",
+        "question_HRTPQ3"
+      ],
+      "name": "FAQ",
+      "settings": {
+        "style": "with-border",
+        "heading": "Plantar Fasciitis",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h3",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#ffffff",
+        "overlay_opacity": 0,
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_4ndgUW": {
+      "type": "rich-text",
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "multicolumn_aUPeic": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_mmpryV": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/Plantar_Fasciitis_Kit.webp",
+            "image_ratio": "square",
+            "heading": "<em>Plantar Fasciitis Kit</em>",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://products/men-plantar-fasciitis-kit",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_4xHh9U": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/L420M_catalog.jpg",
+            "image_ratio": "square",
+            "heading": "<em>Compete Posted Orthotics</em>",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://products/l420m-m",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_YBzYLm": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/AS251W_catalog_a8a0fcd0-5eb9-46c1-9798-1a7f59483bf6.jpg",
+            "image_ratio": "square",
+            "heading": "<em>Carly Arch Support Sneakers</em>",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://products/carly",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_KDKzqw": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image_ratio": "square",
+            "heading": "<em>Jillian Braided Quarter Strap</em>",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://products/jillian",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_mmpryV",
+        "column_4xHh9U",
+        "column_YBzYLm",
+        "column_KDKzqw"
+      ],
+      "name": "Multicolumn",
+      "settings": {
+        "gap": "large",
+        "columns": 4,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "Recommended Products for Plantar Fasciitis",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h4",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "#fafafa",
+        "color_button_background": "#90abb7",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "rich_text_j6dhFt": {
+      "type": "rich-text",
+      "blocks": {
+        "text_KA6KQt": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Terms of Use: Aetrex & Dr. George Ampat will not provide diagnosis, treatment, or medical advice; however, the text, graphics, images & other materials are for informational purposes only. Always seek the advice of your physician or other qualified health providers with any questions you may have regarding a medical condition.</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 18,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_KA6KQt"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 48,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "testimonials_banner_Cbhq4c",
+    "video_with_text_Rx8HBc",
+    "rich_text_g7G4Nb",
+    "rich_text_DJRdNn",
+    "faq_HKU8NM",
+    "rich_text_4ndgUW",
+    "multicolumn_aUPeic",
+    "rich_text_j6dhFt"
+  ]
+}

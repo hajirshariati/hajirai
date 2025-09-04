@@ -1,0 +1,281 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "rich_text_MLXerj": {
+      "type": "rich-text",
+      "blocks": {
+        "text_yKxt79": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Albert 3DFit in the News</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 40,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_yKxt79"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#ffffff",
+        "color_background": "#99a4ad",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 8,
+        "padding_bottom": 8,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "rich_text_PQMMkc": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_zkEGM7": {
+          "type": "heading",
+          "settings": {
+            "heading": "Recent News",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_zkEGM7"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#6f6f6f",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 40,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "multicolumn_UYfLa9": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_TqA4EP": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "left",
+            "text_alignment_mobile": "left",
+            "image": "shopify://shop_images/12.jpg",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "<p><strong>How New 3D Shoe Fitting Technology Minimizes Online Returns</strong></p><p>Sourcing Journal, June 2021</p><p><a href=\"https://sourcingjournal.com/footwear/footwear-innovations/aetrex-3dfit-foot-scanning-footwear-shoe-fitting-online-returns-283121/\" target=\"_blank\">Read more...</a></p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_R6w7Bm": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "left",
+            "text_alignment_mobile": "left",
+            "image": "shopify://shop_images/13.jpg",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "<p><strong>Aetrex 3DFit Foot Scanning Technology Available To All Retailers</strong></p><p>SGB Media, June 2021</p><p><a href=\"https://sgbonline.com/pressrelease/aetrex-3dfit-foot-scanning-technology-available-to-all-retailers/\" target=\"_blank\">Read more...</a></p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_TqA4EP",
+        "column_R6w7Bm"
+      ],
+      "name": "Multicolumn",
+      "settings": {
+        "gap": "large",
+        "columns": 2,
+        "columns_mobile": "1",
+        "carousel_on_desktop": true,
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 44,
+        "padding_bottom": 48,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "multicolumn_aNeFHV": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_dmfXpq": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "left",
+            "text_alignment_mobile": "left",
+            "image": "shopify://shop_images/07.jpg",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "<p><strong>CES 2022: Aetrex Albert Pro Integrates Multiple Technologies To Create Ultimate Retail Footwear Assistant</strong></p><p>International Business Times, January 2022</p><p><a href=\"https://www.ibtimes.com/ces-2022-aetrex-albert-2-pro-integrates-multiple-technologies-create-ultimate-retail-3362585\" target=\"_blank\">Read more...</a></p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_dmfXpq"
+      ],
+      "name": "Multicolumn",
+      "settings": {
+        "gap": "large",
+        "columns": 3,
+        "columns_mobile": "1",
+        "carousel_on_desktop": true,
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 44,
+        "padding_bottom": 12,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "rich_text_MLXerj",
+    "rich_text_PQMMkc",
+    "multicolumn_UYfLa9",
+    "multicolumn_aNeFHV"
+  ]
+}

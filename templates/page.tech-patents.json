@@ -1,0 +1,286 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "testimonials_banner_Cbhq4c": {
+      "type": "testimonials-banner",
+      "name": "Testimonials banner",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/PATENTS_1920X475_90133aa0-ae0f-4537-bec0-445285eb7985.png",
+        "image_height": "adapt",
+        "content_position": "md:items-center md:justify-center",
+        "image_mobile": "shopify://shop_images/patent-mobile.jpg",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-center justify-center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 0,
+        "padding_top": 12,
+        "padding_bottom": 0,
+        "divider": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_MLXerj": {
+      "type": "rich-text",
+      "blocks": {
+        "text_yKxt79": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Patents</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 40,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_yKxt79"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#ffffff",
+        "color_background": "#99a4ad",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 8,
+        "padding_bottom": 8,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "rich_text_bGVzXB": {
+      "type": "rich-text",
+      "blocks": {
+        "text_kgcbmH": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Aetrex is proud to present its granted Technology Patents.</p><p>Please note that this list does not include Aetrex’s Footwear and Orthotic Patents.</p>",
+            "text_font": "heading",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_kgcbmH"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#6f6f6f",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "multicolumn_with_icons_38hxfD": {
+      "type": "multicolumn-with-icons",
+      "blocks": {
+        "column_ximJTH": {
+          "type": "column",
+          "settings": {
+            "icon": "none",
+            "custom_icon": "",
+            "heading": "<strong>US Patents:</strong>",
+            "text": "<p>US 7,493,230<br/>US 9,449,141<br/>US 9,760,674<br/>US 9,892,228<br/>US 10,188,319<br/>US 10,327,502<br/>US 10,417,772<br/>US 10,463,257<br/>US 10,492,712<br/>US 10,496,786<br/>US 10,528,032<br/>US 10,842,220<br/>US 11,151,738<br/>US 11,260,597<br/>US 11,694,096<br/>US 11,730,230<br/>US 11,822,861<br/>US 11,900,625<br/>US 11,978,204<br/>US D702,573<br/>US D714,343<br/>US D732,055<br/>US D868,258<br/>US D972,727<br/><br/></p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_wtWptB": {
+          "type": "column",
+          "settings": {
+            "icon": "none",
+            "custom_icon": "",
+            "heading": "<strong>International Patents:</strong>",
+            "text": "<p>CN 101410843B<br/>CN 110505816B<br/>CN ZL202130247055.3<br/>EP 1971946 B1<br/>EU 008519086-0002<br/>EU 008519086-0003<br/>EU 008519086-0001<br/>IL188645A<br/><br/></p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_ximJTH",
+        "column_wtWptB"
+      ],
+      "name": "Multicolumn with icons",
+      "settings": {
+        "style": "with-border",
+        "columns": 2,
+        "text_alignment": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "rich_text_dt7DVM": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_eNxKBh": {
+          "type": "heading",
+          "settings": {
+            "heading": "",
+            "heading_size": "title-lg tracking-heading",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_LF8gkc": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Aetrex, Inc.’s foot scanning technology and products are protected by one or more of the above United States and international patents. The list may not be all inclusive, and other Aetrex technologies and products not listed here also may be protected by one or more patents. Patent applications may be pending or published, and patents may have been issued in the United States and elsewhere which are not identified on this list.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_eNxKBh",
+        "text_LF8gkc"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 48,
+        "padding_bottom": 48,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "testimonials_banner_Cbhq4c",
+    "rich_text_MLXerj",
+    "rich_text_bGVzXB",
+    "multicolumn_with_icons_38hxfD",
+    "rich_text_dt7DVM"
+  ]
+}

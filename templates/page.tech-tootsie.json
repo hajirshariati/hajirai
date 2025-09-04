@@ -1,0 +1,205 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "testimonials_banner_Cbhq4c": {
+      "type": "testimonials-banner",
+      "name": "Testimonials banner",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/Tootsie_header_1920x475_8004cef1-42ba-41b7-9753-19c854f6b121.jpg",
+        "image_height": "adapt",
+        "content_position": "md:items-center md:justify-center",
+        "image_mobile": "shopify://shop_images/Tootsie_header_1920x475_6da1f6ce-e214-460a-888f-cbab10a63611.png",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-center justify-center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_MLXerj": {
+      "type": "rich-text",
+      "blocks": {
+        "text_yKxt79": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Tootsie™ Foot Scanning for Children</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 40,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_yKxt79"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#ffffff",
+        "color_background": "#97a6a9",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "image_with_text_j3Lqy7": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_rFDjtY": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Kids Shoe Shopping is Finally Fun!</p>",
+            "text_font": "heading",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_MELpTw": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Introducing Tootsie, the first 3D foot scanning experience just for kids! Click the video below to meet Tootsie, our friendly foot scanning monster who guides kids through the process of getting their feet scanned. The Tootsie software will help drive traffic to your store, create a really fun experience for children and parents, and build customer loyalty.<br/><br/>Upon a scan in store, parents and children will get highly accurate 3D foot size measurements and a recommended footwear size. Parents will then receive a follow-up email with the child’s 3D measurements immediately following a scan and at the 6-month mark as a reminder to come back into the store and get scanned again. Children’s tootsies grow so fast, and Tootsie will be there to guide them along the way to help them get the best fitting footwear for their growing feet.<br/><br/>Make it even more fun! Ask your Regional Manager about Tootsie promotional items to make a lasting impression at your launch event.<br/><br/></p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_JyPqnk": {
+          "type": "button",
+          "settings": {
+            "button_label": "Watch Tootsie in Action",
+            "button_link": "https://cdn.shopify.com/videos/c/o/v/5bed42f19ac3498296211a4c3c304477.mov",
+            "button_style": "link",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_XBzAkd": {
+          "type": "button",
+          "settings": {
+            "button_label": "View the Print Ad",
+            "button_link": "https://cdn.shopify.com/s/files/1/0860/3634/9241/files/FN_Tootsie.jpg?v=1750269356",
+            "button_style": "link",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_fFqDBb": {
+          "type": "button",
+          "settings": {
+            "button_label": "Read the Article in Footwear News",
+            "button_link": "https://footwearnews.com/business/retail/3d-scan-kids-shoe-shopping-aetrex-1234723176/",
+            "button_style": "link",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_rFDjtY",
+        "text_MELpTw",
+        "button_JyPqnk",
+        "button_XBzAkd",
+        "button_fFqDBb"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/Kid_Tootsie.jpg",
+        "image_height": "adapt",
+        "image_width": "medium",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 48,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "testimonials_banner_Cbhq4c",
+    "rich_text_MLXerj",
+    "image_with_text_j3Lqy7"
+  ]
+}

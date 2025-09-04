@@ -1,0 +1,135 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "multicolumn_VFRYNq": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_xCigPd": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/technology_flipbook_singles.jpg",
+            "image_ratio": "landscape",
+            "heading": "<a href=\"https://rvq643.saas.contentserv.com/admin/rest/gtstream/stream/assets/Aetrex%20B2B/technology_flipbook_singles_2025.pdf\" title=\"Aetrex Foot Scanning Technology\"><em>Aetrex Foot Scanning Technology</em></a>",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "Download PDF",
+            "button_link": "https://rvq643.saas.contentserv.com/admin/rest/gtstream/stream/assets/Aetrex%20B2B/technology_flipbook_singles_2025.pdf",
+            "button_style": "link",
+            "button_external": true,
+            "button_icon": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_x6DU8A": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/ss26fw25catalog.png",
+            "image_ratio": "landscape",
+            "heading": "<a href=\"https://rvq643.saas.contentserv.com/admin/rest/gtstream/stream/assets/Files/FW25_SS25_Catalog_FINL[1].pdf\" title=\"Aetrex Footwear Catalog\"><em>Aetrex Footwear Catalog</em></a>",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "Download PDF",
+            "button_link": "https://rvq643.saas.contentserv.com/admin/rest/gtstream/stream/assets/Files/v7_final_SS26_FW25_FOOTWEAR_CATALOG.pdf",
+            "button_style": "link",
+            "button_external": true,
+            "button_icon": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_rxnPUX": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/2024_catalog-thumbnail.jpg",
+            "image_ratio": "landscape",
+            "heading": "<a href=\"https://rvq643.saas.contentserv.com/admin/rest/gtstream/stream/assets/Aetrex%20B2B/NEW.Orthotics.Catalog_2025.pdf\" title=\"New 2024Orthotic Catalog\"><em>Aetrex Orthotic Catalog</em></a>",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "Download PDF",
+            "button_link": "https://rvq643.saas.contentserv.com/admin/rest/gtstream/stream/assets/Aetrex%20B2B/NEW.Orthotics.Catalog_2025.pdf",
+            "button_style": "link",
+            "button_external": true,
+            "button_icon": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_xCigPd",
+        "column_x6DU8A",
+        "column_rxnPUX"
+      ],
+      "name": "Multicolumn",
+      "settings": {
+        "gap": "large",
+        "columns": 3,
+        "columns_mobile": "1",
+        "carousel_on_desktop": false,
+        "swipe_on_mobile": false,
+        "heading": "Catalogs",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "#5286c2",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "multicolumn_VFRYNq"
+  ]
+}

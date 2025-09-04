@@ -1,0 +1,288 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "type": "footer",
+  "name": "t:sections.footer-group.name",
+  "sections": {
+    "multicolumn-with-icons": {
+      "type": "multicolumn-with-icons",
+      "blocks": {
+        "column-1": {
+          "type": "column",
+          "settings": {
+            "icon": "support",
+            "custom_icon": "",
+            "heading": "Customer service",
+            "text": "<p><a href=\"https://www.aetrex.com/#\" title=\"#\">Click here </a>to consult with our specialists for a personalized product recommendation for your specific needs.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column-2": {
+          "type": "column",
+          "settings": {
+            "icon": "check_mark",
+            "custom_icon": "",
+            "heading": "No Hassle Returns",
+            "text": "<p>We offer quick, easy returns</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column-3": {
+          "type": "column",
+          "settings": {
+            "icon": "users",
+            "custom_icon": "",
+            "heading": "Refer a friend",
+            "text": "<p>Refer a friend and get 20% off each other.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column-4": {
+          "type": "column",
+          "settings": {
+            "icon": "lock",
+            "custom_icon": "",
+            "heading": "Secure payment",
+            "text": "<p>Safe and secure checkout with Signifyd technology.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column-1",
+        "column-2",
+        "column-3",
+        "column-4"
+      ],
+      "settings": {
+        "style": "with-border",
+        "columns": 4,
+        "text_alignment": "left",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "#f4f4f4",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 60,
+        "padding_bottom": 60,
+        "divider": true,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "multicolumn_with_icons_4NxwpQ": {
+      "type": "multicolumn-with-icons",
+      "blocks": {
+        "column_NDbHhg": {
+          "type": "column",
+          "settings": {
+            "icon": "email",
+            "custom_icon": "",
+            "heading": "Stay Connected",
+            "text": "<p>Sign up for the latest news and offers.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_VUmab6": {
+          "type": "column",
+          "settings": {
+            "icon": "star",
+            "custom_icon": "",
+            "heading": "Aetrex Access",
+            "text": "<p>Join and get <strong>FREE SHIPPING</strong> on all orders.<br/>Plus earn points & exclusive rewards.</p><p><a href=\"https://www.aetrex.com/pages/rewards\">Join Now</a></p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_DMJnkL": {
+          "type": "column",
+          "settings": {
+            "icon": "truck",
+            "custom_icon": "",
+            "heading": "Order Tracking",
+            "text": "<p>Find our when your online purchase<br/>will arrive at your home.</p><p><a href=\"https://orders.aetrex.com/\">Track Now</a></p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_NDbHhg",
+        "column_VUmab6",
+        "column_DMJnkL"
+      ],
+      "name": "Multicolumn with icons",
+      "settings": {
+        "style": "with-border",
+        "columns": 3,
+        "text_alignment": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#ffffff",
+        "color_background": "#1f1f1f",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 52,
+        "padding_bottom": 28,
+        "divider": false,
+        "full_width": false,
+        "rounded": true
+      }
+    },
+    "footer": {
+      "type": "footer",
+      "blocks": {
+        "store_info_aLFGMz": {
+          "type": "store_info",
+          "settings": {
+            "heading": "Contact Us",
+            "hours_icon": "shopify://shop_images/clock-three-svgrepo-com.svg",
+            "hours": "<p>Mon - Fri: 8:30am - 12:00am ET<br/>Sat - Sun: 9:00am - 12:00am ET</p>",
+            "phone_icon": "shopify://shop_images/call-receive-svgrepo-com.svg",
+            "phone": "1.888.526.2739",
+            "contact_icon": "shopify://shop_images/mail-alt-3-svgrepo-com.svg",
+            "contact_text": "Contact Us",
+            "contact_url": "shopify://pages/contact-us",
+            "chat_icon": "shopify://shop_images/chat-round-dots-svgrepo-com.svg",
+            "chat_text": "Live Chat",
+            "chat_url": "#",
+            "locator_icon": "shopify://shop_images/location-pin-svgrepo-com_1.svg",
+            "locator_text": "Store Locator",
+            "locator_url": "shopify://pages/store-locator"
+          }
+        },
+        "link_list-1": {
+          "type": "link_list",
+          "settings": {
+            "heading": "About Aetrex",
+            "menu": "about-aetrex",
+            "opened": false
+          }
+        },
+        "link_list-2": {
+          "type": "link_list",
+          "settings": {
+            "heading": "Customer Service",
+            "menu": "footer",
+            "opened": false
+          }
+        },
+        "link_list_wjmakC": {
+          "type": "link_list",
+          "settings": {
+            "heading": "Dealer Resources",
+            "menu": "dealer-resources",
+            "opened": false
+          }
+        },
+        "link_list_j6EGHB": {
+          "type": "link_list",
+          "settings": {
+            "heading": "Accessibility",
+            "menu": "accessibility",
+            "opened": false
+          }
+        }
+      },
+      "block_order": [
+        "store_info_aLFGMz",
+        "link_list-1",
+        "link_list-2",
+        "link_list_wjmakC",
+        "link_list_j6EGHB"
+      ],
+      "settings": {
+        "invert_newsletter_others": true,
+        "enable_newsletter": false,
+        "newsletter_heading": "Sign up and save",
+        "newsletter_heading_size": "md:title-lg",
+        "newsletter_text": "<p>Be the first to know when we launch.</p>",
+        "newsletter_logo_height": 50,
+        "show_newsletter": true,
+        "newsletter_title": "Stay Connected",
+        "newsletter_description": "Sign up for the latest news and offers.",
+        "footer_form_id": "",
+        "show_social": false,
+        "enable_follow_on_shop": false,
+        "color_text": "#ffffff",
+        "color_background": "#1f1f1f",
+        "gradient_background": "",
+        "color_button_text": "#000000",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": false,
+        "rounded": true,
+        "enable_parallax": false
+      }
+    },
+    "footer-copyright": {
+      "type": "footer-copyright",
+      "settings": {
+        "enable_language_selector": false,
+        "enable_country_selector": false,
+        "show_policy": true,
+        "show_payment_icons": false,
+        "monochrome_payment_icons": false,
+        "show_copyright": true,
+        "copyright_text": "",
+        "color_text": "#ffffff",
+        "color_background": "#171717",
+        "gradient_background": "",
+        "divider": false,
+        "full_width": true,
+        "rounded": true,
+        "enable_parallax": true
+      }
+    }
+  },
+  "order": [
+    "multicolumn-with-icons",
+    "multicolumn_with_icons_4NxwpQ",
+    "footer",
+    "footer-copyright"
+  ]
+}

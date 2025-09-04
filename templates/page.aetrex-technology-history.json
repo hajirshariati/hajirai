@@ -1,0 +1,302 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "testimonials_banner_Cbhq4c": {
+      "type": "testimonials-banner",
+      "name": "Testimonials banner",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/banner_about_cd318f39-c7b4-4fc5-85dc-ae22ab3dbfd2.jpg",
+        "image_height": "adapt",
+        "content_position": "md:items-center md:justify-center",
+        "image_mobile": "shopify://shop_images/banner_about_cd318f39-c7b4-4fc5-85dc-ae22ab3dbfd2.png",
+        "image_height_mobile": "300px",
+        "content_position_mobile": "items-center justify-center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 0,
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_bGVzXB": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_7E9VQ9": {
+          "type": "heading",
+          "settings": {
+            "heading": "About Aetrex Technology",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_GLBLQW": {
+          "type": "text",
+          "settings": {
+            "text": "<h5>Science & Technology for Better Health & Comfort ®</h5>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_7E9VQ9",
+        "text_GLBLQW"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_AhWdpk": {
+      "type": "rich-text",
+      "blocks": {
+        "text_eGXbBJ": {
+          "type": "text",
+          "settings": {
+            "text": "<h4>Aetrex History</h4><p>Founded in 1946, Aetrex is the global leader in foot scanning technology and aftermarket orthotics. For more than 74 years Aetrex has designed innovative products that provide unmatched support, offset pressure, and better align the body. The goal: not only to deliver incredible comfort, but to help consumers avoid setbacks, keeping them active and healthy doing the things they love.</p><p>Aetrex combines its history of foot health expertise with more than 20 years of experience developing software and hardware. In 1999 Aetrex created the Foot Health Network, designing websites for retailers, and driving customers to their websites and stores to purchase products to help with their foot care needs. The next step, the creation of Foot.com in 2000, to this day, is the world’s foremost resource for foot health information.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_eGXbBJ"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "heading": "",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h3",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_WRUBda": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_Q8H6iH": {
+          "type": "heading",
+          "settings": {
+            "heading": "",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_CLtjRE": {
+          "type": "text",
+          "settings": {
+            "text": "<h4>Pressure</h4><p>Aetrex pioneered foot scanning technology to consumer markets in 2002 with the introduction of pressure plate technology called iStep, a revolutionary retail platform. The scanning system was designed to differentiate a store’s fit experience by capturing pressure data underfoot to help stores gather unique information to market to its customers and drive enormous untapped profit through the custom selection of foot-type specific orthotics.</p><p>Since 2002, Aetrex has placed over 10,000 scanners worldwide that have performed more than 40 million unique customer foot scans, currently averaging more than 2.5 million scans a year. Aetrex has built the infrastructure and cultivated the hard- won know-how to make the integrated foot scanning program a massive success for our partners. The Aetrex team includes a 30-person global sales and service organization, extensive in-house support, and a diverse team of tech developers, including experts in software coding, machine learning, computer vision, and optical and electrical engineers.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_Q8H6iH",
+        "text_CLtjRE"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/istep.jpg",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/istep.jpg",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_Yg6Ybb": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_gMFGKf": {
+          "type": "text",
+          "settings": {
+            "text": "<h4>Mobile Integration</h4><p>In 2018 Aetrex acquired SOLS, the leading developer of mobile device foot-scanning applications, and launched the Albert Control Panel CRM, which provides partners access to all data points collected at the scanners. The control panel stores a wide range of data about consumers’ feet which can be used for R&D, merchandising, and to create powerful, personalized digital marketing campaigns to targeted consumers.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_gMFGKf"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/sizeright_mobile_600px.jpg",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/sizeright_mobile_600px.jpg",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "video_mDmK3X": {
+      "type": "video",
+      "name": "Video",
+      "settings": {
+        "transparent_header": false,
+        "video_url": "https://vimeo.com/337555857",
+        "cover_image": "shopify://shop_images/About_Aetrex_Technology.jpg",
+        "description": "",
+        "enable_video_autoplay": false,
+        "enable_video_looping": false,
+        "image_height": "adapt",
+        "video_url_mobile": "https://vimeo.com/337555857",
+        "cover_image_mobile": "shopify://shop_images/About_Aetrex_Technology.jpg",
+        "image_height_mobile": "auto",
+        "padding_top": 24,
+        "padding_bottom": 48,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "testimonials_banner_Cbhq4c",
+    "rich_text_bGVzXB",
+    "rich_text_AhWdpk",
+    "image_with_text_WRUBda",
+    "image_with_text_Yg6Ybb",
+    "video_mDmK3X"
+  ]
+}

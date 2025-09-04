@@ -1,0 +1,961 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "slideshow_FWtLKn": {
+      "type": "slideshow",
+      "blocks": {
+        "image_t4b7Uf": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/1920x700_Ariel_Black_top_banner_e920fce1-a47e-4189-942c-491cd2e6ca9a.png",
+            "image_mobile": "shopify://shop_images/Spring_25_Collection_M3.png",
+            "heading": "Summer '25 Collection - Smart Support. Pain-free Steps. All Spring Long",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "button_label": "SHOP SUMMER COLLECTION",
+            "button_link": "shopify://collections/summer-collection",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "image_89rbRz": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/655x456_Mobile_Courtney_BlackCutout_CA120_7738_fb4c3f74-f430-40f6-8c18-1a878559707e.png",
+            "image_mobile": "shopify://shop_images/Superior_Sneakers_M3.png",
+            "heading": "Superior Sneakers - Say Hello to Comfort & Goodbye to Foot Pain",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "button_label": "SHOP SNEAKERS",
+            "button_link": "shopify://collections/womens-sneakers",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "image_GBXdxP": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/mobile_Josie_Champagne_SC221_4934_4a43fa78-41f5-4957-9868-689f3eeaff19.jpg",
+            "image_mobile": "shopify://shop_images/New_Spring_Styles_M3.png",
+            "heading": "New Summer Styles - Healthy Comfort Starts Here!®",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "button_label": "SHOP NEW ARRIVALS",
+            "button_link": "shopify://collections/womens-new-arrivals",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "image_t4b7Uf",
+        "image_89rbRz",
+        "image_GBXdxP"
+      ],
+      "custom_css": [],
+      "name": "Slideshow",
+      "settings": {
+        "autoplay": true,
+        "autoplay_speed": 5,
+        "show_navigation": true,
+        "image_height": "adapt",
+        "content_width": "small",
+        "image_height_mobile": "adapt",
+        "accessibility_info": "Slideshow about our brand",
+        "color_text": "#525252",
+        "color_background": "rgba(0,0,0,0)",
+        "gradient_background": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 0,
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_overlay_e9GhwP": {
+      "type": "image-with-text-overlay",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/tamara_D_a3d21c7c-7d80-43e0-b933-ff29935f442a.gif",
+        "image_height": "adapt",
+        "content_width": "small",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/tamara_M_279272c9-e13d-48e8-b000-0cc612ff6524.jpg",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 70,
+        "padding_top": 36,
+        "padding_bottom": 36,
+        "divider": true,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "scrolling_text_tVKedi": {
+      "type": "scrolling-text",
+      "blocks": {
+        "text_T36ate": {
+          "type": "text",
+          "settings": {
+            "text": "30 DAY WEAR TEST , PLUS EASY RETURNS",
+            "text_size": 26,
+            "text_font": "body",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_T36ate"
+      ],
+      "settings": {
+        "direction": "left",
+        "speed": 1,
+        "grid_horizontal": 75,
+        "enable_twin": false,
+        "enable_parallax": false,
+        "color_text": "",
+        "color_background": "#efeae6",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "padding_top": 16,
+        "padding_bottom": 16,
+        "divider": false,
+        "rounded": false
+      }
+    },
+    "collection_list_q7Rypj": {
+      "type": "collection-list",
+      "blocks": {
+        "collection_6iykJg": {
+          "type": "collection",
+          "settings": {
+            "collection": "womens-sandals",
+            "image": "shopify://shop_images/Sandals_0e3a64ec-f790-4efd-b3ec-b1b92f015ed3.png",
+            "title": "SANDALS",
+            "heading_font_size": 16,
+            "description": "",
+            "overlay_content": false,
+            "text_position": "bottom",
+            "title_shadow": false,
+            "color_text": "#171717",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "collection_UFADDM": {
+          "type": "collection",
+          "settings": {
+            "collection": "womens-wedges-heels",
+            "image": "shopify://shop_images/Wedges_Heels_ee9e52bb-58bc-4edc-85c2-5b6b70590fd1.png",
+            "title": "WEDGES & HEELS",
+            "heading_font_size": 16,
+            "description": "",
+            "overlay_content": false,
+            "text_position": "bottom",
+            "title_shadow": false,
+            "color_text": "#171717",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "collection_6NeXRg": {
+          "type": "collection",
+          "settings": {
+            "collection": "womens-sneakers",
+            "image": "shopify://shop_images/Sneakers_9347202f-883a-4054-a367-840d1673a259.png",
+            "title": "SNEAKERS",
+            "heading_font_size": 16,
+            "description": "",
+            "overlay_content": false,
+            "text_position": "bottom",
+            "title_shadow": false,
+            "color_text": "#171717",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "collection_b6zYFq": {
+          "type": "collection",
+          "settings": {
+            "collection": "womens-flip-flop-sandals",
+            "image": "shopify://shop_images/flips_8c5c4a61-3b54-451e-acd8-35bdc2c948f6.png",
+            "title": "FLIPS",
+            "heading_font_size": 16,
+            "description": "",
+            "overlay_content": false,
+            "text_position": "bottom",
+            "title_shadow": false,
+            "color_text": "#171717",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "collection_D7JLdh": {
+          "type": "collection",
+          "settings": {
+            "collection": "womens-casuals",
+            "image": "shopify://shop_images/Casuals_2ed0a5bd-d5c0-401d-a8d3-0f617e069b02.png",
+            "title": "CASUALS",
+            "heading_font_size": 16,
+            "description": "",
+            "overlay_content": false,
+            "text_position": "bottom",
+            "title_shadow": false,
+            "color_text": "#171717",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "collection_AefeLJ": {
+          "type": "collection",
+          "settings": {
+            "collection": "womens-slippers",
+            "image": "shopify://shop_images/slippers_16225ef4-55b4-4911-a55c-f1928247b3c9.png",
+            "title": "SLIPPERS",
+            "heading_font_size": 16,
+            "description": "",
+            "overlay_content": false,
+            "text_position": "bottom",
+            "title_shadow": false,
+            "color_text": "#171717",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "collection_tHYraX": {
+          "type": "collection",
+          "settings": {
+            "collection": "womens-clogs",
+            "image": "shopify://shop_images/Clog_6aa98460-00b3-41c4-8d51-b33a611b361e.png",
+            "title": "CLOGS",
+            "heading_font_size": 16,
+            "description": "",
+            "overlay_content": false,
+            "text_position": "bottom",
+            "title_shadow": false,
+            "color_text": "#171717",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "collection_LCmgJQ": {
+          "type": "collection",
+          "settings": {
+            "collection": "womens-boots",
+            "image": "shopify://shop_images/Boots_31d6a537-6d19-4f8c-baf9-de93206db007.png",
+            "title": "BOOTS",
+            "heading_font_size": 16,
+            "description": "",
+            "overlay_content": false,
+            "text_position": "bottom",
+            "title_shadow": false,
+            "color_text": "#171717",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0
+          }
+        }
+      },
+      "block_order": [
+        "collection_6iykJg",
+        "collection_UFADDM",
+        "collection_6NeXRg",
+        "collection_b6zYFq",
+        "collection_D7JLdh",
+        "collection_AefeLJ",
+        "collection_tHYraX",
+        "collection_LCmgJQ"
+      ],
+      "custom_css": [],
+      "settings": {
+        "columns": 4,
+        "carousel_on_desktop": false,
+        "image_type": "collection",
+        "image_ratio": "square",
+        "show_products_count": false,
+        "show_view_all": false,
+        "columns_mobile": "2",
+        "swipe_on_mobile": false,
+        "heading": "WOMEN'S STYLES",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h3",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 36,
+        "padding_bottom": 36,
+        "divider": false,
+        "full_width": true,
+        "rounded": false
+      }
+    },
+    "multicolumn_9UNM8U": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_637eWd": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/pain_relief_icon_75px.png",
+            "image_ratio": "adapt",
+            "heading": "PAIN RELIEF",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_wecJTc": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/arch_supp_icon_75px.png",
+            "image_ratio": "adapt",
+            "heading": "ARCH SUPPORT",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_m8nkAK": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/align_icon_75px.png",
+            "image_ratio": "adapt",
+            "heading": "ALIGNMENT",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_jFkxBd": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/memory_foam_icon_75px.png",
+            "image_ratio": "adapt",
+            "heading": "CUSHIONING",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_637eWd",
+        "column_wecJTc",
+        "column_m8nkAK",
+        "column_jFkxBd"
+      ],
+      "settings": {
+        "gap": "large",
+        "columns": 3,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#ffffff",
+        "color_background": "#d8ccc7",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 36,
+        "padding_bottom": 36,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "collection_list_fgPMz9": {
+      "type": "collection-list",
+      "blocks": {
+        "collection_YbUxUk": {
+          "type": "collection",
+          "settings": {
+            "collection": "womens-new-arrivals",
+            "image": "shopify://shop_images/NewArrivals_605x480_c9dc832c-964c-49e0-a345-9ac3ebf9d5ba.png",
+            "title": "New Arrivals",
+            "heading_font_size": 30,
+            "description": "",
+            "overlay_content": true,
+            "text_position": "bottom",
+            "title_shadow": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 15
+          }
+        },
+        "collection_z3JcHD": {
+          "type": "collection",
+          "settings": {
+            "collection": "womens-best-sellers-footwear",
+            "image": "shopify://shop_images/Best_sellers_605x480_2ed2d03a-2de3-4824-ab2d-30f7d31e2c6e.png",
+            "title": "Best Sellers",
+            "heading_font_size": 30,
+            "description": "",
+            "overlay_content": true,
+            "text_position": "bottom",
+            "title_shadow": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 15
+          }
+        },
+        "collection_Y6AhJP": {
+          "type": "collection",
+          "settings": {
+            "collection": "womens-sneakers",
+            "image": "shopify://shop_images/Sneakers_605x480_00ac39c0-6b39-47a1-b595-b220a968ff08.png",
+            "title": "Sneakers",
+            "heading_font_size": 30,
+            "description": "",
+            "overlay_content": true,
+            "text_position": "bottom",
+            "title_shadow": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 15
+          }
+        }
+      },
+      "block_order": [
+        "collection_YbUxUk",
+        "collection_z3JcHD",
+        "collection_Y6AhJP"
+      ],
+      "settings": {
+        "columns": 3,
+        "carousel_on_desktop": false,
+        "image_type": "collection",
+        "image_ratio": "adapt",
+        "show_products_count": false,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_overlay_GNC4KT": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "subheading_yJRt4d": {
+          "type": "subheading",
+          "settings": {
+            "subheading": "SPRING FAVORITES",
+            "subheading_size": "subtitle-md",
+            "secondary_color": true
+          }
+        },
+        "divider_RDiA8A": {
+          "type": "divider",
+          "settings": {
+            "divider_width": 120,
+            "divider_mt": 20,
+            "divider_mb": 5
+          }
+        },
+        "text_YWeqgi": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Step out in comfort this season in styles that will have you looking good and feeling even better. Each pair features our Aetrex Signature Arch Support and orthotic footbed to provide maximum comfort and support each and every step</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_nae79B": {
+          "type": "button",
+          "settings": {
+            "button_label": "View Collection",
+            "button_link": "shopify://collections/summer-collection",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "subheading_yJRt4d",
+        "divider_RDiA8A",
+        "text_YWeqgi",
+        "button_nae79B"
+      ],
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/SPRING_FAVORITES_MV4_4.png",
+        "image_height": "adapt",
+        "content_width": "small",
+        "content_position": "md:items-center md:justify-end",
+        "text_alignment": "center",
+        "image_mobile": "shopify://shop_images/SPRING_FAVORITES_MIM2.png",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-end justify-center",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_highlight": "#525252",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_overlay_cLVdgJ": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "heading_XFBMp7": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>SNEAKERS</p>",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "divider_bFyxXA": {
+          "type": "divider",
+          "settings": {
+            "divider_width": 120,
+            "divider_mt": 20,
+            "divider_mb": 5
+          }
+        },
+        "text_Dd6NMF": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Featuring Aetrex’s Signature Arch Support and our premium, super-cushy UltraSky™ EVA foam midsole. These styles offer maximum comfort and alignment and help to minimize over-pronation during your daily activities. The stretchy knit upper gives you the perfect fit.</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_KN7cRW": {
+          "type": "button",
+          "settings": {
+            "button_label": "View Collection",
+            "button_link": "shopify://collections/womens-sneakers",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_XFBMp7",
+        "divider_bFyxXA",
+        "text_Dd6NMF",
+        "button_KN7cRW"
+      ],
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/1780x655_Sadie_Grey_excl_0426_26a8f75c-b17d-4284-bfee-b5b33ff58d71.png",
+        "image_height": "adapt",
+        "content_width": "small",
+        "content_position": "md:items-center md:justify-start",
+        "text_alignment": "center",
+        "image_mobile": "shopify://shop_images/SNEAKERS_M3.png",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-end justify-center",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_highlight": "#525252",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_overlay_HEWGdX": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "subheading_GVkqAc": {
+          "type": "subheading",
+          "settings": {
+            "subheading": "THE AETREX TECHNOLOGY DIFFERENCE",
+            "subheading_size": "subtitle-md",
+            "secondary_color": true
+          }
+        },
+        "divider_AGUC4Q": {
+          "type": "divider",
+          "settings": {
+            "divider_width": 120,
+            "divider_mt": 20,
+            "divider_mb": 5
+          }
+        },
+        "text_84bkF8": {
+          "type": "text",
+          "settings": {
+            "text": "<p>What makes our shoes different is all tied to our technology and our knowledge of feet. When a shoe is made, it’s built over a last which determines its 3D shape. We have millions of 3D foot scans in our database which help us develop our unique lasts and footwear.</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_MLhezL": {
+          "type": "button",
+          "settings": {
+            "button_label": "Watch Movie",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "subheading_GVkqAc",
+        "divider_AGUC4Q",
+        "text_84bkF8",
+        "button_MLhezL"
+      ],
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/Aetrex_difference_1920x655_1.jpg",
+        "image_height": "adapt",
+        "content_width": "small",
+        "content_position": "md:items-center md:justify-end",
+        "text_alignment": "center",
+        "image_mobile": "shopify://shop_images/TECHNOLOGY_DIFFERENCE_M3.png",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-end justify-center",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_highlight": "#525252",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_overlay_K399zb": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "subheading_LJCnPX": {
+          "type": "subheading",
+          "settings": {
+            "subheading": "AETREX SIGNATURE ARCH SUPPORT",
+            "subheading_size": "subtitle-md",
+            "secondary_color": true
+          }
+        },
+        "divider_kDdRMY": {
+          "type": "divider",
+          "settings": {
+            "divider_width": 120,
+            "divider_mt": 20,
+            "divider_mb": 5
+          }
+        },
+        "text_jNDWWq": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Every Aetrex shoe features our signature arch support. The contour, position and height of Aetrex’s unique arch aligns anatomically in the proper place (at the apex of the arch) to help support your body from the ground up. Designed to help create natural alignment throughout the gait cycle, proper arch support can help reduce pronation and prevent injuries.</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "subheading_LJCnPX",
+        "divider_kDdRMY",
+        "text_jNDWWq"
+      ],
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/1780x655_Danika_LightGrey.jpg",
+        "image_height": "adapt",
+        "content_width": "small",
+        "content_position": "md:items-center md:justify-end",
+        "text_alignment": "center",
+        "image_mobile": "shopify://shop_images/AETREX_SIGNATURE_M3.png",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-end justify-center",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_highlight": "#525252",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
+        "padding_top": 24,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_4wWz3A": {
+      "type": "rich-text",
+      "blocks": {
+        "text_k8gK3r": {
+          "type": "text",
+          "settings": {
+            "text": "<p>SHARE YOUR LOOK</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 24,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_AzHTpY": {
+          "type": "text",
+          "settings": {
+            "text": "<h6>Share a photo of your favorite Aetrex product for a chance to be featured! Tag your Instagram images with <em><strong>#MYAETREX</strong></em><em>.</em></h6>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_k8gK3r",
+        "text_AzHTpY"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "#0b61cd",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 48,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "slideshow_FWtLKn",
+    "image_with_text_overlay_e9GhwP",
+    "scrolling_text_tVKedi",
+    "collection_list_q7Rypj",
+    "multicolumn_9UNM8U",
+    "collection_list_fgPMz9",
+    "image_with_text_overlay_GNC4KT",
+    "image_with_text_overlay_cLVdgJ",
+    "image_with_text_overlay_HEWGdX",
+    "image_with_text_overlay_K399zb",
+    "rich_text_4wWz3A"
+  ]
+}

@@ -1,0 +1,648 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-sm",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "video_with_text_overlay_TgKph8": {
+      "type": "video-with-text-overlay",
+      "blocks": {
+        "subheading_DQGQFg": {
+          "type": "subheading",
+          "settings": {
+            "subheading": "Add a tagline",
+            "subheading_size": "subtitle-md",
+            "secondary_color": true
+          }
+        },
+        "heading_64L34p": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>Video with text overlay</p>",
+            "heading_size": "title-lg tracking-heading",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_H4rWEH": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Pair text with an image to focus on your chosen product, collection, or blog post. Add details on availability, style, or even provide a review.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "subheading_DQGQFg",
+        "heading_64L34p",
+        "text_H4rWEH"
+      ],
+      "name": "t:sections.video-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
+        "description": "",
+        "enable_video_autoplay": true,
+        "enable_video_looping": true,
+        "image_height": "650px",
+        "content_width": "small",
+        "content_position": "md:items-center md:justify-center",
+        "text_alignment": "center",
+        "video_url_mobile": "",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-center justify-center",
+        "text_alignment_mobile": "center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 70,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false
+      }
+    },
+    "scrolling_text_kPA4Mj": {
+      "type": "scrolling-text",
+      "blocks": {
+        "text_qHYqEc": {
+          "type": "text",
+          "settings": {
+            "text": "Welcome to our store",
+            "text_size": 160,
+            "text_font": "body",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_qHYqEc"
+      ],
+      "name": "t:sections.scrolling-text.name",
+      "settings": {
+        "direction": "left",
+        "speed": 20,
+        "grid_horizontal": 70,
+        "enable_twin": false,
+        "enable_parallax": true,
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "padding_top": 36,
+        "padding_bottom": 36,
+        "divider": false,
+        "rounded": false
+      }
+    },
+    "featured_collection_p3qpRy": {
+      "type": "featured-collection",
+      "name": "Multiple featured collections",
+      "settings": {
+        "collection": "all-day-standing-orthotics",
+        "products": [],
+        "product_limit": 6,
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "Featured collection",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "SEO and search engines",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_overlay_M6AhUn": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "subheading_HaxULK": {
+          "type": "subheading",
+          "settings": {
+            "subheading": "Add a tagline",
+            "subheading_size": "subtitle-md",
+            "secondary_color": true
+          }
+        },
+        "heading_CE9MYn": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>Image with text overlay</p>",
+            "heading_size": "title-lg tracking-heading",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_CVjrUt": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Pair text with an image to focus on your chosen product, collection, or blog post. Add details on availability, style, or even provide a review.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "subheading_HaxULK",
+        "heading_CE9MYn",
+        "text_CVjrUt"
+      ],
+      "name": "t:sections.image-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "image_height": "650px",
+        "content_width": "small",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 70,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": true,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_comparison_TwWkKR": {
+      "type": "image-comparison",
+      "blocks": {
+        "image_rdTtYx": {
+          "type": "image",
+          "settings": {
+            "subheading": "",
+            "heading": "",
+            "content_position": "end",
+            "color_text": "#ffffff"
+          }
+        },
+        "image_MDDneR": {
+          "type": "image",
+          "settings": {
+            "subheading": "",
+            "heading": "",
+            "content_position": "end",
+            "color_text": "#ffffff"
+          }
+        }
+      },
+      "block_order": [
+        "image_rdTtYx",
+        "image_MDDneR"
+      ],
+      "name": "t:sections.image-comparison.name",
+      "settings": {
+        "layout": "horizontal",
+        "image_height": "adapt",
+        "image_height_mobile": "adapt",
+        "heading": "Image comparison",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "collection_list_EzLXyt": {
+      "type": "collection-list",
+      "blocks": {
+        "collection_r7EnrV": {
+          "type": "collection",
+          "settings": {
+            "collection": "all-day-standing-orthotics",
+            "title": "",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30
+          }
+        },
+        "collection_mRPA7g": {
+          "type": "collection",
+          "settings": {
+            "collection": "orthotics-for-ball-of-foot-discomfort",
+            "title": "",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30
+          }
+        },
+        "collection_8zbN6f": {
+          "type": "collection",
+          "settings": {
+            "collection": "at-home",
+            "title": "",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30
+          }
+        },
+        "collection_hCTGyE": {
+          "type": "collection",
+          "settings": {
+            "collection": "online-exclusives",
+            "title": "",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30
+          }
+        }
+      },
+      "block_order": [
+        "collection_r7EnrV",
+        "collection_mRPA7g",
+        "collection_8zbN6f",
+        "collection_hCTGyE"
+      ],
+      "name": "t:sections.collection-list.name",
+      "settings": {
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "image_type": "collection",
+        "image_ratio": "square",
+        "show_products_count": true,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "Collections <em>neet</em>",
+        "heading_size": "title-md",
+        "heading_alignment": "text-right md:items-end md:flex-row-reverse",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "<p>Whether you're walking, running, or standing all day, we’ve got orthotics for every activity. Find the right match for your lifestyle and feet.</p>",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "testimonials_banner_8MQRY4": {
+      "type": "testimonials-banner",
+      "blocks": {
+        "testimonial_7TFigX": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_FFpJU7": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_WjHQPN": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_7TFigX",
+        "testimonial_FFpJU7",
+        "testimonial_WjHQPN"
+      ],
+      "name": "t:sections.testimonials-banner.name",
+      "settings": {
+        "transparent_header": false,
+        "image_height": "650px",
+        "content_position": "md:items-center md:justify-center",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-center justify-center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 70,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "rounded": false,
+        "enable_parallax": true,
+        "parallax_direction": "vertical"
+      }
+    },
+    "faq_y3jEeX": {
+      "type": "faq",
+      "blocks": {
+        "question_7Q9BFT": {
+          "type": "question",
+          "settings": {
+            "title": "Frequently asked question",
+            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_DVxeE4": {
+          "type": "question",
+          "settings": {
+            "title": "Frequently asked question",
+            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_qEfidm": {
+          "type": "question",
+          "settings": {
+            "title": "Frequently asked question",
+            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "question_7Q9BFT",
+        "question_DVxeE4",
+        "question_qEfidm"
+      ],
+      "name": "t:sections.faq.name",
+      "settings": {
+        "style": "with-border",
+        "heading": "FAQs",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#ffffff",
+        "overlay_opacity": 4,
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "blog_posts_AqwDBC": {
+      "type": "blog-posts",
+      "name": "t:sections.blog-posts.name",
+      "settings": {
+        "blog": "aetrex-blog",
+        "post_limit": 3,
+        "columns": 3,
+        "carousel_on_desktop": false,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "image_ratio": "landscape",
+        "show_tags": true,
+        "show_date": true,
+        "show_comments": true,
+        "show_author": false,
+        "show_excerpt": true,
+        "heading": "Blog posts",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "images_with_text_overlay_pgicH3": {
+      "type": "images-with-text-overlay",
+      "blocks": {
+        "subheading_9hKYJe": {
+          "type": "subheading",
+          "settings": {
+            "subheading": "Add a tagline",
+            "subheading_size": "subtitle-md",
+            "secondary_color": true
+          }
+        },
+        "heading_LgFJaa": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>Images with text overlay</p>",
+            "heading_size": "title-lg tracking-heading",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_HbcxnX": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Pair text with an image to focus on your chosen product, collection, or blog post. Add details on availability, style, or even provide a review.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "subheading_9hKYJe",
+        "heading_LgFJaa",
+        "text_HbcxnX"
+      ],
+      "name": "t:sections.images-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "image_height": "650px",
+        "content_width": "medium",
+        "content_position": "md:items-center md:justify-center",
+        "text_alignment": "center",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 100,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": true
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "video_with_text_overlay_TgKph8",
+    "scrolling_text_kPA4Mj",
+    "featured_collection_p3qpRy",
+    "image_with_text_overlay_M6AhUn",
+    "image_comparison_TwWkKR",
+    "collection_list_EzLXyt",
+    "testimonials_banner_8MQRY4",
+    "faq_y3jEeX",
+    "blog_posts_AqwDBC",
+    "images_with_text_overlay_pgicH3"
+  ]
+}

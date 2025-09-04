@@ -1,0 +1,533 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "testimonials_banner_Cbhq4c": {
+      "type": "testimonials-banner",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/drd_a23d4e35-00b6-46f5-bf8f-7aa00a284f16.jpg",
+        "image_height": "adapt",
+        "content_position": "md:items-center md:justify-center",
+        "image_mobile": "shopify://shop_images/drm.jpg",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-center justify-center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "video_with_text_fXaKQ6": {
+      "type": "video-with-text",
+      "blocks": {
+        "text_GzmA9Q": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Friday, April 29<br/><em>Arthritis & Diabetes</em></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_GzmA9Q"
+      ],
+      "name": "Video with text",
+      "settings": {
+        "video_url": "https://vimeo.com/707815755",
+        "cover_image": "shopify://shop_images/thumb_1_5b7edcb1-46f3-48a0-bceb-98fe15b6f125.jpg",
+        "description": "",
+        "enable_video_autoplay": false,
+        "enable_video_looping": false,
+        "image_height": "adapt",
+        "video_width": "large",
+        "layout": "video_first",
+        "text_alignment": "center",
+        "content_position": "align-self-center",
+        "video_url_mobile": "https://vimeo.com/707815755",
+        "cover_image_mobile": "shopify://shop_images/thumb_1_5b7edcb1-46f3-48a0-bceb-98fe15b6f125.jpg",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "center",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "#90abb7",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_DJRdNn": {
+      "type": "rich-text",
+      "blocks": {
+        "text_nXL9rw": {
+          "type": "text",
+          "settings": {
+            "text": "<p><em><strong>YOUR QUESTIONS</strong></em></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_nXL9rw"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "#90abb7",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_PLkKyP": {
+      "type": "rich-text",
+      "blocks": {
+        "text_AgNjT8": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Choose your topic from the list below</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_AgNjT8"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "faq_HKU8NM": {
+      "type": "faq",
+      "blocks": {
+        "question_dicKY9": {
+          "type": "question",
+          "settings": {
+            "title": "Dorothy Z. – I have a talonavicular joint problem with my right foot. What insole would you recommend to buy? Thank you.",
+            "text": "<p>Dr George: Hi Dorothy! I recommend trying a memory foam orthotic like the L2300 Premium Memory Foam Orthotics:<a href=\"https://www.aetrex.com/women-s-premium-memory-foam-med-high-arch-orthotics-L2300W.html?lang=en_US\">https://www.aetrex.com/women-s-premium-memory-foam-med-high-arch-orthotics-L2300W.html?lang=en_US</a>The arch support should be able to help stabilize the talonavicular joint and the rest of the orthotic would help cradle the entire foot.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_EwJpgL": {
+          "type": "question",
+          "settings": {
+            "title": "Roxane T. – Is there anything good for neuropathy?",
+            "text": "<p>Dr George: Hi Roxane! I recommend trying the L200 Conform Orthotics:<a href=\"https://www.aetrex.com/orthotics-for-diabetes.html?lang=en_US\">https://www.aetrex.com/orthotics-for-diabetes.html?lang=en_US</a>These orthotics customize to the foot during the gait cycle, transfer pressure away from “hot spots,” and providing shock absorption for extra protection. If you are experiencing symptoms of neuropathy, it’s best to reach out to a physician for support and a diagnosis.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_QRjDnJ": {
+          "type": "question",
+          "settings": {
+            "title": "Shirley D. – Approximately, 8 years ago I was diagnosed with idiopathic peripheral neuropathy in my lower extremities. My legs don't seem to be bothered too much. My feet though always ache and are numb from the pad of my foot up into my toes. My toes are particularly bothered. I've tried many different shoes, shoes, arch supports, and socks but nothing helps relieve the discomfort. I don't usually have any sharp pains. Can you make any suggestions regarding footwear? I always make sure that I have enough room in the toe box. I usually lean towards wearing good athletic sneakers because they seem to be the best for my situation. I'm 62, very active (walking, aerobic exercise, strength training, some treadmill running, and hiking). I make the best of it, but it seems like my feet are always on my mind, both day and night. Thank you!",
+            "text": "<p>Dr George: Hi Shirley and thank you so much for sharing your story. It’s great that you are making sure your footwear is supportive and have tried different options. Have you tried memory foam orthotics yet or orthotics with a metatarsal pad? I recommend trying the L2305 Premium Memory Foam Orthotics with Metatarsal Support:<a href=\"https://www.aetrex.com/women-s-premium-memory-foam-med-high-arch-w-metatarsal-support-L2305W.html?lang=en_US\">https://www.aetrex.com/women-s-premium-memory-foam-med-high-arch-w-metatarsal-support-L2305W.html?lang=en_US</a>. These orthotics are made with 43% more memory foam cushioning in the forefoot. You can also try the L205 Conform Orthotics with Metatarsal Support:<a href=\"https://www.aetrex.com/conform-orthotics-l205w-L205W.html?lang=en_US\">https://www.aetrex.com/conform-orthotics-l205w-L205W.html?lang=en_US</a>These orthotics customize to the foot during the gait cycle, transfer pressure away from “hot spots,” and providing shock absorption for extra protection.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_PaX3q3": {
+          "type": "question",
+          "settings": {
+            "title": "Cybil B. – I have been diagnosed with Talonavicular arthritis of the hindfoot. Can you recommend an over the counter orthotic or treatment to aid with this condition? I find that if I walk, hike, or exercise the pain which radiates up my ankle increases. Will one of the sessions address this condition?",
+            "text": "<p>Dr George: Hi Cybil and thank you for sharing your story. I recommend trying a memory foam orthotic like the L2300 Premium Memory Foam Orthotics:<a href=\"https://www.aetrex.com/women-s-premium-memory-foam-med-high-arch-orthotics-L2300W.html?lang=en_US\">https://www.aetrex.com/women-s-premium-memory-foam-med-high-arch-orthotics-L2300W.html?lang=en_US</a>The arch support should be able to help stabilize the talonavicular joint and the rest of the orthotic would help cradle the entire foot.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_7ryeDd": {
+          "type": "question",
+          "settings": {
+            "title": "Janice R. – I am an older dancer with arthritis in my feet, high arches, and drop metatarsal so I have all the pain going in my metatarsals when I'm on my feet dancing. Is there anything I can do?",
+            "text": "<p>Dr George: Hi Janice and thank you for your question. I recommend trying the L2305 Premium Memory Foam Orthotics with Metatarsal Support:<a href=\"https://www.aetrex.com/women-s-premium-memory-foam-med-high-arch-w-metatarsal-support-L2305W.html?lang=en_US\">https://www.aetrex.com/women-s-premium-memory-foam-med-high-arch-w-metatarsal-support-L2305W.html?lang=en_US</a>Along with arch support, these orthotics have a metatarsal pad that helps unload pressure at the metatarsal area and provides cushioning to help relieve discomfort and are made with 43% more memory foam cushioning in the forefoot.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_LHzXah": {
+          "type": "question",
+          "settings": {
+            "title": "Clare W. – Neuropathy. My daughter has vibrations in her feet, but does not have diabetes.",
+            "text": "<p>Dr George: Hi Clare and thank you for your question. I recommend for your daughter to try the L200 Conform Orthotics:<a href=\"https://www.aetrex.com/orthotics-for-diabetes.html?lang=en_US\">https://www.aetrex.com/orthotics-for-diabetes.html?lang=en_US</a>These orthotics customize to the foot during the gait cycle, transfer pressure away from “hot spots,” and provide shock absorption for extra protection. If she is experiencing symptoms of neuropathy, it’s best to reach out to a physician for a diagnosis.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_WyHmxM": {
+          "type": "question",
+          "settings": {
+            "title": "Bonnie K. – What kinds of treatment are available for rheumatoid arthritis in your feet?",
+            "text": "<p>Dr George: Hi Bonnie and thank you for your question. A memory foam orthotic may help with rheumatoid arthritis in feet. I recommend trying L2300 Premium Memory Foam Orthotics:<a href=\"https://www.aetrex.com/women-s-premium-memory-foam-med-high-arch-orthotics-L2300W.html?lang=en_US\">https://www.aetrex.com/women-s-premium-memory-foam-med-high-arch-orthotics-L2300W.html?lang=en_US</a>These orthotics are made with 43% more memory foam cushioning in the forefoot. I also recommend reaching out to a physician for a diagnosis.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "question_dicKY9",
+        "question_EwJpgL",
+        "question_QRjDnJ",
+        "question_PaX3q3",
+        "question_7ryeDd",
+        "question_LHzXah",
+        "question_WyHmxM"
+      ],
+      "name": "FAQ",
+      "settings": {
+        "style": "with-border",
+        "heading": "Arthritis & Diabetes",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h3",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#ffffff",
+        "overlay_opacity": 0,
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_4ndgUW": {
+      "type": "rich-text",
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "multicolumn_aUPeic": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_mmpryV": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image_ratio": "square",
+            "heading": "<em>Conform Orthotics</em>",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "SHOP NOW",
+            "button_link": "https://www.aetrex.com/products/l200m-m?variant=50400532169017",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_4xHh9U": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/34170-L2200M_catalog.jpg",
+            "image_ratio": "square",
+            "heading": "<em>Memory Foam Orthotics</em>",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "SHOP NOW",
+            "button_link": "https://www.aetrex.com/products/l2200m-m?variant=50400741491001",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_YBzYLm": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/SE210W_catalog_e6ef4907-c6cc-452f-a3a6-050afcdd9d7e.jpg",
+            "image_ratio": "square",
+            "heading": "<em>Jess Adjustable Strap Sandal</em>",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://products/jess",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_KDKzqw": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/E390W_catalog.jpg",
+            "image_ratio": "square",
+            "heading": "<em>Berries Helen Mary Jane</em>",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://products/helen-knit",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_mmpryV",
+        "column_4xHh9U",
+        "column_YBzYLm",
+        "column_KDKzqw"
+      ],
+      "name": "Multicolumn",
+      "settings": {
+        "gap": "large",
+        "columns": 4,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "Recommended Products for Arthritis & Diabetes",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h4",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "#fafafa",
+        "color_button_background": "#90abb7",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "rich_text_9mFdHe": {
+      "type": "rich-text",
+      "blocks": {
+        "text_6hgC4Y": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Terms of Use: Aetrex & Dr. George Ampat will not provide diagnosis, treatment, or medical advice; however, the text, graphics, images & other materials are for informational purposes only. Always seek the advice of your physician or other qualified health providers with any questions you may have regarding a medical condition.</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 18,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_6hgC4Y"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 48,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "testimonials_banner_Cbhq4c",
+    "video_with_text_fXaKQ6",
+    "rich_text_DJRdNn",
+    "rich_text_PLkKyP",
+    "faq_HKU8NM",
+    "rich_text_4ndgUW",
+    "multicolumn_aUPeic",
+    "rich_text_9mFdHe"
+  ]
+}

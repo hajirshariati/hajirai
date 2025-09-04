@@ -1,0 +1,266 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "testimonials_banner_Cbhq4c": {
+      "type": "testimonials-banner",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/drd_a23d4e35-00b6-46f5-bf8f-7aa00a284f16.jpg",
+        "image_height": "adapt",
+        "content_position": "md:items-center md:justify-center",
+        "image_mobile": "shopify://shop_images/drm.jpg",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-center justify-center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 24,
+        "divider": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_TBEQAG": {
+      "type": "rich-text",
+      "blocks": {
+        "text_GtYqMw": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Co-hosted by</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "heading_3Dy4hC": {
+          "type": "heading",
+          "settings": {
+            "heading": "DR. GEORGE AMPAT",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "image_8Jfz3e": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Frame_427322007.png",
+            "image_width": "custom",
+            "image_max_width": 220,
+            "image_max_width_mobile": 240
+          }
+        },
+        "text_W3EA9r": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Orthopedic Spinal Surgeon<br/>and Medical Consultant</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_hTc44n": {
+          "type": "text",
+          "settings": {
+            "text": "<p>To celebrate Foot Health Awareness Month this April, we are hosting 5 Live Q&A sessions with our medical consultant Dr. George Ampat.<br/><br/>An Orthopedic Surgeon at Royal Liverpool University Hospital and a Clinical Teacher at the School of Medicine at The University of Liverpool, Dr. George has assisted Aetrex in several orthopedic research projects and recommends Aetrex to his patients. His mission is to provide a quality orthopedic opinion to promote wellness, relieve suffering, and restore health with minimal surgical intervention.<br/><br/>We’ll be discussing different types of foot ailments, their causes, symptoms, and how Aetrex can help! If you suffer from foot pain, feel free to submit your questions below for Dr. George to answer during the Live Q&A!<br/><br/>Tune in & make sure to ask your questions!<br/><br/></p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_GtYqMw",
+        "heading_3Dy4hC",
+        "image_8Jfz3e",
+        "text_W3EA9r",
+        "text_hTc44n"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#90abb7",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_VgM8tk": {
+      "type": "rich-text",
+      "blocks": {
+        "text_xaqX8f": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Watch videos and read Q&A.</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_FQmbNt": {
+          "type": "button",
+          "settings": {
+            "button_label": "Plantar Fasciitis Q&A",
+            "button_link": "",
+            "button_style": "primary",
+            "button_size": "sm",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_kA9cH3": {
+          "type": "button",
+          "settings": {
+            "button_label": "Metatarsalgia Q&A",
+            "button_link": "",
+            "button_style": "primary",
+            "button_size": "sm",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_U4gA4d": {
+          "type": "button",
+          "settings": {
+            "button_label": "Bunions Q&A",
+            "button_link": "",
+            "button_style": "primary",
+            "button_size": "sm",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_bCJpqm": {
+          "type": "button",
+          "settings": {
+            "button_label": "Athletic Lifestyles Q&A",
+            "button_link": "",
+            "button_style": "primary",
+            "button_size": "sm",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_7EeCyz": {
+          "type": "button",
+          "settings": {
+            "button_label": "Arthritis & Diabetes Q&A",
+            "button_link": "",
+            "button_style": "primary",
+            "button_size": "sm",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_xaqX8f",
+        "button_FQmbNt",
+        "button_kA9cH3",
+        "button_U4gA4d",
+        "button_bCJpqm",
+        "button_7EeCyz"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#90abb7",
+        "color_button_gradient": "",
+        "padding_top": 4,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "testimonials_banner_Cbhq4c",
+    "rich_text_TBEQAG",
+    "rich_text_VgM8tk"
+  ]
+}

@@ -1,0 +1,725 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "image_with_text_overlay_3B3AqL": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "heading_4xTaMy": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>Clinically Proven to Relieve Foot Pain and More!*</p>",
+            "heading_size": "title-md",
+            "heading_tag": "h4",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_XDMrMw": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Aetrex Premium Memory Foam Orthotics</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_dgGUmr": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP PREMIUM ORTHOTICS",
+            "button_link": "https://www.aetrex.com/collections/premium-memory-foam?ose=false",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_rqfjwJ": {
+          "type": "button",
+          "settings": {
+            "button_label": "READ THE STUDY",
+            "button_link": "https://www.tandfonline.com/doi/full/10.1080/02703181.2023.2215818",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_4xTaMy",
+        "text_XDMrMw",
+        "button_dgGUmr",
+        "button_rqfjwJ"
+      ],
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/PMFd.jpg",
+        "image_height": "adapt",
+        "content_width": "large",
+        "content_position": "md:items-center md:justify-start",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/bannerPrem_M.jpg",
+        "image_height_mobile": "100vh",
+        "content_position_mobile": "items-end justify-center",
+        "text_alignment_mobile": "left",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#ffffff",
+        "color_button_background": "#8e5f31",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "zoom"
+      }
+    },
+    "rich_text_ADQfqY": {
+      "type": "rich-text",
+      "blocks": {
+        "image_jLGCbc": {
+          "type": "image",
+          "disabled": true,
+          "settings": {
+            "image": "shopify://shop_images/image_3_901c514b-7209-4cf6-b67b-ce6f26c26bda.png",
+            "image_width": "custom",
+            "image_max_width": 1000,
+            "image_max_width_mobile": 50
+          }
+        },
+        "text_DFxFpn": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Those in the study who wore Aetrex Premium<br/>Memory Foam Orthotics Experienced:**</p>",
+            "text_font": "body",
+            "text_size": "subtext-lg",
+            "text_max_size": 40,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "image_jLGCbc",
+        "text_DFxFpn"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "#efefef",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_b9LFaB": {
+      "type": "rich-text",
+      "blocks": {
+        "image_xnjmqx": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/image_D.jpg",
+            "image_width": "custom",
+            "image_max_width": 1000,
+            "image_max_width_mobile": 600
+          }
+        }
+      },
+      "block_order": [
+        "image_xnjmqx"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "#efefef",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "rich_text_mmGfpe": {
+      "type": "rich-text",
+      "blocks": {
+        "image_HnKj6r": {
+          "type": "image",
+          "disabled": true,
+          "settings": {
+            "image": "shopify://shop_images/image_3_901c514b-7209-4cf6-b67b-ce6f26c26bda.png",
+            "image_width": "custom",
+            "image_max_width": 1000,
+            "image_max_width_mobile": 50
+          }
+        }
+      },
+      "block_order": [
+        "image_HnKj6r"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#61b5b6",
+        "color_background": "rgba(0,0,0,0)",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_AhWdpk": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h3",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#716d6a",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_nVG8Xb": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_eJPkm3": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Foot Pain Prevalence & Importance</p>",
+            "text_font": "heading",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_dX9H3D": {
+          "type": "text",
+          "settings": {
+            "text": "<p>One in four adults over the age of 45 experiences frequent foot discomfort which can reduce physical activity and potentially contribute to poor mental health. Many older adults experience foot pain and therefore become less active and mobile. One way to prevent foot pain and muscle weakness from occurring is to stay active. But in order to be active, one must first be comfortable on his/her feet.<br/><br/></p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_eJPkm3",
+        "text_dX9H3D"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/young.jpg",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_mobile": "shopify://shop_images/young.jpg",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_hL9HD8": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_LNjrJf": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Reducing & Preventing Pain</p>",
+            "text_font": "heading",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_P9PCMg": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Aetrex Premium Memory Foam Orthotics are clinically proven to reduce common foot pains as well as pain in the back, hip, knee and ankle. Plus, they have been clinically proven to help reduce the fear of falling in older adults, which can aid in reducing the likelihood of an actual fall.</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_LNjrJf",
+        "text_P9PCMg"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/image_1_737bdb7d-b150-4573-a277-12db6fb61a17.png",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_mobile": "shopify://shop_images/image_1_737bdb7d-b150-4573-a277-12db6fb61a17.png",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_CXjGtL": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_Bnpdtj": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Unlock Your Confidence and Relieve Pain</p>",
+            "text_font": "heading",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_EtBWwJ": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Foot pain can significantly impact your daily life. Our meticulously researched Premium Memory Foam Orthotics have demonstrated remarkable effectiveness in reducing foot pain, improving foot health, and alleviating the fear of falling. These orthotics are a non-invasive, cost-effective way to support pain-free aging. Available for both men and women.</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_wDptcn": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP PREMIUM ORTHOTICS",
+            "button_link": "shopify://collections/premium-memory-foam",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_Bnpdtj",
+        "text_EtBWwJ",
+        "button_wDptcn"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/imig1_735abc38-178e-4a27-8772-b72ce371db21.jpg",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_mobile": "shopify://shop_images/imig1_735abc38-178e-4a27-8772-b72ce371db21.jpg",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#5eb3ba",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_BxYG4C": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_fHaGJH": {
+          "type": "text",
+          "settings": {
+            "text": "<h3>Learn More About the Clinical Study</h3><p>Delve deeper into Dr. George Ampat's comprehensive case study on the impact of Aetrex Compete Orthotics & Orthotic Flips reducing pain and improving the condition of Plantar Fasciitis.<br/>Gain invaluable insights and explore the potential for a more confident and secure future.</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_YWEXYx": {
+          "type": "button",
+          "settings": {
+            "button_label": "VIEW THE PUBLISHED CLINICAL TRIAL",
+            "button_link": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10514714/pdf/WJO-14-707.pdf",
+            "button_video_link": "",
+            "button_style": "secondary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_fHaGJH",
+        "button_YWEXYx"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/dr_george.jpg",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_MLXerj": {
+      "type": "rich-text",
+      "blocks": {
+        "text_yKxt79": {
+          "type": "text",
+          "settings": {
+            "text": "<p>* Clinical Study conducted in Liverpool, England by Dr. George Ampat, ** Statistics provided by the FHSQ Subscale & Falls Efficacy Scale used in the study</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 40,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_yKxt79"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "rgba(0,0,0,0)",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_L4LYYK": {
+      "type": "rich-text",
+      "blocks": {
+        "text_8WqbLV": {
+          "type": "text",
+          "settings": {
+            "text": "<h3>READ ALL CLINICAL STUDIES</h3><p>See individual studies for details</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 40,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_B3JCk6": {
+          "type": "button",
+          "settings": {
+            "button_label": "LEARN MORE",
+            "button_link": "https://www.aetrex.com/pages/clinical-studies?ose=false",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_8WqbLV",
+        "button_B3JCk6"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#eea15a",
+        "color_background": "#daeded",
+        "gradient_background": "linear-gradient(180deg, rgba(248, 251, 251, 1) 31%, rgba(216, 235, 236, 1) 93%)",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#eea15a",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 48,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "image_with_text_overlay_3B3AqL",
+    "rich_text_ADQfqY",
+    "rich_text_b9LFaB",
+    "rich_text_mmGfpe",
+    "rich_text_AhWdpk",
+    "image_with_text_nVG8Xb",
+    "image_with_text_hL9HD8",
+    "image_with_text_CXjGtL",
+    "image_with_text_BxYG4C",
+    "rich_text_MLXerj",
+    "rich_text_L4LYYK"
+  ]
+}

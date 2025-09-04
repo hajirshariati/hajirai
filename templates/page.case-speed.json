@@ -1,0 +1,534 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "image_with_text_overlay_3B3AqL": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "text_7Dya7D": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>Clinically Proven to Improve<br/>Comfort While Running</strong></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_XDMrMw": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Aetrex Speed Orthotics</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_dgGUmr": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP SPEED ORTHOTICS",
+            "button_link": "https://www.aetrex.com/collections/speed?ose=false",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_rqfjwJ": {
+          "type": "button",
+          "settings": {
+            "button_label": "READ THE STUDY",
+            "button_link": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9302029/pdf/WJO-13-652.pdf",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_7Dya7D",
+        "text_XDMrMw",
+        "button_dgGUmr",
+        "button_rqfjwJ"
+      ],
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/banner4_1.jpg",
+        "image_height": "100vh",
+        "content_width": "small",
+        "content_position": "md:items-center md:justify-start",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/banner_M.jpg",
+        "image_height_mobile": "100vh",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#ffffff",
+        "color_button_background": "#eda15b",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 0,
+        "padding_top": 12,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_b9LFaB": {
+      "type": "rich-text",
+      "blocks": {
+        "text_V4zebK": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Those in the Study Who Wore Aetrex Speed Orthotics Experienced:</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 40,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "image_xnjmqx": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Group11.png",
+            "image_width": "custom",
+            "image_max_width": 300,
+            "image_max_width_mobile": 350
+          }
+        }
+      },
+      "block_order": [
+        "text_V4zebK",
+        "image_xnjmqx"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "#f7f7f7",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "rich_text_AhWdpk": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h3",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#716d6a",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_CPxfFz": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_4T8RpJ": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Foot Pain is Common Among Runners</p>",
+            "text_font": "heading",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_QcpX3f": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Running is one of the most accessible and popular fitness activities around the world. In fact, 50 million Americans participate in the sport by running or jogging. However, running related injury rates are high, and foot pain is a common issue among runners. As many as 50% of runners get injured each year!</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_4T8RpJ",
+        "text_QcpX3f"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/image_2b.webp",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/image_2_99741b7b-f6fc-46bc-a37c-7dae9a7caea6.jpg",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 48,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_JFxeF6": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_i8TaXM": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Improving Comfort & Helping to Reduce Injury</p>",
+            "text_font": "heading",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_f7gMcE": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Aetrex Speed Orthotics are clinically proven to increase comfort while running, helping runners stay healthy on their feet. Participants in the study who ran with Aetrex Speed Orthotics reported average comfort scores of 1.27 points higher than participants who ran without orthotics, reporting a statistically significant increase!</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_GizffR": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP SPEED ORTHOTICS",
+            "button_link": "shopify://collections/speed",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_i8TaXM",
+        "text_f7gMcE",
+        "button_GizffR"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/image_1_b.webp",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/image_1_9e1deeb9-a1b7-4a7d-aa71-687e2f8c812c.jpg",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "#ffffff",
+        "color_button_background": "#eda15b",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_GVNtrz": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_dinQBb": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Run On! Learn More About the Clinical Study</p>",
+            "text_font": "heading",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_tdetRh": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Read Dr. George Ampat’s study to learn more about the impact Aetrex Speed Orthotics can have on your feet, offering a more comfortable, stable run and helping to prevent injuries.</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_hmg9p3": {
+          "type": "button",
+          "settings": {
+            "button_label": "READ THE STUDY",
+            "button_link": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10514714/pdf/WJO-14-707.pdf",
+            "button_style": "secondary",
+            "button_size": "sm",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_dinQBb",
+        "text_tdetRh",
+        "button_hmg9p3"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/dr_george_099f1d0b-551d-4818-8b60-0bebfa9f967d.jpg",
+        "image_height": "400px",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_background": "#efefef",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "#525252",
+        "color_button_background": "#525252",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_JyBcbP": {
+      "type": "rich-text",
+      "blocks": {
+        "text_wYzwYN": {
+          "type": "text",
+          "settings": {
+            "text": "<p>* Clinical Study conducted in Liverpool, England by Dr. George Ampat</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 40,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_wYzwYN"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "rgba(0,0,0,0)",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_74JhPY": {
+      "type": "rich-text",
+      "blocks": {
+        "text_gkDMzm": {
+          "type": "text",
+          "settings": {
+            "text": "<h3>READ ALL CLINICAL STUDIES</h3><p>See individual studies for details</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 40,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_Gq8Vf4": {
+          "type": "button",
+          "settings": {
+            "button_label": "LEARN MORE",
+            "button_link": "https://www.aetrex.com/pages/clinical-studies?ose=false",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_gkDMzm",
+        "button_Gq8Vf4"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#eea15a",
+        "color_background": "#daeded",
+        "gradient_background": "linear-gradient(180deg, rgba(248, 251, 251, 1) 31%, rgba(216, 235, 236, 1) 93%)",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#eea15a",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 48,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "image_with_text_overlay_3B3AqL",
+    "rich_text_b9LFaB",
+    "rich_text_AhWdpk",
+    "image_with_text_CPxfFz",
+    "image_with_text_JFxeF6",
+    "image_with_text_GVNtrz",
+    "rich_text_JyBcbP",
+    "rich_text_74JhPY"
+  ]
+}

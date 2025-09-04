@@ -1,0 +1,228 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "custom_liquid_YR33pL": {
+      "type": "custom-liquid",
+      "name": "Custom Liquid",
+      "settings": {
+        "liquid": "<style>\n  .ORTHOPLP-section {\n    background-color: #5a7d5d;\n    padding: 0;\n    display: flex;\n    justify-content: center;\n  }\n\n  .ORTHOPLP-content-container {\n    display: flex;\n    flex-direction: column;\n    width: 90%;\n    max-width: 1200px;\n  }\n\n  .ORTHOPLP-text-box {\n    text-align: center;\n    color: white;\n    padding: 20px;\n    align-self: center;\n  }\n\n  .ORTHOPLP-text-box p {\n    font-size: 1em;\n    letter-spacing: 1px;\n    line-height: 1.4em;\n    padding: 0 2%;\n    font-weight: 300;\n  }\n\n  .ORTHOPLP-icons {\n    display: none;\n    max-width: 1200px;\n    margin: auto;\n    padding: 10px;\n  }\n\n  .ORTHOPLP-icons-container {\n    display: flex;\n    flex-wrap: wrap;\n    justify-content: center;\n  }\n\n  .ORTHOPLP-icon {\n    flex: 1 1 25%;\n    max-width: 25%;\n    text-align: center;\n    padding: 5px;\n    justify-items: center;\n  }\n\n  .ORTHOPLP-icon img {\n    width: 50%;\n  }\n\n  .ORTHOPLP-icon p {\n    text-transform: uppercase;\n    margin: 5px 0 0;\n    letter-spacing: 1px;\n    color: white;\n    font-size: 0.7rem;\n  }\n\n  .ORTHOPLP-image-box {\n    display: none;\n    width: 100%;\n  }\n\n  .ORTHOPLP-image-box img {\n    width: 100%;\n    height: auto;\n    object-fit: cover;\n    min-height: 300px;\n  }\n\n  @media (min-width: 1200px) {\n    .ORTHOPLP-content-container {\n      flex-direction: row-reverse;\n    }\n\n    .ORTHOPLP-text-box {\n      width: 50%;\n    }\n\n    .ORTHOPLP-image-box {\n      display: flex;\n      width: 50%;\n    }\n\n    .ORTHOPLP-icons {\n      display: block;\n    }\n  }\n</style>\n\n<div class=\"ORTHOPLP-section\">\n  <div class=\"ORTHOPLP-content-container\">\n    <div class=\"ORTHOPLP-text-box\">\n      <p>\n        These Aetrex Premium Orthotic options provide the support, comfort, and shock absorption you need to stay active and healthy on your feet. All Aetrex Orthotics help prevent common conditions such as Plantar Fasciitis, Arch Pain, and Metatarsalgia. Dial up the cushioning and stay injury free.\n      </p>\n\n      <div class=\"ORTHOPLP-icons\">\n        <div class=\"ORTHOPLP-icons-container\">\n          <div class=\"ORTHOPLP-icon\">\n            <img alt=\"Aetrex Alignment\" src=\"https://cdn.shopify.com/s/files/1/0860/3634/9241/files/11_05_Alignment_Icon_3953a3b4-a2c0-4f20-9606-e698f502e6e8.png?v=1743510968\" title=\"Aetrex Alignment\" />\n            <p>Alignment</p>\n          </div>\n          <div class=\"ORTHOPLP-icon\">\n            <img alt=\"Aetrex Arch Support\" src=\"https://cdn.shopify.com/s/files/1/0860/3634/9241/files/11_05_ArchSupport_Icon_16a878f3-907c-4da1-a1b9-dcd84e7f430c.png?v=1743510968\" title=\"Aetrex Arch Support\" />\n            <p>Arch Support</p>\n          </div>\n          <div class=\"ORTHOPLP-icon\">\n            <img alt=\"Aetrex Superior Cushioning\" src=\"https://cdn.shopify.com/s/files/1/0860/3634/9241/files/11_05_ExoFoamComfort_Icon_c8e0c521-3b4b-4e21-8bc1-a78c4e38e0db.png?v=1743510968\" title=\"Aetrex Superior Cushioning\" />\n            <p>Superior Cushioning</p>\n          </div>\n          <div class=\"ORTHOPLP-icon\">\n            <img alt=\"Aetrex Pain Relief\" src=\"https://cdn.shopify.com/s/files/1/0860/3634/9241/files/11_05_PainRelief_Icon_826e8ac9-4782-4038-bbc2-7f0cc21e23a1.png?v=1743510968\" title=\"Aetrex Pain Relief\" />\n            <p>Pain Relief</p>\n          </div>\n        </div>\n      </div>\n    </div>\n\n    <div class=\"ORTHOPLP-image-box\">\n      <img src=\"https://cdn.shopify.com/s/files/1/0860/3634/9241/files/walking_rev02.jpg?v=1743507243\" alt=\"Walking background image\" />\n    </div>\n  </div>\n</div>",
+        "color_text": "",
+        "color_background": "#5a7d5d",
+        "gradient_background": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "main-collection-banner": {
+      "type": "main-collection-banner",
+      "blocks": {
+        "breadcrumb": {
+          "type": "breadcrumb",
+          "disabled": true,
+          "settings": {
+            "show_collections_link": false
+          }
+        },
+        "title": {
+          "type": "title",
+          "settings": {
+            "title_size": "title-sm"
+          }
+        }
+      },
+      "block_order": [
+        "breadcrumb",
+        "title"
+      ],
+      "settings": {
+        "transparent_header": false,
+        "show_image": false,
+        "image_height": "adapt",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "center",
+        "color_text": "#ffffff",
+        "color_overlay": "#000000",
+        "overlay_opacity": 40,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": true,
+        "enable_parallax": true,
+        "parallax_direction": "vertical"
+      }
+    },
+    "main-collection": {
+      "type": "main-collection",
+      "blocks": {
+        "subcollections": {
+          "type": "subcollections",
+          "settings": {
+            "menu": "",
+            "show_count": true
+          }
+        },
+        "promotion": {
+          "type": "promotion",
+          "settings": {
+            "position": 8,
+            "column_size": "1",
+            "heading": "Example heading",
+            "content": "<p>Share information about your brand with your customers.</p>",
+            "button_label": "Shop now",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "content_position": "md:items-center",
+            "text_alignment": "center",
+            "content_position_mobile": "items-center",
+            "text_alignment_mobile": "center",
+            "color_text": "#ffffff",
+            "color_button_text": "#4d5940",
+            "color_button_background": "#ffffff",
+            "color_button_gradient": "",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30
+          }
+        }
+      },
+      "block_order": [
+        "subcollections",
+        "promotion"
+      ],
+      "settings": {
+        "products_per_page": 16,
+        "columns": 5,
+        "columns_mobile": "2",
+        "pagination": "click",
+        "enable_filtering": true,
+        "filter_collapsed": false,
+        "filter_type": "sidebar",
+        "filter_color_swatches": true,
+        "enable_sorting": true,
+        "padding_top": 0,
+        "padding_bottom": 100,
+        "divider": false,
+        "full_width": false,
+        "rounded": true
+      }
+    },
+    "recently-viewed": {
+      "type": "recently-viewed",
+      "settings": {
+        "product_limit": 6,
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "Recently Viewed",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 80,
+        "divider": false,
+        "full_width": false,
+        "rounded": true
+      }
+    },
+    "rich_text_ARCqRb": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_JecEV8": {
+          "type": "heading",
+          "settings": {
+            "heading": "{{ collection.title }}",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_hWMiHh": {
+          "type": "text",
+          "settings": {
+            "text": "{{ collection.description }}",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_JecEV8",
+        "text_hWMiHh"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 100,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    }
+  },
+  "order": [
+    "custom_liquid_YR33pL",
+    "main-collection-banner",
+    "main-collection",
+    "recently-viewed",
+    "rich_text_ARCqRb"
+  ]
+}

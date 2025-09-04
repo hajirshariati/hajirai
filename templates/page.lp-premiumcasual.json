@@ -1,0 +1,1110 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "image_with_text_overlay_6Yqecn": {
+      "type": "image-with-text-overlay",
+      "name": "Image with text overlay",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/clouds_D.gif",
+        "image_height": "adapt",
+        "content_width": "small",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/clouds_M.gif",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
+        "padding_top": 52,
+        "padding_bottom": 12,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_MLXerj": {
+      "type": "rich-text",
+      "blocks": {
+        "text_yKxt79": {
+          "type": "text",
+          "settings": {
+            "text": "<h6>ONLINE EXCLUSIVE</h6><h4>Aetrex Premium Casual Orthotics</h4><p><em>Feel like walking on clouds</em></p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 26,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_yKxt79"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "#f7f7f7",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "rich_text_mxjCRr": {
+      "type": "rich-text",
+      "blocks": {
+        "text_AWnUbH": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The Perfect Combination Of Comfort,<br/>Support & Material Technology.</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 24,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_AWnUbH"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#6f6f6f",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "rich_text_ntY7bT": {
+      "type": "rich-text",
+      "blocks": {
+        "image_fAEJ3a": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/details_D.jpg",
+            "image_width": "custom",
+            "image_max_width": 1000,
+            "image_max_width_mobile": 600
+          }
+        }
+      },
+      "block_order": [
+        "image_fAEJ3a"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_rKArAL": {
+      "type": "rich-text",
+      "blocks": {
+        "button_Rb9jTU": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP MEN",
+            "button_link": "shopify://products/l1600m-m",
+            "button_style": "primary",
+            "button_size": "sm",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_9e9emH": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP WOMEN",
+            "button_link": "shopify://products/l1600w-m",
+            "button_style": "primary",
+            "button_size": "sm",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "button_Rb9jTU",
+        "button_9e9emH"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#afc4e2",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "rich_text_r7gtcn": {
+      "type": "rich-text",
+      "blocks": {
+        "text_mGceFx": {
+          "type": "text",
+          "settings": {
+            "text": "<p>FREE SHIPPING, 30 DAY COMFORT GUARANTEE</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 24,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_mGceFx"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#ffffff",
+        "color_background": "#afc4e2",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_mqK3Ax": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_X8rdMm": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Can Aetrex Orthotics help eliminate foot pain?</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_drWVpr": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Yes. Aetrex Orthotics are designed to support your longitudinal arch and provide the alignment needed to reduce over-pronation. They also help relieve foot injuries caused by repetitive stress by absorbing shock, providing cushioning, and transferring pressure away from high impact areas.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_ipN4FB": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP WOMEN",
+            "button_link": "shopify://products/l1600w-m",
+            "button_video_link": "",
+            "button_style": "secondary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_X8rdMm",
+        "text_drWVpr",
+        "button_ipN4FB"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/L1600W_catalog2_fd31b09e-5162-4e05-b83a-5fb4ac82b461.jpg",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "medium",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_mobile": "shopify://shop_images/L1600W_catalog2_d677d5cb-9454-4ba8-96a1-6eaf8b6fdabf.jpg",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_background": "#f7f7f7",
+        "gradient_background": "",
+        "color_background_2": "rgba(0,0,0,0)",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 36,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_f4x6qj": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_n3779R": {
+          "type": "text",
+          "settings": {
+            "text": "<p>What activities are these insoles most ideal for?</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_tq7xfN": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Living an active lifestyle can put a tremendous amount of strain on your feet, legs, and back and in these circumstances inserting Aetrex Premium Casual Orthotics can help provide the essential support you need underfoot to prevent & relieve pain. Insert them in your casual, walking or work shoes for extraordinary comfort all day.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_YGzVLz": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP MEN",
+            "button_link": "shopify://products/l1600m-m",
+            "button_video_link": "",
+            "button_style": "secondary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_n3779R",
+        "text_tq7xfN",
+        "button_YGzVLz"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/L1600M_shoes3.jpg",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "medium",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_mobile": "shopify://shop_images/L1600M_shoes3.jpg",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_background": "#f7f7f7",
+        "gradient_background": "",
+        "color_background_2": "rgba(0,0,0,0)",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 40,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "multicolumn_R8kcbF": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_aAJcWw": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/L1600W_right2.jpg",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_kWkHxk": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/L1600W_shoes_copy.jpg",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_CdGGyt": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/L1600M_rear2.jpg",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_FKnXYw": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/L1600W_shoes.jpg",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_aAJcWw",
+        "column_kWkHxk",
+        "column_CdGGyt",
+        "column_FKnXYw"
+      ],
+      "name": "Multicolumn",
+      "settings": {
+        "gap": "small",
+        "columns": 4,
+        "columns_mobile": "2",
+        "carousel_on_desktop": true,
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "rich_text_7en7te": {
+      "type": "rich-text",
+      "blocks": {
+        "icon_cXDGqK": {
+          "type": "icon",
+          "settings": {
+            "icon": "none",
+            "icon_image": "shopify://shop_images/30day.jpg",
+            "iwidth": "custom",
+            "icon_width": 56,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "text_fxRckt": {
+          "type": "text",
+          "settings": {
+            "text": "<h4><em>With Our 30 Day Comfort Guarantee,<br/>You have nothing to Lose But Pain.</em></h4>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "icon_cXDGqK",
+        "text_fxRckt"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "#f7f7f7",
+        "gradient_background": "",
+        "color_highlight": "#3175a6",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_Y9jkkf": {
+      "type": "rich-text",
+      "blocks": {
+        "text_ixTQh3": {
+          "type": "text",
+          "settings": {
+            "text": "<p>How Aetrex Orthotics<br/>Help Provide Real Support</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 24,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_ixTQh3"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "multicolumn_WP8adQ": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_6K9qRd": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/Image_1_3246ee7f-b5eb-4b8d-b2cd-9c6e3dff46f1.jpg",
+            "image_ratio": "adapt",
+            "heading": "<em>1. The Right Arch Support & Alignment</em>",
+            "heading_size": "text-base-xl",
+            "text": "<p>Supporting the arch in the proper place is crucial. Looking at your bare feet, the apex of the arch appears to be in the middle of the foot. An X-ray can confirm the apex is actually further back. The contour, position and height of Aetrex’s unique arch support aligns anatomically in the proper place to help support our bodies from the ground up.</p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_GNYqJi": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/Image_2_543e90cd-eeec-4485-9b7c-896984e149c8.jpg",
+            "image_ratio": "adapt",
+            "heading": "<em>2. The Right Premium Materials</em>",
+            "heading_size": "text-base-xl",
+            "text": "<p>Most orthotics available in the market use plastics and other hard, uncomfortable materials. The Aetrex Orthotics Collection utilizes premium, shock absorbing materials designed to cushion and support the body while protecting the foot. The collection integrates high-tech, light-weight, modern materials such as memory foams, polyurethanes, and slow recovery foams.</p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_XRCwq8": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/EC_Image_3.jpg",
+            "image_ratio": "adapt",
+            "heading": "<em>3. The Right Experience & Technology</em>",
+            "heading_size": "text-base-xl",
+            "text": "<p>Aetrex is the global leader in foot scanning technology and orthotics. Backed by 70-years of data and expertise, Aetrex’s has remained dedicated to advancements in foot health and comfort. Every Orthotic is carefully designed to help relieve common foot pain like Plantar fasciitis, Metatarsalgia, Arch & Heel Pain.</p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_6K9qRd",
+        "column_GNYqJi",
+        "column_XRCwq8"
+      ],
+      "name": "Multicolumn",
+      "settings": {
+        "gap": "small",
+        "columns": 2,
+        "columns_mobile": "1",
+        "carousel_on_desktop": true,
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "#3175a6",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "rich_text_gBRqYf": {
+      "type": "rich-text",
+      "blocks": {
+        "button_pngVRa": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP MEN",
+            "button_link": "shopify://products/l1600m-m",
+            "button_style": "secondary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_UUByBB": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP WOMEN",
+            "button_link": "shopify://products/l1600w-m",
+            "button_style": "secondary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "button_pngVRa",
+        "button_UUByBB"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "testimonials_FMCa3y": {
+      "type": "testimonials",
+      "blocks": {
+        "testimonial_zACyNq": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<h6>\"I recommend Aetrex Orthotics to my patients because it helps provide the right balance and support to relieve and prevent foot conditions like Plantar Fasciitis. Unlike other brands; the contour, position and height of the Aetrex orthotic arch support aligns anatomically in the proper place to help support our bodies from the ground up.”</h6>",
+            "author": "Janine Taddeo, DPM",
+            "author_info": "",
+            "author_url": "",
+            "image": "shopify://shop_images/Dr_J_Taddeo.png",
+            "image_ratio": "adapt",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_zACyNq"
+      ],
+      "name": "Testimonials",
+      "settings": {
+        "heading": "",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "#f7f7f7",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "rounded": false
+      }
+    },
+    "rich_text_wLGRM7": {
+      "type": "rich-text",
+      "blocks": {
+        "text_3yQ3eH": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Recently Released</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_3yQ3eH"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "multicolumn_UXa7xF": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_3zmWPt": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/L2900M_catalog_74d2b54f-20cc-4657-a671-a4c0dd029430.jpg",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "Performance Confort Orthotics",
+            "button_link": "shopify://pages/aetrex-essentials-collection",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_NqzKRm": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/L6200M_catalog_7346807d-4e9f-4a1f-b39a-d65313bbd676.jpg",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "Extreme Comfort Orthotics",
+            "button_link": "shopify://pages/aetrex-extreme-comfort-orthotic-collection",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_3zmWPt",
+        "column_NqzKRm"
+      ],
+      "name": "Multicolumn",
+      "settings": {
+        "gap": "small",
+        "columns": 2,
+        "columns_mobile": "2",
+        "carousel_on_desktop": false,
+        "swipe_on_mobile": false,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": false,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 48,
+        "divider": false,
+        "full_width": true,
+        "rounded": false
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "image_with_text_overlay_6Yqecn",
+    "rich_text_MLXerj",
+    "rich_text_mxjCRr",
+    "rich_text_ntY7bT",
+    "rich_text_rKArAL",
+    "rich_text_r7gtcn",
+    "image_with_text_mqK3Ax",
+    "image_with_text_f4x6qj",
+    "multicolumn_R8kcbF",
+    "rich_text_7en7te",
+    "rich_text_Y9jkkf",
+    "multicolumn_WP8adQ",
+    "rich_text_gBRqYf",
+    "testimonials_FMCa3y",
+    "rich_text_wLGRM7",
+    "multicolumn_UXa7xF"
+  ]
+}

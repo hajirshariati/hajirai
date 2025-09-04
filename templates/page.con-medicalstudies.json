@@ -1,0 +1,209 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "image_with_text_overlay_3B3AqL": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "heading_4AzDUj": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>CLINICAL STUDIES</p>",
+            "heading_size": "title-md",
+            "heading_tag": "h3",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "heading_4xTaMy": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>Aetrex Orthotics are Clinically Proven* to: • Relieve Foot & Body Pain • Increase Foot Function • Relieve Plantar Fasciitis • & Much More!</p>",
+            "heading_size": "title-sm",
+            "heading_tag": "h4",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_XDMrMw": {
+          "type": "text",
+          "settings": {
+            "text": "<p>*See individual studies below for details</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_4AzDUj",
+        "heading_4xTaMy",
+        "text_XDMrMw"
+      ],
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/cs1.png",
+        "image_height": "adapt",
+        "content_width": "small",
+        "content_position": "md:items-center md:justify-start",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/cs1_b63e2476-becb-4516-baaa-e4f46a2c0c2e.png",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-center justify-center",
+        "text_alignment_mobile": "left",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
+        "padding_top": 12,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "zoom"
+      }
+    },
+    "multicolumn_KrCFaG": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_MmrBNf": {
+          "type": "column",
+          "settings": {
+            "show_border": true,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/cs2_2V.png",
+            "image_ratio": "landscape",
+            "heading": "<strong>Clinically Proven to Reduce Foot, Knee, Hip & Back Pain</strong>",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Aetrex Premium Memory Foam Orthotics</p>",
+            "button_label": "LEARN MORE",
+            "button_link": "shopify://pages/case-premmem",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_zWEBkN": {
+          "type": "column",
+          "settings": {
+            "show_border": true,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/cs3_2V.png",
+            "image_ratio": "landscape",
+            "heading": "<strong>Clinically Proven to Improve Plantar Fasciitis Pain & Foot Function</strong>",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Aetrex Compete Orthotics & Orthotic Flips</p>",
+            "button_label": "LEARN MORE",
+            "button_link": "shopify://pages/casestudy-pfkit",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_XE6pkE": {
+          "type": "column",
+          "settings": {
+            "show_border": true,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/image_52_2V.png",
+            "image_ratio": "landscape",
+            "heading": "<strong>Clinically Proven to Improve Comfort While Running</strong>",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Aetrex Speed Orthotics</p>",
+            "button_label": "LEARN MORE",
+            "button_link": "shopify://pages/casestudy-speed",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_MmrBNf",
+        "column_zWEBkN",
+        "column_XE6pkE"
+      ],
+      "name": "Multicolumn",
+      "settings": {
+        "gap": "small",
+        "columns": 3,
+        "columns_mobile": "1",
+        "carousel_on_desktop": false,
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#eea15a",
+        "color_button_gradient": "",
+        "padding_top": 52,
+        "padding_bottom": 48,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "image_with_text_overlay_3B3AqL",
+    "multicolumn_KrCFaG"
+  ]
+}

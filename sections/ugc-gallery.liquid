@@ -1,0 +1,82 @@
+{{ 'ugc-gallery.min.css' | asset_url | stylesheet_tag }}
+
+
+{% liquid 
+  assign _s = section.settings
+
+  assign gallery_id = ""
+  if _s.custom_gallery != blank
+    assign gallery_id = _s.custom_gallery
+  elsif global_pdp_sourced_gallery != blank
+    assign gallery_id = _s.global_pdp_sourced_gallery
+  else
+    assign gallery_id = _s.global_fallback_sourced_gallery
+  endif
+%}
+
+{%- if template contains 'product' -%}
+  {% if _s.custom_gallery != blank %}
+    <div
+    class="yotpo yotpo-pictures-widget"
+    data-gallery-id="{{ gallery_id }}"
+  >
+  </div>
+    {% else %}
+  <div
+    class="yotpo yotpo-pictures-widget"
+    data-gallery-id="{{ gallery_id }}"
+    {% if _s.global_pdp_sourced_gallery != blank %}
+      data-product-id="{{ product.id }}"
+    {% endif %}
+  >
+  </div>
+  {% endif %}
+  
+{%- elsif template contains 'collection' and collection.metafields.custom.ugc_gallery_id -%}
+  {%- assign gallery_id = collection.metafields.custom.ugc_gallery_id | default: _s.global_fallback_sourced_gallery -%}
+  <div
+    class="yotpo yotpo-pictures-widget"
+    data-gallery-id="{{ gallery_id  }}"
+  >
+  </div>
+{%- elsif template contains 'page' and page.metafields.custom.ugc_gallery_id -%}
+  {%- assign gallery_id = page.metafields.custom.ugc_gallery_id | default: _s.global_fallback_sourced_gallery -%}
+  <div
+    class="yotpo yotpo-pictures-widget"
+    data-gallery-id="{{ gallery_id }}"
+  >
+  </div>
+{%- endif -%}
+
+{% schema %} 
+{
+  "name": "UGC Gallery",
+  "settings": [
+    {
+      "type":"text",
+      "id":"custom_gallery",
+      "label": "Custom Gallery",
+      "info": "This sourced gallery will take priority over the Global PDP and Global Fallback Galleries",
+    },
+    {
+      "type":"text",
+      "id":"global_pdp_sourced_gallery",
+      "label": "Global PDP sourced UGC Gallery",
+      "info": "This sourced gallery will take priority over the fallback setting",
+      "default": "67807363501d9d972ff9bf48"
+    },
+    {
+      "type":"text",
+      "id":"global_fallback_sourced_gallery",
+      "label": "Global Fallback UGC Gallery",
+      "info": "This value stores the global fallback for the UGC gallery",
+      "default":"67806b650c1215001c37bb7e"
+    }
+  ],
+  "presets": [
+    {
+      "name": "UGC Gallery"
+    }
+  ]
+}
+{% endschema %}

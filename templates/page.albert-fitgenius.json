@@ -1,0 +1,217 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-sm",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "image_with_text_gAKU8K": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_P9PpYC": {
+          "type": "heading",
+          "settings": {
+            "heading": "Albert FitGenius™",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_kL9wCq": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Your feet are 3-dimensional. So are your shoes. Yet, today online ordering is still just based on length and width. It’s no wonder 30-40% of these orders are returned. And, as e-commerce continues to grow at an exponential rate, this challenge will unfortunately only become more prevalent. Aetrex’s FitGenius AI engine can dramatically reduce your e-commerce footwear returns and create a more personalized customer experience.<br/><br/>One of the challenges when shopping for footwear online is that consumers typically only know their length and possibly their width. But, the reality is that feet are three-dimensional, and shoes are too. So, there are many more factors at play. The combination of an accurate 3D reconstruction of your feet with our FitGenius AI engine, allows us to solve this problem and recommend the right shoes in the appropriate size.<br/><br/></p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_P9PpYC",
+        "text_kL9wCq"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/FitGenius_Albert2Pro_400x400px.jpg",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_mobile": "shopify://shop_images/FitGenius_Albert2Pro_400x400px.jpg",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "left",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 48,
+        "padding_bottom": 12,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_GFYmqd": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_4kk8GD": {
+          "type": "text",
+          "settings": {
+            "text": "<p>FitGenius is our proprietary Artificial Intelligence platform created to custom match customers’ unique 3D foot profiles with the ideal footwear styles and sizes based on a retailer’s inventory. It works by matching a customer’s unique 3D foot profile & fit preference data with the shoe purchase history of similar profiles to help get the right fit on the first try.</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_4kk8GD"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/iPad_aetrex_page_400x326px.jpg",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_mobile": "shopify://shop_images/iPad_aetrex_page_400x326px.jpg",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "left",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_nJawHh": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_hrAeCb": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The process begins with a 3D foot scan in store. Consumers are able to instantly view their 3D foot measurements and immediately receive their unique foot profile data via email. Retailers who fully integrate the program can then have FitGenius recommendations appear wherever the consumer shops- whether in store, on their website or through their email blasts and social media channels. The process is easy, engaging, and fun for the shopper and allows them to get the right fit on the first try. Retailers benefit from reduced online returns, increased customer satisfaction and customer loyalty.<br/><br/></p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_zbzwmV": {
+          "type": "button",
+          "settings": {
+            "button_label": "Button label",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "link",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_hrAeCb",
+        "button_zbzwmV"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/iPad_footwear_page._400x326px.jpg",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_mobile": "shopify://shop_images/iPad_footwear_page._400x326px.jpg",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "left",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 48,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "image_with_text_gAKU8K",
+    "image_with_text_GFYmqd",
+    "image_with_text_nJawHh"
+  ]
+}

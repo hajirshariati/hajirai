@@ -1,0 +1,766 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "video_with_text_overlay_84weNe": {
+      "type": "video-with-text-overlay",
+      "blocks": {
+        "heading_GPDbEf": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>FOOT PAIN ISN'T NORMAL.<br/>YOUR SOLUTION SHOULDN'T BE EITHER.</p>",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_LgtJTj": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We’ve scanned over 50 million feet to create orthotics and footwear engineered from real data—for real relief.</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_qiiHDC": {
+          "type": "button",
+          "settings": {
+            "button_label": "Shop Footwear",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": true,
+            "button_icon": false
+          }
+        },
+        "button_KVTBYB": {
+          "type": "button",
+          "settings": {
+            "button_label": "Shop Orthotics",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": true,
+            "button_icon": false
+          }
+        },
+        "button_e48qx6": {
+          "type": "button",
+          "settings": {
+            "button_label": "How it works",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "secondary",
+            "button_size": "md",
+            "button_external": true,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_GPDbEf",
+        "text_LgtJTj",
+        "button_qiiHDC",
+        "button_KVTBYB",
+        "button_e48qx6"
+      ],
+      "name": "t:sections.video-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
+        "description": "",
+        "enable_video_autoplay": true,
+        "enable_video_looping": true,
+        "image_height": "650px",
+        "content_width": "medium",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
+        "video_url_mobile": "",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-center justify-center",
+        "text_alignment_mobile": "center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 70,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false
+      }
+    },
+    "collection_list_JTMprT": {
+      "type": "collection-list",
+      "blocks": {
+        "collection_MhEWgT": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "title": "Plantar Fasciitis",
+            "description": "",
+            "overlay_content": true,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 31
+          }
+        },
+        "collection_7eb3Hp": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "title": "Wide Feet",
+            "description": "",
+            "overlay_content": true,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 31
+          }
+        },
+        "collection_VmRmWb": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "title": "Metatarsalgia",
+            "description": "",
+            "overlay_content": true,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 31
+          }
+        },
+        "collection_zJfbDi": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "title": "Flat Feet",
+            "description": "",
+            "overlay_content": true,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 31
+          }
+        },
+        "collection_tfzaHW": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "title": "Bunions",
+            "description": "",
+            "overlay_content": true,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 31
+          }
+        }
+      },
+      "block_order": [
+        "collection_MhEWgT",
+        "collection_7eb3Hp",
+        "collection_VmRmWb",
+        "collection_zJfbDi",
+        "collection_tfzaHW"
+      ],
+      "name": "t:sections.collection-list.name",
+      "settings": {
+        "columns": 5,
+        "carousel_on_desktop": true,
+        "image_type": "product",
+        "image_ratio": "portrait",
+        "show_products_count": false,
+        "show_view_all": false,
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "heading": "<strong>Pain Is Personal. So Are Our Products.</strong>",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "Find what’s right for you—from plantar fasciitis relief to all-day comfort.",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": true,
+        "rounded": false
+      }
+    },
+    "reveal_video_with_text_overlay_dbRckr": {
+      "type": "reveal-video-with-text-overlay",
+      "blocks": {
+        "heading_VztWWz": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p><strong>What if shoes were built from </strong><em><strong>science</strong></em><strong>, not assumptions?</strong></p>",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_76QfCb": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We built our own scanners. Captured millions of scans. And created better-fitting products to solve real pain.<br/><br/>Today, Aetrex is redefining what foot health looks—and feels—like.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_VztWWz",
+        "text_76QfCb"
+      ],
+      "name": "t:sections.reveal-video-with-text-overlay.name",
+      "settings": {
+        "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
+        "description": "",
+        "content_width": "medium",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
+        "video_url_mobile": "",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
+        "color_text": "#ffffff",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 70,
+        "enable_parallax": true
+      }
+    },
+    "collection_list_nHdzzA": {
+      "type": "collection-list",
+      "blocks": {
+        "collection_7fTgzN": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "title": "Walking",
+            "description": "",
+            "overlay_content": true,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30
+          }
+        },
+        "collection_6JbKPw": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "title": "Standing",
+            "description": "",
+            "overlay_content": true,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30
+          }
+        },
+        "collection_cY4EYG": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "title": "Gym/Workout",
+            "description": "",
+            "overlay_content": true,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30
+          }
+        },
+        "collection_kNKmxL": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "title": "Running",
+            "description": "",
+            "overlay_content": true,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30
+          }
+        }
+      },
+      "block_order": [
+        "collection_7fTgzN",
+        "collection_6JbKPw",
+        "collection_cY4EYG",
+        "collection_kNKmxL"
+      ],
+      "name": "t:sections.collection-list.name",
+      "settings": {
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "image_type": "collection",
+        "image_ratio": "portrait",
+        "show_products_count": false,
+        "show_view_all": false,
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "heading": "<strong>Support That Moves With You</strong>",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "<p>Every activity puts your feet through something different — that’s why we don’t believe in one-size-fits-all support. Our footwear and orthotics are carefully selected and rigorously tested to meet the demands of how you move — whether you're walking, running, standing all day, or exploring outdoors.</p>",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "image_comparison_rpwXdf": {
+      "type": "image-comparison",
+      "blocks": {
+        "image_ec6m3E": {
+          "type": "image",
+          "settings": {
+            "subheading": "",
+            "heading": "",
+            "content_position": "end",
+            "color_text": "#ffffff"
+          }
+        },
+        "image_NWbxFz": {
+          "type": "image",
+          "settings": {
+            "subheading": "",
+            "heading": "",
+            "content_position": "end",
+            "color_text": "#ffffff"
+          }
+        }
+      },
+      "block_order": [
+        "image_ec6m3E",
+        "image_NWbxFz"
+      ],
+      "name": "t:sections.image-comparison.name",
+      "settings": {
+        "layout": "horizontal",
+        "image_height": "adapt",
+        "image_height_mobile": "adapt",
+        "heading": "<strong>Support You Can See. </strong><em><strong>Relief</strong></em><strong>  You Can Feel.</strong>",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "<p>Compare the difference. Aetrex Orthotics use precision foot mapping to bring real comfort and support to every pair of shoes.</p>",
+        "button_label": "Shop Orthotics",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": false,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "rich_text_zDG4ya": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_qdE9GL": {
+          "type": "heading",
+          "settings": {
+            "heading": "<strong>Trusted by Brands That Put Fit First</strong>",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_qdE9GL"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "medium",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 36,
+        "padding_bottom": 36,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "scrolling_text_byhkGn": {
+      "type": "scrolling-text",
+      "blocks": {
+        "image_dP3Thd": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/foot.gif",
+            "height": 80,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "image_KRQ3jf": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/alo.gif",
+            "height": 80,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "image_CQTeDD": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/puma.gif",
+            "height": 80,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "image_DqCzKX": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/dsw.gif",
+            "height": 80,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "image_pjc9yY": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/nike_06b59e60-23dc-4474-807a-22f1c3115ee7.jpg",
+            "height": 80,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "image_nqhLz4": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/gucci.gif",
+            "height": 80,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "image_cerP7C": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/scheels.jpg",
+            "height": 80,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        }
+      },
+      "block_order": [
+        "image_dP3Thd",
+        "image_KRQ3jf",
+        "image_CQTeDD",
+        "image_DqCzKX",
+        "image_pjc9yY",
+        "image_nqhLz4",
+        "image_cerP7C"
+      ],
+      "name": "t:sections.scrolling-text.name",
+      "settings": {
+        "direction": "left",
+        "speed": 5,
+        "grid_horizontal": 70,
+        "enable_twin": false,
+        "enable_parallax": true,
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "padding_top": 36,
+        "padding_bottom": 36,
+        "divider": false,
+        "rounded": false
+      }
+    },
+    "shop_the_look_j4C8TF": {
+      "type": "shop-the-look",
+      "blocks": {
+        "product_mx4rdB": {
+          "type": "product",
+          "settings": {
+            "product": "sydney-sand-cutout-ew778w",
+            "color_text": "#ffffff",
+            "vertical": 25,
+            "horizontal": 25,
+            "vertical_mobile": 25,
+            "horizontal_mobile": 25
+          }
+        },
+        "product_4NNb9C": {
+          "type": "product",
+          "settings": {
+            "product": "jillian-cognac-sc363w",
+            "color_text": "#ffffff",
+            "vertical": 50,
+            "horizontal": 50,
+            "vertical_mobile": 50,
+            "horizontal_mobile": 50
+          }
+        },
+        "product_BUNcFG": {
+          "type": "product",
+          "settings": {
+            "product": "marz-beige-ss507w",
+            "color_text": "#ffffff",
+            "vertical": 75,
+            "horizontal": 65,
+            "vertical_mobile": 75,
+            "horizontal_mobile": 65
+          }
+        }
+      },
+      "block_order": [
+        "product_mx4rdB",
+        "product_4NNb9C",
+        "product_BUNcFG"
+      ],
+      "name": "t:sections.shop-the-look.name",
+      "settings": {
+        "heading": "<strong>Our Top Picks, Backed by Science</strong>",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "<p>From arch support to all-day wear, these customer favorites deliver proven relief and performance in every step.</p>",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 30,
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": true,
+        "rounded": false
+      }
+    },
+    "reveal_image_with_text_TWNmEV": {
+      "type": "reveal-image-with-text",
+      "name": "t:sections.reveal-image-with-text.name",
+      "settings": {
+        "image": "shopify://shop_images/Zoey_scanner_render01.png",
+        "content_width": "medium",
+        "heading": "For over two decades, we’ve used cutting-edge foot scanning to engineer orthotics that move with you—built around your unique shape, pressure points, and stride.",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center",
+        "heading_tag": "h2",
+        "button_label": "",
+        "button_link": "",
+        "button_video_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "color_text": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": ""
+      }
+    },
+    "video_with_text_overlay_RTPQg7": {
+      "type": "video-with-text-overlay",
+      "blocks": {
+        "subheading_Ezf7k3": {
+          "type": "subheading",
+          "settings": {
+            "subheading": "Powered by Scans. Proven by Comfort.",
+            "subheading_size": "subtitle-lg",
+            "secondary_color": true
+          }
+        },
+        "heading_GeNLwY": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p><strong>Want to Know What Your Feet Need? Start With a Scan.</strong></p>",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_i4kBgR": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Get a free 3D foot scan in minutes at a store near you. Understand your foot profile—and what support you really need.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_QRVPLh": {
+          "type": "button",
+          "settings": {
+            "button_label": "STORE LOCATOR",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "secondary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": true
+          }
+        }
+      },
+      "block_order": [
+        "subheading_Ezf7k3",
+        "heading_GeNLwY",
+        "text_i4kBgR",
+        "button_QRVPLh"
+      ],
+      "name": "t:sections.video-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
+        "description": "",
+        "enable_video_autoplay": true,
+        "enable_video_looping": true,
+        "image_height": "650px",
+        "content_width": "small",
+        "content_position": "md:items-center md:justify-start",
+        "text_alignment": "left",
+        "video_url_mobile": "",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-center justify-center",
+        "text_alignment_mobile": "center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 70,
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": true,
+        "rounded": false
+      }
+    }
+  },
+  "order": [
+    "video_with_text_overlay_84weNe",
+    "collection_list_JTMprT",
+    "reveal_video_with_text_overlay_dbRckr",
+    "collection_list_nHdzzA",
+    "image_comparison_rpwXdf",
+    "rich_text_zDG4ya",
+    "scrolling_text_byhkGn",
+    "shop_the_look_j4C8TF",
+    "reveal_image_with_text_TWNmEV",
+    "video_with_text_overlay_RTPQg7"
+  ]
+}

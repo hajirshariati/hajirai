@@ -1,0 +1,105 @@
+.main-promotional-banner-container {
+  position: relative;
+  z-index: 21;
+  overflow: hidden;
+}
+.main-promotional-banner-container .main-promo-banner-inner-wrapper {
+  height: 2.5rem;
+}
+.main-promotional-banner-container .promo-banner__dropdown {
+  opacity: 0;
+  overflow: hidden;
+  transition: all .5s ease-in-out;
+  display: flex;
+  position: absolute;
+  top: 120%;
+  left: 0;
+  width: 100%;
+}
+.main-promotional-banner-container .promo-banner__dropdown-close {
+  position: absolute;
+  right: 30px;
+  z-index: 999;
+  display: block;
+  width: 30px;
+  cursor: pointer;
+  color: #fff;
+  cursor: pointer;
+}
+.main-promotional-banner-container .main-promo-banner-inner-wrapper .promo-infor-wrapper {
+    color: #fff;
+    font-size: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+.main-promotional-banner-container .main-promo-banner-inner-wrapper .promo-infor-wrapper .promo-banner__caret svg {
+    width: 10px;
+    transition: transform .5s ease;
+    cursor: pointer;
+}
+.main-promotional-banner-container span.promo-banner__caret.active-dropdown svg.icon.icon--caret-down {
+    transform: rotate(180deg);
+}
+.main-promotional-banner-container .promo-banner__dropdown:before {
+    content: " ";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: .8;
+    z-index: -1;
+    background-color: #111111;
+}
+.main-promotional-banner-container .promo-banner__dropdown.active-drop-div {
+    opacity: 1;
+    padding: 2rem 3rem;
+    height: fit-content;
+    top: 100%;
+}
+.main-promotional-banner-container .promo-banner__dropdown-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: unset;
+    padding: 0 3rem;
+    gap: 1.5rem;
+    margin: auto;
+}
+.main-promotional-banner-container .promo-banner__dropdown--content {
+    background: #fff;
+    width: 100%;
+    max-width: 25rem;
+    flex: 1;
+    padding: 1.5rem;
+}
+.main-promotional-banner-container .promo-banner__dropdown--content h5 {
+    font-size: 24px;
+    font-weight: 400;
+    letter-spacing: 0;
+    line-height: 120%;
+    margin: 0 0 .30rem;
+}
+.main-promotional-banner-container .promo-banner__dropdown--content p {
+    font-size: 16px;
+    line-height: 150%;
+    font-weight: 400;
+    margin: 0 0 .30rem;
+}
+.main-promotional-banner-container .promo-banner__dropdown--content > a {
+    margin-top: 0.6rem;
+    color: #0171E3;
+    text-decoration: underline;
+    display: inline-block;
+}
+@media (max-width: 1023px) {
+    .main-promotional-banner-container .promo-banner__dropdown.active-drop-div {
+        padding: 2rem .75rem;;
+    }
+  .main-promotional-banner-container .promo-banner__dropdown-wrapper {
+    padding: 3rem 0;
+    flex-direction: column;
+  }
+}

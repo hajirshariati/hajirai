@@ -1,0 +1,127 @@
+{%- doc -%}
+  Renders product pricing with sale detection, unit prices, and dynamic price ranges.
+
+  Displays comprehensive pricing information including regular prices, sale prices, price ranges for products with variants, and unit pricing. Automatically detects sales, formats currencies, and handles various pricing scenarios with proper accessibility support.
+
+  @param {object} [product] - Shopify product object for pricing
+  @param {object} [variant] - Specific variant for single price display
+  @param {boolean} [use_variant] - Show variant price vs product range
+  @param {boolean} [placeholder] - Display placeholder $19.99 price
+  @param {boolean} [hide_unit_price] - Hide unit price information
+  @param {boolean} [skip_to_price] - Skip quantity break considerations
+  @param {boolean} [show_badges] - Show sale/sold out badges (reserved)
+  @param {string} [class] - Additional CSS classes
+
+  @example
+  {% render 'product-price',
+     product: product,
+     variant: product.selected_variant,
+     use_variant: true
+  %}
+{%- enddoc -%}
+
+{%- liquid
+  if use_variant
+    assign target = variant | default: product.selected_or_first_available_variant
+  elsif placeholder
+    assign target = null
+  else
+    assign target = product
+  endif
+
+  assign compare_at_price = target.compare_at_price
+  assign price = target.price | default: 1999
+
+  assign on_sale = false
+  if compare_at_price > price
+    assign on_sale = true
+  endif
+-%}
+
+<div class="price
+  {%- if on_sale %} price--on-sale{% endif -%}
+  {%- if class != blank %} {{ class }}{% endif -%}"
+>
+  {%- if on_sale -%}
+    <span class="sr-only">{{ 'products.price.sale_price' | t }}</span>
+  {%- endif -%}
+
+  <span class="price__regular whitespace-nowrap">
+    {%- liquid
+      if product.quantity_price_breaks_configured? != true or skip_to_price
+        if target == product and product.price_varies
+          if settings.currency_code_enabled
+            assign price_min = product.price_min | money_with_currency
+          else
+            assign price_min = product.price_min | money
+          endif
+          echo 'products.price.from_price_html' | t: price: price_min
+        else
+          if settings.currency_code_enabled
+            echo price | money_with_currency
+          else
+            echo price | money
+          endif
+        endif
+      else
+        if settings.currency_code_enabled
+          assign price_min = product.price_min | money_with_currency
+        else
+          assign price_min = product.price_min | money
+        endif
+        echo 'products.price.from_price_html' | t: price: price_min
+      endif
+    -%}
+  </span>
+
+  {%- if on_sale -%}
+    <span class="sr-only">{{ 'products.price.regular_price' | t }}</span>
+    <span class="price__sale inline-flex items-center h-auto relative">
+      {%- liquid
+        if settings.currency_code_enabled
+          echo compare_at_price | money_with_currency
+        else
+          echo compare_at_price | money
+        endif
+      -%}
+    </span>
+  {%- endif -%}
+
+  {%- if on_sale and template == 'product' and tooltip_heading != blank and tooltip_message != blank -%}
+    <span class="price__item--tooltip tooltip {% if on_sale == false %} visually-hidden {% endif %}" role="tooltip" aria-describedby="tooltip-message">
+      <svg class="icon icon--price-tooltip tooltip-icon" width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <g opacity="0.6">
+        <rect x="0.5" y="0.570312" width="15" height="15" rx="7.5" stroke="#111111"></rect>
+        <path d="M7.42045 12.0703V5.52486H8.42614V12.0703H7.42045ZM7.93182 4.43395C7.7358 4.43395 7.56676 4.36719 7.42472 4.23366C7.28551 4.10014 7.21591 3.93963 7.21591 3.75213C7.21591 3.56463 7.28551 3.40412 7.42472 3.2706C7.56676 3.13707 7.7358 3.07031 7.93182 3.07031C8.12784 3.07031 8.29545 3.13707 8.43466 3.2706C8.5767 3.40412 8.64773 3.56463 8.64773 3.75213C8.64773 3.93963 8.5767 4.10014 8.43466 4.23366C8.29545 4.36719 8.12784 4.43395 7.93182 4.43395Z" fill="#111111"></path>
+      </g>
+    </svg>
+      <span class="tooltip__message" id="tooltip-message">
+        <p class="tooltip__heading">{{ tooltip_heading }}</p>
+        <p class="tooltip__description">{{ tooltip_message }}</p>
+      </span>
+    </span>
+  {% endif %}
+  
+  {%- unless hide_unit_price -%}
+    {%- assign product_variant = product.selected_or_first_available_variant -%}
+    {%- if product_variant.unit_price_measurement -%}
+      <span class="sr-only">{{ 'products.price.unit_price' | t }}</span>
+      <span class="unit-price flex items-center">
+        {%- liquid
+          capture unit_price_base_unit
+            if product_variant.unit_price_measurement
+              if product_variant.unit_price_measurement.reference_value != 1
+                echo product_variant.unit_price_measurement.reference_value
+              endif
+              echo product_variant.unit_price_measurement.reference_unit
+            endif
+          endcapture
+        -%}
+        ({{ product_variant.unit_price | money }}
+        <span aria-hidden="true">/</span>
+        <span class="sr-only">&nbsp;{{ 'general.accessibility.unit_price_separator' | t }}&nbsp;</span>
+        {{ unit_price_base_unit }})
+        </span>
+    {%- endif -%}
+  {%- endunless -%}
+</div>

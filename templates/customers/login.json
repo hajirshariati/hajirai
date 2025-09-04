@@ -1,0 +1,300 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "rich_text_krWnnK": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_LRQNML": {
+          "type": "heading",
+          "settings": {
+            "heading": "A Better Way to Shop Aetrex",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_LRQNML"
+      ],
+      "disabled": true,
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#000000",
+        "color_background": "#f4e2d1",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_6efLPm": {
+      "type": "rich-text",
+      "blocks": {
+        "text_qqGBwr": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We’ve upgraded our website to give you a faster, more secure shopping experience—thank you for your patience during the refresh!<br/><br/>For your safety, we couldn’t transfer your account password. To continue shopping, please reset your password by clicking the link below or using the “Forgot Password” option on our site.</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_jhaPUd": {
+          "type": "button",
+          "settings": {
+            "button_label": "GET ACCESS",
+            "button_link": "/account/login?error=login_required#recover",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_cwnU3H": {
+          "type": "button",
+          "settings": {
+            "button_label": "See What’s New",
+            "button_link": "shopify://blogs/news/aetrex-com-has-a-new-home",
+            "button_style": "link",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_qqGBwr",
+        "button_jhaPUd",
+        "button_cwnU3H"
+      ],
+      "disabled": true,
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "#faede1",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "empty_space_MYLMCz": {
+      "type": "empty-space",
+      "name": "Empty space",
+      "settings": {
+        "desktop_height": 40,
+        "mobile_height": 28,
+        "color_background": "",
+        "gradient_background": ""
+      }
+    },
+    "main-login": {
+      "type": "main-login",
+      "settings": {
+        "enable_shop_login_button": false,
+        "heading_size": "title-sm",
+        "heading_tag": "h3",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "rounded": false
+      }
+    },
+    "empty_space_kpmbpR": {
+      "type": "empty-space",
+      "name": "Empty space",
+      "settings": {
+        "desktop_height": 40,
+        "mobile_height": 28,
+        "color_background": "",
+        "gradient_background": ""
+      }
+    },
+    "multicolumn_with_icons_JfDLw8": {
+      "type": "multicolumn-with-icons",
+      "blocks": {
+        "column_CmKp3F": {
+          "type": "column",
+          "settings": {
+            "icon": "truck",
+            "custom_icon": "",
+            "heading": "",
+            "text": "<p>Free ground shipping (US ONLY*)</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_jPYrwC": {
+          "type": "column",
+          "settings": {
+            "icon": "creadit_card",
+            "custom_icon": "",
+            "heading": "",
+            "text": "<p>Earn 5% on every purchase</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_jn7QyR": {
+          "type": "column",
+          "settings": {
+            "icon": "star",
+            "custom_icon": "",
+            "heading": "",
+            "text": "<p>Early VIP access to sales & product releases</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_eJMLPi": {
+          "type": "column",
+          "settings": {
+            "icon": "gift",
+            "custom_icon": "",
+            "heading": "",
+            "text": "<p>$20 worth of points on your anniversary</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_WETG3g": {
+          "type": "column",
+          "settings": {
+            "icon": "sale",
+            "custom_icon": "",
+            "heading": "",
+            "text": "<p>$20 worth of points after the first purchase</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_BzPbNe": {
+          "type": "column",
+          "settings": {
+            "icon": "heart",
+            "custom_icon": "",
+            "heading": "",
+            "text": "<p>$20 worth of points for referral</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_CmKp3F",
+        "column_jPYrwC",
+        "column_jn7QyR",
+        "column_eJMLPi",
+        "column_WETG3g",
+        "column_BzPbNe"
+      ],
+      "name": "Multicolumn with icons",
+      "settings": {
+        "style": "with-border",
+        "columns": 2,
+        "text_alignment": "center",
+        "heading": "<strong>Member Benefits</strong>",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h3",
+        "subheading": "Aetrex Access",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "#f7f9fa",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 20,
+        "padding_bottom": 20,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "empty_space_jkUWyh": {
+      "type": "empty-space",
+      "name": "Empty space",
+      "settings": {
+        "desktop_height": 40,
+        "mobile_height": 28,
+        "color_background": "",
+        "gradient_background": ""
+      }
+    }
+  },
+  "order": [
+    "rich_text_krWnnK",
+    "rich_text_6efLPm",
+    "empty_space_MYLMCz",
+    "main-login",
+    "empty_space_kpmbpR",
+    "multicolumn_with_icons_JfDLw8",
+    "empty_space_jkUWyh"
+  ]
+}

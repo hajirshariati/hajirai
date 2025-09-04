@@ -1,0 +1,767 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "video_with_text_overlay_TgKph8": {
+      "type": "video-with-text-overlay",
+      "blocks": {
+        "subheading_DQGQFg": {
+          "type": "subheading",
+          "disabled": true,
+          "settings": {
+            "subheading": "Add a tagline",
+            "subheading_size": "subtitle-md",
+            "secondary_color": true
+          }
+        },
+        "heading_64L34p": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>The Science of Comfort. Engineered for Your Feet.</p>",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_H4rWEH": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Crafted from millions of foot scans, our orthotics provide personalized support to relieve pain, improve posture, and keep you moving with ease.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_PwAQDY": {
+          "type": "button",
+          "settings": {
+            "button_label": "Find Your Perfect Pair",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": true
+          }
+        },
+        "button_AGih6p": {
+          "type": "button",
+          "settings": {
+            "button_label": "Shop All",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": true
+          }
+        }
+      },
+      "block_order": [
+        "subheading_DQGQFg",
+        "heading_64L34p",
+        "text_H4rWEH",
+        "button_PwAQDY",
+        "button_AGih6p"
+      ],
+      "name": "t:sections.video-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "video": "shopify://files/videos/OrthoticLPdesktop.mp4",
+        "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
+        "description": "",
+        "enable_video_autoplay": true,
+        "enable_video_looping": true,
+        "image_height": "650px",
+        "content_width": "medium",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
+        "video_url_mobile": "",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-center justify-center",
+        "text_alignment_mobile": "center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 40,
+        "padding_top": 0,
+        "padding_bottom": 56,
+        "divider": false,
+        "full_width": true,
+        "rounded": true
+      }
+    },
+    "scrolling_text_kzjffn": {
+      "type": "scrolling-text",
+      "blocks": {
+        "text_YAtRjd": {
+          "type": "text",
+          "settings": {
+            "text": "Try for 30 Days  Risk-Free.",
+            "text_size": 30,
+            "text_font": "body",
+            "highlighted_text": "stencil",
+            "highlighted_scribble": "squiggle-underline"
+          }
+        }
+      },
+      "block_order": [
+        "text_YAtRjd"
+      ],
+      "name": "Scrolling text",
+      "settings": {
+        "direction": "left",
+        "speed": 20,
+        "grid_horizontal": 70,
+        "enable_twin": false,
+        "enable_parallax": true,
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "padding_top": 56,
+        "padding_bottom": 56,
+        "divider": false,
+        "rounded": false
+      }
+    },
+    "featured_collections_9d3ge7": {
+      "type": "featured-collections",
+      "blocks": {
+        "collection_xxeKq7": {
+          "type": "collection",
+          "settings": {
+            "collection": "orthotics-plantar-fasciitis",
+            "products": [],
+            "title": "Plantar Fasciitis"
+          }
+        },
+        "collection_g9AqYk": {
+          "type": "collection",
+          "settings": {
+            "collection": "orthotics-for-flat-feet",
+            "products": [],
+            "title": "Flat Feet"
+          }
+        },
+        "collection_Wzc8ka": {
+          "type": "collection",
+          "settings": {
+            "collection": "orthotics-for-ball-of-foot-discomfort",
+            "products": [],
+            "title": "Ball of Foot Discomfort"
+          }
+        },
+        "collection_BbmnMe": {
+          "type": "collection",
+          "settings": {
+            "collection": "premium-memory-foam",
+            "products": [],
+            "title": "Pressure Relief"
+          }
+        },
+        "collection_3qxYYM": {
+          "type": "collection",
+          "settings": {
+            "collection": "orthotics-for-high-arches",
+            "products": [],
+            "title": "High Arches"
+          }
+        },
+        "collection_Uccwbn": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "products": [],
+            "title": "Running"
+          }
+        }
+      },
+      "block_order": [
+        "collection_xxeKq7",
+        "collection_g9AqYk",
+        "collection_Wzc8ka",
+        "collection_BbmnMe",
+        "collection_3qxYYM",
+        "collection_Uccwbn"
+      ],
+      "name": "Multiple featured collections",
+      "settings": {
+        "product_limit": 6,
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "Which Orthotic is Right for You?",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "Different feet, different needs. Explore by pain point.",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_overlay_M6AhUn": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "subheading_HaxULK": {
+          "type": "subheading",
+          "settings": {
+            "subheading": "Why Aetrex Orthotics?",
+            "subheading_size": "subtitle-md",
+            "secondary_color": true
+          }
+        },
+        "heading_CE9MYn": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>Unmatched Technology for Real Relief</p>",
+            "heading_size": "title-lg tracking-heading",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_CVjrUt": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Unlike generic orthotics, Aetrex products are designed from <strong>advanced foot mapping technology</strong>. With over  <strong>50 million foot scans</strong> and decades of experience, our orthotics are crafted to align with your unique foot shape and provide the <strong>most comfortable fit</strong> possible.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "subheading_HaxULK",
+        "heading_CE9MYn",
+        "text_CVjrUt"
+      ],
+      "name": "t:sections.image-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/Screenshot_2025-05-04_at_7.25.17_PM.png",
+        "image_height": "650px",
+        "content_width": "large",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 70,
+        "padding_top": 28,
+        "padding_bottom": 0,
+        "divider": true,
+        "full_width": false,
+        "rounded": true,
+        "enable_parallax": true,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_comparison_i6BATK": {
+      "type": "image-comparison",
+      "blocks": {
+        "image_AE8JMC": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/before.png",
+            "image_mobile": "shopify://shop_images/after.png",
+            "subheading": "",
+            "heading": "Without Aetrex",
+            "content_position": "end",
+            "color_text": "#2c2c2c"
+          }
+        },
+        "image_ezxGf9": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/after.png",
+            "subheading": "",
+            "heading": "With Aetrex",
+            "content_position": "end",
+            "color_text": "#2c2c2c"
+          }
+        }
+      },
+      "block_order": [
+        "image_AE8JMC",
+        "image_ezxGf9"
+      ],
+      "name": "Image comparison",
+      "settings": {
+        "layout": "horizontal",
+        "image_height": "adapt",
+        "image_height_mobile": "auto",
+        "heading": "<strong>See the Difference. Feel the Relief.</strong>",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "Our orthotics don’t just cushion — they correct.",
+        "description": "<p>With and without Aetrex orthotics, the contrast is clear: less pressure, better alignment, and real comfort you can see.</p>",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": true,
+        "rounded": false
+      }
+    },
+    "collection_list_mPHCpz": {
+      "type": "collection-list",
+      "blocks": {
+        "collection_BMqtdJ": {
+          "type": "collection",
+          "settings": {
+            "collection": "walking-orthotics",
+            "image": "shopify://shop_images/20250512_1112_City_Walk_Sneakers_remix_01jv2grqbnffc955hw9gd45skj.png",
+            "title": "Walking",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30
+          }
+        },
+        "collection_UwnQyA": {
+          "type": "collection",
+          "settings": {
+            "collection": "all-day-standing-orthotics",
+            "image": "shopify://shop_images/assets_task_01jv54kk6wexzs1p402wcd17ym_1747150649_img_0.webp",
+            "title": "Standing",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30
+          }
+        },
+        "collection_hHkQLw": {
+          "type": "collection",
+          "settings": {
+            "collection": "running-orthotics",
+            "image": "shopify://shop_images/assets_task_01jv2rvpyte2xtt42ac2x8ekzn_1747071223_img_0.webp",
+            "title": "Running",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30
+          }
+        },
+        "collection_FWgTeX": {
+          "type": "collection",
+          "settings": {
+            "collection": "gym-training",
+            "image": "shopify://shop_images/20250512_1121_Outdoor_Sneaker_Adventure_remix_01jv2h914mez09q0jgnzmczyv5.png",
+            "title": "Gym",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30
+          }
+        },
+        "collection_wPrGdz": {
+          "type": "collection",
+          "settings": {
+            "collection": "tennis-pickleball-orthotics",
+            "title": "Tennis & Pickeball",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30
+          }
+        }
+      },
+      "block_order": [
+        "collection_BMqtdJ",
+        "collection_UwnQyA",
+        "collection_hHkQLw",
+        "collection_FWgTeX",
+        "collection_wPrGdz"
+      ],
+      "name": "Collection list",
+      "settings": {
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "image_type": "collection",
+        "image_ratio": "adapt",
+        "show_products_count": false,
+        "show_view_all": true,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "<strong>Tailored to Your </strong><em><strong>Needs</strong></em><strong>.</strong>",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "<p>Whether you're walking, running, or standing all day, we’ve got orthotics for every activity. Find the right match for your lifestyle and feet.</p>",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "testimonials_banner_P8DMGU": {
+      "type": "testimonials-banner",
+      "blocks": {
+        "testimonial_CRjWCe": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_RnLxLb": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_GUBLhy": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_CRjWCe",
+        "testimonial_RnLxLb",
+        "testimonial_GUBLhy"
+      ],
+      "name": "Testimonials banner",
+      "settings": {
+        "transparent_header": false,
+        "image_height": "650px",
+        "content_position": "md:items-center md:justify-center",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-center justify-center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 70,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "rounded": false,
+        "enable_parallax": true,
+        "parallax_direction": "vertical"
+      }
+    },
+    "faq_XM3i3D": {
+      "type": "faq",
+      "blocks": {
+        "question_PtH3YU": {
+          "type": "question",
+          "settings": {
+            "title": "<strong>How do I know which orthotics are right for me?</strong>",
+            "text": "<p>Our easy-to-use quiz can help you find the perfect fit based on your lifestyle and foot type.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_HFPm8X": {
+          "type": "question",
+          "settings": {
+            "title": "<strong>Can I wear them in any shoe?</strong>",
+            "text": "<p>Yes, our orthotics are designed to fit most types of shoes, from sneakers to dress shoes.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_xpY86j": {
+          "type": "question",
+          "settings": {
+            "title": "<strong>How long will it take to feel the difference?</strong>",
+            "text": "<p>Most customers feel a difference in comfort within the first few days. However, for full adaptation, it may take up to a week.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "question_PtH3YU",
+        "question_HFPm8X",
+        "question_xpY86j"
+      ],
+      "name": "FAQ",
+      "settings": {
+        "style": "with-border",
+        "heading": "<strong>Have Questions? We’ve Got Answers.</strong>",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#ffffff",
+        "overlay_opacity": 4,
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "blog_posts_PJxFGa": {
+      "type": "blog-posts",
+      "name": "Blog posts",
+      "settings": {
+        "blog": "case-studies",
+        "post_limit": 3,
+        "columns": 3,
+        "carousel_on_desktop": false,
+        "show_view_all": false,
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "image_ratio": "landscape",
+        "show_tags": true,
+        "show_date": true,
+        "show_comments": true,
+        "show_author": false,
+        "show_excerpt": true,
+        "heading": "<strong>Built on Proof, Not Promises</strong>",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "CLINICAL STUDIES",
+        "description": "<p>We don’t guess — we measure. Independent clinical studies have validated the effectiveness of Aetrex orthotics in delivering meaningful pressure relief and biomechanical support. Because your comfort should be proven, not promised.</p>",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "images_with_text_overlay_pgicH3": {
+      "type": "images-with-text-overlay",
+      "blocks": {
+        "subheading_9hKYJe": {
+          "type": "subheading",
+          "disabled": true,
+          "settings": {
+            "subheading": "Add a tagline",
+            "subheading_size": "subtitle-md",
+            "secondary_color": true
+          }
+        },
+        "heading_LgFJaa": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p><strong>Ready to Step Into Comfort?</strong></p>",
+            "heading_size": "title-lg tracking-heading",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_HbcxnX": {
+          "type": "text",
+          "settings": {
+            "text": "",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_y7PWVx": {
+          "type": "button",
+          "settings": {
+            "button_label": "Find Your Perfect Pair Now",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": true
+          }
+        }
+      },
+      "block_order": [
+        "subheading_9hKYJe",
+        "heading_LgFJaa",
+        "text_HbcxnX",
+        "button_y7PWVx"
+      ],
+      "name": "t:sections.images-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "image_height": "650px",
+        "content_width": "medium",
+        "content_position": "md:items-center md:justify-center",
+        "text_alignment": "center",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 100,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": true
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "video_with_text_overlay_TgKph8",
+    "scrolling_text_kzjffn",
+    "featured_collections_9d3ge7",
+    "image_with_text_overlay_M6AhUn",
+    "image_comparison_i6BATK",
+    "collection_list_mPHCpz",
+    "testimonials_banner_P8DMGU",
+    "faq_XM3i3D",
+    "blog_posts_PJxFGa",
+    "images_with_text_overlay_pgicH3"
+  ]
+}

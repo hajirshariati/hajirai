@@ -1,0 +1,564 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "testimonials_banner_Cbhq4c": {
+      "type": "testimonials-banner",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/drd_a23d4e35-00b6-46f5-bf8f-7aa00a284f16.jpg",
+        "image_height": "adapt",
+        "content_position": "md:items-center md:justify-center",
+        "image_mobile": "shopify://shop_images/drm.jpg",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-center justify-center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "video_with_text_bkGTeG": {
+      "type": "video-with-text",
+      "blocks": {
+        "text_izB7Xe": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Friday, April 8<br/><em>Metatarsalgia</em></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_izB7Xe"
+      ],
+      "name": "Video with text",
+      "settings": {
+        "video_url": "https://vimeo.com/698307425",
+        "cover_image": "shopify://shop_images/thumb_3.jpg",
+        "description": "",
+        "enable_video_autoplay": false,
+        "enable_video_looping": false,
+        "image_height": "adapt",
+        "video_width": "large",
+        "layout": "video_first",
+        "text_alignment": "center",
+        "content_position": "align-self-center",
+        "video_url_mobile": "https://vimeo.com/698307425",
+        "cover_image_mobile": "shopify://shop_images/thumb_3.jpg",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "center",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "#90abb7",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_DJRdNn": {
+      "type": "rich-text",
+      "blocks": {
+        "text_nXL9rw": {
+          "type": "text",
+          "settings": {
+            "text": "<p><em><strong>YOUR QUESTIONS</strong></em></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_nXL9rw"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "#90abb7",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_PLkKyP": {
+      "type": "rich-text",
+      "blocks": {
+        "text_AgNjT8": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Choose your topic from the list below</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_AgNjT8"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "faq_HKU8NM": {
+      "type": "faq",
+      "blocks": {
+        "question_dicKY9": {
+          "type": "question",
+          "settings": {
+            "title": "Amanda B. – I have Hallux Limitus in my left foot, and I started using an Aetrex insert designed for Metatarsalgia that has significantly helped. However, now it seems like my right foot may be developing Hallux Limitus despite wearing the insert. Is there another insert that would be better for my condition?",
+            "text": "<p>Dr. George Ampat: Hi Amanda! Thank you for sharing your story. Orthotics do not prevent the occurrence of Hallux Limitus, but they can help provide relief from pain. I recommend trying an orthotic like the L2305 Premium Memory Foam Orthotics with Metatarsal Support:<a href=\"https://www.aetrex.com/women-s-premium-memory-foam-med-high-arch-w-metatarsal-support-L2305W.html?lang=en_US\">https://www.aetrex.com/women-s-premium-memory-foam-med-high-arch-w-metatarsal-support-L2305W.html?lang=en_US</a>These orthotics have 43% more memory foam cushioning in the forefoot. The L2405 Customizable Orthotics with Metatarsal Support is also a good style to try:<a href=\"https://www.aetrex.com/customizable-orthotics-l2405-orthotics-14-L2405W.html?lang=en_US\">https://www.aetrex.com/customizable-orthotics-l2405-orthotics-14-L2405W.html?lang=en_US</a>These orthotics have removable gel pods that can help customize your comfort. I also recommend seeing a physician to help you get a diagnosis.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_DhrBHV": {
+          "type": "question",
+          "settings": {
+            "title": "Lainie F. – I have a problem with a callous on the ball of my foot, below the space between the second and third toe. It is very painful. I've had it trimmed by a podiatrist, but once he trimmed too much and it still hurts very much. Where could I get metatarsal pads that would ease some of the pressure on that area? Thank you.",
+            "text": "<p>Dr. George Ampat: Hi Lainie! Aetrex has a range of orthotics that have metatarsal pads to help provide relief. The callus develops because of increased pressure underneath the heads of the second third and fourth metatarsal heads. The metatarsal pad elevates the metatarsal heads and will help decrease the pressure going through that part of the foot. This can prevent calluses from recurring. I recommend trying the Premium Memory Foam Orthotics with Metatarsal Support:<a href=\"https://www.aetrex.com/women-s-premium-memory-foam-med-high-arch-w-metatarsal-support-L2305W.html?lang=en_US\">https://www.aetrex.com/women-s-premium-memory-foam-med-high-arch-w-metatarsal-support-L2305W.html?lang=en_US</a>These orthotics have 43% more memory foam in the forefoot to help with foot discomfort or fatigue.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_aBqMC6": {
+          "type": "question",
+          "settings": {
+            "title": "Richard F. – Will replays be available as I am not able to attend the April 8th webinar?q",
+            "text": "<p>Dr George: Hi Richard! Yes, all the live videos have been posted here and are also accessible on Facebook, Instagram, Twitter, Vimeo, and YouTube.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_FKAYaJ": {
+          "type": "question",
+          "settings": {
+            "title": "Anna V. – I have used the Aetrex orthotics for a number of years especially in my walking shoes for work. I delivered mail for 35 years. My feet have taken a biting and are always hurting. I have metatarsal calluses. What else can I do? Now that I'm retired, I want to keep walking.",
+            "text": "<p>Dr. George Ampat: Hello Anna and thank you for sharing your story. You may want to try an orthotic with a metatarsal pad if you have not been using one yet. A metatarsal pad helps unload pressure at the metatarsal area to help provide cushioning and support. I recommend trying the L2305 Premium Memory Foam Orthotics with Metatarsal Support:<a href=\"https://www.aetrex.com/women-s-premium-memory-foam-med-high-arch-w-metatarsal-support-L2305W.html?lang=en_US\">https://www.aetrex.com/women-s-premium-memory-foam-med-high-arch-w-metatarsal-support-L2305W.html?lang=en_US</a>These orthotics should be able to help provide the comfort that you require to be able to continue walking.<br/><br/></p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_zFFjPa": {
+          "type": "question",
+          "settings": {
+            "title": "Denise H. – Hello, I was diagnosed with Metatarsalgia in 2017 and I’m also developing hammertoes. I wear inserts which I get from Aetrex and have been wearing them in all my boots/sneakers. I can walk with these…. 6 kms a day. My problem is summer wear. I have some styles that help, but I am looking for a waterproof sandal that I could wear around sand, water, etc. Every flip flop I have worn bother my foot. I like the Maui orthotic flip flops that Aetrex sells, but worried that they won’t work for me. Do you have any suggestions? Thank you for your time.",
+            "text": "<p>Dr. George Ampat: Hello Denise and thank you for sharing your story. Aetrex has many supportive and water-friendly sandals to choose from that can help keep your feet comfortable. These styles are water-friendly which means if they get wet, they can dry to their original form:<a href=\"https://www.aetrex.com/water-friendly-sandals/?lang=default\">https://www.aetrex.com/water-friendly-sandals/?lang=default</a>The Maui is a great style to try:<a href=\"https://www.aetrex.com/aetrex-flips-grey-L3100W.html?lang=default\">https://www.aetrex.com/aetrex-flips-grey-L3100W.html?lang=default</a>Along with arch support, they feature Cobra Orthotic Technology that helps alleviate forefoot pressure.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_tLDpe9": {
+          "type": "question",
+          "settings": {
+            "title": "Robert D. – Suffering from Metatarsalgia for 8 years. Condition set in at age 40 after only a few days of jogging in a new pair of top brand running shoes that apparently were very wrong for my feet (high arches). I have been treated by numerous doctors, podiatrists, chiropractors, physiotherapists, osteopaths, and reflexologists. The condition has never improved. Custom orthotics have never helped and the Aetrex inserts have been the most tolerable option I have found so far. Quality of life significantly compromised. What am I missing?!",
+            "text": "<p>Dr. George Ampat: Hi Robert and thank you for sharing your story. I’m happy to hear that the Aetrex Orthotics have been helping you. Aetrex makes many orthotics with different technology features and for different activities; therefore, I would recommend to get an Aetrex foot scan at a location near you here:<a href=\"https://www.aetrex.com/store-locator.html\">https://www.aetrex.com/store-locator.html</a>The foot scan will be able to help identify your pressure points, arch height, and which orthotics would suit you best. I hope you can find the best orthotics to help provide comfort and support.<br/><br/></p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_yBxyxd": {
+          "type": "question",
+          "settings": {
+            "title": "Margene C. – I have a very high arch and am currently experiencing Metatarsalgia. Can you recommend which Aetrex orthotics is best for this condition?",
+            "text": "<p>Dr. George Ampat: Hi Margene and thank you for your question. If you have a high arch, it is likely that there is an increase pressure on the heads of the metatarsals. One of the options I would recommend is an orthotic with more cushioning and a metatarsal pad like the L2305 Premium Memory Foam Orthotics with Metatarsal Support:<a href=\"https://www.aetrex.com/women-s-premium-memory-foam-med-high-arch-w-metatarsal-support-L2305W.html?lang=en_US\">https://www.aetrex.com/women-s-premium-memory-foam-med-high-arch-w-metatarsal-support-L2305W.html?lang=en_US</a>hese orthotics will provide more cushioning over the entire foot and will be the most ideal for you.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_jyKe3h": {
+          "type": "question",
+          "settings": {
+            "title": "Patricia – I was diagnosed with Morton's neuroma 3 years ago. It's getting worse. What treatment is available to help?",
+            "text": "<p>Dr. George Ampat: Hi Patricia. An orthotic with a metatarsal pad can help relieve pressure on the nerves and help provide relief. If you haven’t tried an orthotic with a metatarsal pad yet, then I recommend trying the L2305 Premium Memory Foam Orthotics with Metatarsal Support:<a href=\"https://www.aetrex.com/women-s-premium-memory-foam-med-high-arch-w-metatarsal-support-L2305W.html?lang=en_US\">https://www.aetrex.com/women-s-premium-memory-foam-med-high-arch-w-metatarsal-support-L2305W.html?lang=en_US</a></p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_MFp6YB": {
+          "type": "question",
+          "settings": {
+            "title": "Dorene F. – I have pain on the balls of my feet, I have bunions (not too bad, but right foot is a little worse), and often the balls of my feet hurt. I was told at a shoe store that I hit heavy at the heels when I walk. What can I do to ease the comfort? What shoes are best? I do use a pad and inserts in most of my shoes. I did see a podiatrist several months ago and had an x-ray done, but she only suggested a specific little pad that I am to put on near the arch area of my foot.",
+            "text": "<p>Dr. George Ampat: Hi Dorene and thank you for sharing your story. I’m sorry to hear you are experiencing pain. I recommend trying the L2405 Customizable Orthotics with Metatarsal Support:<a href=\"https://www.aetrex.com/customizable-orthotics-l2405-orthotics-14-L2405W.html?lang=en_US\">https://www.aetrex.com/customizable-orthotics-l2405-orthotics-14-L2405W.html?lang=en_US</a>Along with arch support and a metatarsal pad, these orthotics feature gel pods that you can remove to help alleviate specific pressure points that best suits your needs.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_mKB84d": {
+          "type": "question",
+          "settings": {
+            "title": "Dana R. – I have suffered from plantar fasciitis on and off for years, but last year I sustained an injury that I didn't realize the extent of and thought it would heal. Flash forward after an MRI, I have plantar fasciitis, arthritis, and Baxter's Neuropathy. I have worn a boot, been through physical therapy, both which made it worse not better. Doctor seems stumped. I am now scheduled to get nerve conduction studies. Any suggestions to heal Baxter?",
+            "text": "<p>Dr. George Ampat: Hello Dana. Thank you for sharing your story. Baxter’s neuropathy is rare, but can cause chronic heel pain which can mimic plantar fasciitis. It is good that you are seeking help from a qualified health professional. Stretching, orthotics, medications, and more have a role in Baxter’s neuropathy. Following the advice of your health professional is the most appropriate action.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "question_dicKY9",
+        "question_DhrBHV",
+        "question_aBqMC6",
+        "question_FKAYaJ",
+        "question_zFFjPa",
+        "question_tLDpe9",
+        "question_yBxyxd",
+        "question_jyKe3h",
+        "question_MFp6YB",
+        "question_mKB84d"
+      ],
+      "name": "FAQ",
+      "settings": {
+        "style": "with-border",
+        "heading": "Metatarsalgia",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h3",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#ffffff",
+        "overlay_opacity": 0,
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_4ndgUW": {
+      "type": "rich-text",
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "multicolumn_aUPeic": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_mmpryV": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/34680-L605M_catalog.jpg",
+            "image_ratio": "square",
+            "heading": "<em>Casual Comfort Orthotics with Metatarsal Support</em>",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://products/l605m-m",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_4xHh9U": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/34396-L2305W_catalog.jpg",
+            "image_ratio": "square",
+            "heading": "<em>Premium Memory Foam Orthotics with Metatarsal Support</em>",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://products/l2305w-m",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_YBzYLm": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/XS103W_catalog.jpg",
+            "image_ratio": "square",
+            "heading": "<em>Xspress Runner 2 Women</em>",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://products/xspress-runner2-women",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_KDKzqw": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/L5003W_catalog_e04a9188-c5b6-4e03-b677-bb7f611a314a.jpg",
+            "image_ratio": "square",
+            "heading": "<em>Bondi Orthotic Clogs Men</em>",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://products/bondi-men",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_mmpryV",
+        "column_4xHh9U",
+        "column_YBzYLm",
+        "column_KDKzqw"
+      ],
+      "name": "Multicolumn",
+      "settings": {
+        "gap": "large",
+        "columns": 4,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "Recommended Products for Metatarsalgia",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h4",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "#fafafa",
+        "color_button_background": "#90abb7",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "rich_text_zXk7nk": {
+      "type": "rich-text",
+      "blocks": {
+        "text_nRr9tH": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Terms of Use: Aetrex & Dr. George Ampat will not provide diagnosis, treatment, or medical advice; however, the text, graphics, images & other materials are for informational purposes only. Always seek the advice of your physician or other qualified health providers with any questions you may have regarding a medical condition.</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 18,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_nRr9tH"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 48,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "testimonials_banner_Cbhq4c",
+    "video_with_text_bkGTeG",
+    "rich_text_DJRdNn",
+    "rich_text_PLkKyP",
+    "faq_HKU8NM",
+    "rich_text_4ndgUW",
+    "multicolumn_aUPeic",
+    "rich_text_zXk7nk"
+  ]
+}

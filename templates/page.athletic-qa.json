@@ -1,0 +1,534 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "testimonials_banner_Cbhq4c": {
+      "type": "testimonials-banner",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/drd_a23d4e35-00b6-46f5-bf8f-7aa00a284f16.jpg",
+        "image_height": "adapt",
+        "content_position": "md:items-center md:justify-center",
+        "image_mobile": "shopify://shop_images/drm.jpg",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-center justify-center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "video_with_text_YVDtTf": {
+      "type": "video-with-text",
+      "blocks": {
+        "text_hTd968": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Friday, April 22<br/><em>Athletic Lifestyles</em></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_hTd968"
+      ],
+      "name": "Video with text",
+      "settings": {
+        "video_url": "https://vimeo.com/702928331",
+        "cover_image": "shopify://shop_images/thumb_1.jpg",
+        "description": "",
+        "enable_video_autoplay": false,
+        "enable_video_looping": false,
+        "image_height": "adapt",
+        "video_width": "large",
+        "layout": "video_first",
+        "text_alignment": "center",
+        "content_position": "align-self-center",
+        "video_url_mobile": "https://vimeo.com/702928331",
+        "cover_image_mobile": "shopify://shop_images/thumb_1.jpg",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "center",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "#90abb7",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_DJRdNn": {
+      "type": "rich-text",
+      "blocks": {
+        "text_nXL9rw": {
+          "type": "text",
+          "settings": {
+            "text": "<p><em><strong>YOUR QUESTIONS</strong></em></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_nXL9rw"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "#90abb7",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_PLkKyP": {
+      "type": "rich-text",
+      "blocks": {
+        "text_AgNjT8": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Choose your topic from the list below</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_AgNjT8"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "faq_HKU8NM": {
+      "type": "faq",
+      "blocks": {
+        "question_dicKY9": {
+          "type": "question",
+          "settings": {
+            "title": "Chris – I am a 30-year-old runner and I have flat feet with infrequent arch pain. I wear medial posted orthotics in my everyday shoes. However, my “wear pattern” of neutral running shoes without any inserts show a supinated running wear pattern on the outside of the shoe, so the running store told me to wear a neutral running shoe without support. I have been having chronic knee pain and was wondering if you would recommend switching to a support shoe or just add orthotics to my neutral running shoes or both? Or just quit running altogether and find an exercise with less impact on the body?",
+            "text": "<p>Dr George: Hi Chris and thank you for sharing your story. It truly depends on what provides you with maximum comfort. If a neutral running shoe with orthotics provide comfort, then my recommendation would be to use that. Even in a supinated foot, orthotics allows for wider area of weight bearing. I don’t think you will have to quit running, but I recommend listening to your body and choose what feels comfortable.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_xVbNjh": {
+          "type": "question",
+          "settings": {
+            "title": "Gwen M. – My yoga and barre instructors want us to exercise barefoot. I wear supportive running shoes with Aetrex insoles with arch support. Should I try to work towards exercising barefoot? If I wear the arch supports, is it ok to go up on toes?",
+            "text": "<p>Dr George: Hi Gwen! There is no harm in exercising barefoot as long as you are on soft ground. However, if the ground is hard and not soft (sand or grass) then walking barefoot is not going to be comfortable.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_FtDJpX": {
+          "type": "question",
+          "settings": {
+            "title": "Linda P. – I had LizFranc surgery over 2 years ago. I have a high arch and am having problems finding the correct insole. I need some support in my arch, but if it is too high it hurts my arch. I walk about 5 miles fast paced every day and want to get back to tennis. I would appreciate any advice you could give me. Thanks!",
+            "text": "<p>Dr George: Hi Linda! I would recommend to get an Aetrex foot scan at a location near you here:<a href=\"https://www.aetrex.com/store-locator.html\">https://www.aetrex.com/store-locator.html</a>The foot scan will be able to help identify your pressure points, arch height, and which orthotics would suit you best. If you do not want to get your foot scanned, then I recommend trying the L805 Train Orthotics with Metatarsal Support:<a href=\"https://www.aetrex.com/train-orthotics-l805w-L805W.html?lang=en_US\">https://www.aetrex.com/train-orthotics-l805w-L805W.html?lang=en_US</a>You may also want to see a physician to help.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_gnYgFw": {
+          "type": "question",
+          "settings": {
+            "title": "Gail J. – I have flat wide feet. What is the best athletic shoe and sandals to wear? Thank you",
+            "text": "<p>Dr George: Hi Gail and thank you for your question. Supportive and comfortable shoes and sandals are essential. I recommend trying a style that has support features built in or ones that can accommodate an orthotic with a posted heel to help support flat feet like the L405 Compete Orthotics:<a href=\"https://www.aetrex.com/compete-orthotics-l405w-L405W.html?lang=en_US\">https://www.aetrex.com/compete-orthotics-l405w-L405W.html?lang=en_US</a>Many athletic shoes have a removable insole, so you can easily remove them and insert an Aetrex orthotic. You can also try the Xspress Runner 2:<a href=\"https://www.aetrex.com/women-xspress2-runner-pink-XS109W.html?lang=en_US\">https://www.aetrex.com/women-xspress2-runner-pink-XS109W.html?lang=en_US</a>These sneakers come in a wide width option and include many comfort features. A sandal like the Jillian Sport has arch support and adjustable straps to help accommodate different widths:<a href=\"https://www.aetrex.com/jillian-braided-quarter-strap-sandal-black-SC450W.html?lang=en_US\">https://www.aetrex.com/jillian-braided-quarter-strap-sandal-black-SC450W.html?lang=en_US</a></p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_ytbkVB": {
+          "type": "question",
+          "settings": {
+            "title": "Fre W. – What is a good shoe for running and walking with the heel not pounding on the floor and more cushion to the bottom end? Older feet need comfort too.",
+            "text": "<p>Dr George: Hello Fre. Inserting an Aetrex orthotic into your athletic shoes can help provide comfort and support. I recommend trying the L400 Compete Orthotics:<a href=\"https://www.aetrex.com/compete-orthotics-l400w-L400W.html?lang=en_US\">https://www.aetrex.com/compete-orthotics-l400w-L400W.html?lang=en_US</a>Aetrex also has many supportive sneakers for lightweight activity like the Carly:<a href=\"https://www.aetrex.com/carly-arch-support-sneakers-AS106W.html?lang=en_US\">https://www.aetrex.com/carly-arch-support-sneakers-AS106W.html?lang=en_US</a>and Xspress Runner 2:<a href=\"https://www.aetrex.com/women-xspress2-runner-pink-XS109W.html?lang=en_US\">https://www.aetrex.com/women-xspress2-runner-pink-XS109W.html?lang=en_US</a></p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_YNYwma": {
+          "type": "question",
+          "settings": {
+            "title": "Wendy R. – My heel hurts toward the side too. I was playing pickleball and moving more than usual. What can it be, how to I treat it? Thank you",
+            "text": "<p>Dr George: Hello Wendy and thank you for your question. It’s important to wear supportive shoes and orthotics, especially if you are on hard surfaces. I recommend trying an orthotic like the L800 Train Orthotics to support your feet while playing pickleball:<a href=\"https://www.aetrex.com/train-orthotics-l800w-L800W.html?lang=default\">https://www.aetrex.com/train-orthotics-l800w-L800W.html?lang=default</a>These orthotics have a center layer of FitGuard™ that cushions every stride with slow recovery memory foam.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_tPGKmm": {
+          "type": "question",
+          "settings": {
+            "title": "Don B. – I play golf and prefer to walk. Toward the end of my round and after completing my round, my feet are very sore especially under the ball of my feet and in the heel area. What can I do to lessen the discomfort?",
+            "text": "<p>Dr George: Hi Don and thank you for your question. Golf involves striking the ball with aim and at a great force. Even though golf is a non-contact sport, the amount of energy transferred is significant. I recommend trying an orthotic with arch support and a metatarsal pad to help. Along with arch support, the L405 Compete Orthotics feature a cupped heel to cushion and stabilize the back of foot and a metatarsal pad to redistribute weight to relieve ball-of-foot discomfort:<a href=\"https://www.aetrex.com/compete-orthotics-l405m-L405M.html?lang=en_US\">https://www.aetrex.com/compete-orthotics-l405m-L405M.html?lang=en_US</a></p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "question_dicKY9",
+        "question_xVbNjh",
+        "question_FtDJpX",
+        "question_gnYgFw",
+        "question_ytbkVB",
+        "question_YNYwma",
+        "question_tPGKmm"
+      ],
+      "name": "FAQ",
+      "settings": {
+        "style": "with-border",
+        "heading": "Athletic Lifestyles",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h3",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#ffffff",
+        "overlay_opacity": 0,
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_4ndgUW": {
+      "type": "rich-text",
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "multicolumn_aUPeic": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_mmpryV": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/34627-L400M_catalog.jpg",
+            "image_ratio": "square",
+            "heading": "<em>Compete Orthotics</em>",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://products/l400m-m",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_4xHh9U": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/34584-L700W_catalog.jpg",
+            "image_ratio": "square",
+            "heading": "<em>Speed Orthotics</em>",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "SHOP NOW",
+            "button_link": "https://www.aetrex.com/products/l700w-m?variant=50400836288825",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_YBzYLm": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/AS160_catalog_5fdddfdb-d479-4539-b513-a69ccc4e3296.jpg",
+            "image_ratio": "square",
+            "heading": "<em>Emery Arch Support Sneaker</em>",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://products/emery",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_KDKzqw": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/AP100W_catalog.jpg",
+            "image_ratio": "square",
+            "heading": "<em>Danika Arch Support Sneaker</em>",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://products/danika",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_mmpryV",
+        "column_4xHh9U",
+        "column_YBzYLm",
+        "column_KDKzqw"
+      ],
+      "name": "Multicolumn",
+      "settings": {
+        "gap": "large",
+        "columns": 4,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "Recommended Products for Athletic Lifestyles",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h4",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "#fafafa",
+        "color_button_background": "#90abb7",
+        "color_button_gradient": "",
+        "padding_top": 120,
+        "padding_bottom": 12,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "rich_text_iDfFwc": {
+      "type": "rich-text",
+      "blocks": {
+        "text_axpGCA": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Terms of Use: Aetrex & Dr. George Ampat will not provide diagnosis, treatment, or medical advice; however, the text, graphics, images & other materials are for informational purposes only. Always seek the advice of your physician or other qualified health providers with any questions you may have regarding a medical condition.</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 18,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_axpGCA"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 48,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "testimonials_banner_Cbhq4c",
+    "video_with_text_YVDtTf",
+    "rich_text_DJRdNn",
+    "rich_text_PLkKyP",
+    "faq_HKU8NM",
+    "rich_text_4ndgUW",
+    "multicolumn_aUPeic",
+    "rich_text_iDfFwc"
+  ]
+}

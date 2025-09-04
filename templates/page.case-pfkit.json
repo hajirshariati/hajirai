@@ -1,0 +1,909 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "rich_text_ADQfqY": {
+      "type": "rich-text",
+      "blocks": {
+        "text_DFxFpn": {
+          "type": "text",
+          "settings": {
+            "text": "<h6><strong>Guaranteed to heal Plantar Fasciitis in 10 days or your money back</strong></h6>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 40,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_DFxFpn"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h3",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#ffffff",
+        "color_background": "#3dbcba",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_overlay_3B3AqL": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "heading_4xTaMy": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>Clinically Proven to Relieve Plantar Fasciitis and Improve Foot Function*</p>",
+            "heading_size": "title-sm",
+            "heading_tag": "h4",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_XDMrMw": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Aetrex Compete Orthotics & Orthotic Flips</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_dgGUmr": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP PLANTAR FASCIITIS KIT",
+            "button_link": "https://www.aetrex.com/collections/speed?ose=false",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_rqfjwJ": {
+          "type": "button",
+          "settings": {
+            "button_label": "READ THE STUDY",
+            "button_link": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9302029/pdf/WJO-13-652.pdf",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_4xTaMy",
+        "text_XDMrMw",
+        "button_dgGUmr",
+        "button_rqfjwJ"
+      ],
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/orthotics_PF_Kit2.jpg",
+        "image_height": "adapt",
+        "content_width": "small",
+        "content_position": "md:items-center md:justify-end",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/OthoD1_4d011157-e72d-4b9d-acb5-d452bb9e5104.jpg",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
+        "color_text": "#61b5b6",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#ffffff",
+        "color_button_background": "#eea15a",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "zoom"
+      }
+    },
+    "rich_text_HhMqBA": {
+      "type": "rich-text",
+      "blocks": {
+        "image_iKejMr": {
+          "type": "image",
+          "disabled": true,
+          "settings": {
+            "image": "shopify://shop_images/image_3_901c514b-7209-4cf6-b67b-ce6f26c26bda.png",
+            "image_width": "custom",
+            "image_max_width": 1000,
+            "image_max_width_mobile": 50
+          }
+        },
+        "text_EAiFR3": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>Clinical Study Participants Experienced:</strong></p>",
+            "text_font": "body",
+            "text_size": "subtext-lg",
+            "text_max_size": 40,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "image_iKejMr",
+        "text_EAiFR3"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "rgba(0,0,0,0)",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_b9LFaB": {
+      "type": "rich-text",
+      "blocks": {
+        "image_xnjmqx": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/pfkit1.png",
+            "image_width": "custom",
+            "image_max_width": 1000,
+            "image_max_width_mobile": 600
+          }
+        }
+      },
+      "block_order": [
+        "image_xnjmqx"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "rgba(0,0,0,0)",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "rich_text_H8Lce7": {
+      "type": "rich-text",
+      "blocks": {
+        "image_NYQL6h": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/pfkit3_b.webp",
+            "image_width": "custom",
+            "image_max_width": 770,
+            "image_max_width_mobile": 400
+          }
+        }
+      },
+      "block_order": [
+        "image_NYQL6h"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "#e7e7e7",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "rich_text_mmGfpe": {
+      "type": "rich-text",
+      "blocks": {
+        "image_HnKj6r": {
+          "type": "image",
+          "disabled": true,
+          "settings": {
+            "image": "shopify://shop_images/image_3_901c514b-7209-4cf6-b67b-ce6f26c26bda.png",
+            "image_width": "custom",
+            "image_max_width": 1000,
+            "image_max_width_mobile": 50
+          }
+        },
+        "text_HEYfbP": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>Plantar Fasciitis Pain is Common</strong></p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 40,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "image_HnKj6r",
+        "text_HEYfbP"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#61b5b6",
+        "color_background": "rgba(0,0,0,0)",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_Xyfdia": {
+      "type": "rich-text",
+      "blocks": {
+        "image_bFyKdX": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/pfkit4b.webp",
+            "image_width": "custom",
+            "image_max_width": 1000,
+            "image_max_width_mobile": 600
+          }
+        }
+      },
+      "block_order": [
+        "image_bFyKdX"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "rgba(0,0,0,0)",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "rich_text_AhWdpk": {
+      "type": "rich-text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h3",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#716d6a",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_NjkHfP": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_gyY4Bc": {
+          "type": "text",
+          "settings": {
+            "text": "<p>What is Plantar Fasciitis?</p>",
+            "text_font": "heading",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_ALD7Kt": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The plantar fascia is a broad band of fibrous tissue which runs along the bottom surface of the foot, attaching at the bottom of the heel bone and extending to the forefoot. The plantar fascia can become overstretched from overpronation, standing for long periods of time or walking and running long distances. This can cause inflammation and significant pain. Plantar fasciitis is usually felt on the inner part of the heel and is most severe first thing in the morning upon your first steps.</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_gyY4Bc",
+        "text_ALD7Kt"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/pfkit5.png",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "medium",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_gYX8jd": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_BYgQN7": {
+          "type": "text",
+          "settings": {
+            "text": "<p>How Aetrex Orthotics & Orthotic Flips Can Help</p>",
+            "text_font": "heading",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_LHY6M3": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Orthotics can help with plantar fasciitis. But orthotics can only be worn when wearing shoes. Orthotic sandals have also shown to help with plantar fasciitis. Both options provide relief by supporting and cradling the foot, reducing overpronation and stress to the plantar fascia. </p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_X4UUbi": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP THE PLANTAR FASCIITIS KIT",
+            "button_link": "shopify://pages/plantar-fasciitis-kit",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_BYgQN7",
+        "text_LHY6M3",
+        "button_X4UUbi"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/pfkit6.png",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "medium",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_mobile": "shopify://shop_images/pfkit6.png",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "center",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#eea15a",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_e7zEA9": {
+      "type": "rich-text",
+      "blocks": {
+        "image_DmbcYG": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/pfkit7.png",
+            "image_width": "custom",
+            "image_max_width": 540,
+            "image_max_width_mobile": 250
+          }
+        },
+        "button_eRUVxr": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP ORTHOTICS",
+            "button_link": "shopify://collections/compete",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_yD3ehW": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP MAUI FLIPS",
+            "button_link": "shopify://pages/plantar-fasciitis-kit",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "image_DmbcYG",
+        "button_eRUVxr",
+        "button_yD3ehW"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "rgba(0,0,0,0)",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "#ffffff",
+        "color_button_background": "#eea15a",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "image_with_text_H3ijHN": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_hexwXp": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Learn More About the Clinical Study</p>",
+            "text_font": "heading",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_RMpdzw": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Delve deeper into Dr. George Ampat's comprehensive case study on the impact of Aetrex Compete Orthotics & Orthotic Flips reducing pain and improving the condition of Plantar Fasciitis.<br/>Gain invaluable insights and explore the potential for a more confident and secure future.</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_eYpXRg": {
+          "type": "button",
+          "settings": {
+            "button_label": "VIEW THE PUBLISHED CLINICAL TRIAL",
+            "button_link": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10514714/pdf/WJO-14-707.pdf",
+            "button_video_link": "",
+            "button_style": "secondary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_hexwXp",
+        "text_RMpdzw",
+        "button_eYpXRg"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/drGeorge_b.jpg",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_mobile": "shopify://shop_images/drGeorge_b.jpg",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "left",
+        "color_text": "#525252",
+        "color_background": "#efefef",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "#525252",
+        "color_button_background": "#525252",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_MLXerj": {
+      "type": "rich-text",
+      "blocks": {
+        "text_yKxt79": {
+          "type": "text",
+          "settings": {
+            "text": "<p>* Clinical Study conducted in Liverpool, England by Dr. George Ampat</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 40,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_yKxt79"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "rgba(0,0,0,0)",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_4ePXwf": {
+      "type": "rich-text",
+      "blocks": {
+        "text_cbTnUT": {
+          "type": "text",
+          "settings": {
+            "text": "<h3>READ ALL CLINICAL STUDIES</h3><p>See individual studies for details</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 40,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_UFP9U4": {
+          "type": "button",
+          "settings": {
+            "button_label": "LEARN MORE",
+            "button_link": "shopify://pages/clinical-studies",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_cbTnUT",
+        "button_UFP9U4"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#eea15a",
+        "color_background": "#daeded",
+        "gradient_background": "linear-gradient(180deg, rgba(248, 251, 251, 1) 31%, rgba(216, 235, 236, 1) 93%)",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#eea15a",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 48,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "rich_text_ADQfqY",
+    "image_with_text_overlay_3B3AqL",
+    "rich_text_HhMqBA",
+    "rich_text_b9LFaB",
+    "rich_text_H8Lce7",
+    "rich_text_mmGfpe",
+    "rich_text_Xyfdia",
+    "rich_text_AhWdpk",
+    "image_with_text_NjkHfP",
+    "image_with_text_gYX8jd",
+    "rich_text_e7zEA9",
+    "image_with_text_H3ijHN",
+    "rich_text_MLXerj",
+    "rich_text_4ePXwf"
+  ]
+}

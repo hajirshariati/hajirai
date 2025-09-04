@@ -1,0 +1,253 @@
+{{- 'promo-banner.css' | asset_url | stylesheet_tag -}}
+
+{% liquid
+  assign section_setting = section.settings
+  assign page_url_downcased = request.path | downcase
+  if page_url_downcased contains 'tech'
+    assign page_type = "text_tech"
+  else
+    assign page_type = "text"
+  endif
+  
+%}
+
+<div class="main-promotional-banner-container swiper-container">
+  <div class="main-promo-banner-inner-wrapper swiper-wrapper">
+    {% for block in section.blocks %}
+        {% if block.type == page_type %}
+          {% assign block_setting = block.settings %}
+           <div class="swiper-slide promo-infor-wrapper promo-banner__heading" {% if page_type == 'text_tech' and block.type == 'text_tech' %}style="background-color: {{ block_setting.color_tech }};" {% elsif section_setting.color_custom != blank %}style="background-color: {{ section_setting.color_custom }};" {% endif %}>
+            {% unless block_setting.url == blank %}
+              <a href="{{ block_setting.url }}">
+            {% endunless %}
+            {% unless block_setting.dropdown_copy == blank and block_setting.dropdown_heading == blank and block_setting.dropdown_cta_copy == blank %}<span data-title-dropdown>{% endunless %}
+            {{ block_setting.heading }}
+            {% unless block_setting.dropdown_copy == blank and block_setting.dropdown_heading == blank %}</span>{% endunless %}          
+            {% unless block_setting.url == blank %}
+              </a>
+            {% endunless %}
+            {% unless block_setting.dropdown_copy == blank and block_setting.dropdown_heading == blank %}
+              <span class="promo-banner__caret">
+                <svg class="icon icon--caret-down " width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M2 6L10 14L18 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"></path>
+                </svg>
+              </span>
+            {% endunless %}
+          </div>
+        {% endif %}
+    {% endfor %}
+  </div>
+  <div class="swiper-button-next"></div>
+  <div class="swiper-button-prev"></div>
+  <div class="promo-banner__dropdown {{ section_setting.banner_style }}" {% if page_type == 'text_tech' %}style="background-color: {{ block_setting.color_tech_dropdown }};"{% endif %}>
+    <div class="promo-banner__dropdown-close">
+     <svg class="icon icon--close " width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g clip-path="url(#clip0_2326_12904)">
+          <path d="M0.477051 0.476562L19.5246 19.5241" stroke="currentColor" stroke-width="1.34783" stroke-linejoin="round"></path>
+          <path d="M19.5246 0.476562L0.477051 19.5241" stroke="currentColor" stroke-width="1.34783" stroke-linejoin="round"></path>
+        </g>
+        <defs>
+          <clipPath id="clip0_2326_12904">
+            <rect width="20" height="20" fill="currentColor"></rect>
+          </clipPath>
+        </defs>
+      </svg>
+    </div>
+    <div class="promo-banner__dropdown-wrapper">
+
+   
+    {% for block in section.blocks %}
+      {% if block.type == page_type %}
+        {% assign block_setting = block.settings %}
+        {% unless block_setting.dropdown_copy == blank and block_setting.dropdown_heading == blank %}
+          <div class="promo-banner__dropdown--content">
+            <h5>
+              {{ block_setting.dropdown_heading }}
+            </h5>
+            <p class="p-2 w-regular">
+              {{ block_setting.dropdown_copy }}
+            </p>
+
+            <a href="{{ block_setting.dropdown_cta_url }}">
+              <p class="promo-banner__dropdown--content-link p-2 w-regular uppercase">
+                {{ block_setting.dropdown_cta_copy }}
+              </p>
+            </a>
+          </div>
+        {% endunless %}
+      {% endif %}
+    {% endfor %}
+    </div>
+  </div>
+</div>
+
+<script>
+  {% if section.settings.enable_autoplay == true %}
+    var slideSpeed = {{ section.settings.duration }};
+    var Swipes = new Swiper('.swiper-container', {
+    loop: true,
+    autoplay: {
+      delay: slideSpeed,
+      disableOnInteraction: false,
+    },
+    navigation: {
+        enabled: false,
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+    },
+  });
+  {% else %}
+    var Swipes = new Swiper('.swiper-container', {
+    loop: true,
+      navigation: {
+        enabled: true,
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+    },
+  });
+  {% endif %}
+
+    
+</script>
+
+{% schema %}
+  {
+    "name": "Custom Promo banner",
+    "class": "custom-promo-banner",
+    "settings": [
+      {
+        "type": "color",
+        "id": "color_custom",
+        "label": "Promo Banner Custom Color",
+        "info": "Only effects the banner, dropdown color is determiend by Banner Style"
+      },
+      {
+      "type": "header",
+      "content": "Carousel Settings"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_autoplay",
+        "label": "Enable Autoplay",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "duration",
+        "label": "Autoplay Duration",
+        "default": "6000",
+        "info": "Set time in millisecond"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "text",
+        "name": "Promo Text",
+        "limit": 3,
+        "settings": [
+          {
+            "type": "text",
+            "id": "heading",
+            "label": "Banner Text"
+          },
+          {
+            "type": "url",
+            "id": "url",
+            "label": "Link"
+          },
+          {
+            "type": "header",
+            "content": "Dropdown Content"
+          },
+  
+          {
+            "type": "text",
+            "label": "Dropdown Heading",
+            "id": "dropdown_heading"
+          },
+          {
+            "type": "text",
+            "label": "Dropdown Copy",
+            "id": "dropdown_copy"
+          },
+  
+          {
+            "type": "text",
+            "id": "dropdown_cta_copy",
+            "label": "Dropdown CTA Copy"
+          },
+          {
+            "type": "url",
+            "id": "dropdown_cta_url",
+            "label": "Dropdown CTA Url"
+          }
+        ]
+      },
+      {
+        "type": "text_tech",
+        "name": "Tech Promo Text",
+        "limit": 3,
+        "settings": [
+          {
+            "type": "header",
+            "content": "Tech Banner Styles"
+          },
+          {
+            "type": "color",
+            "id": "color_tech",
+            "label": "Tech Banner Color"
+          },
+          {
+            "type": "header",
+            "content": "Banner Content"
+          },
+          {
+            "type": "text",
+            "id": "heading",
+            "label": "Banner Text"
+          },
+          {
+            "type": "url",
+            "id": "url",
+            "label": "Link"
+          },
+          {
+            "type": "header",
+            "content": "Dropdown Content"
+          },
+  
+          {
+            "type": "text",
+            "label": "Dropdown Heading",
+            "id": "dropdown_heading"
+          },
+          {
+            "type": "text",
+            "label": "Dropdown Copy",
+            "id": "dropdown_copy"
+          },
+  
+          {
+            "type": "text",
+            "id": "dropdown_cta_copy",
+            "label": "Dropdown CTA Copy"
+          },
+          {
+            "type": "url",
+            "id": "dropdown_cta_url",
+            "label": "Dropdown CTA Url"
+          }
+        ]
+      }    
+    ],
+    "presets": [
+      {
+        "name": "Promo Banner",
+        "category": "Header"
+      }
+    ],
+    "enabled_on": {
+      "groups": ["header"]
+    }
+  }
+{% endschema %}

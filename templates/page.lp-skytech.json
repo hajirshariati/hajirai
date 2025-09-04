@@ -1,0 +1,1472 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "rich_text_jM7xhL": {
+      "type": "rich-text",
+      "blocks": {
+        "image_JD8HYt": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/SkyTechTitle_da69ef79-6f15-4153-8586-1f1b9e54508c.png",
+            "image_width": "custom",
+            "image_max_width": 1000,
+            "image_max_width_mobile": 600
+          }
+        }
+      },
+      "block_order": [
+        "image_JD8HYt"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "video_w8wr4w": {
+      "type": "video",
+      "name": "Video",
+      "settings": {
+        "transparent_header": false,
+        "video": "shopify://files/videos/NewSkyTech2.mov",
+        "video_url": "",
+        "cover_image": "shopify://shop_images/SkyTechTitle_da69ef79-6f15-4153-8586-1f1b9e54508c.png",
+        "description": "",
+        "enable_video_autoplay": true,
+        "enable_video_looping": true,
+        "image_height": "500px",
+        "video_mobile": "shopify://files/videos/NewSkyTech2.mov",
+        "video_url_mobile": "",
+        "image_height_mobile": "adapt",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "rich_text_PDNbLf": {
+      "type": "rich-text",
+      "blocks": {
+        "image_fGPrcL": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/everybody_c744ed48-bbf0-4328-8151-ddaae69d6984.png",
+            "image_width": "custom",
+            "image_max_width": 700,
+            "image_max_width_mobile": 600
+          }
+        }
+      },
+      "block_order": [
+        "image_fGPrcL"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "testimonials_FMCa3y": {
+      "type": "testimonials",
+      "blocks": {
+        "testimonial_zACyNq": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "none",
+            "text": "",
+            "author": "Katie M",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "adapt",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_zACyNq"
+      ],
+      "name": "Testimonials",
+      "settings": {
+        "heading": "",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "<p>“So thankful to find a brand of flip flops that support flat feet/over pronation. Thank you! Now I can wear flip flops year-round while still taking care of my feet and posture!”</p>",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "rounded": false
+      }
+    },
+    "rich_text_bGVzXB": {
+      "type": "rich-text",
+      "blocks": {
+        "button_i7Q3aH": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://pages/skycollection",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "button_i7Q3aH"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#6f6f6f",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "#ffffff",
+        "color_button_background": "#91b7c9",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "logo_list_iHUfYQ": {
+      "type": "logo-list",
+      "blocks": {
+        "logo_BKJea8": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/image_80.png",
+            "height": 52,
+            "link": ""
+          }
+        },
+        "logo_Tq6F4Q": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/image_81.png",
+            "height": 52,
+            "link": ""
+          }
+        },
+        "logo_ie6Vq8": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/image_82.png",
+            "height": 52,
+            "link": ""
+          }
+        },
+        "logo_GHQxK8": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/image_83.png",
+            "height": 52,
+            "link": ""
+          }
+        },
+        "logo_YVtwbx": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/image_84.png",
+            "height": 52,
+            "link": ""
+          }
+        },
+        "logo_QYdkeq": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/image_89.png",
+            "height": 52,
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "logo_BKJea8",
+        "logo_Tq6F4Q",
+        "logo_ie6Vq8",
+        "logo_GHQxK8",
+        "logo_YVtwbx",
+        "logo_QYdkeq"
+      ],
+      "name": "Logo list",
+      "settings": {
+        "layout": "default",
+        "grid_horizontal": 50,
+        "direction": "left",
+        "speed": 1,
+        "heading": "AS SEEN ON",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 32,
+        "padding_bottom": 32,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "rich_text_r7gtcn": {
+      "type": "rich-text",
+      "blocks": {
+        "text_mGceFx": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>30 DAY WEAR TEST</strong>-SEND THEM BACK IF YOU’RE NOT 100% SATISFIED</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 26,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_mGceFx"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "#bbeaff",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "multicolumn_R8kcbF": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_aAJcWw": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image_ratio": "adapt",
+            "video": "shopify://files/videos/shock2.mp4",
+            "heading": "Shock Absorption",
+            "heading_size": "text-base-xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_kWkHxk": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/arch_8.png",
+            "image_ratio": "adapt",
+            "heading": "Extreme Cushioning",
+            "heading_size": "text-base-xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_CdGGyt": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/arch_3.png",
+            "image_ratio": "adapt",
+            "heading": "Lightweight Durability",
+            "heading_size": "text-base-xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_aAJcWw",
+        "column_kWkHxk",
+        "column_CdGGyt"
+      ],
+      "name": "Multicolumn",
+      "settings": {
+        "gap": "medium",
+        "columns": 3,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "SKYTECH",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h3",
+        "subheading": "",
+        "description": "<p> Shoe Features</p>",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#ffffff",
+        "color_background": "#3d5d65",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 32,
+        "divider": false,
+        "full_width": true,
+        "rounded": false
+      }
+    },
+    "multicolumn_eWKCGx": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_V9JfC9": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/arch_5.png",
+            "image_ratio": "adapt",
+            "heading": "Built-in Arch Support",
+            "heading_size": "text-base-xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_Jn4W6n": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/arch_6.png",
+            "image_ratio": "adapt",
+            "heading": "Metatarsal Support",
+            "heading_size": "text-base-xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_A3H6iT": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image_ratio": "adapt",
+            "video": "shopify://files/videos/water4.mp4",
+            "heading": "Water-Friendly Construction",
+            "heading_size": "text-base-xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_V9JfC9",
+        "column_Jn4W6n",
+        "column_A3H6iT"
+      ],
+      "name": "Multicolumn",
+      "settings": {
+        "gap": "medium",
+        "columns": 3,
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#ffffff",
+        "color_background": "#3d5d65",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 32,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "rich_text_itUVgg": {
+      "type": "rich-text",
+      "blocks": {
+        "text_tce76f": {
+          "type": "text",
+          "settings": {
+            "text": "<p><em>WITH OVER 1000+ 5 STAR REVIEWS</em></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_tce76f"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "#91b7c9",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "multicolumn_VTPptV": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_QY3yzd": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/image_90.png",
+            "image_ratio": "adapt",
+            "heading": "<strong>These Saved My Life!</strong>",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>★★★★★</p><p>These flip flops saved my summer! My plantar fasciitis was really bad and when I put these on I felt relief almost immediately. The discomfort continues to subside more and more each day, and is still improving, which I largely attribute to wearing these all day, every day. Plus, they felt very secure even when wet. Very thankful for these!</p><p><em>- Lisa R.</em></p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_R8g7jX": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/image_91.png",
+            "image_ratio": "adapt",
+            "heading": "<strong>My Absolute Favorite!</strong>",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>★★★★★</p><p>These were the first shoe I ordered from Aetrex. I loved them immediately. I am now on my 3rd pair, including one for my daughter since she kept stealing mine! They are cushiony & supportive enough for a day at an amusement park plus the strap keeps them secure. Casual enough for everyday, but dressy enough for a night out means only packing one pair for trips.</p><p><em>- Holly J.</em></p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_kMKiDg": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/image_92.png",
+            "image_ratio": "adapt",
+            "heading": "<strong>Better Than My Bare Feet!</strong>",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>★★★★★</p><p>These sandals are perfect. They are very cushioned and supportive in all the right places. I can already feel the difference with my pronation issues when I wear these slides. I also love that they are cute and so easy to wear. I wear them out or just around the house. I couldn't recommend more!!!</p><p><em>- Kimberly S.</em></p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_QY3yzd",
+        "column_R8g7jX",
+        "column_kMKiDg"
+      ],
+      "name": "Multicolumn",
+      "settings": {
+        "gap": "small",
+        "columns": 3,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_overlay_9hcxMU": {
+      "type": "image-with-text-overlay",
+      "name": "Image with text overlay",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/Group_3.png",
+        "image_height": "adapt",
+        "content_width": "small",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/Group_3.png",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_ihPpaq": {
+      "type": "rich-text",
+      "blocks": {
+        "button_3he48g": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP SKYTECH COLLECTION",
+            "button_link": "shopify://collections/sky-collection",
+            "button_style": "primary",
+            "button_size": "sm",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "button_3he48g"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "#f2f2f2",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "#ffffff",
+        "color_button_background": "#91b7c9",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_9t8qKQ": {
+      "type": "rich-text",
+      "blocks": {
+        "text_NePjkw": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>30 DAY WEAR TEST</strong>-SEND THEM BACK IF YOU’RE NOT 100% SATISFIED</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 28,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_NePjkw"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "#bbeaff",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "video_RPC6WR": {
+      "type": "video",
+      "name": "Video",
+      "settings": {
+        "transparent_header": false,
+        "video": "shopify://files/videos/SkyTechAll.mp4",
+        "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
+        "description": "",
+        "enable_video_autoplay": true,
+        "enable_video_looping": true,
+        "image_height": "adapt",
+        "video_url_mobile": "",
+        "image_height_mobile": "auto",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false
+      }
+    },
+    "rich_text_qhigBb": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_GdKCXk": {
+          "type": "heading",
+          "settings": {
+            "heading": "AETREX",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_3N3TpP": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Best Sellers<br/></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 40,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_GdKCXk",
+        "text_3N3TpP"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#91b7c9",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_tqMWGc": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_TC4FdY": {
+          "type": "heading",
+          "settings": {
+            "heading": "Maui",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_qBGErE": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>Orthotic Flips</strong></p><p>Feel the comfort and support of Aetrex in the Maui! These orthotic flips with arch support are made from UltraSky™ injected EVA to provide extreme cushioning, shock absorption, and durability. The toe post is specially designed with super soft foam to keep your toes comfortable all day long. With the Maui Flips, you'll feel like you're walking on air!</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_CAd8dK": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP MEN´S",
+            "button_link": "shopify://products/maui-men",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_LKcLtG": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP WOMEN´S",
+            "button_link": "shopify://products/maui-women",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_TC4FdY",
+        "text_qBGErE",
+        "button_CAd8dK",
+        "button_LKcLtG"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/Maui.png",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "content_position": "align-self-center",
+        "image_mobile": "shopify://shop_images/MauiM2.png",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "#ffffff",
+        "color_button_background": "#91b7c9",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_BAxLFb": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_VbcrNt": {
+          "type": "heading",
+          "settings": {
+            "heading": "Jillian Sport",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_LJ6aHW": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>Sandal</strong></p><p>A fan favorite style, the Jillian, turned water-friendly! The Jillian Sport is the perfect sandal for your trips to the beach, the pool, or the lake. The UltraSky™ lightweight EVA foam will have you feeling like you are walking on clouds all summer long.</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_MCftTd": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://products/jillian-sport-sandal",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_VbcrNt",
+        "text_LJ6aHW",
+        "button_MCftTd"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/Jillian.png",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "content_position": "align-self-center",
+        "image_mobile": "shopify://shop_images/JillianM2.png",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "#ffffff",
+        "color_button_background": "#91b7c9",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_kCKdeJ": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_WrwCUf": {
+          "type": "heading",
+          "settings": {
+            "heading": "Janey Sport",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_MPgFpE": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>Sandal</strong></p><p>Slide into the water-friendly version of Janey for all your warm-weather adventures! These light-weight UltraSky™ EVA foam sandals have arch support, Cobra Orthotic Technology, adjustable straps, and a dual-density outsole to keep you supported and comfortable no matter where the day takes you.</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_nAqHbt": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://products/janey-sport-water-friendly-slide",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_WrwCUf",
+        "text_MPgFpE",
+        "button_nAqHbt"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/Janey.png",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "content_position": "align-self-center",
+        "image_mobile": "shopify://shop_images/JaneyM2.png",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "#ffffff",
+        "color_button_background": "#91b7c9",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_wPTPVA": {
+      "type": "rich-text",
+      "blocks": {
+        "text_6G8By7": {
+          "type": "text",
+          "settings": {
+            "text": "<p>More SkyTech™ Collection:</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_6G8By7"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#91b7c9",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "multicolumn_emYFiA": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_raDMXY": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/image_79.png",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Fiji Flip</p>",
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://products/fiji-women",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_yixMfq": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/image_76.png",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Milos Slide</p>",
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://products/milos-mens",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_ykp6PA": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/image_77.png",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Bali Sandal</p>",
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://products/bali-men",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_w768Xw": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/image_78.png",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Bondi Clog</p>",
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://products/bondi-women",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_raDMXY",
+        "column_yixMfq",
+        "column_ykp6PA",
+        "column_w768Xw"
+      ],
+      "name": "Multicolumn",
+      "settings": {
+        "gap": "small",
+        "columns": 4,
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h3",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "rich_text_rdnTUC": {
+      "type": "rich-text",
+      "blocks": {
+        "text_YB7zfY": {
+          "type": "text",
+          "settings": {
+            "text": "<p><em>#MYAETREX</em></p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "heading_WMTDnr": {
+          "type": "heading",
+          "settings": {
+            "heading": "<em>Show Us Your Aetrex Shoes</em>",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_eg8BV8": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Use the hashtag #MyAetrex and tag @Aetrexworldwide for the chance to be featured here.</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 40,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_YB7zfY",
+        "heading_WMTDnr",
+        "text_eg8BV8"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "#f5f5f5",
+        "gradient_background": "",
+        "color_highlight": "#91b7c9",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 48,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "empty_space_kBYgc4": {
+      "type": "empty-space",
+      "name": "Empty space",
+      "settings": {
+        "desktop_height": 40,
+        "mobile_height": 28,
+        "color_background": "",
+        "gradient_background": ""
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "rich_text_jM7xhL",
+    "video_w8wr4w",
+    "rich_text_PDNbLf",
+    "testimonials_FMCa3y",
+    "rich_text_bGVzXB",
+    "logo_list_iHUfYQ",
+    "rich_text_r7gtcn",
+    "multicolumn_R8kcbF",
+    "multicolumn_eWKCGx",
+    "rich_text_itUVgg",
+    "multicolumn_VTPptV",
+    "image_with_text_overlay_9hcxMU",
+    "rich_text_ihPpaq",
+    "rich_text_9t8qKQ",
+    "video_RPC6WR",
+    "rich_text_qhigBb",
+    "image_with_text_tqMWGc",
+    "image_with_text_BAxLFb",
+    "image_with_text_kCKdeJ",
+    "rich_text_wPTPVA",
+    "multicolumn_emYFiA",
+    "rich_text_rdnTUC",
+    "empty_space_kBYgc4"
+  ]
+}

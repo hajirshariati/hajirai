@@ -1,0 +1,469 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "image_with_text_overlay_Hbbf6c": {
+      "type": "image-with-text-overlay",
+      "name": "Image with text overlay",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/1920x475_SizeRight_banner.png",
+        "image_height": "adapt",
+        "content_width": "small",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/1920x475_SizeRight_banner.png",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-center justify-center",
+        "text_alignment_mobile": "center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 0,
+        "padding_top": 12,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_MLXerj": {
+      "type": "rich-text",
+      "blocks": {
+        "text_yKxt79": {
+          "type": "text",
+          "settings": {
+            "text": "<p>SizeRight™ Mobile App</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_yKxt79"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#ffffff",
+        "color_background": "#99a4ad",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "rich_text_bGVzXB": {
+      "type": "rich-text",
+      "blocks": {
+        "text_cRAdEE": {
+          "type": "text",
+          "settings": {
+            "text": "<p>One Click for a Better Fit™</p>",
+            "text_font": "heading",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_cRAdEE"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#6f6f6f",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_AhWdpk": {
+      "type": "rich-text",
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h3",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#716d6a",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_nQPyJp": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_Yi8LJA": {
+          "type": "text",
+          "settings": {
+            "text": "<p>SizeRight™ Mobile App</p>",
+            "text_font": "heading",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_gHw4bL": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Aetrex’s SizeRight Mobile App allows you to measure your feet with your phone or iPad. Downloadable from the Apple store, the app only requires one photo (aka “one click”) to get your accurate foot size in 2-dimensions (length and width). After a quick photo, you’ll receive your Median Shoe Size and shoe width. And you can have your foot data sent right to you via email.</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_Yi8LJA",
+        "text_gHw4bL"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/690x605_sizeright.png",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/690x605_sizeright.png",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "center",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "logo_list_8bhV34": {
+      "type": "logo-list",
+      "blocks": {
+        "logo_7pKD3m": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/APPSTORE.png",
+            "height": 152,
+            "link": "https://apps.apple.com/us/app/aetrex-sizeright/id1536083899"
+          }
+        },
+        "logo_4cG6z6": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/GOOGLEPLAY.png",
+            "height": 152,
+            "link": "https://play.google.com/store/apps/details?id=com.aetrex.sizeright"
+          }
+        }
+      },
+      "block_order": [
+        "logo_7pKD3m",
+        "logo_4cG6z6"
+      ],
+      "name": "Logo list",
+      "settings": {
+        "layout": "default",
+        "grid_horizontal": 50,
+        "direction": "left",
+        "speed": 1,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": false,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "rich_text_qpk3Bb": {
+      "type": "rich-text",
+      "blocks": {
+        "text_xGcjCB": {
+          "type": "text",
+          "settings": {
+            "text": "<p>SizeRight can also be accessed through a website when shopping on participating sites. This web version allows for an integrated experience while browsing online, without having to leave the website where you are shopping. For example, you can check it out here on aetrex.com while browsing on smartphone or tablet.</p><p><br/>Just look for this symbol:</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "icon_eP689q": {
+          "type": "icon",
+          "settings": {
+            "icon": "none",
+            "icon_image": "shopify://shop_images/sizeright-logo.webp",
+            "icon_width": 50
+          }
+        }
+      },
+      "block_order": [
+        "text_xGcjCB",
+        "icon_eP689q"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_W4q3eK": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_aEhRLn": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Median Shoe Size</p>",
+            "text_font": "heading",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_f7WkWq": {
+          "type": "text",
+          "settings": {
+            "text": "<p>As you may know, some shoes run small, some shoes run big, while others run what we consider to be true to size. Your Median Shoe Size is an indicator of what likely is the most common shoe size in your closet.</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_BUGERz": {
+          "type": "button",
+          "settings": {
+            "button_label": "SizeRight Presentation from the 2022 FN CEO Summit. By Larry Schwartz (Aetrex CEO) ",
+            "button_link": "https://player.vimeo.com/progressive_redirect/playback/813592741/rendition/720p/file.mp4?loc=external&signature=e459c7e00477ff11ea9d5b2ab66a4f84ec458517e5ffded6c1e9e46111c4aa9e",
+            "button_style": "link",
+            "button_size": "sm",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_gFPmNx": {
+          "type": "button",
+          "settings": {
+            "button_label": "",
+            "button_link": "https://cdn.shopify.com/videos/c/o/v/59100797928a4b0bbcd30c674dafd8aa.mp4",
+            "button_style": "link",
+            "button_size": "sm",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_aEhRLn",
+        "text_f7WkWq",
+        "button_BUGERz",
+        "button_gFPmNx"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/ShoeCloset_690x598_2x_87d65b3e-81d2-40c9-bdd0-5b8a0ea27249.png",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/ShoeCloset_690x598_2x_87d65b3e-81d2-40c9-bdd0-5b8a0ea27249.png",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "center",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 48,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "image_with_text_overlay_Hbbf6c",
+    "rich_text_MLXerj",
+    "rich_text_bGVzXB",
+    "rich_text_AhWdpk",
+    "image_with_text_nQPyJp",
+    "logo_list_8bhV34",
+    "rich_text_qpk3Bb",
+    "image_with_text_W4q3eK"
+  ]
+}

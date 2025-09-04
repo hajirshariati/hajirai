@@ -1,0 +1,939 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "rich_text_b3VMAU": {
+      "type": "rich-text",
+      "blocks": {
+        "text_879kBK": {
+          "type": "text",
+          "settings": {
+            "text": "<p>New Aetrex Orthotics Series</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 40,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_879kBK"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-lg tracking-heading",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#ffffff",
+        "color_background": "#99a4ad",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_rT7Yy8": {
+      "type": "rich-text",
+      "blocks": {
+        "text_JXnKwK": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>Aetrex Edge Orthotics</strong></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_JXnKwK"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-lg tracking-heading",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_8r8Mkk": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_hjWPFR": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Aetrex Edge Orthotics provide comfort, support and pressure relief in footwear designed for outdoor sports such as skiing, snowboarding, hiking and mountain biking. This orthotic features a soft microfiber top cover and our signature Aetrex Arch Support to help biomechanically align your body & help prevent common foot pain such as Plantar Fasciitis, Arch Pain and Metatarsalgia. Unisex sizing.</p><p><strong>Price:</strong> Available Now for $59.95</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_MVgjM6": {
+          "type": "button",
+          "settings": {
+            "button_label": "Learn More: Edge Orthotics",
+            "button_link": "https://www.aetrex.com/products/l1800u-m?variant=50459365802297",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_hjWPFR",
+        "button_MVgjM6"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/L1800_Edge_F_7806_dc4c2ea8-7e3e-43c0-87ab-2f494d29db4b.jpg",
+        "image_height": "adapt",
+        "image_width": "medium",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#525252",
+        "color_button_gradient": "",
+        "padding_top": 32,
+        "padding_bottom": 28,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_VQGnHD": {
+      "type": "rich-text",
+      "blocks": {
+        "text_pMnfT9": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>Aetrex Customizable Orthotics</strong></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_pMnfT9"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-lg tracking-heading",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "#e7e7e7",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_zDdM8w": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_QhkKEb": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Aetrex Customizable Orthotics offer personalized comfort and pressure relief with patented Mozaic® technology. Featuring removable gel pods for high-pressure areas like the heel or ball of the foot, they provide easy discomfort relief. With strategic arch support and a CopperGuard® top cover, these orthotics help align your body and keep your feet healthy and clean.</p><p><strong>Price:</strong> Available Now for $89.95</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_yaDdUq": {
+          "type": "button",
+          "settings": {
+            "button_label": "Learn More: Men's Orthotics",
+            "button_link": "https://www.aetrex.com/products/l2400m-m?variant=50400590332217",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_rcy9Dj": {
+          "type": "button",
+          "settings": {
+            "button_label": "Learn More: Women's Orthotics",
+            "button_link": "https://www.aetrex.com/products/l2400w-m?variant=50400603799865",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_QhkKEb",
+        "button_yaDdUq",
+        "button_rcy9Dj"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/L2400_Customizable_F_7915_9f309b71-e14a-45ab-8dad-c3a92fa77cfc.jpg",
+        "image_height": "adapt",
+        "image_width": "medium",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_background": "#e7e7e7",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#525252",
+        "color_button_gradient": "",
+        "padding_top": 28,
+        "padding_bottom": 28,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_x6f6qM": {
+      "type": "rich-text",
+      "blocks": {
+        "text_AmBcVi": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>Aetrex Plantar Fasciitis Kit</strong></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_AmBcVi"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-lg tracking-heading",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_KYfa9x": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_AkjXbJ": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>What is Plantar Fasciitis? </strong>Plantar Fasciitis is an inflammation caused by excessive stretching of the plantar fascia. The plantar fascia is a broad band of fibrous tissue which runs along the bottom surface of the foot, attaching at the bottom of the calcaneus (heel bone) and extending to the forefoot. When the plantar fascia is excessively stretched, this can cause plantar fasciitis, which can also lead to heel pain, arch pain, and even heel spurs.</p><p></p><p><strong>The Aetrex Plantar Fasciitis Kit:</strong><br/>The Aetrex Plantar Fasciitis Kit includes 4 key tools to help relieve and prevent plantar fasciitis: Aetrex Compete Orthotics, Aetrex Maui Orthotic Flips, Aetrex Foot Roller and a Stretching Guide</p><p><strong>Price:</strong> $145.95 Value, Available Now for $95.95</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_Qcy7RE": {
+          "type": "button",
+          "settings": {
+            "button_label": "Learn More: Men's PF Kit",
+            "button_link": "https://www.aetrex.com/products/l1800u-m?variant=50459365802297",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_wJhjQw": {
+          "type": "button",
+          "settings": {
+            "button_label": "Learn More: Women's PF Kit",
+            "button_link": "https://www.aetrex.com/products/women-plantar-fasciitis-kit?variant=50419905659193",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_AkjXbJ",
+        "button_Qcy7RE",
+        "button_wJhjQw"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/plantar_faciitis_106f6020-9374-4aee-aa62-470f413f9d86.jpg",
+        "image_height": "adapt",
+        "image_width": "medium",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#525252",
+        "color_button_gradient": "",
+        "padding_top": 32,
+        "padding_bottom": 32,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_azr6zP": {
+      "type": "rich-text",
+      "blocks": {
+        "text_jg9HPF": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>Aetrex Morton’s Neuroma Orthotics</strong></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_jg9HPF"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-lg tracking-heading",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "#e7e7e7",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_9Q3q77": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_jbNEFM": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>What is Morton’s Neuroma? </strong>Morton’s Neuroma is a common foot problem associated with pain, swelling and/or an inflammation of a nerve, usually at the ball-of-the-foot between the 3rd and 4th toes. Symptoms of this condition include sharp pain, burning, and possibly even a lack of feeling in the affected area. Morton’s Neuroma may also cause numbness, tingling, or cramping in the forefoot.<br/><br/><strong>Aetrex Morton’s Neuroma Orthotics:</strong><br/>Aetrex Morton’s Neuroma Orthotics are designed specifically with a metatarsal pad and removed gel pads between the 3rd and 4th metatarsal heads to offer a pressure free environment in your shoes. The strategically placed arch support helps provide balance and aligns your body from the ground up.</p><p><strong>Price:</strong> Available Now for $69.95</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_WgQW64": {
+          "type": "button",
+          "settings": {
+            "button_label": "Learn More: Men's Orthotics",
+            "button_link": "https://www.aetrex.com/products/men-plantar-fasciitis-kit?variant=50491179106617",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_Qwyn6K": {
+          "type": "button",
+          "settings": {
+            "button_label": "Learn More: Women's Orthotics",
+            "button_link": "https://www.aetrex.com/products/l2400w-m?variant=50400603799865",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_jbNEFM",
+        "button_WgQW64",
+        "button_Qwyn6K"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/neuroma_a319ff4c-ec0e-4244-bee4-8236e324008a.jpg",
+        "image_height": "adapt",
+        "image_width": "medium",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_background": "#e7e7e7",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#525252",
+        "color_button_gradient": "",
+        "padding_top": 28,
+        "padding_bottom": 28,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_CgQUie": {
+      "type": "rich-text",
+      "blocks": {
+        "text_T7GQek": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>Aetrex Metatarsalgia Orthotics</strong></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_T7GQek"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-lg tracking-heading",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_y8caAd": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_jWbb3P": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>What is Metatarsalgia? </strong>Metatarsalgia is a general term used to denote a pain in the metatarsal region of the foot (the area just before the toes, more commonly referred to as the ball-of-the-foot). This is a common foot problem that can affect the bones and joints at the ball-of-the-foot. Metatarsalgia (ball-of-foot-pain) is often located under the 2nd, 3rd, and 4th metatarsal heads, or more isolated at the first metatarsal head (near the big toe).<br/><br/><strong>Aetrex Metatarsalgia Orthotics:</strong><br/>Aetrex Metatarsalgia Orthotics are specifically designed to relieve ball-of-foot discomfort with slow recovery memory foam and the inclusion of a metatarsal pad. The metatarsal pad helps distribute the body's weight evenly across the metatarsal bones, reducing the pressure on specific areas and preventing discomfort. These orthotics immediately customize to the foot, offering a pressure-free environment in your shoes. In addition, the strategically placed arch support aligns your body to help support your body from the ground up.</p><p><strong>Price:</strong> Available Now for $69.95</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_XAy8Y8": {
+          "type": "button",
+          "settings": {
+            "button_label": "Learn More: Men's Orthotics",
+            "button_link": "https://www.aetrex.com/products/metatarsalgia-orthotics-men?variant=50491173536057",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_hFHPLj": {
+          "type": "button",
+          "settings": {
+            "button_label": "Learn More: Women's Orthotics",
+            "button_link": "https://www.aetrex.com/products/women-plantar-fasciitis-kit?variant=50419905659193",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_jWbb3P",
+        "button_XAy8Y8",
+        "button_hFHPLj"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/metatarsalgia_315ce0b3-5ac4-4f7a-8e59-8f81b0b6e338.jpg",
+        "image_height": "adapt",
+        "image_width": "medium",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#525252",
+        "color_button_gradient": "",
+        "padding_top": 28,
+        "padding_bottom": 28,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_GYAiy6": {
+      "type": "rich-text",
+      "blocks": {
+        "text_mNgKEL": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>Aetrex Heel Spurs Orthotics</strong></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_mNgKEL"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-lg tracking-heading",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "#e7e7e7",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_fxf8r4": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_EpxyUG": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>What are Heel Spurs? </strong>The calcaneus (heel bone) is the largest bone in the foot and absorbs the most amount of shock and pressure. A heel spur develops as an abnormal growth of the heel bone. Calcium deposits form when the plantar fascia pulls away from the heel area, causing a bony protrusion, or heel spur. The plantar fascia is a broad band of fibrous tissue located along the bottom surface of the foot that runs from the heel to the forefoot. Heel spurs can cause extreme pain in the rearfoot, especially while standing or walking.<br/><br/><strong>Aetrex Heel Spurs Orthotics:</strong><br/>Aetrex Heel Spurs Orthotics are specifically designed with an absent heel pod to help redistribute pressure away from the center of the heel where the spur is located. This redistribution of pressure helps reduce pain and allows for the area to heal. In addition Aetrex’s strategically placed arch support aligns your body to help reduce overpronation and support your body from the ground up.</p><p><strong>Price:</strong> Available Now for $69.95</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_Y6B4FE": {
+          "type": "button",
+          "settings": {
+            "button_label": "Learn More: Men's Orthotics",
+            "button_link": "https://www.aetrex.com/products/heel-spurs-orthotics-men?variant=50491169931577",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_VDNghV": {
+          "type": "button",
+          "settings": {
+            "button_label": "Learn More: Women's Orthotics",
+            "button_link": "https://www.aetrex.com/products/heel-spurs-orthotics-women?variant=50491181236537",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_EpxyUG",
+        "button_Y6B4FE",
+        "button_VDNghV"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/heelspurs_dbe2c75b-dbd3-4165-81b4-8763f9ecd930.jpg",
+        "image_height": "adapt",
+        "image_width": "medium",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_background": "#e7e7e7",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#525252",
+        "color_button_gradient": "",
+        "padding_top": 28,
+        "padding_bottom": 28,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_LaXper": {
+      "type": "rich-text",
+      "blocks": {
+        "text_Dpa3np": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>Aetrex Overpronation Orthotics</strong></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_Dpa3np"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-lg tracking-heading",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_wPxyTT": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_LTmwwP": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>What is Overpronation? </strong>Overpronation, or flat feet, is a common biomechanical problem that occurs in the walking process when a person’s arch collapses upon weight bearing. This motion can cause extreme stress or inflammation on the plantar fascia, potentially causing discomfort and leading to other foot problems.<br/><br/><strong>Aetrex Overpronation Orthotics:</strong><br/>Aetrex Overpronation Orthotics are designed specifically to reduce shock, control overpronation and provide maximum comfort. These orthotics are engineered with medial posting for rearfoot control to help with overpronation.</p><p><strong>Price:</strong> Available Now for $59.95</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_76mTTj": {
+          "type": "button",
+          "settings": {
+            "button_label": "Learn More: Men's Orthotics",
+            "button_link": "shopify://products/overpronation-orthotics-men",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_JtmUhL": {
+          "type": "button",
+          "settings": {
+            "button_label": "Learn More: Women's Orthotics",
+            "button_link": "shopify://products/overpronation-orthotics-women",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_LTmwwP",
+        "button_76mTTj",
+        "button_JtmUhL"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/overpronation_b9cee24d-3ca8-4e05-9ba0-feb8140193d0.jpg",
+        "image_height": "adapt",
+        "image_width": "medium",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#525252",
+        "color_button_gradient": "",
+        "padding_top": 28,
+        "padding_bottom": 48,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "rich_text_b3VMAU",
+    "rich_text_rT7Yy8",
+    "image_with_text_8r8Mkk",
+    "rich_text_VQGnHD",
+    "image_with_text_zDdM8w",
+    "rich_text_x6f6qM",
+    "image_with_text_KYfa9x",
+    "rich_text_azr6zP",
+    "image_with_text_9Q3q77",
+    "rich_text_CgQUie",
+    "image_with_text_y8caAd",
+    "rich_text_GYAiy6",
+    "image_with_text_fxf8r4",
+    "rich_text_LaXper",
+    "image_with_text_wPxyTT"
+  ]
+}

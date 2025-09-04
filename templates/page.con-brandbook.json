@@ -1,0 +1,143 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "rich_text_wAjFNq": {
+      "type": "rich-text",
+      "blocks": {
+        "text_brgQht": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Aetrex Brand Style Guide</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 40,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_brgQht"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#ffffff",
+        "color_background": "#97a6a9",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "image_with_text_cYepac": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_bXtgy7": {
+          "type": "text",
+          "settings": {
+            "text": "<h3>2024 Brand Book </h3>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_RQHjen": {
+          "type": "button",
+          "settings": {
+            "button_label": "Download PDF",
+            "button_link": "https://rvq643.saas.contentserv.com/admin/rest/gtstream/stream/assets/Aetrex%20B2B/B2B%20PDF/Aetrex_Brand_StyleGuide_2024_digitalSM.pdf",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": true,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_bXtgy7",
+        "button_RQHjen"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/brandbook5_881f1e17-8c01-497b-8b72-e2363aa9b60e.webp",
+        "image_height": "adapt",
+        "image_width": "large",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "content_position": "align-self-center",
+        "image_mobile": "shopify://shop_images/brandbook_M.webp",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#525252",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "rich_text_wAjFNq",
+    "image_with_text_cYepac"
+  ]
+}

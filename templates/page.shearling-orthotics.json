@@ -1,0 +1,519 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "testimonials_banner_Cbhq4c": {
+      "type": "testimonials-banner",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/shearling_D_00a36b19-44c6-4633-b7f4-84cba1e1f323.jpg",
+        "image_height": "adapt",
+        "content_position": "md:items-center md:justify-center",
+        "image_mobile": "shopify://shop_images/shearling_M.jpg",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-center justify-center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 0,
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_brMKhp": {
+      "type": "rich-text",
+      "blocks": {
+        "button_DptdWP": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://pages/aetrex-shearling-orthotics",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "button_DptdWP"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "shopify://collections/shearling",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#ed975a",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_Wy6TDf": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_H9MB4x": {
+          "type": "heading",
+          "settings": {
+            "heading": "<em><strong>Step into Warmth & Comfort</strong></em>",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_bWwHwa": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Super supportive and ultra plush Aetrex Shearling Orthotics make every pair of boots feel extra comfy. Add Aetrex Shearling Orthotics inside your fall and winter boots so you can do the things you love pain-free.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_H9MB4x",
+        "text_bWwHwa"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/boots_28597945-802e-49d1-81d0-fd12244dc10b.gif",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "content_position": "align-self-center",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "#e9ad81",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 48,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_pfea7x": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_rcYQdL": {
+          "type": "heading",
+          "settings": {
+            "heading": "<em><strong>Premium Materials that Benefit Your Health</strong></em>",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_xGMjtH": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Soft Shearling water-resistant top cover for warmth and comfort. Pro-Shox(r) and cork blended center layer for shock absorption and support. It also has a durable, genuine suede bottom layer.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_rcYQdL",
+        "text_xGMjtH"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/layers.jpg",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "content_position": "align-self-center",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "#e9ad81",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 48,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_KqXCd4": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_eYYqRm": {
+          "type": "heading",
+          "settings": {
+            "heading": "<em><strong>Strategically Placed Arch Support</strong></em>",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_CMhBCe": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The contour, position and height of Aetrex’s unique arch support aligns anatomically in the proper place to help support our bodies from the ground up.<br/><strong><br/>$59.95</strong></p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_eYYqRm",
+        "text_CMhBCe"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/us_vs.jpg",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "content_position": "align-self-center",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "#e9ad81",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 48,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "multicolumn_CPk7gj": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_CrhgT4": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/shipping_489ecc4f-3f30-4ca0-b16f-b3a3a5c0de3d.png",
+            "image_ratio": "adapt",
+            "heading": "Ground Shipping",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_9q7CQ7": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/return_edc8b2c2-bd5e-4253-bf58-c7f5cb18a895.png",
+            "image_ratio": "adapt",
+            "heading": "Easy Returns",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_t3ytnF": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/30day_4df19e0b-2fdd-43a7-b164-9e2cb56ac8af.png",
+            "image_ratio": "adapt",
+            "heading": "30 Day Comfort Guarantee",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_CrhgT4",
+        "column_9q7CQ7",
+        "column_t3ytnF"
+      ],
+      "settings": {
+        "gap": "small",
+        "columns": 3,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "#efefef",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 12,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "rich_text_aJH4fx": {
+      "type": "rich-text",
+      "blocks": {
+        "image_E8VTQ6": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/rec_ae5886f5-71c8-4fa9-a33b-3d96c75789a7.png",
+            "image_width": "custom",
+            "image_max_width": 70,
+            "image_max_width_mobile": 70
+          }
+        },
+        "text_84GeKn": {
+          "type": "text",
+          "settings": {
+            "text": "<p>RECOMMENDED BY DOCTORS & LOVED BY MILLIONS</p>",
+            "text_font": "heading",
+            "text_size": "subtext-sm",
+            "text_max_size": 30,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "image_E8VTQ6",
+        "text_84GeKn"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#ffffff",
+        "color_background": "#ed975a",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_overlay_bgKPCE": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "text_7H7VW8": {
+          "type": "text",
+          "settings": {
+            "text": "<p><em>Don't Know Which Orthotics Are Perfect For You?</em></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_Q8p34L": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Take our easy 4 step quiz based on your shoe type and area of discomfort.</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_CCkJbN": {
+          "type": "button",
+          "settings": {
+            "button_label": "TAKE QUIZ NOW",
+            "button_link": "https://irle3andv1z.typeform.com/to/gujvKvEg",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_7H7VW8",
+        "text_Q8p34L",
+        "button_CCkJbN"
+      ],
+      "name": "Image with text overlay",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/Quiz_M1_2.gif",
+        "image_height": "adapt",
+        "content_width": "small",
+        "content_position": "md:items-center md:justify-start",
+        "text_alignment": "center",
+        "image_mobile": "shopify://shop_images/Quiz_M1_4.gif",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-end justify-center",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_highlight": "#2c90b3",
+        "gradient_highlight": "",
+        "color_button_text": "#ffffff",
+        "color_button_background": "#2c90b3",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 0,
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "testimonials_banner_Cbhq4c",
+    "rich_text_brMKhp",
+    "image_with_text_Wy6TDf",
+    "image_with_text_pfea7x",
+    "image_with_text_KqXCd4",
+    "multicolumn_CPk7gj",
+    "rich_text_aJH4fx",
+    "image_with_text_overlay_bgKPCE"
+  ]
+}

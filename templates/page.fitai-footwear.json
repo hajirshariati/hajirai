@@ -1,0 +1,419 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "testimonials_banner_Cbhq4c": {
+      "type": "testimonials-banner",
+      "name": "Testimonials banner",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/1920x475_FitAI_FitGenius_1.jpg",
+        "image_height": "adapt",
+        "content_position": "md:items-center md:justify-center",
+        "image_mobile": "shopify://shop_images/1920x475_FitAI_FitGenius_1_a4a0e8e1-9135-455d-847d-203cf073ea26.png",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-center justify-center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 0,
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_MLXerj": {
+      "type": "rich-text",
+      "blocks": {
+        "text_yKxt79": {
+          "type": "text",
+          "settings": {
+            "text": "<p>FitAI™ Footwear Recommendations Software</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_yKxt79"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#ffffff",
+        "color_background": "#99a4ad",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 8,
+        "padding_bottom": 8,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "rich_text_AhWdpk": {
+      "type": "rich-text",
+      "blocks": {
+        "text_eGXbBJ": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Solving Fit & Reducing Returns: Your feet are 3-dimensional. So are your shoes. Yet, today shoe sizing is still based on length and width. It’s no wonder 30-40% of footwear orders online are returned. But, it doesn’t have to be this way. Aetrex’s FitAI™ footwear recommendations software custom recommends and matches footwear to individuals based on their unique 3D foot scan data and information.</p>",
+            "text_font": "heading",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_eGXbBJ"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "heading": "",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h3",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_cqHnCf": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_BaM9Y6": {
+          "type": "heading",
+          "settings": {
+            "heading": "FitStarter™",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_GW6cKf": {
+          "type": "text",
+          "settings": {
+            "text": "<h4>Turnkey Footwear and Fit Recommendations</h4>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_KhVqYe": {
+          "type": "text",
+          "settings": {
+            "text": "<p>FitStarter is a personalized footwear recommendation platform designed to help retailers improve their shoe fitting service for shoppers, reduce returns, and increase customer satisfaction. Developed in partnership with the premier shoe fit testing company Heeluxe, FitStarter is an accurate, turnkey starting point to Aetrex’s AI-powered shoe match-making platform, FitGenius.<br/><br/>Aetrex utilizes its own Fit Labs to analyze shoes submitted by participating retailers each season using the patented Heeluxe technology, which utilizes PSI pressure sensors. The FitStarter platform analyzes each customer’s unique 3D foot scan data collected in store, from either an AlbertPro or Albert 3D Fit, alongside the Fit Lab data to provide immediate, personalized fitting recommendations. Within days, retailers can have customized footwear and fit recommendations available in their stores.</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_436WQn": {
+          "type": "button",
+          "settings": {
+            "button_label": "Read the Press Release",
+            "button_link": "https://www.businesswire.com/news/home/20231128895456/en/Aetrex-Launches-FitStarter-Technology-Platform-to-Offer-Retailers-Immediate-Footwear-Fitting-Solution",
+            "button_video_link": "",
+            "button_style": "link",
+            "button_size": "sm",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_Fwzine": {
+          "type": "button",
+          "settings": {
+            "button_label": "Feature in Sourcing Journal",
+            "button_link": "https://sourcingjournal.com/footwear/footwear-retail/aetrex-heeluxe-fitstarter-footwear-recommendation-technology-albert-fitsense-471287/",
+            "button_video_link": "",
+            "button_style": "link",
+            "button_size": "sm",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_BaM9Y6",
+        "text_GW6cKf",
+        "text_KhVqYe",
+        "button_436WQn",
+        "button_Fwzine"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/602x367_FitAI.jpg",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_mobile": "shopify://shop_images/602x367_FitAI.jpg",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "left",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_hCACNV": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_adQAEB": {
+          "type": "heading",
+          "settings": {
+            "heading": "Albert FitGenius™ AI Platform",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_XEzAbi": {
+          "type": "text",
+          "settings": {
+            "text": "<h4>Reduce E-commerce Returns with the Right Fit</h4>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_DPg6ET": {
+          "type": "text",
+          "settings": {
+            "text": "<p>After accumulating 5,000 matching data points, as defined by being able to match a 3D foot scan to an in-store footwear purchase, the store will have the option to upgrade their FitStarter program to FitGenius.<br/><br/>Aetrex’s FitGenius AI platform, available within the Albert software and as a plug-in for retailers’ websites, can dramatically reduce your e-commerce footwear returns and create a more personalized customer experience. It works by matching a customer’s unique 3D foot profile & fit preference data with the shoe purchase history of similar profiles to help shoppers get the right fit on the first try.<br/><br/>The process begins with a 3D foot scan in store. Consumers are able to instantly view their 3D measurements and receive their unique foot profile data via email. Retailers who fully integrate the program can then have FitGenius recommendations appear wherever the consumer shops- whether in store, on their website, or through their email blasts and<br/><br/></p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_nFJeLK": {
+          "type": "button",
+          "settings": {
+            "button_label": "Watch Video to Learn More",
+            "button_link": "",
+            "button_video_link": "https://cdn.shopify.com/videos/c/o/v/2ab2730ba01a4d50aa963587b4659822.mp4",
+            "button_style": "link",
+            "button_size": "sm",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_ypPfJw": {
+          "type": "button",
+          "settings": {
+            "button_label": "FitGenius in the News",
+            "button_link": "https://www.runninginsight.com/a-running-insight-conversation-with-matt-schwartz-chief-revenue-officer-aetrex",
+            "button_video_link": "",
+            "button_style": "link",
+            "button_size": "sm",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_p8yqpT": {
+          "type": "button",
+          "settings": {
+            "button_label": "See How LeHigh Uses FitGenius to Reduce Returns",
+            "button_link": "",
+            "button_video_link": "https://cdn.shopify.com/videos/c/o/v/c58581f7023f41fea642e6cd3db454ff.mp4",
+            "button_style": "link",
+            "button_size": "sm",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_RTY9mi": {
+          "type": "button",
+          "settings": {
+            "button_label": "Consumers: Find a Foot Scanner Near You",
+            "button_link": "shopify://pages/store-locator",
+            "button_video_link": "",
+            "button_style": "link",
+            "button_size": "sm",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_4qMT9V": {
+          "type": "button",
+          "settings": {
+            "button_label": "Retailers: Book a Demo",
+            "button_link": "https://irle3andv1z.typeform.com/to/V3YAATXm",
+            "button_video_link": "",
+            "button_style": "link",
+            "button_size": "sm",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_adQAEB",
+        "text_XEzAbi",
+        "text_DPg6ET",
+        "button_nFJeLK",
+        "button_ypPfJw",
+        "button_p8yqpT",
+        "button_RTY9mi",
+        "button_4qMT9V"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/602x367_FitGenius.jpg",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_mobile": "shopify://shop_images/602x367_FitGenius.jpg",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "left",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 48,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "testimonials_banner_Cbhq4c",
+    "rich_text_MLXerj",
+    "rich_text_AhWdpk",
+    "image_with_text_cqHnCf",
+    "image_with_text_hCACNV"
+  ]
+}

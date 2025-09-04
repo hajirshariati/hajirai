@@ -1,0 +1,142 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "main-cart",
+      "blocks": {
+        "free_shipping": {
+          "type": "free_shipping",
+          "disabled": true,
+          "settings": {
+            "minimum_amount": "1000"
+          }
+        },
+        "subtotal": {
+          "type": "subtotal",
+          "settings": {}
+        },
+        "cart_note": {
+          "type": "cart_note",
+          "disabled": true,
+          "settings": {
+            "heading": "Add a note to your order"
+          }
+        },
+        "buttons": {
+          "type": "buttons",
+          "settings": {
+            "show_accelerated_buttons": false
+          }
+        },
+        "afterpay_on_site_messaging_payments_messaging_xmCix7": {
+          "type": "shopify://apps/afterpay-on-site-messaging/blocks/payments-messaging/f45a5524-d177-4475-bf59-281efd2215a8",
+          "settings": {
+            "text_align": "inherit",
+            "margin_top": 16,
+            "margin_bottom": 16,
+            "color": "",
+            "size": "md",
+            "intro_text": "or",
+            "show_interest_free": true,
+            "payment_amount_is_bold": true,
+            "show_with": true,
+            "logo_type": "badge",
+            "logo_theme": "black-on-mint",
+            "modal_link_style": "circled-info-icon",
+            "modal_theme": "mint",
+            "breakpoint": 749,
+            "text_align_mobile": "inherit",
+            "margin_top_mobile": 16,
+            "margin_bottom_mobile": 16,
+            "show_lower_limit": true,
+            "show_upper_limit": true,
+            "show_if_outside_limits": true,
+            "product": ""
+          }
+        }
+      },
+      "block_order": [
+        "free_shipping",
+        "subtotal",
+        "cart_note",
+        "buttons",
+        "afterpay_on_site_messaging_payments_messaging_xmCix7"
+      ],
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "md:items-end",
+        "heading_tag": "h1",
+        "show_vendor": false,
+        "show_payment_icons": false,
+        "show_shipping_calculator": false,
+        "padding_top": 72,
+        "padding_bottom": 60,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "custom_liquid_LAUEGE": {
+      "type": "custom-liquid",
+      "name": "Custom Liquid",
+      "settings": {
+        "liquid": "<div class=\"yotpo-widget-instance\" data-yotpo-instance-id=\"1064470\"></div>",
+        "color_text": "",
+        "color_background": "#dfeeff",
+        "gradient_background": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": true,
+        "rounded": true
+      }
+    },
+    "recently-viewed": {
+      "type": "recently-viewed",
+      "settings": {
+        "product_limit": 6,
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "You may also like",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 60,
+        "padding_bottom": 100,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    }
+  },
+  "order": [
+    "main",
+    "custom_liquid_LAUEGE",
+    "recently-viewed"
+  ]
+}

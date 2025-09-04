@@ -1,0 +1,598 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "testimonials_banner_Cbhq4c": {
+      "type": "testimonials-banner",
+      "name": "Testimonials banner",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/1920x475_Albert2Pro_banner.png",
+        "image_height": "adapt",
+        "content_position": "md:items-center md:justify-center",
+        "image_mobile": "shopify://shop_images/1920x475_Albert2Pro_banner_d6947222-de9b-4339-8636-ddcc84dce9ea.png",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-center justify-center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 0,
+        "padding_top": 12,
+        "padding_bottom": 0,
+        "divider": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_MLXerj": {
+      "type": "rich-text",
+      "blocks": {
+        "text_yKxt79": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Albert Pro Scanner</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 40,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_yKxt79"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#ffffff",
+        "color_background": "#99a4ad",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 8,
+        "padding_bottom": 8,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "rich_text_bGVzXB": {
+      "type": "rich-text",
+      "blocks": {
+        "text_8bW7wp": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>The Premier All-In-One Foot Scanning Solution</strong></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_8bW7wp"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#6f6f6f",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 40,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "image_with_text_BazqH8": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_kDbXLy": {
+          "type": "text",
+          "settings": {
+            "text": "<h2>Featuring:</h2><ul><li>3D Measurements</li><li>Pressure Data</li><li>AI Footwear & Orthotic Recommendations<br/></li></ul><p>The Albert Pro is an easy-to-use, all-in-one 3D foot scanning system engineered to help customers find the right fitting footwear and orthotics and provide an enhanced customer experience at retail.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_kDbXLy"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/609x469_Albert2_CES_Awards_2x_3f64cd06-d822-4a57-9a6b-8cbbcb5b5e77.png",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_iAiy3e": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_e4wikT": {
+          "type": "text",
+          "settings": {
+            "text": "<p>In 20 seconds or less with a two-foot-at-once foot scan, Albert Pro captures unmatched data about a customer’s feet, including static pressure data and the option for dynamic pressure.<br/><br/><br/>Fully integrated with Aetrex Orthotic recommendations for customers, the Albert Pro creates a profit center for retailers. It’s the most advanced foot scanning system offered globally and facilitates a more personalized omnichannel relationship with customers.<br/><br/></p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_e4wikT"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/690x469_3D_Measurements_banner_2x_819c3491-ca32-47e1-918a-ff683f237e41.png",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": true,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_PJjzGa": {
+      "type": "image-with-text",
+      "blocks": {
+        "button_FRwkwD": {
+          "type": "button",
+          "settings": {
+            "button_label": "Watch Video to Learn More",
+            "button_link": "https://player.vimeo.com/progressive_redirect/playback/471733146/rendition/720p/file.mp4?loc=external&signature=b9465fd68ef3f804276a5bd429257310046c30b7bb41e6530f5dd4be5672fcc6",
+            "button_video_link": "",
+            "button_style": "link",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_LjGUmB": {
+          "type": "button",
+          "settings": {
+            "button_label": "View Scanner Comparison Chart",
+            "button_link": "shopify://pages/comparison-chart",
+            "button_video_link": "",
+            "button_style": "link",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_ib8VAN": {
+          "type": "button",
+          "settings": {
+            "button_label": "Albert Pro in the News",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "link",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_Y7FKPM": {
+          "type": "button",
+          "settings": {
+            "button_label": "How to Check Your 3D Scanner for Accuracy: Watch Video",
+            "button_link": "https://player.vimeo.com/progressive_redirect/playback/667869916/rendition/1080p/file.mp4?loc=external&signature=fa723d237f9f1fc33869d91c98ca65f2f9a85c8b5c56bb8ab02def1b69ee69a8",
+            "button_video_link": "",
+            "button_style": "link",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_UK7qf6": {
+          "type": "button",
+          "settings": {
+            "button_label": "Visit AetrexB2B.com to Purchase",
+            "button_link": "https://aetrexb2b.com/",
+            "button_video_link": "",
+            "button_style": "link",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_4Bxxfk": {
+          "type": "button",
+          "settings": {
+            "button_label": "See how Tradehome Enhances the In-Store Experience with Albert Pro",
+            "button_link": "https://player.vimeo.com/progressive_redirect/playback/923904023/rendition/1080p/file.mp4?loc=external&log_user=0&signature=f396bdaaab3d1c17037b5d32598a7eec01f703e1a3869ef61ae63c0383929ded",
+            "button_video_link": "",
+            "button_style": "link",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "button_FRwkwD",
+        "button_LjGUmB",
+        "button_ib8VAN",
+        "button_Y7FKPM",
+        "button_UK7qf6",
+        "button_4Bxxfk"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/690x469_Pressure_banner_2x_7cacfa1d-43ab-4b97-a9eb-ca1988194ceb.png",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": true,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_D7P7dh": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_YXEWYf": {
+          "type": "heading",
+          "settings": {
+            "heading": "<strong>What Albert Pro Retailers Are Saying</strong>",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_YXEWYf"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "#fbfbfb",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 40,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "testimonials_iRP84t": {
+      "type": "testimonials",
+      "blocks": {
+        "testimonial_MjnntH": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<h6>“We have people driving 30+ minutes to get their feet scanned with our Aetrex Albert scanner and get fitted with Aetrex Orthotics. The technology really helps with conversion. Once you get a customer on the scanner and you put an Aetrex Orthotic in one of their shoes- BOOM, the orthotics sell themselves!”</h6>",
+            "author": "Ronnie Coleman",
+            "author_info": "Coleman Shoes, Princeton, KY",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_QnAwwH": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<h6>“We can’t imagine our stores without the Albert Pro. We take great pride in creating a memorable, individualized experience for our guests. Aetrex’s Albert 3D foot scanner allows us to take our service to a completely different level. People are immediately impressed with the speed of the scan, the accuracy of the scanning results, and the next-step options provided by the technology. Albert's features complement our hands-on approach and enhance our staff’s ability to find customers ideal footwear solutions. By utilizing this state-of-the-art scanning technology, we continue to see shoppers making purchases with elevated confidence, revisiting our stores with increased frequency, and becoming Tradehome Shoes ambassadors amongst their friends and families.”</h6>",
+            "author": "Justin Kehrwald, Tradehome",
+            "author_info": "President & CEO",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_frdWcU": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<h6>“The personalized 3D foot data we are able to collect from the Albert scanner is a gamechanger. It allows us to offer an even greater solution of safety to our account customers in the industrial workforce. By expanding foot safety to full body wellness, individual workers experience improved on-the-job performance, greater productivity, less pain and less fatigue. With these benefits we exponentially lower our account’s risk and liability while opening the door to also contribute to their full corporate employee wellness program.”</h6>",
+            "author": "Jeff Stern",
+            "author_info": "Senior Vice President, Brand GM at Rocky Brands, Inc., Lehigh Outfitters, LLC",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_LNMw7z": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<h6>“Aetrex Technology has given our customers a truly unique experience they previously could not receive in a typical running store. Having an Aetrex scanner in our store gives us the ability to capture accurate 3D measurements of the customer’s feet and provide a completely customized experience. The technology helps us determine the right fitting footwear and orthotics for them on the first try. Runners come to us looking for ways to increase their performance in their shoes- whether that’s by increasing their support, relieving their foot pain, or helping to prevent injuries. Having an Aetrex foot scanner in our store gives us the opportunity to help address the customer’s individual needs, and elevates the shopping experience.”</h6>",
+            "author": "Zach Shanle",
+            "author_info": "Peak Performance Footwear",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_eHWC7K": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<h6>“Albert is an excellent tool to increase conversions in our stores. Its scanning speed, advanced technology and dynamic look makes a strong impression with our customers. After getting a 3D foot scan, our shoppers convert easily, with most buying multiple products at a time. Aetrex Technology not only helps drive sales, it gives our customers extra confidence knowing the products they are buying are great for their unique feet.”</h6>",
+            "author": "Hussam Irshad",
+            "author_info": "Brand Distribution Manager  Andy Enterprises L.L.C.Dubai, U.A.E.",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_yB986p": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<h6>“We have people driving 30+ minutes to get their feet scanned with our Aetrex Albert scanner and get fitted with Aetrex Orthotics. The technology really helps with conversion. Once you get a customer on the scanner and you put an Aetrex Orthotic in one of their shoes- BOOM, the orthotics sell themselves!”</h6>",
+            "author": "Ronnie Coleman",
+            "author_info": "Coleman Shoes, Princeton, KY",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_qAedeQ": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<h6>“The Albert takes the 3D foot scan process to the next level by offering a quick, comprehensive scan process and an engaging presentation for the customer. The ability to offer a dynamic scan in addition to the static scan gives each salesperson the flexibility to create the right experience in the moment for each customer. The technology is extremely beneficial to our team.”</h6>",
+            "author": "Dave Casamassa",
+            "author_info": "Director Of Operations <br> The Sole Provisions Family of Stores",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_HR6mLn": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<h6>“Aetrex Technology provides our customers with scientific data that really helps increase their faith in the products we recommend for them based on their specific needs. We’ve noticed when a shopper’s confidence increases, the person buys more. And, we've seen a significant increase in sales after someone gets their feet scanned.”</h6>",
+            "author": "Gian Romero, Owner",
+            "author_info": "Wild Runners: Fair Oaks, CA",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_HaAiCf": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<h6>“The Albert Pro Scanner has been a game changer! It has given our staff the ability to show the customers what their feet are doing and visually show them why they need a particular shoe and orthotic. This is no longer a sales pitch, but a series of pictures worth 1,000 words!”</h6>",
+            "author": "Rick Dodgen",
+            "author_info": "Director of Stores, Sun & Ski Sports",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_MjnntH",
+        "testimonial_QnAwwH",
+        "testimonial_frdWcU",
+        "testimonial_LNMw7z",
+        "testimonial_eHWC7K",
+        "testimonial_yB986p",
+        "testimonial_qAedeQ",
+        "testimonial_HR6mLn",
+        "testimonial_HaAiCf"
+      ],
+      "name": "Testimonials",
+      "settings": {
+        "heading": "",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h4",
+        "subheading": "",
+        "description": "",
+        "button_label": "READ ALL",
+        "button_link": "shopify://pages/albert-2-pro-testimonials",
+        "button_external": false,
+        "button_icon": false,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "#fbfbfb",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#171717",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 48,
+        "divider": false,
+        "rounded": false
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "testimonials_banner_Cbhq4c",
+    "rich_text_MLXerj",
+    "rich_text_bGVzXB",
+    "image_with_text_BazqH8",
+    "image_with_text_iAiy3e",
+    "image_with_text_PJjzGa",
+    "rich_text_D7P7dh",
+    "testimonials_iRP84t"
+  ]
+}

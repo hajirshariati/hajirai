@@ -1,0 +1,407 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "rich_text_MLXerj": {
+      "type": "rich-text",
+      "blocks": {
+        "text_yKxt79": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The Footwear Development Package</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 40,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_yKxt79"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#ffffff",
+        "color_background": "#99a4ad",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 8,
+        "padding_bottom": 8,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "rich_text_UMMJDg": {
+      "type": "rich-text",
+      "blocks": {
+        "text_jbq8iX": {
+          "type": "text",
+          "settings": {
+            "text": "<h3>Our Ultimate Package for Advanced Footwear Development</h3>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 26,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_jbq8iX"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "rgba(0,0,0,0)",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "rich_text_wMER9F": {
+      "type": "rich-text",
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "image_with_text_fyK3Gy": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_ahiEnm": {
+          "type": "text",
+          "settings": {
+            "text": "",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_eJ4mCm": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The Footwear Development Package is our most comprehensive package to create better fitting and functioning footwear utilizing complete, accurate 3D foot data. The package includes full access to Foot.com, plus special software features including advanced measurement tools and analysis programs.</p><h2>Package Includes:</h2><ul><li>Albert Pro Scanner</li><li>Special Software with Advanced Features for Development</li></ul><p><strong>Foot.com Data</strong> – Access to comprehensive global 3D foot data and pressure data underfoot, remote access, and the ability to 3D print foot models for fit testing.</p><p><strong>Wear Tester</strong> – AI-driven comparison and data analysis tool to identify the most accurate physical wear tester profiles for your business.</p><p><strong>“Lasso” Tool</strong> – 3D measurement tool for calculating infinite measurements of the foot on individual scans.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_ahiEnm",
+        "text_eJ4mCm"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/MeasCharts01_690x480_35a69b5d-7732-4aae-aa16-b682e363d76a.jpg",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/MeasCharts01_690x480_35a69b5d-7732-4aae-aa16-b682e363d76a.jpg",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "left",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_Cq3wRG": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_ALfqUD": {
+          "type": "text",
+          "settings": {
+            "text": "<h3>Wear Tester Software</h3><h6><strong>Identify Accurate Wear Testers in a Snap!</strong></h6><p>Footwear developers rely heavily on the feedback of wear testers. But, how do you really know if the wear tester’s feet represent an ideal sample for the population?<br/><br/>The Aetrex Wear Tester Software is designed to help footwear teams learn how to identify the most accurate physical wear tester profiles based on their 3D foot characteristics.<br/><br/>The program works by using AI to compare comprehensive 3D foot scans of a company’s wear tester candidates to millions of foot profiles collected from the general population around the world. Potential wear tester profiles are then assigned a score for their comparison accuracy of the desired sample size per region. Footwear brands can use the scores to identify the most accurate wear testers for their brand, ensuring the best fit for their shoes.<br/><br/></p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_ALfqUD"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/690x480px_Foot.com_Albert_2_Monitor_3D_Scan_Foot3.jpg",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/690x480px_Foot.com_Albert_2_Monitor_3D_Scan_Foot3.jpg",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "left",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_UFAWmC": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_fHKy9A": {
+          "type": "text",
+          "settings": {
+            "text": "<h3>\"Lasso\" Tool</h3><p><strong>Calculate Infinite Foot Measurements</strong></p><p>Much like a true lasso, this tool virtually “wraps” around the 3D foot and can be moved on an axis at any angle to measure and analyze a cross-section of any aspect of a 3D foot scan. Users can also identify 2 spots within a cross-section to measure and get even further detailed data.</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_fHKy9A"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/Foot.com_lasso.jpg",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/Foot.com_lasso.jpg",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "left",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_h6mBPb": {
+      "type": "rich-text",
+      "blocks": {
+        "text_Y7WMPN": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>Learn How 3D Foot Data Can Help You Develop Better-Fitting and Functioning Footwear</strong></p>",
+            "text_font": "body",
+            "text_size": "subtext-lg",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_dXLMFh": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Create your optimal shoe last by region, size, gender, and more today</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_gBfnpA": {
+          "type": "button",
+          "settings": {
+            "button_label": "BOOK A DEMO",
+            "button_link": "https://irle3andv1z.typeform.com/to/V3YAATXm?typeform-source=www.aetrex.com",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": true,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_Y7WMPN",
+        "text_dXLMFh",
+        "button_gBfnpA"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h3",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#77a2c4",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 48,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "rich_text_MLXerj",
+    "rich_text_UMMJDg",
+    "rich_text_wMER9F",
+    "image_with_text_fyK3Gy",
+    "image_with_text_Cq3wRG",
+    "image_with_text_UFAWmC",
+    "rich_text_h6mBPb"
+  ]
+}

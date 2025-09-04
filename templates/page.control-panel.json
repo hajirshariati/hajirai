@@ -1,0 +1,343 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "image_with_text_MyF3Fm": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_d7kQfJ": {
+          "type": "heading",
+          "settings": {
+            "heading": "Control Panel",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_pFabTL": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The Albert Control Panel is a dashboard where retailers can easily access, filter, and export all foot scan data. The control panel helps retailers monitor scanner usage by store and by sales associate. It can then filter all customer foot scan data by store, which can be used to create customized marketing programs targeted to customer’s needs based on foot size, width, arch height, and much more.</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_d7kQfJ",
+        "text_pFabTL"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/Corrected_iPAD_Horizontal_Control_Panel_1.jpg",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/Corrected_iPAD_Horizontal_Control_Panel_1.jpg",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 48,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_HwK99y": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_36cNWf": {
+          "type": "heading",
+          "settings": {
+            "heading": "3D Printing",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_VK8Byw": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The Albert Control Panel is a dashboard where retailers can easily access, filter, and export all foot scan data. The control panel helps retailers monitor scanner usage by store and by sales associate. It can then filter all customer foot scan data by store, which can be used to create customized marketing programs targeted to customer’s needs based on foot size, width, arch height, and much more.</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_TV3wPa": {
+          "type": "button",
+          "settings": {
+            "button_label": "Watch Aetrex 3D Printed Orthotics Movie",
+            "button_link": "https://vimeo.com/337556072",
+            "button_style": "link",
+            "button_size": "sm",
+            "button_external": true,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_36cNWf",
+        "text_VK8Byw",
+        "button_TV3wPa"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/690x500_3D_Ortho.png",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/690x500_3D_Ortho.png",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_gYz77F": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_Vi3kn4": {
+          "type": "heading",
+          "settings": {
+            "heading": "Foot Scan Data",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_hXBydp": {
+          "type": "text",
+          "settings": {
+            "text": "<ul><li>Pressure per sensor by 1⁄4 cm² in kgs</li><li>Plantar surface of foot by 1⁄4 cm²</li><li>Plantar surface arch depth by 1⁄2 cm</li><li>Average pressure per sensor by 1⁄4 cm²</li><li>Left and right foot individual measurements by 1 mm of length, width, in-step height, arch height, girth.</li><li>An algorithmic output quantifying percentile relative to overall population for each measurement above</li><li>Gait analysis shows pressure distribution while walking</li><li>Degree of over-pronation, left and right foot</li><li>Foot Differentiation Score, assessing and quantifying differences between left and right foot in terms of arch height, arch depth, and pressure, and providing a machine learning output score detailing percentile relative to overall population</li><li>Median shoe size</li></ul>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_Vi3kn4",
+        "text_hXBydp"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/690x788_Data_Collection.png",
+        "image_height": "adapt",
+        "image_width": "medium",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/690x788_Data_Collection.png",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_qRPNeQ": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_9Gmk6F": {
+          "type": "heading",
+          "settings": {
+            "heading": "Retail Store Data",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_XTUpAR": {
+          "type": "text",
+          "settings": {
+            "text": "<ul><li>Reporting of scanner usage by store and/or sales associate</li><li>Automated weekly reporting via email by store and/or sales associate</li><li>Reporting on scan to email or mobile number acquisition rate by store and/or sales associate</li><li>With POS Integration: customizable reporting on scan to footwear sales by store and/or sales associate</li></ul>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_9Gmk6F",
+        "text_XTUpAR"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/690x580_store_data.png",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/690x580_store_data.png",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_YqeNKk": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_EYAm7F": {
+          "type": "heading",
+          "settings": {
+            "heading": "Cloud Analytics",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_y4iU7i": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Cloud Analytics is highly secure, reliable, cloud-based data analytics platform for Albert Pro. It uses Artificial Intelligence and a range of analytical tools to extract information from the massive data collected from the Albert scanners and present them in a way that is easily categorized and readily available through the Control Panel.</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_EYAm7F",
+        "text_y4iU7i"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/690x500_cloud_analytics.png",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/690x500_cloud_analytics.png",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 48,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "image_with_text_MyF3Fm",
+    "image_with_text_HwK99y",
+    "image_with_text_gYz77F",
+    "image_with_text_qRPNeQ",
+    "image_with_text_YqeNKk"
+  ]
+}

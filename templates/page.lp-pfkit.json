@@ -1,0 +1,1952 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "rich_text_MLXerj": {
+      "type": "rich-text",
+      "blocks": {
+        "text_yKxt79": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Guaranteed to Heal Plantar Fasciitis In 10 Days Or Your Money Back</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 26,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_yKxt79"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#ffffff",
+        "color_background": "#d39161",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_9BT4ax": {
+      "type": "rich-text",
+      "blocks": {
+        "text_TG4iCA": {
+          "type": "text",
+          "settings": {
+            "text": "<h2>The Aetrex Plantar Fasciitis Kit</h2>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_kgfN3n": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Your First Step to Recovery</p><p>Over 90% of Surveyed Purchasers Experienced Relief of Symptoms</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 26,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_TG4iCA",
+        "text_kgfN3n"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#ffffff",
+        "color_background": "#5a7463",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 4,
+        "padding_bottom": 32,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "image_with_text_overlay_a863DH": {
+      "type": "image-with-text-overlay",
+      "name": "Image with text overlay",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/PFK_HQ_expanded_gif.gif",
+        "image_height": "adapt",
+        "content_width": "small",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/easy_return_pfk_landing_3_new_comp.gif",
+        "image_height_mobile": "250px",
+        "content_position_mobile": "items-center justify-center",
+        "text_alignment_mobile": "center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
+        "padding_top": 24,
+        "padding_bottom": 4,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_bGVzXB": {
+      "type": "rich-text",
+      "blocks": {
+        "text_AK3zed": {
+          "type": "text",
+          "settings": {
+            "text": "<h1>Goodbye Pain,<br/>Hello Relief!</h1>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_JC6iHj": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Must-haves to quickly help eliminate pain from symptoms of Plantar Fasciitis</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_ja7JHP": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP MEN'S KIT",
+            "button_link": "shopify://products/men-plantar-fasciitis-kit",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_k8HbdL": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP WOMEN'S KIT",
+            "button_link": "shopify://products/women-plantar-fasciitis-kit",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_AK3zed",
+        "text_JC6iHj",
+        "button_ja7JHP",
+        "button_k8HbdL"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#5a7463",
+        "color_background": "#e3ede7",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#d39161",
+        "color_button_gradient": "",
+        "padding_top": 40,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "multicolumn_UXa7xF": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_w3M7CY": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/InsideBox.png",
+            "image_ratio": "adapt",
+            "heading": "<em>Aetrex Compete Orthotics</em>",
+            "heading_size": "text-base-xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_7dkUVT": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/include_maui.jpg",
+            "image_ratio": "adapt",
+            "heading": "<em>Aetrex Orthotic Flips</em>",
+            "heading_size": "text-base-xl",
+            "text": "<h5>*Color May Vary</h5>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_3zmWPt": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/include_roll.jpg",
+            "image_ratio": "adapt",
+            "heading": "<em>Aetrex Foot Roller</em>",
+            "heading_size": "text-base-xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_NqzKRm": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/include_guide.jpg",
+            "image_ratio": "adapt",
+            "heading": "<em>Stretching Guide</em>",
+            "heading_size": "text-base-xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_w3M7CY",
+        "column_7dkUVT",
+        "column_3zmWPt",
+        "column_NqzKRm"
+      ],
+      "settings": {
+        "gap": "small",
+        "columns": 4,
+        "columns_mobile": "2",
+        "carousel_on_desktop": true,
+        "swipe_on_mobile": true,
+        "heading": "<em>What's inside the box:</em>",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": false,
+        "highlighted_text": "text",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "#5a7463",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#d39161",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": true,
+        "rounded": false
+      }
+    },
+    "rich_text_gBRqYf": {
+      "type": "rich-text",
+      "blocks": {
+        "button_pngVRa": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP MEN'S KIT",
+            "button_link": "shopify://products/men-plantar-fasciitis-kit",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_UUByBB": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP WOMEN'S KIT",
+            "button_link": "shopify://products/women-plantar-fasciitis-kit",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "button_pngVRa",
+        "button_UUByBB"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#d39161",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_iGwpd6": {
+      "type": "rich-text",
+      "blocks": {
+        "text_aT88nr": {
+          "type": "text",
+          "settings": {
+            "text": "<p>30 DAY WEAR TEST, PLUS EASY RETURNS</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 26,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_aT88nr"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#ffffff",
+        "color_background": "#5a7463",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "testimonials_pBTDbF": {
+      "type": "testimonials",
+      "blocks": {
+        "testimonial_RnpVgq": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "none",
+            "text": "",
+            "author": "",
+            "author_info": "",
+            "author_url": "",
+            "image": "shopify://shop_images/90_D.png",
+            "image_ratio": "adapt",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_RnpVgq"
+      ],
+      "settings": {
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "rounded": false
+      }
+    },
+    "video_WV6mjH": {
+      "type": "video",
+      "settings": {
+        "transparent_header": false,
+        "video": "shopify://files/videos/Plantar__fasciatis__Kit.mp4",
+        "video_url": "",
+        "description": "",
+        "enable_video_autoplay": false,
+        "enable_video_looping": false,
+        "image_height": "adapt",
+        "video_url_mobile": "",
+        "image_height_mobile": "auto",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "rich_text_483HBz": {
+      "type": "rich-text",
+      "blocks": {
+        "text_NzTTbP": {
+          "type": "text",
+          "settings": {
+            "text": "<h2>Four Essential Tools That Help<br/>Relieve & Prevent Plantar Fasciitis</h2>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_NzTTbP"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#5a7463",
+        "color_background": "rgba(0,0,0,0)",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_9GjNVF": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_PTLJMy": {
+          "type": "text",
+          "settings": {
+            "text": "<p>SUPPORT INSIDE YOUR SHOES</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_djcA4X": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>1. Aetrex Compete Orthotics</strong></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_thBQrc": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Helps Prevent Excessive Stretching Of Plantar Fascia</p><p>The best-selling Aetrex Orthotics are designed to help keep the foot in the neutral position throughout the gait cycle and to reduce stretching of the plantar fascia. Within days of use, most people begin experience relief from the pain or discomfort.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_PTLJMy",
+        "text_djcA4X",
+        "text_thBQrc"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/shoes_orthotics_02f5b72a-fb58-4d04-a301-ebd1347ea377.png",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "left",
+        "color_text": "#5a7463",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "multicolumn_AQhJ69": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_dmwCRD": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/Feature1.png",
+            "image_ratio": "adapt",
+            "heading": "Aetrex Signature Arch Support",
+            "heading_size": "text-base-xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_3fxddL": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/Feature2.png",
+            "image_ratio": "adapt",
+            "heading": "Posted Heel",
+            "heading_size": "text-base-xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_d37xTX": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/Feature3_shoes_Materials.png",
+            "image_ratio": "adapt",
+            "heading": "High-Tech Premium Materials",
+            "heading_size": "text-base-xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_eBeGRU": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/Feature4_shoes_Lightweight.png",
+            "image_ratio": "adapt",
+            "heading": "Lightweight & Supportive",
+            "heading_size": "text-base-xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_dmwCRD",
+        "column_3fxddL",
+        "column_d37xTX",
+        "column_eBeGRU"
+      ],
+      "settings": {
+        "gap": "small",
+        "columns": 4,
+        "columns_mobile": "2",
+        "carousel_on_desktop": true,
+        "swipe_on_mobile": true,
+        "heading": "FEATURES",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": false,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#5a7463",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "full_width": true,
+        "rounded": false
+      }
+    },
+    "image_with_text_kKFRgk": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_L7AtQa": {
+          "type": "text",
+          "settings": {
+            "text": "<p>SUPPORT AROUND THE HOUSE</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_qiiVzM": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>2. Aetrex Orthotic Flips</strong></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_GTxjCJ": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Helps Cradle Your Heel & Relieve Pressure</p><p>Aetrex Maui Flips are made from UltraSKY™ injected EVA to provide extreme cushioning, shock absorption and durability. With Aetrex Maui Flips you'll feel like you're walking on air and enjoy the most comfortable footwear experience on earth.</p><p><em>*Color May Vary</em></p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_L7AtQa",
+        "text_qiiVzM",
+        "text_GTxjCJ"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/newhouse_maui-min_c.png",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "left",
+        "color_text": "#5a7463",
+        "color_background": "#e3ede7",
+        "gradient_background": "",
+        "color_background_2": "rgba(0,0,0,0)",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "multicolumn_ckbhP8": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_EcRpmx": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/house_arch.png",
+            "image_ratio": "adapt",
+            "heading": "Aetrex Signature Arch Support",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_LfYqtd": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/house_eva.png",
+            "image_ratio": "adapt",
+            "heading": "Special Pressure Relief Technology Foot-bed",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_7rXpn4": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/house_water.png",
+            "image_ratio": "adapt",
+            "heading": "Water-Friendly & Light-Weight",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_pqtbDz": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/house_dual.png",
+            "image_ratio": "adapt",
+            "heading": "Dual density outsole for pressure relief",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_EcRpmx",
+        "column_LfYqtd",
+        "column_7rXpn4",
+        "column_pqtbDz"
+      ],
+      "settings": {
+        "gap": "small",
+        "columns": 4,
+        "columns_mobile": "2",
+        "carousel_on_desktop": true,
+        "swipe_on_mobile": true,
+        "heading": "FEATURES",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": false,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#5a7463",
+        "color_background": "#e3ede7",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "full_width": true,
+        "rounded": false
+      }
+    },
+    "rich_text_n3NE66": {
+      "type": "rich-text",
+      "blocks": {
+        "image_CYg93i": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/house_onfoot.png",
+            "image_width": "custom",
+            "image_max_width": 500,
+            "image_max_width_mobile": 260
+          }
+        },
+        "button_ywMCkU": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP MEN'S KIT",
+            "button_link": "shopify://products/men-plantar-fasciitis-kit",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_G9cYgV": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP WOMEN'S KIT",
+            "button_link": "shopify://products/women-plantar-fasciitis-kit",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "image_CYg93i",
+        "button_ywMCkU",
+        "button_G9cYgV"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "#e3ede7",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#d39161",
+        "color_button_gradient": "",
+        "padding_top": 40,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "image_with_text_n7qyiq": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_BEmFji": {
+          "type": "text",
+          "settings": {
+            "text": "<p>HELPS RELAX YOUR FEET ANYWHERE</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_ntLaE3": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>3. AETREX FOOT ROLLER</strong></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_hhAKcP": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Helps Relieve Pressure & Tension</p><p>The Aetrex Foot Roller is designed to help ease pain, promote foot health and well-being. Regular stretches with the foot roller can help keep your feet strong and reduce foot & ankle pain. The Aetrex Foot Roller is small enough to fit in a gym bag, purse, or desk drawer to help relax your feet anywhere you may need it</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_VrjCgq": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP MEN'S KIT",
+            "button_link": "shopify://products/men-plantar-fasciitis-kit",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_3tXcJT": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP WOMEN'S KIT",
+            "button_link": "shopify://products/women-plantar-fasciitis-kit",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_BEmFji",
+        "text_ntLaE3",
+        "text_hhAKcP",
+        "button_VrjCgq",
+        "button_3tXcJT"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/Foot_Roller.png",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "left",
+        "color_text": "#5a7463",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "#ffffff",
+        "color_button_background": "#d39161",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_bhX6KF": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_HhWwTY": {
+          "type": "text",
+          "settings": {
+            "text": "<p>DAILY STRETCHES TO HELP EXPEDITE RECOVERY</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_aG7FGY": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>4. PLANTAR FASCIITIS STRETCHING GUIDE</strong></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_TFn3WR": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP MEN'S KIT",
+            "button_link": "shopify://products/men-plantar-fasciitis-kit",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_U3DFTa": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP WOMEN'S KIT",
+            "button_link": "shopify://products/women-plantar-fasciitis-kit",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_HhWwTY",
+        "text_aG7FGY",
+        "button_TFn3WR",
+        "button_U3DFTa"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/stretch_guide.png",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "center",
+        "color_text": "#5a7463",
+        "color_background": "#e3ede7",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "#ffffff",
+        "color_button_background": "#d39161",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_nGmJpt": {
+      "type": "rich-text",
+      "blocks": {
+        "text_CkQAN7": {
+          "type": "text",
+          "settings": {
+            "text": "<p>What is Plantar Fasciitis?</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_xCRMU4": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Plantar Fasciitis is an inflammation caused by excessive stretching of the plantar fascia. The plantar fascia is a band of fibrous tissue that runs along the bottom surface of the foot. Excessive stretching of this tissue can cause this condition. The most common symptom is pain in the heel or arch area in the morning or after prolonged periods of rest.</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_CkQAN7",
+        "text_xCRMU4"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 100,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "image_with_text_4UxBhb": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_E6bUaN": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Alignment & Biomechnical Efficency</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_FhnjFF": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Supporting the arch in the proper place is crucial. Looking at your bare feet, the apex of the arch appears to be in the middle of the foot. An X-ray can confirm the apex is actually further back. The contour, position and height of Aetrex’s unique arch support aligns anatomically in the proper place to help support our bodies from the ground up.<br/><br/>Proper alignment helps minimize over-pronation and reduces stress on the plantar fascia, knees, hips and back.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_E6bUaN",
+        "text_FhnjFF"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/PFK_Kit_Alignment.png",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "medium",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "left",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": true,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_gEAkTq": {
+      "type": "rich-text",
+      "blocks": {
+        "text_MmgMVT": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Doctor Recommended</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "image_XDEzHK": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/janine.png",
+            "image_width": "custom",
+            "image_max_width": 250,
+            "image_max_width_mobile": 250
+          }
+        },
+        "text_WX8Efz": {
+          "type": "text",
+          "settings": {
+            "text": "<p>\"I recommend Aetrex Orthotics to my patients because it helps provide the right balance and support to relieve and prevent foot conditions like Plantar Fasciitis. Unlike other brands; the contour, position and height of the Aetrex orthotic arch support aligns anatomically in the proper place to help support our bodies from the ground up.”<br/><br/>- Janine Taddeo, DPM</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_4ke3Fp": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP MEN'S KIT",
+            "button_link": "shopify://products/men-plantar-fasciitis-kit",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_6bBaz6": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP WOMEN'S KIT",
+            "button_link": "shopify://products/women-plantar-fasciitis-kit",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_MmgMVT",
+        "image_XDEzHK",
+        "text_WX8Efz",
+        "button_4ke3Fp",
+        "button_6bBaz6"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "#ffffff",
+        "color_button_background": "#d39161",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "testimonials_JBLaqj": {
+      "type": "testimonials",
+      "blocks": {
+        "testimonial_AbpzJm": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "none",
+            "text": "<p>\"I just LOVE Aetrex Orthotics for my Plantar Fasciitis.\"<br/><br/></p>",
+            "author": "Adel",
+            "author_info": "",
+            "author_url": "",
+            "image": "shopify://shop_images/loved4.png",
+            "image_ratio": "adapt",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_xFGRpN": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "none",
+            "text": "<p>\"Aetrex Flips are EXCELLENT for Plantar Fasciitis.\"</p>",
+            "author": "Antonio",
+            "author_info": "",
+            "author_url": "",
+            "image": "shopify://shop_images/loved2.png",
+            "image_ratio": "adapt",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_7QR3i4": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "none",
+            "text": "<p>\"Clouds of cushiony comfort.\"</p>",
+            "author": "Vanessa",
+            "author_info": "",
+            "author_url": "",
+            "image": "shopify://shop_images/loved5.png",
+            "image_ratio": "adapt",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_dgnBpM": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "none",
+            "text": "<p>\"If you suffer from Plantar Fasciitis or Bunions, this is the flip flop for you!\"</p>",
+            "author": "Anna",
+            "author_info": "",
+            "author_url": "",
+            "image": "shopify://shop_images/loved6_1.png",
+            "image_ratio": "adapt",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_XVKBYi": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "none",
+            "text": "<p>\"I live in Aetrex Flips. What a RELIEF!\"</p>",
+            "author": "Rui",
+            "author_info": "",
+            "author_url": "",
+            "image": "shopify://shop_images/loved3_1.png",
+            "image_ratio": "adapt",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_PCEhPP": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "none",
+            "text": "<p>Good arch support and CUSHY heels for my Plantar Fasciitis.\"</p>",
+            "author": "Rui",
+            "author_info": "",
+            "author_url": "",
+            "image": "shopify://shop_images/loved1.png",
+            "image_ratio": "adapt",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_AbpzJm",
+        "testimonial_xFGRpN",
+        "testimonial_7QR3i4",
+        "testimonial_dgnBpM",
+        "testimonial_XVKBYi",
+        "testimonial_PCEhPP"
+      ],
+      "settings": {
+        "heading": "LOVED BY MILLIONS",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h3",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "#e3ede7",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 72,
+        "divider": false,
+        "rounded": false
+      }
+    },
+    "multicolumn_QdM9fz": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_8Cqm4r": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/aetrex.png",
+            "image_ratio": "adapt",
+            "heading": "Aetrex Orthotics",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_i8TynF": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/them.png",
+            "image_ratio": "adapt",
+            "heading": "Custom Orthotics",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_8Cqm4r",
+        "column_i8TynF"
+      ],
+      "name": "Multicolumn",
+      "settings": {
+        "gap": "large",
+        "columns": 2,
+        "columns_mobile": "2",
+        "carousel_on_desktop": false,
+        "swipe_on_mobile": false,
+        "heading": "<em>BEGIN YOUR RECOVERY WITH PREMIUM HIGH-TECH MATERIALS THAT BENEFIT YOUR FOOT HEALTH</em>",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h3",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "text",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "#5a7463",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "multicolumn_jcDkPQ": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_4gAx9r": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/cheap.png",
+            "image_ratio": "adapt",
+            "heading": "Bundle price of $99",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Aetrex Orthotics can be up to 250% less expensive than custom orthotics.</p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_g6VmLy": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/expensive.png",
+            "image_ratio": "adapt",
+            "heading": "Price $200-$700",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Custom orthotics can cost anywhere between $200-$700 plus medical costs.</p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_4gAx9r",
+        "column_g6VmLy"
+      ],
+      "name": "Multicolumn",
+      "settings": {
+        "gap": "large",
+        "columns": 2,
+        "columns_mobile": "2",
+        "carousel_on_desktop": false,
+        "swipe_on_mobile": false,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "multicolumn_F4hwWd": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_nKbEEy": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/material_5a4ae36c-2a35-4d85-be27-8d15520d74ca.png",
+            "image_ratio": "adapt",
+            "heading": "High-tech Premium",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Aetrex Orthotics are designed using premium materials that promote natural movement while protecting the foot.</p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_eWtLQN": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/rock.png",
+            "image_ratio": "adapt",
+            "heading": "Rigid & Hard Materials",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Custom orthotics are typically made from hard, uncomfortable materials that can weaken muscles over time leaving you more prone to injuries.</p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_nKbEEy",
+        "column_eWtLQN"
+      ],
+      "name": "Multicolumn",
+      "settings": {
+        "gap": "large",
+        "columns": 2,
+        "columns_mobile": "2",
+        "carousel_on_desktop": false,
+        "swipe_on_mobile": false,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "rich_text_MLXerj",
+    "rich_text_9BT4ax",
+    "image_with_text_overlay_a863DH",
+    "rich_text_bGVzXB",
+    "multicolumn_UXa7xF",
+    "rich_text_gBRqYf",
+    "rich_text_iGwpd6",
+    "testimonials_pBTDbF",
+    "video_WV6mjH",
+    "rich_text_483HBz",
+    "image_with_text_9GjNVF",
+    "multicolumn_AQhJ69",
+    "image_with_text_kKFRgk",
+    "multicolumn_ckbhP8",
+    "rich_text_n3NE66",
+    "image_with_text_n7qyiq",
+    "image_with_text_bhX6KF",
+    "rich_text_nGmJpt",
+    "image_with_text_4UxBhb",
+    "rich_text_gEAkTq",
+    "testimonials_JBLaqj",
+    "multicolumn_QdM9fz",
+    "multicolumn_jcDkPQ",
+    "multicolumn_F4hwWd"
+  ]
+}

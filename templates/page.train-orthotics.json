@@ -1,0 +1,850 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "image_with_text_overlay_mhxGVg": {
+      "type": "image-with-text-overlay",
+      "name": "Image with text overlay",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/TrainOrtho1-D_626f7c07-75d0-499e-93af-ffd56c568fbf.jpg",
+        "image_height": "adapt",
+        "content_width": "small",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/TrainOrtho1-M_6d8a090f-5c7c-490b-b276-0545bc52fcd8.jpg",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
+        "padding_top": 12,
+        "padding_bottom": 32,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_WkRyNe": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_Y9wGkK": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Ready to take your fitness journey to the next level? Look no further than Aetrex Train Orthotics! Designed for those who are passionate about pushing their limits, these insoles are more than just foot support—they are your ultimate training companion. Whether it's an intensive cardio session, a grueling weightlifting routine, or a long run, with Train Orthotics, endurance becomes second nature. Say goodbye to early fatigue and hello to extended training sessions.<br/><br/></p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_7dAfVJ": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP WOMEN'S",
+            "button_link": "shopify://products/l800w-m",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_DYb8xE": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP MEN'S",
+            "button_link": "shopify://products/l800m-m",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_Y9wGkK",
+        "button_7dAfVJ",
+        "button_DYb8xE"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/TrainOrtho14-D.jpg",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_mobile": "shopify://shop_images/TrainOrtho14-D.jpg",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#d25e39",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 32,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_jQbf9Y": {
+      "type": "rich-text",
+      "blocks": {
+        "image_dmm9Fq": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/TrainOrtho5-D.jpg",
+            "image_width": "custom",
+            "image_max_width": 700,
+            "image_max_width_mobile": 500
+          }
+        },
+        "text_jDU98B": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Aetrex Train Orthotics offer unbeatable arch support and slow recovery memory foam for your active lifestyle.</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 30,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "image_dmm9Fq",
+        "text_jDU98B"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 32,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_jbfp7p": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_t8UUNh": {
+          "type": "text",
+          "settings": {
+            "text": "<p><em><strong>The Aetrex Signature Arch Support Advantage</strong></em></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_9dgDGx": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Ensure biomechanical perfection with every move. Our signature arch support seamlessly aligns your foot, optimizes your gait, and reduces undue strain. Transform your workouts from strenuous to efficient, and watch as you outdo your personal bests.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_t8UUNh",
+        "text_9dgDGx"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/TrainOrtho11-D.jpg",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "left",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "#d25e39",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_rrrikg": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_cxiPNG": {
+          "type": "text",
+          "settings": {
+            "text": "<p><em><strong>Slow Recovery Memory Foam: The Difference is in the Feel</strong></em></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_ni48wG": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Experience a fit that adapts to you. With our slow recovery memory foam, Train Orthotics cradle your feet in unmatched comfort. Every step, jump, and stance is cushioned, providing a unique blend of responsiveness and protection.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_cxiPNG",
+        "text_ni48wG"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/small.gif",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_mobile": "shopify://shop_images/small.gif",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "left",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "#d25e39",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_fwjTtw": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_EABJwt": {
+          "type": "text",
+          "settings": {
+            "text": "<p><em><strong>Invest in Your Performance</strong></em></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_EA6Wda": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The best athletes know that every detail matters. With Train Orthotics, you’re not just choosing an insole—you’re opting for a performance boost. Slide them into your training shoes and feel the transformation from the ground up.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_EABJwt",
+        "text_EA6Wda"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/TrainOrtho111-D.jpg",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "left",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "#d25e39",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_R86mEX": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_Ui6BeT": {
+          "type": "text",
+          "settings": {
+            "text": "<p><em><strong>Transform Your Trusted Pair</strong></em></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_qJTGk7": {
+          "type": "text",
+          "settings": {
+            "text": "<p>We know you love your go-to sneakers. So why not elevate them? Simply remove those flimsy, worn-out insoles and insert a pair of Aetrex Train Orthotics. Feel the immediate upgrade and witness the Aetrex difference with every step.<br/></p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_Ui6BeT",
+        "text_qJTGk7"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/TrainOrtho4-D.jpg",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "left",
+        "color_text": "#777670",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "#d25e39",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "multicolumn_DWWMiP": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_yPDkpN": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/TrainOrtho12-D.jpg",
+            "image_ratio": "adapt",
+            "heading": "<em>STEP 1</em>",
+            "heading_size": "text-base-xl",
+            "text": "<p>Remove the flimsy insoles</p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_qdYVLU": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/TrainOrtho13-D.jpg",
+            "image_ratio": "adapt",
+            "heading": "<em>STEP 2</em>",
+            "heading_size": "text-base-xl",
+            "text": "<p>Insert Aetrex Train Orthotics</p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_q3zqUb": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/TrainOrtho14.jpg",
+            "image_ratio": "adapt",
+            "heading": "<em>STEP 3</em>",
+            "heading_size": "text-base-xl",
+            "text": "<p>Conquer your workout with comfort and support!</p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_yPDkpN",
+        "column_qdYVLU",
+        "column_q3zqUb"
+      ],
+      "settings": {
+        "gap": "large",
+        "columns": 3,
+        "columns_mobile": "1",
+        "carousel_on_desktop": true,
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#777670",
+        "color_background": "#efefef",
+        "gradient_background": "",
+        "color_highlight": "#d25e39",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "multicolumn_Dw9VTE": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_HNwyeG": {
+          "type": "column",
+          "settings": {
+            "show_border": true,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/TrainOrtho7-D.jpg",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "SHOP WOMEN'S",
+            "button_link": "shopify://products/l800w-m",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_PbP4pj": {
+          "type": "column",
+          "settings": {
+            "show_border": true,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/TrainOrtho6-D.jpg",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-base-xl",
+            "text": "",
+            "button_label": "SHOP MEN'S",
+            "button_link": "shopify://products/l800m-m",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_HNwyeG",
+        "column_PbP4pj"
+      ],
+      "settings": {
+        "gap": "large",
+        "columns": 2,
+        "columns_mobile": "2",
+        "carousel_on_desktop": true,
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#777670",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#d15e38",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "multicolumn_xcFLwd": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_gtMBb6": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/TrainOrtho2-D.jpg",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "https://vimeo.com/875251761",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_RQTzQ7": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/TrainOrtho3-D.jpg",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "https://vimeo.com/875211178",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_gtMBb6",
+        "column_RQTzQ7"
+      ],
+      "settings": {
+        "gap": "large",
+        "columns": 2,
+        "columns_mobile": "1",
+        "carousel_on_desktop": false,
+        "swipe_on_mobile": false,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#777670",
+        "color_background": "#efefef",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "multicolumn_Qx6nBW": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_PtVga3": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/TrainOrtho10-D.jpg",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "<p><a href=\"https://www.aetrex.com/blog.html?p=maximize-your-athletic-potential-with-train-orthotics\">Maximize Your Athletic Potential with Train Orthotics</a></p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_4w8njp": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/TrainOrtho9-D.jpg",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "<p><a href=\"https://staging-na01-aetrex.demandware.net/blog.html?p=this-is-why-the-train-orthotics-are-the-best-workout-partner\">This Is Why the Train Orthotics Are the Best Workout Partner</a></p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_8ETc9i": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/TrainOrtho8-D.jpg",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "<p><a href=\"https://staging-na01-aetrex.demandware.net/blog.html?p=how-aetrex-train-orthotics-are-transforming-your-gym-sessions\">How Train Orthotics with Arch Support Are Transforming Your Gym Sessions</a></p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_PtVga3",
+        "column_4w8njp",
+        "column_8ETc9i"
+      ],
+      "settings": {
+        "gap": "large",
+        "columns": 3,
+        "columns_mobile": "1",
+        "carousel_on_desktop": true,
+        "swipe_on_mobile": true,
+        "heading": "<em>Learn more about Train Orthotics on the Aetrex Foot Health Blog</em>",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "text",
+        "highlighted_scribble": "circle",
+        "color_text": "#777670",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_highlight": "#d25e39",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "image_with_text_overlay_mhxGVg",
+    "image_with_text_WkRyNe",
+    "rich_text_jQbf9Y",
+    "image_with_text_jbfp7p",
+    "image_with_text_rrrikg",
+    "image_with_text_fwjTtw",
+    "image_with_text_R86mEX",
+    "multicolumn_DWWMiP",
+    "multicolumn_Dw9VTE",
+    "multicolumn_xcFLwd",
+    "multicolumn_Qx6nBW"
+  ]
+}

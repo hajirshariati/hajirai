@@ -1,0 +1,850 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "image_with_text_overlay_KnAhnq": {
+      "type": "image-with-text-overlay",
+      "name": "Image with text overlay",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/foot_banner_57360dcf-5e1e-4495-b9f9-26cd1afbaa74.jpg",
+        "image_height": "adapt",
+        "content_width": "small",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/foot_banner_m.jpg",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_W4LHQn": {
+      "type": "rich-text",
+      "blocks": {
+        "text_6MCAiV": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Arthritis is an inflammation of the joint(s). The inflammation causes pain and discomfort which can reduce an individual’s mobility. Any joint in the body can have Arthritis, including the joints in the foot and ankle.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_a9KRYt": {
+          "type": "text",
+          "settings": {
+            "text": "<h2><em>Aetrex Memory Foam Orthotics</em></h2><p>with superior cushioning & signature arch support helps relieve foot pain cause due to Arthritis</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "image_7BYiFd": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/memory_foam.png",
+            "image_width": "full_width",
+            "image_max_width": 50,
+            "image_max_width_mobile": 50
+          }
+        },
+        "button_EWcUjP": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://collections/premium-memory-foam",
+            "button_style": "primary",
+            "button_size": "sm",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_6MCAiV",
+        "text_a9KRYt",
+        "image_7BYiFd",
+        "button_EWcUjP"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "#f7f7f7",
+        "gradient_background": "",
+        "color_highlight": "#3175a6",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#3175a6",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 36,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "multicolumn_4qkD6X": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_KYL6jd": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/dr_b5ae8914-c5df-4050-8a54-68087e6e76b4.png",
+            "image_ratio": "adapt",
+            "heading": "Doctor Recommended",
+            "heading_size": "text-base-xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_wk7EQp": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/return_be96a6c0-a6ef-435c-9351-a24f15b66c71.png",
+            "image_ratio": "adapt",
+            "heading": "EASY Returns",
+            "heading_size": "text-base-xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_GQWCRh": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/30Day_6e15911b-4c64-4189-b655-21e5ee6336c3.png",
+            "image_ratio": "adapt",
+            "heading": "30 Day Comfort Guarantee",
+            "heading_size": "text-base-xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_KYL6jd",
+        "column_wk7EQp",
+        "column_GQWCRh"
+      ],
+      "settings": {
+        "gap": "small",
+        "columns": 3,
+        "columns_mobile": "1",
+        "carousel_on_desktop": true,
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#635959",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "multicolumn_LBgc79": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_tNgpXG": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/circle3.png",
+            "image_ratio": "adapt",
+            "heading": "Gout",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_hidH6G": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/circle1.png",
+            "image_ratio": "adapt",
+            "heading": "Osteoarthritis (OA)",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_BVir7y": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/circle2.png",
+            "image_ratio": "adapt",
+            "heading": "RheumatoidArthritis (RA)",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_tNgpXG",
+        "column_hidH6G",
+        "column_BVir7y"
+      ],
+      "settings": {
+        "gap": "large",
+        "columns": 3,
+        "columns_mobile": "1",
+        "carousel_on_desktop": true,
+        "swipe_on_mobile": true,
+        "heading": "<em>Three common forms of Arthritis that affect the joints in the FOOT & ANKLE:</em>",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h6",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "text",
+        "highlighted_scribble": "circle",
+        "color_text": "#635959",
+        "color_background": "#f7f7f7",
+        "gradient_background": "",
+        "color_highlight": "#3175a6",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 36,
+        "padding_bottom": 28,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_WkRyNe": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_nEy3Ry": {
+          "type": "heading",
+          "settings": {
+            "heading": "<em>What are the symptoms of Arthritis in the feet?</em>",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_Y9wGkK": {
+          "type": "text",
+          "settings": {
+            "text": "<ul><li>Pain</li><li>No Tenderness</li><li>No Stiffness in the joints of feet & ankles</li><li>No Swelling</li><li>Decreased range of motion<br/></li></ul>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_nEy3Ry",
+        "text_Y9wGkK"
+      ],
+      "settings": {
+        "image": "shopify://shop_images/600x400.jpg",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "left",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "#3175a6",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 28,
+        "padding_bottom": 32,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_jQbf9Y": {
+      "type": "rich-text",
+      "blocks": {
+        "text_jDU98B": {
+          "type": "text",
+          "settings": {
+            "text": "<h3><em>Best Orthotics for Arthritic Feet</em></h3>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 30,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "image_dmm9Fq": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/memory_foam2.png",
+            "image_width": "custom",
+            "image_max_width": 770,
+            "image_max_width_mobile": 450
+          }
+        },
+        "text_gGg6xN": {
+          "type": "text",
+          "settings": {
+            "text": "<h3><em>Aetrex Memory Foam Orthotics</em></h3>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 30,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_T6XP97": {
+          "type": "text",
+          "settings": {
+            "text": "<p>✓ Helps redistribute pressure on areas that are prone to pain</p><p>✓ Thick premium memory foam layer helps provide superior cushioning & comfort</p><p>✓ Signature arch support helps align the body correctly to prevent stress on knees, back, hip and foot</p><p>✓ Helps absorb shock to protect the foot & prevent injuries</p><p>✓ Helps provide support & stability to keep feet in place</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_jDU98B",
+        "image_dmm9Fq",
+        "text_gGg6xN",
+        "text_T6XP97"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "left",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "#3175a6",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 28,
+        "padding_bottom": 32,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "multicolumn_Dw9VTE": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_HNwyeG": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/men.png",
+            "image_ratio": "square",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "SHOP MEN'S",
+            "button_link": "shopify://products/l2200m-m",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_PbP4pj": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/women.png",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "SHOP WOMEN'S",
+            "button_link": "shopify://products/l2200w-m",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_HNwyeG",
+        "column_PbP4pj"
+      ],
+      "settings": {
+        "gap": "small",
+        "columns": 2,
+        "columns_mobile": "1",
+        "carousel_on_desktop": true,
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#777670",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#3a73a4",
+        "color_button_gradient": "",
+        "padding_top": 28,
+        "padding_bottom": 96,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "rich_text_Lk6jLK": {
+      "type": "rich-text",
+      "blocks": {
+        "text_WGJHRM": {
+          "type": "text",
+          "settings": {
+            "text": "<h4>30 Day Trial + Easy Returns</h4><p>Try Aetrex Orthotics for 30 days and if you are not completely satisfied, return them for free</p><p></p><p></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 22,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_WGJHRM"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#ffffff",
+        "color_background": "#a0aeb8",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 4,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_qwUUx3": {
+      "type": "rich-text",
+      "blocks": {
+        "text_qa4tiD": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Our bestselling orthotic that utilizes premium, shock absorbing materials to cushion and support the body while protecting the foot.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_qa4tiD"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_ckK3Lk": {
+      "type": "rich-text",
+      "blocks": {
+        "image_XGfrKb": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/IQ50_25dd6300-4c0c-4360-b32e-8587d67b40ce.jpg",
+            "image_width": "custom",
+            "image_max_width": 770,
+            "image_max_width_mobile": 400
+          }
+        }
+      },
+      "block_order": [
+        "image_XGfrKb"
+      ],
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "left",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "#3175a6",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "testimonials_TFgQDP": {
+      "type": "testimonials",
+      "blocks": {
+        "testimonial_ng6TDG": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "5-stars",
+            "text": "<h3>The solution for me!</h3><h5>Severe pronation as well as fallen arches complicated by arthritis in feet and ankles, so lots of help is needed! Finding Aetrex Memory Foam Orthotics have been wonderful!</h5>",
+            "author": "Donna M.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_ajRh49": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "5-stars",
+            "text": "<h3>Very Helpful!</h3><h5>I have arthritis in my feet. The cushioning and support help me walk much further. I use in athletic shoes or low heel boots.<br/><br/></h5>",
+            "author": "Suzanne W.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_ya3atP": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "5-stars",
+            "text": "<h3>I am pleased with my Aetrex Insoles!</h3><h5>This prevents the pain I was having of my shoes pressing on arthritic lumps developing on both the inside and outside of the foot. I walk 3 miles or more every day. The inner soles lasted about 6 months, with constant wear (only shoes I wore). I am also impressed by the longevity.</h5>",
+            "author": "Jean D.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_mWff3c": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "5-stars",
+            "text": "<h3>Provides great comfort and fits easily into shoes.</h3><h5>Cushioning Great for fat pad loss, arthritis and bunion pain. The metatarsal pad is not too obtrusive, provides just the right amount of lift.</h5>",
+            "author": "Wildlife F.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_ng6TDG",
+        "testimonial_ajRh49",
+        "testimonial_ya3atP",
+        "testimonial_mWff3c"
+      ],
+      "settings": {
+        "heading": "Loved by Millions",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#555c64",
+        "color_background": "#f7f7f7",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "rounded": false
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "image_with_text_overlay_KnAhnq",
+    "rich_text_W4LHQn",
+    "multicolumn_4qkD6X",
+    "multicolumn_LBgc79",
+    "image_with_text_WkRyNe",
+    "rich_text_jQbf9Y",
+    "multicolumn_Dw9VTE",
+    "rich_text_Lk6jLK",
+    "rich_text_qwUUx3",
+    "rich_text_ckK3Lk",
+    "testimonials_TFgQDP"
+  ]
+}

@@ -1,0 +1,339 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "testimonials_banner_Cbhq4c": {
+      "type": "testimonials-banner",
+      "name": "Testimonials banner",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/1920x475_3DFit_banner.png",
+        "image_height": "adapt",
+        "content_position": "md:items-center md:justify-center",
+        "image_mobile": "shopify://shop_images/1920x475_3DFit_banner.png",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-center justify-center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 0,
+        "padding_top": 12,
+        "padding_bottom": 20,
+        "divider": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_MLXerj": {
+      "type": "rich-text",
+      "blocks": {
+        "text_yKxt79": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Albert 3DFit Scanner</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 40,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_yKxt79"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#ffffff",
+        "color_background": "#99a4ad",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 8,
+        "padding_bottom": 8,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "rich_text_bGVzXB": {
+      "type": "rich-text",
+      "blocks": {
+        "text_WnRRPL": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>An Affordable, State-of-the-Art 3D Foot Scanner</strong></p>",
+            "text_font": "heading",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_WnRRPL"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#6f6f6f",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 40,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "image_with_text_8cWttP": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_ay6MMi": {
+          "type": "text",
+          "settings": {
+            "text": "<h2><strong>Featuring:</strong></h2><ul><li>3D Measurements</li><li>AI Footwear Recommendations</li></ul><p></p><p>The Albert 3DFit scanner incorporates 3-dimensional foot scanning capabilities with AI footwear matching software to help retailers and consumers find the right fitting footwear on the first try.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_ay6MMi"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/690x469_3D_Measurements_2x_7c1bc712-d2d7-409d-8f27-6a28034901e5.png",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_mobile": "shopify://shop_images/690x469_3D_Measurements_2x_7c1bc712-d2d7-409d-8f27-6a28034901e5.png",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_rCg6mV": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_AmBmWA": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Featuring 4 Intel® RealSense™ depth cameras, voice activation software, a Learning Center where customers can ask questions about foot health, and a FitGenius™ plug-in tool for retailers, the scanner boasts premier technical features at a fraction of the price of the competition.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_WiiNhG": {
+          "type": "button",
+          "settings": {
+            "button_label": "Watch Video to Learn More",
+            "button_link": "https://player.vimeo.com/progressive_redirect/playback/560582810/rendition/1080p/file.mp4?loc=external&signature=c1ea3dce32708ec1aa9f66e03845c4b3be45efbd07ca070574eff4878981e03a",
+            "button_video_link": "",
+            "button_style": "link",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_4r6fP7": {
+          "type": "button",
+          "settings": {
+            "button_label": "View Scanner Comparison Chart",
+            "button_link": "https://cdn.shopify.com/s/files/1/0860/3634/9241/files/Scanner_Comparison_Chart.png?v=1750266152",
+            "button_video_link": "",
+            "button_style": "link",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_9NdLr7": {
+          "type": "button",
+          "settings": {
+            "button_label": "Albert 3DFit in the News",
+            "button_link": "shopify://pages/tech-albert-3dfit",
+            "button_video_link": "",
+            "button_style": "link",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_FRcqFw": {
+          "type": "button",
+          "settings": {
+            "button_label": "How to Check Your 3D Scanner for Accuracy: Watch Video",
+            "button_link": "https://cdn.shopify.com/videos/c/o/v/85c8e928bcc44a2e8672dffac9f3ac3c.mp4",
+            "button_video_link": "",
+            "button_style": "link",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_rwagQC": {
+          "type": "button",
+          "settings": {
+            "button_label": "Visit AetrexB2B.com to Purchase",
+            "button_link": "https://www.aetrexb2b.com",
+            "button_video_link": "",
+            "button_style": "link",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_AmBmWA",
+        "button_WiiNhG",
+        "button_4r6fP7",
+        "button_9NdLr7",
+        "button_FRcqFw",
+        "button_rwagQC"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/690x469_AI_FootwearReco_2x_b7c52b3c-1530-4092-bb33-114224f2933e.png",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_mobile": "shopify://shop_images/690x469_AI_FootwearReco_2x_b7c52b3c-1530-4092-bb33-114224f2933e.png",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 48,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "testimonials_banner_Cbhq4c",
+    "rich_text_MLXerj",
+    "rich_text_bGVzXB",
+    "image_with_text_8cWttP",
+    "image_with_text_rCg6mV"
+  ]
+}

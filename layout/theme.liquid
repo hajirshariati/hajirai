@@ -1,0 +1,173 @@
+{%- capture direction -%}{% render 'direction' %}{%- endcapture -%}
+<!doctype html>
+<html
+  class="no-js{% if request.design_mode %} shopify-design-mode{% endif %}"
+  lang="{{ request.locale.iso_code }}"
+  dir="{{ direction }}"
+>
+  <head>
+    <script src="https://rapid-cdn.yottaa.com/rapid/lib/HucOtCTdvSMtxQ.js"></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="{{ settings.color_button_background }}">
+    <link rel="canonical" href="{{ canonical_url }}">
+    <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
+    {% # theme-check-disable RemoteAsset %}
+    <link rel="dns-prefetch" href="https://ajax.googleapis.com">
+    <link rel="dns-prefetch" href="https://maps.googleapis.com">
+    <link rel="dns-prefetch" href="https://maps.gstatic.com">
+    {% # theme-check-enable RemoteAsset %}
+
+    {%- if settings.favicon != blank -%}
+      <link rel="shortcut icon" href="{{ settings.favicon | image_url: width: 32, height: 32 }}" type="image/png">
+    {%- endif -%}
+
+    <title>
+      {{- page_title -}}
+      {%- if current_tags -%}
+        {%- assign meta_tags = current_tags | join: ', ' %} &ndash; {{ 'general.meta.tags' | t: tags: meta_tags -}}
+      {%- endif -%}
+      {%- if current_page != 1 %} &ndash; {{ 'general.meta.page' | t: page: current_page }}{% endif -%}
+      {%- if request.page_type == 'password' -%}
+        {{- shop.name -}}
+      {%- else -%}
+        {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+      {%- endif -%}
+    </title>
+
+    {%- if page_description -%}
+      <meta name="description" content="{{ page_description | escape }}">
+    {%- endif -%}
+
+    {%- liquid
+      render 'social-meta-tags'
+
+      render 'css-variables'
+      echo 'theme.css' | asset_url | stylesheet_tag: preload: true
+
+      if direction == 'rtl'
+        echo 'rtl.css' | asset_url | stylesheet_tag: preload: true
+      endif
+    -%}
+
+    <link
+      rel="stylesheet"
+      href="{{ 'apps.css' | asset_url }}"
+      media="print"
+      fetchpriority="low"
+      onload="this.media='all'"
+    >
+
+    {{ content_for_header }}
+
+    <script src="{{ 'vendor.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'theme.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'dynamic.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'swiper-bundle.min.js' | asset_url }}"></script>
+
+    {{- 'dynamic.css' | asset_url | stylesheet_tag -}}
+    {{- 'swiper-bundle.min.css' | asset_url | stylesheet_tag -}}
+
+    {%- if settings.enable_tab_attention -%}
+      <script src="{{ 'tab-attention.js' | asset_url }}" defer="defer"></script>
+    {%- endif -%}
+
+    {%- if request.page_type contains 'customers/' -%}
+      <script src="{{ 'shopify_common.js' | shopify_asset_url }}" defer="defer"></script>
+    {%- endif -%}
+
+    {%- render 'js-variables' -%}
+  </head>
+
+  <body
+    class="template-{{ template | replace: '.', ' ' | truncatewords: 1, '' | handle }}{% if request.path == '/challenge' %} template-challange{% endif %}"
+    data-rounded-button="{{ settings.rounded_button }}"
+    data-rounded-input="{{ settings.rounded_input }}"
+    data-rounded-block="{{ settings.rounded_block }}"
+    data-rounded-card="{{ settings.rounded_card }}"
+    data-button-hover="{{ settings.buttons_hover }}"
+    {% if settings.enable_page_transition %}
+      data-page-transition
+    {% endif -%}
+    {% if settings.enable_lazy_image %}
+      data-lazy-image
+    {% endif %}
+    data-title-animation
+    data-page-rendering
+  >
+    <a class="sr-only skip-link" href="#MainContent">{{ 'general.accessibility.skip_to_content' | t }}</a>
+
+    {%- liquid
+      if settings.enable_page_transition
+        render 'loading-bar'
+      endif
+
+      render 'mouse-cursor'
+
+      sections 'header-group'
+      sections 'overlay-group'
+    -%}
+
+    <div class="page-container" id="PageContainer">
+      <main class="main-content relative" id="MainContent" role="main">
+        {{ content_for_layout }}
+      </main>
+
+      <footer class="footer-group block w-full" is="footer-group">
+        {%- sections 'footer-group' -%}
+      </footer>
+    </div>
+
+    <ul hidden>
+      <li id="a11y-refresh-page-message">{{ 'general.accessibility.refresh_page' | t }}</li>
+      <li id="a11y-new-window-message">{{ 'general.accessibility.link_messages.new_window' | t }}</li>
+    </ul>
+
+    {%- if request.design_mode == false and settings.preload_links -%}
+      <script src="{{ 'instant-page.js' | asset_url }}" type="module" fetchpriority="low" defer="defer"></script>
+    {%- endif -%}
+
+    <script src="https://a.klaviyo.com/media/js/onsite/onsite.js"></script>
+    {% assign klaviyoAccount = settings.klaviyo_api_key %}
+
+    {% if klaviyoAccount != blank %}
+      <script>
+        var klaviyo = klaviyo || [];
+        klaviyo.init({
+          account: '{{ klaviyoAccount }}',
+          platform: 'shopify',
+        });
+        klaviyo.enable('backinstock', {
+          trigger: {
+            product_page_text: 'Sold Out - Notify Me',
+            product_page_class: 'btn btn--secondary full-width',
+            product_page_text_align: 'center',
+            product_page_margin: '0px',
+            replace_anchor: true,
+          },
+          modal: {
+            headline: '{product_name}',
+            body_content: 'Register to receive a notification when this item comes back in stock.',
+            email_field_label: 'Email',
+            button_label: 'Notify me when available',
+            subscription_success_label: "You're in! We'll let you know when it's back.",
+            footer_content: '',
+            additional_styles: "* {font-family: Lato, Arial, Helvetica, sans-serif} .btn {border-radius: 8px; border: 2px solid #111; background-color: #111;}",
+            drop_background_color: '#000',
+            background_color: '#fff',
+            text_color: '#222',
+            button_text_color: '#fff',
+            button_background_color: '#439fdb',
+            close_button_color: '#ccc',
+            error_background_color: '#fcd6d7',
+            error_text_color: '#C72E2F',
+            success_background_color: '#d3efcd',
+            success_text_color: '#1B9500',
+          },
+        });
+      </script>
+    {% endif %}
+  </body>
+</html>

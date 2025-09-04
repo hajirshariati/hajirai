@@ -1,0 +1,373 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "testimonials_banner_Cbhq4c": {
+      "type": "testimonials-banner",
+      "name": "Testimonials banner",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/banner_training_0039484f-30f9-4d41-8936-6f0074fc27d0.jpg",
+        "image_height": "adapt",
+        "content_position": "md:items-center md:justify-center",
+        "image_mobile": "shopify://shop_images/banner_training_0039484f-30f9-4d41-8936-6f0074fc27d0.png",
+        "image_height_mobile": "300px",
+        "content_position_mobile": "items-center justify-center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 0,
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_bGVzXB": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_7E9VQ9": {
+          "type": "heading",
+          "settings": {
+            "heading": "TRAINING AND SUPPORT",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_7E9VQ9"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#495258",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_WRUBda": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_Q8H6iH": {
+          "type": "heading",
+          "settings": {
+            "heading": "",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_CLtjRE": {
+          "type": "text",
+          "settings": {
+            "text": "<h4>Call Center</h4><p>Aetrex has offices in the US, Middle East and Asia that offer phone support 7 days a week.</p><p>In addition, any email sent to istephelp@aetrex.com is responded to immediately and automatically issued a case number and assigned to a tech support representative. Tech support reps work with each store to resolve issues in a timely manner.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_Q8H6iH",
+        "text_CLtjRE"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/call_center.jpg",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/call_center.jpg",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "left",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_Yg6Ybb": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_gMFGKf": {
+          "type": "text",
+          "settings": {
+            "text": "<h4>Service and Support</h4><p>There is no other company in the foot scanning or orthotic space that comes close to matching Aetrex’s capacity and resources for training, servicing and supporting large chain and independent retailers. Aetrex has successfully launched and supported over 10,000 foot scanners since 2002.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_gMFGKf"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/service.jpg",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/service.jpg",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "left",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_fFCw6J": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_ddfMUG": {
+          "type": "heading",
+          "settings": {
+            "heading": "",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_MU6KBc": {
+          "type": "text",
+          "settings": {
+            "text": "<h4>In-store training</h4><p>Aetrex has 12 full time Regional Managers throughout the US and 2 internationally that are all trained on Albert technology and conduct in-store training and support on a regular basis. Aetrex also has a dedicated Director of Training and Education who oversees training and regular visits stores throughout the world.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_ddfMUG",
+        "text_MU6KBc"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/instore_training.jpg",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/instore_training.jpg",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "left",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_44cJib": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_ktLUbq": {
+          "type": "text",
+          "settings": {
+            "text": "<h4>Aetrex Academy</h4><p>Aetrex Academy is an online, on-demand customer training program designed to educate retail associates about maximizing the potential of the Aetrex technology and orthotics programs. Participants can learn about biomechanics, anatomy and selling tools to help retailers create a cutting edge service experience. The academy also provides store associates with proven methods to drive sales and identifies opportunities to optimize their data.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_ktLUbq"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/aetrex_academy.jpg",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/aetrex_academy.jpg",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "left",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_keKNW3": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_kw6UhF": {
+          "type": "text",
+          "settings": {
+            "text": "<h4>Aetrex Certification Program</h4><p>The Aetrex Certification Program is an integral part of the Aetrex Academy and is offered in 13 different languages. This program is divided into different modules covering topics such as technology, foot types, biomechanics and selling best practices. At the completion of the program, there is an online test where participants can become Aetrex Certified Fitters.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_kw6UhF"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/aetrex_certificate.jpg",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/aetrex_certificate.jpg",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "left",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 48,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "testimonials_banner_Cbhq4c",
+    "rich_text_bGVzXB",
+    "image_with_text_WRUBda",
+    "image_with_text_Yg6Ybb",
+    "image_with_text_fFCw6J",
+    "image_with_text_44cJib",
+    "image_with_text_keKNW3"
+  ]
+}

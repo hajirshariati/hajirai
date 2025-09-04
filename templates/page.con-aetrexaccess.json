@@ -1,0 +1,220 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "faq_fjtdJ4": {
+      "type": "faq",
+      "blocks": {
+        "question_9mgqph": {
+          "type": "question",
+          "settings": {
+            "title": "What are ways to earn rewards?",
+            "text": "<p>Aetrex Access program members can earn points for purchases and activities made on <a href=\"https://aetrex.com/\">aetrex.com</a>.</p><p>Every $1 spent = 10 points<br/>After first purchase = 4000 points<br/>Anniversary celebration = 4000 points<br/>Like on Facebook = 50 points<br/>Follow us Instagram = 50 points<br/>Review on Website = 100 points<br/>Referral Bonus = 4000 points<br/>*Points are only rewarded to the subtotal, excludes tax & shipping on purchases.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_TK6AeN": {
+          "type": "question",
+          "settings": {
+            "title": "What can I redeem with my points?",
+            "text": "<p>1,000 points = $5 Coupon<br/>2,000 points = $10 Coupon<br/>3,000 points = $15 Coupon<br/>4,000 points = $20 Coupon<br/>5,000 points = $25 Coupon<br/>6,000 points = $30 Coupon<br/>7,000 points = $35 Coupon<br/>8,000 points = $40 Coupon<br/>9,000 points = $45 Coupon<br/>10,000 points = $50 Coupon<br/>11,000 points = $55 Coupon<br/>12,000 points = $60 Coupon<br/>13,000 points = $65 Coupon<br/>14,000 points = $70 Coupon<br/>15,000 points = $75 Coupon<br/>16,000 points = $80 Coupon<br/>17,000 points = $85 Coupon<br/>18,000 points = $90 Coupon<br/>19,000 points = $95 Coupon<br/>20,000 points = $100 Coupon<br/>21,000 points = $105 Coupon<br/>22,000 points = $110 Coupon<br/>23,000 points = $115 Coupon<br/>24,000 points = $120 Coupon<br/>25,000 points = $125 Coupon</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_Gz6cEE": {
+          "type": "question",
+          "settings": {
+            "title": "How do I redeem my rewards?",
+            "text": "<p>If an Aetrex rewards program member has earned enough points, they can redeem points by logging into their account and going to the cart page. On the cart page, you can see the number of points you have accumulated. You can select the amount of points you wish to use in the reward dropdown and then click apply. Points will be applied to your cart and you can checkout. Please note you can remove the points from your order by clicking X on the points under the dropdown if you no longer want to apply them. And, if your selected points in the dropdown are not being applied, it is probably because you don't have that many points in your account.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_ambnwf": {
+          "type": "question",
+          "settings": {
+            "title": "When do my points expire? How long are they valid for?",
+            "text": "<p>Points expire after inactivity of purchases and/or social sharing of 12 months.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_UipUnN": {
+          "type": "question",
+          "settings": {
+            "title": "When will my points be posted?",
+            "text": "<p>Points for online orders, including the first purchase bonus will be rewarded 30 days after purchase.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_FHNiNb": {
+          "type": "question",
+          "settings": {
+            "title": "What are extra point days?",
+            "text": "<p>As a member of the Aetrex Rewards Program, customers will receive exclusive invitations to earn double or triple points on purchases made during the promotional period. These additional promotional rule points are not cumulative with product-based points earned. This means you may not earn points under both the standard rules and the promotional rule, but only under the promotional rule.</p><p>After 30 days of the day of purchase, your points will be placed in your rewards account. Please note that if you would like to preview the amount of potential points that will be awarded during the promotional period, you may log into your rewards account. Purchases made without logging into your account but that are associated with your email address will have points reflected in your account 30 days after purchase.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_CyTzpa": {
+          "type": "question",
+          "settings": {
+            "title": "Are points transferrable?",
+            "text": "<p>Unfortunately at the current moment points will not be transferable.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_KUY3FF": {
+          "type": "question",
+          "settings": {
+            "title": "How do I request points not applied to an order?",
+            "text": "<p>If you suspect points were not rewarded and you are missing points, please contact customer service via email at <a href=\"mailto:rewards@aetrex.com\" title=\"mailto:rewards@aetrex.com\">rewards@aetrex.com</a> or by phone at 1.888.526.2739<br/>Mon - Fri: 8:00am - 6:30pm (EST)</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_WrY6JU": {
+          "type": "question",
+          "settings": {
+            "title": "How do I review my points balance?",
+            "text": "<p>To review your points balance, you must be logged into your account. Once logged in, scroll down to the Rewards section to review your balance.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_AGDaJG": {
+          "type": "question",
+          "settings": {
+            "title": "How do refunds work with my point balance?",
+            "text": "<p>Points will be deducted for the amount of each item that was returned.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_W7Tfde": {
+          "type": "question",
+          "settings": {
+            "title": "what if my order total is less than my current available reward?",
+            "text": "<p>Rewards are issued in the form of coupons, if your order total is less than the coupon value, the remaining balance cannot be carried over to future orders. The unused remainder of the coupon will be forfeited.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_xeLnNC": {
+          "type": "question",
+          "settings": {
+            "title": "I redeemed two rewards of the same value, but they both are not applying to my order. why?",
+            "text": "<p>Coupons of the same value (example: two $5 rewards, two $10 rewards, etc) cannot be used together in one order. We recommend redeeming the reward with the greatest dollar value if you are intending to use the equivalent rewards points on your purchase.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_tGcmbw": {
+          "type": "question",
+          "settings": {
+            "title": "how is the anniversary date determined for the loyalty program?",
+            "text": "<p>The anniversary date is based on the date the account is created with a password..</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_CgVbH4": {
+          "type": "question",
+          "settings": {
+            "title": "When do the first purchase bonus points go into effect?",
+            "text": "<p>The first purchase bonus points go into effect with a customer's first purchase after creating a loyalty account with a password. This applies only to new customers who haven't purchased from us before. Existing customers who have purchased before, but have just created a loyalty account, will not receive the 4,000 bonus points.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_GMbXMW": {
+          "type": "question",
+          "settings": {
+            "title": "Is the aetrex access rewards program available for non-us customers",
+            "text": "<p>Unfortunately, it is currently only available for US customers. However, we are considering expanding it internationally in the future.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "question_9mgqph",
+        "question_TK6AeN",
+        "question_Gz6cEE",
+        "question_ambnwf",
+        "question_UipUnN",
+        "question_FHNiNb",
+        "question_CyTzpa",
+        "question_KUY3FF",
+        "question_WrY6JU",
+        "question_AGDaJG",
+        "question_W7Tfde",
+        "question_xeLnNC",
+        "question_tGcmbw",
+        "question_CgVbH4",
+        "question_GMbXMW"
+      ],
+      "name": "FAQ",
+      "settings": {
+        "style": "with-background",
+        "heading": "Frequently Asked Questions",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#ffffff",
+        "overlay_opacity": 0,
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "faq_fjtdJ4"
+  ]
+}

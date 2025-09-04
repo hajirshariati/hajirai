@@ -1,0 +1,584 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "testimonials_banner_Cbhq4c": {
+      "type": "testimonials-banner",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/drd_a23d4e35-00b6-46f5-bf8f-7aa00a284f16.jpg",
+        "image_height": "adapt",
+        "content_position": "md:items-center md:justify-center",
+        "image_mobile": "shopify://shop_images/drm.jpg",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-center justify-center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "video_with_text_eziwQT": {
+      "type": "video-with-text",
+      "blocks": {
+        "text_rpT63p": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Friday, April 15<br/><em>Bunions</em></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_rpT63p"
+      ],
+      "name": "Video with text",
+      "settings": {
+        "video_url": "https://vimeo.com/702027975",
+        "cover_image": "shopify://shop_images/thumb_2.jpg",
+        "description": "",
+        "enable_video_autoplay": false,
+        "enable_video_looping": false,
+        "image_height": "adapt",
+        "video_width": "large",
+        "layout": "video_first",
+        "text_alignment": "center",
+        "content_position": "align-self-center",
+        "video_url_mobile": "https://vimeo.com/702027975",
+        "cover_image_mobile": "shopify://shop_images/thumb_2.jpg",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "center",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "#90abb7",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_DJRdNn": {
+      "type": "rich-text",
+      "blocks": {
+        "text_nXL9rw": {
+          "type": "text",
+          "settings": {
+            "text": "<p><em><strong>YOUR QUESTIONS</strong></em></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_nXL9rw"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "#90abb7",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_PLkKyP": {
+      "type": "rich-text",
+      "blocks": {
+        "text_AgNjT8": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Choose your topic from the list below</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "secondary_color": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_AgNjT8"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "faq_HKU8NM": {
+      "type": "faq",
+      "blocks": {
+        "question_dicKY9": {
+          "type": "question",
+          "settings": {
+            "title": "Rossana V. – I was born with flat feet and had surgery 5 years ago, mainly for a torn posterior tibial tendon (I had several procedures at once - a PTT transfer along with arch reconstruction and bunion correction). It was successful and I now have an arch and no tendon pain, but my great toe has remained slightly raised and the ball of my foot hurts in most of my dress shoes, especially if I wear them without an orthotics. Please advise if there is a way to find relief without resorting to another surgery or any exercises you could recommend to relax my great toe joint and minimize my pain. Thank you!",
+            "text": "<p>Dr. George Ampat: Hi Rossana! I’m sorry to hear that you have pain in the ball of your feet. My first suggestion would be to try an orthotic with a metatarsal pad like the Premium Memory Foam Orthotics with Metatarsal Support:<a href=\"https://www.aetrex.com/memory-foam-orthotic/?lang=en_US\">https://www.aetrex.com/memory-foam-orthotic/?lang=en_US</a>These orthotics have 43% more memory foam in the footbed and also include a metatarsal pad to help with relieve pressure from the ball of foot pain. I also recommend trying the L2405 Customizable Orthotics with Metatarsal Support. Along with a metatarsal pad, they include gel pods that can be removed to help customize to your needs:<a href=\"https://www.aetrex.com/customizable-orthotics-l2405-orthotics-14-L2405W.html?lang=en_US\">https://www.aetrex.com/customizable-orthotics-l2405-orthotics-14-L2405W.html?lang=en_US</a>Hopefully the orthotics can help provide relief.<br/><br/></p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_DhrBHV": {
+          "type": "question",
+          "settings": {
+            "title": "Crystal A. – I have hammer toes on my right foot. What can be done to fix these? They hurt sometime and I do NOT want to wear funny shoes to fix them. I have already increased the size of the shoes I wear and that helps, but I still get pain sometimes.",
+            "text": "<p>Dr George: Hello Crystal! Comfortable shoes that accommodate your feet and toes are essential. In addition, orthotics with a metatarsal pad may help relax the soft tissues and may help decrease the hammer toes. I recommend trying the L2305 Premium Memory Foam Orthotics with Metatarsal Support:<a href=\"https://www.aetrex.com/women-s-premium-memory-foam-med-high-arch-w-metatarsal-support-L2305W.html?lang=en_US\">https://www.aetrex.com/women-s-premium-memory-foam-med-high-arch-w-metatarsal-support-L2305W.html?lang=en_US</a>These orthotics have 43% more memory foam cushioning in the forefoot and may be able to help provide comfort.<br/><br/></p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_aBqMC6": {
+          "type": "question",
+          "settings": {
+            "title": "Kathryn C. – How can I re-align my feet to reduce bunions without surgery? Thank You!",
+            "text": "<p>Dr. George Ampat: Hi Kathryn and thank you for your question. Comfortable and supportive shoes that accommodate your feet and toes are essential to help with bunions. In addition, orthotics with a metatarsal pad may help. I recommend trying the L2305 Premium Memory Foam Orthotics with Metatarsal Support:<a href=\"https://www.aetrex.com/women-s-premium-memory-foam-med-high-arch-w-metatarsal-support-L2305W.html?lang=en_US\">https://www.aetrex.com/women-s-premium-memory-foam-med-high-arch-w-metatarsal-support-L2305W.html?lang=en_US</a>I also showed a few exercises on our Live Q&A on Bunions that can help as well. You can watch it on this page, but here is a link to the video too:https://www.youtube.com/watch?v=Z_R2RRivb_8&list=PLfTlbW4ddDhlIK-M68BCroEK2dWdEK9OR&index=2</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_FKAYaJ": {
+          "type": "question",
+          "settings": {
+            "title": "Cass C. – I feel like my toes are numb when I wake up in the morning. It's like they are being pushed toward my big toes.",
+            "text": "<p>Dr George: Hello Cass and thank you for sharing your story. It’s important to make sure you are wearing supportive footwear with a large toe box to help give the toes space. For example, shoes with narrow toe boxes put a lot of pressure on toes and may cause pain. I recommend trying the L2305 Premium Memory Foam Orthotics with Metatarsal Support:<a href=\"https://www.aetrex.com/women-s-premium-memory-foam-med-high-arch-w-metatarsal-support-L2305W.html?lang=en_US\">https://www.aetrex.com/women-s-premium-memory-foam-med-high-arch-w-metatarsal-support-L2305W.html?lang=en_US</a>We also showed a few exercises on our Live Q&A on Bunions that can help as well. You can watch it on this page, but here is a link to the video too:https://www.youtube.com/watch?v=Z_R2RRivb_8&list=PLfTlbW4ddDhlIK-M68BCroEK2dWdEK9OR&index=2</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_zFFjPa": {
+          "type": "question",
+          "settings": {
+            "title": "Priscilla G. – I have bilateral bunions, really not sure about surgery.",
+            "text": "<p>Dr George: Hello Priscilla! My advice would be to consider an orthotic with a metatarsal pad to see if it provides relief. The L2305 Premium Memory Foam Orthotics with Metatarsal Support may be able to help:<a href=\"https://www.aetrex.com/women-s-premium-memory-foam-med-high-arch-w-metatarsal-support-L2305W.html?lang=en_US\">https://www.aetrex.com/women-s-premium-memory-foam-med-high-arch-w-metatarsal-support-L2305W.html?lang=en_US</a>These orthotics include a metatarsal pad that helps unload pressure at the metatarsal area and provides cushioning to help relieve discomfort.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_tLDpe9": {
+          "type": "question",
+          "settings": {
+            "title": "Kama L. – I have used a bunion bootie, but they wear down pretty quickly. I don't understand with all the innovations in surgery, why bunion surgery requires a year and a half of downtime. I am not able to do that! I need to work, and if I can't even swim, or walk, or run, I will get fat. So that is not an option. My feet keep growing, which is why the bunion happened. I have gone from a 7 to a 7.5, to an 8, to an 8.5, to a 9 in running shoes. So not sure if the surgery would be worth it ANYWAY. What devices do you like as the bunion bootie wears down too easily, and it is costly as well. Thanks.",
+            "text": "<p>Dr George: Hi Kama and thank you for sharing your story. Bunion surgery may involve osteotomies and in this form of surgery, the bone is broken and then allowed to heal in the corrected position. This takes time and hence the downtime. My advice would be to consider an orthotic with a metatarsal pad to see if it provides reasonable relief. The L2305 Premium Memory Foam Orthotics with Metatarsal Support may be able to help:<a href=\"https://www.aetrex.com/women-s-premium-memory-foam-med-high-arch-w-metatarsal-support-L2305W.html?lang=en_US\">https://www.aetrex.com/women-s-premium-memory-foam-med-high-arch-w-metatarsal-support-L2305W.html?lang=en_US</a>Along with arch support and a metatarsal pad, they feature 43% more memory foam cushioning in the forefoot.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_yBxyxd": {
+          "type": "question",
+          "settings": {
+            "title": "Emma M. – Are there exercises I can do to reduce a small bunion?",
+            "text": "<p>Dr George: Hi Emma and thank you for your question. We answered your question and showed a few exercises on our Live Q&A that can help with bunions. You can watch it on this page, but here is a link to the video too:https://www.youtube.com/watch?v=Z_R2RRivb_8&list=PLfTlbW4ddDhlIK-M68BCroEK2dWdEK9OR&index=2</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_jyKe3h": {
+          "type": "question",
+          "settings": {
+            "title": "Edward S. – What are some shoes and orthotics that can help with bunions?",
+            "text": "<p>Dr George: Hello Edward! Choosing a supportive shoe with a wide toe can help relieve pressure from the bunion area. I also recommend choosing a style that has a removable insole so you can insert an orthotic with memory foam cushioning inside. I recommend trying the L2200 Memory Foam Orthotics:<a href=\"https://www.aetrex.com/memory-foam-orthotics-l2200-orthotics-L2200M.html?lang=en_US\">https://www.aetrex.com/memory-foam-orthotics-l2200-orthotics-L2200M.html?lang=en_US</a>These orthotics feature a layer of slow recovery IQ150™ memory foam that customizes to your foot to help relieve pressure and provide superior cushioning.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_MFp6YB": {
+          "type": "question",
+          "settings": {
+            "title": "Jennifer B. – Are bunions hereditary? Also, can bunions cause foot drop? Thank you!",
+            "text": "<p>Dr George: Hi Jennifer and thank you for your question. Yes, bunions are hereditary. Bunions do not cause foot drop.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_mKB84d": {
+          "type": "question",
+          "settings": {
+            "title": "Patrice E. – Is there a good orthotic for tailor’s bunion relief. I am wearing wider shoes, doing foot exercises, and losing weight.",
+            "text": "<p>Dr George: Hi Patrice. It is good to hear that you are wearing wider issues and doing foot exercises in addition to losing weight. Orthotics with metatarsal pads may help with the tailor’s bunion:<a href=\"https://www.aetrex.com/search?q=metatarsal+support&prefn1=arch-type&prefv1=High\">https://www.aetrex.com/search?q=metatarsal+support&prefn1=arch-type&prefv1=High</a>A metatarsal pad helps unload pressure at the metatarsal area and provides cushioning to help relieve discomfort.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_kceFhH": {
+          "type": "question",
+          "settings": {
+            "title": "Carollynn – I'd like to see you make more sandals with a wider front strap that goes over baby bunions rather than exposing them or digging into them. Do you plan to?",
+            "text": "<p>Dr George: Hi Carollynn and thank you for your feedback. I will forward your ideas to the Aetrex Product Development Team.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_hzrxUA": {
+          "type": "question",
+          "settings": {
+            "title": "Per my podiatrist's recommendation, I have been using custom orthotics I purchased through his office in my shoes most days for the last several years. I also have another pair of short boots in which I keep another pair of orthotics so that I have a choice of footwear from day to day. (The boots were not recommended by my podiatrist, but are a pair I found that my orthotics fit in and stay in place.) I am flatfooted, overpronate and have bunions. This seems to have kept my bunions from progressing much more and I rarely have pain in them anymore. In the summer, I have a pair of sandals I wear for casual footwear and a pair of Aetrex Sydney wedges I wear with skirts. Do you have other recommendations I could add to my options? Also, I have heard some debate about whether it is harmful to walk barefoot. What is your opinion? Thank you.",
+            "text": "<p>Dr George: Hello and thank you for your questions. All Aetrex shoes have comfort features built-in to help support your feet like arch support and pressure relief technology throughout the footbed:<a href=\"https://www.aetrex.com/footwear/?lang=en_US\">https://www.aetrex.com/footwear/?lang=en_US</a>Walking barefoot on hard surfaces like concrete or wooden floors can be harmful and cause foot pains, which is why you should wear an orthotic when standing on those surfaces. However, if you are walking barefoot on soft ground like grass or sand, then that is okay since the soft ground cradles your foot with each step.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "question_dicKY9",
+        "question_DhrBHV",
+        "question_aBqMC6",
+        "question_FKAYaJ",
+        "question_zFFjPa",
+        "question_tLDpe9",
+        "question_yBxyxd",
+        "question_jyKe3h",
+        "question_MFp6YB",
+        "question_mKB84d",
+        "question_kceFhH",
+        "question_hzrxUA"
+      ],
+      "name": "FAQ",
+      "settings": {
+        "style": "with-border",
+        "heading": "Bunions",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h3",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#ffffff",
+        "overlay_opacity": 0,
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_4ndgUW": {
+      "type": "rich-text",
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "multicolumn_aUPeic": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_mmpryV": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/34170-L2200M_catalog.jpg",
+            "image_ratio": "square",
+            "heading": "<em>Memory Foam Orthotics</em>",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://collections/memory-foam-orthotics",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_4xHh9U": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/34407-L2320M_catalog.jpg",
+            "image_ratio": "square",
+            "heading": "<em>Premium Memory Foam Orthotics</em>",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://products/l2320m-m",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_YBzYLm": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/AS130W_catalog_6c3e66a6-2d1d-4152-8767-30542deda3fc.jpg",
+            "image_ratio": "square",
+            "heading": "<em>Angie Arch Support Sneakers</em>",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://products/angie",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_KDKzqw": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/23569-L8000W_catalog.jpg",
+            "image_ratio": "square",
+            "heading": "<em>Jillian Sport Water Friendly Sandal</em>",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://products/jillian-sport-sandal",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_mmpryV",
+        "column_4xHh9U",
+        "column_YBzYLm",
+        "column_KDKzqw"
+      ],
+      "name": "Multicolumn",
+      "settings": {
+        "gap": "large",
+        "columns": 4,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "Recommended Products for Bunions",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h4",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "#fafafa",
+        "color_button_background": "#90abb7",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "rich_text_gCe8k3": {
+      "type": "rich-text",
+      "blocks": {
+        "text_RqyLFN": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Terms of Use: Aetrex & Dr. George Ampat will not provide diagnosis, treatment, or medical advice; however, the text, graphics, images & other materials are for informational purposes only. Always seek the advice of your physician or other qualified health providers with any questions you may have regarding a medical condition.</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 18,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_RqyLFN"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 48,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "testimonials_banner_Cbhq4c",
+    "video_with_text_eziwQT",
+    "rich_text_DJRdNn",
+    "rich_text_PLkKyP",
+    "faq_HKU8NM",
+    "rich_text_4ndgUW",
+    "multicolumn_aUPeic",
+    "rich_text_gCe8k3"
+  ]
+}
