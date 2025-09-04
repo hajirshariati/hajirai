@@ -55,6 +55,7 @@
 .quick-order-list__total {
   padding: var(--sp-6) var(--sp-7d5);
   border-block-start: 2px solid rgb(var(--color-foreground));
+  -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
   background-color: rgb(var(--color-background)/ 0.7);
 }

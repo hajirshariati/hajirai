@@ -30,6 +30,7 @@
 }
 
 .image-comparison[data-layout=horizontal] .comparison__after {
+  -webkit-clip-path: inset(0px calc(100% - var(--percent)) 0px 0px);
   clip-path: inset(0px calc(100% - var(--percent)) 0px 0px);
 }
 

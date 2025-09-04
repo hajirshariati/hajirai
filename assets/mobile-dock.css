@@ -68,7 +68,12 @@
 
 @media screen and (min-width: 768px) {
   .mobile-dock {
-    display: none !important;
+    display: none;
+  }
+  
+  /* Higher specificity to ensure mobile dock is hidden on desktop */
+  body .mobile-dock {
+    display: none;
   }
 }
 

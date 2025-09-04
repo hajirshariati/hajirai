@@ -16,7 +16,30 @@
   else
     assign page_type = 'text'
   endif
+
+  assign hide_for_non_us = section.settings.hide_for_non_us
+
 -%}
+
+<script>
+{% if hide_for_non_us %}
+function getDetails(url) {
+  return fetch(url)
+    .then(res => res.json());
+}
+
+var u = "https://get.geojs.io/v1/ip/country.json";
+getDetails(u).then(function(data) {
+ // console.log("Visitor country:", data.country);
+  const announcementBar = document.querySelector(".custom-announcement-bar");
+  if (data.country === "US") {
+    announcementBar.classList.remove("hidden");
+  } else {
+    announcementBar.classList.add("hidden");
+  }
+});
+{% endif %}
+</script>
 
 {%- if show_section -%}
   <style>
@@ -48,6 +71,7 @@
       assign enable_country_selector = true
     endif
   -%}
+
 
   <nav
     id="shopify-section-{{ section.id }}"
@@ -327,6 +351,16 @@
   "name": "t:sections.announcement-bar.name",
   "class": "topbar-section custom-announcement-bar",
   "settings": [
+    {
+      "type": "header",
+      "content": "International Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_for_non_us",
+      "label": "Hide for International users",
+      "default": false
+    },
     {
       "type": "checkbox",
       "id": "show_social",
