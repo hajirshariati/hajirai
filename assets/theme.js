@@ -5233,9 +5233,19 @@ class ProductInfo extends HTMLElement {
             }));
 
             // Re-initialize color swatch handlers after variant change
-            if (window.productColorSwatchHandler) {
-                window.productColorSwatchHandler.attachSwatchListeners();
-            }
+            // Use requestAnimationFrame to ensure DOM updates are complete before re-attaching listeners
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    const swatches = document.querySelectorAll('.custom-meta-url[data-product-handle]');
+                    
+                    if (window.productColorSwatchHandler) {
+                        window.productColorSwatchHandler.attachSwatchListeners();
+                    } else {
+                        // If handler doesn't exist yet, create it
+                        window.productColorSwatchHandler = new ProductColorSwatchHandler();
+                    }
+                }, 50);
+            });
         };
     }
 
@@ -5266,6 +5276,11 @@ class ProductInfo extends HTMLElement {
                             input.checked = true;
                         }
                     });
+                    
+                    // Re-attach color swatch listeners after DOM update
+                    if (window.productColorSwatchHandler) {
+                        window.productColorSwatchHandler.attachSwatchListeners();
+                    }
                 }]
             );
         }
@@ -8033,6 +8048,7 @@ class ProductColorSwatchHandler {
             'ss_recommendations_GRidrn'
         ];
         
+        this.observer = null;
         this.init();
     }
 
@@ -8052,21 +8068,26 @@ class ProductColorSwatchHandler {
     }
 
     attachSwatchListeners() {
-        document.querySelectorAll('.custom-meta-url[data-product-handle]').forEach((swatch) => {
+        const swatches = document.querySelectorAll('.custom-meta-url[data-product-handle]');
+        
+        swatches.forEach((swatch, index) => {
+            console.log(`Attaching listener to swatch ${index}:`, swatch.getAttribute('data-product-handle'));
+            
             // Remove existing listeners to prevent duplicates
             if (swatch._swatchClickHandler) {
+                console.log(`Removing existing handler from swatch ${index}`);
                 swatch.removeEventListener('click', swatch._swatchClickHandler);
             }
             
             // Create and store the bound handler
             swatch._swatchClickHandler = (event) => this.handleSwatchClick(event, swatch);
             swatch.addEventListener('click', swatch._swatchClickHandler);
+            console.log(`Added new handler to swatch ${index}`);
         });
     }
 
     handleSwatchClick(event, swatch) {
         event.preventDefault();
-        console.log('click')
         const handle = swatch.getAttribute('data-product-handle');
         if (!handle) return;
 
