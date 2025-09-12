@@ -5153,10 +5153,12 @@ class ProductInfo extends HTMLElement {
 
                 if (activeElement.hasAttribute('align-selected')) {
                     const scrollElement = activeElement.closest(activeElement.getAttribute('align-selected'));
-                    scrollElement.scrollTo({
-                        left: activeElement.offsetLeft,
-                        behavior: 'instant'
-                    });
+                    if (scrollElement) {
+                        scrollElement.scrollTo({
+                            left: activeElement.offsetLeft,
+                            behavior: 'instant'
+                        });
+                    }
                 }
                 setTimeout(() => {
                     activeElement.focus({preventScroll: true});
@@ -5229,6 +5231,11 @@ class ProductInfo extends HTMLElement {
                     variant: variant
                 }
             }));
+
+            // Re-initialize color swatch handlers after variant change
+            if (window.productColorSwatchHandler) {
+                window.productColorSwatchHandler.attachSwatchListeners();
+            }
         };
     }
 
@@ -5239,8 +5246,28 @@ class ProductInfo extends HTMLElement {
 
     updateOptionValues(parsedHTML) {
         const variantPicker = parsedHTML.getElementById(`VariantPicker-${this.sectionId}-${this.productId}`);
-        if (variantPicker) {
-            theme.HTMLUpdateUtility.viewTransition(this.variantSelectors, variantPicker, this.preProcessHtmlCallbacks);
+        if (variantPicker && this.variantSelectors) {
+            // Store current selections before updating
+            const currentSelections = {};
+            this.variantSelectors.querySelectorAll('input[type="radio"]:checked').forEach(input => {
+                currentSelections[input.name] = input.value;
+            });
+
+            // Update the variant picker
+            theme.HTMLUpdateUtility.viewTransition(
+                this.variantSelectors, 
+                variantPicker, 
+                this.preProcessHtmlCallbacks,
+                // Post-process callback to restore selections after transition
+                [(newNode) => {
+                    Object.entries(currentSelections).forEach(([name, value]) => {
+                        const input = newNode.querySelector(`input[name="${name}"][value="${value}"]`);
+                        if (input && !input.disabled) {
+                            input.checked = true;
+                        }
+                    });
+                }]
+            );
         }
     }
 
@@ -5537,13 +5564,19 @@ class ProductForm extends HTMLFormElement {
             this.submitButton.setAttribute('disabled', '');
             if (unavailable) this.submitButton.setAttribute('unavailable', '');
             if (text) {
-                (submitButtonTextChild || submitButtonText).textContent = text;
+                const textElement = submitButtonTextChild || submitButtonText;
+                if (textElement) {
+                    textElement.textContent = text;
+                }
             } else {
                 this.submitButton.setAttribute('loading', '');
             }
         } else {
             this.submitButton.removeAttribute('disabled');
-            (submitButtonTextChild || submitButtonText).textContent = this.submitButton.hasAttribute('data-pre-order') ? theme.variantStrings.preOrder : theme.variantStrings.addToCart;
+            const textElement = submitButtonTextChild || submitButtonText;
+            if (textElement) {
+                textElement.textContent = this.submitButton.hasAttribute('data-pre-order') ? theme.variantStrings.preOrder : theme.variantStrings.addToCart;
+            }
         }
     }
 }
@@ -7897,3 +7930,209 @@ class IconsCarousel extends HTMLDivElement {
 }
 
 customElements.define('icons-carousel', IconsCarousel, {extends: 'div'});
+
+(function () {
+    const SECTIONS_TO_UPDATE = [
+        'main',
+        'product_details_4UfMKj',
+        'product_highlights_EMEhAr',
+        '1736487006f9b363ba',
+        'ugc_gallery_n48LPJ',
+        'ss_recommendations_pFUtFd',
+        'ss_recommendations_3JCDgT',
+        'ss_recommendations_GRidrn'
+    ];
+
+    function executeScript(script) {
+        const newScript = document.createElement('script');
+        Array.from(script.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+        newScript.innerHTML = script.innerHTML;
+        document.head.appendChild(newScript).parentNode.removeChild(newScript);
+    }
+
+    function attachSwatchListeners() {
+        document.querySelectorAll('.product-form__swatch[data-product-handle]').forEach(function (swatch) {
+            swatch.addEventListener('click', function (event) {
+                event.preventDefault();
+
+                const handle = swatch.getAttribute('data-product-handle');
+                if (!handle) return;
+
+                if (swatch.classList.contains('color-links--already-loaded')) return;
+                swatch.classList.add('color-links--already-loaded');
+
+                document.body.classList.add('page-loading');
+
+                const url = `/products/${handle}`;
+
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.text();
+                    })
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+
+                        SECTIONS_TO_UPDATE.forEach(sectionId => {
+                            const newSections = doc.querySelectorAll(`[id*="${sectionId}"]`);
+                            const currentSections = document.querySelectorAll(`[id*="${sectionId}"]`);
+
+                            newSections.forEach((newSection, idx) => {
+                                const currentSection = currentSections[idx];
+                                if (newSection && currentSection) {
+                                    currentSection.innerHTML = newSection.innerHTML;
+                                    Array.from(newSection.getElementsByTagName('script')).forEach(executeScript);
+                                }
+                            });
+                        });
+
+                        // --- Update URL to new product ---
+                        let urlSearchParams = new URLSearchParams(window.location.search);
+                        urlSearchParams.delete('variant'); // Remove variant since we're switching products
+                        let search = urlSearchParams.toString();
+                        let hash = window.location.hash;
+                        let finalUrl = url + (search ? '?' + search : '') + (hash ? hash : '');
+                        window.history.replaceState(null, '', finalUrl);
+
+                        attachSwatchListeners();
+                        if (typeof yotpoWidgetsContainer !== 'undefined' && yotpoWidgetsContainer.initWidgets) {
+                            yotpoWidgetsContainer.initWidgets();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching product page:', error);
+                    })
+                    .finally(() => {
+                        document.body.classList.remove('page-loading');
+                    });
+            });
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', attachSwatchListeners);
+    } else {
+        attachSwatchListeners();
+    }
+})();
+
+// Product Color Swatch Handler for switching between related products
+class ProductColorSwatchHandler {
+    constructor() {
+        this.SECTIONS_TO_UPDATE = [
+            'main',
+            'product_details_4UfMKj',
+            'product_highlights_EMEhAr',
+            '1736487006f9b363ba',
+            'ugc_gallery_n48LPJ',
+            'ss_recommendations_pFUtFd',
+            'ss_recommendations_3JCDgT',
+            'ss_recommendations_GRidrn'
+        ];
+        
+        this.init();
+    }
+
+    init() {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.attachSwatchListeners());
+        } else {
+            this.attachSwatchListeners();
+        }
+    }
+
+    executeScript(script) {
+        const newScript = document.createElement('script');
+        Array.from(script.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+        newScript.innerHTML = script.innerHTML;
+        document.head.appendChild(newScript).parentNode.removeChild(newScript);
+    }
+
+    attachSwatchListeners() {
+        document.querySelectorAll('.custom-meta-url[data-product-handle]').forEach((swatch) => {
+            // Remove existing listeners to prevent duplicates
+            if (swatch._swatchClickHandler) {
+                swatch.removeEventListener('click', swatch._swatchClickHandler);
+            }
+            
+            // Create and store the bound handler
+            swatch._swatchClickHandler = (event) => this.handleSwatchClick(event, swatch);
+            swatch.addEventListener('click', swatch._swatchClickHandler);
+        });
+    }
+
+    handleSwatchClick(event, swatch) {
+        event.preventDefault();
+        console.log('click')
+        const handle = swatch.getAttribute('data-product-handle');
+        if (!handle) return;
+
+        if (swatch.classList.contains('color-links--already-loaded')) return;
+        swatch.classList.add('color-links--already-loaded');
+
+        document.body.classList.add('page-loading');
+
+        const url = `/products/${handle}`;
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(html => {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+
+                this.SECTIONS_TO_UPDATE.forEach(sectionId => {
+                    const newSections = doc.querySelectorAll(`[id*="${sectionId}"]`);
+                    const currentSections = document.querySelectorAll(`[id*="${sectionId}"]`);
+
+                    newSections.forEach((newSection, idx) => {
+                        const currentSection = currentSections[idx];
+                        if (newSection && currentSection) {
+                            currentSection.innerHTML = newSection.innerHTML;
+                            Array.from(newSection.getElementsByTagName('script')).forEach(script => this.executeScript(script));
+                        }
+                    });
+                });
+
+                // Update URL to new product
+                let urlSearchParams = new URLSearchParams(window.location.search);
+                urlSearchParams.delete('variant'); // Remove variant since we're switching products
+                let search = urlSearchParams.toString();
+                let hash = window.location.hash;
+                let finalUrl = url + (search ? '?' + search : '') + (hash ? hash : '');
+                window.history.replaceState(null, '', finalUrl);
+
+                // Re-attach listeners for the new content
+                this.attachSwatchListeners();
+                
+                // Re-initialize Yotpo widgets if available
+                if (typeof yotpoWidgetsContainer !== 'undefined' && yotpoWidgetsContainer.initWidgets) {
+                    yotpoWidgetsContainer.initWidgets();
+                }
+
+                // Dispatch custom event for other components that might need to reinitialize
+                document.dispatchEvent(new CustomEvent('product:switched', {
+                    detail: { productHandle: handle, url: finalUrl }
+                }));
+            })
+            .catch(error => {
+                console.error('Error fetching product page:', error);
+                swatch.classList.remove('color-links--already-loaded');
+            })
+            .finally(() => {
+                document.body.classList.remove('page-loading');
+            });
+    }
+}
+
+// Initialize the product color swatch handler
+theme.DOMready(() => {
+    window.productColorSwatchHandler = new ProductColorSwatchHandler();
+});
