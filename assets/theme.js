@@ -8071,18 +8071,14 @@ class ProductColorSwatchHandler {
         const swatches = document.querySelectorAll('.custom-meta-url[data-product-handle]');
         
         swatches.forEach((swatch, index) => {
-            console.log(`Attaching listener to swatch ${index}:`, swatch.getAttribute('data-product-handle'));
-            
             // Remove existing listeners to prevent duplicates
             if (swatch._swatchClickHandler) {
-                console.log(`Removing existing handler from swatch ${index}`);
                 swatch.removeEventListener('click', swatch._swatchClickHandler);
             }
             
             // Create and store the bound handler
             swatch._swatchClickHandler = (event) => this.handleSwatchClick(event, swatch);
             swatch.addEventListener('click', swatch._swatchClickHandler);
-            console.log(`Added new handler to swatch ${index}`);
         });
     }
 
