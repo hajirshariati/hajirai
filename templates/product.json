@@ -178,7 +178,7 @@
         "image_ratio_mobile": "adapt_first",
         "mobile_thumbnail": true,
         "padding_top": 0,
-        "padding_bottom": 4,
+        "padding_bottom": 28,
         "divider": false,
         "full_width": true,
         "rounded": false
@@ -306,15 +306,6 @@
         "padding_bottom": 36,
         "divider": false,
         "rounded": false
-      }
-    },
-    "ugc_gallery_9emGbm": {
-      "type": "ugc-gallery",
-      "name": "UGC Gallery",
-      "settings": {
-        "custom_gallery": "{{ product.metafields.product.yotpo_gallery_id.value }}",
-        "global_pdp_sourced_gallery": "",
-        "global_fallback_sourced_gallery": "67c9dfd952921dee2bb9fc5c"
       }
     },
     "help-drawer": {
@@ -768,6 +759,15 @@
         "divider": false,
         "full_width": false,
         "rounded": false
+      }
+    },
+    "ugc_gallery_9emGbm": {
+      "type": "ugc-gallery",
+      "name": "UGC Gallery",
+      "settings": {
+        "custom_gallery": "{{ product.metafields.product.yotpo_gallery_id.value }}",
+        "global_pdp_sourced_gallery": "",
+        "global_fallback_sourced_gallery": "67c9dfd952921dee2bb9fc5c"
       }
     },
     "image_with_text_overlay_9zaRhz": {
