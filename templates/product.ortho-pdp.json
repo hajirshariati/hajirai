@@ -954,6 +954,64 @@
         "full_width": false,
         "rounded": false
       }
+    },
+    "image_comparison_XmUhYp": {
+      "type": "image-comparison",
+      "blocks": {
+        "image_jYaW9X": {
+          "type": "image",
+          "settings": {
+            "subheading": "",
+            "heading": "",
+            "content_position": "end",
+            "color_text": "#ffffff"
+          }
+        },
+        "image_aWBtYd": {
+          "type": "image",
+          "settings": {
+            "subheading": "",
+            "heading": "",
+            "content_position": "end",
+            "color_text": "#ffffff"
+          }
+        }
+      },
+      "block_order": [
+        "image_jYaW9X",
+        "image_aWBtYd"
+      ],
+      "name": "t:sections.image-comparison.name",
+      "settings": {
+        "layout": "horizontal",
+        "image_height": "adapt",
+        "image_height_mobile": "adapt",
+        "heading": "Image comparison",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
     }
   },
   "order": [
@@ -963,6 +1021,7 @@
     "product-details",
     "multicolumn_KyfUdW",
     "faq_Aea7ch",
+    "image_comparison_XmUhYp",
     "ugc_gallery_9emGbm",
     "multicolumn_CEQ6Uh",
     "video_with_text_xf4VTt",
