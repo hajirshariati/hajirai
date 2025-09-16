@@ -78,10 +78,6 @@
             "size_chart": "sizing-fit-guide"
           }
         },
-        "true_fit_widget_8cjNbr": {
-          "type": "shopify://apps/true-fit/blocks/widget/caa08c3b-c601-47cd-9c2a-32bb0567b191",
-          "settings": {}
-        },
         "buy_buttons": {
           "type": "buy_buttons",
           "settings": {
@@ -92,15 +88,6 @@
             "enable_back_in_stock": false,
             "show_back_in_stock_name": false,
             "show_back_in_stock_phone": false
-          }
-        },
-        "complementary": {
-          "type": "complementary",
-          "settings": {
-            "heading": "Pairs well with",
-            "product_limit": 4,
-            "show_vendor": false,
-            "show_price": true
           }
         },
         "text-1": {
@@ -155,9 +142,7 @@
         "afterpay_on_site_messaging_payments_messaging_hqp3bW",
         "yotpo_product_reviews_star_rating_88eCgC",
         "variant_picker",
-        "true_fit_widget_8cjNbr",
         "buy_buttons",
-        "complementary",
         "text-1",
         "text-3",
         "text-2",
@@ -308,15 +293,6 @@
         "rounded": false
       }
     },
-    "ugc_gallery_9emGbm": {
-      "type": "ugc-gallery",
-      "name": "UGC Gallery",
-      "settings": {
-        "custom_gallery": "{{ product.metafields.product.yotpo_gallery_id.value }}",
-        "global_pdp_sourced_gallery": "",
-        "global_fallback_sourced_gallery": "67c9dfd952921dee2bb9fc5c"
-      }
-    },
     "help-drawer": {
       "type": "help-drawer",
       "blocks": {
@@ -398,11 +374,41 @@
         "description_DRfp3h": {
           "type": "description",
           "settings": {
-            "icon": "check_mark",
+            "icon": "file_text",
             "iwidth": "custom",
             "icon_width": 24,
             "heading": "Description",
             "split_mode": false
+          }
+        },
+        "collapsible_tab_H9eYQT": {
+          "type": "collapsible_tab",
+          "settings": {
+            "icon": "clipboard",
+            "iwidth": "custom",
+            "icon_width": 24,
+            "heading": "Specifications",
+            "content": "<p>Use collapsible tabs for more detailed information that will help customers make a purchasing decision.</p><p>Ex: Shipping and return policies, size guides, and other common questions.</p>",
+            "metafields": ""
+          }
+        },
+        "collapsible_tab_Epam8x": {
+          "type": "collapsible_tab",
+          "settings": {
+            "icon": "ruler",
+            "iwidth": "custom",
+            "icon_width": 24,
+            "heading": "Size Guide",
+            "content": "<p>Use collapsible tabs for more detailed information that will help customers make a purchasing decision.</p><p>Ex: Shipping and return policies, size guides, and other common questions.</p>",
+            "metafields": ""
+          }
+        },
+        "specification_Qjh3nn": {
+          "type": "specification",
+          "repeater": "{{ product.metafields.product.details_icons.value }}",
+          "settings": {
+            "icon": "{{ block.repeater.icon.value }}",
+            "heading": "{{ block.repeater.label.value }}"
           }
         },
         "collapsible_tab_TdVDbU": {
@@ -415,20 +421,14 @@
             "content": "<p>When you choose Aetrex, you make the healthy choice. Wear the shoes or Aetrex Orthotics and if you are not completely satisfied, return them to us. If you need detailed step-by-step instructions, please visit our <a href=\"https://support.aetrex.com/hc/en-us/articles/360007223654-How-do-I-return-an-order?_gl=1%2Amv7vy8%2A_gcl_aw%2AR0NMLjE3Mzk0NTI1MzYuQ2p3S0NBaUF6YmE5QmhCaEVpd0E3Z2xiYW1JRktlOUdSLUh3WnNGR1U1WHdRNGE1dTNVcklqR1VaNDNUNGhxYkt5cHFkcDM2ai10OWd4b0NBYzRRQXZEX0J3RQ..%2A_gcl_au%2AMTMyMDU2NzExNi4xNzM3NDA1Mjg0LjczODEwNDAyOS4xNzQyNDc3NzY0LjE3NDI0Nzc3NjQ.%2AFPAU%2AMTMyMDU2NzExNi4xNzM3NDA1Mjg0\" target=\"_blank\">FAQ page</a> for further guidance.<br/><br/>The refund will be processed to the original form of payment and should be reflected in your account within 5 to 7 days from the day of the drop-off.<br/><br/><strong>A return fee of $5.95</strong> will be automatically deducted when processing your return.<br/><br/>Shipping charges from the original order are non-refundable.</p>",
             "metafields": ""
           }
-        },
-        "specification_Qjh3nn": {
-          "type": "specification",
-          "repeater": "{{ product.metafields.product.details_icons.value }}",
-          "settings": {
-            "icon": "{{ block.repeater.icon.value }}",
-            "heading": "{{ block.repeater.label.value }}"
-          }
         }
       },
       "block_order": [
         "description_DRfp3h",
-        "collapsible_tab_TdVDbU",
-        "specification_Qjh3nn"
+        "collapsible_tab_H9eYQT",
+        "collapsible_tab_Epam8x",
+        "specification_Qjh3nn",
+        "collapsible_tab_TdVDbU"
       ],
       "settings": {
         "style": "with-border",
@@ -458,6 +458,74 @@
         "padding_bottom": 28,
         "divider": false,
         "full_width": true,
+        "rounded": false
+      }
+    },
+    "faq_Aea7ch": {
+      "type": "faq",
+      "blocks": {
+        "question_NPxFPG": {
+          "type": "question",
+          "settings": {
+            "title": "Frequently asked question",
+            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_fcTa7d": {
+          "type": "question",
+          "settings": {
+            "title": "Frequently asked question",
+            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_khVQy3": {
+          "type": "question",
+          "settings": {
+            "title": "Frequently asked question",
+            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "question_NPxFPG",
+        "question_fcTa7d",
+        "question_khVQy3"
+      ],
+      "name": "t:sections.faq.name",
+      "settings": {
+        "style": "with-border",
+        "heading": "FAQs",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#ffffff",
+        "overlay_opacity": 4,
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "narrow": true,
         "rounded": false
       }
     },
@@ -516,11 +584,20 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 0,
+        "padding_top": 72,
         "padding_bottom": 72,
         "divider": false,
         "full_width": false,
         "rounded": true
+      }
+    },
+    "ugc_gallery_9emGbm": {
+      "type": "ugc-gallery",
+      "name": "UGC Gallery",
+      "settings": {
+        "custom_gallery": "{{ product.metafields.product.yotpo_gallery_id.value }}",
+        "global_pdp_sourced_gallery": "",
+        "global_fallback_sourced_gallery": "67c9dfd952921dee2bb9fc5c"
       }
     },
     "multicolumn_CEQ6Uh": {
@@ -882,10 +959,11 @@
   "order": [
     "main-product",
     "scrolling_text_4DH9VU",
-    "ugc_gallery_9emGbm",
     "help-drawer",
     "product-details",
+    "faq_Aea7ch",
     "multicolumn_KyfUdW",
+    "ugc_gallery_9emGbm",
     "multicolumn_CEQ6Uh",
     "video_with_text_xf4VTt",
     "17477533508981334f",
