@@ -267,9 +267,9 @@
         "collection_LCmgJQ": {
           "type": "collection",
           "settings": {
-            "collection": "womens-boots",
-            "image": "shopify://shop_images/Boots_31d6a537-6d19-4f8c-baf9-de93206db007.png",
-            "title": "BOOTS",
+            "collection": "womens-flip-flop-sandals",
+            "image": "shopify://shop_images/flips_8c5c4a61-3b54-451e-acd8-35bdc2c948f6.png",
+            "title": "FLIPS",
             "description": "",
             "overlay_content": false,
             "color_text": "#171717",
