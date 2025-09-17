@@ -105,6 +105,14 @@
             "show_price": true
           }
         },
+        "icon_list_VBaw6z": {
+          "type": "icon_list",
+          "settings": {
+            "heading": "Helps to relieve which foot pain",
+            "enable_carousel": true,
+            "show_below_media": true
+          }
+        },
         "text-1": {
           "type": "text",
           "settings": {
@@ -148,14 +156,6 @@
         "sticky_buy_button": {
           "type": "sticky_buy_button",
           "settings": {}
-        },
-        "icon_list_VBaw6z": {
-          "type": "icon_list",
-          "settings": {
-            "heading": "Specs",
-            "enable_carousel": true,
-            "show_below_media": true
-          }
         }
       },
       "block_order": [
@@ -168,12 +168,12 @@
         "true_fit_widget_8cjNbr",
         "buy_buttons",
         "complementary",
+        "icon_list_VBaw6z",
         "text-1",
         "text-3",
         "text-2",
         "text-4",
-        "sticky_buy_button",
-        "icon_list_VBaw6z"
+        "sticky_buy_button"
       ],
       "settings": {
         "enable_sticky_info": true,
