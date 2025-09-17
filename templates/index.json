@@ -294,8 +294,8 @@
         "color_overlay": "#171717",
         "divider_color": "#111111",
         "overlay_opacity": 0,
-        "padding_top": 0,
-        "padding_bottom": 0,
+        "padding_top": 48,
+        "padding_bottom": 48,
         "divider": false,
         "full_width": true,
         "rounded": false
@@ -445,8 +445,8 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 24,
-        "padding_bottom": 24,
+        "padding_top": 48,
+        "padding_bottom": 48,
         "divider": false,
         "full_width": false,
         "rounded": false
@@ -855,6 +855,87 @@
         "enable_parallax": false,
         "parallax_direction": "vertical"
       }
+    },
+    "image_with_text_overlay_ahU44t": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "text_ygFHR6": {
+          "type": "text",
+          "settings": {
+            "text": "<h2>Celebrating 20 Years of Foot Scanning Technology</h2>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_XtWfRH": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Over the past 20 years we’ve scanned more than 50 million people. With all of this global foot data, we really know feet. This is what makes us different from the rest.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_AaYDtV": {
+          "type": "button",
+          "settings": {
+            "button_label": "How we use tech to create shoes",
+            "button_link": "shopify://pages/tech-aetrex-footwear",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_ygFHR6",
+        "text_XtWfRH",
+        "button_AaYDtV"
+      ],
+      "name": "t:sections.image-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/Media_52.png",
+        "image_height": "650px",
+        "content_width": "small",
+        "content_position": "md:items-start md:justify-end",
+        "text_alignment": "center",
+        "image_mobile": "shopify://shop_images/image_1_cb21f437-3b7f-4f69-ba55-684197d498e2.png",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-end justify-center",
+        "text_alignment_mobile": "center",
+        "color_text": "#000000",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
     }
   },
   "order": [
@@ -864,6 +945,7 @@
     "slideshow_kjFa7L",
     "multicolumn_FeTBee",
     "scrolling_text_byhkGn",
-    "slideshow_M93zTz"
+    "slideshow_M93zTz",
+    "image_with_text_overlay_ahU44t"
   ]
 }
