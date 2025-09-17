@@ -523,7 +523,7 @@
         "gap": "large",
         "columns": 4,
         "columns_mobile": "1",
-        "carousel_on_desktop": false,
+        "carousel_on_desktop": true,
         "swipe_on_mobile": true,
         "heading": "Main Features",
         "heading_size": "title-md",
