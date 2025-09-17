@@ -566,6 +566,60 @@
         "parallax_direction": "vertical"
       }
     },
+    "rich_text_mVRDXW": {
+      "type": "rich-text",
+      "blocks": {
+        "text_JgKBRr": {
+          "type": "text",
+          "settings": {
+            "text": "<h2>OUR BRAND PARTNERS</h2>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 12,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_JgKBRr"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#000000",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
     "scrolling_text_byhkGn": {
       "type": "scrolling-text",
       "blocks": {
@@ -978,6 +1032,7 @@
     "image_with_text_overlay_ahU44t",
     "multicolumn_FeTBee",
     "image_with_text_overlay_TNKwpP",
+    "rich_text_mVRDXW",
     "scrolling_text_byhkGn",
     "slideshow_M93zTz"
   ]
