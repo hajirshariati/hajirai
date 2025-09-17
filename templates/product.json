@@ -22,7 +22,7 @@
           "type": "title",
           "settings": {
             "title_size": "product-title-md",
-            "title_size_mobile": "product-title-md",
+            "title_size_mobile": "product-title-sm",
             "show_price": true,
             "show_rating": true
           }
@@ -453,7 +453,6 @@
         },
         "specification_Qjh3nn": {
           "type": "specification",
-          "disabled": true,
           "repeater": "{{ product.metafields.product.details_icons.value }}",
           "settings": {
             "icon": "{{ block.repeater.icon.value }}",
@@ -533,7 +532,7 @@
         "gap": "large",
         "columns": 4,
         "columns_mobile": "1",
-        "carousel_on_desktop": true,
+        "carousel_on_desktop": false,
         "swipe_on_mobile": true,
         "heading": "Main Features",
         "heading_size": "title-md",
