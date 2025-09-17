@@ -403,7 +403,7 @@
             "iwidth": "custom",
             "icon_width": 24,
             "heading": "Description",
-            "split_mode": true
+            "split_mode": false
           }
         },
         "collapsible_tab_3dfxMx": {
@@ -495,7 +495,7 @@
         "padding_bottom": 28,
         "divider": false,
         "full_width": true,
-        "rounded": false
+        "rounded": true
       }
     },
     "multicolumn_KyfUdW": {
