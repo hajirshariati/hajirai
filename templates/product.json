@@ -637,12 +637,12 @@
         "button_link": "",
         "button_external": false,
         "button_icon": true,
-        "highlighted_text": "none",
+        "highlighted_text": "text",
         "highlighted_scribble": "circle",
         "color_text": "",
         "color_background": "#ebf5ff",
         "gradient_background": "",
-        "color_highlight": "",
+        "color_highlight": "#ffffff",
         "gradient_highlight": "",
         "color_button_text": "",
         "color_button_background": "",
@@ -679,7 +679,7 @@
         "description": "",
         "enable_video_autoplay": false,
         "enable_video_looping": false,
-        "image_height": "adapt",
+        "image_height": "400px",
         "video_width": "medium",
         "layout": "text_first",
         "text_alignment": "center",
@@ -692,7 +692,7 @@
         "gradient_background": "",
         "color_background_2": "",
         "gradient_background_2": "",
-        "color_highlight": "#99b7c4",
+        "color_highlight": "#c5a370",
         "gradient_highlight": "",
         "color_button_text": "",
         "color_button_background": "",
@@ -741,7 +741,7 @@
         "padding_bottom": 72,
         "divider": false,
         "full_width": false,
-        "rounded": false
+        "rounded": true
       }
     },
     "product-recommendations": {
