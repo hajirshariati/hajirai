@@ -109,12 +109,12 @@
       "type": "image-with-text-overlay",
       "settings": {
         "transparent_header": false,
-        "image": "shopify://shop_images/tamara_D_a3d21c7c-7d80-43e0-b933-ff29935f442a.gif",
+        "image": "shopify://shop_images/ashley_D.jpg",
         "image_height": "adapt",
         "content_width": "small",
         "content_position": "md:items-end md:justify-start",
         "text_alignment": "left",
-        "image_mobile": "shopify://shop_images/tamara_M_279272c9-e13d-48e8-b000-0cc612ff6524.jpg",
+        "image_mobile": "shopify://shop_images/ashley_M.jpg",
         "image_height_mobile": "adapt",
         "content_position_mobile": "items-end justify-start",
         "text_alignment_mobile": "left",
@@ -159,7 +159,7 @@
         "grid_horizontal": 75,
         "enable_twin": false,
         "enable_parallax": false,
-        "color_text": "",
+        "color_text": "#171717",
         "color_background": "#efeae6",
         "gradient_background": "",
         "color_highlight": "",
@@ -176,9 +176,9 @@
         "collection_6iykJg": {
           "type": "collection",
           "settings": {
-            "collection": "womens-sandals",
-            "image": "shopify://shop_images/Sandals_0e3a64ec-f790-4efd-b3ec-b1b92f015ed3.png",
-            "title": "SANDALS",
+            "collection": "womens-sneakers",
+            "image": "shopify://shop_images/Sneakers_9347202f-883a-4054-a367-840d1673a259.png",
+            "title": "SNEAKERS",
             "description": "",
             "overlay_content": false,
             "color_text": "#171717",
@@ -840,76 +840,6 @@
         "enable_parallax": false,
         "parallax_direction": "vertical"
       }
-    },
-    "rich_text_4wWz3A": {
-      "type": "rich-text",
-      "blocks": {
-        "text_k8gK3r": {
-          "type": "text",
-          "settings": {
-            "text": "<p>SHARE YOUR LOOK</p>",
-            "text_font": "body",
-            "text_size": "subtext-custom",
-            "text_max_size": 24,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_AzHTpY": {
-          "type": "text",
-          "settings": {
-            "text": "<h6>Share a photo of your favorite Aetrex product for a chance to be featured! Tag your Instagram images with <em><strong>#MYAETREX</strong></em><em>.</em></h6>",
-            "text_font": "body",
-            "text_size": "subtext-sm",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "text",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "text_k8gK3r",
-        "text_AzHTpY"
-      ],
-      "name": "Rich text",
-      "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "#525252",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "#0b61cd",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 24,
-        "padding_bottom": 48,
-        "divider": false,
-        "narrow": true,
-        "rounded": false
-      }
     }
   },
   "order": [
@@ -923,7 +853,6 @@
     "image_with_text_overlay_GNC4KT",
     "image_with_text_overlay_cLVdgJ",
     "image_with_text_overlay_HEWGdX",
-    "image_with_text_overlay_K399zb",
-    "rich_text_4wWz3A"
+    "image_with_text_overlay_K399zb"
   ]
 }
