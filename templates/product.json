@@ -395,7 +395,40 @@
             "iwidth": "custom",
             "icon_width": 24,
             "heading": "Description",
-            "split_mode": false
+            "split_mode": true
+          }
+        },
+        "collapsible_tab_3dfxMx": {
+          "type": "collapsible_tab",
+          "settings": {
+            "icon": "none",
+            "iwidth": "custom",
+            "icon_width": 24,
+            "heading": "Key features",
+            "content": "<p>Use collapsible tabs for more detailed information that will help customers make a purchasing decision.</p><p>Ex: Shipping and return policies, size guides, and other common questions.</p>",
+            "metafields": ""
+          }
+        },
+        "collapsible_tab_96ewnx": {
+          "type": "collapsible_tab",
+          "settings": {
+            "icon": "none",
+            "iwidth": "custom",
+            "icon_width": 24,
+            "heading": "Shoe Care",
+            "content": "<p>Use collapsible tabs for more detailed information that will help customers make a purchasing decision.</p><p>Ex: Shipping and return policies, size guides, and other common questions.</p>",
+            "metafields": ""
+          }
+        },
+        "collapsible_tab_C9R9gb": {
+          "type": "collapsible_tab",
+          "settings": {
+            "icon": "none",
+            "iwidth": "custom",
+            "icon_width": 24,
+            "heading": "Size Chart",
+            "content": "<p>Use collapsible tabs for more detailed information that will help customers make a purchasing decision.</p><p>Ex: Shipping and return policies, size guides, and other common questions.</p>",
+            "metafields": ""
           }
         },
         "collapsible_tab_TdVDbU": {
@@ -420,6 +453,9 @@
       },
       "block_order": [
         "description_DRfp3h",
+        "collapsible_tab_3dfxMx",
+        "collapsible_tab_96ewnx",
+        "collapsible_tab_C9R9gb",
         "collapsible_tab_TdVDbU",
         "specification_Qjh3nn"
       ],
