@@ -531,7 +531,7 @@
           "type": "subheading",
           "settings": {
             "subheading": "FALL FAVORITES",
-            "subheading_size": "subtitle-md",
+            "subheading_size": "subtitle-lg",
             "secondary_color": true
           }
         },
@@ -697,7 +697,7 @@
           "type": "subheading",
           "settings": {
             "subheading": "THE AETREX TECHNOLOGY DIFFERENCE",
-            "subheading_size": "subtitle-md",
+            "subheading_size": "subtitle-lg",
             "secondary_color": true
           }
         },
