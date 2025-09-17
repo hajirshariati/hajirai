@@ -153,8 +153,8 @@
           "type": "icon_list",
           "settings": {
             "heading": "",
-            "enable_carousel": false,
-            "show_below_media": false
+            "enable_carousel": true,
+            "show_below_media": true
           }
         }
       },
