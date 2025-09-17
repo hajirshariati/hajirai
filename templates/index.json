@@ -485,6 +485,87 @@
         "rounded": false
       }
     },
+    "image_with_text_overlay_TNKwpP": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "text_rRj3Np": {
+          "type": "text",
+          "settings": {
+            "text": "<h2>Data Driven Design</h2>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_xMJiMQ": {
+          "type": "text",
+          "settings": {
+            "text": "<p>At Aetrex, our shoes are engineered using data from more than 50 million foot scans. This unmatched depth of knowledge allows us to design footwear with superior fit, alignment, and function—helping you move more comfortably and with less strain on your body.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_AEVmYq": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP Now",
+            "button_link": "shopify://pages/women-footwear",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_rRj3Np",
+        "text_xMJiMQ",
+        "button_AEVmYq"
+      ],
+      "name": "t:sections.image-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/1920x655_aetrex_difference_Dahlia.jpg",
+        "image_height": "650px",
+        "content_width": "small",
+        "content_position": "md:items-start md:justify-end",
+        "text_alignment": "center",
+        "image_mobile": "shopify://shop_images/difference_Dahlia4.jpg",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-end justify-center",
+        "text_alignment_mobile": "center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
+        "padding_top": 48,
+        "padding_bottom": 48,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
     "scrolling_text_byhkGn": {
       "type": "scrolling-text",
       "blocks": {
@@ -896,6 +977,7 @@
     "video_with_text_overlay_3RJkWH",
     "image_with_text_overlay_ahU44t",
     "multicolumn_FeTBee",
+    "image_with_text_overlay_TNKwpP",
     "scrolling_text_byhkGn",
     "slideshow_M93zTz"
   ]
