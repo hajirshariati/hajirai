@@ -530,7 +530,7 @@
         "subheading_yJRt4d": {
           "type": "subheading",
           "settings": {
-            "subheading": "SPRING FAVORITES",
+            "subheading": "FALL FAVORITES",
             "subheading_size": "subtitle-md",
             "secondary_color": true
           }
@@ -548,7 +548,7 @@
           "settings": {
             "text": "<p>Step out in comfort this season in styles that will have you looking good and feeling even better. Each pair features our Aetrex Signature Arch Support and orthotic footbed to provide maximum comfort and support each and every step</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -562,7 +562,7 @@
           "type": "button",
           "settings": {
             "button_label": "View Collection",
-            "button_link": "shopify://collections/summer-collection",
+            "button_link": "shopify://collections/fall-collection",
             "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
@@ -579,12 +579,12 @@
       ],
       "settings": {
         "transparent_header": false,
-        "image": "shopify://shop_images/SPRING_FAVORITES_MV4_4.png",
+        "image": "shopify://shop_images/1920x655_Fall_Favorites.jpg",
         "image_height": "adapt",
         "content_width": "small",
         "content_position": "md:items-center md:justify-end",
         "text_alignment": "center",
-        "image_mobile": "shopify://shop_images/SPRING_FAVORITES_MIM2.png",
+        "image_mobile": "shopify://shop_images/655x456_Fall_Favorites.png",
         "image_height_mobile": "adapt",
         "content_position_mobile": "items-end justify-center",
         "text_alignment_mobile": "center",
