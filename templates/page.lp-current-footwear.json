@@ -88,7 +88,7 @@
         "content_width": "small",
         "image_height_mobile": "adapt",
         "accessibility_info": "Slideshow about our brand",
-        "color_text": "#171717",
+        "color_text": "#ffffff",
         "color_background": "rgba(0,0,0,0)",
         "gradient_background": "",
         "color_button_text": "#171717",
@@ -189,9 +189,9 @@
         "collection_UFADDM": {
           "type": "collection",
           "settings": {
-            "collection": "womens-wedges-heels",
-            "image": "shopify://shop_images/Wedges_Heels_ee9e52bb-58bc-4edc-85c2-5b6b70590fd1.png",
-            "title": "WEDGES & HEELS",
+            "collection": "loafers-oxfords",
+            "image": "shopify://shop_images/Casuals_2ed0a5bd-d5c0-401d-a8d3-0f617e069b02.png",
+            "title": "LOAFERS & OXFORDS",
             "description": "",
             "overlay_content": false,
             "color_text": "#171717",
