@@ -401,10 +401,10 @@
         "collapsible_tab_3dfxMx": {
           "type": "collapsible_tab",
           "settings": {
-            "icon": "star",
+            "icon": "shoe",
             "iwidth": "custom",
             "icon_width": 24,
-            "heading": "Key features",
+            "heading": "Details",
             "content": "<p>Use collapsible tabs for more detailed information that will help customers make a purchasing decision.</p><p>Ex: Shipping and return policies, size guides, and other common questions.</p>",
             "metafields": ""
           }
