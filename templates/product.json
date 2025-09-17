@@ -401,7 +401,7 @@
         "collapsible_tab_3dfxMx": {
           "type": "collapsible_tab",
           "settings": {
-            "icon": "lightning",
+            "icon": "star",
             "iwidth": "custom",
             "icon_width": 24,
             "heading": "Key features",
