@@ -995,72 +995,6 @@
         "divider": false,
         "rounded": false
       }
-    },
-    "image_with_text_g8WPGk": {
-      "type": "image-with-text",
-      "blocks": {
-        "text_HLEAkW": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Get free shipping, exclusive promotions and earn points on your purchases. It’s FREE and easy to join!</p>",
-            "text_font": "body",
-            "text_size": "subtext-custom",
-            "text_max_size": 22,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_yTfQhw": {
-          "type": "button",
-          "settings": {
-            "button_label": "Join Now",
-            "button_link": "shopify://pages/rewards",
-            "button_video_link": "",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": false
-          }
-        }
-      },
-      "block_order": [
-        "text_HLEAkW",
-        "button_yTfQhw"
-      ],
-      "name": "t:sections.image-with-text.name",
-      "settings": {
-        "image": "shopify://shop_images/woman-two-tone-background.png",
-        "img_url": "",
-        "image_height": "adapt",
-        "image_width": "medium",
-        "layout": "image_first",
-        "text_alignment": "center",
-        "custom_content_position": "items-center",
-        "image_mobile": "shopify://shop_images/woman-two-tone-background.png",
-        "image_height_mobile": "adapt",
-        "text_alignment_mobile": "left",
-        "color_text": "#000000",
-        "color_background": "#f0e6de",
-        "gradient_background": "",
-        "color_background_2": "",
-        "gradient_background_2": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "enable_parallax": true,
-        "parallax_direction": "vertical"
-      }
     }
   },
   "order": [
@@ -1071,7 +1005,6 @@
     "multicolumn_FeTBee",
     "image_with_text_overlay_TNKwpP",
     "rich_text_mVRDXW",
-    "scrolling_text_byhkGn",
-    "image_with_text_g8WPGk"
+    "scrolling_text_byhkGn"
   ]
 }
