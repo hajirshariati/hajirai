@@ -148,6 +148,14 @@
         "sticky_buy_button": {
           "type": "sticky_buy_button",
           "settings": {}
+        },
+        "icon_list_VBaw6z": {
+          "type": "icon_list",
+          "settings": {
+            "heading": "",
+            "enable_carousel": false,
+            "show_below_media": false
+          }
         }
       },
       "block_order": [
@@ -164,7 +172,8 @@
         "text-3",
         "text-2",
         "text-4",
-        "sticky_buy_button"
+        "sticky_buy_button",
+        "icon_list_VBaw6z"
       ],
       "settings": {
         "enable_sticky_info": true,
@@ -444,6 +453,7 @@
         },
         "specification_Qjh3nn": {
           "type": "specification",
+          "disabled": true,
           "repeater": "{{ product.metafields.product.details_icons.value }}",
           "settings": {
             "icon": "{{ block.repeater.icon.value }}",
