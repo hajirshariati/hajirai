@@ -413,7 +413,7 @@
       ],
       "settings": {
         "gap": "large",
-        "columns": 3,
+        "columns": 4,
         "columns_mobile": "1",
         "carousel_on_desktop": true,
         "swipe_on_mobile": true,
@@ -451,7 +451,7 @@
           "type": "collection",
           "settings": {
             "collection": "womens-new-arrivals",
-            "image": "shopify://shop_images/NewArrivals_605x480_c9dc832c-964c-49e0-a345-9ac3ebf9d5ba.png",
+            "image": "shopify://shop_images/600x480_Aubry_Tan3.jpg",
             "title": "New Arrivals",
             "description": "",
             "overlay_content": true,
@@ -464,7 +464,7 @@
           "type": "collection",
           "settings": {
             "collection": "womens-best-sellers-footwear",
-            "image": "shopify://shop_images/Best_sellers_605x480_2ed2d03a-2de3-4824-ab2d-30f7d31e2c6e.png",
+            "image": "shopify://shop_images/600x480_Danika_SkyBlue2.jpg",
             "title": "Best Sellers",
             "description": "",
             "overlay_content": true,
@@ -477,7 +477,7 @@
           "type": "collection",
           "settings": {
             "collection": "womens-sneakers",
-            "image": "shopify://shop_images/Sneakers_605x480_00ac39c0-6b39-47a1-b595-b220a968ff08.png",
+            "image": "shopify://shop_images/600x480_Reagan_red.jpg",
             "title": "Sneakers",
             "description": "",
             "overlay_content": true,
@@ -503,7 +503,7 @@
         "swipe_on_mobile": true,
         "heading": "",
         "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
         "subheading": "",
         "description": "",
