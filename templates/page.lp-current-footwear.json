@@ -727,8 +727,8 @@
         "button_MLhezL": {
           "type": "button",
           "settings": {
-            "button_label": "Watch Movie",
-            "button_link": "",
+            "button_label": "WATCH VIDEO",
+            "button_link": "https://rvq643.saas.contentserv.com/admin/rest/gtstream/stream/assets/Aetrex B2B/The_Aetrex_Technology_Difference.mp4",
             "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
@@ -745,12 +745,12 @@
       ],
       "settings": {
         "transparent_header": false,
-        "image": "shopify://shop_images/Aetrex_difference_1920x655_1.jpg",
+        "image": "shopify://shop_images/Aetrex_difference_1920x655_2.jpg",
         "image_height": "adapt",
         "content_width": "small",
         "content_position": "md:items-center md:justify-end",
         "text_alignment": "center",
-        "image_mobile": "shopify://shop_images/TECHNOLOGY_DIFFERENCE_M3.png",
+        "image_mobile": "shopify://shop_images/Aetrex_difference_655x418_525726a6-aa8c-4533-bb93-677420a70ccb.jpg",
         "image_height_mobile": "adapt",
         "content_position_mobile": "items-end justify-center",
         "text_alignment_mobile": "center",
