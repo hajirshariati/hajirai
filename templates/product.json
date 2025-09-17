@@ -21,14 +21,15 @@
         "title": {
           "type": "title",
           "settings": {
-            "title_size": "product-title-sm",
+            "title_size": "product-title-md",
             "title_size_mobile": "product-title-md",
-            "show_price": false,
-            "show_rating": false
+            "show_price": true,
+            "show_rating": true
           }
         },
         "price_TirYdK": {
           "type": "price",
+          "disabled": true,
           "settings": {
             "show_taxes_notice": false,
             "tooltip_heading": "MSRP",
@@ -64,6 +65,7 @@
         },
         "yotpo_product_reviews_star_rating_88eCgC": {
           "type": "shopify://apps/yotpo-product-reviews/blocks/star-rating/eb7dfd7d-db44-4334-bc49-c893b51b36cf",
+          "disabled": true,
           "settings": {
             "product": "{{product}}"
           }
