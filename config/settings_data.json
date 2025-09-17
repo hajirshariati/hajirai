@@ -92,7 +92,7 @@
     "swatch_config": "",
     "swatch_image_tooltip": true,
     "product_image_ratio": "adapt",
-    "product_image_fill": true,
+    "product_image_fill": false,
     "product_vendor": false,
     "product_secondary_image": true,
     "product_rating": false,
