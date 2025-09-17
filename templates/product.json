@@ -182,8 +182,8 @@
         "padding_top": 0,
         "padding_bottom": 28,
         "divider": false,
-        "full_width": false,
-        "rounded": false
+        "full_width": true,
+        "rounded": true
       }
     },
     "scrolling_text_4DH9VU": {
