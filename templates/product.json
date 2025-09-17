@@ -178,7 +178,7 @@
         "image_ratio_mobile": "adapt_first",
         "mobile_thumbnail": true,
         "padding_top": 0,
-        "padding_bottom": 4,
+        "padding_bottom": 28,
         "divider": false,
         "full_width": true,
         "rounded": false
@@ -308,15 +308,6 @@
         "rounded": false
       }
     },
-    "ugc_gallery_9emGbm": {
-      "type": "ugc-gallery",
-      "name": "UGC Gallery",
-      "settings": {
-        "custom_gallery": "{{ product.metafields.product.yotpo_gallery_id.value }}",
-        "global_pdp_sourced_gallery": "",
-        "global_fallback_sourced_gallery": "67c9dfd952921dee2bb9fc5c"
-      }
-    },
     "help-drawer": {
       "type": "help-drawer",
       "blocks": {
@@ -434,7 +425,7 @@
         "style": "with-border",
         "open_first_row": true,
         "specifications_heading": "Helps to relieve which foot pain",
-        "heading": "{{ product.title }}",
+        "heading": "",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
@@ -454,7 +445,7 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 72,
+        "padding_top": 28,
         "padding_bottom": 28,
         "divider": false,
         "full_width": true,
@@ -675,6 +666,15 @@
         "rounded": true,
         "enable_parallax": false,
         "parallax_direction": "vertical"
+      }
+    },
+    "ugc_gallery_9emGbm": {
+      "type": "ugc-gallery",
+      "name": "UGC Gallery",
+      "settings": {
+        "custom_gallery": "{{ product.metafields.product.yotpo_gallery_id.value }}",
+        "global_pdp_sourced_gallery": "",
+        "global_fallback_sourced_gallery": "67c9dfd952921dee2bb9fc5c"
       }
     },
     "17477533508981334f": {
