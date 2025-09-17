@@ -96,7 +96,6 @@
       "name": "t:sections.video-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
-        "video": "shopify://files/videos/OrthoticLPdesktop.mp4",
         "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
         "description": "",
         "enable_video_autoplay": true,
@@ -166,7 +165,7 @@
         "collection_xxeKq7": {
           "type": "collection",
           "settings": {
-            "collection": "orthotics-plantar-fasciitis",
+            "collection": "",
             "products": [],
             "title": "Plantar Fasciitis"
           }
@@ -296,7 +295,6 @@
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
-        "image": "shopify://shop_images/Screenshot_2025-05-04_at_7.25.17_PM.png",
         "image_height": "650px",
         "content_width": "large",
         "content_position": "md:items-end md:justify-start",
@@ -328,8 +326,6 @@
         "image_AE8JMC": {
           "type": "image",
           "settings": {
-            "image": "shopify://shop_images/before.png",
-            "image_mobile": "shopify://shop_images/after.png",
             "subheading": "",
             "heading": "Without Aetrex",
             "content_position": "end",
@@ -339,7 +335,6 @@
         "image_ezxGf9": {
           "type": "image",
           "settings": {
-            "image": "shopify://shop_images/after.png",
             "subheading": "",
             "heading": "With Aetrex",
             "content_position": "end",
@@ -389,8 +384,7 @@
         "collection_BMqtdJ": {
           "type": "collection",
           "settings": {
-            "collection": "walking-orthotics",
-            "image": "shopify://shop_images/20250512_1112_City_Walk_Sneakers_remix_01jv2grqbnffc955hw9gd45skj.png",
+            "collection": "",
             "title": "Walking",
             "description": "",
             "overlay_content": false,
@@ -402,8 +396,7 @@
         "collection_UwnQyA": {
           "type": "collection",
           "settings": {
-            "collection": "all-day-standing-orthotics",
-            "image": "shopify://shop_images/assets_task_01jv54kk6wexzs1p402wcd17ym_1747150649_img_0.webp",
+            "collection": "",
             "title": "Standing",
             "description": "",
             "overlay_content": false,
@@ -415,8 +408,7 @@
         "collection_hHkQLw": {
           "type": "collection",
           "settings": {
-            "collection": "running-orthotics",
-            "image": "shopify://shop_images/assets_task_01jv2rvpyte2xtt42ac2x8ekzn_1747071223_img_0.webp",
+            "collection": "",
             "title": "Running",
             "description": "",
             "overlay_content": false,
@@ -428,8 +420,7 @@
         "collection_FWgTeX": {
           "type": "collection",
           "settings": {
-            "collection": "gym-training",
-            "image": "shopify://shop_images/20250512_1121_Outdoor_Sneaker_Adventure_remix_01jv2h914mez09q0jgnzmczyv5.png",
+            "collection": "",
             "title": "Gym",
             "description": "",
             "overlay_content": false,
@@ -631,7 +622,7 @@
       "type": "blog-posts",
       "name": "Blog posts",
       "settings": {
-        "blog": "case-studies",
+        "blog": "",
         "post_limit": 3,
         "columns": 3,
         "carousel_on_desktop": false,
