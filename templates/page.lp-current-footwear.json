@@ -254,9 +254,9 @@
         "collection_tHYraX": {
           "type": "collection",
           "settings": {
-            "collection": "womens-clogs",
-            "image": "shopify://shop_images/Clog_6aa98460-00b3-41c4-8d51-b33a611b361e.png",
-            "title": "CLOGS",
+            "collection": "womens-sandals",
+            "image": "shopify://shop_images/Sandals_0e3a64ec-f790-4efd-b3ec-b1b92f015ed3.png",
+            "title": "SANDALS",
             "description": "",
             "overlay_content": false,
             "color_text": "#171717",
