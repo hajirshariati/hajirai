@@ -457,7 +457,7 @@
         "columns": 3,
         "columns_mobile": "1",
         "carousel_on_desktop": false,
-        "swipe_on_mobile": false,
+        "swipe_on_mobile": true,
         "heading": "",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
@@ -481,7 +481,7 @@
         "padding_top": 48,
         "padding_bottom": 48,
         "divider": false,
-        "full_width": false,
+        "full_width": true,
         "rounded": false
       }
     },
