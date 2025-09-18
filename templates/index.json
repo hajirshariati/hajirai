@@ -99,7 +99,9 @@
         "collection_hQM3j9": {
           "type": "collection",
           "settings": {
+            "link_type": "collection",
             "collection": "womens-shop-all-footwear",
+            "custom_url": "",
             "image": "shopify://shop_images/LeighChar_Womens_footwear_435x600_5fb32f05-04a8-4cfe-b0d9-843b3f8641be.jpg",
             "title": "Women's Footwear",
             "description": "See the Collection",
@@ -112,7 +114,9 @@
         "collection_pcPnMc": {
           "type": "collection",
           "settings": {
+            "link_type": "collection",
             "collection": "mens-shop-all-footwear",
+            "custom_url": "",
             "image": "shopify://shop_images/Graham_Charcoal_mens_footwear_435x600_dd80abe0-56b1-45d4-add7-6a277d6dd07a.jpg",
             "title": "Men's Footwear",
             "description": "See the Collection",
@@ -125,7 +129,9 @@
         "collection_9YDiHe": {
           "type": "collection",
           "settings": {
+            "link_type": "collection",
             "collection": "shop-all-orthotics",
+            "custom_url": "",
             "image": "shopify://shop_images/PMF2.webp",
             "title": "Orthotics Collection",
             "description": "Browse Orthotics",
@@ -138,7 +144,9 @@
         "collection_mT6zg6": {
           "type": "collection",
           "settings": {
+            "link_type": "url",
             "collection": "",
+            "custom_url": "https://irle3andv1z.typeform.com/to/gujvKvEg",
             "image": "shopify://shop_images/orthotics2.webp",
             "title": "Find Your Orthotics",
             "description": "Take the Quiz",
@@ -483,7 +491,9 @@
         "collection_KJAYNc": {
           "type": "collection",
           "settings": {
+            "link_type": "collection",
             "collection": "fall-collection",
+            "custom_url": "",
             "image": "shopify://shop_images/600x550_Reagan_Cognac.jpg",
             "title": "Fall Collection",
             "description": "",
@@ -496,7 +506,9 @@
         "collection_hC7yGr": {
           "type": "collection",
           "settings": {
+            "link_type": "collection",
             "collection": "",
+            "custom_url": "",
             "title": "",
             "description": "",
             "overlay_content": false,
@@ -508,7 +520,9 @@
         "collection_JNfAif": {
           "type": "collection",
           "settings": {
+            "link_type": "collection",
             "collection": "",
+            "custom_url": "",
             "title": "",
             "description": "",
             "overlay_content": false,
