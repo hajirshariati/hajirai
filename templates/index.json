@@ -166,7 +166,7 @@
       "name": "t:sections.collection-list.name",
       "settings": {
         "columns": 4,
-        "carousel_on_desktop": true,
+        "carousel_on_desktop": false,
         "image_type": "collection",
         "image_ratio": "adapt",
         "show_products_count": false,
@@ -193,130 +193,6 @@
         "padding_bottom": 48,
         "divider": false,
         "full_width": true,
-        "rounded": false
-      }
-    },
-    "multicolumn_fXhrkD": {
-      "type": "multicolumn",
-      "blocks": {
-        "column_H8T7JY": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image": "shopify://shop_images/LeighChar_Womens_footwear_435x600_5fb32f05-04a8-4cfe-b0d9-843b3f8641be.jpg",
-            "image_ratio": "adapt",
-            "heading": "Women's Footwear",
-            "heading_size": "text-lg-2xl",
-            "text": "",
-            "button_label": "See the Collection",
-            "button_link": "shopify://collections/womens-shop-all-footwear",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_WJJGyR": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image": "shopify://shop_images/Graham_Charcoal_mens_footwear_435x600_dd80abe0-56b1-45d4-add7-6a277d6dd07a.jpg",
-            "image_ratio": "adapt",
-            "heading": "Men's Footwear",
-            "heading_size": "text-lg-2xl",
-            "text": "",
-            "button_label": "See the Collection",
-            "button_link": "shopify://collections/mens-shop-all-footwear",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_rewkMN": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image": "shopify://shop_images/PMF2.webp",
-            "image_ratio": "adapt",
-            "heading": "Orthotics Collection",
-            "heading_size": "text-lg-2xl",
-            "text": "",
-            "button_label": "Browse Orthotics",
-            "button_link": "shopify://collections/shop-all-orthotics",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_kHEWtD": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image": "shopify://shop_images/orthotics2.webp",
-            "image_ratio": "adapt",
-            "heading": "Find Your Orthotics",
-            "heading_size": "text-lg-2xl",
-            "text": "",
-            "button_label": "Take the Quiz",
-            "button_link": "https://irle3andv1z.typeform.com/to/gujvKvEg",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "column_H8T7JY",
-        "column_WJJGyR",
-        "column_rewkMN",
-        "column_kHEWtD"
-      ],
-      "name": "t:sections.multicolumn.name",
-      "settings": {
-        "gap": "large",
-        "columns": 4,
-        "columns_mobile": "1",
-        "carousel_on_desktop": true,
-        "swipe_on_mobile": true,
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
         "rounded": false
       }
     },
@@ -485,86 +361,88 @@
         "parallax_direction": "vertical"
       }
     },
-    "collection_list_4MGtkJ": {
+    "collection_list_cLB6dX": {
       "type": "collection-list",
       "blocks": {
-        "collection_KJAYNc": {
+        "collection_FwLVtb": {
           "type": "collection",
           "settings": {
             "link_type": "collection",
             "collection": "fall-collection",
             "custom_url": "",
             "image": "shopify://shop_images/600x550_Reagan_Cognac.jpg",
-            "title": "Fall Collection",
-            "description": "",
+            "title": "FALL COLLECTION",
+            "description": "SHOP NOW",
             "overlay_content": true,
             "color_text": "#ffffff",
-            "color_overlay": "#000000",
+            "color_overlay": "rgba(0,0,0,0)",
             "overlay_opacity": 0
           }
         },
-        "collection_hC7yGr": {
+        "collection_9Ryhfw": {
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "",
+            "collection": "womens-best-sellers-footwear",
             "custom_url": "",
-            "title": "",
-            "description": "",
-            "overlay_content": false,
+            "image": "shopify://shop_images/600x550_Charlotte_butterYellow.jpg",
+            "title": "Best Sellers",
+            "description": "SHOP NOW",
+            "overlay_content": true,
             "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30
+            "color_overlay": "rgba(0,0,0,0)",
+            "overlay_opacity": 0
           }
         },
-        "collection_JNfAif": {
+        "collection_czGEyj": {
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "",
+            "collection": "shop-all-orthotics",
             "custom_url": "",
-            "title": "",
-            "description": "",
-            "overlay_content": false,
+            "image": "shopify://shop_images/600x550_Aubry_Taupe.jpg",
+            "title": "Sneakers Collection",
+            "description": "SHOP NOW",
+            "overlay_content": true,
             "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30
+            "color_overlay": "rgba(0,0,0,0)",
+            "overlay_opacity": 0
           }
         }
       },
       "block_order": [
-        "collection_KJAYNc",
-        "collection_hC7yGr",
-        "collection_JNfAif"
+        "collection_FwLVtb",
+        "collection_9Ryhfw",
+        "collection_czGEyj"
       ],
       "name": "t:sections.collection-list.name",
       "settings": {
-        "columns": 4,
-        "carousel_on_desktop": true,
+        "columns": 3,
+        "carousel_on_desktop": false,
         "image_type": "collection",
         "image_ratio": "adapt",
         "show_products_count": false,
         "show_view_all": false,
         "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
+        "swipe_on_mobile": false,
+        "heading": "Women's Footwear",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
         "subheading": "",
         "description": "",
-        "highlighted_text": "none",
+        "highlighted_text": "text",
         "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
+        "color_text": "#ffffff",
+        "color_background": "#ffffff",
         "gradient_background": "",
-        "color_highlight": "",
+        "color_highlight": "#ffffff",
         "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#171717",
         "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
+        "padding_top": 48,
+        "padding_bottom": 48,
         "divider": false,
         "full_width": true,
         "rounded": false
@@ -1188,10 +1066,9 @@
   "order": [
     "video_with_text_overlay_84weNe",
     "collection_list_kK69i9",
-    "multicolumn_fXhrkD",
     "video_with_text_overlay_3RJkWH",
     "image_with_text_overlay_ahU44t",
-    "collection_list_4MGtkJ",
+    "collection_list_cLB6dX",
     "multicolumn_FeTBee",
     "image_with_text_overlay_TNKwpP",
     "rich_text_mVRDXW",
