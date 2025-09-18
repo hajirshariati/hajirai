@@ -166,7 +166,7 @@
         "collection_xxeKq7": {
           "type": "collection",
           "settings": {
-            "collection": "",
+            "collection": "orthotics-plantar-fasciitis",
             "products": [],
             "title": "Plantar Fasciitis"
           }
@@ -190,7 +190,7 @@
         "collection_BbmnMe": {
           "type": "collection",
           "settings": {
-            "collection": "premium-memory-foam",
+            "collection": "all-day-standing-orthotics",
             "products": [],
             "title": "All Day Standing"
           }
@@ -206,7 +206,7 @@
         "collection_Uccwbn": {
           "type": "collection",
           "settings": {
-            "collection": "",
+            "collection": "orthotics-for-mortons-neuroma",
             "products": [],
             "title": "Morton’s Neuroma"
           }
@@ -254,30 +254,12 @@
     "image_with_text_overlay_M6AhUn": {
       "type": "image-with-text-overlay",
       "blocks": {
-        "subheading_HaxULK": {
-          "type": "subheading",
-          "settings": {
-            "subheading": "Why Aetrex Orthotics?",
-            "subheading_size": "subtitle-md",
-            "secondary_color": true
-          }
-        },
-        "heading_CE9MYn": {
-          "type": "heading",
-          "settings": {
-            "heading": "<p>Unmatched Technology for Real Relief</p>",
-            "heading_size": "title-lg tracking-heading",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
         "text_CVjrUt": {
           "type": "text",
           "settings": {
-            "text": "<p>Unlike generic orthotics, Aetrex products are designed from <strong>advanced foot mapping technology</strong>. With over  <strong>50 million foot scans</strong> and decades of experience, our orthotics are crafted to align with your unique foot shape and provide the <strong>most comfortable fit</strong> possible.</p>",
+            "text": "<p>The future of foot health starts here.<br/>Powered by data, guided by experience.</p>",
             "text_font": "body",
-            "text_size": "subtext-md",
+            "text_size": "subtext-custom",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -289,8 +271,6 @@
         }
       },
       "block_order": [
-        "subheading_HaxULK",
-        "heading_CE9MYn",
         "text_CVjrUt"
       ],
       "name": "t:sections.image-with-text-overlay.name",
