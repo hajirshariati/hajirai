@@ -27,30 +27,26 @@
     "video_with_text_overlay_TgKph8": {
       "type": "video-with-text-overlay",
       "blocks": {
-        "subheading_DQGQFg": {
-          "type": "subheading",
-          "disabled": true,
-          "settings": {
-            "subheading": "Add a tagline",
-            "subheading_size": "subtitle-md",
-            "secondary_color": true
-          }
-        },
-        "heading_64L34p": {
-          "type": "heading",
-          "settings": {
-            "heading": "<p>The Science of Comfort. Engineered for Your Feet.</p>",
-            "heading_size": "title-md",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
         "text_H4rWEH": {
           "type": "text",
           "settings": {
             "text": "<p>The Science Of 30 Million Foot Scans, Engineered Into Every Step.<br/></p>",
             "text_font": "heading",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_jPX4Q6": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Explore our range of Aetrex Orthotics, expertly designed to target different foot conditions,<br/>with support trusted by millions. </p>",
+            "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
@@ -72,26 +68,12 @@
             "button_external": false,
             "button_icon": true
           }
-        },
-        "button_AGih6p": {
-          "type": "button",
-          "settings": {
-            "button_label": "Shop All",
-            "button_link": "",
-            "button_video_link": "",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": true
-          }
         }
       },
       "block_order": [
-        "subheading_DQGQFg",
-        "heading_64L34p",
         "text_H4rWEH",
-        "button_PwAQDY",
-        "button_AGih6p"
+        "text_jPX4Q6",
+        "button_PwAQDY"
       ],
       "name": "t:sections.video-with-text-overlay.name",
       "settings": {
@@ -108,7 +90,7 @@
         "image_height_mobile": "auto",
         "content_position_mobile": "items-center justify-center",
         "text_alignment_mobile": "center",
-        "color_text": "#ffffff",
+        "color_text": "#171717",
         "color_highlight": "#e0a580",
         "gradient_highlight": "",
         "color_button_text": "#171717",
@@ -116,7 +98,7 @@
         "color_button_gradient": "",
         "color_overlay": "#171717",
         "divider_color": "#111111",
-        "overlay_opacity": 40,
+        "overlay_opacity": 0,
         "padding_top": 0,
         "padding_bottom": 56,
         "divider": false,
@@ -124,38 +106,57 @@
         "rounded": true
       }
     },
-    "scrolling_text_kzjffn": {
-      "type": "scrolling-text",
+    "rich_text_qnmcNt": {
+      "type": "rich-text",
       "blocks": {
-        "text_YAtRjd": {
+        "text_9pqJ6D": {
           "type": "text",
           "settings": {
-            "text": "Try for 30 Days  Risk-Free.",
-            "text_size": 30,
+            "text": "<p>Try it risk-free for 30 days | Clinically Proven To Reduce Foot, Knee Back & Hip Pain* |<br/>Recommended By Doctors & Podiatrists | Loved By Millions </p>",
             "text_font": "body",
-            "highlighted_text": "stencil",
-            "highlighted_scribble": "squiggle-underline"
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
           }
         }
       },
       "block_order": [
-        "text_YAtRjd"
+        "text_9pqJ6D"
       ],
-      "name": "Scrolling text",
+      "name": "t:sections.rich-text.name",
       "settings": {
-        "direction": "left",
-        "speed": 20,
-        "grid_horizontal": 70,
-        "enable_twin": false,
-        "enable_parallax": true,
-        "color_text": "",
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
         "color_background": "",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
-        "padding_top": 56,
-        "padding_bottom": 56,
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
         "divider": false,
+        "narrow": false,
         "rounded": false
       }
     },
@@ -755,7 +756,7 @@
   "order": [
     "main-page",
     "video_with_text_overlay_TgKph8",
-    "scrolling_text_kzjffn",
+    "rich_text_qnmcNt",
     "featured_collections_9d3ge7",
     "image_with_text_overlay_M6AhUn",
     "image_comparison_i6BATK",
