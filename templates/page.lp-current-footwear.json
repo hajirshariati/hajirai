@@ -651,14 +651,12 @@
     "image_with_text_overlay_cLVdgJ": {
       "type": "image-with-text-overlay",
       "blocks": {
-        "heading_XFBMp7": {
-          "type": "heading",
+        "subheading_rhiKn9": {
+          "type": "subheading",
           "settings": {
-            "heading": "<p>ATHLEISURE</p>",
-            "heading_size": "title-sm",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
+            "subheading": "ATHLEISURE",
+            "subheading_size": "subtitle-lg",
+            "secondary_color": true
           }
         },
         "divider_bFyxXA": {
@@ -698,7 +696,7 @@
         }
       },
       "block_order": [
-        "heading_XFBMp7",
+        "subheading_rhiKn9",
         "divider_bFyxXA",
         "text_Dd6NMF",
         "button_KN7cRW"
