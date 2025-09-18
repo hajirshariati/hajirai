@@ -110,7 +110,7 @@
             "button_label": "See the Collection",
             "button_link": "shopify://collections/womens-shop-all-footwear",
             "button_style": "primary",
-            "button_external": false,
+            "button_external": true,
             "button_icon": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -223,12 +223,12 @@
         "text_Vk4ikN": {
           "type": "text",
           "settings": {
-            "text": "<h2>Healthy Comfort<br/>Starts Here!</h2>",
+            "text": "<h2>Healthy Comfort<br/>Starts Here!®</h2>",
             "text_font": "body",
             "text_size": "subtext-custom",
-            "text_max_size": 30,
+            "text_max_size": 128,
             "text_line_height": 1.6,
-            "text_letter_spacing": 0,
+            "text_letter_spacing": 250,
             "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
@@ -356,9 +356,9 @@
       "settings": {
         "transparent_header": false,
         "image": "shopify://shop_images/Media_52.png",
-        "image_height": "650px",
+        "image_height": "100vh",
         "content_width": "small",
-        "content_position": "md:items-start md:justify-end",
+        "content_position": "md:items-center md:justify-end",
         "text_alignment": "center",
         "image_mobile": "shopify://shop_images/image_1_cb21f437-3b7f-4f69-ba55-684197d498e2.png",
         "image_height_mobile": "auto",
