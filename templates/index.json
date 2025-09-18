@@ -448,109 +448,6 @@
         "rounded": false
       }
     },
-    "multicolumn_FeTBee": {
-      "type": "multicolumn",
-      "blocks": {
-        "column_RkFFzT": {
-          "type": "column",
-          "settings": {
-            "show_border": true,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image": "shopify://shop_images/600x550_Reagan_Cognac.jpg",
-            "image_ratio": "adapt",
-            "heading": "Fall Collection",
-            "heading_size": "text-lg-2xl",
-            "text": "",
-            "button_label": "Shop Now",
-            "button_link": "shopify://collections/fall-collection",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_qhFj8L": {
-          "type": "column",
-          "settings": {
-            "show_border": true,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image": "shopify://shop_images/600x550_Charlotte_butterYellow.jpg",
-            "image_ratio": "adapt",
-            "heading": "Best Sellers",
-            "heading_size": "text-lg-2xl",
-            "text": "",
-            "button_label": "Shop Now",
-            "button_link": "shopify://collections/womens-best-sellers-footwear",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_88cfyV": {
-          "type": "column",
-          "settings": {
-            "show_border": true,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image": "shopify://shop_images/600x550_Aubry_Taupe.jpg",
-            "image_ratio": "adapt",
-            "heading": "Sneakers Collection",
-            "heading_size": "text-lg-2xl",
-            "text": "",
-            "button_label": "Shop Now",
-            "button_link": "shopify://collections/womens-sneakers",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "column_RkFFzT",
-        "column_qhFj8L",
-        "column_88cfyV"
-      ],
-      "name": "t:sections.multicolumn.name",
-      "settings": {
-        "gap": "large",
-        "columns": 3,
-        "columns_mobile": "1",
-        "carousel_on_desktop": false,
-        "swipe_on_mobile": false,
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 48,
-        "padding_bottom": 48,
-        "divider": false,
-        "full_width": false,
-        "rounded": false
-      }
-    },
     "image_with_text_overlay_TNKwpP": {
       "type": "image-with-text-overlay",
       "blocks": {
@@ -1069,7 +966,6 @@
     "video_with_text_overlay_3RJkWH",
     "image_with_text_overlay_ahU44t",
     "collection_list_cLB6dX",
-    "multicolumn_FeTBee",
     "image_with_text_overlay_TNKwpP",
     "rich_text_mVRDXW",
     "scrolling_text_byhkGn"
