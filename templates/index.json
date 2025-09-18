@@ -1047,7 +1047,7 @@
       "name": "t:sections.scrolling-text.name",
       "settings": {
         "direction": "left",
-        "speed": 13,
+        "speed": 5,
         "grid_horizontal": 70,
         "enable_twin": false,
         "enable_parallax": false,
