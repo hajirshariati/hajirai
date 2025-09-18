@@ -7,7 +7,7 @@
   }
 </style>
 
-<div class="section collection-list section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}">
+<div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}">
   <div class="page-width{% if section.settings.full_width %} page-width--full{% endif %} relative">
     {%- capture view_all -%}
       {%- if section.settings.show_view_all and section.blocks.size < collections.size -%}
@@ -45,20 +45,17 @@
     {%- endcapture -%}
     {%- render 'section-heading', section: section, section_button: indicators -%}
 
-    <slider-element id="Slider-{{ section.id }}" class="grid slider{% if section.settings.carousel_on_desktop %} slider--desktop{% endif %}{% if section.settings.swipe_on_mobile %} slider--tablet{% endif %}" selector=".card-grid>.card">
+    <slider-element id="Slider-{{ section.id }}" class="grid slider{% if section.settings.carousel_on_desktop %} slider--desktop{% endif %}{% if section.settings.swipe_on_mobile %} slider--tablet{% endif %}" selector=".card-grid>.card"{% if section.settings.carousel_on_desktop or section.settings.swipe_on_mobile %} tabindex="0"{% endif %}>
       <motion-list class="card-grid card-grid--{{ section.settings.columns }} mobile:card-grid--{{ section.settings.columns_mobile }} grid">
         {%- for block in section.blocks -%}
           {%- assign collection = collections[block.settings.collection] -%}
           {%- render 'collection-card',
             block: block,
             collection: collection,
-            heading_font_size: block.settings.heading_font_size,
             image_type: section.settings.image_type,
             image_ratio: section.settings.image_ratio,
             show_products_count: section.settings.show_products_count,
-            position: forloop.index,
-            card_text_position: block.settings.text_position,
-            title_shadow: block.settings.title_shadow,
+            position: forloop.index
           -%}
         {%- endfor -%}
       </motion-list>
@@ -246,51 +243,44 @@
       ],
       "default": "text-left md:items-end md:flex-row"
     },
+{
+  "type": "select",
+  "id": "heading_tag",
+  "options": [
     {
-      "type": "select",
-      "id": "heading_tag",
-      "options": [
-        {
-          "value": "h1",
-          "label": "t:sections.global.settings.heading_tag.options__1.label"
-        },
-        {
-          "value": "h2",
-          "label": "t:sections.global.settings.heading_tag.options__2.label"
-        },
-        {
-          "value": "h3",
-          "label": "t:sections.global.settings.heading_tag.options__3.label"
-        },
-        {
-          "value": "h4",
-          "label": "t:sections.global.settings.heading_tag.options__4.label"
-        },
-        {
-          "value": "h5",
-          "label": "t:sections.global.settings.heading_tag.options__5.label"
-        },
-        {
-          "value": "h6",
-          "label": "t:sections.global.settings.heading_tag.options__6.label"
-        },
-        {
-          "value": "div",
-          "label": "t:sections.global.settings.heading_tag.options__7.label"
-        },
-        {
-          "value": "span",
-          "label": "t:sections.global.settings.heading_tag.options__8.label"
-        },
-        {
-          "value": "p",
-          "label": "t:sections.global.settings.heading_tag.options__9.label"
-        }
-      ],
-      "default": "h2",
-      "label": "t:sections.global.settings.heading_tag.label",
-      "info": "t:sections.global.settings.heading_tag.info"
+      "value": "h1",
+      "label": "t:sections.global.settings.heading_tag.options__1.label"
     },
+    {
+      "value": "h2",
+      "label": "t:sections.global.settings.heading_tag.options__2.label"
+    },
+    {
+      "value": "h3",
+      "label": "t:sections.global.settings.heading_tag.options__3.label"
+    },
+    {
+      "value": "h4",
+      "label": "t:sections.global.settings.heading_tag.options__4.label"
+    },
+    {
+      "value": "h5",
+      "label": "t:sections.global.settings.heading_tag.options__5.label"
+    },
+    {
+      "value": "h6",
+      "label": "t:sections.global.settings.heading_tag.options__6.label"
+    },
+    {
+      "value": "p",
+      "label": "t:sections.global.settings.heading_tag.options__9.label"
+    }
+  ],
+  "default": "h2",
+  "label": "t:sections.global.settings.heading_tag.label",
+  "info": "t:sections.global.settings.heading_tag.info"
+},
+
     {
       "type": "text",
       "id": "subheading",
@@ -481,16 +471,6 @@
           "label": "t:sections.global.settings.title.label"
         },
         {
-          "type": "range",
-          "id": "heading_font_size",
-          "label": "Heading Size",
-          "min": 16,
-          "max": 50,
-          "step": 1,
-          "unit": "px",
-          "default": 16
-        },
-        {
           "type": "inline_richtext",
           "id": "description",
           "label": "t:sections.global.settings.description.label"
@@ -500,32 +480,6 @@
           "id": "overlay_content",
           "default": false,
           "label": "t:sections.main-list-collections.settings.overlay_content.label"
-        },
-        {
-          "type": "select",
-          "id": "text_position",
-          "options": [
-            {
-              "value": "top",
-              "label": "Top"
-            },
-            {
-              "value": "center",
-              "label": "Center"
-            },
-            {
-              "value": "bottom",
-              "label": "Bottom"
-            },
-          ],
-          "label": "Text Position",
-          "default": "bottom"
-        },
-        {
-          "type": "checkbox",
-          "id": "title_shadow",
-          "default": false,
-          "label": "Title Shadow"
         },
         {
           "type": "header",
@@ -558,7 +512,7 @@
   ],
   "presets": [
     {
-      "name": "t:sections.collection-list.presets.name",
+      "name": "t:sections.collection-list.name",
       "blocks": [
         {
           "type": "collection"
