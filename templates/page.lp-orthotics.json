@@ -176,7 +176,7 @@
           "settings": {
             "collection": "orthotics-for-flat-feet",
             "products": [],
-            "title": "Flat Feet"
+            "title": "Flat Feet Pain"
           }
         },
         "collection_Wzc8ka": {
@@ -192,7 +192,7 @@
           "settings": {
             "collection": "premium-memory-foam",
             "products": [],
-            "title": "Pressure Relief"
+            "title": "All Day Standing"
           }
         },
         "collection_3qxYYM": {
@@ -208,7 +208,7 @@
           "settings": {
             "collection": "",
             "products": [],
-            "title": "Running"
+            "title": "Morton’s Neuroma"
           }
         }
       },
@@ -228,12 +228,12 @@
         "show_view_all": false,
         "columns_mobile": "1",
         "swipe_on_mobile": true,
-        "heading": "Which Orthotic is Right for You?",
+        "heading": "",
         "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
         "subheading": "Different feet, different needs. Explore by pain point.",
-        "description": "",
+        "description": "<p>Which Aetrex Orthotic Is Right For You?</p>",
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "",
