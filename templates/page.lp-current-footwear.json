@@ -117,7 +117,7 @@
         "image_mobile": "shopify://shop_images/ashley_M.jpg",
         "image_height_mobile": "adapt",
         "content_position_mobile": "items-end justify-start",
-        "text_alignment_mobile": "left",
+        "text_alignment_mobile": "center",
         "color_text": "#ffffff",
         "color_highlight": "#e0a580",
         "gradient_highlight": "",
@@ -126,47 +126,67 @@
         "color_button_gradient": "",
         "color_overlay": "#171717",
         "divider_color": "#111111",
-        "overlay_opacity": 70,
+        "overlay_opacity": 0,
         "padding_top": 36,
         "padding_bottom": 36,
-        "divider": true,
+        "divider": false,
         "full_width": false,
         "rounded": false,
         "enable_parallax": false,
         "parallax_direction": "vertical"
       }
     },
-    "scrolling_text_tVKedi": {
-      "type": "scrolling-text",
+    "rich_text_PKdTPU": {
+      "type": "rich-text",
       "blocks": {
-        "text_T36ate": {
+        "text_7DJnxj": {
           "type": "text",
           "settings": {
-            "text": "30 DAY WEAR TEST , PLUS EASY RETURNS",
-            "text_size": 26,
+            "text": "<p>30 DAY WEAR TEST , PLUS EASY RETURNS</p>",
             "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         }
       },
       "block_order": [
-        "text_T36ate"
+        "text_7DJnxj"
       ],
+      "name": "t:sections.rich-text.name",
       "settings": {
-        "direction": "left",
-        "speed": 1,
-        "grid_horizontal": 75,
-        "enable_twin": false,
-        "enable_parallax": false,
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
         "color_text": "#171717",
         "color_background": "#efeae6",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
-        "padding_top": 16,
-        "padding_bottom": 16,
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
         "divider": false,
+        "narrow": true,
         "rounded": false
       }
     },
@@ -176,20 +196,24 @@
         "collection_6iykJg": {
           "type": "collection",
           "settings": {
+            "link_type": "collection",
             "collection": "womens-sneakers",
+            "custom_url": "",
             "image": "shopify://shop_images/Sneakers_9347202f-883a-4054-a367-840d1673a259.png",
             "title": "SNEAKERS",
             "description": "",
             "overlay_content": false,
             "color_text": "#171717",
-            "color_overlay": "#000000",
+            "color_overlay": "#171717",
             "overlay_opacity": 0
           }
         },
         "collection_UFADDM": {
           "type": "collection",
           "settings": {
+            "link_type": "collection",
             "collection": "loafers-oxfords",
+            "custom_url": "",
             "image": "shopify://shop_images/Casuals_2ed0a5bd-d5c0-401d-a8d3-0f617e069b02.png",
             "title": "LOAFERS & OXFORDS",
             "description": "",
@@ -202,7 +226,9 @@
         "collection_6NeXRg": {
           "type": "collection",
           "settings": {
+            "link_type": "collection",
             "collection": "womens-boots",
+            "custom_url": "",
             "image": "shopify://shop_images/Boots_31d6a537-6d19-4f8c-baf9-de93206db007.png",
             "title": "BOOTS",
             "description": "",
@@ -215,7 +241,9 @@
         "collection_b6zYFq": {
           "type": "collection",
           "settings": {
+            "link_type": "collection",
             "collection": "womens-clogs",
+            "custom_url": "",
             "image": "shopify://shop_images/Clog_6aa98460-00b3-41c4-8d51-b33a611b361e.png",
             "title": "CLOGS",
             "description": "",
@@ -228,7 +256,9 @@
         "collection_D7JLdh": {
           "type": "collection",
           "settings": {
+            "link_type": "collection",
             "collection": "womens-slippers",
+            "custom_url": "",
             "image": "shopify://shop_images/31206-FE200W_catalog.jpg",
             "title": "SLIPPERS",
             "description": "",
@@ -241,7 +271,9 @@
         "collection_AefeLJ": {
           "type": "collection",
           "settings": {
+            "link_type": "collection",
             "collection": "womens-wedges-heels",
+            "custom_url": "",
             "image": "shopify://shop_images/Wedges_Heels_ee9e52bb-58bc-4edc-85c2-5b6b70590fd1.png",
             "title": "WEDGES & HEELS",
             "description": "",
@@ -254,7 +286,9 @@
         "collection_tHYraX": {
           "type": "collection",
           "settings": {
+            "link_type": "collection",
             "collection": "womens-sandals",
+            "custom_url": "",
             "image": "shopify://shop_images/Sandals_0e3a64ec-f790-4efd-b3ec-b1b92f015ed3.png",
             "title": "SANDALS",
             "description": "",
@@ -267,7 +301,9 @@
         "collection_LCmgJQ": {
           "type": "collection",
           "settings": {
+            "link_type": "collection",
             "collection": "womens-flip-flop-sandals",
+            "custom_url": "",
             "image": "shopify://shop_images/flips_8c5c4a61-3b54-451e-acd8-35bdc2c948f6.png",
             "title": "FLIPS",
             "description": "",
@@ -298,12 +334,12 @@
         "show_view_all": false,
         "columns_mobile": "2",
         "swipe_on_mobile": false,
-        "heading": "WOMEN'S STYLES",
+        "heading": "",
         "heading_size": "title-sm",
         "heading_alignment": "text-center md:items-center",
         "heading_tag": "h3",
         "subheading": "",
-        "description": "",
+        "description": "<h3>WOMEN'S STYLES</h3>",
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "",
@@ -314,7 +350,7 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 36,
+        "padding_top": 48,
         "padding_bottom": 36,
         "divider": false,
         "full_width": true,
@@ -450,7 +486,9 @@
         "collection_YbUxUk": {
           "type": "collection",
           "settings": {
+            "link_type": "collection",
             "collection": "womens-new-arrivals",
+            "custom_url": "",
             "image": "shopify://shop_images/600x480_Aubry_Tan3.jpg",
             "title": "New Arrivals",
             "description": "",
@@ -463,7 +501,9 @@
         "collection_z3JcHD": {
           "type": "collection",
           "settings": {
+            "link_type": "collection",
             "collection": "womens-best-sellers-footwear",
+            "custom_url": "",
             "image": "shopify://shop_images/600x480_Danika_SkyBlue2.jpg",
             "title": "Best Sellers",
             "description": "",
@@ -476,7 +516,9 @@
         "collection_Y6AhJP": {
           "type": "collection",
           "settings": {
+            "link_type": "collection",
             "collection": "womens-boots",
+            "custom_url": "",
             "image": "shopify://shop_images/600x480_Reagan_red.jpg",
             "title": "ARCH SUPPORT BOOTS",
             "description": "",
@@ -846,7 +888,7 @@
     "main-page",
     "slideshow_FWtLKn",
     "image_with_text_overlay_e9GhwP",
-    "scrolling_text_tVKedi",
+    "rich_text_PKdTPU",
     "collection_list_q7Rypj",
     "multicolumn_9UNM8U",
     "collection_list_fgPMz9",
