@@ -112,9 +112,9 @@
         "text_9pqJ6D": {
           "type": "text",
           "settings": {
-            "text": "<p>Try it risk-free for 30 days | Clinically Proven To Reduce Foot, Knee Back & Hip Pain* |<br/>Recommended By Doctors & Podiatrists | Loved By Millions </p>",
+            "text": "<p>Try it risk-free for 30 days </p>",
             "text_font": "body",
-            "text_size": "subtext-md",
+            "text_size": "subtext-custom",
             "text_max_size": 32,
             "text_line_height": 1.2,
             "text_letter_spacing": 0,
@@ -145,8 +145,8 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "color_text": "#171717",
-        "color_background": "",
+        "color_text": "#ffffff",
+        "color_background": "#6c6c6c",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
