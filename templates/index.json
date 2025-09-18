@@ -15,12 +15,12 @@
         "text_LgtJTj": {
           "type": "text",
           "settings": {
-            "text": "<h2>The Aetrex <br/> Technology <br/> Difference</h2>",
+            "text": "<h2>The<br/>Aetrex <br/> Technology <br/> Difference</h2>",
             "text_font": "body",
             "text_size": "subtext-custom",
             "text_max_size": 30,
             "text_line_height": 1.6,
-            "text_letter_spacing": 0,
+            "text_letter_spacing": 5,
             "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
