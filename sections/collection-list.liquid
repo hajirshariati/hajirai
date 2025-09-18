@@ -48,15 +48,28 @@
     <slider-element id="Slider-{{ section.id }}" class="grid slider{% if section.settings.carousel_on_desktop %} slider--desktop{% endif %}{% if section.settings.swipe_on_mobile %} slider--tablet{% endif %}" selector=".card-grid>.card"{% if section.settings.carousel_on_desktop or section.settings.swipe_on_mobile %} tabindex="0"{% endif %}>
       <motion-list class="card-grid card-grid--{{ section.settings.columns }} mobile:card-grid--{{ section.settings.columns_mobile }} grid">
         {%- for block in section.blocks -%}
-          {%- assign collection = collections[block.settings.collection] -%}
-          {%- render 'collection-card',
-            block: block,
-            collection: collection,
-            image_type: section.settings.image_type,
-            image_ratio: section.settings.image_ratio,
-            show_products_count: section.settings.show_products_count,
-            position: forloop.index
-          -%}
+{%- if block.settings.link_type == 'url' and block.settings.custom_url != blank -%}
+  {%- render 'collection-card',
+    block: block,
+    custom_url: block.settings.custom_url,
+    image_type: section.settings.image_type,
+    image_ratio: section.settings.image_ratio,
+    show_products_count: false,
+    position: forloop.index
+  -%}
+{%- else -%}
+  {%- assign collection = collections[block.settings.collection] -%}
+  {%- render 'collection-card',
+    block: block,
+    collection: collection,
+    image_type: section.settings.image_type,
+    image_ratio: section.settings.image_ratio,
+    show_products_count: section.settings.show_products_count,
+    position: forloop.index
+  -%}
+{%- endif -%}
+
+
         {%- endfor -%}
       </motion-list>
 
@@ -452,63 +465,85 @@
   ],
   "blocks": [
     {
-      "type": "collection",
-      "name": "t:sections.global.blocks.collection.name",
-      "settings": [
+  "type": "collection",
+  "name": "t:sections.global.blocks.collection.name",
+  "settings": [
+    {
+      "type": "select",
+      "id": "link_type",
+      "label": "Link type",
+      "default": "collection",
+      "options": [
         {
-          "label": "t:sections.global.settings.collection.label",
-          "id": "collection",
-          "type": "collection"
+          "value": "collection",
+          "label": "Collection"
         },
         {
-          "type": "image_picker",
-          "id": "image",
-          "label": "t:sections.global.settings.image.label"
-        },
-        {
-          "type": "text",
-          "id": "title",
-          "label": "t:sections.global.settings.title.label"
-        },
-        {
-          "type": "inline_richtext",
-          "id": "description",
-          "label": "t:sections.global.settings.description.label"
-        },
-        {
-          "type": "checkbox",
-          "id": "overlay_content",
-          "default": false,
-          "label": "t:sections.main-list-collections.settings.overlay_content.label"
-        },
-        {
-          "type": "header",
-          "content": "t:sections.global.settings.header__colors.content"
-        },
-        {
-          "type": "color",
-          "id": "color_text",
-          "label": "t:sections.global.settings.color_text.label",
-          "default": "#ffffff"
-        },
-        {
-          "type": "color",
-          "id": "color_overlay",
-          "label": "t:sections.global.settings.color_overlay.label",
-          "default": "#000000"
-        },
-        {
-          "type": "range",
-          "id": "overlay_opacity",
-          "min": 0,
-          "max": 100,
-          "step": 1,
-          "unit": "%",
-          "label": "t:sections.global.settings.overlay_opacity.label",
-          "default": 30
+          "value": "url",
+          "label": "Custom URL"
         }
       ]
+    },
+    {
+      "label": "t:sections.global.settings.collection.label",
+      "id": "collection",
+      "type": "collection"
+    },
+    {
+      "type": "url",
+      "id": "custom_url",
+      "label": "Custom URL"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:sections.global.settings.image.label"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.global.settings.title.label"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "description",
+      "label": "t:sections.global.settings.description.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "overlay_content",
+      "default": false,
+      "label": "t:sections.main-list-collections.settings.overlay_content.label"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.global.settings.header__colors.content"
+    },
+    {
+      "type": "color",
+      "id": "color_text",
+      "label": "t:sections.global.settings.color_text.label",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "color_overlay",
+      "label": "t:sections.global.settings.color_overlay.label",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "label": "t:sections.global.settings.overlay_opacity.label",
+      "default": 30
     }
+  ]
+}
+
   ],
   "presets": [
     {

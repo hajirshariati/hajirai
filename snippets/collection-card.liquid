@@ -4,37 +4,38 @@
   Supports block overrides, product counts, and graceful onboarding placeholders.
 
   @param {object} [collection] - Shopify collection object (shows placeholder if nil)
+  @param {string} [custom_url] - Custom URL if link_type == url
   @param {string} [image_type] - Image source selection
-
-  - 'collection' - Uses collection.image - 'product' - Uses first product's featured image
-
   @param {string} [image_ratio] - Image aspect ratio class
-
-  - 'adapt' - Use image's natural ratio (defaults to 'wide' if no image) - 'square' - 1:1 ratio - 'portrait' - Portrait
-  ratio - 'landscape' - Landscape ratio - 'wide' - Wide ratio
-
   @param {boolean} [show_products_count] - Display product count badge
   @param {number} [position] - Card position for placeholder cycling (1-5)
   @param {object} [block] - Block object for content overrides
-
-  @example
-  {% render 'collection-card',
-     collection: collection,
-     image_type: 'product',
-     image_ratio: 'square',
-     show_products_count: true
-  %}
 {%- enddoc -%}
 
 {%- liquid
-  if image_type == 'collection' and collection.image
+  # choose link
+  assign link_url = blank
+  if custom_url != blank
+    assign link_url = custom_url
+  elsif collection
+    assign link_url = collection.url
+  endif
+
+  # choose image source
+  if image_type == 'collection' and collection and collection.image
     assign collection_image = collection.image
-  else
+  elsif collection and collection.products.size > 0
     assign collection_image = collection.products.first.featured_media.preview_image
   endif
 
-  assign collection_title = collection.title
+  # title with safe fallback
+  if collection
+    assign collection_title = collection.title
+  else
+    assign collection_title = 'Collection'
+  endif
 
+  # block overrides
   if block != blank
     if block.settings.image != blank
       assign collection_image = block.settings.image
@@ -51,6 +52,7 @@
     assign overlay_content = block.settings.overlay_content
   endif
 
+  # adapt ratio fallback
   if image_ratio == 'adapt' and collection_image == blank
     assign image_ratio = 'wide'
   endif
@@ -67,9 +69,10 @@
       }
     </style>
   {%- endif -%}
-  {%- if collection != blank -%}
+
+  {%- if link_url != blank -%}
     <a
-      href="{{ collection.url }}"
+      href="{{ link_url }}"
       class="media-card__link flex flex-col w-full h-full relative"
       aria-label="{{ collection_title | escape }}"
     >
@@ -84,6 +87,7 @@
           <span class="block aspect-{{ image_ratio }}"></span>
         {%- endif -%}
       </div>
+
       <div class="media-card__content flex justify-between items-center gap-4 w-full text-{{ settings.card_text_alignment }} text-postion-{{ card_text_position }}">
         <div class="media-card__text shrink-1 grid gap-0d5">
           <p>
@@ -92,7 +96,7 @@
               style="font-size: {{ heading_font_size }}px"
             >
               {{- collection_title | escape -}}
-              {%- if show_products_count and collection.all_products_count > 0 -%}
+              {%- if show_products_count and collection and collection.all_products_count > 0 -%}
                 <small class="count font-medium absolute text-xs tracking-none whitespace-nowrap">
                   {{- collection.all_products_count -}}
                 </small>
@@ -107,11 +111,7 @@
       </div>
     </a>
   {%- else -%}
-    <a
-      href="#"
-      class="media-card__link flex flex-col w-full h-full relative"
-      aria-label="{{ collection_title | escape }}"
-    >
+    <div class="media-card__link flex flex-col w-full h-full relative">
       <div class="media media--{{ image_ratio }} relative overflow-hidden">
         {%- liquid
           assign modulo = position | modulo: 5 | plus: 1
@@ -135,6 +135,6 @@
         </div>
         {%- render 'icon', icon: 'arrow-right', size: 'xs', class: 'transform shrink-0' -%}
       </div>
-    </a>
+    </div>
   {%- endif -%}
 </div>
