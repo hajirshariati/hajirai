@@ -15,24 +15,16 @@
         "text_LgtJTj": {
           "type": "text",
           "settings": {
-            "text": "<h2>The<br/>Aetrex <br/> Technology <br/> Difference</h2>",
-            "text_font": "subtitle",
-            "text_size": "subtext-lg",
-            "text_max_size": 128,
+            "text": "<h2>The Aetrex <br/> Technology <br/> Difference</h2>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 30,
             "text_line_height": 1.6,
-            "text_letter_spacing": 250,
+            "text_letter_spacing": 0,
             "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
-          }
-        },
-        "divider_BGfpAn": {
-          "type": "divider",
-          "settings": {
-            "divider_width": 120,
-            "divider_mt": 10,
-            "divider_mb": 10
           }
         },
         "text_ty3xHk": {
@@ -40,7 +32,7 @@
           "settings": {
             "text": "<p>How Aetrex uses <br/> foot scanning technology <br/> to develop footwear that’s <br/> better for your health</p>",
             "text_font": "body",
-            "text_size": "subtext-lg",
+            "text_size": "subtext-sm",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -65,7 +57,6 @@
       },
       "block_order": [
         "text_LgtJTj",
-        "divider_BGfpAn",
         "text_ty3xHk",
         "button_qiiHDC"
       ],
@@ -77,7 +68,7 @@
         "description": "",
         "enable_video_autoplay": true,
         "enable_video_looping": true,
-        "image_height": "100vh",
+        "image_height": "adapt",
         "content_width": "medium",
         "content_position": "md:items-center md:justify-end",
         "text_alignment": "center",
@@ -102,6 +93,101 @@
         "rounded": false
       }
     },
+    "collection_list_kK69i9": {
+      "type": "collection-list",
+      "blocks": {
+        "collection_hQM3j9": {
+          "type": "collection",
+          "settings": {
+            "collection": "womens-shop-all-footwear",
+            "image": "shopify://shop_images/LeighChar_Womens_footwear_435x600_5fb32f05-04a8-4cfe-b0d9-843b3f8641be.jpg",
+            "title": "Women's Footwear",
+            "description": "See the Collection",
+            "overlay_content": true,
+            "color_text": "#171717",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "collection_pcPnMc": {
+          "type": "collection",
+          "settings": {
+            "collection": "mens-shop-all-footwear",
+            "image": "shopify://shop_images/Graham_Charcoal_mens_footwear_435x600_dd80abe0-56b1-45d4-add7-6a277d6dd07a.jpg",
+            "title": "Men's Footwear",
+            "description": "See the Collection",
+            "overlay_content": true,
+            "color_text": "#171717",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "collection_9YDiHe": {
+          "type": "collection",
+          "settings": {
+            "collection": "shop-all-orthotics",
+            "image": "shopify://shop_images/PMF2.webp",
+            "title": "Orthotics Collection",
+            "description": "Browse Orthotics",
+            "overlay_content": true,
+            "color_text": "#171717",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "collection_mT6zg6": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "image": "shopify://shop_images/orthotics2.webp",
+            "title": "Find Your Orthotics",
+            "description": "Take the Quiz",
+            "overlay_content": true,
+            "color_text": "#171717",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0
+          }
+        }
+      },
+      "block_order": [
+        "collection_hQM3j9",
+        "collection_pcPnMc",
+        "collection_9YDiHe",
+        "collection_mT6zg6"
+      ],
+      "name": "t:sections.collection-list.name",
+      "settings": {
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "image_type": "collection",
+        "image_ratio": "adapt",
+        "show_products_count": false,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "Women's Footwear",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 48,
+        "padding_bottom": 48,
+        "divider": false,
+        "full_width": true,
+        "rounded": false
+      }
+    },
     "multicolumn_fXhrkD": {
       "type": "multicolumn",
       "blocks": {
@@ -119,7 +205,7 @@
             "button_label": "See the Collection",
             "button_link": "shopify://collections/womens-shop-all-footwear",
             "button_style": "primary",
-            "button_external": true,
+            "button_external": false,
             "button_icon": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -232,12 +318,12 @@
         "text_Vk4ikN": {
           "type": "text",
           "settings": {
-            "text": "<h2>Healthy Comfort<br/>Starts Here!®</h2>",
+            "text": "<h2>Healthy Comfort<br/>Starts Here! ®</h2>",
             "text_font": "body",
             "text_size": "subtext-custom",
-            "text_max_size": 128,
+            "text_max_size": 30,
             "text_line_height": 1.6,
-            "text_letter_spacing": 250,
+            "text_letter_spacing": 0,
             "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
@@ -365,9 +451,9 @@
       "settings": {
         "transparent_header": false,
         "image": "shopify://shop_images/Media_52.png",
-        "image_height": "100vh",
+        "image_height": "650px",
         "content_width": "small",
-        "content_position": "md:items-center md:justify-end",
+        "content_position": "md:items-start md:justify-end",
         "text_alignment": "center",
         "image_mobile": "shopify://shop_images/image_1_cb21f437-3b7f-4f69-ba55-684197d498e2.png",
         "image_height_mobile": "auto",
@@ -389,6 +475,85 @@
         "rounded": false,
         "enable_parallax": false,
         "parallax_direction": "vertical"
+      }
+    },
+    "collection_list_4MGtkJ": {
+      "type": "collection-list",
+      "blocks": {
+        "collection_KJAYNc": {
+          "type": "collection",
+          "settings": {
+            "collection": "fall-collection",
+            "image": "shopify://shop_images/600x550_Reagan_Cognac.jpg",
+            "title": "Fall Collection",
+            "description": "",
+            "overlay_content": true,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0
+          }
+        },
+        "collection_hC7yGr": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "title": "",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30
+          }
+        },
+        "collection_JNfAif": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "title": "",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30
+          }
+        }
+      },
+      "block_order": [
+        "collection_KJAYNc",
+        "collection_hC7yGr",
+        "collection_JNfAif"
+      ],
+      "name": "t:sections.collection-list.name",
+      "settings": {
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "image_type": "collection",
+        "image_ratio": "adapt",
+        "show_products_count": false,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": true,
+        "rounded": false
       }
     },
     "multicolumn_FeTBee": {
@@ -466,7 +631,7 @@
         "columns": 3,
         "columns_mobile": "1",
         "carousel_on_desktop": false,
-        "swipe_on_mobile": true,
+        "swipe_on_mobile": false,
         "heading": "",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
@@ -490,7 +655,7 @@
         "padding_top": 48,
         "padding_bottom": 48,
         "divider": false,
-        "full_width": true,
+        "full_width": false,
         "rounded": false
       }
     },
@@ -549,9 +714,9 @@
       "settings": {
         "transparent_header": false,
         "image": "shopify://shop_images/1920x655_aetrex_difference_Dahlia.jpg",
-        "image_height": "100vh",
+        "image_height": "650px",
         "content_width": "small",
-        "content_position": "md:items-center md:justify-end",
+        "content_position": "md:items-start md:justify-end",
         "text_alignment": "center",
         "image_mobile": "shopify://shop_images/difference_Dahlia4.jpg",
         "image_height_mobile": "auto",
@@ -1008,9 +1173,11 @@
   },
   "order": [
     "video_with_text_overlay_84weNe",
+    "collection_list_kK69i9",
     "multicolumn_fXhrkD",
     "video_with_text_overlay_3RJkWH",
     "image_with_text_overlay_ahU44t",
+    "collection_list_4MGtkJ",
     "multicolumn_FeTBee",
     "image_with_text_overlay_TNKwpP",
     "rich_text_mVRDXW",
