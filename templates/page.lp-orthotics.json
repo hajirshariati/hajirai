@@ -49,8 +49,8 @@
         "text_H4rWEH": {
           "type": "text",
           "settings": {
-            "text": "<p>Crafted from millions of foot scans, our orthotics provide personalized support to relieve pain, improve posture, and keep you moving with ease.</p>",
-            "text_font": "body",
+            "text": "<p>The Science Of 30 Million Foot Scans, Engineered Into Every Step.<br/></p>",
+            "text_font": "heading",
             "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
@@ -384,7 +384,9 @@
         "collection_BMqtdJ": {
           "type": "collection",
           "settings": {
+            "link_type": "collection",
             "collection": "",
+            "custom_url": "",
             "title": "Walking",
             "description": "",
             "overlay_content": false,
@@ -396,7 +398,9 @@
         "collection_UwnQyA": {
           "type": "collection",
           "settings": {
+            "link_type": "collection",
             "collection": "",
+            "custom_url": "",
             "title": "Standing",
             "description": "",
             "overlay_content": false,
@@ -408,7 +412,9 @@
         "collection_hHkQLw": {
           "type": "collection",
           "settings": {
+            "link_type": "collection",
             "collection": "",
+            "custom_url": "",
             "title": "Running",
             "description": "",
             "overlay_content": false,
@@ -420,7 +426,9 @@
         "collection_FWgTeX": {
           "type": "collection",
           "settings": {
+            "link_type": "collection",
             "collection": "",
+            "custom_url": "",
             "title": "Gym",
             "description": "",
             "overlay_content": false,
@@ -432,7 +440,9 @@
         "collection_wPrGdz": {
           "type": "collection",
           "settings": {
+            "link_type": "collection",
             "collection": "tennis-pickleball-orthotics",
+            "custom_url": "",
             "title": "Tennis & Pickeball",
             "description": "",
             "overlay_content": false,
