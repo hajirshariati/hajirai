@@ -95,13 +95,19 @@
             "show_back_in_stock_phone": false
           }
         },
+        "klaviyo_email_marketing_sms_form_embed_block_qDg68M": {
+          "type": "shopify://apps/klaviyo-email-marketing-sms/blocks/form-embed-block/2632fe16-c075-4321-a88b-50b567f42507",
+          "settings": {
+            "formId": "UZG2CK"
+          }
+        },
         "complementary": {
           "type": "complementary",
           "settings": {
             "heading": "Pairs well with",
             "product_limit": 4,
             "show_vendor": false,
-            "show_price": true
+            "show_price": false
           }
         },
         "icon_list_VBaw6z": {
@@ -152,6 +158,29 @@
             "text_size": "text-sm"
           }
         },
+        "aetrex_fitai_pdp_size_recommendation_gUEcCb": {
+          "type": "shopify://apps/aetrex-fitai/blocks/PDPSizeRecommendation/6c991f1a-1e7d-4325-983c-2984a2e41236",
+          "settings": {
+            "ProductPage": true,
+            "tab_background": "#f2f2f2",
+            "tab_foreground": "#5c6271",
+            "active_tab_background": "#5c6271",
+            "acitve_tab_foreground": "#fff",
+            "button_background": "#f2f2f2",
+            "button_foreground": "#5c6271",
+            "acive_button_background": "#5c6271",
+            "acive_button_foreground": "#fff",
+            "size_color": "#d60000",
+            "result_header_background": "#d06263",
+            "result_header_foreground": "#fff",
+            "result_content_background": "#F1F1F1",
+            "result_content_foreground": "#707070",
+            "result_footer_background": "#c8c8c8",
+            "result_footer_foreground": "#363636",
+            "popup_title_background": "#c8c8c8",
+            "popup_title_foreground": "#363636"
+          }
+        },
         "sticky_buy_button": {
           "type": "sticky_buy_button",
           "settings": {}
@@ -166,12 +195,14 @@
         "variant_picker",
         "true_fit_widget_8cjNbr",
         "buy_buttons",
+        "klaviyo_email_marketing_sms_form_embed_block_qDg68M",
         "complementary",
         "icon_list_VBaw6z",
         "text-1",
         "text-3",
         "text-2",
         "text-4",
+        "aetrex_fitai_pdp_size_recommendation_gUEcCb",
         "sticky_buy_button"
       ],
       "settings": {
