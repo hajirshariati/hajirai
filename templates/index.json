@@ -493,6 +493,14 @@
             "highlighted_scribble": "circle"
           }
         },
+        "divider_AEFVy3": {
+          "type": "divider",
+          "settings": {
+            "divider_width": 120,
+            "divider_mt": 0,
+            "divider_mb": 5
+          }
+        },
         "text_xMJiMQ": {
           "type": "text",
           "settings": {
@@ -523,6 +531,7 @@
       },
       "block_order": [
         "text_rRj3Np",
+        "divider_AEFVy3",
         "text_xMJiMQ",
         "button_AEVmYq"
       ],
