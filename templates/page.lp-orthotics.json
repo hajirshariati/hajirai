@@ -435,7 +435,7 @@
         "subheading_HaxULK": {
           "type": "subheading",
           "settings": {
-            "subheading": "Why Aetrex Orthotics?",
+            "subheading": "Data-Driven Comfort, Backed by 50 Million Scans",
             "subheading_size": "subtitle-md",
             "secondary_color": true
           }
@@ -443,8 +443,8 @@
         "heading_CE9MYn": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Unmatched Technology for Real Relief</p>",
-            "heading_size": "title-lg tracking-heading",
+            "heading": "<p><strong>Foot Scanning Technology that powers our orthotics</strong></p>",
+            "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -453,7 +453,7 @@
         "text_CVjrUt": {
           "type": "text",
           "settings": {
-            "text": "<p>Unlike generic orthotics, Aetrex products are designed from <strong>advanced foot mapping technology</strong>. With over  <strong>50 million foot scans</strong> and decades of experience, our orthotics are crafted to align with your unique foot shape and provide the <strong>most comfortable fit</strong> possible.</p>",
+            "text": "<p>Aetrex’s advanced foot scanners capture millions of data points on arch type, pressure points, and alignment. We use this real-world data to design orthotics that deliver personalized support, superior comfort, and proven relief from common foot pain.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -532,7 +532,7 @@
         "image_height_mobile": "auto",
         "heading": "<strong>See the Difference. Feel the Relief.</strong>",
         "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
+        "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
         "subheading": "Our orthotics don’t just cushion — they correct.",
         "description": "<p>With and without Aetrex orthotics, the contrast is clear: less pressure, better alignment, and real comfort you can see.</p>",
@@ -745,8 +745,17 @@
         "question_PtH3YU": {
           "type": "question",
           "settings": {
-            "title": "<strong>How do I know which orthotics are right for me?</strong>",
+            "title": "<strong>How do orthotics work?</strong> ",
             "text": "<p>Our easy-to-use quiz can help you find the perfect fit based on your lifestyle and foot type.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_XpAeUz": {
+          "type": "question",
+          "settings": {
+            "title": "<strong>Are orthotics the same as insoles?</strong> ",
+            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -754,7 +763,16 @@
         "question_HFPm8X": {
           "type": "question",
           "settings": {
-            "title": "<strong>Can I wear them in any shoe?</strong>",
+            "title": "<strong>Can Orthotics Help With Plantar Fasciitis?</strong> ",
+            "text": "<p>Yes, our orthotics are designed to fit most types of shoes, from sneakers to dress shoes.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_HKXX4p": {
+          "type": "question",
+          "settings": {
+            "title": "<strong>Do I need Orthotics if I have Flat Feet?</strong> ",
             "text": "<p>Yes, our orthotics are designed to fit most types of shoes, from sneakers to dress shoes.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -763,7 +781,25 @@
         "question_xpY86j": {
           "type": "question",
           "settings": {
-            "title": "<strong>How long will it take to feel the difference?</strong>",
+            "title": "<strong>How long will it take for Orthotics to relieve foot pain?</strong> ",
+            "text": "<p>Most customers feel a difference in comfort within the first few days. However, for full adaptation, it may take up to a week.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_pFxxpt": {
+          "type": "question",
+          "settings": {
+            "title": "<strong>Do Orthotics help with overpronation?</strong> ",
+            "text": "<p>Yes, our orthotics are designed to fit most types of shoes, from sneakers to dress shoes.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_H3pMh4": {
+          "type": "question",
+          "settings": {
+            "title": "<strong>How do I know which Orthotics are right for me?</strong> ",
             "text": "<p>Most customers feel a difference in comfort within the first few days. However, for full adaptation, it may take up to a week.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -772,8 +808,12 @@
       },
       "block_order": [
         "question_PtH3YU",
+        "question_XpAeUz",
         "question_HFPm8X",
-        "question_xpY86j"
+        "question_HKXX4p",
+        "question_xpY86j",
+        "question_pFxxpt",
+        "question_H3pMh4"
       ],
       "name": "FAQ",
       "settings": {
@@ -824,11 +864,11 @@
         "show_comments": true,
         "show_author": false,
         "show_excerpt": true,
-        "heading": "<strong>Built on Proof, Not Promises</strong>",
+        "heading": "<strong>Backed by Science: Real Results from Clinical Trials on Aetrex Orthotics</strong>",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
-        "subheading": "CLINICAL STUDIES",
+        "subheading": "BUILT ON PROOF, NOT PROMISES..",
         "description": "<p>We don’t guess — we measure. Independent clinical studies have validated the effectiveness of Aetrex orthotics in delivering meaningful pressure relief and biomechanical support. Because your comfort should be proven, not promised.</p>",
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
