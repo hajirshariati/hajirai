@@ -95,12 +95,6 @@
             "show_back_in_stock_phone": false
           }
         },
-        "klaviyo_email_marketing_sms_form_embed_block_qDg68M": {
-          "type": "shopify://apps/klaviyo-email-marketing-sms/blocks/form-embed-block/2632fe16-c075-4321-a88b-50b567f42507",
-          "settings": {
-            "formId": "UZG2CK"
-          }
-        },
         "complementary": {
           "type": "complementary",
           "settings": {
@@ -108,6 +102,12 @@
             "product_limit": 4,
             "show_vendor": false,
             "show_price": false
+          }
+        },
+        "klaviyo_email_marketing_sms_form_embed_block_qDg68M": {
+          "type": "shopify://apps/klaviyo-email-marketing-sms/blocks/form-embed-block/2632fe16-c075-4321-a88b-50b567f42507",
+          "settings": {
+            "formId": "UZG2CK"
           }
         },
         "icon_list_VBaw6z": {
@@ -195,8 +195,8 @@
         "variant_picker",
         "true_fit_widget_8cjNbr",
         "buy_buttons",
-        "klaviyo_email_marketing_sms_form_embed_block_qDg68M",
         "complementary",
+        "klaviyo_email_marketing_sms_form_embed_block_qDg68M",
         "icon_list_VBaw6z",
         "text-1",
         "text-3",
