@@ -296,6 +296,81 @@
         "rounded": false
       }
     },
+    "image_with_text_z3gkM9": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_wC4LiG": {
+          "type": "heading",
+          "settings": {
+            "heading": "Image with text",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_6VMEBX": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_RKmQHj": {
+          "type": "button",
+          "settings": {
+            "button_label": "Button label",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": true
+          }
+        }
+      },
+      "block_order": [
+        "heading_wC4LiG",
+        "text_6VMEBX",
+        "button_RKmQHj"
+      ],
+      "name": "t:sections.image-with-text.name",
+      "settings": {
+        "img_url": "",
+        "image_height": "650px",
+        "image_width": "medium",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": true,
+        "parallax_direction": "vertical"
+      }
+    },
     "image_with_text_overlay_M6AhUn": {
       "type": "image-with-text-overlay",
       "blocks": {
@@ -518,10 +593,10 @@
         "rounded": false
       }
     },
-    "testimonials_banner_P8DMGU": {
-      "type": "testimonials-banner",
+    "reveal_testimonials_gaxcCz": {
+      "type": "reveal-testimonials",
       "blocks": {
-        "testimonial_CRjWCe": {
+        "testimonial_btpraL": {
           "type": "testimonial",
           "settings": {
             "icon": "quote",
@@ -534,7 +609,7 @@
             "highlighted_scribble": "circle"
           }
         },
-        "testimonial_RnLxLb": {
+        "testimonial_pk9Pe9": {
           "type": "testimonial",
           "settings": {
             "icon": "quote",
@@ -547,7 +622,33 @@
             "highlighted_scribble": "circle"
           }
         },
-        "testimonial_GUBLhy": {
+        "testimonial_icwcHK": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_8A6XiF": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_xjYkNb": {
           "type": "testimonial",
           "settings": {
             "icon": "quote",
@@ -562,28 +663,29 @@
         }
       },
       "block_order": [
-        "testimonial_CRjWCe",
-        "testimonial_RnLxLb",
-        "testimonial_GUBLhy"
+        "testimonial_btpraL",
+        "testimonial_pk9Pe9",
+        "testimonial_icwcHK",
+        "testimonial_8A6XiF",
+        "testimonial_xjYkNb"
       ],
-      "name": "Testimonials banner",
+      "name": "t:sections.reveal-testimonials.name",
       "settings": {
-        "transparent_header": false,
-        "image_height": "650px",
-        "content_position": "md:items-center md:justify-center",
-        "image_height_mobile": "auto",
-        "content_position_mobile": "items-center justify-center",
-        "color_text": "#ffffff",
-        "color_highlight": "#e0a580",
+        "heading": "What people are saying",
+        "heading_size": "title-md",
+        "heading_tag": "h2",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
         "gradient_highlight": "",
-        "color_overlay": "#171717",
-        "overlay_opacity": 70,
-        "padding_top": 0,
-        "padding_bottom": 0,
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
         "divider": false,
-        "rounded": false,
-        "enable_parallax": true,
-        "parallax_direction": "vertical"
+        "rounded": false
       }
     },
     "blog_posts_PJxFGa": {
@@ -830,176 +932,6 @@
         "rounded": false,
         "enable_parallax": true
       }
-    },
-    "reveal_testimonials_gaxcCz": {
-      "type": "reveal-testimonials",
-      "blocks": {
-        "testimonial_btpraL": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "testimonial_pk9Pe9": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "testimonial_icwcHK": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "testimonial_8A6XiF": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "testimonial_xjYkNb": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "testimonial_btpraL",
-        "testimonial_pk9Pe9",
-        "testimonial_icwcHK",
-        "testimonial_8A6XiF",
-        "testimonial_xjYkNb"
-      ],
-      "name": "t:sections.reveal-testimonials.name",
-      "settings": {
-        "heading": "What people are saying",
-        "heading_size": "title-md",
-        "heading_tag": "h2",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "rounded": false
-      }
-    },
-    "image_with_text_z3gkM9": {
-      "type": "image-with-text",
-      "blocks": {
-        "heading_wC4LiG": {
-          "type": "heading",
-          "settings": {
-            "heading": "Image with text",
-            "heading_size": "title-md",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_6VMEBX": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_RKmQHj": {
-          "type": "button",
-          "settings": {
-            "button_label": "Button label",
-            "button_link": "",
-            "button_video_link": "",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": true
-          }
-        }
-      },
-      "block_order": [
-        "heading_wC4LiG",
-        "text_6VMEBX",
-        "button_RKmQHj"
-      ],
-      "name": "t:sections.image-with-text.name",
-      "settings": {
-        "img_url": "",
-        "image_height": "650px",
-        "image_width": "medium",
-        "layout": "image_first",
-        "text_alignment": "left",
-        "custom_content_position": "items-center",
-        "image_height_mobile": "auto",
-        "text_alignment_mobile": "left",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_background_2": "",
-        "gradient_background_2": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "enable_parallax": true,
-        "parallax_direction": "vertical"
-      }
     }
   },
   "order": [
@@ -1011,11 +943,10 @@
     "image_with_text_overlay_M6AhUn",
     "image_comparison_i6BATK",
     "collection_list_mPHCpz",
-    "testimonials_banner_P8DMGU",
+    "reveal_testimonials_gaxcCz",
     "blog_posts_PJxFGa",
     "faq_XM3i3D",
     "rich_text_VUBDw6",
-    "images_with_text_overlay_pgicH3",
-    "reveal_testimonials_gaxcCz"
+    "images_with_text_overlay_pgicH3"
   ]
 }
