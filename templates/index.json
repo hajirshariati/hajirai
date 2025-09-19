@@ -27,12 +27,20 @@
             "highlighted_scribble": "circle"
           }
         },
+        "divider_nd3AeW": {
+          "type": "divider",
+          "settings": {
+            "divider_width": 120,
+            "divider_mt": 0,
+            "divider_mb": 5
+          }
+        },
         "text_ty3xHk": {
           "type": "text",
           "settings": {
             "text": "<p>How Aetrex uses <br/> foot scanning technology <br/> to develop footwear that’s <br/> better for your health</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -57,6 +65,7 @@
       },
       "block_order": [
         "text_LgtJTj",
+        "divider_nd3AeW",
         "text_ty3xHk",
         "button_qiiHDC"
       ],
@@ -104,7 +113,7 @@
             "custom_url": "",
             "image": "shopify://shop_images/LeighChar_Womens_footwear_435x600_5fb32f05-04a8-4cfe-b0d9-843b3f8641be.jpg",
             "title": "Women's Footwear",
-            "description": "See the Collection",
+            "description": "",
             "overlay_content": true,
             "color_text": "#171717",
             "color_overlay": "rgba(0,0,0,0)",
@@ -119,7 +128,7 @@
             "custom_url": "",
             "image": "shopify://shop_images/Graham_Charcoal_mens_footwear_435x600_dd80abe0-56b1-45d4-add7-6a277d6dd07a.jpg",
             "title": "Men's Footwear",
-            "description": "See the Collection",
+            "description": "",
             "overlay_content": true,
             "color_text": "#171717",
             "color_overlay": "rgba(0,0,0,0)",
@@ -134,7 +143,7 @@
             "custom_url": "",
             "image": "shopify://shop_images/PMF2.webp",
             "title": "Orthotics Collection",
-            "description": "Browse Orthotics",
+            "description": "",
             "overlay_content": true,
             "color_text": "#171717",
             "color_overlay": "rgba(0,0,0,0)",
@@ -149,7 +158,7 @@
             "custom_url": "https://irle3andv1z.typeform.com/to/gujvKvEg",
             "image": "shopify://shop_images/orthotics2.webp",
             "title": "Find Your Orthotics",
-            "description": "Take the Quiz",
+            "description": "",
             "overlay_content": true,
             "color_text": "#171717",
             "color_overlay": "rgba(0,0,0,0)",
