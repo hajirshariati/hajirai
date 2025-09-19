@@ -124,38 +124,89 @@
         "rounded": true
       }
     },
-    "scrolling_text_kzjffn": {
-      "type": "scrolling-text",
+    "multicolumn_with_icons_C37PFY": {
+      "type": "multicolumn-with-icons",
       "blocks": {
-        "text_YAtRjd": {
-          "type": "text",
+        "column_fdpN6e": {
+          "type": "column",
           "settings": {
-            "text": "Try for 30 Days  Risk-Free.",
-            "text_size": 30,
-            "text_font": "body",
-            "highlighted_text": "stencil",
-            "highlighted_scribble": "squiggle-underline"
+            "icon": "shield",
+            "custom_icon": "",
+            "heading": "<strong>Try It Risk-Free for 30 Days</strong>",
+            "text": "<p>Experience the difference without the worry. If you’re not completely satisfied, simply return within 30 days—no questions asked.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_xgmmV3": {
+          "type": "column",
+          "settings": {
+            "icon": "award",
+            "custom_icon": "",
+            "heading": "<strong>Clinically Proven to Reduce Pain</strong>*",
+            "text": "<p>Our orthotics are backed by clinical studies showing significant reduction in foot, knee, back, and hip pain—helping you move with confidence.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_kYia3a": {
+          "type": "column",
+          "settings": {
+            "icon": "users",
+            "custom_icon": "",
+            "heading": "<strong>Recommended by Doctors & Podiatrists</strong>",
+            "text": "<p>Leading health professionals trust and recommend our products for their patients, because they’re designed with science and comfort in mind.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_DNrLDF": {
+          "type": "column",
+          "settings": {
+            "icon": "heart",
+            "custom_icon": "",
+            "heading": "Loved by Millions",
+            "text": "<p>Join a growing community of people who’ve found relief and comfort with our footwear—millions of happy steps and counting.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
           }
         }
       },
       "block_order": [
-        "text_YAtRjd"
+        "column_fdpN6e",
+        "column_xgmmV3",
+        "column_kYia3a",
+        "column_DNrLDF"
       ],
-      "name": "Scrolling text",
+      "name": "t:sections.multicolumn-with-icons.name",
       "settings": {
-        "direction": "left",
-        "speed": 20,
-        "grid_horizontal": 70,
-        "enable_twin": false,
-        "enable_parallax": true,
+        "style": "with-border",
+        "columns": 4,
+        "text_alignment": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
         "color_text": "",
         "color_background": "",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
-        "padding_top": 56,
-        "padding_bottom": 56,
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
         "divider": false,
+        "full_width": false,
         "rounded": false
       }
     },
@@ -755,7 +806,7 @@
   "order": [
     "main-page",
     "video_with_text_overlay_TgKph8",
-    "scrolling_text_kzjffn",
+    "multicolumn_with_icons_C37PFY",
     "featured_collections_9d3ge7",
     "image_with_text_overlay_M6AhUn",
     "image_comparison_i6BATK",
