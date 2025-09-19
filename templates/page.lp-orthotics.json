@@ -40,7 +40,7 @@
           "type": "heading",
           "settings": {
             "heading": "<h3>The Science Of 50 Million Foot Scans, Engineered Into Every Step.</h3>",
-            "heading_size": "title-md",
+            "heading_size": "title-sm",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
