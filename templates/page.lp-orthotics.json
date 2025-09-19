@@ -401,7 +401,7 @@
         "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
         "subheading": "The future of foot health starts here. ",
-        "description": "<p>Our orthotics don’t just cushion — they correct.</p>",
+        "description": "",
         "button_label": "",
         "button_link": "",
         "button_external": false,
@@ -501,7 +501,7 @@
           "type": "image",
           "settings": {
             "subheading": "",
-            "heading": "ARCH SUPPORT",
+            "heading": "Without Aetrex",
             "content_position": "end",
             "color_text": "#2c2c2c"
           }
@@ -510,7 +510,7 @@
           "type": "image",
           "settings": {
             "subheading": "",
-            "heading": "PREMIUM MATERIALS",
+            "heading": "With Aetrex",
             "content_position": "end",
             "color_text": "#2c2c2c"
           }
@@ -527,7 +527,7 @@
         "image_height_mobile": "auto",
         "heading": "<strong>See the Difference. Feel the Relief.</strong>",
         "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
+        "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
         "subheading": "Our orthotics don’t just cushion — they correct.",
         "description": "<p>With and without Aetrex orthotics, the contrast is clear: less pressure, better alignment, and real comfort you can see.</p>",
