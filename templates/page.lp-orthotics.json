@@ -744,7 +744,7 @@
       ],
       "name": "t:sections.reveal-testimonials.name",
       "settings": {
-        "heading": "What people are saying",
+        "heading": "Testimonials",
         "heading_size": "title-md",
         "heading_tag": "h2",
         "color_text": "",
@@ -758,6 +758,114 @@
         "padding_top": 72,
         "padding_bottom": 72,
         "divider": false,
+        "rounded": false
+      }
+    },
+    "faq_XM3i3D": {
+      "type": "faq",
+      "blocks": {
+        "question_PtH3YU": {
+          "type": "question",
+          "settings": {
+            "title": "<strong>How do orthotics work?</strong> ",
+            "text": "<p>Our easy-to-use quiz can help you find the perfect fit based on your lifestyle and foot type.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_HFPm8X": {
+          "type": "question",
+          "settings": {
+            "title": "<strong>Are orthotics the same as insoles?</strong> ",
+            "text": "<p>Yes, our orthotics are designed to fit most types of shoes, from sneakers to dress shoes.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_xpY86j": {
+          "type": "question",
+          "settings": {
+            "title": "<strong>Can Orthotics Help With Plantar Fasciitis?</strong> ",
+            "text": "<p>Most customers feel a difference in comfort within the first few days. However, for full adaptation, it may take up to a week.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_rg43Nh": {
+          "type": "question",
+          "settings": {
+            "title": "<strong>Do I need Orthotics if I have Flat Feet?</strong> ",
+            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_FLGwzh": {
+          "type": "question",
+          "settings": {
+            "title": "<strong>How long will it take for Orthotics to relieve foot pain?</strong> ",
+            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_Bg6fea": {
+          "type": "question",
+          "settings": {
+            "title": "<strong>Do Orthotics help with overpronation?</strong> ",
+            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_XTRaRw": {
+          "type": "question",
+          "settings": {
+            "title": "<strong>How do I know which Orthotics are right for me?</strong> ",
+            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "question_PtH3YU",
+        "question_HFPm8X",
+        "question_xpY86j",
+        "question_rg43Nh",
+        "question_FLGwzh",
+        "question_Bg6fea",
+        "question_XTRaRw"
+      ],
+      "name": "FAQ",
+      "settings": {
+        "style": "with-border",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "<p><strong>Have Questions? We’ve Got Answers.</strong></p>",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#ffffff",
+        "overlay_opacity": 4,
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "narrow": true,
         "rounded": false
       }
     },
@@ -798,128 +906,6 @@
         "padding_bottom": 72,
         "divider": false,
         "full_width": false,
-        "rounded": false
-      }
-    },
-    "faq_XM3i3D": {
-      "type": "faq",
-      "blocks": {
-        "question_PtH3YU": {
-          "type": "question",
-          "settings": {
-            "title": "<strong>How do I know which orthotics are right for me?</strong>",
-            "text": "<p>Our easy-to-use quiz can help you find the perfect fit based on your lifestyle and foot type.</p>",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "question_HFPm8X": {
-          "type": "question",
-          "settings": {
-            "title": "<strong>Can I wear them in any shoe?</strong>",
-            "text": "<p>Yes, our orthotics are designed to fit most types of shoes, from sneakers to dress shoes.</p>",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "question_xpY86j": {
-          "type": "question",
-          "settings": {
-            "title": "<strong>How long will it take to feel the difference?</strong>",
-            "text": "<p>Most customers feel a difference in comfort within the first few days. However, for full adaptation, it may take up to a week.</p>",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "question_PtH3YU",
-        "question_HFPm8X",
-        "question_xpY86j"
-      ],
-      "name": "FAQ",
-      "settings": {
-        "style": "with-border",
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "<p><strong>Have Questions? We’ve Got Answers.</strong></p>",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "#171717",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "color_overlay": "#ffffff",
-        "overlay_opacity": 4,
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "narrow": true,
-        "rounded": false
-      }
-    },
-    "rich_text_VUBDw6": {
-      "type": "rich-text",
-      "blocks": {
-        "text_LizwRj": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Backed by Science: Real Results from Clinical Trials on Aetrex Orthotics</p>",
-            "text_font": "body",
-            "text_size": "subtext-xl",
-            "text_max_size": 32,
-            "text_line_height": 1.2,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "text_LizwRj"
-      ],
-      "name": "t:sections.rich-text.name",
-      "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "#171717",
-        "color_background": "rgba(0,0,0,0)",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 24,
-        "padding_bottom": 24,
-        "divider": false,
-        "narrow": false,
         "rounded": false
       }
     },
@@ -1017,9 +1003,8 @@
     "image_comparison_i6BATK",
     "collection_list_mPHCpz",
     "reveal_testimonials_gaxcCz",
-    "blog_posts_PJxFGa",
     "faq_XM3i3D",
-    "rich_text_VUBDw6",
+    "blog_posts_PJxFGa",
     "images_with_text_overlay_pgicH3"
   ]
 }
