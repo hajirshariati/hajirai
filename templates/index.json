@@ -223,6 +223,14 @@
             "highlighted_scribble": "circle"
           }
         },
+        "divider_AgRWiK": {
+          "type": "divider",
+          "settings": {
+            "divider_width": 120,
+            "divider_mt": 5,
+            "divider_mb": 5
+          }
+        },
         "text_zfk6ye": {
           "type": "text",
           "settings": {
@@ -253,6 +261,7 @@
       },
       "block_order": [
         "text_Vk4ikN",
+        "divider_AgRWiK",
         "text_zfk6ye",
         "button_erVtxD"
       ],
