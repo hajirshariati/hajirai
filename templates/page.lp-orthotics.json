@@ -427,13 +427,31 @@
     "image_with_text_overlay_M6AhUn": {
       "type": "image-with-text-overlay",
       "blocks": {
+        "subheading_wQeHKU": {
+          "type": "subheading",
+          "settings": {
+            "subheading": "Data-Driven Comfort, Backed by 50 Million Scans",
+            "subheading_size": "subtitle-md",
+            "secondary_color": true
+          }
+        },
+        "heading_VbGWPF": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>Foot Scanning Technology That Powers Our Orthotics</p>",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
         "text_CVjrUt": {
           "type": "text",
           "settings": {
-            "text": "<p>The future of foot health starts here.<br/>Powered by data, guided by experience.</p>",
-            "text_font": "body",
+            "text": "<p>Aetrex’s advanced foot scanners capture millions of data points on arch type, pressure points, and alignment. We use this real-world data to design orthotics that deliver personalized support, superior comfort, and proven relief from common foot pain.</p>",
+            "text_font": "subtitle",
             "text_size": "subtext-custom",
-            "text_max_size": 32,
+            "text_max_size": 18,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
             "text_capitalize": false,
@@ -444,6 +462,8 @@
         }
       },
       "block_order": [
+        "subheading_wQeHKU",
+        "heading_VbGWPF",
         "text_CVjrUt"
       ],
       "name": "t:sections.image-with-text-overlay.name",
