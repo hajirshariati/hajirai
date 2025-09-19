@@ -30,7 +30,7 @@
         "text_H4rWEH": {
           "type": "text",
           "settings": {
-            "text": "<p>The Science Of 30 Million Foot Scans, Engineered Into Every Step.<br/></p>",
+            "text": "<h3>The Science Of 50 Million Foot Scans, Engineered Into Every Step.<br/></h3>",
             "text_font": "heading",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -45,7 +45,7 @@
         "text_jPX4Q6": {
           "type": "text",
           "settings": {
-            "text": "<p>Explore our range of Aetrex Orthotics, expertly designed to target different foot conditions,<br/>with support trusted by millions. </p>",
+            "text": "<p>Explore our range of Aetrex Orthotics, expertly designed to target different foot conditions, with support trusted by millions. </p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -68,12 +68,25 @@
             "button_external": false,
             "button_icon": true
           }
+        },
+        "button_CkabLw": {
+          "type": "button",
+          "settings": {
+            "button_label": "Shop All",
+            "button_link": "shopify://collections",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": true
+          }
         }
       },
       "block_order": [
         "text_H4rWEH",
         "text_jPX4Q6",
-        "button_PwAQDY"
+        "button_PwAQDY",
+        "button_CkabLw"
       ],
       "name": "t:sections.video-with-text-overlay.name",
       "settings": {
@@ -100,42 +113,74 @@
         "divider_color": "#111111",
         "overlay_opacity": 0,
         "padding_top": 0,
-        "padding_bottom": 56,
+        "padding_bottom": 0,
         "divider": false,
         "full_width": true,
         "rounded": true
       }
     },
-    "rich_text_qnmcNt": {
-      "type": "rich-text",
+    "multicolumn_with_icons_AJrwxJ": {
+      "type": "multicolumn-with-icons",
       "blocks": {
-        "text_9pqJ6D": {
-          "type": "text",
+        "column_LmLXx9": {
+          "type": "column",
           "settings": {
-            "text": "<p>Try it risk-free for 30 days </p>",
-            "text_font": "body",
-            "text_size": "subtext-custom",
-            "text_max_size": 32,
-            "text_line_height": 1.2,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
+            "icon": "check_mark",
+            "custom_icon": "",
+            "heading": "<strong>Try It Risk-Free for 30 Days</strong>",
+            "text": "<p>Experience the difference without the worry. If you’re not completely satisfied, simply return within 30 days—no questions asked.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_UNxwb7": {
+          "type": "column",
+          "settings": {
+            "icon": "award",
+            "custom_icon": "",
+            "heading": "<strong>Clinically Proven to Reduce Pain</strong>*",
+            "text": "<p>Our orthotics is backed by clinical studies showing significant reduction in foot, knee, back, and hip pain—helping you move with confidence.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_TWtaty": {
+          "type": "column",
+          "settings": {
+            "icon": "users",
+            "custom_icon": "",
+            "heading": "<strong>Recommended by Doctors & Podiatrists</strong>",
+            "text": "<p>Leading health professionals trust and recommend our products for their patients, because they’re designed with science and comfort in mind.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_f9CBhJ": {
+          "type": "column",
+          "settings": {
+            "icon": "heart",
+            "custom_icon": "",
+            "heading": "Loved by Millions",
+            "text": "<p>Join a growing community of people who’ve found relief and comfort with our footwear—millions of happy steps and counting.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         }
       },
       "block_order": [
-        "text_9pqJ6D"
+        "column_LmLXx9",
+        "column_UNxwb7",
+        "column_TWtaty",
+        "column_f9CBhJ"
       ],
-      "name": "t:sections.rich-text.name",
+      "name": "t:sections.multicolumn-with-icons.name",
       "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
+        "style": "with-border",
+        "columns": 4,
+        "text_alignment": "left",
         "heading": "",
         "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
+        "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
         "subheading": "",
         "description": "",
@@ -145,18 +190,18 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "color_text": "#ffffff",
-        "color_background": "#6c6c6c",
+        "color_text": "",
+        "color_background": "#f4f4f4",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 24,
-        "padding_bottom": 24,
+        "padding_top": 72,
+        "padding_bottom": 72,
         "divider": false,
-        "narrow": false,
+        "full_width": true,
         "rounded": false
       }
     },
@@ -226,14 +271,14 @@
         "columns": 4,
         "carousel_on_desktop": true,
         "show_view_all": false,
-        "columns_mobile": "1",
+        "columns_mobile": "2",
         "swipe_on_mobile": true,
-        "heading": "",
+        "heading": "Which Aetrex Orthotic Is Right For You?",
         "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "Different feet, different needs. Explore by pain point.",
-        "description": "<p>Which Aetrex Orthotic Is Right For You?</p>",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h3",
+        "subheading": "Different feet, different needs. Explore by foot condition.  ",
+        "description": "",
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "",
@@ -785,13 +830,184 @@
         "rounded": false,
         "enable_parallax": true
       }
+    },
+    "reveal_testimonials_gaxcCz": {
+      "type": "reveal-testimonials",
+      "blocks": {
+        "testimonial_btpraL": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_pk9Pe9": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_icwcHK": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_8A6XiF": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_xjYkNb": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_btpraL",
+        "testimonial_pk9Pe9",
+        "testimonial_icwcHK",
+        "testimonial_8A6XiF",
+        "testimonial_xjYkNb"
+      ],
+      "name": "t:sections.reveal-testimonials.name",
+      "settings": {
+        "heading": "What people are saying",
+        "heading_size": "title-md",
+        "heading_tag": "h2",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_z3gkM9": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_wC4LiG": {
+          "type": "heading",
+          "settings": {
+            "heading": "Image with text",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_6VMEBX": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_RKmQHj": {
+          "type": "button",
+          "settings": {
+            "button_label": "Button label",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": true
+          }
+        }
+      },
+      "block_order": [
+        "heading_wC4LiG",
+        "text_6VMEBX",
+        "button_RKmQHj"
+      ],
+      "name": "t:sections.image-with-text.name",
+      "settings": {
+        "img_url": "",
+        "image_height": "650px",
+        "image_width": "medium",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": true,
+        "parallax_direction": "vertical"
+      }
     }
   },
   "order": [
     "main-page",
     "video_with_text_overlay_TgKph8",
-    "rich_text_qnmcNt",
+    "multicolumn_with_icons_AJrwxJ",
     "featured_collections_9d3ge7",
+    "image_with_text_z3gkM9",
     "image_with_text_overlay_M6AhUn",
     "image_comparison_i6BATK",
     "collection_list_mPHCpz",
@@ -799,6 +1015,7 @@
     "blog_posts_PJxFGa",
     "faq_XM3i3D",
     "rich_text_VUBDw6",
-    "images_with_text_overlay_pgicH3"
+    "images_with_text_overlay_pgicH3",
+    "reveal_testimonials_gaxcCz"
   ]
 }
