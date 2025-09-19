@@ -666,10 +666,10 @@
         "rounded": false
       }
     },
-    "reveal_testimonials_gaxcCz": {
-      "type": "reveal-testimonials",
+    "testimonials_eCbq6g": {
+      "type": "testimonials",
       "blocks": {
-        "testimonial_btpraL": {
+        "testimonial_QNxEr3": {
           "type": "testimonial",
           "settings": {
             "icon": "quote",
@@ -682,7 +682,7 @@
             "highlighted_scribble": "circle"
           }
         },
-        "testimonial_pk9Pe9": {
+        "testimonial_ickcBH": {
           "type": "testimonial",
           "settings": {
             "icon": "quote",
@@ -695,33 +695,7 @@
             "highlighted_scribble": "circle"
           }
         },
-        "testimonial_icwcHK": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "testimonial_8A6XiF": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "testimonial_xjYkNb": {
+        "testimonial_R6Up9h": {
           "type": "testimonial",
           "settings": {
             "icon": "quote",
@@ -736,17 +710,24 @@
         }
       },
       "block_order": [
-        "testimonial_btpraL",
-        "testimonial_pk9Pe9",
-        "testimonial_icwcHK",
-        "testimonial_8A6XiF",
-        "testimonial_xjYkNb"
+        "testimonial_QNxEr3",
+        "testimonial_ickcBH",
+        "testimonial_R6Up9h"
       ],
-      "name": "t:sections.reveal-testimonials.name",
+      "name": "t:sections.testimonials.name",
       "settings": {
         "heading": "Testimonials",
         "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
         "color_text": "",
         "color_background": "",
         "gradient_background": "",
@@ -1002,7 +983,7 @@
     "image_with_text_overlay_M6AhUn",
     "image_comparison_i6BATK",
     "collection_list_mPHCpz",
-    "reveal_testimonials_gaxcCz",
+    "testimonials_eCbq6g",
     "faq_XM3i3D",
     "blog_posts_PJxFGa",
     "images_with_text_overlay_pgicH3"
