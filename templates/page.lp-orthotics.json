@@ -27,25 +27,29 @@
     "video_with_text_overlay_TgKph8": {
       "type": "video-with-text-overlay",
       "blocks": {
-        "text_H4rWEH": {
-          "type": "text",
+        "subheading_DQGQFg": {
+          "type": "subheading",
+          "disabled": true,
           "settings": {
-            "text": "<h3>The Science Of 50 Million Foot Scans, Engineered Into Every Step.<br/></h3>",
-            "text_font": "heading",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
+            "subheading": "Add a tagline",
+            "subheading_size": "subtitle-md",
+            "secondary_color": true
+          }
+        },
+        "heading_64L34p": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>The Science of Comfort. Engineered for Your Feet.</p>",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         },
-        "text_jPX4Q6": {
+        "text_H4rWEH": {
           "type": "text",
           "settings": {
-            "text": "<p>Explore our range of Aetrex Orthotics, expertly designed to target different foot conditions, with support trusted by millions. </p>",
+            "text": "<p>Crafted from millions of foot scans, our orthotics provide personalized support to relieve pain, improve posture, and keep you moving with ease.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -69,11 +73,11 @@
             "button_icon": true
           }
         },
-        "button_CkabLw": {
+        "button_AGih6p": {
           "type": "button",
           "settings": {
             "button_label": "Shop All",
-            "button_link": "shopify://collections",
+            "button_link": "",
             "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
@@ -83,10 +87,11 @@
         }
       },
       "block_order": [
+        "subheading_DQGQFg",
+        "heading_64L34p",
         "text_H4rWEH",
-        "text_jPX4Q6",
         "button_PwAQDY",
-        "button_CkabLw"
+        "button_AGih6p"
       ],
       "name": "t:sections.video-with-text-overlay.name",
       "settings": {
@@ -103,7 +108,7 @@
         "image_height_mobile": "auto",
         "content_position_mobile": "items-center justify-center",
         "text_alignment_mobile": "center",
-        "color_text": "#171717",
+        "color_text": "#ffffff",
         "color_highlight": "#e0a580",
         "gradient_highlight": "",
         "color_button_text": "#171717",
@@ -111,97 +116,46 @@
         "color_button_gradient": "",
         "color_overlay": "#171717",
         "divider_color": "#111111",
-        "overlay_opacity": 0,
+        "overlay_opacity": 40,
         "padding_top": 0,
-        "padding_bottom": 0,
+        "padding_bottom": 56,
         "divider": false,
         "full_width": true,
         "rounded": true
       }
     },
-    "multicolumn_with_icons_AJrwxJ": {
-      "type": "multicolumn-with-icons",
+    "scrolling_text_kzjffn": {
+      "type": "scrolling-text",
       "blocks": {
-        "column_LmLXx9": {
-          "type": "column",
+        "text_YAtRjd": {
+          "type": "text",
           "settings": {
-            "icon": "check_mark",
-            "custom_icon": "",
-            "heading": "<strong>Try It Risk-Free for 30 Days</strong>",
-            "text": "<p>Experience the difference without the worry. If you’re not completely satisfied, simply return within 30 days—no questions asked.</p>",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_UNxwb7": {
-          "type": "column",
-          "settings": {
-            "icon": "award",
-            "custom_icon": "",
-            "heading": "<strong>Clinically Proven to Reduce Pain</strong>*",
-            "text": "<p>Our orthotics is backed by clinical studies showing significant reduction in foot, knee, back, and hip pain—helping you move with confidence.</p>",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_TWtaty": {
-          "type": "column",
-          "settings": {
-            "icon": "users",
-            "custom_icon": "",
-            "heading": "<strong>Recommended by Doctors & Podiatrists</strong>",
-            "text": "<p>Leading health professionals trust and recommend our products for their patients, because they’re designed with science and comfort in mind.</p>",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_f9CBhJ": {
-          "type": "column",
-          "settings": {
-            "icon": "heart",
-            "custom_icon": "",
-            "heading": "Loved by Millions",
-            "text": "<p>Join a growing community of people who’ve found relief and comfort with our footwear—millions of happy steps and counting.</p>",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
+            "text": "Try for 30 Days  Risk-Free.",
+            "text_size": 30,
+            "text_font": "body",
+            "highlighted_text": "stencil",
+            "highlighted_scribble": "squiggle-underline"
           }
         }
       },
       "block_order": [
-        "column_LmLXx9",
-        "column_UNxwb7",
-        "column_TWtaty",
-        "column_f9CBhJ"
+        "text_YAtRjd"
       ],
-      "name": "t:sections.multicolumn-with-icons.name",
+      "name": "Scrolling text",
       "settings": {
-        "style": "with-border",
-        "columns": 4,
-        "text_alignment": "center",
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
+        "direction": "left",
+        "speed": 20,
+        "grid_horizontal": 70,
+        "enable_twin": false,
+        "enable_parallax": true,
         "color_text": "",
-        "color_background": "#f4f4f4",
+        "color_background": "",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
+        "padding_top": 56,
+        "padding_bottom": 56,
         "divider": false,
-        "full_width": true,
         "rounded": false
       }
     },
@@ -211,7 +165,7 @@
         "collection_xxeKq7": {
           "type": "collection",
           "settings": {
-            "collection": "orthotics-plantar-fasciitis",
+            "collection": "",
             "products": [],
             "title": "Plantar Fasciitis"
           }
@@ -221,7 +175,7 @@
           "settings": {
             "collection": "orthotics-for-flat-feet",
             "products": [],
-            "title": "Flat Feet Pain"
+            "title": "Flat Feet"
           }
         },
         "collection_Wzc8ka": {
@@ -235,9 +189,9 @@
         "collection_BbmnMe": {
           "type": "collection",
           "settings": {
-            "collection": "all-day-standing-orthotics",
+            "collection": "premium-memory-foam",
             "products": [],
-            "title": "All Day Standing"
+            "title": "Pressure Relief"
           }
         },
         "collection_3qxYYM": {
@@ -251,9 +205,9 @@
         "collection_Uccwbn": {
           "type": "collection",
           "settings": {
-            "collection": "orthotics-for-mortons-neuroma",
+            "collection": "",
             "products": [],
-            "title": "Morton’s Neuroma"
+            "title": "Running"
           }
         }
       },
@@ -271,13 +225,13 @@
         "columns": 4,
         "carousel_on_desktop": true,
         "show_view_all": false,
-        "columns_mobile": "2",
+        "columns_mobile": "1",
         "swipe_on_mobile": true,
-        "heading": "Which Aetrex Orthotic Is Right For You?",
+        "heading": "Which Orthotic is Right for You?",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h3",
-        "subheading": "Different feet, different needs. Explore by foot condition.  ",
+        "heading_tag": "h2",
+        "subheading": "Different feet, different needs. Explore by pain point.",
         "description": "",
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
@@ -296,151 +250,23 @@
         "rounded": false
       }
     },
-    "collage_AjkP4e": {
-      "type": "collage",
-      "blocks": {
-        "image_mXGKX7": {
-          "type": "image",
-          "settings": {
-            "subheading": "",
-            "heading": "",
-            "link": "",
-            "invert_subheading_heading": false,
-            "image_ratio": "portrait",
-            "content_position": "md:items-end md:justify-start",
-            "text_alignment": "left",
-            "image_ratio_mobile": "portrait",
-            "content_position_mobile": "items-end justify-start",
-            "text_alignment_mobile": "left",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle",
-            "color_text": "#ffffff",
-            "color_highlight": "",
-            "gradient_highlight": "",
-            "color_overlay": "#171717",
-            "overlay_opacity": 10
-          }
-        },
-        "image_GKgL3k": {
-          "type": "image",
-          "settings": {
-            "subheading": "",
-            "heading": "",
-            "link": "",
-            "invert_subheading_heading": false,
-            "image_ratio": "portrait",
-            "content_position": "md:items-end md:justify-start",
-            "text_alignment": "left",
-            "image_ratio_mobile": "portrait",
-            "content_position_mobile": "items-end justify-start",
-            "text_alignment_mobile": "left",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle",
-            "color_text": "#ffffff",
-            "color_highlight": "",
-            "gradient_highlight": "",
-            "color_overlay": "#171717",
-            "overlay_opacity": 10
-          }
-        },
-        "image_Q7MJEF": {
-          "type": "image",
-          "settings": {
-            "subheading": "",
-            "heading": "",
-            "link": "",
-            "invert_subheading_heading": false,
-            "image_ratio": "portrait",
-            "content_position": "md:items-end md:justify-start",
-            "text_alignment": "left",
-            "image_ratio_mobile": "portrait",
-            "content_position_mobile": "items-end justify-start",
-            "text_alignment_mobile": "left",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle",
-            "color_text": "#ffffff",
-            "color_highlight": "",
-            "gradient_highlight": "",
-            "color_overlay": "#171717",
-            "overlay_opacity": 10
-          }
-        },
-        "image_6cMypt": {
-          "type": "image",
-          "settings": {
-            "subheading": "",
-            "heading": "",
-            "link": "",
-            "invert_subheading_heading": false,
-            "image_ratio": "portrait",
-            "content_position": "md:items-end md:justify-start",
-            "text_alignment": "left",
-            "image_ratio_mobile": "portrait",
-            "content_position_mobile": "items-end justify-start",
-            "text_alignment_mobile": "left",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle",
-            "color_text": "#ffffff",
-            "color_highlight": "",
-            "gradient_highlight": "",
-            "color_overlay": "#171717",
-            "overlay_opacity": 10
-          }
-        }
-      },
-      "block_order": [
-        "image_mXGKX7",
-        "image_GKgL3k",
-        "image_Q7MJEF",
-        "image_6cMypt"
-      ],
-      "name": "t:sections.collage.name",
-      "settings": {
-        "heading": "<strong>Powered by data, guided by experience.</strong> ",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "subheading": "The future of foot health starts here. ",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "enable_parallax": true
-      }
-    },
     "image_with_text_overlay_M6AhUn": {
       "type": "image-with-text-overlay",
       "blocks": {
-        "subheading_wQeHKU": {
+        "subheading_HaxULK": {
           "type": "subheading",
           "settings": {
-            "subheading": "Data-Driven Comfort, Backed by 50 Million Scans",
+            "subheading": "Why Aetrex Orthotics?",
             "subheading_size": "subtitle-md",
             "secondary_color": true
           }
         },
-        "heading_VbGWPF": {
+        "heading_CE9MYn": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Foot Scanning Technology That Powers Our Orthotics</p>",
-            "heading_size": "title-sm",
-            "heading_tag": "h3",
+            "heading": "<p>Unmatched Technology for Real Relief</p>",
+            "heading_size": "title-lg tracking-heading",
+            "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -448,10 +274,10 @@
         "text_CVjrUt": {
           "type": "text",
           "settings": {
-            "text": "<p>Aetrex’s advanced foot scanners capture millions of data points on arch type, pressure points, and alignment. We use this real-world data to design orthotics that deliver personalized support, superior comfort, and proven relief from common foot pain.</p>",
-            "text_font": "subtitle",
-            "text_size": "subtext-custom",
-            "text_max_size": 18,
+            "text": "<p>Unlike generic orthotics, Aetrex products are designed from <strong>advanced foot mapping technology</strong>. With over  <strong>50 million foot scans</strong> and decades of experience, our orthotics are crafted to align with your unique foot shape and provide the <strong>most comfortable fit</strong> possible.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
             "text_capitalize": false,
@@ -462,8 +288,8 @@
         }
       },
       "block_order": [
-        "subheading_wQeHKU",
-        "heading_VbGWPF",
+        "subheading_HaxULK",
+        "heading_CE9MYn",
         "text_CVjrUt"
       ],
       "name": "t:sections.image-with-text-overlay.name",
@@ -485,11 +311,11 @@
         "color_overlay": "#171717",
         "divider_color": "#111111",
         "overlay_opacity": 70,
-        "padding_top": 28,
+        "padding_top": 0,
         "padding_bottom": 0,
         "divider": true,
-        "full_width": false,
-        "rounded": true,
+        "full_width": true,
+        "rounded": false,
         "enable_parallax": true,
         "parallax_direction": "vertical"
       }
@@ -527,7 +353,7 @@
         "image_height_mobile": "auto",
         "heading": "<strong>See the Difference. Feel the Relief.</strong>",
         "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
         "subheading": "Our orthotics don’t just cushion — they correct.",
         "description": "<p>With and without Aetrex orthotics, the contrast is clear: less pressure, better alignment, and real comfort you can see.</p>",
@@ -558,9 +384,7 @@
         "collection_BMqtdJ": {
           "type": "collection",
           "settings": {
-            "link_type": "collection",
             "collection": "",
-            "custom_url": "",
             "title": "Walking",
             "description": "",
             "overlay_content": false,
@@ -572,9 +396,7 @@
         "collection_UwnQyA": {
           "type": "collection",
           "settings": {
-            "link_type": "collection",
             "collection": "",
-            "custom_url": "",
             "title": "Standing",
             "description": "",
             "overlay_content": false,
@@ -586,9 +408,7 @@
         "collection_hHkQLw": {
           "type": "collection",
           "settings": {
-            "link_type": "collection",
             "collection": "",
-            "custom_url": "",
             "title": "Running",
             "description": "",
             "overlay_content": false,
@@ -600,9 +420,7 @@
         "collection_FWgTeX": {
           "type": "collection",
           "settings": {
-            "link_type": "collection",
             "collection": "",
-            "custom_url": "",
             "title": "Gym",
             "description": "",
             "overlay_content": false,
@@ -614,9 +432,7 @@
         "collection_wPrGdz": {
           "type": "collection",
           "settings": {
-            "link_type": "collection",
             "collection": "tennis-pickleball-orthotics",
-            "custom_url": "",
             "title": "Tennis & Pickeball",
             "description": "",
             "overlay_content": false,
@@ -652,7 +468,7 @@
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "",
-        "color_background": "",
+        "color_background": "#f4f4f4",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
@@ -666,10 +482,10 @@
         "rounded": false
       }
     },
-    "testimonials_eCbq6g": {
-      "type": "testimonials",
+    "testimonials_banner_P8DMGU": {
+      "type": "testimonials-banner",
       "blocks": {
-        "testimonial_QNxEr3": {
+        "testimonial_CRjWCe": {
           "type": "testimonial",
           "settings": {
             "icon": "quote",
@@ -682,7 +498,7 @@
             "highlighted_scribble": "circle"
           }
         },
-        "testimonial_ickcBH": {
+        "testimonial_RnLxLb": {
           "type": "testimonial",
           "settings": {
             "icon": "quote",
@@ -695,7 +511,7 @@
             "highlighted_scribble": "circle"
           }
         },
-        "testimonial_R6Up9h": {
+        "testimonial_GUBLhy": {
           "type": "testimonial",
           "settings": {
             "icon": "quote",
@@ -710,36 +526,28 @@
         }
       },
       "block_order": [
-        "testimonial_QNxEr3",
-        "testimonial_ickcBH",
-        "testimonial_R6Up9h"
+        "testimonial_CRjWCe",
+        "testimonial_RnLxLb",
+        "testimonial_GUBLhy"
       ],
-      "name": "t:sections.testimonials.name",
+      "name": "Testimonials banner",
       "settings": {
-        "heading": "Testimonials",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
+        "transparent_header": false,
+        "image_height": "650px",
+        "content_position": "md:items-center md:justify-center",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-center justify-center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
         "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
+        "color_overlay": "#171717",
+        "overlay_opacity": 70,
+        "padding_top": 0,
+        "padding_bottom": 0,
         "divider": false,
-        "rounded": false
+        "rounded": false,
+        "enable_parallax": true,
+        "parallax_direction": "vertical"
       }
     },
     "faq_XM3i3D": {
@@ -748,7 +556,7 @@
         "question_PtH3YU": {
           "type": "question",
           "settings": {
-            "title": "<strong>How do orthotics work?</strong> ",
+            "title": "<strong>How do I know which orthotics are right for me?</strong>",
             "text": "<p>Our easy-to-use quiz can help you find the perfect fit based on your lifestyle and foot type.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -757,7 +565,7 @@
         "question_HFPm8X": {
           "type": "question",
           "settings": {
-            "title": "<strong>Are orthotics the same as insoles?</strong> ",
+            "title": "<strong>Can I wear them in any shoe?</strong>",
             "text": "<p>Yes, our orthotics are designed to fit most types of shoes, from sneakers to dress shoes.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -766,44 +574,8 @@
         "question_xpY86j": {
           "type": "question",
           "settings": {
-            "title": "<strong>Can Orthotics Help With Plantar Fasciitis?</strong> ",
+            "title": "<strong>How long will it take to feel the difference?</strong>",
             "text": "<p>Most customers feel a difference in comfort within the first few days. However, for full adaptation, it may take up to a week.</p>",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "question_rg43Nh": {
-          "type": "question",
-          "settings": {
-            "title": "<strong>Do I need Orthotics if I have Flat Feet?</strong> ",
-            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "question_FLGwzh": {
-          "type": "question",
-          "settings": {
-            "title": "<strong>How long will it take for Orthotics to relieve foot pain?</strong> ",
-            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "question_Bg6fea": {
-          "type": "question",
-          "settings": {
-            "title": "<strong>Do Orthotics help with overpronation?</strong> ",
-            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "question_XTRaRw": {
-          "type": "question",
-          "settings": {
-            "title": "<strong>How do I know which Orthotics are right for me?</strong> ",
-            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -812,11 +584,7 @@
       "block_order": [
         "question_PtH3YU",
         "question_HFPm8X",
-        "question_xpY86j",
-        "question_rg43Nh",
-        "question_FLGwzh",
-        "question_Bg6fea",
-        "question_XTRaRw"
+        "question_xpY86j"
       ],
       "name": "FAQ",
       "settings": {
@@ -833,8 +601,8 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "color_text": "#171717",
-        "color_background": "",
+        "color_text": "",
+        "color_background": "#f4f4f4",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
@@ -854,7 +622,7 @@
       "type": "blog-posts",
       "name": "Blog posts",
       "settings": {
-        "blog": "case-studies",
+        "blog": "",
         "post_limit": 3,
         "columns": 3,
         "carousel_on_desktop": false,
@@ -867,11 +635,11 @@
         "show_comments": true,
         "show_author": false,
         "show_excerpt": true,
-        "heading": "<strong>Backed by Science: Real Results from Clinical Trials on Aetrex Orthotics</strong> ",
+        "heading": "<strong>Built on Proof, Not Promises</strong>",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
-        "subheading": "Built on proof, NOT promises.",
+        "subheading": "CLINICAL STUDIES",
         "description": "<p>We don’t guess — we measure. Independent clinical studies have validated the effectiveness of Aetrex orthotics in delivering meaningful pressure relief and biomechanical support. Because your comfort should be proven, not promised.</p>",
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
@@ -977,13 +745,12 @@
   "order": [
     "main-page",
     "video_with_text_overlay_TgKph8",
-    "multicolumn_with_icons_AJrwxJ",
+    "scrolling_text_kzjffn",
     "featured_collections_9d3ge7",
-    "collage_AjkP4e",
     "image_with_text_overlay_M6AhUn",
     "image_comparison_i6BATK",
     "collection_list_mPHCpz",
-    "testimonials_eCbq6g",
+    "testimonials_banner_P8DMGU",
     "faq_XM3i3D",
     "blog_posts_PJxFGa",
     "images_with_text_overlay_pgicH3"
