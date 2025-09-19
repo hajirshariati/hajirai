@@ -97,7 +97,7 @@
     "product_secondary_image": true,
     "product_rating": false,
     "product_countdown": false,
-    "product_quick_add": false,
+    "product_quick_add": true,
     "product_quick_view": true,
     "product_color_swatches": true,
     "product_max_color_swatches": 6,
