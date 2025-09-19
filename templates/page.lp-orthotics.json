@@ -39,7 +39,7 @@
         "heading_64L34p": {
           "type": "heading",
           "settings": {
-            "heading": "<p>The Science of Comfort. Engineered for Your Feet.</p>",
+            "heading": "<h3>The Science Of 50 Million Foot Scans, Engineered Into Every Step.</h3>",
             "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "none",
@@ -49,7 +49,7 @@
         "text_H4rWEH": {
           "type": "text",
           "settings": {
-            "text": "<p>Crafted from millions of foot scans, our orthotics provide personalized support to relieve pain, improve posture, and keep you moving with ease.</p>",
+            "text": "<p>Explore our range of Aetrex Orthotics, expertly designed to target different foot conditions, with support trusted by millions.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -384,7 +384,9 @@
         "collection_BMqtdJ": {
           "type": "collection",
           "settings": {
+            "link_type": "collection",
             "collection": "",
+            "custom_url": "",
             "title": "Walking",
             "description": "",
             "overlay_content": false,
@@ -396,7 +398,9 @@
         "collection_UwnQyA": {
           "type": "collection",
           "settings": {
+            "link_type": "collection",
             "collection": "",
+            "custom_url": "",
             "title": "Standing",
             "description": "",
             "overlay_content": false,
@@ -408,7 +412,9 @@
         "collection_hHkQLw": {
           "type": "collection",
           "settings": {
+            "link_type": "collection",
             "collection": "",
+            "custom_url": "",
             "title": "Running",
             "description": "",
             "overlay_content": false,
@@ -420,7 +426,9 @@
         "collection_FWgTeX": {
           "type": "collection",
           "settings": {
+            "link_type": "collection",
             "collection": "",
+            "custom_url": "",
             "title": "Gym",
             "description": "",
             "overlay_content": false,
@@ -432,7 +440,9 @@
         "collection_wPrGdz": {
           "type": "collection",
           "settings": {
+            "link_type": "collection",
             "collection": "tennis-pickleball-orthotics",
+            "custom_url": "",
             "title": "Tennis & Pickeball",
             "description": "",
             "overlay_content": false,
