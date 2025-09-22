@@ -158,10 +158,6 @@
             "text_size": "text-sm"
           }
         },
-        "sku_WXMkYt": {
-          "type": "sku",
-          "settings": {}
-        },
         "aetrex_fitai_pdp_size_recommendation_gUEcCb": {
           "type": "shopify://apps/aetrex-fitai/blocks/PDPSizeRecommendation/6c991f1a-1e7d-4325-983c-2984a2e41236",
           "settings": {
@@ -206,7 +202,6 @@
         "text-3",
         "text-2",
         "text-4",
-        "sku_WXMkYt",
         "aetrex_fitai_pdp_size_recommendation_gUEcCb",
         "sticky_buy_button"
       ],
