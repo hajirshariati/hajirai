@@ -158,6 +158,10 @@
             "text_size": "text-sm"
           }
         },
+        "sku_WXMkYt": {
+          "type": "sku",
+          "settings": {}
+        },
         "aetrex_fitai_pdp_size_recommendation_gUEcCb": {
           "type": "shopify://apps/aetrex-fitai/blocks/PDPSizeRecommendation/6c991f1a-1e7d-4325-983c-2984a2e41236",
           "settings": {
@@ -165,15 +169,15 @@
             "tab_background": "#f2f2f2",
             "tab_foreground": "#5c6271",
             "active_tab_background": "#5c6271",
-            "acitve_tab_foreground": "#fff",
+            "acitve_tab_foreground": "#ffffff",
             "button_background": "#f2f2f2",
             "button_foreground": "#5c6271",
             "acive_button_background": "#5c6271",
-            "acive_button_foreground": "#fff",
+            "acive_button_foreground": "#ffffff",
             "size_color": "#d60000",
             "result_header_background": "#d06263",
-            "result_header_foreground": "#fff",
-            "result_content_background": "#F1F1F1",
+            "result_header_foreground": "#ffffff",
+            "result_content_background": "#f1f1f1",
             "result_content_foreground": "#707070",
             "result_footer_background": "#c8c8c8",
             "result_footer_foreground": "#363636",
@@ -202,6 +206,7 @@
         "text-3",
         "text-2",
         "text-4",
+        "sku_WXMkYt",
         "aetrex_fitai_pdp_size_recommendation_gUEcCb",
         "sticky_buy_button"
       ],
