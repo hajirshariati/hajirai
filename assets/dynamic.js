@@ -167,7 +167,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // custom detect symbols of tradmark and register starts
 function separateTrademarkSymbols() {
-  const elements = document.querySelectorAll('split-words .word animate-element');
+  const elements = document.querySelectorAll('.rte, h1, h2, h3, h4, h5, h6, p, span, div, strong, b, em, i, small, mark, del, ins, sub, sup, blockquote, figcaption, caption, td, th, li, dt, dd, label, legend, button, a');
 
   elements.forEach(el => {
     const text = el.textContent.trim();
@@ -176,13 +176,25 @@ function separateTrademarkSymbols() {
     const match = text.match(/(.+?)(?:\s*)(®|™|TM)$/i);
 
     if (match) {
-      const [, baseText, symbol] = match;
-
-      // Determine class based on symbol
-      const className = symbol === '®' ? 'register-symbol' : 'trademark-symbol';
-
-      // Replace content with wrapped trademark symbol
-      el.innerHTML = `${baseText}<span class="${className}">${symbol}</span>`;
+      const [, baseTextContent, symbol] = match;
+      
+      // Get the original HTML content
+      const originalHTML = el.innerHTML;
+      
+      // Find the symbol in the HTML and replace it while preserving all HTML structure
+      // Create a regex to match the symbol at the end, accounting for possible whitespace
+      const symbolRegex = new RegExp(`\\s*(${symbol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})$`, 'i');
+      
+      // Check if the symbol exists in the HTML
+      if (symbolRegex.test(originalHTML)) {
+        // Determine class based on symbol
+        const className = symbol === '®' ? 'register-symbol' : 'trademark-symbol';
+        
+        // Replace the symbol in the HTML while preserving all other HTML structure
+        const newHTML = originalHTML.replace(symbolRegex, `<span class="${className}">$1</span>`);
+        
+        el.innerHTML = newHTML;
+      }
     }
   });
 }

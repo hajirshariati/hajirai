@@ -16318,7 +16318,7 @@ video-media:not([playing]) .deferred-poster .play-button .icon:last-child:not(:o
 }
 
 /* REGISTER & TRADEMARK SYMBOL */
-.banner__title .register-symbol {
+.register-symbol {
     position: relative;
     font-weight: 100;
     line-height: 0;
@@ -16328,7 +16328,7 @@ video-media:not([playing]) .deferred-poster .play-button .icon:last-child:not(:o
     top: -1em;
 }
 
-.banner__title .trademark-symbol {
+.trademark-symbol {
     position: relative;
     font-weight: 100;
     line-height: 0;
