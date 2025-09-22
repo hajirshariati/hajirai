@@ -106,6 +106,9 @@
             "text_font": "body",
             "text_size": "subtext-custom",
             "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -166,6 +169,9 @@
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -178,11 +184,12 @@
       ],
       "settings": {
         "image": "shopify://shop_images/Material.png",
+        "img_url": "",
         "image_height": "adapt",
         "image_width": "small",
         "layout": "image_first",
         "text_alignment": "left",
-        "content_position": "align-self-center",
+        "custom_content_position": "items-center",
         "image_height_mobile": "adapt",
         "text_alignment_mobile": "center",
         "color_text": "#525252",
@@ -190,7 +197,7 @@
         "gradient_background": "",
         "color_background_2": "",
         "gradient_background_2": "",
-        "color_highlight": "#eb864b",
+        "color_highlight": "#171717",
         "gradient_highlight": "",
         "color_button_text": "",
         "color_button_background": "",
@@ -224,6 +231,9 @@
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -236,11 +246,12 @@
       ],
       "settings": {
         "image": "shopify://shop_images/friction.png",
+        "img_url": "",
         "image_height": "adapt",
         "image_width": "small",
         "layout": "text_first",
         "text_alignment": "left",
-        "content_position": "align-self-center",
+        "custom_content_position": "items-center",
         "image_height_mobile": "adapt",
         "text_alignment_mobile": "center",
         "color_text": "#525252",
@@ -282,6 +293,9 @@
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -292,6 +306,7 @@
           "settings": {
             "button_label": "SHOP NOW",
             "button_link": "shopify://collections/conform",
+            "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
             "button_external": false,
@@ -306,11 +321,12 @@
       ],
       "settings": {
         "image": "shopify://shop_images/arch_support_8183c8bf-3da9-4b71-b296-531a8a35956a.png",
+        "img_url": "",
         "image_height": "adapt",
         "image_width": "small",
         "layout": "image_first",
         "text_alignment": "left",
-        "content_position": "align-self-center",
+        "custom_content_position": "items-center",
         "image_height_mobile": "adapt",
         "text_alignment_mobile": "center",
         "color_text": "#525252",
@@ -405,6 +421,7 @@
         "gap": "small",
         "columns": 3,
         "columns_mobile": "1",
+        "carousel_on_desktop": true,
         "swipe_on_mobile": true,
         "heading": "",
         "heading_size": "title-md",
@@ -436,23 +453,31 @@
     "image_with_text_Bad4Cj": {
       "type": "image-with-text",
       "blocks": {
-        "heading_CkAbCW": {
-          "type": "heading",
+        "text_QM7eC8": {
+          "type": "text",
           "settings": {
-            "heading": "About Diabetes & the Diabetic Foot",
-            "heading_size": "title-sm",
-            "heading_tag": "h2",
+            "text": "<h2>About Diabetes & Diabetic Foot</h2>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         },
-        "text_QM7eC8": {
+        "text_eT9yVa": {
           "type": "text",
           "settings": {
             "text": "<p>Diabetes is a highly prevalent condition globally. It is defined as a metabolic disorder, and there are two main types. Type 1 is an autoimmune disease mostly found in children where the body’s immune system destroys the insulin-producing pancreatic beta-cells. It is found in 5 to 10 percent of patients with Diabetes. Type 2 accounts for the remaining 90 to 95 percent, frequently found in people over age 45. It’s associated with the physical inactivity of adolescents and the sugar-rich diets commonly adopted today.<br/></p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -460,16 +485,17 @@
         }
       },
       "block_order": [
-        "heading_CkAbCW",
-        "text_QM7eC8"
+        "text_QM7eC8",
+        "text_eT9yVa"
       ],
       "settings": {
         "image": "shopify://shop_images/feet_pain.gif",
+        "img_url": "",
         "image_height": "adapt",
         "image_width": "small",
         "layout": "text_first",
         "text_alignment": "left",
-        "content_position": "align-self-center",
+        "custom_content_position": "items-center",
         "image_height_mobile": "adapt",
         "text_alignment_mobile": "center",
         "color_text": "#525252",
@@ -477,7 +503,7 @@
         "gradient_background": "",
         "color_background_2": "",
         "gradient_background_2": "",
-        "color_highlight": "",
+        "color_highlight": "#171717",
         "gradient_highlight": "",
         "color_button_text": "",
         "color_button_background": "",
@@ -491,58 +517,60 @@
         "parallax_direction": "vertical"
       }
     },
-    "rich_text_4XiQkT": {
-      "type": "rich-text",
+    "image_with_text_GJDAhj": {
+      "type": "image-with-text",
       "blocks": {
-        "text_LNmhDK": {
+        "text_c6yDM7": {
           "type": "text",
           "settings": {
-            "text": "<h5><strong>Foot Conditions associated with Diabetes include:</strong></h5>",
+            "text": "<h2>Foot Conditions associated with Diabetes include:</h2>",
             "text_font": "body",
-            "text_size": "subtext-sm",
-            "text_max_size": 30,
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         },
-        "text_YPMXNi": {
+        "text_4kmETN": {
           "type": "text",
           "settings": {
-            "text": "<ul><li><em><strong>Peripheral Sensory Neuropathy</strong></em></li></ul><p>Nerve damage in the feet</p><ul><li><em><strong>Peripheral Vascular Disease & Peripheral Arterial Disease</strong></em></li></ul><p>Plaque build-up in the arteries reducing blood flow and the ability to heal</p><ul><li><em><strong>Charcot Foot</strong></em></li></ul><p>Structural damage caused by a lack of sensation and bone weakness. The arches are lost, and the foot may become boat shaped./p&gt;</p><ul><li><em><strong>Diabetic Foot Ulcer</strong></em></li></ul><p>A sore developed when damaged skin goes unnoticed due to loss of sensation</p>",
+            "text": "<p><strong>PERIPHERAL SENSORY NEUROPATHY</strong>• Nerve damage in the feet<br/><br/><strong>PERIPHERAL VASCULAR DISEASE & PERIPHERAL ARTERIAL DISEASE</strong>• Plaque build-up in the arteries reducing blood flow and the ability to heal<br/><br/><strong>CHARCOT FOOT</strong>• Structural damage caused by a lack of sensation and bone weakness. The arches are lost, and the foot may become boat shaped.<br/><br/><strong>DIABETIC FOOT ULCER</strong>• A sore developed when damaged skin goes unnoticed due to loss of sensation<br/></p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
-            "highlighted_text": "text",
+            "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         }
       },
       "block_order": [
-        "text_LNmhDK",
-        "text_YPMXNi"
+        "text_c6yDM7",
+        "text_4kmETN"
       ],
       "settings": {
+        "image": "shopify://shop_images/daibetes_orthotics.png",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "image_first",
         "text_alignment": "left",
-        "text_alignment_mobile": "left",
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "center",
         "color_text": "#525252",
         "color_background": "",
         "gradient_background": "",
-        "color_highlight": "#eb864b",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "#171717",
         "gradient_highlight": "",
         "color_button_text": "",
         "color_button_background": "",
@@ -550,8 +578,10 @@
         "padding_top": 0,
         "padding_bottom": 0,
         "divider": false,
-        "narrow": true,
-        "rounded": false
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
       }
     },
     "image_with_text_hjPy3i": {
@@ -570,10 +600,28 @@
         "text_i63RN8": {
           "type": "text",
           "settings": {
+            "text": "<h2>Orthotics</h2>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_nktn3W": {
+          "type": "text",
+          "settings": {
             "text": "<p>Wearing the right footwear and orthotics combination can help reduce risk factors and help relieve the pressure and friction on the parts of the foot that are more prone to ulcerations. Aetrex Conform Orthotics help protect the low-risk Diabetic Foot by customizing to the foot during the gait cycle, transferring pressure away from “hot spots” and providing shock absorption for extra protection.<br/><br/></p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -584,6 +632,7 @@
           "settings": {
             "button_label": "SHOP NOW",
             "button_link": "shopify://collections/conform",
+            "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
             "button_external": false,
@@ -594,15 +643,17 @@
       "block_order": [
         "heading_mAqtJV",
         "text_i63RN8",
+        "text_nktn3W",
         "button_nMXNFP"
       ],
       "settings": {
         "image": "shopify://shop_images/conformlp.jpg",
+        "img_url": "",
         "image_height": "adapt",
         "image_width": "small",
         "layout": "text_first",
         "text_alignment": "left",
-        "content_position": "align-self-center",
+        "custom_content_position": "items-center",
         "image_height_mobile": "adapt",
         "text_alignment_mobile": "center",
         "color_text": "#525252",
@@ -643,6 +694,9 @@
             "text_font": "body",
             "text_size": "subtext-sm",
             "text_max_size": 30,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -687,19 +741,40 @@
     "rich_text_PX4KRK": {
       "type": "rich-text",
       "blocks": {
-        "heading_VwXUMp": {
-          "type": "heading",
+        "text_bzFbyY": {
+          "type": "text",
           "settings": {
-            "heading": "DOs & DONT'S",
-            "heading_size": "title-lg tracking-heading",
-            "heading_tag": "h2",
+            "text": "<h2>DOs & DONT'S</h2>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_Amg43z": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         }
       },
       "block_order": [
-        "heading_VwXUMp"
+        "text_bzFbyY",
+        "text_Amg43z"
       ],
       "name": "Rich text",
       "settings": {
@@ -726,8 +801,8 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 24,
-        "padding_bottom": 24,
+        "padding_top": 0,
+        "padding_bottom": 0,
         "divider": false,
         "narrow": false,
         "rounded": false
@@ -784,6 +859,7 @@
         "gap": "large",
         "columns": 2,
         "columns_mobile": "1",
+        "carousel_on_desktop": true,
         "swipe_on_mobile": true,
         "heading": "",
         "heading_size": "title-md",
@@ -822,6 +898,9 @@
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -872,6 +951,9 @@
             "text_font": "body",
             "text_size": "subtext-custom",
             "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "text",
             "highlighted_scribble": "circle"
@@ -884,6 +966,9 @@
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -894,6 +979,7 @@
           "settings": {
             "button_label": "TAKE QUIZ NOW",
             "button_link": "https://irle3andv1z.typeform.com/to/gujvKvEg?typeform-source=shop.aetrex.com",
+            "button_video_link": "",
             "button_style": "primary",
             "button_size": "sm",
             "button_external": false,
@@ -925,6 +1011,7 @@
         "color_button_background": "#ed884a",
         "color_button_gradient": "",
         "color_overlay": "#171717",
+        "divider_color": "#111111",
         "overlay_opacity": 0,
         "padding_top": 24,
         "padding_bottom": 24,
@@ -945,6 +1032,9 @@
             "text_font": "body",
             "text_size": "subtext-custom",
             "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "text",
             "highlighted_scribble": "circle"
@@ -957,6 +1047,9 @@
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -967,6 +1060,7 @@
           "settings": {
             "button_label": "TAKE QUIZ NOW",
             "button_link": "",
+            "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
             "button_external": false,
@@ -983,11 +1077,12 @@
       "name": "Image with text",
       "settings": {
         "image": "shopify://shop_images/Gif_1.gif",
+        "img_url": "",
         "image_height": "adapt",
         "image_width": "medium",
         "layout": "text_first",
         "text_alignment": "left",
-        "content_position": "align-self-center",
+        "custom_content_position": "items-center",
         "image_height_mobile": "auto",
         "text_alignment_mobile": "center",
         "color_text": "",
@@ -1020,7 +1115,7 @@
     "image_with_text_DYXjiq",
     "multicolumn_TFjQe9",
     "image_with_text_Bad4Cj",
-    "rich_text_4XiQkT",
+    "image_with_text_GJDAhj",
     "image_with_text_hjPy3i",
     "rich_text_JWGnhT",
     "rich_text_PX4KRK",
