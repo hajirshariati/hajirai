@@ -61,6 +61,13 @@
             "show_if_outside_limits": true,
             "product": ""
           }
+        },
+        "govx_id_exclusive_discounts_govx_id_button_HDVPC9": {
+          "type": "shopify://apps/govx-id-exclusive-discounts/blocks/govx-id-button/2b41cbab-a2d3-48ab-85b4-09f16dcc4bf0",
+          "settings": {
+            "cta_layout": "slim",
+            "cta_prompt": "Discount available for Military, First Responders, Medical Workers and Teachers"
+          }
         }
       },
       "block_order": [
@@ -68,7 +75,8 @@
         "subtotal",
         "cart_note",
         "buttons",
-        "afterpay_on_site_messaging_payments_messaging_xmCix7"
+        "afterpay_on_site_messaging_payments_messaging_xmCix7",
+        "govx_id_exclusive_discounts_govx_id_button_HDVPC9"
       ],
       "settings": {
         "heading_size": "title-xl tracking-heading",
