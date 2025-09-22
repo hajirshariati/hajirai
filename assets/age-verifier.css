@@ -8,6 +8,7 @@
 }
 
 .age-modal>.overlay .media--blur {
+  -webkit-filter: blur(0.6rem);
   filter: blur(0.6rem);
   transform: scale(1.03);
 }

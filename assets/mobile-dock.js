@@ -46,7 +46,7 @@ if (!customElements.get('mobile-dock')) {
         
         if (!header.classList.contains('header-sticky')) {
           this.scrollY  = parseInt(header.getBoundingClientRect().bottom);
-          window.addEventListener('scroll', theme.utils.throttle(this.onScrollForHeader.bind(this)), false);
+          window.addEventListener('scroll', theme.utils.throttle(this.onScrollForHeader.bind(this)), { passive: true });
         }
       }
     
@@ -63,7 +63,7 @@ if (!customElements.get('mobile-dock')) {
         const footer = document.querySelector('.footer-copyright');
         if (footer === null) return;
     
-        window.addEventListener('scroll', theme.utils.throttle(this.onScrollForFooter.bind(this)), false);
+        window.addEventListener('scroll', theme.utils.throttle(this.onScrollForFooter.bind(this)), { passive: true });
       }
     
       onScrollForFooter() {

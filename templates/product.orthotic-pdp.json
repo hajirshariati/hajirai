@@ -24,7 +24,7 @@
             "title_size": "product-title-sm",
             "title_size_mobile": "product-title-md",
             "show_price": false,
-            "show_rating": true
+            "show_rating": false
           }
         },
         "price_TirYdK": {
@@ -64,7 +64,6 @@
         },
         "yotpo_product_reviews_star_rating_88eCgC": {
           "type": "shopify://apps/yotpo-product-reviews/blocks/star-rating/eb7dfd7d-db44-4334-bc49-c893b51b36cf",
-          "disabled": true,
           "settings": {
             "product": "{{product}}"
           }
@@ -101,21 +100,7 @@
             "heading": "Pairs well with",
             "product_limit": 4,
             "show_vendor": false,
-            "show_price": false
-          }
-        },
-        "klaviyo_email_marketing_sms_form_embed_block_qDg68M": {
-          "type": "shopify://apps/klaviyo-email-marketing-sms/blocks/form-embed-block/2632fe16-c075-4321-a88b-50b567f42507",
-          "settings": {
-            "formId": "UZG2CK"
-          }
-        },
-        "icon_list_VBaw6z": {
-          "type": "icon_list",
-          "settings": {
-            "heading": "Helps to relieve which foot pain",
-            "enable_carousel": true,
-            "show_below_media": true
+            "show_price": true
           }
         },
         "text-1": {
@@ -158,29 +143,6 @@
             "text_size": "text-sm"
           }
         },
-        "aetrex_fitai_pdp_size_recommendation_gUEcCb": {
-          "type": "shopify://apps/aetrex-fitai/blocks/PDPSizeRecommendation/6c991f1a-1e7d-4325-983c-2984a2e41236",
-          "settings": {
-            "ProductPage": true,
-            "tab_background": "#f2f2f2",
-            "tab_foreground": "#5c6271",
-            "active_tab_background": "#5c6271",
-            "acitve_tab_foreground": "#ffffff",
-            "button_background": "#f2f2f2",
-            "button_foreground": "#5c6271",
-            "acive_button_background": "#5c6271",
-            "acive_button_foreground": "#ffffff",
-            "size_color": "#d60000",
-            "result_header_background": "#d06263",
-            "result_header_foreground": "#ffffff",
-            "result_content_background": "#f1f1f1",
-            "result_content_foreground": "#707070",
-            "result_footer_background": "#c8c8c8",
-            "result_footer_foreground": "#363636",
-            "popup_title_background": "#c8c8c8",
-            "popup_title_foreground": "#363636"
-          }
-        },
         "sticky_buy_button": {
           "type": "sticky_buy_button",
           "settings": {}
@@ -196,18 +158,15 @@
         "true_fit_widget_8cjNbr",
         "buy_buttons",
         "complementary",
-        "klaviyo_email_marketing_sms_form_embed_block_qDg68M",
-        "icon_list_VBaw6z",
         "text-1",
         "text-3",
         "text-2",
         "text-4",
-        "aetrex_fitai_pdp_size_recommendation_gUEcCb",
         "sticky_buy_button"
       ],
       "settings": {
         "enable_sticky_info": true,
-        "media_size": 65,
+        "media_size": 66,
         "gallery_layout": "columns",
         "thumbnail_position": "beside",
         "image_ratio": "adapt_first",
@@ -222,7 +181,7 @@
         "padding_bottom": 28,
         "divider": false,
         "full_width": true,
-        "rounded": true
+        "rounded": false
       }
     },
     "scrolling_text_4DH9VU": {
@@ -427,56 +386,23 @@
     "product-details": {
       "type": "product-details",
       "blocks": {
-        "description_4ytTac": {
+        "description_DRfp3h": {
           "type": "description",
           "settings": {
-            "icon": "none",
+            "icon": "check_mark",
             "iwidth": "custom",
             "icon_width": 24,
             "heading": "Description",
             "split_mode": false
           }
         },
-        "collapsible_tab_3dfxMx": {
-          "type": "collapsible_tab",
-          "settings": {
-            "icon": "shoe",
-            "iwidth": "custom",
-            "icon_width": 24,
-            "heading": "Details",
-            "content": "",
-            "metafields": ""
-          }
-        },
-        "collapsible_tab_96ewnx": {
-          "type": "collapsible_tab",
-          "settings": {
-            "icon": "wash",
-            "iwidth": "custom",
-            "icon_width": 24,
-            "heading": "Care Instructions",
-            "content": "",
-            "metafields": ""
-          }
-        },
-        "collapsible_tab_C9R9gb": {
-          "type": "collapsible_tab",
-          "settings": {
-            "icon": "ruler",
-            "iwidth": "custom",
-            "icon_width": 24,
-            "heading": "Size Chart",
-            "content": "<p>Use collapsible tabs for more detailed information that will help customers make a purchasing decision.</p><p>Ex: Shipping and return policies, size guides, and other common questions.</p>",
-            "metafields": ""
-          }
-        },
         "collapsible_tab_TdVDbU": {
           "type": "collapsible_tab",
           "settings": {
-            "icon": "return",
+            "icon": "truck",
             "iwidth": "custom",
             "icon_width": 24,
-            "heading": "No-Hassle Returns",
+            "heading": "Shipping & Returns",
             "content": "<p>When you choose Aetrex, you make the healthy choice. Wear the shoes or Aetrex Orthotics and if you are not completely satisfied, return them to us. If you need detailed step-by-step instructions, please visit our <a href=\"https://support.aetrex.com/hc/en-us/articles/360007223654-How-do-I-return-an-order?_gl=1%2Amv7vy8%2A_gcl_aw%2AR0NMLjE3Mzk0NTI1MzYuQ2p3S0NBaUF6YmE5QmhCaEVpd0E3Z2xiYW1JRktlOUdSLUh3WnNGR1U1WHdRNGE1dTNVcklqR1VaNDNUNGhxYkt5cHFkcDM2ai10OWd4b0NBYzRRQXZEX0J3RQ..%2A_gcl_au%2AMTMyMDU2NzExNi4xNzM3NDA1Mjg0LjczODEwNDAyOS4xNzQyNDc3NzY0LjE3NDI0Nzc3NjQ.%2AFPAU%2AMTMyMDU2NzExNi4xNzM3NDA1Mjg0\" target=\"_blank\">FAQ page</a> for further guidance.<br/><br/>The refund will be processed to the original form of payment and should be reflected in your account within 5 to 7 days from the day of the drop-off.<br/><br/><strong>A return fee of $5.95</strong> will be automatically deducted when processing your return.<br/><br/>Shipping charges from the original order are non-refundable.</p>",
             "metafields": ""
           }
@@ -491,10 +417,7 @@
         }
       },
       "block_order": [
-        "description_4ytTac",
-        "collapsible_tab_3dfxMx",
-        "collapsible_tab_96ewnx",
-        "collapsible_tab_C9R9gb",
+        "description_DRfp3h",
         "collapsible_tab_TdVDbU",
         "specification_Qjh3nn"
       ],
@@ -502,7 +425,7 @@
         "style": "with-border",
         "open_first_row": true,
         "specifications_heading": "Helps to relieve which foot pain",
-        "heading": "",
+        "heading": "{{ product.title }}",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
@@ -522,11 +445,11 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 28,
+        "padding_top": 72,
         "padding_bottom": 28,
         "divider": false,
         "full_width": true,
-        "rounded": true
+        "rounded": false
       }
     },
     "multicolumn_KyfUdW": {
@@ -676,12 +599,12 @@
         "button_link": "",
         "button_external": false,
         "button_icon": true,
-        "highlighted_text": "text",
+        "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "",
         "color_background": "#ebf5ff",
         "gradient_background": "",
-        "color_highlight": "#ffffff",
+        "color_highlight": "",
         "gradient_highlight": "",
         "color_button_text": "",
         "color_button_background": "",
@@ -718,7 +641,7 @@
         "description": "",
         "enable_video_autoplay": false,
         "enable_video_looping": false,
-        "image_height": "400px",
+        "image_height": "adapt",
         "video_width": "medium",
         "layout": "text_first",
         "text_alignment": "center",
@@ -731,7 +654,7 @@
         "gradient_background": "",
         "color_background_2": "",
         "gradient_background_2": "",
-        "color_highlight": "#c5a370",
+        "color_highlight": "#99b7c4",
         "gradient_highlight": "",
         "color_button_text": "",
         "color_button_background": "",
@@ -743,15 +666,6 @@
         "rounded": true,
         "enable_parallax": false,
         "parallax_direction": "vertical"
-      }
-    },
-    "ugc_gallery_9emGbm": {
-      "type": "ugc-gallery",
-      "name": "UGC Gallery",
-      "settings": {
-        "custom_gallery": "{{ product.metafields.product.yotpo_gallery_id.value }}",
-        "global_pdp_sourced_gallery": "",
-        "global_fallback_sourced_gallery": "67c9dfd952921dee2bb9fc5c"
       }
     },
     "17477533508981334f": {
@@ -780,7 +694,7 @@
         "padding_bottom": 72,
         "divider": false,
         "full_width": false,
-        "rounded": true
+        "rounded": false
       }
     },
     "product-recommendations": {
@@ -973,7 +887,6 @@
     "multicolumn_KyfUdW",
     "multicolumn_CEQ6Uh",
     "video_with_text_xf4VTt",
-    "ugc_gallery_9emGbm",
     "17477533508981334f",
     "product-recommendations",
     "recently_viewed_xgPMUd",
