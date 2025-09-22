@@ -627,6 +627,11 @@
                     <span class="text-sm-base font-medium leading-none">{{ block.settings.heading | default: block.settings.page.title | escape }}</span>
                   </div>
                   {%- render 'icon', icon: 'plus-2', size: 'xs', class: 'shrink-0' -%}
+
+              <p class="product__sku" id="Sku-{{ section.id }}-{{ product.id }}" {{ block.shopify_attributes }}>SKU:&nbsp;
+                {{- product.selected_or_first_available_variant.sku -}}
+              </p>
+              
                 </summary>
                 <div class="details__content rte text-sm text-opacity">
                   
