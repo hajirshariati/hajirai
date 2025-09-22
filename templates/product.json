@@ -427,15 +427,14 @@
     "product-details": {
       "type": "product-details",
       "blocks": {
-        "collapsible_tab_EnqwqQ": {
-          "type": "collapsible_tab",
+        "description_4ytTac": {
+          "type": "description",
           "settings": {
             "icon": "none",
             "iwidth": "custom",
             "icon_width": 24,
             "heading": "Description",
-            "content": "<p>{{ product.metafields.custom.short_description | metafield_tag }}</p>",
-            "metafields": ""
+            "split_mode": false
           }
         },
         "collapsible_tab_3dfxMx": {
@@ -445,7 +444,7 @@
             "iwidth": "custom",
             "icon_width": 24,
             "heading": "Details",
-            "content": "{{ product.metafields.custom.details | metafield_tag: field: 'title' }}",
+            "content": "",
             "metafields": ""
           }
         },
@@ -456,7 +455,7 @@
             "iwidth": "custom",
             "icon_width": 24,
             "heading": "Care Instructions",
-            "content": "<p>{{ product.metafields.custom.care_instructions | metafield_tag }}</p>",
+            "content": "",
             "metafields": ""
           }
         },
@@ -492,7 +491,7 @@
         }
       },
       "block_order": [
-        "collapsible_tab_EnqwqQ",
+        "description_4ytTac",
         "collapsible_tab_3dfxMx",
         "collapsible_tab_96ewnx",
         "collapsible_tab_C9R9gb",
