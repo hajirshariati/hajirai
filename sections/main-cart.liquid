@@ -501,7 +501,23 @@
                 </div>
               {%- endif -%}
               
-              {%- if section.settings.add_discount_code -%}
+              
+            </div>
+          {%- endif -%}
+        </div>
+
+        <div class="grow-0">
+          <sticky-element class="flex flex-col gap-7d5 sticky top-0">
+
+
+
+
+
+
+
+
+
+            {%- if section.settings.add_discount_code -%}
                 {%- liquid
                   assign discount_codes = cart.cart_level_discount_applications | where: 'type', 'discount_code' | map: 'title'
                   for item in cart.items
@@ -562,12 +578,18 @@
                   </details>
                 </div>
               {%- endif -%}
-            </div>
-          {%- endif -%}
-        </div>
 
-        <div class="grow-0">
-          <sticky-element class="flex flex-col gap-7d5 sticky top-0">
+
+
+
+
+
+
+
+
+
+
+
             <div class="cart__sidebar flex flex-col gap-7d5 md:gap-10">
               {%- for block in section.blocks -%}
                 {%- case block.type -%}
