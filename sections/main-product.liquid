@@ -629,10 +629,7 @@
                   {%- render 'icon', icon: 'plus-2', size: 'xs', class: 'shrink-0' -%}
                 </summary>
                 <div class="details__content rte text-sm text-opacity">
-              <p class="product__sku" id="Sku-{{ section.id }}-{{ product.id }}" {{ block.shopify_attributes }}>SKU:&nbsp;
-                {{- product.selected_or_first_available_variant.sku -}}
-              </p>
-
+                  
                   {{ block.settings.content }}
                   {{ block.settings.page.content }}
                   {{ block.settings.liquid }}
