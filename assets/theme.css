@@ -16324,8 +16324,8 @@ video-media:not([playing]) .deferred-poster .play-button .icon:last-child:not(:o
     line-height: 0;
     vertical-align: baseline;
     left: 0;
-    font-size: 40%;
-    top: -1em;
+    font-size: 60%;
+    top: -0.5em;
 }
 
 .trademark-symbol {
@@ -16334,8 +16334,8 @@ video-media:not([playing]) .deferred-poster .play-button .icon:last-child:not(:o
     line-height: 0;
     vertical-align: baseline;
     left: 0;
-    font-size: 28%;
-    top: -2em;
+    font-size: 60%;
+    top: -0.5em;
 }
 
 /* PDP VARIANT GRID  */

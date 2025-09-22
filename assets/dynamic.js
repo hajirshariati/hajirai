@@ -167,34 +167,57 @@ document.addEventListener("DOMContentLoaded", function () {
 
 // custom detect symbols of tradmark and register starts
 function separateTrademarkSymbols() {
-  const elements = document.querySelectorAll('.rte, h1, h2, h3, h4, h5, h6, p, span, div, strong, b, em, i, small, mark, del, ins, sub, sup, blockquote, figcaption, caption, td, th, li, dt, dd, label, legend, button, a');
+  // Only target specific content areas where trademark symbols should appear
+  const contentSelectors = [
+    '.rte',
+    '.product-description', 
+    '.specification',
+    '.product-content',
+    '.content-area',
+    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+    'p:not([class*="price"]):not([class*="field"]):not([class*="input"])',
+    'li:not([class*="price"]):not([class*="field"]):not([class*="input"])',
+    'td:not([class*="price"]):not([class*="field"]):not([class*="input"])',
+    'th:not([class*="price"]):not([class*="field"]):not([class*="input"])',
+    'figcaption',
+    'caption',
+    'blockquote'
+  ];
+
+  const elements = document.querySelectorAll(contentSelectors.join(', '));
 
   elements.forEach(el => {
-    const text = el.textContent.trim();
-
-    // Match any word ending with ®, ™, or TM (case-insensitive for TM)
-    const match = text.match(/(.+?)(?:\s*)(®|™|TM)$/i);
-
-    if (match) {
-      const [, baseTextContent, symbol] = match;
+    // Skip any elements that are inside or part of form/interactive components
+    if (el.closest('form, price-range, facet-filters, .facets, .filter, .field, .input-wrapper, .range-wrapper, .price-range, input, select, textarea, button, [class*="facet"], [class*="filter"], [class*="range"], [data-price]')) {
+      return;
+    }
+    
+    // Additional check: skip if element has form-related classes
+    const classList = el.className || '';
+    if (classList.includes('prefix') || classList.includes('field') || classList.includes('input') || classList.includes('range') || classList.includes('filter') || classList.includes('facet')) {
+      return;
+    }
+    
+    // Get the original HTML content
+    let originalHTML = el.innerHTML;
+    
+    // Find all trademark symbols in the HTML and wrap them
+    // This regex finds trademark symbols that are not already wrapped in spans
+    const symbolRegex = /(?<!<span[^>]*>)([®™]|TM)(?![^<]*<\/span>)/gi;
+    
+    // Check if there are any trademark symbols to process
+    if (symbolRegex.test(originalHTML)) {
+      // Reset regex lastIndex for global regex
+      symbolRegex.lastIndex = 0;
       
-      // Get the original HTML content
-      const originalHTML = el.innerHTML;
-      
-      // Find the symbol in the HTML and replace it while preserving all HTML structure
-      // Create a regex to match the symbol at the end, accounting for possible whitespace
-      const symbolRegex = new RegExp(`\\s*(${symbol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})$`, 'i');
-      
-      // Check if the symbol exists in the HTML
-      if (symbolRegex.test(originalHTML)) {
+      // Replace all found symbols with wrapped versions
+      const newHTML = originalHTML.replace(symbolRegex, (match, symbol) => {
         // Determine class based on symbol
         const className = symbol === '®' ? 'register-symbol' : 'trademark-symbol';
-        
-        // Replace the symbol in the HTML while preserving all other HTML structure
-        const newHTML = originalHTML.replace(symbolRegex, `<span class="${className}">$1</span>`);
-        
-        el.innerHTML = newHTML;
-      }
+        return `<span class="${className}">${symbol}</span>`;
+      });
+      
+      el.innerHTML = newHTML;
     }
   });
 }
