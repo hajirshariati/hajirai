@@ -80,7 +80,7 @@
         "govx_id_exclusive_discounts_govx_id_button_HDVPC9"
       ],
       "settings": {
-        "heading_size": "title-xl tracking-heading",
+        "heading_size": "title-lg tracking-heading",
         "heading_alignment": "md:items-end",
         "heading_tag": "h1",
         "show_vendor": false,
