@@ -22,6 +22,7 @@
             "heading": "Customer service",
             "text": "<p><a href=\"https://www.aetrex.com/#\" title=\"#\">Click here </a>to consult with our specialists for a personalized product recommendation for your specific needs.</p>",
             "highlighted_text": "none",
+            "custom_html": "",
             "highlighted_scribble": "circle"
           }
         },
@@ -33,6 +34,7 @@
             "heading": "No Hassle Returns",
             "text": "<p>We offer quick, easy returns</p>",
             "highlighted_text": "none",
+            "custom_html": "",
             "highlighted_scribble": "circle"
           }
         },
@@ -44,6 +46,7 @@
             "heading": "Refer a friend",
             "text": "<p>Refer a friend and get 20% off each other.</p>",
             "highlighted_text": "none",
+            "custom_html": "",
             "highlighted_scribble": "circle"
           }
         },
@@ -55,6 +58,7 @@
             "heading": "Secure payment",
             "text": "<p>Safe and secure checkout with Signifyd technology.</p>",
             "highlighted_text": "none",
+            "custom_html": "",
             "highlighted_scribble": "circle"
           }
         }
@@ -107,6 +111,7 @@
             "heading": "Stay Connected",
             "text": "<p>Sign up for the latest news and offers.</p>",
             "highlighted_text": "none",
+            "custom_html": "<div class=\"klaviyo-form-TAKnwd\"></div>",
             "highlighted_scribble": "circle"
           }
         },
@@ -118,6 +123,7 @@
             "heading": "Aetrex Access",
             "text": "<p>Join and get <strong>FREE SHIPPING</strong> on all orders.<br/>Plus earn points & exclusive rewards.</p><p><a href=\"https://www.aetrex.com/pages/rewards\">Join Now</a></p>",
             "highlighted_text": "none",
+            "custom_html": "",
             "highlighted_scribble": "circle"
           }
         },
@@ -129,6 +135,7 @@
             "heading": "Order Tracking",
             "text": "<p>Find our when your online purchase<br/>will arrive at your home.</p><p><a href=\"https://orders.aetrex.com/\">Track Now</a></p>",
             "highlighted_text": "none",
+            "custom_html": "",
             "highlighted_scribble": "circle"
           }
         }
