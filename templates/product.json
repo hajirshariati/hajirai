@@ -847,15 +847,6 @@
         "rounded": false
       }
     },
-    "ugc_gallery_9emGbm": {
-      "type": "ugc-gallery",
-      "name": "UGC Gallery",
-      "settings": {
-        "custom_gallery": "{{ product.metafields.product.yotpo_gallery_id.value }}",
-        "global_pdp_sourced_gallery": "",
-        "global_fallback_sourced_gallery": "67c9dfd952921dee2bb9fc5c"
-      }
-    },
     "image_with_text_overlay_9zaRhz": {
       "type": "image-with-text-overlay",
       "blocks": {
@@ -977,7 +968,6 @@
     "17477533508981334f",
     "product-recommendations",
     "recently_viewed_xgPMUd",
-    "ugc_gallery_9emGbm",
     "image_with_text_overlay_9zaRhz",
     "recently-viewed"
   ]
