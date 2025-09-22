@@ -222,6 +222,15 @@
                           <div class="specification grid grid-cols-12 gap-6 md:gap-10">
                             {{- collapsible_content -}}
                           </div>
+
+
+            {%- if block.settings.heading == 'DETAILS' -%}
+              <p class="product__sku" id="Sku-{{ section.id }}-{{ product.id }}">
+                SKU:&nbsp;{{- product.selected_or_first_available_variant.sku -}}
+              </p>
+            {%- endif -%}
+
+
                         </div>
                       </details>
                     </div>
