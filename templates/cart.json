@@ -77,29 +77,12 @@
         "show_vendor": false,
         "show_payment_icons": false,
         "show_shipping_calculator": false,
+        "add_discount_code": true,
         "padding_top": 72,
         "padding_bottom": 60,
         "divider": false,
         "full_width": false,
         "rounded": false
-      }
-    },
-    "custom_liquid_LAUEGE": {
-      "type": "custom-liquid",
-      "name": "Custom Liquid",
-      "settings": {
-        "liquid": "<div class=\"yotpo-widget-instance\" data-yotpo-instance-id=\"1064470\"></div>",
-        "color_text": "",
-        "color_background": "#dfeeff",
-        "gradient_background": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 0,
-        "padding_bottom": 0,
-        "divider": false,
-        "narrow": true,
-        "rounded": true
       }
     },
     "recently-viewed": {
@@ -136,7 +119,6 @@
   },
   "order": [
     "main",
-    "custom_liquid_LAUEGE",
     "recently-viewed"
   ]
 }
