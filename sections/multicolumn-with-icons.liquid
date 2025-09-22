@@ -19,6 +19,11 @@
       -%}
       {%- for block in section.blocks -%}
         <div class="column flex gap-5 w-full flex-col xl:flex-row xl:text-{{ section.settings.text_alignment }} text-center" {{ block.shopify_attributes }}>
+
+
+
+
+
           {%- if block.settings.custom_icon != blank -%}
             <div class="column__icon with-svg">
               {{- block.settings.custom_icon -}}
@@ -30,16 +35,30 @@
           {%- endif -%}
           
           <div class="column__content">
+
+
+
+
             {%- if block.settings.heading != blank -%}
               <p class="column__title heading font-medium leading-tight tracking-none">
                 {%- render 'highlighted-text', content: block.settings.heading, style: block.settings.highlighted_text, scribble: block.settings.highlighted_scribble, gradient: with_gradient -%}
               </p>
+
+              
             {%- endif -%}
             {%- if block.settings.text != blank -%}
               <div class="column__text rte">
                 {{- block.settings.text -}}
               </div>
             {%- endif -%}
+
+<br>
+{%- if block.settings.custom_html != blank -%}
+  <div class="column__custom-html rte">
+    {{ block.settings.custom_html }}
+  </div>
+{%- endif -%}
+
           </div>
         </div>
       {%- endfor -%}
@@ -51,6 +70,8 @@
 {
   "name": "t:sections.multicolumn-with-icons.name",
   "settings": [
+
+ 
     {
       "type": "select",
       "id": "style",
@@ -136,6 +157,9 @@
       ],
       "default": "text-center md:items-center"
     },
+
+ 
+
     {
       "type": "select",
       "id": "heading_tag",
@@ -380,6 +404,9 @@
       "type": "column",
       "name": "t:sections.multicolumn.blocks.column.name",
       "settings": [
+
+
+
         {
           "type": "select",
           "id": "icon",
@@ -634,6 +661,12 @@
           "label": "t:sections.global.settings.description.label",
           "default": "<p>Use this section to explain a set of product features, to link to a series of pages, or to answer common questions about your products.</p>"
         },
+
+
+ 
+
+
+
         {
           "type": "header",
           "content": "t:sections.global.settings.header__highlight.content",
@@ -675,6 +708,15 @@
           "default": "none",
           "label": "t:sections.global.settings.highlighted_text.label"
         },
+
+{
+  "type": "html",
+  "id": "custom_html",
+  "label": "Custom HTML (below text)",
+
+},
+
+        
         {
           "visible_if": "{{ block.settings.highlighted_text == 'scribble' }}",
           "type": "select",
@@ -700,6 +742,12 @@
               "value": "squiggle-underline-2",
               "label": "t:sections.global.settings.highlighted_scribble.options__5.label"
             }
+
+
+
+
+
+
           ],
           "default": "circle",
           "label": "t:sections.global.settings.highlighted_scribble.label",
@@ -707,6 +755,7 @@
         }
       ]
     }
+  
   ],
   "presets": [
     {
