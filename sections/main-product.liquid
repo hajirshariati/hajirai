@@ -636,6 +636,14 @@
                   {{ block.settings.content }}
                   {{ block.settings.page.content }}
                   {{ block.settings.liquid }}
+
+{%- if block.settings.heading == 'DETAILS' -%}
+        <p class="product__sku" id="Sku-{{ section.id }}-{{ product.id }}" {{ block.shopify_attributes }}>
+          SKU:&nbsp;{{- product.selected_or_first_available_variant.sku -}}
+        </p>
+      {%- endif -%}
+
+
                 </div>
               </details>
 
