@@ -140,6 +140,7 @@
     "tab_attention_message_1": "Something we said?",
     "tab_attention_message_2": "We're still here!",
     "tab_attention_message_delay": 3,
+    "ss_branch_name": "nik/redesign",
     "checkout_logo_position": "left",
     "checkout_logo_size": "small",
     "checkout_body_background_color": "#ffffff",
