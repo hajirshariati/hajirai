@@ -229,8 +229,6 @@
 
 
 
-{%- if block.settings.heading == 'Size Chart' -%} 
-
 {%- if block.settings.heading == 'Size Chart' and block.settings.size_chart_table != blank -%}
   {%- assign table_data = block.settings.size_chart_table | parse_json -%}
   <div class="size-chart overflow-x-auto mt-4">
@@ -255,8 +253,6 @@
   </div>
 {%- endif -%}
 
-
-{%- endif -%}
 
 
 
