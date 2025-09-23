@@ -469,7 +469,7 @@
             "icon_width": 24,
             "heading": "Size Chart",
             "content": "<p> </p>",
-            "size_chart_table": "[\n  {\"Size\":\"S\",\"Chest\":\"36\"},\n  {\"Size\":\"M\",\"Chest\":\"38\"}\n]",
+            "size_chart_table": "{\n  \"type\": \"collapsible_tab\",\n  \"name\": \"Size Chart\",\n  \"settings\": [\n    {\n      \"type\": \"text\",\n      \"id\": \"heading\",\n      \"label\": \"Heading\",\n      \"default\": \"Size Chart\"\n    },\n    {\n      \"type\": \"text\",\n      \"id\": \"columns\",\n      \"label\": \"Columns (comma-separated)\",\n      \"default\": \"Size,Chest\"\n    },\n    {\n      \"type\": \"textarea\",\n      \"id\": \"rows\",\n      \"label\": \"Rows (one per line, comma-separated)\",\n      \"default\": \"S,36\\nM,38\"\n    }\n  ]\n}",
             "metafields": ""
           }
         },
