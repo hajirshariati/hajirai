@@ -5,6 +5,45 @@
     --section-padding-bottom: {{ section.settings.padding_bottom }}px;
     {%- render 'section-variables', section: section -%}
   }
+
+  /* Remove underline hover effects while keeping zoom */
+  #shopify-section-{{ section.id }} .media-card__link:hover .heading {
+    text-decoration: none;
+  }
+  
+  #shopify-section-{{ section.id }} .media-card__link:hover .media-card__text {
+    text-decoration: none;
+  }
+
+  /* Title positioning classes */
+  #shopify-section-{{ section.id }} .title-position-top .media-card__content {
+    align-items: flex-start;
+    justify-content: flex-start;
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    right: 1rem;
+  }
+
+  #shopify-section-{{ section.id }} .title-position-center .media-card__content {
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: calc(100% - 2rem);
+  }
+
+  #shopify-section-{{ section.id }} .title-position-bottom .media-card__content {
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  /* Drop shadow for titles */
+  #shopify-section-{{ section.id }} .collection-title-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
 </style>
 
 <div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}">
@@ -55,7 +94,9 @@
     image_type: section.settings.image_type,
     image_ratio: section.settings.image_ratio,
     show_products_count: false,
-    position: forloop.index
+    position: forloop.index,
+    title_position: block.settings.submenu_title_position,
+    title_shadow: block.settings.enable_title_drop_shadow
   -%}
 {%- else -%}
   {%- assign collection = collections[block.settings.collection] -%}
@@ -65,7 +106,9 @@
     image_type: section.settings.image_type,
     image_ratio: section.settings.image_ratio,
     show_products_count: section.settings.show_products_count,
-    position: forloop.index
+    position: forloop.index,
+    title_position: block.settings.submenu_title_position,
+    title_shadow: block.settings.enable_title_drop_shadow
   -%}
 {%- endif -%}
 
@@ -540,6 +583,38 @@
       "unit": "%",
       "label": "t:sections.global.settings.overlay_opacity.label",
       "default": 30
+    },
+    {
+      "type": "header",
+      "content": "Title Settings"
+    },
+    {
+      "type": "select",
+      "id": "submenu_title_position",
+      "options": [
+        {
+          "value": "top",
+          "label": "Top"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "bottom",
+          "label": "Bottom"
+        }
+      ],
+      "default": "bottom",
+      "label": "Title position",
+      "info": "Choose where to position the collection title within this card"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_title_drop_shadow",
+      "default": false,
+      "label": "Enable title drop shadow",
+      "info": "Add a drop shadow effect to this collection title"
     }
   ]
 }
