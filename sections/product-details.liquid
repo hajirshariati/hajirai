@@ -231,27 +231,30 @@
 
 {%- if block.settings.heading == 'Size Chart' -%} 
 
-  {%- assign table_data = block.settings.size_chart_table -%}
-  <div class="size-chart-table overflow-x-auto my-4">
-    <table class="w-full border-collapse border border-gray-300">
-      <thead>
+{%- if block.settings.heading == 'Size Chart' and block.settings.size_chart_table != blank -%}
+  {%- assign table_data = block.settings.size_chart_table | parse_json -%}
+  <div class="size-chart overflow-x-auto mt-4">
+    <table class="w-full border border-gray-300 text-left">
+      <thead class="bg-gray-100">
         <tr>
-          {%- for col in table_data.columns -%}
-            <th class="border border-gray-300 px-2 py-1 text-left">{{ col }}</th>
+          {%- for column in table_data[0] -%}
+            <th class="border px-3 py-2 font-medium">{{ column[0] }}</th>
           {%- endfor -%}
         </tr>
       </thead>
       <tbody>
-        {%- for row in table_data.rows -%}
+        {%- for row in table_data -%}
           <tr>
             {%- for cell in row -%}
-              <td class="border border-gray-300 px-2 py-1">{{ cell }}</td>
+              <td class="border px-3 py-2">{{ cell[1] }}</td>
             {%- endfor -%}
           </tr>
         {%- endfor -%}
       </tbody>
     </table>
   </div>
+{%- endif -%}
+
 
 {%- endif -%}
 
