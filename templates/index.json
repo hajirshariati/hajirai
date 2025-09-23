@@ -54,8 +54,8 @@
           "type": "button",
           "settings": {
             "button_label": "Watch Movie",
-            "button_link": "https://rvq643.saas.contentserv.com/admin/rest/gtstream/stream/assets/Aetrex B2B/The_Aetrex_Technology_Difference.mp4",
-            "button_video_link": "",
+            "button_link": "",
+            "button_video_link": "https://rvq643.saas.contentserv.com/admin/rest/gtstream/stream/assets/Aetrex B2B/The_Aetrex_Technology_Difference.mp4",
             "button_style": "primary",
             "button_size": "md",
             "button_external": true,
