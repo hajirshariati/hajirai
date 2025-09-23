@@ -228,25 +228,42 @@
                           </div>
 
  
-{%- if block.settings.heading == 'Size Chart' and block.settings.size_chart_table != blank -%}
-  {%- assign table_data = block.settings.size_chart_table | parse_json -%}
+ 
+
+
+
+
+
+
+                          {%- if block.settings.heading == 'Size Chart' and block.settings.size_chart_table != blank -%}
+  {%- liquid
+    assign table_data = block.settings.size_chart_table | parse_json
+    assign has_valid_data = false
+    
+    if table_data and table_data.size > 0
+      assign first_item = table_data.first
+      if first_item and first_item.size > 0
+        assign has_valid_data = true
+      endif
+    endif
+  -%}
   
-  {%- if table_data and table_data.size > 0 -%}
+  {%- if has_valid_data -%}
     <h3 class="text-lg font-medium mb-2">{{ block.settings.heading }}</h3>
     <div class="size-chart overflow-x-auto mt-2">
       <table class="w-full border border-gray-300 text-left">
         <thead class="bg-gray-100">
           <tr>
-            {%- for header in table_data.first -%}
-              <th class="border px-3 py-2 font-medium">{{ header.first }}</th>
+            {%- for key_value in table_data.first -%}
+              <th class="border px-3 py-2 font-medium">{{ key_value[0] }}</th>
             {%- endfor -%}
           </tr>
         </thead>
         <tbody>
           {%- for row in table_data -%}
             <tr>
-              {%- for cell in row -%}
-                <td class="border px-3 py-2">{{ cell.last }}</td>
+              {%- for key_value in row -%}
+                <td class="border px-3 py-2">{{ key_value[1] }}</td>
               {%- endfor -%}
             </tr>
           {%- endfor -%}
@@ -254,12 +271,16 @@
       </table>
     </div>
   {%- else -%}
-    <!-- Debug info - remove this once working -->
-    <div style="background: #f0f0f0; padding: 10px; margin: 10px 0;">
-      <strong>Debug Info:</strong><br>
-      Heading: {{ block.settings.heading }}<br>
-      Raw Data: {{ block.settings.size_chart_table }}<br>
-      Parsed Data Size: {{ table_data.size }}
+    <!-- Comprehensive Debug -->
+    <div style="background: #f0f0f0; padding: 15px; margin: 10px 0; font-family: monospace;">
+      <strong>Debug Information:</strong><br><br>
+      <strong>Heading:</strong> "{{ block.settings.heading }}"<br>
+      <strong>Raw JSON:</strong> {{ block.settings.size_chart_table }}<br>
+      <strong>JSON Length:</strong> {{ block.settings.size_chart_table.size }}<br>
+      <strong>Parse Result Type:</strong> {{ table_data | class }}<br>
+      <strong>Parse Result Size:</strong> {{ table_data.size }}<br>
+      <strong>First Item:</strong> {{ table_data.first }}<br>
+      <strong>Block Type:</strong> {{ block.type }}<br>
     </div>
   {%- endif -%}
 {%- endif -%}
