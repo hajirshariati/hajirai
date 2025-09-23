@@ -235,16 +235,16 @@
     <table class="w-full border border-gray-300 text-left">
       <thead class="bg-gray-100">
         <tr>
-          {%- for column in table_data[0] -%}
-            <th class="border px-3 py-2 font-medium">{{ column[0] }}</th>
+          {%- for column in table_data.columns -%}
+            <th class="border px-3 py-2 font-medium">{{ column }}</th>
           {%- endfor -%}
         </tr>
       </thead>
       <tbody>
-        {%- for row in table_data -%}
+        {%- for row in table_data.rows -%}
           <tr>
             {%- for cell in row -%}
-              <td class="border px-3 py-2">{{ cell[1] }}</td>
+              <td class="border px-3 py-2">{{ cell }}</td>
             {%- endfor -%}
           </tr>
         {%- endfor -%}
@@ -252,6 +252,7 @@
     </table>
   </div>
 {%- endif -%}
+
 
 
 
