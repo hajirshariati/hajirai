@@ -236,11 +236,11 @@
   {%- assign rows_raw = block.settings.rows | newline_to_br | split: '<br />' -%}
 
   {%- if columns.size > 0 and rows_raw.size > 0 -%}
-    <!-- Scrollable wrapper inside accordion -->
-    <div style="display:block; width:100%; overflow-x:auto; -webkit-overflow-scrolling: touch; margin:16px 0; position:relative;">
-      <table style="border-collapse:collapse; font-size:12px; min-width:600px; width:auto; border:1px solid #e5e5e5; border-radius:8px; background:white;">
+    <!-- SCROLLABLE TABLE INSIDE ACCORDION -->
+    <div style="width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 16px 0; position: relative;">
+      <table style="border-collapse: collapse; font-size: 12px; min-width: 600px; width: max-content; border: 1px solid #e5e5e5; border-radius: 8px; background: white;">
         <thead>
-          <tr style="background-color:#f8f8f8;">
+          <tr style="background-color: #f8f8f8;">
             {%- for column in columns -%}
               <th style="border-bottom:1px solid #e5e5e5; padding:8px 12px; text-align:left; font-weight:600; white-space:nowrap;">
                 {{ column | strip }}
@@ -263,10 +263,9 @@
           {%- endfor -%}
         </tbody>
       </table>
-      <!-- Optional right fade -->
+      <!-- RIGHT FADE -->
       <div style="position:absolute; top:0; right:0; width:40px; height:100%; pointer-events:none; background: linear-gradient(to left, white, rgba(255,255,255,0));"></div>
     </div>
-
     <div style="text-align:center; margin:8px 0 16px 0; font-size:11px; color:#666;">
       ← Scroll horizontally to see all sizes →
     </div>
