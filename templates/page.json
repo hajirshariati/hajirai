@@ -81,6 +81,7 @@
         "content_width": "small",
         "content_position": "md:items-center md:justify-center",
         "text_alignment": "center",
+        "video_url_mobile": "",
         "image_height_mobile": "auto",
         "content_position_mobile": "items-center justify-center",
         "text_alignment_mobile": "center",
@@ -269,73 +270,58 @@
         "rounded": false
       }
     },
-    "multicolumn_VTkXik": {
-      "type": "multicolumn",
+    "images_with_text_WtPNjT": {
+      "type": "images-with-text",
       "blocks": {
-        "column_ACzLQE": {
-          "type": "column",
+        "heading_Fx6jaH": {
+          "type": "heading",
           "settings": {
-            "show_border": false,
-            "text_alignment": "left",
-            "text_alignment_mobile": "left",
-            "image": "shopify://shop_images/Group_13.png",
-            "image_ratio": "adapt",
-            "heading": "",
-            "heading_size": "text-lg-2xl",
-            "text": "",
-            "button_label": "Shoe Finder Quiz",
-            "button_link": "#",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": true,
+            "heading": "Find the Solution You Need",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         },
-        "column_bJmgtA": {
-          "type": "column",
+        "button_CbJzat": {
+          "type": "button",
           "settings": {
-            "show_border": false,
-            "text_alignment": "left",
-            "text_alignment_mobile": "left",
-            "image": "shopify://shop_images/Group_15.png",
-            "image_ratio": "adapt",
-            "heading": "Orthotics Finder Quiz",
-            "heading_size": "text-lg-2xl",
-            "text": "",
-            "button_label": "",
+            "button_label": "Shoe Finder Quiz",
             "button_link": "",
-            "button_style": "secondary",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
             "button_external": false,
-            "button_icon": true,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
+            "button_icon": false
+          }
+        },
+        "button_bCdgHc": {
+          "type": "button",
+          "settings": {
+            "button_label": "Orthotic Finder Quiz",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
           }
         }
       },
       "block_order": [
-        "column_ACzLQE",
-        "column_bJmgtA"
+        "heading_Fx6jaH",
+        "button_CbJzat",
+        "button_bCdgHc"
       ],
-      "name": "t:sections.multicolumn.name",
+      "name": "t:sections.images-with-text.name",
       "settings": {
-        "gap": "large",
-        "columns": 2,
-        "columns_mobile": "2",
-        "carousel_on_desktop": false,
-        "swipe_on_mobile": false,
-        "heading": "Find the Solution You Need",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
+        "image_url": "",
+        "image2_url": "",
+        "image_ratio": "portrait",
+        "image_width": "medium",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
         "color_text": "",
         "color_background": "",
         "gradient_background": "",
@@ -348,7 +334,8 @@
         "padding_bottom": 72,
         "divider": false,
         "full_width": false,
-        "rounded": false
+        "rounded": false,
+        "enable_parallax": true
       }
     }
   },
@@ -357,6 +344,6 @@
     "video_with_text_overlay_cfhWL7",
     "collection_list_MUtgad",
     "testimonials_McVqED",
-    "multicolumn_VTkXik"
+    "images_with_text_WtPNjT"
   ]
 }
