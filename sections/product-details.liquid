@@ -114,328 +114,176 @@
                   {%- assign first_row = false -%}
                 {%- endif -%}
   
-              {%- when 'collapsible_tab' -%}
-                {%- capture collapsible_content -%}
-                  {%- liquid
-                    if block.settings.content != blank
-                      assign metafield_content = block.settings.content
-  
-                      if metafield_content contains '<h6>'
-                        if metafield_content contains 'class="metafield-single_line_text_field-array'
-                          assign metafield_content = metafield_content | replace: 'class="metafield-single_line_text_field-array', 'class="metafield-single_line_text_field-array col-span-full'
-                        elsif metafield_content contains 'class="metafield-rich_text_field'
-                          assign metafield_content = metafield_content | replace: 'class="metafield-rich_text_field', 'class="metafield-rich_text_field col-span-full'
-                        elsif metafield_content contains 'class='
-                          assign metafield_content = metafield_content | replace: 'class="', 'class="col-span-full '
-                        else
-                          assign metafield_content = '<div class="col-span-full">' | append: metafield_content | append: '</div>'
-                        endif
-                        
-                        assign metafield_content = metafield_content | replace_first: '<h6>', '<div class="grid grid-cols-12 gap-6 md:gap-10"><h6>'
-                        assign metafield_content = metafield_content | replace: '<h6>', '</div><div class="col-span-full md:col-span-6"><h6 class="leading-none tracking-none">'
-                        assign metafield_content = metafield_content | remove_first: '</div>'
-                        assign metafield_content = metafield_content | append: '</div></div>'
-                      else
-                        assign metafield_content = '<div class="col-span-full">' | append: metafield_content | append: '</div>'
-                      endif
-  
-                      echo metafield_content
-                    endif
-                  -%}
-  
-                  {%- if block.settings.metafields != blank -%}
-                    {%- assign metafields = block.settings.metafields | newline_to_br | split: '<br />' -%}
-                    {%- for line in metafields -%}
-                      {%- liquid
-                        assign metafield_parts = line | strip | split: '.'
-                        assign metafield_namespace = metafield_parts | first
-                        assign metafield_key = metafield_parts | last
-                        assign metafield_name = metafield_key | replace: '_', ' ' | capitalize
-  
-                        if metafield_namespace contains ':'
-                          assign parts = metafield_namespace | split: ':'
-                          assign metafield_namespace = parts | last
-                          assign metafield_name = parts | first
-                        endif
-  
-                        assign metafield = product.metafields[metafield_namespace][metafield_key]
-                      -%}
-  
-                      {%- if metafield.value != blank -%}
-                        <div class="col-span-full md:col-span-6">
-                          <h6 class="leading-none tracking-none">{{ metafield_name | escape }}</h6>
-                          {%- if metafield.list? -%}
-                            <p>
-                              {%- liquid
-                                for value in metafield.value
-                                  echo value
-                                  unless forloop.last
-                                    echo '<br />'
-                                  endunless
-                                endfor
-                              -%}
-                            </p>
-                          {%- else -%}
-                            {{- metafield | metafield_tag -}}
-                          {%- endif -%}
-                        </div>
-                      {%- endif -%}
-                    {%- endfor -%}
-                  {%- endif -%}
-                {%- endcapture -%}
-  
-                {%- if collapsible_content != blank -%}
-                  {%- if block.settings.heading != blank -%}
-                    <div class="accordion">
-                      <details class="details" is="accordion-details"{% if section.settings.open_first_row and first_row %} open{% endif %} {{ block.shopify_attributes }}>
-                        <summary class="details__summary flex items-center justify-between gap-2 cursor-pointer">
-                          <span class="heading text-base-xl font-medium leading-none flex items-center gap-2d5 md:gap-3">
-                            {%- if block.settings.icon_image != blank -%}
-                              {%- liquid
-                                if block.settings.iwidth == 'fit'
-                                  assign icon_width = block.settings.icon_image.width
-                                else
-                                  assign icon_width = block.settings.icon_width
-                                endif
-                              -%}
-                              <figure class="media media--transparent relative inline-block">
-                                {%- capture sizes -%}{{ icon_width }}px{%- endcapture -%}
-                                {%- capture widths -%}{{ icon_width }}, {{ icon_width | times: 2 | at_most: block.settings.icon_image.width }}{%- endcapture -%}
-                                {%- assign image_alt = block.settings.icon_image.alt | default: block.settings.accessibility_info | escape -%}
-                                {%- assign image_alt = image_alt | default: block.settings.heading | escape -%}
-                                {{- block.settings.icon_image | image_url: width: block.settings.icon_image.width | image_tag: loading: 'lazy', sizes: sizes, widths: widths, alt: image_alt, class: 'image-fit' -}}
-                              </figure>
-                            {%- elsif block.settings.icon != 'none' -%}
-                              {%- liquid
-                                if block.settings.iwidth == 'fit'
-                                  render 'icon-guarantee', icon: block.settings.icon, size: 'lg', class: 'inline-block'
-                                else
-                                  render 'icon-guarantee', icon: block.settings.icon, size: 'custom', class: 'inline-block', width: block.settings.icon_width
-                                endif
-                              -%}
-                            {%- endif -%}
-                            {{- block.settings.heading | escape -}}
-                          </span>
-                          {%- render 'icon', icon: 'plus-2', size: 'xs', class: 'shrink-0' -%}
-                        </summary>
-                        <div class="details__content text-base rte">
-                          <div class="specification grid grid-cols-12 gap-6 md:gap-10">
-                            {{- collapsible_content -}}
-                          </div>
+{%- when 'collapsible_tab' -%}
+  {%- capture collapsible_content -%}
+    {%- liquid
+      if block.settings.content != blank
+        assign metafield_content = block.settings.content
 
+        if metafield_content contains '<h6>'
+          if metafield_content contains 'class="metafield-single_line_text_field-array'
+            assign metafield_content = metafield_content | replace: 'class="metafield-single_line_text_field-array', 'class="metafield-single_line_text_field-array col-span-full'
+          elsif metafield_content contains 'class="metafield-rich_text_field'
+            assign metafield_content = metafield_content | replace: 'class="metafield-rich_text_field', 'class="metafield-rich_text_field col-span-full'
+          elsif metafield_content contains 'class='
+            assign metafield_content = metafield_content | replace: 'class="', 'class="col-span-full '
+          else
+            assign metafield_content = '<div class="col-span-full">' | append: metafield_content | append: '</div>'
+          endif
+          
+          assign metafield_content = metafield_content | replace_first: '<h6>', '<div class="grid grid-cols-12 gap-6 md:gap-10"><h6>'
+          assign metafield_content = metafield_content | replace: '<h6>', '</div><div class="col-span-full md:col-span-6"><h6 class="leading-none tracking-none">'
+          assign metafield_content = metafield_content | remove_first: '</div>'
+          assign metafield_content = metafield_content | append: '</div></div>'
+        else
+          assign metafield_content = '<div class="col-span-full">' | append: metafield_content | append: '</div>'
+        endif
 
-            {%- if block.settings.heading == 'Size Chart' -%}
-<style>
-.size-guide{margin:auto;overflow:scroll;width:100%;height:100vh;overflow:auto;position:relative;background-color:var(--color-white);padding:1.5rem .75rem;max-width:70rem}@media(min-width: 1024px){.size-guide{padding:2.375rem 1.5rem;height:auto}}.size-guide__table-wrapper{width:100%;margin-top:1.5rem;margin-bottom:.75rem;overflow-x:auto;border-left:1px solid var(--color-light)}.size-guide__table-wrapper::-webkit-scrollbar{width:4px;height:4px}.size-guide__table-wrapper::-webkit-scrollbar-track{background:var(--color-light);border-radius:0}.size-guide__table-wrapper::-webkit-scrollbar-thumb{background:var(--color-black);border-radius:0}.size-guide__table-wrapper::-webkit-scrollbar-thumb:hover{background:var(--color-black)}.size-guide__table{border-collapse:collapse;width: max-content;min-width:100%}.size-guide__table th,.size-guide__table td{border:1px solid var(--color-light);width:4.25rem;padding:.75rem;text-align:center}.size-guide__table td:first-child{border-left:none}.size-guide__table td:nth-child(odd),.size-guide__table th:nth-child(odd){background-color:var(--color-off-white)}.size-guide__table td:nth-child(even),.size-guide__table th:nth-child(even){background-color:var(--color-white)}.size-guide__table .tsize-sticky-col{position:sticky;left:0;text-align:left;z-index:2;border-right:1px solid var(--color-light);box-shadow:2px 0 5px rgba(0,0,0,.1)}.size-guide__info{display:flex;justify-content:start;flex-direction:column;row-gap:1.5rem;margin-top:1.5rem}@media(min-width: 1024px){.size-guide__info{margin-top:2.75rem;flex-direction:row}}@media(min-width: 1024px){.size-guide__info .size-guide__info-left,.size-guide__info .size-guide__info-right{width:50%;padding-right:6rem}}
-</style>
-<div class="size-guide__content">
-<h3 class="uppercase w-semibold">Size Guide</h3>
-<div class="size-guide__info">
-<div class="size-guide__info-left">
-<p class="p-3">Make sure you are standing, wearing the socks or stockings you will wear with your new shoes. Using one of the following charts, convert your U.S. shoe size to EU.</p>
-</div>
-<div class="size-guide__info-right">
-<p class="p-3 w-semibold">IN BETWEEN SIZES?</p>
-<p class="p-3">Aetrex recommends you size up for footwear and Orthotics</p>
-</div>
-</div>
-<div class="size-guide__table-wrapper">
-<table  class="size-guide__table">
-<tbody>
-<tr style="height: 39.1875px;">
-<td style="width: 10.3832%; height: 39.1875px;" class="tsize-sticky-col p-3 w-semibold">HEEL-TOE MEASUREMENT</td>
-<td style="width: 4.83879%; height: 39.1875px;"class="p-3">7.2" - 7.5"</td>
-<td style="width: 2.82263%; height: 39.1875px;"class="p-3">7.9"</td>
-<td style="width: 2.82263%; height: 39.1875px;"class="p-3">8.2"</td>
-<td style="width: 2.82263%; height: 39.1875px;"class="p-3">8.5"</td>
-<td style="width: 2.82263%; height: 39.1875px;" class="p-3">8.7"</td>
-<td style="width: 2.82263%; height: 39.1875px;" class="p-3">8.8"</td>
-<td style="width: 2.82263%; height: 39.1875px;" class="p-3">8.9"</td>
-<td style="width: 2.82263%; height: 39.1875px;" class="p-3">9.0"</td>
-<td style="width: 2.82263%; height: 39.1875px;" class="p-3">9.2"</td>
-<td style="width: 2.82263%; height: 39.1875px;" class="p-3">9.3"</td>
-<td style="width: 2.82263%; height: 39.1875px;" class="p-3">9.5"</td>
-<td style="width: 2.82263%; height: 39.1875px;" class="p-3">9.7"</td>
-<td style="width: 2.82263%; height: 39.1875px;" class="p-3">9.8"</td>
-<td style="width: 3.52828%; height: 39.1875px;" class="p-3">10.0"</td>
-<td style="width: 3.52828%; height: 39.1875px;" class="p-3">10.2"</td>
-<td style="width: 3.52828%; height: 39.1875px;" class="p-3">10.4"</td>
-<td style="width: 3.52828%; height: 39.1875px;" class="p-3">10.5"</td>
-<td style="width: 3.52828%; height: 39.1875px;" class="p-3">10.7"</td>
-<td style="width: 3.52828%; height: 39.1875px;" class="p-3">10.8"</td>
-<td style="width: 3.52828%; height: 39.1875px;" class="p-3">11.0"</td>
-<td style="width: 3.52828%; height: 39.1875px;" class="p-3">11.2"</td>
-<td style="width: 3.52828%; height: 39.1875px;" class="p-3">11.3"</td>
-<td style="width: 3.52828%; height: 39.1875px;" class="p-3">11.5"</td>
-<td style="width: 3.52828%; height: 39.1875px;" class="p-3">11.7"</td>
-<td style="width: 3.52828%; height: 39.1875px;" class="p-3">11.9"</td>
-<td style="width: 3.52828%; height: 39.1875px;" class="p-3">12.0"</td>
-</tr>
-<tr style="height: 19.5938px;">
-<td style="width: 10.3832%; height: 19.5938px;" class="tsize-sticky-col p-3 w-semibold">WOMEN'S - US</td>
-<td style="width: 4.83879%; height: 19.5938px;"class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;"class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;"class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;"class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">5</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">5.5</td>
-<td style="width: 2.82263%; height: 19.5938px;"class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">6</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">6.5</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">7</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">7.5</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">8</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">8.5</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">9</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">9.5</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">10</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">10.5</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">11</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">11.5</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">12</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">--</td>
-</tr>
-<tr style="height: 19.5938px;">
-<td style="width: 10.3832%; height: 19.5938px;" class="tsize-sticky-col p-3 w-semibold">WOMEN'S - EU</td>
-<td style="width: 4.83879%; height: 19.5938px;"class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;"class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;"class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;"class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">35</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">35</td>
-<td style="width: 2.82263%; height: 19.5938px;"class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">36</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">36</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">37</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">38</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">38</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">39</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">40</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">40</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">41</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">41</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">42</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">43</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">43</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">--</td>
-</tr>
-<tr style="height: 19.5938px;">
-<td style="width: 10.3832%; height: 19.5938px;" class="tsize-sticky-col p-3 w-semibold">MEN'S - US</td>
-<td style="width: 4.83879%; height: 19.5938px;"class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;"class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;"class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;"class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;"class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">7</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">7.5</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">8</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">8.5</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">9</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">9.5</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">10</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">10.5</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">11</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">11.5</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">12</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">12.5</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">13</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">13.5</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">14</td>
-</tr>
-<tr style="height: 19.5938px;">
-<td style="width: 10.3832%; height: 19.5938px;" class="tsize-sticky-col p-3 w-semibold">MEN'S - EU</td>
-<td style="width: 4.83879%; height: 19.5938px;"class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;"class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;"class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;"class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;"class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">39</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">40</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">41</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">42</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">42</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">43</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">43</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">44</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">45</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">45</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">46</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">47</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">47</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">48</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">48</td>
-</tr>
-<tr style="height: 19.5938px;">
-<td style="width: 10.3832%; height: 19.5938px;" class="tsize-sticky-col p-3 w-semibold">KIDS - US	</td>
-<td style="width: 4.83879%; height: 19.5938px;"class="p-3">C12/13	</td>
-<td style="width: 2.82263%; height: 19.5938px;"class="p-3">Y1</td>
-<td style="width: 2.82263%; height: 19.5938px;"class="p-3">Y2</td>
-<td style="width: 2.82263%; height: 19.5938px;"class="p-3">Y3</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">Y4</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">Y5</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">Y6</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 2.82263%; height: 19.5938px;" class="p-3">Y7</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">--</td>
-<td style="width: 3.52828%; height: 19.5938px;" class="p-3">--</td>
-</tr>
-</tbody>
-</table>
-</div>
-<p class="p-4 color-medium-dark">This Size Chart Scrolls Horizontally</p>
-</div>
+        echo metafield_content
+      endif
+    -%}
+
+    {%- if block.settings.metafields != blank -%}
+      {%- assign metafields = block.settings.metafields | newline_to_br | split: '<br />' -%}
+      {%- for line in metafields -%}
+        {%- liquid
+          assign metafield_parts = line | strip | split: '.'
+          assign metafield_namespace = metafield_parts | first
+          assign metafield_key = metafield_parts | last
+          assign metafield_name = metafield_key | replace: '_', ' ' | capitalize
+
+          if metafield_namespace contains ':'
+            assign parts = metafield_namespace | split: ':'
+            assign metafield_namespace = parts | last
+            assign metafield_name = parts | first
+          endif
+
+          assign metafield = product.metafields[metafield_namespace][metafield_key]
+        -%}
+
+        {%- if metafield.value != blank -%}
+          <div class="col-span-full md:col-span-6">
+            <h6 class="leading-none tracking-none">{{ metafield_name | escape }}</h6>
+            {%- if metafield.list? -%}
+              <p>
+                {%- liquid
+                  for value in metafield.value
+                    echo value
+                    unless forloop.last
+                      echo '<br />'
+                    endunless
+                  endfor
+                -%}
+              </p>
+            {%- else -%}
+              {{- metafield | metafield_tag -}}
             {%- endif -%}
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endif -%}
+  {%- endcapture -%}
+
+  {%- if collapsible_content != blank or block.settings.heading == 'SIZE CHART' -%}
+    <div class="accordion">
+      <details class="details" is="accordion-details"{% if section.settings.open_first_row and first_row %} open{% endif %} {{ block.shopify_attributes }}>
+        <summary class="details__summary flex items-center justify-between gap-2 cursor-pointer">
+          <span class="heading text-base-xl font-medium leading-none flex items-center gap-2d5 md:gap-3">
+            {%- if block.settings.icon_image != blank -%}
+              {%- liquid
+                if block.settings.iwidth == 'fit'
+                  assign icon_width = block.settings.icon_image.width
+                else
+                  assign icon_width = block.settings.icon_width
+                endif
+              -%}
+              <figure class="media media--transparent relative inline-block">
+                {%- capture sizes -%}{{ icon_width }}px{%- endcapture -%}
+                {%- capture widths -%}{{ icon_width }}, {{ icon_width | times: 2 | at_most: block.settings.icon_image.width }}{%- endcapture -%}
+                {%- assign image_alt = block.settings.icon_image.alt | default: block.settings.accessibility_info | escape -%}
+                {%- assign image_alt = image_alt | default: block.settings.heading | escape -%}
+                {{- block.settings.icon_image | image_url: width: block.settings.icon_image.width | image_tag: loading: 'lazy', sizes: sizes, widths: widths, alt: image_alt, class: 'image-fit' -}}
+              </figure>
+            {%- elsif block.settings.icon != 'none' -%}
+              {%- liquid
+                if block.settings.iwidth == 'fit'
+                  render 'icon-guarantee', icon: block.settings.icon, size: 'lg', class: 'inline-block'
+                else
+                  render 'icon-guarantee', icon: block.settings.icon, size: 'custom', class: 'inline-block', width: block.settings.icon_width
+                endif
+              -%}
+            {%- endif -%}
+            {{- block.settings.heading | escape -}}
+          </span>
+          {%- render 'icon', icon: 'plus-2', size: 'xs', class: 'shrink-0' -%}
+        </summary>
+
+        <div class="details__content text-base rte">
+          {%- if block.settings.heading == 'SIZE CHART' -%}
+            <!-- 👇 Your custom Size Chart -->
+            <style>
+              .size-guide__table-wrapper {
+                width: 100%;
+                margin-top: 1.5rem;
+                margin-bottom: .75rem;
+                overflow-x: auto;
+                border-left: 1px solid var(--color-light);
+              }
+              .size-guide__table {
+                border-collapse: collapse;
+                width: max-content;
+                min-width: 100%;
+              }
+              .size-guide__table th,
+              .size-guide__table td {
+                padding: .5rem 1rem;
+                border: 1px solid var(--color-light);
+                text-align: center;
+                white-space: nowrap;
+              }
+              .size-guide__table th {
+                background: var(--color-light);
+                font-weight: 600;
+              }
+            </style>
+            <div class="size-guide__content">
+              <div class="size-guide__table-wrapper">
+                <table class="size-guide__table">
+                  <thead>
+                    <tr>
+                      <th>Size</th>
+                      <th>Chest (in)</th>
+                      <th>Waist (in)</th>
+                      <th>Hips (in)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>S</td><td>34–36</td><td>28–30</td><td>35–37</td></tr>
+                    <tr><td>M</td><td>38–40</td><td>32–34</td><td>39–41</td></tr>
+                    <tr><td>L</td><td>42–44</td><td>36–38</td><td>43–45</td></tr>
+                    <tr><td>XL</td><td>46–48</td><td>40–42</td><td>47–49</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          {%- else -%}
+            <div class="specification grid grid-cols-12 gap-6 md:gap-10">
+              {{- collapsible_content -}}
+            </div>
+          {%- endif -%}
+        </div>
+      </details>
+    </div>
+    {%- assign first_row = false -%}
+  {%- endif -%}
 
 
-                        </div>
-                      </details>
-                    </div>
-                  {%- else -%}
-                    <div class="text-base rte" {{ block.shopify_attributes }}>
-                      <div class="specification grid grid-cols-12 gap-6 md:gap-10">
-                        {{- collapsible_content -}}
-                      </div>
-                    </div>
-                  {%- endif -%}
-                  {%- assign first_row = false -%}
-                {%- endif -%}
+
+
+
+
+
+
             {%- endcase -%}
           {%- endfor -%}
         </accordions-details>
