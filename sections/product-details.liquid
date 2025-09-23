@@ -234,15 +234,15 @@
  {%- if block.settings.heading == 'Size Chart' and block.settings.columns != blank and block.settings.rows != blank -%}
   {%- assign columns = block.settings.columns | split: ',' -%}
   {%- assign rows_raw = block.settings.rows | newline_to_br | split: '<br />' -%}
-  
+
   {%- if columns.size > 0 and rows_raw.size > 0 -%}
-    <!-- Scrollable table wrapper inside accordion -->
-    <div style="width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 16px 0; position: relative;">
-      <table style="border-collapse: collapse; font-size: 12px; width: auto; min-width: 400px; border: 1px solid #e5e5e5; border-radius: 8px; background: white;">
+    <!-- Scrollable wrapper inside accordion -->
+    <div style="display:block; width:100%; overflow-x:auto; -webkit-overflow-scrolling: touch; margin:16px 0; position:relative;">
+      <table style="border-collapse:collapse; font-size:12px; min-width:600px; width:auto; border:1px solid #e5e5e5; border-radius:8px; background:white;">
         <thead>
-          <tr style="background-color: #f8f8f8;">
+          <tr style="background-color:#f8f8f8;">
             {%- for column in columns -%}
-              <th style="border-bottom: 1px solid #e5e5e5; padding: 8px 12px; text-align: left; font-weight: 600; white-space: nowrap; min-width: 60px;">
+              <th style="border-bottom:1px solid #e5e5e5; padding:8px 12px; text-align:left; font-weight:600; white-space:nowrap;">
                 {{ column | strip }}
               </th>
             {%- endfor -%}
@@ -252,9 +252,9 @@
           {%- for row_raw in rows_raw -%}
             {%- assign row_data = row_raw | strip | split: ',' -%}
             {%- if row_data.size > 0 and row_raw != blank -%}
-              <tr style="border-bottom: 1px solid #f0f0f0;">
+              <tr style="border-bottom:1px solid #f0f0f0;">
                 {%- for cell in row_data -%}
-                  <td style="padding: 6px 12px; border-right: 1px solid #f0f0f0; white-space: nowrap; font-size: 11px;">
+                  <td style="padding:6px 12px; border-right:1px solid #f0f0f0; white-space:nowrap; font-size:11px;">
                     {{ cell | strip }}
                   </td>
                 {%- endfor -%}
@@ -263,12 +263,11 @@
           {%- endfor -%}
         </tbody>
       </table>
-
-      <!-- Right fade overlay -->
+      <!-- Optional right fade -->
       <div style="position:absolute; top:0; right:0; width:40px; height:100%; pointer-events:none; background: linear-gradient(to left, white, rgba(255,255,255,0));"></div>
     </div>
 
-    <div style="text-align: center; margin: 8px 0 16px 0; font-size: 11px; color: #666;">
+    <div style="text-align:center; margin:8px 0 16px 0; font-size:11px; color:#666;">
       ← Scroll horizontally to see all sizes →
     </div>
   {%- endif -%}
