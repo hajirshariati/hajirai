@@ -230,11 +230,14 @@
 {%- if block.settings.heading == 'Size Chart' and block.settings.size_chart_table != blank -%}
 
   {%- comment -%} 
-    Clean up the JSON string and parse it 
+    Remove unwanted characters and parse the JSON string 
   {%- endcomment -%}
-  {%- assign table_data_raw = block.settings.size_chart_table -%}
-  {%- assign table_data_json = table_data_raw | remove: '\n' | remove: '\r' | remove: '\t' -%}
-  {%- assign table_data = table_data_json | parse_json -%}
+  {%- assign table_data_clean = block.settings.size_chart_table 
+      | strip 
+      | replace: '\n', '' 
+      | replace: '\r', '' 
+      | replace: '\t', '' -%}
+  {%- assign table_data = table_data_clean | parse_json -%}
 
   {%- if table_data and table_data.size > 0 -%}
 
@@ -260,9 +263,12 @@
       </table>
     </div>
 
+  {%- else -%}
+    <p>No size chart data available.</p>
   {%- endif -%}
-  
+
 {%- endif -%}
+
 
 
 
