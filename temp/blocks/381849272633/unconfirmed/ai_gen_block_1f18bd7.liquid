@@ -1,6 +1,799 @@
+{% doc %}
+  @prompt
+    a section similar to how collection list section tiles look like. when you click a tile it flips to show subcategories where you can click on the subcategories, its only 3 tiles and have the option for up to 12 subcategories. Theres doesn't have to be a "main category" link option, can there be a main section title, can you make it easier to manage each tile in the template by breaking them up in the editor? make it so the background is white and all text is black, make it so the backside of the tile is scrollable to scroll through the category list
+
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-category-tiles-{{ ai_gen_id }} {
+    padding: 40px 20px;
+    background-color: #ffffff;
+  }
+
+  .ai-category-tiles__container-{{ ai_gen_id }} {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .ai-category-tiles__title-{{ ai_gen_id }} {
+    text-align: center;
+    margin: 0 0 40px;
+    color: #000000;
+    font-size: {{ block.settings.title_size }}px;
+  }
+
+  .ai-category-tiles__grid-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .ai-category-tile-{{ ai_gen_id }} {
+    position: relative;
+    height: {{ block.settings.tile_height }}px;
+    perspective: 1000px;
+  }
+
+  .ai-category-tile__inner-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    cursor: pointer;
+  }
+
+  .ai-category-tile-{{ ai_gen_id }}.flipped .ai-category-tile__inner-{{ ai_gen_id }} {
+    transform: rotateY(180deg);
+  }
+
+  .ai-category-tile__front-{{ ai_gen_id }},
+  .ai-category-tile__back-{{ ai_gen_id }} {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: {{ block.settings.border_radius }}px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .ai-category-tile__front-{{ ai_gen_id }} {
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 30px;
+    border: 1px solid #e5e5e5;
+  }
+
+  .ai-category-tile__back-{{ ai_gen_id }} {
+    background-color: #ffffff;
+    transform: rotateY(180deg);
+    border: 1px solid #e5e5e5;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ai-category-tile__image-{{ ai_gen_id }} {
+    width: 100%;
+    height: 60%;
+    object-fit: cover;
+    margin-bottom: 20px;
+  }
+
+  .ai-category-tile__image-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 60%;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+
+  .ai-category-tile__image-placeholder-{{ ai_gen_id }} svg {
+    width: 60px;
+    height: 60px;
+    color: #999999;
+  }
+
+  .ai-category-tile__title-{{ ai_gen_id }} {
+    color: #000000;
+    font-size: {{ block.settings.tile_title_size }}px;
+    font-weight: 600;
+    margin: 0;}
+
+  .ai-category-tile__back-header-{{ ai_gen_id }} {
+    padding: 20px 20px 15px;
+    border-bottom: 1px solid #e5e5e5;display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f8f8f8;
+  }
+
+  .ai-category-tile__back-title-{{ ai_gen_id }} {
+    color: #000000;
+    font-size: {{ block.settings.subcategory_title_size }}px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .ai-category-tile__close-{{ ai_gen_id }} {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    color: #000000;
+    font-size:20px;
+    line-height: 1;
+  }
+
+  .ai-category-tile__subcategories-{{ ai_gen_id }} {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+  }
+
+  .ai-category-tile__subcategory-{{ ai_gen_id }} {
+    display: block;
+    padding: 15px 20px;
+    color: #000000;
+    text-decoration: none;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s ease;
+    font-size: {{ block.settings.subcategory_size }}px;
+  }
+
+  .ai-category-tile__subcategory-{{ ai_gen_id }}:hover {
+    background-color: #f8f8f8;
+  }
+
+  .ai-category-tile__subcategory-{{ ai_gen_id }}:last-child {
+    border-bottom: none;
+  }
+
+  .ai-category-tile__empty-state-{{ ai_gen_id }} {
+    padding: 40px 20px;
+    text-align: center;
+    color: #666666;
+    font-style: italic;
+  }
+
+  @media screen and (max-width: 768px) {
+    .ai-category-tiles__grid-{{ ai_gen_id }} {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .ai-category-tile-{{ ai_gen_id }} {
+      height: {{ block.settings.tile_height | times: 0.8 }}px;
+    }
+
+    .ai-category-tiles__title-{{ ai_gen_id }} {
+      font-size: {{ block.settings.title_size | times: 0.9 }}px;
+      margin-bottom: 30px;
+    }
+  }
+{% endstyle %}<category-tiles-{{ ai_gen_id }}
+  class="ai-category-tiles-{{ ai_gen_id }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="ai-category-tiles__container-{{ ai_gen_id }}">
+    {% if block.settings.section_title != blank %}
+      <h2 class="ai-category-tiles__title-{{ ai_gen_id }}">{{ block.settings.section_title }}</h2>
+    {% endif %}
+
+    <div class="ai-category-tiles__grid-{{ ai_gen_id }}">
+      {% for i in (1..3) %}
+        {% liquid
+          assign tile_title_key = 'tile_' | append: i | append: '_title'
+          assign tile_image_key = 'tile_' | append: i | append: '_image'
+          assign tile_title = block.settings[tile_title_key]
+          assign tile_image = block.settings[tile_image_key]
+        %}<div class="ai-category-tile-{{ ai_gen_id }}" data-tile="{{ i }}">
+          <div class="ai-category-tile__inner-{{ ai_gen_id }}">
+            <div class="ai-category-tile__front-{{ ai_gen_id }}">
+              {% if tile_image %}
+                <img
+                  src="{{ tile_image | image_url: width: 400 }}"
+                  alt="{{ tile_image.alt | escape }}"
+                  class="ai-category-tile__image-{{ ai_gen_id }}"loading="lazy"
+                  width="400"
+                  height="240"
+                >
+              {% else %}
+                <div class="ai-category-tile__image-placeholder-{{ ai_gen_id }}">
+                  {{ 'collection-1' | placeholder_svg_tag }}
+                </div>
+              {% endif %}
+
+              {% if tile_title != blank %}
+                <h3 class="ai-category-tile__title-{{ ai_gen_id }}">{{ tile_title }}</h3>
+              {% else %}
+                <h3 class="ai-category-tile__title-{{ ai_gen_id }}">Category {{ i }}</h3>
+              {% endif %}
+            </div>
+
+            <div class="ai-category-tile__back-{{ ai_gen_id }}">
+              <div class="ai-category-tile__back-header-{{ ai_gen_id }}">
+                {% if tile_title != blank %}
+                  <h3 class="ai-category-tile__back-title-{{ ai_gen_id }}">{{ tile_title }}</h3>
+                {% else %}
+                  <h3 class="ai-category-tile__back-title-{{ ai_gen_id }}">Category {{ i }}</h3>
+                {% endif %}
+                <button class="ai-category-tile__close-{{ ai_gen_id }}" aria-label="Close">×</button>
+              </div>
+
+              <div class="ai-category-tile__subcategories-{{ ai_gen_id }}">
+                {% assign has_subcategories = false %}
+                {% for j in (1..12) %}
+                  {% liquid
+                    assign subcategory_text_key = 'tile_' | append: i | append: '_subcategory_' | append: j | append: '_text'
+                    assign subcategory_link_key = 'tile_' | append: i | append: '_subcategory_' | append: j | append: '_link'
+                    assign subcategory_text = block.settings[subcategory_text_key]
+                    assign subcategory_link = block.settings[subcategory_link_key]
+                  %}
+
+                  {% if subcategory_text != blank %}
+                    {% assign has_subcategories = true %}
+                    {% if subcategory_link != blank %}
+                      <a href="{{ subcategory_link }}" class="ai-category-tile__subcategory-{{ ai_gen_id }}">{{ subcategory_text }}
+                      </a>
+                    {% else %}
+                      <span class="ai-category-tile__subcategory-{{ ai_gen_id }}">
+                        {{ subcategory_text }}
+                      </span>
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+
+                {% unless has_subcategories %}
+                  <div class="ai-category-tile__empty-state-{{ ai_gen_id }}">
+                    Add subcategories to this tile
+                  </div>
+                {% endunless %}
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</category-tiles-{{ ai_gen_id }}><script>
+  (function() {
+    class CategoryTiles{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        this.tiles = this.querySelectorAll('.ai-category-tile-{{ ai_gen_id }}');
+        this.setupEventListeners();
+      }
+
+      setupEventListeners() {
+        this.tiles.forEach((tile) => {
+          const front = tile.querySelector('.ai-category-tile__front-{{ ai_gen_id }}');
+          const closeButton = tile.querySelector('.ai-category-tile__close-{{ ai_gen_id }}');
+
+          front.addEventListener('click', () => {
+            this.closeAllTiles();
+            tile.classList.add('flipped');
+          });
+
+          closeButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            tile.classList.remove('flipped');
+          });
+        });document.addEventListener('click', (e) => {
+          if (!e.target.closest('.ai-category-tile-{{ ai_gen_id }}')) {
+            this.closeAllTiles();
+          }
+        });
+      }
+
+      closeAllTiles() {
+        this.tiles.forEach((tile) => {
+          tile.classList.remove('flipped');
+        });
+      }
+    }
+
+    customElements.define('category-tiles-{{ ai_gen_id }}', CategoryTiles{{ ai_gen_id }});
+  })();
+</script>
+
 {% schema %}
- {
-   "name": "AI_Block",
-   "tag": "shopify-ai-generated-block"
- }
+{
+  "name": "Category tiles",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section"
+    },
+    {
+      "type": "text",
+      "id": "section_title",
+      "label": "Section title",
+      "default": "Shop by Category"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 16,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Title size",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "tile_height",
+      "min": 200,
+      "max": 500,
+      "step": 20,
+      "unit": "px",
+      "label": "Tile height",
+      "default": 300
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "Border radius",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "tile_title_size",
+      "min": 14,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "label": "Tile title size",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "subcategory_title_size",
+      "min": 14,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Subcategory title size",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "subcategory_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Subcategory text size",
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "Tile1"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_title",
+      "label": "Title",
+      "default": "Women's Fashion"
+    },
+    {
+      "type": "image_picker",
+      "id": "tile_1_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_subcategory_1_text",
+      "label": "Subcategory 1 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_subcategory_1_link",
+      "label": "Subcategory 1 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_subcategory_2_text",
+      "label": "Subcategory 2 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_subcategory_2_link",
+      "label": "Subcategory 2 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_subcategory_3_text",
+      "label": "Subcategory 3 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_subcategory_3_link",
+      "label": "Subcategory 3 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_subcategory_4_text",
+      "label": "Subcategory 4 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_subcategory_4_link",
+      "label": "Subcategory 4 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_subcategory_5_text",
+      "label": "Subcategory 5 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_subcategory_5_link",
+      "label": "Subcategory 5 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_subcategory_6_text",
+      "label": "Subcategory 6 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_subcategory_6_link",
+      "label": "Subcategory 6 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_subcategory_7_text",
+      "label": "Subcategory 7 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_subcategory_7_link",
+      "label": "Subcategory 7 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_subcategory_8_text",
+      "label": "Subcategory 8 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_subcategory_8_link",
+      "label": "Subcategory 8 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_subcategory_9_text",
+      "label": "Subcategory 9 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_subcategory_9_link",
+      "label": "Subcategory 9 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_subcategory_10_text",
+      "label": "Subcategory 10 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_subcategory_10_link",
+      "label": "Subcategory 10 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_subcategory_11_text",
+      "label": "Subcategory 11 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_subcategory_11_link",
+      "label": "Subcategory 11 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_subcategory_12_text",
+      "label": "Subcategory 12 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_subcategory_12_link",
+      "label": "Subcategory 12 link"
+    },
+    {
+      "type": "header",
+      "content": "Tile 2"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_title",
+      "label": "Title",
+      "default": "Men's Fashion"
+    },
+    {
+      "type": "image_picker",
+      "id": "tile_2_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_subcategory_1_text",
+      "label": "Subcategory 1 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_subcategory_1_link",
+      "label": "Subcategory 1 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_subcategory_2_text",
+      "label": "Subcategory 2 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_subcategory_2_link",
+      "label": "Subcategory 2 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_subcategory_3_text",
+      "label": "Subcategory 3 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_subcategory_3_link",
+      "label": "Subcategory 3 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_subcategory_4_text",
+      "label": "Subcategory 4 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_subcategory_4_link",
+      "label": "Subcategory 4 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_subcategory_5_text",
+      "label": "Subcategory 5 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_subcategory_5_link",
+      "label": "Subcategory 5 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_subcategory_6_text",
+      "label": "Subcategory 6 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_subcategory_6_link",
+      "label": "Subcategory 6 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_subcategory_7_text",
+      "label": "Subcategory 7 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_subcategory_7_link",
+      "label": "Subcategory 7 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_subcategory_8_text",
+      "label": "Subcategory 8 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_subcategory_8_link",
+      "label": "Subcategory 8 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_subcategory_9_text",
+      "label": "Subcategory 9 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_subcategory_9_link",
+      "label": "Subcategory 9 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_subcategory_10_text",
+      "label": "Subcategory 10 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_subcategory_10_link",
+      "label": "Subcategory 10 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_subcategory_11_text",
+      "label": "Subcategory 11 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_subcategory_11_link",
+      "label": "Subcategory 11 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_subcategory_12_text",
+      "label": "Subcategory 12 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_subcategory_12_link",
+      "label": "Subcategory 12 link"
+    },
+    {
+      "type": "header",
+      "content": "Tile 3"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_title",
+      "label": "Title",
+      "default": "Accessories"
+    },
+    {
+      "type": "image_picker",
+      "id": "tile_3_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_subcategory_1_text",
+      "label": "Subcategory 1 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_subcategory_1_link",
+      "label": "Subcategory 1 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_subcategory_2_text",
+      "label": "Subcategory 2 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_subcategory_2_link",
+      "label": "Subcategory 2 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_subcategory_3_text",
+      "label": "Subcategory 3 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_subcategory_3_link",
+      "label": "Subcategory 3 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_subcategory_4_text",
+      "label": "Subcategory 4 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_subcategory_4_link",
+      "label": "Subcategory 4 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_subcategory_5_text",
+      "label": "Subcategory 5 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_subcategory_5_link",
+      "label": "Subcategory 5 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_subcategory_6_text",
+      "label": "Subcategory 6 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_subcategory_6_link",
+      "label": "Subcategory 6 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_subcategory_7_text",
+      "label": "Subcategory 7 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_subcategory_7_link",
+      "label": "Subcategory 7 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_subcategory_8_text",
+      "label": "Subcategory 8 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_subcategory_8_link",
+      "label": "Subcategory 8 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_subcategory_9_text",
+      "label": "Subcategory 9 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_subcategory_9_link",
+      "label": "Subcategory 9 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_subcategory_10_text",
+      "label": "Subcategory 10 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_subcategory_10_link",
+      "label": "Subcategory 10 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_subcategory_11_text",
+      "label": "Subcategory 11 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_subcategory_11_link",
+      "label": "Subcategory 11 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_subcategory_12_text",
+      "label": "Subcategory 12 text"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_subcategory_12_link",
+      "label": "Subcategory 12 link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Category tiles"
+    }
+  ],
+  "tag": null
+}
 {% endschema %}
