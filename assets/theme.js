@@ -8069,8 +8069,10 @@ class ProductColorSwatchHandler {
 
     attachSwatchListeners() {
         const swatches = document.querySelectorAll('.custom-meta-url[data-product-handle]');
+        console.log('Attaching swatch listeners to', swatches.length, 'swatches');
         
         swatches.forEach((swatch, index) => {
+            
             // Remove existing listeners to prevent duplicates
             if (swatch._swatchClickHandler) {
                 swatch.removeEventListener('click', swatch._swatchClickHandler);
@@ -8082,12 +8084,99 @@ class ProductColorSwatchHandler {
         });
     }
 
+    resetVariantSelection() {
+        // Deselect all variant option buttons
+        const variantOptButtons = document.querySelectorAll('.custom-option-buttons');
+        
+        variantOptButtons.forEach((optBtn) => {
+            optBtn.removeAttribute('checked');
+            optBtn.checked = false;
+            // Remove any selected/active classes
+            optBtn.classList.remove('selected', 'active', 'checked');
+        });
+
+        // Reset radio buttons and checkboxes in variant selectors
+        const variantInputs = document.querySelectorAll('input[name*="option"], input[name*="variant"]');
+        variantInputs.forEach((input) => {
+            input.checked = false;
+            input.removeAttribute('checked');
+        });
+
+        // Disable and update add to cart buttons
+        const addToCartBtn = document.querySelector('button.product-form__submit');
+        const stickyAddToCartBtn = document.querySelector('button.sticky_form__submit');
+        
+        if (addToCartBtn) {
+            // Find the first required option to determine the text
+            const firstRequiredOption = document.querySelector('.custom-option-buttons[data-opt-name="Size"], .custom-option-buttons[data-opt-name="Width"]');
+            const optName = firstRequiredOption ? firstRequiredOption.getAttribute('data-opt-name') : 'SIZE';
+            
+            addToCartBtn.style.display = "flex";
+            addToCartBtn.setAttribute("disabled", "disabled");
+            addToCartBtn.disabled = true;
+            
+            // Clear existing content and set new text
+            addToCartBtn.innerHTML = '';
+            addToCartBtn.innerText = "PLEASE SELECT " + optName.toUpperCase();
+            
+            // If there's a .btn-text element, create it and set the text
+            const btnText = document.createElement('span');
+            btnText.className = 'btn-text';
+            btnText.innerText = "PLEASE SELECT " + optName.toUpperCase();
+            addToCartBtn.appendChild(btnText);
+        }
+
+        if (stickyAddToCartBtn) {
+            // Find the first required option to determine the text
+            const firstRequiredOption = document.querySelector('.custom-option-buttons[data-opt-name="Size"], .custom-option-buttons[data-opt-name="Width"]');
+            const optName = firstRequiredOption ? firstRequiredOption.getAttribute('data-opt-name') : 'SIZE';
+            
+            stickyAddToCartBtn.style.display = "flex";
+            stickyAddToCartBtn.classList.add("disabled-btn");
+            stickyAddToCartBtn.setAttribute("disabled", "disabled");
+            stickyAddToCartBtn.disabled = true;
+            
+            // Clear existing content and set new text
+            stickyAddToCartBtn.innerHTML = '';
+            stickyAddToCartBtn.innerText = "PLEASE SELECT " + optName.toUpperCase();
+            
+            // If there's a .btn-text element, create it and set the text
+            const btnText = document.createElement('span');
+            btnText.className = 'btn-text';
+            btnText.innerText = "PLEASE SELECT " + optName.toUpperCase();
+            stickyAddToCartBtn.appendChild(btnText);
+        }
+
+        // Reset any variant picker selections in the theme's variant picker
+        const variantPickers = document.querySelectorAll('variant-picker, .variant-picker');
+        variantPickers.forEach((picker) => {
+            const inputs = picker.querySelectorAll('input[type="radio"]');
+            inputs.forEach((input) => {
+                input.checked = false;
+                input.removeAttribute('checked');
+            });
+        });
+
+        // Trigger change events to ensure other components are notified
+        document.dispatchEvent(new CustomEvent('variant:deselected', {
+            detail: { reason: 'product_switched' }
+        }));
+    }
+
     handleSwatchClick(event, swatch) {
         event.preventDefault();
         const handle = swatch.getAttribute('data-product-handle');
-        if (!handle) return;
+        
+        if (!handle) {
+            console.log('No handle found, returning');
+            return;
+        }
 
-        if (swatch.classList.contains('color-links--already-loaded')) return;
+        if (swatch.classList.contains('color-links--already-loaded')) {
+            console.log('Swatch already loaded, returning');
+            return;
+        }
+
         swatch.classList.add('color-links--already-loaded');
 
         document.body.classList.add('page-loading');
@@ -8128,6 +8217,11 @@ class ProductColorSwatchHandler {
 
                 // Re-attach listeners for the new content
                 this.attachSwatchListeners();
+                
+                // Small delay to ensure DOM is fully updated before resetting variants
+                setTimeout(() => {
+                    this.resetVariantSelection();
+                }, 50);
                 
                 // Re-initialize Yotpo widgets if available
                 if (typeof yotpoWidgetsContainer !== 'undefined' && yotpoWidgetsContainer.initWidgets) {

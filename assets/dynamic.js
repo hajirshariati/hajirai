@@ -45,14 +45,118 @@ function refreshAddToCartButton() {
     });
 }
 
-// === Variant Button Handling ===
+function resetVariantsAndDisableButton() {
   const variantOptButtons = document.querySelectorAll(".custom-option-buttons");
   const addTocartBtn = document.querySelector("button.product-form__submit");
-  const addTocartBtnText = document.querySelector("button.product-form__submit .btn-text");
   const stickyAddTocartBtn = document.querySelector("button.sticky_form__submit");
-  // Store base button text (initially)
-  let baseBtnText = "";
-  let stickyBaseBtnText = "";
+
+  variantOptButtons.forEach((optBtn) => {
+    const optName = optBtn.getAttribute("data-opt-name");
+    
+    if (optName === "Size" || optName === "Width") {
+      // Properly reset the checked state
+      optBtn.removeAttribute("checked");
+      optBtn.checked = false;
+      
+      // Remove any active/selected classes that might be applied
+      optBtn.classList.remove('selected', 'active', 'checked');
+      
+      if (addTocartBtn) {
+        addTocartBtn.style.display = "flex";
+        addTocartBtn.setAttribute("disabled", "disabled");
+        addTocartBtn.disabled = true;
+        addTocartBtn.innerText = "PLEASE SELECT " + optName.toUpperCase();
+        
+        // Also update .btn-text if it exists
+        const btnText = addTocartBtn.querySelector('.btn-text');
+        if (btnText) {
+          btnText.innerText = "PLEASE SELECT " + optName.toUpperCase();
+        }
+      }
+
+      if (stickyAddTocartBtn) {
+        stickyAddTocartBtn.style.display = "flex";
+        stickyAddTocartBtn.classList.add("disabled-btn");
+        stickyAddTocartBtn.setAttribute("disabled", "disabled");
+        stickyAddTocartBtn.disabled = true;
+        stickyAddTocartBtn.innerText = "PLEASE SELECT " + optName.toUpperCase();
+        
+        // Also update .btn-text if it exists
+        const btnText = stickyAddTocartBtn.querySelector('.btn-text');
+        if (btnText) {
+          btnText.innerText = "PLEASE SELECT " + optName.toUpperCase();
+        }
+      }
+    }
+  });
+  
+  // Reattach event listeners after reset
+  attachVariantEventListeners();
+}
+
+function attachVariantEventListeners() {
+  const variantOptButtons = document.querySelectorAll(".custom-option-buttons");
+  
+  variantOptButtons.forEach((optBtn) => {
+    const optName = optBtn.getAttribute("data-opt-name");
+    
+    // Remove existing listeners to prevent duplicates
+    if (optBtn._clickHandler) {
+      optBtn.removeEventListener("click", optBtn._clickHandler);
+    }
+    if (optBtn._changeHandler) {
+      optBtn.removeEventListener("change", optBtn._changeHandler);
+    }
+    
+    // Create and store click handler
+    optBtn._clickHandler = (event) => {
+      if (optBtn.classList.contains("disabled")) {
+        return;
+      }
+      
+      // Ensure the button is checked and has active state
+      optBtn.checked = true;
+      optBtn.setAttribute("checked", "checked");
+      
+      // Remove checked state from other buttons in the same option group
+      const sameOptionButtons = document.querySelectorAll(`.custom-option-buttons[data-opt-name="${optName}"]`);
+      sameOptionButtons.forEach((btn) => {
+        if (btn !== optBtn) {
+          btn.checked = false;
+          btn.removeAttribute("checked");
+        }
+      });
+    };
+    
+    // Create and store change handler
+    optBtn._changeHandler = (event) => {
+      if (optBtn.classList.contains("disabled")) {
+        console.log("This option is disabled. Skipping update.");
+        return;
+      }
+      console.log(optBtn);
+      
+      // Ensure the button is checked and has active state
+      optBtn.checked = true;
+      optBtn.setAttribute("checked", "checked");
+      
+      if (["Size", "Width", "Color"].includes(optName)) {
+        refreshAddToCartButton();
+      }
+    };
+    
+    // Attach the handlers
+    optBtn.addEventListener("click", optBtn._clickHandler);
+    optBtn.addEventListener("change", optBtn._changeHandler);
+  });
+}
+
+// === Variant Button Handling ===
+// Initialize variant buttons on page load
+(function initializeVariantButtons() {
+  const variantOptButtons = document.querySelectorAll(".custom-option-buttons");
+  const addTocartBtn = document.querySelector("button.product-form__submit");
+  const stickyAddTocartBtn = document.querySelector("button.sticky_form__submit");
 
   variantOptButtons.forEach((optBtn) => {
     const optName = optBtn.getAttribute("data-opt-name");
@@ -60,32 +164,35 @@ function refreshAddToCartButton() {
     
     if (optName === "Size" || optName === "Width") {
       optBtn.removeAttribute("checked");
-      addTocartBtn.style.display = "flex";
-      addTocartBtn.setAttribute("disabled", "disabled");
-      addTocartBtn.innerText = "PLEASE SELECT " + optName.toUpperCase();
+      if (addTocartBtn) {
+        addTocartBtn.style.display = "flex";
+        addTocartBtn.setAttribute("disabled", "disabled");
+        addTocartBtn.innerText = "PLEASE SELECT " + optName.toUpperCase();
+      }
 
-      stickyAddTocartBtn.style.display = "flex";
-      stickyAddTocartBtn.classList.add("disabled-btn");
-      stickyAddTocartBtn.innerText = "PLEASE SELECT " + optName.toUpperCase();
+      if (stickyAddTocartBtn) {
+        stickyAddTocartBtn.style.display = "flex";
+        stickyAddTocartBtn.classList.add("disabled-btn");
+        stickyAddTocartBtn.innerText = "PLEASE SELECT " + optName.toUpperCase();
+      }
     }
-
-    // if (optName === "Width") {
-      optBtn.addEventListener("change", (event) => {
-        if (optBtn.classList.contains("disabled")) {
-          console.log("This option is disabled. Skipping update.");
-          return;
-        }
-        console.log(optBtn);
-        
-        if (["Size", "Width", "Color"].includes(optName)) {
-          refreshAddToCartButton();
-        }
-      });
-    // } 
   });
+  
+  // Attach event listeners
+  attachVariantEventListeners();
+})();
 
 
 document.addEventListener("DOMContentLoaded", function () {
+
+  // Listen for product switch events and reset variants
+  document.addEventListener('product:switched', function(event) {
+    console.log('Product switched, resetting variants:', event.detail);
+    // Small delay to ensure DOM is updated
+    setTimeout(() => {
+      resetVariantsAndDisableButton();
+    }, 100);
+  });
 
   //
   const dropDownArw = document.querySelectorAll("span.promo-banner__caret");
