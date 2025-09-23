@@ -271,33 +271,37 @@
 
 /* --- Table Wrapper (Scroll) --- */
 .size-guide__table-wrapper {
-  width: 100%;
-  margin: 1.5rem 0 .75rem;
-  overflow-x: auto;
+  max-width: 100%;       /* prevents stretching flex parent */
+  overflow-x: auto;      /* horizontal scroll */
   -webkit-overflow-scrolling: touch;
   border-left: 1px solid var(--color-light);
 }
+
 .size-guide__table-wrapper::-webkit-scrollbar {
   width: 4px;
   height: 4px;
 }
+
 .size-guide__table-wrapper::-webkit-scrollbar-track {
   background: var(--color-light);
 }
+
 .size-guide__table-wrapper::-webkit-scrollbar-thumb {
   background: var(--color-black);
 }
+
 .size-guide__table-wrapper::-webkit-scrollbar-thumb:hover {
   background: var(--color-black);
 }
 
+
 /* --- Table --- */
 .size-guide__table {
   border-collapse: collapse;
-  width: auto;           /* ✅ allow natural width */
-  min-width: 600px;      /* ✅ keeps it from collapsing too small */
-  max-width: none;       /* ✅ prevents stretching to full screen */
+  min-width: 600px;   /* ensures table is wide enough to scroll */
+  width: auto;        /* natural width, do not stretch parent */
 }
+
 .size-guide__table th,
 .size-guide__table td {
   border: 1px solid var(--color-light);
@@ -339,7 +343,7 @@
 <p class="p-3">Aetrex recommends you size up for footwear and Orthotics</p>
 </div>
 </div>
-<div class="size-guide__table-wrapper">
+<div class="size-guide__table-wrapper" style="max-width: 100%; overflow-x: auto;">
 <table class="size-guide__table">
 <tbody>
 <tr style="height: 39.1875px;">
