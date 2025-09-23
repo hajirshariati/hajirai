@@ -234,17 +234,19 @@
 {%- if block.settings.heading == 'Size Chart' and block.settings.columns != blank and block.settings.rows != blank -%}
   {%- assign columns = block.settings.columns | split: ',' -%}
   {%- assign rows_raw = block.settings.rows | newline_to_br | split: '<br />' -%}
-
+  
   {%- if columns.size > 0 and rows_raw.size > 0 -%}
     <div class="accordion__content">
       <!-- Scroll container -->
-      <div class="relative overflow-x-auto max-w-full" style="margin: 16px 0; border: 1px solid #e5e5e5; border-radius: 8px; background: white;">
-        <!-- Table -->
-        <table class="min-w-[400px] border-collapse text-sm">
-          <thead class="bg-gray-100">
-            <tr>
+      <div style="overflow-x:auto; position: relative; margin: 16px 0;">
+        <!-- Table (keep exactly as before) -->
+        <table style="border-collapse: collapse; font-size: 12px; width: auto; min-width: 400px; border: 1px solid #e5e5e5; border-radius: 8px; background: white;">
+          <thead>
+            <tr style="background-color: #f8f8f8;">
               {%- for column in columns -%}
-                <th class="border-b border-gray-300 px-3 py-2 text-left font-semibold whitespace-nowrap">{{ column | strip }}</th>
+                <th style="border-bottom: 1px solid #e5e5e5; padding: 8px 12px; text-align: left; font-weight: 600; white-space: nowrap; min-width: 60px;">
+                  {{ column | strip }}
+                </th>
               {%- endfor -%}
             </tr>
           </thead>
@@ -252,9 +254,11 @@
             {%- for row_raw in rows_raw -%}
               {%- assign row_data = row_raw | strip | split: ',' -%}
               {%- if row_data.size > 0 and row_raw != blank -%}
-                <tr class="border-b border-gray-200">
+                <tr style="border-bottom: 1px solid #f0f0f0;">
                   {%- for cell in row_data -%}
-                    <td class="px-3 py-2 border-r border-gray-200 whitespace-nowrap text-xs">{{ cell | strip }}</td>
+                    <td style="padding: 6px 12px; border-right: 1px solid #f0f0f0; white-space: nowrap; font-size: 11px;">
+                      {{ cell | strip }}
+                    </td>
                   {%- endfor -%}
                 </tr>
               {%- endif -%}
@@ -263,18 +267,15 @@
         </table>
 
         <!-- Right fade -->
-        <div class="absolute top-0 right-0 h-full w-12 pointer-events-none"
-             style="background: linear-gradient(to left, white, rgba(255,255,255,0));">
-        </div>
+        <div style="position:absolute; top:0; right:0; width: 40px; height:100%; pointer-events:none; background: linear-gradient(to left, white, rgba(255,255,255,0));"></div>
       </div>
 
-      <div class="text-center mt-2 text-xs text-gray-500">
+      <div style="text-align: center; margin: 8px 0 16px 0; font-size: 11px; color: #666;">
         ← Scroll horizontally to see all sizes →
       </div>
     </div>
   {%- else -%}
-    <!-- Debug info -->
-    <div class="bg-gray-100 p-2 text-xs my-2">
+    <div class="col-span-full" style="background: #f0f0f0; padding: 10px; margin: 10px 0; font-size: 12px;">
       <strong>Debug Info:</strong><br>
       Heading: "{{ block.settings.heading }}"<br>
       Columns: "{{ block.settings.columns }}"<br>
