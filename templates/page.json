@@ -101,6 +101,46 @@
         "rounded": false
       }
     },
+    "17586424252fbd6c52": {
+      "type": "_blocks",
+      "blocks": {
+        "ai_gen_block_479b021_zi3jaU": {
+          "type": "ai_gen_block_479b021",
+          "settings": {
+            "collections": [
+              "3-4-dress-orthotics",
+              "womens-shoe-accessories",
+              "active"
+            ],
+            "subcategories_title": "Shop by category",
+            "max_subcategories": 5,
+            "show_product_count": true,
+            "min_tile_width": 280,
+            "tile_height": 320,
+            "grid_gap": 20,
+            "section_padding": 20,
+            "border_radius": 8,
+            "title_size": 20,
+            "count_size": 14,
+            "placeholder_bg_color": "#f4f4f4",
+            "back_bg_color": "#ffffff",
+            "back_text_color": "#000000",
+            "subtitle_size": 18,
+            "subcategory_bg_color": "#f8f8f8",
+            "subcategory_hover_bg_color": "#e8e8e8",
+            "subcategory_text_color": "#333333",
+            "subcategory_hover_text_color": "#000000",
+            "subcategory_text_size": 14,
+            "subcategory_border_radius": 4
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "ai_gen_block_479b021_zi3jaU"
+      ],
+      "settings": {}
+    },
     "collection_list_MUtgad": {
       "type": "collection-list",
       "blocks": {
@@ -382,6 +422,7 @@
   "order": [
     "main-page",
     "video_with_text_overlay_cfhWL7",
+    "17586424252fbd6c52",
     "collection_list_MUtgad",
     "blog_posts_JnT6A7",
     "testimonials_McVqED",
