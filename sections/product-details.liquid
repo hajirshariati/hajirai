@@ -233,28 +233,28 @@
 
 {%- if block.settings.heading == 'Size Chart' and block.settings.columns != blank and block.settings.rows != blank -%}
   {%- assign columns = block.settings.columns | split: ',' -%}
-  {%- assign rows = block.settings.rows | split: newline -%}
+  {%- assign rows_raw = block.settings.rows | newline_to_br | split: '<br />' -%}
   
-  {%- if columns.size > 0 and rows.size > 0 -%}
-    <div class="size-chart-container mt-4 mb-2">
-      <div class="size-chart-wrapper overflow-x-auto border border-gray-200 rounded-lg" style="max-width: 100%; -webkit-overflow-scrolling: touch;">
-        <table class="size-chart-table min-w-full text-left border-collapse" style="min-width: max-content;">
+  {%- if columns.size > 0 and rows_raw.size > 0 -%}
+    <div style="margin: 16px 0;">
+      <div style="overflow-x: auto; border: 1px solid #e5e5e5; border-radius: 8px; max-width: 100%; -webkit-overflow-scrolling: touch;">
+        <table style="width: 100%; min-width: 600px; border-collapse: collapse; font-size: 12px;">
           <thead>
-            <tr class="bg-gray-50">
+            <tr style="background-color: #f8f8f8;">
               {%- for column in columns -%}
-                <th class="border-b border-gray-200 px-2 py-1 text-xs font-semibold text-gray-700 whitespace-nowrap" style="min-width: 60px;">
+                <th style="border-bottom: 1px solid #e5e5e5; padding: 8px 12px; text-align: left; font-weight: 600; white-space: nowrap; min-width: 80px;">
                   {{ column | strip }}
                 </th>
               {%- endfor -%}
             </tr>
           </thead>
-          <tbody class="bg-white">
-            {%- for row in rows -%}
-              {%- assign row_data = row | split: ',' -%}
-              {%- if row_data.size > 0 and row != blank -%}
-                <tr class="border-b border-gray-100 hover:bg-gray-50">
+          <tbody>
+            {%- for row_raw in rows_raw -%}
+              {%- assign row_data = row_raw | strip | split: ',' -%}
+              {%- if row_data.size > 0 and row_raw != blank -%}
+                <tr style="border-bottom: 1px solid #f0f0f0;">
                   {%- for cell in row_data -%}
-                    <td class="px-2 py-1 text-xs text-gray-600 whitespace-nowrap border-r border-gray-100 last:border-r-0">
+                    <td style="padding: 6px 12px; border-right: 1px solid #f0f0f0; white-space: nowrap;">
                       {{ cell | strip }}
                     </td>
                   {%- endfor -%}
@@ -264,20 +264,20 @@
           </tbody>
         </table>
       </div>
-      <div class="text-xs text-gray-500 mt-2 text-center">
-        <span class="md:hidden">← Swipe to see more sizes →</span>
-        <span class="hidden md:inline">Scroll horizontally to see all sizes</span>
+      <div style="text-align: center; margin-top: 8px; font-size: 11px; color: #666;">
+        Scroll horizontally to see all sizes →
       </div>
     </div>
   {%- else -%}
     <!-- Debug for simple schema -->
-    <div style="background: #f0f0f0; padding: 10px; margin: 10px 0;">
+    <div style="background: #f0f0f0; padding: 10px; margin: 10px 0; font-size: 12px;">
       <strong>Debug Info:</strong><br>
       Heading: "{{ block.settings.heading }}"<br>
       Columns: "{{ block.settings.columns }}"<br>
-      Rows: "{{ block.settings.rows }}"<br>
+      Raw Rows: "{{ block.settings.rows }}"<br>
       Columns count: {{ columns.size }}<br>
-      Rows count: {{ rows.size }}<br>
+      Rows count: {{ rows_raw.size }}<br>
+      First row: "{{ rows_raw.first }}"
     </div>
   {%- endif -%}
 {%- endif -%}
