@@ -22,7 +22,7 @@
             "heading": "Customer service",
             "text": "<p><a href=\"https://www.aetrex.com/#\" title=\"#\">Click here </a>to consult with our specialists for a personalized product recommendation for your specific needs.</p>",
             "highlighted_text": "none",
-            "custom_html": "<a href=\"javascript:void(0);\" onclick=\"zE('messenger', 'open');\">\n\ncleck here\n</a>",
+            "custom_html": "<a href=\"https://static.zdassets.com/web_widget/latest/liveChat.html?v=10#key=subdomain.zendesk.com%0A\">\n\ncleck here\n</a>",
             "highlighted_scribble": "circle"
           }
         },
