@@ -821,3 +821,7 @@ menu-drawer .drawer__content .grandchild-Sale {
 body .yotpo-reviews-main-widget svg {
     margin: 0 auto;
 }
+
+.custom-product-url .main-media-custom-slider {
+    overflow: hidden;
+}
