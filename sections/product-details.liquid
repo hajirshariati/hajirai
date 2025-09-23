@@ -233,34 +233,43 @@
 
 
 
- {%- if block.settings.heading == 'Size Chart' and block.settings.columns != blank and block.settings.rows != blank -%}
+{%- if block.settings.heading == 'Size Chart' and block.settings.columns != blank and block.settings.rows != blank -%}
   {%- assign columns = block.settings.columns | split: ',' -%}
   {%- assign rows = block.settings.rows | split: newline -%}
   
   {%- if columns.size > 0 and rows.size > 0 -%}
-    <h3 class="text-lg font-medium mb-2">{{ block.settings.heading }}</h3>
-    <div class="size-chart overflow-x-auto mt-2">
-      <table class="w-full border border-gray-300 text-left">
-        <thead class="bg-gray-100">
-          <tr>
-            {%- for column in columns -%}
-              <th class="border px-3 py-2 font-medium">{{ column | strip }}</th>
+    <div class="size-chart-container mt-4 mb-2">
+      <div class="size-chart-wrapper overflow-x-auto border border-gray-200 rounded-lg" style="max-width: 100%; -webkit-overflow-scrolling: touch;">
+        <table class="size-chart-table min-w-full text-left border-collapse" style="min-width: max-content;">
+          <thead>
+            <tr class="bg-gray-50">
+              {%- for column in columns -%}
+                <th class="border-b border-gray-200 px-2 py-1 text-xs font-semibold text-gray-700 whitespace-nowrap" style="min-width: 60px;">
+                  {{ column | strip }}
+                </th>
+              {%- endfor -%}
+            </tr>
+          </thead>
+          <tbody class="bg-white">
+            {%- for row in rows -%}
+              {%- assign row_data = row | split: ',' -%}
+              {%- if row_data.size > 0 and row != blank -%}
+                <tr class="border-b border-gray-100 hover:bg-gray-50">
+                  {%- for cell in row_data -%}
+                    <td class="px-2 py-1 text-xs text-gray-600 whitespace-nowrap border-r border-gray-100 last:border-r-0">
+                      {{ cell | strip }}
+                    </td>
+                  {%- endfor -%}
+                </tr>
+              {%- endif -%}
             {%- endfor -%}
-          </tr>
-        </thead>
-        <tbody>
-          {%- for row in rows -%}
-            {%- assign row_data = row | split: ',' -%}
-            {%- if row_data.size > 0 and row != blank -%}
-              <tr>
-                {%- for cell in row_data -%}
-                  <td class="border px-3 py-2">{{ cell | strip }}</td>
-                {%- endfor -%}
-              </tr>
-            {%- endif -%}
-          {%- endfor -%}
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
+      <div class="text-xs text-gray-500 mt-2 text-center">
+        <span class="md:hidden">← Swipe to see more sizes →</span>
+        <span class="hidden md:inline">Scroll horizontally to see all sizes</span>
+      </div>
     </div>
   {%- else -%}
     <!-- Debug for simple schema -->
@@ -274,7 +283,6 @@
     </div>
   {%- endif -%}
 {%- endif -%}
-
 
 
 
