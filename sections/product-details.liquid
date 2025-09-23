@@ -230,34 +230,33 @@
  
 
  
-{%- if block.settings.heading == 'Size Chart' -%}
-  <h3 class="text-lg font-medium mb-2">{{ block.settings.heading }}</h3>
-
-  {%- assign columns = block.settings.columns | split: "," -%}
-  {%- assign rows = block.settings.rows | split: "\n" -%}
-
-  <div class="size-chart overflow-x-auto mt-2">
-    <table class="w-full border border-gray-300 text-left">
-      <thead class="bg-gray-100">
-        <tr>
-          {%- for column in columns -%}
-            <th class="border px-3 py-2 font-medium">{{ column | strip }}</th>
-          {%- endfor -%}
-        </tr>
-      </thead>
-      <tbody>
-        {%- for row in rows -%}
+{%- if block.settings.heading == 'Size Chart' and block.settings.size_chart_table != blank -%}
+  {%- assign table_data = block.settings.size_chart_table | parse_json -%}
+  {%- if table_data.size > 0 -%}
+    <h3 class="text-lg font-medium mb-2">{{ block.settings.heading }}</h3>
+    <div class="size-chart overflow-x-auto mt-2">
+      <table class="w-full border border-gray-300 text-left">
+        <thead class="bg-gray-100">
           <tr>
-            {%- assign cells = row | split: "," -%}
-            {%- for cell in cells -%}
-              <td class="border px-3 py-2">{{ cell | strip }}</td>
+            {%- for key in table_data[0] -%}
+              <th class="border px-3 py-2 font-medium">{{ key }}</th>
             {%- endfor -%}
           </tr>
-        {%- endfor -%}
-      </tbody>
-    </table>
-  </div>
+        </thead>
+        <tbody>
+          {%- for row in table_data -%}
+            <tr>
+              {%- for key in row -%}
+                <td class="border px-3 py-2">{{ row[key] }}</td>
+              {%- endfor -%}
+            </tr>
+          {%- endfor -%}
+        </tbody>
+      </table>
+    </div>
+  {%- endif -%}
 {%- endif -%}
+
 
 
 
