@@ -202,8 +202,8 @@ function separateTrademarkSymbols() {
     let originalHTML = el.innerHTML;
     
     // Find all trademark symbols in the HTML and wrap them
-    // This regex finds trademark symbols that are not already wrapped in spans
-    const symbolRegex = /(?<!<span[^>]*>)([®™]|TM)(?![^<]*<\/span>)/gi;
+    // This regex finds trademark symbols that are not already wrapped in spans and not inside HTML attributes/URLs
+    const symbolRegex = /(?<!<span[^>]*>)(?<!href="[^"]*?)(?<!src="[^"]*?)(?<!data-[^=]*="[^"]*?)([®™]|(?<![a-z])TM(?![a-z]))(?![^<]*<\/span>)(?![^"]*"[^>]*>)/gi;
     
     // Check if there are any trademark symbols to process
     if (symbolRegex.test(originalHTML)) {
