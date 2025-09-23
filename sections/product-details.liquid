@@ -229,41 +229,38 @@
 
  
  
-
 {%- if block.settings.heading == 'Size Chart' and block.settings.columns != blank and block.settings.rows != blank -%}
   {%- assign columns = block.settings.columns | split: ',' -%}
   {%- assign rows_raw = block.settings.rows | newline_to_br | split: '<br />' -%}
   
   {%- if columns.size > 0 and rows_raw.size > 0 -%}
-    <div style="margin: 16px 0; width: 100%; max-width: 100%;">
-      <div style="width: 100%; max-width: 100%; overflow-x: auto; overflow-y: hidden; border: 1px solid #e5e5e5; border-radius: 8px; -webkit-overflow-scrolling: touch; position: relative;">
-        <div style="min-width: 100%; width: max-content; max-width: none;">
-          <table style="width: 100%; border-collapse: collapse; font-size: 12px; table-layout: auto;">
-            <thead>
-              <tr style="background-color: #f8f8f8;">
-                {%- for column in columns -%}
-                  <th style="border-bottom: 1px solid #e5e5e5; padding: 8px 12px; text-align: left; font-weight: 600; white-space: nowrap; min-width: 80px;">
-                    {{ column | strip }}
-                  </th>
-                {%- endfor -%}
-              </tr>
-            </thead>
-            <tbody>
-              {%- for row_raw in rows_raw -%}
-                {%- assign row_data = row_raw | strip | split: ',' -%}
-                {%- if row_data.size > 0 and row_raw != blank -%}
-                  <tr style="border-bottom: 1px solid #f0f0f0;">
-                    {%- for cell in row_data -%}
-                      <td style="padding: 6px 12px; border-right: 1px solid #f0f0f0; white-space: nowrap;">
-                        {{ cell | strip }}
-                      </td>
-                    {%- endfor -%}
-                  </tr>
-                {%- endif -%}
+    <div class="col-span-full" style="margin: 16px 0;">
+      <div style="width: 100%; overflow-x: auto; border: 1px solid #e5e5e5; border-radius: 8px; -webkit-overflow-scrolling: touch;">
+        <table style="width: auto; min-width: 100%; border-collapse: collapse; font-size: 12px;">
+          <thead>
+            <tr style="background-color: #f8f8f8;">
+              {%- for column in columns -%}
+                <th style="border-bottom: 1px solid #e5e5e5; padding: 8px 12px; text-align: left; font-weight: 600; white-space: nowrap; min-width: 80px;">
+                  {{ column | strip }}
+                </th>
               {%- endfor -%}
-            </tbody>
-          </table>
-        </div>
+            </tr>
+          </thead>
+          <tbody>
+            {%- for row_raw in rows_raw -%}
+              {%- assign row_data = row_raw | strip | split: ',' -%}
+              {%- if row_data.size > 0 and row_raw != blank -%}
+                <tr style="border-bottom: 1px solid #f0f0f0;">
+                  {%- for cell in row_data -%}
+                    <td style="padding: 6px 12px; border-right: 1px solid #f0f0f0; white-space: nowrap;">
+                      {{ cell | strip }}
+                    </td>
+                  {%- endfor -%}
+                </tr>
+              {%- endif -%}
+            {%- endfor -%}
+          </tbody>
+        </table>
       </div>
       <div style="text-align: center; margin-top: 8px; font-size: 11px; color: #666;">
         Scroll horizontally to see all sizes →
@@ -271,7 +268,7 @@
     </div>
   {%- else -%}
     <!-- Debug for simple schema -->
-    <div style="background: #f0f0f0; padding: 10px; margin: 10px 0; font-size: 12px;">
+    <div class="col-span-full" style="background: #f0f0f0; padding: 10px; margin: 10px 0; font-size: 12px;">
       <strong>Debug Info:</strong><br>
       Heading: "{{ block.settings.heading }}"<br>
       Columns: "{{ block.settings.columns }}"<br>
@@ -282,7 +279,6 @@
     </div>
   {%- endif -%}
 {%- endif -%}
-
 
 
 
