@@ -219,16 +219,67 @@
                           {%- render 'icon', icon: 'plus-2', size: 'xs', class: 'shrink-0' -%}
                         </summary>
                         <div class="details__content text-base rte">
+
+
+  
+
                           <div class="specification grid grid-cols-12 gap-6 md:gap-10">
                             {{- collapsible_content -}}
                           </div>
 
+ 
+ 
 
-            {%- if block.settings.heading == 'Details' -%}
-              <!--p class="product__sku" id="Sku-{{ section.id }}-{{ product.id }}">
-                SKU:&nbsp;{{- product.selected_or_first_available_variant.sku -}}
-              </p-->
+
+
+
+ {%- if block.settings.heading == 'Size Chart' and block.settings.columns != blank and block.settings.rows != blank -%}
+  {%- assign columns = block.settings.columns | split: ',' -%}
+  {%- assign rows = block.settings.rows | split: newline -%}
+  
+  {%- if columns.size > 0 and rows.size > 0 -%}
+    <h3 class="text-lg font-medium mb-2">{{ block.settings.heading }}</h3>
+    <div class="size-chart overflow-x-auto mt-2">
+      <table class="w-full border border-gray-300 text-left">
+        <thead class="bg-gray-100">
+          <tr>
+            {%- for column in columns -%}
+              <th class="border px-3 py-2 font-medium">{{ column | strip }}</th>
+            {%- endfor -%}
+          </tr>
+        </thead>
+        <tbody>
+          {%- for row in rows -%}
+            {%- assign row_data = row | split: ',' -%}
+            {%- if row_data.size > 0 and row != blank -%}
+              <tr>
+                {%- for cell in row_data -%}
+                  <td class="border px-3 py-2">{{ cell | strip }}</td>
+                {%- endfor -%}
+              </tr>
             {%- endif -%}
+          {%- endfor -%}
+        </tbody>
+      </table>
+    </div>
+  {%- else -%}
+    <!-- Debug for simple schema -->
+    <div style="background: #f0f0f0; padding: 10px; margin: 10px 0;">
+      <strong>Debug Info:</strong><br>
+      Heading: "{{ block.settings.heading }}"<br>
+      Columns: "{{ block.settings.columns }}"<br>
+      Rows: "{{ block.settings.rows }}"<br>
+      Columns count: {{ columns.size }}<br>
+      Rows count: {{ rows.size }}<br>
+    </div>
+  {%- endif -%}
+{%- endif -%}
+
+
+
+
+
+
 
 
                         </div>
@@ -243,6 +294,13 @@
                   {%- endif -%}
                   {%- assign first_row = false -%}
                 {%- endif -%}
+
+
+
+
+
+
+                
             {%- endcase -%}
           {%- endfor -%}
         </accordions-details>
@@ -606,6 +664,7 @@
     }
   ],
   "blocks": [
+    
     {
       "type": "description",
       "name": "t:sections.main-product.blocks.description.name",
@@ -1179,6 +1238,22 @@
           "label": "t:sections.main-product.blocks.collapsible_tab.settings.content.label",
           "default": "<p>Use collapsible tabs for more detailed information that will help customers make a purchasing decision.</p><p>Ex: Shipping and return policies, size guides, and other common questions.</p>"
         },
+ 
+{
+  "type": "text",
+  "id": "columns",
+  "label": "Size Chart Columns (comma-separated)",
+  "info": "Only shows when heading is 'Size Chart'. Example: Size,Chest,Length",
+  "default": "Size,Chest"
+},
+{
+  "type": "textarea",
+  "id": "rows",
+  "label": "Size Chart Rows (one per line, comma-separated)",
+  "info": "Only shows when heading is 'Size Chart'. Example: S,36,28",
+  "default": "S,36\nM,38\nL,40"
+},
+
         {
           "type": "textarea",
           "id": "metafields",

@@ -11,6 +11,7 @@
   "sections": {
     "main-page": {
       "type": "main-page",
+      "disabled": true,
       "settings": {
         "heading_size": "title-sm",
         "heading_alignment": "text-left",
@@ -22,9 +23,655 @@
         "narrow": true,
         "rounded": false
       }
+    },
+    "video_with_text_overlay_cfhWL7": {
+      "type": "video-with-text-overlay",
+      "blocks": {
+        "heading_WJT6Hn": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>Precision Relief with Technology</p>",
+            "heading_size": "title-lg tracking-heading",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_ceKNrw": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Footwear & orthotics designed with data to better your health</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_TWtxKB": {
+          "type": "button",
+          "settings": {
+            "button_label": "Button label",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_WJT6Hn",
+        "text_ceKNrw",
+        "button_TWtxKB"
+      ],
+      "name": "t:sections.video-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
+        "description": "",
+        "enable_video_autoplay": true,
+        "enable_video_looping": true,
+        "image_height": "650px",
+        "content_width": "small",
+        "content_position": "md:items-center md:justify-center",
+        "text_alignment": "center",
+        "video_url_mobile": "",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-center justify-center",
+        "text_alignment_mobile": "center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 70,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false
+      }
+    },
+    "empty_space_ei6bpL": {
+      "type": "empty-space",
+      "name": "t:sections.empty-space.name",
+      "settings": {
+        "desktop_height": 40,
+        "mobile_height": 28,
+        "color_background": "",
+        "gradient_background": ""
+      }
+    },
+    "17586443670450d0fd": {
+      "type": "_blocks",
+      "blocks": {
+        "ai_gen_block_03a72e7_Tqrr4h": {
+          "type": "ai_gen_block_03a72e7",
+          "settings": {
+            "section_title": "A Solution For Every Step",
+            "title_size": 48,
+            "tile_height": 500,
+            "border_radius": 16,
+            "tile_title_size": 26,
+            "subcategory_title_size": 18,
+            "subcategory_size": 14,
+            "tile_1_title": "Pain",
+            "tile_1_image": "shopify://shop_images/image_2.png",
+            "tile_1_subcategory_1_text": "Plantar Fasciitis",
+            "tile_1_subcategory_1_link": "",
+            "tile_1_subcategory_2_text": "Flat Feet",
+            "tile_1_subcategory_2_link": "",
+            "tile_1_subcategory_3_text": "High Arches",
+            "tile_1_subcategory_3_link": "",
+            "tile_1_subcategory_4_text": "Bunions",
+            "tile_1_subcategory_4_link": "",
+            "tile_1_subcategory_5_text": "Metatarsalgia",
+            "tile_1_subcategory_5_link": "",
+            "tile_1_subcategory_6_text": "Overpronation",
+            "tile_1_subcategory_6_link": "",
+            "tile_1_subcategory_7_text": "Morton's Neuroma",
+            "tile_1_subcategory_7_link": "",
+            "tile_1_subcategory_8_text": "Heel Spurs",
+            "tile_1_subcategory_8_link": "",
+            "tile_1_subcategory_9_text": "",
+            "tile_1_subcategory_9_link": "",
+            "tile_1_subcategory_10_text": "",
+            "tile_1_subcategory_10_link": "",
+            "tile_1_subcategory_11_text": "",
+            "tile_1_subcategory_11_link": "",
+            "tile_1_subcategory_12_text": "",
+            "tile_1_subcategory_12_link": "",
+            "tile_2_title": "Activity",
+            "tile_2_image": "shopify://shop_images/image_1.png",
+            "tile_2_subcategory_1_text": "Casual Everyday",
+            "tile_2_subcategory_1_link": "",
+            "tile_2_subcategory_2_text": "All Day Standing",
+            "tile_2_subcategory_2_link": "",
+            "tile_2_subcategory_3_text": "Walking",
+            "tile_2_subcategory_3_link": "",
+            "tile_2_subcategory_4_text": "Running",
+            "tile_2_subcategory_4_link": "",
+            "tile_2_subcategory_5_text": "Dress Up",
+            "tile_2_subcategory_5_link": "",
+            "tile_2_subcategory_6_text": "Gym & Training",
+            "tile_2_subcategory_6_link": "",
+            "tile_2_subcategory_7_text": "",
+            "tile_2_subcategory_7_link": "",
+            "tile_2_subcategory_8_text": "",
+            "tile_2_subcategory_8_link": "",
+            "tile_2_subcategory_9_text": "",
+            "tile_2_subcategory_9_link": "",
+            "tile_2_subcategory_10_text": "",
+            "tile_2_subcategory_10_link": "",
+            "tile_2_subcategory_11_text": "",
+            "tile_2_subcategory_11_link": "",
+            "tile_2_subcategory_12_text": "",
+            "tile_2_subcategory_12_link": "",
+            "tile_3_title": "Career",
+            "tile_3_image": "shopify://shop_images/image_3.png",
+            "tile_3_subcategory_1_text": "Healthcare",
+            "tile_3_subcategory_1_link": "",
+            "tile_3_subcategory_2_text": "Teacher",
+            "tile_3_subcategory_2_link": "",
+            "tile_3_subcategory_3_text": "Cosmetology & Barber",
+            "tile_3_subcategory_3_link": "",
+            "tile_3_subcategory_4_text": "Warehouse",
+            "tile_3_subcategory_4_link": "",
+            "tile_3_subcategory_5_text": "Restaurant & Food Services",
+            "tile_3_subcategory_5_link": "",
+            "tile_3_subcategory_6_text": "Retail",
+            "tile_3_subcategory_6_link": "",
+            "tile_3_subcategory_7_text": "",
+            "tile_3_subcategory_7_link": "",
+            "tile_3_subcategory_8_text": "",
+            "tile_3_subcategory_8_link": "",
+            "tile_3_subcategory_9_text": "",
+            "tile_3_subcategory_9_link": "",
+            "tile_3_subcategory_10_text": "",
+            "tile_3_subcategory_10_link": "",
+            "tile_3_subcategory_11_text": "",
+            "tile_3_subcategory_11_link": "",
+            "tile_3_subcategory_12_text": "",
+            "tile_3_subcategory_12_link": ""
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "ai_gen_block_03a72e7_Tqrr4h"
+      ],
+      "settings": {}
+    },
+    "blog_posts_JnT6A7": {
+      "type": "blog-posts",
+      "name": "t:sections.blog-posts.name",
+      "settings": {
+        "blog": "aetrex-blog",
+        "post_limit": 6,
+        "columns": 3,
+        "carousel_on_desktop": false,
+        "show_view_all": true,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "image_ratio": "landscape",
+        "show_tags": true,
+        "show_date": true,
+        "show_comments": true,
+        "show_author": false,
+        "show_excerpt": true,
+        "heading": "Blog posts",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "faq_f3crHM": {
+      "type": "faq",
+      "blocks": {
+        "question_epkXHM": {
+          "type": "question",
+          "settings": {
+            "title": "Frequently asked question",
+            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_bVLHeh": {
+          "type": "question",
+          "settings": {
+            "title": "Frequently asked question",
+            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_JE4DWV": {
+          "type": "question",
+          "settings": {
+            "title": "Frequently asked question",
+            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "question_epkXHM",
+        "question_bVLHeh",
+        "question_JE4DWV"
+      ],
+      "name": "t:sections.faq.name",
+      "settings": {
+        "style": "with-border",
+        "heading": "FAQs",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#ffffff",
+        "overlay_opacity": 4,
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "testimonials_McVqED": {
+      "type": "testimonials",
+      "blocks": {
+        "testimonial_bMYXKi": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_MYf74W": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_VRFqVT": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_bMYXKi",
+        "testimonial_MYf74W",
+        "testimonial_VRFqVT"
+      ],
+      "name": "t:sections.testimonials.name",
+      "settings": {
+        "heading": "Loved by Customers Since 1948",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "<p>10,000+ Reviews</p>",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "rounded": false
+      }
+    },
+    "images_with_text_WtPNjT": {
+      "type": "images-with-text",
+      "blocks": {
+        "heading_Fx6jaH": {
+          "type": "heading",
+          "settings": {
+            "heading": "Find the Solution You Need",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_CbJzat": {
+          "type": "button",
+          "settings": {
+            "button_label": "Shoe Finder Quiz",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_bCdgHc": {
+          "type": "button",
+          "settings": {
+            "button_label": "Orthotic Finder Quiz",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_Fx6jaH",
+        "button_CbJzat",
+        "button_bCdgHc"
+      ],
+      "name": "t:sections.images-with-text.name",
+      "settings": {
+        "image_url": "",
+        "image2_url": "",
+        "image_ratio": "portrait",
+        "image_width": "medium",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": true
+      }
+    },
+    "shop_the_feed_R7FhLb": {
+      "type": "shop-the-feed",
+      "blocks": {
+        "feed_zitphR": {
+          "type": "feed",
+          "settings": {
+            "image": "shopify://shop_images/Carly_keelygoshia_2_POSTED.jpg",
+            "enable_video_autoplay": true,
+            "enable_video_looping": true,
+            "video_on_hover": true,
+            "button_label": "",
+            "button_link": "",
+            "button_external": false,
+            "button_icon": false,
+            "account_name": "@Concept",
+            "account_description": "We cultivate sonic excellence",
+            "account_button": "Follow",
+            "account_link": "",
+            "account_link_external": false,
+            "color_text": "#ffffff",
+            "color_button_text": "#000000",
+            "color_button_background": "#ffffff",
+            "color_button_gradient": "",
+            "hotspot_color_text_1": "#ffffff",
+            "hotspot_vertical_1": 45,
+            "hotspot_horizontal_1": 25,
+            "hotspot_product_1": "",
+            "hotspot_color_text_2": "#ffffff",
+            "hotspot_vertical_2": 30,
+            "hotspot_horizontal_2": 65,
+            "hotspot_product_2": "",
+            "hotspot_color_text_3": "#ffffff",
+            "hotspot_vertical_3": 60,
+            "hotspot_horizontal_3": 75,
+            "hotspot_product_3": "",
+            "hotspot_color_text_4": "#ffffff",
+            "hotspot_vertical_4": 50,
+            "hotspot_horizontal_4": 50,
+            "hotspot_product_4": ""
+          }
+        },
+        "feed_h6CcCW": {
+          "type": "feed",
+          "settings": {
+            "image": "shopify://shop_images/INF_4.jpg",
+            "enable_video_autoplay": true,
+            "enable_video_looping": true,
+            "video_on_hover": true,
+            "button_label": "",
+            "button_link": "",
+            "button_external": false,
+            "button_icon": false,
+            "account_name": "@Concept",
+            "account_description": "We cultivate sonic excellence",
+            "account_button": "Follow",
+            "account_link": "",
+            "account_link_external": false,
+            "color_text": "#ffffff",
+            "color_button_text": "#000000",
+            "color_button_background": "#ffffff",
+            "color_button_gradient": "",
+            "hotspot_color_text_1": "#ffffff",
+            "hotspot_vertical_1": 45,
+            "hotspot_horizontal_1": 25,
+            "hotspot_product_1": "",
+            "hotspot_color_text_2": "#ffffff",
+            "hotspot_vertical_2": 30,
+            "hotspot_horizontal_2": 65,
+            "hotspot_product_2": "",
+            "hotspot_color_text_3": "#ffffff",
+            "hotspot_vertical_3": 60,
+            "hotspot_horizontal_3": 75,
+            "hotspot_product_3": "",
+            "hotspot_color_text_4": "#ffffff",
+            "hotspot_vertical_4": 50,
+            "hotspot_horizontal_4": 50,
+            "hotspot_product_4": ""
+          }
+        },
+        "feed_EzVDDq": {
+          "type": "feed",
+          "settings": {
+            "image": "shopify://shop_images/Screenshot_2025-05-13_at_12.00.49_PM.png",
+            "enable_video_autoplay": true,
+            "enable_video_looping": true,
+            "video_on_hover": true,
+            "button_label": "",
+            "button_link": "",
+            "button_external": false,
+            "button_icon": false,
+            "account_name": "@Concept",
+            "account_description": "We cultivate sonic excellence",
+            "account_button": "Follow",
+            "account_link": "",
+            "account_link_external": false,
+            "color_text": "#ffffff",
+            "color_button_text": "#000000",
+            "color_button_background": "#ffffff",
+            "color_button_gradient": "",
+            "hotspot_color_text_1": "#ffffff",
+            "hotspot_vertical_1": 45,
+            "hotspot_horizontal_1": 25,
+            "hotspot_product_1": "",
+            "hotspot_color_text_2": "#ffffff",
+            "hotspot_vertical_2": 30,
+            "hotspot_horizontal_2": 65,
+            "hotspot_product_2": "",
+            "hotspot_color_text_3": "#ffffff",
+            "hotspot_vertical_3": 60,
+            "hotspot_horizontal_3": 75,
+            "hotspot_product_3": "",
+            "hotspot_color_text_4": "#ffffff",
+            "hotspot_vertical_4": 50,
+            "hotspot_horizontal_4": 50,
+            "hotspot_product_4": ""
+          }
+        },
+        "feed_jdbTzL": {
+          "type": "feed",
+          "settings": {
+            "image": "shopify://shop_images/Screenshot_2025-05-13_at_12.01.13_PM.png",
+            "enable_video_autoplay": true,
+            "enable_video_looping": true,
+            "video_on_hover": true,
+            "button_label": "",
+            "button_link": "",
+            "button_external": false,
+            "button_icon": false,
+            "account_name": "@Concept",
+            "account_description": "We cultivate sonic excellence",
+            "account_button": "Follow",
+            "account_link": "",
+            "account_link_external": false,
+            "color_text": "#ffffff",
+            "color_button_text": "#000000",
+            "color_button_background": "#ffffff",
+            "color_button_gradient": "",
+            "hotspot_color_text_1": "#ffffff",
+            "hotspot_vertical_1": 45,
+            "hotspot_horizontal_1": 25,
+            "hotspot_product_1": "",
+            "hotspot_color_text_2": "#ffffff",
+            "hotspot_vertical_2": 30,
+            "hotspot_horizontal_2": 65,
+            "hotspot_product_2": "",
+            "hotspot_color_text_3": "#ffffff",
+            "hotspot_vertical_3": 60,
+            "hotspot_horizontal_3": 75,
+            "hotspot_product_3": "",
+            "hotspot_color_text_4": "#ffffff",
+            "hotspot_vertical_4": 50,
+            "hotspot_horizontal_4": 50,
+            "hotspot_product_4": ""
+          }
+        }
+      },
+      "block_order": [
+        "feed_zitphR",
+        "feed_h6CcCW",
+        "feed_EzVDDq",
+        "feed_jdbTzL"
+      ],
+      "name": "t:sections.shop-the-feed.name",
+      "settings": {
+        "columns": 5,
+        "carousel_on_desktop": true,
+        "image_ratio": "portrait",
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "account_name": "@aetrexworldwide",
+        "show_vendor": false,
+        "show_price": false,
+        "heading": "Shop the Feed",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "<p>Discover premium audio from our Instagram and shop now.</p>",
+        "button_label": "Follow",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": false,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 80,
+        "padding_bottom": 100,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
     }
   },
   "order": [
-    "main-page"
+    "main-page",
+    "video_with_text_overlay_cfhWL7",
+    "empty_space_ei6bpL",
+    "17586443670450d0fd",
+    "blog_posts_JnT6A7",
+    "faq_f3crHM",
+    "testimonials_McVqED",
+    "images_with_text_WtPNjT",
+    "shop_the_feed_R7FhLb"
   ]
 }

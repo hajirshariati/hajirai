@@ -40,7 +40,8 @@
             <img src="{{ block.settings.chat_icon | img_url: 'master' }}" alt="chat" />
           </div>
           {% endif %}
-          <a {% if block.settings.chat_url %}href="{{ block.settings.chat_url }}"{% endif %} class="store-info-text {% if block.settings.chat_url %} reversed-link{% endif %}">{{ block.settings.chat_text }}</a>
+          <a onclick="openWidget()">Live Chat</a>
+          <!--a {% if block.settings.chat_url %}href="{{ block.settings.chat_url }}"{% endif %} class="store-info-text {% if block.settings.chat_url %} reversed-link{% endif %}">{{ block.settings.chat_text }}</a-->
         </div>
         {% endif %}
       {% if block.settings.locator_text != blank %}

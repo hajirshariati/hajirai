@@ -445,6 +445,7 @@
             "icon_width": 24,
             "heading": "Details",
             "content": "",
+            "size_chart_table": "[{\"Size\":\"S\",\"Chest\":\"36\",\"Length\":\"28\"},{\"Size\":\"M\",\"Chest\":\"38\",\"Length\":\"29\"},{\"Size\":\"L\",\"Chest\":\"40\",\"Length\":\"30\"}]",
             "metafields": ""
           }
         },
@@ -456,6 +457,7 @@
             "icon_width": 24,
             "heading": "Care Instructions",
             "content": "",
+            "size_chart_table": "[{\"Size\":\"S\",\"Chest\":\"36\",\"Length\":\"28\"},{\"Size\":\"M\",\"Chest\":\"38\",\"Length\":\"29\"},{\"Size\":\"L\",\"Chest\":\"40\",\"Length\":\"30\"}]",
             "metafields": ""
           }
         },
@@ -466,7 +468,8 @@
             "iwidth": "custom",
             "icon_width": 24,
             "heading": "Size Chart",
-            "content": "<p>Use collapsible tabs for more detailed information that will help customers make a purchasing decision.</p><p>Ex: Shipping and return policies, size guides, and other common questions.</p>",
+            "content": "<p> </p>",
+            "size_chart_table": "{\n  \"type\": \"collapsible_tab\",\n  \"name\": \"Size Chart\",\n  \"settings\": [\n    {\n      \"type\": \"text\",\n      \"id\": \"heading\",\n      \"label\": \"Heading\",\n      \"default\": \"Size Chart\"\n    },\n    {\n      \"type\": \"text\",\n      \"id\": \"columns\",\n      \"label\": \"Columns (comma-separated)\",\n      \"default\": \"Size,Chest\"\n    },\n    {\n      \"type\": \"textarea\",\n      \"id\": \"rows\",\n      \"label\": \"Rows (one per line, comma-separated)\",\n      \"default\": \"S,36\\nM,38\"\n    }\n  ]\n}",
             "metafields": ""
           }
         },
@@ -478,6 +481,7 @@
             "icon_width": 24,
             "heading": "No-Hassle Returns",
             "content": "<p>When you choose Aetrex, you make the healthy choice. Wear the shoes or Aetrex Orthotics and if you are not completely satisfied, return them to us. If you need detailed step-by-step instructions, please visit our <a href=\"https://support.aetrex.com/hc/en-us/articles/360007223654-How-do-I-return-an-order?_gl=1%2Amv7vy8%2A_gcl_aw%2AR0NMLjE3Mzk0NTI1MzYuQ2p3S0NBaUF6YmE5QmhCaEVpd0E3Z2xiYW1JRktlOUdSLUh3WnNGR1U1WHdRNGE1dTNVcklqR1VaNDNUNGhxYkt5cHFkcDM2ai10OWd4b0NBYzRRQXZEX0J3RQ..%2A_gcl_au%2AMTMyMDU2NzExNi4xNzM3NDA1Mjg0LjczODEwNDAyOS4xNzQyNDc3NzY0LjE3NDI0Nzc3NjQ.%2AFPAU%2AMTMyMDU2NzExNi4xNzM3NDA1Mjg0\" target=\"_blank\">FAQ page</a> for further guidance.<br/><br/>The refund will be processed to the original form of payment and should be reflected in your account within 5 to 7 days from the day of the drop-off.<br/><br/><strong>A return fee of $5.95</strong> will be automatically deducted when processing your return.<br/><br/>Shipping charges from the original order are non-refundable.</p>",
+            "size_chart_table": "[{\"Size\":\"S\",\"Chest\":\"36\",\"Length\":\"28\"},{\"Size\":\"M\",\"Chest\":\"38\",\"Length\":\"29\"},{\"Size\":\"L\",\"Chest\":\"40\",\"Length\":\"30\"}]",
             "metafields": ""
           }
         },

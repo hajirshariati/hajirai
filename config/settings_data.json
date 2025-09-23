@@ -189,6 +189,20 @@
           "inject_modules_loader": true,
           "inject_sdk_loader": false
         }
+      },
+      "11945366711752539959": {
+        "type": "shopify://apps/zendesk/blocks/zendesk_web_widget/c0b417b1-b90b-4754-baaf-f55627e6acd4",
+        "disabled": false,
+        "settings": {}
+      },
+      "3703718642129649661": {
+        "type": "shopify://apps/casper-cart-sync/blocks/cross-device-cart/3e8e9213-3920-4806-a1c5-772d07bb1e4e",
+        "disabled": false,
+        "settings": {
+          "reload": true,
+          "not_replace_with_empty": false,
+          "clear_after_logout": false
+        }
       }
     }
   },
