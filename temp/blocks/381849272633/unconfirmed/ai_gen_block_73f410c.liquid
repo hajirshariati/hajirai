@@ -1,6 +1,1206 @@
+{% doc %}
+  @prompt
+    a section similar to how collection list section tiles look like. when you click a tile it flips to show subcategories where you can click on the subcategories, its only 3 tiles and have the option for up to 12 subcategories. Theres doesn't have to be a "main category" link option, can there be a main section title
+
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-collection-flip-section-{{ ai_gen_id }} {
+    padding: {{ block.settings.section_padding }}px 0;
+  }
+
+  .ai-collection-flip-header-{{ ai_gen_id }} {
+    text-align: {{ block.settings.header_alignment }};
+    margin-bottom: {{ block.settings.header_spacing }}px;
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .ai-collection-flip-main-title-{{ ai_gen_id }} {
+    color: {{ block.settings.main_title_color }};
+    font-size: {{ block.settings.main_title_size }}px;
+    font-weight: 700;
+    margin: 0 0 {{ block.settings.title_subtitle_spacing }}px;
+    line-height: 1.2;}
+
+  .ai-collection-flip-subtitle-{{ ai_gen_id }} {
+    color: {{ block.settings.subtitle_color }};
+    font-size: {{ block.settings.subtitle_size }}px;
+    margin: 0;
+    line-height: 1.4;opacity: 0.9;
+  }
+
+  .ai-collection-flip-grid-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax({{ block.settings.min_tile_width }}px, 1fr));
+    gap: {{ block.settings.grid_gap }}px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .ai-collection-flip-tile-{{ ai_gen_id }} {
+    position: relative;
+    height: {{ block.settings.tile_height }}px;
+    perspective: 1000px;
+    border-radius: {{ block.settings.border_radius }}px;
+    overflow: hidden;
+  }
+
+  .ai-collection-flip-inner-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    cursor: pointer;
+  }
+
+  .ai-collection-flip-tile-{{ ai_gen_id }}.flipped .ai-collection-flip-inner-{{ ai_gen_id }} {
+    transform: rotateY(180deg);
+  }
+
+  .ai-collection-flip-front-{{ ai_gen_id }},
+  .ai-collection-flip-back-{{ ai_gen_id }} {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: {{ block.settings.border_radius }}px;
+    overflow: hidden;
+  }
+
+  .ai-collection-flip-back-{{ ai_gen_id }} {
+    transform: rotateY(180deg);background-color: {{ block.settings.back_bg_color }};
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ai-collection-flip-front-{{ ai_gen_id }} {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    background-size: cover;
+    background-position: center;
+    background-color: {{ block.settings.placeholder_bg_color }};
+  }
+
+  .ai-collection-flip-front-placeholder-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: {{ block.settings.placeholder_bg_color }};
+  }
+
+  .ai-collection-flip-front-placeholder-{{ ai_gen_id }} svg {
+    width: 60%;
+    height: 60%;
+    opacity: 0.3;
+    color: {{ block.settings.placeholder_icon_color }};
+  }
+
+  .ai-collection-flip-overlay-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, {{ block.settings.overlay_opacity | divided_by: 100.0 }}) 100%
+    );
+  }
+
+  .ai-collection-flip-front-content-{{ ai_gen_id }} {
+    position: relative;
+    z-index: 2;
+    padding: 20px;
+    width: 100%;
+    text-align: {{ block.settings.text_alignment }};
+  }
+
+  .ai-collection-flip-title-{{ ai_gen_id }} {
+    color: {{ block.settings.title_color }};
+    font-size: {{ block.settings.title_size }}px;
+    font-weight: 600;
+    margin: 0 0 8px;
+    line-height: 1.2;
+  }
+
+  .ai-collection-flip-description-{{ ai_gen_id }} {
+    color: {{ block.settings.description_color }};
+    font-size: {{ block.settings.description_size }}px;
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .ai-collection-flip-back-header-{{ ai_gen_id }} {
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .ai-collection-flip-back-title-{{ ai_gen_id }} {
+    color: {{ block.settings.back_title_color }};
+    font-size: {{ block.settings.back_title_size }}px;
+    font-weight: 600;
+    margin: 0 0 8px;
+    line-height: 1.2;
+  }
+
+  .ai-collection-flip-back-subtitle-{{ ai_gen_id }} {
+    color: {{ block.settings.back_subtitle_color }};
+    font-size: {{ block.settings.back_subtitle_size }}px;
+    margin: 0;
+    opacity: 0.8;
+  }
+
+  .ai-collection-flip-subcategories-{{ ai_gen_id }} {
+    flex-grow: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+    align-content: start;
+  }
+
+  .ai-collection-flip-subcategory-{{ ai_gen_id }} {
+    display: block;
+    padding: 12px 16px;
+    background-color: {{ block.settings.subcategory_bg_color }};
+    color: {{ block.settings.subcategory_text_color }};
+    text-decoration: none;
+    border-radius: {{ block.settings.subcategory_border_radius }}px;
+    transition: all 0.3s ease;
+    font-size: {{ block.settings.subcategory_text_size }}px;
+    text-align: center;
+    border: 1px solid transparent;min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-collection-flip-subcategory-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.subcategory_hover_bg_color }};
+    color: {{ block.settings.subcategory_hover_text_color }};
+    transform: translateY(-2px);
+  }
+
+  .ai-collection-flip-back-footer-{{ ai_gen_id }} {
+    margin-top: 20px;
+    text-align: center;
+  }
+
+  .ai-collection-flip-back-button-{{ ai_gen_id }} {
+    background: none;
+    border: 1px solid {{ block.settings.back_button_color }};
+    color: {{ block.settings.back_button_color }};
+    padding: 8px 16px;
+    border-radius: {{ block.settings.subcategory_border_radius }}px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;}
+
+  .ai-collection-flip-back-button-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.back_button_color }};
+    color: {{ block.settings.back_bg_color }};
+  }
+
+  .ai-collection-flip-empty-state-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .ai-collection-flip-empty-subcategories-{{ ai_gen_id }} {
+    grid-column: 1 / -1;text-align: center;
+    color: #999;
+    font-style: italic;
+    padding: 20px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-collection-flip-grid-{{ ai_gen_id }} {
+      grid-template-columns: 1fr;
+      gap: {{ block.settings.grid_gap | times: 0.75 }}px;
+    }
+
+    .ai-collection-flip-tile-{{ ai_gen_id }} {
+      height: {{ block.settings.tile_height | times: 0.8 }}px;
+    }
+
+    .ai-collection-flip-back-{{ ai_gen_id }} {
+      padding: 16px;
+    }
+
+    .ai-collection-flip-front-content-{{ ai_gen_id }} {
+      padding: 16px;
+    }
+
+    .ai-collection-flip-subcategories-{{ ai_gen_id }} {
+      grid-template-columns: 1fr;
+    }
+
+    .ai-collection-flip-main-title-{{ ai_gen_id }} {
+      font-size: {{ block.settings.main_title_size | times: 0.8 }}px;
+    }
+
+    .ai-collection-flip-subtitle-{{ ai_gen_id }} {
+      font-size: {{ block.settings.subtitle_size | times: 0.9 }}px;
+    }
+  }
+{% endstyle %}<div class="ai-collection-flip-section-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  {% if block.settings.main_title != blank or block.settings.subtitle != blank %}
+    <div class="ai-collection-flip-header-{{ ai_gen_id }}">
+      {% if block.settings.main_title != blank %}
+        <h2 class="ai-collection-flip-main-title-{{ ai_gen_id }}">{{ block.settings.main_title }}</h2>
+      {% endif %}
+      {% if block.settings.subtitle != blank %}
+        <p class="ai-collection-flip-subtitle-{{ ai_gen_id }}">{{ block.settings.subtitle }}</p>
+      {% endif %}
+    </div>
+  {% endif %}<collection-flip-tiles-{{ ai_gen_id }} class="ai-collection-flip-grid-{{ ai_gen_id }}">
+    {% for i in (1..3) %}
+      {% liquid
+        assign title_key = 'tile_' | append: i | append: '_title'
+        assign description_key = 'tile_' | append: i | append: '_description'
+        assign image_key = 'tile_' | append: i | append: '_image'
+
+        assign tile_title = block.settings[title_key]
+        assign tile_description = block.settings[description_key]
+        assign tile_image = block.settings[image_key]
+
+        assign has_subcategories = false
+        for j in (1..12)
+          assign subcategory_key = 'tile_' | append: i | append: '_subcategory_' | append: j
+          assign subcategory = block.settings[subcategory_key]
+          if subcategory != blank
+            assign has_subcategories = true
+            break
+          endif
+        endfor%}
+
+      {% if tile_title != blank or tile_image != blank or has_subcategories %}
+        <div class="ai-collection-flip-tile-{{ ai_gen_id }}" data-tile="{{ i }}">
+          <div class="ai-collection-flip-inner-{{ ai_gen_id }}">
+            <div class="ai-collection-flip-front-{{ ai_gen_id }}"
+                 {% if tile_image %}
+                   style="background-image: url('{{ tile_image | image_url: width: 600 }}');"
+                 {% endif %}>
+              
+              {% unless tile_image %}
+                <div class="ai-collection-flip-front-placeholder-{{ ai_gen_id }}">
+                  {{ 'collection-1' | placeholder_svg_tag }}
+                </div>
+              {% endunless %}
+
+              <div class="ai-collection-flip-overlay-{{ ai_gen_id }}"></div>
+              
+              <div class="ai-collection-flip-front-content-{{ ai_gen_id }}">
+                {% if tile_title != blank %}
+                  <h3 class="ai-collection-flip-title-{{ ai_gen_id }}">{{ tile_title }}</h3>
+                {% endif %}
+                {% if tile_description != blank %}
+                  <p class="ai-collection-flip-description-{{ ai_gen_id }}">
+                    {{ tile_description | strip_html | truncate: 80 }}
+                  </p>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="ai-collection-flip-back-{{ ai_gen_id }}">
+              <div class="ai-collection-flip-back-header-{{ ai_gen_id }}">
+                {% if tile_title != blank %}
+                  <h3 class="ai-collection-flip-back-title-{{ ai_gen_id }}">{{ tile_title }}</h3>
+                {% endif %}
+                <p class="ai-collection-flip-back-subtitle-{{ ai_gen_id }}">{{ block.settings.subcategory_label }}</p>
+              </div><div class="ai-collection-flip-subcategories-{{ ai_gen_id }}">
+                {% assign subcategory_count = 0 %}
+                {% for j in (1..12) %}
+                  {% liquid
+                    assign subcategory_key = 'tile_' | append: i | append: '_subcategory_' | append: j
+                    assign subcategory_url_key = 'tile_' | append: i | append: '_subcategory_' | append: j | append: '_url'
+                
+                    assign subcategory_title = block.settings[subcategory_key]
+                    assign subcategory_url = block.settings[subcategory_url_key]
+                  %}
+
+                  {% if subcategory_title != blank %}
+                    {% assign subcategory_count = subcategory_count | plus: 1 %}
+                    <a href="{{ subcategory_url | default: '#' }}" class="ai-collection-flip-subcategory-{{ ai_gen_id }}">
+                      {{ subcategory_title }}
+                    </a>
+                  {% endif %}
+                {% endfor %}
+
+                {% if subcategory_count == 0 %}
+                  <div class="ai-collection-flip-empty-subcategories-{{ ai_gen_id }}">
+                    Add subcategories in settings
+                  </div>
+                {% endif %}
+              </div>
+
+              <div class="ai-collection-flip-back-footer-{{ ai_gen_id }}"><button class="ai-collection-flip-back-button-{{ ai_gen_id }}" data-action="flip-back">
+                  Back
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+
+    {% if block.settings.tile_1_title == blank and block.settings.tile_2_title == blank and block.settings.tile_3_title == blank and block.settings.tile_1_image == blank and block.settings.tile_2_image == blank and block.settings.tile_3_image == blank %}
+      <div class="ai-collection-flip-tile-{{ ai_gen_id }}">
+        <div class="ai-collection-flip-inner-{{ ai_gen_id }}">
+          <div class="ai-collection-flip-front-{{ ai_gen_id }}">
+            <div class="ai-collection-flip-front-placeholder-{{ ai_gen_id }}">
+              {{ 'collection-1' | placeholder_svg_tag }}
+            </div>
+            <div class="ai-collection-flip-overlay-{{ ai_gen_id }}"></div>
+            <div class="ai-collection-flip-empty-state-{{ ai_gen_id }}">
+              Add tiles in block settings
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  </collection-flip-tiles-{{ ai_gen_id }}>
+</div>
+
+<script>
+  (function() {
+    class CollectionFlipTiles{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        this.tiles = this.querySelectorAll('.ai-collection-flip-tile-{{ ai_gen_id }}');
+        this.setupEventListeners();
+      }
+
+      setupEventListeners() {
+        this.tiles.forEach((tile) => {
+          const inner = tile.querySelector('.ai-collection-flip-inner-{{ ai_gen_id }}');
+          const backButton = tile.querySelector('.ai-collection-flip-back-button-{{ ai_gen_id }}');
+
+          inner.addEventListener('click', (e) => {
+            if (e.target.closest('.ai-collection-flip-back-{{ ai_gen_id }}')) {
+              return;
+            }
+            
+            this.tiles.forEach((otherTile) => {
+              if (otherTile !== tile) {
+                otherTile.classList.remove('flipped');
+              }
+            });
+
+            tile.classList.add('flipped');});
+
+          if (backButton) {
+            backButton.addEventListener('click', (e) => {
+              e.stopPropagation();
+              tile.classList.remove('flipped');
+            });
+          }
+        });document.addEventListener('click', (e) => {
+          if (!e.target.closest('.ai-collection-flip-tile-{{ ai_gen_id }}')) {
+            this.tiles.forEach((tile) => {
+              tile.classList.remove('flipped');
+            });
+          }
+        });document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') {
+            this.tiles.forEach((tile) => {
+              tile.classList.remove('flipped');
+            });
+          }
+        });
+      }
+    }
+
+    customElements.define('collection-flip-tiles-{{ ai_gen_id }}', CollectionFlipTiles{{ ai_gen_id }});
+  })();
+</script>
+
 {% schema %}
- {
-   "name": "AI_Block",
-   "tag": "shopify-ai-generated-block"
- }
+{
+  "name": "Collection flip tiles",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section header"
+    },
+    {
+      "type": "text",
+      "id": "main_title",
+      "label": "Main title",
+      "default": "Shop by Category"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Discover our curated collections designed for every style and occasion"
+    },
+    {
+      "type": "select",
+      "id": "header_alignment",
+      "label": "Header alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "color",
+      "id": "main_title_color",
+      "label": "Main title color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "main_title_size",
+      "min": 24,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Main title size",
+      "default": 36
+    },
+    {
+      "type": "color",
+      "id": "subtitle_color",
+      "label": "Subtitle color",
+      "default": "#666666"
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size",
+      "min": 14,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Subtitle size",
+      "default": 18
+    },
+    {
+      "type": "range",
+      "id": "title_subtitle_spacing",
+      "min": 5,
+      "max": 30,
+      "step": 5,
+      "unit": "px",
+      "label": "Title subtitle spacing",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "header_spacing",
+      "min": 20,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Header bottom spacing",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "min_tile_width",
+      "min": 250,
+      "max": 500,
+      "step": 25,
+      "unit": "px",
+      "label": "Minimum tile width",
+      "default": 350
+    },
+    {
+      "type": "range",
+      "id": "tile_height",
+      "min": 200,
+      "max": 500,
+      "step": 20,
+      "unit": "px",
+      "label": "Tile height",
+      "default": 300
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "Grid gap",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "section_padding",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Section padding",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "Border radius",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Front side style"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "label": "Overlay opacity",
+      "default": 40
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 16,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "label": "Title size",
+      "default": 24
+    },
+    {
+      "type": "color",
+      "id": "description_color",
+      "label": "Description color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "description_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Description size",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "placeholder_bg_color",
+      "label": "Placeholder background",
+      "default": "#f4f4f4"
+    },
+    {
+      "type": "color",
+      "id": "placeholder_icon_color",
+      "label": "Placeholder icon color",
+      "default": "#cccccc"
+    },
+    {
+      "type": "header",
+      "content": "Back side style"
+    },
+    {
+      "type": "text",
+      "id": "subcategory_label",
+      "label": "Subcategory label",
+      "default": "Shop by category"
+    },
+    {
+      "type": "color",
+      "id": "back_bg_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "back_title_color",
+      "label": "Title color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "back_title_size",
+      "min": 16,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "label": "Title size",
+      "default": 20
+    },
+    {
+      "type": "color",
+      "id": "back_subtitle_color",
+      "label": "Subtitle color",
+      "default": "#666666"
+    },
+    {
+      "type": "range",
+      "id": "back_subtitle_size",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "Subtitle size",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "subcategory_bg_color",
+      "label": "Subcategory background",
+      "default": "#f8f8f8"
+    },
+    {
+      "type": "color",
+      "id": "subcategory_text_color",
+      "label": "Subcategory text color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "subcategory_hover_bg_color",
+      "label": "Subcategory hover background",
+      "default": "#e8e8e8"
+    },
+    {
+      "type": "color",
+      "id": "subcategory_hover_text_color",
+      "label": "Subcategory hover text color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "subcategory_text_size",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "Subcategory text size",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "subcategory_border_radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "Subcategory border radius",
+      "default": 6
+    },
+    {
+      "type": "color",
+      "id": "back_button_color",
+      "label": "Back button color",
+      "default": "#666666"
+    },
+    {
+      "type": "header",
+      "content": "Tile1"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_title",
+      "label": "Title",
+      "default": "Women's Shoes"
+    },
+    {
+      "type": "textarea",
+      "id": "tile_1_description",
+      "label": "Description",
+      "default": "Discover our collection of comfortable and stylish footwear"
+    },
+    {
+      "type": "image_picker",
+      "id": "tile_1_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_subcategory_1",
+      "label": "Subcategory 1",
+      "default": "Athletic Shoes"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_subcategory_1_url",
+      "label": "Subcategory 1 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_subcategory_2",
+      "label": "Subcategory 2",
+      "default": "Casual Shoes"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_subcategory_2_url",
+      "label": "Subcategory 2 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_subcategory_3",
+      "label": "Subcategory 3",
+      "default": "Dress Shoes"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_subcategory_3_url",
+      "label": "Subcategory 3 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_subcategory_4",
+      "label": "Subcategory 4",
+      "default": "Boots"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_subcategory_4_url",
+      "label": "Subcategory 4 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_subcategory_5",
+      "label": "Subcategory 5"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_subcategory_5_url",
+      "label": "Subcategory 5 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_subcategory_6",
+      "label": "Subcategory 6"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_subcategory_6_url",
+      "label": "Subcategory 6 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_subcategory_7",
+      "label": "Subcategory 7"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_subcategory_7_url",
+      "label": "Subcategory 7 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_subcategory_8",
+      "label": "Subcategory 8"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_subcategory_8_url",
+      "label": "Subcategory 8 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_subcategory_9",
+      "label": "Subcategory 9"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_subcategory_9_url",
+      "label": "Subcategory 9 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_subcategory_10",
+      "label": "Subcategory 10"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_subcategory_10_url",
+      "label": "Subcategory 10 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_subcategory_11",
+      "label": "Subcategory 11"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_subcategory_11_url",
+      "label": "Subcategory 11 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_subcategory_12",
+      "label": "Subcategory 12"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_subcategory_12_url",
+      "label": "Subcategory 12 URL"
+    },
+    {
+      "type": "header",
+      "content": "Tile 2"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_title",
+      "label": "Title",
+      "default": "Men's Shoes"
+    },
+    {
+      "type": "textarea",
+      "id": "tile_2_description",
+      "label": "Description",
+      "default": "Find the perfect pair for every occasion"
+    },
+    {
+      "type": "image_picker",
+      "id": "tile_2_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_subcategory_1",
+      "label": "Subcategory 1",
+      "default": "Running Shoes"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_subcategory_1_url",
+      "label": "Subcategory 1 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_subcategory_2",
+      "label": "Subcategory 2",
+      "default": "Sneakers"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_subcategory_2_url",
+      "label": "Subcategory 2 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_subcategory_3",
+      "label": "Subcategory 3",
+      "default": "Formal Shoes"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_subcategory_3_url",
+      "label": "Subcategory 3 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_subcategory_4",
+      "label": "Subcategory 4",
+      "default": "Work Boots"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_subcategory_4_url",
+      "label": "Subcategory 4 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_subcategory_5",
+      "label": "Subcategory 5"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_subcategory_5_url",
+      "label": "Subcategory 5 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_subcategory_6",
+      "label": "Subcategory 6"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_subcategory_6_url",
+      "label": "Subcategory 6 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_subcategory_7",
+      "label": "Subcategory 7"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_subcategory_7_url",
+      "label": "Subcategory 7 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_subcategory_8",
+      "label": "Subcategory 8"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_subcategory_8_url",
+      "label": "Subcategory 8 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_subcategory_9",
+      "label": "Subcategory 9"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_subcategory_9_url",
+      "label": "Subcategory 9 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_subcategory_10",
+      "label": "Subcategory 10"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_subcategory_10_url",
+      "label": "Subcategory 10 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_subcategory_11",
+      "label": "Subcategory 11"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_subcategory_11_url",
+      "label": "Subcategory 11 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_subcategory_12",
+      "label": "Subcategory 12"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_subcategory_12_url",
+      "label": "Subcategory 12 URL"
+    },
+    {
+      "type": "header",
+      "content": "Tile 3"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_title",
+      "label": "Title",
+      "default": "Accessories"
+    },
+    {
+      "type": "textarea",
+      "id": "tile_3_description",
+      "label": "Description",
+      "default": "Complete your look with our accessories"
+    },
+    {
+      "type": "image_picker",
+      "id": "tile_3_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_subcategory_1",
+      "label": "Subcategory 1",
+      "default": "Insoles"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_subcategory_1_url",
+      "label": "Subcategory 1 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_subcategory_2",
+      "label": "Subcategory 2",
+      "default": "Socks"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_subcategory_2_url",
+      "label": "Subcategory 2 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_subcategory_3",
+      "label": "Subcategory 3",
+      "default": "Shoe Care"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_subcategory_3_url",
+      "label": "Subcategory 3 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_subcategory_4",
+      "label": "Subcategory 4",
+      "default": "Laces"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_subcategory_4_url",
+      "label": "Subcategory 4 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_subcategory_5",
+      "label": "Subcategory 5"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_subcategory_5_url",
+      "label": "Subcategory 5 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_subcategory_6",
+      "label": "Subcategory 6"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_subcategory_6_url",
+      "label": "Subcategory 6 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_subcategory_7",
+      "label": "Subcategory 7"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_subcategory_7_url",
+      "label": "Subcategory 7 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_subcategory_8",
+      "label": "Subcategory 8"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_subcategory_8_url",
+      "label": "Subcategory 8 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_subcategory_9",
+      "label": "Subcategory 9"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_subcategory_9_url",
+      "label": "Subcategory 9 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_subcategory_10",
+      "label": "Subcategory 10"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_subcategory_10_url",
+      "label": "Subcategory 10 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_subcategory_11",
+      "label": "Subcategory 11"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_subcategory_11_url",
+      "label": "Subcategory 11 URL"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_subcategory_12",
+      "label": "Subcategory 12"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_subcategory_12_url",
+      "label": "Subcategory 12 URL"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection flip tiles"
+    }
+  ]
+}
 {% endschema %}
