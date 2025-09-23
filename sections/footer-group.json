@@ -22,7 +22,7 @@
             "heading": "Customer service",
             "text": "<p><a href=\"https://www.aetrex.com/#\" title=\"#\">Click here </a>to consult with our specialists for a personalized product recommendation for your specific needs.</p>",
             "highlighted_text": "none",
-            "custom_html": "<a id=\"start-chatbot\" href=\"javascript:openChat();\">\ncleck here\n</a>",
+            "custom_html": "<a id=\"start-chatbot\" href=\"javascript:openChat();\">\ncleck here\n</a>\n<script>function openChat() {\n    zE('messenger', ‘open’);\n\n}</script>",
             "highlighted_scribble": "circle"
           }
         },
