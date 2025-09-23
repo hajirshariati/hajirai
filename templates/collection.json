@@ -76,6 +76,7 @@
           "type": "subcollections",
           "settings": {
             "menu": "",
+            "per_row": 5,
             "show_count": true
           }
         },
@@ -121,12 +122,13 @@
         "padding_top": 40,
         "padding_bottom": 100,
         "divider": false,
-        "full_width": false,
+        "full_width": true,
         "rounded": true
       }
     },
     "recently-viewed": {
       "type": "recently-viewed",
+      "disabled": true,
       "settings": {
         "product_limit": 6,
         "columns": 4,
@@ -173,12 +175,9 @@
           "type": "text",
           "settings": {
             "text": "{{ collection.description }}",
-            "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
+            "text_font": "body",
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -189,7 +188,8 @@
         "heading_JecEV8",
         "text_hWMiHh"
       ],
-      "name": "Rich text",
+      "disabled": true,
+      "name": "t:sections.rich-text.presets.name",
       "settings": {
         "text_alignment": "center",
         "text_alignment_mobile": "center",
@@ -220,6 +220,40 @@
         "narrow": true,
         "rounded": false
       }
+    },
+    "ss_recs_script_nYBUNj": {
+      "type": "ss-recs-script",
+      "blocks": {
+        "ss_profile_block_GCHbrj": {
+          "type": "ss_profile_block",
+          "settings": {
+            "ss_profile_id": "recently-viewed",
+            "ss_collection_list": [],
+            "ss_batched": true
+          }
+        }
+      },
+      "block_order": [
+        "ss_profile_block_GCHbrj"
+      ],
+      "name": "Searchspring Recommendations",
+      "settings": {}
+    },
+    "ss_recs_target_Rwfepp": {
+      "type": "ss-recs-target",
+      "blocks": {
+        "ss_profile_block_ptjwra": {
+          "type": "ss_profile_block",
+          "settings": {
+            "ss_profile_id": "recently-viewed"
+          }
+        }
+      },
+      "block_order": [
+        "ss_profile_block_ptjwra"
+      ],
+      "name": "Searchspring Recommendations Target",
+      "settings": {}
     }
   },
   "order": [
@@ -227,6 +261,8 @@
     "1750082334ddfccde7",
     "main-collection",
     "recently-viewed",
-    "rich_text_ARCqRb"
+    "rich_text_ARCqRb",
+    "ss_recs_script_nYBUNj",
+    "ss_recs_target_Rwfepp"
   ]
 }

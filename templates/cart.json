@@ -124,10 +124,46 @@
         "full_width": false,
         "rounded": false
       }
+    },
+    "ss_recs_script_txc4Dp": {
+      "type": "ss-recs-script",
+      "blocks": {
+        "ss_profile_block_KMiWNM": {
+          "type": "ss_profile_block",
+          "settings": {
+            "ss_profile_id": "view-cart",
+            "ss_collection_list": [],
+            "ss_batched": true
+          }
+        }
+      },
+      "block_order": [
+        "ss_profile_block_KMiWNM"
+      ],
+      "name": "Searchspring Recommendations",
+      "settings": {}
+    },
+    "ss_recs_target_zxHQEG": {
+      "type": "ss-recs-target",
+      "blocks": {
+        "ss_profile_block_zE9yiU": {
+          "type": "ss_profile_block",
+          "settings": {
+            "ss_profile_id": "view-cart"
+          }
+        }
+      },
+      "block_order": [
+        "ss_profile_block_zE9yiU"
+      ],
+      "name": "Searchspring Recommendations Target",
+      "settings": {}
     }
   },
   "order": [
     "main",
-    "recently-viewed"
+    "recently-viewed",
+    "ss_recs_script_txc4Dp",
+    "ss_recs_target_zxHQEG"
   ]
 }

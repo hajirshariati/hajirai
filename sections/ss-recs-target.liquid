@@ -1,0 +1,34 @@
+{% if settings.ss_enable %}
+    {% for block in section.blocks %}
+        {%- if block.settings.ss_profile_id != blank -%}
+            <div class="ss__recs__{{ block.settings.ss_profile_id | escape }}" style="min-height: 550px;"></div>
+        {%- endif -%}
+    {% endfor %}
+{% endif %}
+
+{% schema %}
+{
+  "name": "SS Recs Target",
+  "tag": "div",
+  "class": "section-product-recommendations page-width",
+  "presets": [
+    {
+      "name": "Searchspring Recommendations Target"
+    }
+  ],
+  "settings": [],
+  "blocks": [
+    {
+      "type": "ss_profile_block",
+      "name": "Recommendations Profile",
+      "settings": [
+        {
+          "type": "text",
+          "id": "ss_profile_id",
+          "label": "Profile ID"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,3 +1,4 @@
+{% render 'rapid-search-results-template-v2' %}
 <style>
   #shopify-section-{{ section.id }} {
     --section-padding-top: {{ section.settings.padding_top }}px;
@@ -36,7 +37,7 @@
     {%- endif -%}
 
     {%- paginate collection.products by section.settings.products_per_page -%}
-      {%- if collection.all_products_count > 0 -%}
+      {%- if collection.all_products_count > 0 and settings.ss_enable == false -%}
         {%- render 'facets-sticky',
           results: collection,
           collapsed: section.settings.filter_collapsed,
@@ -48,197 +49,215 @@
         -%}
       {%- endif -%}
 
-      {%- if enable_filtering or enable_sorting or subcollections != blank -%}
-        <div class="collection__topbar hidden xl:flex items-center gap-4">
-          {%- if enable_filtering and collection.all_products_count > 0 -%}
-            {%- if filter_type == 'drawer' -%}
-              {%- render 'facets-drawer',
-                results: collection,
-                collapsed: section.settings.filter_collapsed,
-                enable_filtering: enable_filtering,
-                enable_sorting: enable_sorting,
-                enable_color_swatches: section.settings.filter_color_swatches,
-                filter_count: filter_count
-                section_id: section.id
+      {%- if settings.ss_enable -%}
+        <div id="searchspring-toolbar"></div>
+      {% else %}
+        {%- if enable_filtering or enable_sorting or subcollections != blank -%}
+          <div class="collection__topbar hidden xl:flex items-center gap-4">
+            {%- if enable_filtering and collection.all_products_count > 0 -%}
+              {%- if filter_type == 'drawer' -%}
+                {%- render 'facets-drawer',
+                  results: collection,
+                  collapsed: section.settings.filter_collapsed,
+                  enable_filtering: enable_filtering,
+                  enable_sorting: enable_sorting,
+                  enable_color_swatches: section.settings.filter_color_swatches,
+                  filter_count: filter_count
+                  section_id: section.id
+                -%}
+              {%- elsif filter_type == 'sidebar' -%}
+                <div class="facet-wrapper">
+                  <button class="button button--secondary icon-with-text" type="button" is="filters-toggle" aria-controls="FacetFiltersContainer" aria-expanded="true">
+                    <span class="btn-fill" data-fill></span>
+                    <span class="btn-text">
+                      {%- liquid
+                        render 'icon', icon: 'filter'
+                        echo 'collections.filtering.filter_hide_button' | t
+                      -%}
+                    </span>
+                    <span class="btn-text btn-duplicate">
+                      {%- liquid
+                        render 'icon', icon: 'filter'
+                        echo 'collections.filtering.filter_show_button' | t
+                      -%}
+                      <facet-count class="count flex items-center justify-center text-xs font-medium rounded-full"{% if filter_count == 0 %} hidden{% endif %}>{{ filter_count }}</facet-count>
+                    </span>
+                  </button>
+                </div>
+              {%- endif -%}
+            {%- endif -%}
+
+            {%- if subcollections != blank -%}
+              {%- render 'subcollections',
+                main_menu: subcollections.settings.menu,
+                per_row: subcollections.settings.per_row,
+                show_count: subcollections.settings.show_count
               -%}
-            {%- elsif filter_type == 'sidebar' -%}
-              <div class="facet-wrapper">
-                <button class="button button--secondary icon-with-text" type="button" is="filters-toggle" aria-controls="FacetFiltersContainer" aria-expanded="true">
-                  <span class="btn-fill" data-fill></span>
-                  <span class="btn-text">
-                    {%- liquid
-                      render 'icon', icon: 'filter'
-                      echo 'collections.filtering.filter_hide_button' | t
-                    -%}
-                  </span>
-                  <span class="btn-text btn-duplicate">
-                    {%- liquid
-                      render 'icon', icon: 'filter'
-                      echo 'collections.filtering.filter_show_button' | t
-                    -%}
-                    <facet-count class="count flex items-center justify-center text-xs font-medium rounded-full"{% if filter_count == 0 %} hidden{% endif %}>{{ filter_count }}</facet-count>
-                  </span>
-                </button>
+            {%- else -%}
+              <p id="ProductCount" class="text-base lg:text-lg" role="status">
+                {%- liquid
+                  if collection.results_count
+                    echo 'general.search.results_with_count' | t: terms: collection.terms, count: collection.results_count
+                  elsif collection.products_count == collection.all_products_count
+                    echo 'collections.general.product_count_simple' | t: count: collection.products_count
+                  else
+                    echo 'collections.general.product_count' | t: product_count: collection.products_count, count: collection.all_products_count
+                  endif
+                -%}
+              </p>
+            {%- endif -%}
+
+            {%- if enable_sorting and collection.all_products_count > 0 -%}
+              {%- liquid
+                assign sort_by = collection.sort_by | default: collection.default_sort_by
+                for option in collection.sort_options
+                  if option.value == sort_by
+                    assign sort_by_name = option.name
+                    break
+                  endif
+                endfor
+              -%}
+              <div class="facet-sorting inline-flex items-center gap-6" id="SortByContainer">
+                <span>{{ 'collections.sorting.sort_by_label' | t }}</span>
+                <facet-sort class="sort-wrapper relative">
+                  <hover-element class="button button--secondary sort-by whitespace-nowrap overflow-hidden z-3">
+                    <span class="btn-fill" data-fill></span>
+                    <div class="btn-text">
+                      <span class="sort-header flex items-center justify-center gap-5 relative w-full">
+                        <span class="sort-selection">{{ sort_by_name | escape }}</span>
+                        <span class="sort-title text-sm uppercase absolute left-0 opacity-0 tracking-widest">{{ 'collections.sorting.sort_button' | t }}</span>
+                        <span class="sort-close flex items-center justify-center rounded-full">
+                          {%- render 'icon', icon: 'close', size: 'sm' -%}
+                        </span>
+                      </span>
+                      <ul class="sort-listbox text-left grid gap-2 absolute left-0 opacity-0 invisible w-full h-auto">
+                        {%- for option in collection.sort_options -%}
+                          <li class="opacity-0 relative">
+                            <input id="SortBy-{{ option.value }}" class="sr-only" name="sort_by" type="radio" value="{{ option.value }}"{% if option.value == sort_by %} checked{% endif %} />
+                            <label for="SortBy-{{ option.value }}" class="reversed-link text-xl">{{ option.name | escape }}</label>
+                          </li>
+                        {%- endfor -%}
+                      </ul>
+                    </div>
+                  </hover-element>
+                </facet-sort>
               </div>
             {%- endif -%}
-          {%- endif -%}
-
-          {%- if subcollections != blank -%}
-            {%- render 'subcollections',
-              main_menu: subcollections.settings.menu,
-              show_count: subcollections.settings.show_count
-            -%}
-          {%- else -%}
-            <p id="ProductCount" class="text-base lg:text-lg" role="status">
-              {%- liquid
-                if collection.results_count
-                  echo 'general.search.results_with_count' | t: terms: collection.terms, count: collection.results_count
-                elsif collection.products_count == collection.all_products_count
-                  echo 'collections.general.product_count_simple' | t: count: collection.products_count
-                else
-                  echo 'collections.general.product_count' | t: product_count: collection.products_count, count: collection.all_products_count
-                endif
-              -%}
-            </p>
-          {%- endif -%}
-
-          {%- if enable_sorting and collection.all_products_count > 0 -%}
-            {%- liquid
-              assign sort_by = collection.sort_by | default: collection.default_sort_by
-              for option in collection.sort_options
-                if option.value == sort_by
-                  assign sort_by_name = option.name
-                  break
-                endif
-              endfor
-            -%}
-            <div class="facet-sorting inline-flex items-center gap-6" id="SortByContainer">
-              <span>{{ 'collections.sorting.sort_by_label' | t }}</span>
-              <facet-sort class="sort-wrapper relative">
-                <hover-element class="button button--secondary sort-by whitespace-nowrap overflow-hidden z-3">
-                  <span class="btn-fill" data-fill></span>
-                  <div class="btn-text">
-                    <span class="sort-header flex items-center justify-center gap-5 relative w-full">
-                      <span class="sort-selection">{{ sort_by_name | escape }}</span>
-                      <span class="sort-title text-sm uppercase absolute left-0 opacity-0 tracking-widest">{{ 'collections.sorting.sort_button' | t }}</span>
-                      <span class="sort-close flex items-center justify-center rounded-full">
-                        {%- render 'icon', icon: 'close', size: 'sm' -%}
-                      </span>
-                    </span>
-                    <ul class="sort-listbox text-left grid gap-2 absolute left-0 opacity-0 invisible w-full h-auto">
-                      {%- for option in collection.sort_options -%}
-                        <li class="opacity-0 relative">
-                          <input id="SortBy-{{ option.value }}" class="sr-only" name="sort_by" type="radio" value="{{ option.value }}"{% if option.value == sort_by %} checked{% endif %} />
-                          <label for="SortBy-{{ option.value }}" class="reversed-link text-xl">{{ option.name | escape }}</label>
-                        </li>
-                      {%- endfor -%}
-                    </ul>
-                  </div>
-                </hover-element>
-              </facet-sort>
-            </div>
-          {%- endif -%}
-        </div>
+          </div>
+        {%- endif -%}
       {%- endif -%}
 
-      {%- liquid
-        if enable_filtering
-          render 'facets-active', results: collection, enable_color_swatches: section.settings.filter_color_swatches, filter_count: filter_count
-        endif
-      -%}
-
+      {%- if settings.ss_enable -%}
+        <div id="searchspring-summary"></div>
+      {% else %}
+        {%- liquid
+          if enable_filtering
+            render 'facets-active', results: collection, enable_color_swatches: section.settings.filter_color_swatches, filter_count: filter_count
+          endif
+        -%}
+      {%- endif -%}
       <div class="collection__content flex">
-        {%- if enable_filtering and filter_type == 'sidebar' and collection.all_products_count > 0 -%}
+        {%- if settings.ss_enable -%}
           <div class="hidden xl:block" id="FacetFiltersContainer">
-            <sticky-element class="facets__scroll block sticky top-0">
-              {%- render 'facets',
-                context: 'sidebar',
-                results: collection,
-                collapsed: section.settings.filter_collapsed,
-                enable_filtering: enable_filtering,
-                enable_sorting: false,
-                enable_color_swatches: section.settings.filter_color_swatches,
-                section_id: section.id
-              -%}
-            </sticky-element>
+            <div id="searchspring-sidebar" style="min-height: 100vh;"></div>
           </div>
+        {% else %}
+          {%- if enable_filtering and filter_type == 'sidebar' and collection.all_products_count > 0 -%}
+            <div class="hidden xl:block" id="FacetFiltersContainer">
+              <sticky-element class="facets__scroll block sticky top-0">
+                {%- render 'facets',
+                  context: 'sidebar',
+                  results: collection,
+                  collapsed: section.settings.filter_collapsed,
+                  enable_filtering: enable_filtering,
+                  enable_sorting: false,
+                  enable_color_swatches: section.settings.filter_color_swatches,
+                  section_id: section.id
+                -%}
+              </sticky-element>
+            </div>
+          {%- endif -%}
         {%- endif -%}
 
         <div class="flex flex-col gap-12 grow" id="ProductGridContainer">
-          {%- if collection.products.size == 0 -%}
-            <div class="empty-state grid items-center justify-center text-center gap-7d5">
-              {%- if collection.all_products_count > 0 -%}
-                <div class="flex flex-col items-center gap-3">
-                  {%- render 'icon', icon: 'empty', size: 'xxxl' -%}
-                  <p class="heading leading-none tracking-tight">{{ 'collections.general.no_results' | t }}</p>
-                  <p>{{ 'collections.general.use_fewer_filters' | t }}</p>
-                </div>
-                <a class="button button--primary icon-with-text" href="{{ collection.url }}" is="facet-remove" data-magnet="0">
-                  <span class="btn-fill" data-fill></span>
-                  <span class="btn-text">
-                    {%- liquid
-                      render 'icon', icon: 'close-2', size: 'xxxs'
-                      echo 'collections.filtering.clear_all' | t
-                    -%}
-                  </span>
-                </a>
-              {%- else -%}
-                <div class="flex flex-col items-center gap-3">
-                  {%- render 'icon', icon: 'empty', size: 'xxxl' -%}
-                  <p class="heading leading-none tracking-tight">{{ 'collections.general.empty' | t }}</p>
-                </div>
-                <a class="button button--primary icon-with-text" href="{{ routes.all_products_collection_url }}" is="hover-link">
-                  <span class="btn-fill" data-fill></span>
-                  <span class="btn-text">{{ 'collections.general.continue_shopping' | t }}</span>
-                </a>
-              {%- endif -%}
-            </div>
-          {%- endif -%}
+          {%- if settings.ss_enable -%}
+            <div id="searchspring-content" style="min-height: 100vh;"></div>
+          {% else %}
+            {%- if collection.products.size == 0 -%}
+              <div class="empty-state grid items-center justify-center text-center gap-7d5">
+                {%- if collection.all_products_count > 0 -%}
+                  <div class="flex flex-col items-center gap-3">
+                    {%- render 'icon', icon: 'empty', size: 'xxxl' -%}
+                    <p class="heading leading-none tracking-tight">{{ 'collections.general.no_results' | t }}</p>
+                    <p>{{ 'collections.general.use_fewer_filters' | t }}</p>
+                  </div>
+                  <a class="button button--primary icon-with-text" href="{{ collection.url }}" is="facet-remove" data-magnet="0">
+                    <span class="btn-fill" data-fill></span>
+                    <span class="btn-text">
+                      {%- liquid
+                        render 'icon', icon: 'close-2', size: 'xxxs'
+                        echo 'collections.filtering.clear_all' | t
+                      -%}
+                    </span>
+                  </a>
+                {%- else -%}
+                  <div class="flex flex-col items-center gap-3">
+                    {%- render 'icon', icon: 'empty', size: 'xxxl' -%}
+                    <p class="heading leading-none tracking-tight">{{ 'collections.general.empty' | t }}</p>
+                  </div>
+                  <a class="button button--primary icon-with-text" href="{{ routes.all_products_collection_url }}" is="hover-link">
+                    <span class="btn-fill" data-fill></span>
+                    <span class="btn-text">{{ 'collections.general.continue_shopping' | t }}</span>
+                  </a>
+                {%- endif -%}
+              </div>
+            {%- endif -%}
 
-          {%- if collection.all_products_count > 0 -%}
-            <motion-list class="card-grid card-grid--{{ section.settings.columns }} mobile:card-grid--{{ section.settings.columns_mobile }} grid relative">
-              {%- for product in collection.products -%}
-                {%- liquid
-                  for block in section.blocks
-                    if block.type == 'promotion' or block.type == 'promotion_video'
-                      if forloop.parentloop.index != block.settings.position
-                        continue
+            {%- if collection.all_products_count > 0 -%}
+              <motion-list class="card-grid card-grid--{{ section.settings.columns }} mobile:card-grid--{{ section.settings.columns_mobile }} grid relative">
+                {%- for product in collection.products -%}
+                  {%- liquid
+                    for block in section.blocks
+                      if block.type == 'promotion' or block.type == 'promotion_video'
+                        if forloop.parentloop.index != block.settings.position
+                          continue
+                        endif
+
+                        render 'promotion-card', block: block
                       endif
+                    endfor
 
-                      render 'promotion-card', block: block
+                    assign lazy_load = false
+                    if forloop.index > 2
+                      assign lazy_load = true
                     endif
-                  endfor
-
-                  assign lazy_load = false
-                  if forloop.index > 2
-                    assign lazy_load = true
-                  endif
-                -%}
-                {%- render 'product-card',
-                  product: product,
-                  product_id: product.id,
-                  section_id: section.id,
-                  lazy_load: lazy_load,
-                  image_ratio: settings.product_image_ratio,
-                  image_fill: settings.product_image_fill,
-                  show_secondary_image: settings.product_secondary_image,
-                  show_vendor: settings.product_vendor,
-                  show_rating: settings.product_rating,
-                  show_color_swatches: settings.product_color_swatches,
-                  show_countdown: settings.product_countdown,
-                  show_quick_add: settings.product_quick_add,
-                  show_quick_view: settings.product_quick_view,
-                  show_save_amount: settings.product_save_amount,
-                  save_type: settings.product_save_type,
-                  show_icon_list: settings.product_icon_list
-                -%}
-              {%- endfor -%}
-            </motion-list>
-            {%- liquid
-              if paginate.pages > 1
-                render 'pagination', paginate: paginate, mode: section.settings.pagination
-              endif
-            -%}
+                  -%}
+                  {%- render 'product-card',
+                    product: product,
+                    product_id: product.id,
+                    section_id: section.id,
+                    lazy_load: lazy_load,
+                    image_ratio: settings.product_image_ratio,
+                    image_fill: settings.product_image_fill,
+                    show_secondary_image: settings.product_secondary_image,
+                    show_vendor: settings.product_vendor,
+                    show_rating: settings.product_rating,
+                    show_color_swatches: settings.product_color_swatches,
+                    show_countdown: settings.product_countdown,
+                    show_quick_add: settings.product_quick_add,
+                    show_quick_view: settings.product_quick_view,
+                    show_save_amount: settings.product_save_amount,
+                    save_type: settings.product_save_type,
+                    show_icon_list: settings.product_icon_list
+                  -%}
+                {%- endfor -%}
+              </motion-list>
+              {%- liquid
+                if paginate.pages > 1
+                  render 'pagination', paginate: paginate, mode: section.settings.pagination
+                endif
+              -%}
+            {%- endif -%}
           {%- endif -%}
         </div>
       </div>
@@ -433,6 +452,15 @@
           "type": "link_list",
           "id": "menu",
           "label": "t:sections.main-collection.blocks.subcollections.settings.menu.label"
+        },
+        {
+          "type": "range",
+          "id": "per_row",
+          "label": "t:sections.main-collection.blocks.subcollections.settings.per_row.label",
+          "default": 5,
+          "min": 2,
+          "max": 5,
+          "step": 1
         },
         {
           "type": "checkbox",

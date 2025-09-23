@@ -79,6 +79,10 @@
     {%- endif -%}
 
     {%- render 'js-variables' -%}
+
+    {% if settings.ss_enable %}
+      {% render 'ss-script' %}
+    {% endif %}
   </head>
 
   <body
