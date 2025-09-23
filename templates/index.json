@@ -83,7 +83,7 @@
         "text_alignment": "center",
         "video_mobile": "shopify://files/videos/655x550_Fitopia_Albert_Shoe.mp4",
         "video_url_mobile": "",
-        "image_height_mobile": "auto",
+        "image_height_mobile": "500px",
         "content_position_mobile": "items-end justify-center",
         "text_alignment_mobile": "center",
         "color_text": "#111111",
@@ -117,7 +117,9 @@
             "overlay_content": true,
             "color_text": "#171717",
             "color_overlay": "rgba(0,0,0,0)",
-            "overlay_opacity": 0
+            "overlay_opacity": 0,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
           }
         },
         "collection_pcPnMc": {
@@ -132,7 +134,9 @@
             "overlay_content": true,
             "color_text": "#171717",
             "color_overlay": "rgba(0,0,0,0)",
-            "overlay_opacity": 0
+            "overlay_opacity": 0,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
           }
         },
         "collection_9YDiHe": {
@@ -147,7 +151,9 @@
             "overlay_content": true,
             "color_text": "#171717",
             "color_overlay": "rgba(0,0,0,0)",
-            "overlay_opacity": 0
+            "overlay_opacity": 0,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
           }
         },
         "collection_mT6zg6": {
@@ -162,7 +168,9 @@
             "overlay_content": true,
             "color_text": "#171717",
             "color_overlay": "rgba(0,0,0,0)",
-            "overlay_opacity": 0
+            "overlay_opacity": 0,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
           }
         }
       },
@@ -403,7 +411,9 @@
             "overlay_content": true,
             "color_text": "#ffffff",
             "color_overlay": "rgba(0,0,0,0)",
-            "overlay_opacity": 0
+            "overlay_opacity": 0,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
           }
         },
         "collection_9Ryhfw": {
@@ -418,7 +428,9 @@
             "overlay_content": true,
             "color_text": "#ffffff",
             "color_overlay": "rgba(0,0,0,0)",
-            "overlay_opacity": 0
+            "overlay_opacity": 0,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
           }
         },
         "collection_czGEyj": {
@@ -433,7 +445,9 @@
             "overlay_content": true,
             "color_text": "#ffffff",
             "color_overlay": "rgba(0,0,0,0)",
-            "overlay_opacity": 0
+            "overlay_opacity": 0,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
           }
         }
       },
