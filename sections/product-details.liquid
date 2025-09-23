@@ -228,30 +228,42 @@
                           </div>
 
 {%- if block.settings.heading == 'Size Chart' and block.settings.size_chart_table != blank -%}
-  {{ block.settings.size_chart_table | parse_json | json }}
 
-  {%- assign table_data = block.settings.size_chart_table | parse_json -%}
-  {%- if table_data.size > 0 -%}
-    <table class="w-full border border-gray-300 text-left">
-      <thead>
-        <tr>
-          {%- for key in table_data[0] -%}
-            <th class="border px-3 py-2">{{ key }}</th>
-          {%- endfor -%}
-        </tr>
-      </thead>
-      <tbody>
-        {%- for row in table_data -%}
+  {%- comment -%} 
+    Clean up the JSON string and parse it 
+  {%- endcomment -%}
+  {%- assign table_data_raw = block.settings.size_chart_table -%}
+  {%- assign table_data_json = table_data_raw | remove: '\n' | remove: '\r' | remove: '\t' -%}
+  {%- assign table_data = table_data_json | parse_json -%}
+
+  {%- if table_data and table_data.size > 0 -%}
+
+    <h3 class="text-lg font-semibold mb-2">Size Chart</h3>
+    <div class="size-chart overflow-x-auto mt-2">
+      <table class="w-full border border-gray-300 text-left">
+        <thead class="bg-gray-100">
           <tr>
-            {%- for key in row -%}
-              <td class="border px-3 py-2">{{ row[key] }}</td>
+            {%- for key in table_data[0] -%}
+              <th class="border px-3 py-2 font-medium">{{ key }}</th>
             {%- endfor -%}
           </tr>
-        {%- endfor -%}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {%- for row in table_data -%}
+            <tr>
+              {%- for key in row -%}
+                <td class="border px-3 py-2">{{ row[key] }}</td>
+              {%- endfor -%}
+            </tr>
+          {%- endfor -%}
+        </tbody>
+      </table>
+    </div>
+
   {%- endif -%}
+  
 {%- endif -%}
+
 
 
 
