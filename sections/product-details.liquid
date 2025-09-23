@@ -227,20 +227,18 @@
                             {{- collapsible_content -}}
                           </div>
 
+ 
+
+
 {%- if block.settings.heading == 'Size Chart' and block.settings.size_chart_table != blank -%}
 
-  {%- comment -%} 
-    Remove unwanted characters and parse the JSON string 
+  {%- comment -%}
+    Remove unwanted whitespace/newlines and parse JSON string
   {%- endcomment -%}
-  {%- assign table_data_clean = block.settings.size_chart_table 
-      | strip 
-      | replace: '\n', '' 
-      | replace: '\r', '' 
-      | replace: '\t', '' -%}
-  {%- assign table_data = table_data_clean | parse_json -%}
+  {%- assign json_string = block.settings.size_chart_table | strip | replace: '\n', '' | replace: '\r', '' -%}
+  {%- assign table_data = json_string | parse_json -%}
 
-  {%- if table_data and table_data.size > 0 -%}
-
+  {%- if table_data != nil and table_data.size > 0 -%}
     <h3 class="text-lg font-semibold mb-2">Size Chart</h3>
     <div class="size-chart overflow-x-auto mt-2">
       <table class="w-full border border-gray-300 text-left">
@@ -262,14 +260,11 @@
         </tbody>
       </table>
     </div>
-
   {%- else -%}
     <p>No size chart data available.</p>
   {%- endif -%}
 
 {%- endif -%}
-
-
 
 
 
