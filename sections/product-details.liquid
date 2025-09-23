@@ -230,7 +230,29 @@
 
                           
 
-
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Find the size chart accordion details element
+    const accordionDetails = document.querySelector('[data-block-id="{{ block.id }}"] details');
+    const sizeChartTable = document.getElementById('size-chart-table-{{ block.id }}');
+    
+    if (accordionDetails && sizeChartTable) {
+      // Listen for accordion open/close
+      accordionDetails.addEventListener('toggle', function() {
+        if (this.open) {
+          sizeChartTable.style.display = 'block';
+        } else {
+          sizeChartTable.style.display = 'none';
+        }
+      });
+      
+      // Initial state - hide if accordion is closed
+      if (!accordionDetails.open) {
+        sizeChartTable.style.display = 'none';
+      }
+    }
+  });
+</script>
 {%- if block.settings.heading == 'Size Chart' and block.settings.columns != blank and block.settings.rows != blank -%}
   {%- assign columns = block.settings.columns | split: ',' -%}
   {%- assign rows_raw = block.settings.rows | newline_to_br | split: '<br />' -%}
