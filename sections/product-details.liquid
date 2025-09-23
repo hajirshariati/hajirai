@@ -227,50 +227,125 @@
                             {{- collapsible_content -}}
                           </div>
 
- 
- 
+
+                          
 
 
 
-
- {%- if block.settings.heading == 'Size Chart' and block.settings.columns != blank and block.settings.rows != blank -%}
+{%- if block.settings.heading == 'Size Chart' and block.settings.columns != blank and block.settings.rows != blank -%}
   {%- assign columns = block.settings.columns | split: ',' -%}
-  {%- assign rows = block.settings.rows | split: newline -%}
+  {%- assign rows_raw = block.settings.rows | newline_to_br | split: '<br />' -%}
   
-  {%- if columns.size > 0 and rows.size > 0 -%}
-    <h3 class="text-lg font-medium mb-2">{{ block.settings.heading }}</h3>
-    <div class="size-chart overflow-x-auto mt-2">
-      <table class="w-full border border-gray-300 text-left">
-        <thead class="bg-gray-100">
-          <tr>
-            {%- for column in columns -%}
-              <th class="border px-3 py-2 font-medium">{{ column | strip }}</th>
+  {%- if columns.size > 0 and rows_raw.size > 0 -%}
+    <div class="col-span-full">
+      <div id="size-chart-{{ section.id }}-{{ block.id }}" style="width: 100%; max-width: 100%; overflow-x: scroll; overflow-y: visible; margin: 16px 0; border: 1px solid #e5e5e5; border-radius: 8px; -webkit-overflow-scrolling: touch; box-sizing: border-box;">
+        <table style="border-collapse: collapse; font-size: 12px; width: auto; min-width: 300px; display: block; white-space: nowrap;">
+          <thead style="display: table; width: 100%; table-layout: fixed;">
+            <tr style="background-color: #f8f8f8; display: table-row;">
+              {%- for column in columns -%}
+                <th style="border-bottom: 1px solid #e5e5e5; padding: 6px 8px; text-align: left; font-weight: 600; white-space: nowrap; min-width: 50px; font-size: 11px; display: table-cell;">
+                  {{ column | strip }}
+                </th>
+              {%- endfor -%}
+            </tr>
+          </thead>
+          <tbody style="display: table; width: 100%; table-layout: fixed;">
+            {%- for row_raw in rows_raw -%}
+              {%- assign row_data = row_raw | strip | split: ',' -%}
+              {%- if row_data.size > 0 and row_raw != blank -%}
+                <tr style="border-bottom: 1px solid #f0f0f0; display: table-row;">
+                  {%- for cell in row_data -%}
+                    <td style="padding: 4px 8px; border-right: 1px solid #f0f0f0; white-space: nowrap; font-size: 10px; display: table-cell;">
+                      {{ cell | strip }}
+                    </td>
+                  {%- endfor -%}
+                </tr>
+              {%- endif -%}
             {%- endfor -%}
-          </tr>
-        </thead>
-        <tbody>
-          {%- for row in rows -%}
-            {%- assign row_data = row | split: ',' -%}
-            {%- if row_data.size > 0 and row != blank -%}
-              <tr>
-                {%- for cell in row_data -%}
-                  <td class="border px-3 py-2">{{ cell | strip }}</td>
-                {%- endfor -%}
-              </tr>
-            {%- endif -%}
-          {%- endfor -%}
-        </tbody>
-      </table>
+          </tbody>
+        </table>
+      </div>
+      <div style="text-align: center; margin-top: 8px; font-size: 11px; color: #666;">
+        ← Scroll horizontally to see all sizes →
+      </div>
     </div>
+
+    <style>
+      /* Constrain the main flex container to prevent sidebar push */
+      .specifications.flex.flex-col.lg\:flex-row {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+      
+      .specifications.flex.flex-col.lg\:flex-row > .grow {
+        flex: 1 1 0%;
+        min-width: 0;
+        max-width: calc(100% - 300px); /* Reserve space for sidebar */
+        overflow: hidden;
+      }
+      
+      .specifications.flex.flex-col.lg\:flex-row > .grow-0 {
+        flex: 0 0 280px;
+        max-width: 280px;
+      }
+      
+      /* Ensure accordion content doesn't overflow */
+      .accordions-details.accordions.w-full {
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+      }
+      
+      .details__content {
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+      }
+      
+      /* Make sure the grid doesn't overflow */
+      .specification.grid.grid-cols-12 {
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+      }
+      
+      /* Force table scroll */
+      #size-chart-{{ section.id }}-{{ block.id }} {
+        scrollbar-width: thin;
+      }
+      
+      #size-chart-{{ section.id }}-{{ block.id }}::-webkit-scrollbar {
+        height: 8px;
+      }
+      
+      #size-chart-{{ section.id }}-{{ block.id }}::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+      }
+      
+      #size-chart-{{ section.id }}-{{ block.id }}::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+      }
+      
+      @media (max-width: 1023px) {
+        .specifications.flex.flex-col.lg\:flex-row > .grow {
+          max-width: 100%;
+        }
+      }
+    </style>
+
   {%- else -%}
     <!-- Debug for simple schema -->
-    <div style="background: #f0f0f0; padding: 10px; margin: 10px 0;">
+    <div class="col-span-full" style="background: #f0f0f0; padding: 10px; margin: 10px 0; font-size: 12px;">
       <strong>Debug Info:</strong><br>
       Heading: "{{ block.settings.heading }}"<br>
       Columns: "{{ block.settings.columns }}"<br>
-      Rows: "{{ block.settings.rows }}"<br>
+      Raw Rows: "{{ block.settings.rows }}"<br>
       Columns count: {{ columns.size }}<br>
-      Rows count: {{ rows.size }}<br>
+      Rows count: {{ rows_raw.size }}<br>
+      First row: "{{ rows_raw.first }}"
     </div>
   {%- endif -%}
 {%- endif -%}
