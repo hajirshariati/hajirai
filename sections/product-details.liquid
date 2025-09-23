@@ -227,15 +227,14 @@
                             {{- collapsible_content -}}
                           </div>
 
- 
-{%- if block.settings.heading == 'Size Chart' and block.settings.columns != blank and block.settings.rows != blank -%}
+ {%- if block.settings.heading == 'Size Chart' and block.settings.columns != blank and block.settings.rows != blank -%}
   {%- assign columns = block.settings.columns | split: ',' -%}
   {%- assign rows_raw = block.settings.rows | newline_to_br | split: '<br />' -%}
   
   {%- if columns.size > 0 and rows_raw.size > 0 -%}
-    <div class="col-span-full" style="width: 100%; max-width: 100%; min-width: 0;">
-      <div style="width: 100%; overflow-x: auto; margin: 16px 0; border: 1px solid #e5e5e5; border-radius: 8px; -webkit-overflow-scrolling: touch; max-width: 100%;">
-        <table style="border-collapse: collapse; font-size: 12px; width: auto; min-width: 300px;">
+    <div class="col-span-full">
+      <div style="width: 100%; overflow-x: auto; overflow-y: visible; margin: 16px 0; border: 1px solid #e5e5e5; border-radius: 8px; -webkit-overflow-scrolling: touch;">
+        <table style="border-collapse: collapse; font-size: 12px; width: auto; min-width: 300px; display: table;">
           <thead>
             <tr style="background-color: #f8f8f8;">
               {%- for column in columns -%}
@@ -265,6 +264,22 @@
         ← Scroll horizontally to see all sizes →
       </div>
     </div>
+
+    <style>
+      /* Fix for Size Chart table overflow */
+      .accordions .details__content {
+        overflow: hidden;
+      }
+      .specifications.flex.flex-col.lg\\:flex-row > .grow {
+        min-width: 0;
+        overflow: hidden;
+      }
+      .accordions-details.accordions.w-full {
+        min-width: 0;
+        overflow: hidden;
+      }
+    </style>
+
   {%- else -%}
     <!-- Debug for simple schema -->
     <div class="col-span-full" style="background: #f0f0f0; padding: 10px; margin: 10px 0; font-size: 12px;">
