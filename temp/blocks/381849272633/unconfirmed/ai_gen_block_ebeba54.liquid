@@ -1,6 +1,848 @@
+{% doc %}
+  @prompt
+    a section similar to how collection list section tiles look like. when you click a tile it flips to show subcategories where you can click on the subcategories, its only 3 tiles and have the option for up to 12 subcategories. Theres doesn't have to be a "main category" link option, can there be a main section title, can you make it easier to manage each tile in the template by breaking them up in the editor? make it so the background is white and all text is black
+
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-category-tiles-{{ ai_gen_id }} {
+    background-color: #ffffff;
+    padding: 40px 20px;
+  }
+
+  .ai-category-tiles__container-{{ ai_gen_id }} {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .ai-category-tiles__title-{{ ai_gen_id }} {
+    text-align: center;
+    margin: 0 0 40px;
+    color: #000000;
+    font-size: {{ block.settings.title_size }}px;
+  }
+
+  .ai-category-tiles__grid-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .ai-category-tile-{{ ai_gen_id }} {
+    position: relative;
+    height: {{ block.settings.tile_height }}px;
+    perspective: 1000px;
+    border-radius: {{ block.settings.border_radius }}px;
+    overflow: hidden;
+  }
+
+  .ai-category-tile__inner-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    cursor: pointer;
+  }
+
+  .ai-category-tile-{{ ai_gen_id }}.flipped .ai-category-tile__inner-{{ ai_gen_id }} {
+    transform: rotateY(180deg);
+  }
+
+  .ai-category-tile__front-{{ ai_gen_id }},
+  .ai-category-tile__back-{{ ai_gen_id }} {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: {{ block.settings.border_radius }}px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .ai-category-tile__back-{{ ai_gen_id }} {
+    transform: rotateY(180deg);
+    background-color: #ffffff;
+    border: 2px solid #f0f0f0;
+  }
+
+  .ai-category-tile__front-content-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .ai-category-tile__front-overlay-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, {{ block.settings.overlay_opacity | divided_by: 100.0 }});
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-category-tile__front-title-{{ ai_gen_id }} {
+    color: #ffffff;
+    font-size: {{ block.settings.tile_title_size }}px;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    margin: 0;
+    padding: 0 20px;
+  }
+
+  .ai-category-tile__front-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    background-color: #f4f4f4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .ai-category-tile__front-placeholder-{{ ai_gen_id }} svg {
+    width: 60px;
+    height: 60px;
+    color: #cccccc;
+  }
+
+  .ai-category-tile__placeholder-text-{{ ai_gen_id }} {
+    color: #999999;
+    font-size: 14px;
+    text-align: center;
+    padding: 0 20px;
+  }
+
+  .ai-category-tile__back-content-{{ ai_gen_id }} {
+    padding: 30px 20px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .ai-category-tile__back-title-{{ ai_gen_id }} {
+    color: #000000;
+    font-size: {{ block.settings.back_title_size }}px;
+    font-weight: 600;
+    margin: 0 0 20px;
+    text-align: center;
+  }
+
+  .ai-category-tile__subcategories-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+    flex-grow: 1;
+    align-content: center;
+  }
+
+  .ai-category-tile__subcategory-{{ ai_gen_id }} {
+    display: block;
+    padding: 12px 16px;
+    background-color: #f8f8f8;
+    color: #000000;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 14px;
+    text-align: center;
+    transition: background-color 0.3s ease;
+    border: 1px solid #e0e0e0;
+  }
+
+  .ai-category-tile__subcategory-{{ ai_gen_id }}:hover {
+    background-color: #e8e8e8;
+  }
+
+  .ai-category-tile__back-button-{{ ai_gen_id }} {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #666666;
+    padding: 5px;
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
+  }
+
+  .ai-category-tile__back-button-{{ ai_gen_id }}:hover {
+    background-color: #f0f0f0;
+  }
+
+  .ai-category-tile__empty-state-{{ ai_gen_id }} {
+    text-align: center;
+    color: #999999;
+    font-style: italic;
+    font-size: 14px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-category-tiles__grid-{{ ai_gen_id }} {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .ai-category-tile-{{ ai_gen_id }} {
+      height: {{ block.settings.tile_height | times: 0.8 }}px;
+    }
+
+    .ai-category-tile__subcategories-{{ ai_gen_id }} {
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+  }
+{% endstyle %}
+
+<category-tiles-{{ ai_gen_id }}
+  class="ai-category-tiles-{{ ai_gen_id }}"
+  {{ block.shopify_attributes }}
+>
+  <div class="ai-category-tiles__container-{{ ai_gen_id }}">
+    {% if block.settings.section_title != blank %}
+      <h2 class="ai-category-tiles__title-{{ ai_gen_id }}">{{ block.settings.section_title }}</h2>
+    {% endif %}
+
+    <div class="ai-category-tiles__grid-{{ ai_gen_id }}">
+      {% for i in (1..3) %}
+        {% liquid
+          assign tile_title_key = 'tile_' | append: i | append: '_title'
+          assign tile_image_key = 'tile_' | append: i | append: '_image'
+          assign tile_title = block.settings[tile_title_key]
+          assign tile_image = block.settings[tile_image_key]
+        %}
+
+        <div class="ai-category-tile-{{ ai_gen_id }}" data-tile="{{ i }}">
+          <div class="ai-category-tile__inner-{{ ai_gen_id }}">
+            <div class="ai-category-tile__front-{{ ai_gen_id }}">
+              {% if tile_image %}
+                <div 
+                  class="ai-category-tile__front-content-{{ ai_gen_id }}"
+                  style="background-image: url('{{ tile_image | image_url: width: 600 }}');"
+                >
+                  <div class="ai-category-tile__front-overlay-{{ ai_gen_id }}">
+                    {% if tile_title != blank %}
+                      <h3 class="ai-category-tile__front-title-{{ ai_gen_id }}">{{ tile_title }}</h3>
+                    {% endif %}
+                  </div>
+                </div>
+              {% else %}
+                <div class="ai-category-tile__front-placeholder-{{ ai_gen_id }}">
+                  {{ 'collection-1' | placeholder_svg_tag }}
+                  <div class="ai-category-tile__placeholder-text-{{ ai_gen_id }}">
+                    Add an image for tile {{ i }}
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="ai-category-tile__back-{{ ai_gen_id }}">
+              <button 
+                class="ai-category-tile__back-button-{{ ai_gen_id }}"
+                aria-label="Go back to category view"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+
+              <div class="ai-category-tile__back-content-{{ ai_gen_id }}">
+                {% if tile_title != blank %}
+                  <h3 class="ai-category-tile__back-title-{{ ai_gen_id }}">{{ tile_title }}</h3>
+                {% endif %}
+
+                {% assign has_subcategories = false %}
+                <div class="ai-category-tile__subcategories-{{ ai_gen_id }}">
+                  {% for j in (1..12) %}
+                    {% liquid
+                      assign subcategory_title_key = 'tile_' | append: i | append: '_sub_' | append: j | append: '_title'
+                      assign subcategory_url_key = 'tile_' | append: i | append: '_sub_' | append: j | append: '_url'
+                      assign subcategory_title = block.settings[subcategory_title_key]
+                      assign subcategory_url = block.settings[subcategory_url_key]
+                    %}
+
+                    {% if subcategory_title != blank %}
+                      {% assign has_subcategories = true %}
+                      <a 
+                        href="{{ subcategory_url | default: '#' }}"
+                        class="ai-category-tile__subcategory-{{ ai_gen_id }}"
+                      >
+                        {{ subcategory_title }}
+                      </a>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+
+                {% unless has_subcategories %}
+                  <div class="ai-category-tile__empty-state-{{ ai_gen_id }}">
+                    Add subcategories for this tile
+                  </div>
+                {% endunless %}
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</category-tiles-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class CategoryTiles{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        this.tiles = this.querySelectorAll('.ai-category-tile-{{ ai_gen_id }}');
+        this.setupEventListeners();
+      }
+
+      setupEventListeners() {
+        this.tiles.forEach((tile) => {
+          const front = tile.querySelector('.ai-category-tile__front-{{ ai_gen_id }}');
+          const backButton = tile.querySelector('.ai-category-tile__back-button-{{ ai_gen_id }}');
+
+          front.addEventListener('click', () => {
+            this.flipTile(tile, true);
+          });
+
+          backButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.flipTile(tile, false);
+          });
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') {
+            this.tiles.forEach(tile => this.flipTile(tile, false));
+          }
+        });
+      }
+
+      flipTile(tile, toBack) {
+        if (toBack) {
+          this.tiles.forEach(otherTile => {
+            if (otherTile !== tile) {
+              this.flipTile(otherTile, false);
+            }
+          });
+          tile.classList.add('flipped');
+        } else {
+          tile.classList.remove('flipped');
+        }
+      }
+    }
+
+    customElements.define('category-tiles-{{ ai_gen_id }}', CategoryTiles{{ ai_gen_id }});
+  })();
+</script>
+
 {% schema %}
- {
-   "name": "AI_Block",
-   "tag": "shopify-ai-generated-block"
- }
+{
+  "name": "Category tiles",
+  "settings": [
+    {
+      "type": "header",
+      "content": "General"
+    },
+    {
+      "type": "text",
+      "id": "section_title",
+      "label": "Section title",
+      "default": "Shop by category"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 20,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Section title size",
+      "default": 32
+    },
+    {
+      "type": "header",
+      "content": "Tile style"
+    },
+    {
+      "type": "range",
+      "id": "tile_height",
+      "min": 200,
+      "max": 500,
+      "step": 20,
+      "unit": "px",
+      "label": "Tile height",
+      "default": 300
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "Border radius",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "label": "Image overlay opacity",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "tile_title_size",
+      "min": 16,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Tile title size",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "back_title_size",
+      "min": 16,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "label": "Back side title size",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Tile 1"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_title",
+      "label": "Title",
+      "default": "Category 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "tile_1_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_sub_1_title",
+      "label": "Subcategory 1 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_sub_1_url",
+      "label": "Subcategory 1 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_sub_2_title",
+      "label": "Subcategory 2 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_sub_2_url",
+      "label": "Subcategory 2 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_sub_3_title",
+      "label": "Subcategory 3 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_sub_3_url",
+      "label": "Subcategory 3 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_sub_4_title",
+      "label": "Subcategory 4 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_sub_4_url",
+      "label": "Subcategory 4 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_sub_5_title",
+      "label": "Subcategory 5 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_sub_5_url",
+      "label": "Subcategory 5 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_sub_6_title",
+      "label": "Subcategory 6 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_sub_6_url",
+      "label": "Subcategory 6 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_sub_7_title",
+      "label": "Subcategory 7 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_sub_7_url",
+      "label": "Subcategory 7 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_sub_8_title",
+      "label": "Subcategory 8 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_sub_8_url",
+      "label": "Subcategory 8 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_sub_9_title",
+      "label": "Subcategory 9 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_sub_9_url",
+      "label": "Subcategory 9 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_sub_10_title",
+      "label": "Subcategory 10 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_sub_10_url",
+      "label": "Subcategory 10 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_sub_11_title",
+      "label": "Subcategory 11 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_sub_11_url",
+      "label": "Subcategory 11 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_1_sub_12_title",
+      "label": "Subcategory 12 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_1_sub_12_url",
+      "label": "Subcategory 12 link"
+    },
+    {
+      "type": "header",
+      "content": "Tile 2"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_title",
+      "label": "Title",
+      "default": "Category 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "tile_2_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_sub_1_title",
+      "label": "Subcategory 1 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_sub_1_url",
+      "label": "Subcategory 1 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_sub_2_title",
+      "label": "Subcategory 2 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_sub_2_url",
+      "label": "Subcategory 2 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_sub_3_title",
+      "label": "Subcategory 3 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_sub_3_url",
+      "label": "Subcategory 3 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_sub_4_title",
+      "label": "Subcategory 4 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_sub_4_url",
+      "label": "Subcategory 4 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_sub_5_title",
+      "label": "Subcategory 5 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_sub_5_url",
+      "label": "Subcategory 5 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_sub_6_title",
+      "label": "Subcategory 6 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_sub_6_url",
+      "label": "Subcategory 6 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_sub_7_title",
+      "label": "Subcategory 7 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_sub_7_url",
+      "label": "Subcategory 7 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_sub_8_title",
+      "label": "Subcategory 8 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_sub_8_url",
+      "label": "Subcategory 8 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_sub_9_title",
+      "label": "Subcategory 9 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_sub_9_url",
+      "label": "Subcategory 9 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_sub_10_title",
+      "label": "Subcategory 10 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_sub_10_url",
+      "label": "Subcategory 10 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_sub_11_title",
+      "label": "Subcategory 11 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_sub_11_url",
+      "label": "Subcategory 11 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_2_sub_12_title",
+      "label": "Subcategory 12 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_2_sub_12_url",
+      "label": "Subcategory 12 link"
+    },
+    {
+      "type": "header",
+      "content": "Tile 3"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_title",
+      "label": "Title",
+      "default": "Category 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "tile_3_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_sub_1_title",
+      "label": "Subcategory 1 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_sub_1_url",
+      "label": "Subcategory 1 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_sub_2_title",
+      "label": "Subcategory 2 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_sub_2_url",
+      "label": "Subcategory 2 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_sub_3_title",
+      "label": "Subcategory 3 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_sub_3_url",
+      "label": "Subcategory 3 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_sub_4_title",
+      "label": "Subcategory 4 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_sub_4_url",
+      "label": "Subcategory 4 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_sub_5_title",
+      "label": "Subcategory 5 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_sub_5_url",
+      "label": "Subcategory 5 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_sub_6_title",
+      "label": "Subcategory 6 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_sub_6_url",
+      "label": "Subcategory 6 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_sub_7_title",
+      "label": "Subcategory 7 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_sub_7_url",
+      "label": "Subcategory 7 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_sub_8_title",
+      "label": "Subcategory 8 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_sub_8_url",
+      "label": "Subcategory 8 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_sub_9_title",
+      "label": "Subcategory 9 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_sub_9_url",
+      "label": "Subcategory 9 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_sub_10_title",
+      "label": "Subcategory 10 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_sub_10_url",
+      "label": "Subcategory 10 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_sub_11_title",
+      "label": "Subcategory 11 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_sub_11_url",
+      "label": "Subcategory 11 link"
+    },
+    {
+      "type": "text",
+      "id": "tile_3_sub_12_title",
+      "label": "Subcategory 12 title"
+    },
+    {
+      "type": "url",
+      "id": "tile_3_sub_12_url",
+      "label": "Subcategory 12 link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Category tiles"
+    }
+  ]
+}
 {% endschema %}
