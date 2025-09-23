@@ -228,30 +228,32 @@
                           </div>
 
 
-
 {%- if block.settings.heading == 'Size Chart' and block.settings.size_chart_table != blank -%}
   {%- assign table_data = block.settings.size_chart_table | parse_json -%}
-  <div class="size-chart overflow-x-auto mt-4">
+  {%- if table_data.size > 0 -%}
     <table class="w-full border border-gray-300 text-left">
-      <thead class="bg-gray-100">
+      <thead>
         <tr>
-          {%- for column in table_data.columns -%}
-            <th class="border px-3 py-2 font-medium">{{ column }}</th>
+          {%- for key in table_data[0].keys -%}
+            <th class="border px-3 py-2">{{ key }}</th>
           {%- endfor -%}
         </tr>
       </thead>
       <tbody>
-        {%- for row in table_data.rows -%}
+        {%- for row in table_data -%}
           <tr>
-            {%- for cell in row -%}
-              <td class="border px-3 py-2">{{ cell }}</td>
+            {%- for key in row.keys -%}
+              <td class="border px-3 py-2">{{ row[key] }}</td>
             {%- endfor -%}
           </tr>
         {%- endfor -%}
       </tbody>
     </table>
-  </div>
+  {%- endif -%}
 {%- endif -%}
+
+
+
 
 
 
