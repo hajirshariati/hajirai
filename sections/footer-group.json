@@ -22,7 +22,7 @@
             "heading": "Customer service",
             "text": "<p><a href=\"https://www.aetrex.com/#\" title=\"#\">Click here </a>to consult with our specialists for a personalized product recommendation for your specific needs.</p>",
             "highlighted_text": "none",
-            "custom_html": "<a href=\"javascript:$zopim.livechat.window.show();\">\nchat\n</a>\n\n<script>\n$zopim(function() {\n   $zopim.livechat.hideAll();\n});\n</script>",
+            "custom_html": "<div id=\"myLauncher\" onclick=\"openWidget()\">Click to chat with me!</div>\n\n\n \n<script type=\"text/javascript\">\n  zE(\"webWidget\", \"hide\")\n\n  function openWidget() {\n    zE(\"webWidget\", \"show\")\n    zE(\"webWidget\", \"open\")\n    document.querySelector(\"#myLauncher\").style.opacity = 0\n  }\n\n</script>",
             "highlighted_scribble": "circle"
           }
         },
