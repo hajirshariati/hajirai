@@ -231,19 +231,9 @@
 
  
 
-
 {%- if block.settings.heading == 'Size Chart' and block.settings.size_chart_table != blank -%}
 
-  {%- assign json_string = block.settings.size_chart_table | strip | replace: '\n', '' | replace: '\r', '' -%}
-
-  {%- comment -%} Fix double quotes issue if JSON is wrapped in quotes {%- endcomment -%}
-  {%- assign first_char = json_string | slice: 0, 1 -%}
-  {%- assign last_char = json_string | slice: -1, 1 -%}
-  {%- if first_char == '"' and last_char == '"' -%}
-    {%- assign json_string = json_string | slice: 1, json_string.size | minus: 2 -%}
-  {%- endif -%}
-
-  {%- assign table_data = json_string | parse_json -%}
+  {%- assign table_data = block.settings.size_chart_table | parse_json -%}
 
   {%- if table_data != nil and table_data.size > 0 -%}
     <h3 class="text-lg font-semibold mb-2">Size Chart</h3>
@@ -251,35 +241,19 @@
       <table class="w-full border border-gray-300 text-left">
         <thead class="bg-gray-100">
           <tr>
-            {%- if table_data[0].columns != nil and table_data[0].rows != nil -%}
-              {%- for column in table_data.columns -%}
-                <th class="border px-3 py-2 font-medium">{{ column }}</th>
-              {%- endfor -%}
-            {%- else -%}
-              {%- for key in table_data[0] -%}
-                <th class="border px-3 py-2 font-medium">{{ key }}</th>
-              {%- endfor -%}
-            {%- endif -%}
+            {%- for key in table_data[0] -%}
+              <th class="border px-3 py-2 font-medium">{{ key }}</th>
+            {%- endfor -%}
           </tr>
         </thead>
         <tbody>
-          {%- if table_data[0].columns != nil and table_data[0].rows != nil -%}
-            {%- for row in table_data.rows -%}
-              <tr>
-                {%- for cell in row -%}
-                  <td class="border px-3 py-2">{{ cell }}</td>
-                {%- endfor -%}
-              </tr>
-            {%- endfor -%}
-          {%- else -%}
-            {%- for row in table_data -%}
-              <tr>
-                {%- for key in row -%}
-                  <td class="border px-3 py-2">{{ row[key] }}</td>
-                {%- endfor -%}
-              </tr>
-            {%- endfor -%}
-          {%- endif -%}
+          {%- for row in table_data -%}
+            <tr>
+              {%- for key in row -%}
+                <td class="border px-3 py-2">{{ row[key] }}</td>
+              {%- endfor -%}
+            </tr>
+          {%- endfor -%}
         </tbody>
       </table>
     </div>
@@ -288,6 +262,7 @@
   {%- endif -%}
 
 {%- endif -%}
+
 
 
 
