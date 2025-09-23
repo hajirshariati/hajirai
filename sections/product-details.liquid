@@ -219,14 +219,21 @@
                           {%- render 'icon', icon: 'plus-2', size: 'xs', class: 'shrink-0' -%}
                         </summary>
                         <div class="details__content text-base rte">
+
+
+ 
+
+{%- if block.settings.heading == 'SIZE CHART' -%} MY CODE HERE {%- endif -%}
+
+
+
+
+
+
+
                           <div class="specification grid grid-cols-12 gap-6 md:gap-10">
                             {{- collapsible_content -}}
                           </div>
-
-
-
-
-
                         </div>
                       </details>
                     </div>
