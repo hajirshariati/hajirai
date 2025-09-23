@@ -227,30 +227,35 @@
                             {{- collapsible_content -}}
                           </div>
 
- {%- if block.settings.heading == 'Size Chart' and block.settings.columns != blank and block.settings.rows != blank -%}
+
+                          
+
+
+
+{%- if block.settings.heading == 'Size Chart' and block.settings.columns != blank and block.settings.rows != blank -%}
   {%- assign columns = block.settings.columns | split: ',' -%}
   {%- assign rows_raw = block.settings.rows | newline_to_br | split: '<br />' -%}
   
   {%- if columns.size > 0 and rows_raw.size > 0 -%}
     <div class="col-span-full">
-      <div style="width: 100%; overflow-x: auto; overflow-y: visible; margin: 16px 0; border: 1px solid #e5e5e5; border-radius: 8px; -webkit-overflow-scrolling: touch;">
-        <table style="border-collapse: collapse; font-size: 12px; width: auto; min-width: 300px; display: table;">
-          <thead>
-            <tr style="background-color: #f8f8f8;">
+      <div id="size-chart-{{ section.id }}-{{ block.id }}" style="width: 100%; max-width: 100%; overflow-x: scroll; overflow-y: visible; margin: 16px 0; border: 1px solid #e5e5e5; border-radius: 8px; -webkit-overflow-scrolling: touch; box-sizing: border-box;">
+        <table style="border-collapse: collapse; font-size: 12px; width: auto; min-width: 300px; display: block; white-space: nowrap;">
+          <thead style="display: table; width: 100%; table-layout: fixed;">
+            <tr style="background-color: #f8f8f8; display: table-row;">
               {%- for column in columns -%}
-                <th style="border-bottom: 1px solid #e5e5e5; padding: 6px 8px; text-align: left; font-weight: 600; white-space: nowrap; min-width: 50px; font-size: 11px;">
+                <th style="border-bottom: 1px solid #e5e5e5; padding: 6px 8px; text-align: left; font-weight: 600; white-space: nowrap; min-width: 50px; font-size: 11px; display: table-cell;">
                   {{ column | strip }}
                 </th>
               {%- endfor -%}
             </tr>
           </thead>
-          <tbody>
+          <tbody style="display: table; width: 100%; table-layout: fixed;">
             {%- for row_raw in rows_raw -%}
               {%- assign row_data = row_raw | strip | split: ',' -%}
               {%- if row_data.size > 0 and row_raw != blank -%}
-                <tr style="border-bottom: 1px solid #f0f0f0;">
+                <tr style="border-bottom: 1px solid #f0f0f0; display: table-row;">
                   {%- for cell in row_data -%}
-                    <td style="padding: 4px 8px; border-right: 1px solid #f0f0f0; white-space: nowrap; font-size: 10px;">
+                    <td style="padding: 4px 8px; border-right: 1px solid #f0f0f0; white-space: nowrap; font-size: 10px; display: table-cell;">
                       {{ cell | strip }}
                     </td>
                   {%- endfor -%}
@@ -266,17 +271,68 @@
     </div>
 
     <style>
-      /* Fix for Size Chart table overflow */
-      .accordions .details__content {
-        overflow: hidden;
+      /* Constrain the main flex container to prevent sidebar push */
+      .specifications.flex.flex-col.lg\:flex-row {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
       }
-      .specifications.flex.flex-col.lg\\:flex-row > .grow {
+      
+      .specifications.flex.flex-col.lg\:flex-row > .grow {
+        flex: 1 1 0%;
         min-width: 0;
+        max-width: calc(100% - 300px); /* Reserve space for sidebar */
         overflow: hidden;
       }
+      
+      .specifications.flex.flex-col.lg\:flex-row > .grow-0 {
+        flex: 0 0 280px;
+        max-width: 280px;
+      }
+      
+      /* Ensure accordion content doesn't overflow */
       .accordions-details.accordions.w-full {
-        min-width: 0;
+        width: 100%;
+        max-width: 100%;
         overflow: hidden;
+      }
+      
+      .details__content {
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+      }
+      
+      /* Make sure the grid doesn't overflow */
+      .specification.grid.grid-cols-12 {
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+      }
+      
+      /* Force table scroll */
+      #size-chart-{{ section.id }}-{{ block.id }} {
+        scrollbar-width: thin;
+      }
+      
+      #size-chart-{{ section.id }}-{{ block.id }}::-webkit-scrollbar {
+        height: 8px;
+      }
+      
+      #size-chart-{{ section.id }}-{{ block.id }}::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+      }
+      
+      #size-chart-{{ section.id }}-{{ block.id }}::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+      }
+      
+      @media (max-width: 1023px) {
+        .specifications.flex.flex-col.lg\:flex-row > .grow {
+          max-width: 100%;
+        }
       }
     </style>
 
@@ -293,6 +349,8 @@
     </div>
   {%- endif -%}
 {%- endif -%}
+
+
 
 
 
