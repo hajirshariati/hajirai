@@ -741,7 +741,7 @@
         "description": "",
         "enable_video_autoplay": false,
         "enable_video_looping": false,
-        "image_height": "adapt",
+        "image_height": "450px",
         "video_width": "medium",
         "layout": "text_first",
         "text_alignment": "center",
