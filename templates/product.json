@@ -217,7 +217,7 @@
         "enable_video_looping": true,
         "mobile_layout": "full_width",
         "image_ratio_mobile": "adapt_first",
-        "mobile_thumbnail": true,
+        "mobile_thumbnail": false,
         "padding_top": 0,
         "padding_bottom": 28,
         "divider": false,

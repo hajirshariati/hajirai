@@ -235,8 +235,8 @@
           "type": "divider",
           "settings": {
             "divider_width": 120,
-            "divider_mt": 5,
-            "divider_mb": 5
+            "divider_mt": 0,
+            "divider_mb": 0
           }
         },
         "text_zfk6ye": {
