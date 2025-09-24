@@ -15496,6 +15496,7 @@ video-media:not([playing]) .deferred-poster .play-button .icon:last-child:not(:o
         width: 550px;
         inset-inline-end: var(--sp-5);
         inset-block-end: var(--sp-5);
+          padding-bottom: 3.5em;
     }
 
     .product-sticky-form__card {
