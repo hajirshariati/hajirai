@@ -76,7 +76,7 @@
             "picker_type": "button",
             "enable_color_swatches": true,
             "color_swatch_type": "variant",
-            "size_chart": "sizing-fit-guide"
+            "size_chart": "size-chart"
           }
         },
         "true_fit_widget_8cjNbr": {
