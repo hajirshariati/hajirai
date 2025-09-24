@@ -750,7 +750,7 @@
         "image_height_mobile": "auto",
         "text_alignment_mobile": "center",
         "color_text": "#171717",
-        "color_background": "#ffffff",
+        "color_background": "#fafafa",
         "gradient_background": "",
         "color_background_2": "",
         "gradient_background_2": "",
@@ -770,6 +770,7 @@
     },
     "ugc_gallery_9emGbm": {
       "type": "ugc-gallery",
+      "custom_css": [],
       "name": "UGC Gallery",
       "settings": {
         "custom_gallery": "{{ product.metafields.product.yotpo_gallery_id.value }}",
