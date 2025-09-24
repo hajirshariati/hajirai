@@ -470,7 +470,7 @@
             "iwidth": "custom",
             "icon_width": 24,
             "heading": "Size Chart",
-            "content": "<p>Make sure you are standing, wearing the socks or stockings you will wear with your new shoes. Using one of the following charts, convert your U.S. shoe size to EU.</p><p>IN BETWEEN SIZES?</p><p>Aetrex recommends you size up for footwear and Orthotics</p>",
+            "content": "<p>Make sure you are standing, wearing the socks or stockings you will wear with your new shoes. Using one of the following charts, convert your U.S. shoe size to EU.</p><p><strong>IN BETWEEN SIZES? </strong>Aetrex recommends you size up for footwear and Orthotics</p>",
             "columns": "HEEL-TOE MEASUREMENT,7.2\" - 7.5\",7.9\",8.2\",8.5\",8.7\",8.8\",8.9\",9.0\",9.2\",9.3\",9.5\",9.7\",9.8\",10.0\",10.2\",10.4\",10.5\",10.7\",10.8\",11.0\",11.2\",11.3\",11.5\",11.7\",11.9\",12.0\"",
             "rows": "WOMEN'S - US,--,--,--,--,5,5.5,--,6,6.5,7,7.5,8,8.5,9,9.5,10,10.5,11,11.5,12,--,--,--,--,--,--\nWOMEN'S - EU,--,--,--,--,35,35,--,36,36,37,38,38,39,40,40,41,41,42,43,43,--,--,--,--,--,--\nMEN'S - US,--,--,--,--,--,--,--,--,--,--,--,7,7.5,8,8.5,9,9.5,10,10.5,11,11.5,12,12.5,13,13.5,14\nMEN'S - EU,--,--,--,--,--,--,--,--,--,--,--,39,40,41,42,42,43,43,44,45,45,46,47,47,48,48\nKIDS - US,C12/13,Y1,Y2,Y3,--,--,Y4,--,Y5,--,Y6,--,Y7,--,--,--,--,--,--,--,--,--,--,--,--,--",
             "metafields": ""
