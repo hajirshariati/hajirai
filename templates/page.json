@@ -211,6 +211,79 @@
       ],
       "settings": {}
     },
+    "images_with_text_overlay_DmtwTd": {
+      "type": "images-with-text-overlay",
+      "blocks": {
+        "heading_KTgKmn": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>Section Describing why aetrex</p>",
+            "heading_size": "title-lg tracking-heading",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_LRT9Gw": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Pair text with an image to focus on your chosen product, collection, or blog post. Add details on availability, style, or even provide a review.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_DGeqRN": {
+          "type": "button",
+          "settings": {
+            "button_label": "Learn More",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": true
+          }
+        }
+      },
+      "block_order": [
+        "heading_KTgKmn",
+        "text_LRT9Gw",
+        "button_DGeqRN"
+      ],
+      "name": "t:sections.images-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "image_height": "650px",
+        "content_width": "small",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 100,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": true
+      }
+    },
     "blog_posts_JnT6A7": {
       "type": "blog-posts",
       "name": "t:sections.blog-posts.name",
@@ -668,6 +741,7 @@
     "video_with_text_overlay_cfhWL7",
     "empty_space_ei6bpL",
     "17586443670450d0fd",
+    "images_with_text_overlay_DmtwTd",
     "blog_posts_JnT6A7",
     "faq_f3crHM",
     "testimonials_McVqED",
