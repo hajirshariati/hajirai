@@ -93,12 +93,12 @@
                 {%- render block -%}
     
               {%- when 'spacing' -%}
-                <empty-element style="text-transform: capitalize;" class="block spacing-section{% if block.settings.height_mobile == 0 %} hidden lg:block{% endif %}{% if block.settings.height == 0 %} lg:hidden{% endif %}" style="--spacing-height-desktop: {{ block.settings.height }}px;--spacing-height-mobile: {{ block.settings.height_mobile }}px;" {{ block.shopify_attributes }}></empty-element>
+                <empty-element class="block spacing-section{% if block.settings.height_mobile == 0 %} hidden lg:block{% endif %}{% if block.settings.height == 0 %} lg:hidden{% endif %}" style="--spacing-height-desktop: {{ block.settings.height }}px;--spacing-height-mobile: {{ block.settings.height_mobile }}px;" {{ block.shopify_attributes }}></empty-element>
                 
               {%- when 'heading' -%}
                 {%- if block.settings.heading != blank -%}
                   {%- assign delay = delay | plus: 1 -%}
-                  <{{ block.settings.heading_tag }} class="heading leading-none {{ block.settings.heading_size }}" {{ block.shopify_attributes }}>
+                  <{{ block.settings.heading_tag }} style="text-transform: capitalize;" class="heading leading-none {{ block.settings.heading_size }}" {{ block.shopify_attributes }}>
                     {%- if block.settings.highlighted_text == 'none' -%}
                       <split-words class="split-words js-invisible block" data-animate="fade-up-large" data-animate-delay="{{ delay | times: 250 }}">
                         {{ block.settings.heading }} 
