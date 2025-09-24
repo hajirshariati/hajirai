@@ -121,7 +121,7 @@
             "title_size": 48,
             "tile_height": 500,
             "border_radius": 16,
-            "tile_title_size": 26,
+            "tile_title_size": 32,
             "subcategory_title_size": 18,
             "subcategory_size": 14,
             "tile_1_title": "Pain",
