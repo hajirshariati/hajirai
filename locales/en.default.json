@@ -224,18 +224,8 @@
         "other": "{{ quantity }} items added"
       },
 
-"comparison-table": {
-  "settings": {
-    "sticky_product_info": {
-      "label": "Sticky product info"
-    },
-    "first_available_variant": {
-      "label": "Show first available variant"
-    }
-  }
-},
 
-
+      
       "items_removed": {
         "one": "{{ quantity }} item removed",
         "other": "{{ quantity }} items removed"
