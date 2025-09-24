@@ -15391,7 +15391,7 @@ video-media:not([playing]) .deferred-poster .play-button .icon:last-child:not(:o
 }
 
 .specs__sidebar .media img {
-    max-width: var(--sp-12);
+    max-width: var(--sp-2);
 }
 
 .specifications .grow + .grow-0 {
