@@ -1,3 +1,5 @@
+{{- 'announcement-banner.css' | asset_url | stylesheet_tag -}}
+
 {%- liquid
   assign show_section = true
   if section.settings.hide_homepage and request.page_type == 'index'
@@ -106,6 +108,7 @@ getDetails(u).then(function(data) {
               {% unless forloop.first or announcements_count > 1 %}
                 aria-hidden="true"
               {% endunless %}
+              data-block-id="{{ block.id }}"
               {{ block.shopify_attributes }}
             >
               {%- capture announcement__content -%}
@@ -344,7 +347,71 @@ getDetails(u).then(function(data) {
       </div>
     {%- endif -%}
   </nav>
+
+  {%- assign text_blocks = section.blocks | where: 'type', 'text' -%}
+  {%- for block in text_blocks -%}
+    {%- if block.settings.enable_notification_banner -%}
+      <div id="notification-banner-popup-{{ block.id }}" class="notification-banner-popup" data-section-id="{{ section.id }}" data-block-id="{{ block.id }}">
+        <div class="notification-banner-overlay"></div>
+        <div class="notification-banner-content page-width">
+          <button class="notification-banner-close" aria-label="Close notification">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div class="notification-banner-items">
+            {%- comment -%} Notification Item 1 {%- endcomment -%}
+            <div class="notification-banner-item" {{ block.shopify_attributes }}>
+              {%- if block.settings.notification_title != blank -%}
+                <h3 class="notification-banner-title">{{ block.settings.notification_title }}</h3>
+              {%- endif -%}
+              {%- if block.settings.notification_subtitle != blank -%}
+                <p class="notification-banner-subtitle">{{ block.settings.notification_subtitle }}</p>
+              {%- endif -%}
+              {%- if block.settings.notification_link != blank and block.settings.notification_link_text != blank -%}
+                <a href="{{ block.settings.notification_link }}" class="notification-banner-link">
+                  {{ block.settings.notification_link_text }}
+                </a>
+              {%- endif -%}
+            </div>
+            
+            {%- comment -%} Notification Item 2 {%- endcomment -%}
+            <div class="notification-banner-item" {{ block.shopify_attributes }}>
+              {%- if block.settings.notification_title_2 != blank -%}
+                <h3 class="notification-banner-title">{{ block.settings.notification_title_2 }}</h3>
+              {%- endif -%}
+              {%- if block.settings.notification_subtitle_2 != blank -%}
+                <p class="notification-banner-subtitle">{{ block.settings.notification_subtitle_2 }}</p>
+              {%- endif -%}
+              {%- if block.settings.notification_link_2 != blank and block.settings.notification_link_text_2 != blank -%}
+                <a href="{{ block.settings.notification_link_2 }}" class="notification-banner-link">
+                  {{ block.settings.notification_link_text_2 }}
+                </a>
+              {%- endif -%}
+            </div>
+            
+            {%- comment -%} Notification Item 3 {%- endcomment -%}
+            <div class="notification-banner-item" {{ block.shopify_attributes }}>
+              {%- if block.settings.notification_title_3 != blank -%}
+                <h3 class="notification-banner-title">{{ block.settings.notification_title_3 }}</h3>
+              {%- endif -%}
+              {%- if block.settings.notification_subtitle_3 != blank -%}
+                <p class="notification-banner-subtitle">{{ block.settings.notification_subtitle_3 }}</p>
+              {%- endif -%}
+              {%- if block.settings.notification_link_3 != blank and block.settings.notification_link_text_3 != blank -%}
+                <a href="{{ block.settings.notification_link_3 }}" class="notification-banner-link">
+                  {{ block.settings.notification_link_text_3 }}
+                </a>
+              {%- endif -%}
+            </div>
+          </div>
+        </div>
+      </div>
+    {%- endif -%}
+  {%- endfor -%}
 {%- endif -%}
+
+<script src="{{ 'announcement-banner.js' | asset_url }}" defer></script>
 
 {% schema %}
 {
@@ -836,6 +903,106 @@ getDetails(u).then(function(data) {
           "default": "circle",
           "label": "t:sections.global.settings.highlighted_scribble.label",
           "info": "t:sections.global.settings.highlighted_scribble.info"
+        },
+        {
+          "type": "header",
+          "content": "Notification Banner"
+        },
+        {
+          "type": "checkbox",
+          "id": "enable_notification_banner",
+          "label": "Enable Notification Banner",
+          "default": false,
+          "info": "Show this announcement as a notification in the popup banner"
+        },
+        {
+          "type": "text",
+          "id": "notification_title",
+          "label": "Notification Title",
+          "default": "Notification Title",
+          "info": "Title for the notification popup (can be different from announcement text)"
+        },
+        {
+          "type": "textarea",
+          "id": "notification_subtitle",
+          "label": "Notification Subtitle",
+          "default": "Notification subtitle text",
+          "info": "Subtitle for the notification popup"
+        },
+        {
+          "type": "url",
+          "id": "notification_link",
+          "label": "Notification Link URL",
+          "info": "Link for the notification popup (can be different from announcement link)"
+        },
+        {
+          "type": "text",
+          "id": "notification_link_text",
+          "label": "Notification Link Text",
+          "default": "Learn More",
+          "info": "Button text for the notification popup"
+        },
+        {
+          "type": "header",
+          "content": "Notification Item 2"
+        },
+        {
+          "type": "text",
+          "id": "notification_title_2",
+          "label": "Notification Title 2",
+          "default": "Notification Title 2",
+          "info": "Title for the second notification item"
+        },
+        {
+          "type": "textarea",
+          "id": "notification_subtitle_2",
+          "label": "Notification Subtitle 2",
+          "default": "Notification subtitle text 2",
+          "info": "Subtitle for the second notification item"
+        },
+        {
+          "type": "url",
+          "id": "notification_link_2",
+          "label": "Notification Link URL 2",
+          "info": "Link for the second notification item"
+        },
+        {
+          "type": "text",
+          "id": "notification_link_text_2",
+          "label": "Notification Link Text 2",
+          "default": "Learn More",
+          "info": "Button text for the second notification item"
+        },
+        {
+          "type": "header",
+          "content": "Notification Item 3"
+        },
+        {
+          "type": "text",
+          "id": "notification_title_3",
+          "label": "Notification Title 3",
+          "default": "Notification Title 3",
+          "info": "Title for the third notification item"
+        },
+        {
+          "type": "textarea",
+          "id": "notification_subtitle_3",
+          "label": "Notification Subtitle 3",
+          "default": "Notification subtitle text 3",
+          "info": "Subtitle for the third notification item"
+        },
+        {
+          "type": "url",
+          "id": "notification_link_3",
+          "label": "Notification Link URL 3",
+          "info": "Link for the third notification item"
+        },
+        {
+          "type": "text",
+          "id": "notification_link_text_3",
+          "label": "Notification Link Text 3",
+          "default": "Learn More",
+          "info": "Button text for the third notification item"
         }
       ]
     },

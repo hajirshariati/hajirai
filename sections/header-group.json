@@ -23,7 +23,20 @@
             "hide_icon_mobile": true,
             "text_mobile": "",
             "highlighted_text": "none",
-            "highlighted_scribble": "circle"
+            "highlighted_scribble": "circle",
+            "enable_notification_banner": true,
+            "notification_title": "Free Shipping on Any Aetrex Orthotics Purchase. Limited Time.",
+            "notification_subtitle": "",
+            "notification_link": "shopify://collections",
+            "notification_link_text": "Learn More",
+            "notification_title_2": "New Sparkle, Now in Wine",
+            "notification_subtitle_2": "The Carly Sparkle sneaker pairs signature support with a bold, eye-catching finish.",
+            "notification_link_2": "",
+            "notification_link_text_2": "Learn More",
+            "notification_title_3": "We’re upgrading our systems to serve you better.",
+            "notification_subtitle_3": "Any orders placed between September 28 and October 5 will begin processing and shipping starting October 6.",
+            "notification_link_3": "",
+            "notification_link_text_3": ""
           }
         },
         "text_M4Dw6T": {
@@ -35,7 +48,20 @@
             "hide_icon_mobile": true,
             "text_mobile": "",
             "highlighted_text": "none",
-            "highlighted_scribble": "circle"
+            "highlighted_scribble": "circle",
+            "enable_notification_banner": true,
+            "notification_title": "Free Shipping on Any Aetrex Orthotics Purchase. Limited Time.",
+            "notification_subtitle": "",
+            "notification_link": "shopify://collections",
+            "notification_link_text": "Learn More",
+            "notification_title_2": "New Sparkle, Now in Wine",
+            "notification_subtitle_2": "The Carly Sparkle sneaker pairs signature support with a bold, eye-catching finish.",
+            "notification_link_2": "",
+            "notification_link_text_2": "Learn More",
+            "notification_title_3": "We’re upgrading our systems to serve you better.",
+            "notification_subtitle_3": "Any orders placed between September 28 and October 5 will begin processing and shipping starting October 6.",
+            "notification_link_3": "",
+            "notification_link_text_3": "Learn More"
           }
         },
         "text_b7jteY": {
@@ -47,7 +73,20 @@
             "hide_icon_mobile": true,
             "text_mobile": "",
             "highlighted_text": "none",
-            "highlighted_scribble": "circle"
+            "highlighted_scribble": "circle",
+            "enable_notification_banner": true,
+            "notification_title": "Notification Title",
+            "notification_subtitle": "Notification subtitle text",
+            "notification_link": "shopify://collections",
+            "notification_link_text": "Learn More",
+            "notification_title_2": "Notification Title 2",
+            "notification_subtitle_2": "Notification subtitle text 2",
+            "notification_link_2": "",
+            "notification_link_text_2": "Learn More",
+            "notification_title_3": "Notification Title 3",
+            "notification_subtitle_3": "Notification subtitle text 3",
+            "notification_link_3": "",
+            "notification_link_text_3": "Learn More"
           }
         },
         "tech_hwHFMa": {
