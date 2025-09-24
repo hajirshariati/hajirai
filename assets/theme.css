@@ -3732,6 +3732,7 @@ button.shopify-payment-button__button--unbranded {
     max-width: 100%;
     width: 100%;
     height: 100%;
+    object-fit: contain;
     mix-blend-mode: darken;
     background: #fafafa;
 }
