@@ -16524,3 +16524,233 @@ body .rte .contact-box a {
     padding: 0.9rem 1rem;
   }
 }
+
+
+/*! comparison-table */
+
+.comparison-table {
+  --card-grid-gap: var(--sp-3);
+  padding-block-start: var(--sp-10);
+}
+
+.comparison-table__head {
+  border-block-end: 1px solid currentColor;
+  padding-block-start: var(--sp-2);
+  padding-block-end: var(--sp-4);
+}
+
+.comparison-table__row {
+  gap: var(--card-grid-gap);
+  grid-template-columns: repeat(var(--values-columns-count), minmax(200px, 1fr));
+}
+
+.comparison-table__row.thead {
+  padding-block-end: var(--sp-4);
+}
+
+.comparison-table__column.rte p:first-child {
+  margin-block-start: 0;
+}
+
+.comparison-table__column.rte :is(ul, p):first-child,
+.comparison-table__column.rte :is(h6, .h6)+:is(ul, p) {
+  margin-block-start: 0;
+}
+
+.comparison-table__column.rte :is(ul, p):last-child {
+  margin-block-end: 0;
+}
+
+.comparison-table__column.rte li {
+  margin-block-start: 0;
+}
+
+.comparison-table__column.rte :is(h1,h2,h3,h4,h5,h6,.h0,.h1,.h2,.h3,.h4,.h5,.h6) {
+  margin-block-end:var(--sp-2);
+  margin-block-start: 0;
+  font-weight: var(--font-medium);
+}
+
+.comparison-table__column.rte *:not(h1, h2, h3, h4, h5, h6, .h0, .h1, .h2, .h3, .h4, .h5, .h6) {
+  color: rgb(var(--color-foreground)/ .6);
+}
+
+@media screen and (min-width: 768px) {
+  .comparison-table {
+    --card-grid-gap: clamp(var(--sp-4), 1.263vw, var(--sp-6));
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .comparison-table {
+    padding-block-start: var(--sp-6);
+  }
+
+  .comparison-table__column.rte :is(h6, .h6) {
+    font-size: inherit;
+  }
+}
+
+.comparison-table__row .horizontal-product {
+  border-block-start: 0;
+  padding-block: 0;
+}
+
+.comparison-table__sticky {
+  --tw-translate-y: calc(var(--sp-2d5) * -1);
+  padding-block: var(--sp-4);
+  background-color: rgb(var(--color-background));
+  border-block-end: 1px solid rgb(var(--color-foreground)/ 0.115);
+  transform: translateY(var(--tw-translate-y));
+  transition: var(--animation-primary);
+  transition-property: opacity, visibility, transform, inset;
+}
+
+.header-sticky~.page-container .comparison-table__sticky {
+  inset-block-start: var(--sticky-header-height);
+}
+
+.header-hidden[data-sticky-type=on-scroll-up]~.page-container .comparison-table__sticky {
+  inset-block-start: 0;
+}
+
+.comparison-table__sticky.active {
+  --tw-translate-y: 0;
+  opacity: 1;
+  visibility: visible;
+}
+
+.comparison-table__sticky .horizontal-product {
+  --cart-item-media-width: clamp(var(--sp-12), 4.21vw, var(--sp-20));
+}
+
+.comparison-table__sticky .horizontal-product__vendor,
+.comparison-table__sticky .comparison-table__selector {
+  display: none;
+}
+
+.comparison-table .comparison-table__column.rte .icon-close-circle-filled,
+.comparison-table .comparison-table__column.rte .icon-close-circle-filled path {
+  color: rgb(var(--color-foreground)/ 0.4);
+}
+
+.comparison-table .comparison-table__column.rte .icon-check-circle-filled,
+.comparison-table .comparison-table__column.rte .icon-check-circle-filled path {
+  color: rgb(var(--color-success-text));
+}
+
+.comparison-highlight {
+  --buttons-border-width: 0;
+  --color-button-gradient: none;
+  --color-button-background: var(--color-foreground) / 0.025;
+  --color-button-text: var(--color-foreground);
+}
+
+@media screen and (pointer: fine) {
+  .js [data-button-hover=standard] .comparison-highlight:hover:not([disabled]) {
+    color: rgb(var(--color-button-text));
+  }
+}
+
+@media screen and (max-width: 639px) {
+  .comparison-table-section .page-width {
+    padding-inline: 0;
+  }
+
+  .comparison-table__head,
+  .comparison-table__row {
+    padding-inline: var(--page-padding);
+  }
+
+  .comparison-table__head .comparison-table__column {
+    position: sticky;
+    inset-inline-start: var(--page-padding);
+  }
+}
+
+/*! product-comparison  */
+
+.product-comparison {
+  gap: var(--card-grid-gap);
+}
+
+.product-comparison .comparison-table__head {
+  padding-block-start: var(--sp-6);
+}
+
+.product-comparison .comparison-table__row.thead + .comparison-table__row,
+.product-comparison .comparison-table__row + .comparison-table__row.tfoot {
+  padding-block-start: var(--sp-4);
+}
+
+.comparison-table__row:is(.odd, .even, .info) .comparison-table__column {
+  padding-inline: var(--sp-4);
+  transition: var(--animation-primary);
+  transition-property: padding, background-color;
+}
+
+.comparison-table__row:is(.even, .info) .comparison-table__column {
+  padding-block: var(--sp-4);
+}
+
+.comparison-table__row.even .comparison-table__column {
+  background-color: rgb(var(--color-foreground) / .025);
+}
+
+.comparison-table__row.info .comparison-table__column {
+  background-color: rgb(var(--color-info-background));
+}
+
+[data-rounded-block=round] .comparison-table__row .comparison-table__column {
+  border-radius: var(--sp-2);
+}
+
+@media screen and (min-width: 768px) {
+  .comparison-table__row:is(.odd, .even) .comparison-table__column {
+    padding-inline: var(--sp-6);
+  }
+
+  .product-comparison .comparison-table__head {
+    padding-block-start: var(--sp-10);
+  }
+
+  .product-comparison .comparison-table__row.thead + .comparison-table__row,
+  .product-comparison .comparison-table__row + .comparison-table__row.tfoot {
+    padding-block-start: var(--sp-8);
+  }
+
+  .product-comparison .comparison-table__head + .comparison-table__row {
+    padding-block-start: var(--sp-4);
+  }
+}
+
+.product-comparison .select {
+  color: rgb(var(--color-foreground));
+  border: 1px solid rgb(var(--color-border));
+  background-color: rgb(var(--color-background));
+}
+
+.product-comparison .select:hover,
+.product-comparison .select:focus-visible {
+  border-color: rgb(var(--color-foreground));
+}
+
+@media screen and (max-width: 639px) {
+  .product-comparison .comparison-table__row:is(.odd, .even) {
+    padding-inline: 0;
+  }
+
+  .product-comparison .comparison-table__row:is(.odd, .even) .comparison-table__column {
+    padding-inline: var(--page-padding);
+  }
+
+  [data-rounded-block=round] .product-comparison .comparison-table__row .comparison-table__column:first-child {
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
+  }
+
+  [data-rounded-block=round] .product-comparison .comparison-table__row .comparison-table__column:last-child {
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
+  }
+}
