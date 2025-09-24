@@ -271,22 +271,6 @@
     "mobile-dock": {
       "type": "mobile-dock",
       "blocks": {
-        "mobile-dock-2": {
-          "type": "menu",
-          "disabled": true,
-          "settings": {
-            "custom_icon": "",
-            "title": "Menu"
-          }
-        },
-        "mobile-dock-1": {
-          "type": "home",
-          "disabled": true,
-          "settings": {
-            "custom_icon": "",
-            "title": "Home"
-          }
-        },
         "mobile-dock-3": {
           "type": "search",
           "settings": {
@@ -316,15 +300,20 @@
             "custom_icon": "",
             "title": "Account"
           }
+        },
+        "custom_html_7yWDrM": {
+          "type": "custom_html",
+          "settings": {
+            "custom_code": "<a onclick=\"openWidget()\"> </a>\n\n\n<script type=\"text/javascript\">\n  zE(\"webWidget\", \"hide\")\n\n  function openWidget() {\n    zE(\"webWidget\", \"show\")\n    zE(\"webWidget\", \"open\")\n     \n  }\n\n</script>"
+          }
         }
       },
       "block_order": [
-        "mobile-dock-2",
-        "mobile-dock-1",
         "mobile-dock-3",
         "mobile-dock-4",
         "mobile-dock-5",
-        "mobile-dock-6"
+        "mobile-dock-6",
+        "custom_html_7yWDrM"
       ],
       "settings": {
         "color_text": "#000000",
