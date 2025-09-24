@@ -80,6 +80,12 @@
             -%}
             <span class="text-3xs leading-none">{{ block.settings.title | escape }}</span>
             </a>
+            
+{%- when 'custom_html' -%}
+  <div class="dock__item flex flex-col items-center justify-center gap-1d5 grow shrink-0">
+    {{ block.settings.custom_code }}
+  </div>
+
 
         {%- when 'link' -%}
           <a class="dock__item flex flex-col items-center justify-center gap-1d5 grow shrink-0 cursor-pointer" href="{{ block.settings.link }}"{% if block.settings.external %} target="_blank" rel="noopener"{% endif %}>
@@ -181,6 +187,21 @@
         }
       ]
     },
+
+{
+  "type": "custom_html",
+  "name": "Custom HTML",
+  "settings": [
+    {
+      "type": "html",
+      "id": "custom_code",
+      "label": "Custom HTML",
+      "info": "Add your own HTML or embed code here."
+    }
+  ]
+},
+
+
     {
       "type": "cart",
       "name": "t:sections.mobile-dock.blocks.cart.name",
