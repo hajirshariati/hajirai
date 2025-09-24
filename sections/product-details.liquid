@@ -234,12 +234,19 @@
  {%- if block.settings.heading == 'Size Chart' and block.settings.columns != blank and block.settings.rows != blank -%}
   {%- assign columns = block.settings.columns | split: ',' -%}
   {%- assign rows_raw = block.settings.rows | newline_to_br | split: '<br />' -%}
-
   {%- if columns.size > 0 and rows_raw.size > 0 -%}
     <!-- Scrollable container, full width -->
-    <div style="    max-width: 40em; min-width: -webkit-fill-available; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin:16px 0; padding-bottom:4px; border-radius: 1em;">
-      <div    style="min-width: 600px; display:inline-block;"> <!-- prevents flex/grid from constraining -->
-        <table  style="border-collapse: collapse; width:100%; min-width:600px; border:1px solid #e5e5e5; border-radius:8px; background:white;">
+    <div style="
+      max-width: 40em; 
+      min-width: -webkit-fill-available; 
+      width: 100%; 
+      overflow-x: auto; 
+      -webkit-overflow-scrolling: touch; 
+      margin:16px 0; 
+      padding-bottom:4px; 
+      border-radius: 1em;">
+      <div style="min-width: 600px; display:inline-block;"> <!-- prevents flex/grid from constraining -->
+        <table style="border-collapse: collapse; width:100%; min-width:600px; border:1px solid #e5e5e5; border-radius:8px; background:white;">
           <thead>
             <tr style="background-color:#f8f8f8;">
               {%- for column in columns -%}
@@ -255,9 +262,30 @@
               {%- if row_data.size > 0 and row_raw != blank -%}
                 <tr style="border-bottom:1px solid #f0f0f0;">
                   {%- for cell in row_data -%}
-                    <td style="padding:6px 12px; border-right:1px solid #f0f0f0; white-space:nowrap; font-size:11px;">
-                      {{ cell | strip }}
-                    </td>
+                    {%- if forloop.first -%}
+                      <!-- First column with fixed positioning -->
+                      <td style="
+                        padding:6px 12px; 
+                        border-right:1px solid #f0f0f0; 
+                        font-size:11px;
+                        background: white;
+                        position: -webkit-sticky;
+                        position: sticky;
+                        left: 0;
+                        z-index: 1;
+                        white-space: nowrap;
+                        max-width: 120px;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        box-shadow: 1px 0 3px rgba(0,0,0,0.1);">
+                        {{ cell | strip }}
+                      </td>
+                    {%- else -%}
+                      <!-- Regular scrolling columns -->
+                      <td style="padding:6px 12px; border-right:1px solid #f0f0f0; white-space:nowrap; font-size:11px; min-width: 60px;">
+                        {{ cell | strip }}
+                      </td>
+                    {%- endif -%}
                   {%- endfor -%}
                 </tr>
               {%- endif -%}
