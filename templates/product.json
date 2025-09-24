@@ -444,7 +444,7 @@
             "iwidth": "custom",
             "icon_width": 24,
             "heading": "Details",
-            "content": "<p>TEST</p>",
+            "content": "<p>{{ product.metafields.custom.short_description | metafield_tag }}</p>",
             "columns": "Size,Chest",
             "rows": "S,36\nM,38\nL,40",
             "metafields": ""
