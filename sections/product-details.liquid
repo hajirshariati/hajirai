@@ -249,33 +249,20 @@
               {%- endfor -%}
             </tr>
           </thead>
- <tbody>
-  {%- for row_raw in rows_raw -%}
-    {%- assign row_data = row_raw | strip | split: ',' -%}
-    {%- if row_data.size > 0 and row_raw != blank -%}
-      <tr style="border-bottom:1px solid #f0f0f0;">
-        {%- for cell in row_data -%}
-          <td 
-            style="
-              padding:6px 12px; 
-              border-right:1px solid #f0f0f0; 
-              white-space:nowrap; 
-              font-size:11px;
-              {% if forloop.first %} 
-                position: sticky; 
-                left: 0; 
-                background: white; 
-                z-index: 2; 
-              {% endif %}
-            "
-          >
-            {{ cell | strip }}
-          </td>
-        {%- endfor -%}
-      </tr>
-    {%- endif -%}
-  {%- endfor -%}
-</tbody>
+          <tbody>
+            {%- for row_raw in rows_raw -%}
+              {%- assign row_data = row_raw | strip | split: ',' -%}
+              {%- if row_data.size > 0 and row_raw != blank -%}
+                <tr style="border-bottom:1px solid #f0f0f0;">
+                  {%- for cell in row_data -%}
+                    <td style="padding:6px 12px; border-right:1px solid #f0f0f0; white-space:nowrap; font-size:11px;">
+                      {{ cell | strip }}
+                    </td>
+                  {%- endfor -%}
+                </tr>
+              {%- endif -%}
+            {%- endfor -%}
+          </tbody>
         </table>
       </div>
     </div>
