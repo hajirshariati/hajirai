@@ -263,7 +263,7 @@
         "divider": false,
         "full_width": false,
         "rounded": true,
-        "enable_parallax": false
+        "enable_parallax": true
       }
     },
     "footer-copyright": {
