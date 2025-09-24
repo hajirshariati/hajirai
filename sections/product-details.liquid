@@ -233,8 +233,11 @@
 .table-container {
   position: relative;
   overflow-x: auto;
+  max-width: 400px; /* example */
+  border: 1px solid #ccc;
 }
 
+/* the fade effect */
 .table-container::after {
   content: "";
   position: absolute;
