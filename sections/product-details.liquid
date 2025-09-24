@@ -229,27 +229,8 @@
 
 
                           
-<style>
-.table-container {
-  position: relative;
-  overflow-x: auto;
-  max-width: 400px; /* example */
-  border: 1px solid #ccc;
-}
-
-/* the fade effect */
-.table-container::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 50px;  /* width of fade */
-  height: 100%;
-  pointer-events: none; /* so scrolling still works */
-  background: linear-gradient(to left, white, rgba(255,255,255,0));
-}
-
-</style>
+ 
+ 
 
  {%- if block.settings.heading == 'Size Chart' and block.settings.columns != blank and block.settings.rows != blank -%}
   {%- assign columns = block.settings.columns | split: ',' -%}
@@ -258,7 +239,7 @@
   {%- if columns.size > 0 and rows_raw.size > 0 -%}
     <!-- Scrollable container, full width -->
     <div style="max-width: 63em; width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin:16px 0; padding-bottom:4px; border-radius: 1em;">
-      <div class="table-container" style="min-width: 600px; display:inline-block;"> <!-- prevents flex/grid from constraining -->
+      <div  style="min-width: 600px; display:inline-block;"> <!-- prevents flex/grid from constraining -->
         <table style="border-collapse: collapse; width:100%; min-width:600px; border:1px solid #e5e5e5; border-radius:8px; background:white;">
           <thead>
             <tr style="background-color:#f8f8f8;">
