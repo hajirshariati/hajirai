@@ -4,7 +4,7 @@
   color: rgb(var(--color-foreground));
   background: var(--gradient-background);
   background-color: rgb(var(--color-background));
-  padding-block-start: var(--section-padding-top);
+  padding-block-start: 1em;
   padding-block-end: var(--section-padding-bottom);
 }
 
