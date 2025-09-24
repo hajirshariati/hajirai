@@ -271,20 +271,28 @@
     "mobile-dock": {
       "type": "mobile-dock",
       "blocks": {
-        "mobile-dock-3": {
-          "type": "search",
+        "menu_QLriFB": {
+          "type": "menu",
           "settings": {
             "custom_icon": "",
-            "title": "Search"
+            "title": "Menu"
           }
         },
         "mobile-dock-4": {
           "type": "link",
+          "disabled": true,
           "settings": {
             "custom_icon": "",
             "title": "Shop",
             "link": "shopify://collections/all",
             "external": false
+          }
+        },
+        "mobile-dock-3": {
+          "type": "search",
+          "settings": {
+            "custom_icon": "",
+            "title": "Search"
           }
         },
         "mobile-dock-5": {
@@ -309,8 +317,9 @@
         }
       },
       "block_order": [
-        "mobile-dock-3",
+        "menu_QLriFB",
         "mobile-dock-4",
+        "mobile-dock-3",
         "mobile-dock-5",
         "mobile-dock-6",
         "custom_html_7yWDrM"
