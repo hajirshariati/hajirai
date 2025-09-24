@@ -111,6 +111,16 @@
         "gradient_background": ""
       }
     },
+    "empty_space_WrHUjC": {
+      "type": "empty-space",
+      "name": "t:sections.empty-space.name",
+      "settings": {
+        "desktop_height": 40,
+        "mobile_height": 28,
+        "color_background": "",
+        "gradient_background": ""
+      }
+    },
     "17586443670450d0fd": {
       "type": "_blocks",
       "blocks": {
@@ -217,7 +227,7 @@
         "heading_KTgKmn": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Section Describing why aetrex</p>",
+            "heading": "<p>Why Aetrex</p>",
             "heading_size": "title-lg tracking-heading",
             "heading_tag": "h2",
             "highlighted_text": "none",
@@ -227,7 +237,7 @@
         "text_LRT9Gw": {
           "type": "text",
           "settings": {
-            "text": "<p>Pair text with an image to focus on your chosen product, collection, or blog post. Add details on availability, style, or even provide a review.</p>",
+            "text": "<p>Our Aetrex scanners capture over a million data points on your feet, revealing the unique aspects of your foot that contribute to pain. With this precise information, we design footwear and orthotics that provide targeted relief—whether it’s extra cushioning where you need it, enhanced arch support, or better heel alignment.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -741,6 +751,7 @@
     "video_with_text_overlay_cfhWL7",
     "empty_space_ei6bpL",
     "17586443670450d0fd",
+    "empty_space_WrHUjC",
     "images_with_text_overlay_DmtwTd",
     "blog_posts_JnT6A7",
     "faq_f3crHM",
