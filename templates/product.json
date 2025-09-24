@@ -444,7 +444,7 @@
             "iwidth": "custom",
             "icon_width": 24,
             "heading": "Details",
-            "content": "",
+            "content": "<p>TEST</p>",
             "columns": "Size,Chest",
             "rows": "S,36\nM,38\nL,40",
             "metafields": ""
@@ -457,7 +457,7 @@
             "iwidth": "custom",
             "icon_width": 24,
             "heading": "Care Instructions",
-            "content": "",
+            "content": "<p> {{ product.metafields.custom.care_instructions | metafield_tag }}</p>",
             "columns": "Size,Chest",
             "rows": "S,36\nM,38\nL,40",
             "metafields": ""
