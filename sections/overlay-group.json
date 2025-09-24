@@ -13,7 +13,28 @@
   "sections": {
     "cart-drawer": {
       "type": "cart-drawer",
-      "settings": {}
+      "settings": {
+        "show_vendor": true,
+        "show_cart_note": true,
+        "show_shipping_calculator": true,
+        "add_discount_code": true,
+        "show_view_cart_button": true,
+        "show_checkout_button": true,
+        "show_free_shipping_bar": false,
+        "free_shipping_minimum_amount": "100",
+        "cart_recommendations_enabled": true,
+        "cart_recommendations_heading": "You may also like",
+        "cart_recommendations_limit": 5,
+        "show_cart_recommendations_vendor": false,
+        "show_cart_recommendations_price": true,
+        "empty_cart_message": "",
+        "empty_cart_collections": [],
+        "recent_products_enabled": true,
+        "recent_products_heading": "Recently viewed",
+        "recent_products_limit": 5,
+        "show_recent_products_vendor": false,
+        "show_recent_products_price": true
+      }
     },
     "search-drawer": {
       "type": "search-drawer",
@@ -252,6 +273,7 @@
       "blocks": {
         "mobile-dock-2": {
           "type": "menu",
+          "disabled": true,
           "settings": {
             "custom_icon": "",
             "title": "Menu"
@@ -274,7 +296,6 @@
         },
         "mobile-dock-4": {
           "type": "link",
-          "disabled": true,
           "settings": {
             "custom_icon": "",
             "title": "Shop",
