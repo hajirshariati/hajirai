@@ -46,7 +46,7 @@
             "heading": "Refer a friend",
             "text": "<p>Refer a friend and get 20% off each other.</p>",
             "highlighted_text": "none",
-            "custom_html": "",
+            "custom_html": "<a href=\"/pages/give-20-get-20\">Start Here</a>",
             "highlighted_scribble": "circle"
           }
         },
