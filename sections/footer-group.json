@@ -72,7 +72,7 @@
       "settings": {
         "style": "with-border",
         "columns": 4,
-        "text_alignment": "center",
+        "text_alignment": "left",
         "heading": "",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
@@ -149,7 +149,7 @@
       "settings": {
         "style": "with-border",
         "columns": 3,
-        "text_alignment": "center",
+        "text_alignment": "left",
         "heading": "",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
