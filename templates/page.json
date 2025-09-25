@@ -30,7 +30,7 @@
         "heading_WJT6Hn": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Precision Relief with Technology</p>",
+            "heading": "<h4><strong>Explore Foot Health & Find the Right Support for You</strong></h4>",
             "heading_size": "title-lg tracking-heading",
             "heading_tag": "h2",
             "highlighted_text": "none",
@@ -40,7 +40,7 @@
         "text_ceKNrw": {
           "type": "text",
           "settings": {
-            "text": "<p>Footwear & orthotics designed with data to better your health</p>",
+            "text": "<p>Learn about common foot issues, discover products designed for your lifestyle, and get expert guidance from Aetrex.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -51,24 +51,11 @@
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
-        },
-        "button_TWtxKB": {
-          "type": "button",
-          "settings": {
-            "button_label": "Button label",
-            "button_link": "",
-            "button_video_link": "",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": false
-          }
         }
       },
       "block_order": [
         "heading_WJT6Hn",
-        "text_ceKNrw",
-        "button_TWtxKB"
+        "text_ceKNrw"
       ],
       "name": "t:sections.video-with-text-overlay.name",
       "settings": {
@@ -101,24 +88,94 @@
         "rounded": false
       }
     },
-    "empty_space_ei6bpL": {
-      "type": "empty-space",
-      "name": "t:sections.empty-space.name",
+    "lookbook_XrVA6j": {
+      "type": "lookbook",
+      "blocks": {
+        "content_89mXEz": {
+          "type": "content",
+          "settings": {
+            "icon": "none",
+            "iwidth": "custom",
+            "icon_width": 24,
+            "heading": "HEEL PAIN",
+            "text": "<p>GOT PAIN?</p>",
+            "link": "shopify://products/ar900110",
+            "color_text": "#ffffff",
+            "vertical": 16,
+            "horizontal": 46,
+            "vertical_mobile": 50,
+            "horizontal_mobile": 50
+          }
+        },
+        "content_rRPgF4": {
+          "type": "content",
+          "settings": {
+            "icon": "none",
+            "iwidth": "custom",
+            "icon_width": 24,
+            "heading": "BUNIONS",
+            "text": "<p>what's that sticking out?</p>",
+            "link": "shopify://products/a001538",
+            "color_text": "#ffffff",
+            "vertical": 50,
+            "horizontal": 44,
+            "vertical_mobile": 50,
+            "horizontal_mobile": 50
+          }
+        },
+        "content_eM9a73": {
+          "type": "content",
+          "settings": {
+            "icon": "none",
+            "iwidth": "custom",
+            "icon_width": 24,
+            "heading": "Arch Pain/Plantar Fasciitis",
+            "text": "<p>YOU GOT SOME PAIN HOMIE</p>",
+            "link": "shopify://blogs/aetrex-blog",
+            "color_text": "#ffffff",
+            "vertical": 29,
+            "horizontal": 43,
+            "vertical_mobile": 50,
+            "horizontal_mobile": 50
+          }
+        }
+      },
+      "block_order": [
+        "content_89mXEz",
+        "content_rRPgF4",
+        "content_eM9a73"
+      ],
+      "name": "t:sections.lookbook.name",
       "settings": {
-        "desktop_height": 40,
-        "mobile_height": 28,
+        "image": "shopify://shop_images/female-feet-front-view-white-background-image-walking-68467642.webp",
+        "heading": "Foot Pain Identifier",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "heading_position": "none",
+        "subheading": "",
+        "description": "<p>Hover over the area of the foot where you expierencee pain or discomfort to learn why and how we can help</p>",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
         "color_background": "",
-        "gradient_background": ""
-      }
-    },
-    "empty_space_WrHUjC": {
-      "type": "empty-space",
-      "name": "t:sections.empty-space.name",
-      "settings": {
-        "desktop_height": 40,
-        "mobile_height": 28,
-        "color_background": "",
-        "gradient_background": ""
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 30,
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": true,
+        "rounded": false
       }
     },
     "17586443670450d0fd": {
@@ -219,7 +276,18 @@
       "block_order": [
         "ai_gen_block_03a72e7_Tqrr4h"
       ],
+      "disabled": true,
       "settings": {}
+    },
+    "empty_space_WrHUjC": {
+      "type": "empty-space",
+      "name": "t:sections.empty-space.name",
+      "settings": {
+        "desktop_height": 40,
+        "mobile_height": 28,
+        "color_background": "",
+        "gradient_background": ""
+      }
     },
     "images_with_text_overlay_DmtwTd": {
       "type": "images-with-text-overlay",
@@ -749,7 +817,7 @@
   "order": [
     "main-page",
     "video_with_text_overlay_cfhWL7",
-    "empty_space_ei6bpL",
+    "lookbook_XrVA6j",
     "17586443670450d0fd",
     "empty_space_WrHUjC",
     "images_with_text_overlay_DmtwTd",
