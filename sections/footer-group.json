@@ -34,7 +34,7 @@
             "heading": "No Hassle Returns",
             "text": "<p>We offer quick, easy returns</p>",
             "highlighted_text": "none",
-            "custom_html": "",
+            "custom_html": "<a href=\"/apps/aftership-returns-center\">Return Center</a>",
             "highlighted_scribble": "circle"
           }
         },
