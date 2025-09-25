@@ -88,6 +88,71 @@
         "rounded": false
       }
     },
+    "rich_text_eMGQNq": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_HaBHQJ": {
+          "type": "heading",
+          "settings": {
+            "heading": "Foot health & Find the right solution aetrex solutions",
+            "heading_size": "title-lg tracking-heading",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_3RWLBR": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Our Explore page is your guide to understanding foot health and discovering the perfect footwear and orthotics for your unique needs. Learn about common foot conditions, see how different careers and activities impact your feet, and explore curated product recommendations designed to deliver comfort, support, and lasting relief.”</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_HaBHQJ",
+        "text_3RWLBR"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 100,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
     "lookbook_XrVA6j": {
       "type": "lookbook",
       "blocks": {
@@ -285,6 +350,93 @@
         "heading_tag": "h2",
         "subheading": "",
         "description": "<p>Whether walking, traveling or exercising, Aetrex has the perfect support.</p>",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "logo_list_wddRgK": {
+      "type": "logo-list",
+      "blocks": {
+        "logo_hmLhKB": {
+          "type": "logo",
+          "settings": {
+            "height": 80,
+            "link": ""
+          }
+        },
+        "logo_cbHeRr": {
+          "type": "logo",
+          "settings": {
+            "height": 80,
+            "link": ""
+          }
+        },
+        "logo_Hk7FDL": {
+          "type": "logo",
+          "settings": {
+            "height": 80,
+            "link": ""
+          }
+        },
+        "logo_PqkqeN": {
+          "type": "logo",
+          "settings": {
+            "height": 80,
+            "link": ""
+          }
+        },
+        "logo_7TEXfP": {
+          "type": "logo",
+          "settings": {
+            "height": 80,
+            "link": ""
+          }
+        },
+        "logo_gizUbH": {
+          "type": "logo",
+          "settings": {
+            "height": 80,
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "logo_hmLhKB",
+        "logo_cbHeRr",
+        "logo_Hk7FDL",
+        "logo_PqkqeN",
+        "logo_7TEXfP",
+        "logo_gizUbH"
+      ],
+      "name": "t:sections.logo-list.name",
+      "settings": {
+        "layout": "default",
+        "grid_horizontal": 70,
+        "direction": "left",
+        "speed": 5,
+        "heading": "AS SEEN ON",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "",
@@ -593,114 +745,6 @@
         "enable_parallax": true
       }
     },
-    "blog_posts_JnT6A7": {
-      "type": "blog-posts",
-      "name": "t:sections.blog-posts.name",
-      "settings": {
-        "blog": "aetrex-blog",
-        "post_limit": 6,
-        "columns": 3,
-        "carousel_on_desktop": false,
-        "show_view_all": true,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "image_ratio": "landscape",
-        "show_tags": true,
-        "show_date": true,
-        "show_comments": true,
-        "show_author": false,
-        "show_excerpt": true,
-        "heading": "Blog posts",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false
-      }
-    },
-    "faq_f3crHM": {
-      "type": "faq",
-      "blocks": {
-        "question_epkXHM": {
-          "type": "question",
-          "settings": {
-            "title": "Frequently asked question",
-            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "question_bVLHeh": {
-          "type": "question",
-          "settings": {
-            "title": "Frequently asked question",
-            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "question_JE4DWV": {
-          "type": "question",
-          "settings": {
-            "title": "Frequently asked question",
-            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "question_epkXHM",
-        "question_bVLHeh",
-        "question_JE4DWV"
-      ],
-      "name": "t:sections.faq.name",
-      "settings": {
-        "style": "with-border",
-        "heading": "FAQs",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "color_overlay": "#ffffff",
-        "overlay_opacity": 4,
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "narrow": true,
-        "rounded": false
-      }
-    },
     "testimonials_McVqED": {
       "type": "testimonials",
       "blocks": {
@@ -775,74 +819,6 @@
         "padding_bottom": 72,
         "divider": false,
         "rounded": false
-      }
-    },
-    "images_with_text_WtPNjT": {
-      "type": "images-with-text",
-      "blocks": {
-        "heading_Fx6jaH": {
-          "type": "heading",
-          "settings": {
-            "heading": "Find the Solution You Need",
-            "heading_size": "title-md",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_CbJzat": {
-          "type": "button",
-          "settings": {
-            "button_label": "Shoe Finder Quiz",
-            "button_link": "",
-            "button_video_link": "",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": false
-          }
-        },
-        "button_bCdgHc": {
-          "type": "button",
-          "settings": {
-            "button_label": "Orthotic Finder Quiz",
-            "button_link": "",
-            "button_video_link": "",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": false
-          }
-        }
-      },
-      "block_order": [
-        "heading_Fx6jaH",
-        "button_CbJzat",
-        "button_bCdgHc"
-      ],
-      "name": "t:sections.images-with-text.name",
-      "settings": {
-        "image_url": "",
-        "image2_url": "",
-        "image_ratio": "portrait",
-        "image_width": "medium",
-        "layout": "image_first",
-        "text_alignment": "left",
-        "text_alignment_mobile": "left",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "enable_parallax": true
       }
     },
     "shop_the_feed_R7FhLb": {
@@ -1043,21 +1019,130 @@
         "full_width": false,
         "rounded": false
       }
+    },
+    "faq_f3crHM": {
+      "type": "faq",
+      "blocks": {
+        "question_epkXHM": {
+          "type": "question",
+          "settings": {
+            "title": "Frequently asked question",
+            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_bVLHeh": {
+          "type": "question",
+          "settings": {
+            "title": "Frequently asked question",
+            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_JE4DWV": {
+          "type": "question",
+          "settings": {
+            "title": "Frequently asked question",
+            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "question_epkXHM",
+        "question_bVLHeh",
+        "question_JE4DWV"
+      ],
+      "name": "t:sections.faq.name",
+      "settings": {
+        "style": "with-border",
+        "heading": "FAQs",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#ffffff",
+        "overlay_opacity": 4,
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "blog_posts_JnT6A7": {
+      "type": "blog-posts",
+      "name": "t:sections.blog-posts.name",
+      "settings": {
+        "blog": "aetrex-blog",
+        "post_limit": 6,
+        "columns": 3,
+        "carousel_on_desktop": false,
+        "show_view_all": true,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "image_ratio": "landscape",
+        "show_tags": true,
+        "show_date": true,
+        "show_comments": true,
+        "show_author": false,
+        "show_excerpt": true,
+        "heading": "Blog posts",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
     }
   },
   "order": [
     "main-page",
     "video_with_text_overlay_cfhWL7",
+    "rich_text_eMGQNq",
     "lookbook_XrVA6j",
     "collection_list_LWrAVe",
+    "logo_list_wddRgK",
     "collection_list_LhqV7k",
     "17586443670450d0fd",
     "empty_space_WrHUjC",
     "images_with_text_overlay_DmtwTd",
-    "blog_posts_JnT6A7",
-    "faq_f3crHM",
     "testimonials_McVqED",
-    "images_with_text_WtPNjT",
-    "shop_the_feed_R7FhLb"
+    "shop_the_feed_R7FhLb",
+    "faq_f3crHM",
+    "blog_posts_JnT6A7"
   ]
 }
