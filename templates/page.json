@@ -94,7 +94,7 @@
         "heading_HaBHQJ": {
           "type": "heading",
           "settings": {
-            "heading": "Foot health & Find the right solution aetrex solutions",
+            "heading": "Foot Health & the Right Aetrex Solution for You",
             "heading_size": "title-sm",
             "heading_tag": "h2",
             "highlighted_text": "none",
@@ -104,7 +104,7 @@
         "text_3RWLBR": {
           "type": "text",
           "settings": {
-            "text": "<p>Our Explore page is your guide to understanding foot health and discovering the perfect footwear and orthotics for your unique needs. Learn about common foot conditions, see how different careers and activities impact your feet, and explore curated product recommendations designed to deliver comfort, support, and lasting relief.”</p>",
+            "text": "<p>Our Explore page is your guide to foot health and the best Aetrex orthotics and shoes for your needs. Learn about conditions like plantar fasciitis, bunions, and flat feet. See how work and daily activities affect your feet, and discover curated product recommendations built for comfort, support, and lasting relief.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -349,7 +349,7 @@
         "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
         "subheading": "",
-        "description": "<p>Whether walking, traveling or exercising, Aetrex has the perfect support.</p>",
+        "description": "<p>Whether walking, traveling, or exercising, Aetrex orthotics and comfort shoes deliver the right support to keep you moving in comfort.</p>",
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "",
