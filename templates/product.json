@@ -722,7 +722,7 @@
         "heading_ePLUpg": {
           "type": "heading",
           "settings": {
-            "heading": "Why Customers Love<em> </em><em>{{ product.title }}</em>",
+            "heading": "Why Customers Love <em> </em><em>{{ product.title }}</em>",
             "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "text",
