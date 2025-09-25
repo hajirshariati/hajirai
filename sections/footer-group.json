@@ -72,7 +72,7 @@
       "settings": {
         "style": "with-border",
         "columns": 4,
-        "text_alignment": "left",
+        "text_alignment": "center",
         "heading": "",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
