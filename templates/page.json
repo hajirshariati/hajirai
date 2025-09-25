@@ -150,11 +150,11 @@
         "image": "shopify://shop_images/female-feet-front-view-white-background-image-walking-68467642.webp",
         "heading": "Foot Pain Identifier",
         "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
+        "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
         "heading_position": "none",
         "subheading": "",
-        "description": "<p>Hover over the area of the foot where you expierencee pain or discomfort to learn why and how we can help</p>",
+        "description": "<p>Explore causes, symptoms, and recommended aetrex products</p>",
         "button_label": "",
         "button_link": "",
         "button_external": false,
@@ -175,6 +175,130 @@
         "padding_bottom": 72,
         "divider": false,
         "full_width": true,
+        "rounded": false
+      }
+    },
+    "collection_list_LWrAVe": {
+      "type": "collection-list",
+      "blocks": {
+        "collection_zcc67F": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "",
+            "custom_url": "",
+            "title": "Walking",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_6MTJMp": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "",
+            "custom_url": "",
+            "title": "Running",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_THUfra": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "",
+            "custom_url": "",
+            "title": "Light Exercise",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_PLzb6c": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "",
+            "custom_url": "",
+            "title": "Everyday Comfort",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_NfjzWW": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "",
+            "custom_url": "",
+            "title": "Travel",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        }
+      },
+      "block_order": [
+        "collection_zcc67F",
+        "collection_6MTJMp",
+        "collection_THUfra",
+        "collection_PLzb6c",
+        "collection_NfjzWW"
+      ],
+      "name": "t:sections.collection-list.name",
+      "settings": {
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "image_type": "collection",
+        "image_ratio": "square",
+        "show_products_count": true,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "Shoes for Your Activities",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "<p>Whether walking, traveling or exercising, Aetrex has the perfect support.</p>",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
         "rounded": false
       }
     },
@@ -818,6 +942,7 @@
     "main-page",
     "video_with_text_overlay_cfhWL7",
     "lookbook_XrVA6j",
+    "collection_list_LWrAVe",
     "17586443670450d0fd",
     "empty_space_WrHUjC",
     "images_with_text_overlay_DmtwTd",
