@@ -31,7 +31,7 @@
           "type": "heading",
           "settings": {
             "heading": "<h4><strong>Explore Foot Health & Find the Right Support for You</strong></h4>",
-            "heading_size": "title-lg tracking-heading",
+            "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -95,7 +95,7 @@
           "type": "heading",
           "settings": {
             "heading": "Foot health & Find the right solution aetrex solutions",
-            "heading_size": "title-lg tracking-heading",
+            "heading_size": "title-sm",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
