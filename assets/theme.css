@@ -7847,9 +7847,8 @@ details.active .drawer__promotions .mega-menu__item,
 }
 
 .media-card__link .media img {
-    background-blend-mode: darken;
+    mix-blend-mode: darken;
     background: #fafafa;
-    object-fit: scale-down;
     height: 100%;
     transition: transform var(--animation-primary);
     backface-visibility: hidden;
