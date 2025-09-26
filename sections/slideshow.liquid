@@ -171,6 +171,13 @@
                   </div>
                 {%- endif -%}
 
+                {%- if block.settings.show_divider and block.settings.divider_width -%}
+                  <div
+                    class="custom-divider md:text-{{ section.settings.text_alignment }} text-{{ section.settings.text_alignment_mobile }}"
+                    style="background: {{ section.settings.divider_color }}; width: {{ block.settings.divider_width }}px; margin-top: {{ block.settings.divider_mt }}px; margin-bottom: {{ block.settings.divider_mb }}px"
+                  ></div>
+                {%- endif -%}
+
                 {%- if block.settings.text != blank -%}
                   <div
                     class="rte {{ block.settings.text_font }} {{ block.settings.text_size }}{% if block.settings.text_font == 'subtitle' %} uppercase leading-tight tracking-widest{% else %} leading-normal{% endif %}{% if block.settings.secondary_color_text %} text-opacity{% endif %} md:text-{{ section.settings.text_alignment }} text-{{ section.settings.text_alignment_mobile }}"
@@ -932,6 +939,12 @@
           "content": "Divider"
         },
         {
+          "type": "checkbox",
+          "id": "show_divider",
+          "label": "Show divider",
+          "default": false
+        },
+        {
           "type": "range",
           "id": "divider_width",
           "label": "Width",
@@ -1344,6 +1357,12 @@
         {
           "type": "header",
           "content": "Divider"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_divider",
+          "label": "Show divider",
+          "default": false
         },
         {
           "type": "range",
