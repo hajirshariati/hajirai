@@ -48,6 +48,7 @@
             "secondary_color_text": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle",
+            "show_divider": false,
             "divider_width": 120,
             "divider_mt": 10,
             "divider_mb": 10,
@@ -79,6 +80,7 @@
             "secondary_color_text": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle",
+            "show_divider": false,
             "divider_width": 120,
             "divider_mt": 10,
             "divider_mb": 10,
@@ -110,6 +112,7 @@
             "secondary_color_text": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle",
+            "show_divider": false,
             "divider_width": 120,
             "divider_mt": 10,
             "divider_mb": 10,
@@ -559,14 +562,14 @@
             "collection": "womens-new-arrivals",
             "custom_url": "",
             "image": "shopify://shop_images/600x480_Aubry_Tan3.jpg",
-            "title": "New Arrivals",
+            "title": "NEW ARRIVALS",
             "description": "",
             "overlay_content": true,
             "color_text": "#ffffff",
             "color_overlay": "#000000",
-            "overlay_opacity": 15,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
+            "overlay_opacity": 0,
+            "submenu_title_position": "center",
+            "enable_title_drop_shadow": true
           }
         },
         "collection_z3JcHD": {
@@ -576,14 +579,14 @@
             "collection": "womens-best-sellers-footwear",
             "custom_url": "",
             "image": "shopify://shop_images/600x480_Danika_SkyBlue2.jpg",
-            "title": "Best Sellers",
+            "title": "BEST SELLERS",
             "description": "",
             "overlay_content": true,
             "color_text": "#ffffff",
             "color_overlay": "#000000",
-            "overlay_opacity": 15,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
+            "overlay_opacity": 0,
+            "submenu_title_position": "center",
+            "enable_title_drop_shadow": true
           }
         },
         "collection_Y6AhJP": {
@@ -598,9 +601,9 @@
             "overlay_content": true,
             "color_text": "#ffffff",
             "color_overlay": "#000000",
-            "overlay_opacity": 15,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
+            "overlay_opacity": 0,
+            "submenu_title_position": "center",
+            "enable_title_drop_shadow": true
           }
         }
       },
