@@ -26,30 +26,6 @@
       }
     }
   {% endif -%}
-
-  /* Mobile empty space styles */
-  @media screen and (max-width: 767px) {
-    {%- for block in section.blocks -%}
-      {%- if block.settings.enable_mobile_space -%}
-        .mobile-empty-space-{{ forloop.index0 }} {
-          height: {{ block.settings.mobile_space_height }}px;
-          background-color: {{ block.settings.mobile_space_color }};
-          display: block;
-        }
-      {%- else -%}
-        .mobile-empty-space-{{ forloop.index0 }} {
-          display: none;
-        }
-      {%- endif -%}
-    {%- endfor -%}
-  }
-
-  /* Hide mobile empty space on desktop */
-  @media screen and (min-width: 768px) {
-    [class*="mobile-empty-space-"] {
-      display: none !important;
-    }
-  }
 </style>
 
 {%- if section.blocks.size > 0 -%}
@@ -94,7 +70,7 @@
         -%}
         {%- case block.type -%}
           {%- when 'image' -%}
-            <div class="banner media--{{ section.settings.image_height }} mobile:media--{{ section.settings.image_height_mobile }} w-full overflow-hidden slideshow-slide-{{ forloop.index0 }}" data-type="image" {{ block.shopify_attributes }}>
+            <div class="banner media--{{ section.settings.image_height }} mobile:media--{{ section.settings.image_height_mobile }} w-full overflow-hidden" data-type="image" {{ block.shopify_attributes }}>
               <media-element class="banner__media block w-full h-full overflow-hidden"{% if section.settings.enable_parallax %} data-parallax="0.3" data-parallax-dir="{{ section.settings.parallax_direction }}"{% endif %}>
                 <animate-element data-animate="zoom-out" class="media media--height block w-full h-full relative overflow-hidden" paused>
                   <picture class="media media--height block w-full h-full relative overflow-hidden">
@@ -121,11 +97,9 @@
                 <a href="{{ block.settings.button_link }}"{% if block.settings.button_external %} target="_blank" rel="noopener"{% endif %} class="block absolute top-0 left-0 w-full h-full" aria-hidden="true">&nbsp;</a>
               {%- endif -%}
             </div>
-            <!-- Mobile Empty Space - Separate from banner -->
-            <div class="mobile-empty-space-{{ forloop.index0 }} w-full"></div>
 
           {%- when 'video' -%}
-            <div class="banner media--{{ section.settings.image_height }} mobile:media--{{ section.settings.image_height_mobile }} w-full overflow-hidden slideshow-slide-{{ forloop.index0 }}" data-type="video" {{ block.shopify_attributes }}>
+            <div class="banner media--{{ section.settings.image_height }} mobile:media--{{ section.settings.image_height_mobile }} w-full overflow-hidden" data-type="video" {{ block.shopify_attributes }}>
               <media-element class="banner__media block w-full h-full overflow-hidden"{% if section.settings.enable_parallax %} data-parallax="0.3" data-parallax-dir="{{ section.settings.parallax_direction }}"{% endif %}>
                 <animate-element data-animate="zoom-out" class="media media--height block w-full h-full relative overflow-hidden" paused>
                   {%- if block.settings.video_mobile or block.settings.video_url_mobile -%}
@@ -169,8 +143,6 @@
                 <a href="{{ block.settings.button_link }}"{% if block.settings.button_external %} target="_blank" rel="noopener"{% endif %} class="block absolute top-0 left-0 w-full h-full" aria-hidden="true">&nbsp;</a>
               {%- endif -%}
             </div>
-            <!-- Mobile Empty Space - Separate from banner -->
-            <div class="mobile-empty-space-{{ forloop.index0 }} w-full"></div>
         {%- endcase -%}
       {%- endfor -%}
     </slideshow-element>
@@ -644,35 +616,6 @@
         },
         {
           "type": "header",
-          "content": "Mobile Empty Space"
-        },
-        {
-          "type": "checkbox",
-          "id": "enable_mobile_space",
-          "label": "Enable mobile empty space",
-          "default": false,
-          "info": "Add empty space below image on mobile for overlay text"
-        },
-        {
-          "visible_if": "{{ block.settings.enable_mobile_space == true }}",
-          "type": "range",
-          "id": "mobile_space_height",
-          "min": 50,
-          "max": 500,
-          "step": 10,
-          "unit": "px",
-          "label": "Mobile space height",
-          "default": 150
-        },
-        {
-          "visible_if": "{{ block.settings.enable_mobile_space == true }}",
-          "type": "color",
-          "id": "mobile_space_color",
-          "label": "Mobile space color",
-          "default": "#f8f8f8"
-        },
-        {
-          "type": "header",
           "content": "t:sections.global.settings.header__heading.content"
         },
         {
@@ -855,35 +798,6 @@
           "type": "image_picker",
           "id": "cover_image_mobile",
           "label": "t:sections.video.settings.cover_image_mobile.label"
-        },
-        {
-          "type": "header",
-          "content": "Mobile Empty Space"
-        },
-        {
-          "type": "checkbox",
-          "id": "enable_mobile_space",
-          "label": "Enable mobile empty space",
-          "default": false,
-          "info": "Add empty space below video on mobile for overlay text"
-        },
-        {
-          "visible_if": "{{ block.settings.enable_mobile_space == true }}",
-          "type": "range",
-          "id": "mobile_space_height",
-          "min": 50,
-          "max": 500,
-          "step": 10,
-          "unit": "px",
-          "label": "Mobile space height",
-          "default": 150
-        },
-        {
-          "visible_if": "{{ block.settings.enable_mobile_space == true }}",
-          "type": "color",
-          "id": "mobile_space_color",
-          "label": "Mobile space color",
-          "default": "#f8f8f8"
         },
         {
           "type": "header",
