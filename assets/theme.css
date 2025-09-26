@@ -15141,6 +15141,7 @@ video-media:not([playing]) .deferred-poster .play-button .icon:last-child:not(:o
 
 .slideshow-words .banner__box {
     padding-block: 0;
+        margin: 0em 7vw;
 }
 
 .slideshow-word:not([aria-current=true]) {
