@@ -81,7 +81,7 @@
     "buttons_shadow_vertical_offset": 0,
     "inputs_border_thickness": 0,
     "inputs_border_opacity": 65,
-    "card_style": "card",
+    "card_style": "standard",
     "card_text_alignment": "center",
     "card_border_thickness": 0,
     "card_border_opacity": 0,
