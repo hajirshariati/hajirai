@@ -87,7 +87,7 @@
         "image_height": "adapt",
         "content_width": "small",
         "content_position": "md:items-center md:justify-end",
-        "text_alignment": "center",
+        "text_alignment": "right",
         "image_height_mobile": "adapt",
         "content_position_mobile": "items-end justify-center",
         "text_alignment_mobile": "center",
