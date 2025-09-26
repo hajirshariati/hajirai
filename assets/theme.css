@@ -16329,7 +16329,7 @@ video-media:not([playing]) .deferred-poster .play-button .icon:last-child:not(:o
     line-height: 0;
     vertical-align: baseline;
     left: 0;
-    font-size: 60%;
+    font-size: 40%;
     top: -0.5em;
 }
 
