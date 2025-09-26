@@ -153,12 +153,45 @@
           <nav is="slideshow-words" class="slideshow-words grid items-center" aria-controls="Slider-{{ section.id }}" aria-labelledby="Slider-{{ section.id }}">
             {%- for block in section.blocks -%}
               <div class="slideshow-word flex flex-col gap-6 md:text-{{ section.settings.text_alignment }} text-{{ section.settings.text_alignment_mobile }}" data-index="{{ forloop.index0 }}" aria-current="{% if forloop.first %}true{% else %}false{% endif %}">
+                
+                {%- if block.settings.subheading != blank -%}
+                  <p
+                    class="banner__subheading heading uppercase leading-none tracking-widest {{ block.settings.subheading_size }}{% if block.settings.secondary_color %} banner__text--colored{% endif %}"
+                    {{ block.shopify_attributes }}
+                  >
+                    {{- block.settings.subheading -}}
+                  </p>
+                {%- endif -%}
+
                 {%- if block.settings.heading != blank -%}
                   <div class="banner__box banner__box--{{ section.settings.content_width }}">
                     <{{ block.settings.heading_tag }} class="heading leading-none {{ block.settings.heading_size }}">
                       <split-words class="split-words js-invisible block" data-animate="fade-up-large" data-animate-delay="250">{{ block.settings.heading }}</split-words>
                     </{{ block.settings.heading_tag }}>
                   </div>
+                {%- endif -%}
+
+                {%- if block.settings.text != blank -%}
+                  <div
+                    class="rte {{ block.settings.text_font }} {{ block.settings.text_size }}{% if block.settings.text_font == 'subtitle' %} uppercase leading-tight tracking-widest{% else %} leading-normal{% endif %}{% if block.settings.secondary_color_text %} text-opacity{% endif %}"
+                    {% if block.settings.text_size == 'subtext-custom' %}
+                      style="--subtext-size: {{ block.settings.text_max_size }}px;--subtext-line-height: {{ block.settings.text_line_height }};--subtext-letter-spacing: {{ block.settings.text_letter_spacing | divided_by: 1000.00 }}em;{% if block.settings.text_capitalize %}--subtext-text-transform: uppercase;{% endif %}"
+                    {% endif %}
+                  >
+                    {%- render 'highlighted-text',
+                      content: block.settings.text,
+                      style: block.settings.highlighted_text,
+                      scribble: block.settings.highlighted_scribble,
+                      gradient: false
+                    -%}
+                  </div>
+                {%- endif -%}
+
+                {%- if block.settings.divider_width -%}
+                  <div
+                    class="custom-divider"
+                    style="background: {{ section.settings.divider_color }}; width: {{ block.settings.divider_width }}px; margin-top: {{ block.settings.divider_mt }}px; margin-bottom: {{ block.settings.divider_mb }}px"
+                  ></div>
                 {%- endif -%}
 
                 {%- if block.settings.button_label != blank -%}
@@ -520,6 +553,12 @@
       "default": "#171717"
     },
     {
+      "type": "color",
+      "id": "divider_color",
+      "label": "Divider",
+      "default": "#111111"
+    },
+    {
       "type": "range",
       "id": "overlay_opacity",
       "min": 0,
@@ -616,7 +655,39 @@
         },
         {
           "type": "header",
-          "content": "t:sections.global.settings.header__heading.content"
+          "content": "Content"
+        },
+        {
+          "type": "text",
+          "id": "subheading",
+          "default": "Add a tagline",
+          "label": "t:sections.global.settings.subheading.label"
+        },
+        {
+          "type": "select",
+          "id": "subheading_size",
+          "options": [
+            {
+              "value": "subtitle-sm",
+              "label": "t:sections.global.settings.subheading_size.options__1.label"
+            },
+            {
+              "value": "subtitle-md",
+              "label": "t:sections.global.settings.subheading_size.options__2.label"
+            },
+            {
+              "value": "subtitle-lg",
+              "label": "t:sections.global.settings.subheading_size.options__3.label"
+            }
+          ],
+          "default": "subtitle-md",
+          "label": "t:sections.global.settings.subheading_size.label"
+        },
+        {
+          "type": "checkbox",
+          "id": "secondary_color",
+          "default": true,
+          "label": "t:sections.global.settings.secondary_color.label"
         },
         {
           "type": "inline_richtext",
@@ -692,6 +763,203 @@
           "default": "h2",
           "label": "t:sections.global.settings.heading_tag.label",
           "info": "t:sections.global.settings.heading_tag.info"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "default": "<p>Pair text with an image to focus on your chosen product, collection, or blog post. Add details on availability, style, or even provide a review.</p>",
+          "label": "t:sections.global.settings.text.label"
+        },
+        {
+          "type": "select",
+          "id": "text_font",
+          "options": [
+            {
+              "value": "body",
+              "label": "t:sections.global.settings.text_font.options__1.label"
+            },
+            {
+              "value": "heading",
+              "label": "t:sections.global.settings.text_font.options__2.label"
+            },
+            {
+              "value": "subtitle",
+              "label": "t:sections.global.settings.text_font.options__3.label"
+            }
+          ],
+          "default": "body",
+          "label": "t:sections.global.settings.text_font.label"
+        },
+        {
+          "type": "select",
+          "id": "text_size",
+          "options": [
+            {
+              "value": "subtext-sm",
+              "label": "t:sections.global.settings.text_size.options__1.label"
+            },
+            {
+              "value": "subtext-md",
+              "label": "t:sections.global.settings.text_size.options__2.label"
+            },
+            {
+              "value": "subtext-lg",
+              "label": "t:sections.global.settings.text_size.options__3.label"
+            },
+            {
+              "value": "subtext-xl",
+              "label": "t:sections.global.settings.text_size.options__4.label"
+            },
+            {
+              "value": "subtext-custom",
+              "label": "t:sections.global.settings.text_size.options__5.label"
+            }
+          ],
+          "default": "subtext-md",
+          "label": "t:sections.global.settings.text_size.label"
+        },
+        {
+          "visible_if": "{{ block.settings.text_size == 'subtext-custom' }}",
+          "type": "range",
+          "id": "text_max_size",
+          "default": 32,
+          "min": 12,
+          "max": 128,
+          "step": 2,
+          "unit": "px",
+          "label": "t:sections.global.settings.text_max_size.label"
+        },
+        {
+          "visible_if": "{{ block.settings.text_size == 'subtext-custom' }}",
+          "type": "range",
+          "id": "text_line_height",
+          "label": "t:sections.global.settings.text_line_height.label",
+          "default": 1.6,
+          "min": 0.8,
+          "max": 2,
+          "step": 0.1
+        },
+        {
+          "visible_if": "{{ block.settings.text_size == 'subtext-custom' }}",
+          "type": "range",
+          "id": "text_letter_spacing",
+          "label": "t:sections.global.settings.text_letter_spacing.label",
+          "default": 0,
+          "min": -75,
+          "max": 250,
+          "step": 5
+        },
+        {
+          "visible_if": "{{ block.settings.text_size == 'subtext-custom' }}",
+          "type": "checkbox",
+          "id": "text_capitalize",
+          "label": "t:sections.global.settings.text_capitalize.label"
+        },
+        {
+          "type": "checkbox",
+          "id": "secondary_color_text",
+          "default": false,
+          "label": "t:sections.global.settings.secondary_color.label"
+        },
+        {
+          "type": "select",
+          "id": "highlighted_text",
+          "options": [
+            {
+              "value": "none",
+              "label": "t:sections.global.settings.highlighted_text.options__1.label"
+            },
+            {
+              "value": "text",
+              "label": "t:sections.global.settings.highlighted_text.options__2.label"
+            },
+            {
+              "value": "full_text",
+              "label": "t:sections.global.settings.highlighted_text.options__3.label"
+            },
+            {
+              "value": "half_text",
+              "label": "t:sections.global.settings.highlighted_text.options__4.label"
+            },
+            {
+              "value": "underline",
+              "label": "t:sections.global.settings.highlighted_text.options__5.label"
+            },
+            {
+              "value": "stencil",
+              "label": "t:sections.global.settings.highlighted_text.options__6.label"
+            },
+            {
+              "value": "scribble",
+              "label": "t:sections.global.settings.highlighted_text.options__7.label"
+            }
+          ],
+          "default": "none",
+          "label": "t:sections.global.settings.highlighted_text.label"
+        },
+        {
+          "visible_if": "{{ block.settings.highlighted_text == 'scribble' }}",
+          "type": "select",
+          "id": "highlighted_scribble",
+          "options": [
+            {
+              "value": "circle",
+              "label": "t:sections.global.settings.highlighted_scribble.options__1.label"
+            },
+            {
+              "value": "basic-underline",
+              "label": "t:sections.global.settings.highlighted_scribble.options__2.label"
+            },
+            {
+              "value": "sketch-underline",
+              "label": "t:sections.global.settings.highlighted_scribble.options__3.label"
+            },
+            {
+              "value": "squiggle-underline",
+              "label": "t:sections.global.settings.highlighted_scribble.options__4.label"
+            },
+            {
+              "value": "squiggle-underline-2",
+              "label": "t:sections.global.settings.highlighted_scribble.options__5.label"
+            }
+          ],
+          "default": "circle",
+          "label": "t:sections.global.settings.highlighted_scribble.label",
+          "info": "t:sections.global.settings.highlighted_scribble.info"
+        },
+        {
+          "type": "header",
+          "content": "Divider"
+        },
+        {
+          "type": "range",
+          "id": "divider_width",
+          "label": "Width",
+          "min": 20,
+          "max": 500,
+          "step": 10,
+          "unit": "px",
+          "default": 120
+        },
+        {
+          "type": "range",
+          "id": "divider_mt",
+          "label": "Top Space",
+          "min": 0,
+          "max": 100,
+          "step": 5,
+          "unit": "px",
+          "default": 10
+        },
+        {
+          "type": "range",
+          "id": "divider_mb",
+          "label": "Bottom Space",
+          "min": 0,
+          "max": 100,
+          "step": 5,
+          "unit": "px",
+          "default": 10
         },
         {
           "type": "text",
@@ -801,7 +1069,39 @@
         },
         {
           "type": "header",
-          "content": "t:sections.global.settings.header__heading.content"
+          "content": "Content"
+        },
+        {
+          "type": "text",
+          "id": "subheading",
+          "default": "Add a tagline",
+          "label": "t:sections.global.settings.subheading.label"
+        },
+        {
+          "type": "select",
+          "id": "subheading_size",
+          "options": [
+            {
+              "value": "subtitle-sm",
+              "label": "t:sections.global.settings.subheading_size.options__1.label"
+            },
+            {
+              "value": "subtitle-md",
+              "label": "t:sections.global.settings.subheading_size.options__2.label"
+            },
+            {
+              "value": "subtitle-lg",
+              "label": "t:sections.global.settings.subheading_size.options__3.label"
+            }
+          ],
+          "default": "subtitle-md",
+          "label": "t:sections.global.settings.subheading_size.label"
+        },
+        {
+          "type": "checkbox",
+          "id": "secondary_color",
+          "default": true,
+          "label": "t:sections.global.settings.secondary_color.label"
         },
         {
           "type": "inline_richtext",
@@ -877,6 +1177,203 @@
           "default": "h2",
           "label": "t:sections.global.settings.heading_tag.label",
           "info": "t:sections.global.settings.heading_tag.info"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "default": "<p>Pair text with an image to focus on your chosen product, collection, or blog post. Add details on availability, style, or even provide a review.</p>",
+          "label": "t:sections.global.settings.text.label"
+        },
+        {
+          "type": "select",
+          "id": "text_font",
+          "options": [
+            {
+              "value": "body",
+              "label": "t:sections.global.settings.text_font.options__1.label"
+            },
+            {
+              "value": "heading",
+              "label": "t:sections.global.settings.text_font.options__2.label"
+            },
+            {
+              "value": "subtitle",
+              "label": "t:sections.global.settings.text_font.options__3.label"
+            }
+          ],
+          "default": "body",
+          "label": "t:sections.global.settings.text_font.label"
+        },
+        {
+          "type": "select",
+          "id": "text_size",
+          "options": [
+            {
+              "value": "subtext-sm",
+              "label": "t:sections.global.settings.text_size.options__1.label"
+            },
+            {
+              "value": "subtext-md",
+              "label": "t:sections.global.settings.text_size.options__2.label"
+            },
+            {
+              "value": "subtext-lg",
+              "label": "t:sections.global.settings.text_size.options__3.label"
+            },
+            {
+              "value": "subtext-xl",
+              "label": "t:sections.global.settings.text_size.options__4.label"
+            },
+            {
+              "value": "subtext-custom",
+              "label": "t:sections.global.settings.text_size.options__5.label"
+            }
+          ],
+          "default": "subtext-md",
+          "label": "t:sections.global.settings.text_size.label"
+        },
+        {
+          "visible_if": "{{ block.settings.text_size == 'subtext-custom' }}",
+          "type": "range",
+          "id": "text_max_size",
+          "default": 32,
+          "min": 12,
+          "max": 128,
+          "step": 2,
+          "unit": "px",
+          "label": "t:sections.global.settings.text_max_size.label"
+        },
+        {
+          "visible_if": "{{ block.settings.text_size == 'subtext-custom' }}",
+          "type": "range",
+          "id": "text_line_height",
+          "label": "t:sections.global.settings.text_line_height.label",
+          "default": 1.6,
+          "min": 0.8,
+          "max": 2,
+          "step": 0.1
+        },
+        {
+          "visible_if": "{{ block.settings.text_size == 'subtext-custom' }}",
+          "type": "range",
+          "id": "text_letter_spacing",
+          "label": "t:sections.global.settings.text_letter_spacing.label",
+          "default": 0,
+          "min": -75,
+          "max": 250,
+          "step": 5
+        },
+        {
+          "visible_if": "{{ block.settings.text_size == 'subtext-custom' }}",
+          "type": "checkbox",
+          "id": "text_capitalize",
+          "label": "t:sections.global.settings.text_capitalize.label"
+        },
+        {
+          "type": "checkbox",
+          "id": "secondary_color_text",
+          "default": false,
+          "label": "t:sections.global.settings.secondary_color.label"
+        },
+        {
+          "type": "select",
+          "id": "highlighted_text",
+          "options": [
+            {
+              "value": "none",
+              "label": "t:sections.global.settings.highlighted_text.options__1.label"
+            },
+            {
+              "value": "text",
+              "label": "t:sections.global.settings.highlighted_text.options__2.label"
+            },
+            {
+              "value": "full_text",
+              "label": "t:sections.global.settings.highlighted_text.options__3.label"
+            },
+            {
+              "value": "half_text",
+              "label": "t:sections.global.settings.highlighted_text.options__4.label"
+            },
+            {
+              "value": "underline",
+              "label": "t:sections.global.settings.highlighted_text.options__5.label"
+            },
+            {
+              "value": "stencil",
+              "label": "t:sections.global.settings.highlighted_text.options__6.label"
+            },
+            {
+              "value": "scribble",
+              "label": "t:sections.global.settings.highlighted_text.options__7.label"
+            }
+          ],
+          "default": "none",
+          "label": "t:sections.global.settings.highlighted_text.label"
+        },
+        {
+          "visible_if": "{{ block.settings.highlighted_text == 'scribble' }}",
+          "type": "select",
+          "id": "highlighted_scribble",
+          "options": [
+            {
+              "value": "circle",
+              "label": "t:sections.global.settings.highlighted_scribble.options__1.label"
+            },
+            {
+              "value": "basic-underline",
+              "label": "t:sections.global.settings.highlighted_scribble.options__2.label"
+            },
+            {
+              "value": "sketch-underline",
+              "label": "t:sections.global.settings.highlighted_scribble.options__3.label"
+            },
+            {
+              "value": "squiggle-underline",
+              "label": "t:sections.global.settings.highlighted_scribble.options__4.label"
+            },
+            {
+              "value": "squiggle-underline-2",
+              "label": "t:sections.global.settings.highlighted_scribble.options__5.label"
+            }
+          ],
+          "default": "circle",
+          "label": "t:sections.global.settings.highlighted_scribble.label",
+          "info": "t:sections.global.settings.highlighted_scribble.info"
+        },
+        {
+          "type": "header",
+          "content": "Divider"
+        },
+        {
+          "type": "range",
+          "id": "divider_width",
+          "label": "Width",
+          "min": 20,
+          "max": 500,
+          "step": 10,
+          "unit": "px",
+          "default": 120
+        },
+        {
+          "type": "range",
+          "id": "divider_mt",
+          "label": "Top Space",
+          "min": 0,
+          "max": 100,
+          "step": 5,
+          "unit": "px",
+          "default": 10
+        },
+        {
+          "type": "range",
+          "id": "divider_mb",
+          "label": "Bottom Space",
+          "min": 0,
+          "max": 100,
+          "step": 5,
+          "unit": "px",
+          "default": 10
         },
         {
           "type": "text",
