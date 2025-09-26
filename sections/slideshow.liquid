@@ -137,50 +137,52 @@
         {%- endcase -%}
       {%- endfor -%}
     </slideshow-element>
-    <div class="page-width absolute bottom-0 left-0 w-full pointer-events-none">
-      <div class="slideshow-content">
-        <nav is="slideshow-words" class="slideshow-words grid items-center" aria-controls="Slider-{{ section.id }}" aria-labelledby="Slider-{{ section.id }}">
-          {%- for block in section.blocks -%}
-            <div class="slideshow-word flex flex-col md:flex-row md:items-end justify-between gap-6" data-index="{{ forloop.index0 }}" aria-current="{% if forloop.first %}true{% else %}false{% endif %}">
-              {%- if block.settings.heading != blank -%}
-                <div class="banner__box banner__box--{{ section.settings.content_width }}">
-                  <{{ block.settings.heading_tag }} class="heading leading-none {{ block.settings.heading_size }}">
-                    <split-words class="split-words js-invisible block" data-animate="fade-up-large" data-animate-delay="250">{{ block.settings.heading }}</split-words>
-                  </{{ block.settings.heading_tag }}>
-                </div>
-              {%- endif -%}
+    <div class="absolute top-0 left-0 w-full h-full pointer-events-none">
+      <div class="page-width w-full h-full flex {{ section.settings.content_position }} {{ section.settings.content_position_mobile }}">
+        <div class="slideshow-content">
+          <nav is="slideshow-words" class="slideshow-words grid items-center" aria-controls="Slider-{{ section.id }}" aria-labelledby="Slider-{{ section.id }}">
+            {%- for block in section.blocks -%}
+              <div class="slideshow-word flex flex-col md:flex-row md:items-end justify-between gap-6" data-index="{{ forloop.index0 }}" aria-current="{% if forloop.first %}true{% else %}false{% endif %}">
+                {%- if block.settings.heading != blank -%}
+                  <div class="banner__box banner__box--{{ section.settings.content_width }} md:text-{{ section.settings.text_alignment }} text-{{ section.settings.text_alignment_mobile }}">
+                    <{{ block.settings.heading_tag }} class="heading leading-none {{ block.settings.heading_size }}">
+                      <split-words class="split-words js-invisible block" data-animate="fade-up-large" data-animate-delay="250">{{ block.settings.heading }}</split-words>
+                    </{{ block.settings.heading_tag }}>
+                  </div>
+                {%- endif -%}
 
-              {%- if block.settings.button_label != blank -%}
-                {%- render 'button',
-                  label: block.settings.button_label,
-                  link: block.settings.button_link,
-                  style: block.settings.button_style,
-                  external: block.settings.button_external,
-                  show_icon: block.settings.button_icon,
-                  classes: 'button--blur button--fixed pointer-events-auto',
-                  shopify_attributes: block.shopify_attributes
-                -%}
-              {%- endif -%}
+                {%- if block.settings.button_label != blank -%}
+                  {%- render 'button',
+                    label: block.settings.button_label,
+                    link: block.settings.button_link,
+                    style: block.settings.button_style,
+                    external: block.settings.button_external,
+                    show_icon: block.settings.button_icon,
+                    classes: 'button--blur button--fixed pointer-events-auto',
+                    shopify_attributes: block.shopify_attributes
+                  -%}
+                {%- endif -%}
+              </div>
+            {%- endfor -%}
+          </nav>
+          {%- if section.blocks.size > 1 and section.settings.show_navigation -%}
+            <div class="slideshow-dots flex items-end justify-between">
+              <button type="button" is="previous-button" class="hidden md:block pointer-events-auto" aria-controls="Slider-{{ section.id }}" aria-label="{{ 'general.pagination.previous' | t | escape }}">
+                {%- render 'icon', icon: 'arrow-left-long', class: 'transform' -%}
+              </button>
+              <slider-dots class="flickity-page-dots w-auto pointer-events-auto" aria-controls="Slider-{{ section.id }}">
+                {%- for block in section.blocks -%}
+                  <button type="button" class="flickity-page-dot" data-index="{{ forloop.index0 }}" aria-current="{% if forloop.first %}true{% else %}false{% endif %}">
+                    <span class="sr-only">{{ 'general.pagination.page' | t: number: forloop.index }}</span>
+                  </button>
+                {%- endfor -%}
+              </slider-dots>
+              <button type="button" is="next-button" class="hidden md:block pointer-events-auto" aria-controls="Slider-{{ section.id }}" aria-label="{{ 'general.pagination.next' | t | escape }}">
+                {%- render 'icon', icon: 'arrow-right-long', class: 'transform' -%}
+              </button>
             </div>
-          {%- endfor -%}
-        </nav>
-        {%- if section.blocks.size > 1 and section.settings.show_navigation -%}
-          <div class="slideshow-dots flex items-end justify-between">
-            <button type="button" is="previous-button" class="hidden md:block pointer-events-auto" aria-controls="Slider-{{ section.id }}" aria-label="{{ 'general.pagination.previous' | t | escape }}">
-              {%- render 'icon', icon: 'arrow-left-long', class: 'transform' -%}
-            </button>
-            <slider-dots class="flickity-page-dots w-auto pointer-events-auto" aria-controls="Slider-{{ section.id }}">
-              {%- for block in section.blocks -%}
-                <button type="button" class="flickity-page-dot" data-index="{{ forloop.index0 }}" aria-current="{% if forloop.first %}true{% else %}false{% endif %}">
-                  <span class="sr-only">{{ 'general.pagination.page' | t: number: forloop.index }}</span>
-                </button>
-              {%- endfor -%}
-            </slider-dots>
-            <button type="button" is="next-button" class="hidden md:block pointer-events-auto" aria-controls="Slider-{{ section.id }}" aria-label="{{ 'general.pagination.next' | t | escape }}">
-              {%- render 'icon', icon: 'arrow-right-long', class: 'transform' -%}
-            </button>
-          </div>
-        {%- endif -%}
+          {%- endif -%}
+        </div>
       </div>
     </div>
   </div>
@@ -296,6 +298,56 @@
       "label": "t:sections.global.settings.content_width.label"
     },
     {
+      "type": "select",
+      "id": "content_position",
+      "options": [
+        {
+          "value": "md:items-start md:justify-start",
+          "label": "t:sections.global.settings.content_position.options__1.label"
+        },
+        {
+          "value": "md:items-start md:justify-center",
+          "label": "t:sections.global.settings.content_position.options__2.label"
+        },
+        {
+          "value": "md:items-start md:justify-end",
+          "label": "t:sections.global.settings.content_position.options__3.label"
+        },
+        {
+          "value": "md:items-center md:justify-start",
+          "label": "t:sections.global.settings.content_position.options__4.label"
+        },
+        {
+          "value": "md:items-center md:justify-center",
+          "label": "t:sections.global.settings.content_position.options__5.label"
+        },
+        {
+          "value": "md:items-center md:justify-end",
+          "label": "t:sections.global.settings.content_position.options__6.label"
+        },
+        {
+          "value": "md:items-end md:justify-start",
+          "label": "t:sections.global.settings.content_position.options__7.label"
+        },
+        {
+          "value": "md:items-end md:justify-center",
+          "label": "t:sections.global.settings.content_position.options__8.label"
+        },
+        {
+          "value": "md:items-end md:justify-end",
+          "label": "t:sections.global.settings.content_position.options__9.label"
+        }
+      ],
+      "default": "md:items-end md:justify-start",
+      "label": "t:sections.global.settings.content_position.label"
+    },
+    {
+      "type": "text_alignment",
+      "id": "text_alignment",
+      "default": "left",
+      "label": "t:sections.global.settings.text_alignment.label"
+    },
+    {
       "type": "header",
       "content": "t:sections.global.settings.header__mobile.content"
     },
@@ -342,6 +394,56 @@
       ],
       "default": "auto",
       "label": "t:sections.global.settings.image_height_mobile.label"
+    },
+    {
+      "type": "select",
+      "id": "content_position_mobile",
+      "options": [
+        {
+          "value": "items-start justify-start",
+          "label": "t:sections.global.settings.content_position.options__1.label"
+        },
+        {
+          "value": "items-start justify-center",
+          "label": "t:sections.global.settings.content_position.options__2.label"
+        },
+        {
+          "value": "items-start justify-end",
+          "label": "t:sections.global.settings.content_position.options__3.label"
+        },
+        {
+          "value": "items-center justify-start",
+          "label": "t:sections.global.settings.content_position.options__4.label"
+        },
+        {
+          "value": "items-center justify-center",
+          "label": "t:sections.global.settings.content_position.options__5.label"
+        },
+        {
+          "value": "items-center justify-end",
+          "label": "t:sections.global.settings.content_position.options__6.label"
+        },
+        {
+          "value": "items-end justify-start",
+          "label": "t:sections.global.settings.content_position.options__7.label"
+        },
+        {
+          "value": "items-end justify-center",
+          "label": "t:sections.global.settings.content_position.options__8.label"
+        },
+        {
+          "value": "items-end justify-end",
+          "label": "t:sections.global.settings.content_position.options__9.label"
+        }
+      ],
+      "default": "items-end justify-start",
+      "label": "t:sections.global.settings.content_position_mobile.label"
+    },
+    {
+      "type": "text_alignment",
+      "id": "text_alignment_mobile",
+      "default": "left",
+      "label": "t:sections.global.settings.text_alignment_mobile.label"
     },
     {
       "type": "header",
