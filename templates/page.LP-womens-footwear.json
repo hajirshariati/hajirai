@@ -349,7 +349,7 @@
         "columns": 4,
         "carousel_on_desktop": false,
         "image_type": "collection",
-        "image_ratio": "square",
+        "image_ratio": "adapt",
         "show_products_count": false,
         "show_view_all": false,
         "columns_mobile": "2",
