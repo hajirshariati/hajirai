@@ -156,7 +156,7 @@
                 
                 {%- if block.settings.subheading != blank -%}
                   <p
-                    class="banner__subheading heading uppercase leading-none tracking-widest {{ block.settings.subheading_size }}{% if block.settings.secondary_color %} banner__text--colored{% endif %}"
+                    class="banner__subheading heading uppercase leading-none tracking-widest {{ block.settings.subheading_size }}{% if block.settings.secondary_color %} banner__text--colored{% endif %} md:text-{{ section.settings.text_alignment }} text-{{ section.settings.text_alignment_mobile }}"
                     {{ block.shopify_attributes }}
                   >
                     {{- block.settings.subheading -}}
@@ -173,7 +173,7 @@
 
                 {%- if block.settings.text != blank -%}
                   <div
-                    class="rte {{ block.settings.text_font }} {{ block.settings.text_size }}{% if block.settings.text_font == 'subtitle' %} uppercase leading-tight tracking-widest{% else %} leading-normal{% endif %}{% if block.settings.secondary_color_text %} text-opacity{% endif %}"
+                    class="rte {{ block.settings.text_font }} {{ block.settings.text_size }}{% if block.settings.text_font == 'subtitle' %} uppercase leading-tight tracking-widest{% else %} leading-normal{% endif %}{% if block.settings.secondary_color_text %} text-opacity{% endif %} md:text-{{ section.settings.text_alignment }} text-{{ section.settings.text_alignment_mobile }}"
                     {% if block.settings.text_size == 'subtext-custom' %}
                       style="--subtext-size: {{ block.settings.text_max_size }}px;--subtext-line-height: {{ block.settings.text_line_height }};--subtext-letter-spacing: {{ block.settings.text_letter_spacing | divided_by: 1000.00 }}em;{% if block.settings.text_capitalize %}--subtext-text-transform: uppercase;{% endif %}"
                     {% endif %}
@@ -189,7 +189,7 @@
 
                 {%- if block.settings.divider_width -%}
                   <div
-                    class="custom-divider"
+                    class="custom-divider md:text-{{ section.settings.text_alignment }} text-{{ section.settings.text_alignment_mobile }}"
                     style="background: {{ section.settings.divider_color }}; width: {{ block.settings.divider_width }}px; margin-top: {{ block.settings.divider_mt }}px; margin-bottom: {{ block.settings.divider_mb }}px"
                   ></div>
                 {%- endif -%}
