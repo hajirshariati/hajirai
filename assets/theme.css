@@ -15128,7 +15128,7 @@ video-media:not([playing]) .deferred-poster .play-button .icon:last-child:not(:o
 @media screen and (min-width: 640px) {
     .slideshow-dots {
         margin-block-start: var(--sp-8);
-        border-block-start: 1px solid rgb(var(--color-border));
+        order-block-start: 1px solid rgb(var(--color-border));
     }
 
     .slideshow-dots .flickity-page-dots {
