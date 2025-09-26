@@ -16325,12 +16325,12 @@ video-media:not([playing]) .deferred-poster .play-button .icon:last-child:not(:o
 /* REGISTER & TRADEMARK SYMBOL */
 .register-symbol {
     position: relative;
-    font-weight: 100;
     line-height: 0;
     vertical-align: baseline;
-    left: 0;
+    left: 3px;
     font-size: 40%;
-    top: -0.5em;
+    top: -1.3em;
+    font-weight: 500;
 }
 
 .trademark-symbol {
