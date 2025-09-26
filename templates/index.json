@@ -219,11 +219,11 @@
         "text_Vk4ikN": {
           "type": "text",
           "settings": {
-            "text": "<h2>Healthy Comfort<br/>Starts Here! ®</h2>",
+            "text": "<p><strong>Healthy Comfort<br/>Starts Here! ®</strong></p>",
             "text_font": "body",
             "text_size": "subtext-custom",
-            "text_max_size": 30,
-            "text_line_height": 1.6,
+            "text_max_size": 46,
+            "text_line_height": 1.2,
             "text_letter_spacing": 0,
             "text_capitalize": false,
             "secondary_color": false,
@@ -242,12 +242,12 @@
         "text_zfk6ye": {
           "type": "text",
           "settings": {
-            "text": "<p><strong>New Arrivals</strong></p>",
+            "text": "<p>New Arrivals</p>",
             "text_font": "body",
             "text_size": "subtext-custom",
             "text_max_size": 32,
             "text_line_height": 1.6,
-            "text_letter_spacing": 0,
+            "text_letter_spacing": 50,
             "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
