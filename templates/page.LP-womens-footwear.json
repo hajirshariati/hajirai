@@ -85,7 +85,7 @@
         "autoplay_speed": 5,
         "show_navigation": true,
         "image_height": "adapt",
-        "content_width": "small",
+        "content_width": "medium",
         "content_position": "md:items-center md:justify-end",
         "text_alignment": "right",
         "image_height_mobile": "adapt",
