@@ -84,7 +84,7 @@
       ],
       "settings": {
         "transparent_header": false,
-        "video": "shopify://files/videos/Banner1_OmniSuite.mp4",
+        "video": "shopify://files/videos/Zoe_Rotation_Banner (1).mp4",
         "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
         "cover_image": "shopify://shop_images/Fitopia.png",
         "description": "",
@@ -94,7 +94,7 @@
         "content_width": "small",
         "content_position": "md:items-center md:justify-end",
         "text_alignment": "center",
-        "video_mobile": "shopify://files/videos/Banner_01_MOBILE_655px.mp4",
+        "video_mobile": "shopify://files/videos/Zoe_M2.mp4",
         "video_url_mobile": "",
         "cover_image_mobile": "shopify://shop_images/Fitopia.png",
         "image_height_mobile": "100vh",
