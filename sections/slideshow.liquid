@@ -153,29 +153,12 @@
           <nav is="slideshow-words" class="slideshow-words grid items-center" aria-controls="Slider-{{ section.id }}" aria-labelledby="Slider-{{ section.id }}">
             {%- for block in section.blocks -%}
               <div class="slideshow-word flex flex-col gap-6 md:text-{{ section.settings.text_alignment }} text-{{ section.settings.text_alignment_mobile }}" data-index="{{ forloop.index0 }}" aria-current="{% if forloop.first %}true{% else %}false{% endif %}">
-                
-                {%- if block.settings.subheading != blank -%}
-                  <p
-                    class="banner__subheading heading uppercase leading-none tracking-widest {{ block.settings.subheading_size }}{% if block.settings.secondary_color %} banner__text--colored{% endif %}"
-                    {{ block.shopify_attributes }}
-                  >
-                    {{- block.settings.subheading -}}
-                  </p>
-                {%- endif -%}
-
                 {%- if block.settings.heading != blank -%}
                   <div class="banner__box banner__box--{{ section.settings.content_width }}">
                     <{{ block.settings.heading_tag }} class="heading leading-none {{ block.settings.heading_size }}">
                       <split-words class="split-words js-invisible block" data-animate="fade-up-large" data-animate-delay="250">{{ block.settings.heading }}</split-words>
                     </{{ block.settings.heading_tag }}>
                   </div>
-                {%- endif -%}
-
-                {%- if block.settings.divider_width -%}
-                  <div
-                    class="custom-divider"
-                    style="background: {{ section.settings.divider_color }}; width: {{ block.settings.divider_width }}px; margin-top: {{ block.settings.divider_mt }}px; margin-bottom: {{ block.settings.divider_mb }}px"
-                  ></div>
                 {%- endif -%}
 
                 {%- if block.settings.button_label != blank -%}
@@ -537,12 +520,6 @@
       "default": "#171717"
     },
     {
-      "type": "color",
-      "id": "divider_color",
-      "label": "Divider",
-      "default": "#111111"
-    },
-    {
       "type": "range",
       "id": "overlay_opacity",
       "min": 0,
@@ -642,38 +619,6 @@
           "content": "t:sections.global.settings.header__heading.content"
         },
         {
-          "type": "text",
-          "id": "subheading",
-          "default": "Add a tagline",
-          "label": "t:sections.global.settings.subheading.label"
-        },
-        {
-          "type": "select",
-          "id": "subheading_size",
-          "options": [
-            {
-              "value": "subtitle-sm",
-              "label": "t:sections.global.settings.subheading_size.options__1.label"
-            },
-            {
-              "value": "subtitle-md",
-              "label": "t:sections.global.settings.subheading_size.options__2.label"
-            },
-            {
-              "value": "subtitle-lg",
-              "label": "t:sections.global.settings.subheading_size.options__3.label"
-            }
-          ],
-          "default": "subtitle-md",
-          "label": "t:sections.global.settings.subheading_size.label"
-        },
-        {
-          "type": "checkbox",
-          "id": "secondary_color",
-          "default": true,
-          "label": "t:sections.global.settings.secondary_color.label"
-        },
-        {
           "type": "inline_richtext",
           "id": "heading",
           "label": "t:sections.global.settings.heading.label",
@@ -747,40 +692,6 @@
           "default": "h2",
           "label": "t:sections.global.settings.heading_tag.label",
           "info": "t:sections.global.settings.heading_tag.info"
-        },
-        {
-          "type": "header",
-          "content": "Divider"
-        },
-        {
-          "type": "range",
-          "id": "divider_width",
-          "label": "Width",
-          "min": 20,
-          "max": 500,
-          "step": 10,
-          "unit": "px",
-          "default": 120
-        },
-        {
-          "type": "range",
-          "id": "divider_mt",
-          "label": "Top Space",
-          "min": 0,
-          "max": 100,
-          "step": 5,
-          "unit": "px",
-          "default": 10
-        },
-        {
-          "type": "range",
-          "id": "divider_mb",
-          "label": "Bottom Space",
-          "min": 0,
-          "max": 100,
-          "step": 5,
-          "unit": "px",
-          "default": 10
         },
         {
           "type": "text",
@@ -893,38 +804,6 @@
           "content": "t:sections.global.settings.header__heading.content"
         },
         {
-          "type": "text",
-          "id": "subheading",
-          "default": "Add a tagline",
-          "label": "t:sections.global.settings.subheading.label"
-        },
-        {
-          "type": "select",
-          "id": "subheading_size",
-          "options": [
-            {
-              "value": "subtitle-sm",
-              "label": "t:sections.global.settings.subheading_size.options__1.label"
-            },
-            {
-              "value": "subtitle-md",
-              "label": "t:sections.global.settings.subheading_size.options__2.label"
-            },
-            {
-              "value": "subtitle-lg",
-              "label": "t:sections.global.settings.subheading_size.options__3.label"
-            }
-          ],
-          "default": "subtitle-md",
-          "label": "t:sections.global.settings.subheading_size.label"
-        },
-        {
-          "type": "checkbox",
-          "id": "secondary_color",
-          "default": true,
-          "label": "t:sections.global.settings.secondary_color.label"
-        },
-        {
           "type": "inline_richtext",
           "id": "heading",
           "label": "t:sections.global.settings.heading.label",
@@ -998,40 +877,6 @@
           "default": "h2",
           "label": "t:sections.global.settings.heading_tag.label",
           "info": "t:sections.global.settings.heading_tag.info"
-        },
-        {
-          "type": "header",
-          "content": "Divider"
-        },
-        {
-          "type": "range",
-          "id": "divider_width",
-          "label": "Width",
-          "min": 20,
-          "max": 500,
-          "step": 10,
-          "unit": "px",
-          "default": 120
-        },
-        {
-          "type": "range",
-          "id": "divider_mt",
-          "label": "Top Space",
-          "min": 0,
-          "max": 100,
-          "step": 5,
-          "unit": "px",
-          "default": 10
-        },
-        {
-          "type": "range",
-          "id": "divider_mb",
-          "label": "Bottom Space",
-          "min": 0,
-          "max": 100,
-          "step": 5,
-          "unit": "px",
-          "default": 10
         },
         {
           "type": "text",
