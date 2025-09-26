@@ -412,8 +412,8 @@
             "color_text": "#ffffff",
             "color_overlay": "rgba(0,0,0,0)",
             "overlay_opacity": 0,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
+            "submenu_title_position": "center",
+            "enable_title_drop_shadow": true
           }
         },
         "collection_9Ryhfw": {
@@ -423,14 +423,14 @@
             "collection": "womens-best-sellers-footwear",
             "custom_url": "",
             "image": "shopify://shop_images/600x550_Charlotte_butterYellow.jpg",
-            "title": "Best Sellers",
+            "title": "BEST SELLERS",
             "description": "",
             "overlay_content": true,
             "color_text": "#ffffff",
             "color_overlay": "rgba(0,0,0,0)",
             "overlay_opacity": 0,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
+            "submenu_title_position": "center",
+            "enable_title_drop_shadow": true
           }
         },
         "collection_czGEyj": {
@@ -440,14 +440,14 @@
             "collection": "shop-all-orthotics",
             "custom_url": "",
             "image": "shopify://shop_images/600x550_Aubry_Taupe.jpg",
-            "title": "Sneakers Collection",
+            "title": "SNEAKERS COLLECTION",
             "description": "",
             "overlay_content": true,
             "color_text": "#ffffff",
             "color_overlay": "rgba(0,0,0,0)",
             "overlay_opacity": 0,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
+            "submenu_title_position": "center",
+            "enable_title_drop_shadow": true
           }
         }
       },
