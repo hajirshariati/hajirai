@@ -625,8 +625,19 @@
     "image_with_text_overlay_GNC4KT": {
       "type": "image-with-text-overlay",
       "blocks": {
+        "heading_reH96V": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>FALL FAVORITES</p>",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
         "subheading_yJRt4d": {
           "type": "subheading",
+          "disabled": true,
           "settings": {
             "subheading": "FALL FAVORITES",
             "subheading_size": "subtitle-lg",
@@ -670,6 +681,7 @@
         }
       },
       "block_order": [
+        "heading_reH96V",
         "subheading_yJRt4d",
         "divider_RDiA8A",
         "text_YWeqgi",
@@ -707,8 +719,19 @@
     "image_with_text_overlay_cLVdgJ": {
       "type": "image-with-text-overlay",
       "blocks": {
+        "heading_LgwFNV": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>ATHLEISURE</p>",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
         "subheading_rhiKn9": {
           "type": "subheading",
+          "disabled": true,
           "settings": {
             "subheading": "ATHLEISURE",
             "subheading_size": "subtitle-lg",
@@ -752,6 +775,7 @@
         }
       },
       "block_order": [
+        "heading_LgwFNV",
         "subheading_rhiKn9",
         "divider_bFyxXA",
         "text_Dd6NMF",
@@ -789,8 +813,19 @@
     "image_with_text_overlay_HEWGdX": {
       "type": "image-with-text-overlay",
       "blocks": {
+        "heading_wRLhrU": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>THE AETREX TECHNOLOGY DIFFERENCE</p>",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
         "subheading_GVkqAc": {
           "type": "subheading",
+          "disabled": true,
           "settings": {
             "subheading": "THE AETREX TECHNOLOGY DIFFERENCE",
             "subheading_size": "subtitle-lg",
@@ -834,6 +869,7 @@
         }
       },
       "block_order": [
+        "heading_wRLhrU",
         "subheading_GVkqAc",
         "divider_AGUC4Q",
         "text_84bkF8",
@@ -871,8 +907,19 @@
     "image_with_text_overlay_K399zb": {
       "type": "image-with-text-overlay",
       "blocks": {
+        "heading_eEwP4h": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>AETREX SIGNATURE ARCH SUPPORT</p>",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
         "subheading_LJCnPX": {
           "type": "subheading",
+          "disabled": true,
           "settings": {
             "subheading": "AETREX SIGNATURE ARCH SUPPORT",
             "subheading_size": "subtitle-lg",
@@ -904,6 +951,7 @@
         }
       },
       "block_order": [
+        "heading_eEwP4h",
         "subheading_LJCnPX",
         "divider_kDdRMY",
         "text_jNDWWq"
