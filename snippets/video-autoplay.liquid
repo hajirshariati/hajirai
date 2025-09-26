@@ -1,0 +1,113 @@
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function findAndPlayVideo() {
+        // Multiple selectors to find video sections in any theme version
+        const videoSelectors = [
+            // For your current image-with-text section
+            '.image-with-text video',
+            '.image-banner__video video',
+            // For your future product-details section  
+            '.product-details video',
+            'product-details video',
+            // Generic fallbacks for any video section
+            '[class*="video"] video',
+            'section video',
+            '.section video'
+        ];
+        
+        let videoFound = false;
+        let videoElement = null;
+        let videoSection = null;
+        
+        // Find the first available video
+        for (const selector of videoSelectors) {
+            const videos = document.querySelectorAll(selector);
+            
+            for (const video of videos) {
+                // Skip hidden videos on current device
+                const isHiddenMobile = video.classList.contains('hide-mobile') && window.innerWidth <= 767;
+                const isHiddenDesktop = video.classList.contains('hide-desktop') && window.innerWidth > 767;
+                
+                if (!isHiddenMobile && !isHiddenDesktop) {
+                    videoElement = video;
+                    videoSection = video.closest('section, .section, product-details, .product-details, .image-with-text');
+                    videoFound = true;
+                    break;
+                }
+            }
+            
+            if (videoFound) break;
+        }
+        
+        if (videoFound && videoElement && videoSection) {
+            // Scroll to the video section
+            videoSection.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'center' 
+            });
+            
+            // Wait a moment for scroll, then play video
+            setTimeout(() => {
+                try {
+                    // Set up video for autoplay
+                    videoElement.muted = true;
+                    videoElement.playsInline = true;
+                    
+                    // Attempt to play
+                    const playPromise = videoElement.play();
+                    
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => {
+                            console.log('Video auto-playing successfully');
+                            // Add visual indicator that video is playing
+                            videoSection.style.boxShadow = '0 0 20px rgba(0, 122, 204, 0.3)';
+                            setTimeout(() => {
+                                videoSection.style.boxShadow = '';
+                            }, 3000);
+                        }).catch(error => {
+                            console.log('Auto-play prevented, showing controls:', error);
+                            // Fallback: ensure controls are visible
+                            videoElement.controls = true;
+                            // Still highlight the section
+                            videoSection.style.outline = '3px solid #007acc';
+                            setTimeout(() => {
+                                videoSection.style.outline = '';
+                            }, 3000);
+                        });
+                    }
+                } catch (error) {
+                    console.log('Error playing video:', error);
+                    videoElement.controls = true;
+                }
+            }, 800);
+            
+            return true;
+        }
+        
+        console.log('No video found on this page');
+        return false;
+    }
+    
+    // Check if URL has #video hash
+    function checkForVideoHash() {
+        const hash = window.location.hash.toLowerCase();
+        if (hash === '#video') {
+            setTimeout(findAndPlayVideo, 100);
+        }
+    }
+    
+    // Run on page load
+    checkForVideoHash();
+    
+    // Listen for hash changes (when someone clicks a #video link on same page)
+    window.addEventListener('hashchange', checkForVideoHash);
+    
+    // Also listen for any clicks on links with #video
+    document.addEventListener('click', function(e) {
+        const link = e.target.closest('a[href*="#video"]');
+        if (link) {
+            setTimeout(findAndPlayVideo, 200);
+        }
+    });
+});
+</script>
