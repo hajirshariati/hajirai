@@ -258,12 +258,6 @@
                     {%- endif -%}
                   </div>
                 {%- endif -%}
-
-                {%- liquid
-                  if rating_block == blank and block.settings.show_rating
-                    render 'product-rating', product: product
-                  endif
-                -%}
               </div>
 
               {%- if price_block == blank and block.settings.show_price -%}
@@ -310,6 +304,13 @@
                     </div>
                   {%- endif -%}
                 {%- endif -%}
+
+
+                {%- liquid
+                  if rating_block == blank and block.settings.show_rating
+                    render 'product-rating', product: product
+                  endif
+                -%}
               </div>
 
             {%- when 'quantity_selector' -%}
@@ -1689,13 +1690,6 @@
           "id": "show_price",
           "default": true,
           "label": "t:sections.global.settings.show_product_price.label"
-        },
-        {
-          "type": "checkbox",
-          "id": "show_rating",
-          "default": true,
-          "label": "t:sections.main-product.blocks.title.settings.show_rating.label",
-          "info": "t:sections.main-product.blocks.title.settings.show_rating.info"
         }
       ]
     },
@@ -1719,6 +1713,13 @@
           "type": "text",
           "id": "tooltip_message_strikethrough",
           "label": "Tooltip Message Strikethrough Price"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_rating",
+          "default": true,
+          "label": "t:sections.main-product.blocks.title.settings.show_rating.label",
+          "info": "t:sections.main-product.blocks.title.settings.show_rating.info"
         }
       ]
     },
