@@ -857,3 +857,11 @@ body .yotpo-reviews-main-widget svg {
 .custom-product-url .main-media-custom-slider {
     overflow: hidden;
 }
+
+.product__price form[action="/cart/add"] {
+    display: none!important;
+}
+
+.product-form-wrapper .product-form__buttons {
+    margin-bottom: 20px;
+}
