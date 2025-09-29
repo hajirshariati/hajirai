@@ -117,10 +117,24 @@
               {%- when 'collapsible_tab' -%}
 {%- capture collapsible_content -%}
   {%- liquid
-    if block.settings.content_html != blank
+    # Check for metafield reference first
+    if block.settings.content_metafield != blank
+      assign metafield_parts = block.settings.content_metafield | split: '.'
+      if metafield_parts.size == 4
+        assign metafield_namespace = metafield_parts[2]
+        assign metafield_key = metafield_parts[3]
+        assign dynamic_metafield = product.metafields[metafield_namespace][metafield_key]
+        if dynamic_metafield != blank
+          echo dynamic_metafield.value
+        endif
+      endif
+    elsif block.settings.content_html != blank
       echo block.settings.content_html
     elsif block.settings.content != blank
       assign metafield_content = block.settings.content
+
+
+      
   
                       if metafield_content contains '<h6>'
                         if metafield_content contains 'class="metafield-single_line_text_field-array'
@@ -1281,17 +1295,24 @@
           "label": "t:sections.global.settings.heading.label",
           "info": "t:sections.main-product.blocks.collapsible_tab.settings.heading.info"
         },
-        {
-          "type": "richtext",
-          "id": "content",
-          "label": "t:sections.main-product.blocks.collapsible_tab.settings.content.label",
-          "default": "<p>Use collapsible tabs for more detailed information that will help customers make a purchasing decision.</p><p>Ex: Shipping and return policies, size guides, and other common questions.</p>"
-        },
 {
-  "type": "html",
+  "type": "richtext",
+  "id": "content",
+  "label": "t:sections.main-product.blocks.collapsible_tab.settings.content.label",
+  "default": "<p>Use collapsible tabs for more detailed information that will help customers make a purchasing decision.</p><p>Ex: Shipping and return policies, size guides, and other common questions.</p>"
+},
+{
+  "type": "textarea",
   "id": "content_html",
-  "label": "Row Content (HTML)",
-  "info": "Use this field for raw HTML content. Supports dynamic sources. If filled, this will be used instead of the Rich Text field above."
+  "label": "Row Content (Raw HTML)",
+  "info": "Paste raw HTML here. This will render without escaping tags."
+},
+{
+  "type": "text",
+  "id": "content_metafield",
+  "label": "Or use Product Metafield",
+  "info": "Enter metafield reference (e.g., product.metafields.custom.html_content). This will override the fields above if filled.",
+  "placeholder": "product.metafields.namespace.key"
 },
 
 
