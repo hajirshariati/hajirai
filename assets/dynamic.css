@@ -608,21 +608,20 @@ label.active-swatch.custom-meta-label:before {
 
 variant-picker .main-pdp-variant-custom-badge {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 11px;
+    top: 0;
+    right: 0;
+    font-size: 12px;
     line-height: 100%;
-    padding: 5px 8px;
+    padding: 5px;
     text-transform: capitalize;
     background: rgb(var(--color-sale-tag));
-    border-radius: 50px;
+    border-radius: 0 5px;
     color: rgb(var(--color-sale-tag-text));
     font-weight: 500;
     border-width: 1px !important;
 }
 
 variant-picker .main-pdp-variant-custom-badge:not(.custom-normal-sale) {
-    border: var(--buttons-border-width) solid rgb(var(--color-button-border)/ 1);
     background: #fff;
     color: rgb(var(--color-button-background));
 }

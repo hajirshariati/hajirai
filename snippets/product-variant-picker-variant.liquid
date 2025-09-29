@@ -55,11 +55,14 @@
                   <div class="main-pdp-variant-custom-badge custom-normal-sale">
                     {{- "SALE" -}}
                   </div>
-                {%- endif -%} 
+                {%- endif -%}
               {%- elsif variant_badge != blank -%}
-                <div class="main-pdp-variant-custom-badge custom-meta-badge">
-                {{- variant_badge -}}
-                </div>
+                {%- assign allowed_badges = 'NEW,Best Seller,SALE' | split: ',' -%}
+                {%- if allowed_badges contains variant_badge -%}
+                  <div class="main-pdp-variant-custom-badge custom-meta-badge">
+                  {{- variant_badge -}}
+                  </div>
+                {%- endif -%}
               {%- endif -%}
 
                 {% assign metaproductcolor = metaproduct.metafields.custom.color | metafield_tag | strip_html %}
