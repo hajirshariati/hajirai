@@ -60,17 +60,12 @@
     "image_with_text_overlay_HEWGdX": {
       "type": "image-with-text-overlay",
       "blocks": {
-        "text_84bkF8": {
-          "type": "text",
+        "heading_67Mz3K": {
+          "type": "heading",
           "settings": {
-            "text": "<p>New Fall Styles</p>",
-            "text_font": "heading",
-            "text_size": "subtext-custom",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
+            "heading": "<p>New Fall Styles</p>",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -112,7 +107,7 @@
         }
       },
       "block_order": [
-        "text_84bkF8",
+        "heading_67Mz3K",
         "divider_AGUC4Q",
         "text_7kb9cy",
         "button_MLhezL"
