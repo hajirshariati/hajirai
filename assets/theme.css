@@ -4456,7 +4456,7 @@ input[type=checkbox].switch:is(:disabled, .disabled):not(:checked)::after {
     --swatch-offset: 0px;
     --swatch-margin: calc(var(--swatch-offset) * 2);
     border-radius: var(--swatch-radius);
-    padding: var(--sp-4) var(--sp-5);
+    padding: 10px;
     transition: all var(--animation-short);
 }
 
@@ -16347,8 +16347,7 @@ video-media:not([playing]) .deferred-poster .play-button .icon:last-child:not(:o
 
 /* PDP VARIANT GRID  */
 ul.swatches li label {
-    min-width: 8rem;
-    min-height: 4rem;
+    height: 100%;
     text-align: center;
     display: flex;
     gap: 4px;
@@ -16368,9 +16367,7 @@ ul.swatches li label p {
 @media (min-width: 1024px) and (max-width: 1399px),
 (min-width: 361px) and (max-width: 480px) {
     ul.swatches li label {
-        min-width: 7.2rem;
-        font-size: 13px;
-        padding: 1rem;
+        font-size: 14px;
     }
 }
 

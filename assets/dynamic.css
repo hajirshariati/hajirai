@@ -315,6 +315,40 @@ label.active-swatch.custom-meta-label:before {
 
 /* PDP Custom swatches end */
 
+/* Responsive swatch grid layout */
+.swatches--variant {
+    display: grid !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+}
+
+@media screen and (min-width: 768px) {
+    .swatches--variant {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+}
+
+.custom-list-items {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+}
+
+.custom-list-items magnet-element {
+    width: 100%;
+    height: 100%;
+}
+
+.swatches--variant .color-swatch {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+}
+
 /* PLP swatch slider start */
 .product-card .product-variant-slider-wrapper {
     padding: 1rem 15px 0px;
