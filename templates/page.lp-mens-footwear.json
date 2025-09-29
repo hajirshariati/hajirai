@@ -441,8 +441,8 @@
           "settings": {
             "text": "<p>Featuring Aetrex’s Signature Arch Support and our premium, super-cushy UltraSky™ EVA foam midsole. These styles offer maximum comfort and alignment and help to minimize over-pronation during your daily activities. The stretchy knit upper gives you the perfect fit.</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
-            "text_max_size": 32,
+            "text_size": "subtext-custom",
+            "text_max_size": 16,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
             "text_capitalize": false,
