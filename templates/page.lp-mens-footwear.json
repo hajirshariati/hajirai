@@ -138,40 +138,9 @@
         "divider_color": "#111111",
         "overlay_opacity": 0,
         "padding_top": 24,
-        "padding_bottom": 24,
+        "padding_bottom": 0,
         "divider": false,
         "full_width": true,
-        "rounded": false,
-        "enable_parallax": false,
-        "parallax_direction": "vertical"
-      }
-    },
-    "image_with_text_overlay_e9GhwP": {
-      "type": "image-with-text-overlay",
-      "settings": {
-        "transparent_header": false,
-        "image": "shopify://shop_images/ashley_D.jpg",
-        "image_height": "adapt",
-        "content_width": "small",
-        "content_position": "md:items-end md:justify-start",
-        "text_alignment": "left",
-        "image_mobile": "shopify://shop_images/ashley_M.jpg",
-        "image_height_mobile": "adapt",
-        "content_position_mobile": "items-end justify-start",
-        "text_alignment_mobile": "center",
-        "color_text": "#ffffff",
-        "color_highlight": "#e0a580",
-        "gradient_highlight": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
-        "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "divider_color": "#111111",
-        "overlay_opacity": 0,
-        "padding_top": 36,
-        "padding_bottom": 36,
-        "divider": false,
-        "full_width": false,
         "rounded": false,
         "enable_parallax": false,
         "parallax_direction": "vertical"
@@ -186,7 +155,7 @@
             "text": "<p>30 Day Wear Test, Plus Easy Returns</p>",
             "text_font": "subtitle",
             "text_size": "subtext-custom",
-            "text_max_size": 24,
+            "text_max_size": 32,
             "text_line_height": 1.2,
             "text_letter_spacing": 35,
             "text_capitalize": false,
@@ -238,9 +207,9 @@
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "womens-sneakers",
+            "collection": "mens-sneakers",
             "custom_url": "",
-            "image": "shopify://shop_images/Sneakers_9347202f-883a-4054-a367-840d1673a259.png",
+            "image": "shopify://shop_images/Chase_628369ac-c083-468f-b1aa-cb38c7b267e5.png",
             "title": "SNEAKERS",
             "description": "",
             "overlay_content": false,
@@ -251,120 +220,52 @@
             "enable_title_drop_shadow": false
           }
         },
-        "collection_UFADDM": {
+        "collection_4BTcXY": {
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "loafers-oxfords",
+            "collection": "mens-clogs",
             "custom_url": "",
-            "image": "shopify://shop_images/Casuals_2ed0a5bd-d5c0-401d-a8d3-0f617e069b02.png",
-            "title": "LOAFERS & OXFORDS",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#171717",
-            "color_overlay": "#000000",
-            "overlay_opacity": 0,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_6NeXRg": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "womens-boots",
-            "custom_url": "",
-            "image": "shopify://shop_images/Boots_31d6a537-6d19-4f8c-baf9-de93206db007.png",
-            "title": "BOOTS",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#171717",
-            "color_overlay": "#000000",
-            "overlay_opacity": 0,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_b6zYFq": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "womens-clogs",
-            "custom_url": "",
-            "image": "shopify://shop_images/Clog_6aa98460-00b3-41c4-8d51-b33a611b361e.png",
+            "image": "shopify://shop_images/08_cc447f1d-771b-4148-9ac4-3d9c9b65e71e.png",
             "title": "CLOGS",
             "description": "",
             "overlay_content": false,
             "color_text": "#171717",
-            "color_overlay": "#000000",
+            "color_overlay": "#171717",
             "overlay_opacity": 0,
             "submenu_title_position": "bottom",
             "enable_title_drop_shadow": false
           }
         },
-        "collection_D7JLdh": {
+        "collection_3nT67h": {
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "womens-slippers",
+            "collection": "mens-sandals",
             "custom_url": "",
-            "image": "shopify://shop_images/31206-FE200W_catalog.jpg",
-            "title": "SLIPPERS",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#171717",
-            "color_overlay": "#000000",
-            "overlay_opacity": 0,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_AefeLJ": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "womens-wedges-heels",
-            "custom_url": "",
-            "image": "shopify://shop_images/Wedges_Heels_ee9e52bb-58bc-4edc-85c2-5b6b70590fd1.png",
-            "title": "WEDGES & HEELS",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#171717",
-            "color_overlay": "#000000",
-            "overlay_opacity": 0,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_tHYraX": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "womens-sandals",
-            "custom_url": "",
-            "image": "shopify://shop_images/Sandals_0e3a64ec-f790-4efd-b3ec-b1b92f015ed3.png",
+            "image": "shopify://shop_images/flips_2ea06c02-e7cb-4a6a-a10e-46e2b20d011a.png",
             "title": "SANDALS",
             "description": "",
             "overlay_content": false,
             "color_text": "#171717",
-            "color_overlay": "#000000",
+            "color_overlay": "#171717",
             "overlay_opacity": 0,
             "submenu_title_position": "bottom",
             "enable_title_drop_shadow": false
           }
         },
-        "collection_LCmgJQ": {
+        "collection_eUDUdB": {
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "womens-flip-flop-sandals",
+            "collection": "mens-sneakers",
             "custom_url": "",
-            "image": "shopify://shop_images/flips_8c5c4a61-3b54-451e-acd8-35bdc2c948f6.png",
-            "title": "FLIPS",
+            "image": "shopify://shop_images/Chase_628369ac-c083-468f-b1aa-cb38c7b267e5.png",
+            "title": "SNEAKERS",
             "description": "",
             "overlay_content": false,
             "color_text": "#171717",
-            "color_overlay": "#000000",
+            "color_overlay": "#171717",
             "overlay_opacity": 0,
             "submenu_title_position": "bottom",
             "enable_title_drop_shadow": false
@@ -373,13 +274,9 @@
       },
       "block_order": [
         "collection_6iykJg",
-        "collection_UFADDM",
-        "collection_6NeXRg",
-        "collection_b6zYFq",
-        "collection_D7JLdh",
-        "collection_AefeLJ",
-        "collection_tHYraX",
-        "collection_LCmgJQ"
+        "collection_4BTcXY",
+        "collection_3nT67h",
+        "collection_eUDUdB"
       ],
       "custom_css": [],
       "settings": {
@@ -396,7 +293,7 @@
         "heading_alignment": "text-center md:items-center",
         "heading_tag": "h3",
         "subheading": "",
-        "description": "<h3>WOMEN'S STYLES</h3>",
+        "description": "<h3>MEN'S STYLES</h3>",
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "",
@@ -997,7 +894,6 @@
     "main-page",
     "slideshow_FWtLKn",
     "image_with_text_overlay_HEWGdX",
-    "image_with_text_overlay_e9GhwP",
     "rich_text_PKdTPU",
     "collection_list_q7Rypj",
     "multicolumn_9UNM8U",
