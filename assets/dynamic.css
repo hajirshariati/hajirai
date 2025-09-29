@@ -329,6 +329,10 @@ label.active-swatch.custom-meta-label:before {
     }
 }
 
+fieldset[data-option-slug="width"] .swatches--variant {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .custom-list-items {
     display: flex;
     justify-content: center;
@@ -643,11 +647,6 @@ variant-picker .main-pdp-variant-custom-badge.custom-final-sale,
 
 @media (max-width: 1023px) {
     .product__media-container .main-pdp-custom-badge {
-        left: 10px;
-        right: auto;
-    }
-
-    variant-picker .main-pdp-variant-custom-badge {
         left: 10px;
         right: auto;
     }
