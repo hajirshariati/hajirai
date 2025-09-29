@@ -117,10 +117,10 @@
               {%- when 'collapsible_tab' -%}
 {%- capture collapsible_content -%}
   {%- liquid
-    if block.settings.content_html != blank
-      # Render as raw HTML without richtext wrapper
-      assign html_content = block.settings.content_html | strip
-      echo html_content
+    if block.settings.content_dynamic != blank
+      echo block.settings.content_dynamic
+    elsif block.settings.content_html != blank
+      echo block.settings.content_html
     elsif block.settings.content != blank
       assign metafield_content = block.settings.content
 
@@ -1290,14 +1290,19 @@
   "type": "richtext",
   "id": "content",
   "label": "Row Content (Rich Text)",
-  "info": "Standard rich text editor with formatting options",
   "default": "<p>Use collapsible tabs for more detailed information that will help customers make a purchasing decision.</p><p>Ex: Shipping and return policies, size guides, and other common questions.</p>"
 },
 {
-  "type": "richtext",
+  "type": "textarea",
   "id": "content_html",
-  "label": "Row Content (Raw HTML)",
-  "info": "For HTML content or metafields containing HTML. This will render without Shopify's rich text wrapper. Supports dynamic sources."
+  "label": "Row Content (Raw HTML - Manual)",
+  "info": "Paste raw HTML here to render without escaping"
+},
+{
+  "type": "inline_richtext",
+  "id": "content_dynamic",
+  "label": "Row Content (Dynamic Source)",
+  "info": "Connect to HTML metafields using dynamic sources"
 },
 
 
