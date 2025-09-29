@@ -115,7 +115,7 @@
 
 <div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}">
   <div class="page-width{% if media_count > 0 %}{% if section.settings.full_width %} page-width--full{% endif %}{% else %} page-width--narrow{% endif %} relative">
-    <div class="featured-product product product--{{ section.settings.gallery_layout }}{% if media_count == 0 %} no-media{% endif %} flex flex-col items-start lg:grid gap-5 w-full relative">
+    <div class="featured-product product product--{{ section.settings.gallery_layout }}{% if media_count == 0 %} no-media{% endif %} flex flex-col items-start lg:grid gap-14 md:gap-5 w-full relative">
       {%- if media_count > 0 -%}
         <div class="product__gallery-container{% if section.settings.enable_sticky_info %} lg:sticky{% endif %} flex flex-col gap-0 md:gap-8 relative w-full">
           {%- render 'product-media-gallery',

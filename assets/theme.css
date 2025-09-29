@@ -3468,6 +3468,16 @@ button.shopify-payment-button__button--unbranded {
     transition: all 400ms ease-in-out;
 }
 
+.product__media-container .indicators {
+    height: 36px;
+    bottom: -50px;
+}
+
+.product__media-container .indicators .button {
+    width: 36px;
+    height: 36px;
+}
+
 @media screen and (min-width: 1280px) {
     .indicators .button {
         --buttons-width: var(--sp-14);
@@ -13242,6 +13252,8 @@ button:is([is=media-lightbox-button], [is=media-hover-button]):focus-visible {
 
     .product__thumbnails.with-dots,
     .product__thumbnails.with-dots .product__thumbnails-list {
+        position: absolute;
+        bottom: 5px;
         width: 100%;
         display: flex;
         align-items: center;

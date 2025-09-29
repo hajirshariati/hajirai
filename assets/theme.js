@@ -4464,7 +4464,9 @@ class SliderElement extends HTMLElement {
             elementWidth = this.clientWidth - parseFloat(styles.paddingLeft) - parseFloat(styles.paddingRight);
         }
 
-        return Math.floor(elementWidth / this.itemOffset);
+        const calculatedPerPage = Math.floor(elementWidth / this.itemOffset);
+        // Ensure at least 1 item per page when items exist and itemOffset > 0
+        return calculatedPerPage > 0 ? calculatedPerPage : (this.itemsToShow.length > 0 && this.itemOffset > 0 ? 1 : 0);
     }
 
     get isScrollable() {
