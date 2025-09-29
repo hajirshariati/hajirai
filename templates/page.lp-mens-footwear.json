@@ -258,10 +258,10 @@
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "mens-sneakers",
+            "collection": "mens-shop-all-footwear",
             "custom_url": "",
-            "image": "shopify://shop_images/Chase_628369ac-c083-468f-b1aa-cb38c7b267e5.png",
-            "title": "SNEAKERS",
+            "image": "shopify://shop_images/shopallMennew_bfcaaf39-a554-45f4-8b76-2d30cd5b6803.png",
+            "title": "SHOP ALL",
             "description": "",
             "overlay_content": false,
             "color_text": "#171717",
