@@ -5924,6 +5924,10 @@ ol {
     transition-property: opacity, transform;
 }
 
+.announcement__content:hover {
+    cursor: pointer;
+}
+
 .announcement__slide[aria-hidden] .announcement__content {
     opacity: 0;
     transform: translateY(100%);
