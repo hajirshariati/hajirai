@@ -434,98 +434,6 @@
         "rounded": false
       }
     },
-    "collection_list_fgPMz9": {
-      "type": "collection-list",
-      "blocks": {
-        "collection_YbUxUk": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "womens-new-arrivals",
-            "custom_url": "",
-            "image": "shopify://shop_images/600x480_Aubry_Tan3.jpg",
-            "title": "NEW ARRIVALS",
-            "description": "",
-            "overlay_content": true,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 0,
-            "submenu_title_position": "center",
-            "enable_title_drop_shadow": true
-          }
-        },
-        "collection_z3JcHD": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "womens-best-sellers-footwear",
-            "custom_url": "",
-            "image": "shopify://shop_images/600x480_Danika_SkyBlue2.jpg",
-            "title": "BEST SELLERS",
-            "description": "",
-            "overlay_content": true,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 0,
-            "submenu_title_position": "center",
-            "enable_title_drop_shadow": true
-          }
-        },
-        "collection_Y6AhJP": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "womens-boots",
-            "custom_url": "",
-            "image": "shopify://shop_images/600x480_Reagan_red.jpg",
-            "title": "ARCH SUPPORT BOOTS",
-            "description": "",
-            "overlay_content": true,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 0,
-            "submenu_title_position": "center",
-            "enable_title_drop_shadow": true
-          }
-        }
-      },
-      "block_order": [
-        "collection_YbUxUk",
-        "collection_z3JcHD",
-        "collection_Y6AhJP"
-      ],
-      "settings": {
-        "columns": 3,
-        "carousel_on_desktop": false,
-        "image_type": "collection",
-        "image_ratio": "adapt",
-        "show_products_count": false,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false
-      }
-    },
     "image_with_text_overlay_GNC4KT": {
       "type": "image-with-text-overlay",
       "blocks": {
@@ -807,87 +715,6 @@
         "enable_parallax": false,
         "parallax_direction": "vertical"
       }
-    },
-    "image_with_text_overlay_K399zb": {
-      "type": "image-with-text-overlay",
-      "blocks": {
-        "heading_eEwP4h": {
-          "type": "heading",
-          "settings": {
-            "heading": "<p>AETREX SIGNATURE ARCH SUPPORT</p>",
-            "heading_size": "title-sm",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "subheading_LJCnPX": {
-          "type": "subheading",
-          "disabled": true,
-          "settings": {
-            "subheading": "AETREX SIGNATURE ARCH SUPPORT",
-            "subheading_size": "subtitle-lg",
-            "secondary_color": true
-          }
-        },
-        "divider_kDdRMY": {
-          "type": "divider",
-          "settings": {
-            "divider_width": 120,
-            "divider_mt": 20,
-            "divider_mb": 5
-          }
-        },
-        "text_jNDWWq": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Every Aetrex shoe features our signature arch support. The contour, position and height of Aetrex’s unique arch aligns anatomically in the proper place (at the apex of the arch) to help support your body from the ground up. Designed to help create natural alignment throughout the gait cycle, proper arch support can help reduce pronation and prevent injuries.</p>",
-            "text_font": "body",
-            "text_size": "subtext-sm",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "heading_eEwP4h",
-        "subheading_LJCnPX",
-        "divider_kDdRMY",
-        "text_jNDWWq"
-      ],
-      "settings": {
-        "transparent_header": false,
-        "image": "shopify://shop_images/1780x655_aetrex_arch_Dash.jpg",
-        "image_height": "adapt",
-        "content_width": "small",
-        "content_position": "md:items-center md:justify-end",
-        "text_alignment": "center",
-        "image_mobile": "shopify://shop_images/655x499_aetrex_arch_Dash.png",
-        "image_height_mobile": "adapt",
-        "content_position_mobile": "items-end justify-center",
-        "text_alignment_mobile": "center",
-        "color_text": "#525252",
-        "color_highlight": "#525252",
-        "gradient_highlight": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
-        "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "divider_color": "#111111",
-        "overlay_opacity": 0,
-        "padding_top": 24,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "enable_parallax": false,
-        "parallax_direction": "vertical"
-      }
     }
   },
   "order": [
@@ -897,10 +724,8 @@
     "rich_text_PKdTPU",
     "collection_list_q7Rypj",
     "multicolumn_9UNM8U",
-    "collection_list_fgPMz9",
     "image_with_text_overlay_GNC4KT",
     "image_with_text_overlay_cLVdgJ",
-    "image_with_text_overlay_9BfJhL",
-    "image_with_text_overlay_K399zb"
+    "image_with_text_overlay_9BfJhL"
   ]
 }
