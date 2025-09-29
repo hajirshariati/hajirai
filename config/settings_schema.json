@@ -767,6 +767,12 @@
         "label": "t:settings_schema.global.settings.text_alignment.label"
       },
       {
+        "type": "text_alignment",
+        "id": "collection_card_text_alignment",
+        "default": "left",
+        "label": "Collection cards Text alignment"
+      },
+      {
         "type": "header",
         "content": "t:settings_schema.global.settings.header__border.content"
       },
