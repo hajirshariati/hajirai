@@ -117,24 +117,15 @@
               {%- when 'collapsible_tab' -%}
 {%- capture collapsible_content -%}
   {%- liquid
-    # Check for metafield reference first
-    if block.settings.content_metafield != blank
-      assign metafield_parts = block.settings.content_metafield | split: '.'
-      if metafield_parts.size == 4
-        assign metafield_namespace = metafield_parts[2]
-        assign metafield_key = metafield_parts[3]
-        assign dynamic_metafield = product.metafields[metafield_namespace][metafield_key]
-        if dynamic_metafield != blank
-          echo dynamic_metafield.value
-        endif
-      endif
-    elsif block.settings.content_html != blank
-      echo block.settings.content_html
+    if block.settings.content_html != blank
+      # Render as raw HTML without richtext wrapper
+      assign html_content = block.settings.content_html | strip
+      echo html_content
     elsif block.settings.content != blank
       assign metafield_content = block.settings.content
 
 
-      
+
   
                       if metafield_content contains '<h6>'
                         if metafield_content contains 'class="metafield-single_line_text_field-array'
@@ -1298,21 +1289,15 @@
 {
   "type": "richtext",
   "id": "content",
-  "label": "t:sections.main-product.blocks.collapsible_tab.settings.content.label",
+  "label": "Row Content (Rich Text)",
+  "info": "Standard rich text editor with formatting options",
   "default": "<p>Use collapsible tabs for more detailed information that will help customers make a purchasing decision.</p><p>Ex: Shipping and return policies, size guides, and other common questions.</p>"
 },
 {
-  "type": "textarea",
+  "type": "richtext",
   "id": "content_html",
   "label": "Row Content (Raw HTML)",
-  "info": "Paste raw HTML here. This will render without escaping tags."
-},
-{
-  "type": "text",
-  "id": "content_metafield",
-  "label": "Or use Product Metafield",
-  "info": "Enter metafield reference (e.g., product.metafields.custom.html_content). This will override the fields above if filled.",
-  "placeholder": "product.metafields.namespace.key"
+  "info": "For HTML content or metafields containing HTML. This will render without Shopify's rich text wrapper. Supports dynamic sources."
 },
 
 
