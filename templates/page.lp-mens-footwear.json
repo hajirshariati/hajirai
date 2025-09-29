@@ -535,8 +535,8 @@
           "settings": {
             "text": "<p>What makes our shoes different is all tied to our technology and our knowledge of feet. When a shoe is made, it’s built over a last which determines its 3D shape. We have millions of 3D foot scans in our database which help us develop our unique lasts and footwear.</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
-            "text_max_size": 32,
+            "text_size": "subtext-custom",
+            "text_max_size": 16,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
             "text_capitalize": false,
