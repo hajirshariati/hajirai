@@ -26,88 +26,6 @@
     },
     "slideshow_FWtLKn": {
       "type": "slideshow",
-      "blocks": {
-        "image_t4b7Uf": {
-          "type": "image",
-          "settings": {
-            "image": "shopify://shop_images/1920x700_Collette_Taupe.jpg",
-            "image_mobile": "shopify://shop_images/693x520_Collette_taupe.png",
-            "heading": "Fall-Winter '25 Styles",
-            "heading_size": "title-sm",
-            "heading_tag": "h3",
-            "text": "<p>Healthy Comfort Starts Here!®</p>",
-            "text_font": "body",
-            "text_size": "subtext-lg",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color_text": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle",
-            "button_label": "SHOP NEW ARRIVALS",
-            "button_link": "shopify://collections/womens-new-arrivals",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": false
-          }
-        },
-        "image_89rbRz": {
-          "type": "image",
-          "settings": {
-            "image": "shopify://shop_images/1920x700_Gianna_Taupe.jpg",
-            "image_mobile": "shopify://shop_images/693x520_Gianna_Charcoal.png",
-            "heading": "Proven Comfort, Perfected by Science",
-            "heading_size": "title-sm",
-            "heading_tag": "h3",
-            "text": "<p>Every pair is designed using scientific data and insights from more than 50 million global 3D foot scans.</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color_text": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle",
-            "button_label": "Shop Fall Collection",
-            "button_link": "shopify://collections/fall-collection",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": false
-          }
-        },
-        "image_GBXdxP": {
-          "type": "image",
-          "settings": {
-            "image": "shopify://shop_images/1920x700_CarlySparklwe_Wine.jpg",
-            "image_mobile": "shopify://shop_images/693x520_CarlySparkle_Wine.png",
-            "heading": "Redefining Everyday Comfort",
-            "heading_size": "title-sm",
-            "heading_tag": "h3",
-            "text": "<p>Explore sneakers with innovative support and effortless versatility.</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color_text": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle",
-            "button_label": "Shop Sneakers",
-            "button_link": "shopify://collections/womens-sneakers",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": false
-          }
-        }
-      },
-      "block_order": [
-        "image_t4b7Uf",
-        "image_89rbRz",
-        "image_GBXdxP"
-      ],
       "custom_css": [],
       "name": "Slideshow",
       "settings": {
@@ -132,6 +50,95 @@
         "overlay_opacity": 0,
         "padding_top": 12,
         "padding_bottom": 12,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_overlay_HEWGdX": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "text_84bkF8": {
+          "type": "text",
+          "settings": {
+            "text": "<p>New Fall Styles</p>",
+            "text_font": "heading",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "divider_AGUC4Q": {
+          "type": "divider",
+          "settings": {
+            "divider_width": 120,
+            "divider_mt": 20,
+            "divider_mb": 5
+          }
+        },
+        "text_7kb9cy": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Healthy Comfort Starts Here!</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 18,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_MLhezL": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP NEW ARRIVALS",
+            "button_link": "shopify://collections/mens-new-arrivals",
+            "button_video_link": "",
+            "button_style": "secondary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "text_84bkF8",
+        "divider_AGUC4Q",
+        "text_7kb9cy",
+        "button_MLhezL"
+      ],
+      "settings": {
+        "transparent_header": true,
+        "image": "shopify://shop_images/Main_D2_2a41daac-363f-45ff-89a1-76f67f1802ce.jpg",
+        "image_height": "adapt",
+        "content_width": "small",
+        "content_position": "md:items-center md:justify-end",
+        "text_alignment": "center",
+        "image_mobile": "shopify://shop_images/main_M2_fcb52967-4837-4c50-8454-1370011ff964.jpg",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-end justify-center",
+        "text_alignment_mobile": "center",
+        "color_text": "#ffffff",
+        "color_highlight": "#525252",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
+        "padding_top": 24,
+        "padding_bottom": 24,
         "divider": false,
         "full_width": true,
         "rounded": false,
@@ -810,10 +817,10 @@
         "parallax_direction": "vertical"
       }
     },
-    "image_with_text_overlay_HEWGdX": {
+    "image_with_text_overlay_9BfJhL": {
       "type": "image-with-text-overlay",
       "blocks": {
-        "heading_wRLhrU": {
+        "heading_zqMYC6": {
           "type": "heading",
           "settings": {
             "heading": "<p>THE AETREX TECHNOLOGY DIFFERENCE</p>",
@@ -823,7 +830,7 @@
             "highlighted_scribble": "circle"
           }
         },
-        "subheading_GVkqAc": {
+        "subheading_LVcfqT": {
           "type": "subheading",
           "disabled": true,
           "settings": {
@@ -832,7 +839,7 @@
             "secondary_color": true
           }
         },
-        "divider_AGUC4Q": {
+        "divider_Ac8wdJ": {
           "type": "divider",
           "settings": {
             "divider_width": 120,
@@ -840,7 +847,7 @@
             "divider_mb": 5
           }
         },
-        "text_84bkF8": {
+        "text_3Je9Vy": {
           "type": "text",
           "settings": {
             "text": "<p>What makes our shoes different is all tied to our technology and our knowledge of feet. When a shoe is made, it’s built over a last which determines its 3D shape. We have millions of 3D foot scans in our database which help us develop our unique lasts and footwear.</p>",
@@ -855,7 +862,7 @@
             "highlighted_scribble": "circle"
           }
         },
-        "button_MLhezL": {
+        "button_9eWriQ": {
           "type": "button",
           "settings": {
             "button_label": "WATCH VIDEO",
@@ -869,11 +876,11 @@
         }
       },
       "block_order": [
-        "heading_wRLhrU",
-        "subheading_GVkqAc",
-        "divider_AGUC4Q",
-        "text_84bkF8",
-        "button_MLhezL"
+        "heading_zqMYC6",
+        "subheading_LVcfqT",
+        "divider_Ac8wdJ",
+        "text_3Je9Vy",
+        "button_9eWriQ"
       ],
       "settings": {
         "transparent_header": false,
@@ -989,6 +996,7 @@
   "order": [
     "main-page",
     "slideshow_FWtLKn",
+    "image_with_text_overlay_HEWGdX",
     "image_with_text_overlay_e9GhwP",
     "rich_text_PKdTPU",
     "collection_list_q7Rypj",
@@ -996,7 +1004,7 @@
     "collection_list_fgPMz9",
     "image_with_text_overlay_GNC4KT",
     "image_with_text_overlay_cLVdgJ",
-    "image_with_text_overlay_HEWGdX",
+    "image_with_text_overlay_9BfJhL",
     "image_with_text_overlay_K399zb"
   ]
 }
