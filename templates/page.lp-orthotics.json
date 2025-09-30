@@ -654,7 +654,7 @@
       ],
       "name": "Collection list",
       "settings": {
-        "columns": 4,
+        "columns": 5,
         "carousel_on_desktop": true,
         "image_type": "collection",
         "image_ratio": "adapt",
