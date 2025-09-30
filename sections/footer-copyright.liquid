@@ -46,7 +46,7 @@
         {%- endif -%}
       {%- endif -%}
 
-      <li>{% render 'country-selector' %}</li>
+      
 
       {%- if section.settings.show_policy -%}
         <ul class="flex flex-wrap gap-3 justify-center lg:justify-start">
@@ -62,6 +62,10 @@
 
             {%- endif -%}
           {%- endfor -%}
+
+
+          <li>{% render 'country-selector' %}</li>
+
         </ul>
       {%- endif -%}
     </div>
