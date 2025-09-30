@@ -690,6 +690,9 @@
       "block_order": [
         "ai_gen_block_f954ddc_UhgMqx"
       ],
+      "custom_css": [
+        ".ai-product-comparison__selected-image-ay094c2g5l0lmymyvdaigenblockf954ddcuhgmqx{display:none}"
+      ],
       "settings": {}
     },
     "image_comparison_kctafY": {
