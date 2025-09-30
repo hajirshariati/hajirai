@@ -35,6 +35,7 @@
           <ul class="flex flex-wrap gap-3 justify-center lg:justify-start">
             {%- for link in linklists[section.settings.footer_menu].links -%}
               <li>
+                <li>{% render 'country-selector' %}</li>
                 <small>
                   <a href="{{ link.url }}" class="block reversed-link">{{ link.title }}</a>
                 </small>
@@ -53,7 +54,7 @@
                 </small>
               </li>
 
-<li>{% render 'country-selector' %}</li>
+
 
             {%- endif -%}
           {%- endfor -%}
