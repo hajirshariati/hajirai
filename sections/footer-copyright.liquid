@@ -16,7 +16,10 @@
   {% if section.settings.enable_parallax %}
     is="footer-parallax"
   {% endif %}
->{% render 'country-selector' %}
+>
+  
+  <br>
+  {% render 'country-selector' %}
   <div class="footer-copyright page-width{% if section.settings.full_width %} page-width--full{% endif %} w-full flex flex-col items-center justify-between gap-4 lg:gap-0 lg:flex-row relative">
     <div class="rte credits text-center">
       <small>
