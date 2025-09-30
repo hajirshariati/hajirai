@@ -327,7 +327,7 @@
         "divider_f4br8p": {
           "type": "divider",
           "settings": {
-            "divider_width": 120,
+            "divider_width": 320,
             "divider_mt": 20,
             "divider_mb": 5
           }
