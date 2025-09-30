@@ -17,8 +17,8 @@
         "text_idUGqR": {
           "type": "text",
           "settings": {
-            "icon": "none",
-            "text": "<strong>FREE SHIPPING! </strong>*For a limited time only, get U.S. Ground Shipping on all orders. This deal won't last long! <a href=\"/collections/all-products\" title=\"Shop All\">Shop Now</a>",
+            "icon": "alert",
+            "text": "<strong>FREE SHIPPING! </strong>*For a limited time only, get U.S. Ground Shipping on all orders. This deal won't last long!",
             "link": "",
             "hide_icon_mobile": true,
             "text_mobile": "",
