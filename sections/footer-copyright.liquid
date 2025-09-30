@@ -57,7 +57,7 @@
         </ul>
       {%- endif -%}
     </div>
-{% render 'country-selector' %}
+
     {%- liquid
       if section.settings.enable_language_selector and localization.available_languages.size > 1
         assign enable_language_selector = true
@@ -197,6 +197,8 @@
       {%- endunless -%}
     {%- endif -%}
   </div>
+{% render 'country-selector' %}
+
 </div>
 
 {% schema %}
