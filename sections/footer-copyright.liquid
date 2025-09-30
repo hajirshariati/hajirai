@@ -40,11 +40,14 @@
                   <a href="{{ link.url }}" class="block reversed-link">{{ link.title }}</a>
                 </small>
               </li>
-              <li>{% render 'country-selector' %}</li>
+              
             {%- endfor -%}
           </ul>
         {%- endif -%}
       {%- endif -%}
+
+      <li>{% render 'country-selector' %}</li>
+
       {%- if section.settings.show_policy -%}
         <ul class="flex flex-wrap gap-3 justify-center lg:justify-start">
           {%- for policy in shop.policies -%}
