@@ -283,7 +283,7 @@
         "columns_mobile": "1",
         "swipe_on_mobile": true,
         "heading": "Which Orthotic is Right for You?",
-        "heading_size": "title-md",
+        "heading_size": "title-sm",
         "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
         "subheading": "Different feet, different needs. Explore by foot condition.  ",
