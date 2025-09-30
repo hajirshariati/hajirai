@@ -441,14 +441,14 @@
           "settings": {
             "subheading": "Data-Driven Comfort, Backed by 50 Million Scans",
             "subheading_size": "subtitle-md",
-            "secondary_color": true
+            "secondary_color": false
           }
         },
         "heading_CE9MYn": {
           "type": "heading",
           "settings": {
             "heading": "<p><strong>Foot Scanning Technology that powers our orthotics</strong></p>",
-            "heading_size": "title-md",
+            "heading_size": "title-sm",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
