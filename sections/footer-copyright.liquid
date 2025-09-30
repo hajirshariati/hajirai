@@ -64,12 +64,12 @@
           {%- endfor -%}
 
 
-          <li>{% render 'country-selector' %}</li>
+          
 
         </ul>
       {%- endif -%}
     </div>
-
+<li>{% render 'country-selector' %}</li>
     {%- liquid
       if section.settings.enable_language_selector and localization.available_languages.size > 1
         assign enable_language_selector = true
