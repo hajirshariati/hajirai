@@ -104,12 +104,6 @@
             "show_price": false
           }
         },
-        "klaviyo_email_marketing_sms_form_embed_block_qDg68M": {
-          "type": "shopify://apps/klaviyo-email-marketing-sms/blocks/form-embed-block/2632fe16-c075-4321-a88b-50b567f42507",
-          "settings": {
-            "formId": "UZG2CK"
-          }
-        },
         "icon_list_VBaw6z": {
           "type": "icon_list",
           "settings": {
@@ -197,7 +191,6 @@
         "true_fit_widget_8cjNbr",
         "buy_buttons",
         "complementary",
-        "klaviyo_email_marketing_sms_form_embed_block_qDg68M",
         "icon_list_VBaw6z",
         "text-1",
         "text-3",
@@ -546,6 +539,132 @@
         "rounded": true
       }
     },
+    "faq_QUnjDd": {
+      "type": "faq",
+      "blocks": {
+        "question_CpncM6": {
+          "type": "question",
+          "settings": {
+            "title": "Frequently asked question",
+            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_r86NDb": {
+          "type": "question",
+          "settings": {
+            "title": "Frequently asked question",
+            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_7mUcMH": {
+          "type": "question",
+          "settings": {
+            "title": "Frequently asked question",
+            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "question_CpncM6",
+        "question_r86NDb",
+        "question_7mUcMH"
+      ],
+      "name": "t:sections.faq.name",
+      "settings": {
+        "style": "with-border",
+        "heading": "FAQs",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "#fafafa",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#ffffff",
+        "overlay_opacity": 4,
+        "padding_top": 0,
+        "padding_bottom": 20,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "image_comparison_kctafY": {
+      "type": "image-comparison",
+      "blocks": {
+        "image_pgFQFn": {
+          "type": "image",
+          "settings": {
+            "subheading": "",
+            "heading": "",
+            "content_position": "end",
+            "color_text": "#ffffff"
+          }
+        },
+        "image_8WiW97": {
+          "type": "image",
+          "settings": {
+            "subheading": "",
+            "heading": "",
+            "content_position": "end",
+            "color_text": "#ffffff"
+          }
+        }
+      },
+      "block_order": [
+        "image_pgFQFn",
+        "image_8WiW97"
+      ],
+      "name": "t:sections.image-comparison.name",
+      "settings": {
+        "layout": "horizontal",
+        "image_height": "adapt",
+        "image_height_mobile": "adapt",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "#fafafa",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
     "multicolumn_KyfUdW": {
       "type": "multicolumn",
       "blocks": {
@@ -574,6 +693,7 @@
       "block_order": [
         "column_4ReHNr"
       ],
+      "disabled": true,
       "name": "Multicolumn",
       "settings": {
         "gap": "large",
@@ -979,6 +1099,8 @@
     "scrolling_text_4DH9VU",
     "help-drawer",
     "product-details",
+    "faq_QUnjDd",
+    "image_comparison_kctafY",
     "multicolumn_KyfUdW",
     "multicolumn_CEQ6Uh",
     "video_with_text_xf4VTt",
