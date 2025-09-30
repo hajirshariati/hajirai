@@ -52,10 +52,13 @@
                   <a href="{{ policy.url }}" class="block reversed-link">{{ policy.title }}</a>
                 </small>
               </li>
+
+<li>{% render 'country-selector' %}</li>
+
             {%- endif -%}
           {%- endfor -%}
         </ul>
-      {%- endif -%}{% render 'country-selector' %}
+      {%- endif -%}
     </div>
 
     {%- liquid
