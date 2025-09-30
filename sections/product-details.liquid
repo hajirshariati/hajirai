@@ -115,76 +115,55 @@
                 {%- endif -%}
   
               {%- when 'collapsible_tab' -%}
-                {%- capture collapsible_content -%}
-                  {%- liquid
+                 {%- capture collapsible_content -%}
+  {%- liquid
     if block.settings.content != blank
-      # Check if content has h6 tags by converting to string for checking only
-      assign content_string = block.settings.content | strip
-  
-                      if metafield_content contains '<h6>'
-                        if metafield_content contains 'class="metafield-single_line_text_field-array'
-                          assign metafield_content = metafield_content | replace: 'class="metafield-single_line_text_field-array', 'class="metafield-single_line_text_field-array col-span-full'
-                        elsif metafield_content contains 'class="metafield-rich_text_field'
-                          assign metafield_content = metafield_content | replace: 'class="metafield-rich_text_field', 'class="metafield-rich_text_field col-span-full'
-                        elsif metafield_content contains 'class='
-                          assign metafield_content = metafield_content | replace: 'class="', 'class="col-span-full '
-                        else
-                          assign metafield_content = '<div class="col-span-full">' | append: metafield_content | append: '</div>'
-                        endif
-                        
-                        assign metafield_content = metafield_content | replace_first: '<h6>', '<div class="grid grid-cols-12 gap-6 md:gap-10"><h6>'
-                        assign metafield_content = metafield_content | replace: '<h6>', '</div><div class="col-span-full md:col-span-6"><h6 class="leading-none tracking-none">'
-                        assign metafield_content = metafield_content | remove_first: '</div>'
-                        assign metafield_content = metafield_content | append: '</div></div>'
-                      else
-                        assign metafield_content = '<div class="col-span-full">' | append: metafield_content | append: '</div>'
-                      endif
-  
-                      echo metafield_content
-                    endif
-                  -%}
-  
-                  {%- if block.settings.metafields != blank -%}
-                    {%- assign metafields = block.settings.metafields | newline_to_br | split: '<br />' -%}
-                    {%- for line in metafields -%}
-                      {%- liquid
-                        assign metafield_parts = line | strip | split: '.'
-                        assign metafield_namespace = metafield_parts | first
-                        assign metafield_key = metafield_parts | last
-                        assign metafield_name = metafield_key | replace: '_', ' ' | capitalize
-  
-                        if metafield_namespace contains ':'
-                          assign parts = metafield_namespace | split: ':'
-                          assign metafield_namespace = parts | last
-                          assign metafield_name = parts | first
-                        endif
-  
-                        assign metafield = product.metafields[metafield_namespace][metafield_key]
-                      -%}
-  
-                      {%- if metafield.value != blank -%}
-                        <div class="col-span-full md:col-span-6">
-                          <h6 class="leading-none tracking-none">{{ metafield_name | escape }}</h6>
-                          {%- if metafield.list? -%}
-                            <p>
-                              {%- liquid
-                                for value in metafield.value
-                                  echo value
-                                  unless forloop.last
-                                    echo '<br />'
-                                  endunless
-                                endfor
-                              -%}
-                            </p>
-                          {%- else -%}
-                            {{- metafield | metafield_tag -}}
-                          {%- endif -%}
-                        </div>
-                      {%- endif -%}
-                    {%- endfor -%}
-                  {%- endif -%}
-                {%- endcapture -%}
+      echo '<div class="col-span-full">'
+      echo block.settings.content
+      echo '</div>'
+    endif
+  -%}
 
+  {%- if block.settings.metafields != blank -%}
+    {%- assign metafields = block.settings.metafields | newline_to_br | split: '<br />' -%}
+    {%- for line in metafields -%}
+      {%- liquid
+        assign metafield_parts = line | strip | split: '.'
+        assign metafield_namespace = metafield_parts | first
+        assign metafield_key = metafield_parts | last
+        assign metafield_name = metafield_key | replace: '_', ' ' | capitalize
+
+        if metafield_namespace contains ':'
+          assign parts = metafield_namespace | split: ':'
+          assign metafield_namespace = parts | last
+          assign metafield_name = parts | first
+        endif
+
+        assign metafield = product.metafields[metafield_namespace][metafield_key]
+      -%}
+
+      {%- if metafield.value != blank -%}
+        <div class="col-span-full md:col-span-6">
+          <h6 class="leading-none tracking-none">{{ metafield_name | escape }}</h6>
+          {%- if metafield.list? -%}
+            <p>
+              {%- liquid
+                for value in metafield.value
+                  echo value
+                  unless forloop.last
+                    echo '<br />'
+                  endunless
+                endfor
+              -%}
+            </p>
+          {%- else -%}
+            {{- metafield | metafield_tag -}}
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+{%- endcapture -%}
 
 
 
