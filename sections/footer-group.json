@@ -274,7 +274,7 @@
         "show_menu": true,
         "footer_menu": "footer-notice",
         "show_policy": false,
-        "show_payment_icons": false,
+        "show_payment_icons": true,
         "monochrome_payment_icons": false,
         "show_copyright": true,
         "copyright_text": "",
