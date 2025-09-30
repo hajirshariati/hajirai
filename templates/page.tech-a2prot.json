@@ -109,6 +109,60 @@
         "rounded": false
       }
     },
+    "rich_text_Yrepqy": {
+      "type": "rich-text",
+      "blocks": {
+        "text_hGAWyi": {
+          "type": "text",
+          "settings": {
+            "text": "<p>What Retailers are Saying</p>",
+            "text_font": "subtitle",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 35,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_hGAWyi"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "rgba(0,0,0,0)",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
     "rich_text_eMGQNq": {
       "type": "rich-text",
       "blocks": {
@@ -125,7 +179,7 @@
         "text_3RWLBR": {
           "type": "text",
           "settings": {
-            "text": "<p>Our Explore page is your guide to foot health and the best Aetrex orthotics and shoes for your needs. Learn about conditions like plantar fasciitis, bunions, and flat feet. See how work and daily activities affect your feet, and discover curated product recommendations built for comfort, support, and lasting relief.</p>",
+            "text": "<p>“We can’t imagine our stores without the Albert Pro. We take great pride in creating a memorable, individualized experience for our guests. Aetrex’s Albert 3D foot scanner allows us to take our service to a completely different level. People are immediately impressed with the speed of the scan, the accuracy of the scanning results, and the next-step options provided by the technology. Albert's features complement our hands-on approach and enhance our staff’s ability to find customers ideal footwear solutions. By utilizing this state-of-the-art scanning technology, we continue to see shoppers making purchases with elevated confidence, revisiting our stores with increased frequency, and becoming Tradehome Shoes ambassadors amongst their friends and families.”<br/><br/>Justin Kehrwald, Tradehome<br/>President & CEO<br/><br/><br/><br/><br/><br/>“The personalized 3D foot data we are able to collect from the Albert scanner is a gamechanger. It allows us to offer an even greater solution of safety to our account customers in the industrial workforce. By expanding foot safety to full body wellness, individual workers experience improved on-the-job performance, greater productivity, less pain and less fatigue. With these benefits we exponentially lower our account’s risk and liability while opening the door to also contribute to their full corporate employee wellness program.”<br/><br/>Jeff Stern<br/>Senior Vice President, Brand GM at Rocky Brands, Inc., Lehigh Outfitters, LLC<br/><br/><br/><br/><br/><br/>“Aetrex Technology has given our customers a truly unique experience they previously could not receive in a typical running store. Having an Aetrex scanner in our store gives us the ability to capture accurate 3D measurements of the customer’s feet and provide a completely customized experience. The technology helps us determine the right fitting footwear and orthotics for them on the first try. Runners come to us looking for ways to increase their performance in their shoes- whether that’s by increasing their support, relieving their foot pain, or helping to prevent injuries. Having an Aetrex foot scanner in our store gives us the opportunity to help address the customer’s individual needs, and elevates the shopping experience.”<br/><br/>Zach Shanle<br/>Peak Performance Footwear<br/><br/><br/><br/><br/><br/>“Albert is an excellent tool to increase conversions in our stores. Its scanning speed, advanced technology and dynamic look makes a strong impression with our customers. After getting a 3D foot scan, our shoppers convert easily, with most buying multiple products at a time. Aetrex Technology not only helps drive sales, it gives our customers extra confidence knowing the products they are buying are great for their unique feet.”<br/><br/>Hussam Irshad<br/>Brand Distribution Manager<br/>Andy Enterprises L.L.C.<br/>Dubai, U.A.E.<br/><br/><br/><br/><br/><br/>“We have people driving 30+ minutes to get their feet scanned with our Aetrex Albert scanner and get fitted with Aetrex Orthotics. The technology really helps with conversion. Once you get a customer on the scanner and you put an Aetrex Orthotic in one of their shoes- BOOM, the orthotics sell themselves!”<br/><br/>Ronnie Coleman<br/>Coleman Shoes, Princeton, KY<br/><br/><br/><br/><br/><br/>“The Albert takes the 3D foot scan process to the next level by offering a quick, comprehensive scan process and an engaging presentation for the customer. The ability to offer a dynamic scan in addition to the static scan gives each salesperson the flexibility to create the right experience in the moment for each customer. The technology is extremely beneficial to our team.”<br/><br/>Dave Casamassa<br/>Director Of Operations<br/>The Sole Provisions Family of Stores<br/><br/><br/><br/><br/><br/>“Aetrex Technology provides our customers with scientific data that really helps increase their faith in the products we recommend for them based on their specific needs. We’ve noticed when a shopper’s confidence increases, the person buys more. And, we've seen a significant increase in sales after someone gets their feet scanned.”<br/><br/>Gian Romero, Owner<br/>Wild Runners: Fair Oaks, CA<br/><br/><br/><br/><br/><br/>“The Albert Pro Scanner has been a game changer! It has given our staff the ability to show the customers what their feet are doing and visually show them why they need a particular shoe and orthotic. This is no longer a sales pitch, but a series of pictures worth 1,000 words!”<br/><br/>Rick Dodgen<br/>Director of Stores, Sun & Ski Sports<br/><br/><br/><br/><br/><br/>“Albert allows our team to enhance our customers’ fit experience through data analysis. It’s quick and concise and gives the customer direct feedback and we call this ‘The Wow Factor.’”<br/><br/>Karen Roberts<br/>Owner, Get Fit<br/>Amarillo, TX<br/><br/><br/><br/><br/><br/>“Albert is the important initial step in our fitting process. The scan process is really efficient and effective, and the system has an engaging screen layout that the customers really like. By offering both a static and dynamic scan option, customers are really engaged in the process.”<br/><br/>Bill Bulloch<br/>GM, Rock City Running<br/>Little Rock, AR<br/><br/><br/><br/><br/><br/>“Albert has been an awesome upgrade to our scanning process. Aetrex took the crucial aspects of Albert 1, and built in a number of new features to take our fitting process to new heights. Customers consistently mention how amazed they are at all the information that Albert provides about their feet in such a short amount of time. Plus, the customer gets to take their scan home with them via email!”<br/><br/>Cory Eilers<br/>GM, Dallas Running Co<br/>Plano, Texas<br/><br/><br/><br/><br/><br/>“We have our Albert by the front door in our store, and we love it! Customers come in and ask about it. It’s really cool to have 3D scanning technology part of our fit process. We are able to scan customers and wow them and visually show them what their feet look like on screen and show them their measurements instantly. It helps us get them into the right shoes and orthotics. I would highly recommend this technology. It’s a 10 out of 10!!”<br/><br/>Dane Simmons<br/>Owner<br/>Run In<br/>Simpsonville, SC<br/><br/><br/><br/><br/><br/>“Our boot rooms are going to be a centerpiece to our business. We do a lot of vouchers for work boots, and we’re really excited because Albert is going to help us reduce our return rates.”<br/><br/>Danny<br/>Rugged Trade, New Mexico<br/><br/><br/><br/><br/><br/>“Aetrex Technology has one of the most effective and educational customer service teams I have ever worked with. They told me more about my feet in 5 minutes than anyone ever.”<br/><br/>Lexi<br/>Rugged Trade, New Mexico<br/><br/><br/><br/><br/><br/>“Aetrex scanning technology is an amazing retail tool. It helps educate and motivate our customers to purchase more shoes and insoles.”<br/><br/>Elin<br/>Stadium Örebro City, Sweden</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -144,8 +198,8 @@
       ],
       "name": "t:sections.rich-text.name",
       "settings": {
-        "text_alignment": "left",
-        "text_alignment_mobile": "left",
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
         "heading": "",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
@@ -167,469 +221,10 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 100,
+        "padding_top": 0,
+        "padding_bottom": 0,
         "divider": false,
         "narrow": true,
-        "rounded": false
-      }
-    },
-    "lookbook_XrVA6j": {
-      "type": "lookbook",
-      "blocks": {
-        "content_eM9a73": {
-          "type": "content",
-          "settings": {
-            "icon": "none",
-            "iwidth": "custom",
-            "icon_width": 24,
-            "heading": "Arch Pain/Plantar Fasciitis",
-            "text": "<p>Pain in your arch or heel when you first step out of bed? Does it ease as you move through the day?</p>",
-            "link": "shopify://blogs/aetrex-blog",
-            "color_text": "#ffffff",
-            "vertical": 29,
-            "horizontal": 43,
-            "vertical_mobile": 50,
-            "horizontal_mobile": 50
-          }
-        },
-        "content_89mXEz": {
-          "type": "content",
-          "settings": {
-            "icon": "none",
-            "iwidth": "custom",
-            "icon_width": 24,
-            "heading": "HEEL SPURS/ HEEL PAIN",
-            "text": "<p>Stabbing heel pain with your first steps in the morning? Does it return after long periods of standing?</p>",
-            "link": "shopify://products/ar900110",
-            "color_text": "#ffffff",
-            "vertical": 12,
-            "horizontal": 46,
-            "vertical_mobile": 50,
-            "horizontal_mobile": 50
-          }
-        },
-        "content_rRPgF4": {
-          "type": "content",
-          "settings": {
-            "icon": "none",
-            "iwidth": "custom",
-            "icon_width": 24,
-            "heading": "BUNIONS",
-            "text": "<p>Notice a bump forming at the base of your big toe? Redness, swelling, or discomfort when wearing shoes?</p>",
-            "link": "shopify://products/a001538",
-            "color_text": "#ffffff",
-            "vertical": 50,
-            "horizontal": 44,
-            "vertical_mobile": 50,
-            "horizontal_mobile": 50
-          }
-        },
-        "content_kkztd7": {
-          "type": "content",
-          "settings": {
-            "icon": "none",
-            "iwidth": "custom",
-            "icon_width": 24,
-            "heading": "Metatarsalgia",
-            "text": "<p>Sharp or burning pain in the ball of your foot? Does it worsen when standing, walking, or running?</p>",
-            "link": "",
-            "color_text": "#ffffff",
-            "vertical": 76,
-            "horizontal": 47,
-            "vertical_mobile": 50,
-            "horizontal_mobile": 50
-          }
-        },
-        "content_RtGz7V": {
-          "type": "content",
-          "settings": {
-            "icon": "none",
-            "iwidth": "custom",
-            "icon_width": 24,
-            "heading": "Overpronation",
-            "text": "<p>Do your feet roll inward when you walk? Experiencing arch pain, ankle discomfort, or knee strain?</p>",
-            "link": "",
-            "color_text": "#ffffff",
-            "vertical": 50,
-            "horizontal": 72,
-            "vertical_mobile": 50,
-            "horizontal_mobile": 50
-          }
-        },
-        "content_bXtYAa": {
-          "type": "content",
-          "settings": {
-            "icon": "none",
-            "iwidth": "custom",
-            "icon_width": 24,
-            "heading": "Morton's Neuroma",
-            "text": "<p>Tingling, burning, or numbness between your toes? Feel like you’re stepping on a pebble?</p>",
-            "link": "",
-            "color_text": "#ffffff",
-            "vertical": 92,
-            "horizontal": 53,
-            "vertical_mobile": 50,
-            "horizontal_mobile": 50
-          }
-        }
-      },
-      "block_order": [
-        "content_eM9a73",
-        "content_89mXEz",
-        "content_rRPgF4",
-        "content_kkztd7",
-        "content_RtGz7V",
-        "content_bXtYAa"
-      ],
-      "name": "t:sections.lookbook.name",
-      "settings": {
-        "image": "shopify://shop_images/female-feet-front-view-white-background-image-walking-68467642.webp",
-        "heading": "Foot Pain Identifier",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "heading_position": "none",
-        "subheading": "",
-        "description": "<p>Explore common foot conditions, their causes and symptoms, and see Aetrex orthotics and shoes recommended to relieve your pain.</p>",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "overlay_opacity": 30,
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": true,
-        "rounded": false
-      }
-    },
-    "collection_list_LWrAVe": {
-      "type": "collection-list",
-      "blocks": {
-        "collection_zcc67F": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "",
-            "custom_url": "",
-            "title": "Walking",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_6MTJMp": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "",
-            "custom_url": "",
-            "title": "Running",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_THUfra": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "",
-            "custom_url": "",
-            "title": "Light Exercise",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_PLzb6c": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "",
-            "custom_url": "",
-            "title": "Everyday Comfort",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_NfjzWW": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "",
-            "custom_url": "",
-            "title": "Travel",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        }
-      },
-      "block_order": [
-        "collection_zcc67F",
-        "collection_6MTJMp",
-        "collection_THUfra",
-        "collection_PLzb6c",
-        "collection_NfjzWW"
-      ],
-      "name": "t:sections.collection-list.name",
-      "settings": {
-        "columns": 4,
-        "carousel_on_desktop": true,
-        "image_type": "collection",
-        "image_ratio": "square",
-        "show_products_count": true,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "Aetrex for Your Activities",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "<p>Whether walking, traveling, or exercising, Aetrex orthotics and comfort shoes deliver the right support to keep you moving in comfort.</p>",
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false
-      }
-    },
-    "logo_list_wddRgK": {
-      "type": "logo-list",
-      "blocks": {
-        "logo_hmLhKB": {
-          "type": "logo",
-          "settings": {
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_cbHeRr": {
-          "type": "logo",
-          "settings": {
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_Hk7FDL": {
-          "type": "logo",
-          "settings": {
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_PqkqeN": {
-          "type": "logo",
-          "settings": {
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_7TEXfP": {
-          "type": "logo",
-          "settings": {
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_gizUbH": {
-          "type": "logo",
-          "settings": {
-            "height": 80,
-            "link": ""
-          }
-        }
-      },
-      "block_order": [
-        "logo_hmLhKB",
-        "logo_cbHeRr",
-        "logo_Hk7FDL",
-        "logo_PqkqeN",
-        "logo_7TEXfP",
-        "logo_gizUbH"
-      ],
-      "name": "t:sections.logo-list.name",
-      "settings": {
-        "layout": "default",
-        "grid_horizontal": 70,
-        "direction": "left",
-        "speed": 5,
-        "heading": "AS SEEN ON",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false
-      }
-    },
-    "collection_list_LhqV7k": {
-      "type": "collection-list",
-      "blocks": {
-        "collection_tCf8gT": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "",
-            "custom_url": "",
-            "title": "Healthcare",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_qLLxKt": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "",
-            "custom_url": "",
-            "title": "Teachers",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_YVWzgP": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "",
-            "custom_url": "",
-            "title": "Retail & Hospitality",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_qEYzyQ": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "",
-            "custom_url": "",
-            "title": "Business",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        }
-      },
-      "block_order": [
-        "collection_tCf8gT",
-        "collection_qLLxKt",
-        "collection_YVWzgP",
-        "collection_qEYzyQ"
-      ],
-      "name": "t:sections.collection-list.name",
-      "settings": {
-        "columns": 4,
-        "carousel_on_desktop": true,
-        "image_type": "collection",
-        "image_ratio": "square",
-        "show_products_count": true,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "Aetrex by Career",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "<p>On your feet all day? Discover Aetrex shoes and orthotics designed for professionals like nurses, teachers, retail workers, and chefs—built for comfort, support, and pain relief during long hours.</p>",
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
         "rounded": false
       }
     },
@@ -744,27 +339,27 @@
         "gradient_background": ""
       }
     },
-    "images_with_text_overlay_DmtwTd": {
-      "type": "images-with-text-overlay",
+    "empty_space_7EAfGU": {
+      "type": "empty-space",
+      "name": "t:sections.empty-space.name",
+      "settings": {
+        "desktop_height": 40,
+        "mobile_height": 28,
+        "color_background": "",
+        "gradient_background": ""
+      }
+    },
+    "rich_text_QDpDaE": {
+      "type": "rich-text",
       "blocks": {
-        "heading_KTgKmn": {
-          "type": "heading",
-          "settings": {
-            "heading": "<p>Why Aetrex</p>",
-            "heading_size": "title-lg tracking-heading",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_LRT9Gw": {
+        "text_ck8HNj": {
           "type": "text",
           "settings": {
-            "text": "<p>Aetrex scanners capture over a million foot data points to uncover what causes your pain. Using this precise insight, we design orthotics and comfort shoes that deliver targeted relief—extra cushioning where you need it, enhanced arch support, and improved heel alignment.</p>",
+            "text": "<p><strong>Albert PRO</strong></p>",
             "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
+            "text_size": "subtext-custom",
+            "text_max_size": 24,
+            "text_line_height": 1.2,
             "text_letter_spacing": 0,
             "text_capitalize": false,
             "secondary_color": false,
@@ -772,169 +367,71 @@
             "highlighted_scribble": "circle"
           }
         },
-        "button_DGeqRN": {
+        "text_MWGCQR": {
+          "type": "text",
+          "settings": {
+            "text": "<p>3D Measurements<br/>Pressure Data<br/>AI Footwear & Orthotic<br/>Recommendations</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 24,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "icon_PPa7zD": {
+          "type": "icon",
+          "settings": {
+            "icon": "tag",
+            "icon_image": "shopify://shop_images/albert2pro_clear_edd18252-9ebc-468b-91dd-a738b26dde45.png",
+            "iwidth": "custom",
+            "icon_width": 198,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "button_fx3fWt": {
           "type": "button",
           "settings": {
-            "button_label": "Learn More",
-            "button_link": "",
-            "button_video_link": "",
+            "button_label": "LEARN MORE",
+            "button_link": "https://shop.aetrex.com/pages/tech-albert-2-pro-scanner",
             "button_style": "primary",
             "button_size": "md",
             "button_external": false,
-            "button_icon": true
+            "button_icon": false
+          }
+        },
+        "button_cUMKKi": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP NOW",
+            "button_link": "https://aetrexb2b.com/",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
           }
         }
       },
       "block_order": [
-        "heading_KTgKmn",
-        "text_LRT9Gw",
-        "button_DGeqRN"
+        "text_ck8HNj",
+        "text_MWGCQR",
+        "icon_PPa7zD",
+        "button_fx3fWt",
+        "button_cUMKKi"
       ],
-      "name": "t:sections.images-with-text-overlay.name",
+      "name": "t:sections.rich-text.name",
       "settings": {
-        "transparent_header": false,
-        "image_height": "650px",
-        "content_width": "small",
-        "content_position": "md:items-end md:justify-start",
-        "text_alignment": "left",
-        "image_height_mobile": "auto",
-        "content_position_mobile": "items-end justify-start",
-        "text_alignment_mobile": "left",
-        "color_text": "#ffffff",
-        "color_highlight": "#e0a580",
-        "gradient_highlight": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
-        "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "divider_color": "#111111",
-        "overlay_opacity": 100,
-        "padding_top": 0,
-        "padding_bottom": 0,
-        "divider": false,
-        "full_width": true,
-        "rounded": false,
-        "enable_parallax": true
-      }
-    },
-    "testimonials_McVqED": {
-      "type": "testimonials",
-      "blocks": {
-        "testimonial_bMYXKi": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "testimonial_MYf74W": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "testimonial_VRFqVT": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "testimonial_bMYXKi",
-        "testimonial_MYf74W",
-        "testimonial_VRFqVT"
-      ],
-      "name": "t:sections.testimonials.name",
-      "settings": {
-        "heading": "Loved by Customers Since 1948",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "<p>10,000+ Reviews</p>",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "rounded": false
-      }
-    },
-    "faq_f3crHM": {
-      "type": "faq",
-      "blocks": {
-        "question_epkXHM": {
-          "type": "question",
-          "settings": {
-            "title": "Frequently asked question",
-            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "question_bVLHeh": {
-          "type": "question",
-          "settings": {
-            "title": "Frequently asked question",
-            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "question_JE4DWV": {
-          "type": "question",
-          "settings": {
-            "title": "Frequently asked question",
-            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "question_epkXHM",
-        "question_bVLHeh",
-        "question_JE4DWV"
-      ],
-      "name": "t:sections.faq.name",
-      "settings": {
-        "style": "with-border",
-        "heading": "FAQs",
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
         "heading_tag": "h2",
         "subheading": "",
         "description": "",
@@ -945,259 +442,28 @@
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "",
-        "color_background": "",
+        "color_background": "#e3e8ec",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "color_overlay": "#ffffff",
-        "overlay_opacity": 4,
-        "padding_top": 72,
-        "padding_bottom": 72,
+        "padding_top": 0,
+        "padding_bottom": 0,
         "divider": false,
         "narrow": true,
         "rounded": false
       }
     },
-    "shop_the_feed_R7FhLb": {
-      "type": "shop-the-feed",
-      "blocks": {
-        "feed_zitphR": {
-          "type": "feed",
-          "settings": {
-            "image": "shopify://shop_images/Carly_keelygoshia_2_POSTED.jpg",
-            "enable_video_autoplay": true,
-            "enable_video_looping": true,
-            "video_on_hover": true,
-            "button_label": "",
-            "button_link": "",
-            "button_external": false,
-            "button_icon": false,
-            "account_name": "@Concept",
-            "account_description": "We cultivate sonic excellence",
-            "account_button": "Follow",
-            "account_link": "",
-            "account_link_external": false,
-            "color_text": "#ffffff",
-            "color_button_text": "#000000",
-            "color_button_background": "#ffffff",
-            "color_button_gradient": "",
-            "hotspot_color_text_1": "#ffffff",
-            "hotspot_vertical_1": 45,
-            "hotspot_horizontal_1": 25,
-            "hotspot_product_1": "",
-            "hotspot_color_text_2": "#ffffff",
-            "hotspot_vertical_2": 30,
-            "hotspot_horizontal_2": 65,
-            "hotspot_product_2": "",
-            "hotspot_color_text_3": "#ffffff",
-            "hotspot_vertical_3": 60,
-            "hotspot_horizontal_3": 75,
-            "hotspot_product_3": "",
-            "hotspot_color_text_4": "#ffffff",
-            "hotspot_vertical_4": 50,
-            "hotspot_horizontal_4": 50,
-            "hotspot_product_4": ""
-          }
-        },
-        "feed_h6CcCW": {
-          "type": "feed",
-          "settings": {
-            "image": "shopify://shop_images/INF_4.jpg",
-            "enable_video_autoplay": true,
-            "enable_video_looping": true,
-            "video_on_hover": true,
-            "button_label": "",
-            "button_link": "",
-            "button_external": false,
-            "button_icon": false,
-            "account_name": "@Concept",
-            "account_description": "We cultivate sonic excellence",
-            "account_button": "Follow",
-            "account_link": "",
-            "account_link_external": false,
-            "color_text": "#ffffff",
-            "color_button_text": "#000000",
-            "color_button_background": "#ffffff",
-            "color_button_gradient": "",
-            "hotspot_color_text_1": "#ffffff",
-            "hotspot_vertical_1": 45,
-            "hotspot_horizontal_1": 25,
-            "hotspot_product_1": "",
-            "hotspot_color_text_2": "#ffffff",
-            "hotspot_vertical_2": 30,
-            "hotspot_horizontal_2": 65,
-            "hotspot_product_2": "",
-            "hotspot_color_text_3": "#ffffff",
-            "hotspot_vertical_3": 60,
-            "hotspot_horizontal_3": 75,
-            "hotspot_product_3": "",
-            "hotspot_color_text_4": "#ffffff",
-            "hotspot_vertical_4": 50,
-            "hotspot_horizontal_4": 50,
-            "hotspot_product_4": ""
-          }
-        },
-        "feed_EzVDDq": {
-          "type": "feed",
-          "settings": {
-            "image": "shopify://shop_images/Screenshot_2025-05-13_at_12.00.49_PM.png",
-            "enable_video_autoplay": true,
-            "enable_video_looping": true,
-            "video_on_hover": true,
-            "button_label": "",
-            "button_link": "",
-            "button_external": false,
-            "button_icon": false,
-            "account_name": "@Concept",
-            "account_description": "We cultivate sonic excellence",
-            "account_button": "Follow",
-            "account_link": "",
-            "account_link_external": false,
-            "color_text": "#ffffff",
-            "color_button_text": "#000000",
-            "color_button_background": "#ffffff",
-            "color_button_gradient": "",
-            "hotspot_color_text_1": "#ffffff",
-            "hotspot_vertical_1": 45,
-            "hotspot_horizontal_1": 25,
-            "hotspot_product_1": "",
-            "hotspot_color_text_2": "#ffffff",
-            "hotspot_vertical_2": 30,
-            "hotspot_horizontal_2": 65,
-            "hotspot_product_2": "",
-            "hotspot_color_text_3": "#ffffff",
-            "hotspot_vertical_3": 60,
-            "hotspot_horizontal_3": 75,
-            "hotspot_product_3": "",
-            "hotspot_color_text_4": "#ffffff",
-            "hotspot_vertical_4": 50,
-            "hotspot_horizontal_4": 50,
-            "hotspot_product_4": ""
-          }
-        },
-        "feed_jdbTzL": {
-          "type": "feed",
-          "settings": {
-            "image": "shopify://shop_images/Screenshot_2025-05-13_at_12.01.13_PM.png",
-            "enable_video_autoplay": true,
-            "enable_video_looping": true,
-            "video_on_hover": true,
-            "button_label": "",
-            "button_link": "",
-            "button_external": false,
-            "button_icon": false,
-            "account_name": "@Concept",
-            "account_description": "We cultivate sonic excellence",
-            "account_button": "Follow",
-            "account_link": "",
-            "account_link_external": false,
-            "color_text": "#ffffff",
-            "color_button_text": "#000000",
-            "color_button_background": "#ffffff",
-            "color_button_gradient": "",
-            "hotspot_color_text_1": "#ffffff",
-            "hotspot_vertical_1": 45,
-            "hotspot_horizontal_1": 25,
-            "hotspot_product_1": "",
-            "hotspot_color_text_2": "#ffffff",
-            "hotspot_vertical_2": 30,
-            "hotspot_horizontal_2": 65,
-            "hotspot_product_2": "",
-            "hotspot_color_text_3": "#ffffff",
-            "hotspot_vertical_3": 60,
-            "hotspot_horizontal_3": 75,
-            "hotspot_product_3": "",
-            "hotspot_color_text_4": "#ffffff",
-            "hotspot_vertical_4": 50,
-            "hotspot_horizontal_4": 50,
-            "hotspot_product_4": ""
-          }
-        }
-      },
-      "block_order": [
-        "feed_zitphR",
-        "feed_h6CcCW",
-        "feed_EzVDDq",
-        "feed_jdbTzL"
-      ],
-      "name": "t:sections.shop-the-feed.name",
+    "empty_space_AfK44q": {
+      "type": "empty-space",
+      "name": "t:sections.empty-space.name",
       "settings": {
-        "columns": 5,
-        "carousel_on_desktop": true,
-        "image_ratio": "portrait",
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "account_name": "@aetrexworldwide",
-        "show_vendor": false,
-        "show_price": false,
-        "heading": "Shop the Feed",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "<p>Discover premium audio from our Instagram and shop now.</p>",
-        "button_label": "Follow",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": false,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
+        "desktop_height": 40,
+        "mobile_height": 28,
         "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 80,
-        "padding_bottom": 100,
-        "divider": false,
-        "full_width": false,
-        "rounded": false
-      }
-    },
-    "blog_posts_JnT6A7": {
-      "type": "blog-posts",
-      "name": "t:sections.blog-posts.name",
-      "settings": {
-        "blog": "aetrex-blog",
-        "post_limit": 6,
-        "columns": 5,
-        "carousel_on_desktop": true,
-        "show_view_all": true,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "image_ratio": "landscape",
-        "show_tags": true,
-        "show_date": true,
-        "show_comments": false,
-        "show_author": false,
-        "show_excerpt": true,
-        "heading": "Blog posts",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false
+        "gradient_background": ""
       }
     }
   },
@@ -1205,17 +471,12 @@
     "main-page",
     "image_with_text_overlay_yhmykR",
     "rich_text_Mz94Fp",
+    "rich_text_Yrepqy",
     "rich_text_eMGQNq",
-    "lookbook_XrVA6j",
-    "collection_list_LWrAVe",
-    "logo_list_wddRgK",
-    "collection_list_LhqV7k",
     "17586443670450d0fd",
     "empty_space_WrHUjC",
-    "images_with_text_overlay_DmtwTd",
-    "testimonials_McVqED",
-    "faq_f3crHM",
-    "shop_the_feed_R7FhLb",
-    "blog_posts_JnT6A7"
+    "empty_space_7EAfGU",
+    "rich_text_QDpDaE",
+    "empty_space_AfK44q"
   ]
 }
