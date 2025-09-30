@@ -199,6 +199,9 @@
         "aetrex_fitai_pdp_size_recommendation_gUEcCb",
         "sticky_buy_button"
       ],
+      "custom_css": [
+        ".product-card__title,.horizontal-product__title {text-transform: capitalize;}"
+      ],
       "settings": {
         "enable_sticky_info": true,
         "media_size": 65,
