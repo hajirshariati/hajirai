@@ -202,7 +202,7 @@
         <ul class="payment-icons{% if section.settings.monochrome_payment_icons %} payment-icons--gray{% endif %} flex flex-wrap justify-center gap-2 xl:gap-3">
           {%- for type in shop.enabled_payment_types -%}
             <li>
-              <div style="position: absolute; justify-self: anchor-center;">{% render 'country-selector' %}</div>
+              <div ">{% render 'country-selector' %}</div>
             </li>
           {%- endfor -%}
         </ul>
