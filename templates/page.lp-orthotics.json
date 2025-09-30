@@ -833,9 +833,9 @@
       "settings": {
         "style": "with-border",
         "heading": "<strong>Have Questions? We’ve Got Answers.</strong>",
-        "heading_size": "title-md",
+        "heading_size": "title-sm",
         "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
+        "heading_tag": "h3",
         "subheading": "",
         "description": "",
         "button_label": "",
