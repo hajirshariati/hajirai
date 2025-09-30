@@ -1,0 +1,57 @@
+{{ 'country-selector.min.css' | asset_url | stylesheet_tag }}
+{% if localization.available_countries.size > 1 %}
+  <localization-form>
+    {% form 'localization' %}
+      <div class="country-selector disclosure">
+        <div class="country-selector_selected-country">
+          <p class="p-4 w-semibold">You're in:</p>
+          <button type="button" class="disclosure__button p-4 w-semibold" aria-expanded="false" aria-controls="CountryList">
+            {{ localization.country | image_url: width: 32 | image_tag }}
+            {{ localization.country.name }}
+          </button>
+        </div>
+        <div class="country-selector_modal color-black">
+          <div class="country-selector_modal--content">
+            <div class="country-selector_modal--close">
+              {% render 'icons', icon_name: 'close' %}
+            </div>
+
+            <img
+              src="https://cdn.shopify.com/s/files/1/0860/3634/9241/files/icon-world.png?v=1740428030"
+              width="50"
+              height="50"
+            >
+            <p class="h5 color-black text-center">Now Shipping Worldwide</p>
+            <div class="country-selector_modal--inputs">
+              <label for="countrySelect" class="p-4 uppercase">Change your shipping country</label>
+              <select id="countrySelect" name="countrySelect" class="p-2 disclosure__select">
+                <option value="" disabled selected>Change your shipping country</option>
+
+                {% for country in localization.available_countries %}
+                  <option
+                    class="p-2"
+                    value="{{ country.iso_code }}"
+                  >
+                    {{ localization.country | image_url: width: 32 | image_tag }}
+
+                    {{ country.name }} ({{ country.currency.iso_code }}
+                    {{ country.currency.symbol }})
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+            <button type="button" id="country-selector__save-btn" class="btn btn--primary">Save</button>           
+          </div>
+        </div>
+        <input type="hidden" name="country_code" id="selected-country-code" value="{{ localization.country.iso_code }}">
+      </div>
+    {% endform %}
+  </localization-form>
+  <script src="{{ 'country-selector.min.js' | asset_url }}" defer="defer"></script>
+{% endif %}
+
+{% comment %}
+  FLAGS
+
+  {{ localization.country | image_url: width: 32 | image_tag }}
+{% endcomment %}
