@@ -663,7 +663,7 @@
         "columns_mobile": "1",
         "swipe_on_mobile": true,
         "heading": "<strong>Tailored to Your </strong><em><strong>Needs</strong></em><strong>.</strong>",
-        "heading_size": "title-md",
+        "heading_size": "title-sm",
         "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
         "subheading": "",
@@ -681,7 +681,7 @@
         "padding_top": 72,
         "padding_bottom": 72,
         "divider": false,
-        "full_width": false,
+        "full_width": true,
         "rounded": false
       }
     },
