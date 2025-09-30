@@ -701,7 +701,7 @@
         "color_button_background": "",
         "color_button_gradient": "",
         "padding_top": 20,
-        "padding_bottom": 0,
+        "padding_bottom": 20,
         "divider": false,
         "full_width": false,
         "rounded": false
@@ -858,7 +858,7 @@
         "highlighted_text": "text",
         "highlighted_scribble": "circle",
         "color_text": "",
-        "color_background": "#ffffff",
+        "color_background": "#f4f4f4",
         "gradient_background": "",
         "color_highlight": "#ffffff",
         "gradient_highlight": "",
