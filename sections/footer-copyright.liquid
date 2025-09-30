@@ -197,6 +197,16 @@
       </div>
     {%- endif -%}
 
+
+
+
+    <ul style="flex flex-wrap justify-center gap-2 xl:gap-3">
+      <li>
+      {% render 'country-selector' %}
+    </li>
+
+    </ul>
+
     {%- if section.settings.show_payment_icons -%}
       {%- unless shop.enabled_payment_types == empty -%}
         <ul class="payment-icons{% if section.settings.monochrome_payment_icons %} payment-icons--gray{% endif %} flex flex-wrap justify-center gap-2 xl:gap-3">
