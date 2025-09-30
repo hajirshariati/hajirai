@@ -30,6 +30,19 @@
 
         -%}
       </small>
+      {%- if section.settings.show_menu -%}
+        {%- if linklists[section.settings.footer_menu] != blank -%}
+          <ul class="flex flex-wrap gap-3 justify-center lg:justify-start">
+            {%- for link in linklists[section.settings.footer_menu].links -%}
+              <li>
+                <small>
+                  <a href="{{ link.url }}" class="block reversed-link">{{ link.title }}</a>
+                </small>
+              </li>
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+      {%- endif -%}
       {%- if section.settings.show_policy -%}
         <ul class="flex flex-wrap gap-3 justify-center lg:justify-start">
           {%- for policy in shop.policies -%}
@@ -211,6 +224,22 @@
       "id": "enable_country_selector",
       "label": "t:sections.footer-copyright.settings.enable_country_selector.label",
       "default": true
+    },
+    {
+      "type": "header",
+      "content": "Footer menu"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_menu",
+      "label": "Show menu",
+      "default": false
+    },
+    {
+      "type": "link_list",
+      "id": "footer_menu",
+      "label": "Menu",
+      "info": "Select a menu to display in the footer"
     },
     {
       "type": "header",
