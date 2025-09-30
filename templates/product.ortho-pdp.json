@@ -652,6 +652,46 @@
         "rounded": false
       }
     },
+    "1759256882409468d7": {
+      "type": "_blocks",
+      "blocks": {
+        "ai_gen_block_f954ddc_UhgMqx": {
+          "type": "ai_gen_block_f954ddc",
+          "settings": {
+            "heading": "",
+            "subtitle": "",
+            "collection": "all-day-standing-orthotics",
+            "metafield_1_key": "",
+            "metafield_1_label": "Material",
+            "metafield_2_key": "",
+            "metafield_2_label": "Size",
+            "metafield_3_key": "",
+            "metafield_3_label": "Weight",
+            "metafield_4_key": "",
+            "metafield_4_label": "Warranty",
+            "metafield_5_key": "",
+            "metafield_5_label": "Features",
+            "background_color": "#ffffff",
+            "text_color": "#171717",
+            "heading_color": "#171717",
+            "accent_color": "#171717",
+            "price_color": "#e11d48",
+            "button_color": "#171717",
+            "button_text_color": "#ffffff",
+            "button_hover_color": "#000000",
+            "table_header_bg": "#ffffff",
+            "table_header_text": "#171717",
+            "heading_size": 32,
+            "text_size": 16
+          },
+          "blocks": {}
+        }
+      },
+      "block_order": [
+        "ai_gen_block_f954ddc_UhgMqx"
+      ],
+      "settings": {}
+    },
     "image_comparison_kctafY": {
       "type": "image-comparison",
       "blocks": {
@@ -1146,6 +1186,7 @@
     "help-drawer",
     "product-details",
     "faq_QUnjDd",
+    "1759256882409468d7",
     "image_comparison_kctafY",
     "multicolumn_KyfUdW",
     "multicolumn_CEQ6Uh",
