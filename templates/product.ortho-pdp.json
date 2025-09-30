@@ -545,7 +545,7 @@
         "question_CpncM6": {
           "type": "question",
           "settings": {
-            "title": "Frequently asked question",
+            "title": "Do Aetrex Orthotics fit inside all shoes?",
             "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -554,7 +554,7 @@
         "question_r86NDb": {
           "type": "question",
           "settings": {
-            "title": "Frequently asked question",
+            "title": "How do I know which size Aetrex Orthotics to buy?",
             "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -563,8 +563,46 @@
         "question_7mUcMH": {
           "type": "question",
           "settings": {
-            "title": "Frequently asked question",
+            "title": "Which foot conditions do they help with?",
             "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_AdA7hE": {
+          "type": "question",
+          "settings": {
+            "title": "What is the difference between 00, 05, 20, 25 series?",
+            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_yYkVYE": {
+          "type": "question",
+          "settings": {
+            "title": "How long do Aetrex Orthotics last?",
+            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_Ed9TJb": {
+          "type": "question",
+          "settings": {
+            "title": "Are they covered by HSA/FSA?",
+            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "contact_TJNCXj": {
+          "type": "contact",
+          "settings": {
+            "heading": "Didn’t find your answer?",
+            "text": "<p>Don't hestitate to contact us</p>",
+            "show_phone": false,
+            "avatar_height": 60,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -573,7 +611,11 @@
       "block_order": [
         "question_CpncM6",
         "question_r86NDb",
-        "question_7mUcMH"
+        "question_7mUcMH",
+        "question_AdA7hE",
+        "question_yYkVYE",
+        "question_Ed9TJb",
+        "contact_TJNCXj"
       ],
       "name": "t:sections.faq.name",
       "settings": {
