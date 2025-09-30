@@ -535,7 +535,7 @@
         "image_height": "adapt",
         "image_height_mobile": "auto",
         "heading": "<strong>See the Difference. Feel the Relief.</strong>",
-        "heading_size": "title-md",
+        "heading_size": "title-sm",
         "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
         "subheading": "Our orthotics don’t just cushion — they correct.",
