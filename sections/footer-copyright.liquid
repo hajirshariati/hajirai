@@ -198,13 +198,7 @@
     {%- endif -%}
 
     {%- if section.settings.show_payment_icons -%}
-      {%- unless shop.enabled_payment_types == empty -%}
-        <ul class="payment-icons{% if section.settings.monochrome_payment_icons %} payment-icons--gray{% endif %} flex flex-wrap justify-center gap-2 xl:gap-3">
-          {%- for type in shop.enabled_payment_types -%}
 {% render 'country-selector' %}
-          {%- endfor -%}
-        </ul>
-      {%- endunless -%}
     {%- endif -%}
   </div>
 
