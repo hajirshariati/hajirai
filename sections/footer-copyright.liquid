@@ -10,7 +10,7 @@
   justify-content: center;
 }
 </style>
-{% render 'country-selector' %}
+
 <div
   class="section{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded{% endif %}"
   {% if section.settings.enable_parallax %}
@@ -35,6 +35,9 @@
 
         -%}
       </small>
+
+{% render 'country-selector' %}
+
       {%- if section.settings.show_menu -%}
         {%- if linklists[section.settings.footer_menu] != blank -%}
           <ul class="flex flex-wrap gap-3 justify-center lg:justify-start">
