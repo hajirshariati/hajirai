@@ -24,28 +24,49 @@
         "rounded": false
       }
     },
-    "video_with_text_overlay_cfhWL7": {
-      "type": "video-with-text-overlay",
+    "image_with_text_overlay_yhmykR": {
+      "type": "image-with-text-overlay",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/banner_albert.jpg",
+        "image_height": "adapt",
+        "content_width": "small",
+        "content_position": "md:items-center md:justify-end",
+        "text_alignment": "center",
+        "image_mobile": "shopify://shop_images/banner_albert_mobile.jpg",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-end justify-center",
+        "text_alignment_mobile": "center",
+        "color_text": "#ffffff",
+        "color_highlight": "#525252",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#ffffff",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_Mz94Fp": {
+      "type": "rich-text",
       "blocks": {
-        "heading_WJT6Hn": {
-          "type": "heading",
-          "settings": {
-            "heading": "<h4><strong>Explore Foot Health & Find the Right Support for You</strong></h4>",
-            "heading_size": "title-md",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_ceKNrw": {
+        "text_pMyPgn": {
           "type": "text",
           "settings": {
-            "text": "<p>Learn about common foot issues, discover products designed for your lifestyle, and get expert guidance from Aetrex.</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
+            "text": "<p>30 Day Wear Test, Plus Easy Returns</p>",
+            "text_font": "subtitle",
+            "text_size": "subtext-custom",
             "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 35,
             "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
@@ -54,37 +75,37 @@
         }
       },
       "block_order": [
-        "heading_WJT6Hn",
-        "text_ceKNrw"
+        "text_pMyPgn"
       ],
-      "name": "t:sections.video-with-text-overlay.name",
+      "name": "t:sections.rich-text.name",
       "settings": {
-        "transparent_header": false,
-        "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
-        "description": "",
-        "enable_video_autoplay": true,
-        "enable_video_looping": true,
-        "image_height": "650px",
-        "content_width": "small",
-        "content_position": "md:items-center md:justify-center",
         "text_alignment": "center",
-        "video_url_mobile": "",
-        "image_height_mobile": "auto",
-        "content_position_mobile": "items-center justify-center",
         "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
         "color_text": "#ffffff",
-        "color_highlight": "#e0a580",
+        "color_background": "#99a4ad",
+        "gradient_background": "",
+        "color_highlight": "",
         "gradient_highlight": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
+        "color_button_text": "",
+        "color_button_background": "",
         "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "divider_color": "#111111",
-        "overlay_opacity": 70,
-        "padding_top": 0,
-        "padding_bottom": 0,
+        "padding_top": 12,
+        "padding_bottom": 12,
         "divider": false,
-        "full_width": true,
+        "narrow": true,
         "rounded": false
       }
     },
@@ -1182,7 +1203,8 @@
   },
   "order": [
     "main-page",
-    "video_with_text_overlay_cfhWL7",
+    "image_with_text_overlay_yhmykR",
+    "rich_text_Mz94Fp",
     "rich_text_eMGQNq",
     "lookbook_XrVA6j",
     "collection_list_LWrAVe",
