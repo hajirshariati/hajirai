@@ -168,7 +168,7 @@
           "settings": {
             "icon": "heart",
             "custom_icon": "",
-            "heading": "Loved by Millions",
+            "heading": "<strong>Loved by Millions</strong>",
             "text": "",
             "highlighted_text": "none",
             "custom_html": "",
@@ -201,6 +201,97 @@
         "highlighted_scribble": "circle",
         "color_text": "",
         "color_background": "#f4f4f4",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "featured_collections_9d3ge7": {
+      "type": "featured-collections",
+      "blocks": {
+        "collection_xxeKq7": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "products": [],
+            "title": "Plantar Fasciitis"
+          }
+        },
+        "collection_g9AqYk": {
+          "type": "collection",
+          "settings": {
+            "collection": "orthotics-for-flat-feet",
+            "products": [],
+            "title": "Flat Feet"
+          }
+        },
+        "collection_Wzc8ka": {
+          "type": "collection",
+          "settings": {
+            "collection": "orthotics-for-ball-of-foot-discomfort",
+            "products": [],
+            "title": "Ball of Foot Discomfort"
+          }
+        },
+        "collection_BbmnMe": {
+          "type": "collection",
+          "settings": {
+            "collection": "premium-memory-foam",
+            "products": [],
+            "title": "Pressure Relief"
+          }
+        },
+        "collection_3qxYYM": {
+          "type": "collection",
+          "settings": {
+            "collection": "orthotics-for-high-arches",
+            "products": [],
+            "title": "High Arches"
+          }
+        },
+        "collection_Uccwbn": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "products": [],
+            "title": "Running"
+          }
+        }
+      },
+      "block_order": [
+        "collection_xxeKq7",
+        "collection_g9AqYk",
+        "collection_Wzc8ka",
+        "collection_BbmnMe",
+        "collection_3qxYYM",
+        "collection_Uccwbn"
+      ],
+      "name": "Multiple featured collections",
+      "settings": {
+        "product_limit": 6,
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "Which Orthotic is Right for You?",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "Different feet, different needs. Explore by foot condition.  ",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
@@ -340,97 +431,6 @@
         "full_width": false,
         "rounded": false,
         "enable_parallax": true
-      }
-    },
-    "featured_collections_9d3ge7": {
-      "type": "featured-collections",
-      "blocks": {
-        "collection_xxeKq7": {
-          "type": "collection",
-          "settings": {
-            "collection": "",
-            "products": [],
-            "title": "Plantar Fasciitis"
-          }
-        },
-        "collection_g9AqYk": {
-          "type": "collection",
-          "settings": {
-            "collection": "orthotics-for-flat-feet",
-            "products": [],
-            "title": "Flat Feet"
-          }
-        },
-        "collection_Wzc8ka": {
-          "type": "collection",
-          "settings": {
-            "collection": "orthotics-for-ball-of-foot-discomfort",
-            "products": [],
-            "title": "Ball of Foot Discomfort"
-          }
-        },
-        "collection_BbmnMe": {
-          "type": "collection",
-          "settings": {
-            "collection": "premium-memory-foam",
-            "products": [],
-            "title": "Pressure Relief"
-          }
-        },
-        "collection_3qxYYM": {
-          "type": "collection",
-          "settings": {
-            "collection": "orthotics-for-high-arches",
-            "products": [],
-            "title": "High Arches"
-          }
-        },
-        "collection_Uccwbn": {
-          "type": "collection",
-          "settings": {
-            "collection": "",
-            "products": [],
-            "title": "Running"
-          }
-        }
-      },
-      "block_order": [
-        "collection_xxeKq7",
-        "collection_g9AqYk",
-        "collection_Wzc8ka",
-        "collection_BbmnMe",
-        "collection_3qxYYM",
-        "collection_Uccwbn"
-      ],
-      "name": "Multiple featured collections",
-      "settings": {
-        "product_limit": 6,
-        "columns": 4,
-        "carousel_on_desktop": true,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "Which Orthotic is Right for You?",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "subheading": "Different feet, different needs. Explore by foot condition.  ",
-        "description": "",
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false
       }
     },
     "image_with_text_overlay_M6AhUn": {
