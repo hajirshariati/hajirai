@@ -5,10 +5,7 @@
     --color-foreground: {{ section.settings.color_text.rgb }};
   }
 
-  .localization {
-  margin-top: 1rem; /* spacing below menu */
-  justify-content: center;
-}
+ 
 </style>
 
 <div
@@ -39,7 +36,7 @@
         -%}
       </small>
 
-<button id="ot-sdk-btn" class="ot-sdk-show-settings">Cookie settings</button>
+
       
       {%- if section.settings.show_menu -%}
         {%- if linklists[section.settings.footer_menu] != blank -%}
