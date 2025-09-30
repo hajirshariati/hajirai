@@ -117,8 +117,9 @@
               {%- when 'collapsible_tab' -%}
                 {%- capture collapsible_content -%}
                   {%- liquid
-                    if block.settings.content != blank
-                      assign metafield_content = block.settings.content
+    if block.settings.content != blank
+      # Check if content has h6 tags by converting to string for checking only
+      assign content_string = block.settings.content | strip
   
                       if metafield_content contains '<h6>'
                         if metafield_content contains 'class="metafield-single_line_text_field-array'
