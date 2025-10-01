@@ -24,25 +24,33 @@
         "rounded": false
       }
     },
-    "video_with_text_overlay_cfhWL7": {
-      "type": "video-with-text-overlay",
+    "image_with_text_overlay_jzK9pq": {
+      "type": "image-with-text-overlay",
       "blocks": {
-        "heading_WJT6Hn": {
+        "subheading_eGcBmp": {
+          "type": "subheading",
+          "settings": {
+            "subheading": "Your feet don't have to hurt",
+            "subheading_size": "subtitle-sm",
+            "secondary_color": false
+          }
+        },
+        "heading_KGBdb9": {
           "type": "heading",
           "settings": {
-            "heading": "<h4><strong>Explore Foot Health & Find the Right Support for You</strong></h4>",
-            "heading_size": "title-md",
+            "heading": "<p>Choose Comfort.</p>",
+            "heading_size": "title-sm",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         },
-        "text_ceKNrw": {
+        "text_YUqnpL": {
           "type": "text",
           "settings": {
-            "text": "<p>Learn about common foot issues, discover products designed for your lifestyle, and get expert guidance from Aetrex.</p>",
+            "text": "<p>Many people accept foot pain as a part of their daily life, but they don’t need to! Foot pain isn’t normal, it’s likely caused by unsupportive footwear. </p>",
             "text_font": "body",
-            "text_size": "subtext-md",
+            "text_size": "subtext-sm",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -51,41 +59,66 @@
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
+        },
+        "button_mdbrX8": {
+          "type": "button",
+          "settings": {
+            "button_label": "Shop Men",
+            "button_link": "https://www.aetrex.com/collections/fpinn?tab=products&pb=0#/productsFilter:ss_gender:Unisex/productsFilter:ss_gender:Men",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_LyL4Pe": {
+          "type": "button",
+          "settings": {
+            "button_label": "Shop Women",
+            "button_link": "https://www.aetrex.com/collections/fpinn?tab=products&pb=0#/productsFilter:ss_gender:Unisex/productsFilter:ss_gender:Women",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
         }
       },
       "block_order": [
-        "heading_WJT6Hn",
-        "text_ceKNrw"
+        "subheading_eGcBmp",
+        "heading_KGBdb9",
+        "text_YUqnpL",
+        "button_mdbrX8",
+        "button_LyL4Pe"
       ],
-      "name": "t:sections.video-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
-        "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
-        "description": "",
-        "enable_video_autoplay": true,
-        "enable_video_looping": true,
-        "image_height": "650px",
+        "image": "shopify://shop_images/Group_17_1_74fb51a1-b920-4247-9c50-719eb94ac74c.png",
+        "image_height": "adapt",
         "content_width": "small",
-        "content_position": "md:items-center md:justify-center",
+        "content_position": "md:items-center md:justify-end",
         "text_alignment": "center",
-        "video_url_mobile": "",
-        "image_height_mobile": "auto",
-        "content_position_mobile": "items-center justify-center",
+        "image_mobile": "shopify://shop_images/Group_18.png",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-end justify-center",
         "text_alignment_mobile": "center",
-        "color_text": "#ffffff",
-        "color_highlight": "#e0a580",
+        "color_text": "#24a5ba",
+        "color_highlight": "#525252",
         "gradient_highlight": "",
         "color_button_text": "#171717",
         "color_button_background": "#ffffff",
         "color_button_gradient": "",
         "color_overlay": "#171717",
         "divider_color": "#111111",
-        "overlay_opacity": 70,
-        "padding_top": 0,
-        "padding_bottom": 0,
+        "overlay_opacity": 0,
+        "padding_top": 24,
+        "padding_bottom": 24,
         "divider": false,
         "full_width": true,
-        "rounded": false
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
       }
     },
     "rich_text_eMGQNq": {
@@ -1182,7 +1215,7 @@
   },
   "order": [
     "main-page",
-    "video_with_text_overlay_cfhWL7",
+    "image_with_text_overlay_jzK9pq",
     "rich_text_eMGQNq",
     "lookbook_XrVA6j",
     "collection_list_LWrAVe",
