@@ -450,7 +450,7 @@
         "button_Dp6wa9": {
           "type": "button",
           "settings": {
-            "button_label": "Shop Women's",
+            "button_label": "SHOP WOMEN´S",
             "button_link": "https://www.aetrex.com/collections/fpinn?tab=products&pb=0#/productsFilter:ss_gender:Unisex/productsFilter:ss_gender:Women",
             "button_style": "primary",
             "button_size": "md",
@@ -461,7 +461,7 @@
         "button_wdiJqN": {
           "type": "button",
           "settings": {
-            "button_label": "Shop Men's",
+            "button_label": "SHOP MEN´S",
             "button_link": "https://www.aetrex.com/collections/fpinn?tab=products&pb=0#/productsFilter:ss_gender:Unisex/productsFilter:ss_gender:Men",
             "button_style": "primary",
             "button_size": "md",
