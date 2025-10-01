@@ -7921,7 +7921,7 @@ details.active .drawer__promotions .mega-menu__item,
 }
 
 .collection-list .flex-col {
-    max-width: fit-content;
+    ax-width: fit-content;
     margin: auto;
 }
 
