@@ -333,6 +333,117 @@
         "rounded": false
       }
     },
+    "collection_list_LWrAVe": {
+      "type": "collection-list",
+      "blocks": {
+        "collection_zcc67F": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "orthotics-plantar-fasciitis",
+            "custom_url": "",
+            "image": "shopify://shop_images/Group_17_1.png",
+            "title": "Plantar Fasciitis",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_6MTJMp": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "orthotics-for-mortons-neuroma",
+            "custom_url": "",
+            "image": "shopify://shop_images/Group_17_2.png",
+            "title": "Morton's Neuroma",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_THUfra": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "orthotics-for-metatarsalgia",
+            "custom_url": "",
+            "image": "shopify://shop_images/Group_17_3.png",
+            "title": "Metatarsalgia",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_PLzb6c": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "bunions-1",
+            "custom_url": "",
+            "image": "shopify://shop_images/Group_17_4.png",
+            "title": "Bunions",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        }
+      },
+      "block_order": [
+        "collection_zcc67F",
+        "collection_6MTJMp",
+        "collection_THUfra",
+        "collection_PLzb6c"
+      ],
+      "name": "t:sections.collection-list.name",
+      "settings": {
+        "columns": 4,
+        "carousel_on_desktop": false,
+        "image_type": "collection",
+        "image_ratio": "square",
+        "show_products_count": true,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "Aetrex for Your Activities",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
     "lookbook_XrVA6j": {
       "type": "lookbook",
       "blocks": {
@@ -471,130 +582,6 @@
         "padding_bottom": 72,
         "divider": false,
         "full_width": true,
-        "rounded": false
-      }
-    },
-    "collection_list_LWrAVe": {
-      "type": "collection-list",
-      "blocks": {
-        "collection_zcc67F": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "",
-            "custom_url": "",
-            "title": "Walking",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_6MTJMp": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "",
-            "custom_url": "",
-            "title": "Running",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_THUfra": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "",
-            "custom_url": "",
-            "title": "Light Exercise",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_PLzb6c": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "",
-            "custom_url": "",
-            "title": "Everyday Comfort",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_NfjzWW": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "",
-            "custom_url": "",
-            "title": "Travel",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        }
-      },
-      "block_order": [
-        "collection_zcc67F",
-        "collection_6MTJMp",
-        "collection_THUfra",
-        "collection_PLzb6c",
-        "collection_NfjzWW"
-      ],
-      "name": "t:sections.collection-list.name",
-      "settings": {
-        "columns": 4,
-        "carousel_on_desktop": true,
-        "image_type": "collection",
-        "image_ratio": "square",
-        "show_products_count": true,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "Aetrex for Your Activities",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "<p>Whether walking, traveling, or exercising, Aetrex orthotics and comfort shoes deliver the right support to keep you moving in comfort.</p>",
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
         "rounded": false
       }
     },
@@ -1279,8 +1266,8 @@
     "rich_text_Ffzgxj",
     "logo_list_wddRgK",
     "rich_text_eMGQNq",
-    "lookbook_XrVA6j",
     "collection_list_LWrAVe",
+    "lookbook_XrVA6j",
     "collection_list_LhqV7k",
     "17586443670450d0fd",
     "empty_space_WrHUjC",
