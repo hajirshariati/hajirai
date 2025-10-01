@@ -780,6 +780,142 @@
         "full_width": false,
         "rounded": false
       }
+    },
+    "rich_text_qyCN9a": {
+      "type": "rich-text",
+      "blocks": {
+        "text_wQwVdW": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>DOCTOR-RECOMMENDED, APMA APPROVED</strong></p>",
+            "text_font": "subtitle",
+            "text_size": "subtext-custom",
+            "text_max_size": 24,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 35,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_wQwVdW"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#ffffff",
+        "color_background": "#24a5ba",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "multicolumn_AjqEQQ": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_VzVpJF": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/iPad_Apple_Pencil_5f30321c-41e2-4be9-a3bf-bc6b10402b4e.png",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Footwear  Versatile styles, including sandals, wedges, sneakers, slippers, and boots ensure every step is supported with superior comfort and on-trend style.</p>",
+            "button_label": "SHOP FOOTWEAR",
+            "button_link": "https://www.aetrex.com/collections/fpinn?tab=products&pb=0#/productsFilter:product_type:Footwear",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_PwEtBa": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/iPad_Apple_Pencil_1.png",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Orthotics  Clinically proven to alleviate foot and body pain, increase foot function, help relieve Plantar Fasciitis and much more! With various configurations for different foot types, you can personalize all of your favorite shoes.</p>",
+            "button_label": "SHOP ORTHOTICS",
+            "button_link": "https://www.aetrex.com/collections/fpinn?tab=products&pb=0#/productsFilter:product_type:Orthotics",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_VzVpJF",
+        "column_PwEtBa"
+      ],
+      "name": "t:sections.multicolumn.name",
+      "settings": {
+        "gap": "large",
+        "columns": 2,
+        "columns_mobile": "1",
+        "carousel_on_desktop": false,
+        "swipe_on_mobile": false,
+        "heading": "The Aetrex Difference",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
     }
   },
   "order": [
@@ -792,6 +928,8 @@
     "rich_text_Ycknrp",
     "collection_list_Hr7F4w",
     "featured_collection_m89ACe",
-    "multicolumn_9Kh4Yg"
+    "multicolumn_9Kh4Yg",
+    "rich_text_qyCN9a",
+    "multicolumn_AjqEQQ"
   ]
 }
