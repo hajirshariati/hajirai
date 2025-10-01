@@ -49,66 +49,6 @@
       {% endif -%}
     }
   {% endif -%}
-
-  /* Desktop content box styles */
-  @media screen and (min-width: 768px) {
-    .lookbook-content-box {
-      position: fixed;
-      z-index: 20;
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      padding: 2rem;
-      border-radius: 8px;
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
-      max-width: 400px;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.3s ease, visibility 0.3s ease;
-    }
-
-    .lookbook-content-box.active {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .lookbook-content-box__close {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-      cursor: pointer;
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      line-height: 1;
-      padding: 0;
-      color: inherit;
-    }
-
-    .lookbook-content-box__content {
-      padding-top: 0.5rem;
-    }
-
-    /* Position variants */
-    .lookbook-content-box--top-left {
-      top: 2rem;
-      left: 2rem;
-    }
-
-    .lookbook-content-box--top-right {
-      top: 2rem;
-      right: 2rem;
-    }
-
-    .lookbook-content-box--bottom-left {
-      bottom: 2rem;
-      left: 2rem;
-    }
-
-    .lookbook-content-box--bottom-right {
-      bottom: 2rem;
-      right: 2rem;
-    }
-  }
 </style>
 
 <div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}" data-section-id="{{ section.id }}">
@@ -183,7 +123,7 @@
                     </div>
                   </hover-element>
                   <quick-view id="{{ quick_view_id }}" class="quick-view x-modal drawer z-40 fixed bottom-0 left-0 h-full w-full pointer-events-none" data-product-url="{{ product.url }}" role="dialog" aria-label="{{ 'products.product.choose_product_options' | t: product_name: product.title | escape }}" aria-modal="true" hidden>
-                    <overlay-element class="overlay fixed-modal invisible opacity-0 fixed bottom-0 left-0 w-full h-full pointer-events-none" aria-controls="{{ quick_view_id }}" aria-expanded="false"></overlay-element>
+                    <overlay-element class="overlay fixed-modal invisible opacity-0 fixed bottom-0 left-0 w-full h-screen pointer-events-none" aria-controls="{{ quick_view_id }}" aria-expanded="false"></overlay-element>
                     <div class="drawer__inner z-10 absolute top-0 flex flex-col w-full h-full overflow-hidden">
                       <gesture-element class="drawer__header flex justify-between opacity-0 invisible relative">
                         <button class="button button--secondary button--close drawer__close z-1 absolute top-0 right-0 flex items-center justify-center opacity-0" type="button" is="hover-button" aria-controls="{{ quick_view_id }}" aria-expanded="false" aria-label="{{ 'general.accessibility.close' | t | escape }}">
@@ -218,18 +158,7 @@
               {%- endif -%}
 
             {%- when 'content'-%}
-              <a class="hotspot with-content flex items-center justify-center absolute cursor-pointer hotspot-content-trigger" 
-                 {% if block.settings.link != blank %}
-                   href="{{ block.settings.link }}"
-                 {% else %}
-                   role="button" 
-                   aria-controls="Hotspot-{{ section.id }}-{{ block.id }}" 
-                   aria-expanded="false"
-                   data-content-target="Hotspot-{{ section.id }}-{{ block.id }}"
-                 {% endif %} 
-                 aria-label="{{ block.settings.heading | escape }}" 
-                 id="shopify-block-{{ block.id }}" 
-                 {{ block.shopify_attributes }}>
+              <a class="hotspot with-content flex items-center justify-center absolute cursor-pointer"{% if block.settings.link != blank %} href="{{ block.settings.link }}"{% else %} role="link" aria-disabled="true" aria-controls="Hotspot-{{ section.id }}-{{ block.id }}" aria-expanded="false"{% endif %} aria-label="{{ block.settings.heading | escape }}" id="shopify-block-{{ block.id }}" {{ block.shopify_attributes }}>
                 {% if block.settings.heading != blank or block.settings.text != blank %}
                   <div class="hotspot__content hidden md:flex gap-2 items-center absolute z-1 pointer-events-none{% if block.settings.horizontal < 15 %} with-left{% elsif block.settings.horizontal > 85 %} with-right{% endif %}{% if block.settings.vertical > 70 %} with-bottom{% endif %}">
                     <div class="rte text-sm leading-tight grid gap-2 md:gap-3">
@@ -267,35 +196,13 @@
                   </div>
                 {% endif %}
               </a>
-
-              {%- if block.settings.link == blank -%}
-                <!-- Desktop content box (hidden on mobile) -->
-                <div id="Hotspot-desktop-{{ section.id }}-{{ block.id }}" 
-                     class="lookbook-content-box lookbook-content-box--{{ section.settings.desktop_content_position }} hidden md:block"
-                     role="dialog"
-                     aria-modal="true"
-                     aria-label="{{ block.settings.heading | escape }}">
-                  <button class="lookbook-content-box__close" 
-                          type="button" 
-                          aria-label="{{ 'general.accessibility.close' | t | escape }}"
-                          data-close-content>
-                    ×
-                  </button>
-                  <div class="lookbook-content-box__content">
-                    {%- if block.settings.heading != blank -%}
-                      <h3 class="heading title-md mb-4">{{ block.settings.heading }}</h3>
-                    {%- endif -%}
-                    <div class="rte text-base">{{ block.settings.text }}</div>
-                  </div>
-                </div>
-
-                <!-- Mobile modal (hidden on desktop) -->
-                <x-modal id="Hotspot-{{ section.id }}-{{ block.id }}" 
-                         class="x-modal drawer z-30 fixed bottom-0 left-0 h-full w-full pointer-events-none md:hidden"
-                         role="dialog"
-                         aria-modal="true"
-                         aria-label="{{ block.settings.heading | escape }}"
-                         hidden>
+              {% if block.settings.link == blank %}
+                <x-modal id="Hotspot-{{ section.id }}-{{ block.id }}" class="x-modal drawer z-30 fixed bottom-0 left-0 h-full w-full pointer-events-none"
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="{{ block.settings.heading | escape }}"
+                  hidden
+                >
                   <overlay-element class="overlay fixed-modal invisible opacity-0 fixed bottom-0 left-0 w-full h-screen pointer-events-none" aria-controls="Hotspot-{{ section.id }}-{{ block.id }}" aria-expanded="false"></overlay-element>
                   <div class="drawer__inner z-10 absolute top-0 flex flex-col w-full h-full overflow-hidden">
                     <gesture-element class="drawer__header flex justify-between opacity-0 invisible relative">
@@ -322,49 +229,6 @@
   </div>
 </div>
 
-<script>
-  // Desktop content box functionality
-  if (window.innerWidth >= 768) {
-    document.querySelectorAll('.hotspot-content-trigger').forEach(trigger => {
-      if (!trigger.href || trigger.href === '' || trigger.href.endsWith('#')) {
-        trigger.addEventListener('click', function(e) {
-          e.preventDefault();
-          const targetId = this.getAttribute('data-content-target');
-          if (targetId) {
-            const desktopBox = document.getElementById('Hotspot-desktop-' + targetId.replace('Hotspot-', ''));
-            if (desktopBox) {
-              // Close any other open boxes
-              document.querySelectorAll('.lookbook-content-box.active').forEach(box => {
-                if (box !== desktopBox) {
-                  box.classList.remove('active');
-                }
-              });
-              // Toggle this box
-              desktopBox.classList.toggle('active');
-            }
-          }
-        });
-      }
-    });
-
-    // Close button functionality
-    document.querySelectorAll('[data-close-content]').forEach(closeBtn => {
-      closeBtn.addEventListener('click', function() {
-        this.closest('.lookbook-content-box').classList.remove('active');
-      });
-    });
-
-    // Close on outside click
-    document.addEventListener('click', function(e) {
-      if (!e.target.closest('.lookbook-content-box') && !e.target.closest('.hotspot-content-trigger')) {
-        document.querySelectorAll('.lookbook-content-box.active').forEach(box => {
-          box.classList.remove('active');
-        });
-      }
-    });
-  }
-</script>
-
 {% schema %}
 {
   "name": "t:sections.lookbook.name",
@@ -379,35 +243,6 @@
       "type": "image_picker",
       "id": "image_mobile",
       "label": "t:sections.global.settings.image_mobile.label"
-    },
-    {
-      "type": "header",
-      "content": "Desktop Content Settings"
-    },
-    {
-      "type": "select",
-      "id": "desktop_content_position",
-      "label": "Desktop content position",
-      "options": [
-        {
-          "value": "top-left",
-          "label": "Top Left"
-        },
-        {
-          "value": "top-right",
-          "label": "Top Right"
-        },
-        {
-          "value": "bottom-left",
-          "label": "Bottom Left"
-        },
-        {
-          "value": "bottom-right",
-          "label": "Bottom Right"
-        }
-      ],
-      "default": "top-left",
-      "info": "Choose where content appears on desktop when clicking hotspots"
     },
     {
       "type": "header",
