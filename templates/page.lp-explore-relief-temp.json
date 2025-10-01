@@ -217,41 +217,27 @@
         "enable_parallax": true
       }
     },
-    "rich_text_fNW3Mr": {
-      "type": "rich-text",
-      "blocks": {
-        "heading_wP9Dyd": {
-          "type": "heading",
-          "settings": {
-            "heading": "How Aetrex Can Help",
-            "heading_size": "title-md",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "heading_wP9Dyd"
-      ],
-      "name": "t:sections.rich-text.name",
+    "featured_collection_YGGVXx": {
+      "type": "featured-collection",
+      "name": "t:sections.featured-collection.name",
       "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
+        "collection": "womens-footwear-for-bunions",
+        "products": [],
+        "product_limit": 6,
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "show_view_all": true,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "How Aetrex Can Help",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
         "heading_tag": "h2",
         "subheading": "",
         "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
+        "color_text": "",
         "color_background": "#fafafa",
         "gradient_background": "",
         "color_highlight": "",
@@ -262,80 +248,84 @@
         "padding_top": 0,
         "padding_bottom": 0,
         "divider": false,
-        "narrow": true,
+        "full_width": true,
         "rounded": false
       }
     },
-    "floating_product_bundle_paGHPD": {
-      "type": "floating-product-bundle",
+    "testimonials_byJFpb": {
+      "type": "testimonials",
       "blocks": {
-        "heading_TUYwe9": {
-          "type": "heading",
+        "testimonial_UPjm8b": {
+          "type": "testimonial",
           "settings": {
-            "heading": "Product bundle",
-            "heading_size": "title-md",
-            "heading_tag": "h2",
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         },
-        "text_enX4Gn": {
-          "type": "text",
+        "testimonial_xPKLWB": {
+          "type": "testimonial",
           "settings": {
-            "text": "<p>Pair text with an image to focus on your chosen product, collection, or blog post. Add details on availability, style, or even provide a review.</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_RixBWT": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         }
       },
       "block_order": [
-        "heading_TUYwe9",
-        "text_enX4Gn"
+        "testimonial_UPjm8b",
+        "testimonial_xPKLWB",
+        "testimonial_RixBWT"
       ],
-      "name": "t:sections.floating-product-bundle.name",
+      "name": "t:sections.testimonials.name",
       "settings": {
-        "collection": "casual-everyday-orthotics",
-        "products": [
-          "aubrey-sand-cx158w",
-          "julia-platinum-cp134w",
-          "miles-tan-ap266m"
-        ],
-        "product_limit": 3,
-        "image": "shopify://shop_images/Layer_1_157861f3-a81c-4202-8c47-c2bfdf1ee2f0.png",
-        "image_height": "adapt",
-        "layout": "image_first",
-        "content_position": "md:items-end",
-        "text_alignment": "left",
-        "image_height_mobile": "adapt",
-        "content_position_mobile": "items-center",
-        "text_alignment_mobile": "center",
-        "swipe_on_mobile": true,
-        "show_variant_labels": true,
-        "picker_type": "dropdown",
-        "enable_color_swatches": true,
-        "color_swatch_type": "color",
-        "color_text": "#ffffff",
-        "color_highlight": "#e0a580",
+        "heading": "What Other Plantar Fasciitis Sufferers Say",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "#fafafa",
+        "gradient_background": "",
+        "color_highlight": "",
         "gradient_highlight": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
+        "color_button_text": "",
+        "color_button_background": "",
         "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "overlay_opacity": 0,
-        "padding_top": 0,
-        "padding_bottom": 0,
+        "padding_top": 72,
+        "padding_bottom": 72,
         "divider": false,
-        "full_width": true,
-        "rounded": false,
-        "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "rounded": false
       }
     },
     "image_with_text_overlay_NcafqY": {
@@ -420,8 +410,8 @@
     "image_with_text_overlay_D4BBAy",
     "faq_zhAACx",
     "images_with_text_iL8ht6",
-    "rich_text_fNW3Mr",
-    "floating_product_bundle_paGHPD",
+    "featured_collection_YGGVXx",
+    "testimonials_byJFpb",
     "image_with_text_overlay_NcafqY"
   ]
 }
