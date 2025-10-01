@@ -643,6 +643,22 @@
             "submenu_title_position": "bottom",
             "enable_title_drop_shadow": false
           }
+        },
+        "collection_xjQV8H": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "",
+            "custom_url": "",
+            "title": "View All",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
         }
       },
       "block_order": [
@@ -650,7 +666,8 @@
         "collection_UwnQyA",
         "collection_hHkQLw",
         "collection_FWgTeX",
-        "collection_wPrGdz"
+        "collection_wPrGdz",
+        "collection_xjQV8H"
       ],
       "name": "Collection list",
       "settings": {
