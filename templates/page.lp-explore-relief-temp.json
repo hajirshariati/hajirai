@@ -275,7 +275,7 @@
         "product_limit": 6,
         "columns": 4,
         "carousel_on_desktop": true,
-        "show_view_all": true,
+        "show_view_all": false,
         "columns_mobile": "1",
         "swipe_on_mobile": true,
         "heading": "",
