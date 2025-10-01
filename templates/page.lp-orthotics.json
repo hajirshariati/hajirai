@@ -568,7 +568,7 @@
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "",
+            "collection": "walking-orthotics",
             "custom_url": "",
             "title": "Walking",
             "description": "",
@@ -584,7 +584,7 @@
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "",
+            "collection": "all-day-standing-orthotics",
             "custom_url": "",
             "title": "Standing",
             "description": "",
@@ -600,7 +600,7 @@
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "",
+            "collection": "running-orthotics",
             "custom_url": "",
             "title": "Running",
             "description": "",
