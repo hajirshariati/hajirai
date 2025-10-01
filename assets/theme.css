@@ -3559,7 +3559,7 @@ button.shopify-payment-button__button--unbranded {
 
 .button-wrapper,
 .title-wrapper {
-    margin-block-end: clamp(var(--sp-12), 2.526vw, var(--sp-12));
+    margin-block-end: clamp(var(--sp-8), 2.526vw, var(--sp-12));
 }
 
 .title-wrapper-lg {
