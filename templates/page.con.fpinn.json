@@ -67,7 +67,7 @@
             "button_link": "https://www.aetrex.com/collections/fpinn?tab=products&pb=0#/productsFilter:ss_gender:Unisex/productsFilter:ss_gender:Men",
             "button_video_link": "",
             "button_style": "primary",
-            "button_size": "md",
+            "button_size": "sm",
             "button_external": false,
             "button_icon": false
           }
@@ -168,8 +168,8 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 12,
-        "padding_bottom": 12,
+        "padding_top": 24,
+        "padding_bottom": 24,
         "divider": false,
         "narrow": true,
         "rounded": false
@@ -917,6 +917,94 @@
         "rounded": false
       }
     },
+    "faq_YEwLqt": {
+      "type": "faq",
+      "blocks": {
+        "question_tQCQpa": {
+          "type": "question",
+          "settings": {
+            "title": "How Do Aetrex Shoes Provide Relief for Foot Pain?",
+            "text": "<p>Our shoes incorporate multiple advanced technologies designed specifically for pain relief. Each pair features our proprietary cushioning system that absorbs impact, anatomically correct arch support that reduces strain, and pressure-relief zones that eliminate hot spots. The result is immediate comfort and long-term protection for your feet, helping alleviate pain from plantar fasciitis, metatarsalgia, and general foot fatigue.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_yrQJKC": {
+          "type": "question",
+          "settings": {
+            "title": "Do You Have Shoes Available in Wide or Narrow Widths?",
+            "text": "<p>Yes! We understand feet come in different shapes and sizes. Our collection includes styles with special wide width options to ensure proper fit for everyone. Proper width is crucial for pain relief and foot health. Shop our comprehensive <a href=\"https://www.aetrex.com/collections/womens-wide-width-footwear\" target=\"_blank\" title=\"https://www.aetrex.com/collections/womens-wide-width-footwear\">Wide Width Collection</a> to find your perfect match.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_C6LUqf": {
+          "type": "question",
+          "settings": {
+            "title": "Do Your Products Help with Overpronation or Supination?",
+            "text": "<p>Yes, absolutely! Our shoes and orthotics are specifically engineered to address both overpronation and supination issues. The strategically designed arch support and heel stabilization help improve your gait, while our customizable orthotics provide targeted support where you need it most. This helps align your feet and can reduce related pain in your knees, hips, and back.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_3GArnf": {
+          "type": "question",
+          "settings": {
+            "title": "Do the Shoes and Orthotics Come With a Warranty?",
+            "text": "<p>Yes, we stand by our comfort guarantee. If you aren’t satisfied,  simply return your purchase for a full refund within 30 days of purchase. Our hassle-free return process makes it easy to shop with confidence. </p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_nHzkCn": {
+          "type": "question",
+          "settings": {
+            "title": "How Do I Choose Which Orthotic is Right for Me?",
+            "text": "<p>Finding your perfect orthotic match is simple! Take our quick, <a href=\"https://irle3andv1z.typeform.com/to/gujvKvEg?typeform-source=www.aetrex.com\" target=\"_blank\" title=\"https://irle3andv1z.typeform.com/to/gujvKvEg?typeform-source=www.aetrex.com\">2-minute orthotic quiz</a> to receive personalized recommendations based on your specific foot type, pain points, and activity level. Our advanced algorithm analyzes your needs and matches you with the ideal orthotic from our collection of 20+ specialized variations.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "question_tQCQpa",
+        "question_yrQJKC",
+        "question_C6LUqf",
+        "question_3GArnf",
+        "question_nHzkCn"
+      ],
+      "name": "t:sections.faq.name",
+      "settings": {
+        "style": "with-border",
+        "heading": "Frequently Asked Questions",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#ffffff",
+        "overlay_opacity": 4,
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
     "rich_text_FAnPEJ": {
       "type": "rich-text",
       "blocks": {
@@ -1005,6 +1093,7 @@
     "multicolumn_9Kh4Yg",
     "rich_text_qyCN9a",
     "multicolumn_AjqEQQ",
+    "faq_YEwLqt",
     "rich_text_FAnPEJ",
     "ugc_gallery_DzKDFe"
   ]
