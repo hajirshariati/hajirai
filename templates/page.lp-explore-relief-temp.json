@@ -308,7 +308,7 @@
           "type": "heading",
           "settings": {
             "heading": "What Other Plantar Fasciitis Sufferers Say",
-            "heading_size": "title-md",
+            "heading_size": "title-sm",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -421,7 +421,7 @@
         "color_button_background": "",
         "color_button_gradient": "",
         "padding_top": 20,
-        "padding_bottom": 72,
+        "padding_bottom": 20,
         "divider": false,
         "rounded": false
       }
@@ -435,14 +435,15 @@
             "link_type": "collection",
             "collection": "womens-shop-all-footwear",
             "custom_url": "",
+            "image": "shopify://shop_images/fa7cbbdac8acc2faec39c1efbf62d9636d02cd8e.jpg",
             "title": "",
-            "description": "",
-            "overlay_content": false,
+            "description": "To Help Relieve Plantar Fasciitis",
+            "overlay_content": true,
             "color_text": "#ffffff",
             "color_overlay": "#000000",
             "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
+            "submenu_title_position": "center",
+            "enable_title_drop_shadow": true
           }
         },
         "collection_gpn6Pp": {
@@ -451,14 +452,15 @@
             "link_type": "collection",
             "collection": "shop-all-orthotics",
             "custom_url": "",
+            "image": "shopify://shop_images/42da3f02a44e4ed175ac2e3bb5856bce2c875204.png",
             "title": "",
-            "description": "",
-            "overlay_content": false,
+            "description": "To Help Relieve Plantar Fasciitis",
+            "overlay_content": true,
             "color_text": "#ffffff",
             "color_overlay": "#000000",
             "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
+            "submenu_title_position": "center",
+            "enable_title_drop_shadow": true
           }
         }
       },
@@ -468,15 +470,15 @@
       ],
       "name": "t:sections.collection-list.name",
       "settings": {
-        "columns": 4,
+        "columns": 2,
         "carousel_on_desktop": true,
         "image_type": "collection",
-        "image_ratio": "square",
-        "show_products_count": true,
+        "image_ratio": "wide",
+        "show_products_count": false,
         "show_view_all": false,
         "columns_mobile": "1",
         "swipe_on_mobile": true,
-        "heading": "Collections",
+        "heading": "",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
@@ -485,17 +487,17 @@
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "",
-        "color_background": "",
+        "color_background": "#fafafa",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
+        "padding_top": 0,
+        "padding_bottom": 40,
         "divider": false,
-        "full_width": false,
+        "full_width": true,
         "rounded": false
       }
     },
