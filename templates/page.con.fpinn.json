@@ -916,6 +916,80 @@
         "full_width": false,
         "rounded": false
       }
+    },
+    "rich_text_FAnPEJ": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_TpWqCJ": {
+          "type": "heading",
+          "settings": {
+            "heading": "Loved by over 200,000 People Like You!",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_zfdkrV": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Use #MyAetrex and tag @Aetrexworldwide for the chance to be featured.</p>",
+            "text_font": "subtitle",
+            "text_size": "subtext-custom",
+            "text_max_size": 16,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 35,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_TpWqCJ",
+        "text_zfdkrV"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "ugc_gallery_DzKDFe": {
+      "type": "ugc-gallery",
+      "name": "UGC Gallery",
+      "settings": {
+        "custom_gallery": "{{ page.metafields.custom.ugc_gallery_id.value }}",
+        "global_pdp_sourced_gallery": "",
+        "global_fallback_sourced_gallery": "67c9dfd952921dee2bb9fc5c"
+      }
     }
   },
   "order": [
@@ -930,6 +1004,8 @@
     "featured_collection_m89ACe",
     "multicolumn_9Kh4Yg",
     "rich_text_qyCN9a",
-    "multicolumn_AjqEQQ"
+    "multicolumn_AjqEQQ",
+    "rich_text_FAnPEJ",
+    "ugc_gallery_DzKDFe"
   ]
 }
