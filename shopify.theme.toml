@@ -1,0 +1,4 @@
+[environments.dev]
+store = "f031fc-3"
+path = "."
+output = "json"

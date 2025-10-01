@@ -613,20 +613,21 @@ fieldset[data-option-slug="width"] .swatches--variant {
 variant-picker .main-pdp-variant-custom-badge {
     position: absolute;
     top: 0;
-    right: 0;
+    right: 50%;
+    transform: translateX(50%);
     font-size: 12px;
     line-height: 100%;
     padding: 5px;
     text-transform: capitalize;
     background: rgb(var(--color-sale-tag));
-    border-radius: 0 5px;
+    border-radius: 0 0 5px 5px;
     color: rgb(var(--color-sale-tag-text));
     font-weight: 500;
     border-width: 1px !important;
 }
 
 variant-picker .main-pdp-variant-custom-badge:not(.custom-normal-sale) {
-    background: #fff;
+    background: #ececec;
     color: rgb(var(--color-button-background));
 }
 
@@ -864,4 +865,8 @@ body .yotpo-reviews-main-widget svg {
 
 .product-form-wrapper .product-form__buttons {
     margin-bottom: 20px;
+}
+
+.yotpo-widget-instance {
+    overflow: hidden!important;
 }
