@@ -175,8 +175,8 @@
         "button_TWhPGJ": {
           "type": "button",
           "settings": {
-            "button_label": "Shop Danika",
-            "button_link": "shopify://products/danika-black-ap100w",
+            "button_label": "Shop Jillian",
+            "button_link": "shopify://products/jillian-black-sc450w",
             "button_video_link": "",
             "button_style": "link",
             "button_size": "md",
@@ -192,14 +192,14 @@
       ],
       "name": "t:sections.images-with-text.name",
       "settings": {
-        "image": "shopify://shop_images/b4989dc76dcde29accd23866957e8fcb2f225267.png",
+        "image": "shopify://shop_images/ee4e2fe8a874fb5c106a8cc3c4247add5d9048ed.png",
         "image_url": "",
         "image_2": "shopify://shop_images/recommended_1_2x_21163cd2-e758-4725-87c5-117210d3d3c9.png",
         "image2_url": "",
         "image_ratio": "adapt",
         "image_width": "large",
         "layout": "text_first",
-        "text_alignment": "left",
+        "text_alignment": "center",
         "text_alignment_mobile": "left",
         "color_text": "",
         "color_background": "#fafafa",
@@ -307,7 +307,7 @@
         "heading_KErmNk": {
           "type": "heading",
           "settings": {
-            "heading": "What Other Plantar Fasciitis Sufferers Say",
+            "heading": "What Other Bunion’s Sufferers Say",
             "heading_size": "title-sm",
             "heading_tag": "h2",
             "highlighted_text": "none",
