@@ -59,9 +59,9 @@
       ],
       "name": "t:sections.images-with-text.name",
       "settings": {
-        "image": "shopify://shop_images/c3ff1fd421f5503c7f3e36a2f6cb6e6f2cb55d9a.png",
+        "image": "shopify://shop_images/bg-er2.png",
         "image_url": "",
-        "image_2": "shopify://shop_images/bg-er2.png",
+        "image_2": "shopify://shop_images/c3ff1fd421f5503c7f3e36a2f6cb6e6f2cb55d9a.png",
         "image2_url": "",
         "image_ratio": "adapt",
         "image_width": "small",
