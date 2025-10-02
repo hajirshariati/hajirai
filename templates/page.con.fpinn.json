@@ -237,7 +237,7 @@
       ],
       "name": "t:sections.logo-list.name",
       "settings": {
-        "layout": "default",
+        "layout": "marquee",
         "grid_horizontal": 70,
         "direction": "left",
         "speed": 5,
