@@ -24,6 +24,66 @@
         "rounded": false
       }
     },
+    "images_with_text_YaeyAr": {
+      "type": "images-with-text",
+      "blocks": {
+        "heading_dQ9xwK": {
+          "type": "heading",
+          "settings": {
+            "heading": "<strong>Bunions</strong>",
+            "heading_size": "title-lg tracking-heading",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_UzHi7E": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Bunions, referred to in the medical community as Hallux Valgus, are one of the most common forefoot problems. A bunion is a prominent bump on the inside of the foot around the big toe joint. This bump is actually a bone protruding towards the inside of the foot. With the continued movement of the big toe towards the smaller toes, it is common to find the big toe resting under or over the second toe. This causes a common forefoot condition called overlapping toes. Some of the symptoms of bunions include inflammation, swelling, and soreness on the side surface of the big toe. The discomfort commonly causes a patient to walk improperly.</p><p>Another type of bunion which some individuals experience is called a Tailor’s Bunion, also known as a Bunionette. This forms on the outside of the foot towards the joint at the 5th toe. It is a smaller bump that forms due to the 5th toe moving inwards, towards the big toe.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_dQ9xwK",
+        "text_UzHi7E"
+      ],
+      "name": "t:sections.images-with-text.name",
+      "settings": {
+        "image": "shopify://shop_images/c3ff1fd421f5503c7f3e36a2f6cb6e6f2cb55d9a.png",
+        "image_url": "",
+        "image_2": "shopify://shop_images/bg-er2.png",
+        "image2_url": "",
+        "image_ratio": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "#d4dfe2",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": true,
+        "enable_parallax": true
+      }
+    },
     "image_with_text_overlay_D4BBAy": {
       "type": "image-with-text-overlay",
       "blocks": {
@@ -57,6 +117,7 @@
         "heading_9h34Ce",
         "text_zQwhB8"
       ],
+      "disabled": true,
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
@@ -671,6 +732,7 @@
   },
   "order": [
     "main-page",
+    "images_with_text_YaeyAr",
     "image_with_text_overlay_D4BBAy",
     "faq_zhAACx",
     "lookbook_JQDiwd",
