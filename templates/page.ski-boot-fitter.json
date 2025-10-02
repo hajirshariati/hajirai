@@ -58,6 +58,9 @@
             "text_font": "body",
             "text_size": "subtext-custom",
             "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -109,6 +112,9 @@
             "text_font": "heading",
             "text_size": "subtext-custom",
             "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -121,6 +127,9 @@
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -131,6 +140,7 @@
           "settings": {
             "button_label": "Book a Demo",
             "button_link": "https://irle3andv1z.typeform.com/to/V3YAATXm",
+            "button_video_link": "",
             "button_style": "link",
             "button_size": "sm",
             "button_external": true,
@@ -142,6 +152,7 @@
           "settings": {
             "button_label": "View recent coverage with SGB Online on Ski Boot Fitter",
             "button_link": "https://sgbonline.com/3d-fittech-is-changing-the-ski-boot-fitting-game/",
+            "button_video_link": "",
             "button_style": "link",
             "button_size": "sm",
             "button_external": true,
@@ -158,10 +169,12 @@
       "name": "Image with text",
       "settings": {
         "image": "shopify://shop_images/SkiBoot_Monitor-690x496px.jpg",
+        "img_url": "",
         "image_height": "adapt",
         "image_width": "small",
         "layout": "text_first",
         "text_alignment": "left",
+        "custom_content_position": "items-center",
         "image_mobile": "shopify://shop_images/SkiBoot_Monitor-690x496px.jpg",
         "image_height_mobile": "adapt",
         "text_alignment_mobile": "left",
@@ -183,12 +196,32 @@
         "enable_parallax": false,
         "parallax_direction": "vertical"
       }
+    },
+    "video_zXHN48": {
+      "type": "video",
+      "name": "t:sections.video.name",
+      "settings": {
+        "transparent_header": false,
+        "video": "shopify://files/videos/Ski Boot Fitter Video FINAL.mp4",
+        "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
+        "description": "",
+        "enable_video_autoplay": false,
+        "enable_video_looping": false,
+        "image_height": "adapt",
+        "image_height_mobile": "auto",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false
+      }
     }
   },
   "order": [
     "main-page",
     "testimonials_banner_Cbhq4c",
     "rich_text_bGVzXB",
-    "image_with_text_aPTKgV"
+    "image_with_text_aPTKgV",
+    "video_zXHN48"
   ]
 }
