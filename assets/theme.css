@@ -17452,8 +17452,8 @@ body .rte .contact-box a {
   }
 }
 
-.product-info__mobile-form [data-option-slug="size"] {
-  display: none !important;
+.product-info__mobile-form .form__label {
+  margin-bottom: 1rem;
 }
 
 @media all and (max-width: 767px) {

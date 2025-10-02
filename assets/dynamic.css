@@ -634,6 +634,7 @@ fieldset[data-option-slug="width"] .swatches--variant {
   color: rgb(var(--color-button-background));
 }
 
+.product-info__mobile-form .main-pdp-variant-custom-badge,
 variant-picker .main-pdp-variant-custom-badge {
   position: absolute;
   top: 0;
@@ -650,16 +651,21 @@ variant-picker .main-pdp-variant-custom-badge {
   border-width: 1px !important;
 }
 
+.product-info__mobile-form
+  .main-pdp-variant-custom-badge:not(.custom-normal-sale),
 variant-picker .main-pdp-variant-custom-badge:not(.custom-normal-sale) {
   background: #ececec;
   color: rgb(var(--color-button-background));
 }
 
+.product-info__mobile-form .main-pdp-variant-custom-badge:empty,
 variant-picker .main-pdp-variant-custom-badge:empty {
   display: none;
 }
 
+.product-info__mobile-form .main-pdp-variant-custom-badge.custom-sale,
 variant-picker .main-pdp-variant-custom-badge.custom-sale,
+.product-info__mobile-form .main-pdp-variant-custom-badge.custom-final-sale,
 variant-picker .main-pdp-variant-custom-badge.custom-final-sale,
 .product__media-container .main-pdp-custom-badge.sale,
 .product__media-container .main-pdp-custom-badge.final-sale,
