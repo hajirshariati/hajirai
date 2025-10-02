@@ -24,23 +24,23 @@
         "rounded": false
       }
     },
-    "image_with_text_overlay_D4BBAy": {
-      "type": "image-with-text-overlay",
+    "image_with_text_zj7AiL": {
+      "type": "image-with-text",
       "blocks": {
-        "heading_9h34Ce": {
+        "heading_KnNgCq": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Bunions</p>",
-            "heading_size": "title-lg tracking-heading",
+            "heading": "Plantar Fasciitis",
+            "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         },
-        "text_zQwhB8": {
+        "text_RMR7rx": {
           "type": "text",
           "settings": {
-            "text": "<p>Bunions, referred to in the medical community as Hallux Valgus, are one of the most common forefoot problems. A bunion is a prominent bump on the inside of the foot around the big toe joint. This bump is actually a bone protruding towards the inside of the foot. With the continued movement of the big toe towards the smaller toes, it is common to find the big toe resting under or over the second toe. This causes a common forefoot condition called overlapping toes. Some of the symptoms of bunions include inflammation, swelling, and soreness on the side surface of the big toe. The discomfort commonly causes a patient to walk improperly.</p><p>Another type of bunion which some individuals experience is called a Tailor’s Bunion, also known as a Bunionette. This forms on the outside of the foot towards the joint at the 5th toe. It is a smaller bump that forms due to the 5th toe moving inwards, towards the big toe.</p>",
+            "text": "<p>Plantar Fasciitis is an inflammation resulting from excessive stretching of the plantar fascia. The plantar fascia is a broad band of fibrous tissue running along the bottom of the foot, from the heel bone (calcaneus) to the forefoot.</p><p>Pain from plantar fasciitis typically occurs at the bottom of the foot, near the inside where the heel and arch meet. The pain is often most severe first thing in the morning or after long periods of rest, as the plantar fascia contracts during inactivity. As the day progresses and the plantar fascia is stretched with activity, the pain may gradually decrease.<br/><br/></p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -54,35 +54,36 @@
         }
       },
       "block_order": [
-        "heading_9h34Ce",
-        "text_zQwhB8"
+        "heading_KnNgCq",
+        "text_RMR7rx"
       ],
-      "name": "t:sections.image-with-text-overlay.name",
+      "name": "t:sections.image-with-text.name",
       "settings": {
-        "transparent_header": false,
-        "image": "shopify://shop_images/bg-er.jpg",
+        "image": "shopify://shop_images/PF_1_2x_062c285d-cb82-4947-a547-092fa6fe87b3.png",
+        "img_url": "",
         "image_height": "adapt",
-        "content_width": "medium",
-        "content_position": "md:items-end md:justify-start",
+        "image_width": "medium",
+        "layout": "text_first",
         "text_alignment": "left",
+        "custom_content_position": "items-center",
         "image_height_mobile": "auto",
-        "content_position_mobile": "items-end justify-start",
         "text_alignment_mobile": "left",
-        "color_text": "#4c4c4c",
-        "color_highlight": "#e0a580",
+        "color_text": "",
+        "color_background": "#d3dfe3",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
         "gradient_highlight": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
+        "color_button_text": "",
+        "color_button_background": "",
         "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "divider_color": "#111111",
-        "overlay_opacity": 0,
-        "padding_top": 0,
-        "padding_bottom": 0,
+        "padding_top": 72,
+        "padding_bottom": 72,
         "divider": false,
-        "full_width": true,
-        "rounded": true,
-        "enable_parallax": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": true,
         "parallax_direction": "vertical"
       }
     },
@@ -93,7 +94,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Causes</strong>",
-            "text": "<p>Bunions are a common problem experienced mostly by women. The deformity can develop from an abnormality in foot function, or arthritis, but is more commonly caused by wearing improper fitting footwear. Tight, narrow dress shoes with a constrictive toe box (toe area) can cause the foot to begin to take the shape of the shoe, leading to the formation of a bunion. Women who have bunions normally wear dress shoes that are too small for their feet. Their toes are squeezed together in their shoes causing the first metatarsal bone to protrude on the side of the foot.  The most common cause is a biomechanics abnormality, such as flat feet, that leads to the joint dysfunction.  The abnormal biomechanics can be inherited.  Other less common causes include Rheumatoid arthritis, neuromuscular disorders, and trauma, to name a few.</p><p>It is important for men and women to realize that wearing dress shoes and boots, which are tapered in the toe area, can cause the bunion to worsen to the point where surgery is necessary.</p>",
+            "text": "<p>Excessive stretching of the plantar fascia can lead to plantar fasciitis, causing heel pain, arch pain, and potentially heel spurs.<br/><br/>Unusually high arches, sudden increases in physical activity, excessive weight (often due to obesity or pregnancy), and improperly fitting footwear.<br/><br/>Overpronation (flat feet) is the most common cause of excessive stretching, occurring when the arch collapses during walking and stretches the plantar fascia away from the heel bone.<br/><br/></p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -102,7 +103,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Treatment and Prevention</strong>",
-            "text": "<p>Conservative treatment to alleviate the pain associated with bunions is to wear shoes that accommodate the deformity.  Shoes designed with a wide toe box are recommended.  Orthotics are also recommended for this condition to support the arch in the case of flat feet.  Orthotics can limit the progression of the bunion formation.  Lastly, surgery is an option to correct the deformity.</p><p>If the problem persists, consult your foot doctor.</p>",
+            "text": "<p>Each time your foot strikes the ground, the plantar fascia is stretched, so reducing strain involves avoiding running on hard or uneven surfaces. The key to treating Plantar Fasciitis effectively is identifying the cause of the excessive stretching of the plantar fascia. To minimize stress on the plantar fascia, maintain a healthy weight and include stretching exercises.<br/><br/>For overpronation (flat feet), using an orthotic with rear foot posting and longitudinal arch support helps reduce overpronation and allows the condition to heal.<br/><br/>For very high arches, cushioning the heel, absorbing shock, and wearing proper footwear enhance foot comfort and reduce pain.<br/><br/></p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -147,63 +148,63 @@
     "lookbook_JQDiwd": {
       "type": "lookbook",
       "blocks": {
-        "content_adUCX6": {
+        "content_AeTcCN": {
           "type": "content",
           "settings": {
             "icon": "none",
             "iwidth": "custom",
             "icon_width": 24,
-            "heading": "Signature Arch Support",
-            "text": "<p>With removable insole, our arch support is located further back to support the apex of the foot. This helps proper alignment and help relieve arch and heel pain associated with Plantar Fasciitis</p>",
+            "heading": "",
+            "text": "",
             "link": "",
-            "color_text": "#74a5ba",
+            "color_text": "#ffffff",
             "vertical": 50,
             "horizontal": 50,
             "vertical_mobile": 50,
             "horizontal_mobile": 50
           }
         },
-        "content_X6fqcD": {
+        "content_knQQ6E": {
           "type": "content",
           "settings": {
             "icon": "none",
             "iwidth": "custom",
             "icon_width": 24,
-            "heading": "Test",
-            "text": "<p>Test</p>",
+            "heading": "",
+            "text": "",
             "link": "",
-            "color_text": "#74a5ba",
-            "vertical": 60,
-            "horizontal": 74,
+            "color_text": "#ffffff",
+            "vertical": 6,
+            "horizontal": 53,
             "vertical_mobile": 50,
             "horizontal_mobile": 50
           }
         },
-        "content_MCHM9i": {
+        "content_iXtFEz": {
           "type": "content",
           "settings": {
             "icon": "none",
             "iwidth": "custom",
             "icon_width": 24,
-            "heading": "Test",
-            "text": "<p>Test</p>",
+            "heading": "",
+            "text": "",
             "link": "",
-            "color_text": "#74a5ba",
-            "vertical": 29,
-            "horizontal": 42,
+            "color_text": "#ffffff",
+            "vertical": 50,
+            "horizontal": 50,
             "vertical_mobile": 50,
             "horizontal_mobile": 50
           }
         }
       },
       "block_order": [
-        "content_adUCX6",
-        "content_X6fqcD",
-        "content_MCHM9i"
+        "content_AeTcCN",
+        "content_knQQ6E",
+        "content_iXtFEz"
       ],
       "name": "t:sections.lookbook.name",
       "settings": {
-        "image": "shopify://shop_images/bun.png",
+        "image": "shopify://shop_images/Danika.png",
         "heading": "",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
@@ -357,38 +358,53 @@
         "rounded": false
       }
     },
-    "featured_collection_YGGVXx": {
+    "empty_space_gyE8Nr": {
+      "type": "empty-space",
+      "name": "t:sections.empty-space.name",
+      "settings": {
+        "desktop_height": 40,
+        "mobile_height": 28,
+        "color_background": "",
+        "gradient_background": ""
+      }
+    },
+    "featured_collection_dXtHeM": {
       "type": "featured-collection",
       "name": "t:sections.featured-collection.name",
       "settings": {
-        "collection": "womens-footwear-for-bunions",
-        "products": [],
-        "product_limit": 6,
+        "collection": "",
+        "products": [
+          "women-plantar-fasciitis-kit",
+          "danika-light-grey-ap113w",
+          "l2300m-m",
+          "jillian-black-sc450w"
+        ],
+        "product_limit": 4,
         "columns": 4,
-        "carousel_on_desktop": true,
+        "carousel_on_desktop": false,
         "show_view_all": false,
         "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "",
+        "swipe_on_mobile": false,
+        "heading": "Start Feeling Better Today!",
         "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
         "subheading": "",
         "description": "",
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "#fafafa",
+        "color_text": "#171717",
+        "color_background": "",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 48,
-        "padding_bottom": 0,
+        "padding_top": 72,
+        "padding_bottom": 72,
         "divider": false,
-        "full_width": true,
+        "full_width": false,
         "rounded": false
       }
     },
@@ -413,7 +429,7 @@
       "settings": {
         "text_alignment": "center",
         "text_alignment_mobile": "center",
-        "heading": "",
+        "heading": "What Other Plantar Fasciitis Sufferers Say",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_width": "small",
@@ -427,14 +443,14 @@
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "#74a5ba",
-        "color_background": "#fafafa",
+        "color_background": "#ffffff",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 72,
+        "padding_top": 0,
         "padding_bottom": 0,
         "divider": false,
         "narrow": true,
@@ -448,8 +464,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
+            "text": "<h6>\"These Saved My Life!  </h6><h6>These flip flops saved my summer! My plantar fasciitis was really bad and when I put these on I felt relief almost immediately. The discomfort continues to subside more and more each day, and is still improving, which I largely attribute to wearing these all day, every day. Plus, they felt very secure even when wet. Very thankful for these!\" </h6>",
+            "author": "Lisa R",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -461,8 +477,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
+            "text": "<h6>\"My Favorite!<br/>These were the first shoe I ordered from Aetrex. I loved them immediately. I am now on my 3rd pair, including one for my daughter since she kept stealing mine! They are cushiony & supportive enough for a day at an amusement park plus the strap keeps them secure. Casual enough for everyday, but dressy enough for a night out means only packing one pair for trips.\" </h6>",
+            "author": "Holly J.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -474,8 +490,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
+            "text": "<h6>\"Better Than My Bare Feet! </h6><h6>These sandals are perfect. They are very cushioned and supportive in all the right places. I can already feel the difference with my pronation issues when I wear these slides. I also love that they are cute and so easy to wear. I wear them out or just around the house. I couldn't recommend more!!!\" </h6>",
+            "author": "Kimberly S.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -504,7 +520,7 @@
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "#171717",
-        "color_background": "#fafafa",
+        "color_background": "#ffffff",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
@@ -526,7 +542,7 @@
             "link_type": "collection",
             "collection": "womens-shop-all-footwear",
             "custom_url": "",
-            "image": "shopify://shop_images/ccf17b9d0ec873ba936787a6386cb76cb5e3627b.jpg",
+            "image": "shopify://shop_images/Rectangle_60_45bfd4e4-700b-4afc-8786-af3abca4bc9c.png",
             "title": "",
             "description": "To Help Relieve Bunion’s",
             "overlay_content": true,
@@ -543,7 +559,7 @@
             "link_type": "collection",
             "collection": "shop-all-orthotics",
             "custom_url": "",
-            "image": "shopify://shop_images/42da3f02a44e4ed175ac2e3bb5856bce2c875204.png",
+            "image": "shopify://shop_images/Rectangle_61_668b1198-2250-4e0e-9f58-c1a42125e032.png",
             "title": "",
             "description": "To Help Relieve Bunion’s",
             "overlay_content": true,
@@ -671,12 +687,13 @@
   },
   "order": [
     "main-page",
-    "image_with_text_overlay_D4BBAy",
+    "image_with_text_zj7AiL",
     "faq_zhAACx",
     "lookbook_JQDiwd",
     "images_with_text_iL8ht6",
     "rich_text_pdccXY",
-    "featured_collection_YGGVXx",
+    "empty_space_gyE8Nr",
+    "featured_collection_dXtHeM",
     "rich_text_97Wk36",
     "testimonials_byJFpb",
     "collection_list_fbMkYY",
