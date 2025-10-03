@@ -7949,13 +7949,18 @@ customElements.define('icons-carousel', IconsCarousel, {extends: 'div'});
 (function () {
     const SECTIONS_TO_UPDATE = [
         'main',
+        "product-details",
         'product_details_4UfMKj',
         'product_highlights_EMEhAr',
         '1736487006f9b363ba',
         'ugc_gallery_n48LPJ',
         'ss_recommendations_pFUtFd',
         'ss_recommendations_3JCDgT',
-        'ss_recommendations_GRidrn'
+        'ss_recommendations_GRidrn',
+        "17477533508981334f",
+        "video_with_text_xf4VTt",
+        'multicolumn_KyfUdW',
+        'multicolumn_CEQ6Uh'
     ];
 
     function executeScript(script) {
@@ -8039,13 +8044,18 @@ class ProductColorSwatchHandler {
     constructor() {
         this.SECTIONS_TO_UPDATE = [
             'main',
+            "product-details",
             'product_details_4UfMKj',
             'product_highlights_EMEhAr',
             '1736487006f9b363ba',
             'ugc_gallery_n48LPJ',
             'ss_recommendations_pFUtFd',
             'ss_recommendations_3JCDgT',
-            'ss_recommendations_GRidrn'
+            'ss_recommendations_GRidrn',
+            "17477533508981334f",
+            "video_with_text_xf4VTt",
+            'multicolumn_KyfUdW',
+            'multicolumn_CEQ6Uh'
         ];
         
         this.observer = null;
