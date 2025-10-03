@@ -433,7 +433,9 @@ label.active-swatch.custom-meta-label:before {
 }
 
 .product-card .custom-product-url {
+    position: relative;
     mix-blend-mode: darken;
+    z-index: 9;
 }
 
 .product-card .price.price--on-sale {
