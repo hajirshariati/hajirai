@@ -16521,3 +16521,7 @@ body .rte .contact-box a {
     padding: 0.9rem 1rem;
   }
 }
+
+.ss__theme .ss__carousel .swiper-container>.swiper-wrapper>.swiper-slide {
+    width: 100px;
+}
