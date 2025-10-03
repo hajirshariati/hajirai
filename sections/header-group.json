@@ -140,7 +140,7 @@
             "show_menu_image": true,
             "nav_width": 70,
             "promo_width": 30,
-            "mobile_layout": "vertical",
+            "mobile_layout": "horizontal",
             "button_label": "Shop Sale",
             "button_link": "shopify://collections/womens-sale",
             "promo_image_1": "shopify://shop_images/free_ship_nav_D.jpg",
