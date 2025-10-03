@@ -55,9 +55,14 @@
     data-parent
   >
     {%- unless enable_accordion_menu -%}
-      <button type="button" class="tracking-tight heading text-base shrink-0 flex items-center gap-3 w-full" data-close>
-        {{ link.title | escape }}
-      </button>
+        <div class="drawer__menu-top flex justify-between items-center">
+            <button type="button" class="tracking-tight heading text-base shrink-0 flex items-center gap-3" data-close>
+                {{ link.title | escape }}
+            </button>
+            <a href="{{ link.url }}" class="tracking-tight heading text-base shrink-0">
+                View All
+            </a>
+        </div>
     {%- endunless -%}
     {%- unless section_rendering_api -%}
       <div id="DrawerSubMenu-{{ section.id }}-{{ position }}" class="drawer__scrollable flex flex-col h-full"></div>
@@ -224,7 +229,7 @@
         {%- endif -%}
         {%- if show_promotions -%}
           <li class="drawer__menu-group drawer__promotions">
-            <ul class="mega-menu__list grid grid-cols-2 w-full h-full" role="list" tabindex="-1">
+            <ul class="mega-menu__list grid{% if block.settings.mobile_layout == 'vertical' %} grid-cols-1{% else %} grid-cols-2{% endif %} w-full h-full" role="list" tabindex="-1">
               {%- for i in (1..5) -%}
                 {%- liquid
                   assign show_promotion = false

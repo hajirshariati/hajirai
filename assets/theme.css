@@ -7240,7 +7240,7 @@ ol {
 }
 
 .menu-drawer .drawer__header {
-    padding: var(--sp-8) var(--sp-5) var(--sp-4);
+    padding: var(--sp-15) var(--sp-5) var(--sp-4);
     border-block-end: 0;
 }
 
@@ -7370,14 +7370,14 @@ ol {
     transition: inset var(--animation-primary);
 }
 
-.drawer__submenu > button {
+.drawer__submenu button {
     height: 50px;
     border-block-end: 1px solid rgb(var(--color-border-light));
     padding-inline-start: var(--sp-5);
     color: rgb(var(--color-foreground)/ 0.4);
 }
 
-.drawer__submenu > button::before {
+.drawer__submenu button::before {
     content: '';
     display: block;
     border-inline-start: 2px solid currentColor;
@@ -7387,8 +7387,25 @@ ol {
     transform: rotate(calc(-45deg * var(--transform-logical)));
 }
 
-.drawer__submenu > button:focus-visible {
+.drawer__submenu button:focus-visible {
     outline-offset: -3px;
+}
+
+.drawer__menu-top {
+    padding-right: 20px;
+}
+
+.drawer__menu-top a {
+    color: rgb(var(--color-foreground) / .4);
+}
+
+.drawer__close-menu {
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border: 1px solid;
+    opacity: 0.4;
 }
 
 details.active > .drawer__submenu {
