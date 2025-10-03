@@ -16523,5 +16523,5 @@ body .rte .contact-box a {
 }
 
 .ss__theme .ss__carousel .swiper-container>.swiper-wrapper>.swiper-slide {
-    width: 100px;
+    width: 50px !important;
 }
