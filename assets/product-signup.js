@@ -57,7 +57,7 @@ class ProductSignUp extends HTMLElement {
       })
       .then((data) => {
         console.log(data);
-        if (data.message == "You are already a Loyalty program Member") {
+        if (data.message == "Already a Member") {
           this.onError(data);
           return;
         }
