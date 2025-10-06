@@ -1,0 +1,688 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-sm",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "image_with_text_zj7AiL": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_KnNgCq": {
+          "type": "heading",
+          "settings": {
+            "heading": "Plantar Fasciitis",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_RMR7rx": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Plantar Fasciitis is an inflammation resulting from excessive stretching of the plantar fascia. The plantar fascia is a broad band of fibrous tissue running along the bottom of the foot, from the heel bone (calcaneus) to the forefoot.</p><p>Pain from plantar fasciitis typically occurs at the bottom of the foot, near the inside where the heel and arch meet. The pain is often most severe first thing in the morning or after long periods of rest, as the plantar fascia contracts during inactivity. As the day progresses and the plantar fascia is stretched with activity, the pain may gradually decrease.<br/><br/></p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_KnNgCq",
+        "text_RMR7rx"
+      ],
+      "disabled": true,
+      "name": "t:sections.image-with-text.name",
+      "settings": {
+        "image": "shopify://shop_images/PF_1_2x_062c285d-cb82-4947-a547-092fa6fe87b3.png",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "medium",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "#d3dfe3",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": true,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_overlay_rBfBzp": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "heading_axLTnn": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>Plantar Fasciitis</p>",
+            "heading_size": "title-lg tracking-heading",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_LHGLnM": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Plantar Fasciitis is an inflammation resulting from excessive stretching of the plantar fascia. The plantar fascia is a broad band of fibrous tissue running along the bottom of the foot, from the heel bone (calcaneus) to the forefoot.</p><p>Pain from plantar fasciitis typically occurs at the bottom of the foot, near the inside where the heel and arch meet. The pain is often most severe first thing in the morning or after long periods of rest, as the plantar fascia contracts during inactivity. As the day progresses and the plantar fascia is stretched with activity, the pain may gradually decrease.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_axLTnn",
+        "text_LHGLnM"
+      ],
+      "name": "t:sections.image-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/Group_7_f05d6d9c-ad86-49bd-9e2e-2fd3063a6bd3.png",
+        "image_height": "adapt",
+        "content_width": "small",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/PF_1_2x_062c285d-cb82-4947-a547-092fa6fe87b3.png",
+        "image_height_mobile": "100vh",
+        "content_position_mobile": "items-end justify-end",
+        "text_alignment_mobile": "left",
+        "color_text": "#171717",
+        "color_highlight": "#171717",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": true,
+        "parallax_direction": "vertical"
+      }
+    },
+    "faq_zhAACx": {
+      "type": "faq",
+      "blocks": {
+        "question_XamVPH": {
+          "type": "question",
+          "settings": {
+            "title": "<strong>Causes</strong>",
+            "text": "<p>Excessive stretching of the plantar fascia can lead to plantar fasciitis, causing heel pain, arch pain, and potentially heel spurs.<br/><br/>Unusually high arches, sudden increases in physical activity, excessive weight (often due to obesity or pregnancy), and improperly fitting footwear.<br/><br/>Overpronation (flat feet) is the most common cause of excessive stretching, occurring when the arch collapses during walking and stretches the plantar fascia away from the heel bone.<br/><br/></p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_x9EPUx": {
+          "type": "question",
+          "settings": {
+            "title": "<strong>Treatment and Prevention</strong>",
+            "text": "<p>Each time your foot strikes the ground, the plantar fascia is stretched, so reducing strain involves avoiding running on hard or uneven surfaces. The key to treating Plantar Fasciitis effectively is identifying the cause of the excessive stretching of the plantar fascia. To minimize stress on the plantar fascia, maintain a healthy weight and include stretching exercises.<br/><br/>For overpronation (flat feet), using an orthotic with rear foot posting and longitudinal arch support helps reduce overpronation and allows the condition to heal.<br/><br/>For very high arches, cushioning the heel, absorbing shock, and wearing proper footwear enhance foot comfort and reduce pain.<br/><br/></p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "question_XamVPH",
+        "question_x9EPUx"
+      ],
+      "name": "t:sections.faq.name",
+      "settings": {
+        "style": "with-background",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#ffffff",
+        "overlay_opacity": 4,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "lookbook_JQDiwd": {
+      "type": "lookbook",
+      "blocks": {
+        "content_AeTcCN": {
+          "type": "content",
+          "settings": {
+            "icon": "none",
+            "iwidth": "custom",
+            "icon_width": 24,
+            "heading": "",
+            "text": "",
+            "link": "",
+            "color_text": "#ffffff",
+            "vertical": 50,
+            "horizontal": 50,
+            "vertical_mobile": 50,
+            "horizontal_mobile": 50
+          }
+        },
+        "content_knQQ6E": {
+          "type": "content",
+          "settings": {
+            "icon": "none",
+            "iwidth": "custom",
+            "icon_width": 24,
+            "heading": "",
+            "text": "",
+            "link": "",
+            "color_text": "#ffffff",
+            "vertical": 6,
+            "horizontal": 53,
+            "vertical_mobile": 50,
+            "horizontal_mobile": 50
+          }
+        },
+        "content_iXtFEz": {
+          "type": "content",
+          "settings": {
+            "icon": "none",
+            "iwidth": "fit",
+            "icon_width": 24,
+            "heading": "1",
+            "text": "",
+            "link": "",
+            "color_text": "#ffffff",
+            "vertical": 50,
+            "horizontal": 50,
+            "vertical_mobile": 50,
+            "horizontal_mobile": 50
+          }
+        }
+      },
+      "block_order": [
+        "content_AeTcCN",
+        "content_knQQ6E",
+        "content_iXtFEz"
+      ],
+      "name": "t:sections.lookbook.name",
+      "settings": {
+        "image": "shopify://shop_images/Danika.png",
+        "heading": "",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "heading_position": "none",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false
+      }
+    },
+    "images_with_text_iL8ht6": {
+      "type": "images-with-text",
+      "blocks": {
+        "heading_e4NMJi": {
+          "type": "heading",
+          "settings": {
+            "heading": "Signature Arch Support",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_Bw6Yfi": {
+          "type": "text",
+          "settings": {
+            "text": "<p>With removable insole, our arch support is located further back to support the apex of the foot. This helps proper alignment and help relieve arch and heel pain associated with Plantar Fasciitis</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_TWhPGJ": {
+          "type": "button",
+          "settings": {
+            "button_label": "Shop Jillian",
+            "button_link": "shopify://products/jillian-black-sc450w",
+            "button_video_link": "",
+            "button_style": "link",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": true
+          }
+        }
+      },
+      "block_order": [
+        "heading_e4NMJi",
+        "text_Bw6Yfi",
+        "button_TWhPGJ"
+      ],
+      "disabled": true,
+      "name": "t:sections.images-with-text.name",
+      "settings": {
+        "image": "shopify://shop_images/ee4e2fe8a874fb5c106a8cc3c4247add5d9048ed.png",
+        "image_url": "",
+        "image_2": "shopify://shop_images/recommended_1_2x_21163cd2-e758-4725-87c5-117210d3d3c9.png",
+        "image2_url": "",
+        "image_ratio": "adapt",
+        "image_width": "large",
+        "layout": "text_first",
+        "text_alignment": "center",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "#fafafa",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": true
+      }
+    },
+    "empty_space_gyE8Nr": {
+      "type": "empty-space",
+      "name": "t:sections.empty-space.name",
+      "settings": {
+        "desktop_height": 40,
+        "mobile_height": 28,
+        "color_background": "",
+        "gradient_background": ""
+      }
+    },
+    "featured_collection_dXtHeM": {
+      "type": "featured-collection",
+      "name": "t:sections.featured-collection.name",
+      "settings": {
+        "collection": "",
+        "products": [
+          "women-plantar-fasciitis-kit",
+          "danika-light-grey-ap113w",
+          "l2300m-m",
+          "jillian-black-sc450w"
+        ],
+        "product_limit": 4,
+        "columns": 4,
+        "carousel_on_desktop": false,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": false,
+        "heading": "How Aetrex Can Help",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "rich_text_qygTdt": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_NfEViz": {
+          "type": "heading",
+          "settings": {
+            "heading": "What Other Plantar Fasciitis Sufferers Say",
+            "heading_size": "title-lg tracking-heading",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_NfEViz"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#74a5ba",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "testimonials_byJFpb": {
+      "type": "testimonials",
+      "blocks": {
+        "testimonial_UPjm8b": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<h6>\"These Saved My Life!  </h6><h6>These flip flops saved my summer! My plantar fasciitis was really bad and when I put these on I felt relief almost immediately. The discomfort continues to subside more and more each day, and is still improving, which I largely attribute to wearing these all day, every day. Plus, they felt very secure even when wet. Very thankful for these!\" </h6>",
+            "author": "Lisa R",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_xPKLWB": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<h6>\"My Favorite!<br/>These were the first shoe I ordered from Aetrex. I loved them immediately. I am now on my 3rd pair, including one for my daughter since she kept stealing mine! They are cushiony & supportive enough for a day at an amusement park plus the strap keeps them secure. Casual enough for everyday, but dressy enough for a night out means only packing one pair for trips.\" </h6>",
+            "author": "Holly J.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_RixBWT": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<h6>\"Better Than My Bare Feet! </h6><h6>These sandals are perfect. They are very cushioned and supportive in all the right places. I can already feel the difference with my pronation issues when I wear these slides. I also love that they are cute and so easy to wear. I wear them out or just around the house. I couldn't recommend more!!!\" </h6>",
+            "author": "Kimberly S.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_UPjm8b",
+        "testimonial_xPKLWB",
+        "testimonial_RixBWT"
+      ],
+      "name": "t:sections.testimonials.name",
+      "settings": {
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 20,
+        "padding_bottom": 20,
+        "divider": false,
+        "rounded": false
+      }
+    },
+    "collection_list_fbMkYY": {
+      "type": "collection-list",
+      "blocks": {
+        "collection_cPKHdc": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "orthotics-plantar-fasciitis",
+            "custom_url": "",
+            "image": "shopify://shop_images/Rectangle_60_45bfd4e4-700b-4afc-8786-af3abca4bc9c.png",
+            "title": "",
+            "description": "To Help Relieve Plantar Fasciitis",
+            "overlay_content": true,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "center",
+            "enable_title_drop_shadow": true
+          }
+        },
+        "collection_gpn6Pp": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "shop-all-orthotics",
+            "custom_url": "",
+            "image": "shopify://shop_images/Rectangle_61_668b1198-2250-4e0e-9f58-c1a42125e032.png",
+            "title": "",
+            "description": "To Help Relieve Plantar Fasciitis",
+            "overlay_content": true,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "center",
+            "enable_title_drop_shadow": true
+          }
+        }
+      },
+      "block_order": [
+        "collection_cPKHdc",
+        "collection_gpn6Pp"
+      ],
+      "name": "t:sections.collection-list.name",
+      "settings": {
+        "columns": 2,
+        "carousel_on_desktop": true,
+        "image_type": "collection",
+        "image_ratio": "landscape",
+        "show_products_count": false,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "#fafafa",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 40,
+        "divider": false,
+        "full_width": true,
+        "rounded": false
+      }
+    },
+    "image_with_text_overlay_NcafqY": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "heading_f3kfJV": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>Why Aetrex</p>",
+            "heading_size": "title-lg tracking-heading",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_f3kfJV"
+      ],
+      "name": "t:sections.image-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/Group_9.png",
+        "image_height": "adapt",
+        "content_width": "medium",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/logopng.png",
+        "image_height_mobile": "500px",
+        "content_position_mobile": "items-start justify-start",
+        "text_alignment_mobile": "center",
+        "color_text": "#171717",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 5,
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": true,
+        "parallax_direction": "vertical"
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "image_with_text_zj7AiL",
+    "image_with_text_overlay_rBfBzp",
+    "faq_zhAACx",
+    "lookbook_JQDiwd",
+    "images_with_text_iL8ht6",
+    "empty_space_gyE8Nr",
+    "featured_collection_dXtHeM",
+    "rich_text_qygTdt",
+    "testimonials_byJFpb",
+    "collection_list_fbMkYY",
+    "image_with_text_overlay_NcafqY"
+  ]
+}
