@@ -505,7 +505,9 @@ fieldset[data-option-slug="width"] .swatches--variant {
 }
 
 .product-card .custom-product-url {
+  position: relative;
   mix-blend-mode: darken;
+  z-index: 9;
 }
 
 .product-card .price.price--on-sale {
