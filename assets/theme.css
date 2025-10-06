@@ -16565,22 +16565,23 @@ body .rte .contact-box a {
   }
 }
 
-
-/* Product Sign Up Banner */
 .p-signup {
     background: rgb(var(--color-foreground) / .025);
     padding: 20px 24px;
 }
+
 .p-signup__promo {
     display: flex;
     flex-direction: column;
     gap: 16px;
     text-align: center;
 }
+
 .p-signup__button {
     width: 100%;
     text-transform: uppercase;
 }
+
 .p-signup__button[data-submit] gif {
     display: none;
 }
@@ -16613,55 +16614,64 @@ body .rte .contact-box a {
     }
 }
 
-.p-signup__button--open.loading {
-
-}
-
 .p-signup__form {
     display: none;
     flex-direction: column;
     gap: 16px;
 }
+
 .p-signup__row {
     display: flex;
     flex-direction: column;
     gap: 16px;
 }
+
 .p-signup.active .p-signup__promo {
     display: none;
 }
+
 .p-signup.active .p-signup__form {
     display: flex;
 }
+
 .p-signup__form-checkbox {
     display: flex;
     align-items: center;
     font-size: 14px;
     gap: 8px;
 }
+
+#singup_checkbox {
+    position: relative;
+    top: -5px;
+}
+
 .p-signup__input {
-    padding: 8px 16px;
+    padding: 12px 16px;
     border: 1px solid rgba(0, 0, 0, .5);
     border-radius: 4px;
     width: 100%;
-    font-size: 14px;
+    font-size: 1rem;
     line-height: 100%;
     font-weight: 400;
     color: #000;
     background: #fff;
     transition: all 400ms ease-in-out;
-    outline: none!important;
-    box-shadow: none!important;
+    outline: none !important;
+    box-shadow: none !important;
 }
+
 .p-signup__error,
 .p-signup__success {
     display: none;
     text-align: center;
 }
+
 .p-signup.success .p-signup__promo,
 .p-signup.success .p-signup__form {
     display: none;
 }
+
 .p-signup.success .p-signup__success {
     display: block;
 }
@@ -16670,6 +16680,7 @@ body .rte .contact-box a {
 .p-signup.error .p-signup__form {
     display: none;
 }
+
 .p-signup.error .p-signup__error {
     display: block;
 }
