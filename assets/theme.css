@@ -17461,8 +17461,8 @@ body .rte .contact-box a {
 }
 
 @media all and (max-width: 767px) {
-    .product-info__blocks .form__label--color,
-    .product-info__blocks .swatches--color {
+    .product .product-info__blocks .form__label--color,
+    .product .product-info__blocks .swatches--color {
         display: none !important;
     }
 
