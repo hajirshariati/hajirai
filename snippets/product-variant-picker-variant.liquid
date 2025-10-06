@@ -27,12 +27,12 @@
  {% assign metaProducts = product.metafields.custom.product_reference.value %}
  {% assign productcolor = product.metafields.custom.color | metafield_tag | strip_html %}
   {% if productcolor != blank and metaProducts != blank %}
-    <div class="form__label flex items-center justify-between gap-2 w-full">
+    <div class="form__label flex items-center justify-between gap-2 w-full form__label--color">
       <div class="flex gap-2">Color:
         <span class="font-medium">{{ productcolor }}</span>
       </div>
     </div>
-    <ul class="swatches swatches--{{ settings.rounded_swatch }} swatches--variant flex items-start flex-wrap gap-4">
+    <ul class="swatches swatches--{{ settings.rounded_swatch }} swatches--color swatches--variant flex items-start flex-wrap gap-4">
       {% for metaproduct in metaProducts %}
         <li>
           {%- assign variant_badge = metaproduct.selected_or_first_available_variant.metafields.variant.badge -%}
@@ -55,11 +55,14 @@
                   <div class="main-pdp-variant-custom-badge custom-normal-sale">
                     {{- "SALE" -}}
                   </div>
-                {%- endif -%} 
+                {%- endif -%}
               {%- elsif variant_badge != blank -%}
-                <div class="main-pdp-variant-custom-badge custom-meta-badge">
-                {{- variant_badge -}}
-                </div>
+                {%- assign allowed_badges = 'NEW,Best Seller,SALE' | split: ',' -%}
+                {%- if allowed_badges contains variant_badge -%}
+                  <div class="main-pdp-variant-custom-badge custom-meta-badge">
+                  {{- variant_badge -}}
+                  </div>
+                {%- endif -%}
               {%- endif -%}
 
                 {% assign metaproductcolor = metaproduct.metafields.custom.color | metafield_tag | strip_html %}

@@ -101,10 +101,10 @@
   <div class="product__media card media media--{{ image_ratio }} mobile:media--{{ image_ratio_mobile }}{% unless image_fill %} media--contain{% endunless %} flex w-full shrink-0 relative overflow-hidden
     {%- if gallery_layout == 'scroll' and media.id == featured_media.id %} xl:hidden{% endif -%}
     {%- if hide_variants and variant_images contains media.src %} product__media--variant{% endif -%}"
+    style="scroll-snap-align: start;{%- if image_ratio == 'adapt' or image_ratio_mobile == 'adapt' %} --aspect-ratio: {{ media.aspect_ratio }};{% endif -%}"
     data-media-type="{{ media.media_type }}"
     data-media-id="{{ media.id }}"
     {%- if gang_exist == true %} data-gang-option="{{ gang_option_name }}" data-gang-connect="{{ gang_connect }}"{% if gang_media_active == false %} hidden{% endif %}{% else %} data-gang-default{% endif -%}
-    {%- if image_ratio == 'adapt' or image_ratio_mobile == 'adapt' %} style="--aspect-ratio: {{ media.aspect_ratio }};"{% endif -%}
   >
     {%- render 'media', section_id: section_id, product_id: product_id, media: media, media_alt: media_alt, sizes: sizes, preload: preload, autoplay: autoplay, loop: loop -%}
 
