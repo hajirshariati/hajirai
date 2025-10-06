@@ -10,7 +10,10 @@
             {{ block.settings.form_heading }}
         </div>
 
-        <input class="p-signup__input" type="text" name="name" placeholder="Name">
+        <div class="p-signup__row">
+            <input class="p-signup__input" type="text" name="first_name" placeholder="First Name">
+            <input class="p-signup__input" type="text" name="last_name" placeholder="Last Name">
+        </div>
         
         <input class="p-signup__input" type="email" name="email" placeholder="Email" required>
     
@@ -24,6 +27,12 @@
     <div class="p-signup__success">
         <div class="p-signup__success-heading">
             {{ block.settings.success_heading }}
+        </div>
+    </div>
+
+    <div class="p-signup__error">
+        <div class="p-signup__error-heading">
+            Already a Member
         </div>
     </div>
 

@@ -119,7 +119,7 @@
             "button_label": "Join Today",
             "form_heading": "Create your <strong>FREE</strong> account to get free shipping",
             "checkbox_label": "I want to receive email updates and coupons from Aetrex",
-            "checkbox_is_required": true,
+            "checkbox_is_required": false,
             "form_button_label": "Join Now"
           }
         },

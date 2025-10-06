@@ -16622,6 +16622,11 @@ body .rte .contact-box a {
     flex-direction: column;
     gap: 16px;
 }
+.p-signup__row {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
 .p-signup.active .p-signup__promo {
     display: none;
 }
@@ -16648,6 +16653,7 @@ body .rte .contact-box a {
     outline: none!important;
     box-shadow: none!important;
 }
+.p-signup__error,
 .p-signup__success {
     display: none;
     text-align: center;
@@ -16658,4 +16664,19 @@ body .rte .contact-box a {
 }
 .p-signup.success .p-signup__success {
     display: block;
+}
+
+.p-signup.error .p-signup__promo,
+.p-signup.error .p-signup__form {
+    display: none;
+}
+.p-signup.error .p-signup__error {
+    display: block;
+}
+
+@media all and (min-width: 992px) {
+    .p-signup__row {
+        flex-direction: row;
+        gap: 8px;
+    }
 }
