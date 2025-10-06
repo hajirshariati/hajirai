@@ -94,8 +94,8 @@
         "heading_axLTnn": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Plantar Fasciitis</p>",
-            "heading_size": "title-lg tracking-heading",
+            "heading": "<p>Bunions</p>",
+            "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -104,7 +104,7 @@
         "text_LHGLnM": {
           "type": "text",
           "settings": {
-            "text": "<p>Plantar Fasciitis is an inflammation resulting from excessive stretching of the plantar fascia. The plantar fascia is a broad band of fibrous tissue running along the bottom of the foot, from the heel bone (calcaneus) to the forefoot.</p><p>Pain from plantar fasciitis typically occurs at the bottom of the foot, near the inside where the heel and arch meet. The pain is often most severe first thing in the morning or after long periods of rest, as the plantar fascia contracts during inactivity. As the day progresses and the plantar fascia is stretched with activity, the pain may gradually decrease.</p>",
+            "text": "<p>A bunion is characterized by a prominent bump on the inside of the foot around the big toe joint, caused by a bone protruding towards the inside of the foot. As the big toe moves toward the smaller toes, it can end up resting under or over the second toe, leading to a condition known as overlapping toes.</p><p>Symptoms of bunions include inflammation, swelling, and soreness on the side surface of the big toe, often causing improper walking.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -124,12 +124,11 @@
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
-        "image": "shopify://shop_images/Group_7_f05d6d9c-ad86-49bd-9e2e-2fd3063a6bd3.png",
+        "image": "shopify://shop_images/Group_8_a872f6a0-f2ec-48c9-b9d4-2da3568f1adb.png",
         "image_height": "adapt",
         "content_width": "small",
         "content_position": "md:items-end md:justify-start",
         "text_alignment": "left",
-        "image_mobile": "shopify://shop_images/PF_1_2x_062c285d-cb82-4947-a547-092fa6fe87b3.png",
         "image_height_mobile": "100vh",
         "content_position_mobile": "items-end justify-end",
         "text_alignment_mobile": "left",
