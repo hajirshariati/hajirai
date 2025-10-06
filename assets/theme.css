@@ -7240,7 +7240,7 @@ ol {
 }
 
 .menu-drawer .drawer__header {
-    padding: var(--sp-8) var(--sp-5) var(--sp-4);
+    padding: var(--sp-15) var(--sp-5) var(--sp-4);
     border-block-end: 0;
 }
 
@@ -7370,14 +7370,14 @@ ol {
     transition: inset var(--animation-primary);
 }
 
-.drawer__submenu > button {
+.drawer__submenu button {
     height: 50px;
     border-block-end: 1px solid rgb(var(--color-border-light));
     padding-inline-start: var(--sp-5);
     color: rgb(var(--color-foreground)/ 0.4);
 }
 
-.drawer__submenu > button::before {
+.drawer__submenu button::before {
     content: '';
     display: block;
     border-inline-start: 2px solid currentColor;
@@ -7387,8 +7387,25 @@ ol {
     transform: rotate(calc(-45deg * var(--transform-logical)));
 }
 
-.drawer__submenu > button:focus-visible {
+.drawer__submenu button:focus-visible {
     outline-offset: -3px;
+}
+
+.drawer__menu-top {
+    padding-right: 20px;
+}
+
+.drawer__menu-top a {
+    color: rgb(var(--color-foreground) / .4);
+}
+
+.drawer__close-menu {
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border: 1px solid;
+    opacity: 0.4;
 }
 
 details.active > .drawer__submenu {
@@ -7739,7 +7756,7 @@ details.active .drawer__promotions .mega-menu__item,
     --tw-translate-y: 0;
     --tw-translate-x: 25%;
     flex: calc(20% - var(--header-nav-gap) * 5 / 6);
-    max-width: calc(25% - var(--header-nav-gap) * 4 / 5);
+    align-items: flex-start;
     color: rgb(var(--color-foreground));
     transform: translate(calc(var(--tw-translate-x) * var(--transform-logical)), var(--tw-translate-y));
     transition: transform 1.5s cubic-bezier(.075, .82, .165, 1), opacity .9s cubic-bezier(.19, 1, .22, 1);
@@ -7752,6 +7769,21 @@ details.active .drawer__promotions .mega-menu__item,
     align-content: space-between;
     grid-template-columns: repeat(1, minmax(0, 1fr));
     padding-inline-end: var(--sp-5);
+}
+
+@media screen and (min-width: 768px) {
+    .mega-menu__nav-section {
+        width: var(--nav-width, 70%);
+    }
+
+    .mega-menu__promo-section {
+        width: var(--promo-width, 30%);
+    }
+
+    /* When no promotions section exists, navigation takes full width */
+    .mega-menu__item--nav-only .mega-menu__nav-section {
+        width: 100% !important;
+    }
 }
 
 @media screen and (min-width: 1280px) {
@@ -8005,7 +8037,7 @@ details.active .drawer__promotions .mega-menu__item,
 
 .mega-menu__nav {
     --header-nav-gap: clamp(var(--sp-5), 6.5vw, var(--sp-32));
-    column-gap: var(--header-nav-gap);
+    column-gap: 3rem;
     row-gap: clamp(var(--sp-5), 2.315vw, var(--sp-11));
 }
 
@@ -8024,8 +8056,8 @@ details.active .drawer__promotions .mega-menu__item,
 }
 
 .mega-menu__nav.flex .mega-menu__nav-item {
-    flex: calc(20% - var(--header-nav-gap) * 4 / 5);
-    max-width: calc(20% - var(--header-nav-gap) * 4 / 5);
+    flex: calc(25% - var(--header-nav-gap) * 4 / 5);
+    max-width: 20%;
 }
 
 .mega-menu__nav-item {
