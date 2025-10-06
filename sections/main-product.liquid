@@ -819,6 +819,9 @@
             {%- when 'icon_list' -%}
               {{- icon_list_render -}}
 
+            {% when 'sign_up' -%}
+              {%- render 'product-sign-up-banner', block: block -%}
+
             {%- when 'line_item_property' -%}
               {%- assign custom_name = block.settings.title | escape -%}
               <div class="field" {{ block.shopify_attributes }}>
@@ -1332,6 +1335,69 @@
           "id": "show_collections_link",
           "label": "t:sections.main-product.blocks.breadcrumb.settings.show_collections_link.label",
           "default": true
+        }
+      ]
+    },
+    {
+      "type": "sign_up",
+      "name": "Sign Up Banner",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "inline_richtext",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Aetrex Loyalti Program"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "subheading",
+          "label": "Subheading",
+          "default": "Join for free shipping"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button Label",
+          "default": "Join Today"
+        },
+        {
+          "type": "header",
+          "content": "Form"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "form_heading",
+          "label": "Form Heading",
+          "default": "Create your <strong>FREE</strong> account to get free shipping"
+        },
+        {
+          "type": "text",
+          "id": "checkbox_label",
+          "label": "Checkbox Label",
+          "default": "I want to receive email updates and coupons from Aetrex"
+        },
+        {
+          "type": "checkbox",
+          "id": "checkbox_is_required",
+          "label": "Checkbox is required",
+          "default": false
+        },
+        {
+          "type": "text",
+          "id": "form_button_label",
+          "label": "Button Label",
+          "default": "Join Now"
+        },
+        {
+          "type": "header",
+          "content": "Success"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "success_heading",
+          "label": "Success Heading",
+          "default": "Thank you for signing up!"
         }
       ]
     },

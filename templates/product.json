@@ -7,7 +7,7 @@
  * made to this file may be overwritten.
  * ------------------------------------------------------------
  */
-{
+ {
   "sections": {
     "main-product": {
       "type": "main-product",
@@ -106,8 +106,21 @@
         },
         "klaviyo_email_marketing_sms_form_embed_block_qDg68M": {
           "type": "shopify://apps/klaviyo-email-marketing-sms/blocks/form-embed-block/2632fe16-c075-4321-a88b-50b567f42507",
+          "disabled": true,
           "settings": {
             "formId": "UZG2CK"
+          }
+        },
+        "sign_up_DcnXLa": {
+          "type": "sign_up",
+          "settings": {
+            "heading": "Aetrex Loyalti Program",
+            "subheading": "Join for <strong>free shipping</strong>",
+            "button_label": "Join Today",
+            "form_heading": "Create your <strong>FREE</strong> account to get free shipping",
+            "checkbox_label": "I want to receive email updates and coupons from Aetrex",
+            "checkbox_is_required": true,
+            "form_button_label": "Join Now"
           }
         },
         "icon_list_VBaw6z": {
@@ -198,6 +211,7 @@
         "buy_buttons",
         "complementary",
         "klaviyo_email_marketing_sms_form_embed_block_qDg68M",
+        "sign_up_DcnXLa",
         "icon_list_VBaw6z",
         "text-1",
         "text-3",

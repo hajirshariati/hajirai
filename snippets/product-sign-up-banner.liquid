@@ -1,0 +1,33 @@
+<product-signup class="p-signup block" data-required-checkbox="{{ block.settings.checkbox_is_required }}">
+    <div class="p-signup__promo">
+        <div class="p-signup__heading lg:text-3xl text-2xl leading-none tracking-tight">{{ block.settings.heading }}</div>
+        <p class="p-signup__subheading text-sm">{{ block.settings.subheading }}</p>
+        <button class="p-signup__button button button--primary" data-open-signup>{{ block.settings.button_label }}</button>
+    </div>
+
+    <form class="p-signup__form">
+        <div class="p-signup__form-heading text-center">
+            {{ block.settings.form_heading }}
+        </div>
+
+        <input class="p-signup__input" type="text" name="name" placeholder="Name">
+        
+        <input class="p-signup__input" type="email" name="email" placeholder="Email" required>
+    
+        <div class="p-signup__form-checkbox">
+            <input type="checkbox" name="checkbox" id="singup_checkbox" {% if block.settings.checkbox_is_required %} required{% endif %}>
+            <label for="singup_checkbox">{{ block.settings.checkbox_label }}</label>
+        </div>
+        <button class="p-signup__button button button--primary" type="submit" data-submit>{{ block.settings.form_button_label }}</button>
+    </form>
+
+    <div class="p-signup__success">
+        <div class="p-signup__success-heading">
+            {{ block.settings.success_heading }}
+        </div>
+    </div>
+
+
+</product-signup>
+
+<script src="{{ 'product-signup.js' | asset_url }}" defer></script>
