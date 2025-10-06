@@ -111,7 +111,7 @@
             "heading": "Stay Connected",
             "text": "<p>Sign up for the latest news and offers.</p>",
             "highlighted_text": "none",
-            "custom_html": "<div style=\"justify-self: center; padding:2em\"><div class=\"klaviyo-form-TAKnwd\"></div></div>",
+            "custom_html": "<div style=\"justify-self: center; padding:2em 0em\"><div class=\"klaviyo-form-TAKnwd\"></div></div>",
             "highlighted_scribble": "circle"
           }
         },
