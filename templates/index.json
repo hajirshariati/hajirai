@@ -1008,6 +1008,11 @@
         "divider": false,
         "rounded": false
       }
+    },
+    "ss_recs_script_EYXn3V": {
+      "type": "ss-recs-script",
+      "name": "Searchspring Recommendations",
+      "settings": {}
     }
   },
   "order": [
@@ -1018,6 +1023,7 @@
     "collection_list_cLB6dX",
     "image_with_text_overlay_TNKwpP",
     "rich_text_mVRDXW",
-    "scrolling_text_byhkGn"
+    "scrolling_text_byhkGn",
+    "ss_recs_script_EYXn3V"
   ]
 }

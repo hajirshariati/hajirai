@@ -1,0 +1,64 @@
+{% if settings.ss_enable %}
+  <script type="searchspring/recommendations">
+    globals = {
+  {%- if template contains 'product' -%}products: ['{{ product.variants[0].sku }}'],{% endif %}
+			{%- if template contains 'cart' -%}cart: [{% for item in cart.items %}'{{ item.sku }}'{% unless forloop.last %},{% endunless %}{% endfor %}],{%- endif -%}
+    };
+    profiles = [
+    {% for block in section.blocks %}
+      {%- if block.settings.ss_profile_id != blank -%}
+                  {
+    					tag: '{{ block.settings.ss_profile_id | escape }}',
+    					selector: '.ss__recs__{{ block.settings.ss_profile_id | escape }}',
+    					{%- if block.settings.ss_collection_list != blank or block.settings.ss_batched == false -%}
+                            options: {
+                                {% if block.settings.ss_collection_list != blank %}categories: [{%- for collection in block.settings.ss_collection_list -%}{{ collection.id }}{%- unless forloop.last -%}, {%- endunless -%}{%- endfor -%}],{% endif %}
+        {% if block.settings.ss_batched == false %}dedupe: false,{% endif %}
+                            },
+    					{%- endif -%}
+    				}{% unless forloop.last %},{% endunless %}
+      {%- endif -%}
+    {% endfor %}
+    ];
+  </script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "SS Recommendations",
+  "tag": "div",
+  "class": "section-product-recommendations",
+  "presets": [
+    {
+      "name": "Searchspring Recommendations"
+    }
+  ],
+  "settings": [],
+  "blocks": [
+    {
+      "type": "ss_profile_block",
+      "name": "Recommendations Profile",
+      "settings": [
+        {
+          "type": "text",
+          "id": "ss_profile_id",
+          "label": "Profile ID"
+        },
+        {
+          "type": "collection_list",
+          "id": "ss_collection_list",
+          "label": "Collection ID",
+          "info" : "Filter recommendations to a list of collection ids. This only works for category trending profiles."
+        },
+        {
+          "type": "checkbox",
+          "id": "ss_batched",
+          "label": "Batched",
+          "info" : "Toggle batching for this recommendation.  Note: turning off batching may show duplicate products across recommendations if you have multiple profiles on the same page.",
+          "default": true
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

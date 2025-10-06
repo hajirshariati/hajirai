@@ -82,10 +82,14 @@
     {%- endif -%}
 
     {%- render 'js-variables' -%}
+
+    {% if settings.ss_enable %}
+      {% render 'ss-script' %}
+    {% endif %}
   </head>
 
   <body
-    class="template-{{ template | replace: '.', ' ' | truncatewords: 1, '' | handle }}{% if request.path == '/challenge' %} template-challange{% endif %}"
+    class="template-{{ template | replace: '.', ' ' | truncatewords: 1, '' | handle }}{% if request.path == '/challenge' %} template-challange{% endif %}{% if settings.ss_enable and collection.handle and collection.handle == settings.ss_collection_handle %} ss-shop{% endif %}"
     data-rounded-button="{{ settings.rounded_button }}"
     data-rounded-input="{{ settings.rounded_input }}"
     data-rounded-block="{{ settings.rounded_block }}"

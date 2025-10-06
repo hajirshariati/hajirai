@@ -39,12 +39,12 @@
 {% endif %}
 
 {% if rps_installed
-  and rps_settings.enabled == true
-  and rps_settings.limit_exceeded == false
-  and rps_settings.last_import != false
-  and rps_settings.last_import != null
-  and rps_results_enabled == true
-  and should_load_snapshot == true
+and rps_settings.enabled == true
+and rps_settings.limit_exceeded == false
+and rps_settings.last_import != false
+and rps_settings.last_import != null
+and rps_results_enabled == true
+and should_load_snapshot == true
 %}
   {% if search %}
     {% assign search_title = 'templates.search.title' | t %}
@@ -92,8 +92,8 @@
         const children = Array.from(container.children);
 
         children
-          .filter(child => !child.classList.contains('rps-results'))
-          .forEach(sibling => (sibling.style.display = 'none'));
+                .filter(child => !child.classList.contains('rps-results'))
+                .forEach(sibling => (sibling.style.display = 'none'));
       }
 
       function rpsObserveParent(targetElement) {

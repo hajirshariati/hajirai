@@ -17580,3 +17580,7 @@ body .rte .contact-box a {
         gap: 8px;
     }
 }
+
+.ss__theme .ss__carousel .swiper-container>.swiper-wrapper>.swiper-slide {
+    width: 50px !important;
+}
