@@ -136,7 +136,7 @@
           "type": "mega_menu",
           "settings": {
             "menu_title": "Women's Footwear",
-            "menu_width": "large",
+            "menu_width": "small",
             "show_menu_image": true,
             "nav_width": 70,
             "promo_width": 30,
