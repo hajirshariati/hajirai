@@ -17041,6 +17041,7 @@ ul.swatches li label {
     line-height: 100%;
     font-weight: 600;
     text-transform: capitalize;
+    min-height: 65px;
 }
 
 ul.swatches li label p {
