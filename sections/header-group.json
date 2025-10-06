@@ -144,6 +144,7 @@
             "button_label": "",
             "button_link": "shopify://collections/womens-sale",
             "promo_image_1": "shopify://shop_images/free_ship_nav_D.jpg",
+            "promo_mobile_image_1": "shopify://shop_images/FS_nav_D.gif",
             "promo_image_ratio_1": "adapt",
             "promo_heading_1": "",
             "promo_subtext_1": "",
