@@ -327,15 +327,27 @@ label.active-swatch.custom-meta-label:before {
   width: 100%;
 }
 
+fieldset[data-option-slug="size"] .swatches--variant {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 @media screen and (min-width: 768px) {
   .swatches--variant {
     grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  fieldset[data-option-slug="size"] .swatches--variant {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
 @media screen and (min-width: 1500px) {
   .swatches--variant {
     grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  fieldset[data-option-slug="size"] .swatches--variant {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 }
 
@@ -640,6 +652,7 @@ variant-picker .main-pdp-variant-custom-badge {
   top: 0;
   right: 50%;
   transform: translateX(50%);
+  width: max-content;
   font-size: 12px;
   line-height: 100%;
   padding: 5px;

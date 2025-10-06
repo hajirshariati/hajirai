@@ -3560,11 +3560,6 @@ button.shopify-payment-button__button--unbranded {
   right: 8px;
 }
 
-.product__media-container .indicators {
-  height: 36px;
-  bottom: -50px;
-}
-
 .product__media-container .indicators .button {
   width: 36px;
   height: 36px;
@@ -12796,6 +12791,10 @@ noscript .product-form__input {
   margin-block-start: var(--sp-5);
 }
 
+.product__title {
+  margin: 1rem 0;
+}
+
 .product__price {
   font-size: var(--fluid-lg-to-2xl);
 }
@@ -12810,6 +12809,10 @@ noscript .product-form__input {
 
 .product__tax {
   margin-block-start: var(--sp-1d5);
+}
+
+.variant-picker {
+  margin-top: 1rem;
 }
 
 .product__title.with-price {
@@ -13756,7 +13759,7 @@ button:is(
   .product__thumbnails.with-dots,
   .product__thumbnails.with-dots .product__thumbnails-list {
     position: absolute;
-    bottom: 5px;
+    bottom: 25px;
     width: 100%;
     display: flex;
     align-items: center;
