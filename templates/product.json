@@ -7,7 +7,7 @@
  * made to this file may be overwritten.
  * ------------------------------------------------------------
  */
- {
+{
   "sections": {
     "main-product": {
       "type": "main-product",
@@ -114,13 +114,14 @@
         "sign_up_DcnXLa": {
           "type": "sign_up",
           "settings": {
-            "heading": "Aetrex Loyalti Program",
+            "heading": "Aetrex Loyalty Program",
             "subheading": "Join for <strong>free shipping</strong>",
-            "button_label": "Join Today",
+            "button_label": "Join our Loyalty Program",
             "form_heading": "Create your <strong>FREE</strong> account to get free shipping",
             "checkbox_label": "I want to receive email updates and coupons from Aetrex",
             "checkbox_is_required": false,
-            "form_button_label": "Join Now"
+            "form_button_label": "Join Now",
+            "success_heading": "Thank you for signing up!"
           }
         },
         "icon_list_VBaw6z": {
