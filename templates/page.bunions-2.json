@@ -24,70 +24,6 @@
         "rounded": false
       }
     },
-    "image_with_text_zj7AiL": {
-      "type": "image-with-text",
-      "blocks": {
-        "heading_KnNgCq": {
-          "type": "heading",
-          "settings": {
-            "heading": "Plantar Fasciitis",
-            "heading_size": "title-md",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_RMR7rx": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Plantar Fasciitis is an inflammation resulting from excessive stretching of the plantar fascia. The plantar fascia is a broad band of fibrous tissue running along the bottom of the foot, from the heel bone (calcaneus) to the forefoot.</p><p>Pain from plantar fasciitis typically occurs at the bottom of the foot, near the inside where the heel and arch meet. The pain is often most severe first thing in the morning or after long periods of rest, as the plantar fascia contracts during inactivity. As the day progresses and the plantar fascia is stretched with activity, the pain may gradually decrease.<br/><br/></p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "heading_KnNgCq",
-        "text_RMR7rx"
-      ],
-      "disabled": true,
-      "name": "t:sections.image-with-text.name",
-      "settings": {
-        "image": "shopify://shop_images/PF_1_2x_062c285d-cb82-4947-a547-092fa6fe87b3.png",
-        "img_url": "",
-        "image_height": "adapt",
-        "image_width": "medium",
-        "layout": "text_first",
-        "text_alignment": "left",
-        "custom_content_position": "items-center",
-        "image_height_mobile": "auto",
-        "text_alignment_mobile": "left",
-        "color_text": "",
-        "color_background": "#d3dfe3",
-        "gradient_background": "",
-        "color_background_2": "",
-        "gradient_background_2": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "enable_parallax": true,
-        "parallax_direction": "vertical"
-      }
-    },
     "image_with_text_overlay_rBfBzp": {
       "type": "image-with-text-overlay",
       "blocks": {
@@ -672,7 +608,6 @@
   },
   "order": [
     "main-page",
-    "image_with_text_zj7AiL",
     "image_with_text_overlay_rBfBzp",
     "faq_zhAACx",
     "lookbook_JQDiwd",
