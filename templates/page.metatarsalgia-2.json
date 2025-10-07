@@ -40,7 +40,7 @@
         "text_LHGLnM": {
           "type": "text",
           "settings": {
-            "text": "<p>A bunion is characterized by a prominent bump on the inside of the foot around the big toe joint, caused by a bone protruding towards the inside of the foot. As the big toe moves toward the smaller toes, it can end up resting under or over the second toe, leading to a condition known as overlapping toes.</p><p>Symptoms of bunions include inflammation, swelling, and soreness on the side surface of the big toe, often causing improper walking.</p>",
+            "text": "<p>Metatarsalgia is a term used to describe pain in the metatarsal region of the foot, commonly known as the ball-of-the-foot. This condition affects the bones and joints at the ball-of-the-foot, often located under the 2nd, 3rd, and 4th metatarsal heads, or more isolated at the first metatarsal head near the big toe.<br/><br/>Improperly fitting footwear, especially women’s dress shoes and other restrictive shoes, commonly causes ball-of-foot pain. Additional causes of excessive pressure in the ball-of-foot area include high heels, high-impact activities without proper footwear or orthotics, and thinning of the fat pad in the foot with age.<br/><br/></p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -93,7 +93,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Causes</strong>",
-            "text": "<p>A bunion is a prominent bump on the inside of the foot around the big toe joint. Some of the symptoms of bunions include inflammation, swelling, soreness or pain in the bunion area. </p><p>Bunions are more common in women and often result from improper fitting footwear, such as tight, narrow dress shoes with a constrictive toe box.<br/><br/>Wearing shoes that squeeze the toes together can cause the first metatarsal bone to protrude, leading to the formation of a bunion.<br/><br/><br/><br/></p>",
+            "text": "<p>This condition affects the bones and joints at the ball-of-the-foot, often located under the 2nd, 3rd, and 4th metatarsal heads, or more isolated at the first metatarsal head near the big toe.<br/><br/>Improperly fitting footwear, especially women’s dress shoes and other restrictive shoes, commonly causes ball-of-foot pain.<br/><br/>Additional causes of excessive pressure in the ball-of-foot area include high heels, high-impact activities without proper footwear or orthotics, and thinning of the fat pad in the foot with age.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -102,7 +102,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Treatment and Prevention</strong>",
-            "text": "<p><strong>GET STRETCHING EXERCISE GUIDE</strong><br/>Our Plantar Fasciitis Kit comes with an exercise guide that helps give you instructions on how to stretch the plantar fascia as well as the muscles and tendons surrounding the tissue. In turn it can help with reducing tension and putting you on the path towards pain relief. </p><p><strong>SHOP RECOMMENDED ORTHOTICS</strong><br/>Orthotics are suggested to support the arch, especially for individuals with flat feet.Orthotics can help limit the progression of bunion formation and provide relief from pain. If the problem persists, consult your foot doctor.</p><p><strong>SHOP RECOMMENDED SHOES</strong><br/>Conservative treatment for bunion pain involves wearing shoes that accommodate the deformity.Shoes with a wide toe box are recommended to reduce pressure on the bunion.</p>",
+            "text": "<p><strong>GET STRETCHING EXERCISE GUIDE</strong><br/>Our Plantar Fasciitis Kit comes with an exercise guide that helps give you instructions on how to stretch the plantar fascia as well as the muscles and tendons surrounding the tissue. In turn it can help with reducing tension and putting you on the path towards pain relief. </p><p><br/><br/><strong>SHOP RECOMMENDED ORTHOTICS</strong><br/>Orthotics designed to relieve ball-of-foot pain typically feature a metatarsal pad. The metatarsal pad is placed behind the ball-of-the-foot to relieve pressure and redistribute weight from the painful area to more tolerant areas. If the problem persists, consult your foot doctor.</p><p><br/><br/><strong>SHOP RECOMMENDED SHOES</strong><br/>If improper fitting footwear is the cause, it should be replaced with more suitable options. Footwear recommended for metatarsalgia includes those with a high, wide toe box and shock-absorbing soles.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
