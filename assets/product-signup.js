@@ -1,4 +1,6 @@
-class ProductSignUp extends HTMLElement {
+// Prevent redeclaration if class already exists
+if (!customElements.get('product-signup')) {
+  class ProductSignUp extends HTMLElement {
   constructor() {
     super();
 
@@ -113,6 +115,7 @@ class ProductSignUp extends HTMLElement {
     this.classList.remove("active");
     this.classList.add("error");
   }
-}
+  }
 
-customElements.define("product-signup", ProductSignUp);
+  customElements.define("product-signup", ProductSignUp);
+}
