@@ -261,7 +261,7 @@
             "button_link": "shopify://collections/womens-new-arrivals",
             "button_video_link": "",
             "button_style": "primary",
-            "button_size": "md",
+            "button_size": "lg",
             "button_external": false,
             "button_icon": false
           }
