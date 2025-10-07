@@ -8133,44 +8133,6 @@ class ProductColorSwatchHandler {
         }));
     }
 
-    updateAddToCartButton() {
-        const addToCartBtn = document.querySelector('button.product-form__submit');
-        const stickyAddToCartBtn = document.querySelector('button.sticky_form__submit');
-        
-        if (addToCartBtn) {
-            const firstRequiredOption = document.querySelector('.custom-option-buttons[data-opt-name="Size"], .custom-option-buttons[data-opt-name="Width"]');
-            const optName = firstRequiredOption ? firstRequiredOption.getAttribute('data-opt-name') : 'SIZE';
-            
-            addToCartBtn.style.display = "flex";
-            addToCartBtn.setAttribute("disabled", "disabled");
-            addToCartBtn.disabled = true;
-            
-            const btnText = addToCartBtn.querySelector('.btn-text');
-            if (btnText) {
-                btnText.innerText = "PLEASE SELECT " + optName.toUpperCase();
-            } else {
-                addToCartBtn.innerText = "PLEASE SELECT " + optName.toUpperCase();
-            }
-        }
-
-        if (stickyAddToCartBtn) {
-            const firstRequiredOption = document.querySelector('.custom-option-buttons[data-opt-name="Size"], .custom-option-buttons[data-opt-name="Width"]');
-            const optName = firstRequiredOption ? firstRequiredOption.getAttribute('data-opt-name') : 'SIZE';
-            
-            stickyAddToCartBtn.style.display = "flex";
-            stickyAddToCartBtn.classList.add("disabled-btn");
-            stickyAddToCartBtn.setAttribute("disabled", "disabled");
-            stickyAddToCartBtn.disabled = true;
-            
-            const btnText = stickyAddToCartBtn.querySelector('.btn-text');
-            if (btnText) {
-                btnText.innerText = "PLEASE SELECT " + optName.toUpperCase();
-            } else {
-                stickyAddToCartBtn.innerText = "PLEASE SELECT " + optName.toUpperCase();
-            }
-        }
-    }
-
     forceResetAllVariants() {
         // Force clear all radio inputs
         const allRadioInputs = document.querySelectorAll('input[type="radio"]');
@@ -8180,9 +8142,6 @@ class ProductColorSwatchHandler {
                 input.removeAttribute('checked');
             }
         });
-        
-        // Update button state
-        this.updateAddToCartButton();
         
         // Dispatch event to notify other components
         document.dispatchEvent(new CustomEvent('variants:force-cleared', {
@@ -8280,7 +8239,6 @@ class ProductColorSwatchHandler {
                             input.checked = false;
                             input.removeAttribute('checked');
                         });
-                        this.updateAddToCartButton();
                     }
                 }, 100);
                 
