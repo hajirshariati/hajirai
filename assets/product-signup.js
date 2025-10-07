@@ -111,7 +111,6 @@ if (!customElements.get('product-signup')) {
   }
 
   onError(data) {
-    this.querySelector(".p-signup__error-heading").innerText = data.message;
     this.classList.remove("active");
     this.classList.add("error");
   }
