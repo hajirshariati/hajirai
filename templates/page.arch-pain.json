@@ -239,7 +239,7 @@
       "name": "t:sections.lookbook.name",
       "settings": {
         "image": "shopify://shop_images/Group_18_2.png",
-        "image_mobile": "shopify://shop_images/Group_18_1.png",
+        "image_mobile": "shopify://shop_images/Group_18_2.png",
         "heading": "",
         "heading_size": "title-sm",
         "heading_alignment": "text-center md:items-center",
