@@ -95,6 +95,12 @@
             "show_back_in_stock_phone": false
           }
         },
+        "liquid_JNwFRV": {
+          "type": "liquid",
+          "settings": {
+            "liquid": "<br>"
+          }
+        },
         "complementary": {
           "type": "complementary",
           "settings": {
@@ -210,6 +216,7 @@
         "variant_picker",
         "true_fit_widget_8cjNbr",
         "buy_buttons",
+        "liquid_JNwFRV",
         "complementary",
         "klaviyo_email_marketing_sms_form_embed_block_qDg68M",
         "icon_list_VBaw6z",
