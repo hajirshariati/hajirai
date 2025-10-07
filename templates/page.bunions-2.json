@@ -145,10 +145,10 @@
         "rounded": false
       }
     },
-    "lookbook_qMAtRf": {
+    "lookbook_crRFzY": {
       "type": "lookbook",
       "blocks": {
-        "content_x4Awra": {
+        "content_YrpNak": {
           "type": "content",
           "settings": {
             "icon": "check_mark",
@@ -164,7 +164,7 @@
             "horizontal_mobile": 42
           }
         },
-        "content_ihiH6C": {
+        "content_hJdzY7": {
           "type": "content",
           "settings": {
             "icon": "check_mark",
@@ -180,7 +180,7 @@
             "horizontal_mobile": 40
           }
         },
-        "content_FKbqmw": {
+        "content_VmtXWC": {
           "type": "content",
           "settings": {
             "icon": "check_mark",
@@ -191,12 +191,12 @@
             "link": "",
             "color_text": "#74a5ba",
             "vertical": 56,
-            "horizontal": 5,
+            "horizontal": 8,
             "vertical_mobile": 30,
-            "horizontal_mobile": 7
+            "horizontal_mobile": 12
           }
         },
-        "content_t8b8N6": {
+        "content_8XPnNg": {
           "type": "content",
           "settings": {
             "icon": "check_mark",
@@ -208,11 +208,11 @@
             "color_text": "#74a5ba",
             "vertical": 56,
             "horizontal": 52,
-            "vertical_mobile": 30,
-            "horizontal_mobile": 7
+            "vertical_mobile": 56,
+            "horizontal_mobile": 56
           }
         },
-        "content_3JaVhV": {
+        "content_HXQxdV": {
           "type": "content",
           "settings": {
             "icon": "check_mark",
@@ -230,16 +230,16 @@
         }
       },
       "block_order": [
-        "content_x4Awra",
-        "content_ihiH6C",
-        "content_FKbqmw",
-        "content_t8b8N6",
-        "content_3JaVhV"
+        "content_YrpNak",
+        "content_hJdzY7",
+        "content_VmtXWC",
+        "content_8XPnNg",
+        "content_HXQxdV"
       ],
       "name": "t:sections.lookbook.name",
       "settings": {
         "image": "shopify://shop_images/Group_18_1.png",
-        "image_mobile": "shopify://shop_images/Group_18_15b06015-9b33-4a8d-adb5-e059ed32723b.png",
+        "image_mobile": "shopify://shop_images/Group_18_1.png",
         "heading": "",
         "heading_size": "title-sm",
         "heading_alignment": "text-center md:items-center",
@@ -646,7 +646,7 @@
     "main-page",
     "image_with_text_overlay_rBfBzp",
     "faq_zhAACx",
-    "lookbook_qMAtRf",
+    "lookbook_crRFzY",
     "images_with_text_iL8ht6",
     "empty_space_gyE8Nr",
     "featured_collection_dXtHeM",
