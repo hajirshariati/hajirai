@@ -6265,6 +6265,9 @@ p::after {
     padding: var(--sp-8) var(--sp-5) var(--sp-6);
     transition: var(--animation-primary) 0.1s;
     transition-property: opacity, visibility;
+}
+
+#MenuDrawer .drawer__header {
     opacity: 0!important;
 }
 
