@@ -17461,10 +17461,8 @@ body .rte .contact-box a {
 }
 
 .p-signup__button {
-    width: fit-content;
-    align-self: center;
-    background: #ffffff;
-    color: #171717;
+    width: 100%;
+    text-transform: uppercase;
 }
 
 @media all and (max-width: 767px) {
