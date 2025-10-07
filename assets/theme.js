@@ -5272,16 +5272,28 @@ class ProductInfo extends HTMLElement {
                 this.preProcessHtmlCallbacks,
                 // Post-process callback to restore selections after transition
                 [(newNode) => {
-                    Object.entries(currentSelections).forEach(([name, value]) => {
-                        const input = newNode.querySelector(`input[name="${name}"][value="${value}"]`);
-                        if (input && !input.disabled) {
-                            input.checked = true;
-                        }
-                    });
+                    // Check if we're in a product switching context - if so, don't restore selections
+                    const isProductSwitching = window.productColorSwatchHandler && window.productColorSwatchHandler.isProductSwitching;
+                    
+                    if (!isProductSwitching) {
+                        Object.entries(currentSelections).forEach(([name, value]) => {
+                            const input = newNode.querySelector(`input[name="${name}"][value="${value}"]`);
+                            if (input && !input.disabled) {
+                                input.checked = true;
+                            }
+                        });
+                    }
                     
                     // Re-attach color swatch listeners after DOM update
                     if (window.productColorSwatchHandler) {
                         window.productColorSwatchHandler.attachSwatchListeners();
+                        
+                        // If we're product switching, force clear all variant selections
+                        if (isProductSwitching) {
+                            setTimeout(() => {
+                                window.productColorSwatchHandler.forceResetAllVariants();
+                            }, 10);
+                        }
                     }
                 }]
             );
@@ -7948,98 +7960,7 @@ class IconsCarousel extends HTMLDivElement {
 
 customElements.define('icons-carousel', IconsCarousel, {extends: 'div'});
 
-(function () {
-    const SECTIONS_TO_UPDATE = [
-        'main',
-        "product-details",
-        'product_details_4UfMKj',
-        'product_highlights_EMEhAr',
-        '1736487006f9b363ba',
-        'ugc_gallery_n48LPJ',
-        'ss_recommendations_pFUtFd',
-        'ss_recommendations_3JCDgT',
-        'ss_recommendations_GRidrn',
-        "17477533508981334f",
-        "video_with_text_xf4VTt",
-        'multicolumn_KyfUdW',
-        'multicolumn_CEQ6Uh'
-    ];
-
-    function executeScript(script) {
-        const newScript = document.createElement('script');
-        Array.from(script.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-        newScript.innerHTML = script.innerHTML;
-        document.head.appendChild(newScript).parentNode.removeChild(newScript);
-    }
-
-    function attachSwatchListeners() {
-        document.querySelectorAll('.product-form__swatch[data-product-handle]').forEach(function (swatch) {
-            swatch.addEventListener('click', function (event) {
-                event.preventDefault();
-
-                const handle = swatch.getAttribute('data-product-handle');
-                if (!handle) return;
-
-                if (swatch.classList.contains('color-links--already-loaded')) return;
-                swatch.classList.add('color-links--already-loaded');
-
-                document.body.classList.add('page-loading');
-
-                const url = `/products/${handle}`;
-
-                fetch(url)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.text();
-                    })
-                    .then(html => {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(html, 'text/html');
-
-                        SECTIONS_TO_UPDATE.forEach(sectionId => {
-                            const newSections = doc.querySelectorAll(`[id*="${sectionId}"]`);
-                            const currentSections = document.querySelectorAll(`[id*="${sectionId}"]`);
-
-                            newSections.forEach((newSection, idx) => {
-                                const currentSection = currentSections[idx];
-                                if (newSection && currentSection) {
-                                    currentSection.innerHTML = newSection.innerHTML;
-                                    Array.from(newSection.getElementsByTagName('script')).forEach(executeScript);
-                                }
-                            });
-                        });
-
-                        // --- Update URL to new product ---
-                        let urlSearchParams = new URLSearchParams(window.location.search);
-                        urlSearchParams.delete('variant'); // Remove variant since we're switching products
-                        let search = urlSearchParams.toString();
-                        let hash = window.location.hash;
-                        let finalUrl = url + (search ? '?' + search : '') + (hash ? hash : '');
-                        window.history.replaceState(null, '', finalUrl);
-
-                        attachSwatchListeners();
-                        if (typeof yotpoWidgetsContainer !== 'undefined' && yotpoWidgetsContainer.initWidgets) {
-                            yotpoWidgetsContainer.initWidgets();
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching product page:', error);
-                    })
-                    .finally(() => {
-                        document.body.classList.remove('page-loading');
-                    });
-            });
-        });
-    }
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', attachSwatchListeners);
-    } else {
-        attachSwatchListeners();
-    }
-})();
+// Old implementation removed - now using ProductColorSwatchHandler class below
 
 // Product Color Swatch Handler for switching between related products
 class ProductColorSwatchHandler {
@@ -8061,6 +7982,7 @@ class ProductColorSwatchHandler {
         ];
         
         this.observer = null;
+        this.isProductSwitching = false;
         this.init();
     }
 
@@ -8080,8 +8002,7 @@ class ProductColorSwatchHandler {
     }
 
     attachSwatchListeners() {
-        const swatches = document.querySelectorAll('.custom-meta-url[data-product-handle]');
-        console.log('Attaching swatch listeners to', swatches.length, 'swatches');
+        const swatches = document.querySelectorAll('.custom-meta-url[data-product-handle], .product-form__swatch[data-product-handle]');
         
         swatches.forEach((swatch, index) => {
             
@@ -8112,6 +8033,33 @@ class ProductColorSwatchHandler {
         variantInputs.forEach((input) => {
             input.checked = false;
             input.removeAttribute('checked');
+        });
+
+        // Enhanced reset logic for select options with selected attribute
+        const selectOptions = document.querySelectorAll('select option[selected]');
+        selectOptions.forEach((option) => {
+            option.removeAttribute('selected');
+        });
+
+        // Reset fieldset inputs that might be checked
+        const fieldsetInputs = document.querySelectorAll('fieldset input[checked]');
+        fieldsetInputs.forEach((input) => {
+            input.removeAttribute('checked');
+            input.checked = false;
+        });
+
+        // Reset select elements within variant pickers with selectedIndex reset
+        const variantSelects = document.querySelectorAll('variant-picker select, .variant-picker select');
+        variantSelects.forEach((select) => {
+            select.selectedIndex = -1;
+        });
+
+        // Clear displayed selected values in variant labels
+        const variantLabels = document.querySelectorAll('[id*="option"]:not(input)');
+        variantLabels.forEach((label) => {
+            if (label.textContent && label.textContent.trim() !== '') {
+                label.textContent = '';
+            }
         });
 
         // Disable and update add to cart buttons
@@ -8167,6 +8115,16 @@ class ProductColorSwatchHandler {
                 input.checked = false;
                 input.removeAttribute('checked');
             });
+            
+            // More thorough variant picker reset for select elements
+            const selects = picker.querySelectorAll('select');
+            selects.forEach((select) => {
+                select.selectedIndex = -1;
+                const options = select.querySelectorAll('option');
+                options.forEach((option) => {
+                    option.removeAttribute('selected');
+                });
+            });
         });
 
         // Trigger change events to ensure other components are notified
@@ -8175,21 +8133,79 @@ class ProductColorSwatchHandler {
         }));
     }
 
+    updateAddToCartButton() {
+        const addToCartBtn = document.querySelector('button.product-form__submit');
+        const stickyAddToCartBtn = document.querySelector('button.sticky_form__submit');
+        
+        if (addToCartBtn) {
+            const firstRequiredOption = document.querySelector('.custom-option-buttons[data-opt-name="Size"], .custom-option-buttons[data-opt-name="Width"]');
+            const optName = firstRequiredOption ? firstRequiredOption.getAttribute('data-opt-name') : 'SIZE';
+            
+            addToCartBtn.style.display = "flex";
+            addToCartBtn.setAttribute("disabled", "disabled");
+            addToCartBtn.disabled = true;
+            
+            const btnText = addToCartBtn.querySelector('.btn-text');
+            if (btnText) {
+                btnText.innerText = "PLEASE SELECT " + optName.toUpperCase();
+            } else {
+                addToCartBtn.innerText = "PLEASE SELECT " + optName.toUpperCase();
+            }
+        }
+
+        if (stickyAddToCartBtn) {
+            const firstRequiredOption = document.querySelector('.custom-option-buttons[data-opt-name="Size"], .custom-option-buttons[data-opt-name="Width"]');
+            const optName = firstRequiredOption ? firstRequiredOption.getAttribute('data-opt-name') : 'SIZE';
+            
+            stickyAddToCartBtn.style.display = "flex";
+            stickyAddToCartBtn.classList.add("disabled-btn");
+            stickyAddToCartBtn.setAttribute("disabled", "disabled");
+            stickyAddToCartBtn.disabled = true;
+            
+            const btnText = stickyAddToCartBtn.querySelector('.btn-text');
+            if (btnText) {
+                btnText.innerText = "PLEASE SELECT " + optName.toUpperCase();
+            } else {
+                stickyAddToCartBtn.innerText = "PLEASE SELECT " + optName.toUpperCase();
+            }
+        }
+    }
+
+    forceResetAllVariants() {
+        // Force clear all radio inputs
+        const allRadioInputs = document.querySelectorAll('input[type="radio"]');
+        allRadioInputs.forEach(input => {
+            if (input.name && (input.name.toLowerCase().includes('size') || input.name.toLowerCase().includes('width') || input.classList.contains('custom-option-buttons'))) {
+                input.checked = false;
+                input.removeAttribute('checked');
+            }
+        });
+        
+        // Update button state
+        this.updateAddToCartButton();
+        
+        // Dispatch event to notify other components
+        document.dispatchEvent(new CustomEvent('variants:force-cleared', {
+            detail: { reason: 'product_switching' }
+        }));
+    }
+
     handleSwatchClick(event, swatch) {
         event.preventDefault();
         const handle = swatch.getAttribute('data-product-handle');
         
         if (!handle) {
-            console.log('No handle found, returning');
             return;
         }
 
         if (swatch.classList.contains('color-links--already-loaded')) {
-            console.log('Swatch already loaded, returning');
             return;
         }
 
         swatch.classList.add('color-links--already-loaded');
+        
+        // Set flag to indicate we're switching products
+        this.isProductSwitching = true;
 
         document.body.classList.add('page-loading');
 
@@ -8203,6 +8219,10 @@ class ProductColorSwatchHandler {
                 return response.text();
             })
             .then(html => {
+                // Remove checked attributes from the HTML string before parsing
+                html = html.replace(/\s+checked\s*=\s*["'][^"']*["']/gi, '');
+                html = html.replace(/\s+checked(?=\s|>)/gi, '');
+                
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
 
@@ -8213,6 +8233,25 @@ class ProductColorSwatchHandler {
                     newSections.forEach((newSection, idx) => {
                         const currentSection = currentSections[idx];
                         if (newSection && currentSection) {
+                            // Remove checked attributes from variant inputs before inserting
+                            const variantInputs = newSection.querySelectorAll('input[type="radio"], input.custom-option-buttons, input[name="Size"], input[name="Width"], input[data-opt-name]');
+                            variantInputs.forEach(input => {
+                                input.removeAttribute('checked');
+                                input.checked = false;
+                                // Also remove the checked attribute from the HTML string representation
+                                if (input.hasAttribute('checked')) {
+                                    input.removeAttribute('checked');
+                                }
+                            });
+                            
+                            // Also clear any selected values in option labels
+                            const optionLabels = newSection.querySelectorAll('[id*="option"]:not(input)');
+                            optionLabels.forEach(label => {
+                                if (label.textContent && label.textContent.trim() !== '') {
+                                    label.textContent = '';
+                                }
+                            });
+                            
                             currentSection.innerHTML = newSection.innerHTML;
                             Array.from(newSection.getElementsByTagName('script')).forEach(script => this.executeScript(script));
                         }
@@ -8230,10 +8269,20 @@ class ProductColorSwatchHandler {
                 // Re-attach listeners for the new content
                 this.attachSwatchListeners();
                 
-                // Small delay to ensure DOM is fully updated before resetting variants
+                // Immediate reset since we've already prevented checked attributes during DOM replacement
+                this.resetVariantSelection();
+                
+                // Additional safety check after other components might have initialized
                 setTimeout(() => {
-                    this.resetVariantSelection();
-                }, 50);
+                    const laterChecked = document.querySelectorAll('input[type="radio"]:checked, input.custom-option-buttons:checked');
+                    if (laterChecked.length > 0) {
+                        laterChecked.forEach(input => {
+                            input.checked = false;
+                            input.removeAttribute('checked');
+                        });
+                        this.updateAddToCartButton();
+                    }
+                }, 100);
                 
                 // Re-initialize Yotpo widgets if available
                 if (typeof yotpoWidgetsContainer !== 'undefined' && yotpoWidgetsContainer.initWidgets) {
@@ -8244,10 +8293,16 @@ class ProductColorSwatchHandler {
                 document.dispatchEvent(new CustomEvent('product:switched', {
                     detail: { productHandle: handle, url: finalUrl }
                 }));
+                
+                // Reset the product switching flag after a delay to ensure all updates are complete
+                setTimeout(() => {
+                    this.isProductSwitching = false;
+                }, 500);
             })
             .catch(error => {
                 console.error('Error fetching product page:', error);
                 swatch.classList.remove('color-links--already-loaded');
+                this.isProductSwitching = false; // Reset flag on error
             })
             .finally(() => {
                 document.body.classList.remove('page-loading');
