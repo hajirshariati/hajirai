@@ -6265,6 +6265,7 @@ p::after {
     padding: var(--sp-8) var(--sp-5) var(--sp-6);
     transition: var(--animation-primary) 0.1s;
     transition-property: opacity, visibility;
+    opacity: 0!important;
 }
 
 @media screen and (min-width: 1024px) {
@@ -7487,7 +7488,7 @@ p::after {
 }
 
 .menu-drawer .drawer__header {
-    padding: var(--sp-15) var(--sp-5) var(--sp-4);
+    padding: var(--sp-12) var(--sp-5) var(--sp-4);
     border-block-end: 0;
 }
 
