@@ -667,7 +667,7 @@
         "content_position": "md:items-end md:justify-start",
         "text_alignment": "left",
         "image_mobile": "shopify://shop_images/logopng.png",
-        "image_height_mobile": "500px",
+        "image_height_mobile": "adapt",
         "content_position_mobile": "items-start justify-start",
         "text_alignment_mobile": "center",
         "color_text": "#171717",
