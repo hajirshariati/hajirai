@@ -23,8 +23,7 @@
           "settings": {
             "title_size": "product-title-sm",
             "title_size_mobile": "product-title-md",
-            "show_price": false,
-            "show_rating": true
+            "show_price": false
           }
         },
         "price_TirYdK": {
@@ -32,7 +31,8 @@
           "settings": {
             "show_taxes_notice": false,
             "tooltip_heading": "MSRP",
-            "tooltip_message_strikethrough": "The Manufacturer's Suggested Retail Price, is the price that a manufacturer recommends a retailer sell a product for."
+            "tooltip_message_strikethrough": "The Manufacturer's Suggested Retail Price, is the price that a manufacturer recommends a retailer sell a product for.",
+            "show_rating": true
           }
         },
         "afterpay_on_site_messaging_payments_messaging_hqp3bW": {
@@ -848,37 +848,71 @@
         "rounded": true
       }
     },
-    "recently_viewed_xgPMUd": {
-      "type": "recently-viewed",
-      "name": "Recently viewed",
-      "settings": {
-        "product_limit": 6,
-        "columns": 4,
-        "carousel_on_desktop": true,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "Recently viewed",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false
-      }
+    "ss_recs_script_FKLgRC": {
+      "type": "ss-recs-script",
+      "blocks": {
+        "ss_profile_block_HN6iFD": {
+          "type": "ss_profile_block",
+          "settings": {
+            "ss_profile_id": "cross-sell",
+            "ss_collection_list": [],
+            "ss_batched": true
+          }
+        },
+        "ss_profile_block_B4KtFM": {
+          "type": "ss_profile_block",
+          "settings": {
+            "ss_profile_id": "similar",
+            "ss_collection_list": [],
+            "ss_batched": true
+          }
+        },
+        "ss_profile_block_keiGAw": {
+          "type": "ss_profile_block",
+          "settings": {
+            "ss_profile_id": "recently-viewed",
+            "ss_collection_list": [],
+            "ss_batched": true
+          }
+        }
+      },
+      "block_order": [
+        "ss_profile_block_HN6iFD",
+        "ss_profile_block_B4KtFM",
+        "ss_profile_block_keiGAw"
+      ],
+      "name": "Searchspring Recommendations",
+      "settings": {}
+    },
+    "ss_recs_target_WcRdgj": {
+      "type": "ss-recs-target",
+      "blocks": {
+        "ss_profile_block_hUMykr": {
+          "type": "ss_profile_block",
+          "settings": {
+            "ss_profile_id": "cross-sell"
+          }
+        },
+        "ss_profile_block_BYUhAA": {
+          "type": "ss_profile_block",
+          "settings": {
+            "ss_profile_id": "similar"
+          }
+        },
+        "ss_profile_block_AXb8Di": {
+          "type": "ss_profile_block",
+          "settings": {
+            "ss_profile_id": "recently-viewed"
+          }
+        }
+      },
+      "block_order": [
+        "ss_profile_block_hUMykr",
+        "ss_profile_block_BYUhAA",
+        "ss_profile_block_AXb8Di"
+      ],
+      "name": "Searchspring Recommendations Target",
+      "settings": {}
     },
     "image_with_text_overlay_9zaRhz": {
       "type": "image-with-text-overlay",
@@ -955,104 +989,6 @@
         "enable_parallax": true,
         "parallax_direction": "vertical"
       }
-    },
-    "ss_recs_script_FKLgRC": {
-      "type": "ss-recs-script",
-      "blocks": {
-        "ss_profile_block_HN6iFD": {
-          "type": "ss_profile_block",
-          "settings": {
-            "ss_profile_id": "cross-sell",
-            "ss_collection_list": [],
-            "ss_batched": true
-          }
-        },
-        "ss_profile_block_B4KtFM": {
-          "type": "ss_profile_block",
-          "settings": {
-            "ss_profile_id": "similar",
-            "ss_collection_list": [],
-            "ss_batched": true
-          }
-        },
-        "ss_profile_block_keiGAw": {
-          "type": "ss_profile_block",
-          "settings": {
-            "ss_profile_id": "recently-viewed",
-            "ss_collection_list": [],
-            "ss_batched": true
-          }
-        }
-      },
-      "block_order": [
-        "ss_profile_block_HN6iFD",
-        "ss_profile_block_B4KtFM",
-        "ss_profile_block_keiGAw"
-      ],
-      "name": "Searchspring Recommendations",
-      "settings": {}
-    },
-    "ss_recs_target_WcRdgj": {
-      "type": "ss-recs-target",
-      "blocks": {
-        "ss_profile_block_hUMykr": {
-          "type": "ss_profile_block",
-          "settings": {
-            "ss_profile_id": "cross-sell"
-          }
-        },
-        "ss_profile_block_BYUhAA": {
-          "type": "ss_profile_block",
-          "settings": {
-            "ss_profile_id": "similar"
-          }
-        },
-        "ss_profile_block_AXb8Di": {
-          "type": "ss_profile_block",
-          "settings": {
-            "ss_profile_id": "recently-viewed"
-          }
-        }
-      },
-      "block_order": [
-        "ss_profile_block_hUMykr",
-        "ss_profile_block_BYUhAA",
-        "ss_profile_block_AXb8Di"
-      ],
-      "name": "Searchspring Recommendations Target",
-      "settings": {}
-    },
-    "recently-viewed": {
-      "type": "recently-viewed",
-      "disabled": true,
-      "settings": {
-        "product_limit": 6,
-        "columns": 4,
-        "carousel_on_desktop": true,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "Recently Viewed",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false
-      }
     }
   },
   "order": [
@@ -1068,8 +1004,6 @@
     "product-recommendations",
     "ss_recs_script_FKLgRC",
     "ss_recs_target_WcRdgj",
-    "recently_viewed_xgPMUd",
-    "image_with_text_overlay_9zaRhz",
-    "recently-viewed"
+    "image_with_text_overlay_9zaRhz"
   ]
 }
