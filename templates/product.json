@@ -111,19 +111,6 @@
             "formId": "UZG2CK"
           }
         },
-        "sign_up_DcnXLa": {
-          "type": "sign_up",
-          "settings": {
-            "heading": "Aetrex Loyalty Program",
-            "subheading": "Join for <strong>free shipping</strong>",
-            "button_label": "Join our Loyalty Program",
-            "form_heading": "Create your <strong>FREE</strong> account to get free shipping",
-            "checkbox_label": "I want to receive email updates and coupons from Aetrex",
-            "checkbox_is_required": false,
-            "form_button_label": "Join Now",
-            "success_heading": "Thank you for signing up!"
-          }
-        },
         "icon_list_VBaw6z": {
           "type": "icon_list",
           "settings": {
@@ -172,6 +159,19 @@
             "text_size": "text-sm"
           }
         },
+        "sign_up_DcnXLa": {
+          "type": "sign_up",
+          "settings": {
+            "heading": "Aetrex Loyalty Program",
+            "subheading": "Join for <strong>free shipping</strong>",
+            "button_label": "Join our Loyalty Program",
+            "form_heading": "Create your <strong>FREE</strong> account to get free shipping",
+            "checkbox_label": "I want to receive email updates and coupons from Aetrex",
+            "checkbox_is_required": false,
+            "form_button_label": "Join Now",
+            "success_heading": "Thank you for signing up!"
+          }
+        },
         "aetrex_fitai_pdp_size_recommendation_gUEcCb": {
           "type": "shopify://apps/aetrex-fitai/blocks/PDPSizeRecommendation/6c991f1a-1e7d-4325-983c-2984a2e41236",
           "disabled": true,
@@ -212,12 +212,12 @@
         "buy_buttons",
         "complementary",
         "klaviyo_email_marketing_sms_form_embed_block_qDg68M",
-        "sign_up_DcnXLa",
         "icon_list_VBaw6z",
         "text-1",
         "text-3",
         "text-2",
         "text-4",
+        "sign_up_DcnXLa",
         "aetrex_fitai_pdp_size_recommendation_gUEcCb",
         "sticky_buy_button"
       ],
