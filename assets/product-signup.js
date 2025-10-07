@@ -9,8 +9,43 @@ class ProductSignUp extends HTMLElement {
     this.init();
   }
 
-  init() {
+  async init() {
+    // Hide banner by default
+    this.style.display = 'none';
+    
+    // Check if user is in US and show banner accordingly
+    await this.checkCountryAndShowBanner();
+    
     this.attachSignUpListeners();
+  }
+
+  async checkCountryAndShowBanner() {
+    try {
+      const response = await fetch(
+        window.Shopify.routes.root
+          + 'browsing_context_suggestions.json'
+          + '?country[enabled]=true'
+          + `&country[exclude]=${window.Shopify.country}` 
+          + '&language[enabled]=true'
+          + `&language[exclude]=${window.Shopify.language}` 
+      );
+      
+      const data = await response.json();
+      
+      // Check if detected country is US
+      const detectedCountry = data.detected_values?.country?.handle;
+      
+      // Show banner only if user is in US
+      if (detectedCountry === 'US') {
+        this.style.display = 'block';
+      }
+      
+      console.log('Country detection:', detectedCountry, 'Banner visible:', detectedCountry === 'US');
+      
+    } catch (error) {
+      console.error('Error detecting country:', error);
+      // In case of error, don't show the banner (fail safe)
+    }
   }
 
   attachSignUpListeners() {
