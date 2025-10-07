@@ -145,71 +145,106 @@
         "rounded": false
       }
     },
-    "lookbook_JQDiwd": {
+    "lookbook_w69hfT": {
       "type": "lookbook",
       "blocks": {
-        "content_AeTcCN": {
+        "content_9ghrzK": {
           "type": "content",
           "settings": {
-            "icon": "none",
-            "iwidth": "custom",
-            "icon_width": 24,
-            "heading": "",
-            "text": "",
-            "link": "",
-            "color_text": "#ffffff",
-            "vertical": 50,
-            "horizontal": 50,
-            "vertical_mobile": 50,
-            "horizontal_mobile": 50
-          }
-        },
-        "content_knQQ6E": {
-          "type": "content",
-          "settings": {
-            "icon": "none",
-            "iwidth": "custom",
-            "icon_width": 24,
-            "heading": "",
-            "text": "",
-            "link": "",
-            "color_text": "#ffffff",
-            "vertical": 6,
-            "horizontal": 53,
-            "vertical_mobile": 50,
-            "horizontal_mobile": 50
-          }
-        },
-        "content_iXtFEz": {
-          "type": "content",
-          "settings": {
-            "icon": "none",
+            "icon": "check_mark",
             "iwidth": "fit",
-            "icon_width": 24,
+            "icon_width": 26,
+            "heading": "2",
+            "text": "<p>TEXT</p>",
+            "link": "",
+            "color_text": "#74a5ba",
+            "vertical": 21,
+            "horizontal": 45,
+            "vertical_mobile": 16,
+            "horizontal_mobile": 42
+          }
+        },
+        "content_HF7yEU": {
+          "type": "content",
+          "settings": {
+            "icon": "check_mark",
+            "iwidth": "fit",
+            "icon_width": 26,
             "heading": "1",
+            "text": "<p>TEXT</p>",
+            "link": "",
+            "color_text": "#74a5ba",
+            "vertical": 48,
+            "horizontal": 39,
+            "vertical_mobile": 54,
+            "horizontal_mobile": 40
+          }
+        },
+        "content_LjVywH": {
+          "type": "content",
+          "settings": {
+            "icon": "check_mark",
+            "iwidth": "fit",
+            "icon_width": 26,
+            "heading": "3: Signature Arch Support",
+            "text": "<p>With removable insole, our arch support is located further back to support the apex of the foot. This helps proper alignment and help relieve arch and heel pain associated with Plantar Fasciitis</p>",
+            "link": "",
+            "color_text": "#74a5ba",
+            "vertical": 56,
+            "horizontal": 8,
+            "vertical_mobile": 30,
+            "horizontal_mobile": 12
+          }
+        },
+        "content_3iTAhx": {
+          "type": "content",
+          "settings": {
+            "icon": "check_mark",
+            "iwidth": "fit",
+            "icon_width": 26,
+            "heading": "",
             "text": "",
             "link": "",
-            "color_text": "#ffffff",
-            "vertical": 50,
-            "horizontal": 50,
-            "vertical_mobile": 50,
-            "horizontal_mobile": 50
+            "color_text": "#74a5ba",
+            "vertical": 56,
+            "horizontal": 52,
+            "vertical_mobile": 56,
+            "horizontal_mobile": 56
+          }
+        },
+        "content_Kxzeti": {
+          "type": "content",
+          "settings": {
+            "icon": "check_mark",
+            "iwidth": "fit",
+            "icon_width": 26,
+            "heading": "4",
+            "text": "<h6>TEXT</h6>",
+            "link": "",
+            "color_text": "#74a5ba",
+            "vertical": 70,
+            "horizontal": 75,
+            "vertical_mobile": 69,
+            "horizontal_mobile": 73
           }
         }
       },
       "block_order": [
-        "content_AeTcCN",
-        "content_knQQ6E",
-        "content_iXtFEz"
+        "content_9ghrzK",
+        "content_HF7yEU",
+        "content_LjVywH",
+        "content_3iTAhx",
+        "content_Kxzeti"
       ],
       "name": "t:sections.lookbook.name",
       "settings": {
-        "image": "shopify://shop_images/Metatarsalgia_dba0fe6b-83df-4952-9185-7bb21d32d037.jpg",
+        "image": "shopify://shop_images/Group_18_3.png",
+        "image_mobile": "shopify://shop_images/Group_18_3.png",
         "heading": "",
         "heading_size": "title-sm",
         "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
-        "heading_position": "none",
+        "heading_position": "items-center justify-start text-left",
         "subheading": "",
         "description": "",
         "button_label": "",
@@ -218,8 +253,8 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
+        "color_text": "#171717",
+        "color_background": "rgba(0,0,0,0)",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
@@ -611,7 +646,7 @@
     "main-page",
     "image_with_text_overlay_rBfBzp",
     "faq_zhAACx",
-    "lookbook_JQDiwd",
+    "lookbook_w69hfT",
     "images_with_text_iL8ht6",
     "empty_space_gyE8Nr",
     "featured_collection_dXtHeM",
