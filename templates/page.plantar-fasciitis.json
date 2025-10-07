@@ -267,7 +267,7 @@
             "iwidth": "fit",
             "icon_width": 26,
             "heading": "4",
-            "text": "<p>TEXT</p>",
+            "text": "<h6>TEXT</h6>",
             "link": "",
             "color_text": "#74a5ba",
             "vertical": 70,
