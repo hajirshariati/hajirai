@@ -60,14 +60,14 @@
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
-        "image": "shopify://shop_images/PF_1.png",
+        "image": "shopify://shop_images/Group_10_76daefab-458a-4883-8570-5f570d93b672.png",
         "image_height": "adapt",
         "content_width": "small",
         "content_position": "md:items-end md:justify-start",
         "text_alignment": "left",
-        "image_mobile": "shopify://shop_images/PF_1.png",
+        "image_mobile": "shopify://shop_images/Group_10_76daefab-458a-4883-8570-5f570d93b672.png",
         "image_height_mobile": "adapt",
-        "content_position_mobile": "items-end justify-end",
+        "content_position_mobile": "items-start justify-start",
         "text_alignment_mobile": "left",
         "color_text": "#171717",
         "color_highlight": "#171717",
@@ -83,7 +83,7 @@
         "divider": false,
         "full_width": true,
         "rounded": false,
-        "enable_parallax": true,
+        "enable_parallax": false,
         "parallax_direction": "vertical"
       }
     },
