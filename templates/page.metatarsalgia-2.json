@@ -60,13 +60,14 @@
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
-        "image": "shopify://shop_images/Group_8_a872f6a0-f2ec-48c9-b9d4-2da3568f1adb.png",
+        "image": "shopify://shop_images/Group_13_ec3af216-7398-40b8-926f-ad790764baca.png",
         "image_height": "adapt",
         "content_width": "small",
         "content_position": "md:items-end md:justify-start",
         "text_alignment": "left",
-        "image_height_mobile": "100vh",
-        "content_position_mobile": "items-end justify-end",
+        "image_mobile": "shopify://shop_images/Group_13_ec3af216-7398-40b8-926f-ad790764baca.png",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-start justify-start",
         "text_alignment_mobile": "left",
         "color_text": "#171717",
         "color_highlight": "#171717",
@@ -82,7 +83,7 @@
         "divider": false,
         "full_width": true,
         "rounded": false,
-        "enable_parallax": true,
+        "enable_parallax": false,
         "parallax_direction": "vertical"
       }
     },
@@ -203,7 +204,7 @@
       ],
       "name": "t:sections.lookbook.name",
       "settings": {
-        "image": "shopify://shop_images/Bunions_example1.jpg",
+        "image": "shopify://shop_images/Metatarsalgia_dba0fe6b-83df-4952-9185-7bb21d32d037.jpg",
         "heading": "",
         "heading_size": "title-sm",
         "heading_alignment": "text-center md:items-center",
@@ -364,7 +365,7 @@
         "heading_NfEViz": {
           "type": "heading",
           "settings": {
-            "heading": "What Other Bunion’s Sufferers Say",
+            "heading": "What Other Metatarsalgia Sufferers Say",
             "heading_size": "title-lg tracking-heading",
             "heading_tag": "h2",
             "highlighted_text": "none",
@@ -414,8 +415,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>“Favorite Sandals </strong><br/>I have flat feet, bunions, plantar fasciitis, and have suffered from Achilles tendinitis. These sandals are wonderful! They look very attractive and fashionable while also providing the desperately needed support so that I can walk. I love the Velcro closures that can be adjusted across the toes, as well as around the ankle. I wish that I could get a pair in every color!” </h6>",
-            "author": "Shan",
+            "text": "<h6><strong>“Bought all 4 colors I</strong><br/>bought two pairs and were so elated with the comfort that I bought the last two remaining colors. I suffer from Metatarsalgia and was glad to finally being able to walk without discomfort & pain!!” </h6>",
+            "author": "Ellen o.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -427,8 +428,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>\"Great Styleand Comfort</strong><br/>After bunion surgery I needed to find shoes with more support; these are my third pair of Aetrex shoes. None had to be worn in, my feet felt supported without sacrificing style. Perfect for traveling especially when you have to limit the number of shoes you take.\" </h6>",
-            "author": "Susan C.",
+            "text": "<h6><strong>\"I love these sneakers.</strong><br/>I love these sneakers. I have bought three of the same sneakers, but in different colors. What a difference they have made on my feet. I like to take my dog for walks. I had to stop. My feet were in such pain. With these sneakers my feet are fine now. Thank you Aetrex.</h6>",
+            "author": "Linda P.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -440,7 +441,7 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>\"Very comfortable!</strong><br/>I have bunions and I need good arch support so I don’t skimp on shoes. These sandals were comfortable right out of the box. The adjustable straps make them a perfect fit and the arch support is great. <br/></h6><h6></h6>",
+            "text": "<h6><strong>\"Comfortable & supportiveI </strong><br/>bought these to wear at work. I am a Dental Assistant and on my feet most of the day. With other shoes, I would go home with sore feet and low back pain. The Xspress Runner 2 felt comfortable and supportive right from the first time I laced them up - no break-in required.</h6>",
             "author": "Susanne B.",
             "author_info": "",
             "author_url": "",
@@ -490,15 +491,15 @@
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "bunions-1",
+            "collection": "womens-footwear-for-metatarsalgia",
             "custom_url": "",
-            "image": "shopify://shop_images/Rectangle_60_1.png",
+            "image": "shopify://shop_images/Rectangle_60_3.png",
             "title": "",
-            "description": "To Help Relieve Bunion’s",
+            "description": "To Help Relieve Metatarsalgia",
             "overlay_content": true,
             "color_text": "#ffffff",
             "color_overlay": "#000000",
-            "overlay_opacity": 30,
+            "overlay_opacity": 0,
             "submenu_title_position": "center",
             "enable_title_drop_shadow": true
           }
@@ -511,11 +512,11 @@
             "custom_url": "",
             "image": "shopify://shop_images/Rectangle_61_668b1198-2250-4e0e-9f58-c1a42125e032.png",
             "title": "",
-            "description": "To Help Relieve Bunion’s",
+            "description": "To Help Relieve Metatarsalgia",
             "overlay_content": true,
             "color_text": "#ffffff",
             "color_overlay": "#000000",
-            "overlay_opacity": 30,
+            "overlay_opacity": 0,
             "submenu_title_position": "center",
             "enable_title_drop_shadow": true
           }
