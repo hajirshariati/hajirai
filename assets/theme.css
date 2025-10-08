@@ -12568,8 +12568,7 @@ input[type="email"]:is(
 
 .slider .card {
     scroll-snap-align: start;
-    background: #ffffff;
-    padding: 1em;
+
 }
 
 .slider + :is(p, .indicators) {
