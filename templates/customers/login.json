@@ -313,16 +313,6 @@
         "full_width": false,
         "rounded": false
       }
-    },
-    "empty_space_jkUWyh": {
-      "type": "empty-space",
-      "name": "Empty space",
-      "settings": {
-        "desktop_height": 40,
-        "mobile_height": 28,
-        "color_background": "",
-        "gradient_background": ""
-      }
     }
   },
   "order": [
@@ -332,7 +322,6 @@
     "rich_text_APkGJb",
     "main-login",
     "empty_space_kpmbpR",
-    "multicolumn_with_icons_JfDLw8",
-    "empty_space_jkUWyh"
+    "multicolumn_with_icons_JfDLw8"
   ]
 }
