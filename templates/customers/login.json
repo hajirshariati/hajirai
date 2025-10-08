@@ -80,7 +80,7 @@
           "type": "heading",
           "settings": {
             "heading": "Welcome back",
-            "heading_size": "title-lg tracking-heading",
+            "heading_size": "title-md",
             "heading_tag": "h1",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
