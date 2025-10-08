@@ -115,8 +115,8 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 0,
-        "padding_bottom": 0,
+        "padding_top": 12,
+        "padding_bottom": 12,
         "divider": false,
         "narrow": false,
         "rounded": false
@@ -215,8 +215,8 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 0,
-        "padding_bottom": 0,
+        "padding_top": 12,
+        "padding_bottom": 12,
         "divider": false,
         "narrow": false,
         "rounded": false
@@ -239,7 +239,7 @@
           "type": "text",
           "settings": {
             "text": "Free ground shipping (US ONLY*)",
-            "text_size": 16,
+            "text_size": 18,
             "text_font": "body",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -259,7 +259,7 @@
           "type": "text",
           "settings": {
             "text": "Earn 5% on every purchase",
-            "text_size": 16,
+            "text_size": 18,
             "text_font": "body",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -279,7 +279,7 @@
           "type": "text",
           "settings": {
             "text": "Early VIP access to sales & product releases",
-            "text_size": 16,
+            "text_size": 18,
             "text_font": "body",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -299,7 +299,7 @@
           "type": "text",
           "settings": {
             "text": "$20 worth of points on your anniversary",
-            "text_size": 16,
+            "text_size": 18,
             "text_font": "body",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -319,7 +319,7 @@
           "type": "text",
           "settings": {
             "text": "$20 worth of points after the first purchase",
-            "text_size": 16,
+            "text_size": 18,
             "text_font": "body",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -339,7 +339,7 @@
           "type": "text",
           "settings": {
             "text": "$20 worth of points for referral",
-            "text_size": 16,
+            "text_size": 18,
             "text_font": "body",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
