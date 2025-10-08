@@ -27,26 +27,11 @@
     "video_with_text_overlay_THEjNh": {
       "type": "video-with-text-overlay",
       "blocks": {
-        "text_ycKdaf": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Welcome to</p>",
-            "text_font": "body",
-            "text_size": "subtext-sm",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
         "heading_Fy6D8H": {
           "type": "heading",
           "settings": {
-            "heading": "<p>FITOPIA™</p>",
-            "heading_size": "title-md",
+            "heading": "<h2>Introducing the<br/>Zoe Pro Scanner</h2>",
+            "heading_size": "title-sm",
             "heading_tag": "h1",
             "highlighted_text": "none",
             "highlighted_scribble": "sketch-underline"
@@ -63,7 +48,7 @@
         "text_Eyk9mQ": {
           "type": "text",
           "settings": {
-            "text": "<p>The Industry’s Most<br/> Advanced, Integrated<br/> FitTech Solution</p>",
+            "text": "<p>Engineered to Bring the Future of Shoe Fitting to Everyone.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -77,7 +62,6 @@
         }
       },
       "block_order": [
-        "text_ycKdaf",
         "heading_Fy6D8H",
         "divider_3d6ned",
         "text_Eyk9mQ"
