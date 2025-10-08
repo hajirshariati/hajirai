@@ -162,7 +162,7 @@
               -%}
             </p>
           {%- else -%}
-            {{- metafield | metafield_tag -}}
+            <div>{{ metafield.value }}</div>
           {%- endif -%}
         </div>
       {%- endif -%}
