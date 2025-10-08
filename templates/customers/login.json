@@ -76,24 +76,70 @@
     "rich_text_qjRJB6": {
       "type": "rich-text",
       "blocks": {
-        "text_P3HKDn": {
-          "type": "text",
+        "heading_RiLkG8": {
+          "type": "heading",
           "settings": {
-            "text": "<h1>Welcome back</h1><p>Sign in to your account to continue shopping</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.2,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
+            "heading": "Welcome back",
+            "heading_size": "title-lg tracking-heading",
+            "heading_tag": "h1",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         }
       },
       "block_order": [
-        "text_P3HKDn"
+        "heading_RiLkG8"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_a3rkPe": {
+      "type": "rich-text",
+      "blocks": {
+        "icon_7VwAFd": {
+          "type": "icon",
+          "settings": {
+            "icon": "tag",
+            "icon_image": "shopify://shop_images/aetrex_access.jpg",
+            "iwidth": "custom",
+            "icon_width": 200,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        }
+      },
+      "block_order": [
+        "icon_7VwAFd"
       ],
       "name": "t:sections.rich-text.name",
       "settings": {
@@ -120,6 +166,55 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "rich_text_BjeiGd": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_cG3REf": {
+          "type": "heading",
+          "settings": {
+            "heading": "Member Benefits",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_cG3REf"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
         "padding_top": 0,
         "padding_bottom": 0,
         "divider": false,
@@ -127,21 +222,183 @@
         "rounded": false
       }
     },
-    "rich_text_APkGJb": {
-      "type": "rich-text",
+    "scrolling_text_4kJYfh": {
+      "type": "scrolling-text",
       "blocks": {
-        "image_xNLCMk": {
+        "image_m6mfXe": {
           "type": "image",
           "settings": {
-            "image": "shopify://shop_images/Sign-In_Benefits.jpg",
-            "image_width": "custom",
-            "image_max_width": 400,
-            "image_max_width_mobile": 400
+            "image": "shopify://shop_images/icon-green-shipping.png",
+            "height": 48,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "text_KVfJqG": {
+          "type": "text",
+          "settings": {
+            "text": "Free ground shipping (US ONLY*)",
+            "text_size": 16,
+            "text_font": "body",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "image_EUAB44": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/icon-rush-package.png",
+            "height": 48,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "text_HTdAwf": {
+          "type": "text",
+          "settings": {
+            "text": "Earn 5% on every purchase",
+            "text_size": 16,
+            "text_font": "body",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "image_CcGb4M": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/vip-icon.png",
+            "height": 48,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "text_RcCDND": {
+          "type": "text",
+          "settings": {
+            "text": "Early VIP access to sales & product releases",
+            "text_size": 16,
+            "text_font": "body",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "image_dzPHxU": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/points-icons.png",
+            "height": 48,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "text_bGyhFh": {
+          "type": "text",
+          "settings": {
+            "text": "$20 worth of points on your anniversary",
+            "text_size": 16,
+            "text_font": "body",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "image_jXWHeN": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/earn-icon.png",
+            "height": 48,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "text_AChxmx": {
+          "type": "text",
+          "settings": {
+            "text": "$20 worth of points after the first purchase",
+            "text_size": 16,
+            "text_font": "body",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "image_A4icyY": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/referal-icon.png",
+            "height": 48,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "text_Lhk47x": {
+          "type": "text",
+          "settings": {
+            "text": "$20 worth of points for referral",
+            "text_size": 16,
+            "text_font": "body",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
           }
         }
       },
       "block_order": [
-        "image_xNLCMk"
+        "image_m6mfXe",
+        "text_KVfJqG",
+        "image_EUAB44",
+        "text_HTdAwf",
+        "image_CcGb4M",
+        "text_RcCDND",
+        "image_dzPHxU",
+        "text_bGyhFh",
+        "image_jXWHeN",
+        "text_AChxmx",
+        "image_A4icyY",
+        "text_Lhk47x"
+      ],
+      "name": "t:sections.scrolling-text.name",
+      "settings": {
+        "direction": "left",
+        "speed": 5,
+        "grid_horizontal": 70,
+        "enable_twin": false,
+        "enable_parallax": false,
+        "color_text": "#171717",
+        "color_background": "#ebf5ff",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "padding_top": 36,
+        "padding_bottom": 36,
+        "divider": false,
+        "rounded": false
+      }
+    },
+    "rich_text_QiaCWe": {
+      "type": "rich-text",
+      "blocks": {
+        "text_mcCBPK": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Sign in to your account to continue shopping</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_mcCBPK"
       ],
       "name": "t:sections.rich-text.name",
       "settings": {
@@ -319,7 +576,10 @@
     "rich_text_dR7cAy",
     "empty_space_C8fpxJ",
     "rich_text_qjRJB6",
-    "rich_text_APkGJb",
+    "rich_text_a3rkPe",
+    "rich_text_BjeiGd",
+    "scrolling_text_4kJYfh",
+    "rich_text_QiaCWe",
     "main-login",
     "empty_space_kpmbpR",
     "multicolumn_with_icons_JfDLw8"
