@@ -139,37 +139,6 @@
         "parallax_direction": "vertical"
       }
     },
-    "image_with_text_overlay_e9GhwP": {
-      "type": "image-with-text-overlay",
-      "settings": {
-        "transparent_header": false,
-        "image": "shopify://shop_images/ashley_D.jpg",
-        "image_height": "adapt",
-        "content_width": "small",
-        "content_position": "md:items-end md:justify-start",
-        "text_alignment": "left",
-        "image_mobile": "shopify://shop_images/ashley_M.jpg",
-        "image_height_mobile": "adapt",
-        "content_position_mobile": "items-end justify-start",
-        "text_alignment_mobile": "center",
-        "color_text": "#ffffff",
-        "color_highlight": "#e0a580",
-        "gradient_highlight": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
-        "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "divider_color": "#111111",
-        "overlay_opacity": 0,
-        "padding_top": 36,
-        "padding_bottom": 36,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "enable_parallax": false,
-        "parallax_direction": "vertical"
-      }
-    },
     "rich_text_PKdTPU": {
       "type": "rich-text",
       "blocks": {
@@ -989,7 +958,6 @@
   "order": [
     "main-page",
     "slideshow_FWtLKn",
-    "image_with_text_overlay_e9GhwP",
     "rich_text_PKdTPU",
     "collection_list_q7Rypj",
     "multicolumn_9UNM8U",
