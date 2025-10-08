@@ -11894,7 +11894,6 @@ input[type="email"]:is(
 .multicolumn-card.with-border .multicolumn-card__info {
     padding-inline: var(--sp-5);
     padding-block: var(--sp-2) var(--sp-6);
-    background:white;
 }
 
 @media screen and (min-width: 1024px) {
@@ -12569,6 +12568,8 @@ input[type="email"]:is(
 
 .slider .card {
     scroll-snap-align: start;
+    background: #ffffff;
+    padding: 1em;
 }
 
 .slider + :is(p, .indicators) {
