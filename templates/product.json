@@ -79,12 +79,6 @@
             "size_chart": "size-chart"
           }
         },
-        "liquid_anxBGN": {
-          "type": "liquid",
-          "settings": {
-            "liquid": "<script>// Wait for Yotpo to load\nfunction cloneYotpoData() {\n    // Find the original widget data\n    const originalWidget = document.querySelector('.yotpo-bottom-line-question-wrapper-horizontal');\n    \n    if (originalWidget) {\n        // Clone the element\n        const clonedData = originalWidget.cloneNode(true);\n        \n        // Insert it wherever you want\n        const targetLocation = document.querySelector('#your-target-location');\n        targetLocation.appendChild(clonedData);\n    }\n}\n\n// Run after Yotpo loads\nwindow.addEventListener('load', () => {\n    setTimeout(cloneYotpoData, 2000); // Adjust timing as needed\n});</script>"
-          }
-        },
         "true_fit_widget_8cjNbr": {
           "type": "shopify://apps/true-fit/blocks/widget/caa08c3b-c601-47cd-9c2a-32bb0567b191",
           "settings": {}
@@ -129,6 +123,12 @@
             "heading": "Helps to relieve which foot pain",
             "enable_carousel": true,
             "show_below_media": true
+          }
+        },
+        "liquid_anxBGN": {
+          "type": "liquid",
+          "settings": {
+            "liquid": "<!-- Container for the cloned Yotpo data -->\n<div id=\"cloned-yotpo-data\"></div>\n\n<!-- Script to clone the data with styles -->\n<script>\nfunction cloneYotpoData() {\n    // Find the original widget - try to get a larger wrapper that includes styling\n    const originalWidget = document.querySelector('.yotpo-header-lower-wrapper');\n    \n    if (originalWidget) {\n        // Clone the element deeply with all children\n        const clonedData = originalWidget.cloneNode(true);\n        \n        // Get the target location\n        const targetLocation = document.querySelector('#cloned-yotpo-data');\n        \n        if (targetLocation) {\n            // Clear any existing content\n            targetLocation.innerHTML = '';\n            \n            // Append the cloned data\n            targetLocation.appendChild(clonedData);\n            \n            // Copy computed styles from original to cloned elements\n            copyComputedStyles(originalWidget, clonedData);\n        }\n    }\n}\n\n// Function to copy computed styles\nfunction copyComputedStyles(source, target) {\n    const sourceElements = source.querySelectorAll('*');\n    const targetElements = target.querySelectorAll('*');\n    \n    // Copy styles from root elements\n    const sourceStyle = window.getComputedStyle(source);\n    for (let prop of sourceStyle) {\n        target.style[prop] = sourceStyle.getPropertyValue(prop);\n    }\n    \n    // Copy styles from all child elements\n    sourceElements.forEach((srcEl, index) => {\n        if (targetElements[index]) {\n            const srcStyle = window.getComputedStyle(srcEl);\n            // Copy important visual properties\n            const importantProps = ['color', 'background', 'background-color', 'border', 'padding', 'margin', 'font-size', 'font-weight', 'font-family', 'display', 'width', 'height'];\n            importantProps.forEach(prop => {\n                targetElements[index].style[prop] = srcStyle.getPropertyValue(prop);\n            });\n        }\n    });\n}\n\nfunction waitForYotpo() {\n    const checkInterval = setInterval(() => {\n        const yotpoWidget = document.querySelector('.yotpo-header-lower-wrapper');\n        \n        if (yotpoWidget) {\n            clearInterval(checkInterval);\n            // Wait a bit longer to ensure styles are fully loaded\n            setTimeout(cloneYotpoData, 1000);\n        }\n    }, 500);\n    \n    setTimeout(() => {\n        clearInterval(checkInterval);\n    }, 10000);\n}\n\nif (document.readyState === 'loading') {\n    document.addEventListener('DOMContentLoaded', waitForYotpo);\n} else {\n    waitForYotpo();\n}\n</script>"
           }
         },
         "text-1": {
@@ -221,13 +221,13 @@
         "afterpay_on_site_messaging_payments_messaging_hqp3bW",
         "yotpo_product_reviews_star_rating_88eCgC",
         "variant_picker",
-        "liquid_anxBGN",
         "true_fit_widget_8cjNbr",
         "buy_buttons",
         "liquid_JNwFRV",
         "complementary",
         "klaviyo_email_marketing_sms_form_embed_block_qDg68M",
         "icon_list_VBaw6z",
+        "liquid_anxBGN",
         "text-1",
         "text-3",
         "text-2",
