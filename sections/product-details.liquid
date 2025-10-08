@@ -149,7 +149,7 @@
 
       {%- if metafield.value != blank -%}
         <div class="col-span-full md:col-span-6">
-          <h6 class="leading-none tracking-none">{{ product.metafields.namespace.key.description }}</h6>
+          <h6 class="leading-none tracking-none">{{ metafield_name | escape }}</h6>
           {%- if metafield.list? -%}
             <p>
               {%- liquid
