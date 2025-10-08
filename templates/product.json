@@ -79,6 +79,12 @@
             "size_chart": "size-chart"
           }
         },
+        "liquid_anxBGN": {
+          "type": "liquid",
+          "settings": {
+            "liquid": "<script>// Wait for Yotpo to load\nfunction cloneYotpoData() {\n    // Find the original widget data\n    const originalWidget = document.querySelector('.yotpo-bottom-line-question-wrapper-horizontal');\n    \n    if (originalWidget) {\n        // Clone the element\n        const clonedData = originalWidget.cloneNode(true);\n        \n        // Insert it wherever you want\n        const targetLocation = document.querySelector('#your-target-location');\n        targetLocation.appendChild(clonedData);\n    }\n}\n\n// Run after Yotpo loads\nwindow.addEventListener('load', () => {\n    setTimeout(cloneYotpoData, 2000); // Adjust timing as needed\n});</script>"
+          }
+        },
         "true_fit_widget_8cjNbr": {
           "type": "shopify://apps/true-fit/blocks/widget/caa08c3b-c601-47cd-9c2a-32bb0567b191",
           "settings": {}
@@ -215,6 +221,7 @@
         "afterpay_on_site_messaging_payments_messaging_hqp3bW",
         "yotpo_product_reviews_star_rating_88eCgC",
         "variant_picker",
+        "liquid_anxBGN",
         "true_fit_widget_8cjNbr",
         "buy_buttons",
         "liquid_JNwFRV",
