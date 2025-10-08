@@ -175,7 +175,8 @@
             "checkbox_label": "I want to receive email updates and coupons from Aetrex",
             "checkbox_is_required": false,
             "form_button_label": "Join Now",
-            "success_heading": "Thank you for signing up!"
+            "success_heading": "Thank you for signing up!",
+            "already_a_member": "You’re already a member! 💙 Just <a href=\"https://www.aetrex.com/account/login\" target=\"_blank\" title=\"Login\"><strong>log in</strong></a> to enjoy your perks."
           }
         },
         "aetrex_fitai_pdp_size_recommendation_gUEcCb": {
