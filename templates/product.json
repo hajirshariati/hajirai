@@ -599,7 +599,7 @@
       ],
       "name": "Multicolumn",
       "settings": {
-        "gap": "large",
+        "gap": "small",
         "columns": 4,
         "columns_mobile": "1",
         "carousel_on_desktop": false,
