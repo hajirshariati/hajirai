@@ -472,11 +472,11 @@
             "iwidth": "custom",
             "icon_width": 24,
             "heading": "Details",
-            "content": "<p>{{ product.metafields.custom.details | metafield_tag }}</p>",
+            "content": "",
             "content_metafield": "metafield",
             "columns": "Size,Chest",
             "rows": "S,36\nM,38\nL,40",
-            "metafields": ""
+            "metafields": "custom.comfort_details\ncustom.materials_details\ncustom.measurements_details"
           }
         },
         "collapsible_tab_96ewnx": {
