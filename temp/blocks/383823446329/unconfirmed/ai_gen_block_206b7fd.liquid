@@ -1,6 +1,618 @@
+{% doc %}
+  @prompt
+    I need to improve the Customer Login section — it should be modern and easy to access. It can have an image on one side and the Customer Login on the other.
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-customer-login-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: {{ block.settings.section_height }}px;
+    background-color: {{ block.settings.background_color }};
+    border-radius: {{ block.settings.border_radius }}px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .ai-customer-login-image-{{ ai_gen_id }} {
+    position: relative;
+    background-color: {{ block.settings.image_background_color }};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-customer-login-image-{{ ai_gen_id }} img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ai-customer-login-image-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: {{ block.settings.image_background_color }};
+    position: relative;
+  }
+
+  .ai-customer-login-image-placeholder-{{ ai_gen_id }} svg {
+    width: 60%;
+    height: 60%;
+    opacity: 0.3;
+  }
+
+  .ai-customer-login-empty-state-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 20px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .ai-customer-login-form-container-{{ ai_gen_id }} {
+    padding: {{ block.settings.form_padding }}px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: {{ block.settings.form_background_color }};
+  }
+
+  .ai-customer-login-form-content-{{ ai_gen_id }} {
+    max-width: 400px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .ai-customer-login-header-{{ ai_gen_id }} {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .ai-customer-login-title-{{ ai_gen_id }} {
+    font-family: {{ settings.type_header_font.family }}, {{ settings.type_header_font.fallback_families }};
+    font-weight: {{ settings.type_header_font.weight }};
+    font-size: {{ block.settings.title_size }}px;
+    color: {{ block.settings.text_color }};
+    margin: 0 0 8px;
+    line-height: 1.2;
+  }
+
+  .ai-customer-login-subtitle-{{ ai_gen_id }} {
+    font-family: {{ settings.type_body_font.family }}, {{ settings.type_body_font.fallback_families }};
+    font-size: {{ block.settings.subtitle_size }}px;
+    color: {{ block.settings.subtitle_color }};
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .ai-customer-login-form-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .ai-customer-login-field-{{ ai_gen_id }} {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .ai-customer-login-label-{{ ai_gen_id }} {
+    font-family: {{ settings.type_body_font.family }}, {{ settings.type_body_font.fallback_families }};
+    font-size: 14px;
+    font-weight: 500;
+    color: {{ block.settings.text_color }};
+  }
+
+  .ai-customer-login-input-{{ ai_gen_id }} {
+    padding: 16px;
+    border: {{ settings.inputs_border_thickness }}px solid {{ block.settings.input_border_color }};
+    border-radius: {{ block.settings.input_border_radius }}px;
+    background-color: {{ block.settings.input_background_color }};
+    font-family: {{ settings.type_body_font.family }}, {{ settings.type_body_font.fallback_families }};
+    font-size: 16px;
+    color: {{ block.settings.text_color }};
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .ai-customer-login-input-{{ ai_gen_id }}:focus {
+    outline: none;
+    border-color: {{ block.settings.input_focus_color }};
+    box-shadow: 0 0 0 3px {{ block.settings.input_focus_color | color_modify: 'alpha', 0.1 }};
+  }
+
+  .ai-customer-login-input-{{ ai_gen_id }}::placeholder {
+    color: {{ block.settings.placeholder_color }};
+  }
+
+  .ai-customer-login-button-{{ ai_gen_id }} {
+    padding: 16px 32px;
+    background-color: {{ block.settings.button_background_color }};
+    color: {{ block.settings.button_text_color }};
+    border: none;
+    border-radius: {{ block.settings.button_border_radius }}px;
+    {% if settings.type_button_font == 'heading' %}
+      font-family: {{ settings.type_header_font.family }}, {{ settings.type_header_font.fallback_families }};
+    {% else %}
+      font-family: {{ settings.type_body_font.family }}, {{ settings.type_body_font.fallback_families }};
+    {% endif %}
+    font-size: {{ settings.type_button_size }}px;
+    font-weight: {{ settings.type_button_weight }};
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: 8px;
+  }
+
+  .ai-customer-login-button-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.button_hover_color }};
+    transform: translateY(-1px);
+  }
+
+  .ai-customer-login-button-{{ ai_gen_id }}:active {
+    transform: translateY(0);
+  }
+
+  .ai-customer-login-forgot-password-{{ ai_gen_id }} {
+    text-align: center;
+    margin-top: 16px;
+  }
+
+  .ai-customer-login-forgot-link-{{ ai_gen_id }} {
+    font-family: {{ settings.type_body_font.family }}, {{ settings.type_body_font.fallback_families }};
+    font-size: 14px;
+    color: {{ block.settings.link_color }};
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .ai-customer-login-forgot-link-{{ ai_gen_id }}:hover {
+    color: {{ block.settings.link_hover_color }};
+    text-decoration: underline;
+  }
+
+  .ai-customer-login-create-account-{{ ai_gen_id }} {
+    text-align: center;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid {{ block.settings.divider_color }};
+  }
+
+  .ai-customer-login-create-text-{{ ai_gen_id }} {
+    font-family: {{ settings.type_body_font.family }}, {{ settings.type_body_font.fallback_families }};
+    font-size: 14px;
+    color: {{ block.settings.subtitle_color }};
+    margin: 0 0 12px;
+  }
+
+  .ai-customer-login-create-link-{{ ai_gen_id }} {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: transparent;
+    color: {{ block.settings.secondary_button_color }};
+    border: 2px solid {{ block.settings.secondary_button_color }};
+    border-radius: {{ block.settings.button_border_radius }}px;
+    {% if settings.type_button_font == 'heading' %}
+      font-family: {{ settings.type_header_font.family }}, {{ settings.type_header_font.fallback_families }};
+    {% else %}
+      font-family: {{ settings.type_body_font.family }}, {{ settings.type_body_font.fallback_families }};
+    {% endif %}
+    font-size: {{ settings.type_button_size }}px;
+    font-weight: {{ settings.type_button_weight }};
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .ai-customer-login-create-link-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.secondary_button_color }};
+    color: {{ block.settings.secondary_button_text_color }};
+  }
+
+  .ai-customer-login-error-{{ ai_gen_id }} {
+    background-color: {{ settings.color_error_background }};
+    color: {{ settings.color_error_text }};
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-bottom: 20px;
+    border-left: 4px solid {{ settings.color_error_text }};
+  }
+
+  @media screen and (max-width: 768px) {
+    .ai-customer-login-{{ ai_gen_id }} {
+      grid-template-columns: 1fr;
+      min-height: auto;
+    }
+
+    {% if block.settings.mobile_layout == 'form_only' %}
+      .ai-customer-login-image-{{ ai_gen_id }} {
+        display: none;
+      }
+    {% else %}
+      .ai-customer-login-image-{{ ai_gen_id }} {
+        min-height: 200px;
+      }
+    {% endif %}
+
+    .ai-customer-login-form-container-{{ ai_gen_id }} {
+      padding: {{ block.settings.form_padding | times: 0.7 }}px;
+    }
+
+    .ai-customer-login-title-{{ ai_gen_id }} {
+      font-size: {{ block.settings.title_size | times: 0.8 }}px;
+    }
+  }
+{% endstyle %}
+
+<div class="ai-customer-login-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-customer-login-image-{{ ai_gen_id }}">
+    {% if block.settings.image %}
+      <img
+        src="{{ block.settings.image | image_url: width: 800 }}"
+        alt="{{ block.settings.image.alt | escape }}"
+        loading="lazy"
+        width="{{ block.settings.image.width }}"
+        height="{{ block.settings.image.height }}"
+      >
+    {% else %}
+      <div class="ai-customer-login-image-placeholder-{{ ai_gen_id }}">
+        {{ 'hero-apparel-1' | placeholder_svg_tag }}
+        <div class="ai-customer-login-empty-state-{{ ai_gen_id }}">
+          Add an image to enhance your login experience
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="ai-customer-login-form-container-{{ ai_gen_id }}">
+    <div class="ai-customer-login-form-content-{{ ai_gen_id }}">
+      <div class="ai-customer-login-header-{{ ai_gen_id }}">
+        <h1 class="ai-customer-login-title-{{ ai_gen_id }}">{{ block.settings.title }}</h1>
+        {% if block.settings.subtitle != blank %}
+          <p class="ai-customer-login-subtitle-{{ ai_gen_id }}">{{ block.settings.subtitle }}</p>
+        {% endif %}
+      </div>
+
+      {% form 'customer_login' %}
+        {% if form.errors %}
+          <div class="ai-customer-login-error-{{ ai_gen_id }}">
+            {{ form.errors | default_errors }}
+          </div>
+        {% endif %}
+
+        <div class="ai-customer-login-form-{{ ai_gen_id }}">
+          <div class="ai-customer-login-field-{{ ai_gen_id }}">
+            <label for="CustomerEmail-{{ ai_gen_id }}" class="ai-customer-login-label-{{ ai_gen_id }}">
+              Email address
+            </label>
+            <input
+              type="email"
+              name="customer[email]"
+              id="CustomerEmail-{{ ai_gen_id }}"
+              class="ai-customer-login-input-{{ ai_gen_id }}"
+              autocomplete="email"
+              autocorrect="off"
+              autocapitalize="off"
+              placeholder="Enter your email"
+              {% if form.errors contains 'email' %}
+                aria-invalid="true"
+                aria-describedby="CustomerEmail-{{ ai_gen_id }}-error"
+              {% endif %}
+              required
+            >
+          </div>
+
+          <div class="ai-customer-login-field-{{ ai_gen_id }}">
+            <label for="CustomerPassword-{{ ai_gen_id }}" class="ai-customer-login-label-{{ ai_gen_id }}">
+              Password
+            </label>
+            <input
+              type="password"
+              name="customer[password]"
+              id="CustomerPassword-{{ ai_gen_id }}"
+              class="ai-customer-login-input-{{ ai_gen_id }}"
+              autocomplete="current-password"
+              placeholder="Enter your password"
+              {% if form.errors contains 'password' %}
+                aria-invalid="true"
+                aria-describedby="CustomerPassword-{{ ai_gen_id }}-error"
+              {% endif %}
+              required
+            >
+          </div>
+
+          <button type="submit" class="ai-customer-login-button-{{ ai_gen_id }}">
+            {{ block.settings.button_text }}
+          </button>
+        </div>
+      {% endform %}
+
+      {% if block.settings.show_forgot_password %}
+        <div class="ai-customer-login-forgot-password-{{ ai_gen_id }}">
+          <a href="{{ routes.account_recover_url }}" class="ai-customer-login-forgot-link-{{ ai_gen_id }}">
+            Forgot your password?
+          </a>
+        </div>
+      {% endif %}
+
+      {% if block.settings.show_create_account %}
+        <div class="ai-customer-login-create-account-{{ ai_gen_id }}">
+          <p class="ai-customer-login-create-text-{{ ai_gen_id }}">Don't have an account?</p>
+          <a href="{{ routes.account_register_url }}" class="ai-customer-login-create-link-{{ ai_gen_id }}">
+            Create account
+          </a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
 {% schema %}
- {
-   "name": "AI_Block",
-   "tag": "shopify-ai-generated-block"
- }
+{
+  "name": "Customer login",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Welcome back"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Sign in to your account to continue"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text",
+      "default": "Sign in"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_forgot_password",
+      "label": "Show forgot password link",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_create_account",
+      "label": "Show create account section",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "color",
+      "id": "image_background_color",
+      "label": "Image background color",
+      "default": "#f8f9fa"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "section_height",
+      "min": 400,
+      "max": 800,
+      "step": 20,
+      "unit": "px",
+      "label": "Section height",
+      "default": 600
+    },
+    {
+      "type": "range",
+      "id": "form_padding",
+      "min": 20,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Form padding",
+      "default": 48
+    },
+    {
+      "type": "select",
+      "id": "mobile_layout",
+      "label": "Mobile layout",
+      "options": [
+        {
+          "value": "image_and_form",
+          "label": "Show image and form"
+        },
+        {
+          "value": "form_only",
+          "label": "Show form only"
+        }
+      ],
+      "default": "image_and_form"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "form_background_color",
+      "label": "Form background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#171717"
+    },
+    {
+      "type": "color",
+      "id": "subtitle_color",
+      "label": "Subtitle color",
+      "default": "#6b7280"
+    },
+    {
+      "type": "color",
+      "id": "input_background_color",
+      "label": "Input background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "input_border_color",
+      "label": "Input border color",
+      "default": "#d1d5db"
+    },
+    {
+      "type": "color",
+      "id": "input_focus_color",
+      "label": "Input focus color",
+      "default": "#3b82f6"
+    },
+    {
+      "type": "color",
+      "id": "placeholder_color",
+      "label": "Placeholder color",
+      "default": "#9ca3af"
+    },
+    {
+      "type": "color",
+      "id": "button_background_color",
+      "label": "Button background color",
+      "default": "#171717"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_color",
+      "label": "Button hover color",
+      "default": "#374151"
+    },
+    {
+      "type": "color",
+      "id": "secondary_button_color",
+      "label": "Secondary button color",
+      "default": "#3b82f6"
+    },
+    {
+      "type": "color",
+      "id": "secondary_button_text_color",
+      "label": "Secondary button text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "link_color",
+      "label": "Link color",
+      "default": "#3b82f6"
+    },
+    {
+      "type": "color",
+      "id": "link_hover_color",
+      "label": "Link hover color",
+      "default": "#1d4ed8"
+    },
+    {
+      "type": "color",
+      "id": "divider_color",
+      "label": "Divider color",
+      "default": "#e5e7eb"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 20,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Title size",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "subtitle_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Subtitle size",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "label": "Section border radius",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "input_border_radius",
+      "min": 0,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "label": "Input border radius",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "min": 0,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "label": "Button border radius",
+      "default": 8
+    }
+  ],
+  "presets": [
+    {
+      "name": "Customer login"
+    }
+  ]
+}
 {% endschema %}
