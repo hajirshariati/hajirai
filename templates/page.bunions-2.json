@@ -40,7 +40,7 @@
         "text_LHGLnM": {
           "type": "text",
           "settings": {
-            "text": "<p>A bunion is characterized by a prominent bump on the inside of the foot around the big toe joint, caused by a bone protruding towards the inside of the foot. As the big toe moves toward the smaller toes, it can end up resting under or over the second toe, leading to a condition known as overlapping toes.</p><p>Symptoms of bunions include inflammation, swelling, and soreness on the side surface of the big toe, often causing improper walking.</p>",
+            "text": "<p>Bunions, referred to in the medical community as Hallux Valgus, are one of the most common forefoot problems. A bunion is a prominent bump on the inside of the foot around the big toe joint. This bump is actually a bone protruding towards the inside of the foot. With the continued movement of the big toe towards the smaller toes, it is common to find the big toe resting under or over the second toe. This causes a common forefoot condition called overlapping toes. Some of the symptoms of bunions include inflammation, swelling, and soreness on the side surface of the big toe. The discomfort commonly causes a patient to walk improperly.</p><p>Another type of bunion which some individuals experience is called a Tailor’s Bunion, also known as a Bunionette. This forms on the outside of the foot towards the joint at the 5th toe. It is a smaller bump that forms due to the 5th toe moving inwards, towards the big toe.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -63,7 +63,7 @@
         "image": "shopify://shop_images/Group_8_a872f6a0-f2ec-48c9-b9d4-2da3568f1adb.png",
         "image_height": "adapt",
         "content_width": "small",
-        "content_position": "md:items-end md:justify-start",
+        "content_position": "md:items-center md:justify-start",
         "text_alignment": "left",
         "image_mobile": "shopify://shop_images/Group_8_a872f6a0-f2ec-48c9-b9d4-2da3568f1adb.png",
         "image_height_mobile": "100vh",
@@ -94,7 +94,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Causes</strong>",
-            "text": "<p>A bunion is a prominent bump on the inside of the foot around the big toe joint. Some of the symptoms of bunions include inflammation, swelling, soreness or pain in the bunion area. </p><p>Bunions are more common in women and often result from improper fitting footwear, such as tight, narrow dress shoes with a constrictive toe box.<br/><br/>Wearing shoes that squeeze the toes together can cause the first metatarsal bone to protrude, leading to the formation of a bunion.<br/><br/><br/><br/></p>",
+            "text": "<p>Bunions are a common problem experienced mostly by women. The deformity can develop from an abnormality in foot function, or arthritis, but is more commonly caused by wearing improper fitting footwear. Tight, narrow dress shoes with a constrictive toe box (toe area) can cause the foot to begin to take the shape of the shoe, leading to the formation of a bunion. Women who have bunions normally wear dress shoes that are too small for their feet. Their toes are squeezed together in their shoes causing the first metatarsal bone to protrude on the side of the foot.  The most common cause is a biomechanics abnormality, such as flat feet, that leads to the joint dysfunction.  The abnormal biomechanics can be inherited.  Other less common causes include Rheumatoid arthritis, neuromuscular disorders, and trauma, to name a few.</p><p>It is important for men and women to realize that wearing dress shoes and boots, which are tapered in the toe area, can cause the bunion to worsen to the point where surgery is necessary.<br/><br/><br/><br/></p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -103,7 +103,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Treatment and Prevention</strong>",
-            "text": "<p><strong>GET STRETCHING EXERCISE GUIDE</strong><br/>Our Plantar Fasciitis Kit comes with an exercise guide that helps give you instructions on how to stretch the plantar fascia as well as the muscles and tendons surrounding the tissue. In turn it can help with reducing tension and putting you on the path towards pain relief. </p><p><strong>SHOP RECOMMENDED ORTHOTICS</strong><br/>Orthotics are suggested to support the arch, especially for individuals with flat feet.Orthotics can help limit the progression of bunion formation and provide relief from pain. If the problem persists, consult your foot doctor.</p><p><strong>SHOP RECOMMENDED SHOES</strong><br/>Conservative treatment for bunion pain involves wearing shoes that accommodate the deformity.Shoes with a wide toe box are recommended to reduce pressure on the bunion.</p>",
+            "text": "<p>Conservative treatment to alleviate the pain associated with bunions is to wear shoes that accommodate the deformity.  Shoes designed with a wide toe box are recommended.  Orthotics are also recommended for this condition to support the arch in the case of flat feet.  Orthotics can limit the progression of the bunion formation.  Lastly, surgery is an option to correct the deformity.</p><p>If the problem persists, consult your foot doctor.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
