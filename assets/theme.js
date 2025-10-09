@@ -8087,24 +8087,10 @@ class ProductColorSwatchHandler {
         }
 
         if (stickyAddToCartBtn) {
-            // Find the first required option to determine the text
-            const firstRequiredOption = document.querySelector('.custom-option-buttons[data-opt-name="Size"], .custom-option-buttons[data-opt-name="Width"]');
-            const optName = firstRequiredOption ? firstRequiredOption.getAttribute('data-opt-name') : 'SIZE';
-            
+            // Don't permanently disable the sticky button during product switching
+            // The ProductStickyForm component will handle its own state
+            // Just ensure it's visible
             stickyAddToCartBtn.style.display = "flex";
-            stickyAddToCartBtn.classList.add("disabled-btn");
-            stickyAddToCartBtn.setAttribute("disabled", "disabled");
-            stickyAddToCartBtn.disabled = true;
-            
-            // Clear existing content and set new text
-            stickyAddToCartBtn.innerHTML = '';
-            stickyAddToCartBtn.innerText = "PLEASE SELECT " + optName.toUpperCase();
-            
-            // If there's a .btn-text element, create it and set the text
-            const btnText = document.createElement('span');
-            btnText.className = 'btn-text';
-            btnText.innerText = "PLEASE SELECT " + optName.toUpperCase();
-            stickyAddToCartBtn.appendChild(btnText);
         }
 
         // Reset any variant picker selections in the theme's variant picker
@@ -8251,6 +8237,121 @@ class ProductColorSwatchHandler {
                 document.dispatchEvent(new CustomEvent('product:switched', {
                     detail: { productHandle: handle, url: finalUrl }
                 }));
+                
+                // Listen for variant changes to update sticky button state
+                const handleVariantChange = () => {
+                    setTimeout(() => {
+                        const stickyBtn = document.querySelector('#custom-sticky-cart-btn');
+                        if (stickyBtn) {
+                            stickyBtn.removeAttribute('disabled');
+                            stickyBtn.disabled = false;
+                            
+                            const buttonText = stickyBtn.textContent || stickyBtn.innerText || '';
+                            const needsSelection = buttonText.includes('PLEASE SELECT') || buttonText.includes('SELECT SIZE');
+                            
+                            if (needsSelection) {
+                                stickyBtn.classList.add('disabled-btn');
+                            } else {
+                                stickyBtn.classList.remove('disabled-btn');
+                            }
+                            
+                            // Ensure event listener is attached
+                            if (!stickyBtn._scrollClickHandler) {
+                                stickyBtn._scrollClickHandler = function(e) {
+                                    if (stickyBtn.classList.contains("disabled-btn")) {
+                                        e.preventDefault();
+                                        const scrollTarget = document.querySelector(".custom-main-product");
+                                        if (scrollTarget) {
+                                            scrollTarget.scrollIntoView({ behavior: "smooth" });
+                                        }
+                                    }
+                                };
+                                stickyBtn.addEventListener('click', stickyBtn._scrollClickHandler);
+                            }
+                        }
+                    }, 50);
+                };
+                
+                // Add event listener for variant changes
+                document.addEventListener('variant:change', handleVariantChange);
+                
+                // Clean up the event listener after some time
+                setTimeout(() => {
+                    document.removeEventListener('variant:change', handleVariantChange);
+                }, 5000);
+                
+                // Handle sticky button state after product switching
+                setTimeout(() => {
+                    const stickyBtn = document.querySelector('#custom-sticky-cart-btn');
+                    if (stickyBtn) {
+                        // Remove the disabled attribute (but keep disabled-btn class for scroll functionality)
+                        stickyBtn.removeAttribute('disabled');
+                        stickyBtn.disabled = false;
+                        
+                        // Check button text to determine if we need the disabled-btn class
+                        const buttonText = stickyBtn.textContent || stickyBtn.innerText || '';
+                        const needsSelection = buttonText.includes('PLEASE SELECT') || buttonText.includes('SELECT SIZE');
+                        
+                        if (needsSelection) {
+                            // Add disabled-btn class for scroll functionality but don't disable the button
+                            stickyBtn.classList.add('disabled-btn');
+                        } else {
+                            // Remove disabled-btn class if variant is selected
+                            stickyBtn.classList.remove('disabled-btn');
+                        }
+                        
+                        // Re-attach the click event listener for scroll functionality
+                        // Remove any existing listener first
+                        if (stickyBtn._scrollClickHandler) {
+                            stickyBtn.removeEventListener('click', stickyBtn._scrollClickHandler);
+                        }
+                        
+                        // Create and attach new listener
+                        stickyBtn._scrollClickHandler = function(e) {
+                            if (stickyBtn.classList.contains("disabled-btn")) {
+                                e.preventDefault();
+                                const scrollTarget = document.querySelector(".custom-main-product");
+                                if (scrollTarget) {
+                                    scrollTarget.scrollIntoView({ behavior: "smooth" });
+                                }
+                            }
+                        };
+                        
+                        stickyBtn.addEventListener('click', stickyBtn._scrollClickHandler);
+                    }
+                }, 100);
+                
+                // Also add a longer timeout to catch any delayed updates from ProductStickyForm
+                setTimeout(() => {
+                    const stickyBtn = document.querySelector('#custom-sticky-cart-btn');
+                    if (stickyBtn) {
+                        stickyBtn.removeAttribute('disabled');
+                        stickyBtn.disabled = false;
+                        
+                        const buttonText = stickyBtn.textContent || stickyBtn.innerText || '';
+                        const needsSelection = buttonText.includes('PLEASE SELECT') || buttonText.includes('SELECT SIZE');
+                        
+                        if (needsSelection) {
+                            stickyBtn.classList.add('disabled-btn');
+                        } else {
+                            stickyBtn.classList.remove('disabled-btn');
+                        }
+                        
+                        // Ensure event listener is attached (safety check)
+                        if (!stickyBtn._scrollClickHandler) {
+                            stickyBtn._scrollClickHandler = function(e) {
+                                if (stickyBtn.classList.contains("disabled-btn")) {
+                                    e.preventDefault();
+                                    const scrollTarget = document.querySelector(".custom-main-product");
+                                    if (scrollTarget) {
+                                        scrollTarget.scrollIntoView({ behavior: "smooth" });
+                                    }
+                                }
+                            };
+                            stickyBtn.addEventListener('click', stickyBtn._scrollClickHandler);
+                        }
+                    }
+                }, 500);
                 
                 // Reset the product switching flag after a delay to ensure all updates are complete
                 setTimeout(() => {
