@@ -7648,6 +7648,10 @@ p::after {
 
 .drawer__menu-top a {
     color: rgb(var(--color-foreground) / .4);
+    color: #ffffff;
+    background: #171717;
+    padding: 0em 1em;
+    border-radius: 10px;
 }
 
 .drawer__close-menu {
