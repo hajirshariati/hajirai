@@ -155,8 +155,8 @@
         "text_bGyhFh": {
           "type": "text",
           "settings": {
-            "text": "$20 worth of points on your anniversary",
-            "text_size": 18,
+            "text": "$20 Worth of Points on your Anniversary",
+            "text_size": 20,
             "text_font": "body",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -175,8 +175,8 @@
         "text_AChxmx": {
           "type": "text",
           "settings": {
-            "text": "$20 worth of points after the first purchase",
-            "text_size": 18,
+            "text": "$20 Worth of Points after the First Purchase",
+            "text_size": 20,
             "text_font": "body",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -195,8 +195,8 @@
         "text_Lhk47x": {
           "type": "text",
           "settings": {
-            "text": "$20 worth of points for referral",
-            "text_size": 18,
+            "text": "$20 Worth of Points for Referral",
+            "text_size": 20,
             "text_font": "body",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
