@@ -9,119 +9,6 @@
  */
 {
   "sections": {
-    "rich_text_dR7cAy": {
-      "type": "rich-text",
-      "blocks": {
-        "text_4LdJEp": {
-          "type": "text",
-          "settings": {
-            "text": "<p>We’re upgrading our systems to serve you better. Some orders may be delayed during this time. We expect full operations to resume by October 10th. Thank you for your patience!</p>",
-            "text_font": "body",
-            "text_size": "subtext-custom",
-            "text_max_size": 18,
-            "text_line_height": 1.2,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "text_4LdJEp"
-      ],
-      "name": "t:sections.rich-text.name",
-      "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
-        "heading_size": "title-lg tracking-heading",
-        "heading_alignment": "text-center md:items-center",
-        "heading_width": "small",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "#f4e2d1",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 16,
-        "padding_bottom": 16,
-        "divider": false,
-        "narrow": true,
-        "rounded": false
-      }
-    },
-    "empty_space_C8fpxJ": {
-      "type": "empty-space",
-      "name": "t:sections.empty-space.name",
-      "settings": {
-        "desktop_height": 40,
-        "mobile_height": 28,
-        "color_background": "",
-        "gradient_background": ""
-      }
-    },
-    "rich_text_qjRJB6": {
-      "type": "rich-text",
-      "blocks": {
-        "heading_RiLkG8": {
-          "type": "heading",
-          "settings": {
-            "heading": "Welcome back",
-            "heading_size": "title-md",
-            "heading_tag": "h1",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "heading_RiLkG8"
-      ],
-      "name": "t:sections.rich-text.name",
-      "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "#171717",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 24,
-        "padding_bottom": 24,
-        "divider": false,
-        "narrow": false,
-        "rounded": false
-      }
-    },
     "rich_text_a3rkPe": {
       "type": "rich-text",
       "blocks": {
@@ -136,10 +23,29 @@
             "accessibility_info": "",
             "external": false
           }
+        },
+        "heading_rPytNd": {
+          "type": "heading",
+          "settings": {
+            "heading": "Member Benefits",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "spacing_xEiYax": {
+          "type": "spacing",
+          "settings": {
+            "height": 20,
+            "height_mobile": 16
+          }
         }
       },
       "block_order": [
-        "icon_7VwAFd"
+        "icon_7VwAFd",
+        "heading_rPytNd",
+        "spacing_xEiYax"
       ],
       "name": "t:sections.rich-text.name",
       "settings": {
@@ -173,55 +79,6 @@
         "rounded": false
       }
     },
-    "rich_text_BjeiGd": {
-      "type": "rich-text",
-      "blocks": {
-        "heading_cG3REf": {
-          "type": "heading",
-          "settings": {
-            "heading": "Member Benefits",
-            "heading_size": "title-sm",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "heading_cG3REf"
-      ],
-      "name": "t:sections.rich-text.name",
-      "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "#171717",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 24,
-        "padding_bottom": 24,
-        "divider": false,
-        "narrow": false,
-        "rounded": false
-      }
-    },
     "scrolling_text_4kJYfh": {
       "type": "scrolling-text",
       "blocks": {
@@ -238,8 +95,8 @@
         "text_KVfJqG": {
           "type": "text",
           "settings": {
-            "text": "Free ground shipping (US ONLY*)",
-            "text_size": 18,
+            "text": "Free Ground Shipping (US ONLY*)",
+            "text_size": 20,
             "text_font": "body",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -258,8 +115,8 @@
         "text_HTdAwf": {
           "type": "text",
           "settings": {
-            "text": "Earn 5% on every purchase",
-            "text_size": 18,
+            "text": "Earn 5% on Every Purchase",
+            "text_size": 20,
             "text_font": "body",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -278,8 +135,8 @@
         "text_RcCDND": {
           "type": "text",
           "settings": {
-            "text": "Early VIP access to sales & product releases",
-            "text_size": 18,
+            "text": "Early VIP Access to Sales & Product Releases",
+            "text_size": 20,
             "text_font": "body",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -378,58 +235,14 @@
         "rounded": false
       }
     },
-    "rich_text_QiaCWe": {
-      "type": "rich-text",
-      "blocks": {
-        "text_mcCBPK": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Sign in to your account to continue shopping</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.2,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "text_mcCBPK"
-      ],
-      "name": "t:sections.rich-text.name",
+    "empty_space_kK4Rk8": {
+      "type": "empty-space",
+      "name": "t:sections.empty-space.name",
       "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
+        "desktop_height": 40,
+        "mobile_height": 28,
         "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 24,
-        "padding_bottom": 24,
-        "divider": false,
-        "narrow": false,
-        "rounded": false
+        "gradient_background": ""
       }
     },
     "main-login": {
@@ -573,13 +386,9 @@
     }
   },
   "order": [
-    "rich_text_dR7cAy",
-    "empty_space_C8fpxJ",
-    "rich_text_qjRJB6",
     "rich_text_a3rkPe",
-    "rich_text_BjeiGd",
     "scrolling_text_4kJYfh",
-    "rich_text_QiaCWe",
+    "empty_space_kK4Rk8",
     "main-login",
     "empty_space_kpmbpR",
     "multicolumn_with_icons_JfDLw8"
