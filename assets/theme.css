@@ -15728,11 +15728,6 @@ video-media
     border-radius: var(--rounded-block);
 }
 
-.slideshow:not(.slideshow--hero) .banner {
-    margin-inline-end: var(--sp-7d5);
-    max-width: var(--page-container);
-}
-
 .slideshow .banner__overlay {
     background: linear-gradient(
             180deg,

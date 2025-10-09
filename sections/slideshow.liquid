@@ -148,7 +148,7 @@
     </slideshow-element>
     {%- comment -%} Positioned content overlay for text and CTA {%- endcomment -%}
     <div class="absolute top-0 left-0 w-full h-full pointer-events-none">
-      <div class="page-width w-full h-full flex {{ section.settings.content_position }} {{ section.settings.content_position_mobile }}">
+      <div class="{% unless section.settings.full_width %}page-width {% endunless %}w-full h-full flex {{ section.settings.content_position }} {{ section.settings.content_position_mobile }}">
         <div class="slideshow-content-positioned mobile-padding" style="  max-width: min-content;"  >
           <nav is="slideshow-words" class="slideshow-words grid items-center" aria-controls="Slider-{{ section.id }}" aria-labelledby="Slider-{{ section.id }}">
             {%- for block in section.blocks -%}
@@ -198,7 +198,7 @@
     </div>
 
     {%- comment -%} Fixed navigation at bottom {%- endcomment -%}
-    <div class="page-width absolute bottom-0 left-0 w-full pointer-events-none">
+    <div class="{% unless section.settings.full_width %}page-width {% endunless %}absolute bottom-0 left-0 w-full pointer-events-none">
       <div class="slideshow-content">
         {%- if section.blocks.size > 1 and section.settings.show_navigation -%}
           <div class="slideshow-dots flex items-end justify-between">
