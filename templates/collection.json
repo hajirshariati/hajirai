@@ -31,7 +31,7 @@
       ],
       "settings": {
         "transparent_header": false,
-        "show_image": true,
+        "show_image": false,
         "image_height": "adapt",
         "content_position": "md:items-end md:justify-start",
         "text_alignment": "left",
@@ -175,9 +175,12 @@
           "type": "text",
           "settings": {
             "text": "{{ collection.description }}",
+            "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
-            "text_font": "body",
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
