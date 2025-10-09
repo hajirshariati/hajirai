@@ -30,7 +30,7 @@
         "heading_axLTnn": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Arch Pain</p>",
+            "heading": "<p>Arch Pain / Arch Strain</p>",
             "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "none",
@@ -40,7 +40,7 @@
         "text_LHGLnM": {
           "type": "text",
           "settings": {
-            "text": "<p>Arch pain, also known as arch strain, involves inflammation and/or a burning sensation at the arch of the foot. Various factors can cause arch pain, including structural imbalances or foot injuries. The most common cause of arch pain is Plantar Fasciitis, a condition affecting the plantar fascia, a fibrous tissue band running from the heel to the forefoot.<br/><br/>If untreated and strain on the longitudinal arch continues, a heel spur, a bony protrusion, may develop. Prompt treatment is essential to prevent the condition from worsening.<br/><br/><br/><br/></p>",
+            "text": "<p>The term arch pain (often referred to as arch strain) refers to an inflammation and/or burning sensation at the arch of the foot.<br/></p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -63,7 +63,7 @@
         "image": "shopify://shop_images/Group_10_76daefab-458a-4883-8570-5f570d93b672.png",
         "image_height": "adapt",
         "content_width": "small",
-        "content_position": "md:items-end md:justify-start",
+        "content_position": "md:items-center md:justify-start",
         "text_alignment": "left",
         "image_mobile": "shopify://shop_images/Group_10_76daefab-458a-4883-8570-5f570d93b672.png",
         "image_height_mobile": "adapt",
@@ -94,7 +94,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Causes</strong>",
-            "text": "<p>Arch pain, also known as arch strain, involves inflammation and/or a burning sensation at the arch of the foot. Various factors can cause arch pain, including structural imbalances or foot injuries<br/><br/>The most common cause of arch pain is Plantar Fasciitis, a condition affecting the plantar fascia, a fibrous tissue band running from the heel to the forefoot.<br/><br/>If untreated and strain on the longitudinal arch continues, a heel spur, a bony protrusion, may develop. Prompt treatment is essential to prevent the condition from worsening.<br/></p>",
+            "text": "<p>There are many different factors that can cause arch pain. A structural imbalance or an injury to the foot can often be the direct cause. However, most frequently the cause is a common condition called plantar fasciitis. The plantar fascia is a broad band of fibrous tissue located along the bottom surface of the foot that runs from the heel to the forefoot. Excessive stretching of the plantar fascia, usually due to over-pronation (flat feet), causes plantar fasciitis. The inflammation caused by the plantar fascia being stretched away from the heel often leads to pain in the heel and arch areas. The pain is often extreme in the morning when an individual first gets out of bed or after a prolonged period of rest. If this condition is left untreated and strain on the longitudinal arch continues, a bony protrusion may develop, known as a heel spur. It is important to treat the condition promptly before it worsens.<br/><br/><br/></p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -103,7 +103,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Treatment and Prevention</strong>",
-            "text": "<p><strong>GET STRETCHING EXERCISE GUIDE</strong><br/>Our Plantar Fasciitis Kit comes with an exercise guide that helps give you instructions on how to stretch the plantar fascia as well as the muscles and tendons surrounding the tissue. In turn it can help with reducing tension and putting you on the path towards pain relief. </p><p><br/><br/><strong>SHOP RECOMMENDED ORTHOTICS</strong><br/>If arch pain is related to overpronation (flat feet), use an orthotic with a medial heel post and adequate arch support. This type of orthotic helps control over-pronation, supports the arch, and provides relief from pain. If the problem persists, consult your foot doctor.</p><p><br/><br/><strong>SHOP RECOMMENDED SHOES</strong><br/>Avoid high-heeled shoes whenever possible to prevent exacerbating arch pain. Opt for footwear with a reasonable heel height, soft uppers, shock-absorbing soles, and proper arch support.Shoes with a wide toe box are recommended to reduce pressure on the bunion.<br/><br/></p>",
+            "text": "<p>This is a common foot condition that can be easily treated. If you suffer from arch pain avoid high-heeled shoes whenever possible. Try to choose footwear with a reasonable heel, soft leather uppers, shock absorbing soles and removable foot insoles. When the arch pain is pronation related (flat feet), an orthotic designed with a medial heel post and proper arch support is recommended for treating the pain. This type of orthotic will control over-pronation, support the arch and provide the necessary relief</p><p>If the problem persists, consult your foot doctor.<br/><br/></p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
