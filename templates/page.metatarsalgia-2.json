@@ -40,7 +40,7 @@
         "text_LHGLnM": {
           "type": "text",
           "settings": {
-            "text": "<p>Metatarsalgia is a term used to describe pain in the metatarsal region of the foot, commonly known as the ball-of-the-foot. This condition affects the bones and joints at the ball-of-the-foot, often located under the 2nd, 3rd, and 4th metatarsal heads, or more isolated at the first metatarsal head near the big toe.<br/><br/>Improperly fitting footwear, especially women’s dress shoes and other restrictive shoes, commonly causes ball-of-foot pain. Additional causes of excessive pressure in the ball-of-foot area include high heels, high-impact activities without proper footwear or orthotics, and thinning of the fat pad in the foot with age.<br/><br/></p>",
+            "text": "<p>Metatarsalgia is a general term used to denote a painful foot condition in the metatarsal region of the foot (the area just before the toes, more commonly referred to as the ball-of-the-foot). This is a common foot disorder that can affect the bones and joints at the ball-of-the-foot. Metatarsalgia (ball-of-foot-pain) is often located under the 2nd, 3rd, and 4th metatarsal heads, or more isolated at the first metatarsal head (near the big toe).</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -63,7 +63,7 @@
         "image": "shopify://shop_images/Group_13_ec3af216-7398-40b8-926f-ad790764baca.png",
         "image_height": "adapt",
         "content_width": "small",
-        "content_position": "md:items-end md:justify-start",
+        "content_position": "md:items-center md:justify-start",
         "text_alignment": "left",
         "image_mobile": "shopify://shop_images/Group_13_ec3af216-7398-40b8-926f-ad790764baca.png",
         "image_height_mobile": "auto",
@@ -94,7 +94,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Causes</strong>",
-            "text": "<p>This condition affects the bones and joints at the ball-of-the-foot, often located under the 2nd, 3rd, and 4th metatarsal heads, or more isolated at the first metatarsal head near the big toe.<br/><br/>Improperly fitting footwear, especially women’s dress shoes and other restrictive shoes, commonly causes ball-of-foot pain.<br/><br/>Additional causes of excessive pressure in the ball-of-foot area include high heels, high-impact activities without proper footwear or orthotics, and thinning of the fat pad in the foot with age.</p>",
+            "text": "<p>With this common foot condition, one or more of the metatarsal heads become painful and/or inflamed, usually due to excessive pressure over a long period of time. It is common to experience acute, recurrent, or chronic pain with metatarsalgia. Ball-of-foot pain is often caused from improper fitting footwear, most frequently by women’s dress shoes and other restrictive footwear. Footwear with a narrow toe box (toe area) forces the ball-of-foot area to be forced into a minimal amount of space. This can inhibit the walking process and lead to extreme discomfort in the forefoot. Other factors can cause excessive pressure in the ball-of-foot area that can result in metatarsalgia. These include shoes with heels that are too high or participating in high impact activities without proper footwear and/or orthotics. Also as we get older, the fat pad in our foot tends to thin out, making us much more susceptible to pain in the ball-of-the-foot.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -103,7 +103,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Treatment and Prevention</strong>",
-            "text": "<p><strong>GET STRETCHING EXERCISE GUIDE</strong><br/>Our Plantar Fasciitis Kit comes with an exercise guide that helps give you instructions on how to stretch the plantar fascia as well as the muscles and tendons surrounding the tissue. In turn it can help with reducing tension and putting you on the path towards pain relief. </p><p><br/><br/><strong>SHOP RECOMMENDED ORTHOTICS</strong><br/>Orthotics designed to relieve ball-of-foot pain typically feature a metatarsal pad. The metatarsal pad is placed behind the ball-of-the-foot to relieve pressure and redistribute weight from the painful area to more tolerant areas. If the problem persists, consult your foot doctor.</p><p><br/><br/><strong>SHOP RECOMMENDED SHOES</strong><br/>If improper fitting footwear is the cause, it should be replaced with more suitable options. Footwear recommended for metatarsalgia includes those with a high, wide toe box and shock-absorbing soles.</p>",
+            "text": "<p>The first step in treating metatarsalgia is to determine the cause of the pain. If improper fitting footwear is the cause of the pain, the footwear must be changed. Footwear designed with a high, wide toe box (toe area) and a rocker sole is ideal for treating metatarsalgia. The high, wide toe box allows the foot to spread out while the rocker sole reduces stress on the ball-of-the-foot. Unloading pressure to the ball-of-the-foot can be accomplished with a variety of footcare products. Orthotics designed to relieve ball-of-foot pain usually feature a metatarsal pad. The orthotic is constructed with the pad placed behind the ball-of-the-foot to relieve pressure and redistribute weight from the painful area to more tolerant areas. Other products often recommended include gel metatarsal cushions and metatarsal bandages. When these products are used with proper footwear, you should experience significant relief.</p><p>If problem persists, consult your foot doctor.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
