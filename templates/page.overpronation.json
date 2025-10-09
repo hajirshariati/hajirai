@@ -40,7 +40,7 @@
         "text_LHGLnM": {
           "type": "text",
           "settings": {
-            "text": "<p>Overpronation, or flat feet, is a common biomechanical issue where the arch collapses upon weight bearing, causing stress or inflammation on the plantar fascia. This condition can lead to discomfort and contribute to other foot problems. This added stress can result in conditions such as Plantar Fasciitis, Heel Spurs, Metatarsalgia, Post-tib Tendonitis, and Bunions.</p><p></p><p>Causes of flat feet include obesity, pregnancy, or repetitive pounding on hard surfaces, which weaken the arch.<br/><br/></p>",
+            "text": "<p>Over-pronation, or flat feet, is a common biomechanical problem that occurs in the walking process when a person’s arch collapses upon weight bearing. This motion can cause extreme stress or inflammation on the plantar fascia, potentially causing severe discomfort and leading to other foot problems.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -63,7 +63,7 @@
         "image": "shopify://shop_images/Group_12_bd5993c6-563d-408b-9abe-82db20e1d611.png",
         "image_height": "adapt",
         "content_width": "small",
-        "content_position": "md:items-end md:justify-start",
+        "content_position": "md:items-center md:justify-start",
         "text_alignment": "left",
         "image_mobile": "shopify://shop_images/Group_12_bd5993c6-563d-408b-9abe-82db20e1d611.png",
         "image_height_mobile": "auto",
@@ -94,7 +94,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Causes</strong>",
-            "text": "<p>Overpronation, or flat feet, is a common biomechanical issue where the arch collapses upon weight bearing, causing stress or inflammation on the plantar fascia. This condition can lead to discomfort and contribute to other foot problems.<br/><br/>This added stress can result in conditions such as Plantar Fasciitis, Heel Spurs, Metatarsalgia, Post-tib Tendonitis, and Bunions. Causes of flat feet include obesity, pregnancy, or repetitive pounding on hard surfaces, which weaken the arch.<br/><br/>People with flat feet may not experience discomfort immediately and some may not experience any discomfort at all. When symptoms do develop, they can make walking awkward and increase strain on the feet and calves.<br/><br/></p>",
+            "text": "<p>Over-pronation is very prominent in people who have flexible, flat feet. The framework of the foot begins to collapse, causing the foot to flatten and adding stress to other parts of the foot. As a result, over-pronation, often leads to Plantar Fasciitis, Heel Spurs, Metatarsalgia, Post-tib Tendonitis and/or Bunions. There are many causes of flat feet. Obesity, pregnancy or repetitive pounding on a hard surface can weaken the arch leading to over-pronation. Often people with flat feet do not experience discomfort immediately, and some never suffer from any discomfort at all. However, when symptoms develop and become painful, walking becomes awkward and causes increased strain on the feet and calves.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -103,7 +103,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Treatment and Prevention</strong>",
-            "text": "<p><strong>GET STRETCHING EXERCISE GUIDE<br/></strong>Our Plantar Fasciitis Kit comes with an exercise guide that helps give you instructions on how to stretch the plantar fascia as well as the muscles and tendons surrounding the tissue. In turn it can help with reducing tension and putting you on the path towards pain relief. </p><p></p><p><strong>SHOP RECOMMENDED ORTHOTICS</strong><br/>Overpronation can be treated conservatively using orthotics that provide proper arch support and medial rearfoot posting to help prevent excessive foot rolling.</p><p></p><p><strong>SHOP RECOMMENDED SHOES</strong><br/>It is important to examine footwear to ensure a proper fit. Footwear with firm heel counters is often recommended for added support and stability. If the problem persists, consult your foot doctor.</p>",
+            "text": "<p>Over-Pronation can be treated conservatively (non-surgical treatments) with custom made orthotics. These orthotics should be designed with appropriate arch support and medial rearfoot posting to prevent the over-pronation. Footwear should also be examined to ensure there is a proper fit. Footwear with a firm heel counter is often recommended for extra support and stability. Improperly fitting footwear can lead to additional foot problems.<br/><br/>If the problem persists, consult your foot doctor.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -400,7 +400,7 @@
         "heading_NfEViz": {
           "type": "heading",
           "settings": {
-            "heading": "What Other Metatarsalgia Sufferers Say",
+            "heading": "What Other Overpronation Sufferers Say",
             "heading_size": "title-lg tracking-heading",
             "heading_tag": "h2",
             "highlighted_text": "none",
@@ -450,8 +450,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>“Bought all 4 colors I</strong><br/>bought two pairs and were so elated with the comfort that I bought the last two remaining colors. I suffer from Metatarsalgia and was glad to finally being able to walk without discomfort & pain!!” </h6>",
-            "author": "Ellen o.",
+            "text": "<h6><strong>\"These Saved My Life!  </strong><br/>These flip flops saved my summer! My plantar fasciitis was really bad and when I put these on I felt relief almost immediately. The discomfort continues to subside more and more each day, and is still improving, which I largely attribute to wearing these all day, every day. Plus, they felt very secure even when wet. Very thankful for these!\"</h6>",
+            "author": "Lisa R",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -463,8 +463,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>\"I love these sneakers.</strong><br/>I love these sneakers. I have bought three of the same sneakers, but in different colors. What a difference they have made on my feet. I like to take my dog for walks. I had to stop. My feet were in such pain. With these sneakers my feet are fine now. Thank you Aetrex.</h6>",
-            "author": "Linda P.",
+            "text": "<h6><strong>\"My Favorite! </strong><br/>These were the first shoe I ordered from Aetrex. I loved them immediately. I am now on my 3rd pair, including one for my daughter since she kept stealing mine! They are cushiony & supportive enough for a day at an amusement park plus the strap keeps them secure. Casual enough for everyday, but dressy enough for a night out means only packing one pair for trips.\"</h6>",
+            "author": "Holly J.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -476,8 +476,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>\"Comfortable & supportiveI </strong><br/>bought these to wear at work. I am a Dental Assistant and on my feet most of the day. With other shoes, I would go home with sore feet and low back pain. The Xspress Runner 2 felt comfortable and supportive right from the first time I laced them up - no break-in required.</h6>",
-            "author": "Susanne B.",
+            "text": "<h6><strong>\"Better Than My Bare Feet! </strong><br/>These sandals are perfect. They are very cushioned and supportive in all the right places. I can already feel the difference with my pronation issues when I wear these slides. I also love that they are cute and so easy to wear. I wear them out or just around the house. I couldn't recommend more!!!\" </h6>",
+            "author": "Kimberly S.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
