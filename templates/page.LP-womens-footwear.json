@@ -118,7 +118,7 @@
         "content_width": "large",
         "content_position": "md:items-center md:justify-end",
         "text_alignment": "center",
-        "image_height_mobile": "adapt",
+        "image_height_mobile": "400px",
         "content_position_mobile": "items-end justify-center",
         "text_alignment_mobile": "center",
         "accessibility_info": "Slideshow about our brand",
