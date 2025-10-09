@@ -96,7 +96,7 @@
           "type": "text",
           "settings": {
             "text": "Free Ground Shipping (US ONLY*)",
-            "text_size": 20,
+            "text_size": 22,
             "text_font": "body",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -116,7 +116,7 @@
           "type": "text",
           "settings": {
             "text": "Earn 5% on Every Purchase",
-            "text_size": 20,
+            "text_size": 22,
             "text_font": "body",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -136,7 +136,7 @@
           "type": "text",
           "settings": {
             "text": "Early VIP Access to Sales & Product Releases",
-            "text_size": 20,
+            "text_size": 22,
             "text_font": "body",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -156,7 +156,7 @@
           "type": "text",
           "settings": {
             "text": "$20 Worth of Points on your Anniversary",
-            "text_size": 20,
+            "text_size": 22,
             "text_font": "body",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -176,7 +176,7 @@
           "type": "text",
           "settings": {
             "text": "$20 Worth of Points after the First Purchase",
-            "text_size": 20,
+            "text_size": 22,
             "text_font": "body",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -196,7 +196,7 @@
           "type": "text",
           "settings": {
             "text": "$20 Worth of Points for Referral",
-            "text_size": 20,
+            "text_size": 22,
             "text_font": "body",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
