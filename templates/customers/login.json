@@ -105,7 +105,7 @@
         "image_EUAB44": {
           "type": "image",
           "settings": {
-            "image": "shopify://shop_images/icon-rush-package.png",
+            "image": "shopify://shop_images/earn-icon.png",
             "height": 56,
             "link": "",
             "accessibility_info": "",
@@ -165,7 +165,7 @@
         "image_jXWHeN": {
           "type": "image",
           "settings": {
-            "image": "shopify://shop_images/earn-icon.png",
+            "image": "shopify://shop_images/purchase-icon.png",
             "height": 56,
             "link": "",
             "accessibility_info": "",
