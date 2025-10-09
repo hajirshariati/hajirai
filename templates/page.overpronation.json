@@ -30,7 +30,7 @@
         "heading_axLTnn": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Bunions</p>",
+            "heading": "<p>Overpronation</p>",
             "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "none",
@@ -40,7 +40,7 @@
         "text_LHGLnM": {
           "type": "text",
           "settings": {
-            "text": "<p>Metatarsalgia is a term used to describe pain in the metatarsal region of the foot, commonly known as the ball-of-the-foot. This condition affects the bones and joints at the ball-of-the-foot, often located under the 2nd, 3rd, and 4th metatarsal heads, or more isolated at the first metatarsal head near the big toe.<br/><br/>Improperly fitting footwear, especially women’s dress shoes and other restrictive shoes, commonly causes ball-of-foot pain. Additional causes of excessive pressure in the ball-of-foot area include high heels, high-impact activities without proper footwear or orthotics, and thinning of the fat pad in the foot with age.<br/><br/></p>",
+            "text": "<p>Overpronation, or flat feet, is a common biomechanical issue where the arch collapses upon weight bearing, causing stress or inflammation on the plantar fascia. This condition can lead to discomfort and contribute to other foot problems. This added stress can result in conditions such as Plantar Fasciitis, Heel Spurs, Metatarsalgia, Post-tib Tendonitis, and Bunions.</p><p></p><p>Causes of flat feet include obesity, pregnancy, or repetitive pounding on hard surfaces, which weaken the arch.<br/><br/></p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -60,12 +60,12 @@
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
-        "image": "shopify://shop_images/Group_13_ec3af216-7398-40b8-926f-ad790764baca.png",
+        "image": "shopify://shop_images/Group_12_bd5993c6-563d-408b-9abe-82db20e1d611.png",
         "image_height": "adapt",
         "content_width": "small",
         "content_position": "md:items-end md:justify-start",
         "text_alignment": "left",
-        "image_mobile": "shopify://shop_images/Group_13_ec3af216-7398-40b8-926f-ad790764baca.png",
+        "image_mobile": "shopify://shop_images/Group_12_bd5993c6-563d-408b-9abe-82db20e1d611.png",
         "image_height_mobile": "auto",
         "content_position_mobile": "items-start justify-start",
         "text_alignment_mobile": "left",
@@ -94,7 +94,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Causes</strong>",
-            "text": "<p>This condition affects the bones and joints at the ball-of-the-foot, often located under the 2nd, 3rd, and 4th metatarsal heads, or more isolated at the first metatarsal head near the big toe.<br/><br/>Improperly fitting footwear, especially women’s dress shoes and other restrictive shoes, commonly causes ball-of-foot pain.<br/><br/>Additional causes of excessive pressure in the ball-of-foot area include high heels, high-impact activities without proper footwear or orthotics, and thinning of the fat pad in the foot with age.</p>",
+            "text": "<p>Overpronation, or flat feet, is a common biomechanical issue where the arch collapses upon weight bearing, causing stress or inflammation on the plantar fascia. This condition can lead to discomfort and contribute to other foot problems.<br/><br/>This added stress can result in conditions such as Plantar Fasciitis, Heel Spurs, Metatarsalgia, Post-tib Tendonitis, and Bunions. Causes of flat feet include obesity, pregnancy, or repetitive pounding on hard surfaces, which weaken the arch.<br/><br/>People with flat feet may not experience discomfort immediately and some may not experience any discomfort at all. When symptoms do develop, they can make walking awkward and increase strain on the feet and calves.<br/><br/></p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -103,7 +103,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Treatment and Prevention</strong>",
-            "text": "<p><strong>GET STRETCHING EXERCISE GUIDE</strong><br/>Our Plantar Fasciitis Kit comes with an exercise guide that helps give you instructions on how to stretch the plantar fascia as well as the muscles and tendons surrounding the tissue. In turn it can help with reducing tension and putting you on the path towards pain relief. </p><p><br/><br/><strong>SHOP RECOMMENDED ORTHOTICS</strong><br/>Orthotics designed to relieve ball-of-foot pain typically feature a metatarsal pad. The metatarsal pad is placed behind the ball-of-the-foot to relieve pressure and redistribute weight from the painful area to more tolerant areas. If the problem persists, consult your foot doctor.</p><p><br/><br/><strong>SHOP RECOMMENDED SHOES</strong><br/>If improper fitting footwear is the cause, it should be replaced with more suitable options. Footwear recommended for metatarsalgia includes those with a high, wide toe box and shock-absorbing soles.</p>",
+            "text": "<p><strong>GET STRETCHING EXERCISE GUIDE<br/></strong>Our Plantar Fasciitis Kit comes with an exercise guide that helps give you instructions on how to stretch the plantar fascia as well as the muscles and tendons surrounding the tissue. In turn it can help with reducing tension and putting you on the path towards pain relief. </p><p></p><p><strong>SHOP RECOMMENDED ORTHOTICS</strong><br/>Overpronation can be treated conservatively using orthotics that provide proper arch support and medial rearfoot posting to help prevent excessive foot rolling.</p><p></p><p><strong>SHOP RECOMMENDED SHOES</strong><br/>It is important to examine footwear to ensure a proper fit. Footwear with firm heel counters is often recommended for added support and stability. If the problem persists, consult your foot doctor.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -158,7 +158,7 @@
             "text": "<p>TEXT</p>",
             "link": "",
             "color_text": "#74a5ba",
-            "vertical": 21,
+            "vertical": 30,
             "horizontal": 45,
             "vertical_mobile": 16,
             "horizontal_mobile": 42
@@ -238,8 +238,8 @@
       ],
       "name": "t:sections.lookbook.name",
       "settings": {
-        "image": "shopify://shop_images/Group_18_3.png",
-        "image_mobile": "shopify://shop_images/Group_18_3.png",
+        "image": "shopify://shop_images/Group_18_4.png",
+        "image_mobile": "shopify://shop_images/Group_18_4.png",
         "heading": "",
         "heading_size": "title-sm",
         "heading_alignment": "text-center md:items-center",
@@ -360,10 +360,10 @@
       "settings": {
         "collection": "",
         "products": [
-          "xspress-runner2-white-xs103w",
-          "maui-black-gloss-l3030w",
-          "metatarsalgia-orthotics-men",
-          "blake-black-pc130w"
+          "luna-charcoal-dm706w",
+          "avril-white-ck173w",
+          "l2300m-m",
+          "courtney-casual-chalk-ca101w"
         ],
         "product_limit": 4,
         "columns": 4,
