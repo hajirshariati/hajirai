@@ -466,6 +466,9 @@
         "column_m8nkAK",
         "column_jFkxBd"
       ],
+      "custom_css": [
+        ".multicolumn-card {background: #D8CCC7 !important;}"
+      ],
       "settings": {
         "gap": "small",
         "columns": 4,
