@@ -1,5 +1,9 @@
 
 <style>
+  #shopify-section-{{ section.id }} .title-wrapper {
+  max-width: initial;
+}
+
   #shopify-section-{{ section.id }} {
     --section-padding-top: {{ section.settings.padding_top }}px;
     --section-padding-bottom: {{ section.settings.padding_bottom }}px;
@@ -78,7 +82,7 @@
     {%- endcapture -%}
     {%- capture indicators -%}
       {%- if section.settings.carousel_on_desktop -%}
-        <div class="indicators hidden lg:flex gap-2d5" style="max-width: initial;">
+        <div class="indicators hidden lg:flex gap-2d5" >
           <button class="button button--secondary" type="button" is="previous-button" aria-controls="Slider-{{ section.id }}" aria-label="{{ 'general.pagination.previous' | t | escape }}" disabled>
             <span class="btn-fill" data-fill></span>
             <span class="btn-text">
