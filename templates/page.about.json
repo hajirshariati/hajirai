@@ -46,7 +46,7 @@
           "type": "heading",
           "settings": {
             "heading": "<p>Science & Technology for Better Health and Comfort</p>",
-            "heading_size": "title-lg tracking-heading",
+            "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -60,10 +60,10 @@
       "settings": {
         "transparent_header": true,
         "image": "shopify://shop_images/2015-Aetrex-Building_53741168-fcaa-4721-9a8e-ffad58d9c13a.jpg",
-        "image_height": "adapt",
+        "image_height": "750px",
         "content_width": "medium",
-        "content_position": "md:items-end md:justify-start",
-        "text_alignment": "left",
+        "content_position": "md:items-center md:justify-center",
+        "text_alignment": "center",
         "image_height_mobile": "auto",
         "content_position_mobile": "items-end justify-start",
         "text_alignment_mobile": "left",
@@ -80,8 +80,8 @@
         "padding_bottom": 0,
         "divider": false,
         "full_width": true,
-        "rounded": true,
-        "enable_parallax": true,
+        "rounded": false,
+        "enable_parallax": false,
         "parallax_direction": "vertical"
       }
     },
