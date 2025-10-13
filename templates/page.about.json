@@ -30,7 +30,7 @@
         "text": {
           "type": "text",
           "settings": {
-            "text": "<p><em><strong>Add a tagline</strong></em></p>",
+            "text": "<p><em><strong>About Us </strong></em></p>",
             "text_font": "body",
             "text_size": "subtext-lg",
             "text_max_size": 32,
@@ -45,8 +45,8 @@
         "heading": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Image with text overlay</p>",
-            "heading_size": "title-xl tracking-heading",
+            "heading": "<p>Science & Technology for Better Health and Comfort</p>",
+            "heading_size": "title-lg tracking-heading",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -59,8 +59,9 @@
       ],
       "settings": {
         "transparent_header": true,
-        "image_height": "750px",
-        "content_width": "large",
+        "image": "shopify://shop_images/2015-Aetrex-Building_53741168-fcaa-4721-9a8e-ffad58d9c13a.jpg",
+        "image_height": "adapt",
+        "content_width": "medium",
         "content_position": "md:items-end md:justify-start",
         "text_alignment": "left",
         "image_height_mobile": "auto",
@@ -84,379 +85,32 @@
         "parallax_direction": "vertical"
       }
     },
-    "images-with-text": {
-      "type": "images-with-text",
-      "blocks": {
-        "heading": {
-          "type": "heading",
-          "settings": {
-            "heading": "Example <em>heading</em>",
-            "heading_size": "title-md",
-            "heading_tag": "h2",
-            "highlighted_text": "scribble",
-            "highlighted_scribble": "basic-underline"
-          }
-        },
-        "text": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.<br/><br/>Share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store. Share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button": {
-          "type": "button",
-          "settings": {
-            "button_label": "Button label",
-            "button_link": "",
-            "button_video_link": "",
-            "button_style": "secondary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": true
-          }
-        }
-      },
-      "block_order": [
-        "heading",
-        "text",
-        "button"
-      ],
-      "settings": {
-        "image_ratio": "portrait",
-        "image_width": "medium",
-        "layout": "image_first",
-        "text_alignment": "left",
-        "text_alignment_mobile": "left",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 120,
-        "padding_bottom": 100,
-        "divider": false,
-        "full_width": false,
-        "rounded": true,
-        "enable_parallax": true
-      }
-    },
-    "portfolio": {
-      "type": "portfolio",
-      "blocks": {
-        "profile-1": {
-          "type": "profile",
-          "settings": {
-            "heading": "Example title",
-            "text": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.<br/><br/>Share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store. Share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>",
-            "color_text": "#ffffff",
-            "color_background": "#000000"
-          }
-        },
-        "profile-2": {
-          "type": "profile",
-          "settings": {
-            "heading": "Example title",
-            "text": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.<br/><br/>Share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store. Share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>",
-            "color_text": "#ffffff",
-            "color_background": "#000000"
-          }
-        },
-        "profile-3": {
-          "type": "profile",
-          "settings": {
-            "heading": "Example title",
-            "text": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.<br/><br/>Share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store. Share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>",
-            "color_text": "#ffffff",
-            "color_background": "#000000"
-          }
-        }
-      },
-      "block_order": [
-        "profile-1",
-        "profile-2",
-        "profile-3"
-      ],
-      "settings": {
-        "columns": 4,
-        "carousel_on_desktop": false,
-        "layout": "grid",
-        "image_ratio": "portrait",
-        "image_ratio_mobile": "portrait",
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "Talk about your <em>brand</em>",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left justify-start",
-        "heading_tag": "h2",
-        "subheading": "Add a tagline",
-        "description": "<p>Share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "scribble",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "#ccd8b5",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false
-      }
-    },
-    "scrolling-text": {
-      "type": "scrolling-text",
-      "blocks": {
-        "text": {
-          "type": "text",
-          "settings": {
-            "text": "<em><strong>Free shipping and returns</strong></em>",
-            "text_size": 160,
-            "text_font": "body",
-            "highlighted_text": "stencil",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "text"
-      ],
-      "settings": {
-        "direction": "left",
-        "speed": 20,
-        "grid_horizontal": 70,
-        "enable_twin": false,
-        "enable_parallax": true,
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "rounded": false
-      }
-    },
-    "testimonials": {
-      "type": "testimonials",
-      "blocks": {
-        "testimonial": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "testimonial"
-      ],
-      "settings": {
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 84,
-        "padding_bottom": 120,
-        "divider": false,
-        "rounded": false
-      }
-    },
-    "timeline": {
-      "type": "timeline",
-      "blocks": {
-        "content-1": {
-          "type": "content",
-          "settings": {
-            "subheading": "2019",
-            "heading": "Image with text",
-            "heading_tag": "h2",
-            "text": "<p>Share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": true,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "content-2": {
-          "type": "content",
-          "settings": {
-            "subheading": "2020",
-            "heading": "Image with text",
-            "heading_tag": "h2",
-            "text": "<p>Share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": true,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "content-3": {
-          "type": "content",
-          "settings": {
-            "subheading": "2021",
-            "heading": "Image with text",
-            "heading_tag": "h2",
-            "text": "<p>Share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": true,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "content-4": {
-          "type": "content",
-          "settings": {
-            "subheading": "2022",
-            "heading": "Image with text",
-            "heading_tag": "h2",
-            "text": "<p>Share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": true,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "content-5": {
-          "type": "content",
-          "settings": {
-            "subheading": "2024",
-            "heading": "Image with text",
-            "heading_tag": "h2",
-            "text": "<p>Share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": true,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "content-1",
-        "content-2",
-        "content-3",
-        "content-4",
-        "content-5"
-      ],
-      "settings": {
-        "image_ratio": "portrait",
-        "image_ratio_mobile": "wide",
-        "heading": "Example heading",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "#ffffff",
-        "color_background": "#171717",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": true
-      }
-    },
-    "rich-text": {
+    "rich_text_GVNdq4": {
       "type": "rich-text",
       "blocks": {
-        "text": {
+        "text_hhnt8n": {
           "type": "text",
           "settings": {
-            "text": "<p>Add a tagline</p>",
+            "text": "<p>Aetrex, Inc. is widely recognized as a global leader in foot scanning technology, orthotics and comfort and wellness footwear. The company’s state-of-the-art foot scanning devices, including Albert, Albert Pro and Albert 3DFit (2022 and 2023 CES Innovation Award Honorees) and Albert Pressure are engineered to accurately measure feet and determine foot type and pressure points.Since 2002, Aetrex has placed over 12,000 scanners worldwide that have performed more than 50 million unique customer foot scans. With all of this global foot data, it’s no surprise Aetrex really knows feet. Their unique, premium footwear and orthotic designs are based on learnings from their foot scans to ensure maximum comfort, support, and a better overall fit. Each shoe and orthotic features Aetrex’s Signature Arch Support to provide alignment, minimize over-pronation and help prevent common conditions such as Plantar Fasciitis, Arch Pain and Metatarsalgia.Aetrex is distributed globally and is headquartered just outside New York City, in Teaneck, New Jersey. Additional offices are located in Israel and China. Aetrex employs over 200 people, including leading hardware and software engineers and programmers, top footwear designers, and developers. You can find Aetrex in fine footwear retailers around the world. View the<a href=\"https://aetrex.com/pages/store-locator\" target=\"_blank\"> store locator </a>for more information.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
-            "text_line_height": 1.6,
+            "text_line_height": 1.2,
             "text_letter_spacing": 0,
             "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
-        },
-        "heading": {
-          "type": "heading",
-          "settings": {
-            "heading": "Example <em>heading</em>",
-            "heading_size": "title-md",
-            "heading_tag": "h2",
-            "highlighted_text": "scribble",
-            "highlighted_scribble": "squiggle-underline"
-          }
         }
       },
       "block_order": [
-        "text",
-        "heading"
+        "text_hhnt8n"
       ],
+      "name": "t:sections.rich-text.name",
       "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
         "heading": "",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
@@ -471,124 +125,24 @@
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "",
-        "color_background": "#fafafa",
-        "gradient_background": "",
-        "color_highlight": "#c5e8b8",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 120,
-        "padding_bottom": 20,
-        "divider": false,
-        "narrow": true,
-        "rounded": true
-      }
-    },
-    "logo-list": {
-      "type": "logo-list",
-      "blocks": {
-        "logo-1": {
-          "type": "logo",
-          "settings": {
-            "height": 60,
-            "link": ""
-          }
-        },
-        "logo-2": {
-          "type": "logo",
-          "settings": {
-            "height": 60,
-            "link": ""
-          }
-        },
-        "logo-3": {
-          "type": "logo",
-          "settings": {
-            "height": 60,
-            "link": ""
-          }
-        },
-        "logo-4": {
-          "type": "logo",
-          "settings": {
-            "height": 60,
-            "link": ""
-          }
-        },
-        "logo-5": {
-          "type": "logo",
-          "settings": {
-            "height": 60,
-            "link": ""
-          }
-        },
-        "logo-6": {
-          "type": "logo",
-          "settings": {
-            "height": 60,
-            "link": ""
-          }
-        },
-        "logo-7": {
-          "type": "logo",
-          "settings": {
-            "height": 60,
-            "link": ""
-          }
-        }
-      },
-      "block_order": [
-        "logo-1",
-        "logo-2",
-        "logo-3",
-        "logo-4",
-        "logo-5",
-        "logo-6",
-        "logo-7"
-      ],
-      "settings": {
-        "layout": "marquee",
-        "grid_horizontal": 120,
-        "direction": "right",
-        "speed": 10,
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "#fafafa",
+        "color_background": "",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 60,
-        "padding_bottom": 120,
+        "padding_top": 72,
+        "padding_bottom": 100,
         "divider": false,
-        "full_width": true,
-        "rounded": true
+        "narrow": false,
+        "rounded": false
       }
     }
   },
   "order": [
     "main",
     "image-with-text-overlay",
-    "images-with-text",
-    "portfolio",
-    "scrolling-text",
-    "testimonials",
-    "timeline",
-    "rich-text",
-    "logo-list"
+    "rich_text_GVNdq4"
   ]
 }
