@@ -164,7 +164,6 @@
                 id="{{ section_id }}-{{ product_id }}-{{ option.name | handle }}-{{ forloop.index0 }}"
                 name="{{ option.name }}"
                 value="{{ value | escape }}"
-                {% unless value.available %}disabled{% endunless %}
                 {% if option.selected_value == value %}checked{% endif %}
                 {% if value.product_url != blank and value.product_url != product.url %}data-product-url="{{ value.variant.url | default: value.product_url }}"{% endif %}
                 data-option-value="{{ value | escape }}"

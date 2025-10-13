@@ -4600,6 +4600,7 @@ input:is([type="checkbox"], [type="radio"]):is(:disabled, .disabled)
 + .label-swatch {
     background-color: rgb(var(--color-red-200) / 0.115);
     color: rgb(var(--color-red-300));
+    cursor: pointer;
 }
 
 .swatches
