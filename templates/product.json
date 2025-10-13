@@ -134,9 +134,9 @@
         "sign_up_DcnXLa": {
           "type": "sign_up",
           "settings": {
-            "heading": "Aetrex Loyalty Program",
-            "subheading": "Join for <strong>free shipping</strong>",
-            "button_label": "Join our Loyalty Program",
+            "heading": "Get Free Shipping",
+            "subheading": "with Aetrex Loyalty Program",
+            "button_label": "Join Aetrex Access",
             "form_heading": "Create your <strong>FREE</strong> account to get free shipping",
             "checkbox_label": "I want to receive email updates and coupons from Aetrex",
             "checkbox_is_required": false,
