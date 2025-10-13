@@ -880,6 +880,7 @@
     },
     "blog_posts_PJxFGa": {
       "type": "blog-posts",
+      "disabled": true,
       "name": "Blog posts",
       "settings": {
         "blog": "",
@@ -901,6 +902,109 @@
         "heading_tag": "h2",
         "subheading": "BUILT ON PROOF, NOT PROMISES.",
         "description": "<p>We don’t guess — we measure. Independent clinical studies have validated the effectiveness of Aetrex orthotics in delivering meaningful pressure relief and biomechanical support. Because your comfort should be proven, not promised.</p>",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "multicolumn_VaVtEc": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_ye8FxL": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/Frame_29.png",
+            "image_ratio": "adapt",
+            "heading": "Aetrex Premium Memory Foam Orthotics",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Clinically Proven to Reduce Foot, Knee, Hip & Back Pain</p>",
+            "button_label": "LEARN MORE",
+            "button_link": "",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_jyqVGy": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/Frame_31.png",
+            "image_ratio": "adapt",
+            "heading": "Aetrex Compete Orthotics & Orthotic Flips",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Clinically Proven to Improve Plantar Fasciitis Pain & Foot Function</p>",
+            "button_label": "LEARN MORE",
+            "button_link": "",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_e6aHPg": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/Frame_30.png",
+            "image_ratio": "adapt",
+            "heading": "Aetrex Speed Orthotics",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Clinically Proven to Improve Comfort While Running </p>",
+            "button_label": "LEARN MORE",
+            "button_link": "",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_ye8FxL",
+        "column_jyqVGy",
+        "column_e6aHPg"
+      ],
+      "name": "t:sections.multicolumn.name",
+      "settings": {
+        "gap": "small",
+        "columns": 3,
+        "columns_mobile": "1",
+        "carousel_on_desktop": false,
+        "swipe_on_mobile": true,
+        "heading": "<strong>Backed by Science: Real Results from Clinical Trials on Aetrex Orthotics</strong>",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "BUILT ON PROOF, NOT PROMISES.",
+        "description": "<p>We don’t guess — we measure. Independent clinical studies have validated the effectiveness of Aetrex orthotics in delivering meaningful pressure relief and biomechanical support. Because your comfort should be proven, not promised.</p>",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "",
@@ -1014,6 +1118,7 @@
     "testimonials_banner_P8DMGU",
     "faq_XM3i3D",
     "blog_posts_PJxFGa",
+    "multicolumn_VaVtEc",
     "images_with_text_overlay_pgicH3"
   ]
 }
