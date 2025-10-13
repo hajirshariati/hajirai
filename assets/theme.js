@@ -3496,7 +3496,8 @@ class LocalizationForm extends HTMLFormElement {
     }
 }
 
-customElements.define('localization-form', LocalizationForm, {extends: 'form'});
+// customElements.define('localization-form', LocalizationForm, {extends: 'form'});
+// Commented out - using country-selector.js instead
 
 const cachedSectionsRenderingAPI = new Map();
 

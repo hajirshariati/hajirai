@@ -17585,3 +17585,7 @@ body .rte .contact-box a {
         gap: 8px;
     }
 }
+
+.shopify-section-group-footer-group .section--rounded {
+    z-index: 1!important;
+}
