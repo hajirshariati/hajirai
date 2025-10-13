@@ -38,26 +38,21 @@
 
 
       
-{%- if section.settings.show_menu -%}
-  {%- if linklists[section.settings.footer_menu] != blank -%}
-    <ul class="flex flex-wrap gap-3 justify-center lg:justify-start">
-      {%- for link in linklists[section.settings.footer_menu].links -%}
-        <li>
-          <small>
-            <a 
-              href="{{ link.url }}" 
-              class="block reversed-link{% if link.title contains 'MANAGE' %} ot-sdk-show-settings p-4 w-semibold{% endif %}"
-              {% if link.title contains 'MANAGE' %}id="ot-sdk-btn"{% endif %}
-            >
-              {{ link.title }}
-            </a>
-          </small>
-        </li>
-      {%- endfor -%}
-    </ul>
-  {%- endif -%}
-{%- endif -%}
-
+      {%- if section.settings.show_menu -%}
+        {%- if linklists[section.settings.footer_menu] != blank -%}
+          <ul class="flex flex-wrap gap-3 justify-center lg:justify-start">
+            {%- for link in linklists[section.settings.footer_menu].links -%}
+              <li>
+                
+                <small>
+                  <a href="{{ link.url }}" class="block reversed-link">{{ link.title }}</a>
+                </small>
+              </li>
+              
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+      {%- endif -%}
 
       <br><br><br>
 
