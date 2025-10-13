@@ -23,8 +23,7 @@
           "settings": {
             "title_size": "product-title-sm",
             "title_size_mobile": "product-title-md",
-            "show_price": false,
-            "show_rating": true
+            "show_price": false
           }
         },
         "price_TirYdK": {
@@ -32,7 +31,8 @@
           "settings": {
             "show_taxes_notice": false,
             "tooltip_heading": "MSRP",
-            "tooltip_message_strikethrough": "The Manufacturer's Suggested Retail Price, is the price that a manufacturer recommends a retailer sell a product for."
+            "tooltip_message_strikethrough": "The Manufacturer's Suggested Retail Price, is the price that a manufacturer recommends a retailer sell a product for.",
+            "show_rating": true
           }
         },
         "afterpay_on_site_messaging_payments_messaging_hqp3bW": {
@@ -424,6 +424,16 @@
     "product-details": {
       "type": "product-details",
       "blocks": {
+        "description_c6cXHi": {
+          "type": "description",
+          "settings": {
+            "icon": "none",
+            "iwidth": "custom",
+            "icon_width": 24,
+            "heading": "Description",
+            "split_mode": false
+          }
+        },
         "collapsible_tab_ge9XeN": {
           "type": "collapsible_tab",
           "settings": {
@@ -504,6 +514,7 @@
         }
       },
       "block_order": [
+        "description_c6cXHi",
         "collapsible_tab_ge9XeN",
         "collapsible_tab_3dfxMx",
         "collapsible_tab_96ewnx",
@@ -691,7 +702,7 @@
         "ai_gen_block_f954ddc_UhgMqx"
       ],
       "custom_css": [
-        ".ai-product-comparison__selected-image-ay094c2g5l0lmymyvdaigenblockf954ddcuhgmqx{display:none}"
+        ".ai-product-comparison__selected-image-ay094c2g5l0lmymyvdaigenblockf954ddcuhgmqx {display: none;}"
       ],
       "settings": {}
     },

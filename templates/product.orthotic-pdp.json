@@ -94,6 +94,16 @@
         "text-1": {
           "type": "text",
           "settings": {
+            "icon": "check_mark",
+            "iwidth": "custom",
+            "icon_width": 20,
+            "text": "FSA / HSA Eligible Product",
+            "text_size": "text-sm"
+          }
+        },
+        "text_XcpAzb": {
+          "type": "text",
+          "settings": {
             "icon": "lightning",
             "iwidth": "custom",
             "icon_width": 20,
@@ -186,6 +196,7 @@
         "icon_list_VBaw6z",
         "liquid_anxBGN",
         "text-1",
+        "text_XcpAzb",
         "text-3",
         "text-2",
         "text-4",
@@ -415,8 +426,19 @@
     "product-details": {
       "type": "product-details",
       "blocks": {
+        "description_NUjmHA": {
+          "type": "description",
+          "settings": {
+            "icon": "none",
+            "iwidth": "custom",
+            "icon_width": 24,
+            "heading": "Description",
+            "split_mode": false
+          }
+        },
         "collapsible_tab_ge9XeN": {
           "type": "collapsible_tab",
+          "disabled": true,
           "settings": {
             "icon": "none",
             "iwidth": "custom",
@@ -431,6 +453,7 @@
         },
         "collapsible_tab_3dfxMx": {
           "type": "collapsible_tab",
+          "disabled": true,
           "settings": {
             "icon": "shoe",
             "iwidth": "custom",
@@ -495,6 +518,7 @@
         }
       },
       "block_order": [
+        "description_NUjmHA",
         "collapsible_tab_ge9XeN",
         "collapsible_tab_3dfxMx",
         "collapsible_tab_96ewnx",
@@ -531,6 +555,86 @@
         "divider": false,
         "full_width": true,
         "rounded": true
+      }
+    },
+    "faq_RnQwCJ": {
+      "type": "faq",
+      "blocks": {
+        "contact_R9Kt6z": {
+          "type": "contact",
+          "settings": {
+            "heading": "Didn’t find your answer?",
+            "text": "<p>Don't hestitate to contact us</p>",
+            "show_phone": false,
+            "avatar_height": 60,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_rC6UPC": {
+          "type": "question",
+          "settings": {
+            "title": "Frequently asked question",
+            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_ETTtXm": {
+          "type": "question",
+          "settings": {
+            "title": "Frequently asked question",
+            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_YhpRPw": {
+          "type": "question",
+          "settings": {
+            "title": "Frequently asked question",
+            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "contact_R9Kt6z",
+        "question_rC6UPC",
+        "question_ETTtXm",
+        "question_YhpRPw"
+      ],
+      "name": "t:sections.faq.name",
+      "settings": {
+        "style": "with-border",
+        "heading": "FAQs",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "#fafafa",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#ffffff",
+        "overlay_opacity": 4,
+        "padding_top": 20,
+        "padding_bottom": 72,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
       }
     },
     "multicolumn_KyfUdW": {
@@ -968,6 +1072,7 @@
     "scrolling_text_4DH9VU",
     "help-drawer",
     "product-details",
+    "faq_RnQwCJ",
     "multicolumn_KyfUdW",
     "multicolumn_CEQ6Uh",
     "video_with_text_xf4VTt",
