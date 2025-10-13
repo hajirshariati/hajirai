@@ -548,6 +548,10 @@
     }
   },
   "platform_customizations": {
-    "custom_css": []
+    "custom_css": [
+      ".ss__results .ss__result .image--default {mix-blend-mode: darken;}",
+      ".ss__results .product-card {background: #fafafa;}",
+      ".custom-product-card .product-card__title {text-transform: capitalize;}"
+    ]
   }
 }
