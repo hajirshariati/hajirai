@@ -201,7 +201,6 @@
           "type": "content",
           "settings": {
             "icon": "check_mark",
-            "icon_image": "shopify://shop_images/icon-arch-support.png",
             "iwidth": "fit",
             "icon_width": 26,
             "heading": "Arch Support",
@@ -217,8 +216,7 @@
         "content_eDTngH": {
           "type": "content",
           "settings": {
-            "icon": "check_mark",
-            "icon_image": "shopify://shop_images/open_toes2.webp",
+            "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
             "heading": "Open Toe",
