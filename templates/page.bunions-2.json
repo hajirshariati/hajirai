@@ -151,8 +151,7 @@
         "content_YrpNak": {
           "type": "content",
           "settings": {
-            "icon": "check_mark",
-            "icon_image": "shopify://shop_images/adjustable2.webp",
+            "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
             "heading": "Adjustability for Everyone",
@@ -168,8 +167,7 @@
         "content_hJdzY7": {
           "type": "content",
           "settings": {
-            "icon": "check_mark",
-            "icon_image": "shopify://shop_images/bunion2.webp",
+            "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
             "heading": "Bunion Relief",
@@ -202,8 +200,7 @@
         "content_8XPnNg": {
           "type": "content",
           "settings": {
-            "icon": "check_mark",
-            "icon_image": "shopify://shop_images/icon-arch-support.png",
+            "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
             "heading": "Arch Support",
@@ -219,8 +216,7 @@
         "content_HXQxdV": {
           "type": "content",
           "settings": {
-            "icon": "check_mark",
-            "icon_image": "shopify://shop_images/open_toes2.webp",
+            "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
             "heading": "Open Toe",
