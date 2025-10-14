@@ -982,6 +982,81 @@
         "rounded": false
       }
     },
+    "collection_list_tRHkpk": {
+      "type": "collection-list",
+      "blocks": {
+        "collection_BiVzyG": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "shopify://blogs/case-studies",
+            "image": "shopify://shop_images/cases.jpg",
+            "title": "Case Studies",
+            "description": "",
+            "overlay_content": true,
+            "color_text": "#171717",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_FNtXQa": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "shopify://pages/tech-tootsie",
+            "image": "shopify://shop_images/Tootsie_430x600_3ec3dd61-c97b-4723-87b6-d428a566ce01.jpg",
+            "title": "Tootsie™ Kids Foot Scanning",
+            "description": "",
+            "overlay_content": true,
+            "color_text": "#171717",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        }
+      },
+      "block_order": [
+        "collection_BiVzyG",
+        "collection_FNtXQa"
+      ],
+      "name": "t:sections.collection-list.name",
+      "settings": {
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "image_type": "collection",
+        "image_ratio": "adapt",
+        "show_products_count": true,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
     "multicolumn_Rz4z98": {
       "type": "multicolumn",
       "blocks": {
@@ -1336,6 +1411,7 @@
     "empty_space_EQc6VY",
     "image_with_text_Nwfbke",
     "video_with_text_overlay_FXtW7N",
+    "collection_list_tRHkpk",
     "multicolumn_Rz4z98",
     "rich_text_4yLyNg",
     "number_counter_DpF4p9",
