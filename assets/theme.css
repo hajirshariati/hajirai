@@ -4598,15 +4598,16 @@ input:is([type="checkbox"], [type="radio"]):is(:disabled, .disabled):not(
 .swatches
 input:is([type="checkbox"], [type="radio"]):is(:disabled, .disabled)
 + .label-swatch {
-    background-color: rgb(var(--color-red-200) / 0.115);
-    color: rgb(var(--color-red-300));
+    background-color: #b4b4b440;
+    color: #171717;
+    opacity: 0.7;
     cursor: pointer;
 }
 
 .swatches
 input:is([type="checkbox"], [type="radio"]):is(:disabled, .disabled)
 + .label-swatch::after {
-    --tw-shadow-color: rgb(var(--color-red-200));
+    --tw-shadow-color: #e7e7e7;
 }
 
 .swatches
@@ -4621,7 +4622,7 @@ input:is([type="checkbox"], [type="radio"]):is(:disabled, .disabled)
     background: linear-gradient(
             to bottom right,
             transparent calc(50% - 0.5px),
-            rgb(var(--color-red-200)) calc(50% - 0.5px) calc(50% + 0.5px),
+            #9b9b9b calc(50% - 0.5px) calc(50% + 0.5px),
             transparent calc(50% + 0.5px)
     );
 }
@@ -17584,5 +17585,17 @@ body .rte .contact-box a {
     .p-signup__row {
         flex-direction: row;
         gap: 8px;
+    }
+}
+
+.unavailable-icon {
+    top: 5px;
+    left: 5px;
+}
+
+@media all and (min-width: 768px) and (max-width: 1800px) {
+    .unavailable-icon {
+        width: 10px;
+        height: 10px;
     }
 }
