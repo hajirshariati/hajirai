@@ -5852,6 +5852,7 @@ p::after {
     height: var(--topbar-height);
     font-size: var(--text-2sm);
     transition: height var(--animation-nav);
+    height: 3em;
 }
 
 @media screen and (min-width: 1536px) {
