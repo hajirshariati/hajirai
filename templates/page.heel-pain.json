@@ -30,7 +30,7 @@
         "heading_axLTnn": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Heel Spurs</p>",
+            "heading": "<p>Heel Pain</p>",
             "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "none",
@@ -40,7 +40,7 @@
         "text_LHGLnM": {
           "type": "text",
           "settings": {
-            "text": "<p>The heel bone is the largest bone in the foot and absorbs the most amount of shock and pressure. A heel spur develops as an abnormal growth of the heel bone. Calcium deposits form when the plantar fascia pulls away from the heel area, causing a bony protrusion, or heel spur to develop. The plantar fascia is a broad band of fibrous tissue located along the bottom surface of the foot that runs from the heel to the forefoot. Heel spurs can cause extreme pain in the rearfoot, especially while standing or walking.</p>",
+            "text": "<p>Heel pain is a common condition in which weight bearing on the heel causes extreme discomfort.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -94,7 +94,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Causes</strong>",
-            "text": "<p>Heel spurs develop as an abnormal growth in the heel bone due to calcium deposits that form when the plantar fascia pulls away from the heel. This stretching of the plantar fascia is usually the result of over-pronation (flat feet), but people with unusually high arches (pes cavus) can also develop heel spurs. Women have a significantly higher incidence of heel spurs due to the types of footwear often worn on a regular basis.</p>",
+            "text": "<p>There are two different categories of heel pain. The first is caused by over-use repetitive stress which refers to a soreness resulting from too much impact on a specific area of the foot. This condition, often referred to as “heel pain syndrome,” can be caused by shoes with heels that are too low, a thinned out fat pad in the heel area, or from a sudden increase in activity. Plantar fasciitis, a very common diagnosis of heel pain, is usually caused from a biomechancial problem, such as over-pronation (flat feet). The plantar fascia is a broad band of fibrous tissue that runs along the bottom surface of the foot, from the heel through the midfoot and into the forefoot. Over-pronation can cause the plantar fascia to be excessively stretched and inflamed, resulting in pain in the heel and arch areas of the foot. Often the pain will be most intense first thing in the morning or after a prolonged period of rest. The pain can gradually subside as the day progresses.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -103,7 +103,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Treatment and Prevention</strong>",
-            "text": "<p>The key for the proper treatment of heel spurs is determining what is causing the excessive stretching of the plantar fascia. When the cause is over-pronation (flat feet), an orthotic with rearfoot posting and longitudinal arch support is an effective device to reduce the over-pronation, and allow the condition to heal. Other common treatments include stretching exercises, losing weight, wearing shoes that have a cushioned heel that absorbs shock, and elevating the heel with the use of a heel cradle, heel cup, or orthotic. Heel cradles and heel cups provide extra comfort and cushion to the heel, and reduce the amount of shock and shear forces experienced from everyday activities.<br/><br/><br/>If the problem persists, consult your foot doctor.</p>",
+            "text": "<p>To properly treat heel pain, you must absorb shock, provide cushioning and elevate the heel to transfer pressure. This can be accomplished with a heel cup, visco heel cradle, or an orthotic designed with materials that will absorb shock and shear forces. When the condition is pronation related (usually plantar fasciitis), an orthotic with medial posting and good arch support will control the pronation and prevent the inflammation of the plantar fascia. Footwear selection is also an important criteria when treating heel pain. Shoes with a firm heel counter, good arch support, and appropriate heel height are the ideal choice.  In addition, breaking the pain cycle with the use of oral anti inflammatory medications, cortisone injections, stretching and icing are all treatments as well.<br/><br/><br/>If the problem persists, consult your foot doctor.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
