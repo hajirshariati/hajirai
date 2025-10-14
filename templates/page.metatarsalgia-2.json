@@ -151,8 +151,7 @@
         "content_9ghrzK": {
           "type": "content",
           "settings": {
-            "icon": "check_mark",
-            "icon_image": "shopify://shop_images/padded_heel_shoe2.webp",
+            "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
             "heading": "Padded Heel Sneakers",
@@ -168,9 +167,8 @@
         "content_HF7yEU": {
           "type": "content",
           "settings": {
-            "icon": "check_mark",
-            "icon_image": "shopify://shop_images/memory_foam2.webp",
-            "iwidth": "fit",
+            "icon": "none",
+            "iwidth": "custom",
             "icon_width": 26,
             "heading": "Memory Foam",
             "text": "<p>A material meant to cushion and conform to your foot, helping to evenly distribute weight and providing ultimate comfort.</p>",
@@ -186,7 +184,7 @@
           "type": "content",
           "disabled": true,
           "settings": {
-            "icon": "check_mark",
+            "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
             "heading": "3: Signature Arch Support",
@@ -202,8 +200,7 @@
         "content_3iTAhx": {
           "type": "content",
           "settings": {
-            "icon": "check_mark",
-            "icon_image": "shopify://shop_images/icon-arch-support.png",
+            "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
             "heading": "Arch Support",
@@ -219,8 +216,7 @@
         "content_Kxzeti": {
           "type": "content",
           "settings": {
-            "icon": "check_mark",
-            "icon_image": "shopify://shop_images/metatarsal_support.jpg",
+            "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
             "heading": "Metatarsal Support",
