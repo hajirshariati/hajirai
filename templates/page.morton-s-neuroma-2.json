@@ -240,7 +240,7 @@
       "name": "t:sections.lookbook.name",
       "settings": {
         "image": "shopify://shop_images/Group_18_5_5cd3a5cf-914f-4cce-adf2-e54cc9a16f80.png",
-        "image_mobile": "shopify://shop_images/Group_18_4.png",
+        "image_mobile": "shopify://shop_images/Group_18_5_5cd3a5cf-914f-4cce-adf2-e54cc9a16f80.png",
         "heading": "",
         "heading_size": "title-sm",
         "heading_alignment": "text-center md:items-center",
