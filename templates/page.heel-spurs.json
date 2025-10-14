@@ -30,7 +30,7 @@
         "heading_axLTnn": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Morton’s Neuroma</p>",
+            "heading": "<p>Heel Spurs</p>",
             "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "none",
@@ -40,7 +40,7 @@
         "text_LHGLnM": {
           "type": "text",
           "settings": {
-            "text": "<p>Morton’s Neuroma is a common foot problem associated with pain, swelling and/or an inflammation of a nerve, usually at the ball-of-the-foot between the 3rd and 4th toes. Symptoms of this condition include sharp pain, burning, and even a lack of feeling in the affected area. Morton’s Neuroma may also cause numbness, tingling, or cramping in the forefoot.</p>",
+            "text": "<p>The heel bone is the largest bone in the foot and absorbs the most amount of shock and pressure. A heel spur develops as an abnormal growth of the heel bone. Calcium deposits form when the plantar fascia pulls away from the heel area, causing a bony protrusion, or heel spur to develop. The plantar fascia is a broad band of fibrous tissue located along the bottom surface of the foot that runs from the heel to the forefoot. Heel spurs can cause extreme pain in the rearfoot, especially while standing or walking.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -60,12 +60,12 @@
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
-        "image": "shopify://shop_images/Group_13_1_3f082577-5bd1-47ef-8cfc-53df3ea51c0c.png",
+        "image": "shopify://shop_images/Group_14.png",
         "image_height": "adapt",
         "content_width": "small",
         "content_position": "md:items-center md:justify-start",
         "text_alignment": "left",
-        "image_mobile": "shopify://shop_images/Group_13_1_3f082577-5bd1-47ef-8cfc-53df3ea51c0c.png",
+        "image_mobile": "shopify://shop_images/Group_14.png",
         "image_height_mobile": "auto",
         "content_position_mobile": "items-start justify-start",
         "text_alignment_mobile": "left",
@@ -94,7 +94,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Causes</strong>",
-            "text": "<p>Morton’s Neuroma is a foot condition caused from an abnormal function of the foot that leads to bones squeezing a nerve usually between the 3rd and 4th metatarsal heads. Symptoms of Morton’s Neuroma often occur during or after you have been placing significant pressure on the forefoot area, while walking, standing, jumping, or sprinting. This condition can also be caused by footwear selection. Footwear with pointed toes and/or high heels can often lead to a neuroma. Constricting shoes can pinch the nerve between the toes, causing discomfort and extreme pain.</p>",
+            "text": "<p>Heel spurs develop as an abnormal growth in the heel bone due to calcium deposits that form when the plantar fascia pulls away from the heel. This stretching of the plantar fascia is usually the result of over-pronation (flat feet), but people with unusually high arches (pes cavus) can also develop heel spurs. Women have a significantly higher incidence of heel spurs due to the types of footwear often worn on a regular basis.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -103,7 +103,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Treatment and Prevention</strong>",
-            "text": "<p>The first step in treating Morton’s Neuroma is to select proper footwear. Footwear with a high and wide toe box (toe area) is ideal for treating and relieving the pain. The next step in treatment is to use an orthotic designed with a metatarsal pad. This pad is located behind the ball-of-the-foot to unload pressure, and relieve the pain caused by the neuroma. The use of cortisone injections are very useful as well.  Surgery for this condition, should always be a last resort.<br/><br/>If the problem persists, consult your foot doctor.</p>",
+            "text": "<p>The key for the proper treatment of heel spurs is determining what is causing the excessive stretching of the plantar fascia. When the cause is over-pronation (flat feet), an orthotic with rearfoot posting and longitudinal arch support is an effective device to reduce the over-pronation, and allow the condition to heal. Other common treatments include stretching exercises, losing weight, wearing shoes that have a cushioned heel that absorbs shock, and elevating the heel with the use of a heel cradle, heel cup, or orthotic. Heel cradles and heel cups provide extra comfort and cushion to the heel, and reduce the amount of shock and shear forces experienced from everyday activities.<br/><br/><br/>If the problem persists, consult your foot doctor.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -239,8 +239,8 @@
       ],
       "name": "t:sections.lookbook.name",
       "settings": {
-        "image": "shopify://shop_images/Group_18_5_5cd3a5cf-914f-4cce-adf2-e54cc9a16f80.png",
-        "image_mobile": "shopify://shop_images/Group_18_4.png",
+        "image": "shopify://shop_images/Group_18_4_d349ced9-1792-4d04-8195-d74ef54693ba.png",
+        "image_mobile": "shopify://shop_images/Group_18_4_d349ced9-1792-4d04-8195-d74ef54693ba.png",
         "heading": "",
         "heading_size": "title-sm",
         "heading_alignment": "text-center md:items-center",
@@ -361,10 +361,10 @@
       "settings": {
         "collection": "",
         "products": [
-          "daisy-brown-sc542w",
-          "gabby-white-se263w",
-          "morton-neuroma-orthotics-women",
-          "fiji-white-sparkle-l7103w"
+          "danika-light-grey-ap113w",
+          "brianna-black-bw100w",
+          "heel-spurs-orthotics-women",
+          "noelle-black-ck140w"
         ],
         "product_limit": 4,
         "columns": 4,
@@ -401,7 +401,7 @@
         "heading_NfEViz": {
           "type": "heading",
           "settings": {
-            "heading": "What Other Morton’s Neuroma Sufferers Say",
+            "heading": "What Other Heel Spur Sufferers Say",
             "heading_size": "title-lg tracking-heading",
             "heading_tag": "h2",
             "highlighted_text": "none",
@@ -451,8 +451,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>\"These Saved My Life!  </strong><br/>These flip flops saved my summer! My plantar fasciitis was really bad and when I put these on I felt relief almost immediately. The discomfort continues to subside more and more each day, and is still improving, which I largely attribute to wearing these all day, every day. Plus, they felt very secure even when wet. Very thankful for these!\"</h6>",
-            "author": "Lisa R",
+            "text": "<h6><strong>“Bought all 4 colors</strong><br/> I bought two pairs and were so elated with the comfort that I bought the last two remaining colors. I suffer from Metatarsalgia and was glad to finally being able to walk without discomfort & pain!!” </h6>",
+            "author": "Ellen o.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -464,8 +464,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>\"My Favorite! </strong><br/>These were the first shoe I ordered from Aetrex. I loved them immediately. I am now on my 3rd pair, including one for my daughter since she kept stealing mine! They are cushiony & supportive enough for a day at an amusement park plus the strap keeps them secure. Casual enough for everyday, but dressy enough for a night out means only packing one pair for trips.\"</h6>",
-            "author": "Holly J.",
+            "text": "<h6><strong>\"I love these sneakers.I love these sneakers. </strong><br/>I have bought three of the same sneakers, but in different colors. What a difference they have made on my feet. I like to take my dog for walks. I had to stop. My feet were in such pain. With these sneakers my feet are fine now. Thank you Aetrex.”</h6>",
+            "author": "Linda P.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -477,8 +477,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>\"Better Than My Bare Feet! </strong><br/>These sandals are perfect. They are very cushioned and supportive in all the right places. I can already feel the difference with my pronation issues when I wear these slides. I also love that they are cute and so easy to wear. I wear them out or just around the house. I couldn't recommend more!!!\" </h6>",
-            "author": "Kimberly S.",
+            "text": "<h6><strong>\"Comfortable & supportive </strong><br/>I bought these to wear at work. I am a Dental Assistant and on my feet most of the day. With other shoes, I would go home with sore feet and low back pain. The Xspress Runner 2 felt comfortable and supportive right from the first time I laced them up - no break-in required.”</h6>",
+            "author": "Susanne B.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
