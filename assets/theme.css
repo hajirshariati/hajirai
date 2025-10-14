@@ -17588,3 +17588,9 @@ body .rte .contact-box a {
         gap: 8px;
     }
 }
+
+
+
+.ss__results .product-card {
+    height: fit-content;
+}
