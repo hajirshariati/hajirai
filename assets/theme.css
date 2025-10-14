@@ -17603,3 +17603,10 @@ body .rte .contact-box a {
 .custom-product-card .product-card__title {
   text-transform: capitalize;
 }
+
+
+@media (min-width: 1024px) {
+  .menu-drawer {
+    display: none !important;
+  }
+}
