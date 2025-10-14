@@ -17605,7 +17605,7 @@ body .rte .contact-box a {
 }
 
 
-@media (min-width: 1024px) {
+@media (min-width: 640px) {
   .drawer__close-menu {
     display: none !important;
   }
