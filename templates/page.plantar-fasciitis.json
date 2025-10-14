@@ -215,8 +215,7 @@
         "content_iXtFEz": {
           "type": "content",
           "settings": {
-            "icon": "check_mark",
-            "icon_image": "shopify://shop_images/padded_collar2.webp",
+            "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
             "heading": "Padded Collar",
@@ -232,8 +231,7 @@
         "content_9HJCba": {
           "type": "content",
           "settings": {
-            "icon": "check_mark",
-            "icon_image": "shopify://shop_images/Removable_Insole.png",
+            "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
             "heading": "Removable Insole",
@@ -250,7 +248,7 @@
           "type": "content",
           "disabled": true,
           "settings": {
-            "icon": "check_mark",
+            "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
             "heading": "3: Signature Arch Support",
@@ -266,8 +264,7 @@
         "content_eJtVLB": {
           "type": "content",
           "settings": {
-            "icon": "check_mark",
-            "icon_image": "shopify://shop_images/arch_support_f0ae4503-f783-4a5e-9858-39cc95132d91.png",
+            "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
             "heading": "Arch Support",
@@ -283,8 +280,7 @@
         "content_Q3zqni": {
           "type": "content",
           "settings": {
-            "icon": "check_mark",
-            "icon_image": "shopify://shop_images/forefoot2.webp",
+            "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
             "heading": "Forefoot Cushion",
