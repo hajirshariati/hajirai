@@ -20,6 +20,9 @@
   >
     <overlay-element class="overlay fixed-modal invisible opacity-0 fixed bottom-0 left-0 w-full h-screen pointer-events-none" aria-controls="CartDrawer" aria-expanded="false"></overlay-element>
     <div class="drawer__inner z-10 absolute top-0 flex flex-col w-full h-full overflow-hidden">
+      <button class="drawer__close-menu absolute z-20 flex items-center justify-center w-10 h-10 rounded-full bg-white shadow-md" type="button" aria-controls="CartDrawer" aria-expanded="false" aria-label="{{ 'general.accessibility.close' | t | escape }}">
+  {%- render 'icon', icon: 'close' -%}
+</button>
       <gesture-element class="drawer__header flex justify-between opacity-0 invisible relative">
         <ul class="drawer__tabs flex gap-10" is="tab-list">
           <li>
