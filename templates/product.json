@@ -138,7 +138,7 @@
             "subheading": "with Aetrex Loyalty Program",
             "button_label": "Join Aetrex Access",
             "form_heading": "Create your <strong>FREE</strong> account to get free shipping",
-            "checkbox_label": "I want to receive email updates and coupons from Aetrex",
+            "checkbox_label": "Must use same email address at checkout for free shipping perk to apply. Free shipping perk only available in the US.",
             "checkbox_is_required": false,
             "form_button_label": "Join Now",
             "success_heading": "Thank you for signing up!",
