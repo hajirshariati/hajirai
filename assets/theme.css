@@ -17592,5 +17592,14 @@ body .rte .contact-box a {
 
 
 .ss__results .product-card {
+    background: #fafafa;
     height: fit-content;
+}
+
+.ss__results .ss__result .image--default {
+  mix-blend-mode: darken;
+}
+ 
+.custom-product-card .product-card__title {
+  text-transform: capitalize;
 }
