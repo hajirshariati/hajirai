@@ -151,7 +151,7 @@
         "content_9ghrzK": {
           "type": "content",
           "settings": {
-            "icon": "check_mark",
+            "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
             "heading": "Adjustability for Everyone",
@@ -167,8 +167,7 @@
         "content_HF7yEU": {
           "type": "content",
           "settings": {
-            "icon": "check_mark",
-            "icon_image": "shopify://shop_images/meta_pod_bar.jpg",
+            "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
             "heading": "Met Bar Pod",
@@ -201,8 +200,7 @@
         "content_3iTAhx": {
           "type": "content",
           "settings": {
-            "icon": "check_mark",
-            "icon_image": "shopify://shop_images/icon-arch-support.png",
+            "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
             "heading": "Arch Support",
@@ -218,8 +216,7 @@
         "content_Kxzeti": {
           "type": "content",
           "settings": {
-            "icon": "check_mark",
-            "icon_image": "shopify://shop_images/open_toes2.webp",
+            "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
             "heading": "Open Toe",
