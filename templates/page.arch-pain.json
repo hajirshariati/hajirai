@@ -200,7 +200,7 @@
         "content_Di8hGn": {
           "type": "content",
           "settings": {
-            "icon": "check_mark",
+            "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
             "heading": "Arch Support",
