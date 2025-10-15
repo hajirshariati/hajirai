@@ -10674,6 +10674,7 @@ input[type="email"]:is(
 
 .card-grid .media-card__text {
     --tw-translate-x: 0;
+    letter-spacing: 2px;
 }
 
 @media screen and (min-width: 1280px) {
