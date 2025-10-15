@@ -356,13 +356,6 @@
             "height": 80,
             "link": ""
           }
-        },
-        "logo_CzKWb8": {
-          "type": "logo",
-          "settings": {
-            "height": 80,
-            "link": ""
-          }
         }
       },
       "block_order": [
@@ -397,8 +390,7 @@
         "logo_CPBUBi",
         "logo_CVipba",
         "logo_ekywVQ",
-        "logo_NJhQwC",
-        "logo_CzKWb8"
+        "logo_NJhQwC"
       ],
       "settings": {
         "layout": "marquee",
