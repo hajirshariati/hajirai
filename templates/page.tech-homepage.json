@@ -312,6 +312,7 @@
         "logo_BrecDh": {
           "type": "logo",
           "settings": {
+            "image": "shopify://shop_images/fit.jpg",
             "height": 80,
             "link": ""
           }
@@ -319,6 +320,15 @@
         "logo_gthLik": {
           "type": "logo",
           "settings": {
+            "image": "shopify://shop_images/merrell.jpg",
+            "height": 80,
+            "link": ""
+          }
+        },
+        "logo_CPBUBi": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/rocky_84a13ce6-9c1d-4f57-b124-90c31002d654.jpg",
             "height": 80,
             "link": ""
           }
@@ -326,6 +336,7 @@
         "logo_CVipba": {
           "type": "logo",
           "settings": {
+            "image": "shopify://shop_images/scheels.jpg",
             "height": 80,
             "link": ""
           }
@@ -333,6 +344,7 @@
         "logo_ekywVQ": {
           "type": "logo",
           "settings": {
+            "image": "shopify://shop_images/spe_01c4eba1-3625-4986-b470-84921d3f03f4.jpg",
             "height": 80,
             "link": ""
           }
@@ -340,6 +352,7 @@
         "logo_NJhQwC": {
           "type": "logo",
           "settings": {
+            "image": "shopify://shop_images/brown2.webp",
             "height": 80,
             "link": ""
           }
@@ -381,6 +394,7 @@
         "logo_AGKEyT",
         "logo_BrecDh",
         "logo_gthLik",
+        "logo_CPBUBi",
         "logo_CVipba",
         "logo_ekywVQ",
         "logo_NJhQwC",
