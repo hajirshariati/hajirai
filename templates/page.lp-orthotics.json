@@ -216,20 +216,28 @@
     "featured_collections_9d3ge7": {
       "type": "featured-collections",
       "blocks": {
-        "collection_xxeKq7": {
-          "type": "collection",
-          "settings": {
-            "collection": "",
-            "products": [],
-            "title": "Plantar Fasciitis"
-          }
-        },
         "collection_g9AqYk": {
           "type": "collection",
           "settings": {
             "collection": "orthotics-for-flat-feet",
             "products": [],
             "title": "Flat Feet"
+          }
+        },
+        "collection_3qxYYM": {
+          "type": "collection",
+          "settings": {
+            "collection": "orthotics-for-high-arches",
+            "products": [],
+            "title": "High Arches"
+          }
+        },
+        "collection_xxeKq7": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "products": [],
+            "title": "Plantar Fasciitis"
           }
         },
         "collection_Wzc8ka": {
@@ -248,14 +256,6 @@
             "title": "Pressure Relief"
           }
         },
-        "collection_3qxYYM": {
-          "type": "collection",
-          "settings": {
-            "collection": "orthotics-for-high-arches",
-            "products": [],
-            "title": "High Arches"
-          }
-        },
         "collection_Uccwbn": {
           "type": "collection",
           "settings": {
@@ -266,11 +266,11 @@
         }
       },
       "block_order": [
-        "collection_xxeKq7",
         "collection_g9AqYk",
+        "collection_3qxYYM",
+        "collection_xxeKq7",
         "collection_Wzc8ka",
         "collection_BbmnMe",
-        "collection_3qxYYM",
         "collection_Uccwbn"
       ],
       "name": "Multiple featured collections",
@@ -285,7 +285,7 @@
         "heading_size": "title-sm",
         "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
-        "subheading": "Different feet, different needs. Explore by foot condition.  ",
+        "subheading": "Identify your Foot Type or Foot Condition",
         "description": "",
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
@@ -438,7 +438,7 @@
         "subheading_HaxULK": {
           "type": "subheading",
           "settings": {
-            "subheading": "Data-Driven Comfort, Backed by 50 Million Scans",
+            "subheading": "The Technology Behind Everything We Do",
             "subheading_size": "subtitle-md",
             "secondary_color": false
           }
@@ -446,7 +446,7 @@
         "heading_CE9MYn": {
           "type": "heading",
           "settings": {
-            "heading": "<p><strong>Foot Scanning Technology that powers our orthotics</strong></p>",
+            "heading": "<p>Each Aetrex Orthotic is designed based on the data and insights from our state-of-the-art 3D foot scanners. </p>",
             "heading_size": "title-sm",
             "heading_tag": "h2",
             "highlighted_text": "none",
@@ -456,7 +456,7 @@
         "text_CVjrUt": {
           "type": "text",
           "settings": {
-            "text": "<p>Aetrex’s advanced foot scanners capture millions of data points on arch type, pressure points, and alignment. We use this real-world data to design orthotics that deliver personalized support, superior comfort, and proven relief from common foot pain.</p>",
+            "text": "<p>In 20 seconds or less, an Aetrex foot scan can inform you all about your feet, including accurate 3D measurements (length, width, girth, arch height and more), plus your arch type and areas of pressure when standing or walking. </p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
