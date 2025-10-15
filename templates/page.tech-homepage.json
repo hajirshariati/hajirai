@@ -430,7 +430,7 @@
         "heading_a8XkQ7": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Albert® 2 Pro Scanner</p>",
+            "heading": "<h1>Albert® 2 Pro Scanner</h1>",
             "heading_size": "title-sm",
             "heading_tag": "h1",
             "highlighted_text": "none",
@@ -544,7 +544,7 @@
         "heading_4C7gXg": {
           "type": "heading",
           "settings": {
-            "heading": "<p>FitAI™ Footwear Recommendations</p>",
+            "heading": "<h1>FitAI™ Footwear Recommendations</h1>",
             "heading_size": "title-sm",
             "heading_tag": "h1",
             "highlighted_text": "none",
@@ -658,7 +658,7 @@
         "heading_t3ViHK": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Foot.com</p>",
+            "heading": "<h1>Foot.com</h1>",
             "heading_size": "title-sm",
             "heading_tag": "h1",
             "highlighted_text": "none",
@@ -771,7 +771,7 @@
         "heading_xdTgzn": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Footwear Development Package</p>",
+            "heading": "<h1>Footwear Development Package</h1>",
             "heading_size": "title-sm",
             "heading_tag": "h1",
             "highlighted_text": "none",
