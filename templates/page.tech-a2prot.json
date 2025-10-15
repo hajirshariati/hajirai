@@ -391,8 +391,62 @@
         "color_button_background": "",
         "color_button_gradient": "",
         "padding_top": 0,
-        "padding_bottom": 0,
+        "padding_bottom": 24,
         "divider": false,
+        "rounded": false
+      }
+    },
+    "rich_text_4CELTf": {
+      "type": "rich-text",
+      "blocks": {
+        "text_HhjFVc": {
+          "type": "text",
+          "settings": {
+            "text": "<p>More Testimonials</p>",
+            "text_font": "subtitle",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 35,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_HhjFVc"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "rgba(0,0,0,0)",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": true,
         "rounded": false
       }
     },
@@ -658,6 +712,7 @@
     "rich_text_Yrepqy",
     "17586443670450d0fd",
     "testimonials_dNtAEJ",
+    "rich_text_4CELTf",
     "reveal_testimonials_fGTBby",
     "rich_text_QDpDaE",
     "empty_space_AfK44q"
