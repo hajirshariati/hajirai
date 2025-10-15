@@ -1090,7 +1090,7 @@
         "text_alignment": "center",
         "custom_content_position": "items-center",
         "image_mobile": "shopify://shop_images/Group-2.png",
-        "image_height_mobile": "200px",
+        "image_height_mobile": "auto",
         "text_alignment_mobile": "center",
         "color_text": "#525252",
         "color_background": "#dadee3",
@@ -1117,7 +1117,7 @@
         "heading_PnQByH": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Albert Pressure Scanner</p>",
+            "heading": "<h1>Albert Pressure Scanner</h1>",
             "heading_size": "title-sm",
             "heading_tag": "h1",
             "highlighted_text": "none",
