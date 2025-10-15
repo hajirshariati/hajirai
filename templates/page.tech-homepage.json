@@ -101,6 +101,22 @@
     "logo_list_zPkHPR": {
       "type": "logo-list",
       "blocks": {
+        "logo_zdFV6p": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/foot.gif",
+            "height": 80,
+            "link": ""
+          }
+        },
+        "logo_LxCYpF": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/gucci.gif",
+            "height": 80,
+            "link": ""
+          }
+        },
         "logo_6XV3Ci": {
           "type": "logo",
           "settings": {
@@ -109,18 +125,18 @@
             "link": ""
           }
         },
-        "logo_hAwnt9": {
+        "logo_f7Gbt9": {
           "type": "logo",
           "settings": {
-            "image": "shopify://shop_images/alo.gif",
+            "image": "shopify://shop_images/lulu.gif",
             "height": 80,
             "link": ""
           }
         },
-        "logo_8kYhtM": {
+        "logo_hAwnt9": {
           "type": "logo",
           "settings": {
-            "image": "shopify://shop_images/lulu.gif",
+            "image": "shopify://shop_images/alo.gif",
             "height": 80,
             "link": ""
           }
@@ -141,30 +157,10 @@
             "link": ""
           }
         },
-        "logo_zdFV6p": {
-          "type": "logo",
-          "settings": {
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_LxCYpF": {
-          "type": "logo",
-          "settings": {
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_f7Gbt9": {
-          "type": "logo",
-          "settings": {
-            "height": 80,
-            "link": ""
-          }
-        },
         "logo_YJLEjP": {
           "type": "logo",
           "settings": {
+            "image": "shopify://shop_images/Salvatore-Ferragamo-Logo-500x281.png",
             "height": 80,
             "link": ""
           }
@@ -172,6 +168,7 @@
         "logo_PmMJip": {
           "type": "logo",
           "settings": {
+            "image": "shopify://shop_images/puma.gif",
             "height": 80,
             "link": ""
           }
@@ -339,14 +336,13 @@
         }
       },
       "block_order": [
-        "logo_6XV3Ci",
-        "logo_hAwnt9",
-        "logo_8kYhtM",
-        "logo_WPgCzk",
-        "logo_Y6Ctqq",
         "logo_zdFV6p",
         "logo_LxCYpF",
+        "logo_6XV3Ci",
         "logo_f7Gbt9",
+        "logo_hAwnt9",
+        "logo_WPgCzk",
+        "logo_Y6Ctqq",
         "logo_YJLEjP",
         "logo_PmMJip",
         "logo_LhGR8U",
