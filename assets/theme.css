@@ -17681,3 +17681,7 @@ body .rte .contact-box a {
   margin-bottom: 15px;
   color: #3b3b3b;
 }
+
+.shopify-section-group-footer-group .section--rounded {
+    z-index: 1 !important;
+}
