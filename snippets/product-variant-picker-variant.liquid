@@ -57,7 +57,7 @@
                   </div>
                 {%- endif -%}
               {%- elsif variant_badge != blank -%}
-                {%- assign allowed_badges = 'NEW,Best Seller,SALE' | split: ',' -%}
+                {%- assign allowed_badges = 'NEW,SALE' | split: ',' -%}
                 {%- if allowed_badges contains variant_badge -%}
                   <div class="main-pdp-variant-custom-badge custom-meta-badge">
                   {{- variant_badge -}}
