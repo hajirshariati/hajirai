@@ -1,13 +1,24 @@
 /**
  * Global US User Detection Utility
  * Hides elements with data-us-only attribute for non-US users
+ * Integrates with country selector to show/hide content when country changes
  */
 
 (function() {
   'use strict';
 
-  // Global function to detect US users
+  // Check if selected country is US (from country selector or Shopify settings)
+  function isSelectedCountryUS() {
+    return window.Shopify?.country === 'US';
+  }
+
+  // Global function to detect US users via IP/location
   window.detectUSUser = async function() {
+    // First check if user manually selected US via country selector
+    if (isSelectedCountryUS()) {
+      return true;
+    }
+
     try {
       const response = await fetch(
         window.Shopify.routes.root
@@ -42,12 +53,30 @@
     return isUS;
   };
 
+  // Listen for country selector form submissions
+  function observeCountryChange() {
+    const localizationForms = document.querySelectorAll('localization-form form');
+
+    localizationForms.forEach(form => {
+      form.addEventListener('submit', function(e) {
+        const countryInput = form.querySelector('input[name="country_code"]');
+        if (countryInput) {
+          const selectedCountry = countryInput.value;
+
+          sessionStorage.setItem('selectedCountry', selectedCountry);
+        }
+      });
+    });
+  }
+
   // Auto-initialize on DOM ready for elements with data-us-only attribute
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
       window.applyUSShowOnly();
+      observeCountryChange();
     });
   } else {
     window.applyUSShowOnly();
+    observeCountryChange();
   }
 })();
