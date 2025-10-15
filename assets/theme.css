@@ -17616,3 +17616,46 @@ body .rte .contact-box a {
 
 .product-info__mobile-form .main-pdp-variant-custom-badge:not(.custom-normal-sale), variant-picker .main-pdp-variant-custom-badge:not(.custom-normal-sale)
 {display:none;}
+
+.ORTHOPLP-icons-section {
+    background: linear-gradient(180deg, #fafafa, #ffffff);
+    padding: 20px 30px;
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    line-height: 1em;
+    position: relative;
+}
+.ORTHOPLP-icons-container {
+  width: 100%;
+  max-width: 800px;
+  text-align: center;
+}
+.ORTHOPLP-icons-container h2 {
+  font-size: 1.2em;
+  margin-bottom: 15px;
+  color: #3b3b3b;
+}
+.ORTHOPLP-icons {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  justify-items: center;
+}
+.ORTHOPLP-icons div {
+  text-align: center;
+  width: 100%;
+}
+.ORTHOPLP-icons img {
+  width: 50%;
+  max-width: 60px;
+  justify-self: center;
+}
+.ORTHOPLP-icons p {
+  text-transform: uppercase;
+  margin-top: 5px;
+  margin-bottom: 0;
+  letter-spacing: 1px;
+  font-size: 0.65rem;
+  color: #3b3b3b;
+}
