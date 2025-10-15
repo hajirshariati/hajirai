@@ -156,7 +156,7 @@
 {%- if block.settings.heading != blank -%}
   <div class="banner__box banner__box--{{ section.settings.content_width }}">
     <{{ block.settings.heading_tag }} class="heading leading-none {{ block.settings.heading_size }}">
-      <div class="block" data-animate="fade-up-large" data-animate-delay="250">{{ block.settings.heading }}</div>
+      {{ block.settings.heading }}
     </{{ block.settings.heading_tag }}>
   </div>
 {%- endif -%}
