@@ -146,56 +146,51 @@
         {%- endcase -%}
       {%- endfor -%}
     </slideshow-element>
-    {%- comment -%} Positioned content overlay for text and CTA {%- endcomment -%}
-    <div class="absolute top-0 left-0 w-full h-full pointer-events-none">
-      <div class="{% unless section.settings.full_width %}page-width {% endunless %}w-full h-full flex {{ section.settings.content_position }} {{ section.settings.content_position_mobile }}">
-        <div class="slideshow-content-positioned mobile-padding " style="max-width: max-content;position: absolute;margin: 2em;" >
-          <nav is="slideshow-words" class="slideshow-words grid items-center" aria-controls="Slider-{{ section.id }}" aria-labelledby="Slider-{{ section.id }}">
-            {%- for block in section.blocks -%}
-              <div class="slideshow-word flex flex-col gap-6 md:text-{{ section.settings.text_alignment }} text-{{ section.settings.text_alignment_mobile }}" data-index="{{ forloop.index0 }}" aria-current="{% if forloop.first %}true{% else %}false{% endif %}">
-                {%- if block.settings.heading != blank -%}
-                  <div class="banner__box banner__box--{{ section.settings.content_width }}">
-                    <{{ block.settings.heading_tag }} class="heading leading-none {{ block.settings.heading_size }}">
-                      <split-words class="split-words js-invisible block" data-animate="fade-up-large" data-animate-delay="250">{{ block.settings.heading }}</split-words>
-                    </{{ block.settings.heading_tag }}>
-                  </div>
-                {%- endif -%}
-
-                {%- if block.settings.text != blank -%}
-                  <div
-                    class="rte {{ block.settings.text_font }} {{ block.settings.text_size }}{% if block.settings.text_font == 'subtitle' %} uppercase leading-tight tracking-widest{% else %} leading-normal{% endif %}{% if block.settings.secondary_color_text %} text-opacity{% endif %} md:text-{{ section.settings.text_alignment }} text-{{ section.settings.text_alignment_mobile }}"
-                    {% if block.settings.text_size == 'subtext-custom' %}
-                      style="--subtext-size: {{ block.settings.text_max_size }}px;--subtext-line-height: {{ block.settings.text_line_height }};--subtext-letter-spacing: {{ block.settings.text_letter_spacing | divided_by: 1000.00 }}em;{% if block.settings.text_capitalize %}--subtext-text-transform: uppercase;{% endif %}"
-                    {% endif %}
-                  >
-                    {%- render 'highlighted-text',
-                      content: block.settings.text,
-                      style: block.settings.highlighted_text,
-                      scribble: block.settings.highlighted_scribble,
-                      gradient: false
-                    -%}
-                  </div>
-                {%- endif -%}
-
-                {%- if block.settings.button_label != blank -%}
-                  <div>
-                    {%- render 'button',
-                      label: block.settings.button_label,
-                      link: block.settings.button_link,
-                      style: block.settings.button_style,
-                      external: block.settings.button_external,
-                      show_icon: block.settings.button_icon,
-                      classes: 'button--blur button--fixed pointer-events-auto',
-                      shopify_attributes: block.shopify_attributes
-                    -%}
-                  </div>
-                {%- endif -%}
+{%- comment -%} Positioned content overlay for text and CTA {%- endcomment -%}
+<div class="absolute top-0 left-0 w-full h-full pointer-events-none">
+  <div class="{% unless section.settings.full_width %}page-width {% endunless %}w-full h-full flex {{ section.settings.content_position }} {{ section.settings.content_position_mobile }}">
+    <div class="slideshow-content-positioned mobile-padding " style="max-width: max-content;position: absolute;margin: 2em;" >
+      <nav is="slideshow-words" class="slideshow-words grid items-center" aria-controls="Slider-{{ section.id }}" aria-labelledby="Slider-{{ section.id }}">
+        {%- for block in section.blocks -%}
+          <div class="slideshow-word flex flex-col gap-6 md:text-{{ section.settings.text_alignment }} text-{{ section.settings.text_alignment_mobile }}" data-index="{{ forloop.index0 }}" aria-current="{% if forloop.first %}true{% else %}false{% endif %}">
+            {%- if block.settings.heading != blank -%}
+              <div class="banner__box banner__box--{{ section.settings.content_width }}">
+                <{{ block.settings.heading_tag }} class="heading leading-none {{ block.settings.heading_size }}">
+                  {{ block.settings.heading }}
+                </{{ block.settings.heading_tag }}>
               </div>
-            {%- endfor -%}
-          </nav>
-        </div>
-      </div>
+            {%- endif -%}
+
+            {%- if block.settings.text != blank -%}
+              <div
+                class="rte {{ block.settings.text_font }} {{ block.settings.text_size }}{% if block.settings.text_font == 'subtitle' %} uppercase leading-tight tracking-widest{% else %} leading-normal{% endif %}{% if block.settings.secondary_color_text %} text-opacity{% endif %} md:text-{{ section.settings.text_alignment }} text-{{ section.settings.text_alignment_mobile }}"
+                {% if block.settings.text_size == 'subtext-custom' %}
+                  style="--subtext-size: {{ block.settings.text_max_size }}px;--subtext-line-height: {{ block.settings.text_line_height }};--subtext-letter-spacing: {{ block.settings.text_letter_spacing | divided_by: 1000.00 }}em;{% if block.settings.text_capitalize %}--subtext-text-transform: uppercase;{% endif %}"
+                {% endif %}
+              >
+                {{ block.settings.text }}
+              </div>
+            {%- endif -%}
+
+            {%- if block.settings.button_label != blank -%}
+              <div>
+                {%- render 'button',
+                  label: block.settings.button_label,
+                  link: block.settings.button_link,
+                  style: block.settings.button_style,
+                  external: block.settings.button_external,
+                  show_icon: block.settings.button_icon,
+                  classes: 'button--blur button--fixed pointer-events-auto',
+                  shopify_attributes: block.shopify_attributes
+                -%}
+              </div>
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+      </nav>
     </div>
+  </div>
+</div>
 
     {%- comment -%} Fixed navigation at bottom {%- endcomment -%}
     <div class="{% unless section.settings.full_width %}page-width {% endunless %}absolute bottom-0 left-0 w-full pointer-events-none">
