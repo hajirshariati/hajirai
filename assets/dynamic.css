@@ -831,3 +831,8 @@ body .yotpo-reviews-main-widget svg {
 .yotpo-widget-instance {
   overflow: hidden !important;
 }
+
+.ss__variants--custom .ss__carousel .ss__carousel__prev-wrapper,
+.ss__variants--custom .ss__carousel .ss__carousel__next-wrapper {
+    z-index: 8!important;
+}
