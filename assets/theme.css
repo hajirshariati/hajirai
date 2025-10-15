@@ -17618,13 +17618,13 @@ body .rte .contact-box a {
 {display:none;}
 
 .ORTHOPLP-icons-section {
-    background: linear-gradient(180deg, #fafafa, #ffffff);
+    background: linear-gradient(180deg, #fafafa, #fff);
     padding: 20px 30px;
     display: flex;
     justify-content: center;
-    margin-top: 20px;
     line-height: 1em;
     position: relative;
+    border-radius: 1em;
 }
 .ORTHOPLP-icons-container {
   width: 100%;
