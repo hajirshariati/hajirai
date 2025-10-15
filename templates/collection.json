@@ -21,7 +21,7 @@
         "title": {
           "type": "title",
           "settings": {
-            "title_size": "title-sm"
+            "title_size": "title-lg tracking-heading"
           }
         }
       },
