@@ -467,12 +467,25 @@
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
+        },
+        "button_mgbN3C": {
+          "type": "button",
+          "settings": {
+            "button_label": "Find a Scanner Near You",
+            "button_link": "shopify://pages/store-locator",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "sm",
+            "button_external": true,
+            "button_icon": true
+          }
         }
       },
       "block_order": [
         "subheading_HaxULK",
         "heading_CE9MYn",
-        "text_CVjrUt"
+        "text_CVjrUt",
+        "button_mgbN3C"
       ],
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
