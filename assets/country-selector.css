@@ -1,7 +1,7 @@
 .country-selector {
     display: flex;
     justify-content: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.5rem;
     position: relative
 }
 
@@ -123,4 +123,11 @@
 
 .country-selector_modal--inputs {
     width: 100%
+}
+
+@media all and (min-width: 769px) {
+    .country-selector {
+        margin-top: -1.5rem;
+        margin-bottom: 0;
+    }
 }
