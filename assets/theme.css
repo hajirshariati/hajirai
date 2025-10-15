@@ -17632,9 +17632,11 @@ body .rte .contact-box a {
   text-align: center;
 }
 .ORTHOPLP-icons-container h2 {
-  font-size: 1.2em;
-  margin-bottom: 15px;
-  color: #3b3b3b;
+    font-size: 1.2vw;
+    margin-bottom: 15px;
+    color: #3b3b3b;
+    line-height: initial;
+    padding: 1em 2em;
 }
 .ORTHOPLP-icons {
   display: grid;
