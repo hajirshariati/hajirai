@@ -15795,7 +15795,7 @@ video-media
 
 .slideshow-words .banner__box {
     padding-block: 0;
-    width: min-content;
+    
 }
 
 .slideshow-word:not([aria-current="true"]) {
