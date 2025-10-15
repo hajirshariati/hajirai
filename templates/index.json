@@ -38,7 +38,7 @@
         "text_ty3xHk": {
           "type": "text",
           "settings": {
-            "text": "<p>How Aetrex uses <br/> foot scanning technology <br/> to develop footwear that’s <br/> better for your health</p>",
+            "text": "<p>How Aetrex uses <br/>foot scanning technology <br/>to develop footwear that’s <br/>better for your health</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
