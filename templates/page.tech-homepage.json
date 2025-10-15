@@ -1261,11 +1261,101 @@
             "submenu_title_position": "bottom",
             "enable_title_drop_shadow": false
           }
+        },
+        "collection_4fDLfy": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "shopify://pages/tech-control-panel",
+            "image": "shopify://shop_images/control_panel_d.png",
+            "title": "Control Panel",
+            "description": "",
+            "overlay_content": true,
+            "color_text": "#171717",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_rBcCb9": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "shopify://pages/tech-3d-printing",
+            "image": "shopify://shop_images/3D_Ortho_430x600_788df66c-dd02-4a50-81a1-bc7914b30676.png",
+            "title": "3D Printing",
+            "description": "",
+            "overlay_content": true,
+            "color_text": "#171717",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_qV4cmK": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "shopify://pages/tech-unmatched-data-collection",
+            "image": "shopify://shop_images/Data_Collection_430x600_7e45fdd2-8177-4341-b84c-05dad0d455ef.png",
+            "title": "Data Collection",
+            "description": "",
+            "overlay_content": true,
+            "color_text": "#171717",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_kAVXRM": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "shopify://pages/tech-aetrex-fit-philosophy",
+            "image": "shopify://shop_images/430x600_FitPhilosophy.gif",
+            "title": "Fit Philosophy",
+            "description": "",
+            "overlay_content": true,
+            "color_text": "#171717",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_jqFtxF": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "shopify://pages/training-support",
+            "image": "shopify://shop_images/Training_430x600_banner.jpg",
+            "title": "Training Support",
+            "description": "",
+            "overlay_content": true,
+            "color_text": "#171717",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
         }
       },
       "block_order": [
         "collection_BiVzyG",
-        "collection_FNtXQa"
+        "collection_FNtXQa",
+        "collection_4fDLfy",
+        "collection_rBcCb9",
+        "collection_qV4cmK",
+        "collection_kAVXRM",
+        "collection_jqFtxF"
       ],
       "name": "t:sections.collection-list.name",
       "settings": {
@@ -1295,129 +1385,6 @@
         "color_button_gradient": "",
         "padding_top": 0,
         "padding_bottom": 20,
-        "divider": false,
-        "full_width": false,
-        "rounded": false
-      }
-    },
-    "multicolumn_Rz4z98": {
-      "type": "multicolumn",
-      "blocks": {
-        "column_Ude78X": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "left",
-            "text_alignment_mobile": "left",
-            "image": "shopify://shop_images/cases.jpg",
-            "image_ratio": "adapt",
-            "heading": "Case Studies",
-            "heading_size": "text-lg-2xl",
-            "text": "",
-            "button_label": "LEARN MORE",
-            "button_link": "",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": true,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_Ftp4yk": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "left",
-            "text_alignment_mobile": "left",
-            "image": "shopify://shop_images/Tootsie_430x600_3ec3dd61-c97b-4723-87b6-d428a566ce01.jpg",
-            "image_ratio": "adapt",
-            "heading": "Tootsie™ Kids Foot Scanning",
-            "heading_size": "text-lg-2xl",
-            "text": "",
-            "button_label": "LEARN MORE",
-            "button_link": "",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": true,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_BfR9YK": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "left",
-            "text_alignment_mobile": "left",
-            "image": "shopify://shop_images/control_panel_d.png",
-            "image_ratio": "adapt",
-            "heading": "Control Panel",
-            "heading_size": "text-lg-2xl",
-            "text": "",
-            "button_label": "LEARN MORE",
-            "button_link": "",
-            "button_style": "secondary",
-            "button_external": false,
-            "button_icon": true,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_qneXBY": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "left",
-            "text_alignment_mobile": "left",
-            "image": "shopify://shop_images/cases.jpg",
-            "image_ratio": "adapt",
-            "heading": "Case Studies",
-            "heading_size": "text-lg-2xl",
-            "text": "",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "secondary",
-            "button_external": false,
-            "button_icon": true,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "column_Ude78X",
-        "column_Ftp4yk",
-        "column_BfR9YK",
-        "column_qneXBY"
-      ],
-      "settings": {
-        "gap": "large",
-        "columns": 4,
-        "columns_mobile": "1",
-        "carousel_on_desktop": true,
-        "swipe_on_mobile": true,
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
         "divider": false,
         "full_width": false,
         "rounded": false
@@ -1655,7 +1622,6 @@
     "image_with_text_Nwfbke",
     "video_with_text_overlay_FXtW7N",
     "collection_list_tRHkpk",
-    "multicolumn_Rz4z98",
     "rich_text_4yLyNg",
     "number_counter_DpF4p9",
     "rich_text_J8Rkph"
