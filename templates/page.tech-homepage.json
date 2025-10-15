@@ -176,6 +176,7 @@
         "logo_LhGR8U": {
           "type": "logo",
           "settings": {
+            "image": "shopify://shop_images/hoka.gif",
             "height": 80,
             "link": ""
           }
@@ -183,6 +184,7 @@
         "logo_RYYCNk": {
           "type": "logo",
           "settings": {
+            "image": "shopify://shop_images/bauer_e13e32a1-4582-4531-a26e-b5740750d87e.jpg",
             "height": 80,
             "link": ""
           }
@@ -190,6 +192,7 @@
         "logo_eEw6xB": {
           "type": "logo",
           "settings": {
+            "image": "shopify://shop_images/under.gif",
             "height": 80,
             "link": ""
           }
@@ -197,6 +200,7 @@
         "logo_7a9zP3": {
           "type": "logo",
           "settings": {
+            "image": "shopify://shop_images/craft.gif",
             "height": 80,
             "link": ""
           }
@@ -204,6 +208,7 @@
         "logo_dqCWTP": {
           "type": "logo",
           "settings": {
+            "image": "shopify://shop_images/converse_cdb70254-5957-4d42-9306-8f04347b29c9.jpg",
             "height": 80,
             "link": ""
           }
@@ -211,6 +216,7 @@
         "logo_zKP8gF": {
           "type": "logo",
           "settings": {
+            "image": "shopify://shop_images/ecco_88dd687f-102e-4cb4-82a4-44771c790b8d.jpg",
             "height": 80,
             "link": ""
           }
