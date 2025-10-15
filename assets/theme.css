@@ -17659,3 +17659,23 @@ body .rte .contact-box a {
   font-size: 0.65rem;
   color: #3b3b3b;
 }
+.ORTHOPLP-section {
+  background-color: #fafafa;
+  padding: 20px 30px;
+  display: flex;
+  justify-content: center;
+  border-radius: 1em;
+}
+.ORTHOPLP-content-container {
+  width: 100%;
+  max-width: 800px;
+  color: white;
+}
+.ORTHOPLP-text-box p {
+  font-size: 0.95em;
+  letter-spacing: 0.5px;
+  line-height: 1.6em;
+  font-weight: 300;
+  margin-bottom: 15px;
+  color: #3b3b3b;
+}
