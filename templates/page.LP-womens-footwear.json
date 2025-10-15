@@ -31,7 +31,7 @@
           "type": "image",
           "settings": {
             "image": "shopify://shop_images/1920x700_Collette_Taupe.jpg",
-            "image_mobile": "shopify://shop_images/693x520_Collette_taupe.png",
+            "image_mobile": "shopify://shop_images/1_9.jpg",
             "heading": "Fall-Winter '25 Styles",
             "heading_size": "title-sm",
             "heading_tag": "h3",
@@ -118,7 +118,7 @@
         "content_width": "large",
         "content_position": "md:items-center md:justify-end",
         "text_alignment": "center",
-        "image_height_mobile": "400px",
+        "image_height_mobile": "600px",
         "content_position_mobile": "items-end justify-center",
         "text_alignment_mobile": "center",
         "accessibility_info": "Slideshow about our brand",
@@ -467,7 +467,7 @@
         "column_jFkxBd"
       ],
       "custom_css": [
-        ".multicolumn-card {background: #D8CCC7 !important;}"
+        ".multicolumn-card {background: #d8ccc7 !important;}"
       ],
       "settings": {
         "gap": "small",
