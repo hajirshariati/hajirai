@@ -17,6 +17,14 @@ menu-drawer .drawer__content .grandchild-Sale {
   color: red;
 }
 
+header .mega-menu .grandchild-NEW ARRIVALS,
+menu-drawer .drawer__content .grandchild-NEW ARRIVALS {
+  color: red;
+}
+
+
+
+
 /* BANNER CSS */
 .banner__title,
 .banner__title split-words > * {
