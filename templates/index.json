@@ -15,7 +15,7 @@
         "text_LgtJTj": {
           "type": "text",
           "settings": {
-            "text": "<p><strong>The Aetrex <br/> Technology <br/> Difference</strong></p>",
+            "text": "<p><strong>The Aetrex <br/>Technology <br/>Difference</strong></p>",
             "text_font": "body",
             "text_size": "subtext-custom",
             "text_max_size": 46,
