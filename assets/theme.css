@@ -17691,3 +17691,11 @@ body .rte .contact-box a {
 .shopify-section-group-footer-group .section--rounded {
     z-index: 1 !important;
 }
+
+
+a[href="#"] {
+  cursor: default;        /* don't show pointer hand */
+  pointer-events: none;   /* disable clicking entirely */
+  text-decoration: none;  /* remove underline */
+  color: inherit;         /* keep normal text color */
+}
