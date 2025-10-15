@@ -27,7 +27,7 @@
  {% assign metaProducts = product.metafields.custom.product_reference.value %}
  {% assign productcolor = product.metafields.custom.color | metafield_tag | strip_html %}
   {% if productcolor != blank and metaProducts != blank %}
-    <div class="form__label flex items-center justify-between gap-2 w-full form__label--color">
+    <div class="form__label flex items-center justify-between gap-2 w-full form__label--color" style="text-transform: capitalize;">
       <div class="flex gap-2">Color:
         <span class="font-medium">{{ productcolor }}</span>
       </div>
