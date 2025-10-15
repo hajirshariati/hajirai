@@ -224,6 +224,7 @@
         "logo_mrHnaa": {
           "type": "logo",
           "settings": {
+            "image": "shopify://shop_images/primer2.webp",
             "height": 80,
             "link": ""
           }
@@ -231,6 +232,7 @@
         "logo_eU6jbd": {
           "type": "logo",
           "settings": {
+            "image": "shopify://shop_images/trade.jpg",
             "height": 80,
             "link": ""
           }
@@ -238,6 +240,7 @@
         "logo_4yNPWx": {
           "type": "logo",
           "settings": {
+            "image": "shopify://shop_images/altra.gif",
             "height": 80,
             "link": ""
           }
@@ -245,6 +248,7 @@
         "logo_DHKGVG": {
           "type": "logo",
           "settings": {
+            "image": "shopify://shop_images/trek.gif",
             "height": 80,
             "link": ""
           }
@@ -252,6 +256,7 @@
         "logo_MMCqAg": {
           "type": "logo",
           "settings": {
+            "image": "shopify://shop_images/sun.gif",
             "height": 80,
             "link": ""
           }
@@ -259,6 +264,7 @@
         "logo_8ecBqe": {
           "type": "logo",
           "settings": {
+            "image": "shopify://shop_images/keen.gif",
             "height": 80,
             "link": ""
           }
@@ -266,6 +272,7 @@
         "logo_NEmbar": {
           "type": "logo",
           "settings": {
+            "image": "shopify://shop_images/boa_87509b95-0e34-4895-b97a-0f8d6185402d.jpg",
             "height": 80,
             "link": ""
           }
@@ -273,6 +280,7 @@
         "logo_Jk8t3Y": {
           "type": "logo",
           "settings": {
+            "image": "shopify://shop_images/asics_cf07c113-a2d8-4c67-8816-01dcb8a6e2d6.jpg",
             "height": 80,
             "link": ""
           }
@@ -280,6 +288,7 @@
         "logo_PexwQW": {
           "type": "logo",
           "settings": {
+            "image": "shopify://shop_images/intersport.jpg",
             "height": 80,
             "link": ""
           }
@@ -287,6 +296,7 @@
         "logo_fazWXH": {
           "type": "logo",
           "settings": {
+            "image": "shopify://shop_images/saf_90b0d670-65c2-440b-8cc3-914d9ab8583a.jpg",
             "height": 80,
             "link": ""
           }
@@ -294,6 +304,7 @@
         "logo_AGKEyT": {
           "type": "logo",
           "settings": {
+            "image": "shopify://shop_images/shoe_3471ff17-14ae-4d6e-acba-a7b217712a88.jpg",
             "height": 80,
             "link": ""
           }
