@@ -29,17 +29,16 @@
       "blocks": {
         "subheading_DQGQFg": {
           "type": "subheading",
-          "disabled": true,
           "settings": {
-            "subheading": "Add a tagline",
-            "subheading_size": "subtitle-md",
-            "secondary_color": true
+            "subheading": "Goodbye Foot Pain. Hello Relief.",
+            "subheading_size": "subtitle-lg",
+            "secondary_color": false
           }
         },
         "heading_64L34p": {
           "type": "heading",
           "settings": {
-            "heading": "<h3>The Science Of 50 Million Foot Scans, Engineered Into Every Step.</h3>",
+            "heading": "<p>Unmatched Comfort & Support Starts with Science Orthotics Engineered with Insights from Over 50 Million Foot Scans</p>",
             "heading_size": "title-sm",
             "heading_tag": "h2",
             "highlighted_text": "none",
@@ -49,7 +48,7 @@
         "text_H4rWEH": {
           "type": "text",
           "settings": {
-            "text": "<p>Explore our range of Aetrex Orthotics, expertly designed to target different foot conditions, with support trusted by millions.</p>",
+            "text": "<p>Over 30 Million Pairs Sold. Doctor<br/>Recommended. APMA Approved. </p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
