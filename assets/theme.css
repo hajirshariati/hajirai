@@ -15795,7 +15795,7 @@ video-media
 
 .slideshow-words .banner__box {
     padding-block: 0;
-    
+    width: min-content;
 }
 
 .slideshow-word:not([aria-current="true"]) {
@@ -15805,7 +15805,7 @@ video-media
 @media screen and (max-width: 639px) {
     .slideshow-word .split-words .word {
         white-space: unset;
-        width: min-content;
+        
     }
 }
 
