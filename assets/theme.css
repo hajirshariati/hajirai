@@ -17611,3 +17611,8 @@ body .rte .contact-box a {
     display: none !important;
   }
 }
+
+
+
+.product-info__mobile-form .main-pdp-variant-custom-badge:not(.custom-normal-sale), variant-picker .main-pdp-variant-custom-badge:not(.custom-normal-sale)
+{display:none;}
