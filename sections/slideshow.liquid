@@ -153,13 +153,13 @@
           <nav is="slideshow-words" class="slideshow-words grid items-center" aria-controls="Slider-{{ section.id }}" aria-labelledby="Slider-{{ section.id }}">
             {%- for block in section.blocks -%}
               <div class="slideshow-word flex flex-col gap-6 md:text-{{ section.settings.text_alignment }} text-{{ section.settings.text_alignment_mobile }}" data-index="{{ forloop.index0 }}" aria-current="{% if forloop.first %}true{% else %}false{% endif %}">
-{%- if block.settings.heading != blank -%}
-  <div class="banner__box banner__box--{{ section.settings.content_width }}">
-    <{{ block.settings.heading_tag }} class="heading leading-none {{ block.settings.heading_size }}">
-      {{ block.settings.heading }}
-    </{{ block.settings.heading_tag }}>
-  </div>
-{%- endif -%}
+                {%- if block.settings.heading != blank -%}
+                  <div class="banner__box banner__box--{{ section.settings.content_width }}">
+                    <{{ block.settings.heading_tag }} class="heading leading-none {{ block.settings.heading_size }}">
+                      <split-words class="split-words js-invisible block" data-animate="fade-up-large" data-animate-delay="250">{{ block.settings.heading }}</split-words>
+                    </{{ block.settings.heading_tag }}>
+                  </div>
+                {%- endif -%}
 
                 {%- if block.settings.text != blank -%}
                   <div
