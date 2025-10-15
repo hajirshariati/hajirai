@@ -17589,3 +17589,7 @@ body .rte .contact-box a {
 .shopify-section-group-footer-group .section--rounded {
     z-index: 1!important;
 }
+
+[data-us-only] {
+    display: none!important;
+}

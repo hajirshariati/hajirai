@@ -109,7 +109,7 @@
         "tech_hwHFMa"
       ],
       "settings": {
-        "hide_for_non_us": false,
+        "hide_for_non_us": true,
         "show_social": false,
         "enable_language_selector": false,
         "enable_country_selector": false,

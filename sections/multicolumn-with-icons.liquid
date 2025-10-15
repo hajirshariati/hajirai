@@ -18,7 +18,7 @@
         endif
       -%}
       {%- for block in section.blocks -%}
-        <div class="column flex gap-5 w-full flex-col xl:flex-row xl:text-{{ section.settings.text_alignment }} text-center" {{ block.shopify_attributes }}>
+        <div class="column flex gap-5 w-full flex-col xl:flex-row xl:text-{{ section.settings.text_alignment }} text-center" {{ block.shopify_attributes }}{% if block.settings.us_only %} data-us-only{% endif %}>
 
 
 
@@ -716,7 +716,13 @@
 
 },
 
-        
+        {
+          "type": "checkbox",
+          "id": "us_only",
+          "label": "Show to US users only",
+          "default": false,
+          "info": "When enabled, this block will only be visible to users in the United States"
+        },
         {
           "visible_if": "{{ block.settings.highlighted_text == 'scribble' }}",
           "type": "select",

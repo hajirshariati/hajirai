@@ -14,7 +14,7 @@
     <div class="details__content">
       <ul class="flex flex-col gap-3">
         {%- for link in block.settings.menu.links -%}
-          <li class="inline-flex">
+          <li class="inline-flex" {% if link.title == 'Aetrex Rewards' %}data-us-only{% endif %}>
             <a href="{{ link.url }}" class="block reversed-link text-sm-lg leading-tight">{{ link.title }}</a>
           </li>
         {% assign link_downcase = link.title | downcase %}

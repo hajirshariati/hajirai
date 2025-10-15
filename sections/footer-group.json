@@ -23,6 +23,7 @@
             "text": "<p>Consult with our specialists for a personalized product recommendation for your specific needs.</p>",
             "highlighted_text": "none",
             "custom_html": "<a onclick=\"openWidget()\">Chat Now</a>\n\n\n<script type=\"text/javascript\">\n  zE(\"webWidget\", \"hide\")\n\n  function openWidget() {\n    zE(\"webWidget\", \"show\")\n    zE(\"webWidget\", \"open\")\n     \n  }\n\n</script>",
+            "us_only": false,
             "highlighted_scribble": "circle"
           }
         },
@@ -35,6 +36,7 @@
             "text": "<p>We offer quick, easy returns</p>",
             "highlighted_text": "none",
             "custom_html": "<a href=\"/apps/aftership-returns-center\">Return Center</a>",
+            "us_only": false,
             "highlighted_scribble": "circle"
           }
         },
@@ -47,6 +49,7 @@
             "text": "<p>Refer a friend and get 20% off each other.</p>",
             "highlighted_text": "none",
             "custom_html": "<a href=\"/pages/give-20-get-20\">Start Here</a>",
+            "us_only": false,
             "highlighted_scribble": "circle"
           }
         },
@@ -59,6 +62,7 @@
             "text": "<p>Safe and secure checkout with Signifyd technology.</p>",
             "highlighted_text": "none",
             "custom_html": "",
+            "us_only": false,
             "highlighted_scribble": "circle"
           }
         }
@@ -112,6 +116,7 @@
             "text": "",
             "highlighted_text": "none",
             "custom_html": "<div><div class=\"klaviyo-form-TAKnwd\"></div></div>",
+            "us_only": false,
             "highlighted_scribble": "circle"
           }
         },
@@ -124,6 +129,7 @@
             "text": "<p>Join and get <strong>FREE SHIPPING</strong> on all orders.<br/>Plus earn points & exclusive rewards.</p><p><a href=\"https://www.aetrex.com/pages/rewards\">Join Now</a></p>",
             "highlighted_text": "none",
             "custom_html": "",
+            "us_only": true,
             "highlighted_scribble": "circle"
           }
         },
@@ -136,6 +142,7 @@
             "text": "<p>Find our when your online purchase<br/>will arrive at your home.</p><p><a href=\"https://orders.aetrex.com/\">Track Now</a></p>",
             "highlighted_text": "none",
             "custom_html": "",
+            "us_only": false,
             "highlighted_scribble": "circle"
           }
         }

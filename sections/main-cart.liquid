@@ -508,7 +508,7 @@
             
           {%- endif -%}
 
-        <div style="background: #fafafa;"><div class="yotpo-widget-instance" data-yotpo-instance-id="1064470"></div>
+        <div style="background: #fafafa;"{% if section.settings.loyalty_us_only %} data-us-only{% endif %}><div class="yotpo-widget-instance" data-yotpo-instance-id="1064470"></div>
       </div>
         
         </div>
@@ -956,6 +956,13 @@
       "id": "add_discount_code",
       "label": "t:sections.main-cart.settings.add_discount_code.label",
       "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "loyalty_us_only",
+      "label": "Show Loyalty block to US users only",
+      "default": false,
+      "info": "When enabled, the loyalty block will only be visible to users in the United States"
     },
     {
       "type": "header",
