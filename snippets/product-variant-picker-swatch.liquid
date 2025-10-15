@@ -52,7 +52,7 @@
       data-option-slug="{{ option.name | handleize }}"
     >
       <legend class="sr-only">{{ option.name }}</legend>
-      <div class="form__label flex items-center justify-between gap-2 w-full">
+      <div class="form__label flex items-center justify-between gap-2 w-full" style="text-transform: capitalize;">
         {%- if show_variant_labels -%}
           <div class="flex gap-2">
             {{- option.name -}}:
