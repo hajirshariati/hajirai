@@ -31,7 +31,7 @@
           "type": "heading",
           "settings": {
             "heading": "<h2>Introducing the<br/>Zoe Pro Scanner</h2>",
-            "heading_size": "title-sm",
+            "heading_size": "title-md",
             "heading_tag": "h1",
             "highlighted_text": "none",
             "highlighted_scribble": "sketch-underline"
@@ -50,7 +50,7 @@
           "settings": {
             "text": "<p>Engineered to Bring the Future of Shoe Fitting to Everyone.</p>",
             "text_font": "body",
-            "text_size": "subtext-md",
+            "text_size": "subtext-sm",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -86,7 +86,7 @@
         "color_highlight": "#e0a580",
         "gradient_highlight": "",
         "color_button_text": "#ffffff",
-        "color_button_background": "#4b4b4b",
+        "color_button_background": "#171717",
         "color_button_gradient": "",
         "color_overlay": "#171717",
         "divider_color": "#111111",
@@ -772,7 +772,7 @@
           "type": "heading",
           "settings": {
             "heading": "<h1>Footwear Development Package</h1>",
-            "heading_size": "title-sm",
+            "heading_size": "title-md",
             "heading_tag": "h1",
             "highlighted_text": "none",
             "highlighted_scribble": "sketch-underline"
