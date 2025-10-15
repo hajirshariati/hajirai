@@ -938,8 +938,8 @@
           "type": "column",
           "settings": {
             "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
+            "text_alignment": "left",
+            "text_alignment_mobile": "left",
             "image": "shopify://shop_images/Frame_29.png",
             "image_ratio": "wide",
             "heading": "Aetrex Premium Memory Foam Orthotics",
@@ -958,8 +958,8 @@
           "type": "column",
           "settings": {
             "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
+            "text_alignment": "left",
+            "text_alignment_mobile": "left",
             "image": "shopify://shop_images/Frame_31.png",
             "image_ratio": "wide",
             "heading": "Aetrex Compete Orthotics & Orthotic Flips",
@@ -978,8 +978,8 @@
           "type": "column",
           "settings": {
             "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
+            "text_alignment": "left",
+            "text_alignment_mobile": "left",
             "image": "shopify://shop_images/Frame_30.png",
             "image_ratio": "wide",
             "heading": "Aetrex Speed Orthotics",
