@@ -59,19 +59,24 @@
     "rich_text_MLXerj": {
       "type": "rich-text",
       "blocks": {
-        "heading_yC8AYf": {
-          "type": "heading",
+        "text_7K4yTW": {
+          "type": "text",
           "settings": {
-            "heading": "Aetrex Omni-Suite",
-            "heading_size": "title-lg tracking-heading",
-            "heading_tag": "h2",
+            "text": "<p><strong>Aetrex Omni-Suite</strong></p>",
+            "text_font": "heading",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         }
       },
       "block_order": [
-        "heading_yC8AYf"
+        "text_7K4yTW"
       ],
       "name": "Rich text",
       "settings": {
