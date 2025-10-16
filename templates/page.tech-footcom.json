@@ -24,27 +24,35 @@
         "rounded": false
       }
     },
-    "testimonials_banner_Cbhq4c": {
-      "type": "testimonials-banner",
-      "name": "Testimonials banner",
+    "image_with_text_overlay_jrxhJj": {
+      "type": "image-with-text-overlay",
+      "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
         "image": "shopify://shop_images/Foot.com_1920x475_eed7ccc4-ccb8-4c37-8e2e-2d4efafcbf8e.jpg",
         "image_height": "adapt",
-        "content_position": "md:items-center md:justify-center",
+        "content_width": "small",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
         "image_mobile": "shopify://shop_images/Foot.com_1920x475_eed7ccc4-ccb8-4c37-8e2e-2d4efafcbf8e.png",
         "image_height_mobile": "adapt",
-        "content_position_mobile": "items-center justify-center",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
         "color_text": "#ffffff",
         "color_highlight": "#e0a580",
         "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
         "color_overlay": "#171717",
+        "divider_color": "#111111",
         "overlay_opacity": 0,
         "padding_top": 0,
         "padding_bottom": 0,
         "divider": false,
+        "full_width": true,
         "rounded": false,
-        "enable_parallax": false,
+        "enable_parallax": true,
         "parallax_direction": "vertical"
       }
     },
@@ -54,10 +62,13 @@
         "text_yKxt79": {
           "type": "text",
           "settings": {
-            "text": "<p>Foot.com</p>",
+            "text": "<p><strong>Foot.com</strong></p>",
             "text_font": "body",
             "text_size": "subtext-custom",
-            "text_max_size": 40,
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -109,6 +120,9 @@
             "text_font": "body",
             "text_size": "subtext-custom",
             "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -160,6 +174,9 @@
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -172,10 +189,12 @@
       "name": "Image with text",
       "settings": {
         "image": "shopify://shop_images/MeasCharts01_690x480_35a69b5d-7732-4aae-aa16-b682e363d76a.jpg",
+        "img_url": "",
         "image_height": "adapt",
         "image_width": "small",
         "layout": "text_first",
         "text_alignment": "left",
+        "custom_content_position": "items-center",
         "image_height_mobile": "auto",
         "text_alignment_mobile": "left",
         "color_text": "#525252",
@@ -188,7 +207,7 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 24,
+        "padding_top": 48,
         "padding_bottom": 48,
         "divider": false,
         "full_width": false,
@@ -200,7 +219,7 @@
   },
   "order": [
     "main-page",
-    "testimonials_banner_Cbhq4c",
+    "image_with_text_overlay_jrxhJj",
     "rich_text_MLXerj",
     "rich_text_4imz7z",
     "image_with_text_ncPYUf"
