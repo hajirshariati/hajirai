@@ -310,7 +310,7 @@
         "padding_top": 24,
         "padding_bottom": 12,
         "divider": false,
-        "full_width": false,
+        "full_width": true,
         "rounded": false,
         "enable_parallax": false,
         "parallax_direction": "vertical"
@@ -391,7 +391,7 @@
         "padding_top": 24,
         "padding_bottom": 12,
         "divider": false,
-        "full_width": false,
+        "full_width": true,
         "rounded": false,
         "enable_parallax": false,
         "parallax_direction": "vertical"
@@ -472,7 +472,7 @@
         "padding_top": 24,
         "padding_bottom": 12,
         "divider": false,
-        "full_width": false,
+        "full_width": true,
         "rounded": false,
         "enable_parallax": false,
         "parallax_direction": "vertical"
