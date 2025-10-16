@@ -24,27 +24,35 @@
         "rounded": false
       }
     },
-    "testimonials_banner_Cbhq4c": {
-      "type": "testimonials-banner",
-      "name": "Testimonials banner",
+    "image_with_text_overlay_h3Xi8T": {
+      "type": "image-with-text-overlay",
+      "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
         "image": "shopify://shop_images/ski_boot_header_1920x496px_68ff2ce8-fb07-4d01-bc66-695e47e0df72.jpg",
         "image_height": "adapt",
-        "content_position": "md:items-center md:justify-center",
+        "content_width": "small",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
         "image_mobile": "shopify://shop_images/ski_boot_header_1920x496px_49b35ce1-61b5-475c-8736-3229a614d6b3.png",
-        "image_height_mobile": "300px",
-        "content_position_mobile": "items-center justify-center",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
         "color_text": "#ffffff",
         "color_highlight": "#e0a580",
         "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
         "color_overlay": "#171717",
+        "divider_color": "#111111",
         "overlay_opacity": 0,
-        "padding_top": 12,
-        "padding_bottom": 12,
+        "padding_top": 0,
+        "padding_bottom": 0,
         "divider": false,
+        "full_width": true,
         "rounded": false,
-        "enable_parallax": false,
+        "enable_parallax": true,
         "parallax_direction": "vertical"
       }
     },
@@ -208,6 +216,7 @@
         "enable_video_autoplay": false,
         "enable_video_looping": false,
         "image_height": "adapt",
+        "video_url_mobile": "",
         "image_height_mobile": "auto",
         "padding_top": 0,
         "padding_bottom": 0,
@@ -219,7 +228,7 @@
   },
   "order": [
     "main-page",
-    "testimonials_banner_Cbhq4c",
+    "image_with_text_overlay_h3Xi8T",
     "rich_text_bGVzXB",
     "image_with_text_aPTKgV",
     "video_zXHN48"
