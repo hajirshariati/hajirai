@@ -440,7 +440,7 @@
           "type": "heading",
           "settings": {
             "heading": "<strong>What Albert Pro Retailers Are Saying</strong>",
-            "heading_size": "title-sm",
+            "heading_size": "title-md",
             "heading_tag": "h3",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
