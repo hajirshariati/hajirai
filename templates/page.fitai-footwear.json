@@ -24,27 +24,35 @@
         "rounded": false
       }
     },
-    "testimonials_banner_Cbhq4c": {
-      "type": "testimonials-banner",
-      "name": "Testimonials banner",
+    "image_with_text_overlay_qpycaB": {
+      "type": "image-with-text-overlay",
+      "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
         "image": "shopify://shop_images/1920x475_FitAI_FitGenius_1.jpg",
         "image_height": "adapt",
-        "content_position": "md:items-center md:justify-center",
+        "content_width": "small",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
         "image_mobile": "shopify://shop_images/1920x475_FitAI_FitGenius_1_a4a0e8e1-9135-455d-847d-203cf073ea26.png",
         "image_height_mobile": "adapt",
-        "content_position_mobile": "items-center justify-center",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
         "color_text": "#ffffff",
         "color_highlight": "#e0a580",
         "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
         "color_overlay": "#171717",
+        "divider_color": "#111111",
         "overlay_opacity": 0,
-        "padding_top": 12,
-        "padding_bottom": 12,
+        "padding_top": 0,
+        "padding_bottom": 0,
         "divider": false,
+        "full_width": true,
         "rounded": false,
-        "enable_parallax": false,
+        "enable_parallax": true,
         "parallax_direction": "vertical"
       }
     },
@@ -109,7 +117,7 @@
           "type": "text",
           "settings": {
             "text": "<p>Solving Fit & Reducing Returns: Your feet are 3-dimensional. So are your shoes. Yet, today shoe sizing is still based on length and width. It’s no wonder 30-40% of footwear orders online are returned. But, it doesn’t have to be this way. Aetrex’s FitAI™ footwear recommendations software custom recommends and matches footwear to individuals based on their unique 3D foot scan data and information.</p>",
-            "text_font": "heading",
+            "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
@@ -172,11 +180,11 @@
         "text_GW6cKf": {
           "type": "text",
           "settings": {
-            "text": "<h4>Turnkey Footwear and Fit Recommendations</h4>",
+            "text": "<p>Turnkey Footwear and Fit Recommendations</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-custom",
             "text_max_size": 32,
-            "text_line_height": 1.6,
+            "text_line_height": 1.2,
             "text_letter_spacing": 0,
             "text_capitalize": false,
             "secondary_color": false,
@@ -189,7 +197,7 @@
           "settings": {
             "text": "<p>FitStarter is a personalized footwear recommendation platform designed to help retailers improve their shoe fitting service for shoppers, reduce returns, and increase customer satisfaction. Developed in partnership with the premier shoe fit testing company Heeluxe, FitStarter is an accurate, turnkey starting point to Aetrex’s AI-powered shoe match-making platform, FitGenius.<br/><br/>Aetrex utilizes its own Fit Labs to analyze shoes submitted by participating retailers each season using the patented Heeluxe technology, which utilizes PSI pressure sensors. The FitStarter platform analyzes each customer’s unique 3D foot scan data collected in store, from either an AlbertPro or Albert 3D Fit, alongside the Fit Lab data to provide immediate, personalized fitting recommendations. Within days, retailers can have customized footwear and fit recommendations available in their stores.</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -205,7 +213,7 @@
             "button_label": "Read the Press Release",
             "button_link": "https://www.businesswire.com/news/home/20231128895456/en/Aetrex-Launches-FitStarter-Technology-Platform-to-Offer-Retailers-Immediate-Footwear-Fitting-Solution",
             "button_video_link": "",
-            "button_style": "link",
+            "button_style": "primary",
             "button_size": "sm",
             "button_external": false,
             "button_icon": false
@@ -217,7 +225,7 @@
             "button_label": "Feature in Sourcing Journal",
             "button_link": "https://sourcingjournal.com/footwear/footwear-retail/aetrex-heeluxe-fitstarter-footwear-recommendation-technology-albert-fitsense-471287/",
             "button_video_link": "",
-            "button_style": "link",
+            "button_style": "primary",
             "button_size": "sm",
             "button_external": false,
             "button_icon": false
@@ -278,11 +286,11 @@
         "text_XEzAbi": {
           "type": "text",
           "settings": {
-            "text": "<h4>Reduce E-commerce Returns with the Right Fit</h4>",
+            "text": "<p>Reduce E-commerce Returns with the Right Fit</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-custom",
             "text_max_size": 32,
-            "text_line_height": 1.6,
+            "text_line_height": 1.2,
             "text_letter_spacing": 0,
             "text_capitalize": false,
             "secondary_color": false,
@@ -295,7 +303,7 @@
           "settings": {
             "text": "<p>After accumulating 5,000 matching data points, as defined by being able to match a 3D foot scan to an in-store footwear purchase, the store will have the option to upgrade their FitStarter program to FitGenius.<br/><br/>Aetrex’s FitGenius AI platform, available within the Albert software and as a plug-in for retailers’ websites, can dramatically reduce your e-commerce footwear returns and create a more personalized customer experience. It works by matching a customer’s unique 3D foot profile & fit preference data with the shoe purchase history of similar profiles to help shoppers get the right fit on the first try.<br/><br/>The process begins with a 3D foot scan in store. Consumers are able to instantly view their 3D measurements and receive their unique foot profile data via email. Retailers who fully integrate the program can then have FitGenius recommendations appear wherever the consumer shops- whether in store, on their website, or through their email blasts and<br/><br/></p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -311,7 +319,7 @@
             "button_label": "Watch Video to Learn More",
             "button_link": "",
             "button_video_link": "https://cdn.shopify.com/videos/c/o/v/2ab2730ba01a4d50aa963587b4659822.mp4",
-            "button_style": "link",
+            "button_style": "primary",
             "button_size": "sm",
             "button_external": false,
             "button_icon": false
@@ -323,7 +331,7 @@
             "button_label": "FitGenius in the News",
             "button_link": "https://www.runninginsight.com/a-running-insight-conversation-with-matt-schwartz-chief-revenue-officer-aetrex",
             "button_video_link": "",
-            "button_style": "link",
+            "button_style": "primary",
             "button_size": "sm",
             "button_external": false,
             "button_icon": false
@@ -335,7 +343,7 @@
             "button_label": "See How LeHigh Uses FitGenius to Reduce Returns",
             "button_link": "",
             "button_video_link": "https://cdn.shopify.com/videos/c/o/v/c58581f7023f41fea642e6cd3db454ff.mp4",
-            "button_style": "link",
+            "button_style": "primary",
             "button_size": "sm",
             "button_external": false,
             "button_icon": false
@@ -347,7 +355,7 @@
             "button_label": "Consumers: Find a Foot Scanner Near You",
             "button_link": "shopify://pages/store-locator",
             "button_video_link": "",
-            "button_style": "link",
+            "button_style": "primary",
             "button_size": "sm",
             "button_external": false,
             "button_icon": false
@@ -359,7 +367,7 @@
             "button_label": "Retailers: Book a Demo",
             "button_link": "https://irle3andv1z.typeform.com/to/V3YAATXm",
             "button_video_link": "",
-            "button_style": "link",
+            "button_style": "primary",
             "button_size": "sm",
             "button_external": false,
             "button_icon": false
@@ -410,7 +418,7 @@
   },
   "order": [
     "main-page",
-    "testimonials_banner_Cbhq4c",
+    "image_with_text_overlay_qpycaB",
     "rich_text_MLXerj",
     "rich_text_AhWdpk",
     "image_with_text_cqHnCf",
