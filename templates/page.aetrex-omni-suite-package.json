@@ -24,27 +24,35 @@
         "rounded": false
       }
     },
-    "testimonials_banner_Cbhq4c": {
-      "type": "testimonials-banner",
-      "name": "Testimonials banner",
+    "image_with_text_overlay_JxNe9J": {
+      "type": "image-with-text-overlay",
+      "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
-        "image": "shopify://shop_images/1920x475_OmniSuite_top_banner_1.png",
+        "image": "shopify://shop_images/1920x475_OmniSuite_top_banner.png",
         "image_height": "adapt",
-        "content_position": "md:items-center md:justify-center",
+        "content_width": "small",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
         "image_mobile": "shopify://shop_images/Fitopia.png",
         "image_height_mobile": "adapt",
-        "content_position_mobile": "items-center justify-center",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
         "color_text": "#ffffff",
         "color_highlight": "#e0a580",
         "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
         "color_overlay": "#171717",
+        "divider_color": "#111111",
         "overlay_opacity": 0,
-        "padding_top": 12,
+        "padding_top": 0,
         "padding_bottom": 0,
         "divider": false,
+        "full_width": true,
         "rounded": false,
-        "enable_parallax": false,
+        "enable_parallax": true,
         "parallax_direction": "vertical"
       }
     },
@@ -265,7 +273,7 @@
             "button_label": "Learn More",
             "button_link": "shopify://pages/tech-fitai-footwear-recommendations",
             "button_video_link": "",
-            "button_style": "link",
+            "button_style": "primary",
             "button_size": "sm",
             "button_external": false,
             "button_icon": false
@@ -347,7 +355,7 @@
             "button_label": "Learn More",
             "button_link": "shopify://pages/tech-size-right-mobile-app",
             "button_video_link": "",
-            "button_style": "link",
+            "button_style": "primary",
             "button_size": "sm",
             "button_external": false,
             "button_icon": false
@@ -428,7 +436,7 @@
             "button_label": "Learn More",
             "button_link": "shopify://pages/tech-foot-com",
             "button_video_link": "",
-            "button_style": "link",
+            "button_style": "primary",
             "button_size": "sm",
             "button_external": false,
             "button_icon": false
@@ -509,7 +517,7 @@
             "button_label": "See Testimonials",
             "button_link": "shopify://pages/albert-2-pro-testimonials",
             "button_video_link": "",
-            "button_style": "link",
+            "button_style": "primary",
             "button_size": "sm",
             "button_external": false,
             "button_icon": false
@@ -521,7 +529,7 @@
             "button_label": "Watch Video: 2023 FN CEO Summit: Aetrex Tech & FitTech",
             "button_link": "https://youtu.be/1bpvkQSOa18",
             "button_video_link": "",
-            "button_style": "link",
+            "button_style": "primary",
             "button_size": "sm",
             "button_external": false,
             "button_icon": false
@@ -533,7 +541,7 @@
             "button_label": "Visit AetrexB2B.com to Learn More",
             "button_link": "https://aetrexb2b.com",
             "button_video_link": "",
-            "button_style": "link",
+            "button_style": "primary",
             "button_size": "sm",
             "button_external": false,
             "button_icon": false
@@ -581,7 +589,7 @@
   },
   "order": [
     "main-page",
-    "testimonials_banner_Cbhq4c",
+    "image_with_text_overlay_JxNe9J",
     "rich_text_MLXerj",
     "rich_text_bGVzXB",
     "rich_text_AhWdpk",
