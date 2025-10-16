@@ -201,20 +201,10 @@
     "image_with_text_bbkBBk": {
       "type": "image-with-text",
       "blocks": {
-        "heading_AEHQEa": {
-          "type": "heading",
-          "settings": {
-            "heading": "1.",
-            "heading_size": "title-md",
-            "heading_tag": "h3",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
         "text_QAJfcq": {
           "type": "text",
           "settings": {
-            "text": "<p><strong>Aim for Success in 3‐Dimensions</strong></p>",
+            "text": "<p>1. Aim for Success in 3‐Dimensions</p>",
             "text_font": "body",
             "text_size": "subtext-custom",
             "text_max_size": 32,
@@ -243,7 +233,6 @@
         }
       },
       "block_order": [
-        "heading_AEHQEa",
         "text_QAJfcq",
         "text_K4frme"
       ],
@@ -281,20 +270,10 @@
     "image_with_text_g6bHKK": {
       "type": "image-with-text",
       "blocks": {
-        "heading_GjaJpH": {
-          "type": "heading",
-          "settings": {
-            "heading": "2.",
-            "heading_size": "title-md",
-            "heading_tag": "h3",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
         "text_DCKAbC": {
           "type": "text",
           "settings": {
-            "text": "<p>Create an Equal Distribution of Pressure</p>",
+            "text": "<p>2. Create an Equal Distribution of Pressure</p>",
             "text_font": "body",
             "text_size": "subtext-custom",
             "text_max_size": 32,
@@ -323,7 +302,6 @@
         }
       },
       "block_order": [
-        "heading_GjaJpH",
         "text_DCKAbC",
         "text_B4zm3G"
       ],
@@ -361,20 +339,10 @@
     "image_with_text_QLeFdQ": {
       "type": "image-with-text",
       "blocks": {
-        "heading_gAB3Eh": {
-          "type": "heading",
-          "settings": {
-            "heading": "3.",
-            "heading_size": "title-md",
-            "heading_tag": "h3",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
         "text_PF7i6j": {
           "type": "text",
           "settings": {
-            "text": "<p>Provide Alignment & Support</p>",
+            "text": "<p>3. Provide Alignment & Support</p>",
             "text_font": "body",
             "text_size": "subtext-custom",
             "text_max_size": 32,
@@ -403,7 +371,6 @@
         }
       },
       "block_order": [
-        "heading_gAB3Eh",
         "text_PF7i6j",
         "text_cq7E3b"
       ],
@@ -441,20 +408,10 @@
     "image_with_text_dABdgc": {
       "type": "image-with-text",
       "blocks": {
-        "heading_WVcafm": {
-          "type": "heading",
-          "settings": {
-            "heading": "4.",
-            "heading_size": "title-md",
-            "heading_tag": "h3",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
         "text_Qjd36B": {
           "type": "text",
           "settings": {
-            "text": "<p>Deliver Customization through Material Technologies</p>",
+            "text": "<p>4. Deliver Customization through Material Technologies</p>",
             "text_font": "body",
             "text_size": "subtext-custom",
             "text_max_size": 32,
@@ -483,7 +440,6 @@
         }
       },
       "block_order": [
-        "heading_WVcafm",
         "text_Qjd36B",
         "text_wB4cn8"
       ],
@@ -521,20 +477,10 @@
     "image_with_text_TDxYYH": {
       "type": "image-with-text",
       "blocks": {
-        "heading_4KPjd3": {
-          "type": "heading",
-          "settings": {
-            "heading": "5.",
-            "heading_size": "title-md",
-            "heading_tag": "h3",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
         "text_aAgkfT": {
           "type": "text",
           "settings": {
-            "text": "<p>Recognize the Shoe is a Variable</p>",
+            "text": "<p>5. Recognize the Shoe is a Variable</p>",
             "text_font": "body",
             "text_size": "subtext-custom",
             "text_max_size": 32,
@@ -563,7 +509,6 @@
         }
       },
       "block_order": [
-        "heading_4KPjd3",
         "text_aAgkfT",
         "text_HBhe89"
       ],
