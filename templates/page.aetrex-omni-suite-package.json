@@ -449,7 +449,6 @@
         "layout": "text_first",
         "text_alignment": "left",
         "custom_content_position": "items-center",
-        "image_mobile": "shopify://shop_images/690x469_FitGenius_AI_banner_2x_11c592d0-563f-4866-85ea-72c1a03818ba.png",
         "image_height_mobile": "adapt",
         "text_alignment_mobile": "center",
         "color_text": "#525252",
