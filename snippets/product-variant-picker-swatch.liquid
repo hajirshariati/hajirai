@@ -155,7 +155,7 @@
                 -%}
                 <label
                   for="{{ section_id }}-{{ product_id }}-{{ option.name | handle }}-{{ forloop.index0 }}"
-                  class="color-swatch{% if swatch_image != blank %} with-image{% endif %} cursor-pointer relative"
+                  class="color-swatch{% if swatch_image != blank %} with-image{% endif %} cursor-pointer relative{% if option.selected_value == value %} checked{% endif %}"
                   title="{{ value | escape }}"
                   style="--swatch-background: {{ swatch_fallback }};{% if swatch_fallback_override == false and swatch_image != blank %}--swatch-background-image: url({{ swatch_image }});{% endif %}"
                 >
@@ -172,7 +172,7 @@
               {%- else -%}
                 <label
                   for="{{ section_id }}-{{ product_id }}-{{ option.name | handle }}-{{ forloop.index0 }}"
-                  class="label-swatch text-sm font-medium leading-none cursor-pointer relative"
+                  class="label-swatch text-sm font-medium leading-none cursor-pointer relative{% if option.selected_value == value %} checked{% endif %}"
                   title="{{ value | escape }}"
                 >
                   {{- value -}}

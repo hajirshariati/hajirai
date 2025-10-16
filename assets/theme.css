@@ -17599,3 +17599,18 @@ body .rte .contact-box a {
         height: 10px;
     }
 }
+
+.label-swatch.checked {
+    background-color: transparent!important;
+    opacity: 1!important;
+}
+
+.label-swatch.checked:before,
+.label-swatch.checked .unavailable-icon {
+    display: none;
+}
+
+.label-swatch.checked:after {
+    box-shadow: none!important;
+    border: 1px solid #e7e7e7!important;
+}
