@@ -582,8 +582,59 @@
         "parallax_direction": "vertical"
       }
     },
+    "image_with_text_z9Ya3b": {
+      "type": "image-with-text",
+      "blocks": {
+        "button_R9iUEq": {
+          "type": "button",
+          "settings": {
+            "button_label": "Watch Video: 2023 FN CEO Summit: Aetrex Tech & FitTech",
+            "button_link": "https://youtu.be/1bpvkQSOa18",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "sm",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "button_R9iUEq"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/690x469_FitGenius_AI_banner_2x_11c592d0-563f-4866-85ea-72c1a03818ba.png",
+        "img_url": "https://www.youtube.com/watch?v=1bpvkQSOa18",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "image_first",
+        "text_alignment": "center",
+        "custom_content_position": "items-center",
+        "image_mobile": "shopify://shop_images/690x469_FitGenius_AI_banner_2x_11c592d0-563f-4866-85ea-72c1a03818ba.png",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 48,
+        "padding_bottom": 48,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
     "video_93TF8x": {
       "type": "video",
+      "disabled": true,
       "name": "t:sections.video.name",
       "settings": {
         "transparent_header": false,
@@ -614,6 +665,7 @@
     "image_with_text_q9TkU7",
     "image_with_text_MXQ8M8",
     "image_with_text_XRmdjc",
+    "image_with_text_z9Ya3b",
     "video_93TF8x"
   ]
 }
