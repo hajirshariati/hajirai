@@ -136,7 +136,7 @@
           "type": "mega_menu",
           "settings": {
             "menu_title": "Women's Footwear",
-            "menu_width": "medium",
+            "menu_width": "large",
             "show_menu_image": true,
             "nav_width": 75,
             "promo_width": 25,
@@ -256,7 +256,7 @@
           "settings": {
             "menu_title": "Orthotics",
             "menu_width": "large",
-            "show_menu_image": false,
+            "show_menu_image": true,
             "nav_width": 75,
             "promo_width": 25,
             "mobile_layout": "horizontal",
@@ -313,10 +313,11 @@
         },
         "mega_menu_nAKw6T": {
           "type": "mega_menu",
+          "disabled": true,
           "settings": {
             "menu_title": "Explore Relief",
             "menu_width": "large",
-            "show_menu_image": false,
+            "show_menu_image": true,
             "nav_width": 70,
             "promo_width": 30,
             "mobile_layout": "horizontal",
@@ -373,7 +374,7 @@
           "type": "mega_menu",
           "settings": {
             "menu_title": "Technology",
-            "menu_width": "medium",
+            "menu_width": "large",
             "show_menu_image": true,
             "nav_width": 80,
             "promo_width": 20,
