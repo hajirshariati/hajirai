@@ -273,10 +273,10 @@
         "rounded": false
       }
     },
-    "multicolumn_9UNM8U": {
+    "multicolumn_LcGaHb": {
       "type": "multicolumn",
       "blocks": {
-        "column_637eWd": {
+        "column_RzYHkm": {
           "type": "column",
           "settings": {
             "show_border": false,
@@ -296,7 +296,7 @@
             "highlighted_scribble": "circle"
           }
         },
-        "column_wecJTc": {
+        "column_UGTDJ9": {
           "type": "column",
           "settings": {
             "show_border": false,
@@ -316,7 +316,7 @@
             "highlighted_scribble": "circle"
           }
         },
-        "column_m8nkAK": {
+        "column_d873bN": {
           "type": "column",
           "settings": {
             "show_border": false,
@@ -336,7 +336,7 @@
             "highlighted_scribble": "circle"
           }
         },
-        "column_jFkxBd": {
+        "column_DpmfaK": {
           "type": "column",
           "settings": {
             "show_border": false,
@@ -358,16 +358,16 @@
         }
       },
       "block_order": [
-        "column_637eWd",
-        "column_wecJTc",
-        "column_m8nkAK",
-        "column_jFkxBd"
+        "column_RzYHkm",
+        "column_UGTDJ9",
+        "column_d873bN",
+        "column_DpmfaK"
       ],
       "settings": {
         "gap": "small",
         "columns": 4,
         "columns_mobile": "2",
-        "carousel_on_desktop": false,
+        "carousel_on_desktop": true,
         "swipe_on_mobile": false,
         "heading": "",
         "heading_size": "title-md",
@@ -381,7 +381,7 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "color_text": "#ffffff",
+        "color_text": "#171717",
         "color_background": "#d8ccc7",
         "gradient_background": "",
         "color_highlight": "",
@@ -671,7 +671,7 @@
     "image_with_text_overlay_HEWGdX",
     "rich_text_PKdTPU",
     "collection_list_q7Rypj",
-    "multicolumn_9UNM8U",
+    "multicolumn_LcGaHb",
     "image_with_text_overlay_GNC4KT",
     "image_with_text_overlay_cLVdgJ",
     "image_with_text_overlay_9BfJhL"
