@@ -10798,6 +10798,7 @@ input[type="email"]:is(
     font-family: var(--font-product-family);
     font-weight: var(--font-product-weight);
     text-transform: var(--font-product-text-transform);
+    text-transform: capitalize;
 }
 
 .product-card__content.text-center .product-card__details {
