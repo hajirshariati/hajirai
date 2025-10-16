@@ -117,7 +117,7 @@
             "text": "<p>30 Day Wear Test, Plus Easy Returns</p>",
             "text_font": "subtitle",
             "text_size": "subtext-custom",
-            "text_max_size": 24,
+            "text_max_size": 32,
             "text_line_height": 1.2,
             "text_letter_spacing": 35,
             "text_capitalize": false,
@@ -664,6 +664,130 @@
         "enable_parallax": false,
         "parallax_direction": "vertical"
       }
+    },
+    "multicolumn_f6cXPU": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_Uqtx4t": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/pain_relief_icon_75px.png",
+            "image_ratio": "adapt",
+            "heading": "PAIN RELIEF",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_EnwXAx": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/arch_supp_icon_75px.png",
+            "image_ratio": "adapt",
+            "heading": "ARCH SUPPORT",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_qMpDQE": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/align_icon_75px.png",
+            "image_ratio": "adapt",
+            "heading": "ALIGNMENT",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_PDHGWk": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/memory_foam_icon_75px.png",
+            "image_ratio": "adapt",
+            "heading": "CUSHIONING",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_Uqtx4t",
+        "column_EnwXAx",
+        "column_qMpDQE",
+        "column_PDHGWk"
+      ],
+      "name": "t:sections.multicolumn.name",
+      "settings": {
+        "gap": "large",
+        "columns": 3,
+        "columns_mobile": "1",
+        "carousel_on_desktop": true,
+        "swipe_on_mobile": true,
+        "heading": "Multicolumn",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "#d8ccc7",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
     }
   },
   "order": [
@@ -674,6 +798,7 @@
     "multicolumn_LcGaHb",
     "image_with_text_overlay_GNC4KT",
     "image_with_text_overlay_cLVdgJ",
-    "image_with_text_overlay_9BfJhL"
+    "image_with_text_overlay_9BfJhL",
+    "multicolumn_f6cXPU"
   ]
 }
