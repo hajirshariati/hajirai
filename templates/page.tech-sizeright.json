@@ -34,7 +34,7 @@
         "content_width": "small",
         "content_position": "md:items-end md:justify-start",
         "text_alignment": "left",
-        "image_mobile": "shopify://shop_images/1920x475_SizeRight_banner.png",
+        "image_mobile": "shopify://shop_images/690x469_SizeRight_banner_2x_2115ee46-d111-4a6e-9baa-5259423eb4ab.png",
         "image_height_mobile": "adapt",
         "content_position_mobile": "items-center justify-center",
         "text_alignment_mobile": "center",
@@ -45,6 +45,7 @@
         "color_button_background": "#ffffff",
         "color_button_gradient": "",
         "color_overlay": "#171717",
+        "divider_color": "#111111",
         "overlay_opacity": 0,
         "padding_top": 12,
         "padding_bottom": 24,
@@ -65,6 +66,9 @@
             "text_font": "body",
             "text_size": "subtext-custom",
             "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -116,6 +120,9 @@
             "text_font": "heading",
             "text_size": "subtext-custom",
             "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -201,6 +208,9 @@
             "text_font": "heading",
             "text_size": "subtext-custom",
             "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -213,6 +223,9 @@
             "text_font": "body",
             "text_size": "subtext-sm",
             "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -226,10 +239,12 @@
       "name": "Image with text",
       "settings": {
         "image": "shopify://shop_images/690x605_sizeright.png",
+        "img_url": "",
         "image_height": "adapt",
         "image_width": "small",
         "layout": "text_first",
         "text_alignment": "left",
+        "custom_content_position": "items-center",
         "image_mobile": "shopify://shop_images/690x605_sizeright.png",
         "image_height_mobile": "adapt",
         "text_alignment_mobile": "center",
@@ -319,6 +334,9 @@
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -329,7 +347,11 @@
           "settings": {
             "icon": "none",
             "icon_image": "shopify://shop_images/sizeright-logo.webp",
-            "icon_width": 50
+            "iwidth": "custom",
+            "icon_width": 50,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
           }
         }
       },
@@ -379,6 +401,9 @@
             "text_font": "heading",
             "text_size": "subtext-custom",
             "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -391,6 +416,9 @@
             "text_font": "body",
             "text_size": "subtext-sm",
             "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -401,7 +429,8 @@
           "settings": {
             "button_label": "SizeRight Presentation from the 2022 FN CEO Summit. By Larry Schwartz (Aetrex CEO) ",
             "button_link": "https://player.vimeo.com/progressive_redirect/playback/813592741/rendition/720p/file.mp4?loc=external&signature=e459c7e00477ff11ea9d5b2ab66a4f84ec458517e5ffded6c1e9e46111c4aa9e",
-            "button_style": "link",
+            "button_video_link": "",
+            "button_style": "primary",
             "button_size": "sm",
             "button_external": false,
             "button_icon": false
@@ -412,6 +441,7 @@
           "settings": {
             "button_label": "",
             "button_link": "https://cdn.shopify.com/videos/c/o/v/59100797928a4b0bbcd30c674dafd8aa.mp4",
+            "button_video_link": "",
             "button_style": "link",
             "button_size": "sm",
             "button_external": false,
@@ -428,10 +458,12 @@
       "name": "Image with text",
       "settings": {
         "image": "shopify://shop_images/ShoeCloset_690x598_2x_87d65b3e-81d2-40c9-bdd0-5b8a0ea27249.png",
+        "img_url": "",
         "image_height": "adapt",
         "image_width": "small",
         "layout": "text_first",
         "text_alignment": "left",
+        "custom_content_position": "items-center",
         "image_mobile": "shopify://shop_images/ShoeCloset_690x598_2x_87d65b3e-81d2-40c9-bdd0-5b8a0ea27249.png",
         "image_height_mobile": "adapt",
         "text_alignment_mobile": "center",
