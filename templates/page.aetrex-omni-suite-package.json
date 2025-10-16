@@ -257,7 +257,7 @@
           "settings": {
             "text": "<p>A website plug-in designed to dramatically reduce your in store and e-commerce footwear returns and create a more personalized customer experience.</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -339,7 +339,7 @@
           "settings": {
             "text": "<p>A web-based app that quickly calculates a customer’s shoe size and provides footwear recommendations, without the shopper leaving your website.</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -420,7 +420,7 @@
           "settings": {
             "text": "<p>A one-of-a-kind data portal site offering the most comprehensive, global 3D foot data to help footwear designers develop better fitting and functioning footwear.</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -501,7 +501,7 @@
           "settings": {
             "text": "<p>Aetrex operates with an Apple®-like model. Our fully-integrated hardware and software FitTech solutions are all designed by the Aetrex team, creating the most technically advanced and seamlessly integrated omnichannel shoe fitting solutions available today.<br/>This is what make us different.</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
