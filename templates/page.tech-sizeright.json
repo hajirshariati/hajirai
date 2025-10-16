@@ -348,7 +348,7 @@
             "icon": "none",
             "icon_image": "shopify://shop_images/sizeright-logo.webp",
             "iwidth": "custom",
-            "icon_width": 50,
+            "icon_width": 100,
             "link": "",
             "accessibility_info": "",
             "external": false
