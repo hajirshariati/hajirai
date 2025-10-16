@@ -31,7 +31,7 @@
           "type": "image",
           "settings": {
             "image": "shopify://shop_images/1920x700_Collette_Taupe.jpg",
-            "image_mobile": "shopify://shop_images/1_9.jpg",
+            "image_mobile": "shopify://shop_images/footwear1.jpg",
             "heading": "Fall-Winter '25 Styles",
             "heading_size": "title-sm",
             "heading_tag": "h3",
@@ -760,8 +760,8 @@
         "content_width": "small",
         "content_position": "md:items-center md:justify-start",
         "text_alignment": "center",
-        "image_mobile": "shopify://shop_images/655x565_Kinsley_Grey.png",
-        "image_height_mobile": "adapt",
+        "image_mobile": "shopify://shop_images/footwear3.jpg",
+        "image_height_mobile": "100vh",
         "content_position_mobile": "items-end justify-center",
         "text_alignment_mobile": "center",
         "color_text": "#525252",
@@ -776,7 +776,7 @@
         "padding_top": 24,
         "padding_bottom": 24,
         "divider": false,
-        "full_width": false,
+        "full_width": true,
         "rounded": false,
         "enable_parallax": false,
         "parallax_direction": "vertical"
