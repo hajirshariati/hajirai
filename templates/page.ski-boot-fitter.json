@@ -117,10 +117,10 @@
           "type": "text",
           "settings": {
             "text": "<p>3D FitTech is Changing the Ski Boot Fitting Game</p>",
-            "text_font": "heading",
+            "text_font": "body",
             "text_size": "subtext-custom",
             "text_max_size": 32,
-            "text_line_height": 1.6,
+            "text_line_height": 1.2,
             "text_letter_spacing": 0,
             "text_capitalize": false,
             "secondary_color": false,
@@ -149,7 +149,7 @@
             "button_label": "Book a Demo",
             "button_link": "https://irle3andv1z.typeform.com/to/V3YAATXm",
             "button_video_link": "",
-            "button_style": "link",
+            "button_style": "primary",
             "button_size": "sm",
             "button_external": true,
             "button_icon": false
@@ -161,7 +161,7 @@
             "button_label": "View recent coverage with SGB Online on Ski Boot Fitter",
             "button_link": "https://sgbonline.com/3d-fittech-is-changing-the-ski-boot-fitting-game/",
             "button_video_link": "",
-            "button_style": "link",
+            "button_style": "primary",
             "button_size": "sm",
             "button_external": true,
             "button_icon": false
@@ -212,6 +212,7 @@
         "transparent_header": false,
         "video": "shopify://files/videos/Ski Boot Fitter Video FINAL.mp4",
         "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
+        "cover_image": "shopify://shop_images/ski_boot_header_1920x496px_49b35ce1-61b5-475c-8736-3229a614d6b3.png",
         "description": "",
         "enable_video_autoplay": false,
         "enable_video_looping": false,
