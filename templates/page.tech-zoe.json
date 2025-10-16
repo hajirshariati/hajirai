@@ -250,12 +250,12 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 48,
+        "padding_top": 0,
         "padding_bottom": 0,
         "divider": false,
         "full_width": false,
         "rounded": false,
-        "enable_parallax": true,
+        "enable_parallax": false,
         "parallax_direction": "vertical"
       }
     },
@@ -307,7 +307,7 @@
         "divider": false,
         "full_width": false,
         "rounded": false,
-        "enable_parallax": true,
+        "enable_parallax": false,
         "parallax_direction": "vertical"
       }
     },
