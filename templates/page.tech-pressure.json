@@ -24,27 +24,35 @@
         "rounded": false
       }
     },
-    "testimonials_banner_Cbhq4c": {
-      "type": "testimonials-banner",
-      "name": "Testimonials banner",
+    "image_with_text_overlay_MAxr3d": {
+      "type": "image-with-text-overlay",
+      "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
         "image": "shopify://shop_images/1920x475_Albert_Pressure_banner_c8dcb0e7-76ec-4b0d-913d-943896d49afc.png",
         "image_height": "adapt",
-        "content_position": "md:items-center md:justify-center",
-        "image_mobile": "shopify://shop_images/1920x475_Albert_Pressure_banner.png",
+        "content_width": "small",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/1920x475_Albert_Pressure_banner_aa8cf084-e3ea-4119-85f0-42849c031abe.png",
         "image_height_mobile": "adapt",
-        "content_position_mobile": "items-center justify-center",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
         "color_text": "#ffffff",
         "color_highlight": "#e0a580",
         "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
         "color_overlay": "#171717",
+        "divider_color": "#111111",
         "overlay_opacity": 0,
-        "padding_top": 12,
-        "padding_bottom": 20,
+        "padding_top": 0,
+        "padding_bottom": 0,
         "divider": false,
+        "full_width": true,
         "rounded": false,
-        "enable_parallax": false,
+        "enable_parallax": true,
         "parallax_direction": "vertical"
       }
     },
@@ -54,10 +62,13 @@
         "text_yKxt79": {
           "type": "text",
           "settings": {
-            "text": "<p>Albert Pressure Scanner</p>",
+            "text": "<p><strong>Albert Pressure Scanner</strong></p>",
             "text_font": "body",
             "text_size": "subtext-custom",
-            "text_max_size": 40,
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -109,6 +120,9 @@
             "text_font": "heading",
             "text_size": "subtext-custom",
             "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -160,6 +174,9 @@
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -172,6 +189,9 @@
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -185,10 +205,12 @@
       "name": "Image with text",
       "settings": {
         "image": "shopify://shop_images/690x469_Pressure_monitor.png",
+        "img_url": "",
         "image_height": "adapt",
         "image_width": "small",
         "layout": "text_first",
         "text_alignment": "left",
+        "custom_content_position": "items-center",
         "image_mobile": "shopify://shop_images/690x469_Pressure_monitor.png",
         "image_height_mobile": "adapt",
         "text_alignment_mobile": "left",
@@ -221,6 +243,9 @@
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -231,7 +256,8 @@
           "settings": {
             "button_label": "View Scanner Comparison Chart",
             "button_link": "shopify://pages/comparison-chart",
-            "button_style": "link",
+            "button_video_link": "",
+            "button_style": "primary",
             "button_size": "md",
             "button_external": false,
             "button_icon": false
@@ -242,7 +268,8 @@
           "settings": {
             "button_label": "Visit AetrexB2B.com to Purchase",
             "button_link": "https://aetrexb2b.com/",
-            "button_style": "link",
+            "button_video_link": "",
+            "button_style": "primary",
             "button_size": "md",
             "button_external": false,
             "button_icon": false
@@ -257,10 +284,12 @@
       "name": "Image with text",
       "settings": {
         "image": "shopify://shop_images/690x469_Pressure_orthotics.png",
+        "img_url": "",
         "image_height": "adapt",
         "image_width": "small",
         "layout": "text_first",
         "text_alignment": "left",
+        "custom_content_position": "items-center",
         "image_mobile": "shopify://shop_images/690x469_Pressure_orthotics.png",
         "image_height_mobile": "adapt",
         "text_alignment_mobile": "left",
@@ -286,7 +315,7 @@
   },
   "order": [
     "main-page",
-    "testimonials_banner_Cbhq4c",
+    "image_with_text_overlay_MAxr3d",
     "rich_text_MLXerj",
     "rich_text_bGVzXB",
     "image_with_text_8cWttP",
