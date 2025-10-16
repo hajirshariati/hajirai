@@ -29,7 +29,7 @@
       "name": "Image with text overlay",
       "settings": {
         "transparent_header": false,
-        "image": "shopify://shop_images/1920x475_FitPhilosophy.jpg",
+        "image": "shopify://shop_images/1920x475_FitPhilosophy_cc83c71f-efc4-49f3-9f96-7c26f7a9b384.png",
         "image_height": "adapt",
         "content_width": "small",
         "content_position": "md:items-end md:justify-start",
