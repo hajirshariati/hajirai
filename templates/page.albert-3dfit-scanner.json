@@ -24,27 +24,35 @@
         "rounded": false
       }
     },
-    "testimonials_banner_Cbhq4c": {
-      "type": "testimonials-banner",
-      "name": "Testimonials banner",
+    "image_with_text_overlay_48x8nd": {
+      "type": "image-with-text-overlay",
+      "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
         "image": "shopify://shop_images/1920x475_3DFit_banner.png",
         "image_height": "adapt",
-        "content_position": "md:items-center md:justify-center",
-        "image_mobile": "shopify://shop_images/1920x475_3DFit_banner.png",
+        "content_width": "small",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/1920x475_3DFit_banner.webp",
         "image_height_mobile": "adapt",
-        "content_position_mobile": "items-center justify-center",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
         "color_text": "#ffffff",
         "color_highlight": "#e0a580",
         "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
         "color_overlay": "#171717",
+        "divider_color": "#111111",
         "overlay_opacity": 0,
-        "padding_top": 12,
-        "padding_bottom": 20,
+        "padding_top": 0,
+        "padding_bottom": 0,
         "divider": false,
+        "full_width": true,
         "rounded": false,
-        "enable_parallax": false,
+        "enable_parallax": true,
         "parallax_direction": "vertical"
       }
     },
@@ -54,10 +62,10 @@
         "text_yKxt79": {
           "type": "text",
           "settings": {
-            "text": "<p>Albert 3DFit Scanner</p>",
-            "text_font": "body",
+            "text": "<p><strong>Albert 3DFit Scanner</strong></p>",
+            "text_font": "heading",
             "text_size": "subtext-custom",
-            "text_max_size": 40,
+            "text_max_size": 32,
             "text_line_height": 1.2,
             "text_letter_spacing": 0,
             "text_capitalize": false,
@@ -330,7 +338,7 @@
   },
   "order": [
     "main-page",
-    "testimonials_banner_Cbhq4c",
+    "image_with_text_overlay_48x8nd",
     "rich_text_MLXerj",
     "rich_text_bGVzXB",
     "image_with_text_8cWttP",
