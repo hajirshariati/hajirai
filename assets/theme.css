@@ -8267,8 +8267,7 @@ details.active .drawer__promotions .mega-menu__item,
 
 .media-card__text .heading {
     --reversed-link-gap: min(100%, 1.35em);
-    font-size: x-large;
-    letter-spacing: inherit;
+    letter-spacing: 1px;
     bottom: 1em;
 
 }
