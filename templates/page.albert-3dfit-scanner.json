@@ -241,7 +241,7 @@
             "button_label": "Watch Video to Learn More",
             "button_link": "https://player.vimeo.com/progressive_redirect/playback/560582810/rendition/1080p/file.mp4?loc=external&signature=c1ea3dce32708ec1aa9f66e03845c4b3be45efbd07ca070574eff4878981e03a",
             "button_video_link": "",
-            "button_style": "link",
+            "button_style": "primary",
             "button_size": "md",
             "button_external": false,
             "button_icon": false
@@ -253,7 +253,7 @@
             "button_label": "View Scanner Comparison Chart",
             "button_link": "https://cdn.shopify.com/s/files/1/0860/3634/9241/files/Scanner_Comparison_Chart.png?v=1750266152",
             "button_video_link": "",
-            "button_style": "link",
+            "button_style": "primary",
             "button_size": "md",
             "button_external": false,
             "button_icon": false
@@ -265,7 +265,7 @@
             "button_label": "Albert 3DFit in the News",
             "button_link": "shopify://pages/tech-albert-3dfit",
             "button_video_link": "",
-            "button_style": "link",
+            "button_style": "primary",
             "button_size": "md",
             "button_external": false,
             "button_icon": false
@@ -277,7 +277,7 @@
             "button_label": "How to Check Your 3D Scanner for Accuracy: Watch Video",
             "button_link": "https://cdn.shopify.com/videos/c/o/v/85c8e928bcc44a2e8672dffac9f3ac3c.mp4",
             "button_video_link": "",
-            "button_style": "link",
+            "button_style": "primary",
             "button_size": "md",
             "button_external": false,
             "button_icon": false
@@ -289,7 +289,7 @@
             "button_label": "Visit AetrexB2B.com to Purchase",
             "button_link": "https://www.aetrexb2b.com",
             "button_video_link": "",
-            "button_style": "link",
+            "button_style": "primary",
             "button_size": "md",
             "button_external": false,
             "button_icon": false
@@ -326,7 +326,7 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 24,
+        "padding_top": 48,
         "padding_bottom": 48,
         "divider": false,
         "full_width": false,
