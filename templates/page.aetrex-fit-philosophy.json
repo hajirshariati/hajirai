@@ -119,7 +119,7 @@
             "text": "<p>The Five Pillars of Fit</p>",
             "text_font": "heading",
             "text_size": "subtext-custom",
-            "text_max_size": 24,
+            "text_max_size": 32,
             "text_line_height": 1.2,
             "text_letter_spacing": 0,
             "text_capitalize": false,
@@ -214,9 +214,9 @@
         "text_QAJfcq": {
           "type": "text",
           "settings": {
-            "text": "<h4><strong>Aim for Success in 3‐Dimensions</strong></h4>",
+            "text": "<p><strong>Aim for Success in 3‐Dimensions</strong></p>",
             "text_font": "body",
-            "text_size": "subtext-md",
+            "text_size": "subtext-custom",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -231,7 +231,7 @@
           "settings": {
             "text": "<p>Your feet are 3-dimensional, and so are your shoes. So, there’s a lot more to getting the right fit than just length and width. For an optimal fit, all aspects of the foot need to be considered including: dorsal, plantar, anterior, posterior, medial and lateral.</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -270,7 +270,7 @@
         "color_button_background": "",
         "color_button_gradient": "",
         "padding_top": 48,
-        "padding_bottom": 24,
+        "padding_bottom": 48,
         "divider": false,
         "full_width": false,
         "rounded": false,
@@ -294,9 +294,9 @@
         "text_DCKAbC": {
           "type": "text",
           "settings": {
-            "text": "<h4>Create an Equal Distribution of Pressure</h4>",
+            "text": "<p>Create an Equal Distribution of Pressure</p>",
             "text_font": "body",
-            "text_size": "subtext-md",
+            "text_size": "subtext-custom",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -311,7 +311,7 @@
           "settings": {
             "text": "<p>An optimal fit provides an equal distribution of pressure throughout the gait cycle. This can be accomplished through total contact and by transferring pressure away from high pressure areas. Achieving this will help increase comfort and reduce chance for injury.</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -374,9 +374,9 @@
         "text_PF7i6j": {
           "type": "text",
           "settings": {
-            "text": "<h4>Provide Alignment & Support</h4>",
+            "text": "<p>Provide Alignment & Support</p>",
             "text_font": "body",
-            "text_size": "subtext-md",
+            "text_size": "subtext-custom",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -391,7 +391,7 @@
           "settings": {
             "text": "<p>An optimal fit reduces over-pronation and helps provide proper body alignment. Helping the foot stay close to the neutral position of the subtalar joint will also prevent excessive stretching of the plantar fascia and reduce stress to the knees, hips and back.</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -454,9 +454,9 @@
         "text_Qjd36B": {
           "type": "text",
           "settings": {
-            "text": "<h4>Deliver Customization through Material Technologies</h4>",
+            "text": "<p>Deliver Customization through Material Technologies</p>",
             "text_font": "body",
-            "text_size": "subtext-md",
+            "text_size": "subtext-custom",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -471,7 +471,7 @@
           "settings": {
             "text": "<p>An optimal fit protects the foot through customization and by providing cushioning and shock absorption. Choose orthotic materials that do not fight the foot, but instead customize or give way during the impact phases of the gait cycle.</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -534,9 +534,9 @@
         "text_aAgkfT": {
           "type": "text",
           "settings": {
-            "text": "<h4>Recognize the Shoe is a Variable</h4>",
+            "text": "<p>Recognize the Shoe is a Variable</p>",
             "text_font": "body",
-            "text_size": "subtext-md",
+            "text_size": "subtext-custom",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -551,7 +551,7 @@
           "settings": {
             "text": "<p>Sizing among brands and styles is never uniform, and an optimal fit is best achieved by trying on different sizes or through machine learning technologies that address the fit characteristics of particular styles. Sock thickness can also impact fit.</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
