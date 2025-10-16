@@ -23,25 +23,14 @@
 
 -%}
 
-<script>
 {% if hide_for_non_us %}
-function getDetails(url) {
-  return fetch(url)
-    .then(res => res.json());
-}
-
-var u = "https://get.geojs.io/v1/ip/country.json";
-getDetails(u).then(function(data) {
- // console.log("Visitor country:", data.country);
-  const announcementBar = document.querySelector(".custom-announcement-bar");
-  if (data.country === "US") {
-    announcementBar.classList.remove("hidden");
-  } else {
-    announcementBar.classList.add("hidden");
-  }
-});
+    <script>
+        const announcementBar = document.querySelector('.custom-announcement-bar');
+        if (announcementBar) {
+            announcementBar.setAttribute('data-us-only', '');
+        }
+    </script>
 {% endif %}
-</script>
 
 {%- if show_section -%}
   <style>
@@ -425,8 +414,9 @@ getDetails(u).then(function(data) {
     {
       "type": "checkbox",
       "id": "hide_for_non_us",
-      "label": "Hide for International users",
-      "default": false
+      "label": "Show to US users only",
+      "default": false,
+      "info": "When enabled, this block will only be visible to users in the United States"
     },
     {
       "type": "checkbox",

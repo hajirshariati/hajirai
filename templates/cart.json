@@ -87,6 +87,7 @@
         "show_payment_icons": false,
         "show_shipping_calculator": false,
         "add_discount_code": true,
+        "loyalty_us_only": true,
         "padding_top": 72,
         "padding_bottom": 60,
         "divider": false,
