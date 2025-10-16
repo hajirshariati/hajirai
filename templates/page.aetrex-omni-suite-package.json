@@ -308,7 +308,7 @@
         "color_button_background": "",
         "color_button_gradient": "",
         "padding_top": 24,
-        "padding_bottom": 12,
+        "padding_bottom": 24,
         "divider": false,
         "full_width": true,
         "rounded": false,
@@ -389,7 +389,7 @@
         "color_button_background": "",
         "color_button_gradient": "",
         "padding_top": 24,
-        "padding_bottom": 12,
+        "padding_bottom": 24,
         "divider": false,
         "full_width": true,
         "rounded": false,
@@ -470,7 +470,7 @@
         "color_button_background": "",
         "color_button_gradient": "",
         "padding_top": 24,
-        "padding_bottom": 12,
+        "padding_bottom": 24,
         "divider": false,
         "full_width": true,
         "rounded": false,
@@ -525,6 +525,7 @@
         },
         "button_4HXWMJ": {
           "type": "button",
+          "disabled": true,
           "settings": {
             "button_label": "Watch Video: 2023 FN CEO Summit: Aetrex Tech & FitTech",
             "button_link": "https://youtu.be/1bpvkQSOa18",
@@ -578,12 +579,33 @@
         "color_button_background": "",
         "color_button_gradient": "",
         "padding_top": 24,
-        "padding_bottom": 48,
+        "padding_bottom": 24,
         "divider": false,
         "full_width": true,
         "rounded": false,
         "enable_parallax": false,
         "parallax_direction": "vertical"
+      }
+    },
+    "video_93TF8x": {
+      "type": "video",
+      "name": "t:sections.video.name",
+      "settings": {
+        "transparent_header": false,
+        "video_url": "https://www.youtube.com/watch?v=1bpvkQSOa18",
+        "cover_image": "shopify://shop_images/14.jpg",
+        "description": "",
+        "enable_video_autoplay": false,
+        "enable_video_looping": false,
+        "image_height": "adapt",
+        "video_url_mobile": "https://www.youtube.com/watch?v=1bpvkQSOa18",
+        "cover_image_mobile": "shopify://shop_images/14.jpg",
+        "image_height_mobile": "adapt",
+        "padding_top": 48,
+        "padding_bottom": 48,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
       }
     }
   },
@@ -596,6 +618,7 @@
     "image_with_text_JfCE7A",
     "image_with_text_q9TkU7",
     "image_with_text_MXQ8M8",
-    "image_with_text_XRmdjc"
+    "image_with_text_XRmdjc",
+    "video_93TF8x"
   ]
 }
