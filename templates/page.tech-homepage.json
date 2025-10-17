@@ -1004,13 +1004,6 @@
     "image_with_text_Nwfbke": {
       "type": "image-with-text",
       "blocks": {
-        "spacing_zwrJVp": {
-          "type": "spacing",
-          "settings": {
-            "height": 4,
-            "height_mobile": 0
-          }
-        },
         "text_9aNCNU": {
           "type": "text",
           "settings": {
@@ -1082,7 +1075,6 @@
         }
       },
       "block_order": [
-        "spacing_zwrJVp",
         "text_9aNCNU",
         "liquid_gYPKLc",
         "text_CCVrjb",
