@@ -235,7 +235,9 @@
                   assign show_promotion = false
 
                   assign promo_image = 'promo_image_' | append: i
+                  assign promo_image_abra = 'promo_image_abra_' | append: i
                   assign promo_mobile_image = 'promo_mobile_image_' | append: i
+                  assign promo_mobile_image_abra = 'promo_mobile_image_abra_' | append: i
                   if block.settings[promo_image] != blank or block.settings[promo_mobile_image] != blank
                     assign show_promotion = true
                   endif
@@ -249,8 +251,10 @@
                 -%}
                 {%- if show_promotion -%}
                   {%- liquid
+                    assign abra_promo_code = 'abra_promo_code_' | append: i
                     assign promo_image_ratio = 'promo_image_ratio_' | append: i
                     assign promo_mobile_image = 'promo_mobile_image_' | append: i
+                    assign promo_mobile_image_abra = 'promo_mobile_image_abra_' | append: i
                     assign promo_heading = 'promo_heading_' | append: i
                     assign promo_subtext = 'promo_subtext_' | append: i
                     assign promo_overlay_content = 'promo_overlay_content_' | append: i
@@ -282,14 +286,14 @@
                         <div class="media media--{{ block.settings[promo_image_ratio] }} relative overflow-hidden">
                           {%- if block.settings[promo_mobile_image] != blank and block.settings[promo_image] != blank -%}
                             {%- comment -%} Both mobile and desktop images available {%- endcomment -%}
-                            <div class="block lg:hidden">
+                            <div class="block lg:hidden{% if abra_promo_code != blank %} abra-defautl--{{ block.settings[abra_promo_code] | handleize }}{% endif %}" data-abra-default="{{ block.settings[abra_promo_code] | handleize }}">
                               {{-
                                 block.settings[promo_mobile_image]
                                 | image_url: width: block.settings[promo_mobile_image].width
                                 | image_tag: loading: 'lazy', widths: '180,360,540,720', is: 'lazy-image'
                               -}}
                             </div>
-                            <div class="hidden lg:block">
+                            <div class="hidden lg:block{% if block.settings[abra_promo_code] != blank %} abra-defautl--{{ block.settings[abra_promo_code] | handleize }}{% endif %}" data-abra-default="{{ block.settings[abra_promo_code] | handleize }}">
                               {{-
                                 block.settings[promo_image]
                                 | image_url: width: block.settings[promo_image].width
@@ -298,18 +302,54 @@
                             </div>
                           {%- elsif block.settings[promo_mobile_image] != blank -%}
                             {%- comment -%} Mobile image only {%- endcomment -%}
-                            {{-
-                              block.settings[promo_mobile_image]
-                              | image_url: width: block.settings[promo_mobile_image].width
-                              | image_tag: loading: 'lazy', widths: '180,360,540,720,900,1080', is: 'lazy-image'
-                            -}}
+                            <div class="{% if block.settings[abra_promo_code] != blank %} abra-defautl--{{ block.settings[abra_promo_code] | handleize }}{% endif %}" data-abra-default="{{ block.settings[abra_promo_code] | handleize }}">
+                              {{-
+                                block.settings[promo_mobile_image]
+                                | image_url: width: block.settings[promo_mobile_image].width
+                                | image_tag: loading: 'lazy', widths: '180,360,540,720,900,1080', is: 'lazy-image'
+                              -}}
+                            </div>
                           {%- elsif block.settings[promo_image] != blank -%}
                             {%- comment -%} Desktop image only {%- endcomment -%}
-                            {{-
-                              block.settings[promo_image]
-                              | image_url: width: block.settings[promo_image].width
-                              | image_tag: loading: 'lazy', widths: '180,360,540,720,900,1080', is: 'lazy-image'
-                            -}}
+                            <div class="{% if block.settings[abra_promo_code] != blank %} abra-defautl--{{ block.settings[abra_promo_code] | handleize }}{% endif %}" data-abra-default="{{ block.settings[abra_promo_code] | handleize }}">
+                              {{-
+                                block.settings[promo_image]
+                                | image_url: width: block.settings[promo_image].width
+                                | image_tag: loading: 'lazy', widths: '180,360,540,720,900,1080', is: 'lazy-image'
+                              -}}
+                            </div>
+                          {%- endif -%}
+                          {%- if block.settings[promo_mobile_image_abra] != blank and block.settings[promo_image_abra] != blank -%}
+                            <div class="block lg:hidden abra--{{ block.settings[abra_promo_code] | handleize }}-activated" data-abra-promo="{{ block.settings[abra_promo_code] | handleize }}">
+                              {{-
+                                block.settings[promo_mobile_image_abra]
+                                | image_url: width: block.settings[promo_mobile_image_abra].width
+                                | image_tag: loading: 'lazy', widths: '180,360,540,720', is: 'lazy-image'
+                              -}}
+                            </div>
+                            <div class="hidden lg:block abra--{{ block.settings[abra_promo_code] | handleize }}-activated" data-abra-promo="{{ block.settings[abra_promo_code] | handleize }}">
+                              {{-
+                                block.settings[promo_image_abra]
+                                | image_url: width: block.settings[promo_image_abra].width
+                                | image_tag: loading: 'lazy', widths: '180,360,540,720,900,1080', is: 'lazy-image'
+                              -}}
+                            </div>
+                          {%- elsif block.settings[promo_mobile_image_abra] != blank -%}
+                            <div class="abra--{{ block.settings[abra_promo_code] | handleize }}-activated" data-abra-promo="{{ block.settings[abra_promo_code] | handleize }}">
+                              {{-
+                                block.settings[promo_mobile_image_abra]
+                                | image_url: width: block.settings[promo_mobile_image_abra].width
+                                | image_tag: loading: 'lazy', widths: '180,360,540,720,900,1080', is: 'lazy-image'
+                              -}}
+                            </div>
+                          {%- elsif block.settings[promo_image_abra] != blank -%}
+                            <div class="abra--{{ block.settings[abra_promo_code] | handleize }}-activated" data-abra-promo="{{ block.settings[abra_promo_code] | handleize }}">
+                              {{-
+                                block.settings[promo_image_abra]
+                                | image_url: width: block.settings[promo_image_abra].width
+                                | image_tag: loading: 'lazy', widths: '180,360,540,720,900,1080', is: 'lazy-image'
+                              -}}
+                            </div>
                           {%- endif -%}
                         </div>
                         {%- if block.settings[promo_heading] != blank or block.settings[promo_subtext] != blank -%}
