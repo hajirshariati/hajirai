@@ -12,18 +12,13 @@
     "video_with_text_overlay_84weNe": {
       "type": "video-with-text-overlay",
       "blocks": {
-        "text_LgtJTj": {
-          "type": "text",
+        "heading_WMGPBB": {
+          "type": "heading",
           "settings": {
-            "text": "<p><strong>The Aetrex <br/>Technology <br/>Difference</strong></p>",
-            "text_font": "body",
-            "text_size": "subtext-custom",
-            "text_max_size": 40,
-            "text_line_height": 1.1,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
+            "heading": "<h1><strong>The Aetrex <br/>Technology <br/>Difference</strong></h1>",
+            "heading_size": "title-md",
+            "heading_tag": "h1",
+            "highlighted_text": "text",
             "highlighted_scribble": "circle"
           }
         },
@@ -64,7 +59,7 @@
         }
       },
       "block_order": [
-        "text_LgtJTj",
+        "heading_WMGPBB",
         "divider_nd3AeW",
         "text_ty3xHk",
         "button_qiiHDC"
@@ -216,18 +211,13 @@
     "video_with_text_overlay_3RJkWH": {
       "type": "video-with-text-overlay",
       "blocks": {
-        "text_Vk4ikN": {
-          "type": "text",
+        "heading_eJJmzy": {
+          "type": "heading",
           "settings": {
-            "text": "<p><strong>Healthy Comfort<br/>Starts Here!®</strong></p>",
-            "text_font": "body",
-            "text_size": "subtext-custom",
-            "text_max_size": 40,
-            "text_line_height": 1.1,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
+            "heading": "<h1><strong>Healthy Comfort<br/>Starts Here!®</strong></h1>",
+            "heading_size": "title-md",
+            "heading_tag": "h1",
+            "highlighted_text": "text",
             "highlighted_scribble": "circle"
           }
         },
@@ -268,7 +258,7 @@
         }
       },
       "block_order": [
-        "text_Vk4ikN",
+        "heading_eJJmzy",
         "divider_AgRWiK",
         "text_zfk6ye",
         "button_erVtxD"
@@ -315,8 +305,8 @@
             "text": "<p><strong>Celebrating 20 Years of Foot Scanning Technology</strong></p>",
             "text_font": "body",
             "text_size": "subtext-custom",
-            "text_max_size": 40,
-            "text_line_height": 1.1,
+            "text_max_size": 32,
+            "text_line_height": 1.2,
             "text_letter_spacing": 0,
             "text_capitalize": false,
             "secondary_color": false,
@@ -498,8 +488,8 @@
             "text": "<p><strong>Data Driven Design</strong></p>",
             "text_font": "body",
             "text_size": "subtext-custom",
-            "text_max_size": 40,
-            "text_line_height": 1.1,
+            "text_max_size": 32,
+            "text_line_height": 1.2,
             "text_letter_spacing": 0,
             "text_capitalize": false,
             "secondary_color": false,
@@ -588,7 +578,7 @@
             "text": "<h2>OUR BRAND PARTNERS</h2>",
             "text_font": "body",
             "text_size": "subtext-custom",
-            "text_max_size": 12,
+            "text_max_size": 32,
             "text_line_height": 1.2,
             "text_letter_spacing": 0,
             "text_capitalize": false,
