@@ -603,7 +603,7 @@
             "heading": "<p>FALL FAVORITES</p>",
             "heading_size": "title-sm",
             "heading_tag": "h2",
-            "highlighted_text": "none",
+            "highlighted_text": "text",
             "highlighted_scribble": "circle"
           }
         },
@@ -697,7 +697,7 @@
             "heading": "<p>ATHLEISURE</p>",
             "heading_size": "title-sm",
             "heading_tag": "h2",
-            "highlighted_text": "none",
+            "highlighted_text": "text",
             "highlighted_scribble": "circle"
           }
         },

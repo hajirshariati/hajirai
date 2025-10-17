@@ -76,7 +76,7 @@
         "content_width": "medium",
         "content_position": "md:items-center md:justify-end",
         "text_alignment": "center",
-        "video_mobile": "shopify://files/videos/1c (1).mp4",
+        "video_mobile": "shopify://files/videos/1D_2 (1).mp4",
         "video_url_mobile": "",
         "image_height_mobile": "adapt",
         "content_position_mobile": "items-end justify-center",
@@ -208,10 +208,10 @@
         "rounded": false
       }
     },
-    "video_with_text_overlay_3RJkWH": {
+    "video_with_text_overlay_A3ncH7": {
       "type": "video-with-text-overlay",
       "blocks": {
-        "heading_eJJmzy": {
+        "heading_bLaqMU": {
           "type": "heading",
           "settings": {
             "heading": "<h1><strong>Healthy Comfort<br/>Starts Here!®</strong></h1>",
@@ -221,7 +221,7 @@
             "highlighted_scribble": "circle"
           }
         },
-        "divider_AgRWiK": {
+        "divider_itRrKx": {
           "type": "divider",
           "settings": {
             "divider_width": 120,
@@ -229,7 +229,7 @@
             "divider_mb": 0
           }
         },
-        "text_zfk6ye": {
+        "text_y39eP6": {
           "type": "text",
           "settings": {
             "text": "<p>New Arrivals</p>",
@@ -244,7 +244,7 @@
             "highlighted_scribble": "circle"
           }
         },
-        "button_erVtxD": {
+        "button_cVamqp": {
           "type": "button",
           "settings": {
             "button_label": "SHOP NOW",
@@ -258,10 +258,10 @@
         }
       },
       "block_order": [
-        "heading_eJJmzy",
-        "divider_AgRWiK",
-        "text_zfk6ye",
-        "button_erVtxD"
+        "heading_bLaqMU",
+        "divider_itRrKx",
+        "text_y39eP6",
+        "button_cVamqp"
       ],
       "name": "t:sections.video-with-text-overlay.name",
       "settings": {
@@ -1008,7 +1008,7 @@
   "order": [
     "video_with_text_overlay_84weNe",
     "collection_list_kK69i9",
-    "video_with_text_overlay_3RJkWH",
+    "video_with_text_overlay_A3ncH7",
     "image_with_text_overlay_ahU44t",
     "collection_list_cLB6dX",
     "image_with_text_overlay_TNKwpP",
