@@ -48,7 +48,7 @@
         "divider_color": "#111111",
         "overlay_opacity": 0,
         "padding_top": 12,
-        "padding_bottom": 0,
+        "padding_bottom": 12,
         "divider": false,
         "full_width": true,
         "rounded": false,
