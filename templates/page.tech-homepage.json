@@ -50,7 +50,7 @@
           "settings": {
             "text": "<p>Engineered to Bring the Future of Shoe Fitting to Everyone.</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -450,7 +450,7 @@
           "settings": {
             "text": "<p>The Ultimate All-In-One Foot Scanning Solution</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -473,7 +473,7 @@
           "settings": {
             "text": "<p>3D Measurements<br/>Pressure Analysis<br/>AI Footwear Recommendations<br/>The Chance to Meet Albert Himself</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -564,7 +564,7 @@
           "settings": {
             "text": "<p>It’s Like Having a Genie by Your Side to Select Shoes & Reduce Returns</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -587,7 +587,7 @@
           "settings": {
             "text": "<p>FitStarter™ <br/>FitGenius™</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -678,7 +678,7 @@
           "settings": {
             "text": "<p>Would You Rather Design Shoes With 3D Data or Just Take a Shot in the Dark?</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -701,7 +701,7 @@
           "settings": {
             "text": "<p>Welcome to the World’s Ultimate Source for Global 3D Foot Data</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -791,7 +791,7 @@
           "settings": {
             "text": "<p>Take the Guesswork Out Footwear Development with 3D Data & Wear Tester Tools</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -814,7 +814,7 @@
           "settings": {
             "text": "<p>3D Foot Scanner with Special Software Features Easy integration into Foot.com</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -903,7 +903,7 @@
           "settings": {
             "text": "<p>Consumers Can Get Their Shoe Size & Shop Without Ever Leaving Your Site. It’s Pure Magic.</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -924,7 +924,7 @@
           "settings": {
             "text": "<p>Reduce Returns and Capture Data</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -1027,7 +1027,7 @@
           "settings": {
             "text": "<p>An Affordable, State-of-the-Art 3D Foot Scanner. For Those Who Sell Shoes and Want Them to Fit.</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -1048,7 +1048,7 @@
           "settings": {
             "text": "<p>3D Measurements<br/>AI Footwear Recommendations</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -1137,7 +1137,7 @@
           "settings": {
             "text": "<p>No Pressure, No Diamonds!<br/>Static & Dynamic Pressure Data for Exceptional Orthotic Recommendations</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -1160,7 +1160,7 @@
           "settings": {
             "text": "<p>Pressure Analysis<br/>Arch Type Identification<br/>Orthotic Recommendations</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
