@@ -17704,3 +17704,7 @@ a[href="#"] {
 [data-us-only] {
     display: none!important;
 }
+
+[data-abra-promo] {
+    display: none;
+}

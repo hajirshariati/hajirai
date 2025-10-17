@@ -85,6 +85,8 @@ endif
                           -%}
                           {%- if show_section_promotion -%}
                               {%- liquid
+                                  assign abra_promo_code = 'abra_promo_code_' | append: i
+                                  assign promo_image_abra = 'promo_image_abra_' | append: i
                                   assign promo_image_ratio = 'promo_image_ratio_' | append: i
                                   assign promo_heading = 'promo_heading_' | append: i
                                   assign promo_subtext = 'promo_subtext_' | append: i
@@ -105,7 +107,7 @@ endif
                                                   role="link" aria-disabled="true"
                                               {% endif %}
                                       >
-                                          <div class="media-card__media">
+                                            <div class="media-card__media"{% if section.settings[abra_promo_code] != blank %} data-abra-default="{{ section.settings[abra_promo_code] | handleize }}"{% endif %}>
                                               {%- assign image_alt = section.settings[promo_image].alt | default: section.settings[promo_heading] -%}
                                               <img
                                                 src="{{ section.settings[promo_image] | img_url: '600x600' }}"
@@ -123,6 +125,23 @@ endif
                                                   ></div>
                                               {%- endif -%}
                                           </div>
+                                          {% if section.settings[promo_image_abra] != blank %}
+                                            <div class="media-card__media"{% if section.settings[abra_promo_code] != blank %} data-abra-promo="{{ section.settings[abra_promo_code] | handleize }}"{% endif %}>
+                                              {%- assign image_alt = section.settings[promo_image_abra].alt | default: section.settings[promo_heading] -%}
+                                              <img
+                                                src="{{ section.settings[promo_image_abra] | img_url: '600x600' }}"
+                                                alt="{{ image_alt | escape }}"
+                                                loading="lazy"
+                                                class="media-card__image w-full h-full object-cover"
+                                              >
+                                              {%- if section.settings[promo_overlay_content] -%}
+                                                  <div
+                                                          class="media-card__overlay absolute left-0 top-0 w-full h-full opacity-{{ section.settings[promo_overlay_opacity] }}"
+                                                          style="background-color: {{ section.settings[promo_color_overlay] }};"
+                                                  ></div>
+                                              {%- endif -%}
+                                            </div>
+                                          {% endif %}
                                           {%- if section.settings[promo_heading] != blank or section.settings[promo_subtext] != blank or section.settings[promo_tag] != blank -%}
                                               <div class="media-card__content{% if section.settings[promo_overlay_content] %} absolute left-0 top-0 w-full h-full flex flex-col justify-end{% endif %}">
                                                   <div class="media-card__info{% if section.settings[promo_overlay_content] %} p-4{% else %} pt-4{% endif %}">

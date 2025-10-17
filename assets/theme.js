@@ -8370,6 +8370,34 @@ class ProductColorSwatchHandler {
     }
 }
 
+// url can contain ?abralink=vip, and we need to hide data-abra-default with that value, and show data-abra-promo with the same value
+document.addEventListener('DOMContentLoaded', function() {
+    const interval = setInterval(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        let abralink = urlParams.get('abralink');
+    
+        if(abralink) {
+            abralink = abralink.toLowerCase();
+            const abraDefault = document.querySelectorAll('[data-abra-default]');
+            abraDefault.forEach(element => {
+                if (element.dataset.abraDefault === abralink) {
+                    element.style.display = 'none';
+                }
+            });
+            const abraPromo = document.querySelectorAll('[data-abra-promo]');
+            abraPromo.forEach(element => {
+                if (element.dataset.abraPromo === abralink) {
+                    element.style.display = 'block';
+                }
+            });
+        }
+    }, 100)
+
+    setTimeout(() => {
+        clearInterval(interval);
+    }, 10000)
+});
+
 // Initialize the product color swatch handler
 theme.DOMready(() => {
     window.productColorSwatchHandler = new ProductColorSwatchHandler();
