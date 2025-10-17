@@ -30,10 +30,10 @@
         "heading_Fy6D8H": {
           "type": "heading",
           "settings": {
-            "heading": "<h2>Introducing the<br/>Zoe Pro Scanner</h2>",
+            "heading": "<h1>Introducing the<br/>Zoe Pro Scanner</h1>",
             "heading_size": "title-md",
             "heading_tag": "h1",
-            "highlighted_text": "none",
+            "highlighted_text": "text",
             "highlighted_scribble": "sketch-underline"
           }
         },
@@ -431,9 +431,9 @@
           "type": "heading",
           "settings": {
             "heading": "<h1>Albert® 2 Pro Scanner</h1>",
-            "heading_size": "title-sm",
+            "heading_size": "title-md",
             "heading_tag": "h1",
-            "highlighted_text": "none",
+            "highlighted_text": "text",
             "highlighted_scribble": "sketch-underline"
           }
         },
@@ -545,9 +545,9 @@
           "type": "heading",
           "settings": {
             "heading": "<h1>FitAI™ Footwear Recommendations</h1>",
-            "heading_size": "title-sm",
+            "heading_size": "title-md",
             "heading_tag": "h1",
-            "highlighted_text": "none",
+            "highlighted_text": "text",
             "highlighted_scribble": "circle"
           }
         },
@@ -659,9 +659,9 @@
           "type": "heading",
           "settings": {
             "heading": "<h1>Foot.com</h1>",
-            "heading_size": "title-sm",
+            "heading_size": "title-md",
             "heading_tag": "h1",
-            "highlighted_text": "none",
+            "highlighted_text": "text",
             "highlighted_scribble": "sketch-underline"
           }
         },
@@ -774,7 +774,7 @@
             "heading": "<h1>Footwear Development Package</h1>",
             "heading_size": "title-md",
             "heading_tag": "h1",
-            "highlighted_text": "none",
+            "highlighted_text": "text",
             "highlighted_scribble": "sketch-underline"
           }
         },
@@ -886,9 +886,9 @@
           "type": "heading",
           "settings": {
             "heading": "SizeRight™ Mobile App",
-            "heading_size": "title-sm",
+            "heading_size": "title-md",
             "heading_tag": "h1",
-            "highlighted_text": "none",
+            "highlighted_text": "text",
             "highlighted_scribble": "circle"
           }
         },
@@ -1012,7 +1012,7 @@
             "heading": "Albert® 3DFit Scanner",
             "heading_size": "title-sm",
             "heading_tag": "h1",
-            "highlighted_text": "none",
+            "highlighted_text": "text",
             "highlighted_scribble": "circle"
           }
         },
@@ -1120,7 +1120,7 @@
             "heading": "<h1>Albert Pressure Scanner</h1>",
             "heading_size": "title-sm",
             "heading_tag": "h1",
-            "highlighted_text": "none",
+            "highlighted_text": "text",
             "highlighted_scribble": "circle"
           }
         },
