@@ -4607,7 +4607,7 @@ input:is([type="checkbox"], [type="radio"]):is(:disabled, .disabled)
 .swatches
 input:is([type="checkbox"], [type="radio"]):is(:disabled, .disabled)
 + .label-swatch::after {
-    --tw-shadow-color: #e7e7e7;
+    --tw-shadow-color: #171717;
 }
 
 .swatches
@@ -17610,7 +17610,15 @@ body .rte .contact-box a {
     display: none;
 }
 
-.label-swatch.checked:after {
-    box-shadow: none!important;
-    border: 1px solid #e7e7e7!important;
+.product-form__buttons .needsclick {
+    font-weight: bold!important;
+    font-size: 14px!important;
+    letter-spacing: .5px!important;
+    text-transform: uppercase;
+}
+
+.product-form__buttons .needsclick:hover {
+    background-color: #171717!important;
+    color: #fff!important;
+    border-radius: 8px!important;
 }
