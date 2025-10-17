@@ -8071,15 +8071,14 @@ class ProductColorSwatchHandler {
             // Find the first required option to determine the text
             const firstRequiredOption = document.querySelector('.custom-option-buttons[data-opt-name="Size"], .custom-option-buttons[data-opt-name="Width"]');
             const optName = firstRequiredOption ? firstRequiredOption.getAttribute('data-opt-name') : 'SIZE';
-            
+
             addToCartBtn.style.display = "flex";
             addToCartBtn.setAttribute("disabled", "disabled");
             addToCartBtn.disabled = true;
-            
+
             // Clear existing content and set new text
             addToCartBtn.innerHTML = '';
-            addToCartBtn.innerText = "PLEASE SELECT " + optName.toUpperCase();
-            
+
             // If there's a .btn-text element, create it and set the text
             const btnText = document.createElement('span');
             btnText.className = 'btn-text';

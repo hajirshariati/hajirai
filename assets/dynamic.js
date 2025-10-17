@@ -65,12 +65,13 @@ function resetVariantsAndDisableButton() {
         addTocartBtn.style.display = "flex";
         addTocartBtn.setAttribute("disabled", "disabled");
         addTocartBtn.disabled = true;
-        addTocartBtn.innerText = "PLEASE SELECT " + optName.toUpperCase();
-        
-        // Also update .btn-text if it exists
+
+        // Update .btn-text if it exists, otherwise set directly on button
         const btnText = addTocartBtn.querySelector('.btn-text');
         if (btnText) {
           btnText.innerText = "PLEASE SELECT " + optName.toUpperCase();
+        } else {
+          addTocartBtn.innerText = "PLEASE SELECT " + optName.toUpperCase();
         }
       }
 
@@ -79,12 +80,13 @@ function resetVariantsAndDisableButton() {
         stickyAddTocartBtn.classList.add("disabled-btn");
         stickyAddTocartBtn.setAttribute("disabled", "disabled");
         stickyAddTocartBtn.disabled = true;
-        stickyAddTocartBtn.innerText = "PLEASE SELECT " + optName.toUpperCase();
-        
-        // Also update .btn-text if it exists
+
+        // Update .btn-text if it exists, otherwise set directly on button
         const btnText = stickyAddTocartBtn.querySelector('.btn-text');
         if (btnText) {
           btnText.innerText = "PLEASE SELECT " + optName.toUpperCase();
+        } else {
+          stickyAddTocartBtn.innerText = "PLEASE SELECT " + optName.toUpperCase();
         }
       }
     }
@@ -167,13 +169,27 @@ function attachVariantEventListeners() {
       if (addTocartBtn) {
         addTocartBtn.style.display = "flex";
         addTocartBtn.setAttribute("disabled", "disabled");
-        addTocartBtn.innerText = "PLEASE SELECT " + optName.toUpperCase();
+
+        // Update .btn-text if it exists, otherwise set directly on button
+        const btnText = addTocartBtn.querySelector('.btn-text');
+        if (btnText) {
+          btnText.innerText = "PLEASE SELECT " + optName.toUpperCase();
+        } else {
+          addTocartBtn.innerText = "PLEASE SELECT " + optName.toUpperCase();
+        }
       }
 
       if (stickyAddTocartBtn) {
         stickyAddTocartBtn.style.display = "flex";
         stickyAddTocartBtn.classList.add("disabled-btn");
-        stickyAddTocartBtn.innerText = "PLEASE SELECT " + optName.toUpperCase();
+
+        // Update .btn-text if it exists, otherwise set directly on button
+        const btnText = stickyAddTocartBtn.querySelector('.btn-text');
+        if (btnText) {
+          btnText.innerText = "PLEASE SELECT " + optName.toUpperCase();
+        } else {
+          stickyAddTocartBtn.innerText = "PLEASE SELECT " + optName.toUpperCase();
+        }
       }
     }
   });
