@@ -882,13 +882,18 @@
     "image_with_text_gKGMGt": {
       "type": "image-with-text",
       "blocks": {
-        "heading_WWRgWP": {
-          "type": "heading",
+        "text_XrNUeg": {
+          "type": "text",
           "settings": {
-            "heading": "SizeRight™ Mobile App",
-            "heading_size": "title-md",
-            "heading_tag": "h1",
-            "highlighted_text": "text",
+            "text": "<p><strong>SizeRight™ Mobile App</strong></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         },
@@ -948,7 +953,7 @@
         }
       },
       "block_order": [
-        "heading_WWRgWP",
+        "text_XrNUeg",
         "liquid_4Wedzx",
         "text_p9XQkQ",
         "liquid_PP6NJk",
