@@ -971,6 +971,96 @@
         "rounded": false
       }
     },
+    "image_with_text_tqMWGc": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_TC4FdY": {
+          "type": "heading",
+          "settings": {
+            "heading": "Maui",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_qBGErE": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>Orthotic Flips</strong></p><p>Feel the comfort and support of Aetrex in the Maui! These orthotic flips with arch support are made from UltraSky™ injected EVA to provide extreme cushioning, shock absorption, and durability. The toe post is specially designed with super soft foam to keep your toes comfortable all day long. With the Maui Flips, you'll feel like you're walking on air!</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_CAd8dK": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP MEN´S",
+            "button_link": "shopify://products/maui-men",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_LKcLtG": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP WOMEN´S",
+            "button_link": "shopify://products/maui-women",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_TC4FdY",
+        "text_qBGErE",
+        "button_CAd8dK",
+        "button_LKcLtG"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/Maui.png",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "small",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_mobile": "shopify://shop_images/MauiM2.png",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "center",
+        "color_text": "#525252",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "#ffffff",
+        "color_button_background": "#91b7c9",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
     "image_with_text_BAxLFb": {
       "type": "image-with-text",
       "blocks": {
@@ -1413,6 +1503,7 @@
     "rich_text_9t8qKQ",
     "video_RPC6WR",
     "rich_text_qhigBb",
+    "image_with_text_tqMWGc",
     "image_with_text_BAxLFb",
     "image_with_text_kCKdeJ",
     "rich_text_wPTPVA",
