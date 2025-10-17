@@ -27,12 +27,17 @@
     "rich_text_PpYxrf": {
       "type": "rich-text",
       "blocks": {
-        "heading_iBRqrf": {
-          "type": "heading",
+        "text_HaFxrj": {
+          "type": "text",
           "settings": {
-            "heading": "Aetrex 3D Printed Orthotics",
-            "heading_size": "title-sm",
-            "heading_tag": "h1",
+            "text": "<p><strong>Aetrex 3D Printed Orthotics</strong></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -42,8 +47,11 @@
           "settings": {
             "text": "<p>Utilizing data captured from Aetrex’s Albert Pro – the most advanced foot scanning system available globally – Aetrex is able to translate the data captured and produce a 3D printed orthotic that matches precisely to the individual’s foot. Learn more about our 3D Printed Orthotics with our video.</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -51,13 +59,13 @@
         }
       },
       "block_order": [
-        "heading_iBRqrf",
+        "text_HaFxrj",
         "text_RKf9Ay"
       ],
       "name": "Rich text",
       "settings": {
-        "text_alignment": "left",
-        "text_alignment_mobile": "left",
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
         "heading": "",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
