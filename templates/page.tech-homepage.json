@@ -1011,13 +1011,18 @@
             "height_mobile": 0
           }
         },
-        "heading_bnPtFy": {
-          "type": "heading",
+        "text_9aNCNU": {
+          "type": "text",
           "settings": {
-            "heading": "Albert® 3DFit Scanner",
-            "heading_size": "title-sm",
-            "heading_tag": "h1",
-            "highlighted_text": "text",
+            "text": "<p><strong>Albert® 3DFit Scanner</strong></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         },
@@ -1078,7 +1083,7 @@
       },
       "block_order": [
         "spacing_zwrJVp",
-        "heading_bnPtFy",
+        "text_9aNCNU",
         "liquid_gYPKLc",
         "text_CCVrjb",
         "liquid_UDBj6V",
