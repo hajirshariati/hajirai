@@ -11443,6 +11443,7 @@ input[type="email"]:is(
 .quick-view .drawer__header {
     border-block-end: 0;
     padding-block-end: var(--sp-2);
+    display:none;
 }
 
 .quick-view .drawer__close {
