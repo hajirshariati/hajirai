@@ -24,39 +24,17 @@
         "rounded": false
       }
     },
-    "testimonials_banner_Cbhq4c": {
-      "type": "testimonials-banner",
-      "name": "Testimonials banner",
-      "settings": {
-        "transparent_header": false,
-        "image": "shopify://shop_images/banner_training_0039484f-30f9-4d41-8936-6f0074fc27d0.jpg",
-        "image_height": "adapt",
-        "content_position": "md:items-center md:justify-center",
-        "image_mobile": "shopify://shop_images/banner_training_0039484f-30f9-4d41-8936-6f0074fc27d0.png",
-        "image_height_mobile": "300px",
-        "content_position_mobile": "items-center justify-center",
-        "color_text": "#ffffff",
-        "color_highlight": "#e0a580",
-        "gradient_highlight": "",
-        "color_overlay": "#171717",
-        "overlay_opacity": 0,
-        "padding_top": 12,
-        "padding_bottom": 12,
-        "divider": false,
-        "rounded": false,
-        "enable_parallax": false,
-        "parallax_direction": "vertical"
-      }
-    },
     "image_with_text_overlay_DQjzjD": {
       "type": "image-with-text-overlay",
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
+        "image": "shopify://shop_images/banner_training_0039484f-30f9-4d41-8936-6f0074fc27d0.jpg",
         "image_height": "adapt",
         "content_width": "small",
         "content_position": "md:items-end md:justify-start",
         "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/banner_training_0039484f-30f9-4d41-8936-6f0074fc27d0.png",
         "image_height_mobile": "adapt",
         "content_position_mobile": "items-end justify-start",
         "text_alignment_mobile": "left",
@@ -417,7 +395,6 @@
   },
   "order": [
     "main-page",
-    "testimonials_banner_Cbhq4c",
     "image_with_text_overlay_DQjzjD",
     "rich_text_bGVzXB",
     "image_with_text_WRUBda",
