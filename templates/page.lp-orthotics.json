@@ -135,6 +135,7 @@
             "text": "",
             "highlighted_text": "none",
             "custom_html": "",
+            "us_only": false,
             "highlighted_scribble": "circle"
           }
         },
@@ -147,6 +148,7 @@
             "text": "",
             "highlighted_text": "none",
             "custom_html": "",
+            "us_only": false,
             "highlighted_scribble": "circle"
           }
         },
@@ -159,6 +161,7 @@
             "text": "",
             "highlighted_text": "none",
             "custom_html": "",
+            "us_only": false,
             "highlighted_scribble": "circle"
           }
         },
@@ -171,6 +174,7 @@
             "text": "",
             "highlighted_text": "none",
             "custom_html": "",
+            "us_only": false,
             "highlighted_scribble": "circle"
           }
         }
@@ -235,7 +239,7 @@
         "collection_xxeKq7": {
           "type": "collection",
           "settings": {
-            "collection": "",
+            "collection": "orthotics-plantar-fasciitis",
             "products": [],
             "title": "Plantar Fasciitis"
           }
