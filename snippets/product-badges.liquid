@@ -62,9 +62,14 @@
     </span>
   {% else %}
       {%- assign variant_badge = product.selected_or_first_available_variant.metafields.variant.badge -%}
-      {% if variant_badge != blank %}
+      {%- assign allowed_badges = 'NEW,Best Seller,SALE' | split: ',' -%}
+      {% if variant_badge != blank and allowed_badges contains variant_badge %}
         <span class="custom-product-badges badge badge--onsale flex items-center gap-1d5 font-medium leading-none rounded-full meta-badge vb_{{- variant_badge | handleize -}}">
           {{ variant_badge }}
+        </span>
+      {% else %}
+        <span class="custom-product-badges badge badge--onsale flex items-center gap-1d5 font-medium leading-none rounded-full discount-badge" style="display: none;">
+          Sale
         </span>
       {% endif %}
   {%- endif -%}
