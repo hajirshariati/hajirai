@@ -38,7 +38,7 @@
         "heading_64L34p": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Unmatched Comfort & Support Starts with Science Orthotics Engineered with Insights from Over 50 Million Foot Scans</p>",
+            "heading": "<p>Unmatched Comfort & Support Starts with Science. Engineered with Insights from Over 50 Million Foot Scans</p>",
             "heading_size": "title-sm",
             "heading_tag": "h2",
             "highlighted_text": "none",
@@ -48,7 +48,7 @@
         "text_H4rWEH": {
           "type": "text",
           "settings": {
-            "text": "<p>Over 30 Million Pairs Sold. Doctor Recommended. APMA Approved. </p>",
+            "text": "<p>Over 30 Million Pairs Sold</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
