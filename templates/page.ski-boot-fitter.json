@@ -117,7 +117,7 @@
           "type": "text",
           "settings": {
             "text": "<p>3D FitTech is Changing the Ski Boot Fitting Game</p>",
-            "text_font": "body",
+            "text_font": "heading",
             "text_size": "subtext-custom",
             "text_max_size": 32,
             "text_line_height": 1.2,
@@ -186,7 +186,7 @@
         "image_mobile": "shopify://shop_images/SkiBoot_Monitor-690x496px.jpg",
         "image_height_mobile": "adapt",
         "text_alignment_mobile": "left",
-        "color_text": "#525252",
+        "color_text": "rgba(0,0,0,0)",
         "color_background": "",
         "gradient_background": "",
         "color_background_2": "",
