@@ -631,13 +631,26 @@
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
+        },
+        "button_gRfzCf": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP ALL FOOTWEAR",
+            "button_link": "shopify://collections/mens-shop-all-footwear",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
         }
       },
       "block_order": [
         "heading_zqMYC6",
         "subheading_LVcfqT",
         "divider_Ac8wdJ",
-        "text_3Je9Vy"
+        "text_3Je9Vy",
+        "button_gRfzCf"
       ],
       "settings": {
         "transparent_header": false,
