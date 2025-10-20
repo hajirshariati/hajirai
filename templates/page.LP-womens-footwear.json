@@ -737,7 +737,7 @@
           "type": "button",
           "settings": {
             "button_label": "View Collection",
-            "button_link": "shopify://collections/womens-sneakers",
+            "button_link": "shopify://collections/womens-athleisure",
             "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
