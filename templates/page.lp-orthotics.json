@@ -218,6 +218,86 @@
         "rounded": false
       }
     },
+    "multicolumn_GC6LFG": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_WGPbTD": {
+          "type": "column",
+          "settings": {
+            "show_border": true,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image_ratio": "adapt",
+            "heading": "New to Aetrex Orthotics?",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Let us guide you to the perfect pair for your unique feet. Start with our quiz or explore by your pain type.</p>",
+            "button_label": "Take Our Quiz",
+            "button_link": "https://irle3andv1z.typeform.com/to/gujvKvEg?typeform-source=f031fc-3.myshopify.com",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_KdBDtQ": {
+          "type": "column",
+          "settings": {
+            "show_border": true,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image_ratio": "adapt",
+            "heading": "Returning Customer?",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Welcome back. Reorder your favorite pair or use our tool to quickly identify your previous orthotic</p>",
+            "button_label": "Find My Orthotic",
+            "button_link": "https://irle3andv1z.typeform.com/to/ojyWbTvZ?typeform-source=www.aetrex.com",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_WGPbTD",
+        "column_KdBDtQ"
+      ],
+      "name": "t:sections.multicolumn.name",
+      "settings": {
+        "gap": "large",
+        "columns": 2,
+        "columns_mobile": "2",
+        "carousel_on_desktop": true,
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
     "featured_collections_9d3ge7": {
       "type": "featured-collections",
       "blocks": {
@@ -1126,6 +1206,7 @@
     "main-page",
     "video_with_text_overlay_TgKph8",
     "multicolumn_with_icons_C37PFY",
+    "multicolumn_GC6LFG",
     "featured_collections_9d3ge7",
     "collage_ntqjfh",
     "image_with_text_overlay_M6AhUn",
