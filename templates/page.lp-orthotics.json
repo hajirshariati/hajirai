@@ -330,25 +330,25 @@
         "collection_Wzc8ka": {
           "type": "collection",
           "settings": {
-            "collection": "orthotics-for-ball-of-foot-discomfort",
+            "collection": "orthotics-for-metatarsalgia",
             "products": [],
-            "title": "Ball of Foot Discomfort"
+            "title": "Metatarsalgia"
           }
         },
         "collection_BbmnMe": {
           "type": "collection",
           "settings": {
-            "collection": "premium-memory-foam",
+            "collection": "orthotics-for-heel-spurs",
             "products": [],
-            "title": "Pressure Relief"
+            "title": "Heel Spurs"
           }
         },
         "collection_Uccwbn": {
           "type": "collection",
           "settings": {
-            "collection": "running-orthotics",
+            "collection": "conform",
             "products": [],
-            "title": "Running"
+            "title": "Diabetes"
           }
         }
       },
