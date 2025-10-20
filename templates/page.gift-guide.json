@@ -101,25 +101,12 @@
             "highlighted_scribble": "circle"
           }
         },
-        "column_xgmmV3": {
+        "column_kYia3a": {
           "type": "column",
           "settings": {
             "icon": "award",
             "custom_icon": "",
-            "heading": "<strong>Clinically Proven to Reduce Pain</strong>*",
-            "text": "",
-            "highlighted_text": "none",
-            "custom_html": "",
-            "us_only": false,
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_kYia3a": {
-          "type": "column",
-          "settings": {
-            "icon": "check_mark",
-            "custom_icon": "",
-            "heading": "<strong>Recommended by Doctors & Podiatrists</strong>",
+            "heading": "<strong>Doctors Recommended</strong>",
             "text": "",
             "highlighted_text": "none",
             "custom_html": "",
@@ -143,14 +130,13 @@
       },
       "block_order": [
         "column_fdpN6e",
-        "column_xgmmV3",
         "column_kYia3a",
         "column_DNrLDF"
       ],
       "name": "t:sections.multicolumn-with-icons.name",
       "settings": {
         "style": "with-border",
-        "columns": 4,
+        "columns": 3,
         "text_alignment": "center",
         "heading": "",
         "heading_size": "title-md",
@@ -182,40 +168,6 @@
     "collection_list_mPHCpz": {
       "type": "collection-list",
       "blocks": {
-        "collection_hHkQLw": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "running-orthotics",
-            "custom_url": "",
-            "image": "shopify://shop_images/Group_11_cc45e757-0dfe-4e9d-999f-40a29c1844a1.png",
-            "title": "For Her",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_FWgTeX": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "gym-training",
-            "custom_url": "",
-            "image": "shopify://shop_images/Group_7_53cd5509-a4e6-4e01-9140-21ba10532f65.png",
-            "title": "For Him",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
         "collection_BMqtdJ": {
           "type": "collection",
           "settings": {
@@ -265,14 +217,29 @@
             "submenu_title_position": "bottom",
             "enable_title_drop_shadow": false
           }
+        },
+        "collection_zBHa9g": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "",
+            "custom_url": "",
+            "title": "",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
         }
       },
       "block_order": [
-        "collection_hHkQLw",
-        "collection_FWgTeX",
         "collection_BMqtdJ",
         "collection_xjQV8H",
-        "collection_C3dagf"
+        "collection_C3dagf",
+        "collection_zBHa9g"
       ],
       "name": "Collection list",
       "settings": {
@@ -305,6 +272,90 @@
         "divider": false,
         "full_width": true,
         "rounded": false
+      }
+    },
+    "collage_ntqjfh": {
+      "type": "collage",
+      "blocks": {
+        "image_i7MLJM": {
+          "type": "image",
+          "settings": {
+            "subheading": "Strategically Placed Arch Support",
+            "heading": "",
+            "link": "shopify://products/addie-black-nc500w",
+            "invert_subheading_heading": false,
+            "image": "shopify://shop_images/617x640_signature_arch.png",
+            "image_ratio": "adapt",
+            "content_position": "md:items-end md:justify-center",
+            "text_alignment": "center",
+            "image_ratio_mobile": "adapt",
+            "content_position_mobile": "items-end justify-center",
+            "text_alignment_mobile": "center",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle",
+            "color_text": "#171717",
+            "color_highlight": "",
+            "gradient_highlight": "",
+            "color_overlay": "#171717",
+            "overlay_opacity": 0
+          }
+        },
+        "image_kirkAq": {
+          "type": "image",
+          "settings": {
+            "subheading": "Alignment & Biomechanical Efficiency",
+            "heading": "",
+            "link": "",
+            "invert_subheading_heading": false,
+            "image": "shopify://shop_images/617x640_alignment.png",
+            "image_ratio": "adapt",
+            "content_position": "md:items-end md:justify-center",
+            "text_alignment": "center",
+            "image_ratio_mobile": "adapt",
+            "content_position_mobile": "items-end justify-center",
+            "text_alignment_mobile": "center",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle",
+            "color_text": "#171717",
+            "color_highlight": "",
+            "gradient_highlight": "",
+            "color_overlay": "#171717",
+            "overlay_opacity": 0
+          }
+        }
+      },
+      "block_order": [
+        "image_i7MLJM",
+        "image_kirkAq"
+      ],
+      "name": "t:sections.collage.name",
+      "settings": {
+        "heading": "<strong>Comfort for Everyone</strong>",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "<p>Trusted Worldwide for Comfort, Support, & Alignment</p>",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false
       }
     },
     "featured_collections_9d3ge7": {
@@ -378,138 +429,6 @@
         "divider": false,
         "full_width": false,
         "rounded": false
-      }
-    },
-    "collage_ntqjfh": {
-      "type": "collage",
-      "blocks": {
-        "image_i7MLJM": {
-          "type": "image",
-          "settings": {
-            "subheading": "Strategically Placed Arch Support",
-            "heading": "",
-            "link": "shopify://products/addie-black-nc500w",
-            "invert_subheading_heading": false,
-            "image": "shopify://shop_images/617x640_signature_arch.png",
-            "image_ratio": "adapt",
-            "content_position": "md:items-end md:justify-center",
-            "text_alignment": "center",
-            "image_ratio_mobile": "adapt",
-            "content_position_mobile": "items-end justify-center",
-            "text_alignment_mobile": "center",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle",
-            "color_text": "#171717",
-            "color_highlight": "",
-            "gradient_highlight": "",
-            "color_overlay": "#171717",
-            "overlay_opacity": 0
-          }
-        },
-        "image_kirkAq": {
-          "type": "image",
-          "settings": {
-            "subheading": "Alignment & Biomechanical Efficiency",
-            "heading": "",
-            "link": "",
-            "invert_subheading_heading": false,
-            "image": "shopify://shop_images/617x640_alignment.png",
-            "image_ratio": "adapt",
-            "content_position": "md:items-end md:justify-center",
-            "text_alignment": "center",
-            "image_ratio_mobile": "adapt",
-            "content_position_mobile": "items-end justify-center",
-            "text_alignment_mobile": "center",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle",
-            "color_text": "#171717",
-            "color_highlight": "",
-            "gradient_highlight": "",
-            "color_overlay": "#171717",
-            "overlay_opacity": 0
-          }
-        },
-        "image_UMzkxc": {
-          "type": "image",
-          "settings": {
-            "subheading": "Hi-Tech Materials to Benefit Your Health",
-            "heading": "",
-            "link": "",
-            "invert_subheading_heading": false,
-            "image": "shopify://shop_images/617x640_Hi_tech_Materials.png",
-            "image_ratio": "adapt",
-            "content_position": "md:items-end md:justify-center",
-            "text_alignment": "center",
-            "image_ratio_mobile": "adapt",
-            "content_position_mobile": "items-end justify-center",
-            "text_alignment_mobile": "center",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle",
-            "color_text": "#171717",
-            "color_highlight": "",
-            "gradient_highlight": "",
-            "color_overlay": "#171717",
-            "overlay_opacity": 0
-          }
-        },
-        "image_DEUPz8": {
-          "type": "image",
-          "settings": {
-            "subheading": "All-Day Comfort and Energy",
-            "heading": "",
-            "link": "",
-            "invert_subheading_heading": false,
-            "image": "shopify://shop_images/sneaker_ortho.png",
-            "image_ratio": "adapt",
-            "content_position": "md:items-end md:justify-center",
-            "text_alignment": "center",
-            "image_ratio_mobile": "adapt",
-            "content_position_mobile": "items-end justify-center",
-            "text_alignment_mobile": "center",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle",
-            "color_text": "#171717",
-            "color_highlight": "",
-            "gradient_highlight": "",
-            "color_overlay": "#171717",
-            "overlay_opacity": 0
-          }
-        }
-      },
-      "block_order": [
-        "image_i7MLJM",
-        "image_kirkAq",
-        "image_UMzkxc",
-        "image_DEUPz8"
-      ],
-      "name": "t:sections.collage.name",
-      "settings": {
-        "heading": "<strong>The World’s #1 Premium Foot Orthotic.</strong>",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "<p>Trusted Worldwide for Comfort, Support, & Alignment</p>",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "enable_parallax": false
       }
     },
     "image_with_text_overlay_M6AhUn": {
@@ -1055,8 +974,8 @@
     "video_with_text_overlay_TgKph8",
     "multicolumn_with_icons_C37PFY",
     "collection_list_mPHCpz",
-    "featured_collections_9d3ge7",
     "collage_ntqjfh",
+    "featured_collections_9d3ge7",
     "image_with_text_overlay_M6AhUn",
     "image_comparison_i6BATK",
     "testimonials_banner_P8DMGU",
