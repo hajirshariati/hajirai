@@ -624,7 +624,7 @@
         "columns_mobile": "1",
         "swipe_on_mobile": true,
         "heading": "<strong>Shop by Activity</strong>",
-        "heading_size": "title-md",
+        "heading_size": "title-sm",
         "heading_alignment": "text-center md:items-center",
         "heading_tag": "h4",
         "subheading": "",
@@ -751,7 +751,7 @@
       "name": "t:sections.collage.name",
       "settings": {
         "heading": "<strong>The World’s #1 Premium Foot Orthotic.</strong>",
-        "heading_size": "title-md",
+        "heading_size": "title-sm",
         "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
         "subheading": "",
@@ -785,7 +785,7 @@
           "type": "heading",
           "settings": {
             "heading": "<p>The Technology Behind Everything We Do</p>",
-            "heading_size": "title-md",
+            "heading_size": "title-sm",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -887,7 +887,7 @@
         "image_height": "adapt",
         "image_height_mobile": "auto",
         "heading": "<strong>Proof is in the Results</strong>",
-        "heading_size": "title-md",
+        "heading_size": "title-sm",
         "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
         "subheading": "",
@@ -1061,7 +1061,7 @@
         "carousel_on_desktop": false,
         "swipe_on_mobile": true,
         "heading": "<strong>Clinical Studies</strong>",
-        "heading_size": "title-md",
+        "heading_size": "title-sm",
         "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
         "subheading": "",
@@ -1167,7 +1167,7 @@
       "settings": {
         "style": "with-border",
         "heading": "<strong>Have Questions? We’ve Got Answers.</strong>",
-        "heading_size": "title-md",
+        "heading_size": "title-sm",
         "heading_alignment": "text-center md:items-center",
         "heading_tag": "h3",
         "subheading": "",
