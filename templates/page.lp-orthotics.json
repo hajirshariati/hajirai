@@ -264,6 +264,7 @@
         "column_WGPbTD",
         "column_KdBDtQ"
       ],
+      "disabled": true,
       "custom_css": [],
       "name": "t:sections.multicolumn.name",
       "settings": {
