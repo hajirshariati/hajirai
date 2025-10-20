@@ -529,7 +529,7 @@
           "type": "heading",
           "settings": {
             "heading": "<p>The Technology Behind Everything We Do</p>",
-            "heading_size": "title-sm",
+            "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
