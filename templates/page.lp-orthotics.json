@@ -870,6 +870,109 @@
         "parallax_direction": "vertical"
       }
     },
+    "multicolumn_VaVtEc": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_ye8FxL": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "left",
+            "text_alignment_mobile": "left",
+            "image": "shopify://shop_images/Frame_29.png",
+            "image_ratio": "wide",
+            "heading": "Premium Memory Foam Orthotics",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>are Clinically Proven to: </p><ul><li>Decrease foot pain by 39.5%</li><li>Decrease back pain by 27.4%</li><li>Increase foot function by 34.6%</li></ul>",
+            "button_label": "Read the Study",
+            "button_link": "shopify://pages/case-premmem",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_jyqVGy": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "left",
+            "text_alignment_mobile": "left",
+            "image": "shopify://shop_images/Frame_31.png",
+            "image_ratio": "wide",
+            "heading": "Compete Orthotics & Orthotic Flips",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>are Clinically Proven to: </p><ul><li>Decrease Plantar Fasciitis pain by 52.6%</li><li>Decrease back pain by 41.9%</li><li>Increase foot function by 37%</li></ul>",
+            "button_label": "Read the Study",
+            "button_link": "shopify://pages/casestudy-pfkit",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_e6aHPg": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "left",
+            "text_alignment_mobile": "left",
+            "image": "shopify://shop_images/Frame_30.png",
+            "image_ratio": "wide",
+            "heading": "Speed Orthotics",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>are Clinically Proven to: </p><ul><li>Increase comfort while running by 1.27 pts</li><li>Increase speed by 0.35 mph</li><li>Decrease chance of injury by 2.2x</li></ul>",
+            "button_label": "Read the Study",
+            "button_link": "shopify://pages/casestudy-speed",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_ye8FxL",
+        "column_jyqVGy",
+        "column_e6aHPg"
+      ],
+      "name": "t:sections.multicolumn.name",
+      "settings": {
+        "gap": "small",
+        "columns": 3,
+        "columns_mobile": "1",
+        "carousel_on_desktop": false,
+        "swipe_on_mobile": true,
+        "heading": "<strong>Clinical Studies</strong>",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
     "faq_XM3i3D": {
       "type": "faq",
       "blocks": {
@@ -1019,109 +1122,6 @@
         "rounded": false
       }
     },
-    "multicolumn_VaVtEc": {
-      "type": "multicolumn",
-      "blocks": {
-        "column_ye8FxL": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "left",
-            "text_alignment_mobile": "left",
-            "image": "shopify://shop_images/Frame_29.png",
-            "image_ratio": "wide",
-            "heading": "Aetrex Premium Memory Foam Orthotics",
-            "heading_size": "text-lg-2xl",
-            "text": "<p>Clinically Proven to Reduce Foot, Knee, Hip & Back Pain</p>",
-            "button_label": "LEARN MORE",
-            "button_link": "shopify://pages/case-premmem",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_jyqVGy": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "left",
-            "text_alignment_mobile": "left",
-            "image": "shopify://shop_images/Frame_31.png",
-            "image_ratio": "wide",
-            "heading": "Aetrex Compete Orthotics & Orthotic Flips",
-            "heading_size": "text-lg-2xl",
-            "text": "<p>Clinically Proven to Improve Plantar Fasciitis Pain & Foot Function</p>",
-            "button_label": "LEARN MORE",
-            "button_link": "shopify://pages/casestudy-pfkit",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_e6aHPg": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "left",
-            "text_alignment_mobile": "left",
-            "image": "shopify://shop_images/Frame_30.png",
-            "image_ratio": "wide",
-            "heading": "Aetrex Speed Orthotics",
-            "heading_size": "text-lg-2xl",
-            "text": "<p>Clinically Proven to Improve Comfort While Running </p>",
-            "button_label": "LEARN MORE",
-            "button_link": "shopify://pages/casestudy-speed",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "column_ye8FxL",
-        "column_jyqVGy",
-        "column_e6aHPg"
-      ],
-      "name": "t:sections.multicolumn.name",
-      "settings": {
-        "gap": "small",
-        "columns": 3,
-        "columns_mobile": "1",
-        "carousel_on_desktop": false,
-        "swipe_on_mobile": true,
-        "heading": "<strong>Clinical Studies</strong>",
-        "heading_size": "title-sm",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "<p>Our orthotics are clinically proven to reduce pain, increase comfort and reduce chance of injury.</p>",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false
-      }
-    },
     "images_with_text_overlay_pgicH3": {
       "type": "images-with-text-overlay",
       "blocks": {
@@ -1177,6 +1177,7 @@
         "text_HbcxnX",
         "button_y7PWVx"
       ],
+      "disabled": true,
       "name": "t:sections.images-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
@@ -1216,9 +1217,9 @@
     "image_with_text_overlay_M6AhUn",
     "image_comparison_i6BATK",
     "testimonials_banner_P8DMGU",
+    "multicolumn_VaVtEc",
     "faq_XM3i3D",
     "blog_posts_PJxFGa",
-    "multicolumn_VaVtEc",
     "images_with_text_overlay_pgicH3"
   ]
 }
