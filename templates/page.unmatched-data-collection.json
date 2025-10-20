@@ -207,7 +207,7 @@
             "heading": "Foot Scan Data",
             "heading_size": "title-md",
             "heading_tag": "h2",
-            "highlighted_text": "none",
+            "highlighted_text": "text",
             "highlighted_scribble": "circle"
           }
         },
@@ -319,7 +319,7 @@
             "heading": "Retail Store Data",
             "heading_size": "title-md",
             "heading_tag": "h2",
-            "highlighted_text": "none",
+            "highlighted_text": "text",
             "highlighted_scribble": "circle"
           }
         },
@@ -383,7 +383,7 @@
             "heading": "Albert FitGenius™",
             "heading_size": "title-md",
             "heading_tag": "h3",
-            "highlighted_text": "none",
+            "highlighted_text": "text",
             "highlighted_scribble": "circle"
           }
         },
@@ -460,7 +460,7 @@
             "heading": "Albert Control Panel (CRM)",
             "heading_size": "title-md",
             "heading_tag": "h3",
-            "highlighted_text": "none",
+            "highlighted_text": "text",
             "highlighted_scribble": "circle"
           }
         },
@@ -524,7 +524,7 @@
             "heading": "Cloud Analytics",
             "heading_size": "title-md",
             "heading_tag": "h3",
-            "highlighted_text": "none",
+            "highlighted_text": "text",
             "highlighted_scribble": "circle"
           }
         },
