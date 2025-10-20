@@ -920,13 +920,26 @@
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
+        },
+        "button_dNQmH3": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP ALL FOOTWEAR",
+            "button_link": "shopify://collections/womens-shop-all-footwear",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
         }
       },
       "block_order": [
         "heading_eEwP4h",
         "subheading_LJCnPX",
         "divider_kDdRMY",
-        "text_jNDWWq"
+        "text_jNDWWq",
+        "button_dNQmH3"
       ],
       "settings": {
         "transparent_header": false,
