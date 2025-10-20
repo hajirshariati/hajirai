@@ -62,8 +62,8 @@
         "text_wWT86y": {
           "type": "text",
           "settings": {
-            "text": "<p>Ski Boot Fitter</p>",
-            "text_font": "body",
+            "text": "<p><strong>Ski Boot Fitter</strong></p>",
+            "text_font": "heading",
             "text_size": "subtext-custom",
             "text_max_size": 32,
             "text_line_height": 1.2,
@@ -222,7 +222,7 @@
         "padding_top": 0,
         "padding_bottom": 0,
         "divider": false,
-        "full_width": true,
+        "full_width": false,
         "rounded": false
       }
     }
