@@ -396,96 +396,100 @@
         "image_i7MLJM": {
           "type": "image",
           "settings": {
-            "subheading": "",
+            "subheading": "Strategically Placed Arch Support",
             "heading": "",
             "link": "",
             "invert_subheading_heading": false,
-            "image_ratio": "portrait",
-            "content_position": "md:items-end md:justify-start",
-            "text_alignment": "left",
+            "image": "shopify://shop_images/617x640_signature_arch.png",
+            "image_ratio": "adapt",
+            "content_position": "md:items-end md:justify-center",
+            "text_alignment": "center",
             "image_ratio_mobile": "portrait",
-            "content_position_mobile": "items-end justify-start",
-            "text_alignment_mobile": "left",
+            "content_position_mobile": "items-end justify-center",
+            "text_alignment_mobile": "center",
             "highlighted_text": "none",
             "highlighted_scribble": "circle",
-            "color_text": "#ffffff",
+            "color_text": "#171717",
             "color_highlight": "",
             "gradient_highlight": "",
             "color_overlay": "#171717",
-            "overlay_opacity": 10
-          }
-        },
-        "image_UMzkxc": {
-          "type": "image",
-          "settings": {
-            "subheading": "",
-            "heading": "",
-            "link": "",
-            "invert_subheading_heading": false,
-            "image_ratio": "portrait",
-            "content_position": "md:items-end md:justify-start",
-            "text_alignment": "left",
-            "image_ratio_mobile": "portrait",
-            "content_position_mobile": "items-end justify-start",
-            "text_alignment_mobile": "left",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle",
-            "color_text": "#ffffff",
-            "color_highlight": "",
-            "gradient_highlight": "",
-            "color_overlay": "#171717",
-            "overlay_opacity": 10
+            "overlay_opacity": 0
           }
         },
         "image_kirkAq": {
           "type": "image",
           "settings": {
-            "subheading": "",
+            "subheading": "Alignment & Biomechanical Efficiency",
             "heading": "",
             "link": "",
             "invert_subheading_heading": false,
-            "image_ratio": "portrait",
-            "content_position": "md:items-end md:justify-start",
-            "text_alignment": "left",
+            "image": "shopify://shop_images/617x640_alignment.png",
+            "image_ratio": "adapt",
+            "content_position": "md:items-end md:justify-center",
+            "text_alignment": "center",
             "image_ratio_mobile": "portrait",
-            "content_position_mobile": "items-end justify-start",
-            "text_alignment_mobile": "left",
+            "content_position_mobile": "items-end justify-center",
+            "text_alignment_mobile": "center",
             "highlighted_text": "none",
             "highlighted_scribble": "circle",
-            "color_text": "#ffffff",
+            "color_text": "#171717",
             "color_highlight": "",
             "gradient_highlight": "",
             "color_overlay": "#171717",
-            "overlay_opacity": 10
+            "overlay_opacity": 0
+          }
+        },
+        "image_UMzkxc": {
+          "type": "image",
+          "settings": {
+            "subheading": "Hi-Tech Materials to Benefit Your Health",
+            "heading": "",
+            "link": "",
+            "invert_subheading_heading": false,
+            "image": "shopify://shop_images/617x640_Hi_tech_Materials.png",
+            "image_ratio": "adapt",
+            "content_position": "md:items-end md:justify-center",
+            "text_alignment": "center",
+            "image_ratio_mobile": "portrait",
+            "content_position_mobile": "items-end justify-center",
+            "text_alignment_mobile": "center",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle",
+            "color_text": "#171717",
+            "color_highlight": "",
+            "gradient_highlight": "",
+            "color_overlay": "#171717",
+            "overlay_opacity": 0
           }
         },
         "image_DEUPz8": {
           "type": "image",
           "settings": {
-            "subheading": "",
+            "subheading": "All-Day Comfort and Energy",
             "heading": "",
             "link": "",
             "invert_subheading_heading": false,
-            "image_ratio": "portrait",
-            "content_position": "md:items-end md:justify-start",
-            "text_alignment": "left",
+            "image": "shopify://shop_images/sneaker_ortho.png",
+            "image_ratio": "adapt",
+            "content_position": "md:items-end md:justify-center",
+            "text_alignment": "center",
             "image_ratio_mobile": "portrait",
-            "content_position_mobile": "items-end justify-start",
-            "text_alignment_mobile": "left",
+            "content_position_mobile": "items-end justify-center",
+            "text_alignment_mobile": "center",
             "highlighted_text": "none",
             "highlighted_scribble": "circle",
-            "color_text": "#ffffff",
+            "color_text": "#171717",
             "color_highlight": "",
             "gradient_highlight": "",
             "color_overlay": "#171717",
-            "overlay_opacity": 10
+            "overlay_opacity": 0
           }
         }
       },
       "block_order": [
         "image_i7MLJM",
-        "image_UMzkxc",
         "image_kirkAq",
+        "image_UMzkxc",
         "image_DEUPz8"
       ],
       "name": "t:sections.collage.name",
@@ -494,8 +498,8 @@
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
-        "subheading": "Comfort, Support, & Alignment in Every Pair",
-        "description": "",
+        "subheading": "",
+        "description": "<p>Trusted Worldwide for Comfort, Support, & Alignment</p>",
         "button_label": "",
         "button_link": "",
         "button_external": false,
@@ -515,7 +519,7 @@
         "divider": false,
         "full_width": false,
         "rounded": false,
-        "enable_parallax": true
+        "enable_parallax": false
       }
     },
     "image_with_text_overlay_M6AhUn": {
