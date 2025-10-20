@@ -461,22 +461,6 @@
             "enable_title_drop_shadow": false
           }
         },
-        "collection_wPrGdz": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "tennis-pickleball-orthotics",
-            "custom_url": "",
-            "title": "Tennis & Pickeball",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
         "collection_C3dagf": {
           "type": "collection",
           "settings": {
@@ -499,7 +483,6 @@
         "collection_BMqtdJ",
         "collection_xjQV8H",
         "collection_FWgTeX",
-        "collection_wPrGdz",
         "collection_C3dagf"
       ],
       "name": "Collection list",
