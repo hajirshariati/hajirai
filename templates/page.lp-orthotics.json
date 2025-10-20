@@ -525,18 +525,10 @@
     "image_with_text_overlay_M6AhUn": {
       "type": "image-with-text-overlay",
       "blocks": {
-        "subheading_HaxULK": {
-          "type": "subheading",
-          "settings": {
-            "subheading": "The Technology Behind Everything We Do",
-            "subheading_size": "subtitle-md",
-            "secondary_color": false
-          }
-        },
         "heading_CE9MYn": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Each Aetrex Orthotic is designed based on the data and insights from our state-of-the-art 3D foot scanners. </p>",
+            "heading": "<p>The Technology Behind Everything We Do</p>",
             "heading_size": "title-sm",
             "heading_tag": "h2",
             "highlighted_text": "none",
@@ -546,7 +538,7 @@
         "text_CVjrUt": {
           "type": "text",
           "settings": {
-            "text": "<p>In 20 seconds or less, an Aetrex foot scan can inform you all about your feet, including accurate 3D measurements (length, width, girth, arch height and more), plus your arch type and areas of pressure when standing or walking. </p>",
+            "text": "<p>Each Aetrex Orthotic is designed based on the data and insights from our state-of-the-art 3D foot scanners. </p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -567,12 +559,11 @@
             "button_style": "primary",
             "button_size": "sm",
             "button_external": true,
-            "button_icon": true
+            "button_icon": false
           }
         }
       },
       "block_order": [
-        "subheading_HaxULK",
         "heading_CE9MYn",
         "text_CVjrUt",
         "button_mgbN3C"
@@ -580,14 +571,15 @@
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
+        "image": "shopify://shop_images/1920x710_Albert_scanner_feet.png",
         "image_height": "650px",
-        "content_width": "large",
-        "content_position": "md:items-end md:justify-start",
+        "content_width": "small",
+        "content_position": "md:items-center md:justify-start",
         "text_alignment": "left",
         "image_height_mobile": "auto",
-        "content_position_mobile": "items-end justify-start",
+        "content_position_mobile": "items-start justify-start",
         "text_alignment_mobile": "left",
-        "color_text": "#ffffff",
+        "color_text": "#171717",
         "color_highlight": "#e0a580",
         "gradient_highlight": "",
         "color_button_text": "#171717",
@@ -595,13 +587,13 @@
         "color_button_gradient": "",
         "color_overlay": "#171717",
         "divider_color": "#111111",
-        "overlay_opacity": 70,
+        "overlay_opacity": 0,
         "padding_top": 0,
         "padding_bottom": 0,
         "divider": true,
         "full_width": true,
         "rounded": false,
-        "enable_parallax": true,
+        "enable_parallax": false,
         "parallax_direction": "vertical"
       }
     },
