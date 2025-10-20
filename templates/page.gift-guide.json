@@ -309,12 +309,29 @@
             "submenu_title_position": "bottom",
             "enable_title_drop_shadow": false
           }
+        },
+        "collection_baEPmU": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "womens-shoe-accessories",
+            "custom_url": "",
+            "title": "Stocking Stuffers",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
         }
       },
       "block_order": [
         "collection_BMqtdJ",
         "collection_xjQV8H",
-        "collection_zBHa9g"
+        "collection_zBHa9g",
+        "collection_baEPmU"
       ],
       "name": "Collection list",
       "settings": {
@@ -457,13 +474,13 @@
           "settings": {
             "collection": "orthotics-plantar-fasciitis",
             "products": [],
-            "title": "$150 and Under"
+            "title": "For Style & Support"
           }
         },
         "collection_Wzc8ka": {
           "type": "collection",
           "settings": {
-            "collection": "orthotics-for-metatarsalgia",
+            "collection": "womens-shoe-accessories",
             "products": [],
             "title": "Stocking Stuffers"
           }
@@ -745,9 +762,9 @@
     "video_with_text_overlay_TgKph8",
     "multicolumn_with_icons_C37PFY",
     "logo_list_EzFUUx",
+    "featured_collections_9d3ge7",
     "collection_list_mPHCpz",
     "collage_ntqjfh",
-    "featured_collections_9d3ge7",
     "shop_the_feed_tFy3ak"
   ]
 }
