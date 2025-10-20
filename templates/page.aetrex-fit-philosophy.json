@@ -62,8 +62,8 @@
         "text_yKxt79": {
           "type": "text",
           "settings": {
-            "text": "<p>Aetrex Fit Philosophy</p>",
-            "text_font": "body",
+            "text": "<p><strong>Aetrex Fit Philosophy</strong></p>",
+            "text_font": "heading",
             "text_size": "subtext-custom",
             "text_max_size": 32,
             "text_line_height": 1.2,
