@@ -198,7 +198,7 @@
         "custom_content_position": "items-center",
         "image_height_mobile": "adapt",
         "text_alignment_mobile": "left",
-        "color_text": "#171717",
+        "color_text": "rgba(0,0,0,0)",
         "color_background": "",
         "gradient_background": "",
         "color_background_2": "",
