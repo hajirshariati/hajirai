@@ -215,7 +215,7 @@
         "column_4LyY8A"
       ],
       "custom_css": [
-        ".multicolumn-card {background: #F0F5F6 !important;}"
+        ".multicolumn-card {background: #f0f5f6 !important;}"
       ],
       "name": "t:sections.multicolumn.name",
       "settings": {
@@ -1050,6 +1050,9 @@
         "column_jyqVGy",
         "column_e6aHPg"
       ],
+      "custom_css": [
+        ".multicolumn-card {background: #f0f5f6 !important;}"
+      ],
       "name": "t:sections.multicolumn.name",
       "settings": {
         "gap": "small",
@@ -1070,7 +1073,7 @@
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "",
-        "color_background": "",
+        "color_background": "#ffffff",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
