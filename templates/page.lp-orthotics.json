@@ -229,7 +229,7 @@
             "text_alignment_mobile": "center",
             "image_ratio": "adapt",
             "heading": "New to Aetrex Orthotics?",
-            "heading_size": "text-lg-2xl",
+            "heading_size": "text-2xl lg:text-3xl",
             "text": "<p>Let us guide you to the perfect pair for your unique feet. Start with our quiz or explore by your pain type.</p>",
             "button_label": "Take Our Quiz",
             "button_link": "https://irle3andv1z.typeform.com/to/gujvKvEg?typeform-source=f031fc-3.myshopify.com",
@@ -248,7 +248,7 @@
             "text_alignment_mobile": "center",
             "image_ratio": "adapt",
             "heading": "Returning Customer?",
-            "heading_size": "text-lg-2xl",
+            "heading_size": "text-2xl lg:text-3xl",
             "text": "<p>Welcome back. Reorder your favorite pair or use our tool to quickly identify your previous orthotic</p>",
             "button_label": "Find My Orthotic",
             "button_link": "https://irle3andv1z.typeform.com/to/ojyWbTvZ?typeform-source=www.aetrex.com",
@@ -263,6 +263,9 @@
       "block_order": [
         "column_WGPbTD",
         "column_KdBDtQ"
+      ],
+      "custom_css": [
+        ".multicolumn-card {background: #d8ccc7 !important;}"
       ],
       "name": "t:sections.multicolumn.name",
       "settings": {
