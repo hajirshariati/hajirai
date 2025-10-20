@@ -85,307 +85,74 @@
         "rounded": true
       }
     },
-    "logo_list_yx3X9k": {
+    "logo_list_EzFUUx": {
       "type": "logo-list",
       "blocks": {
-        "logo_ABgUc9": {
+        "logo_gMfmid": {
           "type": "logo",
           "settings": {
-            "image": "shopify://shop_images/foot.gif",
-            "height": 80,
+            "image": "shopify://shop_images/image_80.png",
+            "height": 52,
             "link": ""
           }
         },
-        "logo_8qyVnm": {
+        "logo_tfFaTx": {
           "type": "logo",
           "settings": {
-            "image": "shopify://shop_images/gucci.gif",
-            "height": 80,
+            "image": "shopify://shop_images/image_81.png",
+            "height": 52,
             "link": ""
           }
         },
-        "logo_jqXx8x": {
+        "logo_BLnhFd": {
           "type": "logo",
           "settings": {
-            "image": "shopify://shop_images/nike_06b59e60-23dc-4474-807a-22f1c3115ee7.jpg",
-            "height": 80,
+            "image": "shopify://shop_images/image_82.png",
+            "height": 52,
             "link": ""
           }
         },
-        "logo_KiPWR6": {
+        "logo_8i8VzQ": {
           "type": "logo",
           "settings": {
-            "image": "shopify://shop_images/lulu.gif",
-            "height": 80,
+            "image": "shopify://shop_images/image_83.png",
+            "height": 52,
             "link": ""
           }
         },
-        "logo_MKWB4h": {
+        "logo_Y6WYtF": {
           "type": "logo",
           "settings": {
-            "image": "shopify://shop_images/alo.gif",
-            "height": 80,
+            "image": "shopify://shop_images/image_84.png",
+            "height": 52,
             "link": ""
           }
         },
-        "logo_zgajiT": {
+        "logo_mR46E4": {
           "type": "logo",
           "settings": {
-            "image": "shopify://shop_images/north-face.png",
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_aqnA6i": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/dsw.gif",
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_KUmUhz": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/Salvatore-Ferragamo-Logo-500x281.png",
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_Hzyixf": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/puma.gif",
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_mA8KzP": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/hoka.gif",
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_pJUj6X": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/bauer_e13e32a1-4582-4531-a26e-b5740750d87e.jpg",
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_V8mRpc": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/under.gif",
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_BfYH88": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/craft.gif",
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_qRUHXV": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/converse_cdb70254-5957-4d42-9306-8f04347b29c9.jpg",
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_AU9tFa": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/ecco_88dd687f-102e-4cb4-82a4-44771c790b8d.jpg",
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_4bGBMw": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/primer2.webp",
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_6XGUxc": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/trade.jpg",
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_thJtGc": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/altra.gif",
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_NbrERF": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/trek.gif",
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_9TktjL": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/sun.gif",
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_nyq9NP": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/keen.gif",
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_nfHYzr": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/boa_87509b95-0e34-4895-b97a-0f8d6185402d.jpg",
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_EghnPX": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/asics_cf07c113-a2d8-4c67-8816-01dcb8a6e2d6.jpg",
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_R9NADp": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/intersport.jpg",
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_JxpkcD": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/saf_90b0d670-65c2-440b-8cc3-914d9ab8583a.jpg",
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_TDe4PA": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/shoe_3471ff17-14ae-4d6e-acba-a7b217712a88.jpg",
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_RaDLpG": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/fit.jpg",
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_6rdphD": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/merrell.jpg",
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_WwhP3T": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/rocky_84a13ce6-9c1d-4f57-b124-90c31002d654.jpg",
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_m9Rin4": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/scheels.jpg",
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_ULmQcR": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/spe_01c4eba1-3625-4986-b470-84921d3f03f4.jpg",
-            "height": 80,
-            "link": ""
-          }
-        },
-        "logo_thTFEN": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/brown2.webp",
-            "height": 80,
+            "image": "shopify://shop_images/image_89.png",
+            "height": 52,
             "link": ""
           }
         }
       },
       "block_order": [
-        "logo_ABgUc9",
-        "logo_8qyVnm",
-        "logo_jqXx8x",
-        "logo_KiPWR6",
-        "logo_MKWB4h",
-        "logo_zgajiT",
-        "logo_aqnA6i",
-        "logo_KUmUhz",
-        "logo_Hzyixf",
-        "logo_mA8KzP",
-        "logo_pJUj6X",
-        "logo_V8mRpc",
-        "logo_BfYH88",
-        "logo_qRUHXV",
-        "logo_AU9tFa",
-        "logo_4bGBMw",
-        "logo_6XGUxc",
-        "logo_thJtGc",
-        "logo_NbrERF",
-        "logo_9TktjL",
-        "logo_nyq9NP",
-        "logo_nfHYzr",
-        "logo_EghnPX",
-        "logo_R9NADp",
-        "logo_JxpkcD",
-        "logo_TDe4PA",
-        "logo_RaDLpG",
-        "logo_6rdphD",
-        "logo_WwhP3T",
-        "logo_m9Rin4",
-        "logo_ULmQcR",
-        "logo_thTFEN"
+        "logo_gMfmid",
+        "logo_tfFaTx",
+        "logo_BLnhFd",
+        "logo_8i8VzQ",
+        "logo_Y6WYtF",
+        "logo_mR46E4"
       ],
+      "name": "Logo list",
       "settings": {
-        "layout": "marquee",
-        "grid_horizontal": 130,
+        "layout": "default",
+        "grid_horizontal": 50,
         "direction": "left",
-        "speed": 4,
-        "heading": "",
-        "heading_size": "title-md",
+        "speed": 1,
+        "heading": "AS SEEN ON",
+        "heading_size": "title-sm",
         "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
         "subheading": "",
@@ -404,10 +171,10 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 24,
-        "padding_bottom": 24,
+        "padding_top": 32,
+        "padding_bottom": 32,
         "divider": false,
-        "full_width": true,
+        "full_width": false,
         "rounded": false
       }
     },
@@ -994,7 +761,7 @@
   "order": [
     "main-page",
     "video_with_text_overlay_TgKph8",
-    "logo_list_yx3X9k",
+    "logo_list_EzFUUx",
     "collection_list_mPHCpz",
     "collage_ntqjfh",
     "multicolumn_with_icons_C37PFY",
