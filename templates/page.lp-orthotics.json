@@ -214,6 +214,9 @@
         "column_3fJUGP",
         "column_4LyY8A"
       ],
+      "custom_css": [
+        ".multicolumn-card {background: #F0F5F6 !important;}"
+      ],
       "name": "t:sections.multicolumn.name",
       "settings": {
         "gap": "large",
@@ -234,7 +237,7 @@
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "",
-        "color_background": "",
+        "color_background": "#f0f5f6",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
