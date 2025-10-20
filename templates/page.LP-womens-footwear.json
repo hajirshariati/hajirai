@@ -56,7 +56,7 @@
           "type": "image",
           "settings": {
             "image": "shopify://shop_images/1920x700_Gianna_Taupe.jpg",
-            "image_mobile": "shopify://shop_images/693x520_Gianna_Charcoal.png",
+            "image_mobile": "shopify://shop_images/footwear6.jpg",
             "heading": "Proven Comfort, Perfected by Science",
             "heading_size": "title-sm",
             "heading_tag": "h3",
@@ -81,7 +81,7 @@
           "type": "image",
           "settings": {
             "image": "shopify://shop_images/1920x700_CarlySparklwe_Wine.jpg",
-            "image_mobile": "shopify://shop_images/693x520_CarlySparkle_Wine.png",
+            "image_mobile": "shopify://shop_images/footwear7.jpg",
             "heading": "Redefining Everyday Comfort",
             "heading_size": "title-sm",
             "heading_tag": "h3",
