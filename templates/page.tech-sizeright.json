@@ -62,8 +62,8 @@
         "text_yKxt79": {
           "type": "text",
           "settings": {
-            "text": "<p>SizeRight™ Mobile App</p>",
-            "text_font": "body",
+            "text": "<p><strong>SizeRight™ Mobile App</strong></p>",
+            "text_font": "heading",
             "text_size": "subtext-custom",
             "text_max_size": 32,
             "text_line_height": 1.2,
