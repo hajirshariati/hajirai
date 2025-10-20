@@ -390,6 +390,151 @@
         "rounded": false
       }
     },
+    "collection_list_mPHCpz": {
+      "type": "collection-list",
+      "blocks": {
+        "collection_hHkQLw": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "running-orthotics",
+            "custom_url": "",
+            "image": "shopify://shop_images/Group_11_cc45e757-0dfe-4e9d-999f-40a29c1844a1.png",
+            "title": "Running",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_BMqtdJ": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "walking-orthotics",
+            "custom_url": "",
+            "image": "shopify://shop_images/Group_10_a493438e-77f4-4a5e-88b1-04ac1f5a4bf1.png",
+            "title": "Walking",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_xjQV8H": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "all-day-standing-orthotics",
+            "custom_url": "",
+            "image": "shopify://shop_images/Group_8_c53ae63b-9703-4298-89f2-64bf44b0eca0.png",
+            "title": "Working",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_FWgTeX": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "gym-training",
+            "custom_url": "",
+            "image": "shopify://shop_images/Group_7_53cd5509-a4e6-4e01-9140-21ba10532f65.png",
+            "title": "Gym",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_wPrGdz": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "tennis-pickleball-orthotics",
+            "custom_url": "",
+            "title": "Tennis & Pickeball",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_C3dagf": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "golf-orthotics",
+            "custom_url": "",
+            "title": "",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        }
+      },
+      "block_order": [
+        "collection_hHkQLw",
+        "collection_BMqtdJ",
+        "collection_xjQV8H",
+        "collection_FWgTeX",
+        "collection_wPrGdz",
+        "collection_C3dagf"
+      ],
+      "name": "Collection list",
+      "settings": {
+        "columns": 5,
+        "carousel_on_desktop": true,
+        "image_type": "collection",
+        "image_ratio": "square",
+        "show_products_count": false,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "<strong>Shop by Activity</strong>",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h4",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "#f4f4f4",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 40,
+        "padding_bottom": 40,
+        "divider": false,
+        "full_width": true,
+        "rounded": false
+      }
+    },
     "collage_ntqjfh": {
       "type": "collage",
       "blocks": {
@@ -652,147 +797,6 @@
         "color_button_gradient": "",
         "padding_top": 72,
         "padding_bottom": 72,
-        "divider": false,
-        "full_width": true,
-        "rounded": false
-      }
-    },
-    "collection_list_mPHCpz": {
-      "type": "collection-list",
-      "blocks": {
-        "collection_BMqtdJ": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "walking-orthotics",
-            "custom_url": "",
-            "title": "Walking",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_UwnQyA": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "all-day-standing-orthotics",
-            "custom_url": "",
-            "title": "Standing",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_hHkQLw": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "running-orthotics",
-            "custom_url": "",
-            "title": "Running",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_FWgTeX": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "",
-            "custom_url": "",
-            "title": "Gym",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_wPrGdz": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "tennis-pickleball-orthotics",
-            "custom_url": "",
-            "title": "Tennis & Pickeball",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_xjQV8H": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "",
-            "custom_url": "",
-            "title": "View All",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        }
-      },
-      "block_order": [
-        "collection_BMqtdJ",
-        "collection_UwnQyA",
-        "collection_hHkQLw",
-        "collection_FWgTeX",
-        "collection_wPrGdz",
-        "collection_xjQV8H"
-      ],
-      "name": "Collection list",
-      "settings": {
-        "columns": 5,
-        "carousel_on_desktop": true,
-        "image_type": "collection",
-        "image_ratio": "square",
-        "show_products_count": false,
-        "show_view_all": true,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "<strong>Shop by Activity</strong>",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h4",
-        "subheading": "",
-        "description": "<p>Whether you’re walking, running, golfing, skiing, or standing all day, we have orthotics for you. Find your best match based on activity.</p>",
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "#f4f4f4",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 40,
-        "padding_bottom": 40,
         "divider": false,
         "full_width": true,
         "rounded": false
