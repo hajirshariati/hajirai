@@ -99,7 +99,7 @@
     "main-blog": {
       "type": "main-blog",
       "settings": {
-        "heading_size": "title-xl tracking-heading",
+        "heading_size": "title-lg tracking-heading",
         "heading_alignment": "text-center justify-center",
         "heading_tag": "h1",
         "subheading": "",
