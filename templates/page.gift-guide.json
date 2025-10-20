@@ -266,10 +266,9 @@
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "walking-orthotics",
+            "collection": "activity-orthotics",
             "custom_url": "",
-            "image": "shopify://shop_images/Group_10_a493438e-77f4-4a5e-88b1-04ac1f5a4bf1.png",
-            "title": "For Everyday Comfort",
+            "title": "$50 & Under",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -283,26 +282,9 @@
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "all-day-standing-orthotics",
+            "collection": "womens-flip-flop-sandals",
             "custom_url": "",
-            "image": "shopify://shop_images/Group_8_c53ae63b-9703-4298-89f2-64bf44b0eca0.png",
-            "title": "For Wellness Lovers",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_C3dagf": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "golf-orthotics",
-            "custom_url": "",
-            "title": "For Style & Support",
+            "title": "$100 & Under",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -316,9 +298,9 @@
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "",
+            "collection": "womens-best-sellers-footwear",
             "custom_url": "",
-            "title": "",
+            "title": "$150 & Under",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -332,7 +314,6 @@
       "block_order": [
         "collection_BMqtdJ",
         "collection_xjQV8H",
-        "collection_C3dagf",
         "collection_zBHa9g"
       ],
       "name": "Collection list",
@@ -345,7 +326,7 @@
         "show_view_all": false,
         "columns_mobile": "1",
         "swipe_on_mobile": true,
-        "heading": "",
+        "heading": "Gifts For Every Budget",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
         "heading_tag": "h4",
@@ -460,7 +441,7 @@
           "settings": {
             "collection": "orthotics-for-flat-feet",
             "products": [],
-            "title": "$50 and Under"
+            "title": "For Everyday Comfort"
           }
         },
         "collection_3qxYYM": {
@@ -468,7 +449,7 @@
           "settings": {
             "collection": "orthotics-for-high-arches",
             "products": [],
-            "title": "$100 and Under"
+            "title": "For Wellness Lovers"
           }
         },
         "collection_xxeKq7": {
