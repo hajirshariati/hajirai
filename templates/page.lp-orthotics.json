@@ -313,6 +313,7 @@
         "column_kYia3a",
         "column_DNrLDF"
       ],
+      "disabled": true,
       "name": "t:sections.multicolumn-with-icons.name",
       "settings": {
         "style": "with-border",
