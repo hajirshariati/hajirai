@@ -457,7 +457,7 @@
             "link_type": "collection",
             "collection": "",
             "custom_url": "",
-            "title": "",
+            "title": "Plantar Fasciitis",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -467,13 +467,13 @@
             "enable_title_drop_shadow": false
           }
         },
-        "collection_hppEEf": {
+        "collection_9jpzFz": {
           "type": "collection",
           "settings": {
             "link_type": "collection",
             "collection": "",
             "custom_url": "",
-            "title": "",
+            "title": "Ball of Foot Pain",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -489,7 +489,87 @@
             "link_type": "collection",
             "collection": "",
             "custom_url": "",
-            "title": "",
+            "title": "Flat Feet",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_QxdCma": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "",
+            "custom_url": "",
+            "title": "High Arches",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_hppEEf": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "",
+            "custom_url": "",
+            "title": "Metatarsalgia",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_hcYY4B": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "",
+            "custom_url": "",
+            "title": "Morton's Neuroma",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_fagwhw": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "",
+            "custom_url": "",
+            "title": "Overpronation",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_nRRXUD": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "",
+            "custom_url": "",
+            "title": "Bunions",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -502,8 +582,13 @@
       },
       "block_order": [
         "collection_mahcwy",
+        "collection_9jpzFz",
+        "collection_hpGnqB",
+        "collection_QxdCma",
         "collection_hppEEf",
-        "collection_hpGnqB"
+        "collection_hcYY4B",
+        "collection_fagwhw",
+        "collection_nRRXUD"
       ],
       "name": "t:sections.collection-list.name",
       "settings": {
@@ -515,7 +600,7 @@
         "show_view_all": false,
         "columns_mobile": "1",
         "swipe_on_mobile": true,
-        "heading": "Collections",
+        "heading": "Gift for Every Foot Pain",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
