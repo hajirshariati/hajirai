@@ -59,12 +59,17 @@
     "rich_text_bGVzXB": {
       "type": "rich-text",
       "blocks": {
-        "heading_7E9VQ9": {
-          "type": "heading",
+        "text_KpJMJP": {
+          "type": "text",
           "settings": {
-            "heading": "About Aetrex Technology",
-            "heading_size": "title-md",
-            "heading_tag": "h2",
+            "text": "<p>About Aetrex Technology</p>",
+            "text_font": "heading",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -86,7 +91,7 @@
         }
       },
       "block_order": [
-        "heading_7E9VQ9",
+        "text_KpJMJP",
         "text_GLBLQW"
       ],
       "name": "Rich text",
@@ -106,8 +111,8 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "color_text": "#525252",
-        "color_background": "",
+        "color_text": "rgba(0,0,0,0)",
+        "color_background": "#e7e7e7",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
@@ -160,7 +165,7 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "color_text": "#525252",
+        "color_text": "rgba(0,0,0,0)",
         "color_background": "",
         "gradient_background": "",
         "color_highlight": "",
