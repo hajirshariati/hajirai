@@ -27,56 +27,21 @@
     "video_with_text_overlay_TgKph8": {
       "type": "video-with-text-overlay",
       "blocks": {
-        "subheading_DQGQFg": {
-          "type": "subheading",
-          "settings": {
-            "subheading": "Goodbye Foot Pain. Hello Relief.",
-            "subheading_size": "subtitle-lg",
-            "secondary_color": false
-          }
-        },
         "heading_64L34p": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Unmatched Comfort & Support Starts with Science. Engineered with Insights from Over 50 Million Foot Scans</p>",
-            "heading_size": "title-sm",
+            "heading": "<p>The 2025 Holiday Gift Guide</p>",
+            "heading_size": "title-lg tracking-heading",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         },
-        "text_H4rWEH": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Over 30 Million Pairs Sold</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_PwAQDY": {
-          "type": "button",
-          "settings": {
-            "button_label": "Find Your Perfect Pair",
-            "button_link": "https://irle3andv1z.typeform.com/to/gujvKvEg?typeform-source=f031fc-3.myshopify.com",
-            "button_video_link": "",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": false
-          }
-        },
         "button_AGih6p": {
           "type": "button",
           "settings": {
-            "button_label": "Shop All",
-            "button_link": "shopify://collections/shop-all-orthotics",
+            "button_label": "Shop All Gifts",
+            "button_link": "shopify://collections/all-products",
             "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
@@ -86,16 +51,12 @@
         }
       },
       "block_order": [
-        "subheading_DQGQFg",
         "heading_64L34p",
-        "text_H4rWEH",
-        "button_PwAQDY",
         "button_AGih6p"
       ],
       "name": "t:sections.video-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
-        "video": "shopify://files/videos/OrthoticLPdesktop.mp4",
         "video_url": "",
         "description": "",
         "enable_video_autoplay": true,
@@ -218,179 +179,6 @@
         "rounded": false
       }
     },
-    "multicolumn_GC6LFG": {
-      "type": "multicolumn",
-      "blocks": {
-        "column_WGPbTD": {
-          "type": "column",
-          "settings": {
-            "show_border": true,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image_ratio": "adapt",
-            "heading": "New to Aetrex Orthotics?",
-            "heading_size": "text-2xl lg:text-3xl",
-            "text": "<p>Let us guide you to the perfect pair for your unique feet. Start with our quiz or explore by your pain type.</p>",
-            "button_label": "Take Our Quiz",
-            "button_link": "https://irle3andv1z.typeform.com/to/gujvKvEg?typeform-source=f031fc-3.myshopify.com",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_KdBDtQ": {
-          "type": "column",
-          "settings": {
-            "show_border": true,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image_ratio": "adapt",
-            "heading": "Returning Customer?",
-            "heading_size": "text-2xl lg:text-3xl",
-            "text": "<p>Welcome back. Reorder your favorite pair or use our tool to quickly identify your previous orthotic</p>",
-            "button_label": "Find My Orthotic",
-            "button_link": "https://irle3andv1z.typeform.com/to/ojyWbTvZ?typeform-source=www.aetrex.com",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "column_WGPbTD",
-        "column_KdBDtQ"
-      ],
-      "disabled": true,
-      "custom_css": [],
-      "name": "t:sections.multicolumn.name",
-      "settings": {
-        "gap": "large",
-        "columns": 2,
-        "columns_mobile": "2",
-        "carousel_on_desktop": true,
-        "swipe_on_mobile": true,
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 24,
-        "divider": false,
-        "full_width": false,
-        "rounded": false
-      }
-    },
-    "featured_collections_9d3ge7": {
-      "type": "featured-collections",
-      "blocks": {
-        "collection_g9AqYk": {
-          "type": "collection",
-          "settings": {
-            "collection": "orthotics-for-flat-feet",
-            "products": [],
-            "title": "Flat Feet"
-          }
-        },
-        "collection_3qxYYM": {
-          "type": "collection",
-          "settings": {
-            "collection": "orthotics-for-high-arches",
-            "products": [],
-            "title": "High Arches"
-          }
-        },
-        "collection_xxeKq7": {
-          "type": "collection",
-          "settings": {
-            "collection": "orthotics-plantar-fasciitis",
-            "products": [],
-            "title": "Plantar Fasciitis"
-          }
-        },
-        "collection_Wzc8ka": {
-          "type": "collection",
-          "settings": {
-            "collection": "orthotics-for-metatarsalgia",
-            "products": [],
-            "title": "Metatarsalgia"
-          }
-        },
-        "collection_BbmnMe": {
-          "type": "collection",
-          "settings": {
-            "collection": "orthotics-for-heel-spurs",
-            "products": [],
-            "title": "Heel Spurs"
-          }
-        },
-        "collection_Uccwbn": {
-          "type": "collection",
-          "settings": {
-            "collection": "conform",
-            "products": [],
-            "title": "Diabetes"
-          }
-        }
-      },
-      "block_order": [
-        "collection_g9AqYk",
-        "collection_3qxYYM",
-        "collection_xxeKq7",
-        "collection_Wzc8ka",
-        "collection_BbmnMe",
-        "collection_Uccwbn"
-      ],
-      "name": "Multiple featured collections",
-      "settings": {
-        "product_limit": 6,
-        "columns": 4,
-        "carousel_on_desktop": true,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "Which Orthotic is Right for You?",
-        "heading_size": "title-sm",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "subheading": "Identify Your Foot Type or Foot Condition",
-        "description": "",
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false
-      }
-    },
     "collection_list_mPHCpz": {
       "type": "collection-list",
       "blocks": {
@@ -401,41 +189,7 @@
             "collection": "running-orthotics",
             "custom_url": "",
             "image": "shopify://shop_images/Group_11_cc45e757-0dfe-4e9d-999f-40a29c1844a1.png",
-            "title": "Running",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_BMqtdJ": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "walking-orthotics",
-            "custom_url": "",
-            "image": "shopify://shop_images/Group_10_a493438e-77f4-4a5e-88b1-04ac1f5a4bf1.png",
-            "title": "Walking",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_xjQV8H": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "all-day-standing-orthotics",
-            "custom_url": "",
-            "image": "shopify://shop_images/Group_8_c53ae63b-9703-4298-89f2-64bf44b0eca0.png",
-            "title": "Working",
+            "title": "For Her",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -452,7 +206,41 @@
             "collection": "gym-training",
             "custom_url": "",
             "image": "shopify://shop_images/Group_7_53cd5509-a4e6-4e01-9140-21ba10532f65.png",
-            "title": "Gym",
+            "title": "For Him",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_BMqtdJ": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "walking-orthotics",
+            "custom_url": "",
+            "image": "shopify://shop_images/Group_10_a493438e-77f4-4a5e-88b1-04ac1f5a4bf1.png",
+            "title": "For Everyday Comfort",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_xjQV8H": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "all-day-standing-orthotics",
+            "custom_url": "",
+            "image": "shopify://shop_images/Group_8_c53ae63b-9703-4298-89f2-64bf44b0eca0.png",
+            "title": "For Wellness Lovers",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -468,7 +256,7 @@
             "link_type": "collection",
             "collection": "golf-orthotics",
             "custom_url": "",
-            "title": "",
+            "title": "For Style & Support",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -481,9 +269,9 @@
       },
       "block_order": [
         "collection_hHkQLw",
+        "collection_FWgTeX",
         "collection_BMqtdJ",
         "collection_xjQV8H",
-        "collection_FWgTeX",
         "collection_C3dagf"
       ],
       "name": "Collection list",
@@ -496,7 +284,7 @@
         "show_view_all": false,
         "columns_mobile": "1",
         "swipe_on_mobile": true,
-        "heading": "<strong>Shop by Activity</strong>",
+        "heading": "",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
         "heading_tag": "h4",
@@ -519,6 +307,79 @@
         "rounded": false
       }
     },
+    "featured_collections_9d3ge7": {
+      "type": "featured-collections",
+      "blocks": {
+        "collection_g9AqYk": {
+          "type": "collection",
+          "settings": {
+            "collection": "orthotics-for-flat-feet",
+            "products": [],
+            "title": "$50 and Under"
+          }
+        },
+        "collection_3qxYYM": {
+          "type": "collection",
+          "settings": {
+            "collection": "orthotics-for-high-arches",
+            "products": [],
+            "title": "$100 and Under"
+          }
+        },
+        "collection_xxeKq7": {
+          "type": "collection",
+          "settings": {
+            "collection": "orthotics-plantar-fasciitis",
+            "products": [],
+            "title": "$150 and Under"
+          }
+        },
+        "collection_Wzc8ka": {
+          "type": "collection",
+          "settings": {
+            "collection": "orthotics-for-metatarsalgia",
+            "products": [],
+            "title": "Stocking Stuffers"
+          }
+        }
+      },
+      "block_order": [
+        "collection_g9AqYk",
+        "collection_3qxYYM",
+        "collection_xxeKq7",
+        "collection_Wzc8ka"
+      ],
+      "name": "Multiple featured collections",
+      "settings": {
+        "product_limit": 6,
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "Gifts For Every Budget",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "Identify Your Foot Type or Foot Condition",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
     "collage_ntqjfh": {
       "type": "collage",
       "blocks": {
@@ -527,7 +388,7 @@
           "settings": {
             "subheading": "Strategically Placed Arch Support",
             "heading": "",
-            "link": "",
+            "link": "shopify://products/addie-black-nc500w",
             "invert_subheading_heading": false,
             "image": "shopify://shop_images/617x640_signature_arch.png",
             "image_ratio": "adapt",
@@ -1193,9 +1054,8 @@
     "main-page",
     "video_with_text_overlay_TgKph8",
     "multicolumn_with_icons_C37PFY",
-    "multicolumn_GC6LFG",
-    "featured_collections_9d3ge7",
     "collection_list_mPHCpz",
+    "featured_collections_9d3ge7",
     "collage_ntqjfh",
     "image_with_text_overlay_M6AhUn",
     "image_comparison_i6BATK",
