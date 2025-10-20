@@ -116,7 +116,7 @@
         "text_WnRRPL": {
           "type": "text",
           "settings": {
-            "text": "<p><strong>An Affordable, State-of-the-Art 3D Foot Scanner</strong></p>",
+            "text": "<p>An Affordable, State-of-the-Art 3D Foot Scanner</p>",
             "text_font": "heading",
             "text_size": "subtext-custom",
             "text_max_size": 32,
