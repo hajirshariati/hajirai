@@ -116,8 +116,8 @@
         "text_8bW7wp": {
           "type": "text",
           "settings": {
-            "text": "<p><strong>The future of fit is here.  And it fits everyone.</strong></p>",
-            "text_font": "body",
+            "text": "<p>The future of fit is here.  And it fits everyone.</p>",
+            "text_font": "heading",
             "text_size": "subtext-custom",
             "text_max_size": 32,
             "text_line_height": 1.2,
