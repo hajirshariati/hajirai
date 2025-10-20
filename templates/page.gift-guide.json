@@ -259,6 +259,79 @@
         "rounded": false
       }
     },
+    "featured_collections_9d3ge7": {
+      "type": "featured-collections",
+      "blocks": {
+        "collection_g9AqYk": {
+          "type": "collection",
+          "settings": {
+            "collection": "orthotics-for-flat-feet",
+            "products": [],
+            "title": "For Everyday Comfort"
+          }
+        },
+        "collection_3qxYYM": {
+          "type": "collection",
+          "settings": {
+            "collection": "orthotics-for-high-arches",
+            "products": [],
+            "title": "For Wellness Lovers"
+          }
+        },
+        "collection_xxeKq7": {
+          "type": "collection",
+          "settings": {
+            "collection": "orthotics-plantar-fasciitis",
+            "products": [],
+            "title": "For Style & Support"
+          }
+        },
+        "collection_Wzc8ka": {
+          "type": "collection",
+          "settings": {
+            "collection": "womens-shoe-accessories",
+            "products": [],
+            "title": "Stocking Stuffers"
+          }
+        }
+      },
+      "block_order": [
+        "collection_g9AqYk",
+        "collection_3qxYYM",
+        "collection_xxeKq7",
+        "collection_Wzc8ka"
+      ],
+      "name": "Multiple featured collections",
+      "settings": {
+        "product_limit": 6,
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "Comfort, Curated for Them",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
     "collection_list_mPHCpz": {
       "type": "collection-list",
       "blocks": {
@@ -448,79 +521,6 @@
         "full_width": false,
         "rounded": false,
         "enable_parallax": false
-      }
-    },
-    "featured_collections_9d3ge7": {
-      "type": "featured-collections",
-      "blocks": {
-        "collection_g9AqYk": {
-          "type": "collection",
-          "settings": {
-            "collection": "orthotics-for-flat-feet",
-            "products": [],
-            "title": "For Everyday Comfort"
-          }
-        },
-        "collection_3qxYYM": {
-          "type": "collection",
-          "settings": {
-            "collection": "orthotics-for-high-arches",
-            "products": [],
-            "title": "For Wellness Lovers"
-          }
-        },
-        "collection_xxeKq7": {
-          "type": "collection",
-          "settings": {
-            "collection": "orthotics-plantar-fasciitis",
-            "products": [],
-            "title": "For Style & Support"
-          }
-        },
-        "collection_Wzc8ka": {
-          "type": "collection",
-          "settings": {
-            "collection": "womens-shoe-accessories",
-            "products": [],
-            "title": "Stocking Stuffers"
-          }
-        }
-      },
-      "block_order": [
-        "collection_g9AqYk",
-        "collection_3qxYYM",
-        "collection_xxeKq7",
-        "collection_Wzc8ka"
-      ],
-      "name": "Multiple featured collections",
-      "settings": {
-        "product_limit": 6,
-        "columns": 4,
-        "carousel_on_desktop": true,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "Gifts For Every Budget",
-        "heading_size": "title-sm",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "subheading": "Identify Your Foot Type or Foot Condition",
-        "description": "",
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false
       }
     },
     "shop_the_feed_tFy3ak": {
