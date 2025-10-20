@@ -411,86 +411,6 @@
         "rounded": false
       }
     },
-    "multicolumn_with_icons_C37PFY": {
-      "type": "multicolumn-with-icons",
-      "blocks": {
-        "column_fdpN6e": {
-          "type": "column",
-          "settings": {
-            "icon": "shield",
-            "custom_icon": "",
-            "heading": "<strong>Try It Risk-Free for 30 Days</strong>",
-            "text": "",
-            "highlighted_text": "none",
-            "custom_html": "",
-            "us_only": false,
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_kYia3a": {
-          "type": "column",
-          "settings": {
-            "icon": "award",
-            "custom_icon": "",
-            "heading": "<strong>Doctors Recommended</strong>",
-            "text": "",
-            "highlighted_text": "none",
-            "custom_html": "",
-            "us_only": false,
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_DNrLDF": {
-          "type": "column",
-          "settings": {
-            "icon": "heart",
-            "custom_icon": "",
-            "heading": "<strong>Loved by Millions</strong>",
-            "text": "",
-            "highlighted_text": "none",
-            "custom_html": "",
-            "us_only": false,
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "column_fdpN6e",
-        "column_kYia3a",
-        "column_DNrLDF"
-      ],
-      "name": "t:sections.multicolumn-with-icons.name",
-      "settings": {
-        "style": "with-border",
-        "columns": 3,
-        "text_alignment": "center",
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "#f4f4f4",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false
-      }
-    },
     "collection_list_mPHCpz": {
       "type": "collection-list",
       "blocks": {
@@ -684,6 +604,86 @@
         "enable_parallax": false
       }
     },
+    "multicolumn_with_icons_C37PFY": {
+      "type": "multicolumn-with-icons",
+      "blocks": {
+        "column_fdpN6e": {
+          "type": "column",
+          "settings": {
+            "icon": "shield",
+            "custom_icon": "",
+            "heading": "<strong>Try It Risk-Free for 30 Days</strong>",
+            "text": "",
+            "highlighted_text": "none",
+            "custom_html": "",
+            "us_only": false,
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_kYia3a": {
+          "type": "column",
+          "settings": {
+            "icon": "award",
+            "custom_icon": "",
+            "heading": "<strong>Doctors Recommended</strong>",
+            "text": "",
+            "highlighted_text": "none",
+            "custom_html": "",
+            "us_only": false,
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_DNrLDF": {
+          "type": "column",
+          "settings": {
+            "icon": "heart",
+            "custom_icon": "",
+            "heading": "<strong>Loved by Millions</strong>",
+            "text": "",
+            "highlighted_text": "none",
+            "custom_html": "",
+            "us_only": false,
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_fdpN6e",
+        "column_kYia3a",
+        "column_DNrLDF"
+      ],
+      "name": "t:sections.multicolumn-with-icons.name",
+      "settings": {
+        "style": "with-border",
+        "columns": 3,
+        "text_alignment": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "#f4f4f4",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
     "featured_collections_9d3ge7": {
       "type": "featured-collections",
       "blocks": {
@@ -755,74 +755,6 @@
         "divider": false,
         "full_width": false,
         "rounded": false
-      }
-    },
-    "compact_product_bundle_8VEj3m": {
-      "type": "compact-product-bundle",
-      "blocks": {
-        "heading_qraJx9": {
-          "type": "heading",
-          "settings": {
-            "heading": "Product bundle",
-            "heading_size": "title-md",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_8VRfrP": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Pair text with an image to focus on your chosen product, collection, or blog post. Add details on availability, style, or even provide a review.</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "heading_qraJx9",
-        "text_8VRfrP"
-      ],
-      "name": "t:sections.compact-product-bundle.name",
-      "settings": {
-        "collection": "",
-        "products": [],
-        "product_limit": 2,
-        "layout": "image_first",
-        "content_position": "md:items-center",
-        "text_alignment": "center",
-        "image_height_mobile": "adapt",
-        "content_position_mobile": "items-center",
-        "text_alignment_mobile": "center",
-        "swipe_on_mobile": true,
-        "show_variant_labels": true,
-        "picker_type": "button",
-        "enable_color_swatches": true,
-        "color_swatch_type": "color",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "overlay_opacity": 40,
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "enable_parallax": true,
-        "parallax_direction": "vertical"
       }
     },
     "shop_the_feed_tFy3ak": {
@@ -1067,7 +999,6 @@
     "collage_ntqjfh",
     "multicolumn_with_icons_C37PFY",
     "featured_collections_9d3ge7",
-    "compact_product_bundle_8VEj3m",
     "shop_the_feed_tFy3ak"
   ]
 }
