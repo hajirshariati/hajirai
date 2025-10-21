@@ -197,7 +197,7 @@
           "type": "button",
           "settings": {
             "button_label": "SHOP NOW",
-            "button_link": "shopify://pages/skycollection",
+            "button_link": "shopify://collections/sky-collection",
             "button_style": "primary",
             "button_size": "md",
             "button_external": false,
