@@ -301,7 +301,7 @@
         "column_KdBDtQ"
       ],
       "custom_css": [
-        ".multicolumn-card {background: #c7dadd !important;}"
+        ".multicolumn-card {background: #C7DADD !important;}"
       ],
       "name": "t:sections.multicolumn.name",
       "settings": {
