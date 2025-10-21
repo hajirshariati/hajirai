@@ -9137,7 +9137,7 @@ input[type="email"]:is(
     gap: 0;
     justify-content: center;
     text-align: center;
- 
+    margin: auto;
 }
 
 /* @media screen and (min-width: 1024px) {
