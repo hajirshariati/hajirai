@@ -28,10 +28,11 @@
                 </{{ block.settings.heading_tag }}>
               
               {%- when 'text' -%}
-                <div class="rte {{ block.settings.text_size }}{% if block.settings.text_align != blank %} text-{{ block.settings.text_align }}{% endif %}"
-                     style="{% if block.settings.text_color != blank %}color: {{ block.settings.text_color }};{% endif %}">
-                  {{ block.settings.text }}
-                </div>
+<div class="rte {{ block.settings.text_size }}{% if block.settings.text_align != blank %} text-{{ block.settings.text_align }}{% endif %}"
+     style="{% if block.settings.text_color != blank %}color: {{ block.settings.text_color }}; {% endif %}text-align: center;">
+  {{ block.settings.text }}
+</div>
+
               
               {%- when 'icon_with_text' -%}
                 <div class="flex {% if block.settings.icon_position == 'top' %}flex-col items-{{ block.settings.text_align }}{% else %}items-start{% endif %} gap-4">
@@ -65,13 +66,11 @@
                         {{ block.settings.icon_heading }}
                       </h3>
                     {%- endif -%}
-{%- if block.settings.icon_text != blank -%}
-  <div class="rte {{ block.settings.text_size }}" 
-       style="{% if block.settings.text_color != blank %}color: {{ block.settings.text_color }}; {% endif %}align-self: center;">
-    {{ block.settings.icon_text }}
-  </div>
-{%- endif -%}
-
+                    {%- if block.settings.icon_text != blank -%}
+                      <div class="rte {{ block.settings.text_size }}" style="{% if block.settings.text_color != blank %}color: {{ block.settings.text_color }};{% endif %}">
+                        {{ block.settings.icon_text }}
+                      </div>
+                    {%- endif -%}
                   </div>
                 </div>
               
