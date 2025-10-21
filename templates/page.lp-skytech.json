@@ -1254,7 +1254,7 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "color_text": "#91b7c9",
+        "color_text": "rgba(0,0,0,0)",
         "color_background": "#ffffff",
         "gradient_background": "",
         "color_highlight": "",
