@@ -35,7 +35,7 @@
             endif
           -%}
           {%- for block in section.blocks -%}
-            <div style="background: white;padding: 0em 2em 2em;"
+            <div style="background: white;padding: 2em 2em 2em;"
               class="multicolumn-card{% if block.settings.show_border %} with-border{% endif %} card flex gap-5 w-full flex-col items-start xl:flex-row md:text-{{ block.settings.text_alignment }} text-{{ block.settings.text_alignment_mobile }}"
               {{ block.shopify_attributes }}
             >
