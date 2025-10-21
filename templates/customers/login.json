@@ -26,6 +26,7 @@
         },
         "heading_rPytNd": {
           "type": "heading",
+          "disabled": true,
           "settings": {
             "heading": "Member Benefits",
             "heading_size": "title-sm",
@@ -33,19 +34,11 @@
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
-        },
-        "spacing_xEiYax": {
-          "type": "spacing",
-          "settings": {
-            "height": 20,
-            "height_mobile": 16
-          }
         }
       },
       "block_order": [
         "icon_7VwAFd",
-        "heading_rPytNd",
-        "spacing_xEiYax"
+        "heading_rPytNd"
       ],
       "name": "t:sections.rich-text.name",
       "settings": {
@@ -66,7 +59,7 @@
         "highlighted_scribble": "circle",
         "color_text": "",
         "color_background": "",
-        "gradient_background": "",
+        "gradient_background": "linear-gradient(90deg, rgba(92, 109, 116, 1) 13%, rgba(140, 162, 173, 1) 86%)",
         "color_highlight": "",
         "gradient_highlight": "",
         "color_button_text": "",
@@ -217,6 +210,7 @@
         "image_A4icyY",
         "text_Lhk47x"
       ],
+      "disabled": true,
       "name": "t:sections.scrolling-text.name",
       "settings": {
         "direction": "left",
@@ -235,31 +229,155 @@
         "rounded": false
       }
     },
-    "empty_space_kK4Rk8": {
-      "type": "empty-space",
-      "name": "t:sections.empty-space.name",
-      "settings": {
-        "desktop_height": 40,
-        "mobile_height": 28,
-        "color_background": "",
-        "gradient_background": ""
-      }
-    },
     "main-login": {
       "type": "main-login",
+      "blocks": {
+        "heading_XBGMmx": {
+          "type": "heading",
+          "settings": {
+            "heading": "Member Benefits",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "text_color": "#ffffff",
+            "text_align": "center",
+            "background_color": "#5c6d74ff",
+            "padding": 20,
+            "border_radius": 0,
+            "add_spacing": true
+          }
+        },
+        "icon_with_text_w6m4UM": {
+          "type": "icon_with_text",
+          "settings": {
+            "icon_image": "shopify://shop_images/free_shipping_icon_8fe11c46-01fb-43c8-b4a5-0659254f215e.png",
+            "icon_size": "lg",
+            "icon_position": "left",
+            "icon_heading": "",
+            "icon_heading_size": "text-lg font-bold",
+            "icon_text": "<p>Free ground shipping (US ONLY*)</p>",
+            "text_size": "text-lg",
+            "text_color": "",
+            "text_align": "left",
+            "background_color": "#d3e3ec",
+            "padding": 20,
+            "border_radius": 0,
+            "add_spacing": true
+          }
+        },
+        "icon_with_text_bPJnCi": {
+          "type": "icon_with_text",
+          "settings": {
+            "icon_image": "shopify://shop_images/free_shipping_icon_8fe11c46-01fb-43c8-b4a5-0659254f215e.png",
+            "icon_size": "lg",
+            "icon_position": "left",
+            "icon_heading": "",
+            "icon_heading_size": "text-lg font-bold",
+            "icon_text": "<p>Earn 5% on every purchase</p>",
+            "text_size": "text-lg",
+            "text_color": "",
+            "text_align": "left",
+            "background_color": "#d3e3ec",
+            "padding": 20,
+            "border_radius": 0,
+            "add_spacing": true
+          }
+        },
+        "icon_with_text_GMpwRP": {
+          "type": "icon_with_text",
+          "settings": {
+            "icon_image": "shopify://shop_images/free_shipping_icon_8fe11c46-01fb-43c8-b4a5-0659254f215e.png",
+            "icon_size": "lg",
+            "icon_position": "left",
+            "icon_heading": "",
+            "icon_heading_size": "text-lg font-bold",
+            "icon_text": "<p>Early VIP access to sales & product releases</p>",
+            "text_size": "text-lg",
+            "text_color": "",
+            "text_align": "left",
+            "background_color": "#d3e3ec",
+            "padding": 20,
+            "border_radius": 0,
+            "add_spacing": true
+          }
+        },
+        "icon_with_text_JrTAtG": {
+          "type": "icon_with_text",
+          "settings": {
+            "icon_image": "shopify://shop_images/free_shipping_icon_8fe11c46-01fb-43c8-b4a5-0659254f215e.png",
+            "icon_size": "lg",
+            "icon_position": "left",
+            "icon_heading": "",
+            "icon_heading_size": "text-lg font-bold",
+            "icon_text": "<p>$20 Worth of points on your anniversary</p>",
+            "text_size": "text-lg",
+            "text_color": "",
+            "text_align": "left",
+            "background_color": "#d3e3ec",
+            "padding": 20,
+            "border_radius": 0,
+            "add_spacing": true
+          }
+        },
+        "icon_with_text_nBUXxd": {
+          "type": "icon_with_text",
+          "settings": {
+            "icon_image": "shopify://shop_images/free_shipping_icon_8fe11c46-01fb-43c8-b4a5-0659254f215e.png",
+            "icon_size": "lg",
+            "icon_position": "left",
+            "icon_heading": "",
+            "icon_heading_size": "text-lg font-bold",
+            "icon_text": "<p>$20 worth of points after the first purchase</p>",
+            "text_size": "text-lg",
+            "text_color": "",
+            "text_align": "left",
+            "background_color": "#d3e3ec",
+            "padding": 20,
+            "border_radius": 0,
+            "add_spacing": true
+          }
+        },
+        "icon_with_text_qwaqQ7": {
+          "type": "icon_with_text",
+          "settings": {
+            "icon_image": "shopify://shop_images/free_shipping_icon_8fe11c46-01fb-43c8-b4a5-0659254f215e.png",
+            "icon_size": "lg",
+            "icon_position": "left",
+            "icon_heading": "",
+            "icon_heading_size": "text-lg font-bold",
+            "icon_text": "<p>$20 worth of points for referral</p>",
+            "text_size": "text-lg",
+            "text_color": "",
+            "text_align": "left",
+            "background_color": "#d3e3ec",
+            "padding": 20,
+            "border_radius": 0,
+            "add_spacing": true
+          }
+        }
+      },
+      "block_order": [
+        "heading_XBGMmx",
+        "icon_with_text_w6m4UM",
+        "icon_with_text_bPJnCi",
+        "icon_with_text_GMpwRP",
+        "icon_with_text_JrTAtG",
+        "icon_with_text_nBUXxd",
+        "icon_with_text_qwaqQ7"
+      ],
       "settings": {
         "enable_shop_login_button": false,
+        "layout_width": "narrow",
         "heading_size": "title-sm",
         "heading_tag": "h3",
-        "padding_top": 0,
+        "padding_top": 28,
         "padding_bottom": 0,
         "divider": false,
-        "rounded": false
+        "rounded": true
       }
     },
-    "empty_space_kpmbpR": {
+    "empty_space_DPHgJ8": {
       "type": "empty-space",
-      "name": "Empty space",
+      "name": "t:sections.empty-space.name",
       "settings": {
         "desktop_height": 40,
         "mobile_height": 28,
@@ -279,6 +397,7 @@
             "text": "<p>Free ground shipping (US ONLY*)</p>",
             "highlighted_text": "none",
             "custom_html": "",
+            "us_only": false,
             "highlighted_scribble": "circle"
           }
         },
@@ -291,6 +410,7 @@
             "text": "<p>Earn 5% on every purchase</p>",
             "highlighted_text": "none",
             "custom_html": "",
+            "us_only": false,
             "highlighted_scribble": "circle"
           }
         },
@@ -303,6 +423,7 @@
             "text": "<p>Early VIP access to sales & product releases</p>",
             "highlighted_text": "none",
             "custom_html": "",
+            "us_only": false,
             "highlighted_scribble": "circle"
           }
         },
@@ -315,6 +436,7 @@
             "text": "<p>$20 worth of points on your anniversary</p>",
             "highlighted_text": "none",
             "custom_html": "",
+            "us_only": false,
             "highlighted_scribble": "circle"
           }
         },
@@ -327,6 +449,7 @@
             "text": "<p>$20 worth of points after the first purchase</p>",
             "highlighted_text": "none",
             "custom_html": "",
+            "us_only": false,
             "highlighted_scribble": "circle"
           }
         },
@@ -339,6 +462,7 @@
             "text": "<p>$20 worth of points for referral</p>",
             "highlighted_text": "none",
             "custom_html": "",
+            "us_only": false,
             "highlighted_scribble": "circle"
           }
         }
@@ -388,9 +512,8 @@
   "order": [
     "rich_text_a3rkPe",
     "scrolling_text_4kJYfh",
-    "empty_space_kK4Rk8",
     "main-login",
-    "empty_space_kpmbpR",
+    "empty_space_DPHgJ8",
     "multicolumn_with_icons_JfDLw8"
   ]
 }
