@@ -649,7 +649,7 @@
       "settings": {
         "style": "with-background",
         "heading": "Frequently Asked Questions",
-        "heading_size": "title-sm",
+        "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
         "subheading": "",
