@@ -9565,7 +9565,7 @@ input[type="email"]:is(
     overflow: hidden;
     white-space: nowrap;
     padding: 0.15em 0.05em;
-
+    letter-spacing: initial;
 }
 
 [lang="en"] .split-words .word {
@@ -17731,3 +17731,9 @@ a[href="#"] {
     color: #fff!important;
     border-radius: 8px!important;
 }
+
+@media (max-width: 767px) {
+       body {
+           letter-spacing: 1px !important;
+       }
+   }
