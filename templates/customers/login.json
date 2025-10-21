@@ -267,19 +267,6 @@
             "add_spacing": true
           }
         },
-        "text_pJYU7k": {
-          "type": "text",
-          "settings": {
-            "text": "<p>for Members Only</p>",
-            "text_size": "text-base",
-            "text_color": "#ffffff",
-            "text_align": "center",
-            "background_color": "#5c6d74",
-            "padding": 12,
-            "border_radius": 0,
-            "add_spacing": true
-          }
-        },
         "icon_with_text_w6m4UM": {
           "type": "icon_with_text",
           "settings": {
@@ -391,7 +378,6 @@
       },
       "block_order": [
         "heading_XBGMmx",
-        "text_pJYU7k",
         "icon_with_text_w6m4UM",
         "icon_with_text_bPJnCi",
         "icon_with_text_GMpwRP",
