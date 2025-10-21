@@ -59,6 +59,13 @@
             "height_mobile": 28
           }
         },
+        "spacing_m49QdA": {
+          "type": "spacing",
+          "settings": {
+            "height": 120,
+            "height_mobile": 28
+          }
+        },
         "text_H4rWEH": {
           "type": "text",
           "settings": {
@@ -103,12 +110,13 @@
         "heading_64L34p",
         "text_EGcVH3",
         "spacing_f6U9b4",
+        "spacing_m49QdA",
         "text_H4rWEH",
         "button_PwAQDY",
         "button_AGih6p"
       ],
       "custom_css": [
-        ".banner__box--medium {height: inherit; }"
+        ".banner__box--medium {height: inherit;}"
       ],
       "name": "t:sections.video-with-text-overlay.name",
       "settings": {
@@ -118,7 +126,7 @@
         "description": "",
         "enable_video_autoplay": true,
         "enable_video_looping": true,
-        "image_height": "adapt",
+        "image_height": "650px",
         "content_width": "medium",
         "content_position": "md:items-center md:justify-center",
         "text_alignment": "center",
