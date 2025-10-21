@@ -15,8 +15,8 @@
         "heading_WMGPBB": {
           "type": "heading",
           "settings": {
-            "heading": "<p>The Aetrex <br/>Technology <br/>Difference</p>",
-            "heading_size": "title-sm",
+            "heading": "<h1>The Aetrex <br/>Technology <br/>Difference</h1>",
+            "heading_size": "title-md",
             "heading_tag": "h1",
             "highlighted_text": "text",
             "highlighted_scribble": "circle"
