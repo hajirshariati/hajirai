@@ -301,7 +301,7 @@
         "column_KdBDtQ"
       ],
       "custom_css": [
-        ".multicolumn-card {background: #C7DADD !important;}"
+        ".multicolumn-card {background: #c7dadd !important;}"
       ],
       "name": "t:sections.multicolumn.name",
       "settings": {
@@ -599,8 +599,8 @@
         "image_i7MLJM": {
           "type": "image",
           "settings": {
-            "subheading": "",
-            "heading": "Strategically Placed Arch Support",
+            "subheading": "Strategically Placed Arch Support",
+            "heading": "",
             "link": "",
             "invert_subheading_heading": false,
             "image": "shopify://shop_images/617x640_signature_arch.png",
@@ -622,8 +622,8 @@
         "image_kirkAq": {
           "type": "image",
           "settings": {
-            "subheading": "",
-            "heading": "Alignment & Biomechanical Efficiency",
+            "subheading": "Alignment & Biomechanical Efficiency",
+            "heading": "",
             "link": "",
             "invert_subheading_heading": false,
             "image": "shopify://shop_images/617x640_alignment.png",
@@ -645,8 +645,8 @@
         "image_UMzkxc": {
           "type": "image",
           "settings": {
-            "subheading": "",
-            "heading": "Hi-Tech Materials to Benefit Your Health",
+            "subheading": "Hi-Tech Materials to Benefit Your Health",
+            "heading": "",
             "link": "",
             "invert_subheading_heading": false,
             "image": "shopify://shop_images/617x640_Hi_tech_Materials.png",
@@ -668,8 +668,8 @@
         "image_DEUPz8": {
           "type": "image",
           "settings": {
-            "subheading": "",
-            "heading": "All-Day Comfort and Energy",
+            "subheading": "All-Day Comfort and Energy",
+            "heading": "",
             "link": "",
             "invert_subheading_heading": false,
             "image": "shopify://shop_images/sneaker_ortho.png",
