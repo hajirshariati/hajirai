@@ -856,8 +856,8 @@
         "padding_top": 72,
         "padding_bottom": 72,
         "divider": false,
-        "full_width": true,
-        "rounded": false
+        "full_width": false,
+        "rounded": true
       }
     },
     "testimonials_banner_P8DMGU": {
