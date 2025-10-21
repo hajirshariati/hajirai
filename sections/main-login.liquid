@@ -8,43 +8,69 @@
 {{ 'customer.css' | asset_url | stylesheet_tag }}
 
 <div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}">
-  <div class="page-width relative">
+  <div class="{% if section.settings.layout_width == 'narrow' %}page-width{% elsif section.settings.layout_width == 'medium' %}container{% else %}page-width{% endif %} relative">
     
     {%- comment -%} Two Column Layout: Left for custom sections, Right for login {%- endcomment -%}
-    <div class="grid lg:grid-cols-2 gap-8 lg:gap-12">
+    <div class="grid lg:grid-cols-2 {% if section.settings.layout_width == 'narrow' %}lg:gap-8{% elsif section.settings.layout_width == 'medium' %}lg:gap-12{% else %}lg:gap-20{% endif %} gap-8">
       
       {%- comment -%} LEFT COLUMN - Custom Content Sections {%- endcomment -%}
       <div class="order-2 lg:order-1 flex flex-col justify-center">
         {%- for block in section.blocks -%}
-          <div class="login-custom-block" {{ block.shopify_attributes }}>
+          <div class="login-custom-block{% if block.settings.add_spacing %} mb-8{% endif %}" 
+               style="{% if block.settings.background_color != blank %}background-color: {{ block.settings.background_color }};{% endif %}{% if block.settings.padding != blank %} padding: {{ block.settings.padding }}px;{% endif %}{% if block.settings.border_radius != blank %} border-radius: {{ block.settings.border_radius }}px;{% endif %}"
+               {{ block.shopify_attributes }}>
             {%- case block.type -%}
               
               {%- when 'heading' -%}
-                <{{ block.settings.heading_tag }} class="heading {{ block.settings.heading_size }} mb-4">
+                <{{ block.settings.heading_tag }} class="heading {{ block.settings.heading_size }}{% if block.settings.text_align != blank %} text-{{ block.settings.text_align }}{% endif %}"
+                    style="{% if block.settings.text_color != blank %}color: {{ block.settings.text_color }};{% endif %}">
                   {{ block.settings.heading }}
                 </{{ block.settings.heading_tag }}>
               
               {%- when 'text' -%}
-                <div class="rte mb-6 {{ block.settings.text_size }}">
+                <div class="rte {{ block.settings.text_size }}{% if block.settings.text_align != blank %} text-{{ block.settings.text_align }}{% endif %}"
+                     style="{% if block.settings.text_color != blank %}color: {{ block.settings.text_color }};{% endif %}">
                   {{ block.settings.text }}
+                </div>
+              
+              {%- when 'icon_with_text' -%}
+                <div class="flex {% if block.settings.icon_position == 'top' %}flex-col items-{{ block.settings.text_align }}{% else %}items-start{% endif %} gap-4">
+                  {%- if block.settings.icon != blank -%}
+                    <div class="{% if block.settings.icon_position == 'left' %}flex-shrink-0{% endif %}" style="{% if block.settings.icon_color != blank %}color: {{ block.settings.icon_color }};{% endif %}">
+                      {%- render 'icon', icon: block.settings.icon, size: block.settings.icon_size -%}
+                    </div>
+                  {%- endif -%}
+                  <div class="flex-1{% if block.settings.text_align != blank %} text-{{ block.settings.text_align }}{% endif %}">
+                    {%- if block.settings.icon_heading != blank -%}
+                      <h3 class="{{ block.settings.icon_heading_size }} mb-2" style="{% if block.settings.text_color != blank %}color: {{ block.settings.text_color }};{% endif %}">
+                        {{ block.settings.icon_heading }}
+                      </h3>
+                    {%- endif -%}
+                    {%- if block.settings.icon_text != blank -%}
+                      <div class="rte {{ block.settings.text_size }}" style="{% if block.settings.text_color != blank %}color: {{ block.settings.text_color }};{% endif %}">
+                        {{ block.settings.icon_text }}
+                      </div>
+                    {%- endif -%}
+                  </div>
                 </div>
               
               {%- when 'image' -%}
                 {%- if block.settings.image != blank -%}
-                  <div class="mb-6">
+                  <div class="{% if block.settings.text_align != blank %}text-{{ block.settings.text_align }}{% endif %}">
                     <img 
                       src="{{ block.settings.image | image_url: width: 800 }}" 
                       alt="{{ block.settings.image.alt | escape }}"
                       loading="lazy"
                       width="{{ block.settings.image.width }}"
                       height="{{ block.settings.image.height }}"
+                      style="{% if block.settings.image_width != blank %}max-width: {{ block.settings.image_width }}%;{% endif %} height: auto;"
                     />
                   </div>
                 {%- endif -%}
               
               {%- when 'button' -%}
                 {%- if block.settings.button_label != blank -%}
-                  <div class="mb-6">
+                  <div class="{% if block.settings.text_align != blank %}text-{{ block.settings.text_align }}{% endif %}">
                     <a 
                       href="{{ block.settings.button_link }}" 
                       class="button {{ block.settings.button_style }} button--fixed"
@@ -235,6 +261,31 @@
     },
     {
       "type": "header",
+      "content": "Layout Settings"
+    },
+    {
+      "type": "select",
+      "id": "layout_width",
+      "options": [
+        {
+          "value": "narrow",
+          "label": "Narrow (Closer together)"
+        },
+        {
+          "value": "medium",
+          "label": "Medium"
+        },
+        {
+          "value": "wide",
+          "label": "Wide (More space)"
+        }
+      ],
+      "default": "medium",
+      "label": "Layout Width",
+      "info": "Control the spacing between left and right columns"
+    },
+    {
+      "type": "header",
       "content": "t:sections.global.settings.header__heading.content"
     },
     {
@@ -397,6 +448,66 @@
           ],
           "default": "h2",
           "label": "Heading tag"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Text color"
+        },
+        {
+          "type": "select",
+          "id": "text_align",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ],
+          "default": "left",
+          "label": "Text alignment"
+        },
+        {
+          "type": "header",
+          "content": "Block Styling"
+        },
+        {
+          "type": "color",
+          "id": "background_color",
+          "label": "Background color"
+        },
+        {
+          "type": "range",
+          "id": "padding",
+          "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "label": "Padding",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "border_radius",
+          "min": 0,
+          "max": 40,
+          "step": 2,
+          "unit": "px",
+          "label": "Border radius",
+          "default": 0
+        },
+        {
+          "type": "checkbox",
+          "id": "add_spacing",
+          "label": "Add spacing below block",
+          "default": true
         }
       ]
     },
@@ -415,20 +526,258 @@
           "id": "text_size",
           "options": [
             {
-              "value": "text-base",
+              "value": "text-sm",
               "label": "Small"
             },
             {
+              "value": "text-base",
+              "label": "Base"
+            },
+            {
               "value": "text-lg",
-              "label": "Medium"
+              "label": "Large"
             },
             {
               "value": "text-xl",
+              "label": "Extra Large"
+            }
+          ],
+          "default": "text-base",
+          "label": "Text size"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Text color"
+        },
+        {
+          "type": "select",
+          "id": "text_align",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ],
+          "default": "left",
+          "label": "Text alignment"
+        },
+        {
+          "type": "header",
+          "content": "Block Styling"
+        },
+        {
+          "type": "color",
+          "id": "background_color",
+          "label": "Background color"
+        },
+        {
+          "type": "range",
+          "id": "padding",
+          "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "label": "Padding",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "border_radius",
+          "min": 0,
+          "max": 40,
+          "step": 2,
+          "unit": "px",
+          "label": "Border radius",
+          "default": 0
+        },
+        {
+          "type": "checkbox",
+          "id": "add_spacing",
+          "label": "Add spacing below block",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "icon_with_text",
+      "name": "Icon with Text",
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Icon name",
+          "info": "Enter icon name from your theme (e.g., 'checkmark', 'star', 'heart', 'box', 'truck')",
+          "default": "checkmark"
+        },
+        {
+          "type": "select",
+          "id": "icon_size",
+          "options": [
+            {
+              "value": "sm",
+              "label": "Small"
+            },
+            {
+              "value": "md",
+              "label": "Medium"
+            },
+            {
+              "value": "lg",
+              "label": "Large"
+            },
+            {
+              "value": "xl",
+              "label": "Extra Large"
+            }
+          ],
+          "default": "md",
+          "label": "Icon size"
+        },
+        {
+          "type": "color",
+          "id": "icon_color",
+          "label": "Icon color"
+        },
+        {
+          "type": "select",
+          "id": "icon_position",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left of text"
+            },
+            {
+              "value": "top",
+              "label": "Above text"
+            }
+          ],
+          "default": "left",
+          "label": "Icon position"
+        },
+        {
+          "type": "text",
+          "id": "icon_heading",
+          "label": "Heading",
+          "default": "Feature Title"
+        },
+        {
+          "type": "select",
+          "id": "icon_heading_size",
+          "options": [
+            {
+              "value": "text-base font-bold",
+              "label": "Small"
+            },
+            {
+              "value": "text-lg font-bold",
+              "label": "Medium"
+            },
+            {
+              "value": "text-xl font-bold",
+              "label": "Large"
+            },
+            {
+              "value": "text-2xl font-bold",
+              "label": "Extra Large"
+            }
+          ],
+          "default": "text-lg font-bold",
+          "label": "Heading size"
+        },
+        {
+          "type": "richtext",
+          "id": "icon_text",
+          "label": "Description",
+          "default": "<p>Add your description text here.</p>"
+        },
+        {
+          "type": "select",
+          "id": "text_size",
+          "options": [
+            {
+              "value": "text-sm",
+              "label": "Small"
+            },
+            {
+              "value": "text-base",
+              "label": "Base"
+            },
+            {
+              "value": "text-lg",
               "label": "Large"
             }
           ],
-          "default": "text-lg",
-          "label": "Text size"
+          "default": "text-base",
+          "label": "Description size"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "Text color"
+        },
+        {
+          "type": "select",
+          "id": "text_align",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ],
+          "default": "left",
+          "label": "Text alignment"
+        },
+        {
+          "type": "header",
+          "content": "Block Styling"
+        },
+        {
+          "type": "color",
+          "id": "background_color",
+          "label": "Background color"
+        },
+        {
+          "type": "range",
+          "id": "padding",
+          "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "label": "Padding",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "border_radius",
+          "min": 0,
+          "max": 40,
+          "step": 2,
+          "unit": "px",
+          "label": "Border radius",
+          "default": 0
+        },
+        {
+          "type": "checkbox",
+          "id": "add_spacing",
+          "label": "Add spacing below block",
+          "default": true
         }
       ]
     },
@@ -440,6 +789,71 @@
           "type": "image_picker",
           "id": "image",
           "label": "Image"
+        },
+        {
+          "type": "range",
+          "id": "image_width",
+          "min": 20,
+          "max": 100,
+          "step": 5,
+          "unit": "%",
+          "label": "Image width",
+          "default": 100
+        },
+        {
+          "type": "select",
+          "id": "text_align",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ],
+          "default": "center",
+          "label": "Image alignment"
+        },
+        {
+          "type": "header",
+          "content": "Block Styling"
+        },
+        {
+          "type": "color",
+          "id": "background_color",
+          "label": "Background color"
+        },
+        {
+          "type": "range",
+          "id": "padding",
+          "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "label": "Padding",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "border_radius",
+          "min": 0,
+          "max": 40,
+          "step": 2,
+          "unit": "px",
+          "label": "Border radius",
+          "default": 0
+        },
+        {
+          "type": "checkbox",
+          "id": "add_spacing",
+          "label": "Add spacing below block",
+          "default": true
         }
       ]
     },
@@ -473,6 +887,61 @@
           ],
           "default": "button--primary",
           "label": "Button style"
+        },
+        {
+          "type": "select",
+          "id": "text_align",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ],
+          "default": "left",
+          "label": "Button alignment"
+        },
+        {
+          "type": "header",
+          "content": "Block Styling"
+        },
+        {
+          "type": "color",
+          "id": "background_color",
+          "label": "Background color"
+        },
+        {
+          "type": "range",
+          "id": "padding",
+          "min": 0,
+          "max": 80,
+          "step": 4,
+          "unit": "px",
+          "label": "Padding",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "border_radius",
+          "min": 0,
+          "max": 40,
+          "step": 2,
+          "unit": "px",
+          "label": "Border radius",
+          "default": 0
+        },
+        {
+          "type": "checkbox",
+          "id": "add_spacing",
+          "label": "Add spacing below block",
+          "default": true
         }
       ]
     },
