@@ -12,6 +12,13 @@
     "rich_text_a3rkPe": {
       "type": "rich-text",
       "blocks": {
+        "spacing_k6UKWn": {
+          "type": "spacing",
+          "settings": {
+            "height": 8,
+            "height_mobile": 28
+          }
+        },
         "icon_7VwAFd": {
           "type": "icon",
           "settings": {
@@ -24,21 +31,34 @@
             "external": false
           }
         },
-        "heading_rPytNd": {
-          "type": "heading",
-          "disabled": true,
+        "text_JC87eP": {
+          "type": "text",
           "settings": {
-            "heading": "Member Benefits",
-            "heading_size": "title-sm",
-            "heading_tag": "h2",
+            "text": "<p>Join today to unlock exclusive promotions, earn points on your purchases and more.</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
+          }
+        },
+        "spacing_GfGRpP": {
+          "type": "spacing",
+          "settings": {
+            "height": 4,
+            "height_mobile": 28
           }
         }
       },
       "block_order": [
+        "spacing_k6UKWn",
         "icon_7VwAFd",
-        "heading_rPytNd"
+        "text_JC87eP",
+        "spacing_GfGRpP"
       ],
       "name": "t:sections.rich-text.name",
       "settings": {
@@ -57,7 +77,7 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "color_text": "",
+        "color_text": "#ffffff",
         "color_background": "",
         "gradient_background": "linear-gradient(90deg, rgba(92, 109, 116, 1) 13%, rgba(140, 162, 173, 1) 86%)",
         "color_highlight": "",
