@@ -857,16 +857,6 @@
     "image_comparison_i6BATK": {
       "type": "image-comparison",
       "blocks": {
-        "image_AE8JMC": {
-          "type": "image",
-          "settings": {
-            "image": "shopify://shop_images/1256x804_Pressure_monitor_Without.png",
-            "subheading": "",
-            "heading": "Without Aetrex",
-            "content_position": "end",
-            "color_text": "#2c2c2c"
-          }
-        },
         "image_ezxGf9": {
           "type": "image",
           "settings": {
@@ -876,11 +866,21 @@
             "content_position": "end",
             "color_text": "#2c2c2c"
           }
+        },
+        "image_AE8JMC": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/1256x804_Pressure_monitor_Without.png",
+            "subheading": "",
+            "heading": "Without Aetrex",
+            "content_position": "end",
+            "color_text": "#2c2c2c"
+          }
         }
       },
       "block_order": [
-        "image_AE8JMC",
-        "image_ezxGf9"
+        "image_ezxGf9",
+        "image_AE8JMC"
       ],
       "name": "Image comparison",
       "settings": {
