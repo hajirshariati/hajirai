@@ -273,6 +273,69 @@
         "enable_parallax": false
       }
     },
+    "image_with_text_overlay_Bnk7TD": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "heading_DJPjam": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p><strong>Why Aetrex</strong></p>",
+            "heading_size": "title-lg tracking-heading",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_9jRhMJ": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Aetrex, Inc. is widely recognized as a global leader in foot scanning technology, orthotics and comfort and wellness footwear. The company’s state -of-the-art foot scanning devices, including Albert, Albert Pro and Albert 3DFit (2022 and 2023 CEES innovation Award Honorees) and Albert Pressure are engineered to accurately measure feet and determine foot type and pressure points.</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_DJPjam",
+        "text_9jRhMJ"
+      ],
+      "name": "t:sections.image-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/Group_9.png",
+        "image_height": "adapt",
+        "content_width": "medium",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/logopng.png",
+        "image_height_mobile": "500px",
+        "content_position_mobile": "items-start justify-start",
+        "text_alignment_mobile": "center",
+        "color_text": "#171717",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 5,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": true,
+        "parallax_direction": "vertical"
+      }
+    },
     "footer-copyright": {
       "type": "footer-copyright",
       "settings": {
@@ -299,6 +362,7 @@
     "multicolumn-with-icons",
     "multicolumn_with_icons_4NxwpQ",
     "footer",
+    "image_with_text_overlay_Bnk7TD",
     "footer-copyright"
   ]
 }
