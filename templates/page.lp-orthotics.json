@@ -947,8 +947,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
+            "text": "<p>Best Orthotics I've found and I've tried them all!</p>",
+            "author": "Sandra M.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -957,6 +957,32 @@
           }
         },
         "testimonial_RnLxLb": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>I love these orthotics! They are more comfortable and supportive than the custom orthotics made by a pediatrist.</p>",
+            "author": "Ellen H.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_GUBLhy": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>These orthotics are are great quality and are helping with my foot issues.</p>",
+            "author": "Jamie M.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_C38kUD": {
           "type": "testimonial",
           "settings": {
             "icon": "quote",
@@ -969,7 +995,7 @@
             "highlighted_scribble": "circle"
           }
         },
-        "testimonial_GUBLhy": {
+        "testimonial_xbNEwN": {
           "type": "testimonial",
           "settings": {
             "icon": "quote",
@@ -986,7 +1012,9 @@
       "block_order": [
         "testimonial_CRjWCe",
         "testimonial_RnLxLb",
-        "testimonial_GUBLhy"
+        "testimonial_GUBLhy",
+        "testimonial_C38kUD",
+        "testimonial_xbNEwN"
       ],
       "name": "Testimonials banner",
       "settings": {
