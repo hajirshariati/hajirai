@@ -306,7 +306,7 @@
         "grid_horizontal": 50,
         "direction": "left",
         "speed": 1,
-        "heading": "AS SEEN ON",
+        "heading": "As Seen On",
         "heading_size": "title-sm",
         "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
@@ -339,7 +339,7 @@
         "text_mGceFx": {
           "type": "text",
           "settings": {
-            "text": "<p><strong>30 Day Wear Test.</strong> Send Them Back If You Are Not 100% Satisfied </p>",
+            "text": "<p><strong>30 Day Wear Test.</strong> <br/>Send Them Back If You Are Not 100% Satisfied </p>",
             "text_font": "body",
             "text_size": "subtext-custom",
             "text_max_size": 26,
@@ -599,7 +599,7 @@
         "text_tce76f": {
           "type": "text",
           "settings": {
-            "text": "<p><em>WITH OVER 1000+ 5 STAR REVIEWS</em></p>",
+            "text": "<p>WITH OVER 1000+ 5 STAR REVIEWS</p>",
             "text_font": "body",
             "text_size": "subtext-custom",
             "text_max_size": 32,
@@ -635,7 +635,7 @@
         "color_text": "",
         "color_background": "",
         "gradient_background": "",
-        "color_highlight": "#91b7c9",
+        "color_highlight": "rgba(0,0,0,0)",
         "gradient_highlight": "",
         "color_button_text": "",
         "color_button_background": "",
@@ -838,7 +838,7 @@
         "text_NePjkw": {
           "type": "text",
           "settings": {
-            "text": "<p><strong>30 Day Wear Test.</strong> Send Them Back If You Are Not 100% Satisfied </p>",
+            "text": "<p><strong>30 Day Wear Test.</strong> <br/>Send Them Back If You Are Not 100% Satisfied </p>",
             "text_font": "body",
             "text_size": "subtext-custom",
             "text_max_size": 28,
@@ -1384,7 +1384,7 @@
         "color_highlight": "",
         "gradient_highlight": "",
         "color_button_text": "rgba(0,0,0,0)",
-        "color_button_background": "",
+        "color_button_background": "#91b7c9",
         "color_button_gradient": "",
         "padding_top": 24,
         "padding_bottom": 24,
