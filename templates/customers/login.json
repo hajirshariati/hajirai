@@ -33,7 +33,6 @@
         },
         "text_JC87eP": {
           "type": "text",
-          "disabled": true,
           "settings": {
             "text": "<p>Join today to unlock exclusive promotions, earn points on your purchases and more.</p>",
             "text_font": "body",
