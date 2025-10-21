@@ -579,8 +579,8 @@
         "image_i7MLJM": {
           "type": "image",
           "settings": {
-            "subheading": "Strategically Placed Arch Support",
-            "heading": "",
+            "subheading": "",
+            "heading": "Strategically Placed Arch Support",
             "link": "",
             "invert_subheading_heading": false,
             "image": "shopify://shop_images/617x640_signature_arch.png",
@@ -602,8 +602,8 @@
         "image_kirkAq": {
           "type": "image",
           "settings": {
-            "subheading": "Alignment & Biomechanical Efficiency",
-            "heading": "",
+            "subheading": "",
+            "heading": "Alignment & Biomechanical Efficiency",
             "link": "",
             "invert_subheading_heading": false,
             "image": "shopify://shop_images/617x640_alignment.png",
@@ -625,8 +625,8 @@
         "image_UMzkxc": {
           "type": "image",
           "settings": {
-            "subheading": "Hi-Tech Materials to Benefit Your Health",
-            "heading": "",
+            "subheading": "",
+            "heading": "Hi-Tech Materials to Benefit Your Health",
             "link": "",
             "invert_subheading_heading": false,
             "image": "shopify://shop_images/617x640_Hi_tech_Materials.png",
@@ -648,8 +648,8 @@
         "image_DEUPz8": {
           "type": "image",
           "settings": {
-            "subheading": "All-Day Comfort and Energy",
-            "heading": "",
+            "subheading": "",
+            "heading": "All-Day Comfort and Energy",
             "link": "",
             "invert_subheading_heading": false,
             "image": "shopify://shop_images/sneaker_ortho.png",
@@ -678,7 +678,7 @@
       "name": "t:sections.collage.name",
       "settings": {
         "heading": "<strong>The World’s #1 Premium Foot Orthotic.</strong>",
-        "heading_size": "title-sm",
+        "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
         "subheading": "",
@@ -920,8 +920,8 @@
       "name": "Testimonials banner",
       "settings": {
         "transparent_header": false,
-        "image": "shopify://shop_images/Screenshot_2025-10-21_at_3.18.48_PM.png",
-        "image_height": "650px",
+        "image": "shopify://shop_images/testimonials.svg",
+        "image_height": "450px",
         "content_position": "md:items-center md:justify-center",
         "image_height_mobile": "auto",
         "content_position_mobile": "items-center justify-center",
