@@ -8,7 +8,8 @@
 {{ 'customer.css' | asset_url | stylesheet_tag }}
 
 <div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}">
-  <div class="{% if section.settings.layout_width == 'narrow' %}page-width{% elsif section.settings.layout_width == 'medium' %}container{% else %}page-width{% endif %} relative">
+  <div class="{% if section.settings.layout_width == 'narrow' %}page-width{% elsif section.settings.layout_width == 'medium' %}container{% else %}page-width{% endif %} relative" style="
+    max-width: 1600px;">
     
     {%- comment -%} Two Column Layout: Left for custom sections, Right for login {%- endcomment -%}
     <div class="grid lg:grid-cols-2 {% if section.settings.layout_width == 'narrow' %}lg:gap-8{% elsif section.settings.layout_width == 'medium' %}lg:gap-12{% else %}lg:gap-20{% endif %} gap-8">
