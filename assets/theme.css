@@ -4598,15 +4598,20 @@ input:is([type="checkbox"], [type="radio"]):is(:disabled, .disabled):not(
 .swatches
 input:is([type="checkbox"], [type="radio"]):is(:disabled, .disabled)
 + .label-swatch {
-    background-color: #b4b4b440;
+    background-color: #d0d0d040;
     color: #171717;
-    opacity: 0.7;
     cursor: pointer;
 }
 
 .swatches
 input:is([type="checkbox"], [type="radio"]):is(:disabled, .disabled)
 + .label-swatch::after {
+    --tw-shadow-color: #e6e6e6;
+}
+
+.swatches
+input:is([type="checkbox"], [type="radio"]):is(:disabled, .disabled)
++ .label-swatch.checked::after {
     --tw-shadow-color: #171717;
 }
 
@@ -17711,16 +17716,6 @@ a[href="#"] {
         width: 10px;
         height: 10px;
     }
-}
-
-.label-swatch.checked {
-    background-color: transparent!important;
-    opacity: 1!important;
-}
-
-.label-swatch.checked:before,
-.label-swatch.checked .unavailable-icon {
-    display: none;
 }
 
 .product-form__buttons .needsclick {
