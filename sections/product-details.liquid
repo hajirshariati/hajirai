@@ -1368,36 +1368,3 @@
 
 {% endschema %}
 
-<script>
-  // Store all variant SKUs in a JSON object
-  const variantData{{ section.id }} = {
-    {%- for variant in product.variants -%}
-      "{{ variant.id }}": "{{ variant.sku | escape }}"
-      {%- unless forloop.last -%},{%- endunless -%}
-    {%- endfor -%}
-  };
-
-  // Update SKU when variant changes
-  document.addEventListener('DOMContentLoaded', function() {
-    const skuElement = document.querySelector('#Sku-{{ section.id }}-{{ product.id }}');
-    
-    if (skuElement) {
-      // Listen for variant change events
-      document.addEventListener('variant:change', function(event) {
-        if (event.detail && event.detail.variant && event.detail.variant.id) {
-          const newSku = variantData{{ section.id }}[event.detail.variant.id];
-          if (newSku) {
-            skuElement.innerHTML = 'SKU:&nbsp;' + newSku;
-          }
-        }
-      });
-
-      // Also listen for URL changes
-      const urlParams = new URLSearchParams(window.location.search);
-      const variantId = urlParams.get('variant');
-      if (variantId && variantData{{ section.id }}[variantId]) {
-        skuElement.innerHTML = 'SKU:&nbsp;' + variantData{{ section.id }}[variantId];
-      }
-    }
-  });
-</script>
