@@ -14,12 +14,12 @@
     <div class="details__content">
       <ul class="flex flex-col gap-3">
         {%- for link in block.settings.menu.links -%}
-          {% assign link_downcase = link.title | downcase %}
+          {% assign link_title_lower = link.title | downcase | strip %}
           
-          {%- if link.title contains 'Manage Cookie Preference' -%}
+          {%- if link_title_lower contains 'manage cookie' or link_title_lower contains 'cookie preference' -%}
             <li class="inline-flex">
               <button id="ot-sdk-btn" class="ot-sdk-show-settings block reversed-link text-sm-lg leading-tight">
-                Manage Cookie Preference
+                {{ link.title }}
               </button>
             </li>
           {%- else -%}
@@ -28,6 +28,7 @@
             </li>
           {%- endif -%}
           
+          {% assign link_downcase = link.title | downcase %}
           {% if link_downcase contains "accessibility" %}
             <li>
               <button type="button" class="userway-custom-trigger" aria-label="Accessibility Options">
