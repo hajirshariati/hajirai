@@ -600,12 +600,5 @@
   },
   "date_formats": {
     "month_day_year": "%b %d, %Y"
-  },
-  "shopify": {
-    "checkout": {
-      "order_summary": {
-        "discount_title": "Apply Discount"
-      }
-    }
   }
 }
