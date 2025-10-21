@@ -617,6 +617,7 @@
         },
         "collection_C3dagf": {
           "type": "collection",
+          "disabled": true,
           "settings": {
             "link_type": "collection",
             "collection": "golf-orthotics",
