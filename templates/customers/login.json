@@ -256,13 +256,26 @@
         "heading_XBGMmx": {
           "type": "heading",
           "settings": {
-            "heading": "Member Benefits",
+            "heading": "Exclusive Benefits",
             "heading_size": "title-sm",
             "heading_tag": "h2",
             "text_color": "#ffffff",
             "text_align": "center",
             "background_color": "#5c6d74",
             "padding": 20,
+            "border_radius": 0,
+            "add_spacing": true
+          }
+        },
+        "text_pJYU7k": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Add your custom content here.</p>",
+            "text_size": "text-base",
+            "text_color": "",
+            "text_align": "left",
+            "background_color": "",
+            "padding": 0,
             "border_radius": 0,
             "add_spacing": true
           }
@@ -378,6 +391,7 @@
       },
       "block_order": [
         "heading_XBGMmx",
+        "text_pJYU7k",
         "icon_with_text_w6m4UM",
         "icon_with_text_bPJnCi",
         "icon_with_text_GMpwRP",
