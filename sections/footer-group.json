@@ -310,7 +310,7 @@
       "settings": {
         "transparent_header": false,
         "image": "shopify://shop_images/Group_9.png",
-        "image_height": "adapt",
+        "image_height": "400px",
         "content_width": "medium",
         "content_position": "md:items-end md:justify-start",
         "text_alignment": "left",
@@ -326,14 +326,14 @@
         "color_button_gradient": "",
         "color_overlay": "#171717",
         "divider_color": "#111111",
-        "overlay_opacity": 50,
+        "overlay_opacity": 60,
         "padding_top": 0,
         "padding_bottom": 0,
         "divider": false,
         "full_width": true,
         "rounded": true,
         "enable_parallax": true,
-        "parallax_direction": "vertical"
+        "parallax_direction": "horizontal"
       }
     },
     "footer-copyright": {
