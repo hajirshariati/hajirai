@@ -587,16 +587,6 @@
     "image_with_text_hjPy3i": {
       "type": "image-with-text",
       "blocks": {
-        "heading_mAqtJV": {
-          "type": "heading",
-          "settings": {
-            "heading": "Orthotics",
-            "heading_size": "title-md",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
         "text_i63RN8": {
           "type": "text",
           "settings": {
@@ -641,7 +631,6 @@
         }
       },
       "block_order": [
-        "heading_mAqtJV",
         "text_i63RN8",
         "text_nktn3W",
         "button_nMXNFP"
