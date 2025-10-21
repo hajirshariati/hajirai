@@ -516,12 +516,29 @@
         },
         "collection_C3dagf": {
           "type": "collection",
-          "disabled": true,
           "settings": {
             "link_type": "collection",
             "collection": "golf-orthotics",
             "custom_url": "",
-            "title": "",
+            "image": "shopify://shop_images/golf_d9721c22-b996-4b0f-a445-56e0f5cf9ed6.png",
+            "title": "Golf",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_4RE3QR": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "tennis-pickleball-orthotics",
+            "custom_url": "",
+            "image": "shopify://shop_images/pickleball.png",
+            "title": "Pickleball",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -538,7 +555,8 @@
         "collection_xjQV8H",
         "collection_FWgTeX",
         "collection_ELYLBC",
-        "collection_C3dagf"
+        "collection_C3dagf",
+        "collection_4RE3QR"
       ],
       "name": "Collection list",
       "settings": {
