@@ -585,7 +585,7 @@
         "question_W7Tfde": {
           "type": "question",
           "settings": {
-            "title": "what if my order total is less than my current available reward?",
+            "title": "What if my order total is less than my current available reward?",
             "text": "<p>Rewards are issued in the form of coupons, if your order total is less than the coupon value, the remaining balance cannot be carried over to future orders. The unused remainder of the coupon will be forfeited.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -603,7 +603,7 @@
         "question_tGcmbw": {
           "type": "question",
           "settings": {
-            "title": "how is the anniversary date determined for the loyalty program?",
+            "title": "How is the anniversary date determined for the loyalty program?",
             "text": "<p>The anniversary date is based on the date the account is created with a password..</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -621,7 +621,7 @@
         "question_GMbXMW": {
           "type": "question",
           "settings": {
-            "title": "Is the aetrex access rewards program available for non-us customers",
+            "title": "Is the Aetrex Access rewards program available for non-us customers",
             "text": "<p>Unfortunately, it is currently only available for US customers. However, we are considering expanding it internationally in the future.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
