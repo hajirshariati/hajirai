@@ -221,7 +221,7 @@
 
 {%- if block.settings.heading == "Description" -%}
       <p class="product__sku col-span-full" id="Sku-{{ section.id }}-{{ product.id }}">SKU:&nbsp;
-        {{- product.selected_variant -}}
+        {{- product.selected_or_first_available_variant.sku -}}
       </p>
     {%- endif -%}
 
