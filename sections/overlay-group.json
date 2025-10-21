@@ -324,6 +324,7 @@
         "mobile-dock-6",
         "custom_html_7yWDrM"
       ],
+      "disabled": true,
       "settings": {
         "color_text": "#000000",
         "color_background": "#ffffff",

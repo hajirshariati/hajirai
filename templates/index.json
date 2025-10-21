@@ -15,8 +15,8 @@
         "heading_WMGPBB": {
           "type": "heading",
           "settings": {
-            "heading": "<h1><strong>The Aetrex <br/>Technology <br/>Difference</strong></h1>",
-            "heading_size": "title-md",
+            "heading": "<p>The Aetrex <br/>Technology <br/>Difference</p>",
+            "heading_size": "title-sm",
             "heading_tag": "h1",
             "highlighted_text": "text",
             "highlighted_scribble": "circle"
@@ -214,8 +214,8 @@
         "heading_bLaqMU": {
           "type": "heading",
           "settings": {
-            "heading": "<h1><strong>Healthy Comfort<br/>Starts Here!®</strong></h1>",
-            "heading_size": "title-md",
+            "heading": "<p>Healthy Comfort<br/>Starts Here!®</p>",
+            "heading_size": "title-sm",
             "heading_tag": "h1",
             "highlighted_text": "text",
             "highlighted_scribble": "circle"
