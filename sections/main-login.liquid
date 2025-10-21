@@ -169,7 +169,7 @@
         
       </div>
       {%- comment -%} CUSTOM BLOCKS - Shows SECOND on mobile, LEFT on desktop {%- endcomment -%}
-      <div class="lg:order-1 flex flex-col justify-center" style="background: #d3e3ec; border-radius: 2em;">
+      <div class="lg:order-1 flex flex-col justify-center" style="background: #d3e3ec; border-radius: 2em;" data-us-only>
         {%- for block in section.blocks -%}
           <div class="login-custom-block{% if block.settings.add_spacing %} mb-8{% endif %}" 
                style="{% if block.settings.background_color != blank %}background-color: {{ block.settings.background_color }};{% endif %}{% if block.settings.padding != blank %} padding: {{ block.settings.padding }}px;{% endif %}{% if block.settings.border_radius != blank %} border-radius: {{ block.settings.border_radius }}px;{% endif %}"
