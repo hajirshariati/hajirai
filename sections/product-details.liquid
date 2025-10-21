@@ -1368,3 +1368,78 @@
 
 {% endschema %}
 
+<script>
+(function() {
+  // Store all variant SKUs
+  const variantData = {
+    {%- for variant in product.variants -%}
+      {{ variant.id }}: "{{ variant.sku | escape }}"
+      {%- unless forloop.last -%},{%- endunless -%}
+    {%- endfor -%}
+  };
+
+  const skuElement = document.querySelector('#Sku-{{ section.id }}-{{ product.id }}');
+  
+  if (!skuElement) return;
+
+  // Function to update SKU display
+  function updateSKU(variantId) {
+    const newSku = variantData[variantId];
+    if (newSku) {
+      skuElement.innerHTML = 'SKU:&nbsp;' + newSku;
+    }
+  }
+
+  // Method 1: Listen to product-info element changes (most themes)
+  const productInfo = document.querySelector('product-info');
+  if (productInfo) {
+    const observer = new MutationObserver(function() {
+      const currentVariant = productInfo.querySelector('[name="id"]');
+      if (currentVariant && currentVariant.value) {
+        updateSKU(parseInt(currentVariant.value));
+      }
+    });
+    
+    observer.observe(productInfo, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ['value']
+    });
+  }
+
+  // Method 2: Listen to form changes
+  const form = document.querySelector('[data-product-id="{{ product.id }}"]');
+  if (form) {
+    form.addEventListener('change', function(e) {
+      if (e.target.name === 'id') {
+        updateSKU(parseInt(e.target.value));
+      }
+    });
+  }
+
+  // Method 3: Watch for URL parameter changes
+  let lastVariantId = null;
+  setInterval(function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const variantId = urlParams.get('variant');
+    if (variantId && variantId !== lastVariantId) {
+      lastVariantId = variantId;
+      updateSKU(parseInt(variantId));
+    }
+  }, 500);
+
+  // Method 4: Listen to any variant change events
+  document.addEventListener('variant:change', function(event) {
+    if (event.detail && event.detail.variant && event.detail.variant.id) {
+      updateSKU(event.detail.variant.id);
+    }
+  });
+
+  // Initialize with current variant
+  const currentVariantInput = document.querySelector('[name="id"]');
+  if (currentVariantInput && currentVariantInput.value) {
+    updateSKU(parseInt(currentVariantInput.value));
+  }
+})();
+</script>
