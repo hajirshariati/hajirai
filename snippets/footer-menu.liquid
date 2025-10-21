@@ -14,17 +14,30 @@
     <div class="details__content">
       <ul class="flex flex-col gap-3">
         {%- for link in block.settings.menu.links -%}
-          <li class="inline-flex" {% if link.title == 'Aetrex Rewards' %}data-us-only{% endif %}>
-            <a href="{{ link.url }}" class="block reversed-link text-sm-lg leading-tight">{{ link.title }}</a>
-          </li>
-        {% assign link_downcase = link.title | downcase %}
-        {% if link_downcase contains "accessibility" %}
-          <li>
-            <button type="button" class="userway-custom-trigger" aria-label="Accessibility Options">
-              {% render 'icon', icon: "accessibility" %}
-            </button>
-          </li>
-        {% endif %}
+          {% assign link_downcase = link.title | downcase %}
+          
+          {%- comment -%} Check for Manage Cookie Preference {%- endcomment -%}
+          {% if link.title contains 'Manage Cookie Preference' %}
+            <li class="inline-flex">
+              <button id="ot-sdk-btn" class="ot-sdk-show-settings block reversed-link text-sm-lg leading-tight">
+                {{ link.title }}
+              </button>
+            </li>
+          
+          {%- comment -%} Check for Accessibility {%- endcomment -%}
+          {% elsif link_downcase contains "accessibility" %}
+            <li>
+              <button type="button" class="userway-custom-trigger" aria-label="Accessibility Options">
+                {% render 'icon', icon: "accessibility" %}
+              </button>
+            </li>
+          
+          {%- comment -%} Regular links {%- endcomment -%}
+          {% else %}
+            <li class="inline-flex" {% if link.title == 'Aetrex Rewards' %}data-us-only{% endif %}>
+              <a href="{{ link.url }}" class="block reversed-link text-sm-lg leading-tight">{{ link.title }}</a>
+            </li>
+          {% endif %}
         {%- endfor -%}
       </ul>
     </div>
