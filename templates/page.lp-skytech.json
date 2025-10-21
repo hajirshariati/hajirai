@@ -382,7 +382,7 @@
         "color_button_gradient": "",
         "padding_top": 12,
         "padding_bottom": 12,
-        "divider": false,
+        "divider": true,
         "narrow": true,
         "rounded": false
       }
@@ -881,7 +881,7 @@
         "color_button_gradient": "",
         "padding_top": 12,
         "padding_bottom": 12,
-        "divider": false,
+        "divider": true,
         "narrow": true,
         "rounded": false
       }
