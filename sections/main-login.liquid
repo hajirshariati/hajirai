@@ -8,244 +8,156 @@
 {{ 'customer.css' | asset_url | stylesheet_tag }}
 
 <div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}">
-  <div class="{% if section.settings.layout_width == 'narrow' %}page-width{% elsif section.settings.layout_width == 'medium' %}container{% else %}page-width{% endif %} relative">
-    
-    {%- comment -%} Two Column Layout: Left for custom sections, Right for login {%- endcomment -%}
-    <div class="grid lg:grid-cols-2 {% if section.settings.layout_width == 'narrow' %}lg:gap-8{% elsif section.settings.layout_width == 'medium' %}lg:gap-12{% else %}lg:gap-20{% endif %} gap-8">
-      
-      {%- comment -%} LEFT COLUMN - Custom Content Sections {%- endcomment -%}
-      <div class="order-2 lg:order-1 flex flex-col justify-center">
-        {%- for block in section.blocks -%}
-          <div class="login-custom-block{% if block.settings.add_spacing %} mb-8{% endif %}" 
-               style="{% if block.settings.background_color != blank %}background-color: {{ block.settings.background_color }};{% endif %}{% if block.settings.padding != blank %} padding: {{ block.settings.padding }}px;{% endif %}{% if block.settings.border_radius != blank %} border-radius: {{ block.settings.border_radius }}px;{% endif %}"
-               {{ block.shopify_attributes }}>
-            {%- case block.type -%}
-              
-              {%- when 'heading' -%}
-                <{{ block.settings.heading_tag }} class="heading {{ block.settings.heading_size }}{% if block.settings.text_align != blank %} text-{{ block.settings.text_align }}{% endif %}"
-                    style="{% if block.settings.text_color != blank %}color: {{ block.settings.text_color }};{% endif %}">
-                  {{ block.settings.heading }}
-                </{{ block.settings.heading_tag }}>
-              
-              {%- when 'text' -%}
-                <div class="rte {{ block.settings.text_size }}{% if block.settings.text_align != blank %} text-{{ block.settings.text_align }}{% endif %}"
-                     style="{% if block.settings.text_color != blank %}color: {{ block.settings.text_color }};{% endif %}">
-                  {{ block.settings.text }}
-                </div>
-              
-              {%- when 'icon_with_text' -%}
-                <div class="flex {% if block.settings.icon_position == 'top' %}flex-col items-{{ block.settings.text_align }}{% else %}items-start{% endif %} gap-4">
-                  {%- if block.settings.icon != blank -%}
-                    <div class="{% if block.settings.icon_position == 'left' %}flex-shrink-0{% endif %}" style="{% if block.settings.icon_color != blank %}color: {{ block.settings.icon_color }};{% endif %}">
-                      {%- render 'icon', icon: block.settings.icon, size: block.settings.icon_size -%}
-                    </div>
-                  {%- endif -%}
-                  <div class="flex-1{% if block.settings.text_align != blank %} text-{{ block.settings.text_align }}{% endif %}">
-                    {%- if block.settings.icon_heading != blank -%}
-                      <h3 class="{{ block.settings.icon_heading_size }} mb-2" style="{% if block.settings.text_color != blank %}color: {{ block.settings.text_color }};{% endif %}">
-                        {{ block.settings.icon_heading }}
-                      </h3>
-                    {%- endif -%}
-                    {%- if block.settings.icon_text != blank -%}
-                      <div class="rte {{ block.settings.text_size }}" style="{% if block.settings.text_color != blank %}color: {{ block.settings.text_color }};{% endif %}">
-                        {{ block.settings.icon_text }}
-                      </div>
-                    {%- endif -%}
-                  </div>
-                </div>
-              
-              {%- when 'image' -%}
-                {%- if block.settings.image != blank -%}
-                  <div class="{% if block.settings.text_align != blank %}text-{{ block.settings.text_align }}{% endif %}">
-                    <img 
-                      src="{{ block.settings.image | image_url: width: 800 }}" 
-                      alt="{{ block.settings.image.alt | escape }}"
-                      loading="lazy"
-                      width="{{ block.settings.image.width }}"
-                      height="{{ block.settings.image.height }}"
-                      style="{% if block.settings.image_width != blank %}max-width: {{ block.settings.image_width }}%;{% endif %} height: auto;"
-                    />
-                  </div>
-                {%- endif -%}
-              
-              {%- when 'button' -%}
-                {%- if block.settings.button_label != blank -%}
-                  <div class="{% if block.settings.text_align != blank %}text-{{ block.settings.text_align }}{% endif %}">
-                    <a 
-                      href="{{ block.settings.button_link }}" 
-                      class="button {{ block.settings.button_style }} button--fixed"
-                      is="hover-link"
-                    >
-                      <span class="btn-fill" data-fill></span>
-                      <span class="btn-text">{{ block.settings.button_label }}</span>
-                    </a>
-                  </div>
-                {%- endif -%}
-              
-              {%- when 'spacer' -%}
-                <div style="height: {{ block.settings.height }}px;"></div>
-              
-            {%- endcase -%}
-          </div>
-        {%- endfor -%}
-      </div>
-      
-      {%- comment -%} RIGHT COLUMN - Login Forms {%- endcomment -%}
-      <div class="order-1 lg:order-2">
-        
-        <div id="Recover" class="title-wrapper{% if section.settings.heading_size == 'title-xl' %} title-wrapper-lg{% endif %} text-center leading-none hidden gap-4">
-          <{{ section.settings.heading_tag }} class="heading {{ section.settings.heading_size }}" tabindex="-1">
-            <split-words class="split-words js-invisible block" data-animate="fade-up-large">{{ 'customer.recover_password.title' | t }}</split-words>
-          </{{ section.settings.heading_tag }}>
-          <p class="text-lg md:text-2xl">{{ 'customer.recover_password.subtext' | t }}</p>
+  <div class="page-width relative">
+    <div id="Recover" class="title-wrapper{% if section.settings.heading_size == 'title-xl' %} title-wrapper-lg{% endif %} text-center leading-none hidden gap-4">
+      <{{ section.settings.heading_tag }} class="heading {{ section.settings.heading_size }}" tabindex="-1">
+        <split-words class="split-words js-invisible block" data-animate="fade-up-large">{{ 'customer.recover_password.title' | t }}</split-words>
+      </{{ section.settings.heading_tag }}>
+      <p class="text-lg md:text-2xl">{{ 'customer.recover_password.subtext' | t }}</p>
+    </div>
+
+    <div class="customer hidden">
+      {%- form 'recover_customer_password', class: 'grid gap-12' -%}
+        {%- liquid
+          if form.errors
+            assign form_errors = form.errors | default_errors
+            render 'alert', status: 'error', content: form_errors
+          endif
+
+          assign recover_success = form.posted_successfully?
+        -%}
+
+        <div class="field">
+          <input
+            required
+            class="input is-floating{% if form.errors %} invalid{% endif %}"
+            type="email"
+            value=""
+            name="email"
+            id="RecoverEmail"
+            autocorrect="off"
+            autocapitalize="off"
+            autocomplete="email"
+            placeholder="{{ 'customer.recover_password.email' | t | escape }}"
+            {%- if form.errors %} autofocus{% endif -%}
+          />
+          <label class="label is-floating" for="RecoverEmail">{{ 'customer.recover_password.email' | t }}</label>
         </div>
 
-        <div class="customer hidden">
-          {%- form 'recover_customer_password', class: 'grid gap-12' -%}
-            {%- liquid
-              if form.errors
-                assign form_errors = form.errors | default_errors
-                render 'alert', status: 'error', content: form_errors
-              endif
+        <div class="grid gap-8">
+          <button class="button button--primary button--fixed" type="submit" is="hover-button">
+            <span class="btn-fill" data-fill></span>
+            <span class="btn-text">{{ 'customer.recover_password.submit' | t }}</span>
+          </button>
+          
+          <p class="text-center">
+            <a class="inline-flex items-center gap-2" href="#login">
+              {%- render 'icon', icon: 'return', size: 'sm' -%}
+              <span class="link text-lg leading-none">{{ 'customer.recover_password.cancel' | t }}</span>
+            </a>
+          </p>
+        </div>
+      {%- endform -%}
+    </div>
 
-              assign recover_success = form.posted_successfully?
-            -%}
+    <div id="Login" class="title-wrapper{% if section.settings.heading_size == 'title-xl' %} title-wrapper-lg{% endif %} text-center">
+      <{{ section.settings.heading_tag }} class="heading {{ section.settings.heading_size }}">
+        <split-words class="split-words js-invisible block" data-animate="fade-up-large">{{ 'customer.login.title' | t }}</split-words>
+      </{{ section.settings.heading_tag }}>
+    </div>
+    
+    <div class="customer">
+      {%- form 'customer_login', class: 'grid gap-12' -%}
+        {%- liquid
+          if form.errors
+            assign form_errors = form.errors | default_errors
+            render 'alert', status: 'error', content: form_errors
+          endif
 
+          if recover_success == true
+            assign success_message = 'customer.recover_password.success' | t
+            render 'alert', status: 'success', content: success_message
+          endif
+        -%}
+
+        {%- if section.settings.enable_shop_login_button -%}
+          <div class="sign-in-with-shop-provider rte text-center">
+            {{- shop | login_button -}}
+            <p>{{ 'customer.login.alternate_provider_separator' | t }}</p>
+          </div>
+        {%- endif -%}
+        
+        <div class="grid gap-5">
+          <div class="field">
+            <input
+              required
+              class="input is-floating{% if form.errors contains 'form' %} invalid{% endif %}"
+              type="email"
+              name="customer[email]"
+              id="CustomerEmail"
+              autocomplete="email"
+              autocorrect="off"
+              autocapitalize="off"
+              placeholder="{{ 'customer.login.email' | t | escape }}"
+            />
+            <label class="label is-floating" for="CustomerEmail">{{ 'customer.login.email' | t }}</label>
+          </div>
+
+          {%- if form.password_needed -%}
             <div class="field">
               <input
                 required
-                class="input is-floating{% if form.errors %} invalid{% endif %}"
-                type="email"
+                class="input is-floating{% if form.errors contains 'form' %} invalid{% endif %}"
+                type="password"
                 value=""
-                name="email"
-                id="RecoverEmail"
-                autocorrect="off"
-                autocapitalize="off"
-                autocomplete="email"
-                placeholder="{{ 'customer.recover_password.email' | t | escape }}"
-                {%- if form.errors %} autofocus{% endif -%}
+                name="customer[password]"
+                id="CustomerPassword"
+                autocomplete="current-password"
+                placeholder="{{ 'customer.login.password' | t | escape }}"
               />
-              <label class="label is-floating" for="RecoverEmail">{{ 'customer.recover_password.email' | t }}</label>
+              <label class="label is-floating" for="CustomerPassword">{{ 'customer.login.password' | t }}</label>
             </div>
 
-            <div class="grid gap-8">
-              <button class="button button--primary button--fixed" type="submit" is="hover-button">
-                <span class="btn-fill" data-fill></span>
-                <span class="btn-text">{{ 'customer.recover_password.submit' | t }}</span>
-              </button>
-              
-              <p class="text-center">
-                <a class="inline-flex items-center gap-2" href="#login">
-                  {%- render 'icon', icon: 'return', size: 'sm' -%}
-                  <span class="link text-lg leading-none">{{ 'customer.recover_password.cancel' | t }}</span>
-                </a>
-              </p>
-            </div>
-          {%- endform -%}
+            <p>
+              <a class="link" href="#Recover">{{ 'customer.login.forgot_password' | t }}</a>
+            </p>
+          {%- endif -%}
         </div>
 
-        <div id="Login" class="title-wrapper{% if section.settings.heading_size == 'title-xl' %} title-wrapper-lg{% endif %} text-center">
-          <{{ section.settings.heading_tag }} class="heading {{ section.settings.heading_size }}">
-            <split-words class="split-words js-invisible block" data-animate="fade-up-large">{{ 'customer.login.title' | t }}</split-words>
-          </{{ section.settings.heading_tag }}>
+        <div class="grid gap-8">
+          <div class="button-group grid gap-4 md:grid-cols-2">
+            <button class="button button--primary button--fixed" type="submit" is="hover-button">
+              <span class="btn-fill" data-fill></span>
+              <span class="btn-text">{{ 'customer.login.submit' | t }}</span>
+            </button>
+            <a class="button button--secondary button--fixed" href="{{ routes.account_register_url }}" is="hover-link">
+              <span class="btn-fill" data-fill></span>
+              <span class="btn-text">{{ 'customer.login.create_account' | t }}</span>
+            </a>
+          </div>
+          
+          <p class="text-center">
+            <a class="inline-flex items-center gap-2" href="{{ routes.root_url }}">
+              {%- render 'icon', icon: 'return', size: 'sm' -%}
+              <span class="link text-lg leading-none">{{ 'customer.login.return' | t }}</span>
+            </a>
+          </p>
         </div>
-        
-        <div class="customer">
-          {%- form 'customer_login', class: 'grid gap-12' -%}
-            {%- liquid
-              if form.errors
-                assign form_errors = form.errors | default_errors
-                render 'alert', status: 'error', content: form_errors
-              endif
-
-              if recover_success == true
-                assign success_message = 'customer.recover_password.success' | t
-                render 'alert', status: 'success', content: success_message
-              endif
-            -%}
-
-            {%- if section.settings.enable_shop_login_button -%}
-              <div class="sign-in-with-shop-provider rte text-center">
-                {{- shop | login_button -}}
-                <p>{{ 'customer.login.alternate_provider_separator' | t }}</p>
-              </div>
-            {%- endif -%}
-            
-            <div class="grid gap-5">
-              <div class="field">
-                <input
-                  required
-                  class="input is-floating{% if form.errors contains 'form' %} invalid{% endif %}"
-                  type="email"
-                  name="customer[email]"
-                  id="CustomerEmail"
-                  autocomplete="email"
-                  autocorrect="off"
-                  autocapitalize="off"
-                  placeholder="{{ 'customer.login.email' | t | escape }}"
-                />
-                <label class="label is-floating" for="CustomerEmail">{{ 'customer.login.email' | t }}</label>
-              </div>
-
-              {%- if form.password_needed -%}
-                <div class="field">
-                  <input
-                    required
-                    class="input is-floating{% if form.errors contains 'form' %} invalid{% endif %}"
-                    type="password"
-                    value=""
-                    name="customer[password]"
-                    id="CustomerPassword"
-                    autocomplete="current-password"
-                    placeholder="{{ 'customer.login.password' | t | escape }}"
-                  />
-                  <label class="label is-floating" for="CustomerPassword">{{ 'customer.login.password' | t }}</label>
-                </div>
-
-                <p>
-                  <a class="link" href="#Recover">{{ 'customer.login.forgot_password' | t }}</a>
-                </p>
-              {%- endif -%}
-            </div>
-
-            <div class="grid gap-8">
-              <div class="button-group grid gap-4 md:grid-cols-2">
-                <button class="button button--primary button--fixed" type="submit" is="hover-button">
-                  <span class="btn-fill" data-fill></span>
-                  <span class="btn-text">{{ 'customer.login.submit' | t }}</span>
-                </button>
-                <a class="button button--secondary button--fixed" href="{{ routes.account_register_url }}" is="hover-link">
-                  <span class="btn-fill" data-fill></span>
-                  <span class="btn-text">{{ 'customer.login.create_account' | t }}</span>
-                </a>
-              </div>
-              
-              <p class="text-center">
-                <a class="inline-flex items-center gap-2" href="{{ routes.root_url }}">
-                  {%- render 'icon', icon: 'return', size: 'sm' -%}
-                  <span class="link text-lg leading-none">{{ 'customer.login.return' | t }}</span>
-                </a>
-              </p>
-            </div>
-          {%- endform -%}
-        </div>
-        
-        {%- if shop.checkout.guest_login -%}
-          <!--div>
-            <hr>
-            <h2>{{ 'customer.login.guest_title' | t }}</h2>
-
-            {%- form 'guest_login' -%}
-              <button class="button" type="submit">
-                {{ 'customer.login.guest_continue' | t }}
-              </button>
-            {%- endform -%}
-          </div-->
-        {%- endif -%}
-        
-      </div>
-      
+      {%- endform -%}
     </div>
+    
+    {%- if shop.checkout.guest_login -%}
+      <!--div>
+        <hr>
+        <h2>{{ 'customer.login.guest_title' | t }}</h2>
+
+        {%- form 'guest_login' -%}
+          <button class="button" type="submit">
+            {{ 'customer.login.guest_continue' | t }}
+          </button>
+        {%- endform -%}
+      </div-->
+    {%- endif -%}
   </div>
 </div>
 
@@ -258,31 +170,6 @@
       "id": "enable_shop_login_button",
       "label": "t:sections.main-login.settings.enable_shop_login_button.label",
       "default": false
-    },
-    {
-      "type": "header",
-      "content": "Layout Settings"
-    },
-    {
-      "type": "select",
-      "id": "layout_width",
-      "options": [
-        {
-          "value": "narrow",
-          "label": "Narrow (Closer together)"
-        },
-        {
-          "value": "medium",
-          "label": "Medium"
-        },
-        {
-          "value": "wide",
-          "label": "Wide (More space)"
-        }
-      ],
-      "default": "medium",
-      "label": "Layout Width",
-      "info": "Control the spacing between left and right columns"
     },
     {
       "type": "header",
@@ -392,574 +279,6 @@
       "id": "rounded",
       "default": false,
       "label": "t:sections.global.settings.rounded.label"
-    }
-  ],
-  "blocks": [
-    {
-      "type": "heading",
-      "name": "Heading",
-      "settings": [
-        {
-          "type": "text",
-          "id": "heading",
-          "label": "Heading",
-          "default": "Welcome Back"
-        },
-        {
-          "type": "select",
-          "id": "heading_size",
-          "options": [
-            {
-              "value": "title-sm",
-              "label": "Small"
-            },
-            {
-              "value": "title-md",
-              "label": "Medium"
-            },
-            {
-              "value": "title-lg",
-              "label": "Large"
-            },
-            {
-              "value": "title-xl",
-              "label": "Extra Large"
-            }
-          ],
-          "default": "title-lg",
-          "label": "Heading size"
-        },
-        {
-          "type": "select",
-          "id": "heading_tag",
-          "options": [
-            {
-              "value": "h1",
-              "label": "H1"
-            },
-            {
-              "value": "h2",
-              "label": "H2"
-            },
-            {
-              "value": "h3",
-              "label": "H3"
-            }
-          ],
-          "default": "h2",
-          "label": "Heading tag"
-        },
-        {
-          "type": "color",
-          "id": "text_color",
-          "label": "Text color"
-        },
-        {
-          "type": "select",
-          "id": "text_align",
-          "options": [
-            {
-              "value": "left",
-              "label": "Left"
-            },
-            {
-              "value": "center",
-              "label": "Center"
-            },
-            {
-              "value": "right",
-              "label": "Right"
-            }
-          ],
-          "default": "left",
-          "label": "Text alignment"
-        },
-        {
-          "type": "header",
-          "content": "Block Styling"
-        },
-        {
-          "type": "color",
-          "id": "background_color",
-          "label": "Background color"
-        },
-        {
-          "type": "range",
-          "id": "padding",
-          "min": 0,
-          "max": 80,
-          "step": 4,
-          "unit": "px",
-          "label": "Padding",
-          "default": 0
-        },
-        {
-          "type": "range",
-          "id": "border_radius",
-          "min": 0,
-          "max": 40,
-          "step": 2,
-          "unit": "px",
-          "label": "Border radius",
-          "default": 0
-        },
-        {
-          "type": "checkbox",
-          "id": "add_spacing",
-          "label": "Add spacing below block",
-          "default": true
-        }
-      ]
-    },
-    {
-      "type": "text",
-      "name": "Text",
-      "settings": [
-        {
-          "type": "richtext",
-          "id": "text",
-          "label": "Text",
-          "default": "<p>Add your custom content here.</p>"
-        },
-        {
-          "type": "select",
-          "id": "text_size",
-          "options": [
-            {
-              "value": "text-sm",
-              "label": "Small"
-            },
-            {
-              "value": "text-base",
-              "label": "Base"
-            },
-            {
-              "value": "text-lg",
-              "label": "Large"
-            },
-            {
-              "value": "text-xl",
-              "label": "Extra Large"
-            }
-          ],
-          "default": "text-base",
-          "label": "Text size"
-        },
-        {
-          "type": "color",
-          "id": "text_color",
-          "label": "Text color"
-        },
-        {
-          "type": "select",
-          "id": "text_align",
-          "options": [
-            {
-              "value": "left",
-              "label": "Left"
-            },
-            {
-              "value": "center",
-              "label": "Center"
-            },
-            {
-              "value": "right",
-              "label": "Right"
-            }
-          ],
-          "default": "left",
-          "label": "Text alignment"
-        },
-        {
-          "type": "header",
-          "content": "Block Styling"
-        },
-        {
-          "type": "color",
-          "id": "background_color",
-          "label": "Background color"
-        },
-        {
-          "type": "range",
-          "id": "padding",
-          "min": 0,
-          "max": 80,
-          "step": 4,
-          "unit": "px",
-          "label": "Padding",
-          "default": 0
-        },
-        {
-          "type": "range",
-          "id": "border_radius",
-          "min": 0,
-          "max": 40,
-          "step": 2,
-          "unit": "px",
-          "label": "Border radius",
-          "default": 0
-        },
-        {
-          "type": "checkbox",
-          "id": "add_spacing",
-          "label": "Add spacing below block",
-          "default": true
-        }
-      ]
-    },
-    {
-      "type": "icon_with_text",
-      "name": "Icon with Text",
-      "settings": [
-        {
-          "type": "text",
-          "id": "icon",
-          "label": "Icon name",
-          "info": "Enter icon name from your theme (e.g., 'checkmark', 'star', 'heart', 'box', 'truck')",
-          "default": "checkmark"
-        },
-        {
-          "type": "select",
-          "id": "icon_size",
-          "options": [
-            {
-              "value": "sm",
-              "label": "Small"
-            },
-            {
-              "value": "md",
-              "label": "Medium"
-            },
-            {
-              "value": "lg",
-              "label": "Large"
-            },
-            {
-              "value": "xl",
-              "label": "Extra Large"
-            }
-          ],
-          "default": "md",
-          "label": "Icon size"
-        },
-        {
-          "type": "color",
-          "id": "icon_color",
-          "label": "Icon color"
-        },
-        {
-          "type": "select",
-          "id": "icon_position",
-          "options": [
-            {
-              "value": "left",
-              "label": "Left of text"
-            },
-            {
-              "value": "top",
-              "label": "Above text"
-            }
-          ],
-          "default": "left",
-          "label": "Icon position"
-        },
-        {
-          "type": "text",
-          "id": "icon_heading",
-          "label": "Heading",
-          "default": "Feature Title"
-        },
-        {
-          "type": "select",
-          "id": "icon_heading_size",
-          "options": [
-            {
-              "value": "text-base font-bold",
-              "label": "Small"
-            },
-            {
-              "value": "text-lg font-bold",
-              "label": "Medium"
-            },
-            {
-              "value": "text-xl font-bold",
-              "label": "Large"
-            },
-            {
-              "value": "text-2xl font-bold",
-              "label": "Extra Large"
-            }
-          ],
-          "default": "text-lg font-bold",
-          "label": "Heading size"
-        },
-        {
-          "type": "richtext",
-          "id": "icon_text",
-          "label": "Description",
-          "default": "<p>Add your description text here.</p>"
-        },
-        {
-          "type": "select",
-          "id": "text_size",
-          "options": [
-            {
-              "value": "text-sm",
-              "label": "Small"
-            },
-            {
-              "value": "text-base",
-              "label": "Base"
-            },
-            {
-              "value": "text-lg",
-              "label": "Large"
-            }
-          ],
-          "default": "text-base",
-          "label": "Description size"
-        },
-        {
-          "type": "color",
-          "id": "text_color",
-          "label": "Text color"
-        },
-        {
-          "type": "select",
-          "id": "text_align",
-          "options": [
-            {
-              "value": "left",
-              "label": "Left"
-            },
-            {
-              "value": "center",
-              "label": "Center"
-            },
-            {
-              "value": "right",
-              "label": "Right"
-            }
-          ],
-          "default": "left",
-          "label": "Text alignment"
-        },
-        {
-          "type": "header",
-          "content": "Block Styling"
-        },
-        {
-          "type": "color",
-          "id": "background_color",
-          "label": "Background color"
-        },
-        {
-          "type": "range",
-          "id": "padding",
-          "min": 0,
-          "max": 80,
-          "step": 4,
-          "unit": "px",
-          "label": "Padding",
-          "default": 0
-        },
-        {
-          "type": "range",
-          "id": "border_radius",
-          "min": 0,
-          "max": 40,
-          "step": 2,
-          "unit": "px",
-          "label": "Border radius",
-          "default": 0
-        },
-        {
-          "type": "checkbox",
-          "id": "add_spacing",
-          "label": "Add spacing below block",
-          "default": true
-        }
-      ]
-    },
-    {
-      "type": "image",
-      "name": "Image",
-      "settings": [
-        {
-          "type": "image_picker",
-          "id": "image",
-          "label": "Image"
-        },
-        {
-          "type": "range",
-          "id": "image_width",
-          "min": 20,
-          "max": 100,
-          "step": 5,
-          "unit": "%",
-          "label": "Image width",
-          "default": 100
-        },
-        {
-          "type": "select",
-          "id": "text_align",
-          "options": [
-            {
-              "value": "left",
-              "label": "Left"
-            },
-            {
-              "value": "center",
-              "label": "Center"
-            },
-            {
-              "value": "right",
-              "label": "Right"
-            }
-          ],
-          "default": "center",
-          "label": "Image alignment"
-        },
-        {
-          "type": "header",
-          "content": "Block Styling"
-        },
-        {
-          "type": "color",
-          "id": "background_color",
-          "label": "Background color"
-        },
-        {
-          "type": "range",
-          "id": "padding",
-          "min": 0,
-          "max": 80,
-          "step": 4,
-          "unit": "px",
-          "label": "Padding",
-          "default": 0
-        },
-        {
-          "type": "range",
-          "id": "border_radius",
-          "min": 0,
-          "max": 40,
-          "step": 2,
-          "unit": "px",
-          "label": "Border radius",
-          "default": 0
-        },
-        {
-          "type": "checkbox",
-          "id": "add_spacing",
-          "label": "Add spacing below block",
-          "default": true
-        }
-      ]
-    },
-    {
-      "type": "button",
-      "name": "Button",
-      "settings": [
-        {
-          "type": "text",
-          "id": "button_label",
-          "label": "Button label",
-          "default": "Learn More"
-        },
-        {
-          "type": "url",
-          "id": "button_link",
-          "label": "Button link"
-        },
-        {
-          "type": "select",
-          "id": "button_style",
-          "options": [
-            {
-              "value": "button--primary",
-              "label": "Primary"
-            },
-            {
-              "value": "button--secondary",
-              "label": "Secondary"
-            }
-          ],
-          "default": "button--primary",
-          "label": "Button style"
-        },
-        {
-          "type": "select",
-          "id": "text_align",
-          "options": [
-            {
-              "value": "left",
-              "label": "Left"
-            },
-            {
-              "value": "center",
-              "label": "Center"
-            },
-            {
-              "value": "right",
-              "label": "Right"
-            }
-          ],
-          "default": "left",
-          "label": "Button alignment"
-        },
-        {
-          "type": "header",
-          "content": "Block Styling"
-        },
-        {
-          "type": "color",
-          "id": "background_color",
-          "label": "Background color"
-        },
-        {
-          "type": "range",
-          "id": "padding",
-          "min": 0,
-          "max": 80,
-          "step": 4,
-          "unit": "px",
-          "label": "Padding",
-          "default": 0
-        },
-        {
-          "type": "range",
-          "id": "border_radius",
-          "min": 0,
-          "max": 40,
-          "step": 2,
-          "unit": "px",
-          "label": "Border radius",
-          "default": 0
-        },
-        {
-          "type": "checkbox",
-          "id": "add_spacing",
-          "label": "Add spacing below block",
-          "default": true
-        }
-      ]
-    },
-    {
-      "type": "spacer",
-      "name": "Spacer",
-      "settings": [
-        {
-          "type": "range",
-          "id": "height",
-          "min": 20,
-          "max": 200,
-          "step": 10,
-          "unit": "px",
-          "label": "Height",
-          "default": 40
-        }
-      ]
     }
   ]
 }
