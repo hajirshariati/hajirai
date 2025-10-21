@@ -44,13 +44,15 @@
       {%- for link in linklists[section.settings.footer_menu].links -%}
         <li>
           <small>
-            <a 
-              href="{{ link.url }}" 
-              class="block reversed-link{% if link.title contains 'Manage Cookie Preference' %} ot-sdk-show-settings{% endif %}"
-              {% if link.title contains 'Manage Cookie Preference' %}id="ot-sdk-btn"{% endif %}
-            >
-              {{ link.title }}
-            </a>
+            {%- if link.title contains 'Manage Cookie Preference' -%}
+              <button id="ot-sdk-btn" class="ot-sdk-show-settings block reversed-link">
+                {{ link.title }}
+              </button>
+            {%- else -%}
+              <a href="{{ link.url }}" class="block reversed-link">
+                {{ link.title }}
+              </a>
+            {%- endif -%}
           </small>
         </li>
       {%- endfor -%}
