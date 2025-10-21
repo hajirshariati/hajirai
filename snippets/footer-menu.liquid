@@ -13,30 +13,30 @@
   {%- capture block_content -%}
     <div class="details__content">
       <ul class="flex flex-col gap-3">
-{%- for link in block.settings.menu.links -%}
-  {% assign link_title_lower = link.title | downcase | strip %}
-  
-  <li class="inline-flex" {% if link.title == 'Aetrex Rewards' %}data-us-only{% endif %}>
-    {%- if link_title_lower contains 'manage cookie' or link_title_lower contains 'cookie preference' -%}
-      <a href="#" id="ot-sdk-btn" class="ot-sdk-show-settings block reversed-link text-sm-lg leading-tight">
-        {{ link.title }}
-      </a>
-    {%- else -%}
-      <a href="{{ link.url }}" class="block reversed-link text-sm-lg leading-tight">
-        {{ link.title }}
-      </a>
-    {%- endif -%}
-  </li>
-  
-  {% assign link_downcase = link.title | downcase %}
-  {% if link_downcase contains "accessibility" %}
-    <li>
-      <button type="button" class="userway-custom-trigger" aria-label="Accessibility Options">
-        {% render 'icon', icon: "accessibility" %}
-      </button>
-    </li>
-  {% endif %}
-{%- endfor -%}
+        {%- for link in block.settings.menu.links -%}
+          {% assign link_title_lower = link.title | downcase | strip %}
+          
+          <li class="inline-flex" {% if link.title == 'Aetrex Rewards' %}data-us-only{% endif %}>
+            {%- if link_title_lower contains 'manage cookie' or link_title_lower contains 'cookie preference' -%}
+              <a href="#" id="ot-sdk-btn" class="ot-sdk-show-settings block reversed-link text-sm-lg leading-tight">
+                {{ link.title }}
+              </a>
+            {%- else -%}
+              <a href="{{ link.url }}" class="block reversed-link text-sm-lg leading-tight">
+                {{ link.title }}
+              </a>
+            {%- endif -%}
+          </li>
+          
+          {% assign link_downcase = link.title | downcase %}
+          {% if link_downcase contains "accessibility" %}
+            <li>
+              <button type="button" class="userway-custom-trigger" aria-label="Accessibility Options">
+                {% render 'icon', icon: "accessibility" %}
+              </button>
+            </li>
+          {% endif %}
+        {%- endfor -%}
       </ul>
     </div>
     <style>
