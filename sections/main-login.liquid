@@ -65,11 +65,13 @@
                         {{ block.settings.icon_heading }}
                       </h3>
                     {%- endif -%}
-                    {%- if block.settings.icon_text != blank -%}
-                      <div class="rte {{ block.settings.text_size }}" style="{% if block.settings.text_color != blank %}color: {{ block.settings.text_color }};{% endif %}">
-                        {{ block.settings.icon_text }}
-                      </div>
-                    {%- endif -%}
+{%- if block.settings.icon_text != blank -%}
+  <div class="rte {{ block.settings.text_size }}" 
+       style="{% if block.settings.text_color != blank %}color: {{ block.settings.text_color }}; {% endif %}align-self: center;">
+    {{ block.settings.icon_text }}
+  </div>
+{%- endif -%}
+
                   </div>
                 </div>
               
@@ -239,7 +241,7 @@
                 </a>
               </div>
               
-              <p class="text-center" style="align-self: center;">
+              <p class="text-center" >
                 <a class="inline-flex items-center gap-2" href="{{ routes.root_url }}">
                   {%- render 'icon', icon: 'return', size: 'sm' -%}
                   <span class="link text-lg leading-none">{{ 'customer.login.return' | t }}</span>
