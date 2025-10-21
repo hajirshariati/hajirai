@@ -59,12 +59,25 @@
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
+        },
+        "button_KTWnNW": {
+          "type": "button",
+          "settings": {
+            "button_label": "LEARN MORE",
+            "button_link": "shopify://pages/tech-zoe-scanner",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
         }
       },
       "block_order": [
         "heading_Fy6D8H",
         "divider_3d6ned",
-        "text_Eyk9mQ"
+        "text_Eyk9mQ",
+        "button_KTWnNW"
       ],
       "settings": {
         "transparent_header": false,
@@ -85,8 +98,8 @@
         "color_text": "#525252",
         "color_highlight": "#e0a580",
         "gradient_highlight": "",
-        "color_button_text": "#ffffff",
-        "color_button_background": "#4b4b4b",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
         "color_button_gradient": "",
         "color_overlay": "#171717",
         "divider_color": "#111111",
