@@ -269,7 +269,7 @@
         "padding_bottom": 0,
         "divider": false,
         "full_width": false,
-        "rounded": false,
+        "rounded": true,
         "enable_parallax": false
       }
     },
@@ -331,7 +331,7 @@
         "padding_bottom": 0,
         "divider": false,
         "full_width": true,
-        "rounded": false,
+        "rounded": true,
         "enable_parallax": true,
         "parallax_direction": "vertical"
       }
