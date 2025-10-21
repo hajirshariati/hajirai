@@ -253,19 +253,6 @@
     "main-login": {
       "type": "main-login",
       "blocks": {
-        "text_QGBbqG": {
-          "type": "text",
-          "settings": {
-            "text": "<p> </p>",
-            "text_size": "text-base",
-            "text_color": "#ffffff",
-            "text_align": "center",
-            "background_color": "#5c6d74",
-            "padding": 0,
-            "border_radius": 0,
-            "add_spacing": true
-          }
-        },
         "heading_XBGMmx": {
           "type": "heading",
           "settings": {
@@ -275,7 +262,7 @@
             "text_color": "#ffffff",
             "text_align": "center",
             "background_color": "#5c6d74",
-            "padding": 0,
+            "padding": 12,
             "border_radius": 0,
             "add_spacing": true
           }
@@ -403,7 +390,6 @@
         }
       },
       "block_order": [
-        "text_QGBbqG",
         "heading_XBGMmx",
         "text_pJYU7k",
         "icon_with_text_w6m4UM",
