@@ -54,7 +54,7 @@
           "type": "button",
           "settings": {
             "button_label": "SHOP NOW",
-            "button_link": "shopify://pages/aetrex-shearling-orthotics",
+            "button_link": "shopify://collections/conform",
             "button_style": "primary",
             "button_size": "md",
             "button_external": false,
