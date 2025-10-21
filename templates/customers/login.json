@@ -270,11 +270,11 @@
         "text_pJYU7k": {
           "type": "text",
           "settings": {
-            "text": "<p>Add your custom content here.</p>",
+            "text": "<p>for Members Only</p>",
             "text_size": "text-base",
-            "text_color": "",
-            "text_align": "left",
-            "background_color": "",
+            "text_color": "#ffffff",
+            "text_align": "center",
+            "background_color": "#5c6d74",
             "padding": 0,
             "border_radius": 0,
             "add_spacing": true
