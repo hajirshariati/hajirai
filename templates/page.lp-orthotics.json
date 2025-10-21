@@ -807,8 +807,8 @@
           "type": "image",
           "settings": {
             "image": "shopify://shop_images/1256x804_Pressure_monitor_With.jpg",
-            "subheading": "",
-            "heading": "With Aetrex",
+            "subheading": "With Aetrex",
+            "heading": "",
             "content_position": "end",
             "color_text": "#2c2c2c"
           }
@@ -817,8 +817,8 @@
           "type": "image",
           "settings": {
             "image": "shopify://shop_images/1256x804_Pressure_monitor_Without.png",
-            "subheading": "",
-            "heading": "Without Aetrex",
+            "subheading": "Without Aetrex",
+            "heading": "",
             "content_position": "end",
             "color_text": "#2c2c2c"
           }
