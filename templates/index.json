@@ -233,9 +233,9 @@
           "type": "text",
           "settings": {
             "text": "<p>New Arrivals</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
+            "text_font": "heading",
+            "text_size": "subtext-custom",
+            "text_max_size": 30,
             "text_line_height": 1.6,
             "text_letter_spacing": 50,
             "text_capitalize": false,
@@ -299,17 +299,12 @@
     "image_with_text_overlay_ahU44t": {
       "type": "image-with-text-overlay",
       "blocks": {
-        "text_ygFHR6": {
-          "type": "text",
+        "heading_dxjdAV": {
+          "type": "heading",
           "settings": {
-            "text": "<p><strong>Celebrating 20 Years of Foot Scanning Technology</strong></p>",
-            "text_font": "body",
-            "text_size": "subtext-custom",
-            "text_max_size": 32,
-            "text_line_height": 1.2,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
+            "heading": "<p>Celebrating 20 Years of Foot Scanning Technology</p>",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -351,7 +346,7 @@
         }
       },
       "block_order": [
-        "text_ygFHR6",
+        "heading_dxjdAV",
         "divider_f4br8p",
         "text_XtWfRH",
         "button_AaYDtV"
