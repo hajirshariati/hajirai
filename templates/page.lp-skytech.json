@@ -380,8 +380,8 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 12,
-        "padding_bottom": 12,
+        "padding_top": 24,
+        "padding_bottom": 24,
         "divider": true,
         "narrow": true,
         "rounded": false
@@ -879,8 +879,8 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 12,
-        "padding_bottom": 12,
+        "padding_top": 24,
+        "padding_bottom": 24,
         "divider": true,
         "narrow": true,
         "rounded": false
