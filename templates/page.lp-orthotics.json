@@ -1256,7 +1256,7 @@
             "button_style": "primary",
             "button_size": "md",
             "button_external": false,
-            "button_icon": true
+            "button_icon": false
           }
         }
       },
@@ -1290,7 +1290,7 @@
         "divider": false,
         "full_width": true,
         "rounded": false,
-        "enable_parallax": true
+        "enable_parallax": false
       }
     }
   },
