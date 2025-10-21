@@ -962,6 +962,7 @@
         "testimonial_RnLxLb",
         "testimonial_GUBLhy"
       ],
+      "disabled": true,
       "name": "Testimonials banner",
       "settings": {
         "transparent_header": false,
