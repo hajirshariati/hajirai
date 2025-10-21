@@ -262,7 +262,7 @@
             "text_color": "#ffffff",
             "text_align": "center",
             "background_color": "#5c6d74",
-            "padding": 20,
+            "padding": 0,
             "border_radius": 0,
             "add_spacing": true
           }
