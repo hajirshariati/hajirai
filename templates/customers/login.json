@@ -267,7 +267,7 @@
         "icon_with_text_bPJnCi": {
           "type": "icon_with_text",
           "settings": {
-            "icon_image": "shopify://shop_images/free_shipping_icon_8fe11c46-01fb-43c8-b4a5-0659254f215e.png",
+            "icon_image": "shopify://shop_images/earn-icon.png",
             "icon_size": "lg",
             "icon_position": "left",
             "icon_heading": "",
@@ -285,7 +285,7 @@
         "icon_with_text_GMpwRP": {
           "type": "icon_with_text",
           "settings": {
-            "icon_image": "shopify://shop_images/free_shipping_icon_8fe11c46-01fb-43c8-b4a5-0659254f215e.png",
+            "icon_image": "shopify://shop_images/vip-icon.png",
             "icon_size": "lg",
             "icon_position": "left",
             "icon_heading": "",
@@ -303,7 +303,7 @@
         "icon_with_text_JrTAtG": {
           "type": "icon_with_text",
           "settings": {
-            "icon_image": "shopify://shop_images/free_shipping_icon_8fe11c46-01fb-43c8-b4a5-0659254f215e.png",
+            "icon_image": "shopify://shop_images/points-icons.png",
             "icon_size": "lg",
             "icon_position": "left",
             "icon_heading": "",
@@ -321,7 +321,7 @@
         "icon_with_text_nBUXxd": {
           "type": "icon_with_text",
           "settings": {
-            "icon_image": "shopify://shop_images/free_shipping_icon_8fe11c46-01fb-43c8-b4a5-0659254f215e.png",
+            "icon_image": "shopify://shop_images/purchase-icon.png",
             "icon_size": "lg",
             "icon_position": "left",
             "icon_heading": "",
@@ -339,7 +339,7 @@
         "icon_with_text_qwaqQ7": {
           "type": "icon_with_text",
           "settings": {
-            "icon_image": "shopify://shop_images/free_shipping_icon_8fe11c46-01fb-43c8-b4a5-0659254f215e.png",
+            "icon_image": "shopify://shop_images/referal-icon.png",
             "icon_size": "lg",
             "icon_position": "left",
             "icon_heading": "",
