@@ -14,7 +14,7 @@
     <div class="grid lg:grid-cols-2 {% if section.settings.layout_width == 'narrow' %}lg:gap-8{% elsif section.settings.layout_width == 'medium' %}lg:gap-12{% else %}lg:gap-20{% endif %} gap-8">
       
       {%- comment -%} LOGIN FORMS - Shows FIRST on mobile, RIGHT on desktop {%- endcomment -%}
-      <div class="lg:order-2" style="border-radius: 2em; padding: 2em; background: #f6f6f6;">
+      <div class="lg:order-2" style="border-radius: 2em; padding: 3em 0em; background: #f6f6f6;">
         
         <div id="Recover" class="title-wrapper{% if section.settings.heading_size == 'title-xl' %} title-wrapper-lg{% endif %} text-center leading-none hidden gap-4">
           <{{ section.settings.heading_tag }} class="heading {{ section.settings.heading_size }}" tabindex="-1">
