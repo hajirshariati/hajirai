@@ -16,8 +16,8 @@
         {%- for link in block.settings.menu.links -%}
           {% assign link_downcase = link.title | downcase %}
           
-          {%- comment -%} Check for Manage Cookie Preference {%- endcomment -%}
-          {% if link.title contains 'Manage Cookie Preference' %}
+          {%- comment -%} Check for Manage Cookie - using downcase for flexible matching {%- endcomment -%}
+          {% if link_downcase contains 'manage cookie' or link_downcase contains 'cookie preference' %}
             <li class="inline-flex">
               <button id="ot-sdk-btn" class="ot-sdk-show-settings block reversed-link text-sm-lg leading-tight">
                 {{ link.title }}
