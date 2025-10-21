@@ -17734,6 +17734,6 @@ a[href="#"] {
 
 @media (max-width: 767px) {
        body {
-           letter-spacing: 1px !important;
+           letter-spacing: 0px !important;
        }
    }
