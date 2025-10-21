@@ -153,7 +153,7 @@
         "text_eJ4mCm": {
           "type": "text",
           "settings": {
-            "text": "<p>The Footwear Development Package is our most comprehensive package to create better fitting and functioning footwear utilizing complete, accurate 3D foot data. The package includes full access to Foot.com, plus special software features including advanced measurement tools and analysis programs.</p><h2>Package Includes:</h2><ul><li>Albert Pro Scanner</li><li>Special Software with Advanced Features for Development</li></ul><p><strong>Foot.com Data</strong> – Access to comprehensive global 3D foot data and pressure data underfoot, remote access, and the ability to 3D print foot models for fit testing.</p><p><strong>Wear Tester</strong> – AI-driven comparison and data analysis tool to identify the most accurate physical wear tester profiles for your business.</p><p><strong>“Lasso” Tool</strong> – 3D measurement tool for calculating infinite measurements of the foot on individual scans.</p>",
+            "text": "<p>The Footwear Development Package is our most comprehensive package to create better fitting and functioning footwear utilizing complete, accurate 3D foot data. The package includes full access to Foot.com, plus special software features including advanced measurement tools and analysis programs.</p><h3>Package Includes:</h3><ul><li>Albert Pro Scanner</li><li>Special Software with Advanced Features for Development</li></ul><p><strong>Foot.com Data</strong> – Access to comprehensive global 3D foot data and pressure data underfoot, remote access, and the ability to 3D print foot models for fit testing.</p><p><strong>Wear Tester</strong> – AI-driven comparison and data analysis tool to identify the most accurate physical wear tester profiles for your business.</p><p><strong>“Lasso” Tool</strong> – 3D measurement tool for calculating infinite measurements of the foot on individual scans.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -209,7 +209,7 @@
           "settings": {
             "text": "<h3>Wear Tester Software</h3><h6><strong>Identify Accurate Wear Testers in a Snap!</strong></h6><p>Footwear developers rely heavily on the feedback of wear testers. But, how do you really know if the wear tester’s feet represent an ideal sample for the population?<br/><br/>The Aetrex Wear Tester Software is designed to help footwear teams learn how to identify the most accurate physical wear tester profiles based on their 3D foot characteristics.<br/><br/>The program works by using AI to compare comprehensive 3D foot scans of a company’s wear tester candidates to millions of foot profiles collected from the general population around the world. Potential wear tester profiles are then assigned a score for their comparison accuracy of the desired sample size per region. Footwear brands can use the scores to identify the most accurate wear testers for their brand, ensuring the best fit for their shoes.<br/><br/></p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -262,7 +262,7 @@
           "settings": {
             "text": "<h3>\"Lasso\" Tool</h3><p><strong>Calculate Infinite Foot Measurements</strong></p><p>Much like a true lasso, this tool virtually “wraps” around the 3D foot and can be moved on an axis at any angle to measure and analyze a cross-section of any aspect of a 3D foot scan. Users can also identify 2 spots within a cross-section to measure and get even further detailed data.</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -330,7 +330,7 @@
           "settings": {
             "text": "<p>Create your optimal shoe last by region, size, gender, and more today</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.2,
             "text_letter_spacing": 0,
