@@ -735,7 +735,7 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "color_text": "#525252",
+        "color_text": "rgba(0,0,0,0)",
         "color_background": "",
         "gradient_background": "",
         "color_highlight": "",
@@ -892,7 +892,7 @@
       "settings": {
         "transparent_header": false,
         "video": "shopify://files/videos/SkyTechAll.mp4",
-        "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
+        "video_url": "",
         "description": "",
         "enable_video_autoplay": true,
         "enable_video_looping": true,
