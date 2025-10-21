@@ -240,7 +240,7 @@
             "heading_tag": "h2",
             "text_color": "#ffffff",
             "text_align": "center",
-            "background_color": "#5c6d74ff",
+            "background_color": "#5c6d74",
             "padding": 20,
             "border_radius": 0,
             "add_spacing": true
@@ -365,7 +365,7 @@
         "icon_with_text_qwaqQ7"
       ],
       "settings": {
-        "enable_shop_login_button": false,
+        "enable_shop_login_button": true,
         "layout_width": "narrow",
         "heading_size": "title-sm",
         "heading_tag": "h3",
