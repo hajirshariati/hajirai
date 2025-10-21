@@ -978,9 +978,9 @@
           "type": "heading",
           "settings": {
             "heading": "Maui",
-            "heading_size": "title-sm",
+            "heading_size": "title-md",
             "heading_tag": "h3",
-            "highlighted_text": "none",
+            "highlighted_text": "text",
             "highlighted_scribble": "circle"
           }
         },
@@ -1068,9 +1068,9 @@
           "type": "heading",
           "settings": {
             "heading": "Jillian Sport",
-            "heading_size": "title-sm",
+            "heading_size": "title-md",
             "heading_tag": "h3",
-            "highlighted_text": "none",
+            "highlighted_text": "text",
             "highlighted_scribble": "circle"
           }
         },
@@ -1145,9 +1145,9 @@
           "type": "heading",
           "settings": {
             "heading": "Janey Sport",
-            "heading_size": "title-sm",
+            "heading_size": "title-md",
             "heading_tag": "h3",
-            "highlighted_text": "none",
+            "highlighted_text": "text",
             "highlighted_scribble": "circle"
           }
         },
