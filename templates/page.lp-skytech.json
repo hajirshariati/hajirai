@@ -468,7 +468,7 @@
         "heading_alignment": "text-center md:items-center",
         "heading_tag": "h3",
         "subheading": "",
-        "description": "<p> Shoe Features</p>",
+        "description": "",
         "button_label": "",
         "button_link": "",
         "button_external": false,
