@@ -846,7 +846,7 @@
         "testimonial_CRjWCe": {
           "type": "testimonial",
           "settings": {
-            "icon": "quote",
+            "icon": "none",
             "text": "<p>Best Orthotics I've found and I've tried them all!</p>",
             "author": "Sandra M.",
             "author_info": "",
@@ -859,7 +859,7 @@
         "testimonial_RnLxLb": {
           "type": "testimonial",
           "settings": {
-            "icon": "quote",
+            "icon": "none",
             "text": "<p>I love these orthotics! They are more comfortable and supportive than the custom orthotics made by a pediatrist.</p>",
             "author": "Ellen H.",
             "author_info": "",
@@ -872,7 +872,7 @@
         "testimonial_GUBLhy": {
           "type": "testimonial",
           "settings": {
-            "icon": "quote",
+            "icon": "none",
             "text": "<p>These orthotics are are great quality and are helping with my foot issues.</p>",
             "author": "Jamie M.",
             "author_info": "",
@@ -885,7 +885,7 @@
         "testimonial_C38kUD": {
           "type": "testimonial",
           "settings": {
-            "icon": "quote",
+            "icon": "none",
             "text": "<p>These orthotics give me the support I need for any activity from taking long walks to running errands. Being on my feet pain free means everything!</p>",
             "author": "Ann B.",
             "author_info": "",
@@ -898,7 +898,7 @@
         "testimonial_xbNEwN": {
           "type": "testimonial",
           "settings": {
-            "icon": "quote",
+            "icon": "none",
             "text": "<p>THANK YOU!!!! These orthotics relieved my plantar fasciitis pain.</p>",
             "author": "Susan L.",
             "author_info": "",
