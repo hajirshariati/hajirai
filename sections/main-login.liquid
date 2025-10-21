@@ -14,7 +14,7 @@
     <div class="grid lg:grid-cols-2 {% if section.settings.layout_width == 'narrow' %}lg:gap-8{% elsif section.settings.layout_width == 'medium' %}lg:gap-12{% else %}lg:gap-20{% endif %} gap-8">
       
       {%- comment -%} LEFT COLUMN - Custom Content Sections {%- endcomment -%}
-      <div class="order-last lg:order-1 flex flex-col justify-center">
+      <div class="order-2 lg:order-1 flex flex-col justify-center">
         {%- for block in section.blocks -%}
           <div class="login-custom-block{% if block.settings.add_spacing %} mb-8{% endif %}" 
                style="{% if block.settings.background_color != blank %}background-color: {{ block.settings.background_color }};{% endif %}{% if block.settings.padding != blank %} padding: {{ block.settings.padding }}px;{% endif %}{% if block.settings.border_radius != blank %} border-radius: {{ block.settings.border_radius }}px;{% endif %}"
@@ -110,7 +110,7 @@
       </div>
       
       {%- comment -%} RIGHT COLUMN - Login Forms {%- endcomment -%}
-      <div class="order-first lg:order-2">
+      <div class="order-1 lg:order-2">
         
         <div id="Recover" class="title-wrapper{% if section.settings.heading_size == 'title-xl' %} title-wrapper-lg{% endif %} text-center leading-none hidden gap-4">
           <{{ section.settings.heading_tag }} class="heading {{ section.settings.heading_size }}" tabindex="-1">
