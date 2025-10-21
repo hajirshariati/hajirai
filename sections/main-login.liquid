@@ -9,155 +9,217 @@
 
 <div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}">
   <div class="page-width relative">
-    <div id="Recover" class="title-wrapper{% if section.settings.heading_size == 'title-xl' %} title-wrapper-lg{% endif %} text-center leading-none hidden gap-4">
-      <{{ section.settings.heading_tag }} class="heading {{ section.settings.heading_size }}" tabindex="-1">
-        <split-words class="split-words js-invisible block" data-animate="fade-up-large">{{ 'customer.recover_password.title' | t }}</split-words>
-      </{{ section.settings.heading_tag }}>
-      <p class="text-lg md:text-2xl">{{ 'customer.recover_password.subtext' | t }}</p>
-    </div>
-
-    <div class="customer hidden">
-      {%- form 'recover_customer_password', class: 'grid gap-12' -%}
-        {%- liquid
-          if form.errors
-            assign form_errors = form.errors | default_errors
-            render 'alert', status: 'error', content: form_errors
-          endif
-
-          assign recover_success = form.posted_successfully?
-        -%}
-
-        <div class="field">
-          <input
-            required
-            class="input is-floating{% if form.errors %} invalid{% endif %}"
-            type="email"
-            value=""
-            name="email"
-            id="RecoverEmail"
-            autocorrect="off"
-            autocapitalize="off"
-            autocomplete="email"
-            placeholder="{{ 'customer.recover_password.email' | t | escape }}"
-            {%- if form.errors %} autofocus{% endif -%}
-          />
-          <label class="label is-floating" for="RecoverEmail">{{ 'customer.recover_password.email' | t }}</label>
-        </div>
-
-        <div class="grid gap-8">
-          <button class="button button--primary button--fixed" type="submit" is="hover-button">
-            <span class="btn-fill" data-fill></span>
-            <span class="btn-text">{{ 'customer.recover_password.submit' | t }}</span>
-          </button>
-          
-          <p class="text-center">
-            <a class="inline-flex items-center gap-2" href="#login">
-              {%- render 'icon', icon: 'return', size: 'sm' -%}
-              <span class="link text-lg leading-none">{{ 'customer.recover_password.cancel' | t }}</span>
-            </a>
-          </p>
-        </div>
-      {%- endform -%}
-    </div>
-
-    <div id="Login" class="title-wrapper{% if section.settings.heading_size == 'title-xl' %} title-wrapper-lg{% endif %} text-center">
-      <{{ section.settings.heading_tag }} class="heading {{ section.settings.heading_size }}">
-        <split-words class="split-words js-invisible block" data-animate="fade-up-large">{{ 'customer.login.title' | t }}</split-words>
-      </{{ section.settings.heading_tag }}>
-    </div>
     
-    <div class="customer">
-      {%- form 'customer_login', class: 'grid gap-12' -%}
-        {%- liquid
-          if form.errors
-            assign form_errors = form.errors | default_errors
-            render 'alert', status: 'error', content: form_errors
-          endif
-
-          if recover_success == true
-            assign success_message = 'customer.recover_password.success' | t
-            render 'alert', status: 'success', content: success_message
-          endif
-        -%}
-
-        {%- if section.settings.enable_shop_login_button -%}
-          <div class="sign-in-with-shop-provider rte text-center">
-            {{- shop | login_button -}}
-            <p>{{ 'customer.login.alternate_provider_separator' | t }}</p>
+    {%- comment -%} Two Column Layout: Left for custom sections, Right for login {%- endcomment -%}
+    <div class="grid lg:grid-cols-2 gap-8 lg:gap-12">
+      
+      {%- comment -%} LEFT COLUMN - Custom Content Sections {%- endcomment -%}
+      <div class="order-2 lg:order-1 flex flex-col justify-center">
+        {%- for block in section.blocks -%}
+          <div class="login-custom-block" {{ block.shopify_attributes }}>
+            {%- case block.type -%}
+              
+              {%- when 'heading' -%}
+                <{{ block.settings.heading_tag }} class="heading {{ block.settings.heading_size }} mb-4">
+                  {{ block.settings.heading }}
+                </{{ block.settings.heading_tag }}>
+              
+              {%- when 'text' -%}
+                <div class="rte mb-6 {{ block.settings.text_size }}">
+                  {{ block.settings.text }}
+                </div>
+              
+              {%- when 'image' -%}
+                {%- if block.settings.image != blank -%}
+                  <div class="mb-6">
+                    <img 
+                      src="{{ block.settings.image | image_url: width: 800 }}" 
+                      alt="{{ block.settings.image.alt | escape }}"
+                      loading="lazy"
+                      width="{{ block.settings.image.width }}"
+                      height="{{ block.settings.image.height }}"
+                    />
+                  </div>
+                {%- endif -%}
+              
+              {%- when 'button' -%}
+                {%- if block.settings.button_label != blank -%}
+                  <div class="mb-6">
+                    <a 
+                      href="{{ block.settings.button_link }}" 
+                      class="button {{ block.settings.button_style }} button--fixed"
+                      is="hover-link"
+                    >
+                      <span class="btn-fill" data-fill></span>
+                      <span class="btn-text">{{ block.settings.button_label }}</span>
+                    </a>
+                  </div>
+                {%- endif -%}
+              
+              {%- when 'spacer' -%}
+                <div style="height: {{ block.settings.height }}px;"></div>
+              
+            {%- endcase -%}
           </div>
-        {%- endif -%}
+        {%- endfor -%}
+      </div>
+      
+      {%- comment -%} RIGHT COLUMN - Login Forms {%- endcomment -%}
+      <div class="order-1 lg:order-2">
         
-        <div class="grid gap-5">
-          <div class="field">
-            <input
-              required
-              class="input is-floating{% if form.errors contains 'form' %} invalid{% endif %}"
-              type="email"
-              name="customer[email]"
-              id="CustomerEmail"
-              autocomplete="email"
-              autocorrect="off"
-              autocapitalize="off"
-              placeholder="{{ 'customer.login.email' | t | escape }}"
-            />
-            <label class="label is-floating" for="CustomerEmail">{{ 'customer.login.email' | t }}</label>
-          </div>
+        <div id="Recover" class="title-wrapper{% if section.settings.heading_size == 'title-xl' %} title-wrapper-lg{% endif %} text-center leading-none hidden gap-4">
+          <{{ section.settings.heading_tag }} class="heading {{ section.settings.heading_size }}" tabindex="-1">
+            <split-words class="split-words js-invisible block" data-animate="fade-up-large">{{ 'customer.recover_password.title' | t }}</split-words>
+          </{{ section.settings.heading_tag }}>
+          <p class="text-lg md:text-2xl">{{ 'customer.recover_password.subtext' | t }}</p>
+        </div>
 
-          {%- if form.password_needed -%}
+        <div class="customer hidden">
+          {%- form 'recover_customer_password', class: 'grid gap-12' -%}
+            {%- liquid
+              if form.errors
+                assign form_errors = form.errors | default_errors
+                render 'alert', status: 'error', content: form_errors
+              endif
+
+              assign recover_success = form.posted_successfully?
+            -%}
+
             <div class="field">
               <input
                 required
-                class="input is-floating{% if form.errors contains 'form' %} invalid{% endif %}"
-                type="password"
+                class="input is-floating{% if form.errors %} invalid{% endif %}"
+                type="email"
                 value=""
-                name="customer[password]"
-                id="CustomerPassword"
-                autocomplete="current-password"
-                placeholder="{{ 'customer.login.password' | t | escape }}"
+                name="email"
+                id="RecoverEmail"
+                autocorrect="off"
+                autocapitalize="off"
+                autocomplete="email"
+                placeholder="{{ 'customer.recover_password.email' | t | escape }}"
+                {%- if form.errors %} autofocus{% endif -%}
               />
-              <label class="label is-floating" for="CustomerPassword">{{ 'customer.login.password' | t }}</label>
+              <label class="label is-floating" for="RecoverEmail">{{ 'customer.recover_password.email' | t }}</label>
             </div>
 
-            <p>
-              <a class="link" href="#Recover">{{ 'customer.login.forgot_password' | t }}</a>
-            </p>
-          {%- endif -%}
+            <div class="grid gap-8">
+              <button class="button button--primary button--fixed" type="submit" is="hover-button">
+                <span class="btn-fill" data-fill></span>
+                <span class="btn-text">{{ 'customer.recover_password.submit' | t }}</span>
+              </button>
+              
+              <p class="text-center">
+                <a class="inline-flex items-center gap-2" href="#login">
+                  {%- render 'icon', icon: 'return', size: 'sm' -%}
+                  <span class="link text-lg leading-none">{{ 'customer.recover_password.cancel' | t }}</span>
+                </a>
+              </p>
+            </div>
+          {%- endform -%}
         </div>
 
-        <div class="grid gap-8">
-          <div class="button-group grid gap-4 md:grid-cols-2">
-            <button class="button button--primary button--fixed" type="submit" is="hover-button">
-              <span class="btn-fill" data-fill></span>
-              <span class="btn-text">{{ 'customer.login.submit' | t }}</span>
-            </button>
-            <a class="button button--secondary button--fixed" href="{{ routes.account_register_url }}" is="hover-link">
-              <span class="btn-fill" data-fill></span>
-              <span class="btn-text">{{ 'customer.login.create_account' | t }}</span>
-            </a>
-          </div>
-          
-          <p class="text-center">
-            <a class="inline-flex items-center gap-2" href="{{ routes.root_url }}">
-              {%- render 'icon', icon: 'return', size: 'sm' -%}
-              <span class="link text-lg leading-none">{{ 'customer.login.return' | t }}</span>
-            </a>
-          </p>
+        <div id="Login" class="title-wrapper{% if section.settings.heading_size == 'title-xl' %} title-wrapper-lg{% endif %} text-center">
+          <{{ section.settings.heading_tag }} class="heading {{ section.settings.heading_size }}">
+            <split-words class="split-words js-invisible block" data-animate="fade-up-large">{{ 'customer.login.title' | t }}</split-words>
+          </{{ section.settings.heading_tag }}>
         </div>
-      {%- endform -%}
+        
+        <div class="customer">
+          {%- form 'customer_login', class: 'grid gap-12' -%}
+            {%- liquid
+              if form.errors
+                assign form_errors = form.errors | default_errors
+                render 'alert', status: 'error', content: form_errors
+              endif
+
+              if recover_success == true
+                assign success_message = 'customer.recover_password.success' | t
+                render 'alert', status: 'success', content: success_message
+              endif
+            -%}
+
+            {%- if section.settings.enable_shop_login_button -%}
+              <div class="sign-in-with-shop-provider rte text-center">
+                {{- shop | login_button -}}
+                <p>{{ 'customer.login.alternate_provider_separator' | t }}</p>
+              </div>
+            {%- endif -%}
+            
+            <div class="grid gap-5">
+              <div class="field">
+                <input
+                  required
+                  class="input is-floating{% if form.errors contains 'form' %} invalid{% endif %}"
+                  type="email"
+                  name="customer[email]"
+                  id="CustomerEmail"
+                  autocomplete="email"
+                  autocorrect="off"
+                  autocapitalize="off"
+                  placeholder="{{ 'customer.login.email' | t | escape }}"
+                />
+                <label class="label is-floating" for="CustomerEmail">{{ 'customer.login.email' | t }}</label>
+              </div>
+
+              {%- if form.password_needed -%}
+                <div class="field">
+                  <input
+                    required
+                    class="input is-floating{% if form.errors contains 'form' %} invalid{% endif %}"
+                    type="password"
+                    value=""
+                    name="customer[password]"
+                    id="CustomerPassword"
+                    autocomplete="current-password"
+                    placeholder="{{ 'customer.login.password' | t | escape }}"
+                  />
+                  <label class="label is-floating" for="CustomerPassword">{{ 'customer.login.password' | t }}</label>
+                </div>
+
+                <p>
+                  <a class="link" href="#Recover">{{ 'customer.login.forgot_password' | t }}</a>
+                </p>
+              {%- endif -%}
+            </div>
+
+            <div class="grid gap-8">
+              <div class="button-group grid gap-4 md:grid-cols-2">
+                <button class="button button--primary button--fixed" type="submit" is="hover-button">
+                  <span class="btn-fill" data-fill></span>
+                  <span class="btn-text">{{ 'customer.login.submit' | t }}</span>
+                </button>
+                <a class="button button--secondary button--fixed" href="{{ routes.account_register_url }}" is="hover-link">
+                  <span class="btn-fill" data-fill></span>
+                  <span class="btn-text">{{ 'customer.login.create_account' | t }}</span>
+                </a>
+              </div>
+              
+              <p class="text-center">
+                <a class="inline-flex items-center gap-2" href="{{ routes.root_url }}">
+                  {%- render 'icon', icon: 'return', size: 'sm' -%}
+                  <span class="link text-lg leading-none">{{ 'customer.login.return' | t }}</span>
+                </a>
+              </p>
+            </div>
+          {%- endform -%}
+        </div>
+        
+        {%- if shop.checkout.guest_login -%}
+          <!--div>
+            <hr>
+            <h2>{{ 'customer.login.guest_title' | t }}</h2>
+
+            {%- form 'guest_login' -%}
+              <button class="button" type="submit">
+                {{ 'customer.login.guest_continue' | t }}
+              </button>
+            {%- endform -%}
+          </div-->
+        {%- endif -%}
+        
+      </div>
+      
     </div>
-    
-    {%- if shop.checkout.guest_login -%}
-      <!--div>
-        <hr>
-        <h2>{{ 'customer.login.guest_title' | t }}</h2>
-
-        {%- form 'guest_login' -%}
-          <button class="button" type="submit">
-            {{ 'customer.login.guest_continue' | t }}
-          </button>
-        {%- endform -%}
-      </div-->
-    {%- endif -%}
   </div>
 </div>
 
@@ -279,6 +341,156 @@
       "id": "rounded",
       "default": false,
       "label": "t:sections.global.settings.rounded.label"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "heading",
+      "name": "Heading",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Welcome Back"
+        },
+        {
+          "type": "select",
+          "id": "heading_size",
+          "options": [
+            {
+              "value": "title-sm",
+              "label": "Small"
+            },
+            {
+              "value": "title-md",
+              "label": "Medium"
+            },
+            {
+              "value": "title-lg",
+              "label": "Large"
+            },
+            {
+              "value": "title-xl",
+              "label": "Extra Large"
+            }
+          ],
+          "default": "title-lg",
+          "label": "Heading size"
+        },
+        {
+          "type": "select",
+          "id": "heading_tag",
+          "options": [
+            {
+              "value": "h1",
+              "label": "H1"
+            },
+            {
+              "value": "h2",
+              "label": "H2"
+            },
+            {
+              "value": "h3",
+              "label": "H3"
+            }
+          ],
+          "default": "h2",
+          "label": "Heading tag"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Add your custom content here.</p>"
+        },
+        {
+          "type": "select",
+          "id": "text_size",
+          "options": [
+            {
+              "value": "text-base",
+              "label": "Small"
+            },
+            {
+              "value": "text-lg",
+              "label": "Medium"
+            },
+            {
+              "value": "text-xl",
+              "label": "Large"
+            }
+          ],
+          "default": "text-lg",
+          "label": "Text size"
+        }
+      ]
+    },
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        }
+      ]
+    },
+    {
+      "type": "button",
+      "name": "Button",
+      "settings": [
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label",
+          "default": "Learn More"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button link"
+        },
+        {
+          "type": "select",
+          "id": "button_style",
+          "options": [
+            {
+              "value": "button--primary",
+              "label": "Primary"
+            },
+            {
+              "value": "button--secondary",
+              "label": "Secondary"
+            }
+          ],
+          "default": "button--primary",
+          "label": "Button style"
+        }
+      ]
+    },
+    {
+      "type": "spacer",
+      "name": "Spacer",
+      "settings": [
+        {
+          "type": "range",
+          "id": "height",
+          "min": 20,
+          "max": 200,
+          "step": 10,
+          "unit": "px",
+          "label": "Height",
+          "default": 40
+        }
+      ]
     }
   ]
 }
