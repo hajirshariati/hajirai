@@ -107,6 +107,9 @@
         "button_PwAQDY",
         "button_AGih6p"
       ],
+      "custom_css": [
+        ".banner__box--medium {height: inherit; }"
+      ],
       "name": "t:sections.video-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
