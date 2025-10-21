@@ -113,6 +113,95 @@
         "parallax_direction": "vertical"
       }
     },
+    "video_with_text_overlay_m9LDwg": {
+      "type": "video-with-text-overlay",
+      "blocks": {
+        "heading_FzADcY": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>GET FREE SHIPPING WITH AETREX ACCESS</p>",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_rkXYnK": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Join today to unlock exclusive promotions, earn points on your purchases and more.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_Y7jckW": {
+          "type": "button",
+          "settings": {
+            "button_label": "JOIN NOW",
+            "button_link": "https://www.aetrex.com/account/register",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_xkkkfM": {
+          "type": "button",
+          "settings": {
+            "button_label": "LOGIN",
+            "button_link": "https://www.aetrex.com/account/login",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_FzADcY",
+        "text_rkXYnK",
+        "button_Y7jckW",
+        "button_xkkkfM"
+      ],
+      "name": "t:sections.video-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
+        "description": "",
+        "enable_video_autoplay": true,
+        "enable_video_looping": true,
+        "image_height": "650px",
+        "content_width": "small",
+        "content_position": "md:items-center md:justify-center",
+        "text_alignment": "center",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-center justify-center",
+        "text_alignment_mobile": "center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 70,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false
+      }
+    },
     "multicolumn_with_icons_dFmMf4": {
       "type": "multicolumn-with-icons",
       "blocks": {
@@ -679,6 +768,7 @@
   "order": [
     "main-page",
     "image_with_text_overlay_zGt7zC",
+    "video_with_text_overlay_m9LDwg",
     "multicolumn_with_icons_dFmMf4",
     "multicolumn_Nqae7T",
     "multicolumn_ke6Ehd",
