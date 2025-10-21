@@ -16,7 +16,7 @@
           "type": "heading",
           "settings": {
             "heading": "<h1>The Aetrex <br/>Technology <br/>Difference</h1>",
-            "heading_size": "title-md",
+            "heading_size": "title-xl tracking-heading",
             "heading_tag": "h1",
             "highlighted_text": "text",
             "highlighted_scribble": "circle"
