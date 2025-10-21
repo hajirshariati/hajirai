@@ -13,104 +13,8 @@
     {%- comment -%} Two Column Layout: Left for custom sections, Right for login {%- endcomment -%}
     <div class="grid lg:grid-cols-2 {% if section.settings.layout_width == 'narrow' %}lg:gap-8{% elsif section.settings.layout_width == 'medium' %}lg:gap-12{% else %}lg:gap-20{% endif %} gap-8">
       
-      {%- comment -%} LEFT COLUMN - Custom Content Sections {%- endcomment -%}
-      <div class="order-2 lg:order-1 flex flex-col justify-center">
-        {%- for block in section.blocks -%}
-          <div class="login-custom-block{% if block.settings.add_spacing %} mb-8{% endif %}" 
-               style="{% if block.settings.background_color != blank %}background-color: {{ block.settings.background_color }};{% endif %}{% if block.settings.padding != blank %} padding: {{ block.settings.padding }}px;{% endif %}{% if block.settings.border_radius != blank %} border-radius: {{ block.settings.border_radius }}px;{% endif %}"
-               {{ block.shopify_attributes }}>
-            {%- case block.type -%}
-              
-              {%- when 'heading' -%}
-                <{{ block.settings.heading_tag }} class="heading {{ block.settings.heading_size }}{% if block.settings.text_align != blank %} text-{{ block.settings.text_align }}{% endif %}"
-                    style="{% if block.settings.text_color != blank %}color: {{ block.settings.text_color }};{% endif %}">
-                  {{ block.settings.heading }}
-                </{{ block.settings.heading_tag }}>
-              
-              {%- when 'text' -%}
-                <div class="rte {{ block.settings.text_size }}{% if block.settings.text_align != blank %} text-{{ block.settings.text_align }}{% endif %}"
-                     style="{% if block.settings.text_color != blank %}color: {{ block.settings.text_color }};{% endif %}">
-                  {{ block.settings.text }}
-                </div>
-              
-              {%- when 'icon_with_text' -%}
-                <div class="flex {% if block.settings.icon_position == 'top' %}flex-col items-{{ block.settings.text_align }}{% else %}items-start{% endif %} gap-4"  style="align-items: center;">
-                  {%- if block.settings.icon_image != blank -%}
-                    <div class="{% if block.settings.icon_position == 'left' %}flex-shrink-0{% endif %}" >
-                      {%- liquid
-                        assign icon_width = 24
-                        if block.settings.icon_size == 'sm'
-                          assign icon_width = 20
-                        elsif block.settings.icon_size == 'md'
-                          assign icon_width = 32
-                        elsif block.settings.icon_size == 'lg'
-                          assign icon_width = 48
-                        elsif block.settings.icon_size == 'xl'
-                          assign icon_width = 64
-                        endif
-                      -%}
-                      <img 
-                        src="{{ block.settings.icon_image | image_url: width: icon_width }}" 
-                        alt="{{ block.settings.icon_image.alt | default: block.settings.icon_heading | escape }}"
-                        width="{{ icon_width }}"
-                        height="{{ icon_width }}"
-                        loading="lazy"
-                        style="width: {{ icon_width }}px; height: auto;"
-                      />
-                    </div>
-                  {%- endif -%}
-                  <div class="flex-1{% if block.settings.text_align != blank %} text-{{ block.settings.text_align }}{% endif %}">
-                    {%- if block.settings.icon_heading != blank -%}
-                      <h3 class="{{ block.settings.icon_heading_size }} mb-2" style="{% if block.settings.text_color != blank %}color: {{ block.settings.text_color }};{% endif %}">
-                        {{ block.settings.icon_heading }}
-                      </h3>
-                    {%- endif -%}
-                    {%- if block.settings.icon_text != blank -%}
-                      <div class="rte {{ block.settings.text_size }}" style="{% if block.settings.text_color != blank %}color: {{ block.settings.text_color }};{% endif %}">
-                        {{ block.settings.icon_text }}
-                      </div>
-                    {%- endif -%}
-                  </div>
-                </div>
-              
-              {%- when 'image' -%}
-                {%- if block.settings.image != blank -%}
-                  <div class="{% if block.settings.text_align != blank %}text-{{ block.settings.text_align }}{% endif %}">
-                    <img 
-                      src="{{ block.settings.image | image_url: width: 800 }}" 
-                      alt="{{ block.settings.image.alt | escape }}"
-                      loading="lazy"
-                      width="{{ block.settings.image.width }}"
-                      height="{{ block.settings.image.height }}"
-                      style="{% if block.settings.image_width != blank %}max-width: {{ block.settings.image_width }}%;{% endif %} height: auto;"
-                    />
-                  </div>
-                {%- endif -%}
-              
-              {%- when 'button' -%}
-                {%- if block.settings.button_label != blank -%}
-                  <div class="{% if block.settings.text_align != blank %}text-{{ block.settings.text_align }}{% endif %}">
-                    <a 
-                      href="{{ block.settings.button_link }}" 
-                      class="button {{ block.settings.button_style }} button--fixed"
-                      is="hover-link"
-                    >
-                      <span class="btn-fill" data-fill></span>
-                      <span class="btn-text">{{ block.settings.button_label }}</span>
-                    </a>
-                  </div>
-                {%- endif -%}
-              
-              {%- when 'spacer' -%}
-                <div style="height: {{ block.settings.height }}px;"></div>
-              
-            {%- endcase -%}
-          </div>
-        {%- endfor -%}
-      </div>
-      
-      {%- comment -%} RIGHT COLUMN - Login Forms {%- endcomment -%}
-      <div class="order-1 lg:order-2">
+      {%- comment -%} LOGIN FORMS - Shows FIRST on mobile, RIGHT on desktop {%- endcomment -%}
+      <div class="lg:order-2">
         
         <div id="Recover" class="title-wrapper{% if section.settings.heading_size == 'title-xl' %} title-wrapper-lg{% endif %} text-center leading-none hidden gap-4">
           <{{ section.settings.heading_tag }} class="heading {{ section.settings.heading_size }}" tabindex="-1">
@@ -262,6 +166,101 @@
           </div-->
         {%- endif -%}
         
+      </div>
+      {%- comment -%} CUSTOM BLOCKS - Shows SECOND on mobile, LEFT on desktop {%- endcomment -%}
+      <div class="lg:order-1 flex flex-col justify-center">
+        {%- for block in section.blocks -%}
+          <div class="login-custom-block{% if block.settings.add_spacing %} mb-8{% endif %}" 
+               style="{% if block.settings.background_color != blank %}background-color: {{ block.settings.background_color }};{% endif %}{% if block.settings.padding != blank %} padding: {{ block.settings.padding }}px;{% endif %}{% if block.settings.border_radius != blank %} border-radius: {{ block.settings.border_radius }}px;{% endif %}"
+               {{ block.shopify_attributes }}>
+            {%- case block.type -%}
+              
+              {%- when 'heading' -%}
+                <{{ block.settings.heading_tag }} class="heading {{ block.settings.heading_size }}{% if block.settings.text_align != blank %} text-{{ block.settings.text_align }}{% endif %}"
+                    style="{% if block.settings.text_color != blank %}color: {{ block.settings.text_color }};{% endif %}">
+                  {{ block.settings.heading }}
+                </{{ block.settings.heading_tag }}>
+              
+              {%- when 'text' -%}
+                <div class="rte {{ block.settings.text_size }}{% if block.settings.text_align != blank %} text-{{ block.settings.text_align }}{% endif %}"
+                     style="{% if block.settings.text_color != blank %}color: {{ block.settings.text_color }};{% endif %}">
+                  {{ block.settings.text }}
+                </div>
+              
+              {%- when 'icon_with_text' -%}
+                <div class="flex {% if block.settings.icon_position == 'top' %}flex-col items-{{ block.settings.text_align }}{% else %}items-start{% endif %} gap-4"  style="align-items: center;">
+                  {%- if block.settings.icon_image != blank -%}
+                    <div class="{% if block.settings.icon_position == 'left' %}flex-shrink-0{% endif %}" >
+                      {%- liquid
+                        assign icon_width = 24
+                        if block.settings.icon_size == 'sm'
+                          assign icon_width = 20
+                        elsif block.settings.icon_size == 'md'
+                          assign icon_width = 32
+                        elsif block.settings.icon_size == 'lg'
+                          assign icon_width = 48
+                        elsif block.settings.icon_size == 'xl'
+                          assign icon_width = 64
+                        endif
+                      -%}
+                      <img 
+                        src="{{ block.settings.icon_image | image_url: width: icon_width }}" 
+                        alt="{{ block.settings.icon_image.alt | default: block.settings.icon_heading | escape }}"
+                        width="{{ icon_width }}"
+                        height="{{ icon_width }}"
+                        loading="lazy"
+                        style="width: {{ icon_width }}px; height: auto;"
+                      />
+                    </div>
+                  {%- endif -%}
+                  <div class="flex-1{% if block.settings.text_align != blank %} text-{{ block.settings.text_align }}{% endif %}">
+                    {%- if block.settings.icon_heading != blank -%}
+                      <h3 class="{{ block.settings.icon_heading_size }} mb-2" style="{% if block.settings.text_color != blank %}color: {{ block.settings.text_color }};{% endif %}">
+                        {{ block.settings.icon_heading }}
+                      </h3>
+                    {%- endif -%}
+                    {%- if block.settings.icon_text != blank -%}
+                      <div class="rte {{ block.settings.text_size }}" style="{% if block.settings.text_color != blank %}color: {{ block.settings.text_color }};{% endif %}">
+                        {{ block.settings.icon_text }}
+                      </div>
+                    {%- endif -%}
+                  </div>
+                </div>
+              
+              {%- when 'image' -%}
+                {%- if block.settings.image != blank -%}
+                  <div class="{% if block.settings.text_align != blank %}text-{{ block.settings.text_align }}{% endif %}">
+                    <img 
+                      src="{{ block.settings.image | image_url: width: 800 }}" 
+                      alt="{{ block.settings.image.alt | escape }}"
+                      loading="lazy"
+                      width="{{ block.settings.image.width }}"
+                      height="{{ block.settings.image.height }}"
+                      style="{% if block.settings.image_width != blank %}max-width: {{ block.settings.image_width }}%;{% endif %} height: auto;"
+                    />
+                  </div>
+                {%- endif -%}
+              
+              {%- when 'button' -%}
+                {%- if block.settings.button_label != blank -%}
+                  <div class="{% if block.settings.text_align != blank %}text-{{ block.settings.text_align }}{% endif %}">
+                    <a 
+                      href="{{ block.settings.button_link }}" 
+                      class="button {{ block.settings.button_style }} button--fixed"
+                      is="hover-link"
+                    >
+                      <span class="btn-fill" data-fill></span>
+                      <span class="btn-text">{{ block.settings.button_label }}</span>
+                    </a>
+                  </div>
+                {%- endif -%}
+              
+              {%- when 'spacer' -%}
+                <div style="height: {{ block.settings.height }}px;"></div>
+              
+            {%- endcase -%}
+          </div>
+        {%- endfor -%}
       </div>
       
     </div>
