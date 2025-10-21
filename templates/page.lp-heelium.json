@@ -54,6 +54,9 @@
             "text_font": "body",
             "text_size": "subtext-custom",
             "text_max_size": 50,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -115,6 +118,9 @@
             "text_font": "body",
             "text_size": "subtext-sm",
             "text_max_size": 40,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -252,6 +258,7 @@
         "gap": "large",
         "columns": 4,
         "columns_mobile": "1",
+        "carousel_on_desktop": true,
         "swipe_on_mobile": true,
         "heading": "",
         "heading_size": "title-md",
@@ -290,6 +297,9 @@
             "text_font": "body",
             "text_size": "subtext-custom",
             "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -426,6 +436,7 @@
         "gap": "small",
         "columns": 4,
         "columns_mobile": "1",
+        "carousel_on_desktop": true,
         "swipe_on_mobile": true,
         "heading": "",
         "heading_size": "title-sm",
@@ -462,7 +473,11 @@
           "settings": {
             "icon": "none",
             "icon_image": "shopify://shop_images/image_57.png",
-            "icon_width": 120
+            "iwidth": "custom",
+            "icon_width": 120,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
           }
         },
         "heading_TC4FdY": {
@@ -480,8 +495,11 @@
           "settings": {
             "text": "<p><strong>Ballet Flat</strong></p><p>Designed with your foot health in mind, the Brianna flat features arch support, a stretchy topline, a weightless feel, and 5mm of memory foam for extra comfort throughout the day. Add a touch of sophistication to any outfit and step confidently into each day with this flat!</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -492,6 +510,7 @@
           "settings": {
             "button_label": "SHOP NOW",
             "button_link": "shopify://products/brianna",
+            "button_video_link": "",
             "button_style": "secondary",
             "button_size": "md",
             "button_external": false,
@@ -508,11 +527,12 @@
       "name": "Image with text",
       "settings": {
         "image": "shopify://shop_images/float1.png",
+        "img_url": "",
         "image_height": "adapt",
         "image_width": "medium",
         "layout": "text_first",
         "text_alignment": "left",
-        "content_position": "align-self-center",
+        "custom_content_position": "items-center",
         "image_mobile": "shopify://shop_images/float1.png",
         "image_height_mobile": "adapt",
         "text_alignment_mobile": "center",
@@ -543,7 +563,11 @@
           "settings": {
             "icon": "none",
             "icon_image": "shopify://shop_images/image_66.png",
-            "icon_width": 120
+            "iwidth": "custom",
+            "icon_width": 120,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
           }
         },
         "heading_r3m8Ez": {
@@ -563,6 +587,9 @@
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -573,6 +600,7 @@
           "settings": {
             "button_label": "SHOP NOW",
             "button_link": "shopify://products/joanne",
+            "button_video_link": "",
             "button_style": "secondary",
             "button_size": "md",
             "button_external": false,
@@ -628,7 +656,11 @@
           "settings": {
             "icon": "none",
             "icon_image": "shopify://shop_images/image_62.png",
-            "icon_width": 120
+            "iwidth": "custom",
+            "icon_width": 120,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
           }
         },
         "heading_DFRyWM": {
@@ -646,8 +678,11 @@
           "settings": {
             "text": "<p><strong>Slip-On Boot</strong></p><p>Experience the perfect fusion of style, comfort, and weightlessness with this slip-on boot. Crafted with our signature arch support, a flexible elastic topline, and a luxurious layer of memory foam cushioning, this boot proves that you don't have to sacrifice comfort for fashion.</p>",
             "text_font": "body",
-            "text_size": "subtext-sm",
+            "text_size": "subtext-md",
             "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -658,6 +693,7 @@
           "settings": {
             "button_label": "SHOP NOW",
             "button_link": "shopify://products/zoey-boot",
+            "button_video_link": "",
             "button_style": "secondary",
             "button_size": "md",
             "button_external": false,
@@ -674,11 +710,12 @@
       "name": "Image with text",
       "settings": {
         "image": "shopify://shop_images/zoe1.png",
+        "img_url": "",
         "image_height": "adapt",
         "image_width": "medium",
         "layout": "text_first",
         "text_alignment": "left",
-        "content_position": "align-self-center",
+        "custom_content_position": "items-center",
         "image_mobile": "shopify://shop_images/zoe1.png",
         "image_height_mobile": "adapt",
         "text_alignment_mobile": "center",
@@ -709,7 +746,11 @@
           "settings": {
             "icon": "none",
             "icon_image": "shopify://shop_images/image_63.png",
-            "icon_width": 120
+            "iwidth": "custom",
+            "icon_width": 120,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
           }
         },
         "heading_eXUyiQ": {
@@ -729,6 +770,9 @@
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -739,6 +783,7 @@
           "settings": {
             "button_label": "SHOP NOW",
             "button_link": "shopify://products/liz",
+            "button_video_link": "",
             "button_style": "secondary",
             "button_size": "md",
             "button_external": false,
@@ -797,50 +842,12 @@
             "image_max_width": 50,
             "image_max_width_mobile": 50
           }
-        },
-        "text_TqzLJT": {
-          "type": "text",
-          "settings": {
-            "text": "<p><strong>“So Comfy and Supportive! I love these shoes!</strong></p>",
-            "text_font": "body",
-            "text_size": "subtext-custom",
-            "text_max_size": 32,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_mtdfck": {
-          "type": "text",
-          "settings": {
-            "text": "<p>They have a little bit of a wedge, but are so cute! Very supportive on my arches - these are shoes I actually love to wear!</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_QdzNQx": {
-          "type": "text",
-          "settings": {
-            "text": "<p>- Shawna H.</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
         }
       },
       "block_order": [
-        "image_wENm8D",
-        "text_TqzLJT",
-        "text_mtdfck",
-        "text_QdzNQx"
+        "image_wENm8D"
       ],
+      "disabled": true,
       "name": "Rich text",
       "settings": {
         "text_alignment": "left",
@@ -872,6 +879,86 @@
         "narrow": true,
         "rounded": false
       }
+    },
+    "image_with_text_overlay_RTHwkQ": {
+      "type": "image-with-text-overlay",
+      "name": "t:sections.image-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/image_65_6305c9ae-4056-40a2-99e6-fbe0a4131851.png",
+        "image_height": "adapt",
+        "content_width": "small",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/image_65_6305c9ae-4056-40a2-99e6-fbe0a4131851.png",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "testimonials_R8MBQU": {
+      "type": "testimonials",
+      "blocks": {
+        "testimonial_ieWiDW": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<h6>So Comfy and Supportive! I love these shoes!<br/>They have a little bit of a wedge, but are so cute! Very supportive on my arches - these are shoes I actually love to wear!</h6>",
+            "author": "Shawna H.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_ieWiDW"
+      ],
+      "name": "t:sections.testimonials.name",
+      "settings": {
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 48,
+        "padding_bottom": 48,
+        "divider": false,
+        "rounded": false
+      }
     }
   },
   "order": [
@@ -886,6 +973,8 @@
     "video_with_text_frd6gc",
     "image_with_text_KUNJhh",
     "video_with_text_TkUzn6",
-    "rich_text_k478jN"
+    "rich_text_k478jN",
+    "image_with_text_overlay_RTHwkQ",
+    "testimonials_R8MBQU"
   ]
 }
