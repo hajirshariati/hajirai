@@ -53,9 +53,12 @@
                   -%}
                 {%- endif -%}
                 {{- description.settings.heading | escape -}}
+
               </div>
             {%- endif -%}
             <div class="specification text-base rte">
+
+            <p>Test</p>
               {{- product.description -}}
             </div>
           </sticky-element>
@@ -125,7 +128,7 @@
     </div>
   {%- elsif block.settings.content != blank -%}
     <div class="col-span-full">
-      <p>Test</p>
+      
       {{ block.settings.content }}
     </div>
   {%- endif -%}
