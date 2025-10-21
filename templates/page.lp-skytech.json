@@ -413,7 +413,7 @@
         "column_kWkHxk": {
           "type": "column",
           "settings": {
-            "show_border": false,
+            "show_border": true,
             "text_alignment": "center",
             "text_alignment_mobile": "center",
             "image": "shopify://shop_images/arch_8.png",
@@ -433,7 +433,7 @@
         "column_CdGGyt": {
           "type": "column",
           "settings": {
-            "show_border": false,
+            "show_border": true,
             "text_alignment": "center",
             "text_alignment_mobile": "center",
             "image": "shopify://shop_images/arch_3.png",
@@ -496,7 +496,7 @@
         "column_J3f8pW": {
           "type": "column",
           "settings": {
-            "show_border": false,
+            "show_border": true,
             "text_alignment": "center",
             "text_alignment_mobile": "center",
             "image": "shopify://shop_images/arch_5_e116e16f-2289-4d1f-a70e-e13bb287f5a0.png",
@@ -516,7 +516,7 @@
         "column_NfqgBF": {
           "type": "column",
           "settings": {
-            "show_border": false,
+            "show_border": true,
             "text_alignment": "center",
             "text_alignment_mobile": "center",
             "image": "shopify://shop_images/arch_6.png",
