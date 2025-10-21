@@ -28,16 +28,15 @@
                 </{{ block.settings.heading_tag }}>
               
               {%- when 'text' -%}
-<div class="rte {{ block.settings.text_size }}{% if block.settings.text_align != blank %} text-{{ block.settings.text_align }}{% endif %}"
-     style="align-items: center;{% if block.settings.text_color != blank %}color: {{ block.settings.text_color }}; {% endif %}">
-  {{ block.settings.text }}
-</div>
-
+                <div class="rte {{ block.settings.text_size }}{% if block.settings.text_align != blank %} text-{{ block.settings.text_align }}{% endif %}"
+                     style="{% if block.settings.text_color != blank %}color: {{ block.settings.text_color }};{% endif %}">
+                  {{ block.settings.text }}
+                </div>
               
               {%- when 'icon_with_text' -%}
-                <div class="flex {% if block.settings.icon_position == 'top' %}flex-col items-{{ block.settings.text_align }}{% else %}items-start{% endif %} gap-4">
+                <div class="flex {% if block.settings.icon_position == 'top' %}flex-col items-{{ block.settings.text_align }}{% else %}items-start{% endif %} gap-4" >
                   {%- if block.settings.icon_image != blank -%}
-                    <div class="{% if block.settings.icon_position == 'left' %}flex-shrink-0{% endif %}">
+                    <div class="{% if block.settings.icon_position == 'left' %}flex-shrink-0{% endif %}" style="align-items: center;">
                       {%- liquid
                         assign icon_width = 24
                         if block.settings.icon_size == 'sm'
@@ -240,7 +239,7 @@
                 </a>
               </div>
               
-              <p class="text-center" >
+              <p class="text-center">
                 <a class="inline-flex items-center gap-2" href="{{ routes.root_url }}">
                   {%- render 'icon', icon: 'return', size: 'sm' -%}
                   <span class="link text-lg leading-none">{{ 'customer.login.return' | t }}</span>
