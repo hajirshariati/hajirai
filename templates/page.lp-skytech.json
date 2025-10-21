@@ -979,7 +979,7 @@
           "settings": {
             "heading": "Maui",
             "heading_size": "title-md",
-            "heading_tag": "h3",
+            "heading_tag": "h2",
             "highlighted_text": "text",
             "highlighted_scribble": "circle"
           }
@@ -1069,7 +1069,7 @@
           "settings": {
             "heading": "Jillian Sport",
             "heading_size": "title-md",
-            "heading_tag": "h3",
+            "heading_tag": "h2",
             "highlighted_text": "text",
             "highlighted_scribble": "circle"
           }
@@ -1146,7 +1146,7 @@
           "settings": {
             "heading": "Janey Sport",
             "heading_size": "title-md",
-            "heading_tag": "h3",
+            "heading_tag": "h2",
             "highlighted_text": "text",
             "highlighted_scribble": "circle"
           }
