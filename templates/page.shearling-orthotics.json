@@ -103,7 +103,7 @@
           "type": "heading",
           "settings": {
             "heading": "<em><strong>Step into Warmth & Comfort</strong></em>",
-            "heading_size": "title-sm",
+            "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "text",
             "highlighted_scribble": "circle"
@@ -116,6 +116,9 @@
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -128,11 +131,12 @@
       ],
       "settings": {
         "image": "shopify://shop_images/boots_28597945-802e-49d1-81d0-fd12244dc10b.gif",
+        "img_url": "",
         "image_height": "adapt",
         "image_width": "small",
         "layout": "image_first",
         "text_alignment": "left",
-        "content_position": "align-self-center",
+        "custom_content_position": "items-center",
         "image_height_mobile": "adapt",
         "text_alignment_mobile": "center",
         "color_text": "#525252",
@@ -161,7 +165,7 @@
           "type": "heading",
           "settings": {
             "heading": "<em><strong>Premium Materials that Benefit Your Health</strong></em>",
-            "heading_size": "title-sm",
+            "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "text",
             "highlighted_scribble": "circle"
@@ -174,6 +178,9 @@
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -186,11 +193,12 @@
       ],
       "settings": {
         "image": "shopify://shop_images/layers.jpg",
+        "img_url": "",
         "image_height": "adapt",
         "image_width": "small",
         "layout": "text_first",
         "text_alignment": "left",
-        "content_position": "align-self-center",
+        "custom_content_position": "items-center",
         "image_height_mobile": "adapt",
         "text_alignment_mobile": "center",
         "color_text": "#525252",
@@ -232,6 +240,9 @@
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -244,11 +255,12 @@
       ],
       "settings": {
         "image": "shopify://shop_images/us_vs.jpg",
+        "img_url": "",
         "image_height": "adapt",
         "image_width": "small",
         "layout": "image_first",
         "text_alignment": "left",
-        "content_position": "align-self-center",
+        "custom_content_position": "items-center",
         "image_height_mobile": "adapt",
         "text_alignment_mobile": "center",
         "color_text": "#525252",
@@ -343,6 +355,7 @@
         "gap": "small",
         "columns": 3,
         "columns_mobile": "1",
+        "carousel_on_desktop": true,
         "swipe_on_mobile": true,
         "heading": "",
         "heading_size": "title-md",
@@ -390,6 +403,9 @@
             "text_font": "heading",
             "text_size": "subtext-sm",
             "text_max_size": 30,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -441,6 +457,9 @@
             "text_font": "body",
             "text_size": "subtext-custom",
             "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "text",
             "highlighted_scribble": "circle"
@@ -453,6 +472,9 @@
             "text_font": "body",
             "text_size": "subtext-sm",
             "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -463,6 +485,7 @@
           "settings": {
             "button_label": "TAKE QUIZ NOW",
             "button_link": "https://irle3andv1z.typeform.com/to/gujvKvEg",
+            "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
             "button_external": false,
@@ -494,6 +517,7 @@
         "color_button_background": "#2c90b3",
         "color_button_gradient": "",
         "color_overlay": "#171717",
+        "divider_color": "#111111",
         "overlay_opacity": 0,
         "padding_top": 24,
         "padding_bottom": 24,
