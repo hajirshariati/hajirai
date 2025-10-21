@@ -17,7 +17,7 @@
           {% assign link_downcase = link.title | downcase | strip %}
 
           <li class="inline-flex" {% if link.title == 'Aetrex Rewards' %}data-us-only{% endif %}>
-            {% if link_downcase contains 'manage cookie preference' %}
+            {% if link_downcase contains 'Manage Cookie Preference' %}
               <p class="p-4 w-semibold">
                 <button id="ot-sdk-btn" class="ot-sdk-show-settings p-4 w-semibold">
                   Manage Cookie Preference
