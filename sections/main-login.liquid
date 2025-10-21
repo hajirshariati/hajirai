@@ -34,9 +34,9 @@
                 </div>
               
               {%- when 'icon_with_text' -%}
-                <div class="flex {% if block.settings.icon_position == 'top' %}flex-col items-{{ block.settings.text_align }}{% else %}items-start{% endif %} gap-4" >
+                <div class="flex {% if block.settings.icon_position == 'top' %}flex-col items-{{ block.settings.text_align }}{% else %}items-start{% endif %} gap-4"  style="align-items: center;">
                   {%- if block.settings.icon_image != blank -%}
-                    <div class="{% if block.settings.icon_position == 'left' %}flex-shrink-0{% endif %}" style="align-items: center;">
+                    <div class="{% if block.settings.icon_position == 'left' %}flex-shrink-0{% endif %}" >
                       {%- liquid
                         assign icon_width = 24
                         if block.settings.icon_size == 'sm'
