@@ -272,7 +272,7 @@
         "color_button_gradient": "",
         "padding_top": 72,
         "padding_bottom": 72,
-        "divider": false,
+        "divider": true,
         "full_width": false,
         "rounded": false
       }
@@ -679,8 +679,8 @@
         "image_i7MLJM": {
           "type": "image",
           "settings": {
-            "subheading": "",
-            "heading": "Strategically Placed Arch Support",
+            "subheading": "Strategically Placed Arch Support",
+            "heading": "",
             "link": "",
             "invert_subheading_heading": false,
             "image": "shopify://shop_images/617x640_signature_arch.png",
@@ -702,8 +702,8 @@
         "image_kirkAq": {
           "type": "image",
           "settings": {
-            "subheading": "",
-            "heading": "Alignment & Biomechanical Efficiency",
+            "subheading": "Alignment & Biomechanical Efficiency",
+            "heading": "",
             "link": "",
             "invert_subheading_heading": false,
             "image": "shopify://shop_images/617x640_alignment.png",
@@ -725,8 +725,8 @@
         "image_UMzkxc": {
           "type": "image",
           "settings": {
-            "subheading": "",
-            "heading": "Hi-Tech Materials to Benefit Your Health",
+            "subheading": "Hi-Tech Materials to Benefit Your Health",
+            "heading": "",
             "link": "",
             "invert_subheading_heading": false,
             "image": "shopify://shop_images/617x640_Hi_tech_Materials.png",
@@ -748,8 +748,8 @@
         "image_DEUPz8": {
           "type": "image",
           "settings": {
-            "subheading": "",
-            "heading": "All-Day Comfort and Energy",
+            "subheading": "All-Day Comfort and Energy",
+            "heading": "",
             "link": "",
             "invert_subheading_heading": false,
             "image": "shopify://shop_images/sneaker_ortho.png",
@@ -802,7 +802,7 @@
         "divider": false,
         "full_width": false,
         "rounded": false,
-        "enable_parallax": false
+        "enable_parallax": true
       }
     },
     "image_with_text_overlay_M6AhUn": {
