@@ -17,170 +17,8 @@
  
   <br>
   {% render 'country-selector' %}
-  
-  <!-- Desktop: Menu left, Country right in one line | Mobile: Stacked -->
-  <div style="padding-top: 0em;" class="footer-copyright page-width{% if section.settings.full_width %} page-width--full{% endif %} w-full flex flex-col items-center gap-4 relative">
-    
-    <!-- Desktop one-line layout with menu left and country switcher right -->
-    <div class="w-full flex flex-col lg:flex-row items-center justify-between gap-4 lg:gap-8">
-      
-      <!-- Menu items - left side on desktop, centered on mobile -->
-      <div class="flex flex-col items-center lg:items-start">
-        {%- if section.settings.show_menu -%}
-          {%- if linklists[section.settings.footer_menu] != blank -%}
-            <ul class="flex flex-wrap gap-3 justify-center lg:justify-start">
-              {%- for link in linklists[section.settings.footer_menu].links -%}
-                <li>
-                  <small>
-                    {%- if link.title contains 'Manage Cookie Preference' -%}
-                      <button id="ot-sdk-btn" class="ot-sdk-show-settings block reversed-link" style="background: none;font-size: unset;padding: inherit; color: unset;">
-                        {{ link.title }}
-                      </button>
-                    {%- else -%}
-                      <a href="{{ link.url }}" class="block reversed-link">
-                        {{ link.title }}
-                      </a>
-                    {%- endif -%}
-                  </small>
-                </li>
-              {%- endfor -%}
-            </ul>
-          {%- endif -%}
-        {%- endif -%}
-      </div>
-
-      {%- liquid
-        if section.settings.enable_language_selector and localization.available_languages.size > 1
-          assign enable_language_selector = true
-        endif
-        if section.settings.enable_country_selector and localization.available_countries.size > 1
-          assign enable_country_selector = true
-        endif
-
-        assign section_rendering_api = false
-        if section.index == null
-          assign section_rendering_api = true
-        endif
-      -%}
-      
-      <!-- Country/Language selector - right side on desktop, centered on mobile -->
-      {%- if enable_language_selector or enable_country_selector -%}
-        <div class="localization flex items-center justify-center flex-col md:flex-row gap-2">
-          {%- if enable_language_selector -%}
-            <div class="grid gap-2">
-              {%- form 'localization',
-                id: 'footer_localization_language_form',
-                class: 'localization__form flex items-center relative',
-                is: 'localization-form'
-              -%}
-                <label class="sr-only" for="FooterLocalizationLanguageList">
-                  {{- 'localization.language_label' | t -}}
-                </label>
-                {%- render 'icon', icon: 'language', size: 'xs', class: 'stroke-1 absolute pointer-events-none' -%}
-                <button type="button" class="localization__item cursor-pointer leading-tight w-full">
-                  {%- unless section_rendering_api -%}
-                    <api-button
-                      class="api-only"
-                      data-id="FooterLocalizationLanguageList"
-                      data-section-id="{{ section.id }}"
-                    ></api-button>
-                  {%- endunless -%}
-                  {{- localization.language.endonym_name | capitalize -}}
-                </button>
-                {%- unless section_rendering_api -%}
-                  <select
-                    class="localization__item cursor-pointer absolute top-0 left-0 w-full h-full opacity-0"
-                    name="locale_code"
-                    id="FooterLocalizationLanguageList"
-                  >
-                    <option value="{{ localization.language.iso_code }}" selected>
-                      {{- localization.language.endonym_name | capitalize -}}
-                    </option>
-                  </select>
-                {%- else -%}
-                  <select
-                    class="localization__item cursor-pointer absolute top-0 left-0 w-full h-full opacity-0"
-                    name="locale_code"
-                    id="FooterLocalizationLanguageList"
-                  >
-                    {%- for language in localization.available_languages -%}
-                      <option
-                        value="{{ language.iso_code }}"
-                        {% if language.iso_code == localization.language.iso_code %}
-                          selected
-                        {% endif %}
-                      >
-                        {{- language.endonym_name | capitalize -}}
-                      </option>
-                    {%- endfor -%}
-                  </select>
-                {%- endunless -%}
-                {%- render 'icon', icon: 'chevron-down', size: 'xs', class: 'absolute pointer-events-none' -%}
-              {%- endform -%}
-            </div>
-          {%- endif -%}
-          {%- if enable_country_selector -%}
-            <div class="grid gap-2">
-              {%- form 'localization',
-                id: 'footer_localization_country_form',
-                class: 'localization__form flex items-center relative',
-                is: 'localization-form'
-              -%}
-                <label class="sr-only" for="FooterLocalizationCountryList">
-                  {{- 'localization.country_label' | t -}}
-                </label>
-                {%- render 'icon', icon: 'currency', size: 'xs', class: 'stroke-1 absolute pointer-events-none' -%}
-                <button type="button" class="localization__item cursor-pointer leading-tight w-full">
-                  {%- unless section_rendering_api -%}
-                    <api-button
-                      class="api-only"
-                      data-id="FooterLocalizationCountryList"
-                      data-section-id="{{ section.id }}"
-                    ></api-button>
-                  {%- endunless -%}
-                  {{- localization.country.name }} ({{ localization.country.currency.iso_code }}
-                  {{ localization.country.currency.symbol }})
-                </button>
-                {%- unless section_rendering_api -%}
-                  <select
-                    class="localization__item cursor-pointer absolute top-0 left-0 w-full h-full opacity-0"
-                    name="locale_code"
-                    id="FooterLocalizationCountryList"
-                  >
-                    <option value="{{ localization.country.iso_code }}" selected>
-                      {{- localization.country.name }} ({{ localization.country.currency.iso_code }}
-                      {{ localization.country.currency.symbol }})
-                    </option>
-                  </select>
-                {%- else -%}
-                  <select
-                    class="localization__item cursor-pointer absolute top-0 left-0 w-full h-full opacity-0"
-                    name="country_code"
-                    id="FooterLocalizationCountryList"
-                  >
-                    {%- for country in localization.available_countries -%}
-                      <option
-                        value="{{ country.iso_code }}"
-                        {% if country.iso_code == localization.country.iso_code %}
-                          selected
-                        {% endif %}
-                      >
-                        {{- country.name }} ({{ country.currency.iso_code }}
-                        {{ country.currency.symbol }})
-                      </option>
-                    {%- endfor -%}
-                  </select>
-                {%- endunless -%}
-                {%- render 'icon', icon: 'chevron-down', size: 'xs', class: 'absolute pointer-events-none' -%}
-              {%- endform -%}
-            </div>
-          {%- endif -%}
-        </div>
-      {%- endif -%}
-    </div>
-
-    <!-- Copyright and Policy sections - centered, below the menu/country row -->
-    <div class="rte credits text-center w-full">
+  <div style="padding-top: 0em;"class="footer-copyright page-width{% if section.settings.full_width %} page-width--full{% endif %} w-full flex flex-col items-center justify-between gap-4 lg:gap-0 lg:flex-row relative">
+    <div class="rte credits text-center">
       <small>
         {%- liquid
           if section.settings.show_copyright
@@ -194,12 +32,39 @@
             endif
             echo '.&nbsp;'
           endif
+
         -%}
       </small>
 
+
+      
+{%- if section.settings.show_menu -%}
+  {%- if linklists[section.settings.footer_menu] != blank -%}
+    <ul class="flex flex-wrap gap-3 justify-center lg:justify-start">
+      {%- for link in linklists[section.settings.footer_menu].links -%}
+        <li>
+          <small>
+            {%- if link.title contains 'Manage Cookie Preference' -%}
+              <button id="ot-sdk-btn" class="ot-sdk-show-settings block reversed-link" style="background: none;font-size: unset;padding: inherit; color: unset;">
+                {{ link.title }}
+              </button>
+            {%- else -%}
+              <a href="{{ link.url }}" class="block reversed-link">
+                {{ link.title }}
+              </a>
+            {%- endif -%}
+          </small>
+        </li>
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
+{%- endif -%}
+
+
+      <br><br><br>
+
       {%- if section.settings.show_policy -%}
-        <br><br>
-        <ul class="flex flex-wrap gap-3 justify-center">
+        <ul class="flex flex-wrap gap-3 justify-center lg:justify-start">
           {%- for policy in shop.policies -%}
             {%- if policy != blank -%}
               <li>
@@ -207,13 +72,150 @@
                   <a href="{{ policy.url }}" class="block reversed-link">{{ policy.title }}</a>
                 </small>
               </li>
+
+
+
             {%- endif -%}
           {%- endfor -%}
+
+
+          
+
         </ul>
       {%- endif -%}
     </div>
 
-    <!-- Payment Icons -->
+    {%- liquid
+      if section.settings.enable_language_selector and localization.available_languages.size > 1
+        assign enable_language_selector = true
+      endif
+      if section.settings.enable_country_selector and localization.available_countries.size > 1
+        assign enable_country_selector = true
+      endif
+
+      assign section_rendering_api = false
+      if section.index == null
+        assign section_rendering_api = true
+      endif
+    -%}
+    {%- if enable_language_selector or enable_country_selector -%}
+      <div class="localization flex items-center justify-center flex-col md:flex-row">
+        {%- if enable_language_selector -%}
+          <div class="grid gap-2">
+            {%- form 'localization',
+              id: 'footer_localization_language_form',
+              class: 'localization__form flex items-center relative',
+              is: 'localization-form'
+            -%}
+              <label class="sr-only" for="FooterLocalizationLanguageList">
+                {{- 'localization.language_label' | t -}}
+              </label>
+              {%- render 'icon', icon: 'language', size: 'xs', class: 'stroke-1 absolute pointer-events-none' -%}
+              <button type="button" class="localization__item cursor-pointer leading-tight w-full">
+                {%- unless section_rendering_api -%}
+                  <api-button
+                    class="api-only"
+                    data-id="FooterLocalizationLanguageList"
+                    data-section-id="{{ section.id }}"
+                  ></api-button>
+                {%- endunless -%}
+                {{- localization.language.endonym_name | capitalize -}}
+              </button>
+              {%- unless section_rendering_api -%}
+                <select
+                  class="localization__item cursor-pointer absolute top-0 left-0 w-full h-full opacity-0"
+                  name="locale_code"
+                  id="FooterLocalizationLanguageList"
+                >
+                  <option value="{{ localization.language.iso_code }}" selected>
+                    {{- localization.language.endonym_name | capitalize -}}
+                  </option>
+                </select>
+              {%- else -%}
+                <select
+                  class="localization__item cursor-pointer absolute top-0 left-0 w-full h-full opacity-0"
+                  name="locale_code"
+                  id="FooterLocalizationLanguageList"
+                >
+                  {%- for language in localization.available_languages -%}
+                    <option
+                      value="{{ language.iso_code }}"
+                      {% if language.iso_code == localization.language.iso_code %}
+                        selected
+                      {% endif %}
+                    >
+                      {{- language.endonym_name | capitalize -}}
+                    </option>
+                  {%- endfor -%}
+                </select>
+              {%- endunless -%}
+              {%- render 'icon', icon: 'chevron-down', size: 'xs', class: 'absolute pointer-events-none' -%}
+            {%- endform -%}
+          </div>
+        {%- endif -%}
+        {%- if enable_country_selector -%}
+          <div class="grid gap-2">
+            {%- form 'localization',
+              id: 'footer_localization_country_form',
+              class: 'localization__form flex items-center relative',
+              is: 'localization-form'
+            -%}
+              <label class="sr-only" for="FooterLocalizationCountryList">
+                {{- 'localization.country_label' | t -}}
+              </label>
+              {%- render 'icon', icon: 'currency', size: 'xs', class: 'stroke-1 absolute pointer-events-none' -%}
+              <button type="button" class="localization__item cursor-pointer leading-tight w-full">
+                {%- unless section_rendering_api -%}
+                  <api-button
+                    class="api-only"
+                    data-id="FooterLocalizationCountryList"
+                    data-section-id="{{ section.id }}"
+                  ></api-button>
+                {%- endunless -%}
+                {{- localization.country.name }} ({{ localization.country.currency.iso_code }}
+                {{ localization.country.currency.symbol }})
+              </button>
+              {%- unless section_rendering_api -%}
+                <select
+                  class="localization__item cursor-pointer absolute top-0 left-0 w-full h-full opacity-0"
+                  name="locale_code"
+                  id="FooterLocalizationCountryList"
+                >
+                  <option value="{{ localization.country.iso_code }}" selected>
+                    {{- localization.country.name }} ({{ localization.country.currency.iso_code }}
+                    {{ localization.country.currency.symbol }})
+                  </option>
+                </select>
+              {%- else -%}
+                <select
+                  class="localization__item cursor-pointer absolute top-0 left-0 w-full h-full opacity-0"
+                  name="country_code"
+                  id="FooterLocalizationCountryList"
+                >
+                  {%- for country in localization.available_countries -%}
+                    <option
+                      value="{{ country.iso_code }}"
+                      {% if country.iso_code == localization.country.iso_code %}
+                        selected
+                      {% endif %}
+                    >
+                      {{- country.name }} ({{ country.currency.iso_code }}
+                      {{ country.currency.symbol }})
+                    </option>
+                  {%- endfor -%}
+                </select>
+              {%- endunless -%}
+              {%- render 'icon', icon: 'chevron-down', size: 'xs', class: 'absolute pointer-events-none' -%}
+            {%- endform -%}
+          </div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+ 
+      
+ 
+
     {%- if section.settings.show_payment_icons -%}
       {%- unless shop.enabled_payment_types == empty -%}
         <ul class="payment-icons{% if section.settings.monochrome_payment_icons %} payment-icons--gray{% endif %} flex flex-wrap justify-center gap-2 xl:gap-3">
@@ -226,6 +228,8 @@
       {%- endunless -%}
     {%- endif -%}
   </div>
+
+  
 </div>
 
 {% schema %}
