@@ -29,7 +29,7 @@
               
               {%- when 'text' -%}
 <div class="rte {{ block.settings.text_size }}{% if block.settings.text_align != blank %} text-{{ block.settings.text_align }}{% endif %}"
-     style="{% if block.settings.text_color != blank %}color: {{ block.settings.text_color }}; {% endif %}text-align: center;">
+     style="{% if block.settings.text_color != blank %}color: {{ block.settings.text_color }}; {% endif %}align-items: center;">
   {{ block.settings.text }}
 </div>
 
