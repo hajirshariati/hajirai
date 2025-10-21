@@ -127,7 +127,7 @@
         "enable_video_autoplay": true,
         "enable_video_looping": true,
         "image_height": "650px",
-        "content_width": "medium",
+        "content_width": "small",
         "content_position": "md:items-center md:justify-center",
         "text_alignment": "center",
         "video_url_mobile": "",
