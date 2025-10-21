@@ -14,13 +14,19 @@
     <div class="details__content">
       <ul class="flex flex-col gap-3">
         {%- for link in block.settings.menu.links -%}
-          {% assign link_downcase = link.title | downcase | strip %}
+          {%- assign link_title_clean = link.title | downcase | strip -%}
 
           <li class="inline-flex" {% if link.title == 'Aetrex Rewards' %}data-us-only{% endif %}>
-            {% if link_downcase contains 'Manage Cookie Preference' %}
-              <p class="p-4 w-semibold">
-                <button id="ot-sdk-btn" class="ot-sdk-show-settings p-4 w-semibold">
-                  Manage Cookie Preference
+            <!-- DEBUG: raw link title: {{ link.title }} -->
+            {% if link_title_clean == 'manage cookie preference' or link_title_clean contains 'manage cookie' %}
+              <p class="footer__notice-links-link p-4 w-semibold">
+                <button
+                  type="button"
+                  id="ot-sdk-btn"
+                  class="ot-sdk-show-settings p-4 w-semibold"
+                  aria-label="Manage Cookie Preference"
+                >
+                  {{ link.title }}
                 </button>
               </p>
             {% else %}
@@ -32,7 +38,7 @@
             {% endif %}
           </li>
 
-          {% if link_downcase contains "accessibility" %}
+          {% if link_title_clean contains "accessibility" %}
             <li>
               <button type="button" class="userway-custom-trigger" aria-label="Accessibility Options">
                 {% render 'icon', icon: "accessibility" %}
