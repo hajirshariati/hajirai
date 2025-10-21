@@ -8640,6 +8640,7 @@ details.active .drawer__promotions .mega-menu__item,
     inset-block-end: 0;
     border-start-end-radius: 0;
     border-start-start-radius: 0;
+    background:#1f1f1f;
 }
 
 .js .footer-overlay {
