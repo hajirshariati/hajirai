@@ -27,22 +27,36 @@
     "video_with_text_overlay_TgKph8": {
       "type": "video-with-text-overlay",
       "blocks": {
-        "subheading_DQGQFg": {
-          "type": "subheading",
-          "settings": {
-            "subheading": "Goodbye Foot Pain. Hello Relief.",
-            "subheading_size": "subtitle-lg",
-            "secondary_color": false
-          }
-        },
         "heading_64L34p": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Unmatched Comfort & Support Starts with Science. Engineered with Insights from Over 50 Million Foot Scans</p>",
+            "heading": "<p>Goodbye Foot Pain. Hello Relief. </p>",
             "heading_size": "title-sm",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
+          }
+        },
+        "text_EGcVH3": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Unmatched Comfort & Support Starts with Science. Engineered with Insights from Over 50 Million Foot Scans</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "spacing_f6U9b4": {
+          "type": "spacing",
+          "settings": {
+            "height": 120,
+            "height_mobile": 28
           }
         },
         "text_H4rWEH": {
@@ -86,8 +100,9 @@
         }
       },
       "block_order": [
-        "subheading_DQGQFg",
         "heading_64L34p",
+        "text_EGcVH3",
+        "spacing_f6U9b4",
         "text_H4rWEH",
         "button_PwAQDY",
         "button_AGih6p"
@@ -100,7 +115,7 @@
         "description": "",
         "enable_video_autoplay": true,
         "enable_video_looping": true,
-        "image_height": "650px",
+        "image_height": "adapt",
         "content_width": "medium",
         "content_position": "md:items-center md:justify-center",
         "text_alignment": "center",
