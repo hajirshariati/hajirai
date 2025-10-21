@@ -14,23 +14,40 @@
     <div class="details__content">
       <ul class="flex flex-col gap-3">
         {%- for link in block.settings.menu.links -%}
+          {% assign link_downcase = link.title | downcase | strip %}
+
           <li class="inline-flex" {% if link.title == 'Aetrex Rewards' %}data-us-only{% endif %}>
-            <a href="{{ link.url }}" class="block reversed-link text-sm-lg leading-tight">{{ link.title }}</a>
+            {% if link_downcase contains 'manage cookie preference' %}
+              <p class="p-4 w-semibold">
+                <button id="ot-sdk-btn" class="ot-sdk-show-settings p-4 w-semibold">
+                  Manage Cookie Preference
+                </button>
+              </p>
+            {% else %}
+              <p class="p-2 w-regular">
+                <a href="{{ link.url }}" class="block reversed-link text-sm-lg leading-tight">
+                  {{ link.title }}
+                </a>
+              </p>
+            {% endif %}
           </li>
-        {% assign link_downcase = link.title | downcase %}
-        {% if link_downcase contains "accessibility" %}
-          <li>
-            <button type="button" class="userway-custom-trigger" aria-label="Accessibility Options">
-              {% render 'icon', icon: "accessibility" %}
-            </button>
-          </li>
-        {% endif %}
+
+          {% if link_downcase contains "accessibility" %}
+            <li>
+              <button type="button" class="userway-custom-trigger" aria-label="Accessibility Options">
+                {% render 'icon', icon: "accessibility" %}
+              </button>
+            </li>
+          {% endif %}
         {%- endfor -%}
       </ul>
     </div>
+
     <style>
       @media (min-width: 1280px) {
-        .footer__item--{{ block.id }} { width: calc({{ block.settings.container_width }}% - var(--sp-12)); }
+        .footer__item--{{ block.id }} {
+          width: calc({{ block.settings.container_width }}% - var(--sp-12));
+        }
       }
     </style>
   {%- endcapture -%}
