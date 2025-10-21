@@ -14,7 +14,7 @@
     <div class="grid lg:grid-cols-2 {% if section.settings.layout_width == 'narrow' %}lg:gap-8{% elsif section.settings.layout_width == 'medium' %}lg:gap-12{% else %}lg:gap-20{% endif %} gap-8">
       
       {%- comment -%} LOGIN FORMS - Shows FIRST on mobile, RIGHT on desktop {%- endcomment -%}
-      <div class="lg:order-2" style="border-radius: 1em; padding: 2em; background: #f6f6f6;">
+      <div class="lg:order-2" style="border-radius: 2em; padding: 2em; background: #f6f6f6;">
         
         <div id="Recover" class="title-wrapper{% if section.settings.heading_size == 'title-xl' %} title-wrapper-lg{% endif %} text-center leading-none hidden gap-4">
           <{{ section.settings.heading_tag }} class="heading {{ section.settings.heading_size }}" tabindex="-1">
@@ -168,7 +168,7 @@
         
       </div>
       {%- comment -%} CUSTOM BLOCKS - Shows SECOND on mobile, LEFT on desktop {%- endcomment -%}
-      <div class="lg:order-1 flex flex-col justify-center" style="background: #d3e3ec; border-radius: 1em;">
+      <div class="lg:order-1 flex flex-col justify-center" style="background: #d3e3ec; border-radius: 2em;">
         {%- for block in section.blocks -%}
           <div class="login-custom-block{% if block.settings.add_spacing %} mb-8{% endif %}" 
                style="{% if block.settings.background_color != blank %}background-color: {{ block.settings.background_color }};{% endif %}{% if block.settings.padding != blank %} padding: {{ block.settings.padding }}px;{% endif %}{% if block.settings.border_radius != blank %} border-radius: {{ block.settings.border_radius }}px;{% endif %}"
