@@ -245,11 +245,11 @@
       ],
       "name": "t:sections.multicolumn.name",
       "settings": {
-        "gap": "large",
+        "gap": "small",
         "columns": 4,
-        "columns_mobile": "1",
-        "carousel_on_desktop": false,
-        "swipe_on_mobile": true,
+        "columns_mobile": "2",
+        "carousel_on_desktop": true,
+        "swipe_on_mobile": false,
         "heading": "",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
@@ -270,8 +270,8 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
+        "padding_top": 0,
+        "padding_bottom": 0,
         "divider": true,
         "full_width": false,
         "rounded": false
@@ -418,7 +418,6 @@
         "column_WGPbTD",
         "column_KdBDtQ"
       ],
-      "disabled": true,
       "custom_css": [],
       "name": "t:sections.multicolumn.name",
       "settings": {
@@ -440,7 +439,7 @@
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "",
-        "color_background": "",
+        "color_background": "rgba(0,0,0,0)",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
