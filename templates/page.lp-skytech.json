@@ -490,16 +490,16 @@
         "rounded": false
       }
     },
-    "multicolumn_eWKCGx": {
+    "multicolumn_F7pThM": {
       "type": "multicolumn",
       "blocks": {
-        "column_V9JfC9": {
+        "column_J3f8pW": {
           "type": "column",
           "settings": {
             "show_border": false,
             "text_alignment": "center",
             "text_alignment_mobile": "center",
-            "image": "shopify://shop_images/arch_5.png",
+            "image": "shopify://shop_images/arch_5_e116e16f-2289-4d1f-a70e-e13bb287f5a0.png",
             "image_ratio": "adapt",
             "heading": "Built-in Arch Support",
             "heading_size": "text-base-xl",
@@ -513,7 +513,7 @@
             "highlighted_scribble": "circle"
           }
         },
-        "column_Jn4W6n": {
+        "column_NfqgBF": {
           "type": "column",
           "settings": {
             "show_border": false,
@@ -533,7 +533,7 @@
             "highlighted_scribble": "circle"
           }
         },
-        "column_A3H6iT": {
+        "column_EQkybg": {
           "type": "column",
           "settings": {
             "show_border": false,
@@ -555,21 +555,21 @@
         }
       },
       "block_order": [
-        "column_V9JfC9",
-        "column_Jn4W6n",
-        "column_A3H6iT"
+        "column_J3f8pW",
+        "column_NfqgBF",
+        "column_EQkybg"
       ],
       "name": "Multicolumn",
       "settings": {
         "gap": "medium",
         "columns": 3,
-        "columns_mobile": "2",
+        "columns_mobile": "1",
         "carousel_on_desktop": true,
         "swipe_on_mobile": true,
-        "heading": "",
+        "heading": "SKYTECH",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
+        "heading_tag": "h3",
         "subheading": "",
         "description": "",
         "button_label": "",
@@ -589,7 +589,7 @@
         "padding_top": 24,
         "padding_bottom": 32,
         "divider": false,
-        "full_width": false,
+        "full_width": true,
         "rounded": false
       }
     },
@@ -1495,7 +1495,7 @@
     "logo_list_iHUfYQ",
     "rich_text_r7gtcn",
     "multicolumn_R8kcbF",
-    "multicolumn_eWKCGx",
+    "multicolumn_F7pThM",
     "rich_text_itUVgg",
     "multicolumn_VTPptV",
     "image_with_text_overlay_9hcxMU",
