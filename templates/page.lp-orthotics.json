@@ -150,6 +150,16 @@
         "rounded": true
       }
     },
+    "empty_space_9eTXx8": {
+      "type": "empty-space",
+      "name": "t:sections.empty-space.name",
+      "settings": {
+        "desktop_height": 20,
+        "mobile_height": 20,
+        "color_background": "",
+        "gradient_background": ""
+      }
+    },
     "multicolumn_R9f4pc": {
       "type": "multicolumn",
       "blocks": {
@@ -245,7 +255,7 @@
       ],
       "name": "t:sections.multicolumn.name",
       "settings": {
-        "gap": "small",
+        "gap": "large",
         "columns": 4,
         "columns_mobile": "2",
         "carousel_on_desktop": true,
@@ -1379,6 +1389,7 @@
   "order": [
     "main-page",
     "video_with_text_overlay_TgKph8",
+    "empty_space_9eTXx8",
     "multicolumn_R9f4pc",
     "multicolumn_with_icons_C37PFY",
     "multicolumn_GC6LFG",
