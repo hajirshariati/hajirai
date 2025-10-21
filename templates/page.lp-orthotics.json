@@ -251,7 +251,7 @@
         "column_4LyY8A"
       ],
       "custom_css": [
-        ".multicolumn-card {background: #f0f5f6 !important;}"
+        ".multicolumn-card {background: #f0f5f6 !important; }"
       ],
       "name": "t:sections.multicolumn.name",
       "settings": {
