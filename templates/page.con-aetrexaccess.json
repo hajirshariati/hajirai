@@ -24,95 +24,6 @@
         "rounded": false
       }
     },
-    "image_with_text_overlay_zGt7zC": {
-      "type": "image-with-text-overlay",
-      "blocks": {
-        "heading_4dzPR8": {
-          "type": "heading",
-          "settings": {
-            "heading": "<p>GET FREE SHIPPING WITH AETREX ACCESS</p>",
-            "heading_size": "title-md",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_FCRy3n": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Join today to unlock exclusive promotions, earn points on your purchases and more.</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_hFeMGB": {
-          "type": "button",
-          "settings": {
-            "button_label": "JOIN NOW",
-            "button_link": "",
-            "button_video_link": "",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": false
-          }
-        },
-        "button_Y8xwgC": {
-          "type": "button",
-          "settings": {
-            "button_label": "LOGIN",
-            "button_link": "",
-            "button_video_link": "",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": false
-          }
-        }
-      },
-      "block_order": [
-        "heading_4dzPR8",
-        "text_FCRy3n",
-        "button_hFeMGB",
-        "button_Y8xwgC"
-      ],
-      "name": "t:sections.image-with-text-overlay.name",
-      "settings": {
-        "transparent_header": false,
-        "image": "shopify://shop_images/image_2025_03_24_02_27_36_430_2d219677-a8a3-4e4d-8221-9a7dada5e74f.jpg",
-        "image_height": "adapt",
-        "content_width": "small",
-        "content_position": "md:items-center md:justify-end",
-        "text_alignment": "left",
-        "image_mobile": "shopify://shop_images/image_2025_03_24_02_27_39_983.jpg",
-        "image_height_mobile": "adapt",
-        "content_position_mobile": "items-end justify-center",
-        "text_alignment_mobile": "center",
-        "color_text": "#171717",
-        "color_highlight": "#e0a580",
-        "gradient_highlight": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
-        "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "divider_color": "#111111",
-        "overlay_opacity": 0,
-        "padding_top": 0,
-        "padding_bottom": 0,
-        "divider": false,
-        "full_width": true,
-        "rounded": false,
-        "enable_parallax": false,
-        "parallax_direction": "vertical"
-      }
-    },
     "video_with_text_overlay_m9LDwg": {
       "type": "video-with-text-overlay",
       "blocks": {
@@ -175,6 +86,7 @@
       "name": "t:sections.video-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
+        "video": "shopify://files/videos/Sequence 01.mp4",
         "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
         "description": "",
         "enable_video_autoplay": true,
@@ -768,7 +680,6 @@
   },
   "order": [
     "main-page",
-    "image_with_text_overlay_zGt7zC",
     "video_with_text_overlay_m9LDwg",
     "multicolumn_with_icons_dFmMf4",
     "multicolumn_Nqae7T",
