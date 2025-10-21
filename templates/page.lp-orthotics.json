@@ -921,7 +921,7 @@
       "settings": {
         "transparent_header": false,
         "image": "shopify://shop_images/testimonials.svg",
-        "image_height": "450px",
+        "image_height": "adapt",
         "content_position": "md:items-center md:justify-center",
         "image_height_mobile": "auto",
         "content_position_mobile": "items-center justify-center",
