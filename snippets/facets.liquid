@@ -119,7 +119,7 @@
                 </summary>
                 <div class="details__content">
                   {%- if is_color or filter.presentation == 'swatch' -%}
-                    <ul class="swatches swatches--{{ settings.rounded_swatch }} flex items-center flex-wrap gap-4">
+                    <ul class="swatches swatches--{{ settings.rounded_swatch }} flex items-center flex-wrap gap-3">
                       {%- for filter_value in sorted_values -%}
                         {%- liquid
                           assign filter_value_id = filter_id | append: '-' | append: forloop.index
