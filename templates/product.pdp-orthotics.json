@@ -94,6 +94,16 @@
         "text-1": {
           "type": "text",
           "settings": {
+            "icon": "check_mark",
+            "iwidth": "custom",
+            "icon_width": 20,
+            "text": "FSA / HSA Eligible",
+            "text_size": "text-sm"
+          }
+        },
+        "text_tEEMj9": {
+          "type": "text",
+          "settings": {
             "icon": "lightning",
             "iwidth": "custom",
             "icon_width": 20,
@@ -186,6 +196,7 @@
         "icon_list_VBaw6z",
         "liquid_anxBGN",
         "text-1",
+        "text_tEEMj9",
         "text-3",
         "text-2",
         "text-4",
