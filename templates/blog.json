@@ -96,10 +96,115 @@
         "parallax_direction": "vertical"
       }
     },
+    "image_with_text_overlay_GwGiG6": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "heading_qd4JqH": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>WELCOME TO</p>",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_rdLBTc": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The Albert Learning Center</p>",
+            "text_font": "heading",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_aaB4ct": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Welcome to the Albert Learning Center. Here you can learn everything you want to know about your feet and Aetrex Orthotics. <br/><br/> THE MOST POPULAR VIDEOS:</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_TJFxn6": {
+          "type": "button",
+          "settings": {
+            "button_label": "Button label",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_6WfLwV": {
+          "type": "button",
+          "settings": {
+            "button_label": "Button label",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_qd4JqH",
+        "text_rdLBTc",
+        "text_aaB4ct",
+        "button_TJFxn6",
+        "button_6WfLwV"
+      ],
+      "name": "t:sections.image-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/AlbertDeskImg_d5f60747-146d-4080-9386-8fb82eb26e40.jpg",
+        "image_height": "650px",
+        "content_width": "small",
+        "content_position": "md:items-center md:justify-end",
+        "text_alignment": "center",
+        "image_mobile": "shopify://shop_images/AlbertM.jpg",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
+        "color_text": "rgba(0,0,0,0)",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#ffffff",
+        "color_button_background": "rgba(0,0,0,0)",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": true,
+        "parallax_direction": "vertical"
+      }
+    },
     "main-blog": {
       "type": "main-blog",
       "settings": {
-        "heading_size": "title-lg tracking-heading",
+        "heading_size": "title-md",
         "heading_alignment": "text-center justify-center",
         "heading_tag": "h1",
         "subheading": "",
@@ -123,6 +228,7 @@
   },
   "order": [
     "slideshow_rtkNWk",
+    "image_with_text_overlay_GwGiG6",
     "main-blog"
   ]
 }
