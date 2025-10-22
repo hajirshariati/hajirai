@@ -222,7 +222,6 @@
     },
     "main-blog": {
       "type": "main-blog",
-      "disabled": true,
       "settings": {
         "heading_size": "title-md",
         "heading_alignment": "text-center justify-center",
@@ -247,6 +246,7 @@
     },
     "blog_posts_JY8zpf": {
       "type": "blog-posts",
+      "disabled": true,
       "name": "t:sections.blog-posts.name",
       "settings": {
         "blog": "albert-learning-center",
