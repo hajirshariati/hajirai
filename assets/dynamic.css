@@ -39,7 +39,7 @@ menu-drawer .drawer__content .grandchild-NEW.Kids.Orthotics {
 @media all and (max-width: 460px) {
   .banner__title,
   .banner__title split-words > * {
-    font-size: calc(var(--title-md) - 10px);
+    font-size: calc(var(--title-md) - 0px);
   }
 
   .banner__title + *,
