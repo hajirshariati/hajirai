@@ -171,6 +171,7 @@
         "button_TJFxn6",
         "button_6WfLwV"
       ],
+      "disabled": true,
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
