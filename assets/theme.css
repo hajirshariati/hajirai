@@ -17061,6 +17061,9 @@ ul.swatches li label {
     font-weight: 600;
     text-transform: capitalize;
     min-height: 65px;
+}
+
+.facet-form ul.swatches li label {
     width: 65px;
 }
 
