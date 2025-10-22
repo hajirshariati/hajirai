@@ -229,13 +229,13 @@
       },
       "2296928500563504527": {
         "type": "shopify://apps/abra-promotions/blocks/abra/daa1493a-23b5-48bb-8cb5-7ab1267b4642",
-        "disabled": true,
+        "disabled": false,
         "settings": {
-          "popup_preview": true,
-          "popup_background_color": "#119D52",
-          "popup_border_color": "#119D52",
-          "popup_color": "#FFFFFF",
-          "popup_icon_color": "#FFFFFF",
+          "popup_preview": false,
+          "popup_background_color": "#119d52",
+          "popup_border_color": "#119d52",
+          "popup_color": "#ffffff",
+          "popup_icon_color": "#ffffff",
           "popup_border_radius": 4,
           "popup_border_width": 1,
           "popup_font_size": 14,
@@ -245,17 +245,17 @@
           "popup_placement": "bottom-center",
           "popup_dismiss": "manual",
           "popup_dismiss_delay": 5,
-          "announcement_bar_enabled": true,
-          "announcement_bar_background_color": "#119D52",
-          "announcement_bar_border_color": "#119D52",
-          "announcement_bar_color": "#FFFFFF",
-          "announcement_bar_icon_color": "#FFFFFF",
+          "announcement_bar_enabled": false,
+          "announcement_bar_background_color": "#119d52",
+          "announcement_bar_border_color": "#119d52",
+          "announcement_bar_color": "#ffffff",
+          "announcement_bar_icon_color": "#ffffff",
           "announcement_bar_border_radius": 0,
           "announcement_bar_font_size": 14,
           "announcement_bar_icon_size": 16,
           "announcement_bar_padding_y": 10,
           "announcement_bar_padding_x": 10,
-          "sale_price_color": "#FF0000"
+          "sale_price_color": "#ff0000"
         }
       }
     }
