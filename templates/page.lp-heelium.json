@@ -837,7 +837,7 @@
       "settings": {
         "transparent_header": false,
         "image": "shopify://shop_images/image_65_6305c9ae-4056-40a2-99e6-fbe0a4131851.png",
-        "image_height": "adapt",
+        "image_height": "500px",
         "content_width": "small",
         "content_position": "md:items-end md:justify-start",
         "text_alignment": "left",
@@ -857,7 +857,7 @@
         "padding_top": 24,
         "padding_bottom": 24,
         "divider": false,
-        "full_width": true,
+        "full_width": false,
         "rounded": false,
         "enable_parallax": false,
         "parallax_direction": "vertical"
