@@ -11145,8 +11145,8 @@ input[type="email"]:is(
 
 .product-card--promo {
     grid-column: span 2;
-    eight: fit-content;
-    order-radius: 3em;
+    height: fit-content;
+ 
  
 }
 
