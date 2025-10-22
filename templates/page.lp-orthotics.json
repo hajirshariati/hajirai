@@ -1140,6 +1140,7 @@
         "question_pFxxpt",
         "question_H3pMh4"
       ],
+      "disabled": true,
       "name": "FAQ",
       "settings": {
         "style": "with-border",
@@ -1268,6 +1269,7 @@
         "text_HbcxnX",
         "button_y7PWVx"
       ],
+      "disabled": true,
       "name": "t:sections.images-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
