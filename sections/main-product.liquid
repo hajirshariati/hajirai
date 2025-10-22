@@ -982,7 +982,7 @@
                     data-variant-id="{{ product.selected_or_first_available_variant.id }}"
                   >
                     {%- if variant_price_compare -%}
-                      <span class="sr-only">{{ 'products.price.regular_price' | t }}</span>
+                      <!--span class="sr-only">{{ 'products.price.regular_price' | t }}</span>
                       <span class="price__sale inline-flex items-center h-auto relative">
                         {%- liquid
                           if settings.currency_code_enabled
@@ -992,7 +992,7 @@
                           endif
                         -%}
                       </span>
-                      <span class="sr-only">{{ 'products.price.sale_price' | t }}</span>
+                      <span class="sr-only">{{ 'products.price.sale_price' | t }}</span-->
                     {%- endif -%}
                     
                     {%- if product.selected_or_first_available_variant.quantity_price_breaks.size > 0 -%}
