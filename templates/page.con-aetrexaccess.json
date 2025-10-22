@@ -495,7 +495,7 @@
         "question_9mgqph": {
           "type": "question",
           "settings": {
-            "title": "What are ways to earn rewards?",
+            "title": "What Are Ways to Earn Rewards?",
             "text": "<p>Aetrex Access program members can earn points for purchases and activities made on <a href=\"https://aetrex.com/\">aetrex.com</a>.</p><p>Every $1 spent = 10 points<br/>After first purchase = 4000 points<br/>Anniversary celebration = 4000 points<br/>Like on Facebook = 50 points<br/>Follow us Instagram = 50 points<br/>Review on Website = 100 points<br/>Referral Bonus = 4000 points<br/>*Points are only rewarded to the subtotal, excludes tax & shipping on purchases.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -504,7 +504,7 @@
         "question_TK6AeN": {
           "type": "question",
           "settings": {
-            "title": "What can I redeem with my points?",
+            "title": "What Can I Redeem with My Points?",
             "text": "<p>1,000 points = $5 Coupon<br/>2,000 points = $10 Coupon<br/>3,000 points = $15 Coupon<br/>4,000 points = $20 Coupon<br/>5,000 points = $25 Coupon<br/>6,000 points = $30 Coupon<br/>7,000 points = $35 Coupon<br/>8,000 points = $40 Coupon<br/>9,000 points = $45 Coupon<br/>10,000 points = $50 Coupon<br/>11,000 points = $55 Coupon<br/>12,000 points = $60 Coupon<br/>13,000 points = $65 Coupon<br/>14,000 points = $70 Coupon<br/>15,000 points = $75 Coupon<br/>16,000 points = $80 Coupon<br/>17,000 points = $85 Coupon<br/>18,000 points = $90 Coupon<br/>19,000 points = $95 Coupon<br/>20,000 points = $100 Coupon<br/>21,000 points = $105 Coupon<br/>22,000 points = $110 Coupon<br/>23,000 points = $115 Coupon<br/>24,000 points = $120 Coupon<br/>25,000 points = $125 Coupon</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -513,7 +513,7 @@
         "question_Gz6cEE": {
           "type": "question",
           "settings": {
-            "title": "How do I redeem my rewards?",
+            "title": "How Do I Redeem My Rewards?",
             "text": "<p>If an Aetrex rewards program member has earned enough points, they can redeem points by logging into their account and going to the cart page. On the cart page, you can see the number of points you have accumulated. You can select the amount of points you wish to use in the reward dropdown and then click apply. Points will be applied to your cart and you can checkout. Please note you can remove the points from your order by clicking X on the points under the dropdown if you no longer want to apply them. And, if your selected points in the dropdown are not being applied, it is probably because you don't have that many points in your account.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -522,7 +522,7 @@
         "question_ambnwf": {
           "type": "question",
           "settings": {
-            "title": "When do my points expire? How long are they valid for?",
+            "title": "When Do My Points Expire? How Long Are They Valid For?",
             "text": "<p>Points expire after inactivity of purchases and/or social sharing of 12 months.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
