@@ -9,18 +9,104 @@
  */
 {
   "sections": {
+    "rich_text_GCN9wX": {
+      "type": "rich-text",
+      "blocks": {
+        "spacing_NkCAd8": {
+          "type": "spacing",
+          "settings": {
+            "height": 8,
+            "height_mobile": 28
+          }
+        },
+        "icon_3gF3YH": {
+          "type": "icon",
+          "settings": {
+            "icon": "tag",
+            "icon_image": "shopify://shop_images/aetrex_access.jpg",
+            "iwidth": "custom",
+            "icon_width": 200,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "text_9fjYFn": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Join today to unlock exclusive promotions, earn points on your purchases and more.</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "spacing_w8JHNC": {
+          "type": "spacing",
+          "settings": {
+            "height": 4,
+            "height_mobile": 28
+          }
+        }
+      },
+      "block_order": [
+        "spacing_NkCAd8",
+        "icon_3gF3YH",
+        "text_9fjYFn",
+        "spacing_w8JHNC"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#ffffff",
+        "color_background": "",
+        "gradient_background": "linear-gradient(90deg, rgba(92, 109, 116, 1) 13%, rgba(140, 162, 173, 1) 86%)",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
     "main-register": {
       "type": "main-register",
       "settings": {
         "heading_size": "title-xl tracking-heading",
+        "heading_tag": "h1",
         "show_email_consent": true,
         "padding_top": 72,
         "padding_bottom": 100,
-        "rounded": false
+        "divider": false,
+        "rounded": true
       }
     }
   },
   "order": [
+    "rich_text_GCN9wX",
     "main-register"
   ]
 }
