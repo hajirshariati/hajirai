@@ -24,6 +24,65 @@
         "rounded": false
       }
     },
+    "rich_text_U7K8rB": {
+      "type": "rich-text",
+      "blocks": {
+        "spacing_3PaJJD": {
+          "type": "spacing",
+          "settings": {
+            "height": 8,
+            "height_mobile": 28
+          }
+        },
+        "icon_mzUncQ": {
+          "type": "icon",
+          "settings": {
+            "icon": "tag",
+            "icon_image": "shopify://shop_images/aetrex_access.jpg",
+            "iwidth": "custom",
+            "icon_width": 200,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        }
+      },
+      "block_order": [
+        "spacing_3PaJJD",
+        "icon_mzUncQ"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "linear-gradient(90deg, rgba(92, 109, 116, 1), rgba(140, 162, 173, 1) 100%)",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
     "video_with_text_overlay_m9LDwg": {
       "type": "video-with-text-overlay",
       "blocks": {
@@ -112,7 +171,7 @@
         "padding_bottom": 0,
         "divider": false,
         "full_width": true,
-        "rounded": false
+        "rounded": true
       }
     },
     "multicolumn_with_icons_dFmMf4": {
@@ -612,7 +671,7 @@
         "question_CgVbH4": {
           "type": "question",
           "settings": {
-            "title": "When do the first purchase bonus points go into effect?",
+            "title": "When Do the First Purchase Bonus Points Go into Effect?",
             "text": "<p>The first purchase bonus points go into effect with a customer's first purchase after creating a loyalty account with a password. This applies only to new customers who haven't purchased from us before. Existing customers who have purchased before, but have just created a loyalty account, will not receive the 4,000 bonus points.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -621,7 +680,7 @@
         "question_GMbXMW": {
           "type": "question",
           "settings": {
-            "title": "Is the Aetrex Access rewards program available for non-us customers",
+            "title": "Is the Aetrex Access Rewards Program Available for Non-U.S. Customers?",
             "text": "<p>Unfortunately, it is currently only available for US customers. However, we are considering expanding it internationally in the future.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -680,6 +739,7 @@
   },
   "order": [
     "main-page",
+    "rich_text_U7K8rB",
     "video_with_text_overlay_m9LDwg",
     "multicolumn_with_icons_dFmMf4",
     "multicolumn_Nqae7T",
