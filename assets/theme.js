@@ -8247,7 +8247,7 @@ class ProductColorSwatchHandler {
                             stickyBtn.disabled = false;
                             
                             const buttonText = stickyBtn.textContent || stickyBtn.innerText || '';
-                            const needsSelection = buttonText.includes('SELECT') || buttonText.includes('SELECT SIZE');
+                            const needsSelection = buttonText.includes('PLEASE SELECT') || buttonText.includes('SELECT SIZE');
                             
                             if (needsSelection) {
                                 stickyBtn.classList.add('disabled-btn');
