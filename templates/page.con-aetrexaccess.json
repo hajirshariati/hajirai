@@ -86,11 +86,19 @@
     "video_with_text_overlay_m9LDwg": {
       "type": "video-with-text-overlay",
       "blocks": {
+        "subheading_kUMVFg": {
+          "type": "subheading",
+          "settings": {
+            "subheading": "US Customers Only*",
+            "subheading_size": "subtitle-md",
+            "secondary_color": false
+          }
+        },
         "heading_FzADcY": {
           "type": "heading",
           "settings": {
-            "heading": "<p>GET FREE SHIPPING WITH AETREX ACCESS</p>",
-            "heading_size": "title-md",
+            "heading": "<p>GET FREE SHIPPING</p>",
+            "heading_size": "title-lg tracking-heading",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -137,6 +145,7 @@
         }
       },
       "block_order": [
+        "subheading_kUMVFg",
         "heading_FzADcY",
         "text_rkXYnK",
         "button_Y7jckW",
