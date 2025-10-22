@@ -9,93 +9,6 @@
  */
 {
   "sections": {
-    "slideshow_rtkNWk": {
-      "type": "slideshow",
-      "blocks": {
-        "image_p8tBgm": {
-          "type": "image",
-          "settings": {
-            "image": "shopify://shop_images/LE_banner_23d79537-989b-4d9c-9cd0-6cdd49071a5e.jpg",
-            "heading": "Lehigh CustomFit",
-            "heading_size": "title-sm",
-            "heading_tag": "h3",
-            "text": "<p>Return rates significantly below market averages.</p><p></p><p>50% Reduced Return Rate | 8% Annualized Return Rate</p>",
-            "text_font": "body",
-            "text_size": "subtext-lg",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color_text": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle",
-            "button_label": "READ THE FULL STORY",
-            "button_link": "shopify://blogs/case-studies/lehigh-case-study",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": false
-          }
-        },
-        "image_gJc4qY": {
-          "type": "image",
-          "settings": {
-            "image": "shopify://shop_images/CO_banner_6612855d-6899-43cb-ab27-0245a1727400.jpg",
-            "heading": "Comfort One",
-            "heading_size": "title-sm",
-            "heading_tag": "h3",
-            "text": "<p>Detailed data equips sales associates to better assist each customer's unique needs.</p>",
-            "text_font": "body",
-            "text_size": "subtext-lg",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color_text": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle",
-            "button_label": "READ THE FULL STORY",
-            "button_link": "shopify://blogs/case-studies/danner",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": false
-          }
-        }
-      },
-      "block_order": [
-        "image_p8tBgm",
-        "image_gJc4qY"
-      ],
-      "disabled": true,
-      "name": "Slideshow",
-      "settings": {
-        "autoplay": true,
-        "autoplay_speed": 5,
-        "show_navigation": true,
-        "image_height": "adapt",
-        "content_width": "large",
-        "content_position": "md:items-center md:justify-start",
-        "text_alignment": "left",
-        "image_height_mobile": "100vh",
-        "content_position_mobile": "items-end justify-center",
-        "text_alignment_mobile": "center",
-        "accessibility_info": "Slideshow about our brand",
-        "color_text": "#ffffff",
-        "color_background": "rgba(0,0,0,0)",
-        "gradient_background": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
-        "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "overlay_opacity": 0,
-        "padding_top": 12,
-        "padding_bottom": 0,
-        "divider": false,
-        "full_width": true,
-        "rounded": false,
-        "enable_parallax": false,
-        "parallax_direction": "vertical"
-      }
-    },
     "image_with_text_overlay_GwGiG6": {
       "type": "image-with-text-overlay",
       "blocks": {
@@ -189,7 +102,6 @@
         "button_TJFxn6",
         "button_6WfLwV"
       ],
-      "disabled": true,
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
@@ -287,7 +199,6 @@
     }
   },
   "order": [
-    "slideshow_rtkNWk",
     "image_with_text_overlay_GwGiG6",
     "main-blog",
     "blog_posts_JY8zpf"

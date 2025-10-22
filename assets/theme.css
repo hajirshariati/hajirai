@@ -17634,9 +17634,14 @@ body .rte .contact-box a {
 }
 
 .ORTHOPLP-icons-section {
+    background: linear-gradient(180deg, #fafafa, #fff);
     padding: 20px 30px;
+    display: flex;
+    justify-content: center;
     line-height: 1em;
-}
+    position: relative;
+    border-radius: 1em;
+    height: 24vw;
 }
 .ORTHOPLP-icons-container {
   width: 100%;
