@@ -941,7 +941,7 @@
       "settings": {
         "transparent_header": false,
         "image": "shopify://shop_images/testa_2_1.jpg",
-        "image_height": "adapt",
+        "image_height": "400px",
         "content_position": "md:items-center md:justify-center",
         "image_height_mobile": "300px",
         "content_position_mobile": "items-center justify-center",
