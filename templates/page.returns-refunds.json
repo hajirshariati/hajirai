@@ -30,10 +30,13 @@
         "text_eGXbBJ": {
           "type": "text",
           "settings": {
-            "text": "<h2>NO HASSLE RETURNS</h2><h3>Easy Returns with Our Health Guarantee!</h3>",
+            "text": "<h2>NO HASSLE RETURNS</h2><h3>Easy Returns with Our 30 Day Health Guarantee!</h3>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -166,6 +169,7 @@
         "gap": "large",
         "columns": 3,
         "columns_mobile": "1",
+        "carousel_on_desktop": true,
         "swipe_on_mobile": true,
         "heading": "",
         "heading_size": "title-md",
@@ -266,6 +270,9 @@
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -317,6 +324,9 @@
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -329,6 +339,9 @@
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
