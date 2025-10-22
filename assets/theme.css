@@ -10959,7 +10959,7 @@ input[type="email"]:is(
 }
 
 .product-card--standard {
-    background-color: transparent;
+    background-color: #fafafa;
 }
 
 .product-card--standard .product-card__media :is(.media, .flickity-viewport) {
