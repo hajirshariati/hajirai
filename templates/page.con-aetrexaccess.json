@@ -90,7 +90,7 @@
           "type": "heading",
           "settings": {
             "heading": "<p>GET FREE SHIPPING WITH AETREX ACCESS</p>",
-            "heading_size": "title-sm",
+            "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -151,7 +151,7 @@
         "enable_video_autoplay": true,
         "enable_video_looping": true,
         "image_height": "550px",
-        "content_width": "small",
+        "content_width": "large",
         "content_position": "md:items-center md:justify-center",
         "text_alignment": "center",
         "video_url_mobile": "",
