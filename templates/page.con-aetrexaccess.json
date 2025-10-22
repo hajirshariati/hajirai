@@ -735,6 +735,92 @@
         "narrow": false,
         "rounded": false
       }
+    },
+    "images_with_text_WEDgx7": {
+      "type": "images-with-text",
+      "blocks": {
+        "heading_dK9yAr": {
+          "type": "heading",
+          "settings": {
+            "heading": "Join today",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_8qk3cb": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Join today to unlock exclusive promotions, earn points on your purchases and more.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_LirhTz": {
+          "type": "button",
+          "settings": {
+            "button_label": "Join Now",
+            "button_link": "https://www.aetrex.com/account/register",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_8nQTYA": {
+          "type": "button",
+          "settings": {
+            "button_label": "Already a Member",
+            "button_link": "https://www.aetrex.com/account/login",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_dK9yAr",
+        "text_8qk3cb",
+        "button_LirhTz",
+        "button_8nQTYA"
+      ],
+      "name": "t:sections.images-with-text.name",
+      "settings": {
+        "image": "shopify://shop_images/Mobile_Banner_Image.png",
+        "image_url": "",
+        "image_2": "shopify://shop_images/aetrex_access.jpg",
+        "image2_url": "",
+        "image_ratio": "adapt",
+        "image_width": "medium",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "#fafafa",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#5c6d74",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": true
+      }
     }
   },
   "order": [
@@ -744,6 +830,7 @@
     "multicolumn_with_icons_dFmMf4",
     "multicolumn_Nqae7T",
     "multicolumn_ke6Ehd",
-    "faq_fjtdJ4"
+    "faq_fjtdJ4",
+    "images_with_text_WEDgx7"
   ]
 }
