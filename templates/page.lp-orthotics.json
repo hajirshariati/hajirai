@@ -943,7 +943,7 @@
         "image": "shopify://shop_images/testa_1.jpg",
         "image_height": "adapt",
         "content_position": "md:items-center md:justify-center",
-        "image_height_mobile": "auto",
+        "image_height_mobile": "300px",
         "content_position_mobile": "items-center justify-center",
         "color_text": "#171717",
         "color_highlight": "#e0a580",
