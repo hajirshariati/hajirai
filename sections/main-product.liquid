@@ -938,9 +938,10 @@
     {%- assign sticky_buy_button = section.blocks | where: "type", "sticky_buy_button" | first -%}
     {%- if product.available and sticky_buy_button -%}
       <product-sticky-form
-        class="product-sticky-form w-full fixed z-20 bottom-0 right-0 pointer-events-none"
+        class="product-sticky-form w-full fixed bottom-0 right-0 pointer-events-none"
         id="ProductStickyForm-{{ section.id }}-{{ product.id }}"
         form="{{ product_form_id }}"
+        style="z-index: 1000000;"
       >
         <div class="product-sticky-form__card grid gap-4 opacity-0 invisible pointer-events-auto">
           {%- assign featured_media = product.selected_or_first_available_variant.featured_media | default: product.featured_media -%}
