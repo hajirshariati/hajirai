@@ -109,6 +109,14 @@
             "highlighted_scribble": "circle"
           }
         },
+        "divider_Jywiag": {
+          "type": "divider",
+          "settings": {
+            "divider_width": 120,
+            "divider_mt": 10,
+            "divider_mb": 10
+          }
+        },
         "text_rdLBTc": {
           "type": "text",
           "settings": {
@@ -122,6 +130,14 @@
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
+          }
+        },
+        "divider_JHhPq7": {
+          "type": "divider",
+          "settings": {
+            "divider_width": 120,
+            "divider_mt": 10,
+            "divider_mb": 10
           }
         },
         "text_aaB4ct": {
@@ -142,8 +158,8 @@
         "button_TJFxn6": {
           "type": "button",
           "settings": {
-            "button_label": "Button label",
-            "button_link": "",
+            "button_label": "The Function of Feet",
+            "button_link": "https://vimeo.com/701245964",
             "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
@@ -154,8 +170,8 @@
         "button_6WfLwV": {
           "type": "button",
           "settings": {
-            "button_label": "Button label",
-            "button_link": "",
+            "button_label": "Plantar Fascia",
+            "button_link": "https://vimeo.com/701245804",
             "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
@@ -166,12 +182,13 @@
       },
       "block_order": [
         "heading_qd4JqH",
+        "divider_Jywiag",
         "text_rdLBTc",
+        "divider_JHhPq7",
         "text_aaB4ct",
         "button_TJFxn6",
         "button_6WfLwV"
       ],
-      "disabled": true,
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
@@ -204,6 +221,7 @@
     },
     "main-blog": {
       "type": "main-blog",
+      "disabled": true,
       "settings": {
         "heading_size": "title-md",
         "heading_alignment": "text-center justify-center",
@@ -225,11 +243,52 @@
         "full_width": false,
         "rounded": false
       }
+    },
+    "blog_posts_JY8zpf": {
+      "type": "blog-posts",
+      "name": "t:sections.blog-posts.name",
+      "settings": {
+        "blog": "albert-learning-center",
+        "post_limit": 9,
+        "columns": 3,
+        "carousel_on_desktop": false,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": false,
+        "image_ratio": "adapt",
+        "show_tags": true,
+        "show_date": true,
+        "show_comments": false,
+        "show_author": false,
+        "show_excerpt": false,
+        "heading": "<strong>Albert Learning Center</strong>",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "text",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
     }
   },
   "order": [
     "slideshow_rtkNWk",
     "image_with_text_overlay_GwGiG6",
-    "main-blog"
+    "main-blog",
+    "blog_posts_JY8zpf"
   ]
 }
