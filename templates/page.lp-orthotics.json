@@ -431,23 +431,6 @@
     "collection_list_mPHCpz": {
       "type": "collection-list",
       "blocks": {
-        "collection_hHkQLw": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "running-orthotics",
-            "custom_url": "",
-            "image": "shopify://shop_images/Group_11_cc45e757-0dfe-4e9d-999f-40a29c1844a1.png",
-            "title": "Running",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
         "collection_BMqtdJ": {
           "type": "collection",
           "settings": {
@@ -465,14 +448,14 @@
             "enable_title_drop_shadow": false
           }
         },
-        "collection_xjQV8H": {
+        "collection_hHkQLw": {
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "all-day-standing-orthotics",
+            "collection": "running-orthotics",
             "custom_url": "",
-            "image": "shopify://shop_images/Group_8_c53ae63b-9703-4298-89f2-64bf44b0eca0.png",
-            "title": "Working",
+            "image": "shopify://shop_images/Group_11_cc45e757-0dfe-4e9d-999f-40a29c1844a1.png",
+            "title": "Running",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -490,6 +473,23 @@
             "custom_url": "",
             "image": "shopify://shop_images/Group_7_53cd5509-a4e6-4e01-9140-21ba10532f65.png",
             "title": "Gym",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_xjQV8H": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "all-day-standing-orthotics",
+            "custom_url": "",
+            "image": "shopify://shop_images/Group_8_c53ae63b-9703-4298-89f2-64bf44b0eca0.png",
+            "title": "Working",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -552,10 +552,10 @@
         }
       },
       "block_order": [
-        "collection_hHkQLw",
         "collection_BMqtdJ",
-        "collection_xjQV8H",
+        "collection_hHkQLw",
         "collection_FWgTeX",
+        "collection_xjQV8H",
         "collection_ELYLBC",
         "collection_C3dagf",
         "collection_4RE3QR"
