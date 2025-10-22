@@ -17615,6 +17615,7 @@ body .rte .contact-box a {
 .ss__results .product-card {
     background: #fafafa;
     height: fit-content;
+    height: auto;
 }
 
 .ss__results .ss__result .image--default {
