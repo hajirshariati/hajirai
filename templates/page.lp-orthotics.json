@@ -1115,8 +1115,8 @@
         "question_pFxxpt": {
           "type": "question",
           "settings": {
-            "title": "<strong>Do Orthotics help with overpronation?</strong> ",
-            "text": "<p>Yes, our orthotics are designed to fit most types of shoes, from sneakers to dress shoes.</p>",
+            "title": "<strong>How long will it take for my orthotics to relieve my foot pain?</strong>",
+            "text": "<p>Every foot is unique, so pain relief times can vary. Most people begin to feel more comfortable after a short period of time, typically after one to two weeks of regular wear. <br/></p><p>Our orthotics are designed to be worn right out of the box with no break in period required. However, some people find wearing their new orthotics for a few hours a day and gradually increasing wear time can help their feet adjust. <br/></p><p>If your pain persists, please consult a healthcare professional for personalized guidance.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
