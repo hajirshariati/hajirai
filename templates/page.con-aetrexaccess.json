@@ -531,7 +531,7 @@
         "question_UipUnN": {
           "type": "question",
           "settings": {
-            "title": "When will my points be posted?",
+            "title": "When Will My Points Be Posted?",
             "text": "<p>Points for online orders, including the first purchase bonus will be rewarded 30 days after purchase.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -540,7 +540,7 @@
         "question_FHNiNb": {
           "type": "question",
           "settings": {
-            "title": "What are extra point days?",
+            "title": "What Are Extra Point Days?",
             "text": "<p>As a member of the Aetrex Rewards Program, customers will receive exclusive invitations to earn double or triple points on purchases made during the promotional period. These additional promotional rule points are not cumulative with product-based points earned. This means you may not earn points under both the standard rules and the promotional rule, but only under the promotional rule.</p><p>After 30 days of the day of purchase, your points will be placed in your rewards account. Please note that if you would like to preview the amount of potential points that will be awarded during the promotional period, you may log into your rewards account. Purchases made without logging into your account but that are associated with your email address will have points reflected in your account 30 days after purchase.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
