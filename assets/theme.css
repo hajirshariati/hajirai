@@ -6774,7 +6774,7 @@ p::after {
 
 .drawer__tab {
     line-height: 1.6;
-    opacity: 0.2;
+    opacity: 0.4;
     transition: opacity var(--animation-primary);
 }
 
