@@ -1124,8 +1124,17 @@
         "question_H3pMh4": {
           "type": "question",
           "settings": {
-            "title": "<strong>How do I know which Orthotics are right for me?</strong> ",
-            "text": "<p>Most customers feel a difference in comfort within the first few days. However, for full adaptation, it may take up to a week.</p>",
+            "title": "<strong>Do orthotics help with overpronation?</strong>",
+            "text": "<p>Yes. Aetrex Orthotics are designed to help with overpronation, a condition that occurs when the foot rolls excessively inward. It’s prominent in people who have flexible, flat feet. Overpronation can often lead to other foot conditions such as Plantar Fasciitis, Heel Spurs, Metatarsalgia, Post-tib Tendonitis and/or Bunions. </p><p><br/>Overpronation can be treated with orthotics designed with proper arch support and medial rearfoot posting to help prevent the excessive inward rolling motion. Footwear should also be examined; footwear with firm heel counters are often recommended for extra support and stability. <br/></p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_f98WVQ": {
+          "type": "question",
+          "settings": {
+            "title": "<strong>Are Aetrex Orthotics HSA/FSA eligible?</strong>",
+            "text": "<p>Yes. All Aetrex Orthotics are eligible for purchase with your HSA, FSA, or HRA accounts. Simply save your receipt and submit it for reimbursement based on your plan’s requirements.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -1138,7 +1147,8 @@
         "question_HKXX4p",
         "question_xpY86j",
         "question_pFxxpt",
-        "question_H3pMh4"
+        "question_H3pMh4",
+        "question_f98WVQ"
       ],
       "name": "FAQ",
       "settings": {
