@@ -1071,16 +1071,16 @@
           "type": "question",
           "settings": {
             "title": "<strong>How do orthotics work?</strong> ",
-            "text": "<p>Our easy-to-use quiz can help you find the perfect fit based on your lifestyle and foot type.</p>",
+            "text": "<p>Orthotics work by supporting your body from the ground up, promoting proper alignment and reducing stress on your feet, knees, hips, and back. Aetrex Orthotics are designed using data and insights from over 50 million 3D foot scans, providing anatomically correct arch support and using premium materials to absorb shock and redistribute pressure away from high-impact areas. The result is lasting comfort, injury prevention, and healthier movement with every step.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         },
-        "question_XpAeUz": {
+        "question_G6BnhB": {
           "type": "question",
           "settings": {
-            "title": "<strong>Are orthotics the same as insoles?</strong> ",
-            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "title": "<strong>What makes Aetrex Orthotics different from other brands?</strong>",
+            "text": "<p>Aetrex Orthotics are designed using insights and data from over 50 million 3D foot scans, helping us to design anatomically correct products that can truly help relieve pain and prevent injury. </p><p><br/>Each orthotic features Aetrex’s Signature Arch Support. The contour, position and height of Aetrex’s unique arch support aligns anatomically in the proper place to help support our bodies from the ground up.</p><p><br/>The Aetrex Orthotics Collection utilizes premium, shock absorbing materials designed to cushion and support the body while protecting the foot. These include high-tech, light-weight, modern materials such as memory foams, polyurethanes, and slow recovery foams.<br/><br/>A key goal of Aetrex Orthotics is to provide alignment and to keep the foot closer to the neutral position throughout the gait cycle. Proper alignment helps minimize over-pronation and reduces stress on the plantar fascia, knees, hips and back.<br/><br/>Lastly, Aetrex Orthotics are available in a variety of styles to provide you with a custom selected solution based on your specific foot type and footwear style. <br/></p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -1088,8 +1088,8 @@
         "question_HFPm8X": {
           "type": "question",
           "settings": {
-            "title": "<strong>Can Orthotics Help With Plantar Fasciitis?</strong> ",
-            "text": "<p>Yes, our orthotics are designed to fit most types of shoes, from sneakers to dress shoes.</p>",
+            "title": "<strong>Can orthotics help with plantar fasciitis?</strong>",
+            "text": "<p>Yes. Plantar Fasciitis is typically caused by over-pronation (flat feet) or very high arches. Aetrex Orthotics provide alignment and support to keep the foot closer to the neutral position throughout the gait cycle. Proper alignment helps minimize over-pronation, reduces stress on the plantar fascia, and decreases inflammation associated with plantar fasciitis. </p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -1097,8 +1097,8 @@
         "question_HKXX4p": {
           "type": "question",
           "settings": {
-            "title": "<strong>Do I need Orthotics if I have Flat Feet?</strong> ",
-            "text": "<p>Yes, our orthotics are designed to fit most types of shoes, from sneakers to dress shoes.</p>",
+            "title": "<strong>Do I need orthotics if I have flat feet?</strong>",
+            "text": "<p>People with flat feet have very little arch definition, causing their feet to be more flexible and less shock absorbent. When you have flat feet, your arches can make complete contact with the ground when standing or walking. As a result, foot pain and other conditions can occur, such as over-pronation, plantar fasciitis, post-tibial tendonitis, or heel spurs. <br/><br/>Aetrex Orthotics with a medial rearfoot post and arch support are designed for flat feet which can help keep your feet aligned and control over-pronation so you can stay active and healthy doing the things you love. <a href=\"/collections/flat-feet\" title=\"Flat Feet\">Shop Now</a></p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -1106,8 +1106,8 @@
         "question_xpY86j": {
           "type": "question",
           "settings": {
-            "title": "<strong>How long will it take for Orthotics to relieve foot pain?</strong> ",
-            "text": "<p>Most customers feel a difference in comfort within the first few days. However, for full adaptation, it may take up to a week.</p>",
+            "title": "<strong>What is the bump on the top cover found on some of your orthotics?</strong>",
+            "text": "<p>That small raised area near the ball of the foot on select orthotics is called a metatarsal pad. It’s designed to help redistribute pressure away from the forefoot and relieve discomfort caused by conditions such as metatarsalgia or ball-of-foot pain. By slightly lifting the metatarsal bones, it provides added comfort during walking or standing.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -1133,14 +1133,13 @@
       },
       "block_order": [
         "question_PtH3YU",
-        "question_XpAeUz",
+        "question_G6BnhB",
         "question_HFPm8X",
         "question_HKXX4p",
         "question_xpY86j",
         "question_pFxxpt",
         "question_H3pMh4"
       ],
-      "disabled": true,
       "name": "FAQ",
       "settings": {
         "style": "with-border",
