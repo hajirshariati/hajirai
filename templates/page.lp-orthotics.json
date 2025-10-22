@@ -307,7 +307,7 @@
       "settings": {
         "gap": "large",
         "columns": 2,
-        "columns_mobile": "2",
+        "columns_mobile": "1",
         "carousel_on_desktop": false,
         "swipe_on_mobile": false,
         "heading": "",
