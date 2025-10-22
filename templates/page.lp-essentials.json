@@ -1157,6 +1157,16 @@
         "rounded": false
       }
     },
+    "empty_space_fB7tE3": {
+      "type": "empty-space",
+      "name": "t:sections.empty-space.name",
+      "settings": {
+        "desktop_height": 40,
+        "mobile_height": 28,
+        "color_background": "",
+        "gradient_background": ""
+      }
+    },
     "testimonials_NdFQxA": {
       "type": "testimonials",
       "blocks": {
@@ -1281,6 +1291,7 @@
     "multicolumn_djEXnq",
     "multicolumn_gmchwD",
     "testimonials_qrf4RY",
+    "empty_space_fB7tE3",
     "testimonials_NdFQxA",
     "featured_collection_iDAyKn"
   ]
