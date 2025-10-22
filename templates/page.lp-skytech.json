@@ -1474,6 +1474,15 @@
         "rounded": false
       }
     },
+    "ugc_gallery_86rkLt": {
+      "type": "ugc-gallery",
+      "name": "UGC Gallery",
+      "settings": {
+        "custom_gallery": "",
+        "global_pdp_sourced_gallery": "67807363501d9d972ff9bf48",
+        "global_fallback_sourced_gallery": "67806b650c1215001c37bb7e"
+      }
+    },
     "empty_space_kBYgc4": {
       "type": "empty-space",
       "name": "Empty space",
@@ -1509,6 +1518,7 @@
     "rich_text_wPTPVA",
     "multicolumn_emYFiA",
     "rich_text_rdnTUC",
+    "ugc_gallery_86rkLt",
     "empty_space_kBYgc4"
   ]
 }
