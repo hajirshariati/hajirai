@@ -523,6 +523,7 @@
         "column_FR3iyi",
         "column_traEPG"
       ],
+      "disabled": true,
       "name": "t:sections.multicolumn.name",
       "settings": {
         "gap": "small",
