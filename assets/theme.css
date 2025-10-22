@@ -8204,7 +8204,7 @@ details.active .drawer__promotions .mega-menu__item,
         font-size: calc(var(--fluid-xl-to-3xl) - 3px);
         max-width: 90%;
         display: block;
-        justify-self: center;
+        justify-self: center !important;
     }
 }
 
