@@ -549,7 +549,7 @@
         "question_CyTzpa": {
           "type": "question",
           "settings": {
-            "title": "Are points transferrable?",
+            "title": "Are Points Transferable?",
             "text": "<p>Unfortunately at the current moment points will not be transferable.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -558,7 +558,7 @@
         "question_KUY3FF": {
           "type": "question",
           "settings": {
-            "title": "How do I request points not applied to an order?",
+            "title": "How Do I Request Points Not Applied to an Order?",
             "text": "<p>If you suspect points were not rewarded and you are missing points, please contact customer service via email at <a href=\"mailto:rewards@aetrex.com\" title=\"mailto:rewards@aetrex.com\">rewards@aetrex.com</a> or by phone at 1.888.526.2739<br/>Mon - Fri: 8:00am - 6:30pm (EST)</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -567,7 +567,7 @@
         "question_WrY6JU": {
           "type": "question",
           "settings": {
-            "title": "How do I review my points balance?",
+            "title": "How Do I Review My Points Balance?",
             "text": "<p>To review your points balance, you must be logged into your account. Once logged in, scroll down to the Rewards section to review your balance.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -576,7 +576,7 @@
         "question_AGDaJG": {
           "type": "question",
           "settings": {
-            "title": "How do refunds work with my point balance?",
+            "title": "How Do Refunds Work with My Point Balance?",
             "text": "<p>Points will be deducted for the amount of each item that was returned.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -585,7 +585,7 @@
         "question_W7Tfde": {
           "type": "question",
           "settings": {
-            "title": "What if my order total is less than my current available reward?",
+            "title": "What If My Order Total Is Less Than My Current Available Reward?",
             "text": "<p>Rewards are issued in the form of coupons, if your order total is less than the coupon value, the remaining balance cannot be carried over to future orders. The unused remainder of the coupon will be forfeited.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -594,7 +594,7 @@
         "question_xeLnNC": {
           "type": "question",
           "settings": {
-            "title": "I redeemed two rewards of the same value, but they both are not applying to my order. why?",
+            "title": "I Redeemed Two Rewards of the Same Value, but They Both Are Not Applying to My Order. Why?",
             "text": "<p>Coupons of the same value (example: two $5 rewards, two $10 rewards, etc) cannot be used together in one order. We recommend redeeming the reward with the greatest dollar value if you are intending to use the equivalent rewards points on your purchase.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -603,7 +603,7 @@
         "question_tGcmbw": {
           "type": "question",
           "settings": {
-            "title": "How is the anniversary date determined for the loyalty program?",
+            "title": "How Is the Anniversary Date Determined for the Loyalty Program?",
             "text": "<p>The anniversary date is based on the date the account is created with a password..</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
