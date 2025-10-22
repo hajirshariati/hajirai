@@ -258,7 +258,7 @@
         "gap": "large",
         "columns": 4,
         "columns_mobile": "1",
-        "carousel_on_desktop": true,
+        "carousel_on_desktop": false,
         "swipe_on_mobile": true,
         "heading": "",
         "heading_size": "title-md",
