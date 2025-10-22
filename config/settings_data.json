@@ -211,6 +211,52 @@
         "type": "shopify://apps/elevar-conversion-tracking/blocks/dataLayerEmbed/bc30ab68-b15c-4311-811f-8ef485877ad6",
         "disabled": false,
         "settings": {}
+      },
+      "12592085946906583873": {
+        "type": "shopify://apps/wunderkind/blocks/tag/40b05e3b-2403-4814-8fab-e17e57e8b1aa",
+        "disabled": false,
+        "settings": {}
+      },
+      "10533623496951086041": {
+        "type": "shopify://apps/criteo-sales-growth-ads/blocks/theme-extension/b74e0e19-7ecc-4a61-b469-888ea2cdf8f5",
+        "disabled": false,
+        "settings": {}
+      },
+      "7570552984445421165": {
+        "type": "shopify://apps/yotpo-product-reviews/blocks/settings/eb7dfd7d-db44-4334-bc49-c893b51b36cf",
+        "disabled": true,
+        "settings": {}
+      },
+      "2296928500563504527": {
+        "type": "shopify://apps/abra-promotions/blocks/abra/daa1493a-23b5-48bb-8cb5-7ab1267b4642",
+        "disabled": true,
+        "settings": {
+          "popup_preview": true,
+          "popup_background_color": "#119D52",
+          "popup_border_color": "#119D52",
+          "popup_color": "#FFFFFF",
+          "popup_icon_color": "#FFFFFF",
+          "popup_border_radius": 4,
+          "popup_border_width": 1,
+          "popup_font_size": 14,
+          "popup_icon_size": 16,
+          "popup_padding_y": 16,
+          "popup_padding_x": 16,
+          "popup_placement": "bottom-center",
+          "popup_dismiss": "manual",
+          "popup_dismiss_delay": 5,
+          "announcement_bar_enabled": true,
+          "announcement_bar_background_color": "#119D52",
+          "announcement_bar_border_color": "#119D52",
+          "announcement_bar_color": "#FFFFFF",
+          "announcement_bar_icon_color": "#FFFFFF",
+          "announcement_bar_border_radius": 0,
+          "announcement_bar_font_size": 14,
+          "announcement_bar_icon_size": 16,
+          "announcement_bar_padding_y": 10,
+          "announcement_bar_padding_x": 10,
+          "sale_price_color": "#FF0000"
+        }
       }
     }
   },
