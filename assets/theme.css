@@ -8203,8 +8203,10 @@ details.active .drawer__promotions .mega-menu__item,
     .media-card__text .heading {
         font-size: calc(var(--fluid-xl-to-3xl) - -3px);
         max-width: 90%;
+        
         display: block;
         justify-self: center !important;
+        text-wrap-mode: nowrap;
     }
 }
 
