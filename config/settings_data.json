@@ -117,7 +117,7 @@
     "predictive_search_recommendation": "",
     "predictive_search_show_vendor": false,
     "predictive_search_show_price": true,
-    "typewriter_effect_enabled": true,
+    "typewriter_effect_enabled": false,
     "typewriter_starter_text": "Arch Support Sandal",
     "social_facebook_link": "https://facebook.com/shopify",
     "social_twitter_link": "https://x.com/shopify",
