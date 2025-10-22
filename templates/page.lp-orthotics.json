@@ -940,7 +940,7 @@
       "name": "Testimonials banner",
       "settings": {
         "transparent_header": false,
-        "image": "shopify://shop_images/testa_1.jpg",
+        "image": "shopify://shop_images/testa_2_1.jpg",
         "image_height": "adapt",
         "content_position": "md:items-center md:justify-center",
         "image_height_mobile": "300px",
