@@ -239,10 +239,10 @@ body button.sticky_form__submit.button.button--primary.disabled-btn:hover {
 }
 @media screen and (max-width: 767px) {
   button#custom-sticky-cart-btn {
-    padding: 0;
-    width: 90%;
-    height: 50%;
-    font-size: 12px;
+        padding: 10px;
+        font-size: 12px;
+        width: auto;
+        border-radius: 2em;
   }
 }
 /* PDP sticky ATC end */
