@@ -30,8 +30,8 @@
         "heading_Fy6D8H": {
           "type": "heading",
           "settings": {
-            "heading": "<h1>Introducing the<br/>Zoe Pro Scanner</h1>",
-            "heading_size": "title-md",
+            "heading": "<p>Introducing the<br/>Zoe Pro Scanner</p>",
+            "heading_size": "title-sm",
             "heading_tag": "h1",
             "highlighted_text": "text",
             "highlighted_scribble": "sketch-underline"
