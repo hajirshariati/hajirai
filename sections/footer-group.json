@@ -206,19 +206,19 @@
             "locator_url": "shopify://pages/store-locator"
           }
         },
-        "link_list-1": {
-          "type": "link_list",
-          "settings": {
-            "heading": "About Aetrex",
-            "menu": "about-aetrex",
-            "opened": false
-          }
-        },
         "link_list-2": {
           "type": "link_list",
           "settings": {
             "heading": "Customer Service",
             "menu": "footer",
+            "opened": false
+          }
+        },
+        "link_list-1": {
+          "type": "link_list",
+          "settings": {
+            "heading": "About Aetrex",
+            "menu": "about-aetrex",
             "opened": false
           }
         },
@@ -241,8 +241,8 @@
       },
       "block_order": [
         "store_info_aLFGMz",
-        "link_list-1",
         "link_list-2",
+        "link_list-1",
         "link_list_wjmakC",
         "link_list_j6EGHB"
       ],
