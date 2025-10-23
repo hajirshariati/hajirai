@@ -315,12 +315,11 @@
                     {%- endif -%}
                   {%- endif -%}
 
-
-                  {%- liquid
-                    if rating_block == blank and block.settings.show_rating
-                      render 'product-rating', product: product
-                    endif
-                  -%}
+{%- if rating_block == blank and block.settings.show_rating -%}
+  <a href="#yotpo-app" class="flex items-center gap-1 hover:underline">
+    {%- render 'product-rating', product: product -%}
+  </a>
+{%- endif -%}
                 </div>
 
               {%- when 'quantity_selector' -%}
