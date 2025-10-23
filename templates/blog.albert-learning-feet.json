@@ -138,7 +138,7 @@
         "heading_xhckT3": {
           "type": "heading",
           "settings": {
-            "heading": "FOOT CONDITIONS",
+            "heading": "LEARN ABOUT FEET",
             "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "text",
@@ -148,7 +148,7 @@
         "text_WQRcLP": {
           "type": "text",
           "settings": {
-            "text": "<p>A foot condition is often caused by constant improper foot function. Contributing factors such as pain and inflammation are just a few indicators of a foot injury. Help identify common foot ailments by learning about different symptoms, causes, treatments, and preventative tips.</p>",
+            "text": "<h6>Our feet balance and carry our entire body, naturally taking a lot of stress with each step. The best way to care for your feet is by practicing proper foot health. Learn more about the function of our feet and how to support them on a daily basis.</h6>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -271,9 +271,9 @@
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "https://vimeo.com/527490503?fl=pl&fe=sh",
-            "image": "shopify://shop_images/Plantar_Fasciitis__Causes_Orthotics.png",
-            "title": "Plantar Fasciitis: Causes & Orthotics",
+            "custom_url": "https://vimeo.com/701245964?fl=pl&fe=sh",
+            "image": "shopify://shop_images/thumb_8aa50e43-dd81-4264-90e5-9bef635a8609.jpg",
+            "title": "The Function of Feet",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -288,9 +288,9 @@
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "https://vimeo.com/527490503?fl=pl&fe=sh",
-            "image": "shopify://shop_images/Plantar_Fasciitis__Causes_Orthotics.png",
-            "title": "<!--br {mso-data-placement:same-cell;}-->Bunions: Causes & Prevention",
+            "custom_url": "https://vimeo.com/701245916?fl=pl&fe=sh",
+            "image": "shopify://shop_images/thumb_1_32f9cbfe-4ce4-4331-8f1f-31b55ad6ec0d.jpg",
+            "title": "Pronation",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -305,9 +305,9 @@
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "https://vimeo.com/527490503?fl=pl&fe=sh",
-            "image": "shopify://shop_images/Plantar_Fasciitis__Causes_Orthotics.png",
-            "title": "<!--br {mso-data-placement:same-cell;}-->Metatarsalgia: Causes & Orthotics",
+            "custom_url": "https://vimeo.com/701245936?fl=pl&fe=sh",
+            "image": "shopify://shop_images/thumb_1_b7a28020-d47d-4cbe-80ef-d80755fc8909.jpg",
+            "title": "Supination",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -322,9 +322,9 @@
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "https://vimeo.com/527490503?fl=pl&fe=sh",
-            "image": "shopify://shop_images/Plantar_Fasciitis__Causes_Orthotics.png",
-            "title": "Morton's Neuroma: Causes & Orthotic",
+            "custom_url": "https://vimeo.com/701276320?fl=pl&fe=sh",
+            "image": "shopify://shop_images/thumb_7bb2c26e-b8b1-4983-9430-9fc4715c304d.jpg",
+            "title": "Callosity",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -339,9 +339,9 @@
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "https://vimeo.com/527490503?fl=pl&fe=sh",
-            "image": "shopify://shop_images/Plantar_Fasciitis__Causes_Orthotics.png",
-            "title": "Posterior Tibial Tendonitis",
+            "custom_url": "https://vimeo.com/701245645?fl=pl&fe=sh",
+            "image": "shopify://shop_images/thumb_6412f262-1eba-4ba7-aac2-db6d97faf1fe.jpg",
+            "title": "How To Shop For Supportive Footwear",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -356,9 +356,9 @@
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "https://vimeo.com/527490503?fl=pl&fe=sh",
-            "image": "shopify://shop_images/Plantar_Fasciitis__Causes_Orthotics.png",
-            "title": "High Arches & Best Orthotics",
+            "custom_url": "https://vimeo.com/701245804?fl=pl&fe=sh",
+            "image": "shopify://shop_images/thumb_cef9b050-736f-44bf-ab1e-0fdcdc3900bf.jpg",
+            "title": "Plantar Fascia",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -373,9 +373,9 @@
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "https://vimeo.com/527490503?fl=pl&fe=sh",
-            "image": "shopify://shop_images/Plantar_Fasciitis__Causes_Orthotics.png",
-            "title": "Low Arches & Best Orthotics",
+            "custom_url": "https://vimeo.com/701244200?fl=pl&fe=sh",
+            "image": "shopify://shop_images/thumb_a0b42fa4-ec43-4b65-88d9-a349d7243acb.jpg",
+            "title": "Aging Feet & Flat Feet",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -390,9 +390,9 @@
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "https://vimeo.com/527490503?fl=pl&fe=sh",
-            "image": "shopify://shop_images/Plantar_Fasciitis__Causes_Orthotics.png",
-            "title": "Medium Arches & Best Orthotics",
+            "custom_url": "https://vimeo.com/701245933?fl=pl&fe=sh",
+            "image": "shopify://shop_images/thumb_9401a60e-87d6-4dcd-8c43-2ae325d40baf.jpg",
+            "title": "The Importance of Shoe Fitting",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -407,82 +407,14 @@
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "https://vimeo.com/527490503?fl=pl&fe=sh",
-            "image": "shopify://shop_images/Plantar_Fasciitis__Causes_Orthotics.png",
-            "title": "Flat Arches & Best Orthotics",
+            "custom_url": "https://vimeo.com/701245026?fl=pl&fe=sh",
+            "image": "shopify://shop_images/thumb_44b1b793-7a39-4da1-a5be-0c919af91546.jpg",
+            "title": "Does Foot Size Change with Age?",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
             "color_overlay": "#000000",
             "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_WTwQP7": {
-          "type": "collection",
-          "settings": {
-            "link_type": "url",
-            "collection": "",
-            "custom_url": "https://vimeo.com/527490503?fl=pl&fe=sh",
-            "image": "shopify://shop_images/Plantar_Fasciitis__Causes_Orthotics.png",
-            "title": "Flat Feet & Best Orthotics",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_Kif3zt": {
-          "type": "collection",
-          "settings": {
-            "link_type": "url",
-            "collection": "",
-            "custom_url": "https://vimeo.com/527490503?fl=pl&fe=sh",
-            "image": "shopify://shop_images/Plantar_Fasciitis__Causes_Orthotics.png",
-            "title": "Metatarsalgia: Causes & Orthotics",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_kJ6Amk": {
-          "type": "collection",
-          "settings": {
-            "link_type": "url",
-            "collection": "",
-            "custom_url": "https://vimeo.com/527490503?fl=pl&fe=sh",
-            "image": "shopify://shop_images/Plantar_Fasciitis__Causes_Orthotics.png",
-            "title": "Morton's Neuroma: Causes & Orthotics",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 0,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_npWfEE": {
-          "type": "collection",
-          "settings": {
-            "link_type": "url",
-            "collection": "",
-            "custom_url": "https://vimeo.com/527490503?fl=pl&fe=sh",
-            "image": "shopify://shop_images/Plantar_Fasciitis__Causes_Orthotics.png",
-            "title": "Morton's Neuroma: Causes & Orthotics",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 0,
             "submenu_title_position": "bottom",
             "enable_title_drop_shadow": false
           }
@@ -497,11 +429,7 @@
         "collection_rbMbWQ",
         "collection_HKVJfy",
         "collection_k9BrND",
-        "collection_LhPp7e",
-        "collection_WTwQP7",
-        "collection_Kif3zt",
-        "collection_kJ6Amk",
-        "collection_npWfEE"
+        "collection_LhPp7e"
       ],
       "name": "t:sections.collection-list.name",
       "settings": {
@@ -544,9 +472,9 @@
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "https://vimeo.com/701230099?fl=pl&fe=sh",
-            "image": "shopify://shop_images/thumb_8aa50e43-dd81-4264-90e5-9bef635a8609.jpg",
-            "title": "LEARN ABOUT FEET",
+            "custom_url": "shopify://blogs/albert-learning-center",
+            "image": "shopify://shop_images/thumb_5a0e05b6-05a7-4149-87ff-aaa0c410210a.jpg",
+            "title": "FOOT CONDITIONS",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
