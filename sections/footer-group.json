@@ -316,7 +316,7 @@
         "text_alignment": "left",
         "image_mobile": "shopify://shop_images/logopng.png",
         "image_height_mobile": "400px",
-        "content_position_mobile": "items-start justify-start",
+        "content_position_mobile": "items-center justify-center",
         "text_alignment_mobile": "center",
         "color_text": "#171717",
         "color_highlight": "#e0a580",
