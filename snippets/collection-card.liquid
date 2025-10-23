@@ -104,7 +104,7 @@
               class="heading text-xl-3xl tracking-tighter leading-tight relative{{ title_shadow_class }}"
               style="font-size: {{ heading_font_size }}px"
             >
-              {{- collection_title | escape -}}
+              {{- collection_title | replace: "||", "<br>" -}}
               {%- if show_products_count and collection and collection.all_products_count > 0 -%}
                 <small class="count font-medium absolute text-xs tracking-none whitespace-nowrap">
                   {{- collection.all_products_count -}}
@@ -135,7 +135,7 @@
               class="heading reversed-link text-xl-3xl tracking-tighter leading-tight relative{{ title_shadow_class }}"
               style="font-size: {{ heading_font_size }}px"
             >
-              {{- collection_title | escape -}}
+              {{- collection_title | replace: "||", "<br>" -}}
             </span>
           </p>
           {%- if collection_description != blank -%}
