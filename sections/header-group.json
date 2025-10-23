@@ -14,31 +14,6 @@
     "announcement-bar": {
       "type": "announcement-bar",
       "blocks": {
-        "text_CFqqrr": {
-          "type": "text",
-          "settings": {
-            "icon": "shoe",
-            "text": "New Arrival Malina Arch Support Slipper",
-            "link": "shopify://products/malina-black-fe900w",
-            "hide_icon_mobile": true,
-            "text_mobile": "",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle",
-            "enable_notification_banner": true,
-            "notification_title": "New Arrival | Malina Arch Support Slipper",
-            "notification_subtitle": "Soft, supportive, and crafted for everyday lounging.",
-            "notification_link": "shopify://products/malina-black-fe900w",
-            "notification_link_text": "SHOP NOW",
-            "notification_title_2": "Join Aetrex Rewards, Get Free Shipping*",
-            "notification_subtitle_2": "Join Aetrex Rewards, Get US free shipping and earn 10 points per $1 spent* For U.S. Customers Only",
-            "notification_link_2": "shopify://pages/rewards",
-            "notification_link_text_2": "JOIN NOW",
-            "notification_title_3": "GIVE $20, GET $20 | Refer a Friend*",
-            "notification_subtitle_3": "Give your friends $20 off their first order of $49.95+ and get $20 (in points) for each successful referral* For U.S. Customers Only",
-            "notification_link_3": "shopify://pages/give-20-get-20",
-            "notification_link_text_3": "REFER A FRIEND"
-          }
-        },
         "text_fHLXWT": {
           "type": "text",
           "settings": {
@@ -50,21 +25,21 @@
             "highlighted_text": "none",
             "highlighted_scribble": "circle",
             "enable_notification_banner": true,
-            "notification_title": "New Arrival | Malina Arch Support Slipper",
-            "notification_subtitle": "Soft, supportive, and crafted for everyday lounging.",
-            "notification_link": "shopify://products/malina-black-fe900w",
-            "notification_link_text": "SHOP NOW",
-            "notification_title_2": "Join Aetrex Rewards, Get Free Shipping*",
-            "notification_subtitle_2": "Join Aetrex Rewards, Get US free shipping and earn 10 points per $1 spent* For U.S. Customers Only",
-            "notification_link_2": "shopify://pages/rewards",
-            "notification_link_text_2": "JOIN NOW",
-            "notification_title_3": "GIVE $20, GET $20 | Refer a Friend*",
-            "notification_subtitle_3": "Give your friends $20 off their first order of $49.95+ and get $20 (in points) for each successful referral* For U.S. Customers Only",
-            "notification_link_3": "shopify://pages/give-20-get-20",
-            "notification_link_text_3": "REFER A FRIEND"
+            "notification_title": "Join Aetrex Rewards, Get Free Shipping*",
+            "notification_subtitle": "Join Aetrex Rewards, Get US free shipping and earn 10 points per $1 spent* For U.S. Customers Only",
+            "notification_link": "shopify://pages/rewards",
+            "notification_link_text": "JOIN NOW",
+            "notification_title_2": "GIVE $20, GET $20 | Refer a Friend*",
+            "notification_subtitle_2": "Give your friends $20 off their first order of $49.95+ and get $20 (in points) for each successful referral* For U.S. Customers Only",
+            "notification_link_2": "shopify://pages/give-20-get-20",
+            "notification_link_text_2": "REFER A FRIEND",
+            "notification_title_3": "EASY RETURNS",
+            "notification_subtitle_3": "We offer no hassle returns and exchanges within 30 days of purchase if you are not satisfied with your purchase.",
+            "notification_link_3": "shopify://pages/returns-exchanges",
+            "notification_link_text_3": "RETURN POLICY"
           }
         },
-        "text_hyM9kH": {
+        "text_r9UaMj": {
           "type": "text",
           "settings": {
             "icon": "users",
@@ -75,18 +50,43 @@
             "highlighted_text": "none",
             "highlighted_scribble": "circle",
             "enable_notification_banner": true,
-            "notification_title": "New Arrival | Malina Arch Support Slipper",
-            "notification_subtitle": "Soft, supportive, and crafted for everyday lounging.",
-            "notification_link": "shopify://products/malina-black-fe900w",
-            "notification_link_text": "SHOP NOW",
-            "notification_title_2": "Join Aetrex Rewards, Get Free Shipping*",
-            "notification_subtitle_2": "Join Aetrex Rewards, Get US free shipping and earn 10 points per $1 spent* For U.S. Customers Only",
-            "notification_link_2": "shopify://pages/rewards",
-            "notification_link_text_2": "JOIN NOW",
-            "notification_title_3": "GIVE $20, GET $20 | Refer a Friend*",
-            "notification_subtitle_3": "Give your friends $20 off their first order of $49.95+ and get $20 (in points) for each successful referral* For U.S. Customers Only",
-            "notification_link_3": "shopify://pages/give-20-get-20",
-            "notification_link_text_3": "REFER A FRIEND"
+            "notification_title": "Join Aetrex Rewards, Get Free Shipping*",
+            "notification_subtitle": "Join Aetrex Rewards, Get US free shipping and earn 10 points per $1 spent* For U.S. Customers Only",
+            "notification_link": "shopify://pages/rewards",
+            "notification_link_text": "JOIN NOW",
+            "notification_title_2": "GIVE $20, GET $20 | Refer a Friend*",
+            "notification_subtitle_2": "Give your friends $20 off their first order of $49.95+ and get $20 (in points) for each successful referral* For U.S. Customers Only",
+            "notification_link_2": "shopify://pages/give-20-get-20",
+            "notification_link_text_2": "REFER A FRIEND",
+            "notification_title_3": "EASY RETURNS",
+            "notification_subtitle_3": "We offer no hassle returns and exchanges within 30 days of purchase if you are not satisfied with your purchase.",
+            "notification_link_3": "shopify://pages/returns-exchanges",
+            "notification_link_text_3": "RETURN POLICY"
+          }
+        },
+        "text_3qTGqU": {
+          "type": "text",
+          "settings": {
+            "icon": "return",
+            "text": "30 Day No-Hassle Returns",
+            "link": "shopify://pages/returns-exchanges",
+            "hide_icon_mobile": true,
+            "text_mobile": "",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle",
+            "enable_notification_banner": true,
+            "notification_title": "Join Aetrex Rewards, Get Free Shipping*",
+            "notification_subtitle": "Join Aetrex Rewards, Get US free shipping and earn 10 points per $1 spent* For U.S. Customers Only",
+            "notification_link": "shopify://pages/rewards",
+            "notification_link_text": "JOIN NOW",
+            "notification_title_2": "GIVE $20, GET $20 | Refer a Friend*",
+            "notification_subtitle_2": "Give your friends $20 off their first order of $49.95+ and get $20 (in points) for each successful referral* For U.S. Customers Only",
+            "notification_link_2": "shopify://pages/give-20-get-20",
+            "notification_link_text_2": "REFER A FRIEND",
+            "notification_title_3": "EASY RETURNS",
+            "notification_subtitle_3": "We offer no hassle returns and exchanges within 30 days of purchase if you are not satisfied with your purchase.",
+            "notification_link_3": "shopify://pages/returns-exchanges",
+            "notification_link_text_3": "RETURN POLICY"
           }
         },
         "tech_hwHFMa": {
@@ -103,9 +103,9 @@
         }
       },
       "block_order": [
-        "text_CFqqrr",
         "text_fHLXWT",
-        "text_hyM9kH",
+        "text_r9UaMj",
+        "text_3qTGqU",
         "tech_hwHFMa"
       ],
       "settings": {
