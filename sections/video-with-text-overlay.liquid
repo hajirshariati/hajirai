@@ -36,6 +36,33 @@
   {% endif -%}
 </style>
 
+<style>
+  #shopify-section-{{ section.id }} {
+    --section-padding-top: {{ section.settings.padding_top }}px;
+    --section-padding-bottom: {{ section.settings.padding_bottom }}px;
+    {%- render 'section-variables', section: section -%}
+    {%- if poster != null and section.settings.image_height == 'adapt' %}
+      --ratio-percent: {{ 1 | divided_by: poster.aspect_ratio | times: 100 }}%;
+    {% endif -%}
+  }
+
+  {%- if poster_mobile != blank and section.settings.image_height_mobile == 'adapt' %}
+    @media screen and (max-width: 767px) {
+      #shopify-section-{{ section.id }} {
+        --ratio-percent: {{ 1 | divided_by: poster_mobile.aspect_ratio | times: 100 }}%;
+      }
+    }
+  {% endif -%}
+
+  /* Crop mobile video from bottom only - keep top visible */
+  @media screen and (max-width: 767px) {
+    #shopify-section-{{ section.id }} .banner__media video,
+    #shopify-section-{{ section.id }} .banner__media iframe {
+      object-position: top;
+    }
+  }
+</style>
+
 <div
   class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}"
   {% if section.settings.transparent_header %}
