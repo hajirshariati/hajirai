@@ -873,7 +873,7 @@
         "video_mobile": "shopify://files/videos/footwear.mp4",
         "video_url_mobile": "",
         "cover_image_mobile": "shopify://shop_images/full-foot.jpg",
-        "image_height_mobile": "100vh",
+        "image_height_mobile": "adapt",
         "content_position_mobile": "items-end justify-center",
         "text_alignment_mobile": "center",
         "color_text": "#525252",
