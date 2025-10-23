@@ -52,7 +52,7 @@
             "button_link": "",
             "button_video_link": "https://rvq643.saas.contentserv.com/admin/rest/gtstream/stream/assets/Aetrex B2B/The_Aetrex_Technology_Difference.mp4",
             "button_style": "primary",
-            "button_size": "lg",
+            "button_size": "md",
             "button_external": false,
             "button_icon": false
           }
@@ -251,7 +251,7 @@
             "button_link": "shopify://collections/womens-new-arrivals",
             "button_video_link": "",
             "button_style": "primary",
-            "button_size": "lg",
+            "button_size": "md",
             "button_external": false,
             "button_icon": false
           }
@@ -312,7 +312,7 @@
         "divider_f4br8p": {
           "type": "divider",
           "settings": {
-            "divider_width": 320,
+            "divider_width": 160,
             "divider_mt": 20,
             "divider_mb": 5
           }
@@ -339,7 +339,7 @@
             "button_link": "shopify://pages/tech-aetrex-footwear",
             "button_video_link": "",
             "button_style": "primary",
-            "button_size": "lg",
+            "button_size": "md",
             "button_external": false,
             "button_icon": false
           }
@@ -517,7 +517,7 @@
             "button_link": "shopify://pages/women-footwear",
             "button_video_link": "",
             "button_style": "primary",
-            "button_size": "lg",
+            "button_size": "md",
             "button_external": false,
             "button_icon": false
           }
