@@ -407,9 +407,9 @@
       ],
       "settings": {
         "layout": "marquee",
-        "grid_horizontal": 130,
+        "grid_horizontal": 70,
         "direction": "left",
-        "speed": 4,
+        "speed": 5,
         "heading": "",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
