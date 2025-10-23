@@ -781,14 +781,19 @@
     "video_with_text_overlay_fYXVnA": {
       "type": "video-with-text-overlay",
       "blocks": {
-        "heading_xdTgzn": {
-          "type": "heading",
+        "text_pYEmGE": {
+          "type": "text",
           "settings": {
-            "heading": "<h1>Footwear Development Package</h1>",
-            "heading_size": "title-md",
-            "heading_tag": "h1",
-            "highlighted_text": "text",
-            "highlighted_scribble": "sketch-underline"
+            "text": "<p><strong>Footwear Development Package</strong></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
           }
         },
         "divider_bVPmK4": {
@@ -851,7 +856,7 @@
         }
       },
       "block_order": [
-        "heading_xdTgzn",
+        "text_pYEmGE",
         "divider_bVPmK4",
         "text_HXTJXR",
         "divider_RiFVi4",
