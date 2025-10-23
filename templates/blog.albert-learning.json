@@ -132,8 +132,74 @@
         "parallax_direction": "vertical"
       }
     },
+    "rich_text_dp9GiC": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_xhckT3": {
+          "type": "heading",
+          "settings": {
+            "heading": "FOOT CONDITIONS",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_WQRcLP": {
+          "type": "text",
+          "settings": {
+            "text": "<p>A foot condition is often caused by constant improper foot function. Contributing factors such as pain and inflammation are just a few indicators of a foot injury. Help identify common foot ailments by learning about different symptoms, causes, treatments, and preventative tips.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_xhckT3",
+        "text_WQRcLP"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
     "main-blog": {
       "type": "main-blog",
+      "disabled": true,
       "settings": {
         "heading_size": "title-md",
         "heading_alignment": "text-center justify-center",
@@ -196,11 +262,380 @@
         "full_width": false,
         "rounded": false
       }
+    },
+    "collection_list_XEi9XG": {
+      "type": "collection-list",
+      "blocks": {
+        "collection_t8Qf3q": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://vimeo.com/527490503?fl=pl&fe=sh",
+            "image": "shopify://shop_images/Plantar_Fasciitis__Causes_Orthotics.png",
+            "title": "Plantar Fasciitis: Causes & Orthotics",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_nnqagT": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://vimeo.com/527490503?fl=pl&fe=sh",
+            "image": "shopify://shop_images/Plantar_Fasciitis__Causes_Orthotics.png",
+            "title": "<!--br {mso-data-placement:same-cell;}-->Bunions: Causes & Prevention",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_8YghRz": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://vimeo.com/527490503?fl=pl&fe=sh",
+            "image": "shopify://shop_images/Plantar_Fasciitis__Causes_Orthotics.png",
+            "title": "<!--br {mso-data-placement:same-cell;}-->Metatarsalgia: Causes & Orthotics",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_FhWccT": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://vimeo.com/527490503?fl=pl&fe=sh",
+            "image": "shopify://shop_images/Plantar_Fasciitis__Causes_Orthotics.png",
+            "title": "Morton's Neuroma: Causes & Orthotic",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_nnHFLd": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://vimeo.com/527490503?fl=pl&fe=sh",
+            "image": "shopify://shop_images/Plantar_Fasciitis__Causes_Orthotics.png",
+            "title": "Posterior Tibial Tendonitis",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_rbMbWQ": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://vimeo.com/527490503?fl=pl&fe=sh",
+            "image": "shopify://shop_images/Plantar_Fasciitis__Causes_Orthotics.png",
+            "title": "High Arches & Best Orthotics",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_HKVJfy": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://vimeo.com/527490503?fl=pl&fe=sh",
+            "image": "shopify://shop_images/Plantar_Fasciitis__Causes_Orthotics.png",
+            "title": "Low Arches & Best Orthotics",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_k9BrND": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://vimeo.com/527490503?fl=pl&fe=sh",
+            "image": "shopify://shop_images/Plantar_Fasciitis__Causes_Orthotics.png",
+            "title": "Medium Arches & Best Orthotics",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_LhPp7e": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://vimeo.com/527490503?fl=pl&fe=sh",
+            "image": "shopify://shop_images/Plantar_Fasciitis__Causes_Orthotics.png",
+            "title": "Flat Arches & Best Orthotics",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_WTwQP7": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://vimeo.com/527490503?fl=pl&fe=sh",
+            "image": "shopify://shop_images/Plantar_Fasciitis__Causes_Orthotics.png",
+            "title": "Flat Feet & Best Orthotics",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_Kif3zt": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://vimeo.com/527490503?fl=pl&fe=sh",
+            "image": "shopify://shop_images/Plantar_Fasciitis__Causes_Orthotics.png",
+            "title": "Metatarsalgia: Causes & Orthotics",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_kJ6Amk": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://vimeo.com/527490503?fl=pl&fe=sh",
+            "image": "shopify://shop_images/Plantar_Fasciitis__Causes_Orthotics.png",
+            "title": "Morton's Neuroma: Causes & Orthotics",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_npWfEE": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://vimeo.com/527490503?fl=pl&fe=sh",
+            "image": "shopify://shop_images/Plantar_Fasciitis__Causes_Orthotics.png",
+            "title": "Morton's Neuroma: Causes & Orthotics",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        }
+      },
+      "block_order": [
+        "collection_t8Qf3q",
+        "collection_nnqagT",
+        "collection_8YghRz",
+        "collection_FhWccT",
+        "collection_nnHFLd",
+        "collection_rbMbWQ",
+        "collection_HKVJfy",
+        "collection_k9BrND",
+        "collection_LhPp7e",
+        "collection_WTwQP7",
+        "collection_Kif3zt",
+        "collection_kJ6Amk",
+        "collection_npWfEE"
+      ],
+      "name": "t:sections.collection-list.name",
+      "settings": {
+        "columns": 4,
+        "carousel_on_desktop": false,
+        "image_type": "collection",
+        "image_ratio": "adapt",
+        "show_products_count": false,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": false,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false
+      }
+    },
+    "collection_list_dcmHEb": {
+      "type": "collection-list",
+      "blocks": {
+        "collection_iTGqGX": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://vimeo.com/701230099?fl=pl&fe=sh",
+            "image": "shopify://shop_images/thumb_8aa50e43-dd81-4264-90e5-9bef635a8609.jpg",
+            "title": "LEARN ABOUT FEET",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_BAjN8D": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://vimeo.com/701230099?fl=pl&fe=sh",
+            "image": "shopify://shop_images/thumb_6333cd89-1c4f-45a0-be30-43f0499a9fa4.jpg",
+            "title": "AETREX ORTHOTICS",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_N6yiF3": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://vimeo.com/701230099?fl=pl&fe=sh",
+            "image": "shopify://shop_images/thumb_1_1a8d70aa-8208-4b34-a47a-8a58ae695699.jpg",
+            "title": "FOOT SCANNING TECH",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        }
+      },
+      "block_order": [
+        "collection_iTGqGX",
+        "collection_BAjN8D",
+        "collection_N6yiF3"
+      ],
+      "name": "t:sections.collection-list.name",
+      "settings": {
+        "columns": 3,
+        "carousel_on_desktop": false,
+        "image_type": "collection",
+        "image_ratio": "adapt",
+        "show_products_count": false,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "See more topics",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "text",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
     }
   },
   "order": [
     "image_with_text_overlay_GwGiG6",
+    "rich_text_dp9GiC",
     "main-blog",
-    "blog_posts_JY8zpf"
+    "blog_posts_JY8zpf",
+    "collection_list_XEi9XG",
+    "collection_list_dcmHEb"
   ]
 }
