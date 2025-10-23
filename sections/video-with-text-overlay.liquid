@@ -56,9 +56,10 @@
 
   /* Crop mobile video from bottom only - keep top visible */
   @media screen and (max-width: 767px) {
-    #shopify-section-{{ section.id }} .banner__media video,
-    #shopify-section-{{ section.id }} .banner__media iframe {
-      object-position: top;
+    #shopify-section-{{ section.id }} .banner__media.media video,
+    #shopify-section-{{ section.id }} .banner__media.media iframe,
+    #shopify-section-{{ section.id }} .banner__media.media img {
+      object-position: top center !important;
     }
   }
 </style>
