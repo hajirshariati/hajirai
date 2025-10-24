@@ -200,7 +200,7 @@
         "color_highlight": "",
         "gradient_highlight": "",
         "color_button_text": "",
-        "color_button_background": "",
+        "color_button_background": "#414141",
         "color_button_gradient": "",
         "padding_top": 24,
         "padding_bottom": 24,
