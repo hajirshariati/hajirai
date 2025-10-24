@@ -132,23 +132,23 @@
         "parallax_direction": "vertical"
       }
     },
-    "rich_text_dp9GiC": {
+    "rich_text_YatqFt": {
       "type": "rich-text",
       "blocks": {
-        "heading_xhckT3": {
+        "heading_R4KXmW": {
           "type": "heading",
           "settings": {
-            "heading": "LEARN ABOUT FEET",
+            "heading": "FOOT SCANNING TECH",
             "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "text",
             "highlighted_scribble": "circle"
           }
         },
-        "text_WQRcLP": {
+        "text_bmYqtd": {
           "type": "text",
           "settings": {
-            "text": "<h6>Our feet balance and carry our entire body, naturally taking a lot of stress with each step. The best way to care for your feet is by practicing proper foot health. Learn more about the function of our feet and how to support them on a daily basis.</h6>",
+            "text": "<h6>Aetrex Foot Scanners are the ultimate all-in-one foot scanners that are able to capture accurate data about your feet. In less than 20 seconds, an Aetrex Foot Scanner can identify your exact pressure points, arch depth, in-step height, and so much more. Learn about the benefits of Aetrex Foot Scanners and find a scanner near you to experience the Aetrex difference.</h6>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -159,11 +159,23 @@
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
+        },
+        "button_HzEp4p": {
+          "type": "button",
+          "settings": {
+            "button_label": "Find a Scanner Location Near You: STORE LOCATOR",
+            "button_link": "shopify://pages/store-locator",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": true
+          }
         }
       },
       "block_order": [
-        "heading_xhckT3",
-        "text_WQRcLP"
+        "heading_R4KXmW",
+        "text_bmYqtd",
+        "button_HzEp4p"
       ],
       "name": "t:sections.rich-text.name",
       "settings": {
@@ -188,7 +200,7 @@
         "color_highlight": "",
         "gradient_highlight": "",
         "color_button_text": "",
-        "color_button_background": "",
+        "color_button_background": "#414141",
         "color_button_gradient": "",
         "padding_top": 24,
         "padding_bottom": 24,
@@ -560,7 +572,7 @@
   },
   "order": [
     "image_with_text_overlay_GwGiG6",
-    "rich_text_dp9GiC",
+    "rich_text_YatqFt",
     "main-blog",
     "blog_posts_JY8zpf",
     "collection_list_XEi9XG",
