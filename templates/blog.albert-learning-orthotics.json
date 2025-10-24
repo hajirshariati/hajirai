@@ -138,7 +138,7 @@
         "heading_xhckT3": {
           "type": "heading",
           "settings": {
-            "heading": "LEARN ABOUT FEET",
+            "heading": "AETREX ORTHOTICS",
             "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "text",
@@ -148,7 +148,7 @@
         "text_WQRcLP": {
           "type": "text",
           "settings": {
-            "text": "<h6>Our feet balance and carry our entire body, naturally taking a lot of stress with each step. The best way to care for your feet is by practicing proper foot health. Learn more about the function of our feet and how to support them on a daily basis.</h6>",
+            "text": "<p>Aetrex Orthotics are designed to help support your arch and transfer pressure away from high impacted areas by creating an equal distribution of pressure. Each pair of orthotics is made from premium materials and feature our Aetrex Signature Arch Support that helps relieve common arch and heel pain. Learn more about Aetrex Orthotics and find the best orthotic for you.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -159,11 +159,23 @@
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
+        },
+        "button_jLEaXL": {
+          "type": "button",
+          "settings": {
+            "button_label": "Unsure Which Orthotics Are Right for You? - TAKE OUR QUIZ",
+            "button_link": "https://irle3andv1z.typeform.com/to/gujvKvEg?typeform-source=www.aetrex.com",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
         }
       },
       "block_order": [
         "heading_xhckT3",
-        "text_WQRcLP"
+        "text_WQRcLP",
+        "button_jLEaXL"
       ],
       "name": "t:sections.rich-text.name",
       "settings": {
