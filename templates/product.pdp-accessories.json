@@ -45,10 +45,6 @@
             "size_chart": "size-chart"
           }
         },
-        "true_fit_widget_8cjNbr": {
-          "type": "shopify://apps/true-fit/blocks/widget/caa08c3b-c601-47cd-9c2a-32bb0567b191",
-          "settings": {}
-        },
         "buy_buttons": {
           "type": "buy_buttons",
           "settings": {
@@ -139,7 +135,6 @@
         "title",
         "price_TirYdK",
         "variant_picker",
-        "true_fit_widget_8cjNbr",
         "buy_buttons",
         "liquid_Df3mAF",
         "complementary",
