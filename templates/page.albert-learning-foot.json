@@ -519,7 +519,7 @@
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "shopify://blogs/albert-learning-center",
+            "custom_url": "https://www.aetrex.com/pages/albert-learning-center-foot-conditions",
             "image": "shopify://shop_images/thumb_5a0e05b6-05a7-4149-87ff-aaa0c410210a.jpg",
             "title": "FOOT CONDITIONS",
             "description": "",
@@ -536,7 +536,7 @@
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "https://vimeo.com/701230099?fl=pl&fe=sh",
+            "custom_url": "https://www.aetrex.com/pages/albert-learning-center-aetrex-orthotics",
             "image": "shopify://shop_images/thumb_6333cd89-1c4f-45a0-be30-43f0499a9fa4.jpg",
             "title": "AETREX ORTHOTICS",
             "description": "",
@@ -553,7 +553,7 @@
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "https://vimeo.com/701230099?fl=pl&fe=sh",
+            "custom_url": "https://www.aetrex.com/pages/albert-learning-center-learn-about-feet",
             "image": "shopify://shop_images/thumb_8aa50e43-dd81-4264-90e5-9bef635a8609.jpg",
             "title": "LEARN ABOUT FEET",
             "description": "",
