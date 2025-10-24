@@ -14,6 +14,58 @@
 function OptanonWrapper() { }
 </script>
 <!-- OneTrust Cookies Consent Notice end for aetrex.com -->
+
+
+<!-- TruFit Widget -->
+
+{% comment %} True Fit Script {% endcomment %}   
+<script>
+  ;(function (r, e, o) {
+    var w = window, d = document, t, s, x;
+    w.tfcapi = t =
+      w.tfcapi ||
+      function () {
+        t.q = t.q || [];
+        t.q.push(arguments);
+      };
+    t('init', { storeKey: r, environment: e, ...o });
+    x = d.getElementsByTagName('script')[0];
+    s = d.createElement('script');
+    s.type = 'text/javascript';
+    s.async = true;
+    s.crossorigin = 'anonymous';
+    var subDomain = e === 'prod' ? 'cdn' : 'ds-dev';
+    s.src = 'https://' + subDomain + '.truefitcorp.com/fitrec/global/js/tf-integration.js?storeKey=' + r;
+    x.parentNode.insertBefore(s, x);
+  })('aet', 'prod');
+
+  function observeCartChanges() {
+    const cartObserver = new PerformanceObserver((list) => {
+      list.getEntries().forEach((entry) => {
+        const isValidRequestType = ['xmlhttprequest', 'fetch'].includes(entry.initiatorType);
+        const isCartChangeRequest = /\/cart\/add/.test(entry.name);
+        if (isValidRequestType && isCartChangeRequest) {
+          tfcapi('getToken', (token) => {
+            if (!token) return;
+            const formData = new FormData();
+            formData.append('attributes[_tfcToken]', token);
+            fetch(window.Shopify.routes.root + 'cart/update.js', {
+              method: 'POST',
+              body: formData,
+            });
+          });
+        }
+      });
+    });
+    cartObserver.observe({ entryTypes: ['resource'] });
+  }
+  observeCartChanges();
+</script>
+
+
+<!-- TruFit Widget -->
+
+
     
     <script src="https://rapid-cdn.yottaa.com/rapid/lib/HucOtCTdvSMtxQ.js"></script>
     <meta charset="utf-8">
