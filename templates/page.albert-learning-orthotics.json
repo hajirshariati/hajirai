@@ -970,7 +970,7 @@
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "shopify://blogs/albert-learning-center",
+            "custom_url": "https://www.aetrex.com/pages/albert-learning-center-foot-conditions",
             "image": "shopify://shop_images/thumb_5a0e05b6-05a7-4149-87ff-aaa0c410210a.jpg",
             "title": "FOOT CONDITIONS",
             "description": "",
@@ -987,7 +987,7 @@
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "https://www.aetrex.com/blogs/aetrex-blog?view=albert-learning-feet",
+            "custom_url": "https://www.aetrex.com/pages/albert-learning-center-learn-about-feet",
             "image": "shopify://shop_images/thumb_8aa50e43-dd81-4264-90e5-9bef635a8609.jpg",
             "title": "LEARN ABOUT FEET",
             "description": "",
@@ -1004,7 +1004,7 @@
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "https://thumb_1_1a8d70aa-8208-4b34-a47a-8a58ae695699.jpg",
+            "custom_url": "https://www.aetrex.com/pages/albert-learning-center-foot-scanning",
             "image": "shopify://shop_images/thumb_1_1a8d70aa-8208-4b34-a47a-8a58ae695699.jpg",
             "title": "FOOT SCANNING TECH",
             "description": "",
