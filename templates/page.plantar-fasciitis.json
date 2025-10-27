@@ -97,7 +97,7 @@
             "heading": "<p>Plantar Fasciitis</p>",
             "heading_size": "title-lg tracking-heading",
             "heading_tag": "h2",
-            "highlighted_text": "none",
+            "highlighted_text": "text",
             "highlighted_scribble": "circle"
           }
         },
