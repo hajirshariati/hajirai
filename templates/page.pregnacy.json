@@ -30,7 +30,7 @@
         "heading_axLTnn": {
           "type": "heading",
           "settings": {
-            "heading": "<p><strong>Achilles Tendonitis</strong></p>",
+            "heading": "<p><strong>Pregnancy and Your Feet</strong></p>",
             "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "text",
@@ -40,7 +40,7 @@
         "text_LHGLnM": {
           "type": "text",
           "settings": {
-            "text": "<p>Achilles tendonitis is inflammation of the Achilles tendon and can lead to degeneration. The achilles tendon is the large tendon located in the back of the leg that inserts into the heel. The pain caused by achilles tendonitis can develop gradually without a history of trauma. The pain can be a shooting pain, burning pain, or even an extremely piercing pain. Achilles tendonitis should not be left untreated due to the danger that the tendon can become weak and ruptured.   Achilles Tendonitis is aggravated by activities that repeatedly stress the tendon, causing inflammation. In some cases even prolonged periods of standing can cause symptoms. It is a common problem often experienced by athletes, particularly distance runners. </p>",
+            "text": "<p>Pregnancy triggers many different changes in a woman’s body. Many women have common complaints throughout their pregnancy. One of these complaints, often overlooked, is foot pain. Due to the natural weight gain during pregnancy, a woman’s center of gravity is completely altered. This causes a new weight-bearing stance and added pressure to the knees and feet.Two of the most common foot problems experienced by pregnant woman are over- pronation and edema. These problems can lead to pain at the heel, arch, or the ball-of-foot. Many women may also experience leg cramping and varicose veins due to weight gain. Because of this, it is important for all pregnant women to learn more about foot health during their pregnancy to help make this nine month period more comfortable for them.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -60,7 +60,7 @@
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
-        "image": "shopify://shop_images/Group_16.png",
+        "image": "shopify://shop_images/Group_15_c66f62c8-53c3-44b3-a6e1-4a28c6d7782d.png",
         "image_height": "adapt",
         "content_width": "small",
         "content_position": "md:items-center md:justify-start",
@@ -94,7 +94,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Causes</strong>",
-            "text": "<p>There are several factors that can cause achilles tendonitis. The most common cause is over-pronation. Over-pronation occurs in the walking process, when the arch collapses upon weight bearing, adding stress on the achilles tendon.   Other factors that lead to achilles tendonitis are improper shoe selection, inadequate stretching prior to engaging in athletics, a short achilles tendon, direct trauma (injury) to the tendon, and heel bone deformity.</p>",
+            "text": "<p>Over-pronation and edema a very common foot problem experienced during pregnancy. Over-Pronation, also referred to as flat feet, is caused when a person’s arch flattens out upon weight bearing and their feet roll inward when walking. This can create extreme stress or inflammation on the plantar fascia, the fibrous band of tissue that runs from the heel to the forefoot. Over-pronation can make walking very painful and can increase strain on the feet, calves and/or back. The reason many pregnant women suffer from over-pronation is the added pressure on the body as a result of weight gain. Over-pronation is also very prominent in people who have flexible, flat feet or in people who are obese. Edema, also referred to as swelling in the feet, normally occurs in the latter part of pregnancy. Edema results from the extra blood accumulated during pregnancy. The enlarging uterus puts pressure on the blood vessels in the pelvis and legs causing circulation to slow down and blood to pool in the lower extremities. The total water fluid in the body remains the same as before pregnancy, however it becomes displaced. When feet are swollen, they can become purplish in color. Sometimes extra water is retained during pregnancy, adding to the swelling. If there is swelling in the face or hands, a doctor should be contacted immediately.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -103,7 +103,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Treatment and Prevention</strong>",
-            "text": "<p>Athletes, particularly runners, should incorporate a thorough stretching program to properly warm-up the muscles. They should decrease the distance of their walk or run, apply ice after the activity and avoid any uphill climbs. Athletes should use an orthotic device, heel cup, or heel cradle for extra support.   A heel cup or heel cradle elevates the heel to reduce stress and pressure on the achilles tendon. The device should be made with light-weight, shock absorbing materials. An orthotic device can be used to control over-pronation, support the longitudinal arch, and reduce stress on the achilles tendon.</p><p>If the problem persists, consult your foot doctor.</p>",
+            "text": "<p>There are effective ways to treat both over-pronation and edema during pregnancy. Over-Pronation can be treated conservatively with “ready-made” orthotics. These orthotics should be designed with appropriate arch support and medial rearfoot posting to correct the over-pronation. Proper fitting footwear is also very important in treating over-pronation. Choose comfortable footwear that provides extra support and shock absorption. It is important to treat over-pronation for pain relief but also to prevent other foot conditions from developing such as Plantar Fasciitis, Heel Spurs, Metatarsalgia, Post-Tib Tendonitis and/or Bunions. Edema in the feet can be minimized by the following methods: Elevate your feet as often as possible. If you have to sit for long periods of time, place a small stool by your feet to elevate them. Wear proper fitting footwear. Footwear that is too narrow or short will constrict circulation. Have your feet measured several times throughout your pregnancy. They will probably change sizes. Wear seamless socks that do not constrict circulation. If you are driving for a long period of time, take regular breaks to stretch your legs to promote circulation. Exercise regularly to promote overall health; walking is the best exercise. Drink plenty of water to keep the body hydrated. This helps the body retain less fluid. Eat a well-balanced diet and avoid foods high in salt that can cause water retention. Swelling is normally similar in both feet. If swelling is not symmetrical in both feet, this may be a sign of a vascular problem and a doctor should be contacted immediately.</p><p>If the problem persists, consult your foot doctor.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -154,8 +154,8 @@
             "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
-            "heading": "Pull Tab",
-            "text": "<p>A piece of looped material that helps you pull the back of the shoe up over your heel.</p>",
+            "heading": "Padded Heel",
+            "text": "<p>Extra padding on the back of the heel helps to reduce discomfort or blisters while providing additional cushioning.</p>",
             "link": "",
             "color_text": "#74a5ba",
             "vertical": 18,
@@ -170,8 +170,8 @@
             "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
-            "heading": "Complete Underfoot Support",
-            "text": "<p>Our Cobra Orthotic Technology provides a void in the heel area to help alleviate heel pressure and provides metatarsal support.</p>",
+            "heading": "Met Bar Pod",
+            "text": "<p>A pod on the bottom of the shoe that helps to relieve ball-of-foot discomfort or stress.</p>",
             "link": "",
             "color_text": "#74a5ba",
             "vertical": 48,
@@ -203,8 +203,8 @@
             "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
-            "heading": "Arch Support",
-            "text": "<p>Designed to help support natural alignment, our unique arch support position, height and contour aligns in the proper place to help support our bodies from the ground up and helps to relieve plantar fasciitis and common heel/arch pain.</p>",
+            "heading": "Adjustability for Everyone",
+            "text": "<p>Easy to use, our hook and loop adjustable straps help accommodate multiple widths by being able to shorten or elongate the strap.</p>",
             "link": "",
             "color_text": "#74a5ba",
             "vertical": 56,
@@ -219,12 +219,12 @@
             "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
-            "heading": "Lightweight",
-            "text": "<p>Aetrex Flips are designed using light-weight UltraSky™ EVA with a water-friendly construction. It is specially engineered with super soft foam to keep your toes comfortable all day long.</p>",
+            "heading": "Open Toe",
+            "text": "<p>This type of shoe provides ample room for your feet and is beneficial for conditions such as Hammer Toes.</p>",
             "link": "",
             "color_text": "#74a5ba",
-            "vertical": 70,
-            "horizontal": 75,
+            "vertical": 73,
+            "horizontal": 85,
             "vertical_mobile": 69,
             "horizontal_mobile": 73
           }
@@ -239,8 +239,8 @@
       ],
       "name": "t:sections.lookbook.name",
       "settings": {
-        "image": "shopify://shop_images/Group_18_8.png",
-        "image_mobile": "shopify://shop_images/Group_18_8.png",
+        "image": "shopify://shop_images/Group_18_9.png",
+        "image_mobile": "shopify://shop_images/Group_18_9.png",
         "heading": "",
         "heading_size": "title-sm",
         "heading_alignment": "text-center md:items-center",
