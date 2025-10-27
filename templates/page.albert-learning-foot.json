@@ -242,7 +242,229 @@
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "",
+            "custom_url": "https://cdn.shopify.com/s/files/1/0860/3634/9241/files/thumb_1_1a8d70aa-8208-4b34-a47a-8a58ae695699.jpg?v=1761239165",
+            "image": "shopify://shop_images/thumb_1_1a8d70aa-8208-4b34-a47a-8a58ae695699.jpg",
+            "title": "",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_QrkgTX": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://cdn.shopify.com/s/files/1/0860/3634/9241/files/thumb_658f97dc-0825-40ae-8e39-2b0e5502bb8c.jpg?v=1761239192",
+            "image": "shopify://shop_images/thumb_658f97dc-0825-40ae-8e39-2b0e5502bb8c.jpg",
+            "title": "",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_4CLMGb": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://cdn.shopify.com/s/files/1/0860/3634/9241/files/thumb_8311cfbe-996d-41d4-9d3e-2a5e36ee8f6f.jpg?v=1761239226",
+            "image": "shopify://shop_images/thumb_8311cfbe-996d-41d4-9d3e-2a5e36ee8f6f.jpg",
+            "title": "",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_9XjJTq": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://cdn.shopify.com/s/files/1/0860/3634/9241/files/thumb_6a03eb89-93f3-494f-9b25-0b9d09503476.jpg?v=1761239257",
+            "image": "shopify://shop_images/thumb_6a03eb89-93f3-494f-9b25-0b9d09503476.jpg",
+            "title": "",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_dpddUC": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://cdn.shopify.com/s/files/1/0860/3634/9241/files/thumb_9dc8253b-59f1-4382-930f-1f1e8d9a6c93.jpg?v=1761239286",
+            "image": "shopify://shop_images/thumb_9dc8253b-59f1-4382-930f-1f1e8d9a6c93.jpg",
+            "title": "",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_enNwGV": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://cdn.shopify.com/s/files/1/0860/3634/9241/files/thumb_e6d2a897-98e8-4fca-afb0-10247569e669.jpg?v=1761239315",
+            "image": "shopify://shop_images/thumb_e6d2a897-98e8-4fca-afb0-10247569e669.jpg",
+            "title": "",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_8qjJia": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://cdn.shopify.com/s/files/1/0860/3634/9241/files/thumb_96a39ee4-d045-4914-9b0f-00499f276837.jpg?v=1761239347",
+            "image": "shopify://shop_images/thumb_96a39ee4-d045-4914-9b0f-00499f276837.jpg",
+            "title": "",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_RmzYLx": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://cdn.shopify.com/s/files/1/0860/3634/9241/files/thumb_0b1a60ba-2b4e-4f3d-824f-992eefb2deea.jpg?v=1761239381",
+            "image": "shopify://shop_images/thumb_0b1a60ba-2b4e-4f3d-824f-992eefb2deea.jpg",
+            "title": "",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_f74mCc": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://cdn.shopify.com/s/files/1/0860/3634/9241/files/thumb_e0bd26fb-f901-4e9e-b2aa-f322e8f0a034.jpg?v=1761239549",
+            "image": "shopify://shop_images/thumb_e0bd26fb-f901-4e9e-b2aa-f322e8f0a034.jpg",
+            "title": "",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_yATKf3": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://cdn.shopify.com/s/files/1/0860/3634/9241/files/thumb_165c1b25-8e68-42be-9726-f0e04a94fba5.jpg?v=1761239578",
+            "image": "shopify://shop_images/thumb_165c1b25-8e68-42be-9726-f0e04a94fba5.jpg",
+            "title": "",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_U6NLdH": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://cdn.shopify.com/s/files/1/0860/3634/9241/files/thumb_e0408ce3-4779-46da-894e-02cf288b739f.jpg?v=1761239607",
+            "image": "shopify://shop_images/thumb_e0408ce3-4779-46da-894e-02cf288b739f.jpg",
+            "title": "",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_84VnHq": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://cdn.shopify.com/s/files/1/0860/3634/9241/files/thumb_ad782248-b63c-4e16-bf7b-ea3d494e3fce.jpg?v=1761239636",
+            "image": "shopify://shop_images/thumb_ad782248-b63c-4e16-bf7b-ea3d494e3fce.jpg",
+            "title": "",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_HGVN6q": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://cdn.shopify.com/s/files/1/0860/3634/9241/files/thumb_857f97ef-cdfb-4391-a568-ab67755c45d8.jpg?v=1761239666",
+            "image": "shopify://shop_images/thumb_857f97ef-cdfb-4391-a568-ab67755c45d8.jpg",
+            "title": "",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_QXebyc": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://cdn.shopify.com/s/files/1/0860/3634/9241/files/thumb_dc134e7f-116b-4321-9f9b-f65bf5bd5e4d.jpg?v=1761239695",
+            "image": "shopify://shop_images/thumb_dc134e7f-116b-4321-9f9b-f65bf5bd5e4d.jpg",
             "title": "",
             "description": "",
             "overlay_content": false,
@@ -255,7 +477,20 @@
         }
       },
       "block_order": [
-        "collection_idyjze"
+        "collection_idyjze",
+        "collection_QrkgTX",
+        "collection_4CLMGb",
+        "collection_9XjJTq",
+        "collection_dpddUC",
+        "collection_enNwGV",
+        "collection_8qjJia",
+        "collection_RmzYLx",
+        "collection_f74mCc",
+        "collection_yATKf3",
+        "collection_U6NLdH",
+        "collection_84VnHq",
+        "collection_HGVN6q",
+        "collection_QXebyc"
       ],
       "name": "t:sections.collection-list.name",
       "settings": {
