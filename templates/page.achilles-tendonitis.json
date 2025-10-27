@@ -1,0 +1,659 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-sm",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "image_with_text_overlay_rBfBzp": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "heading_axLTnn": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>Diabetes</p>",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_LHGLnM": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Diabetes is a serious disease caused by either a lack of insulin production or the body's inability to use insulin effectively. Diabetes can lead to various complications, disrupting the vascular system and affecting areas such as the eyes, kidneys, legs, and feet. </p><p>People with diabetes should pay special attention to their feet to manage potential complications effectively. Diabetic foot conditions arise from a combination of factors, including poor circulation and neuropathy.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_axLTnn",
+        "text_LHGLnM"
+      ],
+      "name": "t:sections.image-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/Group_15_c66f62c8-53c3-44b3-a6e1-4a28c6d7782d.png",
+        "image_height": "adapt",
+        "content_width": "small",
+        "content_position": "md:items-center md:justify-start",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/Group_15_c66f62c8-53c3-44b3-a6e1-4a28c6d7782d.png",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-start justify-start",
+        "text_alignment_mobile": "left",
+        "color_text": "#171717",
+        "color_highlight": "#171717",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "faq_zhAACx": {
+      "type": "faq",
+      "blocks": {
+        "question_XamVPH": {
+          "type": "question",
+          "settings": {
+            "title": "<strong>Causes</strong>",
+            "text": "<p>Diabetes can lead to various complications, disrupting the vascular system and affecting areas such as the eyes, kidneys, legs, and feet.<br/><br/>People with diabetes should pay special attention to their feet to manage potential complications effectively.Diabetic foot conditions arise from a combination of factors, including poor circulation and neuropathy.<br/><br/>Neuropathy can diminish sensation in the feet, making individuals less aware of injuries or pressure sores that can develop. Additionally, impaired blood flow due to vascular complications can slow down the healing process, increasing the risk of infections and ulcers if injuries do occur.<br/><br/></p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_x9EPUx": {
+          "type": "question",
+          "settings": {
+            "title": "<strong>Treatment and Prevention</strong>",
+            "text": "<p>Our Plantar Fasciitis Kit comes with an exercise guide that helps give you instructions on how to stretch the plantar fascia as well as the muscles and tendons surrounding the tissue. In turn it can help with reducing tension and putting you on the path towards pain relief. <br/><br/>Orthotics made with Plastazote foam are commonly recommended for their ability to accommodate pressure \"hot spots\" by conforming to heat and pressure.<br/><br/>Footwear for individuals with diabetes should include the following protective features:A high, wide toe box to provide ample space in the toe area.Removable insoles for fitting flexibility and the option to insert protective orthotics.Rocker soles designed to reduce pressure in high-pain areas, particularly the ball of the foot.Firm heel counters for support and stability.<br/><br/></p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "question_XamVPH",
+        "question_x9EPUx"
+      ],
+      "name": "t:sections.faq.name",
+      "settings": {
+        "style": "with-background",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#74a5ba",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#ffffff",
+        "overlay_opacity": 4,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "lookbook_w69hfT": {
+      "type": "lookbook",
+      "blocks": {
+        "content_9ghrzK": {
+          "type": "content",
+          "settings": {
+            "icon": "none",
+            "iwidth": "fit",
+            "icon_width": 26,
+            "heading": "Padded Tongue",
+            "text": "<p>Extra padding on the back of the heel helps to reduce discomfort or blisters while providing additional cushioning.</p>",
+            "link": "",
+            "color_text": "#74a5ba",
+            "vertical": 18,
+            "horizontal": 50,
+            "vertical_mobile": 16,
+            "horizontal_mobile": 42
+          }
+        },
+        "content_HF7yEU": {
+          "type": "content",
+          "settings": {
+            "icon": "none",
+            "iwidth": "fit",
+            "icon_width": 26,
+            "heading": "Removable Insole",
+            "text": "<p>Included is a removable arch support & premium foam cushioning insole that can easily be replaced with a more customized Aetrex Orthotic.</p>",
+            "link": "",
+            "color_text": "#74a5ba",
+            "vertical": 48,
+            "horizontal": 39,
+            "vertical_mobile": 54,
+            "horizontal_mobile": 40
+          }
+        },
+        "content_LjVywH": {
+          "type": "content",
+          "disabled": true,
+          "settings": {
+            "icon": "check_mark",
+            "iwidth": "fit",
+            "icon_width": 26,
+            "heading": "3: Signature Arch Support",
+            "text": "<p>With removable insole, our arch support is located further back to support the apex of the foot. This helps proper alignment and help relieve arch and heel pain associated with Plantar Fasciitis</p>",
+            "link": "",
+            "color_text": "#74a5ba",
+            "vertical": 56,
+            "horizontal": 8,
+            "vertical_mobile": 30,
+            "horizontal_mobile": 12
+          }
+        },
+        "content_3iTAhx": {
+          "type": "content",
+          "settings": {
+            "icon": "none",
+            "iwidth": "fit",
+            "icon_width": 26,
+            "heading": "Arch Support",
+            "text": "<p>Designed to help support natural alignment, our unique arch support position, height and contour aligns in the proper place to help support our bodies from the ground up and helps to relieve plantar fasciitis and common heel/arch pain.</p>",
+            "link": "",
+            "color_text": "#74a5ba",
+            "vertical": 56,
+            "horizontal": 52,
+            "vertical_mobile": 56,
+            "horizontal_mobile": 56
+          }
+        },
+        "content_Kxzeti": {
+          "type": "content",
+          "settings": {
+            "icon": "none",
+            "iwidth": "fit",
+            "icon_width": 26,
+            "heading": "Stretch Material",
+            "text": "<p>A material that stretches in many directions for additional comfort and provides more room in the shoe, when needed.</p>",
+            "link": "",
+            "color_text": "#74a5ba",
+            "vertical": 70,
+            "horizontal": 75,
+            "vertical_mobile": 69,
+            "horizontal_mobile": 73
+          }
+        }
+      },
+      "block_order": [
+        "content_9ghrzK",
+        "content_HF7yEU",
+        "content_LjVywH",
+        "content_3iTAhx",
+        "content_Kxzeti"
+      ],
+      "name": "t:sections.lookbook.name",
+      "settings": {
+        "image": "shopify://shop_images/Group_18_7_1.png",
+        "image_mobile": "shopify://shop_images/Group_18_7_1.png",
+        "heading": "",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "heading_position": "items-center justify-start text-left",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "rgba(0,0,0,0)",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false
+      }
+    },
+    "images_with_text_iL8ht6": {
+      "type": "images-with-text",
+      "blocks": {
+        "heading_e4NMJi": {
+          "type": "heading",
+          "settings": {
+            "heading": "Signature Arch Support",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_Bw6Yfi": {
+          "type": "text",
+          "settings": {
+            "text": "<p>With removable insole, our arch support is located further back to support the apex of the foot. This helps proper alignment and help relieve arch and heel pain associated with Plantar Fasciitis</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_TWhPGJ": {
+          "type": "button",
+          "settings": {
+            "button_label": "Shop Jillian",
+            "button_link": "shopify://products/jillian-black-sc450w",
+            "button_video_link": "",
+            "button_style": "link",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": true
+          }
+        }
+      },
+      "block_order": [
+        "heading_e4NMJi",
+        "text_Bw6Yfi",
+        "button_TWhPGJ"
+      ],
+      "disabled": true,
+      "name": "t:sections.images-with-text.name",
+      "settings": {
+        "image": "shopify://shop_images/ee4e2fe8a874fb5c106a8cc3c4247add5d9048ed.png",
+        "image_url": "",
+        "image_2": "shopify://shop_images/recommended_1_2x_21163cd2-e758-4725-87c5-117210d3d3c9.png",
+        "image2_url": "",
+        "image_ratio": "adapt",
+        "image_width": "large",
+        "layout": "text_first",
+        "text_alignment": "center",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "#fafafa",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": true
+      }
+    },
+    "empty_space_gyE8Nr": {
+      "type": "empty-space",
+      "name": "t:sections.empty-space.name",
+      "settings": {
+        "desktop_height": 40,
+        "mobile_height": 28,
+        "color_background": "",
+        "gradient_background": ""
+      }
+    },
+    "featured_collection_dXtHeM": {
+      "type": "featured-collection",
+      "name": "t:sections.featured-collection.name",
+      "settings": {
+        "collection": "",
+        "products": [
+          "sadie-navy-ap155w",
+          "jess-bronze-se214w",
+          "mens-conform-orthotics-insole-for-low-risk-diabetes",
+          "jillian-sport-black-l8000w"
+        ],
+        "product_limit": 4,
+        "columns": 4,
+        "carousel_on_desktop": false,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": false,
+        "heading": "How Aetrex Can Help",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "rich_text_qygTdt": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_NfEViz": {
+          "type": "heading",
+          "settings": {
+            "heading": "What Other Heel Pain Sufferers Say",
+            "heading_size": "title-lg tracking-heading",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_NfEViz"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#74a5ba",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "testimonials_byJFpb": {
+      "type": "testimonials",
+      "blocks": {
+        "testimonial_UPjm8b": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<h6><strong>“Bought all 4 colors</strong><br/> I bought two pairs and were so elated with the comfort that I bought the last two remaining colors. I suffer from Metatarsalgia and was glad to finally being able to walk without discomfort & pain!!” </h6>",
+            "author": "Ellen o.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_xPKLWB": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<h6><strong>\"I love these sneakers.I love these sneakers. </strong><br/>I have bought three of the same sneakers, but in different colors. What a difference they have made on my feet. I like to take my dog for walks. I had to stop. My feet were in such pain. With these sneakers my feet are fine now. Thank you Aetrex.”</h6>",
+            "author": "Linda P.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_RixBWT": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<h6><strong>\"Comfortable & supportive </strong><br/>I bought these to wear at work. I am a Dental Assistant and on my feet most of the day. With other shoes, I would go home with sore feet and low back pain. The Xspress Runner 2 felt comfortable and supportive right from the first time I laced them up - no break-in required.”</h6>",
+            "author": "Susanne B.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_UPjm8b",
+        "testimonial_xPKLWB",
+        "testimonial_RixBWT"
+      ],
+      "name": "t:sections.testimonials.name",
+      "settings": {
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 20,
+        "padding_bottom": 20,
+        "divider": false,
+        "rounded": false
+      }
+    },
+    "collection_list_fbMkYY": {
+      "type": "collection-list",
+      "blocks": {
+        "collection_cPKHdc": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "conform",
+            "custom_url": "",
+            "image": "shopify://shop_images/Rectangle_60_6.png",
+            "title": "",
+            "description": "To Help Relieve Diabetes",
+            "overlay_content": true,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0,
+            "submenu_title_position": "center",
+            "enable_title_drop_shadow": true
+          }
+        },
+        "collection_gpn6Pp": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "conform",
+            "custom_url": "",
+            "image": "shopify://shop_images/Rectangle_61_668b1198-2250-4e0e-9f58-c1a42125e032.png",
+            "title": "",
+            "description": "To Help Relieve Diabetes",
+            "overlay_content": true,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0,
+            "submenu_title_position": "center",
+            "enable_title_drop_shadow": true
+          }
+        }
+      },
+      "block_order": [
+        "collection_cPKHdc",
+        "collection_gpn6Pp"
+      ],
+      "name": "t:sections.collection-list.name",
+      "settings": {
+        "columns": 2,
+        "carousel_on_desktop": true,
+        "image_type": "collection",
+        "image_ratio": "landscape",
+        "show_products_count": false,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "#fafafa",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 40,
+        "divider": false,
+        "full_width": true,
+        "rounded": false
+      }
+    },
+    "image_with_text_overlay_NcafqY": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "heading_f3kfJV": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>Why Aetrex</p>",
+            "heading_size": "title-lg tracking-heading",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_f3kfJV"
+      ],
+      "name": "t:sections.image-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/Group_9.png",
+        "image_height": "adapt",
+        "content_width": "medium",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/logopng.png",
+        "image_height_mobile": "500px",
+        "content_position_mobile": "items-start justify-start",
+        "text_alignment_mobile": "center",
+        "color_text": "#171717",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 5,
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": true,
+        "parallax_direction": "vertical"
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "image_with_text_overlay_rBfBzp",
+    "faq_zhAACx",
+    "lookbook_w69hfT",
+    "images_with_text_iL8ht6",
+    "empty_space_gyE8Nr",
+    "featured_collection_dXtHeM",
+    "rich_text_qygTdt",
+    "testimonials_byJFpb",
+    "collection_list_fbMkYY",
+    "image_with_text_overlay_NcafqY"
+  ]
+}
