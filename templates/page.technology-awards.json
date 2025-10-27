@@ -11,6 +11,7 @@
   "sections": {
     "main-page": {
       "type": "main-page",
+      "disabled": true,
       "settings": {
         "heading_size": "title-sm",
         "heading_alignment": "text-left",
@@ -22,9 +23,256 @@
         "narrow": true,
         "rounded": false
       }
+    },
+    "image_with_text_overlay_yJHQkw": {
+      "type": "image-with-text-overlay",
+      "name": "t:sections.image-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/award_trophies_99f84438-69f2-4297-946b-d1e149bbdfa9.jpg",
+        "image_height": "adapt",
+        "content_width": "small",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/award_trophies.jpg",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": true,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_Ep8akc": {
+      "type": "rich-text",
+      "blocks": {
+        "text_4YDRna": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>Premier Technology Innovation Awards</strong></p>",
+            "text_font": "heading",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_4YDRna"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#ffffff",
+        "color_background": "#99a4ad",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "image_with_text_dMhzAK": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_RECtQV": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>Albert 2 Pro | </strong>Winner of CES 2022 Innovation Honoree Award and Outdoor Retailer Innovation Award Finalist</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_RECtQV"
+      ],
+      "name": "t:sections.image-with-text.name",
+      "settings": {
+        "image": "shopify://shop_images/609x469_Albert2_CES_Awards_2x_e4f260db-1310-45d4-87d7-d4ebd5934f42.png",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "medium",
+        "layout": "image_first",
+        "text_alignment": "center",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "center",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": true,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_yxDgVb": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_pxYFm3": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>3DFit | </strong>Winner of CES 2023 Innovation Honoree Award</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_pxYFm3"
+      ],
+      "name": "t:sections.image-with-text.name",
+      "settings": {
+        "image": "shopify://shop_images/3DFit_CES_Awards.jpg",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "medium",
+        "layout": "image_first",
+        "text_alignment": "center",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "center",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": true,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_NrgkDF": {
+      "type": "image-with-text",
+      "blocks": {
+        "text_cKC6mw": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>Foot.com | </strong>Winner of CES 2023 Innovation Honoree Award</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_cKC6mw"
+      ],
+      "name": "t:sections.image-with-text.name",
+      "settings": {
+        "image": "shopify://shop_images/Foot.com_CES_Awards.jpg",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "medium",
+        "layout": "image_first",
+        "text_alignment": "center",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "center",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": true,
+        "parallax_direction": "vertical"
+      }
     }
   },
   "order": [
-    "main-page"
+    "main-page",
+    "image_with_text_overlay_yJHQkw",
+    "rich_text_Ep8akc",
+    "image_with_text_dMhzAK",
+    "image_with_text_yxDgVb",
+    "image_with_text_NrgkDF"
   ]
 }
