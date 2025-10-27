@@ -40,7 +40,7 @@
         "text_LHGLnM": {
           "type": "text",
           "settings": {
-            "text": "<p>Pregnancy triggers many different changes in a woman’s body. Many women have common complaints throughout their pregnancy. One of these complaints, often overlooked, is foot pain. Due to the natural weight gain during pregnancy, a woman’s center of gravity is completely altered. This causes a new weight-bearing stance and added pressure to the knees and feet.Two of the most common foot problems experienced by pregnant woman are over- pronation and edema. These problems can lead to pain at the heel, arch, or the ball-of-foot. Many women may also experience leg cramping and varicose veins due to weight gain. Because of this, it is important for all pregnant women to learn more about foot health during their pregnancy to help make this nine month period more comfortable for them.</p>",
+            "text": "<p>Pregnancy triggers many different changes in a woman’s body. Many women have common complaints throughout their pregnancy. One of these complaints, often overlooked, is foot pain. Due to the natural weight gain during pregnancy, a woman’s center of gravity is completely altered. This causes a new weight-bearing stance and added pressure to the knees and feet.Two of the most common foot problems experienced by pregnant woman are over- pronation and edema. These problems can lead to pain at the heel, arch, or the ball-of-foot. Many women may also experience leg cramping and varicose veins due to weight gain.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -67,7 +67,7 @@
         "text_alignment": "left",
         "image_mobile": "shopify://shop_images/Group_15_532d5b16-7c7d-4bc4-9bf8-14d5bdf9e14c.png",
         "image_height_mobile": "100vh",
-        "content_position_mobile": "items-start justify-center",
+        "content_position_mobile": "items-center justify-center",
         "text_alignment_mobile": "left",
         "color_text": "#171717",
         "color_highlight": "#171717",
