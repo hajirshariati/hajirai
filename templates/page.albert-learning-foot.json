@@ -234,16 +234,17 @@
         "rounded": false
       }
     },
-    "collection_list_XEi9XG": {
+    "collection_list_bHMARW": {
       "type": "collection-list",
       "blocks": {
-        "collection_t8Qf3q": {
+        "collection_idyjze": {
           "type": "collection",
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "",
-            "title": "Benefits of an Aetrex Foot Scan",
+            "custom_url": "https://vimeo.com/527490503?fl=pl&fe=sh",
+            "image": "shopify://shop_images/thumb_5a0e05b6-05a7-4149-87ff-aaa0c410210a.jpg",
+            "title": "Plantar Fasciitis: Causes & Orthotics",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -253,13 +254,14 @@
             "enable_title_drop_shadow": false
           }
         },
-        "collection_HaCCUi": {
+        "collection_LEhJhL": {
           "type": "collection",
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "",
-            "title": "Benefits of an Aetrex Foot Scan: 3D Measurements",
+            "custom_url": "https://vimeo.com/527490461?fl=pl&fe=sh",
+            "image": "shopify://shop_images/thumb_dc2ff21f-70de-4f84-aed5-e29fbb83073d.jpg",
+            "title": "Bunions: Causes & Prevention",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -269,13 +271,14 @@
             "enable_title_drop_shadow": false
           }
         },
-        "collection_YT6JWM": {
+        "collection_Jti7fb": {
           "type": "collection",
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "",
-            "title": "Benefits of an Aetrex Foot Scan: Identify Your Median Shoe Size",
+            "custom_url": "https://vimeo.com/701245758?fl=pl&fe=sh",
+            "image": "shopify://shop_images/thumb_ff9fbeb1-111e-49f1-bfb1-0c46fac7b038.jpg",
+            "title": "Metatarsalgia: Causes & Orthotics",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -285,13 +288,14 @@
             "enable_title_drop_shadow": false
           }
         },
-        "collection_j9MrTC": {
+        "collection_qdEEJP": {
           "type": "collection",
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "",
-            "title": "Benefits of an Aetrex Foot Scan: Orthotics",
+            "custom_url": "https://vimeo.com/701245779?fl=pl&fe=sh",
+            "image": "shopify://shop_images/thumb_fe1a9933-cf90-49e2-b39a-bdfb44f8bac6.jpg",
+            "title": "Morton's Neuroma: Causes & Orthotic",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -301,13 +305,14 @@
             "enable_title_drop_shadow": false
           }
         },
-        "collection_7NNQxt": {
+        "collection_pG4UkL": {
           "type": "collection",
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "",
-            "title": "Benefits of an Aetrex Foot Scan: Personalized Footwear",
+            "custom_url": "https://vimeo.com/701245836?fl=pl&fe=sh",
+            "image": "shopify://shop_images/thumb_3c8e8315-ca3c-4f74-ad80-f32c8ef0828d.jpg",
+            "title": "Posterior Tibial Tendonitis",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -317,13 +322,14 @@
             "enable_title_drop_shadow": false
           }
         },
-        "collection_TghGhh": {
+        "collection_zPpfU4": {
           "type": "collection",
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "",
-            "title": "Aetrex Foot Scanner: Advanced Technology",
+            "custom_url": "https://vimeo.com/535042413?fl=pl&fe=sh",
+            "image": "shopify://shop_images/thumb_97326806-2c3a-440d-938e-30135ced179a.jpg",
+            "title": "High Arches & Best Orthotics",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -333,13 +339,14 @@
             "enable_title_drop_shadow": false
           }
         },
-        "collection_Byd78X": {
+        "collection_84QPwr": {
           "type": "collection",
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "",
-            "title": "Aetrex Foot Scanner: Measurement & Pressure Capabilities",
+            "custom_url": "https://vimeo.com/535045349?fl=pl&fe=sh",
+            "image": "shopify://shop_images/thumb_37ac7848-8f8e-4cf3-aa57-1d9d38d4f968.jpg",
+            "title": "Low Arches & Best Orthotics",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -349,13 +356,14 @@
             "enable_title_drop_shadow": false
           }
         },
-        "collection_tEVDKM": {
+        "collection_A4J3cF": {
           "type": "collection",
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "",
-            "title": "Aetrex Foot Scan: FitHQ",
+            "custom_url": "https://vimeo.com/535044656?fl=pl&fe=sh",
+            "image": "shopify://shop_images/thumb_c98447a5-e786-4455-8f89-daa986095d6c.jpg",
+            "title": "Medium Arches & Best Orthotics",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -365,13 +373,14 @@
             "enable_title_drop_shadow": false
           }
         },
-        "collection_VHKPRc": {
+        "collection_xKc98w": {
           "type": "collection",
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "",
-            "title": "Aetrex Foot Scanner: Arch Types",
+            "custom_url": "https://vimeo.com/535043815?fl=pl&fe=sh",
+            "image": "shopify://shop_images/thumb_d70d3079-90dd-4850-baa4-847be3287a5f.jpg",
+            "title": "Flat Arches & Best Orthotics",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -381,13 +390,14 @@
             "enable_title_drop_shadow": false
           }
         },
-        "collection_E8naBN": {
+        "collection_QT66GU": {
           "type": "collection",
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "",
-            "title": "Aetrex Foot Scanner: Girth Measurement",
+            "custom_url": "https://vimeo.com/701245065?fl=pl&fe=sh",
+            "image": "shopify://shop_images/thumb_de4cd8e6-6d32-468a-b011-20374a4795b2.jpg",
+            "title": "Flat Feet & Best Orthotics",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -397,13 +407,14 @@
             "enable_title_drop_shadow": false
           }
         },
-        "collection_NRmjKx": {
+        "collection_EbPFQc": {
           "type": "collection",
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "",
-            "title": "Aetrex Foot Scanner: Orthotic Configurations",
+            "custom_url": "https://vimeo.com/701245204?fl=pl&fe=sh",
+            "image": "shopify://shop_images/thumb_1_9a858e3e-d3df-40a1-8c99-937e5ef589da.jpg",
+            "title": "Foot Pain",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -413,70 +424,55 @@
             "enable_title_drop_shadow": false
           }
         },
-        "collection_N3dGGB": {
+        "collection_BGhFzg": {
           "type": "collection",
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "",
-            "title": "Aetrex Foot Scanner: Instep Measurement",
+            "custom_url": "https://vimeo.com/701824570?fl=pl&fe=sh",
+            "image": "shopify://shop_images/thumb_db2bf92f-3c21-42ce-8b4b-411295297fdd.jpg",
+            "title": "Achilles Tendonitis & Best Orthotics",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
             "color_overlay": "#000000",
-            "overlay_opacity": 30,
+            "overlay_opacity": 0,
             "submenu_title_position": "bottom",
             "enable_title_drop_shadow": false
           }
         },
-        "collection_JzftFt": {
+        "collection_cnNA7P": {
           "type": "collection",
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "",
-            "title": "How To Prepare For a Foot Scan",
+            "custom_url": "https://vimeo.com/527490478?fl=pl&fe=sh",
+            "image": "shopify://shop_images/thumb_1220d211-d05f-4234-b63d-bacd5307e10f.jpg",
+            "title": "Heel Spurs: Causes & Orthotics",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
             "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_diMppP": {
-          "type": "collection",
-          "settings": {
-            "link_type": "url",
-            "collection": "",
-            "custom_url": "",
-            "title": "Can an Aetrex Foot Scanner Measure Foot Length?",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
+            "overlay_opacity": 0,
             "submenu_title_position": "bottom",
             "enable_title_drop_shadow": false
           }
         }
       },
       "block_order": [
-        "collection_t8Qf3q",
-        "collection_HaCCUi",
-        "collection_YT6JWM",
-        "collection_j9MrTC",
-        "collection_7NNQxt",
-        "collection_TghGhh",
-        "collection_Byd78X",
-        "collection_tEVDKM",
-        "collection_VHKPRc",
-        "collection_E8naBN",
-        "collection_NRmjKx",
-        "collection_N3dGGB",
-        "collection_JzftFt",
-        "collection_diMppP"
+        "collection_idyjze",
+        "collection_LEhJhL",
+        "collection_Jti7fb",
+        "collection_qdEEJP",
+        "collection_pG4UkL",
+        "collection_zPpfU4",
+        "collection_84QPwr",
+        "collection_A4J3cF",
+        "collection_xKc98w",
+        "collection_QT66GU",
+        "collection_EbPFQc",
+        "collection_BGhFzg",
+        "collection_cnNA7P"
       ],
       "name": "t:sections.collection-list.name",
       "settings": {
@@ -609,7 +605,7 @@
     "image_with_text_overlay_GwGiG6",
     "rich_text_YatqFt",
     "main-blog",
-    "collection_list_XEi9XG",
+    "collection_list_bHMARW",
     "collection_list_dcmHEb"
   ]
 }
