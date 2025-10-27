@@ -67,15 +67,6 @@
             "liquid": "<br>"
           }
         },
-        "complementary": {
-          "type": "complementary",
-          "settings": {
-            "heading": "Pairs well with",
-            "product_limit": 4,
-            "show_vendor": false,
-            "show_price": false
-          }
-        },
         "icon_list_VBaw6z": {
           "type": "icon_list",
           "settings": {
@@ -192,7 +183,6 @@
         "true_fit_widget_8cjNbr",
         "buy_buttons",
         "liquid_Df3mAF",
-        "complementary",
         "icon_list_VBaw6z",
         "liquid_anxBGN",
         "text-1",
