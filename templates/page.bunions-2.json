@@ -67,7 +67,7 @@
         "text_alignment": "left",
         "image_mobile": "shopify://shop_images/Group_8_a872f6a0-f2ec-48c9-b9d4-2da3568f1adb.png",
         "image_height_mobile": "100vh",
-        "content_position_mobile": "items-end justify-end",
+        "content_position_mobile": "items-center justify-center",
         "text_alignment_mobile": "left",
         "color_text": "#171717",
         "color_highlight": "#171717",
