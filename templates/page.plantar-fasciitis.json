@@ -130,7 +130,7 @@
         "content_position": "md:items-end md:justify-start",
         "text_alignment": "left",
         "image_mobile": "shopify://shop_images/Group_7_f05d6d9c-ad86-49bd-9e2e-2fd3063a6bd3.png",
-        "image_height_mobile": "adapt",
+        "image_height_mobile": "100vh",
         "content_position_mobile": "items-end justify-end",
         "text_alignment_mobile": "left",
         "color_text": "#171717",
