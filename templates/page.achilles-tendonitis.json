@@ -30,7 +30,7 @@
         "heading_axLTnn": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Diabetes</p>",
+            "heading": "<p><strong>Achilles Tendonitis</strong></p>",
             "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "text",
@@ -40,7 +40,7 @@
         "text_LHGLnM": {
           "type": "text",
           "settings": {
-            "text": "<p>Diabetes is a serious disease caused by either a lack of insulin production or the body's inability to use insulin effectively. Diabetes can lead to various complications, disrupting the vascular system and affecting areas such as the eyes, kidneys, legs, and feet. </p><p>People with diabetes should pay special attention to their feet to manage potential complications effectively. Diabetic foot conditions arise from a combination of factors, including poor circulation and neuropathy.</p>",
+            "text": "<p>Achilles tendonitis is inflammation of the Achilles tendon and can lead to degeneration. The achilles tendon is the large tendon located in the back of the leg that inserts into the heel. The pain caused by achilles tendonitis can develop gradually without a history of trauma. The pain can be a shooting pain, burning pain, or even an extremely piercing pain. Achilles tendonitis should not be left untreated due to the danger that the tendon can become weak and ruptured.   Achilles Tendonitis is aggravated by activities that repeatedly stress the tendon, causing inflammation. In some cases even prolonged periods of standing can cause symptoms. It is a common problem often experienced by athletes, particularly distance runners. </p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -94,7 +94,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Causes</strong>",
-            "text": "<p>Diabetes can lead to various complications, disrupting the vascular system and affecting areas such as the eyes, kidneys, legs, and feet.<br/><br/>People with diabetes should pay special attention to their feet to manage potential complications effectively.Diabetic foot conditions arise from a combination of factors, including poor circulation and neuropathy.<br/><br/>Neuropathy can diminish sensation in the feet, making individuals less aware of injuries or pressure sores that can develop. Additionally, impaired blood flow due to vascular complications can slow down the healing process, increasing the risk of infections and ulcers if injuries do occur.<br/><br/></p>",
+            "text": "<p>There are several factors that can cause achilles tendonitis. The most common cause is over-pronation. Over-pronation occurs in the walking process, when the arch collapses upon weight bearing, adding stress on the achilles tendon.   Other factors that lead to achilles tendonitis are improper shoe selection, inadequate stretching prior to engaging in athletics, a short achilles tendon, direct trauma (injury) to the tendon, and heel bone deformity.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -103,7 +103,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Treatment and Prevention</strong>",
-            "text": "<p>Our Plantar Fasciitis Kit comes with an exercise guide that helps give you instructions on how to stretch the plantar fascia as well as the muscles and tendons surrounding the tissue. In turn it can help with reducing tension and putting you on the path towards pain relief. <br/><br/>Orthotics made with Plastazote foam are commonly recommended for their ability to accommodate pressure \"hot spots\" by conforming to heat and pressure.<br/><br/>Footwear for individuals with diabetes should include the following protective features:A high, wide toe box to provide ample space in the toe area.Removable insoles for fitting flexibility and the option to insert protective orthotics.Rocker soles designed to reduce pressure in high-pain areas, particularly the ball of the foot.Firm heel counters for support and stability.<br/><br/></p>",
+            "text": "<p>Athletes, particularly runners, should incorporate a thorough stretching program to properly warm-up the muscles. They should decrease the distance of their walk or run, apply ice after the activity and avoid any uphill climbs. Athletes should use an orthotic device, heel cup, or heel cradle for extra support.   A heel cup or heel cradle elevates the heel to reduce stress and pressure on the achilles tendon. The device should be made with light-weight, shock absorbing materials. An orthotic device can be used to control over-pronation, support the longitudinal arch, and reduce stress on the achilles tendon.</p><p>If the problem persists, consult your foot doctor.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
