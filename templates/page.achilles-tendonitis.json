@@ -360,7 +360,12 @@
       "name": "t:sections.featured-collection.name",
       "settings": {
         "collection": "",
-        "products": [],
+        "products": [
+          "emery-black-as160w",
+          "mila-navy-lb305w",
+          "l720m-m",
+          "marz-black-ss500w"
+        ],
         "product_limit": 4,
         "columns": 4,
         "carousel_on_desktop": false,
