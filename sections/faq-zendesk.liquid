@@ -1,0 +1,43 @@
+{% comment %}
+  Shopify Custom Liquid Section: Zendesk FAQ Renderer
+  This fetches articles via Zendesk Help Center API and displays them.
+{% endcomment %}
+
+<div class="faq-section" id="faq-list">
+  <h2>Frequently Asked Questions</h2>
+  <p>Loading FAQs…</p>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const container = document.getElementById('faq-list');
+    container.innerHTML = '<p>Loading FAQs…</p>';
+
+    fetch('https://support.aetrex.com/api/v2/help_center/en-us/articles.json?per_page=10')
+      .then(response => response.json())
+      .then(data => {
+        container.innerHTML = ''; // clear loading text
+        data.articles.forEach(article => {
+          const articleEl = document.createElement('div');
+          articleEl.className = 'faq-article';
+          articleEl.innerHTML = `
+            <h3>${article.title}</h3>
+            <div>${article.html_body}</div>
+            <hr/>
+          `;
+          container.appendChild(articleEl);
+        });
+      })
+      .catch(err => {
+        console.error(err);
+        container.innerHTML = '<p>Unable to load FAQs at this time.</p>';
+      });
+  });
+</script>
+
+<style>
+  .faq-section { max-width: 800px; margin: 2rem auto; font-family: sans-serif; }
+  .faq-article { margin-bottom: 2rem; }
+  .faq-article h3 { color: #2b2b2b; font-size: 1.25rem; margin-bottom: 0.5rem; }
+  .faq-article div { font-size: 1rem; line-height: 1.5; }
+</style>
