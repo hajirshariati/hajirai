@@ -14,6 +14,7 @@
       "disabled": true,
       "settings": {
         "heading_size": "title-xl",
+        "heading_alignment": "text-left",
         "heading_tag": "h1",
         "text_size": "text-lg md:text-2xl",
         "padding_top": 72,
@@ -30,7 +31,7 @@
           "type": "heading",
           "settings": {
             "heading": "Contact Us",
-            "heading_size": "title-xl tracking-heading",
+            "heading_size": "title-lg tracking-heading",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -39,10 +40,13 @@
         "text": {
           "type": "text",
           "settings": {
-            "text": "<p>We'd love to hear from you. Our team is here to help. <br/>Let your customers get in touch with you by filling out the email form below.</p>",
+            "text": "<p>Our world-class customer service team is eager to assist you.</p>",
             "text_font": "body",
             "text_size": "subtext-lg",
             "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -59,16 +63,18 @@
         "heading": "",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
         "heading_tag": "h2",
         "subheading": "",
         "description": "",
         "button_label": "",
         "button_link": "",
+        "button_external": false,
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "",
-        "color_background": "",
+        "color_background": "#f4f4f4",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
@@ -76,110 +82,109 @@
         "color_button_background": "",
         "color_button_gradient": "",
         "padding_top": 72,
-        "padding_bottom": 0,
+        "padding_bottom": 20,
         "divider": false,
         "narrow": false,
-        "rounded": false
+        "rounded": true
       }
     },
-    "empty-space": {
-      "type": "empty-space",
-      "settings": {
-        "desktop_height": 120,
-        "mobile_height": 44,
-        "color_background": "",
-        "gradient_background": ""
-      }
-    },
-    "contact-form": {
-      "type": "contact-form",
+    "multicolumn_yaFcUm": {
+      "type": "multicolumn",
       "blocks": {
-        "contact-1": {
-          "type": "contact",
+        "column_XKzFfL": {
+          "type": "column",
           "settings": {
-            "heading": "Address",
-            "text": "<p><a href=\"#\" title=\"mailto:shop@yourstore.com\">shop@yourstore.com</a></p>"
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "left",
+            "image_ratio": "adapt",
+            "heading": "<a href=\"mailto:help@aetrex.com\">help@aetrex.com</a>",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Someone from our team will get back to you soon</p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
           }
         },
-        "contact-2": {
-          "type": "contact",
+        "column_EQpjQD": {
+          "type": "column",
           "settings": {
-            "heading": "Email",
-            "text": "<p><a href=\"#\" title=\"mailto:contact@yourstore.com\">contact@yourstore.com</a><br/><a href=\"#\" title=\"mailto:sales@yourstore.com\">sales@yourstore.com</a></p>"
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "left",
+            "image_ratio": "adapt",
+            "heading": "<a href=\"tel:+18885262739\">Call Us</a>",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>1.888.526.2739</p><p>Mon - Fri: 8:30 AM - 12am ET<br/>Sat - Sun: 9am - 12am ET</p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
           }
         },
-        "contact-3": {
-          "type": "contact",
+        "column_7UAmAX": {
+          "type": "column",
           "settings": {
-            "heading": "Phone",
-            "text": "<p><a href=\"#\" title=\"tel:+33 (0) 31-305-210\">+33 (0) 31-305-210<br/></a>mo – fri: 09:00 – 17:00</p>"
-          }
-        },
-        "media": {
-          "type": "media",
-          "settings": {
-            "heading": "Follow us"
-          }
-        },
-        "custom_field-1": {
-          "type": "custom_field",
-          "settings": {
-            "type": "text",
-            "title": "Phone number",
-            "required": false,
-            "full_width": false,
-            "checked_value": "Yes",
-            "unchecked_value": "No",
-            "radio_options": "",
-            "select_options": ""
-          }
-        },
-        "custom_field-2": {
-          "type": "custom_field",
-          "settings": {
-            "type": "select",
-            "title": "Subject",
-            "required": false,
-            "full_width": false,
-            "checked_value": "Yes",
-            "unchecked_value": "No",
-            "radio_options": "",
-            "select_options": "Product, Order, Press, Other"
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "left",
+            "image_ratio": "adapt",
+            "heading": "<a href=\"https://support.aetrex.com/hc/en-us\">Help Center and FAQ</a>",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Browse the Help Center</p>",
+            "button_label": "Click Here",
+            "button_link": "https://support.aetrex.com/hc/en-us",
+            "button_style": "link",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
           }
         }
       },
       "block_order": [
-        "contact-1",
-        "contact-2",
-        "contact-3",
-        "media",
-        "custom_field-1",
-        "custom_field-2"
+        "column_XKzFfL",
+        "column_EQpjQD",
+        "column_7UAmAX"
       ],
+      "name": "t:sections.multicolumn.name",
       "settings": {
+        "gap": "small",
+        "columns": 3,
+        "columns_mobile": "1",
+        "carousel_on_desktop": true,
+        "swipe_on_mobile": true,
         "heading": "",
         "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
         "subheading": "",
         "description": "",
         "button_label": "",
         "button_link": "",
+        "button_external": false,
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "",
-        "color_background": "",
+        "color_background": "#f4f4f4",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 0,
-        "padding_bottom": 120,
-        "divider": false,
-        "narrow": false,
+        "padding_top": 40,
+        "padding_bottom": 40,
+        "divider": true,
+        "full_width": false,
         "rounded": false
       }
     }
@@ -187,7 +192,6 @@
   "order": [
     "main",
     "rich-text",
-    "empty-space",
-    "contact-form"
+    "multicolumn_yaFcUm"
   ]
 }
