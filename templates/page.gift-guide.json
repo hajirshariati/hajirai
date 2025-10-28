@@ -645,7 +645,7 @@
             "color_highlight": "",
             "gradient_highlight": "",
             "color_overlay": "#ffffff",
-            "overlay_opacity": 100
+            "overlay_opacity": 0
           }
         },
         "image_kirkAq": {
@@ -668,7 +668,7 @@
             "color_highlight": "",
             "gradient_highlight": "",
             "color_overlay": "#ffffff",
-            "overlay_opacity": 100
+            "overlay_opacity": 0
           }
         }
       },
