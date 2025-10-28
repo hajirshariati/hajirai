@@ -395,22 +395,37 @@
         "rounded": false
       }
     },
-    "rich_text_qygTdt": {
+    "empty_space_QXwAkj": {
+      "type": "empty-space",
+      "name": "t:sections.empty-space.name",
+      "settings": {
+        "desktop_height": 40,
+        "mobile_height": 28,
+        "color_background": "",
+        "gradient_background": ""
+      }
+    },
+    "rich_text_dUPwLg": {
       "type": "rich-text",
       "blocks": {
-        "heading_NfEViz": {
-          "type": "heading",
+        "text_7zmBDU": {
+          "type": "text",
           "settings": {
-            "heading": "What Other Bunion’s Sufferers Say",
-            "heading_size": "title-lg tracking-heading",
-            "heading_tag": "h2",
+            "text": "<p>What Other Bunion’s Sufferers Say</p>",
+            "text_font": "heading",
+            "text_size": "subtext-custom",
+            "text_max_size": 24,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
             "highlighted_text": "none",
-            "highlighted_scribble": "circle"
+            "highlighted_scribble": "one"
           }
         }
       },
       "block_order": [
-        "heading_NfEViz"
+        "text_7zmBDU"
       ],
       "name": "t:sections.rich-text.name",
       "settings": {
@@ -429,6 +444,7 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
+        "narrow": true,
         "color_text": "#74a5ba",
         "color_background": "",
         "gradient_background": "",
@@ -440,7 +456,6 @@
         "padding_top": 0,
         "padding_bottom": 0,
         "divider": false,
-        "narrow": true,
         "rounded": false
       }
     },
@@ -451,7 +466,7 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>“Favorite Sandals </strong><br/>I have flat feet, bunions, plantar fasciitis, and have suffered from Achilles tendinitis. These sandals are wonderful! They look very attractive and fashionable while also providing the desperately needed support so that I can walk. I love the Velcro closures that can be adjusted across the toes, as well as around the ankle. I wish that I could get a pair in every color!” </h6>",
+            "text": "<h6><strong>Favorite Sandals </strong><br/>I have flat feet, bunions, plantar fasciitis, and have suffered from Achilles tendinitis. These sandals are wonderful! They look very attractive and fashionable while also providing the desperately needed support so that I can walk. I love the Velcro closures that can be adjusted across the toes, as well as around the ankle. I wish that I could get a pair in every color!” </h6>",
             "author": "Shan",
             "author_info": "",
             "author_url": "",
@@ -464,7 +479,7 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>\"Great Styleand Comfort</strong><br/>After bunion surgery I needed to find shoes with more support; these are my third pair of Aetrex shoes. None had to be worn in, my feet felt supported without sacrificing style. Perfect for traveling especially when you have to limit the number of shoes you take.\" </h6>",
+            "text": "<h6><strong>Great Styleand Comfort</strong><br/>After bunion surgery I needed to find shoes with more support; these are my third pair of Aetrex shoes. None had to be worn in, my feet felt supported without sacrificing style. Perfect for traveling especially when you have to limit the number of shoes you take.\" </h6>",
             "author": "Susan C.",
             "author_info": "",
             "author_url": "",
@@ -477,7 +492,7 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>\"Very comfortable!</strong><br/>I have bunions and I need good arch support so I don’t skimp on shoes. These sandals were comfortable right out of the box. The adjustable straps make them a perfect fit and the arch support is great. <br/></h6><h6></h6>",
+            "text": "<h6><strong>Very comfortable!</strong><br/>I have bunions and I need good arch support so I don’t skimp on shoes. These sandals were comfortable right out of the box. The adjustable straps make them a perfect fit and the arch support is great. <br/></h6><h6></h6>",
             "author": "Susanne B.",
             "author_info": "",
             "author_url": "",
@@ -594,53 +609,6 @@
         "full_width": true,
         "rounded": false
       }
-    },
-    "image_with_text_overlay_NcafqY": {
-      "type": "image-with-text-overlay",
-      "blocks": {
-        "heading_f3kfJV": {
-          "type": "heading",
-          "settings": {
-            "heading": "<p>Why Aetrex</p>",
-            "heading_size": "title-lg tracking-heading",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "heading_f3kfJV"
-      ],
-      "name": "t:sections.image-with-text-overlay.name",
-      "settings": {
-        "transparent_header": false,
-        "image": "shopify://shop_images/Group_9.png",
-        "image_height": "adapt",
-        "content_width": "medium",
-        "content_position": "md:items-end md:justify-start",
-        "text_alignment": "left",
-        "image_mobile": "shopify://shop_images/logopng.png",
-        "image_height_mobile": "500px",
-        "content_position_mobile": "items-start justify-start",
-        "text_alignment_mobile": "center",
-        "color_text": "#171717",
-        "color_highlight": "#e0a580",
-        "gradient_highlight": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
-        "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "divider_color": "#111111",
-        "overlay_opacity": 5,
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": true,
-        "rounded": false,
-        "enable_parallax": true,
-        "parallax_direction": "vertical"
-      }
     }
   },
   "order": [
@@ -651,9 +619,9 @@
     "images_with_text_iL8ht6",
     "empty_space_gyE8Nr",
     "featured_collection_dXtHeM",
-    "rich_text_qygTdt",
+    "empty_space_QXwAkj",
+    "rich_text_dUPwLg",
     "testimonials_byJFpb",
-    "collection_list_fbMkYY",
-    "image_with_text_overlay_NcafqY"
+    "collection_list_fbMkYY"
   ]
 }
