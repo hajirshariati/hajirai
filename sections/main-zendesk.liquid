@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function() {
     fetch(`https://support.aetrex.com/api/v2/help_center/categories/${categoryId}/articles.json`)
       .then(res => res.json())
       .then(data => {
-        articlesContainer.innerHTML = '';
+        // DON'T clear the loading message yet - keep it visible
         
         if (data.articles && data.articles.length > 0) {
           // Create array of promises to fetch full article content
@@ -114,6 +114,9 @@ document.addEventListener('DOMContentLoaded', function() {
           
           // Wait for all articles to load, then render them IN ORDER
           Promise.all(fetchPromises).then((articlesData) => {
+            // NOW clear the loading message right before rendering
+            articlesContainer.innerHTML = '';
+            
             articlesData.sort((a, b) => {
               if (!a) return 1;
               if (!b) return -1;
