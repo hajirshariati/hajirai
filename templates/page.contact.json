@@ -167,30 +167,11 @@
         "full_width": false,
         "rounded": false
       }
-    },
-    "custom_liquid_9bmttY": {
-      "type": "custom-liquid",
-      "name": "t:sections.custom-liquid.name",
-      "settings": {
-        "liquid": "<script id=\"ze-snippet\" src=\"https://static.zdassets.com/ekr/snippet.js?key=9612ef78-380b-4b59-abc6-76ff649a3a3b\"> </script>",
-        "color_text": "",
-        "color_background": "#e7e7e7",
-        "gradient_background": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "narrow": false,
-        "rounded": false
-      }
     }
   },
   "order": [
     "main",
     "rich-text",
-    "multicolumn_with_icons_igCrVg",
-    "custom_liquid_9bmttY"
+    "multicolumn_with_icons_igCrVg"
   ]
 }
