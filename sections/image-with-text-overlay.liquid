@@ -192,7 +192,7 @@
                     {%- endif -%}
 
                   {%- when 'social_icons' -%}
-                    <div class="social-icons-block" {{ block.shopify_attributes }}>
+                    <div class="social-icons-block flex flex-wrap items-center gap-4 my-8 md:my-0 justify-center md:justify-start" {{ block.shopify_attributes }}>
                       {%- liquid
                         if block.settings.show_social
                           render 'social-icons', size: 'lg', gap: '7'
@@ -349,6 +349,32 @@
     .banner__title #trademark-symbol {
       font-size: 12px !important;
     }
+  }
+  
+  /* Social icons styling */
+  #shopify-section-{{ section.id }} .social-icons-block {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  @media screen and (min-width: 768px) {
+    #shopify-section-{{ section.id }} .social-icons-block {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+  }
+  
+  /* Follow on Shop button styling */
+  #shopify-section-{{ section.id }} .social-icons-block shopify-follow-button {
+    display: inline-flex;
+    align-items: center;
+  }
+  
+  #shopify-section-{{ section.id }} .social-icons-block shopify-follow-button::part(button) {
+    height: 44px;
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
   }
 </style>
 
