@@ -123,7 +123,7 @@
             "icon": "none",
             "custom_icon": "",
             "heading": "<strong>Live Support</strong>",
-            "text": "<h6></h6><p>1.888.526.2739</p><p>Mon - Fri: 8:30 AM - 12am ET<br/>Sat - Sun: 9am - 12am ET</p><p>......................................................................</p><h6>Chat</h6><p>Mon - Fri: 8:30 AM - 12am ET<br/>Sat - Sun: 9am - 12am ET</p>",
+            "text": "<h6></h6><p>Call 1.888.526.2739</p><p>Mon - Fri: 8:30 AM - 12am ET<br/>Sat - Sun: 9am - 12am ET</p><p>......................................................................</p><h6>Chat</h6><p>Mon - Fri: 8:30 AM - 12am ET<br/>Sat - Sun: 9am - 12am ET</p>",
             "highlighted_text": "none",
             "custom_html": "<a onclick=\"openWidget()\">Click Here</a>\n\n\n<script type=\"text/javascript\">\n  zE(\"webWidget\", \"hide\")\n\n  function openWidget() {\n    zE(\"webWidget\", \"show\")\n    zE(\"webWidget\", \"open\")\n     \n  }\n\n</script>",
             "us_only": false,
