@@ -791,7 +791,7 @@
           "type": "column",
           "settings": {
             "show_border": false,
-            "text_alignment": "center",
+            "text_alignment": "left",
             "text_alignment_mobile": "left",
             "image_ratio": "adapt",
             "heading": "DO",
@@ -811,7 +811,7 @@
           "type": "column",
           "settings": {
             "show_border": false,
-            "text_alignment": "center",
+            "text_alignment": "left",
             "text_alignment_mobile": "center",
             "image_ratio": "adapt",
             "heading": "DON'T",
