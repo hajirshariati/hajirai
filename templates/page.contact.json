@@ -167,11 +167,17 @@
         "full_width": false,
         "rounded": false
       }
+    },
+    "faq_zendesk_iW4B8T": {
+      "type": "faq-zendesk",
+      "name": "Zendesk FAQ Section",
+      "settings": {}
     }
   },
   "order": [
     "main",
     "rich-text",
-    "multicolumn_with_icons_igCrVg"
+    "multicolumn_with_icons_igCrVg",
+    "faq_zendesk_iW4B8T"
   ]
 }
