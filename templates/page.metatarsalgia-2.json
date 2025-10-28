@@ -395,22 +395,27 @@
         "rounded": false
       }
     },
-    "rich_text_qygTdt": {
+    "rich_text_4FKGVw": {
       "type": "rich-text",
       "blocks": {
-        "heading_NfEViz": {
-          "type": "heading",
+        "text_jJWFPp": {
+          "type": "text",
           "settings": {
-            "heading": "What Other Metatarsalgia Sufferers Say",
-            "heading_size": "title-lg tracking-heading",
-            "heading_tag": "h2",
+            "text": "<p>What Other Metatarsalgia Sufferers Say</p>",
+            "text_font": "heading",
+            "text_size": "subtext-custom",
+            "text_max_size": 24,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
             "highlighted_text": "none",
-            "highlighted_scribble": "circle"
+            "highlighted_scribble": "one"
           }
         }
       },
       "block_order": [
-        "heading_NfEViz"
+        "text_jJWFPp"
       ],
       "name": "t:sections.rich-text.name",
       "settings": {
@@ -429,6 +434,7 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
+        "narrow": true,
         "color_text": "#74a5ba",
         "color_background": "",
         "gradient_background": "",
@@ -440,7 +446,6 @@
         "padding_top": 0,
         "padding_bottom": 0,
         "divider": false,
-        "narrow": true,
         "rounded": false
       }
     },
@@ -451,7 +456,7 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>“Bought all 4 colors I</strong><br/>bought two pairs and were so elated with the comfort that I bought the last two remaining colors. I suffer from Metatarsalgia and was glad to finally being able to walk without discomfort & pain!!” </h6>",
+            "text": "<h6><strong>Bought all 4 colors I</strong><br/>bought two pairs and were so elated with the comfort that I bought the last two remaining colors. I suffer from Metatarsalgia and was glad to finally being able to walk without discomfort & pain!!” </h6>",
             "author": "Ellen o.",
             "author_info": "",
             "author_url": "",
@@ -464,7 +469,7 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>\"I love these sneakers.</strong><br/>I love these sneakers. I have bought three of the same sneakers, but in different colors. What a difference they have made on my feet. I like to take my dog for walks. I had to stop. My feet were in such pain. With these sneakers my feet are fine now. Thank you Aetrex.</h6>",
+            "text": "<h6><strong>I love these sneakers.</strong><br/>I love these sneakers. I have bought three of the same sneakers, but in different colors. What a difference they have made on my feet. I like to take my dog for walks. I had to stop. My feet were in such pain. With these sneakers my feet are fine now. Thank you Aetrex.</h6>",
             "author": "Linda P.",
             "author_info": "",
             "author_url": "",
@@ -477,7 +482,7 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>\"Comfortable & supportiveI </strong><br/>bought these to wear at work. I am a Dental Assistant and on my feet most of the day. With other shoes, I would go home with sore feet and low back pain. The Xspress Runner 2 felt comfortable and supportive right from the first time I laced them up - no break-in required.</h6>",
+            "text": "<h6><strong>Comfortable & supportiveI </strong><br/>bought these to wear at work. I am a Dental Assistant and on my feet most of the day. With other shoes, I would go home with sore feet and low back pain. The Xspress Runner 2 felt comfortable and supportive right from the first time I laced them up - no break-in required.</h6>",
             "author": "Susanne B.",
             "author_info": "",
             "author_url": "",
@@ -594,53 +599,6 @@
         "full_width": true,
         "rounded": false
       }
-    },
-    "image_with_text_overlay_NcafqY": {
-      "type": "image-with-text-overlay",
-      "blocks": {
-        "heading_f3kfJV": {
-          "type": "heading",
-          "settings": {
-            "heading": "<p>Why Aetrex</p>",
-            "heading_size": "title-lg tracking-heading",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "heading_f3kfJV"
-      ],
-      "name": "t:sections.image-with-text-overlay.name",
-      "settings": {
-        "transparent_header": false,
-        "image": "shopify://shop_images/Group_9.png",
-        "image_height": "adapt",
-        "content_width": "medium",
-        "content_position": "md:items-end md:justify-start",
-        "text_alignment": "left",
-        "image_mobile": "shopify://shop_images/logopng.png",
-        "image_height_mobile": "500px",
-        "content_position_mobile": "items-start justify-start",
-        "text_alignment_mobile": "center",
-        "color_text": "#171717",
-        "color_highlight": "#e0a580",
-        "gradient_highlight": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
-        "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "divider_color": "#111111",
-        "overlay_opacity": 5,
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": true,
-        "rounded": false,
-        "enable_parallax": true,
-        "parallax_direction": "vertical"
-      }
     }
   },
   "order": [
@@ -651,9 +609,8 @@
     "images_with_text_iL8ht6",
     "empty_space_gyE8Nr",
     "featured_collection_dXtHeM",
-    "rich_text_qygTdt",
+    "rich_text_4FKGVw",
     "testimonials_byJFpb",
-    "collection_list_fbMkYY",
-    "image_with_text_overlay_NcafqY"
+    "collection_list_fbMkYY"
   ]
 }
