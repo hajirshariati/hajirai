@@ -133,6 +133,12 @@
                       </div>
                     {%- endif -%}
 
+                    {%- if block.settings.custom_html != blank -%}
+                      <div class="multicolumn-card__custom-html rte">
+                        {{ block.settings.custom_html }}
+                      </div>
+                    {%- endif -%}
+
                     {%- if block.settings.button_label != blank -%}
                       <p>
                         {%- render 'button',
@@ -462,49 +468,19 @@
       "info": "t:sections.global.settings.highlighted_scribble.info"
     },
     {
-      "type": "header",
-      "content": "t:sections.global.settings.header__colors.content",
-      "info": "t:sections.global.settings.header__colors.info"
-    },
-    {
       "type": "color",
-      "id": "color_text",
-      "label": "t:sections.global.settings.color_text.label"
-    },
-    {
-      "type": "color",
-      "id": "color_background",
-      "label": "t:sections.global.settings.color_background.label"
-    },
-    {
-      "type": "color_background",
-      "id": "gradient_background",
-      "label": "t:sections.global.settings.gradient_background.label"
-    },
-    {
-      "type": "color",
-      "id": "color_highlight",
-      "label": "t:sections.global.settings.color_highlight.label"
-    },
-    {
-      "type": "color_background",
       "id": "gradient_highlight",
       "label": "t:sections.global.settings.gradient_highlight.label"
     },
     {
-      "type": "color",
-      "id": "color_button_text",
-      "label": "t:sections.global.settings.color_button_text.label"
+      "type": "header",
+      "content": "t:sections.global.settings.header__colors.content"
     },
     {
-      "type": "color",
-      "id": "color_button_background",
-      "label": "t:sections.global.settings.color_button_background.label"
-    },
-    {
-      "type": "color_background",
-      "id": "color_button_gradient",
-      "label": "t:sections.global.settings.color_button_gradient.label"
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.global.settings.color_scheme.label",
+      "default": "scheme-1"
     },
     {
       "type": "header",
@@ -514,27 +490,21 @@
       "type": "range",
       "id": "padding_top",
       "min": 0,
-      "max": 120,
-      "step": 4,
+      "max": 100,
+      "step": 2,
       "unit": "px",
       "label": "t:sections.global.settings.padding_top.label",
-      "default": 72
+      "default": 60
     },
     {
       "type": "range",
       "id": "padding_bottom",
       "min": 0,
-      "max": 120,
-      "step": 4,
+      "max": 100,
+      "step": 2,
       "unit": "px",
       "label": "t:sections.global.settings.padding_bottom.label",
-      "default": 72
-    },
-    {
-      "type": "checkbox",
-      "id": "divider",
-      "label": "t:sections.global.settings.divider.label",
-      "default": false
+      "default": 60
     },
     {
       "type": "checkbox",
@@ -544,9 +514,16 @@
     },
     {
       "type": "checkbox",
+      "id": "divider",
+      "label": "t:sections.global.settings.divider.label",
+      "default": false
+    },
+    {
+      "type": "checkbox",
       "id": "rounded",
-      "default": false,
-      "label": "t:sections.global.settings.rounded.label"
+      "label": "t:sections.global.settings.rounded.label",
+      "default": true,
+      "info": "t:sections.global.settings.rounded.info"
     }
   ],
   "blocks": [
@@ -641,6 +618,11 @@
           "id": "text",
           "label": "t:sections.global.settings.description.label",
           "default": "<p>Use this section to explain a set of product features, to link to a series of pages, or to answer common questions about your products.</p>"
+        },
+        {
+          "type": "html",
+          "id": "custom_html",
+          "label": "Custom HTML (below text)"
         },
         {
           "type": "text",
