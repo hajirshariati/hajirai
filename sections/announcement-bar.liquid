@@ -400,6 +400,42 @@
   {%- endfor -%}
 {%- endif -%}
 
+<script>
+  // Close notification banner when clicking outside (on overlay)
+  document.addEventListener('DOMContentLoaded', function() {
+    const notificationPopups = document.querySelectorAll('.notification-banner-popup');
+    
+    notificationPopups.forEach(popup => {
+      const overlay = popup.querySelector('.notification-banner-overlay');
+      const closeButton = popup.querySelector('.notification-banner-close');
+      const content = popup.querySelector('.notification-banner-content');
+      
+      // Close when clicking on overlay (outside content)
+      if (overlay) {
+        overlay.addEventListener('click', function(e) {
+          if (e.target === overlay) {
+            popup.classList.remove('active');
+          }
+        });
+      }
+      
+      // Also close when clicking anywhere outside the content
+      popup.addEventListener('click', function(e) {
+        if (e.target === popup) {
+          popup.classList.remove('active');
+        }
+      });
+      
+      // Existing close button functionality
+      if (closeButton) {
+        closeButton.addEventListener('click', function() {
+          popup.classList.remove('active');
+        });
+      }
+    });
+  });
+</script>
+
 <script src="{{ 'announcement-banner.js' | asset_url }}" defer></script>
 
 {% schema %}
