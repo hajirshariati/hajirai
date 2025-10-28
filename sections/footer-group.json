@@ -300,22 +300,38 @@
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
+        },
+        "spacing_bk9MHz": {
+          "type": "spacing",
+          "settings": {
+            "height": 20,
+            "height_mobile": 0
+          }
+        },
+        "social_icons_TkbWQG": {
+          "type": "social_icons",
+          "settings": {
+            "show_social": true,
+            "enable_follow_on_shop": false
+          }
         }
       },
       "block_order": [
         "heading_DJPjam",
-        "text_9jRhMJ"
+        "text_9jRhMJ",
+        "spacing_bk9MHz",
+        "social_icons_TkbWQG"
       ],
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
         "image": "shopify://shop_images/Group_9.png",
-        "image_height": "400px",
+        "image_height": "450px",
         "content_width": "medium",
         "content_position": "md:items-end md:justify-start",
         "text_alignment": "left",
         "image_mobile": "shopify://shop_images/logopng.png",
-        "image_height_mobile": "400px",
+        "image_height_mobile": "500px",
         "content_position_mobile": "items-center justify-center",
         "text_alignment_mobile": "center",
         "color_text": "#171717",
