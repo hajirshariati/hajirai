@@ -32,7 +32,13 @@
             "show_taxes_notice": false,
             "tooltip_heading": "MSRP",
             "tooltip_message_strikethrough": "The Manufacturer's Suggested Retail Price, is the price that a manufacturer recommends a retailer sell a product for.",
-            "show_rating": true
+            "show_rating": false
+          }
+        },
+        "yotpo_product_reviews_reviews_XchWr6": {
+          "type": "shopify://apps/yotpo-product-reviews/blocks/reviews/eb7dfd7d-db44-4334-bc49-c893b51b36cf",
+          "settings": {
+            "product": "{{product}}"
           }
         },
         "variant_picker": {
@@ -169,6 +175,7 @@
         "breadcrumb_UzHCRY",
         "title",
         "price_TirYdK",
+        "yotpo_product_reviews_reviews_XchWr6",
         "variant_picker",
         "true_fit_widget_8cjNbr",
         "buy_buttons",
@@ -538,6 +545,7 @@
             "heading": "{{ block.repeater.heading.value }}",
             "heading_size": "text-lg-2xl",
             "text": "<p>{{ block.repeater.copy.value }}</p>",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -580,8 +588,8 @@
         "color_button_gradient": "",
         "padding_top": 40,
         "padding_bottom": 20,
-        "divider": false,
         "full_width": false,
+        "divider": false,
         "rounded": true
       }
     },
@@ -599,6 +607,7 @@
             "heading": "",
             "heading_size": "text-lg-2xl",
             "text": "",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -618,6 +627,7 @@
             "heading": "",
             "heading_size": "text-lg-2xl",
             "text": "<p>\"I recommend Aetrex products to my patients because it helps provide the right balance and support to relieve and prevent foot conditions like Plantar Fasciitis. Unlike other brands; the contour, position and height of the Aetrex product arch support aligns anatomically in the proper place to help support our bodies from the ground up.\"<br/></p><p>- Janine Taddeo, DPM</p>",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -638,6 +648,7 @@
             "heading": "",
             "heading_size": "text-lg-2xl",
             "text": "",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -682,8 +693,8 @@
         "color_button_gradient": "",
         "padding_top": 28,
         "padding_bottom": 36,
-        "divider": false,
         "full_width": false,
+        "divider": false,
         "rounded": true
       }
     },
