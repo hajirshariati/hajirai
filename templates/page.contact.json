@@ -181,11 +181,30 @@
         "full_width": false,
         "rounded": false
       }
+    },
+    "custom_liquid_VyyMyA": {
+      "type": "custom-liquid",
+      "name": "t:sections.custom-liquid.name",
+      "settings": {
+        "liquid": "<div id=\"as-root\"></div><script>(function(e,t,n){var r,i=e.getElementsByTagName(t)[0];if(e.getElementById(n))return;r=e.createElement(t);r.id=n;r.src=\"https://button.aftership.com/all.js?username=aetrexorders\";i.parentNode.insertBefore(r,i)})(document,\"script\",\"aftership-jssdk\")</script>\n\n<div class=\"as-track-button\" data-size=\"medium\" data-domain=\"orders.aetrex.com/\" data-look-up-option=\"both\" data-btn-label=\"Track\"></div>",
+        "color_text": "",
+        "color_background": "#f4f4f4",
+        "gradient_background": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
     }
   },
   "order": [
     "main",
     "rich-text",
-    "multicolumn_with_icons_igCrVg"
+    "multicolumn_with_icons_igCrVg",
+    "custom_liquid_VyyMyA"
   ]
 }
