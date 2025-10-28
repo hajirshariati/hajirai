@@ -62,7 +62,7 @@
           "settings": {
             "show_date": true,
             "show_comments": false,
-            "show_author": true
+            "show_author": false
           }
         },
         "comments": {
