@@ -168,6 +168,71 @@
         "rounded": false
       }
     },
+    "rich_text_QPQyyd": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_48pGJJ": {
+          "type": "heading",
+          "settings": {
+            "heading": "FAQ",
+            "heading_size": "title-lg tracking-heading",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_hVhkt7": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Find answers to the most common questions about our products, services, and policies</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_48pGJJ",
+        "text_hVhkt7"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "#f4f4f4",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 20,
+        "padding_bottom": 20,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
     "faq_zendesk_iW4B8T": {
       "type": "faq-zendesk",
       "name": "Zendesk FAQ Section",
@@ -178,6 +243,7 @@
     "main",
     "rich-text",
     "multicolumn_with_icons_igCrVg",
+    "rich_text_QPQyyd",
     "faq_zendesk_iW4B8T"
   ]
 }
