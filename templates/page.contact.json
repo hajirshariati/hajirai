@@ -30,7 +30,7 @@
         "heading": {
           "type": "heading",
           "settings": {
-            "heading": "Contact Us",
+            "heading": "Order & Support Hub",
             "heading_size": "title-lg tracking-heading",
             "heading_tag": "h2",
             "highlighted_text": "none",
@@ -58,8 +58,8 @@
         "text"
       ],
       "settings": {
-        "text_alignment": "left",
-        "text_alignment_mobile": "left",
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
         "heading": "",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
