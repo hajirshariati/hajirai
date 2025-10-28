@@ -13,54 +13,82 @@ document.addEventListener('DOMContentLoaded', function() {
   const container = document.getElementById('faq-list');
   container.innerHTML = '<p>Loading FAQs…</p>';
 
+  let allArticles = [];
+  let displayedCount = 0;
+  const articlesPerLoad = 10; // Show 10 at a time
+
   // Step 1: fetch list of articles
   fetch('https://support.aetrex.com/api/v2/help_center/en-us/articles.json?per_page=50')
     .then(res => res.json())
     .then(data => {
+      allArticles = data.articles;
       container.innerHTML = ''; // clear loading text
-
-      // Step 2: fetch each article's full content
-      data.articles.forEach(article => {
-        fetch(`https://support.aetrex.com/api/v2/help_center/articles/${article.id}.json`)
-          .then(res => res.json())
-          .then(articleData => {
-            // Get the body content
-            const body = articleData.article?.body || 
-                        articleData.article?.body_html || 
-                        'Content not available';
-            
-            // Create elements properly to preserve HTML
-            const articleEl = document.createElement('div');
-            articleEl.className = 'faq-article';
-            
-            const btn = document.createElement('button');
-            btn.className = 'faq-question';
-            btn.textContent = article.title; // Use textContent for title (safe)
-            
-            const ans = document.createElement('div');
-            ans.className = 'faq-answer';
-            ans.innerHTML = body; // Use innerHTML for body (contains HTML)
-            ans.style.display = 'none'; // Start collapsed
-            
-            // Append elements
-            articleEl.appendChild(btn);
-            articleEl.appendChild(ans);
-            container.appendChild(articleEl);
-
-            // Collapsible toggle
-            btn.addEventListener('click', () => {
-              ans.style.display = (ans.style.display === 'block') ? 'none' : 'block';
-            });
-          })
-          .catch(err => {
-            console.error('Error fetching article:', article.id, err);
-          });
-      });
+      
+      // Load first batch
+      loadMoreArticles();
     })
     .catch(err => {
       console.error('Error fetching articles list:', err);
       container.innerHTML = '<p>Unable to load FAQs at this time.</p>';
     });
+
+  function loadMoreArticles() {
+    const articlesToLoad = allArticles.slice(displayedCount, displayedCount + articlesPerLoad);
+    
+    // Remove existing "Load More" button if it exists
+    const existingBtn = document.getElementById('load-more-btn');
+    if (existingBtn) existingBtn.remove();
+
+    // Load each article's full content
+    articlesToLoad.forEach(article => {
+      fetch(`https://support.aetrex.com/api/v2/help_center/articles/${article.id}.json`)
+        .then(res => res.json())
+        .then(articleData => {
+          // Get the body content
+          const body = articleData.article?.body || 
+                      articleData.article?.body_html || 
+                      'Content not available';
+          
+          // Create elements properly to preserve HTML
+          const articleEl = document.createElement('div');
+          articleEl.className = 'faq-article';
+          
+          const btn = document.createElement('button');
+          btn.className = 'faq-question';
+          btn.textContent = article.title;
+          
+          const ans = document.createElement('div');
+          ans.className = 'faq-answer';
+          ans.innerHTML = body;
+          ans.style.display = 'none';
+          
+          // Append elements
+          articleEl.appendChild(btn);
+          articleEl.appendChild(ans);
+          container.appendChild(articleEl);
+
+          // Collapsible toggle
+          btn.addEventListener('click', () => {
+            ans.style.display = (ans.style.display === 'block') ? 'none' : 'block';
+          });
+        })
+        .catch(err => {
+          console.error('Error fetching article:', article.id, err);
+        });
+    });
+
+    displayedCount += articlesToLoad.length;
+
+    // Add "Load More" button if there are more articles
+    if (displayedCount < allArticles.length) {
+      const loadMoreBtn = document.createElement('button');
+      loadMoreBtn.id = 'load-more-btn';
+      loadMoreBtn.className = 'load-more-button';
+      loadMoreBtn.textContent = `Load More (${allArticles.length - displayedCount} remaining)`;
+      loadMoreBtn.addEventListener('click', loadMoreArticles);
+      container.appendChild(loadMoreBtn);
+    }
+  }
 });
 </script>
 
@@ -105,6 +133,22 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 .faq-answer a:hover {
   color: #0056b3;
+}
+/* Load More button */
+.load-more-button {
+  display: block;
+  margin: 2rem auto;
+  padding: 0.75rem 2rem;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.load-more-button:hover {
+  background: #0056b3;
 }
 </style>
 
