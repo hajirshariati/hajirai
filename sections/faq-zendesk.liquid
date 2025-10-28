@@ -1,5 +1,6 @@
 {% comment %}
   Shopify Custom Liquid Section: Zendesk FAQ Renderer
+  Pulls articles from Zendesk Help Center and displays full content.
 {% endcomment %}
 
 <div class="faq-section" id="faq-list">
@@ -12,31 +13,37 @@ document.addEventListener('DOMContentLoaded', function() {
   const container = document.getElementById('faq-list');
   container.innerHTML = '<p>Loading FAQs…</p>';
 
+  // Step 1: fetch list of articles
   fetch('https://support.aetrex.com/api/v2/help_center/en-us/articles.json?per_page=50')
-    .then(response => response.json())
+    .then(res => res.json())
     .then(data => {
       container.innerHTML = ''; // clear loading text
-      data.articles.forEach(article => {
-        const articleEl = document.createElement('div');
-        articleEl.className = 'faq-article';
-        articleEl.innerHTML = `
-          <button class="faq-question">${article.title}</button>
-          <div class="faq-answer">${article.body_html}</div>
-        `;
-        container.appendChild(articleEl);
-      });
 
-      // Add collapsible behavior
-      const buttons = container.querySelectorAll('.faq-question');
-      buttons.forEach(btn => {
-        btn.addEventListener('click', () => {
-          const answer = btn.nextElementSibling;
-          answer.style.display = (answer.style.display === 'block') ? 'none' : 'block';
-        });
+      // Step 2: fetch each article's full content
+      data.articles.forEach(article => {
+        fetch(`https://support.aetrex.com/api/v2/help_center/articles/${article.id}.json`)
+          .then(res => res.json())
+          .then(articleData => {
+            const articleEl = document.createElement('div');
+            articleEl.className = 'faq-article';
+            articleEl.innerHTML = `
+              <button class="faq-question">${article.title}</button>
+              <div class="faq-answer">${articleData.article.body_html}</div>
+            `;
+            container.appendChild(articleEl);
+
+            // Collapsible toggle
+            const btn = articleEl.querySelector('.faq-question');
+            const ans = articleEl.querySelector('.faq-answer');
+            btn.addEventListener('click', () => {
+              ans.style.display = (ans.style.display === 'block') ? 'none' : 'block';
+            });
+          })
+          .catch(err => console.error('Error fetching article:', err));
       });
     })
     .catch(err => {
-      console.error(err);
+      console.error('Error fetching articles list:', err);
       container.innerHTML = '<p>Unable to load FAQs at this time.</p>';
     });
 });
