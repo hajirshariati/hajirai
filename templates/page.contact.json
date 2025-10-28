@@ -99,7 +99,7 @@
             "heading": "<strong>Live Chat</strong>",
             "text": "<p>Mon - Fri: 8:30 AM - 12am ET<br/>Sat - Sun: 9am - 12am ET</p>",
             "highlighted_text": "none",
-            "custom_html": "<button class=\"bcontact\" onclick=\"zE.show()\">Click Here</button>",
+            "custom_html": "<a onclick=\"openWidget()\">Click Here</a>\n\n\n<script type=\"text/javascript\">\n  zE(\"webWidget\", \"hide\")\n\n  function openWidget() {\n    zE(\"webWidget\", \"show\")\n    zE(\"webWidget\", \"open\")\n     \n  }\n\n</script>",
             "us_only": false,
             "highlighted_scribble": "circle"
           }
