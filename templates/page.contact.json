@@ -123,7 +123,7 @@
             "icon": "none",
             "custom_icon": "",
             "heading": "",
-            "text": "<h6>Call Us</h6><p>1.888.526.2739</p><p>Mon - Fri: 8:30 AM - 12am ET<br/>Sat - Sun: 9am - 12am ET</p><p>......................................................................</p><h6>Help Center and FAQ</h6><p>Browse the Help Center</p>",
+            "text": "<h6>Call Us</h6><p>1.888.526.2739</p><p>Mon - Fri: 8:30 AM - 12am ET<br/>Sat - Sun: 9am - 12am ET</p><p>......................................................................</p><h6>Help Center and FAQ</h6><p>Browse the <br/>Help Center</p>",
             "highlighted_text": "none",
             "custom_html": "<a href=\"https://support.aetrex.com/hc/en-us\">Click Here</a>",
             "us_only": false,
