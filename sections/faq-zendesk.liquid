@@ -1,6 +1,5 @@
 {% comment %}
   Shopify Custom Liquid Section: Zendesk FAQ Renderer
-  This fetches articles via Zendesk Help Center API and displays them.
 {% endcomment %}
 
 <div class="faq-section" id="faq-list">
@@ -21,11 +20,19 @@
           const articleEl = document.createElement('div');
           articleEl.className = 'faq-article';
           articleEl.innerHTML = `
-            <h3>${article.title}</h3>
-            <div>${article.html_body}</div>
-            <hr/>
+            <button class="faq-question">${article.title}</button>
+            <div class="faq-answer">${article.html_body}</div>
           `;
           container.appendChild(articleEl);
+        });
+
+        // Add collapsible behavior
+        const buttons = container.querySelectorAll('.faq-question');
+        buttons.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const answer = btn.nextElementSibling;
+            answer.style.display = (answer.style.display === 'block') ? 'none' : 'block';
+          });
         });
       })
       .catch(err => {
@@ -37,10 +44,27 @@
 
 <style>
   .faq-section { max-width: 800px; margin: 2rem auto; font-family: sans-serif; }
-  .faq-article { margin-bottom: 2rem; }
-  .faq-article h3 { color: #2b2b2b; font-size: 1.25rem; margin-bottom: 0.5rem; }
-  .faq-article div { font-size: 1rem; line-height: 1.5; }
+  .faq-question { 
+    width: 100%; 
+    text-align: left; 
+    padding: 0.75rem 1rem; 
+    margin-bottom: 0.25rem; 
+    background: #f7f7f7; 
+    border: none; 
+    cursor: pointer; 
+    font-size: 1.1rem; 
+    transition: background 0.3s;
+  }
+  .faq-question:hover { background: #e0e0e0; }
+  .faq-answer { 
+    display: none; 
+    padding: 0.75rem 1rem; 
+    border-left: 3px solid #007bff; 
+    background: #fafafa; 
+    margin-bottom: 1rem; 
+  }
 </style>
+
 {% schema %}
 {
   "name": "Zendesk FAQ",
