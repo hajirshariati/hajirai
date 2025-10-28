@@ -459,22 +459,37 @@
         "rounded": false
       }
     },
+    "empty_space_kMezYD": {
+      "type": "empty-space",
+      "name": "t:sections.empty-space.name",
+      "settings": {
+        "desktop_height": 40,
+        "mobile_height": 28,
+        "color_background": "",
+        "gradient_background": ""
+      }
+    },
     "rich_text_qygTdt": {
       "type": "rich-text",
       "blocks": {
-        "heading_NfEViz": {
-          "type": "heading",
+        "text_ekcTtF": {
+          "type": "text",
           "settings": {
-            "heading": "What Other Plantar Fasciitis Sufferers Say",
-            "heading_size": "title-lg tracking-heading",
-            "heading_tag": "h2",
-            "highlighted_text": "text",
-            "highlighted_scribble": "circle"
+            "text": "<p>What Other Plantar Fasciitis Sufferers Say<br/></p>",
+            "text_font": "heading",
+            "text_size": "subtext-custom",
+            "text_max_size": 24,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "one"
           }
         }
       },
       "block_order": [
-        "heading_NfEViz"
+        "text_ekcTtF"
       ],
       "name": "t:sections.rich-text.name",
       "settings": {
@@ -515,7 +530,7 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6>\"These Saved My Life!  </h6><h6>These flip flops saved my summer! My plantar fasciitis was really bad and when I put these on I felt relief almost immediately. The discomfort continues to subside more and more each day, and is still improving, which I largely attribute to wearing these all day, every day. Plus, they felt very secure even when wet. Very thankful for these!\" </h6>",
+            "text": "<h6>These Saved My Life!  </h6><h6>These flip flops saved my summer! My plantar fasciitis was really bad and when I put these on I felt relief almost immediately. The discomfort continues to subside more and more each day, and is still improving, which I largely attribute to wearing these all day, every day. Plus, they felt very secure even when wet. Very thankful for these!\" </h6>",
             "author": "Lisa R",
             "author_info": "",
             "author_url": "",
@@ -528,7 +543,7 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6>\"My Favorite!<br/>These were the first shoe I ordered from Aetrex. I loved them immediately. I am now on my 3rd pair, including one for my daughter since she kept stealing mine! They are cushiony & supportive enough for a day at an amusement park plus the strap keeps them secure. Casual enough for everyday, but dressy enough for a night out means only packing one pair for trips.\" </h6>",
+            "text": "<h6>My Favorite!<br/>These were the first shoe I ordered from Aetrex. I loved them immediately. I am now on my 3rd pair, including one for my daughter since she kept stealing mine! They are cushiony & supportive enough for a day at an amusement park plus the strap keeps them secure. Casual enough for everyday, but dressy enough for a night out means only packing one pair for trips.\" </h6>",
             "author": "Holly J.",
             "author_info": "",
             "author_url": "",
@@ -541,7 +556,7 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6>\"Better Than My Bare Feet! </h6><h6>These sandals are perfect. They are very cushioned and supportive in all the right places. I can already feel the difference with my pronation issues when I wear these slides. I also love that they are cute and so easy to wear. I wear them out or just around the house. I couldn't recommend more!!!\" </h6>",
+            "text": "<h6>Better Than My Bare Feet! </h6><h6>These sandals are perfect. They are very cushioned and supportive in all the right places. I can already feel the difference with my pronation issues when I wear these slides. I also love that they are cute and so easy to wear. I wear them out or just around the house. I couldn't recommend more!!!\" </h6>",
             "author": "Kimberly S.",
             "author_info": "",
             "author_url": "",
@@ -669,6 +684,7 @@
     "images_with_text_iL8ht6",
     "empty_space_gyE8Nr",
     "featured_collection_dXtHeM",
+    "empty_space_kMezYD",
     "rich_text_qygTdt",
     "testimonials_byJFpb",
     "collection_list_fbMkYY"
