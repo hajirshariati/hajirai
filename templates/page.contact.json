@@ -235,7 +235,13 @@
     },
     "faq_zendesk_iW4B8T": {
       "type": "faq-zendesk",
+      "disabled": true,
       "name": "Zendesk FAQ Section",
+      "settings": {}
+    },
+    "main_zendesk_fR4GdA": {
+      "type": "main-zendesk",
+      "name": "Zendesk FAQ Category Section",
       "settings": {}
     }
   },
@@ -244,6 +250,7 @@
     "rich-text",
     "multicolumn_with_icons_igCrVg",
     "rich_text_QPQyyd",
-    "faq_zendesk_iW4B8T"
+    "faq_zendesk_iW4B8T",
+    "main_zendesk_fR4GdA"
   ]
 }
