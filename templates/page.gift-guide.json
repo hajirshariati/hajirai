@@ -58,7 +58,7 @@
       "settings": {
         "transparent_header": false,
         "image": "shopify://shop_images/desktop_wotext.jpg",
-        "image_height": "800px",
+        "image_height": "adapt",
         "content_width": "small",
         "content_position": "md:items-center md:justify-start",
         "text_alignment": "center",
