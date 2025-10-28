@@ -24,27 +24,30 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch(`https://support.aetrex.com/api/v2/help_center/articles/${article.id}.json`)
           .then(res => res.json())
           .then(articleData => {
-            // Debug: log the response to see the actual structure
-            console.log('Article data:', articleData);
-            
-            // Try different possible property paths
+            // Get the body content
             const body = articleData.article?.body || 
                         articleData.article?.body_html || 
-                        articleData.body || 
                         'Content not available';
             
+            // Create elements properly to preserve HTML
             const articleEl = document.createElement('div');
             articleEl.className = 'faq-article';
-            articleEl.innerHTML = `
-              <button class="faq-question">${article.title}</button>
-              <div class="faq-answer">${body}</div>
-            `;
+            
+            const btn = document.createElement('button');
+            btn.className = 'faq-question';
+            btn.textContent = article.title; // Use textContent for title (safe)
+            
+            const ans = document.createElement('div');
+            ans.className = 'faq-answer';
+            ans.innerHTML = body; // Use innerHTML for body (contains HTML)
+            ans.style.display = 'none'; // Start collapsed
+            
+            // Append elements
+            articleEl.appendChild(btn);
+            articleEl.appendChild(ans);
             container.appendChild(articleEl);
 
             // Collapsible toggle
-            const btn = articleEl.querySelector('.faq-question');
-            const ans = articleEl.querySelector('.faq-answer');
-            ans.style.display = 'none'; // Start collapsed
             btn.addEventListener('click', () => {
               ans.style.display = (ans.style.display === 'block') ? 'none' : 'block';
             });
@@ -94,6 +97,14 @@ document.addEventListener('DOMContentLoaded', function() {
   border-left: 3px solid #007bff; 
   background: #fafafa; 
   margin-bottom: 1rem; 
+}
+/* Style links in answers */
+.faq-answer a {
+  color: #007bff;
+  text-decoration: underline;
+}
+.faq-answer a:hover {
+  color: #0056b3;
 }
 </style>
 
