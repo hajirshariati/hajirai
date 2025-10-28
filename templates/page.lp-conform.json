@@ -541,7 +541,7 @@
         "text_4kmETN": {
           "type": "text",
           "settings": {
-            "text": "<p><strong>PERIPHERAL SENSORY NEUROPATHY</strong>• Nerve damage in the feet<br/><br/><strong>PERIPHERAL VASCULAR DISEASE & PERIPHERAL ARTERIAL DISEASE</strong>• Plaque build-up in the arteries reducing blood flow and the ability to heal<br/><br/><strong>CHARCOT FOOT</strong>• Structural damage caused by a lack of sensation and bone weakness. The arches are lost, and the foot may become boat shaped.<br/><br/><strong>DIABETIC FOOT ULCER</strong>• A sore developed when damaged skin goes unnoticed due to loss of sensation<br/></p>",
+            "text": "<p><strong>PERIPHERAL SENSORY NEUROPATHY: </strong>Nerve damage in the feet<br/><br/><strong>PERIPHERAL VASCULAR DISEASE & PERIPHERAL ARTERIAL DISEASE:</strong> Plaque build-up in the arteries reducing blood flow and the ability to heal<br/><br/><strong>CHARCOT FOOT:</strong> Structural damage caused by a lack of sensation and bone weakness. The arches are lost, and the foot may become boat shaped.<br/><br/><strong>DIABETIC FOOT ULCER:</strong> A sore developed when damaged skin goes unnoticed due to loss of sensation<br/></p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
