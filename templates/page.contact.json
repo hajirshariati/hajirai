@@ -109,8 +109,8 @@
           "settings": {
             "icon": "none",
             "custom_icon": "",
-            "heading": "<strong>Email</strong>",
-            "text": "<p><a href=\"mailto:help@aetrex.com\">help@aetrex.com</a></p><p>Someone from our team will get back to you soon</p><p></p><h6>Live Chat</h6><p>Mon - Fri: 8:30 AM - 12am ET<br/>Sat - Sun: 9am - 12am ET</p>",
+            "heading": "",
+            "text": "<h6>Email</h6><p><a href=\"mailto:help@aetrex.com\">help@aetrex.com</a></p><p>Someone from our team will get back to you soon</p><p></p><h6>Live Chat</h6><p>Mon - Fri: 8:30 AM - 12am ET<br/>Sat - Sun: 9am - 12am ET</p>",
             "highlighted_text": "none",
             "custom_html": "<a onclick=\"openWidget()\">Click Here</a>\n\n\n<script type=\"text/javascript\">\n  zE(\"webWidget\", \"hide\")\n\n  function openWidget() {\n    zE(\"webWidget\", \"show\")\n    zE(\"webWidget\", \"open\")\n     \n  }\n\n</script>",
             "us_only": false,
@@ -122,8 +122,8 @@
           "settings": {
             "icon": "none",
             "custom_icon": "",
-            "heading": "<a href=\"tel:+18885262739\"><strong>Call</strong></a>",
-            "text": "<p>1.888.526.2739</p><p>Mon - Fri: 8:30 AM - 12am ET<br/>Sat - Sun: 9am - 12am ET</p><p></p><h6>Help Center and FAQ</h6><p>Browse the Help Center</p>",
+            "heading": "",
+            "text": "<h6>Call</h6><p>1.888.526.2739</p><p>Mon - Fri: 8:30 AM - 12am ET<br/>Sat - Sun: 9am - 12am ET</p><p></p><h6>Help Center and FAQ</h6><p>Browse the Help Center</p>",
             "highlighted_text": "none",
             "custom_html": "<a href=\"https://support.aetrex.com/hc/en-us\">Click Here</a>",
             "us_only": false,
