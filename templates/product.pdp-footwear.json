@@ -35,8 +35,8 @@
             "show_rating": false
           }
         },
-        "yotpo_product_reviews_reviews_XchWr6": {
-          "type": "shopify://apps/yotpo-product-reviews/blocks/reviews/eb7dfd7d-db44-4334-bc49-c893b51b36cf",
+        "yotpo_product_reviews_star_rating_NHcRBy": {
+          "type": "shopify://apps/yotpo-product-reviews/blocks/star-rating/eb7dfd7d-db44-4334-bc49-c893b51b36cf",
           "settings": {
             "product": "{{product}}"
           }
@@ -175,7 +175,7 @@
         "breadcrumb_UzHCRY",
         "title",
         "price_TirYdK",
-        "yotpo_product_reviews_reviews_XchWr6",
+        "yotpo_product_reviews_star_rating_NHcRBy",
         "variant_picker",
         "true_fit_widget_8cjNbr",
         "buy_buttons",
