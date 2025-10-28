@@ -63,7 +63,7 @@
           "type": "share",
           "settings": {
             "share_label": "Share",
-            "show_comments": true
+            "show_comments": false
           }
         },
         "next_previous_posts": {
