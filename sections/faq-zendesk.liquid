@@ -3,9 +3,11 @@
   Pulls articles from Zendesk Help Center and displays full content.
 {% endcomment %}
 
-<div class="faq-section" id="faq-list">
-  <h2>Frequently Asked Questions</h2>
-  <p>Loading FAQs…</p>
+<div class="faq-section-wrapper">
+  <div class="faq-section" id="faq-list">
+    <h2>Frequently Asked Questions</h2>
+    <p>Loading FAQs…</p>
+  </div>
 </div>
 
 <script>
@@ -114,11 +116,18 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <style>
+/* Full-width wrapper with gray background */
+.faq-section-wrapper {
+  background: #f4f4f4;
+  width: 100%;
+  padding: 2rem 0;
+}
+
+/* Centered content container */
 .faq-section { 
   max-width: 800px; 
-  margin: 2rem auto; 
-  padding: 2rem;
-  background: #f4f4f4;
+  margin: 0 auto; 
+  padding: 0 2rem;
   font-family: sans-serif; 
 }
 .faq-section h2 { 
