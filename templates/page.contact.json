@@ -110,7 +110,7 @@
             "icon": "none",
             "custom_icon": "",
             "heading": "",
-            "text": "<h6>Email Us</h6><p><a href=\"mailto:help@aetrex.com\">help@aetrex.com</a></p><p>Someone from our team will get back to you soon</p><p>......................................................................</p><h6>Live Chat</h6><p>Mon - Fri: 8:30 AM - 12am ET<br/>Sat - Sun: 9am - 12am ET</p>",
+            "text": "<h6>Email Us</h6><p><a href=\"mailto:help@aetrex.com\">help@aetrex.com</a></p><p>Someone from our team <br/>will get back to you soon</p><p>......................................................................</p><h6>Live Chat</h6><p>Mon - Fri: 8:30 AM - 12am ET<br/>Sat - Sun: 9am - 12am ET</p>",
             "highlighted_text": "none",
             "custom_html": "<a onclick=\"openWidget()\">Click Here</a>\n\n\n<script type=\"text/javascript\">\n  zE(\"webWidget\", \"hide\")\n\n  function openWidget() {\n    zE(\"webWidget\", \"show\")\n    zE(\"webWidget\", \"open\")\n     \n  }\n\n</script>",
             "us_only": false,
