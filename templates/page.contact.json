@@ -120,7 +120,7 @@
             "image_ratio": "adapt",
             "heading": "<strong>Email Center</strong>",
             "heading_size": "text-lg-2xl",
-            "text": "<h6></h6><p><a href=\"mailto:help@aetrex.com\">help@aetrex.com</a></p><p>Someone from our team <br/>will get back to you soon</p><p>-</p><h6>Preferences Center</h6><p>Personalize your <br/>Aetrex experience</p>",
+            "text": "<h6></h6><p><a href=\"mailto:help@aetrex.com\">help@aetrex.com</a></p><p>Someone from our team <br/>will get back to you soon</p><p>-</p><h6>Email Preferences Center</h6><p>Personalize your <br/>Aetrex experience</p>",
             "custom_html": "<a href=\"https://customer-preference.aetrex.com/p/user\">Click Here</a>",
             "button_label": "",
             "button_link": "",
