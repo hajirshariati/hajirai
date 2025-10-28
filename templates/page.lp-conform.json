@@ -812,7 +812,7 @@
           "settings": {
             "show_border": false,
             "text_alignment": "left",
-            "text_alignment_mobile": "center",
+            "text_alignment_mobile": "left",
             "image_ratio": "adapt",
             "heading": "DON'T",
             "heading_size": "text-lg-2xl",
@@ -838,7 +838,7 @@
         "columns": 2,
         "columns_mobile": "1",
         "carousel_on_desktop": false,
-        "swipe_on_mobile": false,
+        "swipe_on_mobile": true,
         "heading": "",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
