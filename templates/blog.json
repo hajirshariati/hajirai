@@ -223,24 +223,24 @@
     "main-blog": {
       "type": "main-blog",
       "settings": {
-        "heading_size": "title-md",
+        "heading_size": "title-sm",
         "heading_alignment": "text-center justify-center",
         "heading_tag": "h1",
         "subheading": "",
         "description": "",
         "show_tag_filter": true,
         "per_page": 9,
-        "layout": "collage",
+        "layout": "grid",
         "image_ratio": "landscape",
         "show_tags": true,
         "show_date": true,
-        "show_comments": true,
+        "show_comments": false,
         "show_author": false,
         "show_excerpt": true,
         "padding_top": 72,
         "padding_bottom": 120,
         "divider": false,
-        "full_width": false,
+        "full_width": true,
         "rounded": false
       }
     },
