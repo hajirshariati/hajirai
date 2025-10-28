@@ -191,6 +191,19 @@
                       </div>
                     {%- endif -%}
 
+                  {%- when 'social_icons' -%}
+                    <div class="social-icons-block" {{ block.shopify_attributes }}>
+                      {%- liquid
+                        if block.settings.show_social
+                          render 'social-icons', size: 'lg', gap: '7'
+                        endif
+
+                        if shop.features.follow_on_shop? and block.settings.enable_follow_on_shop
+                          echo shop | login_button: action: 'follow'
+                        endif
+                      -%}
+                    </div>
+
                   {%- when 'icon' -%}
                     {%- if block.settings.icon != 'none' or block.settings.icon_image != blank -%}
                       {%- capture icon_content -%}
@@ -1576,6 +1589,26 @@
           "id": "liquid",
           "label": "t:sections.custom-liquid.settings.liquid.label",
           "info": "t:sections.custom-liquid.settings.liquid.info"
+        }
+      ]
+    },
+    {
+      "type": "social_icons",
+      "name": "Social Icons",
+      "settings": [
+        {
+          "type": "checkbox",
+          "id": "show_social",
+          "label": "Show Social Media Icons",
+          "default": true,
+          "info": "Configure your social media links in Theme Settings"
+        },
+        {
+          "type": "checkbox",
+          "id": "enable_follow_on_shop",
+          "label": "Enable Follow on Shop",
+          "default": false,
+          "info": "Display a 'Follow on Shop' button if the feature is available"
         }
       ]
     },
