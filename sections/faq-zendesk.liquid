@@ -8,61 +8,74 @@
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const container = document.getElementById('faq-list');
-    container.innerHTML = '<p>Loading FAQs…</p>';
+document.addEventListener('DOMContentLoaded', function() {
+  const container = document.getElementById('faq-list');
+  container.innerHTML = '<p>Loading FAQs…</p>';
 
-    fetch('https://support.aetrex.com/api/v2/help_center/en-us/articles.json?per_page=10')
-      .then(response => response.json())
-      .then(data => {
-        container.innerHTML = ''; // clear loading text
-        data.articles.forEach(article => {
-          const articleEl = document.createElement('div');
-          articleEl.className = 'faq-article';
-          articleEl.innerHTML = `
-            <button class="faq-question">${article.title}</button>
-            <div class="faq-answer">${article.html_body}</div>
-          `;
-          container.appendChild(articleEl);
-        });
-
-        // Add collapsible behavior
-        const buttons = container.querySelectorAll('.faq-question');
-        buttons.forEach(btn => {
-          btn.addEventListener('click', () => {
-            const answer = btn.nextElementSibling;
-            answer.style.display = (answer.style.display === 'block') ? 'none' : 'block';
-          });
-        });
-      })
-      .catch(err => {
-        console.error(err);
-        container.innerHTML = '<p>Unable to load FAQs at this time.</p>';
+  fetch('https://support.aetrex.com/api/v2/help_center/en-us/articles.json?per_page=50')
+    .then(response => response.json())
+    .then(data => {
+      container.innerHTML = ''; // clear loading text
+      data.articles.forEach(article => {
+        const articleEl = document.createElement('div');
+        articleEl.className = 'faq-article';
+        articleEl.innerHTML = `
+          <button class="faq-question">${article.title}</button>
+          <div class="faq-answer">${article.body_html}</div>
+        `;
+        container.appendChild(articleEl);
       });
-  });
+
+      // Add collapsible behavior
+      const buttons = container.querySelectorAll('.faq-question');
+      buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const answer = btn.nextElementSibling;
+          answer.style.display = (answer.style.display === 'block') ? 'none' : 'block';
+        });
+      });
+    })
+    .catch(err => {
+      console.error(err);
+      container.innerHTML = '<p>Unable to load FAQs at this time.</p>';
+    });
+});
 </script>
 
 <style>
-  .faq-section { max-width: 800px; margin: 2rem auto; font-family: sans-serif; }
-  .faq-question { 
-    width: 100%; 
-    text-align: left; 
-    padding: 0.75rem 1rem; 
-    margin-bottom: 0.25rem; 
-    background: #f7f7f7; 
-    border: none; 
-    cursor: pointer; 
-    font-size: 1.1rem; 
-    transition: background 0.3s;
-  }
-  .faq-question:hover { background: #e0e0e0; }
-  .faq-answer { 
-    display: none; 
-    padding: 0.75rem 1rem; 
-    border-left: 3px solid #007bff; 
-    background: #fafafa; 
-    margin-bottom: 1rem; 
-  }
+.faq-section { 
+  max-width: 800px; 
+  margin: 2rem auto; 
+  font-family: sans-serif; 
+}
+.faq-section h2 { 
+  text-align: center; 
+  margin-bottom: 2rem; 
+}
+.faq-article { 
+  margin-bottom: 1rem; 
+}
+.faq-question { 
+  width: 100%; 
+  text-align: left; 
+  padding: 0.75rem 1rem; 
+  margin-bottom: 0.25rem; 
+  background: #f7f7f7; 
+  border: none; 
+  cursor: pointer; 
+  font-size: 1.1rem; 
+  transition: background 0.3s;
+}
+.faq-question:hover { 
+  background: #e0e0e0; 
+}
+.faq-answer { 
+  display: none; 
+  padding: 0.75rem 1rem; 
+  border-left: 3px solid #007bff; 
+  background: #fafafa; 
+  margin-bottom: 1rem; 
+}
 </style>
 
 {% schema %}
