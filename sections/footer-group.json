@@ -196,7 +196,7 @@
             "phone_icon": "shopify://shop_images/call-receive-svgrepo-com.svg",
             "phone": "1.888.526.2739",
             "contact_icon": "shopify://shop_images/mail-alt-3-svgrepo-com.svg",
-            "contact_text": "Contact Us",
+            "contact_text": "Support Hub",
             "contact_url": "shopify://pages/contact-us",
             "chat_icon": "shopify://shop_images/chat-round-dots-svgrepo-com.svg",
             "chat_text": "Live Chat",
@@ -289,7 +289,7 @@
         "text_9jRhMJ": {
           "type": "text",
           "settings": {
-            "text": "<p>Aetrex, Inc. is widely recognized as a global leader in foot scanning technology, orthotics and comfort and wellness footwear. The company’s state -of-the-art foot scanning devices, including Albert, Albert Pro and Albert 3DFit (2022 and 2023 CEES innovation Award Honorees) and Albert Pressure are engineered to accurately measure feet and determine foot type and pressure points.</p>",
+            "text": "<p>Aetrex, Inc. is widely recognized as a global leader in foot scanning technology, orthotics and comfort and wellness footwear. The company’s state -of-the-art foot scanning devices, including Albert, Albert Pro and Albert 3DFit (2022 and 2023 CES innovation Award Honorees) and Albert Pressure are engineered to accurately measure feet and determine foot type and pressure points.</p>",
             "text_font": "body",
             "text_size": "subtext-sm",
             "text_max_size": 32,

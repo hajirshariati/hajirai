@@ -30,10 +30,10 @@
         "heading": {
           "type": "heading",
           "settings": {
-            "heading": "Order & Support Hub",
-            "heading_size": "title-md",
+            "heading": "<em>Support</em> Hub",
+            "heading_size": "title-lg tracking-heading",
             "heading_tag": "h2",
-            "highlighted_text": "none",
+            "highlighted_text": "text",
             "highlighted_scribble": "circle"
           }
         },
@@ -76,7 +76,7 @@
         "color_text": "",
         "color_background": "#f4f4f4",
         "gradient_background": "",
-        "color_highlight": "",
+        "color_highlight": "#ff6b2b",
         "gradient_highlight": "",
         "color_button_text": "",
         "color_button_background": "",
