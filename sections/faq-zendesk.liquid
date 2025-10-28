@@ -24,22 +24,34 @@ document.addEventListener('DOMContentLoaded', function() {
         fetch(`https://support.aetrex.com/api/v2/help_center/articles/${article.id}.json`)
           .then(res => res.json())
           .then(articleData => {
+            // Debug: log the response to see the actual structure
+            console.log('Article data:', articleData);
+            
+            // Try different possible property paths
+            const body = articleData.article?.body || 
+                        articleData.article?.body_html || 
+                        articleData.body || 
+                        'Content not available';
+            
             const articleEl = document.createElement('div');
             articleEl.className = 'faq-article';
             articleEl.innerHTML = `
               <button class="faq-question">${article.title}</button>
-              <div class="faq-answer">${articleData.article.body_html}</div>
+              <div class="faq-answer">${body}</div>
             `;
             container.appendChild(articleEl);
 
             // Collapsible toggle
             const btn = articleEl.querySelector('.faq-question');
             const ans = articleEl.querySelector('.faq-answer');
+            ans.style.display = 'none'; // Start collapsed
             btn.addEventListener('click', () => {
               ans.style.display = (ans.style.display === 'block') ? 'none' : 'block';
             });
           })
-          .catch(err => console.error('Error fetching article:', err));
+          .catch(err => {
+            console.error('Error fetching article:', article.id, err);
+          });
       });
     })
     .catch(err => {
