@@ -1,0 +1,276 @@
+{% comment %}
+  Shopify Custom Liquid Section: Zendesk FAQ Renderer by Categories
+  Pulls categories from Zendesk Help Center and displays articles by category.
+{% endcomment %}
+
+<div class="faq-section-wrapper">
+  <div class="faq-section" id="faq-list">
+    <h2>Frequently Asked Questions</h2>
+    <p>Loading categories…</p>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const container = document.getElementById('faq-list');
+  container.innerHTML = '<p>Loading categories…</p>';
+
+  // Fetch categories
+  fetch('https://support.aetrex.com/api/v2/help_center/en-us/categories.json')
+    .then(res => res.json())
+    .then(data => {
+      container.innerHTML = ''; // clear loading text
+      
+      if (data.categories && data.categories.length > 0) {
+        data.categories.forEach(category => {
+          createCategorySection(category);
+        });
+      } else {
+        container.innerHTML = '<p>No categories found.</p>';
+      }
+    })
+    .catch(err => {
+      console.error('Error fetching categories:', err);
+      container.innerHTML = '<p>Unable to load categories at this time.</p>';
+    });
+
+  function createCategorySection(category) {
+    // Create category container
+    const categoryEl = document.createElement('div');
+    categoryEl.className = 'faq-category';
+    
+    // Create category header button
+    const categoryBtn = document.createElement('button');
+    categoryBtn.className = 'faq-category-button';
+    categoryBtn.innerHTML = `
+      <span class="category-title">${category.name}</span>
+      <span class="category-arrow">▼</span>
+    `;
+    
+    // Create articles container
+    const articlesContainer = document.createElement('div');
+    articlesContainer.className = 'faq-articles-container';
+    articlesContainer.style.display = 'none';
+    
+    categoryEl.appendChild(categoryBtn);
+    categoryEl.appendChild(articlesContainer);
+    container.appendChild(categoryEl);
+    
+    let articlesLoaded = false;
+    
+    // Toggle category and load articles on first click
+    categoryBtn.addEventListener('click', () => {
+      const isOpen = articlesContainer.style.display === 'block';
+      
+      if (isOpen) {
+        articlesContainer.style.display = 'none';
+        categoryBtn.classList.remove('active');
+      } else {
+        articlesContainer.style.display = 'block';
+        categoryBtn.classList.add('active');
+        
+        // Load articles only once
+        if (!articlesLoaded) {
+          articlesLoaded = true;
+          loadCategoryArticles(category.id, articlesContainer);
+        }
+      }
+    });
+  }
+  
+  function loadCategoryArticles(categoryId, articlesContainer) {
+    articlesContainer.innerHTML = '<p class="loading-articles">Loading articles…</p>';
+    
+    // Fetch articles for this category
+    fetch(`https://support.aetrex.com/api/v2/help_center/categories/${categoryId}/articles.json`)
+      .then(res => res.json())
+      .then(data => {
+        articlesContainer.innerHTML = '';
+        
+        if (data.articles && data.articles.length > 0) {
+          // Create array of promises to fetch full article content
+          const fetchPromises = data.articles.map((article, index) => {
+            return fetch(`https://support.aetrex.com/api/v2/help_center/articles/${article.id}.json`)
+              .then(res => res.json())
+              .then(articleData => {
+                const body = articleData.article?.body || 
+                            articleData.article?.body_html || 
+                            'Content not available';
+                
+                return {
+                  index: index,
+                  title: article.title,
+                  body: body
+                };
+              })
+              .catch(err => {
+                console.error('Error fetching article:', article.id, err);
+                return null;
+              });
+          });
+          
+          // Wait for all articles to load, then render them IN ORDER
+          Promise.all(fetchPromises).then((articlesData) => {
+            articlesData.sort((a, b) => {
+              if (!a) return 1;
+              if (!b) return -1;
+              return a.index - b.index;
+            });
+            
+            articlesData.forEach(articleData => {
+              if (!articleData) return;
+              
+              const articleEl = document.createElement('div');
+              articleEl.className = 'faq-article';
+              
+              const btn = document.createElement('button');
+              btn.className = 'faq-question';
+              btn.textContent = articleData.title;
+              
+              const ans = document.createElement('div');
+              ans.className = 'faq-answer';
+              ans.innerHTML = articleData.body;
+              ans.style.display = 'none';
+              
+              articleEl.appendChild(btn);
+              articleEl.appendChild(ans);
+              articlesContainer.appendChild(articleEl);
+              
+              // Collapsible toggle
+              btn.addEventListener('click', () => {
+                ans.style.display = (ans.style.display === 'block') ? 'none' : 'block';
+              });
+            });
+          });
+        } else {
+          articlesContainer.innerHTML = '<p class="no-articles">No articles in this category.</p>';
+        }
+      })
+      .catch(err => {
+        console.error('Error fetching articles for category:', categoryId, err);
+        articlesContainer.innerHTML = '<p class="error-articles">Unable to load articles.</p>';
+      });
+  }
+});
+</script>
+
+<style>
+/* Full-width wrapper with gray background */
+.faq-section-wrapper {
+  background: #f4f4f4;
+  width: 100%;
+  padding: 2rem 0;
+}
+
+/* Centered content container */
+.faq-section { 
+  max-width: 800px; 
+  margin: 0 auto; 
+  padding: 0 2rem;
+  font-family: sans-serif; 
+}
+.faq-section h2 { 
+  text-align: center; 
+  margin-bottom: 2rem; 
+}
+
+/* Category styling */
+.faq-category {
+  margin-bottom: 1.5rem;
+}
+
+.faq-category-button {
+  width: 100%;
+  text-align: left;
+  padding: 1rem 1.5rem;
+  background: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  font-weight: bold;
+  transition: background 0.3s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 4px;
+}
+
+.faq-category-button:hover {
+  background: #0056b3;
+}
+
+.faq-category-button.active {
+  background: #0056b3;
+}
+
+.faq-category-button.active .category-arrow {
+  transform: rotate(180deg);
+}
+
+.category-arrow {
+  font-size: 0.9rem;
+  transition: transform 0.3s;
+}
+
+.faq-articles-container {
+  padding: 1rem 0;
+}
+
+.loading-articles, .no-articles, .error-articles {
+  padding: 1rem;
+  text-align: center;
+  color: #666;
+}
+
+/* Article styling */
+.faq-article { 
+  margin-bottom: 0.75rem; 
+}
+.faq-question { 
+  width: 100%; 
+  text-align: left; 
+  padding: 0.75rem 1rem; 
+  margin-bottom: 0.25rem; 
+  background: #ffffff; 
+  border: none; 
+  cursor: pointer; 
+  font-size: 1rem;
+  transition: background 0.3s;
+  border-radius: 4px;
+}
+.faq-question:hover { 
+  background: #e0e0e0; 
+}
+.faq-answer { 
+  display: none; 
+  padding: 0.75rem 1rem; 
+  border-left: 3px solid #007bff; 
+  background: #ffffff; 
+  margin-bottom: 0.5rem;
+  border-radius: 0 4px 4px 0;
+}
+/* Style links in answers */
+.faq-answer a {
+  color: #007bff;
+  text-decoration: underline;
+}
+.faq-answer a:hover {
+  color: #0056b3;
+}
+</style>
+
+{% schema %}
+{
+  "name": "Zendesk FAQ by Category",
+  "tag": "section",
+  "settings": [],
+  "blocks": [],
+  "max_blocks": 1,
+  "presets": [
+    {
+      "name": "Zendesk FAQ Category Section"
+    }
+  ]
+}
+{% endschema %}
