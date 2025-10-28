@@ -11,6 +11,11 @@
 -%}
 
 <style>
+  @media screen and (max-width: 767px) {
+  #shopify-section-{{ section.id }} .banner__image {
+    object-position: top center;
+  }
+}
   #shopify-section-{{ section.id }} {
     --section-padding-top: {{ section.settings.padding_top }}px;
     --section-padding-bottom: {{ section.settings.padding_bottom }}px;

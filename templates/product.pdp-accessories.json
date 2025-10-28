@@ -45,10 +45,6 @@
             "size_chart": "size-chart"
           }
         },
-        "true_fit_widget_8cjNbr": {
-          "type": "shopify://apps/true-fit/blocks/widget/caa08c3b-c601-47cd-9c2a-32bb0567b191",
-          "settings": {}
-        },
         "buy_buttons": {
           "type": "buy_buttons",
           "settings": {
@@ -65,15 +61,6 @@
           "type": "liquid",
           "settings": {
             "liquid": "<br>"
-          }
-        },
-        "complementary": {
-          "type": "complementary",
-          "settings": {
-            "heading": "Pairs well with",
-            "product_limit": 4,
-            "show_vendor": false,
-            "show_price": false
           }
         },
         "icon_list_VBaw6z": {
@@ -139,10 +126,8 @@
         "title",
         "price_TirYdK",
         "variant_picker",
-        "true_fit_widget_8cjNbr",
         "buy_buttons",
         "liquid_Df3mAF",
-        "complementary",
         "icon_list_VBaw6z",
         "liquid_anxBGN",
         "sign_up_DcnXLa",

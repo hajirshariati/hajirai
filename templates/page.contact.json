@@ -14,6 +14,7 @@
       "disabled": true,
       "settings": {
         "heading_size": "title-xl",
+        "heading_alignment": "text-left",
         "heading_tag": "h1",
         "text_size": "text-lg md:text-2xl",
         "padding_top": 72,
@@ -30,7 +31,7 @@
           "type": "heading",
           "settings": {
             "heading": "Contact Us",
-            "heading_size": "title-xl tracking-heading",
+            "heading_size": "title-lg tracking-heading",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -39,10 +40,13 @@
         "text": {
           "type": "text",
           "settings": {
-            "text": "<p>We'd love to hear from you. Our team is here to help. <br/>Let your customers get in touch with you by filling out the email form below.</p>",
+            "text": "<p>Our world-class customer service team is eager to assist you.</p>",
             "text_font": "body",
             "text_size": "subtext-lg",
             "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -59,16 +63,18 @@
         "heading": "",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
         "heading_tag": "h2",
         "subheading": "",
         "description": "",
         "button_label": "",
         "button_link": "",
+        "button_external": false,
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "",
-        "color_background": "",
+        "color_background": "#f4f4f4",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
@@ -76,110 +82,89 @@
         "color_button_background": "",
         "color_button_gradient": "",
         "padding_top": 72,
-        "padding_bottom": 0,
+        "padding_bottom": 20,
         "divider": false,
         "narrow": false,
-        "rounded": false
+        "rounded": true
       }
     },
-    "empty-space": {
-      "type": "empty-space",
-      "settings": {
-        "desktop_height": 120,
-        "mobile_height": 44,
-        "color_background": "",
-        "gradient_background": ""
-      }
-    },
-    "contact-form": {
-      "type": "contact-form",
+    "multicolumn_with_icons_igCrVg": {
+      "type": "multicolumn-with-icons",
       "blocks": {
-        "contact-1": {
-          "type": "contact",
+        "column_WkPr3j": {
+          "type": "column",
           "settings": {
-            "heading": "Address",
-            "text": "<p><a href=\"#\" title=\"mailto:shop@yourstore.com\">shop@yourstore.com</a></p>"
+            "icon": "none",
+            "custom_icon": "",
+            "heading": "<strong>Order Center</strong>",
+            "text": "",
+            "highlighted_text": "none",
+            "custom_html": "<div id=\"as-root\"></div><script>(function(e,t,n){var r,i=e.getElementsByTagName(t)[0];if(e.getElementById(n))return;r=e.createElement(t);r.id=n;r.src=\"https://button.aftership.com/all.js?username=aetrexorders\";i.parentNode.insertBefore(r,i)})(document,\"script\",\"aftership-jssdk\")</script>\n\n<div class=\"as-track-button\" data-size=\"medium\" data-domain=\"orders.aetrex.com/\" data-look-up-option=\"both\" data-btn-label=\"Track\" data-center=\"true\"></div>\n<br>\nNeed to Return Something? <br><div style=\"margin-top:5px\">\n<a href=\"/apps/aftership-returns-center\">\nUS Customer</a>   /   <a href=\"https://web.global-e.com/Returns/Portal/mZnr\">Non-US Customer</a>\n</div>",
+            "us_only": false,
+            "highlighted_scribble": "circle"
           }
         },
-        "contact-2": {
-          "type": "contact",
+        "column_GXc8FK": {
+          "type": "column",
           "settings": {
-            "heading": "Email",
-            "text": "<p><a href=\"#\" title=\"mailto:contact@yourstore.com\">contact@yourstore.com</a><br/><a href=\"#\" title=\"mailto:sales@yourstore.com\">sales@yourstore.com</a></p>"
+            "icon": "none",
+            "custom_icon": "",
+            "heading": "<strong>Email Center</strong>",
+            "text": "<h6></h6><p><a href=\"mailto:help@aetrex.com\">help@aetrex.com</a></p><p>Someone from our team <br/>will get back to you soon</p><p>......................................................................</p><h6>Preferences Center</h6><p>Personalize your <br/>Aetrex experience</p>",
+            "highlighted_text": "none",
+            "custom_html": "<a href=\"https://customer-preference.aetrex.com/p/user\">Click Here</a>",
+            "us_only": false,
+            "highlighted_scribble": "circle"
           }
         },
-        "contact-3": {
-          "type": "contact",
+        "column_qfVYBh": {
+          "type": "column",
           "settings": {
-            "heading": "Phone",
-            "text": "<p><a href=\"#\" title=\"tel:+33 (0) 31-305-210\">+33 (0) 31-305-210<br/></a>mo – fri: 09:00 – 17:00</p>"
-          }
-        },
-        "media": {
-          "type": "media",
-          "settings": {
-            "heading": "Follow us"
-          }
-        },
-        "custom_field-1": {
-          "type": "custom_field",
-          "settings": {
-            "type": "text",
-            "title": "Phone number",
-            "required": false,
-            "full_width": false,
-            "checked_value": "Yes",
-            "unchecked_value": "No",
-            "radio_options": "",
-            "select_options": ""
-          }
-        },
-        "custom_field-2": {
-          "type": "custom_field",
-          "settings": {
-            "type": "select",
-            "title": "Subject",
-            "required": false,
-            "full_width": false,
-            "checked_value": "Yes",
-            "unchecked_value": "No",
-            "radio_options": "",
-            "select_options": "Product, Order, Press, Other"
+            "icon": "none",
+            "custom_icon": "",
+            "heading": "<strong>Live Support</strong>",
+            "text": "<h6></h6><p>Call <a href=\"tel:1.888.526.2739\" title=\"tel:1.888.526.2739\">1.888.526.2739</a></p><p>Mon - Fri: 8:30 AM - 12am ET<br/>Sat - Sun: 9am - 12am ET</p><p>......................................................................</p><h6>Chat</h6><p>Mon - Fri: 8:30 AM - 12am ET<br/>Sat - Sun: 9am - 12am ET</p>",
+            "highlighted_text": "none",
+            "custom_html": "<a onclick=\"openWidget()\">Click Here</a>\n\n\n<script type=\"text/javascript\">\n  zE(\"webWidget\", \"hide\")\n\n  function openWidget() {\n    zE(\"webWidget\", \"show\")\n    zE(\"webWidget\", \"open\")\n     \n  }\n\n</script>",
+            "us_only": false,
+            "highlighted_scribble": "circle"
           }
         }
       },
       "block_order": [
-        "contact-1",
-        "contact-2",
-        "contact-3",
-        "media",
-        "custom_field-1",
-        "custom_field-2"
+        "column_WkPr3j",
+        "column_GXc8FK",
+        "column_qfVYBh"
       ],
+      "name": "t:sections.multicolumn-with-icons.name",
       "settings": {
+        "style": "with-background",
+        "columns": 3,
+        "text_alignment": "center",
         "heading": "",
         "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
         "subheading": "",
         "description": "",
         "button_label": "",
         "button_link": "",
+        "button_external": false,
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "",
-        "color_background": "",
+        "color_background": "#f4f4f4",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 0,
-        "padding_bottom": 120,
+        "padding_top": 52,
+        "padding_bottom": 52,
         "divider": false,
-        "narrow": false,
+        "full_width": false,
         "rounded": false
       }
     }
@@ -187,7 +172,6 @@
   "order": [
     "main",
     "rich-text",
-    "empty-space",
-    "contact-form"
+    "multicolumn_with_icons_igCrVg"
   ]
 }

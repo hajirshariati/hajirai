@@ -256,7 +256,13 @@ body button.custom-loader-button, #custom-sticky-cart-btn {
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: unset;
 }
+
+#klaviyo-bis-button-container {
+    flex: 2!important;
+}
+
 .loading__spinner {
   position: absolute;
   z-index: 1;
@@ -800,6 +806,16 @@ variant-picker .main-pdp-variant-custom-badge.custom-final-sale,
 .product-form__buttons .buy-buttons a.btn--secondary:hover {
   color: #fff;
   background-color: #000;
+}
+
+/* Buy buttons 50/50 layout when 2 items, 100% when 1 item */
+.product-form__buttons .buy-buttons.grid {
+  grid-template-columns: 1fr 1fr !important;
+  gap: 0.5rem;
+}
+
+.product-form__buttons .buy-buttons.grid > *:first-child:last-child {
+  grid-column: 1 / -1;
 }
 
 .collection .collection__content .pagination .infinite-scroll {

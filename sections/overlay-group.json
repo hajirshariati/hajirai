@@ -14,7 +14,7 @@
     "cart-drawer": {
       "type": "cart-drawer",
       "settings": {
-        "show_vendor": true,
+        "show_vendor": false,
         "show_cart_note": false,
         "show_shipping_calculator": false,
         "add_discount_code": true,

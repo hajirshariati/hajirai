@@ -33,7 +33,7 @@
             "heading": "<p>Heel Pain</p>",
             "heading_size": "title-md",
             "heading_tag": "h2",
-            "highlighted_text": "none",
+            "highlighted_text": "text",
             "highlighted_scribble": "circle"
           }
         },
@@ -66,8 +66,8 @@
         "content_position": "md:items-center md:justify-start",
         "text_alignment": "left",
         "image_mobile": "shopify://shop_images/Group_14.png",
-        "image_height_mobile": "auto",
-        "content_position_mobile": "items-start justify-start",
+        "image_height_mobile": "100vh",
+        "content_position_mobile": "items-center justify-center",
         "text_alignment_mobile": "left",
         "color_text": "#171717",
         "color_highlight": "#171717",
@@ -527,9 +527,9 @@
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "orthotics-for-heel-spurs",
+            "collection": "womens-sandals",
             "custom_url": "",
-            "image": "shopify://shop_images/Rectangle_60_5_e14913d2-607f-409b-976e-d6b2001c5a44.png",
+            "image": "shopify://shop_images/Rectangle_60_9.png",
             "title": "",
             "description": "To Help Relieve Heel Spurs",
             "overlay_content": true,

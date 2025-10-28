@@ -1,0 +1,629 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "image_with_text_overlay_GwGiG6": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "heading_qd4JqH": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>WELCOME TO</p>",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "divider_Jywiag": {
+          "type": "divider",
+          "settings": {
+            "divider_width": 120,
+            "divider_mt": 10,
+            "divider_mb": 10
+          }
+        },
+        "text_rdLBTc": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The Albert Learning Center</p>",
+            "text_font": "heading",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "divider_JHhPq7": {
+          "type": "divider",
+          "settings": {
+            "divider_width": 120,
+            "divider_mt": 10,
+            "divider_mb": 10
+          }
+        },
+        "text_aaB4ct": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Welcome to the Albert Learning Center. Here you can learn everything you want to know about your feet and Aetrex Orthotics. <br/><br/> THE MOST POPULAR VIDEOS:</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_TJFxn6": {
+          "type": "button",
+          "settings": {
+            "button_label": "The Function of Feet",
+            "button_link": "https://vimeo.com/701245964",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_6WfLwV": {
+          "type": "button",
+          "settings": {
+            "button_label": "Plantar Fascia",
+            "button_link": "https://vimeo.com/701245804",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_qd4JqH",
+        "divider_Jywiag",
+        "text_rdLBTc",
+        "divider_JHhPq7",
+        "text_aaB4ct",
+        "button_TJFxn6",
+        "button_6WfLwV"
+      ],
+      "name": "t:sections.image-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/AlbertDeskImg_d5f60747-146d-4080-9386-8fb82eb26e40.jpg",
+        "image_height": "650px",
+        "content_width": "small",
+        "content_position": "md:items-center md:justify-end",
+        "text_alignment": "center",
+        "image_mobile": "shopify://shop_images/AlbertM.jpg",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
+        "color_text": "rgba(0,0,0,0)",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#ffffff",
+        "color_button_background": "rgba(0,0,0,0)",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": true,
+        "parallax_direction": "vertical"
+      }
+    },
+    "rich_text_YatqFt": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_R4KXmW": {
+          "type": "heading",
+          "settings": {
+            "heading": "FOOT SCANNING TECH",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_bmYqtd": {
+          "type": "text",
+          "settings": {
+            "text": "<h6>Aetrex Foot Scanners are the ultimate all-in-one foot scanners that are able to capture accurate data about your feet. In less than 20 seconds, an Aetrex Foot Scanner can identify your exact pressure points, arch depth, in-step height, and so much more. Learn about the benefits of Aetrex Foot Scanners and find a scanner near you to experience the Aetrex difference.</h6>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_HzEp4p": {
+          "type": "button",
+          "settings": {
+            "button_label": "Find a Scanner Location Near You: STORE LOCATOR",
+            "button_link": "shopify://pages/store-locator",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": true
+          }
+        }
+      },
+      "block_order": [
+        "heading_R4KXmW",
+        "text_bmYqtd",
+        "button_HzEp4p"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "#414141",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "main-blog": {
+      "type": "main-blog",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-md",
+        "heading_alignment": "text-center justify-center",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "show_tag_filter": true,
+        "per_page": 9,
+        "layout": "collage",
+        "image_ratio": "landscape",
+        "show_tags": true,
+        "show_date": true,
+        "show_comments": true,
+        "show_author": false,
+        "show_excerpt": true,
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "collection_list_bHMARW": {
+      "type": "collection-list",
+      "blocks": {
+        "collection_idyjze": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://cdn.shopify.com/s/files/1/0860/3634/9241/files/thumb_1_1a8d70aa-8208-4b34-a47a-8a58ae695699.jpg?v=1761239165",
+            "image": "shopify://shop_images/thumb_1_1a8d70aa-8208-4b34-a47a-8a58ae695699.jpg",
+            "title": "Benefits of an Aetrex Foot Scan",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_QrkgTX": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://cdn.shopify.com/s/files/1/0860/3634/9241/files/thumb_658f97dc-0825-40ae-8e39-2b0e5502bb8c.jpg?v=1761239192",
+            "image": "shopify://shop_images/thumb_658f97dc-0825-40ae-8e39-2b0e5502bb8c.jpg",
+            "title": "Benefits of an Aetrex Foot Scan: 3D Measurements",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_4CLMGb": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://cdn.shopify.com/s/files/1/0860/3634/9241/files/thumb_8311cfbe-996d-41d4-9d3e-2a5e36ee8f6f.jpg?v=1761239226",
+            "image": "shopify://shop_images/thumb_8311cfbe-996d-41d4-9d3e-2a5e36ee8f6f.jpg",
+            "title": "Benefits of an Aetrex Foot Scan: Identify Your Median Shoe Size",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_9XjJTq": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://cdn.shopify.com/s/files/1/0860/3634/9241/files/thumb_6a03eb89-93f3-494f-9b25-0b9d09503476.jpg?v=1761239257",
+            "image": "shopify://shop_images/thumb_6a03eb89-93f3-494f-9b25-0b9d09503476.jpg",
+            "title": "Benefits of an Aetrex Foot Scan: Orthotics",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_dpddUC": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://cdn.shopify.com/s/files/1/0860/3634/9241/files/thumb_9dc8253b-59f1-4382-930f-1f1e8d9a6c93.jpg?v=1761239286",
+            "image": "shopify://shop_images/thumb_9dc8253b-59f1-4382-930f-1f1e8d9a6c93.jpg",
+            "title": "Benefits of an Aetrex Foot Scan: Personalized Footwear",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_enNwGV": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://cdn.shopify.com/s/files/1/0860/3634/9241/files/thumb_e6d2a897-98e8-4fca-afb0-10247569e669.jpg?v=1761239315",
+            "image": "shopify://shop_images/thumb_e6d2a897-98e8-4fca-afb0-10247569e669.jpg",
+            "title": "Aetrex Foot Scanner: Advanced Technology",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_8qjJia": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://cdn.shopify.com/s/files/1/0860/3634/9241/files/thumb_96a39ee4-d045-4914-9b0f-00499f276837.jpg?v=1761239347",
+            "image": "shopify://shop_images/thumb_96a39ee4-d045-4914-9b0f-00499f276837.jpg",
+            "title": "Aetrex Foot Scanner: Measurement & Pressure Capabilities",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_RmzYLx": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://cdn.shopify.com/s/files/1/0860/3634/9241/files/thumb_0b1a60ba-2b4e-4f3d-824f-992eefb2deea.jpg?v=1761239381",
+            "image": "shopify://shop_images/thumb_0b1a60ba-2b4e-4f3d-824f-992eefb2deea.jpg",
+            "title": "Aetrex Foot Scan: FitHQ",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_f74mCc": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://cdn.shopify.com/s/files/1/0860/3634/9241/files/thumb_e0bd26fb-f901-4e9e-b2aa-f322e8f0a034.jpg?v=1761239549",
+            "image": "shopify://shop_images/thumb_e0bd26fb-f901-4e9e-b2aa-f322e8f0a034.jpg",
+            "title": "Aetrex Foot Scanner: Arch Types",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_yATKf3": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://cdn.shopify.com/s/files/1/0860/3634/9241/files/thumb_165c1b25-8e68-42be-9726-f0e04a94fba5.jpg?v=1761239578",
+            "image": "shopify://shop_images/thumb_165c1b25-8e68-42be-9726-f0e04a94fba5.jpg",
+            "title": "Aetrex Foot Scanner: Girth Measurement",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_U6NLdH": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://cdn.shopify.com/s/files/1/0860/3634/9241/files/thumb_e0408ce3-4779-46da-894e-02cf288b739f.jpg?v=1761239607",
+            "image": "shopify://shop_images/thumb_e0408ce3-4779-46da-894e-02cf288b739f.jpg",
+            "title": "Aetrex Foot Scanner: Orthotic Configurations",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_84VnHq": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://cdn.shopify.com/s/files/1/0860/3634/9241/files/thumb_ad782248-b63c-4e16-bf7b-ea3d494e3fce.jpg?v=1761239636",
+            "image": "shopify://shop_images/thumb_ad782248-b63c-4e16-bf7b-ea3d494e3fce.jpg",
+            "title": "Aetrex Foot Scanner: Instep Measurement",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_HGVN6q": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://cdn.shopify.com/s/files/1/0860/3634/9241/files/thumb_857f97ef-cdfb-4391-a568-ab67755c45d8.jpg?v=1761239666",
+            "image": "shopify://shop_images/thumb_857f97ef-cdfb-4391-a568-ab67755c45d8.jpg",
+            "title": "How To Prepare For a Foot Scan",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_QXebyc": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://cdn.shopify.com/s/files/1/0860/3634/9241/files/thumb_dc134e7f-116b-4321-9f9b-f65bf5bd5e4d.jpg?v=1761239695",
+            "image": "shopify://shop_images/thumb_dc134e7f-116b-4321-9f9b-f65bf5bd5e4d.jpg",
+            "title": "Can an Aetrex Foot Scanner Measure Foot Length?",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        }
+      },
+      "block_order": [
+        "collection_idyjze",
+        "collection_QrkgTX",
+        "collection_4CLMGb",
+        "collection_9XjJTq",
+        "collection_dpddUC",
+        "collection_enNwGV",
+        "collection_8qjJia",
+        "collection_RmzYLx",
+        "collection_f74mCc",
+        "collection_yATKf3",
+        "collection_U6NLdH",
+        "collection_84VnHq",
+        "collection_HGVN6q",
+        "collection_QXebyc"
+      ],
+      "name": "t:sections.collection-list.name",
+      "settings": {
+        "columns": 4,
+        "carousel_on_desktop": false,
+        "image_type": "collection",
+        "image_ratio": "adapt",
+        "show_products_count": false,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": false,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false
+      }
+    },
+    "collection_list_dcmHEb": {
+      "type": "collection-list",
+      "blocks": {
+        "collection_iTGqGX": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://www.aetrex.com/pages/albert-learning-center-foot-conditions",
+            "image": "shopify://shop_images/thumb_5a0e05b6-05a7-4149-87ff-aaa0c410210a.jpg",
+            "title": "FOOT CONDITIONS",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_BAjN8D": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://www.aetrex.com/pages/albert-learning-center-aetrex-orthotics",
+            "image": "shopify://shop_images/thumb_6333cd89-1c4f-45a0-be30-43f0499a9fa4.jpg",
+            "title": "AETREX ORTHOTICS",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_N6yiF3": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://www.aetrex.com/pages/albert-learning-center-learn-about-feet",
+            "image": "shopify://shop_images/thumb_8aa50e43-dd81-4264-90e5-9bef635a8609.jpg",
+            "title": "LEARN ABOUT FEET",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        }
+      },
+      "block_order": [
+        "collection_iTGqGX",
+        "collection_BAjN8D",
+        "collection_N6yiF3"
+      ],
+      "name": "t:sections.collection-list.name",
+      "settings": {
+        "columns": 3,
+        "carousel_on_desktop": false,
+        "image_type": "collection",
+        "image_ratio": "adapt",
+        "show_products_count": false,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "See more topics",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "text",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    }
+  },
+  "order": [
+    "image_with_text_overlay_GwGiG6",
+    "rich_text_YatqFt",
+    "main-blog",
+    "collection_list_bHMARW",
+    "collection_list_dcmHEb"
+  ]
+}

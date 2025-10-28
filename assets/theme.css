@@ -17702,7 +17702,7 @@ body .rte .contact-box a {
 
 a[href="#"] {
   cursor: default;        /* don't show pointer hand */
-  pointer-events: none;   /* disable clicking entirely */
+  ointer-events: none;   /* disable clicking entirely */
   text-decoration: none;  /* remove underline */
   color: inherit;         /* keep normal text color */
 }
@@ -17745,3 +17745,7 @@ a[href="#"] {
            letter-spacing: 0px !important;
        }
    }
+
+
+   .tfc-fitrec-product { padding-top: 1em;}
+   

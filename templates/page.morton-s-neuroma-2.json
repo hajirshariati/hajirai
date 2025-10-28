@@ -33,7 +33,7 @@
             "heading": "<p>Morton’s Neuroma</p>",
             "heading_size": "title-md",
             "heading_tag": "h2",
-            "highlighted_text": "none",
+            "highlighted_text": "text",
             "highlighted_scribble": "circle"
           }
         },
@@ -66,8 +66,8 @@
         "content_position": "md:items-center md:justify-start",
         "text_alignment": "left",
         "image_mobile": "shopify://shop_images/Group_13_1_3f082577-5bd1-47ef-8cfc-53df3ea51c0c.png",
-        "image_height_mobile": "auto",
-        "content_position_mobile": "items-start justify-start",
+        "image_height_mobile": "100vh",
+        "content_position_mobile": "items-center justify-center",
         "text_alignment_mobile": "left",
         "color_text": "#171717",
         "color_highlight": "#171717",
@@ -527,7 +527,7 @@
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "mortons-neuroma",
+            "collection": "womens-sandals",
             "custom_url": "",
             "image": "shopify://shop_images/Rectangle_60_4_8fba1eeb-4515-403b-b70d-520de17a5324.png",
             "title": "",

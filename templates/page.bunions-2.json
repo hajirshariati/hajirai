@@ -33,14 +33,14 @@
             "heading": "<p>Bunions</p>",
             "heading_size": "title-md",
             "heading_tag": "h2",
-            "highlighted_text": "none",
+            "highlighted_text": "text",
             "highlighted_scribble": "circle"
           }
         },
         "text_LHGLnM": {
           "type": "text",
           "settings": {
-            "text": "<p>Bunions, referred to in the medical community as Hallux Valgus, are one of the most common forefoot problems. A bunion is a prominent bump on the inside of the foot around the big toe joint. This bump is actually a bone protruding towards the inside of the foot. With the continued movement of the big toe towards the smaller toes, it is common to find the big toe resting under or over the second toe. This causes a common forefoot condition called overlapping toes. Some of the symptoms of bunions include inflammation, swelling, and soreness on the side surface of the big toe. The discomfort commonly causes a patient to walk improperly.</p><p>Another type of bunion which some individuals experience is called a Tailor’s Bunion, also known as a Bunionette. This forms on the outside of the foot towards the joint at the 5th toe. It is a smaller bump that forms due to the 5th toe moving inwards, towards the big toe.</p>",
+            "text": "<p>Bunions, referred to in the medical community as Hallux Valgus, are one of the most common forefoot problems. A bunion is a prominent bump on the inside of the foot around the big toe joint. This bump is actually a bone protruding towards the inside of the foot. With the continued movement of the big toe towards the smaller toes, it is common to find the big toe resting under or over the second toe. This causes a common forefoot condition called overlapping toes. Some of the symptoms of bunions include inflammation, swelling, and soreness on the side surface of the big toe. The discomfort commonly causes a patient to walk improperly.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -67,7 +67,7 @@
         "text_alignment": "left",
         "image_mobile": "shopify://shop_images/Group_8_a872f6a0-f2ec-48c9-b9d4-2da3568f1adb.png",
         "image_height_mobile": "100vh",
-        "content_position_mobile": "items-end justify-end",
+        "content_position_mobile": "items-center justify-center",
         "text_alignment_mobile": "left",
         "color_text": "#171717",
         "color_highlight": "#171717",
@@ -527,7 +527,7 @@
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "bunions-1",
+            "collection": "womens-footwear-for-bunions",
             "custom_url": "",
             "image": "shopify://shop_images/Rectangle_60_1.png",
             "title": "",

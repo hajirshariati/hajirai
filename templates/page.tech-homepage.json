@@ -1479,7 +1479,7 @@
             "title": "Premier Technology Innovation Awards",
             "number": "4",
             "cta_text": "VIEW AWARDS",
-            "cta_url": "#",
+            "cta_url": "shopify://pages/tech-innovation-awards",
             "unit": "",
             "duration": 5,
             "color_number": "#0b61cd"

@@ -24,10 +24,10 @@
         "rounded": false
       }
     },
-    "video_with_text_overlay_TgKph8": {
-      "type": "video-with-text-overlay",
+    "image_with_text_overlay_TLcLxB": {
+      "type": "image-with-text-overlay",
       "blocks": {
-        "heading_64L34p": {
+        "heading_KL4LzM": {
           "type": "heading",
           "settings": {
             "heading": "<p>Give the Gift of Comfort & Support</p>",
@@ -37,11 +37,11 @@
             "highlighted_scribble": "circle"
           }
         },
-        "button_AGih6p": {
+        "button_kt78ND": {
           "type": "button",
           "settings": {
             "button_label": "Shop All Gifts",
-            "button_link": "shopify://collections/all-products",
+            "button_link": "",
             "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
@@ -51,25 +51,22 @@
         }
       },
       "block_order": [
-        "heading_64L34p",
-        "button_AGih6p"
+        "heading_KL4LzM",
+        "button_kt78ND"
       ],
-      "name": "t:sections.video-with-text-overlay.name",
+      "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
-        "video_url": "",
-        "description": "",
-        "enable_video_autoplay": true,
-        "enable_video_looping": true,
-        "image_height": "650px",
-        "content_width": "medium",
-        "content_position": "md:items-center md:justify-center",
+        "image": "shopify://shop_images/desktop_wotext.jpg",
+        "image_height": "800px",
+        "content_width": "small",
+        "content_position": "md:items-center md:justify-start",
         "text_alignment": "center",
-        "video_url_mobile": "",
+        "image_mobile": "shopify://shop_images/mobile_wotext.jpg",
         "image_height_mobile": "auto",
-        "content_position_mobile": "items-center justify-center",
+        "content_position_mobile": "items-end justify-center",
         "text_alignment_mobile": "center",
-        "color_text": "#171717",
+        "color_text": "#ffffff",
         "color_highlight": "#e0a580",
         "gradient_highlight": "",
         "color_button_text": "#171717",
@@ -82,7 +79,9 @@
         "padding_bottom": 0,
         "divider": false,
         "full_width": true,
-        "rounded": true
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
       }
     },
     "multicolumn_with_icons_C37PFY": {
@@ -633,7 +632,7 @@
             "heading": "Shop Women's Gifts",
             "link": "shopify://products/addie-black-nc500w",
             "invert_subheading_heading": false,
-            "image": "shopify://shop_images/617x640_signature_arch.png",
+            "image": "shopify://shop_images/women_900f5d8b-0f89-4f21-affd-cfa3e6c32a70.jpg",
             "image_ratio": "adapt",
             "content_position": "md:items-end md:justify-center",
             "text_alignment": "center",
@@ -645,7 +644,7 @@
             "color_text": "#171717",
             "color_highlight": "",
             "gradient_highlight": "",
-            "color_overlay": "#171717",
+            "color_overlay": "#ffffff",
             "overlay_opacity": 0
           }
         },
@@ -656,7 +655,7 @@
             "heading": "Shop Men's Gifts",
             "link": "",
             "invert_subheading_heading": false,
-            "image": "shopify://shop_images/617x640_alignment.png",
+            "image": "shopify://shop_images/men_0514e55c-4738-469c-a5a4-14fb4fca092e.jpg",
             "image_ratio": "adapt",
             "content_position": "md:items-end md:justify-center",
             "text_alignment": "center",
@@ -668,7 +667,7 @@
             "color_text": "#171717",
             "color_highlight": "",
             "gradient_highlight": "",
-            "color_overlay": "#171717",
+            "color_overlay": "#ffffff",
             "overlay_opacity": 0
           }
         }
@@ -691,7 +690,7 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "color_text": "",
+        "color_text": "#171717",
         "color_background": "",
         "gradient_background": "",
         "color_highlight": "",
@@ -943,7 +942,7 @@
   },
   "order": [
     "main-page",
-    "video_with_text_overlay_TgKph8",
+    "image_with_text_overlay_TLcLxB",
     "multicolumn_with_icons_C37PFY",
     "logo_list_EzFUUx",
     "featured_collections_9d3ge7",
