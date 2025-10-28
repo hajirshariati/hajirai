@@ -88,79 +88,73 @@
         "rounded": true
       }
     },
-    "multicolumn_yaFcUm": {
-      "type": "multicolumn",
+    "multicolumn_with_icons_igCrVg": {
+      "type": "multicolumn-with-icons",
       "blocks": {
-        "column_XKzFfL": {
+        "column_UCYE9Q": {
           "type": "column",
           "settings": {
-            "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "left",
-            "image_ratio": "adapt",
-            "heading": "<a href=\"mailto:help@aetrex.com\">help@aetrex.com</a>",
-            "heading_size": "text-lg-2xl",
-            "text": "<p>Someone from our team will get back to you soon</p>",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "secondary",
-            "button_external": false,
-            "button_icon": true,
+            "icon": "none",
+            "custom_icon": "",
+            "heading": "<strong>Live Chat</strong>",
+            "text": "<p>Mon - Fri: 8:30 AM - 12am ET<br/>Sat - Sun: 9am - 12am ET</p>",
             "highlighted_text": "none",
+            "custom_html": "<button class=\"bcontact\" onclick=\"zE.show()\">Click Here</button>",
+            "us_only": false,
             "highlighted_scribble": "circle"
           }
         },
-        "column_EQpjQD": {
+        "column_GXc8FK": {
           "type": "column",
           "settings": {
-            "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "left",
-            "image_ratio": "adapt",
+            "icon": "none",
+            "custom_icon": "",
+            "heading": "Email Us",
+            "text": "<p><a href=\"mailto:help@aetrex.com\">help@aetrex.com</a></p><p>Someone from our team will get back to you soon</p>",
+            "highlighted_text": "none",
+            "custom_html": "",
+            "us_only": false,
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_qfVYBh": {
+          "type": "column",
+          "settings": {
+            "icon": "none",
+            "custom_icon": "",
             "heading": "<a href=\"tel:+18885262739\">Call Us</a>",
-            "heading_size": "text-lg-2xl",
             "text": "<p>1.888.526.2739</p><p>Mon - Fri: 8:30 AM - 12am ET<br/>Sat - Sun: 9am - 12am ET</p>",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "secondary",
-            "button_external": false,
-            "button_icon": true,
             "highlighted_text": "none",
+            "custom_html": "",
+            "us_only": false,
             "highlighted_scribble": "circle"
           }
         },
-        "column_7UAmAX": {
+        "column_PYd37K": {
           "type": "column",
           "settings": {
-            "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "left",
-            "image_ratio": "adapt",
+            "icon": "none",
+            "custom_icon": "",
             "heading": "<a href=\"https://support.aetrex.com/hc/en-us\">Help Center and FAQ</a>",
-            "heading_size": "text-lg-2xl",
             "text": "<p>Browse the Help Center</p>",
-            "button_label": "Click Here",
-            "button_link": "https://support.aetrex.com/hc/en-us",
-            "button_style": "link",
-            "button_external": false,
-            "button_icon": false,
             "highlighted_text": "none",
+            "custom_html": "<button href=\"https://support.aetrex.com/hc/en-us\">Click Here</button>",
+            "us_only": false,
             "highlighted_scribble": "circle"
           }
         }
       },
       "block_order": [
-        "column_XKzFfL",
-        "column_EQpjQD",
-        "column_7UAmAX"
+        "column_UCYE9Q",
+        "column_GXc8FK",
+        "column_qfVYBh",
+        "column_PYd37K"
       ],
-      "name": "t:sections.multicolumn.name",
+      "name": "t:sections.multicolumn-with-icons.name",
       "settings": {
-        "gap": "small",
-        "columns": 3,
-        "columns_mobile": "1",
-        "carousel_on_desktop": true,
-        "swipe_on_mobile": true,
+        "style": "with-border",
+        "columns": 4,
+        "text_alignment": "left",
         "heading": "",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
@@ -181,9 +175,9 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 40,
-        "padding_bottom": 40,
-        "divider": true,
+        "padding_top": 72,
+        "padding_bottom": 52,
+        "divider": false,
         "full_width": false,
         "rounded": false
       }
@@ -192,6 +186,6 @@
   "order": [
     "main",
     "rich-text",
-    "multicolumn_yaFcUm"
+    "multicolumn_with_icons_igCrVg"
   ]
 }
