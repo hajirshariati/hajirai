@@ -55,9 +55,9 @@
           "settings": {
             "button_label": "SHOP NOW",
             "button_link": "shopify://collections/conform",
-            "button_style": "primary",
-            "button_size": "md",
             "button_external": false,
+            "button_size": "md",
+            "button_style": "primary",
             "button_icon": false
           }
         }
@@ -81,6 +81,7 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
+        "narrow": false,
         "color_text": "",
         "color_background": "",
         "gradient_background": "",
@@ -92,7 +93,6 @@
         "padding_top": 24,
         "padding_bottom": 24,
         "divider": false,
-        "narrow": false,
         "rounded": false
       }
     },
@@ -134,6 +134,7 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
+        "narrow": false,
         "color_text": "#525252",
         "color_background": "",
         "gradient_background": "",
@@ -145,7 +146,6 @@
         "padding_top": 0,
         "padding_bottom": 0,
         "divider": false,
-        "narrow": false,
         "rounded": false
       }
     },
@@ -362,6 +362,7 @@
             "heading": "Ground Shipping",
             "heading_size": "text-lg-2xl",
             "text": "",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -382,6 +383,7 @@
             "heading": "Easy Returns",
             "heading_size": "text-lg-2xl",
             "text": "",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -402,6 +404,7 @@
             "heading": "30 Day Comfort Guarantee",
             "heading_size": "text-lg-2xl",
             "text": "",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -445,8 +448,8 @@
         "color_button_gradient": "",
         "padding_top": 12,
         "padding_bottom": 12,
-        "divider": false,
         "full_width": false,
+        "divider": false,
         "rounded": false
       }
     },
@@ -712,6 +715,7 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
+        "narrow": false,
         "color_text": "#ffffff",
         "color_background": "#ed975a",
         "gradient_background": "",
@@ -723,7 +727,6 @@
         "padding_top": 0,
         "padding_bottom": 0,
         "divider": false,
-        "narrow": false,
         "rounded": false
       }
     },
@@ -744,26 +747,10 @@
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
-        },
-        "text_Amg43z": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.2,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
         }
       },
       "block_order": [
-        "text_bzFbyY",
-        "text_Amg43z"
+        "text_bzFbyY"
       ],
       "name": "Rich text",
       "settings": {
@@ -782,6 +769,7 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
+        "narrow": false,
         "color_text": "#525252",
         "color_background": "",
         "gradient_background": "",
@@ -793,7 +781,6 @@
         "padding_top": 0,
         "padding_bottom": 0,
         "divider": false,
-        "narrow": false,
         "rounded": false
       }
     },
@@ -810,6 +797,7 @@
             "heading": "DO",
             "heading_size": "text-lg-2xl",
             "text": "<ul><li>Wash feet daily. Dry carefully</li><li>If your feet feel cold at night, wear socks</li><li>Inspect your feet daily for blisters, cuts, and scratches</li><li>Wear an orthotic designed to help reduce your risk factors</li><li>Wear shoes that are designed to protect your feet from injury</li><li>Inspect the insides of your shoes daily for foreign objects and rough areas</li><li>Avoid extreme temperatures. Test water with your hands or elbow before bathing</li><li>See your physician regularly and be sure to have your feet examined at each visit</li><li>Shoes should be fitted by a footcare specialist and be comfortable at the time of purchase</li></ul>",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -829,6 +817,7 @@
             "heading": "DON'T",
             "heading_size": "text-lg-2xl",
             "text": "<ul><li>Soak your feet in hot water</li><li>Walk barefoot</li><li>Wear sandals with thongs between the toes</li><li>Cut corns or calluses; see your physician</li><li>Wear shoes with pointed toe areas</li><li>Walk on hot surfaces such as sandy beaches or on the cement around swimming pools</li></ul>",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -872,8 +861,8 @@
         "color_button_gradient": "",
         "padding_top": 72,
         "padding_bottom": 72,
-        "divider": false,
         "full_width": false,
+        "divider": false,
         "rounded": false
       }
     },
@@ -915,6 +904,7 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
+        "narrow": true,
         "color_text": "#7f7e78",
         "color_background": "",
         "gradient_background": "",
@@ -926,7 +916,6 @@
         "padding_top": 24,
         "padding_bottom": 24,
         "divider": false,
-        "narrow": true,
         "rounded": false
       }
     },
