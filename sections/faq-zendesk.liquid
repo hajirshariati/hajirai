@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (existingBtn) existingBtn.remove();
 
     // Create an array of promises for all article fetches
-    const fetchPromises = articlesToLoad.map(article => {
+    const fetchPromises = articlesToLoad.map((article, index) => {
       return fetch(`https://support.aetrex.com/api/v2/help_center/articles/${article.id}.json`)
         .then(res => res.json())
         .then(articleData => {
@@ -49,36 +49,54 @@ document.addEventListener('DOMContentLoaded', function() {
                       articleData.article?.body_html || 
                       'Content not available';
           
-          // Create elements properly to preserve HTML
-          const articleEl = document.createElement('div');
-          articleEl.className = 'faq-article';
-          
-          const btn = document.createElement('button');
-          btn.className = 'faq-question';
-          btn.textContent = article.title;
-          
-          const ans = document.createElement('div');
-          ans.className = 'faq-answer';
-          ans.innerHTML = body;
-          ans.style.display = 'none';
-          
-          // Append elements
-          articleEl.appendChild(btn);
-          articleEl.appendChild(ans);
-          container.appendChild(articleEl);
-
-          // Collapsible toggle
-          btn.addEventListener('click', () => {
-            ans.style.display = (ans.style.display === 'block') ? 'none' : 'block';
-          });
+          return {
+            index: index,
+            title: article.title,
+            body: body
+          };
         })
         .catch(err => {
           console.error('Error fetching article:', article.id, err);
+          return null;
         });
     });
 
-    // Wait for all articles to load, then add the "Load More" button
-    Promise.all(fetchPromises).then(() => {
+    // Wait for all articles to load, then render them IN ORDER
+    Promise.all(fetchPromises).then((articlesData) => {
+      // Sort by original index to maintain order
+      articlesData.sort((a, b) => {
+        if (!a) return 1;
+        if (!b) return -1;
+        return a.index - b.index;
+      });
+
+      // Render articles in correct order
+      articlesData.forEach(articleData => {
+        if (!articleData) return;
+
+        const articleEl = document.createElement('div');
+        articleEl.className = 'faq-article';
+        
+        const btn = document.createElement('button');
+        btn.className = 'faq-question';
+        btn.textContent = articleData.title;
+        
+        const ans = document.createElement('div');
+        ans.className = 'faq-answer';
+        ans.innerHTML = articleData.body;
+        ans.style.display = 'none';
+        
+        // Append elements
+        articleEl.appendChild(btn);
+        articleEl.appendChild(ans);
+        container.appendChild(articleEl);
+
+        // Collapsible toggle
+        btn.addEventListener('click', () => {
+          ans.style.display = (ans.style.display === 'block') ? 'none' : 'block';
+        });
+      });
+
       displayedCount += articlesToLoad.length;
 
       // Add "Load More" button if there are more articles
