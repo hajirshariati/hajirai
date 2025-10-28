@@ -769,7 +769,7 @@
         "text_8qk3cb": {
           "type": "text",
           "settings": {
-            "text": "<p>Join today to unlock exclusive promotions, earn points on your purchases and more.</p>",
+            "text": "<p>Unlock exclusive promotions, earn points on your purchases and more!</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
