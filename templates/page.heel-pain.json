@@ -429,6 +429,7 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
+        "narrow": true,
         "color_text": "#74a5ba",
         "color_background": "",
         "gradient_background": "",
@@ -440,7 +441,6 @@
         "padding_top": 0,
         "padding_bottom": 0,
         "divider": false,
-        "narrow": true,
         "rounded": false
       }
     },
@@ -594,53 +594,6 @@
         "full_width": true,
         "rounded": false
       }
-    },
-    "image_with_text_overlay_NcafqY": {
-      "type": "image-with-text-overlay",
-      "blocks": {
-        "heading_f3kfJV": {
-          "type": "heading",
-          "settings": {
-            "heading": "<p>Why Aetrex</p>",
-            "heading_size": "title-lg tracking-heading",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "heading_f3kfJV"
-      ],
-      "name": "t:sections.image-with-text-overlay.name",
-      "settings": {
-        "transparent_header": false,
-        "image": "shopify://shop_images/Group_9.png",
-        "image_height": "adapt",
-        "content_width": "medium",
-        "content_position": "md:items-end md:justify-start",
-        "text_alignment": "left",
-        "image_mobile": "shopify://shop_images/logopng.png",
-        "image_height_mobile": "500px",
-        "content_position_mobile": "items-start justify-start",
-        "text_alignment_mobile": "center",
-        "color_text": "#171717",
-        "color_highlight": "#e0a580",
-        "gradient_highlight": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
-        "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "divider_color": "#111111",
-        "overlay_opacity": 5,
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": true,
-        "rounded": false,
-        "enable_parallax": true,
-        "parallax_direction": "vertical"
-      }
     }
   },
   "order": [
@@ -653,7 +606,6 @@
     "featured_collection_dXtHeM",
     "rich_text_qygTdt",
     "testimonials_byJFpb",
-    "collection_list_fbMkYY",
-    "image_with_text_overlay_NcafqY"
+    "collection_list_fbMkYY"
   ]
 }
