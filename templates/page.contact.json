@@ -31,7 +31,7 @@
           "type": "heading",
           "settings": {
             "heading": "Order & Support Hub",
-            "heading_size": "title-lg tracking-heading",
+            "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -175,7 +175,7 @@
           "type": "heading",
           "settings": {
             "heading": "FAQ",
-            "heading_size": "title-md",
+            "heading_size": "title-sm",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -243,6 +243,57 @@
       "type": "main-zendesk",
       "name": "Zendesk FAQ Category Section",
       "settings": {}
+    },
+    "rich_text_6C8UqK": {
+      "type": "rich-text",
+      "blocks": {
+        "button_wxgqU9": {
+          "type": "button",
+          "settings": {
+            "button_label": "Visit FAQ Page",
+            "button_link": "https://support.aetrex.com/hc/en-us",
+            "button_style": "link",
+            "button_size": "sm",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "button_wxgqU9"
+      ],
+      "disabled": true,
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "#f4f4f4",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 40,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
     }
   },
   "order": [
@@ -251,6 +302,7 @@
     "multicolumn_with_icons_igCrVg",
     "rich_text_QPQyyd",
     "faq_zendesk_iW4B8T",
-    "main_zendesk_fR4GdA"
+    "main_zendesk_fR4GdA",
+    "rich_text_6C8UqK"
   ]
 }
