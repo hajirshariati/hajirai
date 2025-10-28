@@ -39,9 +39,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const existingBtn = document.getElementById('load-more-btn');
     if (existingBtn) existingBtn.remove();
 
-    // Load each article's full content
-    articlesToLoad.forEach(article => {
-      fetch(`https://support.aetrex.com/api/v2/help_center/articles/${article.id}.json`)
+    // Create an array of promises for all article fetches
+    const fetchPromises = articlesToLoad.map(article => {
+      return fetch(`https://support.aetrex.com/api/v2/help_center/articles/${article.id}.json`)
         .then(res => res.json())
         .then(articleData => {
           // Get the body content
@@ -77,17 +77,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    displayedCount += articlesToLoad.length;
+    // Wait for all articles to load, then add the "Load More" button
+    Promise.all(fetchPromises).then(() => {
+      displayedCount += articlesToLoad.length;
 
-    // Add "Load More" button if there are more articles
-    if (displayedCount < allArticles.length) {
-      const loadMoreBtn = document.createElement('button');
-      loadMoreBtn.id = 'load-more-btn';
-      loadMoreBtn.className = 'load-more-button';
-      loadMoreBtn.textContent = `Load More (${allArticles.length - displayedCount} remaining)`;
-      loadMoreBtn.addEventListener('click', loadMoreArticles);
-      container.appendChild(loadMoreBtn);
-    }
+      // Add "Load More" button if there are more articles
+      if (displayedCount < allArticles.length) {
+        const loadMoreBtn = document.createElement('button');
+        loadMoreBtn.id = 'load-more-btn';
+        loadMoreBtn.className = 'load-more-button';
+        loadMoreBtn.textContent = `Load More (${allArticles.length - displayedCount} remaining)`;
+        loadMoreBtn.addEventListener('click', loadMoreArticles);
+        container.appendChild(loadMoreBtn);
+      }
+    });
   }
 });
 </script>
