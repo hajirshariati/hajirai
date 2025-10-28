@@ -51,7 +51,7 @@
         "padding_bottom": 0,
         "divider": false,
         "full_width": true,
-        "rounded": true,
+        "rounded": false,
         "enable_parallax": true,
         "parallax_direction": "vertical"
       }
