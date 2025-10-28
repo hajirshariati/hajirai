@@ -157,6 +157,9 @@
         "column_DHYVTX",
         "column_7wcVTK"
       ],
+      "custom_css": [
+        ".slider .card {background: #ededed !important; border-radius: 10px;}"
+      ],
       "name": "t:sections.multicolumn.name",
       "settings": {
         "gap": "small",
