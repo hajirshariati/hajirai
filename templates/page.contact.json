@@ -167,30 +167,11 @@
         "full_width": false,
         "rounded": false
       }
-    },
-    "custom_liquid_9eTGdG": {
-      "type": "custom-liquid",
-      "name": "t:sections.custom-liquid.name",
-      "settings": {
-        "liquid": "<iframe\n  src=\"https://support.aetrex.com/hc/en-us\"\n  width=\"100%\"\n  height=\"1000\"\n  style=\"border:none; min-height:80vh;\">\n</iframe>",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "narrow": false,
-        "rounded": false
-      }
     }
   },
   "order": [
     "main",
     "rich-text",
-    "multicolumn_with_icons_igCrVg",
-    "custom_liquid_9eTGdG"
+    "multicolumn_with_icons_igCrVg"
   ]
 }
