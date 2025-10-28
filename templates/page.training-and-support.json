@@ -126,7 +126,7 @@
         "text_CLtjRE": {
           "type": "text",
           "settings": {
-            "text": "<h4>Call Center</h4><p>Aetrex has offices in the US, Middle East and Asia that offer phone support 7 days a week.</p><p>In addition, any email sent to istephelp@aetrex.com is responded to immediately and automatically issued a case number and assigned to a tech support representative. Tech support reps work with each store to resolve issues in a timely manner.</p>",
+            "text": "<h4>Call Center</h4><p>Aetrex has offices in the US, Middle East and Asia that offer phone support 7 days a week.</p><p>In addition, any email sent to techsupport@aetrex.com is responded to immediately and automatically issued a case number and assigned to a tech support representative. Tech support reps work with each store to resolve issues in a timely manner.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
