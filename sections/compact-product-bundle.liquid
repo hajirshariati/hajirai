@@ -27,7 +27,14 @@
     assign product_limit = products.count
   endif
 -%}
-<div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}">
+<div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}{% if section.settings.abra_promo_code_show != blank %} abra--{{ section.settings.abra_promo_code_show | handleize }}-activated{% endif %}"
+  {% if section.settings.abra_promo_code_hide != blank %}
+    data-abra-default="{{ section.settings.abra_promo_code_hide | handleize }}"
+  {% endif %}
+  {% if section.settings.abra_promo_code_show != blank %}
+    data-abra-promo="{{ section.settings.abra_promo_code_show | handleize }}"
+  {% endif %}
+>
   <div class="page-width{% if section.settings.full_width %} page-width--full{% endif %} relative">
     <div class="compact-product-bundle-wrapper flex flex-col gap-6 lg:grid lg:gap-10{% if section.settings.layout == 'image_first' %} lg:grid-row{% else %} lg:grid-row-reverse{% endif %}">
       <div class="card product-card product-card--promo block leading-none relative overflow-hidden" id="shopify-block-{{ section.id }}">
@@ -602,6 +609,20 @@
           "label": "t:sections.global.settings.parallax_direction.options__3.label"
         }
       ]
+    },
+    {
+      "type": "header",
+      "content": "Abra Promo"
+    },
+    {
+      "type": "text",
+      "id": "abra_promo_code_show",
+      "label": "Abra Code to Show"
+    },
+    {
+      "type": "text",
+      "id": "abra_promo_code_hide",
+      "label": "Abra Code to Hide"
     }
   ],
   "blocks": [

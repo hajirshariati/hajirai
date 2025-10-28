@@ -18,7 +18,14 @@
   {% endif -%}
 </style>
 
-<div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}"{% if section.settings.transparent_header %} allow-transparent-header{% endif %}>
+<div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}{% if section.settings.abra_promo_code_show != blank %} abra--{{ section.settings.abra_promo_code_show | handleize }}-activated{% endif %}"{% if section.settings.transparent_header %} allow-transparent-header{% endif %}
+  {% if section.settings.abra_promo_code_hide != blank %}
+    data-abra-default="{{ section.settings.abra_promo_code_hide | handleize }}"
+  {% endif %}
+  {% if section.settings.abra_promo_code_show != blank %}
+    data-abra-promo="{{ section.settings.abra_promo_code_show | handleize }}"
+  {% endif %}
+>
   <div class="relative">
     <div class="banner media--{{ section.settings.image_height }} mobile:media--{{ section.settings.image_height_mobile }} relative">
       <media-element class="banner__media block w-full h-full overflow-hidden"{% if section.settings.enable_parallax %} data-parallax="0.3" data-parallax-dir="{{ section.settings.parallax_direction }}"{% endif %}>
@@ -387,6 +394,20 @@
       "id": "enable_parallax",
       "label": "t:sections.global.settings.enable_parallax.label",
       "default": true
+    },
+    {
+      "type": "header",
+      "content": "Abra Promo"
+    },
+    {
+      "type": "text",
+      "id": "abra_promo_code_show",
+      "label": "Abra Code to Show"
+    },
+    {
+      "type": "text",
+      "id": "abra_promo_code_hide",
+      "label": "Abra Code to Hide"
     },
     {
       "visible_if": "{{ section.settings.enable_parallax == true }}",
