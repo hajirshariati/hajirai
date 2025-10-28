@@ -736,7 +736,7 @@
         "text_bzFbyY": {
           "type": "text",
           "settings": {
-            "text": "<h2>DOs & DONT'S</h2>",
+            "text": "<h2>DOs & DON'TS</h2>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
