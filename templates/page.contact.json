@@ -138,7 +138,7 @@
             "heading": "<a href=\"https://support.aetrex.com/hc/en-us\">Help Center and FAQ</a>",
             "text": "<p>Browse the Help Center</p>",
             "highlighted_text": "none",
-            "custom_html": "<button href=\"https://support.aetrex.com/hc/en-us\">Click Here</button>",
+            "custom_html": "<a href=\"https://support.aetrex.com/hc/en-us\">Click Here</a>",
             "us_only": false,
             "highlighted_scribble": "circle"
           }
