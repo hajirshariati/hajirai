@@ -104,29 +104,15 @@
             "highlighted_scribble": "circle"
           }
         },
-        "column_UCYE9Q": {
-          "type": "column",
-          "disabled": true,
-          "settings": {
-            "icon": "none",
-            "custom_icon": "",
-            "heading": "<strong>Live Chat</strong>",
-            "text": "<p>Mon - Fri: 8:30 AM - 12am ET<br/>Sat - Sun: 9am - 12am ET</p>",
-            "highlighted_text": "none",
-            "custom_html": "<a onclick=\"openWidget()\">Click Here</a>\n\n\n<script type=\"text/javascript\">\n  zE(\"webWidget\", \"hide\")\n\n  function openWidget() {\n    zE(\"webWidget\", \"show\")\n    zE(\"webWidget\", \"open\")\n     \n  }\n\n</script>",
-            "us_only": false,
-            "highlighted_scribble": "circle"
-          }
-        },
         "column_GXc8FK": {
           "type": "column",
           "settings": {
             "icon": "none",
             "custom_icon": "",
             "heading": "Email Us",
-            "text": "<p><a href=\"mailto:help@aetrex.com\">help@aetrex.com</a></p><p>Someone from our team will get back to you soon</p>",
+            "text": "<p><a href=\"mailto:help@aetrex.com\">help@aetrex.com</a></p><p>Someone from our team will get back to you soon </p><h6>Live Chat</h6><p>Mon - Fri: 8:30 AM - 12am ET<br/>Sat - Sun: 9am - 12am ET</p>",
             "highlighted_text": "none",
-            "custom_html": "",
+            "custom_html": "<a onclick=\"openWidget()\">Click Here</a>\n\n\n<script type=\"text/javascript\">\n  zE(\"webWidget\", \"hide\")\n\n  function openWidget() {\n    zE(\"webWidget\", \"show\")\n    zE(\"webWidget\", \"open\")\n     \n  }\n\n</script>",
             "us_only": false,
             "highlighted_scribble": "circle"
           }
@@ -137,20 +123,7 @@
             "icon": "none",
             "custom_icon": "",
             "heading": "<a href=\"tel:+18885262739\">Call Us</a>",
-            "text": "<p>1.888.526.2739</p><p>Mon - Fri: 8:30 AM - 12am ET<br/>Sat - Sun: 9am - 12am ET</p>",
-            "highlighted_text": "none",
-            "custom_html": "",
-            "us_only": false,
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_PYd37K": {
-          "type": "column",
-          "settings": {
-            "icon": "none",
-            "custom_icon": "",
-            "heading": "<a href=\"https://support.aetrex.com/hc/en-us\">Help Center and FAQ</a>",
-            "text": "<p>Browse the Help Center</p>",
+            "text": "<p>1.888.526.2739</p><p>Mon - Fri: 8:30 AM - 12am ET<br/>Sat - Sun: 9am - 12am ET</p><h6>Help Center and FAQ</h6><p>Browse the Help Center</p>",
             "highlighted_text": "none",
             "custom_html": "<a href=\"https://support.aetrex.com/hc/en-us\">Click Here</a>",
             "us_only": false,
@@ -160,15 +133,13 @@
       },
       "block_order": [
         "column_WkPr3j",
-        "column_UCYE9Q",
         "column_GXc8FK",
-        "column_qfVYBh",
-        "column_PYd37K"
+        "column_qfVYBh"
       ],
       "name": "t:sections.multicolumn-with-icons.name",
       "settings": {
         "style": "with-background",
-        "columns": 4,
+        "columns": 3,
         "text_alignment": "center",
         "heading": "",
         "heading_size": "title-md",
