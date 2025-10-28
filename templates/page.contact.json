@@ -88,6 +88,109 @@
         "rounded": true
       }
     },
+    "multicolumn_kYm3fj": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_gQA8Hf": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image_ratio": "adapt",
+            "heading": "<strong>Order Center</strong>",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "custom_html": "<div id=\"as-root\"></div><script>(function(e,t,n){var r,i=e.getElementsByTagName(t)[0];if(e.getElementById(n))return;r=e.createElement(t);r.id=n;r.src=\"https://button.aftership.com/all.js?username=aetrexorders\";i.parentNode.insertBefore(r,i)})(document,\"script\",\"aftership-jssdk\")</script>\n\n<div class=\"as-track-button\" data-size=\"medium\" data-domain=\"orders.aetrex.com/\" data-look-up-option=\"both\" data-btn-label=\"Track\" data-center=\"true\"></div>\n<br>\nNeed to Return Something? <br><div style=\"margin-top:5px\">\n<a href=\"/apps/aftership-returns-center\">\nUS Customer</a>   /   <a href=\"https://web.global-e.com/Returns/Portal/mZnr\">Non-US Customer</a>\n</div>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_DHYVTX": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image_ratio": "adapt",
+            "heading": "<strong>Email Center</strong>",
+            "heading_size": "text-lg-2xl",
+            "text": "<h6></h6><p><a href=\"mailto:help@aetrex.com\">help@aetrex.com</a></p><p>Someone from our team <br/>will get back to you soon</p><p>.................................................</p><h6>Preferences Center</h6><p>Personalize your <br/>Aetrex experience</p>",
+            "custom_html": "<a href=\"https://customer-preference.aetrex.com/p/user\">Click Here</a>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_7wcVTK": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image_ratio": "adapt",
+            "heading": "<strong>Live Support</strong>",
+            "heading_size": "text-lg-2xl",
+            "text": "<h6></h6><p>Call <a href=\"tel:1.888.526.2739\" title=\"tel:1.888.526.2739\">1.888.526.2739</a></p><p>Mon - Fri: 8:30 AM - 12am ET<br/>Sat - Sun: 9am - 12am ET</p><p>.................................................</p><h6>Chat</h6><p>Mon - Fri: 8:30 AM - 12am ET<br/>Sat - Sun: 9am - 12am ET</p>",
+            "custom_html": "<a onclick=\"openWidget()\">Click Here</a>\n\n\n<script type=\"text/javascript\">\n  zE(\"webWidget\", \"hide\")\n\n  function openWidget() {\n    zE(\"webWidget\", \"show\")\n    zE(\"webWidget\", \"open\")\n     \n  }\n\n</script>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_gQA8Hf",
+        "column_DHYVTX",
+        "column_7wcVTK"
+      ],
+      "name": "t:sections.multicolumn.name",
+      "settings": {
+        "gap": "small",
+        "columns": 3,
+        "columns_mobile": "1",
+        "carousel_on_desktop": true,
+        "swipe_on_mobile": false,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "#f4f4f4",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 20,
+        "padding_bottom": 20,
+        "full_width": false,
+        "divider": false,
+        "rounded": false
+      }
+    },
     "multicolumn_with_icons_igCrVg": {
       "type": "multicolumn-with-icons",
       "blocks": {
@@ -136,6 +239,7 @@
         "column_GXc8FK",
         "column_qfVYBh"
       ],
+      "disabled": true,
       "name": "t:sections.multicolumn-with-icons.name",
       "settings": {
         "style": "with-background",
@@ -331,6 +435,7 @@
   "order": [
     "main",
     "rich-text",
+    "multicolumn_kYm3fj",
     "multicolumn_with_icons_igCrVg",
     "rich_text_QPQyyd",
     "faq_zendesk_iW4B8T",
