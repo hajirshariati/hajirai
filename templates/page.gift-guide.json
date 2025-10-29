@@ -57,12 +57,12 @@
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
-        "image": "shopify://shop_images/desktop_wotext.jpg",
+        "image": "shopify://shop_images/desktop_wotext_16473587-f751-4ea0-90c1-c2483a63f0e4.jpg",
         "image_height": "800px",
         "content_width": "small",
         "content_position": "md:items-center md:justify-start",
         "text_alignment": "center",
-        "image_mobile": "shopify://shop_images/mobile_wotext.jpg",
+        "image_mobile": "shopify://shop_images/mobile_wo_text_v3.jpg",
         "image_height_mobile": "auto",
         "content_position_mobile": "items-end justify-center",
         "text_alignment_mobile": "center",
@@ -81,7 +81,9 @@
         "full_width": true,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "multicolumn_with_icons_C37PFY": {
@@ -161,7 +163,9 @@
         "padding_bottom": 36,
         "divider": false,
         "full_width": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "logo_list_EzFUUx": {
@@ -255,7 +259,9 @@
         "padding_bottom": 32,
         "divider": false,
         "full_width": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "featured_collections_9d3ge7": {
@@ -337,7 +343,9 @@
         "padding_bottom": 72,
         "divider": false,
         "full_width": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "collection_list_mPHCpz": {
@@ -444,7 +452,9 @@
         "padding_bottom": 40,
         "divider": false,
         "full_width": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "collection_list_KbwCHx": {
@@ -454,8 +464,9 @@
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "",
+            "collection": "plantar-fasciitis",
             "custom_url": "",
+            "image": "shopify://shop_images/plantar_aee23cac-d06a-4069-9636-95145c7380a1.jpg",
             "title": "Plantar Fasciitis",
             "description": "",
             "overlay_content": false,
@@ -472,6 +483,7 @@
             "link_type": "collection",
             "collection": "",
             "custom_url": "",
+            "image": "shopify://shop_images/ball_of_foot_9ce3beb3-85e2-4cd5-bc29-c1d727f2ab0e.jpg",
             "title": "Ball of Foot Pain",
             "description": "",
             "overlay_content": false,
@@ -486,8 +498,9 @@
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "",
+            "collection": "flat-feet",
             "custom_url": "",
+            "image": "shopify://shop_images/flat.jpg",
             "title": "Flat Feet",
             "description": "",
             "overlay_content": false,
@@ -504,6 +517,7 @@
             "link_type": "collection",
             "collection": "",
             "custom_url": "",
+            "image": "shopify://shop_images/high_arch.jpg",
             "title": "High Arches",
             "description": "",
             "overlay_content": false,
@@ -520,6 +534,7 @@
             "link_type": "collection",
             "collection": "",
             "custom_url": "",
+            "image": "shopify://shop_images/metatarsalgia_3ff64022-7dbe-48c5-92a7-3a1c8ad2aae9.jpg",
             "title": "Metatarsalgia",
             "description": "",
             "overlay_content": false,
@@ -536,6 +551,7 @@
             "link_type": "collection",
             "collection": "",
             "custom_url": "",
+            "image": "shopify://shop_images/neuroma_9991dac7-3a7e-47f5-91dc-48f905ad1ec6.jpg",
             "title": "Morton's Neuroma",
             "description": "",
             "overlay_content": false,
@@ -552,6 +568,7 @@
             "link_type": "collection",
             "collection": "",
             "custom_url": "",
+            "image": "shopify://shop_images/overpronantion_corrected.jpg",
             "title": "Overpronation",
             "description": "",
             "overlay_content": false,
@@ -568,6 +585,7 @@
             "link_type": "collection",
             "collection": "",
             "custom_url": "",
+            "image": "shopify://shop_images/bunions.jpg",
             "title": "Bunions",
             "description": "",
             "overlay_content": false,
@@ -619,7 +637,9 @@
         "padding_bottom": 72,
         "divider": false,
         "full_width": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "collage_ntqjfh": {
@@ -703,7 +723,9 @@
         "divider": false,
         "full_width": false,
         "rounded": false,
-        "enable_parallax": false
+        "enable_parallax": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "shop_the_feed_tFy3ak": {
@@ -936,7 +958,9 @@
         "padding_bottom": 100,
         "divider": false,
         "full_width": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     }
   },
