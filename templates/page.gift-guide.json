@@ -599,6 +599,46 @@
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
+        },
+        "column_9Wb43Y": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "left",
+            "text_alignment_mobile": "left",
+            "image_ratio": "adapt",
+            "heading": "Example title",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Use this section to explain a set of product features, to link to a series of pages, or to answer common questions about your products.</p>",
+            "custom_html": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_YYryVQ": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "left",
+            "text_alignment_mobile": "left",
+            "image_ratio": "adapt",
+            "heading": "Example title",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Use this section to explain a set of product features, to link to a series of pages, or to answer common questions about your products.</p>",
+            "custom_html": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
         }
       },
       "block_order": [
@@ -606,13 +646,15 @@
         "column_gGRrGz",
         "column_CEKNpP",
         "column_XdTmjJ",
-        "column_bD63kq"
+        "column_bD63kq",
+        "column_9Wb43Y",
+        "column_YYryVQ"
       ],
       "name": "Multicolumn",
       "settings": {
         "gap": "small",
-        "columns": 3,
-        "columns_mobile": "1",
+        "columns": 4,
+        "columns_mobile": "2",
         "carousel_on_desktop": true,
         "swipe_on_mobile": true,
         "heading": "Loved By Millions",
