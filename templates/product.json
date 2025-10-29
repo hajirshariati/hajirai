@@ -723,6 +723,8 @@
         "description": "",
         "enable_video_autoplay": false,
         "enable_video_looping": false,
+        "default_video": "shopify://files/videos/the_aetrex_advantage_-_arch_support (2160p)_b1e093e3-090a-4412-a365-9ffadc8a32e5.mp4",
+        "default_cover_image": "{{ product.featured_image }}",
         "image_height": "450px",
         "video_width": "medium",
         "layout": "text_first",
