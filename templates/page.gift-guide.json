@@ -763,7 +763,7 @@
       "type": "ugc-gallery",
       "name": "UGC Gallery",
       "settings": {
-        "custom_gallery": "",
+        "custom_gallery": "{{ page.metafields.custom.ugc_gallery_id.value }}",
         "global_pdp_sourced_gallery": "",
         "global_fallback_sourced_gallery": "67c9dfd952921dee2bb9fc5c"
       }
