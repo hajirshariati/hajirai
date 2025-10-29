@@ -1,0 +1,930 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "video_w8wr4w": {
+      "type": "video",
+      "name": "Video",
+      "settings": {
+        "transparent_header": false,
+        "video": "shopify://files/videos/HeeliumD.mp4",
+        "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
+        "description": "",
+        "enable_video_autoplay": true,
+        "enable_video_looping": true,
+        "image_height": "550px",
+        "video_url_mobile": "",
+        "image_height_mobile": "auto",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false
+      }
+    },
+    "rich_text_qhigBb": {
+      "type": "rich-text",
+      "blocks": {
+        "text_3N3TpP": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Heelium™ Collection</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 50,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_3N3TpP"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#e4a7b0",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "rich_text_EA7EPA": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_EYYxYX": {
+          "type": "heading",
+          "settings": {
+            "heading": "<strong>By Aetrex</strong>",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_HtQMGR": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Featuring SkyLite™ technology for an ultra-lightweight feel.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 40,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_EYYxYX",
+        "text_HtQMGR"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h3",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "rgba(0,0,0,0)",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "multicolumn_R8kcbF": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_aAJcWw": {
+          "type": "column",
+          "settings": {
+            "show_border": true,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image_ratio": "square",
+            "video": "shopify://files/videos/Heeliumshoe1.mp4",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "SHOP BRIANNA",
+            "button_link": "shopify://products/brianna",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_pNXkfL": {
+          "type": "column",
+          "settings": {
+            "show_border": true,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image_ratio": "square",
+            "video": "shopify://files/videos/Heeliumshoe3.mp4",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "SHOP JOANNE",
+            "button_link": "shopify://products/joanne",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_hR6VPT": {
+          "type": "column",
+          "settings": {
+            "show_border": true,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image_ratio": "square",
+            "video": "shopify://files/videos/Heeliumshoe4.mp4",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "SHOP ZOEY",
+            "button_link": "shopify://products/zoey-boot",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_8FkPNj": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image_ratio": "square",
+            "video": "shopify://files/videos/Heeliumshoe2.mp4",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "button_label": "SHOP LIZ",
+            "button_link": "shopify://products/liz",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_aAJcWw",
+        "column_pNXkfL",
+        "column_hR6VPT",
+        "column_8FkPNj"
+      ],
+      "name": "Multicolumn",
+      "settings": {
+        "gap": "large",
+        "columns": 4,
+        "columns_mobile": "1",
+        "carousel_on_desktop": false,
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h3",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": true,
+        "rounded": false
+      }
+    },
+    "rich_text_fCwh9h": {
+      "type": "rich-text",
+      "blocks": {
+        "text_VGtXmD": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Heelium Collection Features</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_VGtXmD"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "rgba(0,0,0,0)",
+        "color_background": "#fbf4f4",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": false,
+        "rounded": false
+      }
+    },
+    "multicolumn_w48Twe": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_FpqrTm": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/HF-arch.png",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-base-xl",
+            "text": "<p><strong>Signature Arch Support<br/></strong>to Help Relieve Heel/Arch Pain</p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_PRbctQ": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/HF-float.png",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-base-xl",
+            "text": "<p><strong>Extreme Lightweight Design</strong><br/>for Durability & Comfort</p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_RenNCh": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/HF-leather.png",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-base-xl",
+            "text": "<p><strong>Genuine Leather Construction</strong><br/>Quality Nubuck Leather</p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_PGzQEt": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/HF-comfort.png",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-base-xl",
+            "text": "<p><strong>Memory Foam Footbed</strong><br/>for Cushioning and Comfort</p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_FpqrTm",
+        "column_PRbctQ",
+        "column_RenNCh",
+        "column_PGzQEt"
+      ],
+      "name": "Multicolumn",
+      "settings": {
+        "gap": "small",
+        "columns": 4,
+        "columns_mobile": "1",
+        "carousel_on_desktop": true,
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h3",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "rgba(0,0,0,0)",
+        "color_background": "#fbf4f4",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 36,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_tqMWGc": {
+      "type": "image-with-text",
+      "blocks": {
+        "icon_aJNPpN": {
+          "type": "icon",
+          "settings": {
+            "icon": "none",
+            "icon_image": "shopify://shop_images/image_57.png",
+            "iwidth": "custom",
+            "icon_width": 120,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "heading_TC4FdY": {
+          "type": "heading",
+          "settings": {
+            "heading": "Brianna",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_qBGErE": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>Ballet Flat</strong></p><p>Designed with your foot health in mind, the Brianna flat features arch support, a stretchy topline, a weightless feel, and 5mm of memory foam for extra comfort throughout the day. Add a touch of sophistication to any outfit and step confidently into each day with this flat!</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_CAd8dK": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://products/brianna",
+            "button_video_link": "",
+            "button_style": "secondary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "icon_aJNPpN",
+        "heading_TC4FdY",
+        "text_qBGErE",
+        "button_CAd8dK"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/float1.png",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "medium",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_mobile": "shopify://shop_images/float1.png",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "center",
+        "color_text": "rgba(0,0,0,0)",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "#ffffff",
+        "color_button_background": "#171717",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 8,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "video_with_text_frd6gc": {
+      "type": "video-with-text",
+      "blocks": {
+        "icon_3ewWDF": {
+          "type": "icon",
+          "settings": {
+            "icon": "none",
+            "icon_image": "shopify://shop_images/image_66.png",
+            "iwidth": "custom",
+            "icon_width": 120,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "heading_r3m8Ez": {
+          "type": "heading",
+          "settings": {
+            "heading": "Joanne",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_DHYRyf": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>Mary Jane</strong></p><p>Introducing the revolutionary mary jane that combines cutting-edge design with unparalleled comfort. The ultra-lightweight construction, paired with our signature arch support and thick layer of memory foam cushioning, creates a shoe so comfortable, you'll forget you're wearing it.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_HUkKbU": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://products/joanne",
+            "button_video_link": "",
+            "button_style": "secondary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "icon_3ewWDF",
+        "heading_r3m8Ez",
+        "text_DHYRyf",
+        "button_HUkKbU"
+      ],
+      "name": "Video with text",
+      "settings": {
+        "video": "shopify://files/videos/Heelium2D.mp4",
+        "video_url": "",
+        "description": "",
+        "enable_video_autoplay": true,
+        "enable_video_looping": true,
+        "image_height": "100vh",
+        "video_width": "small",
+        "layout": "video_first",
+        "text_alignment": "left",
+        "content_position": "align-self-center",
+        "video_url_mobile": "",
+        "image_height_mobile": "100vh",
+        "text_alignment_mobile": "center",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "#ffffff",
+        "color_button_background": "#171717",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 8,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_KUNJhh": {
+      "type": "image-with-text",
+      "blocks": {
+        "icon_FeCWfm": {
+          "type": "icon",
+          "settings": {
+            "icon": "none",
+            "icon_image": "shopify://shop_images/image_62.png",
+            "iwidth": "custom",
+            "icon_width": 120,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "heading_DFRyWM": {
+          "type": "heading",
+          "settings": {
+            "heading": "Zoey",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_n7ttnz": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>Slip-On Boot</strong></p><p>Experience the perfect fusion of style, comfort, and weightlessness with this slip-on boot. Crafted with our signature arch support, a flexible elastic topline, and a luxurious layer of memory foam cushioning, this boot proves that you don't have to sacrifice comfort for fashion.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_V4Xymr": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://products/zoey-boot",
+            "button_video_link": "",
+            "button_style": "secondary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "icon_FeCWfm",
+        "heading_DFRyWM",
+        "text_n7ttnz",
+        "button_V4Xymr"
+      ],
+      "name": "Image with text",
+      "settings": {
+        "image": "shopify://shop_images/zoe1.png",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "medium",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_mobile": "shopify://shop_images/zoe1.png",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "center",
+        "color_text": "rgba(0,0,0,0)",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "#ffffff",
+        "color_button_background": "#171717",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 8,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "video_with_text_TkUzn6": {
+      "type": "video-with-text",
+      "blocks": {
+        "icon_7agWem": {
+          "type": "icon",
+          "settings": {
+            "icon": "none",
+            "icon_image": "shopify://shop_images/image_63.png",
+            "iwidth": "custom",
+            "icon_width": 120,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "heading_eXUyiQ": {
+          "type": "heading",
+          "settings": {
+            "heading": "Liz",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_BjCwHU": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>Slip-On</strong></p><p>Discover the perfect blend of style and comfort with this slip-on shoe, featuring our signature arch support, elastic topline, and 5mm of memory foam cushioning. The sleek design effortlessly elevates any outfit, while the barely-there feel ensures all-day comfort, making it easy to forget you're even wearing shoes.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_WN3tcj": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://products/liz",
+            "button_video_link": "",
+            "button_style": "secondary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "icon_7agWem",
+        "heading_eXUyiQ",
+        "text_BjCwHU",
+        "button_WN3tcj"
+      ],
+      "name": "Video with text",
+      "settings": {
+        "video": "shopify://files/videos/Heelium3D.mp4",
+        "video_url": "",
+        "description": "",
+        "enable_video_autoplay": true,
+        "enable_video_looping": true,
+        "image_height": "100vh",
+        "video_width": "small",
+        "layout": "video_first",
+        "text_alignment": "left",
+        "content_position": "align-self-center",
+        "video_url_mobile": "",
+        "image_height_mobile": "100vh",
+        "text_alignment_mobile": "center",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "#ffffff",
+        "color_button_background": "#171717",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 8,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_overlay_RTHwkQ": {
+      "type": "image-with-text-overlay",
+      "name": "t:sections.image-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/image_65_6305c9ae-4056-40a2-99e6-fbe0a4131851.png",
+        "image_height": "500px",
+        "content_width": "small",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/image_65_6305c9ae-4056-40a2-99e6-fbe0a4131851.png",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical"
+      }
+    },
+    "testimonials_R8MBQU": {
+      "type": "testimonials",
+      "blocks": {
+        "testimonial_ieWiDW": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<h6>So Comfy and Supportive! I love these shoes!<br/>They have a little bit of a wedge, but are so cute! Very supportive on my arches - these are shoes I actually love to wear!</h6>",
+            "author": "Shawna H.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_ieWiDW"
+      ],
+      "name": "t:sections.testimonials.name",
+      "settings": {
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 48,
+        "padding_bottom": 48,
+        "divider": false,
+        "rounded": false
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "video_w8wr4w",
+    "rich_text_qhigBb",
+    "rich_text_EA7EPA",
+    "multicolumn_R8kcbF",
+    "rich_text_fCwh9h",
+    "multicolumn_w48Twe",
+    "image_with_text_tqMWGc",
+    "video_with_text_frd6gc",
+    "image_with_text_KUNJhh",
+    "video_with_text_TkUzn6",
+    "image_with_text_overlay_RTHwkQ",
+    "testimonials_R8MBQU"
+  ]
+}
