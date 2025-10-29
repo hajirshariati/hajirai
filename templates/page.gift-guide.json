@@ -497,96 +497,93 @@
         "abra_promo_code_hide": ""
       }
     },
-    "logo_list_EzFUUx": {
-      "type": "logo-list",
+    "scrolling_text_gnHFPk": {
+      "type": "scrolling-text",
       "blocks": {
-        "logo_gMfmid": {
-          "type": "logo",
+        "image_jaMgQw": {
+          "type": "image",
           "settings": {
             "image": "shopify://shop_images/image_80.png",
             "height": 52,
-            "link": ""
+            "link": "",
+            "accessibility_info": "",
+            "external": false
           }
         },
-        "logo_tfFaTx": {
-          "type": "logo",
+        "image_nR8yD9": {
+          "type": "image",
           "settings": {
             "image": "shopify://shop_images/image_81.png",
             "height": 52,
-            "link": ""
+            "link": "",
+            "accessibility_info": "",
+            "external": false
           }
         },
-        "logo_BLnhFd": {
-          "type": "logo",
+        "image_MaRPXd": {
+          "type": "image",
           "settings": {
             "image": "shopify://shop_images/image_82.png",
             "height": 52,
-            "link": ""
+            "link": "",
+            "accessibility_info": "",
+            "external": false
           }
         },
-        "logo_8i8VzQ": {
-          "type": "logo",
+        "image_GxqcJX": {
+          "type": "image",
           "settings": {
             "image": "shopify://shop_images/image_83.png",
             "height": 52,
-            "link": ""
+            "link": "",
+            "accessibility_info": "",
+            "external": false
           }
         },
-        "logo_Y6WYtF": {
-          "type": "logo",
+        "image_T4pcHz": {
+          "type": "image",
           "settings": {
             "image": "shopify://shop_images/image_84.png",
             "height": 52,
-            "link": ""
+            "link": "",
+            "accessibility_info": "",
+            "external": false
           }
         },
-        "logo_mR46E4": {
-          "type": "logo",
+        "image_XDaGWN": {
+          "type": "image",
           "settings": {
             "image": "shopify://shop_images/image_89.png",
             "height": 52,
-            "link": ""
+            "link": "",
+            "accessibility_info": "",
+            "external": false
           }
         }
       },
       "block_order": [
-        "logo_gMfmid",
-        "logo_tfFaTx",
-        "logo_BLnhFd",
-        "logo_8i8VzQ",
-        "logo_Y6WYtF",
-        "logo_mR46E4"
+        "image_jaMgQw",
+        "image_nR8yD9",
+        "image_MaRPXd",
+        "image_GxqcJX",
+        "image_T4pcHz",
+        "image_XDaGWN"
       ],
-      "name": "Logo list",
+      "name": "t:sections.scrolling-text.name",
       "settings": {
-        "layout": "default",
-        "grid_horizontal": 50,
         "direction": "left",
-        "speed": 1,
-        "heading": "AS SEEN ON",
-        "heading_size": "title-sm",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
+        "speed": 20,
+        "grid_horizontal": 70,
+        "enable_twin": false,
+        "enable_parallax": true,
         "color_text": "",
-        "color_background": "rgba(0,0,0,0)",
+        "color_background": "",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 32,
-        "padding_bottom": 32,
+        "padding_top": 36,
+        "padding_bottom": 36,
         "divider": false,
-        "full_width": false,
         "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
@@ -843,7 +840,7 @@
     "featured_collections_9d3ge7",
     "collection_list_mPHCpz",
     "collage_ntqjfh",
-    "logo_list_EzFUUx",
+    "scrolling_text_gnHFPk",
     "collection_list_KbwCHx",
     "rich_text_jCLnLy",
     "ugc_gallery_bTB9YG"
