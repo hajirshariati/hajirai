@@ -500,26 +500,6 @@
     "multicolumn_wC3T7d": {
       "type": "multicolumn",
       "blocks": {
-        "column_QFMHTJ": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image_ratio": "adapt",
-            "heading": "",
-            "heading_size": "text-lg-2xl",
-            "text": "<p>★★★★★</p><p>Super comfy and stylish!</p><p><em>- Kimber L.</em></p>",
-            "custom_html": "",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "secondary",
-            "button_external": false,
-            "button_icon": true,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
         "column_gGRrGz": {
           "type": "column",
           "settings": {
@@ -540,46 +520,6 @@
             "highlighted_scribble": "circle"
           }
         },
-        "column_CEKNpP": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image_ratio": "adapt",
-            "heading": "",
-            "heading_size": "text-lg-2xl",
-            "text": "<p>★★★★★</p><p>Love, love, love these shoes!</p><p><em>- Karen P.</em></p>",
-            "custom_html": "",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "secondary",
-            "button_external": false,
-            "button_icon": true,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_XdTmjJ": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image_ratio": "adapt",
-            "heading": "",
-            "heading_size": "text-lg-2xl",
-            "text": "<p>★★★★★</p><p>I feel 15 years younger!</p><p><em>- Mollie B.</em></p>",
-            "custom_html": "",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "secondary",
-            "button_external": false,
-            "button_icon": true,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
         "column_bD63kq": {
           "type": "column",
           "settings": {
@@ -590,86 +530,6 @@
             "heading": "",
             "heading_size": "text-lg-2xl",
             "text": "<p>★★★★★</p><p>These insoles make my feet soooo happy FEELS LIKE WALKING ON CLOUDS!</p><p><em>- Beverly</em></p>",
-            "custom_html": "",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "secondary",
-            "button_external": false,
-            "button_icon": true,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_y3Myhb": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image_ratio": "adapt",
-            "heading": "",
-            "heading_size": "text-lg-2xl",
-            "text": "<p>★★★★★</p><p>I went from 100% pain down to 5%</p><p><em>- </em>Deannie</p>",
-            "custom_html": "",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "secondary",
-            "button_external": false,
-            "button_icon": true,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_qYRBzy": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image_ratio": "adapt",
-            "heading": "",
-            "heading_size": "text-lg-2xl",
-            "text": "<p>★★★★★</p><p>I am so happy to walk with no pain with Aetrex shoes!</p><p><em>- Annie G.</em></p>",
-            "custom_html": "",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "secondary",
-            "button_external": false,
-            "button_icon": true,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_KqQHwk": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image_ratio": "adapt",
-            "heading": "",
-            "heading_size": "text-lg-2xl",
-            "text": "<p>★★★★★</p><p>Very, very comfortable and supportive</p><p><em>- Cynthia B.</em></p>",
-            "custom_html": "",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "secondary",
-            "button_external": false,
-            "button_icon": true,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_H8nWXd": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image_ratio": "adapt",
-            "heading": "",
-            "heading_size": "text-lg-2xl",
-            "text": "<p>★★★★★</p><p>Most comfortable shoes I have put on my feet.</p><p><em>- Kim N.</em></p>",
             "custom_html": "",
             "button_label": "",
             "button_link": "",
@@ -702,23 +562,16 @@
         }
       },
       "block_order": [
-        "column_QFMHTJ",
         "column_gGRrGz",
-        "column_CEKNpP",
-        "column_XdTmjJ",
         "column_bD63kq",
-        "column_y3Myhb",
-        "column_qYRBzy",
-        "column_KqQHwk",
-        "column_H8nWXd",
         "column_WdX4Cf"
       ],
       "name": "Multicolumn",
       "settings": {
         "gap": "small",
-        "columns": 4,
-        "columns_mobile": "2",
-        "carousel_on_desktop": true,
+        "columns": 3,
+        "columns_mobile": "1",
+        "carousel_on_desktop": false,
         "swipe_on_mobile": true,
         "heading": "Loved By Millions",
         "heading_size": "title-md",
@@ -741,6 +594,111 @@
         "color_button_background": "#171717",
         "color_button_gradient": "",
         "padding_top": 12,
+        "padding_bottom": 0,
+        "full_width": false,
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "multicolumn_Nhidck": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_jXnbGp": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>★★★★★</p><p>I went from 100% pain down to 5%</p><p><em>- </em>Deannie</p>",
+            "custom_html": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_3PQyDY": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>★★★★★</p><p>I am so happy to walk with no pain with Aetrex shoes!</p><p><em>- Annie G.</em></p>",
+            "custom_html": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_GxLQdE": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>★★★★★</p><p>Most comfortable shoes I have put on my feet.</p><p><em>- Kim N.</em></p>",
+            "custom_html": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_jXnbGp",
+        "column_3PQyDY",
+        "column_GxLQdE"
+      ],
+      "name": "Multicolumn",
+      "settings": {
+        "gap": "small",
+        "columns": 3,
+        "columns_mobile": "1",
+        "carousel_on_desktop": false,
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": false,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "rgba(0,0,0,0)",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "#ffffff",
+        "color_button_background": "#171717",
+        "color_button_gradient": "",
+        "padding_top": 0,
         "padding_bottom": 24,
         "full_width": false,
         "divider": false,
@@ -1130,6 +1088,7 @@
     "collection_list_mPHCpz",
     "collage_ntqjfh",
     "multicolumn_wC3T7d",
+    "multicolumn_Nhidck",
     "highlight_text_Jpt9Y7",
     "scrolling_text_gnHFPk",
     "collection_list_KbwCHx",
