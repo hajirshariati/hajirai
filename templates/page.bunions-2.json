@@ -271,80 +271,6 @@
         "rounded": false
       }
     },
-    "images_with_text_iL8ht6": {
-      "type": "images-with-text",
-      "blocks": {
-        "heading_e4NMJi": {
-          "type": "heading",
-          "settings": {
-            "heading": "Signature Arch Support",
-            "heading_size": "title-md",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_Bw6Yfi": {
-          "type": "text",
-          "settings": {
-            "text": "<p>With removable insole, our arch support is located further back to support the apex of the foot. This helps proper alignment and help relieve arch and heel pain associated with Plantar Fasciitis</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_TWhPGJ": {
-          "type": "button",
-          "settings": {
-            "button_label": "Shop Jillian",
-            "button_link": "shopify://products/jillian-black-sc450w",
-            "button_video_link": "",
-            "button_style": "link",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": true
-          }
-        }
-      },
-      "block_order": [
-        "heading_e4NMJi",
-        "text_Bw6Yfi",
-        "button_TWhPGJ"
-      ],
-      "disabled": true,
-      "name": "t:sections.images-with-text.name",
-      "settings": {
-        "image": "shopify://shop_images/ee4e2fe8a874fb5c106a8cc3c4247add5d9048ed.png",
-        "image_url": "",
-        "image_2": "shopify://shop_images/recommended_1_2x_21163cd2-e758-4725-87c5-117210d3d3c9.png",
-        "image2_url": "",
-        "image_ratio": "adapt",
-        "image_width": "large",
-        "layout": "text_first",
-        "text_alignment": "center",
-        "text_alignment_mobile": "left",
-        "color_text": "",
-        "color_background": "#fafafa",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "enable_parallax": true
-      }
-    },
     "empty_space_gyE8Nr": {
       "type": "empty-space",
       "name": "t:sections.empty-space.name",
@@ -606,7 +532,6 @@
     "image_with_text_overlay_rBfBzp",
     "faq_zhAACx",
     "lookbook_crRFzY",
-    "images_with_text_iL8ht6",
     "empty_space_gyE8Nr",
     "featured_collection_dXtHeM",
     "rich_text_dUPwLg",
