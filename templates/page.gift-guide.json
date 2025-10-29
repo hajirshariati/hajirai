@@ -497,6 +497,111 @@
         "abra_promo_code_hide": ""
       }
     },
+    "multicolumn_wC3T7d": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_QFMHTJ": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image_ratio": "adapt",
+            "heading": "<strong>These Saved My Life!</strong>",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>★★★★★</p><p>These flip flops saved my summer! My plantar fasciitis was really bad and when I put these on I felt relief almost immediately. The discomfort continues to subside more and more each day, and is still improving, which I largely attribute to wearing these all day, every day. Plus, they felt very secure even when wet. Very thankful for these!</p><p><em>- Lisa R.</em></p>",
+            "custom_html": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_bPGxxM": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image_ratio": "adapt",
+            "heading": "<strong>My Absolute Favorite!</strong>",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>★★★★★</p><p>These were the first shoe I ordered from Aetrex. I loved them immediately. I am now on my 3rd pair, including one for my daughter since she kept stealing mine! They are cushiony & supportive enough for a day at an amusement park plus the strap keeps them secure. Casual enough for everyday, but dressy enough for a night out means only packing one pair for trips.</p><p><em>- Holly J.</em></p>",
+            "custom_html": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_Qcy47y": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image_ratio": "adapt",
+            "heading": "<strong>Better Than My Bare Feet!</strong>",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>★★★★★</p><p>These sandals are perfect. They are very cushioned and supportive in all the right places. I can already feel the difference with my pronation issues when I wear these slides. I also love that they are cute and so easy to wear. I wear them out or just around the house. I couldn't recommend more!!!</p><p><em>- Kimberly S.</em></p>",
+            "custom_html": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_QFMHTJ",
+        "column_bPGxxM",
+        "column_Qcy47y"
+      ],
+      "name": "Multicolumn",
+      "settings": {
+        "gap": "small",
+        "columns": 3,
+        "columns_mobile": "1",
+        "carousel_on_desktop": true,
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "rgba(0,0,0,0)",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 24,
+        "full_width": false,
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
     "highlight_text_Jpt9Y7": {
       "type": "highlight-text",
       "disabled": true,
@@ -877,6 +982,7 @@
     "featured_collections_9d3ge7",
     "collection_list_mPHCpz",
     "collage_ntqjfh",
+    "multicolumn_wC3T7d",
     "highlight_text_Jpt9Y7",
     "scrolling_text_gnHFPk",
     "collection_list_KbwCHx",
