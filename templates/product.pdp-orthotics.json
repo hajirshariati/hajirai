@@ -450,7 +450,7 @@
             "content_metafield": "metafield",
             "columns": "Size,Chest",
             "rows": "S,36\nM,38\nL,40",
-            "metafields": "custom.comfort_details\ncustom.materials_details\ncustom.measurements_details"
+            "metafields": "Comfort:custom.comfort_details\nMaterials:custom.materials_details\nMeasurements:custom.measurements_details"
           }
         },
         "collapsible_tab_96ewnx": {
