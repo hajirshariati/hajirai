@@ -207,6 +207,54 @@
         "abra_promo_code_hide": ""
       }
     },
+    "testimonials_e8hGce": {
+      "type": "testimonials",
+      "blocks": {
+        "testimonial_kyLjbU": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Not only is the design amazing, they have the best arch support. I'm never taking these off.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_kyLjbU"
+      ],
+      "name": "t:sections.testimonials.name",
+      "settings": {
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 72,
+        "divider": false,
+        "rounded": false
+      }
+    },
     "image_with_text_tqMWGc": {
       "type": "image-with-text",
       "blocks": {
@@ -492,6 +540,7 @@
     "video_with_text_overlay_nwbnrx",
     "empty_space_mCfbfK",
     "multicolumn_R8kcbF",
+    "testimonials_e8hGce",
     "image_with_text_tqMWGc",
     "video_with_text_frd6gc",
     "image_with_text_KUNJhh"
