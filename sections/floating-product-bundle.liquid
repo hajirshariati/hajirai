@@ -18,7 +18,14 @@
     assign product_limit = products.count
   endif
 -%}
-<div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}">
+<div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}{% if section.settings.abra_promo_code_show != blank %} abra--{{ section.settings.abra_promo_code_show | handleize }}-activated{% endif %}"
+  {% if section.settings.abra_promo_code_hide != blank %}
+    data-abra-default="{{ section.settings.abra_promo_code_hide | handleize }}"
+  {% endif %}
+  {% if section.settings.abra_promo_code_show != blank %}
+    data-abra-promo="{{ section.settings.abra_promo_code_show | handleize }}"
+  {% endif %}
+>
   <div class="banner media--{{ section.settings.image_height }}{% unless section.settings.full_width %} page-width{% endunless %} relative">
     <media-element class="banner__media hidden lg:block w-full h-full overflow-hidden"{% if section.settings.enable_parallax %} data-parallax="0.3" data-parallax-dir="{{ section.settings.parallax_direction }}"{% endif %}>
       <picture class="media media--height block w-full h-full relative overflow-hidden" is="animate-picture" data-animate="zoom-out">
@@ -653,6 +660,20 @@
           "label": "t:sections.global.settings.parallax_direction.options__3.label"
         }
       ]
+    },
+    {
+      "type": "header",
+      "content": "Abra Promo"
+    },
+    {
+      "type": "text",
+      "id": "abra_promo_code_show",
+      "label": "Abra Code to Show"
+    },
+    {
+      "type": "text",
+      "id": "abra_promo_code_hide",
+      "label": "Abra Code to Hide"
     }
   ],
   "blocks": [

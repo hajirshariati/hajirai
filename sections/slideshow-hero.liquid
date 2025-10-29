@@ -32,7 +32,14 @@
     {% endif -%}
   </style>
 
-  <div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}">
+  <div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}{% if section.settings.abra_promo_code_show != blank %} abra--{{ section.settings.abra_promo_code_show | handleize }}-activated{% endif %}"
+    {% if section.settings.abra_promo_code_hide != blank %}
+      data-abra-default="{{ section.settings.abra_promo_code_hide | handleize }}"
+    {% endif %}
+    {% if section.settings.abra_promo_code_show != blank %}
+      data-abra-promo="{{ section.settings.abra_promo_code_show | handleize }}"
+    {% endif %}
+  >
     <div class="relative">
       {%- if section.blocks.size > 1 and section.settings.autoplay -%}
         <button
@@ -492,6 +499,20 @@
       "id": "rounded",
       "label": "t:sections.global.settings.rounded.label",
       "default": false
+    },
+    {
+      "type": "header",
+      "content": "Abra Promo"
+    },
+    {
+      "type": "text",
+      "id": "abra_promo_code_show",
+      "label": "Abra Code to Show"
+    },
+    {
+      "type": "text",
+      "id": "abra_promo_code_hide",
+      "label": "Abra Code to Hide"
     }
   ],
   "blocks": [

@@ -137,6 +137,7 @@
                     assign promo_subtext = 'promo_subtext_' | append: i
                     assign promo_overlay_content = 'promo_overlay_content_' | append: i
                     assign promo_link = 'promo_link_' | append: i
+                    assign promo_link_abra = 'promo_link_' | append: i | append: '_abra'
                     assign promo_tag = 'promo_tag_' | append: i
                     assign promo_color_text = 'promo_color_text_' | append: i
                     assign promo_color_overlay = 'promo_color_overlay_' | append: i
@@ -153,6 +154,7 @@
                         {% endif %}
                         aria-label="{{ block.settings[promo_heading] | default: block.settings[promo_subtext] | escape }}"
                         style="--color-foreground: {{ block.settings[promo_color_text].rgb }};--color-overlay: {{ block.settings[promo_color_overlay].rgb }};--overlay-opacity: {{ block.settings[promo_overlay_opacity] | divided_by: 100.0 }};"
+                        data-abra-default="{{ block.settings[abra_promo_code] | handleize }}"
                       >
                         {%- if block.settings[promo_tag] != blank -%}
                           <div class="badges z-2 absolute grid gap-3 pointer-events-none">
@@ -168,6 +170,46 @@
                             | image_tag: loading: 'lazy', widths: '180,360,540,720,900,1080', is: 'lazy-image'
                           -}}
                         </div>
+                        {%- if block.settings[promo_heading] != blank or block.settings[promo_subtext] != blank -%}
+                          <div class="media-card__content flex justify-between items-center gap-4 w-full">
+                            <div class="media-card__text opacity-0 shrink-1 grid gap-0d5">
+                              {%- if block.settings[promo_heading] != blank -%}
+                                <p>
+                                  <span class="heading reversed-link text-xl-3xl tracking-tighter leading-tight">
+                                    {{- block.settings[promo_heading] | escape -}}
+                                  </span>
+                                </p>
+                              {%- endif -%}
+                              {%- if block.settings[promo_subtext] != blank -%}
+                                <p class="leading-none text-xs">{{ block.settings[promo_subtext] }}</p>
+                              {%- endif -%}
+                            </div>
+                            {%- render 'icon',
+                              icon: 'arrow-right',
+                              size: 'xs',
+                              class: 'transform shrink-0 hidden xl:block'
+                            -%}
+                          </div>
+                        {%- endif -%}
+                      </a>
+                      <a
+                        class="media-card__link flex flex-col w-full h-full relative abra--{{ block.settings[abra_promo_code] }}-activated"
+                        {% if block.settings[promo_link_abra] != blank %}
+                          href="{{ block.settings[promo_link_abra] }}"
+                        {% else %}
+                          role="link" aria-disabled="true"
+                        {% endif %}
+                        aria-label="{{ block.settings[promo_heading] | default: block.settings[promo_subtext] | escape }}"
+                        style="--color-foreground: {{ block.settings[promo_color_text].rgb }};--color-overlay: {{ block.settings[promo_color_overlay].rgb }};--overlay-opacity: {{ block.settings[promo_overlay_opacity] | divided_by: 100.0 }};"
+                        data-abra-promo="{{ block.settings[abra_promo_code] | handleize }}"
+                      >
+                        {%- if block.settings[promo_tag] != blank -%}
+                          <div class="badges z-2 absolute grid gap-3 pointer-events-none">
+                            <span class="badge badge--onsale flex items-center gap-1d5 font-medium leading-none rounded-full">
+                              {{- block.settings[promo_tag] | escape -}}
+                            </span>
+                          </div>
+                        {%- endif -%}
                         {% if block.settings[promo_image_abra] != blank %}
                           <div class="media media--{{ block.settings[promo_image_ratio] }} relative overflow-hidden abra--{{ block.settings[abra_promo_code] }}-activated" data-abra-promo="{{ block.settings[abra_promo_code] | handleize }}">
                             {{-

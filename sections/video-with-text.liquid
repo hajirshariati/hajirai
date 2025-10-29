@@ -18,7 +18,14 @@
   {% endif -%}
 </style>
 
-<div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}" id="video" >
+<div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}{% if section.settings.abra_promo_code_show != blank %} abra--{{ section.settings.abra_promo_code_show | handleize }}-activated{% endif %}" id="video"
+  {% if section.settings.abra_promo_code_hide != blank %}
+    data-abra-default="{{ section.settings.abra_promo_code_hide | handleize }}"
+  {% endif %}
+  {% if section.settings.abra_promo_code_show != blank %}
+    data-abra-promo="{{ section.settings.abra_promo_code_show | handleize }}"
+  {% endif %}
+>
   <div class="page-width{% if section.settings.full_width %} page-width--full{% endif %} relative">
     {%- liquid
       assign with_background = false
@@ -584,6 +591,20 @@ hosted_cover_image: section.settings.hosted_cover_image | default: section.setti
       "id": "enable_parallax",
       "label": "t:sections.global.settings.enable_parallax.label",
       "default": false
+    },
+    {
+      "type": "header",
+      "content": "Abra Promo"
+    },
+    {
+      "type": "text",
+      "id": "abra_promo_code_show",
+      "label": "Abra Code to Show"
+    },
+    {
+      "type": "text",
+      "id": "abra_promo_code_hide",
+      "label": "Abra Code to Hide"
     },
     {
       "visible_if": "{{ section.settings.enable_parallax == true }}",

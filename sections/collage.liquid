@@ -14,7 +14,14 @@
 {%- capture section_heading -%}
   {%- render 'section-heading', section: section -%}
 {%- endcapture -%}
-<div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}">
+<div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}{% if section.settings.abra_promo_code_show != blank %} abra--{{ section.settings.abra_promo_code_show | handleize }}-activated{% endif %}"
+  {% if section.settings.abra_promo_code_hide != blank %}
+    data-abra-default="{{ section.settings.abra_promo_code_hide | handleize }}"
+  {% endif %}
+  {% if section.settings.abra_promo_code_show != blank %}
+    data-abra-promo="{{ section.settings.abra_promo_code_show | handleize }}"
+  {% endif %}
+>
   <div class="page-width{% if section.settings.full_width %} page-width--full{% endif %}{% if section_heading == blank %} page-width--narrow{% endif %} relative">
     <div class="collage on-scroll{% if section_heading == blank %} without-heading{% endif %} grid items-center">
       {{- section_heading -}}
@@ -338,6 +345,20 @@
       "id": "enable_parallax",
       "label": "t:sections.global.settings.enable_parallax.label",
       "default": true
+    },
+    {
+      "type": "header",
+      "content": "Abra Promo"
+    },
+    {
+      "type": "text",
+      "id": "abra_promo_code_show",
+      "label": "Abra Code to Show"
+    },
+    {
+      "type": "text",
+      "id": "abra_promo_code_hide",
+      "label": "Abra Code to Hide"
     }
   ],
   "blocks": [

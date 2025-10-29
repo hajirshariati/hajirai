@@ -732,7 +732,13 @@
           "visible_if": "{{ block.settings.promo_image_1 != blank }}",
           "type": "url",
           "id": "promo_link_1",
-          "label": "t:sections.header.blocks.mega_menu.settings.promo_link.label"
+          "label": "Link (Default)"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_1 != blank }}",
+          "type": "url",
+          "id": "promo_link_1_abra",
+          "label": "Link (Abra)"
         },
         {
           "visible_if": "{{ block.settings.promo_image_1 != blank }}",
@@ -848,7 +854,13 @@
           "visible_if": "{{ block.settings.promo_image_2 != blank }}",
           "type": "url",
           "id": "promo_link_2",
-          "label": "t:sections.header.blocks.mega_menu.settings.promo_link.label"
+          "label": "Link (Default)"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_2 != blank }}",
+          "type": "url",
+          "id": "promo_link_2_abra",
+          "label": "Link (Abra)"
         },
         {
           "visible_if": "{{ block.settings.promo_image_2 != blank }}",
@@ -964,7 +976,13 @@
           "visible_if": "{{ block.settings.promo_image_3 != blank }}",
           "type": "url",
           "id": "promo_link_3",
-          "label": "t:sections.header.blocks.mega_menu.settings.promo_link.label"
+          "label": "Link (Default)"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_3 != blank }}",
+          "type": "url",
+          "id": "promo_link_3_abra",
+          "label": "Link (Abra)"
         },
         {
           "visible_if": "{{ block.settings.promo_image_3 != blank }}",
@@ -1080,7 +1098,13 @@
           "visible_if": "{{ block.settings.promo_image_4 != blank }}",
           "type": "url",
           "id": "promo_link_4",
-          "label": "t:sections.header.blocks.mega_menu.settings.promo_link.label"
+          "label": "Link (Default)"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_4 != blank }}",
+          "type": "url",
+          "id": "promo_link_4_abra",
+          "label": "Link (Abra)"
         },
         {
           "visible_if": "{{ block.settings.promo_image_4 != blank }}",
@@ -1196,7 +1220,13 @@
           "visible_if": "{{ block.settings.promo_image_5 != blank }}",
           "type": "url",
           "id": "promo_link_5",
-          "label": "t:sections.header.blocks.mega_menu.settings.promo_link.label"
+          "label": "Link (Default)"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_5 != blank }}",
+          "type": "url",
+          "id": "promo_link_5_abra",
+          "label": "Link (Abra)"
         },
         {
           "visible_if": "{{ block.settings.promo_image_5 != blank }}",
@@ -2048,6 +2078,11 @@
     "groups": [
       "header"
     ]
-  }
+  },
+  "presets": [
+      {
+        "name": "Header"
+      }
+    ]
 }
 {% endschema %}
