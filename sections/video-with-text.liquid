@@ -46,7 +46,7 @@
               {%- if section.settings.video_mobile or section.settings.video_url_mobile -%}
                 {%- render 'video',
                   sizes: sizes,
-                  video: section.settings.video_mobile,
+                  video: section.settings.video_mobile | default: section.settings.default_video,
                   video_url: section.settings.video_url_mobile,
                   muted: section.settings.enable_video_autoplay,
                   autoplay: section.settings.enable_video_autoplay,
@@ -59,16 +59,16 @@
                 -%}
               {%- endif -%}
 
-              {%- render 'video',
-                sizes: sizes,
-                video: section.settings.video,
+{%- render 'video',
+  sizes: sizes,
+  video: section.settings.video | default: section.settings.default_video,
                 video_url: section.settings.video_url,
                 muted: section.settings.enable_video_autoplay,
                 autoplay: section.settings.enable_video_autoplay,
                 loop: section.settings.enable_video_looping,
                 description: section.settings.description,
-                cover_image: section.settings.cover_image,
-                hosted_cover_image: section.settings.hosted_cover_image,
+cover_image: section.settings.cover_image | default: section.settings.default_cover_image,
+hosted_cover_image: section.settings.hosted_cover_image | default: section.settings.default_cover_image,
                 show_play_button: show_play_button,
                 class: 'media media--height block w-full h-full relative overflow-hidden'
               -%}
@@ -269,6 +269,24 @@
       "label": "t:sections.video.settings.enable_video_looping.label",
       "default": false
     },
+
+{
+  "type": "header",
+  "content": "Default/Fallback Video"
+},
+{
+  "type": "video",
+  "id": "default_video",
+  "label": "Default video (shown when no video is selected)"
+},
+{
+  "type": "image_picker",
+  "id": "default_cover_image",
+  "label": "Default video cover image"
+},
+
+
+
     {
       "type": "select",
       "id": "image_height",
