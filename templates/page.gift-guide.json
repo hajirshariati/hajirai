@@ -354,9 +354,9 @@
         "collection_BMqtdJ": {
           "type": "collection",
           "settings": {
-            "link_type": "collection",
-            "collection": "activity-orthotics",
-            "custom_url": "",
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://www.aetrex.com/collections/2025-gift-guide?tab=products#/productsFilter:ss_price:25:70",
             "title": "$70 & Under",
             "description": "",
             "overlay_content": false,
@@ -371,8 +371,8 @@
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "womens-flip-flop-sandals",
-            "custom_url": "",
+            "collection": "",
+            "custom_url": "https://www.aetrex.com/collections/2025-gift-guide?tab=products#/productsFilter:ss_price:25:100",
             "title": "$100 & Under",
             "description": "",
             "overlay_content": false,
@@ -386,9 +386,9 @@
         "collection_zBHa9g": {
           "type": "collection",
           "settings": {
-            "link_type": "collection",
-            "collection": "womens-best-sellers-footwear",
-            "custom_url": "",
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://www.aetrex.com/collections/2025-gift-guide?tab=products#/productsFilter:ss_price:25:150",
             "title": "$150 & Under",
             "description": "",
             "overlay_content": false,
