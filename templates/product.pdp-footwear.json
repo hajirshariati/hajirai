@@ -94,7 +94,7 @@
             "icon": "lightning",
             "iwidth": "custom",
             "icon_width": 20,
-            "text": "In stock! Ships within 1-2 business days.",
+            "text": "Product In stock!",
             "text_size": "text-sm"
           }
         },
@@ -331,7 +331,9 @@
         "padding_top": 36,
         "padding_bottom": 36,
         "divider": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "help-drawer": {
@@ -590,7 +592,9 @@
         "padding_bottom": 20,
         "full_width": false,
         "divider": false,
-        "rounded": true
+        "rounded": true,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "multicolumn_CEQ6Uh": {
@@ -695,7 +699,9 @@
         "padding_bottom": 36,
         "full_width": false,
         "divider": false,
-        "rounded": true
+        "rounded": true,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "video_with_text_xf4VTt": {
@@ -749,6 +755,8 @@
         "full_width": false,
         "rounded": true,
         "enable_parallax": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": "",
         "parallax_direction": "vertical"
       }
     },
