@@ -573,9 +573,9 @@
       "settings": {
         "direction": "left",
         "speed": 20,
-        "grid_horizontal": 70,
+        "grid_horizontal": 95,
         "enable_twin": false,
-        "enable_parallax": true,
+        "enable_parallax": false,
         "color_text": "",
         "color_background": "",
         "gradient_background": "",
