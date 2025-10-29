@@ -270,15 +270,24 @@
         "collection_3qxYYM": {
           "type": "collection",
           "settings": {
-            "collection": "orthotics-for-high-arches",
-            "products": [],
+            "collection": "",
+            "products": [
+              "l2300m-m",
+              "l2300w-m",
+              "l400m-m",
+              "l400w-m",
+              "l700m-m",
+              "l700w-m",
+              "l800m-m",
+              "l800w-m"
+            ],
             "title": "For the Wellness Lover"
           }
         },
         "collection_xxeKq7": {
           "type": "collection",
           "settings": {
-            "collection": "womens-wedges-heels",
+            "collection": "",
             "products": [],
             "title": "For the Style Seeker"
           }
@@ -286,7 +295,7 @@
         "collection_yrPJnm": {
           "type": "collection",
           "settings": {
-            "collection": "womens-slippers",
+            "collection": "",
             "products": [],
             "title": "For the Comfort Enthusiast"
           }
@@ -294,7 +303,7 @@
         "collection_eTJ6UR": {
           "type": "collection",
           "settings": {
-            "collection": "refresh-your-sneakers",
+            "collection": "",
             "products": [],
             "title": "For the Frequent Flyer"
           }
