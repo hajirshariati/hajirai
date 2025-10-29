@@ -97,6 +97,7 @@
     },
     "recently-viewed": {
       "type": "recently-viewed",
+      "disabled": true,
       "settings": {
         "product_limit": 6,
         "columns": 4,
