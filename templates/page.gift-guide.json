@@ -499,6 +499,7 @@
     },
     "highlight_text_Jpt9Y7": {
       "type": "highlight-text",
+      "disabled": true,
       "name": "t:sections.highlight-text.name",
       "settings": {
         "text_alignment": "center",
@@ -604,6 +605,7 @@
         "image_T4pcHz",
         "image_XDaGWN"
       ],
+      "disabled": true,
       "name": "t:sections.scrolling-text.name",
       "settings": {
         "direction": "left",
@@ -768,7 +770,7 @@
         "swipe_on_mobile": true,
         "heading": "Gift by Foot Condition",
         "heading_size": "title-sm",
-        "heading_alignment": "text-center md:items-center",
+        "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
         "subheading": "",
         "description": "",
