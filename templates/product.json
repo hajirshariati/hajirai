@@ -331,7 +331,9 @@
         "padding_top": 36,
         "padding_bottom": 36,
         "divider": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "help-drawer": {
@@ -437,7 +439,7 @@
             "content_metafield": "metafield",
             "columns": "Size,Chest",
             "rows": "S,36\nM,38\nL,40",
-            "metafields": "custom.comfort_details\ncustom.materials_details\ncustom.measurements_details"
+            "metafields": "Comfort:custom.comfort_details\nMaterials:custom.materials_details\nMeasurements:custom.measurements_details"
           }
         },
         "collapsible_tab_96ewnx": {
@@ -590,7 +592,9 @@
         "padding_bottom": 20,
         "full_width": false,
         "divider": false,
-        "rounded": true
+        "rounded": true,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "multicolumn_CEQ6Uh": {
@@ -695,7 +699,9 @@
         "padding_bottom": 36,
         "full_width": false,
         "divider": false,
-        "rounded": true
+        "rounded": true,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "video_with_text_xf4VTt": {
@@ -749,6 +755,8 @@
         "full_width": false,
         "rounded": true,
         "enable_parallax": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": "",
         "parallax_direction": "vertical"
       }
     },
