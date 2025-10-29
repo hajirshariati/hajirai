@@ -566,6 +566,9 @@
         "column_bD63kq",
         "column_WdX4Cf"
       ],
+      "custom_css": [
+        ".multicolumn-card {background: #f4f4f4 !important;}"
+      ],
       "name": "Multicolumn",
       "settings": {
         "gap": "small",
@@ -670,6 +673,9 @@
         "column_jXnbGp",
         "column_3PQyDY",
         "column_GxLQdE"
+      ],
+      "custom_css": [
+        ".multicolumn-card {background: #f4f4f4 !important;}"
       ],
       "name": "Multicolumn",
       "settings": {
