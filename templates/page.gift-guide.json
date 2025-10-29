@@ -62,7 +62,7 @@
         "content_width": "small",
         "content_position": "md:items-center md:justify-start",
         "text_alignment": "center",
-        "image_mobile": "shopify://shop_images/mobile_wo_text_v3.jpg",
+        "image_mobile": "shopify://shop_images/Banner_Mobile.jpg",
         "image_height_mobile": "auto",
         "content_position_mobile": "items-end justify-center",
         "text_alignment_mobile": "center",
