@@ -577,7 +577,7 @@
         "carousel_on_desktop": false,
         "swipe_on_mobile": true,
         "heading": "Loved By Millions",
-        "heading_size": "title-md",
+        "heading_size": "title-sm",
         "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
         "subheading": "",
