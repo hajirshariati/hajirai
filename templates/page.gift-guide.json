@@ -652,7 +652,7 @@
             "heading": "Shop Women's Gifts",
             "link": "shopify://products/addie-black-nc500w",
             "invert_subheading_heading": false,
-            "image": "shopify://shop_images/women_900f5d8b-0f89-4f21-affd-cfa3e6c32a70.jpg",
+            "image": "shopify://shop_images/womengift_v2.jpg",
             "image_ratio": "adapt",
             "content_position": "md:items-end md:justify-center",
             "text_alignment": "center",
@@ -665,7 +665,7 @@
             "color_highlight": "",
             "gradient_highlight": "",
             "color_overlay": "#ffffff",
-            "overlay_opacity": 0
+            "overlay_opacity": 35
           }
         },
         "image_kirkAq": {
@@ -675,7 +675,7 @@
             "heading": "Shop Men's Gifts",
             "link": "",
             "invert_subheading_heading": false,
-            "image": "shopify://shop_images/men_0514e55c-4738-469c-a5a4-14fb4fca092e.jpg",
+            "image": "shopify://shop_images/mengift_v2.jpg",
             "image_ratio": "adapt",
             "content_position": "md:items-end md:justify-center",
             "text_alignment": "center",
@@ -688,7 +688,7 @@
             "color_highlight": "",
             "gradient_highlight": "",
             "color_overlay": "#ffffff",
-            "overlay_opacity": 0
+            "overlay_opacity": 35
           }
         }
       },
