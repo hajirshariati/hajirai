@@ -320,7 +320,15 @@
           "type": "collection",
           "settings": {
             "collection": "",
-            "products": [],
+            "products": [
+              "mandy-wine-fe208w",
+              "mandy-grey-fe206w",
+              "millie-charcoal-fe704w",
+              "malina-black-fe900w",
+              "malina-charcoal-fe904w",
+              "misty-pink-fe269w",
+              "misty-ivory-fe262w"
+            ],
             "title": "For the Frequent Flyer"
           }
         },
