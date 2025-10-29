@@ -759,6 +759,89 @@
         "abra_promo_code_hide": ""
       }
     },
+    "rich_text_jCLnLy": {
+      "type": "rich-text",
+      "blocks": {
+        "text_m6gRMd": {
+          "type": "text",
+          "settings": {
+            "text": "<p><em>#MYAETREX</em></p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "heading_mNJGUU": {
+          "type": "heading",
+          "settings": {
+            "heading": "<em>Show Us Your Aetrex Shoes</em>",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_DP39Un": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Use the hashtag #MyAetrex and tag @Aetrexworldwide for the chance to be featured here.</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 40,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_m6gRMd",
+        "heading_mNJGUU",
+        "text_DP39Un"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "narrow": false,
+        "color_text": "rgba(0,0,0,0)",
+        "color_background": "#fafafa",
+        "gradient_background": "",
+        "color_highlight": "#4a6154",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 48,
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
     "ugc_gallery_bTB9YG": {
       "type": "ugc-gallery",
       "name": "UGC Gallery",
@@ -778,6 +861,7 @@
     "collage_ntqjfh",
     "logo_list_EzFUUx",
     "collection_list_KbwCHx",
+    "rich_text_jCLnLy",
     "ugc_gallery_bTB9YG"
   ]
 }
