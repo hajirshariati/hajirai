@@ -149,25 +149,25 @@
         assign metafield = product.metafields[metafield_namespace][metafield_key]
       -%}
 
-{%- if metafield.value != blank -%}
-  <div class="col-span-full md:col-span-6">
-    <h6 class="leading-none tracking-none">{{ metafield.definition.name | default: metafield_name | escape }}</h6>
-    {%- if metafield.list? -%}
-      <p>
-        {%- liquid
-          for value in metafield.value
-            echo value
-            unless forloop.last
-              echo '<br />'
-            endunless
-          endfor
-        -%}
-      </p>
-    {%- else -%}
-      <div>{{ metafield.value }}</div>
-    {%- endif -%}
-  </div>
-{%- endif -%}
+      {%- if metafield.value != blank -%}
+        <div class="col-span-full md:col-span-6">
+          <h6 class="leading-none tracking-none">{{ metafield_name | escape }} <!-- v2 --></h6>
+          {%- if metafield.list? -%}
+            <p>
+              {%- liquid
+                for value in metafield.value
+                  echo value
+                  unless forloop.last
+                    echo '<br />'
+                  endunless
+                endfor
+              -%}
+            </p>
+          {%- else -%}
+            <div>{{ metafield.value }}</div>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
     {%- endfor -%}
   {%- endif -%}
 {%- endcapture -%}
