@@ -463,9 +463,9 @@
         "collection_mahcwy": {
           "type": "collection",
           "settings": {
-            "link_type": "collection",
-            "collection": "plantar-fasciitis",
-            "custom_url": "",
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://www.aetrex.com/collections/2025-gift-guide?tab=products#/productsFilter:mfield_product_reccomended_for:Plantar$2520Fasciitis",
             "image": "shopify://shop_images/plantar_aee23cac-d06a-4069-9636-95145c7380a1.jpg",
             "title": "Plantar Fasciitis",
             "description": "",
@@ -480,9 +480,9 @@
         "collection_9jpzFz": {
           "type": "collection",
           "settings": {
-            "link_type": "collection",
+            "link_type": "url",
             "collection": "",
-            "custom_url": "",
+            "custom_url": "https://www.aetrex.com/collections/2025-gift-guide?tab=products#/productsFilter:mfield_product_reccomended_for:Ball$2520of$2520Foot$2520Pain",
             "image": "shopify://shop_images/ball_of_foot_9ce3beb3-85e2-4cd5-bc29-c1d727f2ab0e.jpg",
             "title": "Ball of Foot Pain",
             "description": "",
@@ -497,9 +497,9 @@
         "collection_hpGnqB": {
           "type": "collection",
           "settings": {
-            "link_type": "collection",
-            "collection": "flat-feet",
-            "custom_url": "",
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://www.aetrex.com/collections/2025-gift-guide?tab=products#/productsFilter:mfield_product_reccomended_for:Flat$2520Feet",
             "image": "shopify://shop_images/flat.jpg",
             "title": "Flat Feet",
             "description": "",
@@ -514,9 +514,9 @@
         "collection_QxdCma": {
           "type": "collection",
           "settings": {
-            "link_type": "collection",
+            "link_type": "url",
             "collection": "",
-            "custom_url": "",
+            "custom_url": "https://www.aetrex.com/collections/2025-gift-guide?tab=products#/productsFilter:mfield_product_reccomended_for:High$2520Arch",
             "image": "shopify://shop_images/high_arch.jpg",
             "title": "High Arches",
             "description": "",
@@ -531,45 +531,11 @@
         "collection_hppEEf": {
           "type": "collection",
           "settings": {
-            "link_type": "collection",
+            "link_type": "url",
             "collection": "",
-            "custom_url": "",
+            "custom_url": "https://www.aetrex.com/collections/2025-gift-guide?tab=products#/productsFilter:mfield_product_reccomended_for:Metatarsalgia",
             "image": "shopify://shop_images/metatarsalgia_3ff64022-7dbe-48c5-92a7-3a1c8ad2aae9.jpg",
             "title": "Metatarsalgia",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_hcYY4B": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "",
-            "custom_url": "",
-            "image": "shopify://shop_images/neuroma_9991dac7-3a7e-47f5-91dc-48f905ad1ec6.jpg",
-            "title": "Morton's Neuroma",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_fagwhw": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "",
-            "custom_url": "",
-            "image": "shopify://shop_images/overpronantion_corrected.jpg",
-            "title": "Overpronation",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -582,11 +548,28 @@
         "collection_nRRXUD": {
           "type": "collection",
           "settings": {
-            "link_type": "collection",
+            "link_type": "url",
             "collection": "",
-            "custom_url": "",
+            "custom_url": "https://www.aetrex.com/collections/2025-gift-guide?tab=products#/productsFilter:mfield_product_reccomended_for:Bunions",
             "image": "shopify://shop_images/bunions.jpg",
             "title": "Bunions",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_hcYY4B": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "https://www.aetrex.com/collections/2025-gift-guide?tab=products#/productsFilter:mfield_product_reccomended_for:Morton's$2520Neuroma",
+            "image": "shopify://shop_images/neuroma_9991dac7-3a7e-47f5-91dc-48f905ad1ec6.jpg",
+            "title": "Morton's Neuroma",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -603,9 +586,8 @@
         "collection_hpGnqB",
         "collection_QxdCma",
         "collection_hppEEf",
-        "collection_hcYY4B",
-        "collection_fagwhw",
-        "collection_nRRXUD"
+        "collection_nRRXUD",
+        "collection_hcYY4B"
       ],
       "name": "t:sections.collection-list.name",
       "settings": {
