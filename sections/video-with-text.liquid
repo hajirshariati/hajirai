@@ -50,32 +50,57 @@
                   assign show_play_button = false
                 endif
               -%}
-              {%- if section.settings.video_mobile or section.settings.video_url_mobile -%}
+{%- if section.settings.video_mobile or section.settings.video_url_mobile -%}
+                {%- liquid
+                  assign mobile_video_to_use = section.settings.video_mobile
+                  assign mobile_cover_to_use = section.settings.cover_image_mobile
+                  
+                  if mobile_video_to_use == blank and section.settings.video_url_mobile == blank
+                    assign mobile_video_to_use = section.settings.default_video
+                    if mobile_cover_to_use == blank
+                      assign mobile_cover_to_use = section.settings.default_cover_image
+                    endif
+                  endif
+                -%}
+
                 {%- render 'video',
                   sizes: sizes,
-                  video: section.settings.video_mobile | default: section.settings.default_video,
+                  video: mobile_video_to_use,
                   video_url: section.settings.video_url_mobile,
                   muted: section.settings.enable_video_autoplay,
                   autoplay: section.settings.enable_video_autoplay,
                   loop: section.settings.enable_video_looping,
                   description: section.settings.description,
-                  cover_image: section.settings.cover_image_mobile,
+                  cover_image: mobile_cover_to_use,
                   show_play_button: show_play_button,
                   is_mobile: true,
                   class: 'media media--height block w-full h-full relative overflow-hidden'
                 -%}
               {%- endif -%}
 
-{%- render 'video',
-  sizes: sizes,
-  video: section.settings.video | default: section.settings.default_video,
+              {%- liquid
+                assign video_to_use = section.settings.video
+                assign cover_to_use = section.settings.cover_image
+                assign hosted_cover_to_use = section.settings.hosted_cover_image
+                
+                if section.settings.video == blank and section.settings.video_url == blank
+                  assign video_to_use = section.settings.default_video
+                  if cover_to_use == blank and hosted_cover_to_use == blank
+                    assign cover_to_use = section.settings.default_cover_image
+                  endif
+                endif
+              -%}
+
+              {%- render 'video',
+                sizes: sizes,
+                video: video_to_use,
                 video_url: section.settings.video_url,
                 muted: section.settings.enable_video_autoplay,
                 autoplay: section.settings.enable_video_autoplay,
                 loop: section.settings.enable_video_looping,
                 description: section.settings.description,
-cover_image: section.settings.cover_image | default: section.settings.default_cover_image,
-hosted_cover_image: section.settings.hosted_cover_image | default: section.settings.default_cover_image,
+                cover_image: cover_to_use,
+                hosted_cover_image: hosted_cover_to_use,
                 show_play_button: show_play_button,
                 class: 'media media--height block w-full h-full relative overflow-hidden'
               -%}
