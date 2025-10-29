@@ -448,7 +448,7 @@
         "collection_baEPmU": {
           "type": "collection",
           "settings": {
-            "link_type": "collection",
+            "link_type": "url",
             "collection": "",
             "custom_url": "https://www.aetrex.com/collections/2025-gift-guide?tab=products#/productsFilter:product_type:Accessories",
             "image": "shopify://shop_images/32653-AR900111_catalog.webp",
