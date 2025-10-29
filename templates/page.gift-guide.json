@@ -41,7 +41,7 @@
           "type": "button",
           "settings": {
             "button_label": "Shop All Gifts",
-            "button_link": "",
+            "button_link": "shopify://collections/2025-gift-guide",
             "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
