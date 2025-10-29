@@ -171,21 +171,23 @@
     "featured_collections_9d3ge7": {
       "type": "featured-collections",
       "blocks": {
-        "collection_3qxYYM": {
+        "collection_nrBYzh": {
           "type": "collection",
           "settings": {
             "collection": "",
             "products": [
-              "l2300m-m",
-              "l2300w-m",
-              "l400m-m",
-              "l400w-m",
-              "l700m-m",
-              "l700w-m",
-              "l800m-m",
-              "l800w-m"
+              "danika-ivory-ap111w",
+              "l1900m-m",
+              "l1900w-m",
+              "carly-grey-as106w",
+              "megan-pewter-ct406w",
+              "ivy-champagne-ct306w",
+              "elise-navy-af155w",
+              "chase-mens-black-ap900m",
+              "xspress-runner2-white-xs103w",
+              "emily-chalk-af101w"
             ],
-            "title": "For the Wellness Lover"
+            "title": "For the Always-In-Motion"
           }
         },
         "collection_xxeKq7": {
@@ -195,6 +197,8 @@
             "products": [
               "reagan-red-ah609w",
               "kaylee-dark-brown-lb659w",
+              "l100m-m",
+              "l100w-m",
               "charlotte-white-ca711w",
               "gianna-taupe-cx200w",
               "dahlia-navy-dm352w",
@@ -236,32 +240,30 @@
             "title": "For the Comfort Enthusiast"
           }
         },
-        "collection_nrBYzh": {
+        "collection_3qxYYM": {
           "type": "collection",
           "settings": {
             "collection": "",
             "products": [
-              "danika-ivory-ap111w",
-              "l1900m-m",
-              "l1900w-m",
-              "carly-grey-as106w",
-              "megan-pewter-ct406w",
-              "ivy-champagne-ct306w",
-              "elise-navy-af155w",
-              "chase-mens-black-ap900m",
-              "xspress-runner2-white-xs103w",
-              "emily-chalk-af101w"
+              "l2300m-m",
+              "l2300w-m",
+              "l400m-m",
+              "l400w-m",
+              "l700m-m",
+              "l700w-m",
+              "l800m-m",
+              "l800w-m"
             ],
-            "title": "For the Always-In-Motion"
+            "title": "For the Wellness Lover"
           }
         }
       },
       "block_order": [
-        "collection_3qxYYM",
+        "collection_nrBYzh",
         "collection_xxeKq7",
         "collection_yrPJnm",
         "collection_eTJ6UR",
-        "collection_nrBYzh"
+        "collection_3qxYYM"
       ],
       "name": "Multiple featured collections",
       "settings": {
