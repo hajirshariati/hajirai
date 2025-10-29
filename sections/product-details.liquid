@@ -334,10 +334,15 @@
   s.type='text/javascript';s.async=true;
   s.src='https://'+r+'-cdn'+(e==='dev'||e==='staging'?'.'+e:'')+ '.truefitcorp.com/fitrec/global/js/tf-integration.js?storeKey='+r;
   x.parentNode.insertBefore(s,x);
-// Don't change anything above this line
 })('atx', 'prd', {autoCalculate: true});
 </script>    
-<div class="tfc-fitrec-product" data-styleid="THE_PRODUCT_ID" data-userid="THE_USER_ID" data-colorid="THE_COLOR_ID" data-locale="THE_LOCALE"></div>
+
+<div class="tfc-fitrec-product" 
+     data-styleid="{{ product.id }}" 
+     data-userid="" 
+     data-colorid="{{ product.selected_or_first_available_variant.id }}" 
+     data-locale="{{ request.locale.iso_code }}">
+</div>
 
   {%- endif -%}
 {%- endif -%}
