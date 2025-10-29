@@ -449,8 +449,9 @@
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "womens-shoe-accessories",
-            "custom_url": "",
+            "collection": "",
+            "custom_url": "https://www.aetrex.com/collections/2025-gift-guide?tab=products#/productsFilter:mfield_custom_category_for_filter:Accessories",
+            "image": "shopify://shop_images/32653-AR900111_catalog.webp",
             "title": "Stocking Stuffers",
             "description": "",
             "overlay_content": false,
