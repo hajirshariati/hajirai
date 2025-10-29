@@ -507,9 +507,9 @@
             "text_alignment": "center",
             "text_alignment_mobile": "center",
             "image_ratio": "adapt",
-            "heading": "<strong>These Saved My Life!</strong>",
+            "heading": "",
             "heading_size": "text-lg-2xl",
-            "text": "<p>★★★★★</p><p>These flip flops saved my summer! My plantar fasciitis was really bad and when I put these on I felt relief almost immediately. The discomfort continues to subside more and more each day, and is still improving, which I largely attribute to wearing these all day, every day. Plus, they felt very secure even when wet. Very thankful for these!</p><p><em>- Lisa R.</em></p>",
+            "text": "<p>★★★★★</p><p>Super comfy and stylish!</p><p><em>- Kimber L.</em></p>",
             "custom_html": "",
             "button_label": "",
             "button_link": "",
@@ -520,16 +520,16 @@
             "highlighted_scribble": "circle"
           }
         },
-        "column_bPGxxM": {
+        "column_gGRrGz": {
           "type": "column",
           "settings": {
             "show_border": false,
             "text_alignment": "center",
             "text_alignment_mobile": "center",
             "image_ratio": "adapt",
-            "heading": "<strong>My Absolute Favorite!</strong>",
+            "heading": "",
             "heading_size": "text-lg-2xl",
-            "text": "<p>★★★★★</p><p>These were the first shoe I ordered from Aetrex. I loved them immediately. I am now on my 3rd pair, including one for my daughter since she kept stealing mine! They are cushiony & supportive enough for a day at an amusement park plus the strap keeps them secure. Casual enough for everyday, but dressy enough for a night out means only packing one pair for trips.</p><p><em>- Holly J.</em></p>",
+            "text": "<p>★★★★★</p><p>Looks Good, Fits Even Better!!</p><p><em>- Doris B.</em></p>",
             "custom_html": "",
             "button_label": "",
             "button_link": "",
@@ -540,16 +540,56 @@
             "highlighted_scribble": "circle"
           }
         },
-        "column_Qcy47y": {
+        "column_CEKNpP": {
           "type": "column",
           "settings": {
             "show_border": false,
             "text_alignment": "center",
             "text_alignment_mobile": "center",
             "image_ratio": "adapt",
-            "heading": "<strong>Better Than My Bare Feet!</strong>",
+            "heading": "",
             "heading_size": "text-lg-2xl",
-            "text": "<p>★★★★★</p><p>These sandals are perfect. They are very cushioned and supportive in all the right places. I can already feel the difference with my pronation issues when I wear these slides. I also love that they are cute and so easy to wear. I wear them out or just around the house. I couldn't recommend more!!!</p><p><em>- Kimberly S.</em></p>",
+            "text": "<p>★★★★★</p><p>Love, love, love these shoes!</p><p><em>- Karen P.</em></p>",
+            "custom_html": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_XdTmjJ": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>★★★★★</p><p>I feel 15 years younger!</p><p><em>- Mollie B.</em></p>",
+            "custom_html": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_bD63kq": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>★★★★★</p><p>These insoles make my feet soooo happy FEELS LIKE WALKING ON CLOUDS!</p><p><em>- Beverly.</em></p>",
             "custom_html": "",
             "button_label": "",
             "button_link": "",
@@ -563,8 +603,10 @@
       },
       "block_order": [
         "column_QFMHTJ",
-        "column_bPGxxM",
-        "column_Qcy47y"
+        "column_gGRrGz",
+        "column_CEKNpP",
+        "column_XdTmjJ",
+        "column_bD63kq"
       ],
       "name": "Multicolumn",
       "settings": {
