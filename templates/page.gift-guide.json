@@ -589,7 +589,7 @@
             "image_ratio": "adapt",
             "heading": "",
             "heading_size": "text-lg-2xl",
-            "text": "<p>★★★★★</p><p>These insoles make my feet soooo happy FEELS LIKE WALKING ON CLOUDS!</p><p><em>- Beverly.</em></p>",
+            "text": "<p>★★★★★</p><p>These insoles make my feet soooo happy FEELS LIKE WALKING ON CLOUDS!</p><p><em>- Beverly</em></p>",
             "custom_html": "",
             "button_label": "",
             "button_link": "",
@@ -600,16 +600,16 @@
             "highlighted_scribble": "circle"
           }
         },
-        "column_9Wb43Y": {
+        "column_y3Myhb": {
           "type": "column",
           "settings": {
             "show_border": false,
-            "text_alignment": "left",
-            "text_alignment_mobile": "left",
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
             "image_ratio": "adapt",
-            "heading": "Example title",
+            "heading": "",
             "heading_size": "text-lg-2xl",
-            "text": "<p>Use this section to explain a set of product features, to link to a series of pages, or to answer common questions about your products.</p>",
+            "text": "<p>★★★★★</p><p>I went from 100% pain down to 5%</p><p><em>- </em>Deannie</p>",
             "custom_html": "",
             "button_label": "",
             "button_link": "",
@@ -620,16 +620,76 @@
             "highlighted_scribble": "circle"
           }
         },
-        "column_YYryVQ": {
+        "column_qYRBzy": {
           "type": "column",
           "settings": {
             "show_border": false,
-            "text_alignment": "left",
-            "text_alignment_mobile": "left",
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
             "image_ratio": "adapt",
-            "heading": "Example title",
+            "heading": "",
             "heading_size": "text-lg-2xl",
-            "text": "<p>Use this section to explain a set of product features, to link to a series of pages, or to answer common questions about your products.</p>",
+            "text": "<p>★★★★★</p><p>I am so happy to walk with no pain with Aetrex shoes!</p><p><em>- Annie G.</em></p>",
+            "custom_html": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_KqQHwk": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>★★★★★</p><p>Very, very comfortable and supportive</p><p><em>- Cynthia B.</em></p>",
+            "custom_html": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_H8nWXd": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>★★★★★</p><p>Most comfortable shoes I have put on my feet.</p><p><em>- Kim N.</em></p>",
+            "custom_html": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_WdX4Cf": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image_ratio": "adapt",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>★★★★★</p><p>Very comfortable and stylish. They support my arches, heels, and also accommodate my bunions.</p><p><em>- </em>Jacqueline I.</p>",
             "custom_html": "",
             "button_label": "",
             "button_link": "",
@@ -647,8 +707,11 @@
         "column_CEKNpP",
         "column_XdTmjJ",
         "column_bD63kq",
-        "column_9Wb43Y",
-        "column_YYryVQ"
+        "column_y3Myhb",
+        "column_qYRBzy",
+        "column_KqQHwk",
+        "column_H8nWXd",
+        "column_WdX4Cf"
       ],
       "name": "Multicolumn",
       "settings": {
