@@ -497,6 +497,42 @@
         "abra_promo_code_hide": ""
       }
     },
+    "rich_text_V7Qy7G": {
+      "type": "rich-text",
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "As Seen On",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "narrow": false,
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
     "scrolling_text_gnHFPk": {
       "type": "scrolling-text",
       "blocks": {
@@ -840,6 +876,7 @@
     "featured_collections_9d3ge7",
     "collection_list_mPHCpz",
     "collage_ntqjfh",
+    "rich_text_V7Qy7G",
     "scrolling_text_gnHFPk",
     "collection_list_KbwCHx",
     "rich_text_jCLnLy",
