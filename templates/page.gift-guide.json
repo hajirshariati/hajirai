@@ -733,8 +733,8 @@
       "name": "UGC Gallery",
       "settings": {
         "custom_gallery": "",
-        "global_pdp_sourced_gallery": "67807363501d9d972ff9bf48",
-        "global_fallback_sourced_gallery": "67806b650c1215001c37bb7e"
+        "global_pdp_sourced_gallery": "",
+        "global_fallback_sourced_gallery": "67c9dfd952921dee2bb9fc5c"
       }
     }
   },
