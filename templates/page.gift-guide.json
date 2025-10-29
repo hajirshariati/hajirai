@@ -304,7 +304,15 @@
           "type": "collection",
           "settings": {
             "collection": "",
-            "products": [],
+            "products": [
+              "dash-women-blue-ap955w",
+              "dash-mens-black-ap950m",
+              "morgan-oatmeal-ca733w",
+              "teagan-navy-nc105w",
+              "helena-black-dm570w",
+              "karina-brown-dm502w",
+              "zoey-dark-taupe-bw702w"
+            ],
             "title": "For the Comfort Enthusiast"
           }
         },
