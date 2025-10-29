@@ -168,101 +168,6 @@
         "abra_promo_code_hide": ""
       }
     },
-    "logo_list_EzFUUx": {
-      "type": "logo-list",
-      "blocks": {
-        "logo_gMfmid": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/image_80.png",
-            "height": 52,
-            "link": ""
-          }
-        },
-        "logo_tfFaTx": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/image_81.png",
-            "height": 52,
-            "link": ""
-          }
-        },
-        "logo_BLnhFd": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/image_82.png",
-            "height": 52,
-            "link": ""
-          }
-        },
-        "logo_8i8VzQ": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/image_83.png",
-            "height": 52,
-            "link": ""
-          }
-        },
-        "logo_Y6WYtF": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/image_84.png",
-            "height": 52,
-            "link": ""
-          }
-        },
-        "logo_mR46E4": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/image_89.png",
-            "height": 52,
-            "link": ""
-          }
-        }
-      },
-      "block_order": [
-        "logo_gMfmid",
-        "logo_tfFaTx",
-        "logo_BLnhFd",
-        "logo_8i8VzQ",
-        "logo_Y6WYtF",
-        "logo_mR46E4"
-      ],
-      "name": "Logo list",
-      "settings": {
-        "layout": "default",
-        "grid_horizontal": 50,
-        "direction": "left",
-        "speed": 1,
-        "heading": "AS SEEN ON",
-        "heading_size": "title-sm",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 32,
-        "padding_bottom": 32,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
     "featured_collections_9d3ge7": {
       "type": "featured-collections",
       "blocks": {
@@ -312,7 +217,7 @@
               "karina-brown-dm502w",
               "zoey-dark-taupe-bw702w"
             ],
-            "title": "For the Comfort Enthusiast"
+            "title": "For the Frequent Flyer"
           }
         },
         "collection_eTJ6UR": {
@@ -328,7 +233,7 @@
               "misty-pink-fe269w",
               "misty-ivory-fe262w"
             ],
-            "title": "For the Frequent Flyer"
+            "title": "For the Comfort Enthusiast"
           }
         },
         "collection_nrBYzh": {
@@ -503,6 +408,187 @@
         "abra_promo_code_hide": ""
       }
     },
+    "collage_ntqjfh": {
+      "type": "collage",
+      "blocks": {
+        "image_i7MLJM": {
+          "type": "image",
+          "settings": {
+            "subheading": "",
+            "heading": "Shop Women's Gifts",
+            "link": "shopify://products/addie-black-nc500w",
+            "invert_subheading_heading": false,
+            "image": "shopify://shop_images/womengift_v2.jpg",
+            "image_ratio": "adapt",
+            "content_position": "md:items-end md:justify-center",
+            "text_alignment": "center",
+            "image_ratio_mobile": "adapt",
+            "content_position_mobile": "items-end justify-center",
+            "text_alignment_mobile": "center",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle",
+            "color_text": "#171717",
+            "color_highlight": "",
+            "gradient_highlight": "",
+            "color_overlay": "#ffffff",
+            "overlay_opacity": 35
+          }
+        },
+        "image_kirkAq": {
+          "type": "image",
+          "settings": {
+            "subheading": "",
+            "heading": "Shop Men's Gifts",
+            "link": "",
+            "invert_subheading_heading": false,
+            "image": "shopify://shop_images/mengift_v2.jpg",
+            "image_ratio": "adapt",
+            "content_position": "md:items-end md:justify-center",
+            "text_alignment": "center",
+            "image_ratio_mobile": "adapt",
+            "content_position_mobile": "items-end justify-center",
+            "text_alignment_mobile": "center",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle",
+            "color_text": "#171717",
+            "color_highlight": "",
+            "gradient_highlight": "",
+            "color_overlay": "#ffffff",
+            "overlay_opacity": 35
+          }
+        }
+      },
+      "block_order": [
+        "image_i7MLJM",
+        "image_kirkAq"
+      ],
+      "name": "t:sections.collage.name",
+      "settings": {
+        "heading": "<strong>Shop Curated Picks</strong>",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "<p>Tailored support for him and her</p>",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "logo_list_EzFUUx": {
+      "type": "logo-list",
+      "blocks": {
+        "logo_gMfmid": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/image_80.png",
+            "height": 52,
+            "link": ""
+          }
+        },
+        "logo_tfFaTx": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/image_81.png",
+            "height": 52,
+            "link": ""
+          }
+        },
+        "logo_BLnhFd": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/image_82.png",
+            "height": 52,
+            "link": ""
+          }
+        },
+        "logo_8i8VzQ": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/image_83.png",
+            "height": 52,
+            "link": ""
+          }
+        },
+        "logo_Y6WYtF": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/image_84.png",
+            "height": 52,
+            "link": ""
+          }
+        },
+        "logo_mR46E4": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/image_89.png",
+            "height": 52,
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "logo_gMfmid",
+        "logo_tfFaTx",
+        "logo_BLnhFd",
+        "logo_8i8VzQ",
+        "logo_Y6WYtF",
+        "logo_mR46E4"
+      ],
+      "name": "Logo list",
+      "settings": {
+        "layout": "default",
+        "grid_horizontal": 50,
+        "direction": "left",
+        "speed": 1,
+        "heading": "AS SEEN ON",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 32,
+        "padding_bottom": 32,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
     "collection_list_KbwCHx": {
       "type": "collection-list",
       "blocks": {
@@ -666,92 +752,6 @@
         "divider": false,
         "full_width": false,
         "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "collage_ntqjfh": {
-      "type": "collage",
-      "blocks": {
-        "image_i7MLJM": {
-          "type": "image",
-          "settings": {
-            "subheading": "",
-            "heading": "Shop Women's Gifts",
-            "link": "shopify://products/addie-black-nc500w",
-            "invert_subheading_heading": false,
-            "image": "shopify://shop_images/womengift_v2.jpg",
-            "image_ratio": "adapt",
-            "content_position": "md:items-end md:justify-center",
-            "text_alignment": "center",
-            "image_ratio_mobile": "adapt",
-            "content_position_mobile": "items-end justify-center",
-            "text_alignment_mobile": "center",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle",
-            "color_text": "#171717",
-            "color_highlight": "",
-            "gradient_highlight": "",
-            "color_overlay": "#ffffff",
-            "overlay_opacity": 35
-          }
-        },
-        "image_kirkAq": {
-          "type": "image",
-          "settings": {
-            "subheading": "",
-            "heading": "Shop Men's Gifts",
-            "link": "",
-            "invert_subheading_heading": false,
-            "image": "shopify://shop_images/mengift_v2.jpg",
-            "image_ratio": "adapt",
-            "content_position": "md:items-end md:justify-center",
-            "text_alignment": "center",
-            "image_ratio_mobile": "adapt",
-            "content_position_mobile": "items-end justify-center",
-            "text_alignment_mobile": "center",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle",
-            "color_text": "#171717",
-            "color_highlight": "",
-            "gradient_highlight": "",
-            "color_overlay": "#ffffff",
-            "overlay_opacity": 35
-          }
-        }
-      },
-      "block_order": [
-        "image_i7MLJM",
-        "image_kirkAq"
-      ],
-      "name": "t:sections.collage.name",
-      "settings": {
-        "heading": "<strong>Shop Curated Picks</strong>",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "<p>Tailored support for him and her</p>",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "#171717",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "enable_parallax": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
