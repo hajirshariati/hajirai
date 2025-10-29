@@ -228,7 +228,6 @@
         "logo_Y6WYtF",
         "logo_mR46E4"
       ],
-      "disabled": true,
       "name": "Logo list",
       "settings": {
         "layout": "default",
@@ -771,11 +770,11 @@
     "main-page",
     "image_with_text_overlay_TLcLxB",
     "multicolumn_with_icons_C37PFY",
-    "logo_list_EzFUUx",
     "featured_collections_9d3ge7",
     "collection_list_mPHCpz",
-    "collection_list_KbwCHx",
     "collage_ntqjfh",
+    "logo_list_EzFUUx",
+    "collection_list_KbwCHx",
     "ugc_gallery_bTB9YG"
   ]
 }
