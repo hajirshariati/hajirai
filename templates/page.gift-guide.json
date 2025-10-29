@@ -335,8 +335,13 @@
         "collection_nrBYzh": {
           "type": "collection",
           "settings": {
-            "collection": "active",
-            "products": [],
+            "collection": "",
+            "products": [
+              "danika-ivory-ap111w",
+              "l1900m-m",
+              "l1900w-m",
+              "carly-grey-as106w"
+            ],
             "title": "For the Always-In-Motion"
           }
         }
