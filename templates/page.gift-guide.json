@@ -419,7 +419,7 @@
           "settings": {
             "subheading": "",
             "heading": "Shop Women's Gifts",
-            "link": "shopify://products/addie-black-nc500w",
+            "link": "https://www.aetrex.com/collections/2025-gift-guide?tab=products#/productsFilter:ss_gender:Women/productsFilter:ss_gender:Unisex",
             "invert_subheading_heading": false,
             "image": "shopify://shop_images/womengift_v2.jpg",
             "image_ratio": "adapt",
@@ -442,7 +442,7 @@
           "settings": {
             "subheading": "",
             "heading": "Shop Men's Gifts",
-            "link": "",
+            "link": "https://www.aetrex.com/collections/2025-gift-guide?tab=products#/productsFilter:ss_gender:Unisex/productsFilter:ss_gender:Men",
             "invert_subheading_heading": false,
             "image": "shopify://shop_images/mengift_v2.jpg",
             "image_ratio": "adapt",
