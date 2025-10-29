@@ -322,6 +322,21 @@
     </div>
 
 
+
+
+<script>
+(function(r,e,o){
+  var w=window,d=document,t,s,x;
+  w.tfcapi=t=w.tfcapi||function(){t.q=t.q||[]; t.q.push(arguments);};
+  t('init', {storeKey: r, environment: e, ...o});
+  x=d.getElementsByTagName('script')[0];
+  s=d.createElement('script');
+  s.type='text/javascript';s.async=true;
+  s.src='https://'+r+'-cdn'+(e==='dev'||e==='staging'?'.'+e:'')+ '.truefitcorp.com/fitrec/global/js/tf-integration.js?storeKey='+r;
+  x.parentNode.insertBefore(s,x);
+// Don't change anything above this line
+})('atx', 'prd', {autoCalculate: true});
+</script>    
 <div class="tfc-fitrec-product" data-styleid="THE_PRODUCT_ID" data-userid="THE_USER_ID" data-colorid="THE_COLOR_ID" data-locale="THE_LOCALE"></div>
 
   {%- endif -%}
