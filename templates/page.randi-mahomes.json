@@ -273,7 +273,7 @@
         "heading_TC4FdY": {
           "type": "heading",
           "settings": {
-            "heading": "Brianna",
+            "heading": "Game Day Style",
             "heading_size": "title-sm",
             "heading_tag": "h3",
             "highlighted_text": "none",
@@ -283,7 +283,7 @@
         "text_qBGErE": {
           "type": "text",
           "settings": {
-            "text": "<p><strong>Ballet Flat</strong></p><p>Designed with your foot health in mind, the Brianna flat features arch support, a stretchy topline, a weightless feel, and 5mm of memory foam for extra comfort throughout the day. Add a touch of sophistication to any outfit and step confidently into each day with this flat!</p>",
+            "text": "<p>Randi’s game-day must-have. The Reagan brings bold, stadium-ready style in classic red — paired with Aetrex’s signature arch support and cushioning to keep her comfortable from kickoff to the final whistle. </p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -298,7 +298,7 @@
         "button_CAd8dK": {
           "type": "button",
           "settings": {
-            "button_label": "SHOP NOW",
+            "button_label": "SHOP THE REAGAN",
             "button_link": "shopify://products/brianna",
             "button_video_link": "",
             "button_style": "secondary",
@@ -345,14 +345,14 @@
         "abra_promo_code_hide": ""
       }
     },
-    "video_with_text_frd6gc": {
-      "type": "video-with-text",
+    "image_with_text_9hCCgW": {
+      "type": "image-with-text",
       "blocks": {
-        "icon_3ewWDF": {
+        "icon_Lh4CKm": {
           "type": "icon",
           "settings": {
             "icon": "none",
-            "icon_image": "shopify://shop_images/image_66.png",
+            "icon_image": "shopify://shop_images/image_57.png",
             "iwidth": "custom",
             "icon_width": 120,
             "link": "",
@@ -360,20 +360,20 @@
             "external": false
           }
         },
-        "heading_r3m8Ez": {
+        "heading_zaCHNm": {
           "type": "heading",
           "settings": {
-            "heading": "Joanne",
-            "heading_size": "title-md",
-            "heading_tag": "h2",
+            "heading": "Support on the Go",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         },
-        "text_DHYRyf": {
+        "text_i6xXGa": {
           "type": "text",
           "settings": {
-            "text": "<p><strong>Mary Jane</strong></p><p>Introducing the revolutionary mary jane that combines cutting-edge design with unparalleled comfort. The ultra-lightweight construction, paired with our signature arch support and thick layer of memory foam cushioning, creates a shoe so comfortable, you'll forget you're wearing it.</p>",
+            "text": "<p>When Randi’s on grandma duty, comfort is key. The Danika Sneaker is lightweight, supportive, and easy to move in — perfect for keeping up with the grandkids and staying on her feet all day long.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -385,11 +385,11 @@
             "highlighted_scribble": "circle"
           }
         },
-        "button_HUkKbU": {
+        "button_DP6rem": {
           "type": "button",
           "settings": {
-            "button_label": "SHOP NOW",
-            "button_link": "shopify://products/joanne",
+            "button_label": "SHOP THE DANIKA",
+            "button_link": "shopify://products/brianna",
             "button_video_link": "",
             "button_style": "secondary",
             "button_size": "md",
@@ -399,27 +399,23 @@
         }
       },
       "block_order": [
-        "icon_3ewWDF",
-        "heading_r3m8Ez",
-        "text_DHYRyf",
-        "button_HUkKbU"
+        "icon_Lh4CKm",
+        "heading_zaCHNm",
+        "text_i6xXGa",
+        "button_DP6rem"
       ],
-      "name": "Video with text",
+      "name": "Image with text",
       "settings": {
-        "video_url": "",
-        "description": "",
-        "enable_video_autoplay": true,
-        "enable_video_looping": true,
-        "image_height": "100vh",
-        "video_width": "small",
-        "layout": "video_first",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "medium",
+        "layout": "image_first",
         "text_alignment": "left",
-        "content_position": "align-self-center",
-        "video_url_mobile": "",
-        "image_height_mobile": "100vh",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "adapt",
         "text_alignment_mobile": "center",
-        "color_text": "",
-        "color_background": "",
+        "color_text": "rgba(0,0,0,0)",
+        "color_background": "#ffffff",
         "gradient_background": "",
         "color_background_2": "",
         "gradient_background_2": "",
@@ -428,15 +424,15 @@
         "color_button_text": "#ffffff",
         "color_button_background": "#171717",
         "color_button_gradient": "",
-        "padding_top": 0,
+        "padding_top": 24,
         "padding_bottom": 8,
         "divider": false,
-        "full_width": false,
+        "full_width": true,
         "rounded": false,
         "enable_parallax": false,
+        "parallax_direction": "vertical",
         "abra_promo_code_show": "",
-        "abra_promo_code_hide": "",
-        "parallax_direction": "vertical"
+        "abra_promo_code_hide": ""
       }
     },
     "image_with_text_KUNJhh": {
@@ -457,7 +453,7 @@
         "heading_DFRyWM": {
           "type": "heading",
           "settings": {
-            "heading": "Zoey",
+            "heading": "Major Comfort Points",
             "heading_size": "title-sm",
             "heading_tag": "h3",
             "highlighted_text": "none",
@@ -467,7 +463,7 @@
         "text_n7ttnz": {
           "type": "text",
           "settings": {
-            "text": "<p><strong>Slip-On Boot</strong></p><p>Experience the perfect fusion of style, comfort, and weightlessness with this slip-on boot. Crafted with our signature arch support, a flexible elastic topline, and a luxurious layer of memory foam cushioning, this boot proves that you don't have to sacrifice comfort for fashion.</p>",
+            "text": "<p>Randi’s favorite sandal for relaxation, the Maui combines comfort and support. She wears it at home, by the pool, or running errands in town when she wants to feel comfortable and put-together. </p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -482,7 +478,7 @@
         "button_V4Xymr": {
           "type": "button",
           "settings": {
-            "button_label": "SHOP NOW",
+            "button_label": "SHOP THE MAUI",
             "button_link": "shopify://products/zoey-boot",
             "button_video_link": "",
             "button_style": "secondary",
@@ -537,7 +533,7 @@
     "multicolumn_R8kcbF",
     "testimonials_e8hGce",
     "image_with_text_tqMWGc",
-    "video_with_text_frd6gc",
+    "image_with_text_9hCCgW",
     "image_with_text_KUNJhh"
   ]
 }
