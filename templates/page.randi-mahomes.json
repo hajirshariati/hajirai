@@ -265,7 +265,7 @@
             "icon": "none",
             "icon_image": "shopify://shop_images/90173-AH609W_catalog.webp",
             "iwidth": "custom",
-            "icon_width": 120,
+            "icon_width": 180,
             "link": "shopify://products/reagan-red-ah609w",
             "accessibility_info": "",
             "external": false
@@ -355,7 +355,7 @@
             "icon": "none",
             "icon_image": "shopify://shop_images/25123-AP111W_catalog.webp",
             "iwidth": "custom",
-            "icon_width": 120,
+            "icon_width": 180,
             "link": "shopify://products/danika-ivory-ap111w",
             "accessibility_info": "",
             "external": false
@@ -445,7 +445,7 @@
             "icon": "none",
             "icon_image": "shopify://shop_images/25590-L3030W_catalog.webp",
             "iwidth": "custom",
-            "icon_width": 120,
+            "icon_width": 180,
             "link": "shopify://products/maui-black-gloss-l3030w",
             "accessibility_info": "",
             "external": false
