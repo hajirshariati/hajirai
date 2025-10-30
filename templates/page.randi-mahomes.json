@@ -145,7 +145,7 @@
           "type": "feed",
           "settings": {
             "video": "shopify://files/videos/Randi Mahomes - Danika CLEAN.mp4",
-            "enable_video_autoplay": true,
+            "enable_video_autoplay": false,
             "enable_video_looping": true,
             "video_on_hover": true,
             "button_label": "Shop the Danika",
@@ -183,7 +183,7 @@
           "type": "feed",
           "settings": {
             "video": "shopify://files/videos/Randi Mahomes - Maui CLEAN.mp4",
-            "enable_video_autoplay": true,
+            "enable_video_autoplay": false,
             "enable_video_looping": true,
             "video_on_hover": true,
             "button_label": "Shop the Maui",
