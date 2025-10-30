@@ -223,6 +223,9 @@
         "feed_4CTRnk",
         "feed_eJRCPG"
       ],
+      "custom_css": [
+        ".product-card__media .badges {display: none;}"
+      ],
       "name": "t:sections.shop-the-feed.name",
       "settings": {
         "columns": 3,
