@@ -101,7 +101,9 @@
         "padding_bottom": 60,
         "divider": true,
         "full_width": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "multicolumn_with_icons_4NxwpQ": {
@@ -181,7 +183,9 @@
         "padding_bottom": 32,
         "divider": false,
         "full_width": false,
-        "rounded": true
+        "rounded": true,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "footer": {
@@ -305,7 +309,7 @@
           "type": "spacing",
           "settings": {
             "height": 20,
-            "height_mobile": 0
+            "height_mobile": 12
           }
         },
         "social_icons_TkbWQG": {
@@ -349,7 +353,9 @@
         "full_width": true,
         "rounded": true,
         "enable_parallax": true,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "footer-copyright": {
