@@ -266,115 +266,6 @@
         "abra_promo_code_hide": ""
       }
     },
-    "multicolumn_R8kcbF": {
-      "type": "multicolumn",
-      "blocks": {
-        "column_aAJcWw": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image_ratio": "adapt",
-            "video": "shopify://files/videos/Randi Mahomes - Reagan CLEAN.mp4",
-            "heading": "",
-            "heading_size": "text-lg-2xl",
-            "text": "",
-            "custom_html": "",
-            "button_label": "SHOP THE REAGAN",
-            "button_link": "shopify://products/reagan-red-ah609w",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_pNXkfL": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image_ratio": "adapt",
-            "video": "shopify://files/videos/Randi Mahomes - Danika CLEAN.mp4",
-            "heading": "",
-            "heading_size": "text-lg-2xl",
-            "text": "",
-            "custom_html": "",
-            "button_label": "SHOP THE DANIKA",
-            "button_link": "shopify://products/danika-ivory-ap111w",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_hR6VPT": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image_ratio": "adapt",
-            "video": "shopify://files/videos/Randi Mahomes - Maui CLEAN.mp4",
-            "heading": "",
-            "heading_size": "text-lg-2xl",
-            "text": "",
-            "custom_html": "",
-            "button_label": "SHOP THE MAUI",
-            "button_link": "shopify://products/maui-black-gloss-l3030w",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "column_aAJcWw",
-        "column_pNXkfL",
-        "column_hR6VPT"
-      ],
-      "custom_css": [],
-      "name": "Multicolumn",
-      "settings": {
-        "gap": "large",
-        "columns": 3,
-        "columns_mobile": "1",
-        "carousel_on_desktop": false,
-        "swipe_on_mobile": true,
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h3",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 24,
-        "padding_bottom": 24,
-        "full_width": true,
-        "divider": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
     "testimonials_e8hGce": {
       "type": "testimonials",
       "blocks": {
@@ -699,7 +590,6 @@
     "video_with_text_overlay_nwbnrx",
     "empty_space_mCfbfK",
     "shop_the_feed_kLkNNn",
-    "multicolumn_R8kcbF",
     "testimonials_e8hGce",
     "image_with_text_tqMWGc",
     "image_with_text_9hCCgW",
