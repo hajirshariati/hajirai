@@ -106,7 +106,7 @@
         "column_aAJcWw": {
           "type": "column",
           "settings": {
-            "show_border": true,
+            "show_border": false,
             "text_alignment": "center",
             "text_alignment_mobile": "center",
             "image_ratio": "adapt",
@@ -127,7 +127,7 @@
         "column_pNXkfL": {
           "type": "column",
           "settings": {
-            "show_border": true,
+            "show_border": false,
             "text_alignment": "center",
             "text_alignment_mobile": "center",
             "image_ratio": "adapt",
@@ -148,7 +148,7 @@
         "column_hR6VPT": {
           "type": "column",
           "settings": {
-            "show_border": true,
+            "show_border": false,
             "text_alignment": "center",
             "text_alignment_mobile": "center",
             "image_ratio": "adapt",
@@ -263,10 +263,10 @@
           "type": "icon",
           "settings": {
             "icon": "none",
-            "icon_image": "shopify://shop_images/image_57.png",
+            "icon_image": "shopify://shop_images/90173-AH609W_catalog.webp",
             "iwidth": "custom",
             "icon_width": 120,
-            "link": "",
+            "link": "shopify://products/reagan-red-ah609w",
             "accessibility_info": "",
             "external": false
           }
@@ -300,9 +300,9 @@
           "type": "button",
           "settings": {
             "button_label": "SHOP THE REAGAN",
-            "button_link": "shopify://products/brianna",
+            "button_link": "shopify://products/reagan-red-ah609w",
             "button_video_link": "",
-            "button_style": "secondary",
+            "button_style": "primary",
             "button_size": "md",
             "button_external": false,
             "button_icon": false
@@ -353,10 +353,10 @@
           "type": "icon",
           "settings": {
             "icon": "none",
-            "icon_image": "shopify://shop_images/image_57.png",
+            "icon_image": "shopify://shop_images/25123-AP111W_catalog.webp",
             "iwidth": "custom",
             "icon_width": 120,
-            "link": "",
+            "link": "shopify://products/danika-ivory-ap111w",
             "accessibility_info": "",
             "external": false
           }
@@ -390,9 +390,9 @@
           "type": "button",
           "settings": {
             "button_label": "SHOP THE DANIKA",
-            "button_link": "shopify://products/brianna",
+            "button_link": "shopify://products/danika-ivory-ap111w",
             "button_video_link": "",
-            "button_style": "secondary",
+            "button_style": "primary",
             "button_size": "md",
             "button_external": false,
             "button_icon": false
