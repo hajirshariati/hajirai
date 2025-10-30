@@ -216,7 +216,7 @@
           "settings": {
             "icon": "quote",
             "text": "<p>Not only is the design amazing, they have the best arch support. I'm never taking these off.</p>",
-            "author": "Author's name",
+            "author": "Randi Mahomes",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -250,7 +250,7 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 0,
+        "padding_top": 72,
         "padding_bottom": 72,
         "divider": false,
         "rounded": false
