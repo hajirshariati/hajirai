@@ -182,7 +182,6 @@
         "feed_eJRCPG": {
           "type": "feed",
           "settings": {
-            "image": "shopify://shop_images/90173-AH609W_catalog.webp",
             "video": "shopify://files/videos/Randi Mahomes - Maui CLEAN.mp4",
             "enable_video_autoplay": true,
             "enable_video_looping": true,
