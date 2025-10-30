@@ -225,7 +225,8 @@
         "feed_eJRCPG"
       ],
       "custom_css": [
-        ".product-card__media .badges {display: none;}"
+        ".product-card__media .badges {display: none;}",
+        ".shop-the-feed .horizontal-product {display: none;}"
       ],
       "name": "t:sections.shop-the-feed.name",
       "settings": {
