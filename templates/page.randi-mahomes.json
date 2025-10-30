@@ -443,10 +443,10 @@
           "type": "icon",
           "settings": {
             "icon": "none",
-            "icon_image": "shopify://shop_images/image_62.png",
+            "icon_image": "shopify://shop_images/25590-L3030W_catalog.webp",
             "iwidth": "custom",
             "icon_width": 120,
-            "link": "",
+            "link": "shopify://products/maui-black-gloss-l3030w",
             "accessibility_info": "",
             "external": false
           }
@@ -480,9 +480,9 @@
           "type": "button",
           "settings": {
             "button_label": "SHOP THE MAUI",
-            "button_link": "shopify://products/zoey-boot",
+            "button_link": "shopify://products/maui-black-gloss-l3030w",
             "button_video_link": "",
-            "button_style": "secondary",
+            "button_style": "primary",
             "button_size": "md",
             "button_external": false,
             "button_icon": false
