@@ -402,8 +402,8 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 40,
-        "padding_bottom": 40,
+        "padding_top": 72,
+        "padding_bottom": 72,
         "divider": false,
         "full_width": true,
         "rounded": false,
@@ -497,87 +497,100 @@
         "abra_promo_code_hide": ""
       }
     },
-    "multicolumn_wC3T7d": {
-      "type": "multicolumn",
+    "testimonials_bz8DM3": {
+      "type": "testimonials",
       "blocks": {
-        "column_gGRrGz": {
-          "type": "column",
+        "testimonial_EnwLB6": {
+          "type": "testimonial",
           "settings": {
-            "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image_ratio": "adapt",
-            "heading": "",
-            "heading_size": "text-lg-2xl",
-            "text": "<p>★★★★★</p><p>Looks Good, Fits Even Better!!</p><p><em>- Doris B.</em></p>",
-            "custom_html": "",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "secondary",
-            "button_external": false,
-            "button_icon": true,
+            "icon": "quote",
+            "text": "<p>Looks Good, Fits Even Better!!</p>",
+            "author": "Doris B.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         },
-        "column_bD63kq": {
-          "type": "column",
+        "testimonial_WGPJ6z": {
+          "type": "testimonial",
           "settings": {
-            "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image_ratio": "adapt",
-            "heading": "",
-            "heading_size": "text-lg-2xl",
-            "text": "<p>★★★★★</p><p>These insoles make my feet soooo happy FEELS LIKE WALKING ON CLOUDS!</p><p><em>- Beverly</em></p>",
-            "custom_html": "",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "secondary",
-            "button_external": false,
-            "button_icon": true,
+            "icon": "quote",
+            "text": "<p>These insoles make my feet soooo happy FEELS LIKE WALKING ON CLOUDS!</p>",
+            "author": "Beverly",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         },
-        "column_WdX4Cf": {
-          "type": "column",
+        "testimonial_edF7jc": {
+          "type": "testimonial",
           "settings": {
-            "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image_ratio": "adapt",
-            "heading": "",
-            "heading_size": "text-lg-2xl",
-            "text": "<p>★★★★★</p><p>Very comfortable and stylish. They support my arches, heels, and also accommodate my bunions.</p><p><em>- </em>Jacqueline I.</p>",
-            "custom_html": "",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "secondary",
-            "button_external": false,
-            "button_icon": true,
+            "icon": "quote",
+            "text": "<p>Very comfortable and stylish. They support my arches, heels, and also accommodate my bunions.</p>",
+            "author": "Jacqueline I.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_iPQnDX": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>I went from 100% pain down to 5%</p>",
+            "author": "Deannie",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_L4rLUj": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>I am so happy to walk with no pain with Aetrex shoes!</p>",
+            "author": "Annie G.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_pfPAbw": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Most comfortable shoes I have put on my feet.</p>",
+            "author": "Kim N.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         }
       },
       "block_order": [
-        "column_gGRrGz",
-        "column_bD63kq",
-        "column_WdX4Cf"
+        "testimonial_EnwLB6",
+        "testimonial_WGPJ6z",
+        "testimonial_edF7jc",
+        "testimonial_iPQnDX",
+        "testimonial_L4rLUj",
+        "testimonial_pfPAbw"
       ],
-      "custom_css": [
-        ".multicolumn-card {background: #f4f4f4 !important;}"
-      ],
-      "name": "Multicolumn",
+      "name": "t:sections.testimonials.name",
       "settings": {
-        "gap": "small",
-        "columns": 3,
-        "columns_mobile": "1",
-        "carousel_on_desktop": false,
-        "swipe_on_mobile": true,
         "heading": "Real Stories, Real Results",
-        "heading_size": "title-sm",
+        "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
         "subheading": "",
@@ -588,129 +601,18 @@
         "button_icon": false,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "color_text": "rgba(0,0,0,0)",
+        "color_text": "",
         "color_background": "#f4f4f4",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
-        "color_button_text": "#ffffff",
-        "color_button_background": "#171717",
+        "color_button_text": "",
+        "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 24,
-        "padding_bottom": 0,
-        "full_width": false,
+        "padding_top": 72,
+        "padding_bottom": 72,
         "divider": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "multicolumn_Nhidck": {
-      "type": "multicolumn",
-      "blocks": {
-        "column_jXnbGp": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image_ratio": "adapt",
-            "heading": "",
-            "heading_size": "text-lg-2xl",
-            "text": "<p>★★★★★</p><p>I went from 100% pain down to 5%</p><p><em>- </em>Deannie</p>",
-            "custom_html": "",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "secondary",
-            "button_external": false,
-            "button_icon": true,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_3PQyDY": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image_ratio": "adapt",
-            "heading": "",
-            "heading_size": "text-lg-2xl",
-            "text": "<p>★★★★★</p><p>I am so happy to walk with no pain with Aetrex shoes!</p><p><em>- Annie G.</em></p>",
-            "custom_html": "",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "secondary",
-            "button_external": false,
-            "button_icon": true,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_GxLQdE": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image_ratio": "adapt",
-            "heading": "",
-            "heading_size": "text-lg-2xl",
-            "text": "<p>★★★★★</p><p>Most comfortable shoes I have put on my feet.</p><p><em>- Kim N.</em></p>",
-            "custom_html": "",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "secondary",
-            "button_external": false,
-            "button_icon": true,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "column_jXnbGp",
-        "column_3PQyDY",
-        "column_GxLQdE"
-      ],
-      "custom_css": [
-        ".multicolumn-card {background: #f4f4f4 !important;}"
-      ],
-      "name": "Multicolumn",
-      "settings": {
-        "gap": "small",
-        "columns": 3,
-        "columns_mobile": "1",
-        "carousel_on_desktop": false,
-        "swipe_on_mobile": true,
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": false,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "rgba(0,0,0,0)",
-        "color_background": "#f4f4f4",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "#ffffff",
-        "color_button_background": "#171717",
-        "color_button_gradient": "",
-        "padding_top": 0,
-        "padding_bottom": 24,
-        "full_width": false,
-        "divider": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
+        "rounded": false
       }
     },
     "highlight_text_Jpt9Y7": {
@@ -1059,7 +961,6 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "narrow": false,
         "color_text": "rgba(0,0,0,0)",
         "color_background": "#fafafa",
         "gradient_background": "",
@@ -1068,9 +969,10 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 24,
+        "padding_top": 72,
         "padding_bottom": 48,
         "divider": false,
+        "narrow": false,
         "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
@@ -1093,8 +995,7 @@
     "featured_collections_9d3ge7",
     "collection_list_mPHCpz",
     "collage_ntqjfh",
-    "multicolumn_wC3T7d",
-    "multicolumn_Nhidck",
+    "testimonials_bz8DM3",
     "highlight_text_Jpt9Y7",
     "scrolling_text_gnHFPk",
     "collection_list_KbwCHx",
