@@ -106,6 +106,7 @@
         "feed_kyTTBG": {
           "type": "feed",
           "settings": {
+            "image": "shopify://shop_images/Screenshot_2025-10-30_at_9.51.50_AM.png",
             "video": "shopify://files/videos/Randi Mahomes - Reagan CLEAN.mp4",
             "enable_video_autoplay": false,
             "enable_video_looping": true,
@@ -144,6 +145,7 @@
         "feed_4CTRnk": {
           "type": "feed",
           "settings": {
+            "image": "shopify://shop_images/Screenshot_2025-10-30_at_9.50.02_AM.png",
             "video": "shopify://files/videos/Randi Mahomes - Danika CLEAN.mp4",
             "enable_video_autoplay": false,
             "enable_video_looping": true,
@@ -182,6 +184,7 @@
         "feed_eJRCPG": {
           "type": "feed",
           "settings": {
+            "image": "shopify://shop_images/Screenshot_2025-10-30_at_9.50.47_AM.png",
             "video": "shopify://files/videos/Randi Mahomes - Maui CLEAN.mp4",
             "enable_video_autoplay": false,
             "enable_video_looping": true,
