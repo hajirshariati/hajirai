@@ -18,15 +18,74 @@
         <split-words class="split-words js-invisible block" data-animate="fade-up-large">{{ 'cart.general.title' | t }}</split-words>
       </{{ section.settings.heading_tag }}>
       <p>
-        <a class="button button--secondary icon-with-text" href="{{ routes.all_products_collection_url }}" is="hover-link">
-          <span class="btn-fill" data-fill></span>
-          <span class="btn-text">
-            {%- liquid
-              render 'icon', icon: 'return', size: 'sm'
-              echo 'cart.general.continue_shopping' | t
-            -%}
-          </span>
-        </a>
+
+        <div class="cta-container">
+  <!-- Continue Shopping Button -->
+  <a class="button button--secondary icon-with-text" 
+     href="{{ routes.all_products_collection_url }}" 
+     is="hover-link">
+    <span class="btn-fill" data-fill></span>
+    <span class="btn-text">
+      {%- liquid
+        render 'icon', icon: 'return', size: 'sm'
+        echo 'cart.general.continue_shopping' | t
+      -%}
+    </span>
+  </a>
+
+  <!-- Need Help Button -->
+  <a class="button button--secondary icon-with-text need-help-btn" 
+     href="javascript:void(0);" 
+     onclick="openWidget()" 
+     is="hover-link">
+    <span class="btn-fill" data-fill></span>
+    <span class="btn-text">
+      {%- liquid
+        render 'icon', icon: 'chat', size: 'sm'
+      -%}
+      Need Help?
+    </span>
+  </a>
+</div>
+
+<style>
+  .cta-container {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .cta-container .button {
+    flex: 1 1 auto;
+    text-align: center;
+    min-width: 180px;
+  }
+
+  /* Stack buttons on mobile */
+  @media (max-width: 600px) {
+    .cta-container {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .cta-container .button {
+      width: 100%;
+      max-width: 320px;
+    }
+  }
+</style>
+
+<script type="text/javascript">
+  // Hide the Zendesk widget on load
+  zE("webWidget", "hide");
+
+  function openWidget() {
+    zE("webWidget", "show");
+    zE("webWidget", "open");
+  }
+</script>
+
       </p>
     </div>
 
