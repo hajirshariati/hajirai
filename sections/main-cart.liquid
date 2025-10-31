@@ -18,8 +18,7 @@
         <split-words class="split-words js-invisible block" data-animate="fade-up-large">{{ 'cart.general.title' | t }}</split-words>
       </{{ section.settings.heading_tag }}>
       <p>
-
-        <div class="cta-container">
+<div class="cta-container">
   <!-- Continue Shopping Button -->
   <a class="button button--secondary icon-with-text" 
      href="{{ routes.all_products_collection_url }}" 
@@ -35,9 +34,9 @@
 
   <!-- Need Help Button -->
   <a class="button button--secondary icon-with-text need-help-btn" 
-     href="javascript:void(0);" 
-     onclick="openWidget()" 
-     is="hover-link">
+     role="button" 
+     is="hover-link" 
+     onclick="openWidget()">
     <span class="btn-fill" data-fill></span>
     <span class="btn-text">
       {%- liquid
@@ -60,6 +59,7 @@
     flex: 1 1 auto;
     text-align: center;
     min-width: 180px;
+    cursor: pointer;
   }
 
   /* Stack buttons on mobile */
@@ -77,7 +77,6 @@
 </style>
 
 <script type="text/javascript">
-  // Hide the Zendesk widget on load
   zE("webWidget", "hide");
 
   function openWidget() {
