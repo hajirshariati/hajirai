@@ -324,7 +324,7 @@
           "type": "icon",
           "settings": {
             "icon": "none",
-            "icon_image": "shopify://shop_images/90173-AH609W_catalog.webp",
+            "icon_image": "shopify://shop_images/1_10.jpg",
             "iwidth": "custom",
             "icon_width": 180,
             "link": "shopify://products/reagan-red-ah609w",
@@ -378,6 +378,7 @@
       ],
       "name": "Image with text",
       "settings": {
+        "image": "shopify://shop_images/reagan_1.jpg",
         "img_url": "",
         "image_height": "adapt",
         "image_width": "medium",
@@ -414,7 +415,7 @@
           "type": "icon",
           "settings": {
             "icon": "none",
-            "icon_image": "shopify://shop_images/25123-AP111W_catalog.webp",
+            "icon_image": "shopify://shop_images/2_7.jpg",
             "iwidth": "custom",
             "icon_width": 180,
             "link": "shopify://products/danika-ivory-ap111w",
@@ -468,6 +469,7 @@
       ],
       "name": "Image with text",
       "settings": {
+        "image": "shopify://shop_images/danika.jpg",
         "img_url": "",
         "image_height": "adapt",
         "image_width": "medium",
@@ -504,7 +506,7 @@
           "type": "icon",
           "settings": {
             "icon": "none",
-            "icon_image": "shopify://shop_images/25590-L3030W_catalog.webp",
+            "icon_image": "shopify://shop_images/3_5.jpg",
             "iwidth": "custom",
             "icon_width": 180,
             "link": "shopify://products/maui-black-gloss-l3030w",
@@ -558,6 +560,7 @@
       ],
       "name": "Image with text",
       "settings": {
+        "image": "shopify://shop_images/maui_1.jpg",
         "img_url": "",
         "image_height": "adapt",
         "image_width": "medium",
