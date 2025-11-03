@@ -17665,8 +17665,9 @@ body .rte .contact-box a {
 .ORTHOPLP-icons img {
   width: 50%;
   max-width: 60px;
-  justify-self: center !important;
+  justify-self: center;
   mix-blend-mode: darken;
+  margin: 0px auto;
 }
 .ORTHOPLP-icons p {
   text-transform: uppercase;
