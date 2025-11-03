@@ -8371,8 +8371,8 @@ class ProductColorSwatchHandler {
 
 // url can contain ?abralink=vip, and we need to hide data-abra-default with that value, and show data-abra-promo with the same value
 document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
     const interval = setInterval(() => {
-        const urlParams = new URLSearchParams(window.location.search);
         let abralink = urlParams.get('abralink');
     
         if(abralink) {
