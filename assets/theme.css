@@ -16089,6 +16089,7 @@ video-media
 
 .specs__sidebar .media img {
     max-width: var(--sp-30);
+    mix-blend-mode: darken;
 }
 
 .specifications .grow + .grow-0 {
