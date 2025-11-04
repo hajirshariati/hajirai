@@ -1,0 +1,564 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-sm",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "image_with_text_overlay_rBfBzp": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "heading_axLTnn": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>Walking</p>",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_LHGLnM": {
+          "type": "text",
+          "settings": {
+            "text": "<p>brief description of how this activity can impact foot health</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_HPpCMd": {
+          "type": "button",
+          "settings": {
+            "button_label": "Explore Footwear & Orthotics for Walking",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_axLTnn",
+        "text_LHGLnM",
+        "button_HPpCMd"
+      ],
+      "name": "t:sections.image-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/Group_7_f05d6d9c-ad86-49bd-9e2e-2fd3063a6bd3.png",
+        "image_height": "adapt",
+        "content_width": "small",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/Group_7_f05d6d9c-ad86-49bd-9e2e-2fd3063a6bd3.png",
+        "image_height_mobile": "100vh",
+        "content_position_mobile": "items-center justify-center",
+        "text_alignment_mobile": "left",
+        "color_text": "#171717",
+        "color_highlight": "#171717",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "faq_zhAACx": {
+      "type": "faq",
+      "blocks": {
+        "question_XamVPH": {
+          "type": "question",
+          "settings": {
+            "title": "<strong>The Impact of Walking on Your Feet</strong>",
+            "text": "<p>A short paragraph or two explaining the specific challenges this activity presents to foot health.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_JNThz9": {
+          "type": "question",
+          "settings": {
+            "title": "<strong>Tips for Pain-Free Walking</strong>",
+            "text": "<p>A set of 3-5 tips for maintaining foot health during the activity. These tips can be broad but activity-specific</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "question_XamVPH",
+        "question_JNThz9"
+      ],
+      "name": "t:sections.faq.name",
+      "settings": {
+        "style": "with-background",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#74a5ba",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_highlight": "rgba(0,0,0,0)",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#ffffff",
+        "overlay_opacity": 4,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "lookbook_JQDiwd": {
+      "type": "lookbook",
+      "blocks": {
+        "content_iXtFEz": {
+          "type": "content",
+          "settings": {
+            "icon": "none",
+            "iwidth": "fit",
+            "icon_width": 26,
+            "heading": "Padded Collar",
+            "text": "<p>Extra padding around the ankle area helps to reduce discomfort or blisters while providing additional cushioning.</p>",
+            "link": "",
+            "color_text": "#74a5ba",
+            "vertical": 21,
+            "horizontal": 45,
+            "vertical_mobile": 16,
+            "horizontal_mobile": 42
+          }
+        },
+        "content_9HJCba": {
+          "type": "content",
+          "settings": {
+            "icon": "none",
+            "iwidth": "fit",
+            "icon_width": 26,
+            "heading": "Removable Insole",
+            "text": "<p>Included is a removable arch support & premium foam cushioning insole that can easily be replaced with a more customized Aetrex Orthotic.</p>",
+            "link": "",
+            "color_text": "#74a5ba",
+            "vertical": 48,
+            "horizontal": 39,
+            "vertical_mobile": 54,
+            "horizontal_mobile": 40
+          }
+        },
+        "content_enWUHR": {
+          "type": "content",
+          "disabled": true,
+          "settings": {
+            "icon": "none",
+            "iwidth": "fit",
+            "icon_width": 26,
+            "heading": "3: Signature Arch Support",
+            "text": "<p>With removable insole, our arch support is located further back to support the apex of the foot. This helps proper alignment and help relieve arch and heel pain associated with Plantar Fasciitis</p>",
+            "link": "",
+            "color_text": "#74a5ba",
+            "vertical": 56,
+            "horizontal": 8,
+            "vertical_mobile": 30,
+            "horizontal_mobile": 12
+          }
+        },
+        "content_eJtVLB": {
+          "type": "content",
+          "settings": {
+            "icon": "none",
+            "iwidth": "fit",
+            "icon_width": 26,
+            "heading": "Arch Support",
+            "text": "<p>Designed to help support natural alignment, our unique arch support position, height and contour aligns in the proper place to help support our bodies from the ground up and helps to relieve plantar fasciitis and common heel/arch pain.</p>",
+            "link": "",
+            "color_text": "#74a5ba",
+            "vertical": 56,
+            "horizontal": 52,
+            "vertical_mobile": 56,
+            "horizontal_mobile": 56
+          }
+        },
+        "content_Q3zqni": {
+          "type": "content",
+          "settings": {
+            "icon": "none",
+            "iwidth": "fit",
+            "icon_width": 26,
+            "heading": "Forefoot Cushion",
+            "text": "<p>Provides extra cushioning, where you need it most, to help alleviate forefoot discomfort.</p>",
+            "link": "",
+            "color_text": "#74a5ba",
+            "vertical": 70,
+            "horizontal": 75,
+            "vertical_mobile": 69,
+            "horizontal_mobile": 73
+          }
+        }
+      },
+      "block_order": [
+        "content_iXtFEz",
+        "content_9HJCba",
+        "content_enWUHR",
+        "content_eJtVLB",
+        "content_Q3zqni"
+      ],
+      "name": "t:sections.lookbook.name",
+      "settings": {
+        "image": "shopify://shop_images/Group_18_15b06015-9b33-4a8d-adb5-e059ed32723b.png",
+        "image_mobile": "shopify://shop_images/Group_18_15b06015-9b33-4a8d-adb5-e059ed32723b.png",
+        "heading": "",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "heading_position": "items-center justify-start text-left",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "rgba(0,0,0,0)",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "empty_space_gyE8Nr": {
+      "type": "empty-space",
+      "name": "t:sections.empty-space.name",
+      "settings": {
+        "desktop_height": 40,
+        "mobile_height": 28,
+        "color_background": "",
+        "gradient_background": ""
+      }
+    },
+    "featured_collection_dXtHeM": {
+      "type": "featured-collection",
+      "name": "t:sections.featured-collection.name",
+      "settings": {
+        "collection": "",
+        "products": [
+          "women-plantar-fasciitis-kit",
+          "danika-light-grey-ap113w",
+          "l2300m-m",
+          "jillian-black-sc450w"
+        ],
+        "product_limit": 4,
+        "columns": 4,
+        "carousel_on_desktop": false,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "How Aetrex Can Help",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "rich_text_qygTdt": {
+      "type": "rich-text",
+      "blocks": {
+        "text_ekcTtF": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Testimonials</p>",
+            "text_font": "heading",
+            "text_size": "subtext-custom",
+            "text_max_size": 24,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "one"
+          }
+        }
+      },
+      "block_order": [
+        "text_ekcTtF"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#74a5ba",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": true,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "testimonials_byJFpb": {
+      "type": "testimonials",
+      "blocks": {
+        "testimonial_UPjm8b": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<h6>These Saved My Life!  </h6><h6>These flip flops saved my summer! My plantar fasciitis was really bad and when I put these on I felt relief almost immediately. The discomfort continues to subside more and more each day, and is still improving, which I largely attribute to wearing these all day, every day. Plus, they felt very secure even when wet. Very thankful for these!\" </h6>",
+            "author": "Lisa R",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_xPKLWB": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<h6>My Favorite!<br/>These were the first shoe I ordered from Aetrex. I loved them immediately. I am now on my 3rd pair, including one for my daughter since she kept stealing mine! They are cushiony & supportive enough for a day at an amusement park plus the strap keeps them secure. Casual enough for everyday, but dressy enough for a night out means only packing one pair for trips.\" </h6>",
+            "author": "Holly J.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_RixBWT": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<h6>Better Than My Bare Feet! </h6><h6>These sandals are perfect. They are very cushioned and supportive in all the right places. I can already feel the difference with my pronation issues when I wear these slides. I also love that they are cute and so easy to wear. I wear them out or just around the house. I couldn't recommend more!!!\" </h6>",
+            "author": "Kimberly S.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_UPjm8b",
+        "testimonial_xPKLWB",
+        "testimonial_RixBWT"
+      ],
+      "name": "t:sections.testimonials.name",
+      "settings": {
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 20,
+        "padding_bottom": 20,
+        "divider": false,
+        "rounded": false
+      }
+    },
+    "collection_list_fbMkYY": {
+      "type": "collection-list",
+      "blocks": {
+        "collection_cPKHdc": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "",
+            "title": "Footwear for Walking",
+            "description": "",
+            "overlay_content": true,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "center",
+            "enable_title_drop_shadow": true
+          }
+        },
+        "collection_94qHkf": {
+          "type": "collection",
+          "settings": {
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "",
+            "title": "Orthotics for Walking",
+            "description": "",
+            "overlay_content": true,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "center",
+            "enable_title_drop_shadow": true
+          }
+        }
+      },
+      "block_order": [
+        "collection_cPKHdc",
+        "collection_94qHkf"
+      ],
+      "name": "t:sections.collection-list.name",
+      "settings": {
+        "columns": 2,
+        "carousel_on_desktop": true,
+        "image_type": "collection",
+        "image_ratio": "landscape",
+        "show_products_count": false,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "#fafafa",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 40,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "image_with_text_overlay_rBfBzp",
+    "faq_zhAACx",
+    "lookbook_JQDiwd",
+    "empty_space_gyE8Nr",
+    "featured_collection_dXtHeM",
+    "rich_text_qygTdt",
+    "testimonials_byJFpb",
+    "collection_list_fbMkYY"
+  ]
+}
