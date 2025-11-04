@@ -27,7 +27,7 @@
     </div>
     
     <div class="customer__content flex flex-col lg:flex-row">
-      <div class="grow flex flex-col gap-5 md:gap-8">
+ <div class="grow flex flex-col gap-5 md:gap-8">
   <h2 class="text-xl-3xl font-medium">{{ 'customer.orders.title' | t }}</h2>
 
   {%- paginate customer.orders by 20 -%}
@@ -69,6 +69,19 @@
               </td>
               <td headers="RowOrder ColumnFulfillment" role="cell" data-label="{{ 'customer.orders.fulfillment_status' | t | escape }}">
                 {{- order.fulfillment_status_label -}}
+                {%- if order.fulfillment_status == 'fulfilled' -%}
+                  <button 
+                    type="button" 
+                    class="track-order-btn" 
+                    data-order-number="{{ order.name }}" 
+                    data-email="{{ customer.email }}"
+                    style="background: #171717; padding: 5px 15px; border-radius: 2em; color: #ffffff; border: none; cursor: pointer; margin-left: 10px; white-space: nowrap; font-size: 14px;"
+                    onmouseover="this.style.opacity='0.8'" 
+                    onmouseout="this.style.opacity='1'"
+                  >
+                    Track Order
+                  </button>
+                {%- endif -%}
               </td>
           
               <!--td headers="RowOrder ColumnTotal" role="cell" data-label="{{ 'customer.orders.total' | t | escape }}">
@@ -98,6 +111,25 @@
     -%}
   {%- endpaginate -%}
 </div>
+
+<script src="https://aetrexorders.aftership.com/tracking-clips/sdk.js"></script>
+<script>
+  const clips = new window.AfterShipTrackingClips(
+    "c4310971d8c744f48e557d60b2fb6ca6"
+  );
+  
+  // Add click handlers to all track order buttons
+  document.addEventListener('DOMContentLoaded', function() {
+    const trackButtons = document.querySelectorAll('.track-order-btn');
+    trackButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const orderNumber = this.getAttribute('data-order-number');
+        const email = this.getAttribute('data-email');
+        clips.open({orderNumber: orderNumber, email: email});
+      });
+    });
+  });
+</script>
 
       <div class="grow-0">
         <sticky-element class="customer__sidebar flex flex-col gap-5 md:gap-7d5 sticky top-0">
