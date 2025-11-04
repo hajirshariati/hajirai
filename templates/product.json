@@ -94,7 +94,7 @@
             "icon": "lightning",
             "iwidth": "custom",
             "icon_width": 20,
-            "text": "In stock! Ships within 1-2 business days.",
+            "text": "In stock!",
             "text_size": "text-sm"
           }
         },
