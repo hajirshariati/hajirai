@@ -75,7 +75,7 @@
                 {{- order.total_net_amount | money_with_currency -}}
               </td-->
          
-              <td headers="RowOrder ColumnReturn" role="cell" data-label="Return" style="background: linear-gradient(270deg, #fafafa, transparent);">
+              <td headers="RowOrder ColumnReturn" role="cell" data-label="Return" >
                 {%- if days_difference <= 30 and order.fulfillment_status == 'fulfilled'  -%}
                   <a href="https://www.aetrex.com/apps/aftership-returns-center" is="hover-link" >
                     <span class="btn-fill" data-fill></span>
