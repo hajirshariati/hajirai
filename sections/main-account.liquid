@@ -76,7 +76,7 @@
               </td-->
          
               <td headers="RowOrder ColumnReturn" role="cell" data-label="Return">
-                {%- if days_difference <= 30 and order.fulfillment_status == 'fulfilled' and order.payment_status == 'paid' -%}
+                {%- if days_difference <= 30 and order.fulfillment_status == 'fulfilled'  -%}
                   <a class="button button--secondary" href="https://www.aetrex.com/apps/aftership-returns-center" is="hover-link">
                     <span class="btn-fill" data-fill></span>
                     <span class="btn-text">Start a Return</span>
