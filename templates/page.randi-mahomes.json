@@ -275,8 +275,8 @@
         "testimonial_kyLjbU": {
           "type": "testimonial",
           "settings": {
-            "icon": "quote",
-            "text": "<p>Not only is the design amazing, they have the best arch support. I'm never taking these off.</p>",
+            "icon": "none",
+            "text": "<p>\"Not only is the design amazing, they have the best arch support. I'm never taking these off.\"</p>",
             "author": "Randi Mahomes",
             "author_info": "",
             "author_url": "",
