@@ -40,7 +40,7 @@
             <th id="ColumnDate" scope="col" role="columnheader">{{ 'customer.orders.date' | t }}</th>
             <th id="ColumnPayment" scope="col" role="columnheader">{{ 'customer.orders.payment_status' | t }}</th>
             <th id="ColumnFulfillment" scope="col" role="columnheader">{{ 'customer.orders.fulfillment_status' | t }}</th>
-            <th id="ColumnTotal" scope="col" role="columnheader">{{ 'customer.orders.total' | t }}</th>
+            <!--th id="ColumnTotal" scope="col" role="columnheader">{{ 'customer.orders.total' | t }}</th-->
             <th id="ColumnReturn" scope="col" role="columnheader">Return</th>
           </tr>
         </thead>
@@ -70,9 +70,9 @@
               <td headers="RowOrder ColumnFulfillment" role="cell" data-label="{{ 'customer.orders.fulfillment_status' | t | escape }}">
                 {{- order.fulfillment_status_label -}}
               </td>
-              <td headers="RowOrder ColumnTotal" role="cell" data-label="{{ 'customer.orders.total' | t | escape }}">
+              <!--td headers="RowOrder ColumnTotal" role="cell" data-label="{{ 'customer.orders.total' | t | escape }}">
                 {{- order.total_net_amount | money_with_currency -}}
-              </td>
+              </td-->
               <td headers="RowOrder ColumnReturn" role="cell" data-label="Return">
                 {%- if days_difference <= 30 -%}
                   <a class="button button--secondary" href="https://www.aetrex.com/apps/aftership-returns-center" is="hover-link" style="text-wrap-mode: nowrap;">
