@@ -94,7 +94,7 @@
             "icon": "lightning",
             "iwidth": "custom",
             "icon_width": 20,
-            "text": "In stock!",
+            "text": "Product In stock!",
             "text_size": "text-sm"
           }
         },
