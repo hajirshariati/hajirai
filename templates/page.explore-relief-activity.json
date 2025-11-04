@@ -24,77 +24,13 @@
         "rounded": false
       }
     },
-    "image_with_text_zj7AiL": {
-      "type": "image-with-text",
-      "blocks": {
-        "heading_KnNgCq": {
-          "type": "heading",
-          "settings": {
-            "heading": "Plantar Fasciitis",
-            "heading_size": "title-md",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_RMR7rx": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Plantar Fasciitis is an inflammation resulting from excessive stretching of the plantar fascia. The plantar fascia is a broad band of fibrous tissue running along the bottom of the foot, from the heel bone (calcaneus) to the forefoot.</p><p>Pain from plantar fasciitis typically occurs at the bottom of the foot, near the inside where the heel and arch meet. The pain is often most severe first thing in the morning or after long periods of rest, as the plantar fascia contracts during inactivity. As the day progresses and the plantar fascia is stretched with activity, the pain may gradually decrease.<br/><br/></p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "heading_KnNgCq",
-        "text_RMR7rx"
-      ],
-      "disabled": true,
-      "name": "t:sections.image-with-text.name",
-      "settings": {
-        "image": "shopify://shop_images/PF_1_2x_062c285d-cb82-4947-a547-092fa6fe87b3.png",
-        "img_url": "",
-        "image_height": "adapt",
-        "image_width": "medium",
-        "layout": "text_first",
-        "text_alignment": "left",
-        "custom_content_position": "items-center",
-        "image_height_mobile": "auto",
-        "text_alignment_mobile": "left",
-        "color_text": "",
-        "color_background": "#d3dfe3",
-        "gradient_background": "",
-        "color_background_2": "",
-        "gradient_background_2": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "enable_parallax": true,
-        "parallax_direction": "vertical"
-      }
-    },
     "image_with_text_overlay_rBfBzp": {
       "type": "image-with-text-overlay",
       "blocks": {
         "heading_axLTnn": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Plantar Fasciitis</p>",
+            "heading": "<p>Walking</p>",
             "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "text",
@@ -104,7 +40,7 @@
         "text_LHGLnM": {
           "type": "text",
           "settings": {
-            "text": "<p>Plantar Fasciitis is an inflammation resulting from excessive stretching of the plantar fascia. The plantar fascia is a broad band of fibrous tissue running along the bottom of the foot, from the heel bone (calcaneus) to the forefoot.</p><p>Pain from plantar fasciitis typically occurs at the bottom of the foot, near the inside where the heel and arch meet. The pain is often most severe first thing in the morning or after long periods of rest, as the plantar fascia contracts during inactivity. As the day progresses and the plantar fascia is stretched with activity, the pain may gradually decrease.</p>",
+            "text": "<p>brief description of how this activity can impact foot health</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -115,11 +51,24 @@
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
+        },
+        "button_HPpCMd": {
+          "type": "button",
+          "settings": {
+            "button_label": "Explore Footwear & Orthotics for Walking",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
         }
       },
       "block_order": [
         "heading_axLTnn",
-        "text_LHGLnM"
+        "text_LHGLnM",
+        "button_HPpCMd"
       ],
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
@@ -148,7 +97,9 @@
         "full_width": true,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "faq_zhAACx": {
@@ -157,17 +108,17 @@
         "question_XamVPH": {
           "type": "question",
           "settings": {
-            "title": "<strong>Causes</strong>",
-            "text": "<p>Excessive stretching of the plantar fascia can lead to plantar fasciitis, causing heel pain, arch pain, and potentially heel spurs.<br/><br/>Unusually high arches, sudden increases in physical activity, excessive weight (often due to obesity or pregnancy), and improperly fitting footwear.<br/><br/>Overpronation (flat feet) is the most common cause of excessive stretching, occurring when the arch collapses during walking and stretches the plantar fascia away from the heel bone.<br/><br/></p>",
+            "title": "<strong>The Impact of Walking on Your Feet</strong>",
+            "text": "<p>A short paragraph or two explaining the specific challenges this activity presents to foot health.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         },
-        "question_x9EPUx": {
+        "question_JNThz9": {
           "type": "question",
           "settings": {
-            "title": "<strong>Treatment and Prevention</strong>",
-            "text": "<p>Each time your foot strikes the ground, the plantar fascia is stretched, so reducing strain involves avoiding running on hard or uneven surfaces. The key to treating Plantar Fasciitis effectively is identifying the cause of the excessive stretching of the plantar fascia. To minimize stress on the plantar fascia, maintain a healthy weight and include stretching exercises.<br/><br/>For overpronation (flat feet), using an orthotic with rear foot posting and longitudinal arch support helps reduce overpronation and allows the condition to heal.<br/><br/>For very high arches, cushioning the heel, absorbing shock, and wearing proper footwear enhance foot comfort and reduce pain.<br/><br/></p>",
+            "title": "<strong>Tips for Pain-Free Walking</strong>",
+            "text": "<p>A set of 3-5 tips for maintaining foot health during the activity. These tips can be broad but activity-specific</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -175,7 +126,7 @@
       },
       "block_order": [
         "question_XamVPH",
-        "question_x9EPUx"
+        "question_JNThz9"
       ],
       "name": "t:sections.faq.name",
       "settings": {
@@ -206,7 +157,9 @@
         "padding_bottom": 0,
         "divider": false,
         "narrow": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "lookbook_JQDiwd": {
@@ -332,81 +285,9 @@
         "padding_bottom": 0,
         "divider": false,
         "full_width": true,
-        "rounded": false
-      }
-    },
-    "images_with_text_iL8ht6": {
-      "type": "images-with-text",
-      "blocks": {
-        "heading_e4NMJi": {
-          "type": "heading",
-          "settings": {
-            "heading": "Signature Arch Support",
-            "heading_size": "title-md",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_Bw6Yfi": {
-          "type": "text",
-          "settings": {
-            "text": "<p>With removable insole, our arch support is located further back to support the apex of the foot. This helps proper alignment and help relieve arch and heel pain associated with Plantar Fasciitis</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_TWhPGJ": {
-          "type": "button",
-          "settings": {
-            "button_label": "Shop Jillian",
-            "button_link": "shopify://products/jillian-black-sc450w",
-            "button_video_link": "",
-            "button_style": "link",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": true
-          }
-        }
-      },
-      "block_order": [
-        "heading_e4NMJi",
-        "text_Bw6Yfi",
-        "button_TWhPGJ"
-      ],
-      "disabled": true,
-      "name": "t:sections.images-with-text.name",
-      "settings": {
-        "image": "shopify://shop_images/ee4e2fe8a874fb5c106a8cc3c4247add5d9048ed.png",
-        "image_url": "",
-        "image_2": "shopify://shop_images/recommended_1_2x_21163cd2-e758-4725-87c5-117210d3d3c9.png",
-        "image2_url": "",
-        "image_ratio": "adapt",
-        "image_width": "large",
-        "layout": "text_first",
-        "text_alignment": "center",
-        "text_alignment_mobile": "left",
-        "color_text": "",
-        "color_background": "#fafafa",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
         "rounded": false,
-        "enable_parallax": true
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "empty_space_gyE8Nr": {
@@ -456,7 +337,9 @@
         "padding_bottom": 72,
         "divider": false,
         "full_width": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_qygTdt": {
@@ -465,7 +348,7 @@
         "text_ekcTtF": {
           "type": "text",
           "settings": {
-            "text": "<p>What Other Pregnancy Foot Pain Sufferers Say</p>",
+            "text": "<p>Testimonials</p>",
             "text_font": "heading",
             "text_size": "subtext-custom",
             "text_max_size": 24,
@@ -498,7 +381,6 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "narrow": true,
         "color_text": "#74a5ba",
         "color_background": "",
         "gradient_background": "",
@@ -510,7 +392,10 @@
         "padding_top": 0,
         "padding_bottom": 0,
         "divider": false,
-        "rounded": false
+        "narrow": true,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "testimonials_byJFpb": {
@@ -595,12 +480,11 @@
         "collection_cPKHdc": {
           "type": "collection",
           "settings": {
-            "link_type": "collection",
-            "collection": "womens-footwear-for-plantar-fasciitis",
+            "link_type": "url",
+            "collection": "",
             "custom_url": "",
-            "image": "shopify://shop_images/Rectangle_60_45bfd4e4-700b-4afc-8786-af3abca4bc9c.png",
-            "title": "",
-            "description": "To Help Relieve Plantar Fasciitis",
+            "title": "Footwear for Walking",
+            "description": "",
             "overlay_content": true,
             "color_text": "#ffffff",
             "color_overlay": "#000000",
@@ -609,15 +493,14 @@
             "enable_title_drop_shadow": true
           }
         },
-        "collection_gpn6Pp": {
+        "collection_94qHkf": {
           "type": "collection",
           "settings": {
-            "link_type": "collection",
-            "collection": "shop-all-orthotics",
+            "link_type": "url",
+            "collection": "",
             "custom_url": "",
-            "image": "shopify://shop_images/Rectangle_61_668b1198-2250-4e0e-9f58-c1a42125e032.png",
-            "title": "",
-            "description": "To Help Relieve Plantar Fasciitis",
+            "title": "Orthotics for Walking",
+            "description": "",
             "overlay_content": true,
             "color_text": "#ffffff",
             "color_overlay": "#000000",
@@ -629,7 +512,7 @@
       },
       "block_order": [
         "collection_cPKHdc",
-        "collection_gpn6Pp"
+        "collection_94qHkf"
       ],
       "name": "t:sections.collection-list.name",
       "settings": {
@@ -661,17 +544,17 @@
         "padding_bottom": 40,
         "divider": false,
         "full_width": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     }
   },
   "order": [
     "main-page",
-    "image_with_text_zj7AiL",
     "image_with_text_overlay_rBfBzp",
     "faq_zhAACx",
     "lookbook_JQDiwd",
-    "images_with_text_iL8ht6",
     "empty_space_gyE8Nr",
     "featured_collection_dXtHeM",
     "rich_text_qygTdt",
