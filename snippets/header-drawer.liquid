@@ -38,8 +38,10 @@ endif
       <nav class="relative grow overflow-hidden" role="navigation">
         <ul class="drawer__scrollable drawer__menu relative w-full h-full" role="list" data-parent>
           {%- assign main_menu = section.settings.menu_mobile | default: section.settings.menu -%}
-          {%- for link in main_menu.links -%}
-            <li class="drawer__menu-group">
+          {% assign additional_menu_index = 0 %}
+          {%- for link in section.settings.abra_additional_menu.links -%}
+            {% assign additional_menu_index = forloop.index %}
+            <li class="drawer__menu-group" data-abra-promo="{{ section.settings.abra_additional_menu_code | handleize }}">
               {%- liquid
                 assign enable_mega_menu = false
                 assign mega_menu_block = nil
@@ -57,6 +59,31 @@ endif
 
               {%- if link.links != blank or enable_mega_menu -%}
                 {%- render 'header-nav-drawer', section: section, link: link, enable_mega_menu: enable_mega_menu, enable_accordion_menu: section.settings.accordion_menu_mobile, block: mega_menu_block, position: forloop.index -%}
+              {%- else -%}
+                <a class="drawer__menu-item block heading text-2xl leading-none tracking-tight" href="{{ link.url }}">{{ link.title | escape }}</a>
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+          {%- for link in main_menu.links -%}
+            {% assign index = forloop.index | plus: additional_menu_index %}
+            <li class="drawer__menu-group">
+              {%- liquid
+                assign enable_mega_menu = false
+                assign mega_menu_block = nil
+                assign link_title_handle = link.title | downcase | handle
+          
+                for block in section.blocks
+                  assign menu_title_handle = block.settings.menu_title | downcase | handle
+                  if menu_title_handle == link_title_handle
+                    assign enable_mega_menu = true
+                    assign mega_menu_block = block
+                    break
+                  endif
+                endfor
+              -%}
+
+              {%- if link.links != blank or enable_mega_menu -%}
+                {%- render 'header-nav-drawer', section: section, link: link, enable_mega_menu: enable_mega_menu, enable_accordion_menu: section.settings.accordion_menu_mobile, block: mega_menu_block, position: index -%}
               {%- else -%}
                 <a class="drawer__menu-item block heading text-2xl leading-none tracking-tight" href="{{ link.url }}">{{ link.title | escape }}</a>
               {%- endif -%}
