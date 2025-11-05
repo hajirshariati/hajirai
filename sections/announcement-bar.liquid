@@ -23,15 +23,6 @@
 
 -%}
 
-{% if hide_for_non_us %}
-    <script>
-        const announcementBar = document.querySelector('.custom-announcement-bar');
-        if (announcementBar) {
-            announcementBar.setAttribute('data-us-only', '');
-        }
-    </script>
-{% endif %}
-
 {%- if show_section -%}
   <style>
     :root {--topbar-height: var(--sp-12);}

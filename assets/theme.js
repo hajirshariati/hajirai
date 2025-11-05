@@ -8402,5 +8402,122 @@ theme.DOMready(() => {
     window.productColorSwatchHandler = new ProductColorSwatchHandler();
 });
 
+// Auto-add alt text to images without alt attribute
+theme.autoAltText = function() {
+    const images = document.querySelectorAll('img:not([alt]), img[alt=""]');
+    
+    images.forEach(img => {
+        // Get the image source (src or data-src for lazy loading)
+        const src = img.getAttribute('src') || img.getAttribute('data-src') || '';
+        
+        if (src) {
+            // Extract filename from URL
+            const urlParts = src.split('/');
+            const filename = urlParts[urlParts.length - 1];
+            
+            // Remove file extension and clean up the name
+            const nameWithoutExt = filename.split('?')[0].split('.')[0];
+            
+            // Convert filename to readable text (replace hyphens, underscores with spaces)
+            const altText = nameWithoutExt
+                .replace(/[-_]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+            
+            // Set the alt attribute
+            if (altText) {
+                img.setAttribute('alt', altText);
+            }
+        }
+    });
+};
+
+// Initialize auto alt text on DOM ready
+theme.DOMready(() => {
+    // Run immediately
+    theme.autoAltText();
+    
+    // Run again after delays to catch lazy-loaded images
+    setTimeout(() => {
+        theme.autoAltText();
+    }, 500);
+    
+    setTimeout(() => {
+        theme.autoAltText();
+    }, 1500);
+    
+    setTimeout(() => {
+        theme.autoAltText();
+    }, 3000);
+    
+    // Also observe for dynamically added images
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+                if (node.nodeType === 1) { // Element node
+                    if (node.tagName === 'IMG' && (!node.hasAttribute('alt') || node.getAttribute('alt') === '')) {
+                        const src = node.getAttribute('src') || node.getAttribute('data-src') || '';
+                        if (src) {
+                            const urlParts = src.split('/');
+                            const filename = urlParts[urlParts.length - 1];
+                            const nameWithoutExt = filename.split('?')[0].split('.')[0];
+                            const altText = nameWithoutExt.replace(/[-_]/g, ' ').replace(/\s+/g, ' ').trim();
+                            if (altText) {
+                                node.setAttribute('alt', altText);
+                            }
+                        }
+                    }
+                    // Check for images within added nodes
+                    const imgs = node.querySelectorAll ? node.querySelectorAll('img:not([alt]), img[alt=""]') : [];
+                    imgs.forEach(img => {
+                        const src = img.getAttribute('src') || img.getAttribute('data-src') || '';
+                        if (src) {
+                            const urlParts = src.split('/');
+                            const filename = urlParts[urlParts.length - 1];
+                            const nameWithoutExt = filename.split('?')[0].split('.')[0];
+                            const altText = nameWithoutExt.replace(/[-_]/g, ' ').replace(/\s+/g, ' ').trim();
+                            if (altText) {
+                                img.setAttribute('alt', altText);
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    });
+    
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+    
+    // Also listen for attribute changes (when src gets added to lazy images)
+    const attrObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'src') {
+                const img = mutation.target;
+                if (img.tagName === 'IMG' && (!img.hasAttribute('alt') || img.getAttribute('alt') === '')) {
+                    const src = img.getAttribute('src') || '';
+                    if (src) {
+                        const urlParts = src.split('/');
+                        const filename = urlParts[urlParts.length - 1];
+                        const nameWithoutExt = filename.split('?')[0].split('.')[0];
+                        const altText = nameWithoutExt.replace(/[-_]/g, ' ').replace(/\s+/g, ' ').trim();
+                        if (altText) {
+                            img.setAttribute('alt', altText);
+                        }
+                    }
+                }
+            }
+        });
+    });
+    
+    attrObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['src'],
+        subtree: true
+    });
+});
+
 
 

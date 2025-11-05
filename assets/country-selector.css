@@ -71,6 +71,8 @@
 }
 
 .country-selector_modal--content img {
+    width: 44px;
+    height: 46px;
     margin-bottom: -0.5rem
 }
 

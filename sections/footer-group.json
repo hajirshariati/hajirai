@@ -22,7 +22,7 @@
             "heading": "Customer service",
             "text": "<p>Consult with our specialists for a personalized product recommendation for your specific needs.</p>",
             "highlighted_text": "none",
-            "custom_html": "<a onclick=\"openWidget()\">Chat Now</a>\n\n\n<script type=\"text/javascript\">\n  zE(\"webWidget\", \"hide\")\n\n  function openWidget() {\n    zE(\"webWidget\", \"show\")\n    zE(\"webWidget\", \"open\")\n     \n  }\n\n</script>",
+            "custom_html": "<a href=\"#chat\" onclick=\"openWidget()\">Chat Now</a>\n\n\n<script type=\"text/javascript\">\n  zE(\"webWidget\", \"hide\")\n\n  function openWidget() {\n    zE(\"webWidget\", \"show\")\n    zE(\"webWidget\", \"open\")\n     \n  }\n\n</script>",
             "us_only": false,
             "highlighted_scribble": "circle"
           }
