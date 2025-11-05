@@ -51,6 +51,7 @@
 
       {%- if settings.ss_enable -%}
         <div id="searchspring-toolbar"></div>
+        {%- render 'searchspring-collection-skeleton' -%}
       {% else %}
         {%- if enable_filtering or enable_sorting or subcollections != blank -%}
           <div class="collection__topbar hidden xl:flex items-center gap-4">
