@@ -64,9 +64,9 @@
 {%- endcapture -%}
 
 {%- if request.page_type == 'index' and logo_h1 -%}
-  <h1 class="header__logo flex justify-center z-2" itemscope itemtype="http://schema.org/Organization">
+  <div class="header__logo flex justify-center z-2" itemscope itemtype="http://schema.org/Organization">
     {{- logo_content -}}
-  </h1>
+  </div>
 {%- else -%}
   <div class="header__logo flex justify-center z-2" itemscope itemtype="http://schema.org/Organization">
     {{- logo_content -}}

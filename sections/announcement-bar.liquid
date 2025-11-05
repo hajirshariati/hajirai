@@ -352,7 +352,7 @@
             {%- comment -%} Notification Item 1 {%- endcomment -%}
             <div class="notification-banner-item" {{ block.shopify_attributes }}>
               {%- if block.settings.notification_title != blank -%}
-                <h3 class="notification-banner-title">{{ block.settings.notification_title }}</h3>
+                <div class="notification-banner-title">{{ block.settings.notification_title }}</div>
               {%- endif -%}
               {%- if block.settings.notification_subtitle != blank -%}
                 <p class="notification-banner-subtitle">{{ block.settings.notification_subtitle }}</p>
@@ -367,7 +367,7 @@
             {%- comment -%} Notification Item 2 {%- endcomment -%}
             <div class="notification-banner-item" {{ block.shopify_attributes }}>
               {%- if block.settings.notification_title_2 != blank -%}
-                <h3 class="notification-banner-title">{{ block.settings.notification_title_2 }}</h3>
+                <div class="notification-banner-title">{{ block.settings.notification_title_2 }}</div>
               {%- endif -%}
               {%- if block.settings.notification_subtitle_2 != blank -%}
                 <p class="notification-banner-subtitle">{{ block.settings.notification_subtitle_2 }}</p>
@@ -382,7 +382,7 @@
             {%- comment -%} Notification Item 3 {%- endcomment -%}
             <div class="notification-banner-item" {{ block.shopify_attributes }}>
               {%- if block.settings.notification_title_3 != blank -%}
-                <h3 class="notification-banner-title">{{ block.settings.notification_title_3 }}</h3>
+                <div class="notification-banner-title">{{ block.settings.notification_title_3 }}</div>
               {%- endif -%}
               {%- if block.settings.notification_subtitle_3 != blank -%}
                 <p class="notification-banner-subtitle">{{ block.settings.notification_subtitle_3 }}</p>
