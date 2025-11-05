@@ -63,7 +63,6 @@
         "image_width": "medium",
         "layout": "text_first",
         "text_alignment": "left",
-        "content_position": "align-self-end",
         "image_height_mobile": "auto",
         "text_alignment_mobile": "left",
         "color_text": "",
@@ -156,8 +155,8 @@
         "color_button_gradient": "",
         "padding_top": 40,
         "padding_bottom": 80,
-        "divider": false,
         "full_width": false,
+        "divider": false,
         "rounded": false
       }
     },

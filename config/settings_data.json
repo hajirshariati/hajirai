@@ -180,24 +180,6 @@
     },
     "content_for_index": [],
     "blocks": {
-      "855628211100114053": {
-        "type": "shopify://apps/klaviyo-email-marketing-sms/blocks/klaviyo-onsite-embed/2632fe16-c075-4321-a88b-50b567f42507",
-        "disabled": false,
-        "settings": {}
-      },
-      "8962992520437913685": {
-        "type": "shopify://apps/yotpo-loyalty-rewards/blocks/loader-app-embed-block/2f9660df-5018-4e02-9868-ee1fb88d6ccd",
-        "disabled": false,
-        "settings": {
-          "inject_modules_loader": true,
-          "inject_sdk_loader": false
-        }
-      },
-      "11945366711752539959": {
-        "type": "shopify://apps/zendesk/blocks/zendesk_web_widget/c0b417b1-b90b-4754-baaf-f55627e6acd4",
-        "disabled": false,
-        "settings": {}
-      },
       "3703718642129649661": {
         "type": "shopify://apps/casper-cart-sync/blocks/cross-device-cart/3e8e9213-3920-4806-a1c5-772d07bb1e4e",
         "disabled": false,
@@ -206,21 +188,6 @@
           "not_replace_with_empty": false,
           "clear_after_logout": false
         }
-      },
-      "15685250022964305326": {
-        "type": "shopify://apps/elevar-conversion-tracking/blocks/dataLayerEmbed/bc30ab68-b15c-4311-811f-8ef485877ad6",
-        "disabled": false,
-        "settings": {}
-      },
-      "12592085946906583873": {
-        "type": "shopify://apps/wunderkind/blocks/tag/40b05e3b-2403-4814-8fab-e17e57e8b1aa",
-        "disabled": false,
-        "settings": {}
-      },
-      "10533623496951086041": {
-        "type": "shopify://apps/criteo-sales-growth-ads/blocks/theme-extension/b74e0e19-7ecc-4a61-b469-888ea2cdf8f5",
-        "disabled": false,
-        "settings": {}
       },
       "2296928500563504527": {
         "type": "shopify://apps/abra-promotions/blocks/abra/daa1493a-23b5-48bb-8cb5-7ab1267b4642",
@@ -253,10 +220,43 @@
           "sale_price_color": "#ff0000"
         }
       },
+      "10533623496951086041": {
+        "type": "shopify://apps/criteo-sales-growth-ads/blocks/theme-extension/b74e0e19-7ecc-4a61-b469-888ea2cdf8f5",
+        "disabled": false,
+        "settings": {}
+      },
+      "12592085946906583873": {
+        "type": "shopify://apps/wunderkind/blocks/tag/40b05e3b-2403-4814-8fab-e17e57e8b1aa",
+        "disabled": false,
+        "settings": {}
+      },
+      "15685250022964305326": {
+        "type": "shopify://apps/elevar-conversion-tracking/blocks/dataLayerEmbed/bc30ab68-b15c-4311-811f-8ef485877ad6",
+        "disabled": false,
+        "settings": {}
+      },
+      "11945366711752539959": {
+        "type": "shopify://apps/zendesk/blocks/zendesk_web_widget/c0b417b1-b90b-4754-baaf-f55627e6acd4",
+        "disabled": false,
+        "settings": {}
+      },
       "7570552984445421165": {
         "type": "shopify://apps/yotpo-product-reviews/blocks/settings/eb7dfd7d-db44-4334-bc49-c893b51b36cf",
         "disabled": false,
         "settings": {}
+      },
+      "855628211100114053": {
+        "type": "shopify://apps/klaviyo-email-marketing-sms/blocks/klaviyo-onsite-embed/2632fe16-c075-4321-a88b-50b567f42507",
+        "disabled": false,
+        "settings": {}
+      },
+      "8962992520437913685": {
+        "type": "shopify://apps/yotpo-loyalty-rewards/blocks/loader-app-embed-block/2f9660df-5018-4e02-9868-ee1fb88d6ccd",
+        "disabled": false,
+        "settings": {
+          "inject_modules_loader": true,
+          "inject_sdk_loader": false
+        }
       }
     }
   },

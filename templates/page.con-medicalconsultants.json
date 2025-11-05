@@ -188,7 +188,6 @@
         "image_width": "small",
         "layout": "text_first",
         "text_alignment": "left",
-        "content_position": "align-self-center",
         "image_mobile": "shopify://shop_images/Dr.Janine.jpg",
         "image_height_mobile": "adapt",
         "text_alignment_mobile": "center",
