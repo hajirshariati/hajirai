@@ -11,6 +11,7 @@
   "sections": {
     "main-page": {
       "type": "main-page",
+      "disabled": true,
       "settings": {
         "heading_size": "title-sm",
         "heading_alignment": "text-left",
@@ -22,9 +23,178 @@
         "narrow": true,
         "rounded": false
       }
+    },
+    "image_with_text_overlay_yHn6tD": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "heading_6C9Ldx": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>Enter to be one of 10 lucky winners to WIN a pair of Aetrex Shoes!</p>",
+            "heading_size": "title-lg tracking-heading",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_6C9Ldx"
+      ],
+      "name": "t:sections.image-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "image_height": "650px",
+        "content_width": "large",
+        "content_position": "md:items-center md:justify-center",
+        "text_alignment": "center",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-center justify-center",
+        "text_alignment_mobile": "center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 70,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": true,
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "rich_text_Q7yxTL": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_7patDC": {
+          "type": "heading",
+          "settings": {
+            "heading": "Step 1: Complete the form below, sit back, and wait to hear if you are a lucky winner!",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "liquid_UzytBH": {
+          "type": "liquid",
+          "settings": {
+            "liquid": "<div data-tf-live=\"01K9CMB6CF478J18EJNRYXEQ7T\"></div><script src=\"//embed.typeform.com/next/embed.js\"></script>"
+          }
+        },
+        "spacing_JVEyxa": {
+          "type": "spacing",
+          "settings": {
+            "height": 40,
+            "height_mobile": 28
+          }
+        },
+        "heading_hDpN7J": {
+          "type": "heading",
+          "settings": {
+            "heading": "Step 2: Follow Aetrex on Instagram",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_8ETp7K": {
+          "type": "button",
+          "settings": {
+            "button_label": "Follow Now",
+            "button_link": "https://www.instagram.com/aetrexworldwide/",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "spacing_BM7xX4": {
+          "type": "spacing",
+          "settings": {
+            "height": 40,
+            "height_mobile": 28
+          }
+        },
+        "heading_BgJUyq": {
+          "type": "heading",
+          "settings": {
+            "heading": "Step 3: Follow Erica Bennett on Instagram",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_EFf6Wi": {
+          "type": "button",
+          "settings": {
+            "button_label": "Follow Now",
+            "button_link": "https://www.instagram.com/_very_erica_/",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_7patDC",
+        "liquid_UzytBH",
+        "spacing_JVEyxa",
+        "heading_hDpN7J",
+        "button_8ETp7K",
+        "spacing_BM7xX4",
+        "heading_BgJUyq",
+        "button_EFf6Wi"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 100,
+        "divider": false,
+        "narrow": true,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
     }
   },
   "order": [
-    "main-page"
+    "main-page",
+    "image_with_text_overlay_yHn6tD",
+    "rich_text_Q7yxTL"
   ]
 }
