@@ -74,12 +74,17 @@
     "rich_text_Q7yxTL": {
       "type": "rich-text",
       "blocks": {
-        "heading_7patDC": {
-          "type": "heading",
+        "text_BEtCVe": {
+          "type": "text",
           "settings": {
-            "heading": "Step 1: Complete the form below",
-            "heading_size": "title-sm",
-            "heading_tag": "h2",
+            "text": "<p>Step 1: Complete the Form</p>",
+            "text_font": "heading",
+            "text_size": "subtext-xl",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -89,92 +94,11 @@
           "settings": {
             "liquid": "<div data-tf-live=\"01K9CMB6CF478J18EJNRYXEQ7T\"></div><script src=\"//embed.typeform.com/next/embed.js\"></script>"
           }
-        },
-        "spacing_JVEyxa": {
-          "type": "spacing",
-          "settings": {
-            "height": 40,
-            "height_mobile": 28
-          }
-        },
-        "heading_hDpN7J": {
-          "type": "heading",
-          "settings": {
-            "heading": "Step 2: Follow Aetrex on Instagram",
-            "heading_size": "title-sm",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_8ETp7K": {
-          "type": "button",
-          "settings": {
-            "button_label": "Follow Now",
-            "button_link": "https://www.instagram.com/aetrexworldwide/",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": false
-          }
-        },
-        "spacing_BM7xX4": {
-          "type": "spacing",
-          "settings": {
-            "height": 40,
-            "height_mobile": 28
-          }
-        },
-        "heading_BgJUyq": {
-          "type": "heading",
-          "settings": {
-            "heading": "Step 3: Follow Erica Bennett on Instagram",
-            "heading_size": "title-sm",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_EFf6Wi": {
-          "type": "button",
-          "settings": {
-            "button_label": "Follow Now",
-            "button_link": "https://www.instagram.com/_very_erica_/",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": false
-          }
-        },
-        "spacing_JhVnPw": {
-          "type": "spacing",
-          "settings": {
-            "height": 40,
-            "height_mobile": 28
-          }
-        },
-        "heading_QeiDx3": {
-          "type": "heading",
-          "settings": {
-            "heading": "Step 4: Sit back and wait to hear if you are a lucky winner!",
-            "heading_size": "title-sm",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
         }
       },
       "block_order": [
-        "heading_7patDC",
-        "liquid_UzytBH",
-        "spacing_JVEyxa",
-        "heading_hDpN7J",
-        "button_8ETp7K",
-        "spacing_BM7xX4",
-        "heading_BgJUyq",
-        "button_EFf6Wi",
-        "spacing_JhVnPw",
-        "heading_QeiDx3"
+        "text_BEtCVe",
+        "liquid_UzytBH"
       ],
       "name": "t:sections.rich-text.name",
       "settings": {
@@ -202,7 +126,168 @@
         "color_button_background": "#e0e8ee",
         "color_button_gradient": "",
         "padding_top": 72,
-        "padding_bottom": 100,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": true,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "multicolumn_RxtkQV": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_jT9iDK": {
+          "type": "column",
+          "settings": {
+            "show_border": true,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image_ratio": "adapt",
+            "heading": "Step 2",
+            "heading_size": "text-2xl lg:text-3xl",
+            "text": "<h5>Follow Aetrex on Instagram</h5>",
+            "custom_html": "",
+            "button_label": "Follow",
+            "button_link": "https://www.instagram.com/aetrexworldwide/",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_x3rxXJ": {
+          "type": "column",
+          "settings": {
+            "show_border": true,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image_ratio": "adapt",
+            "heading": "Step 3",
+            "heading_size": "text-2xl lg:text-3xl",
+            "text": "<h5>Follow Erica Bennett on Instagram</h5>",
+            "custom_html": "",
+            "button_label": "Follow",
+            "button_link": "https://www.instagram.com/_very_erica_/",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_RtN6yz": {
+          "type": "column",
+          "settings": {
+            "show_border": true,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image_ratio": "adapt",
+            "heading": "Step 4",
+            "heading_size": "text-2xl lg:text-3xl",
+            "text": "<h5>Sit back and wait to hear if you are a lucky winner! Winners will be announced on 11/17/2025.</h5>",
+            "custom_html": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_jT9iDK",
+        "column_x3rxXJ",
+        "column_RtN6yz"
+      ],
+      "name": "t:sections.multicolumn.name",
+      "settings": {
+        "gap": "large",
+        "columns": 3,
+        "columns_mobile": "2",
+        "carousel_on_desktop": false,
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#e0e8ee",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 72,
+        "full_width": false,
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "rich_text_CqFqBG": {
+      "type": "rich-text",
+      "blocks": {
+        "text_hHEzjP": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Entries accepted from 11/10/2025 through 11/16/2025. Winners announced on 11/17/2025.</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_hHEzjP"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#969090",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "#366d8d",
+        "color_button_background": "#e0e8ee",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 24,
         "divider": false,
         "narrow": true,
         "rounded": false,
@@ -214,6 +299,8 @@
   "order": [
     "main-page",
     "image_with_text_overlay_yHn6tD",
-    "rich_text_Q7yxTL"
+    "rich_text_Q7yxTL",
+    "multicolumn_RxtkQV",
+    "rich_text_CqFqBG"
   ]
 }
