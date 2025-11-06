@@ -31,7 +31,7 @@
           "type": "heading",
           "settings": {
             "heading": "<p>Enter to be one of 10 lucky winners to WIN a pair of Aetrex Shoes!</p>",
-            "heading_size": "title-lg tracking-heading",
+            "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -77,7 +77,7 @@
         "heading_7patDC": {
           "type": "heading",
           "settings": {
-            "heading": "Step 1: Complete the form below, sit back, and wait to hear if you are a lucky winner!",
+            "heading": "Step 1: Complete the form below",
             "heading_size": "title-sm",
             "heading_tag": "h2",
             "highlighted_text": "none",
@@ -145,6 +145,23 @@
             "button_external": false,
             "button_icon": false
           }
+        },
+        "spacing_JhVnPw": {
+          "type": "spacing",
+          "settings": {
+            "height": 40,
+            "height_mobile": 28
+          }
+        },
+        "heading_QeiDx3": {
+          "type": "heading",
+          "settings": {
+            "heading": "Step 4: Sit back and wait to hear if you are a lucky winner!",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
         }
       },
       "block_order": [
@@ -155,7 +172,9 @@
         "button_8ETp7K",
         "spacing_BM7xX4",
         "heading_BgJUyq",
-        "button_EFf6Wi"
+        "button_EFf6Wi",
+        "spacing_JhVnPw",
+        "heading_QeiDx3"
       ],
       "name": "t:sections.rich-text.name",
       "settings": {
@@ -179,8 +198,8 @@
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
+        "color_button_text": "#366d8d",
+        "color_button_background": "#e0e8ee",
         "color_button_gradient": "",
         "padding_top": 72,
         "padding_bottom": 100,
