@@ -125,7 +125,7 @@
         "padding_top": 40,
         "padding_bottom": 100,
         "divider": false,
-        "full_width": true,
+        "full_width": false,
         "rounded": true
       }
     },
@@ -224,7 +224,9 @@
         "padding_bottom": 100,
         "divider": false,
         "narrow": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "ss_recs_script_nYBUNj": {
