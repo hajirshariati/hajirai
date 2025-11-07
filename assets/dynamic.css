@@ -917,8 +917,8 @@ body .yotpo-reviews-main-widget svg {
 
 .ss-skeleton-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2.463vw;
   margin-top: 2rem;
 }
 

@@ -8350,49 +8350,6 @@ details.active .drawer__promotions .mega-menu__item,
     max-width: 20%;
 }
 
-.mega-menu__nav-item {
-    --tw-translate-x: 25%;
-    transform: translateX(calc(var(--tw-translate-x) * var(--transform-logical)));
-    transition: transform 2s cubic-bezier(0.075, 0.82, 0.165, 1),
-    opacity 1s cubic-bezier(0.19, 1, 0.22, 1);
-    transition-delay: 0.25s;
-}
-
-.mega-menu[open] .mega-menu__nav-item:is(:nth-child(1), :nth-child(2)) {
-    transition-delay: 0.5s;
-}
-
-.mega-menu[open] .mega-menu__nav-item:is(:nth-child(3), :nth-child(4)) {
-    transition-delay: 0.65s;
-}
-
-.mega-menu[open] .mega-menu__nav-item:is(:nth-child(5), :nth-child(6)) {
-    transition-delay: 0.75s;
-}
-
-.mega-menu[open]
-.mega-menu__nav--more
-.mega-menu__nav-item:is(:nth-child(1), :nth-child(2), :nth-child(3)) {
-    transition-delay: 0.5s;
-}
-
-.mega-menu[open]
-.mega-menu__nav--more
-.mega-menu__nav-item:is(:nth-child(4), :nth-child(5), :nth-child(6)) {
-    transition-delay: 0.65s;
-}
-
-.mega-menu[open]
-.mega-menu__nav--more
-.mega-menu__nav-item:is(:nth-child(7), :nth-child(8), :nth-child(9)) {
-    transition-delay: 0.75s;
-}
-
-.mega-menu[open] .mega-menu__nav-item {
-    --tw-translate-x: 0;
-    opacity: 1;
-}
-
 .mega-menu__nav .media {
     margin-block-end: var(--sp-4);
 }
