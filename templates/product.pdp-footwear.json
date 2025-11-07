@@ -131,15 +131,15 @@
         "sign_up_DcnXLa": {
           "type": "sign_up",
           "settings": {
-            "heading": "Get Free Shipping",
-            "subheading": "with Aetrex Loyalty Program",
-            "button_label": "Join Aetrex Access",
-            "form_heading": "Create your <strong>FREE</strong> account to get free shipping",
-            "checkbox_label": "Must use same email address at checkout for free shipping perk to apply. Free shipping perk only available in the US.",
+            "heading": "Aetrex Access",
+            "subheading": "earn points on your purchases & more",
+            "button_label": "Join Now",
+            "form_heading": "Create your account",
+            "checkbox_label": "Must use same email address at checkout for perks to apply. only available in the US.",
             "checkbox_is_required": false,
             "form_button_label": "Join Now",
             "success_heading": "Thank you for signing up!",
-            "already_a_member": "You’re already a member! 💙 Just <a href=\"https://www.aetrex.com/account/login\" target=\"_blank\" title=\"Login\"><strong>log in</strong></a> to enjoy your perks."
+            "already_a_member": "You’re already a member!"
           }
         },
         "aetrex_fitai_pdp_size_recommendation_gUEcCb": {
@@ -147,6 +147,8 @@
           "disabled": true,
           "settings": {
             "ProductPage": true,
+            "size_recommendation_font_family": "OpenSans, sans-serif",
+            "size_recommendation_vertical_spacing": 5,
             "tab_background": "#f2f2f2",
             "tab_foreground": "#5c6271",
             "active_tab_background": "#5c6271",
