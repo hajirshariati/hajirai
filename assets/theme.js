@@ -1371,15 +1371,16 @@ class AnimateElement extends HTMLElement {
     }
 
     connectedCallback() {
-        if (theme.config.motionReduced) return;
+        // Animations disabled to fix CLS issue on PDP
+        // if (theme.config.motionReduced) return;
 
-        this.animation = new theme.Animation(this);
-        this.animation.beforeLoad();
+        // this.animation = new theme.Animation(this);
+        // this.animation.beforeLoad();
 
-        Motion.inView(this, async () => {
-            if (!this.immediate && this.media) await theme.utils.imageLoaded(this.media);
-            this.animation.load();
-        });
+        // Motion.inView(this, async () => {
+        //     if (!this.immediate && this.media) await theme.utils.imageLoaded(this.media);
+        //     this.animation.load();
+        // });
     }
 
     reset() {
@@ -5080,7 +5081,7 @@ class ProductInfo extends HTMLElement {
     }
 
     connectedCallback() {
-        this.initProductAnimation();
+        // this.initProductAnimation(); // Disabled to fix CLS issue
 
         this.onVariantChangeUnsubscriber = theme.pubsub.subscribe(
             theme.pubsub.PUB_SUB_EVENTS.optionValueSelectionChange,
