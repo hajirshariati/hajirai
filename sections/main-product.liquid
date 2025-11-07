@@ -23,6 +23,75 @@
       --aspect-ratio: {{ first_media.aspect_ratio }};
     }
   }
+
+  /* PDP Gallery CLS Prevention - Slider specific */
+  #shopify-section-{{ section.id }} slider-element {
+    min-height: calc(100vw - 40px);
+  }
+
+  @media screen and (min-width: 768px) {
+    #shopify-section-{{ section.id }} slider-element {
+      min-height: 600px;
+    }
+  }
+
+  @media screen and (min-width: 1024px) {
+    #shopify-section-{{ section.id }} slider-element {
+      min-height: auto;
+    }
+  }
+
+  /* Prevent layout shifts from variant picker images */
+  #shopify-section-{{ section.id }} .product-info__mobile-form .color-swatch,
+  #shopify-section-{{ section.id }} .product-info__blocks .color-swatch {
+    width: 80px;
+    height: 80px;
+  }
+
+  #shopify-section-{{ section.id }} .product-info__mobile-form magnet-element,
+  #shopify-section-{{ section.id }} .product-info__blocks magnet-element {
+    transform: none !important;
+    transition: none !important;
+  }
+
+  /* Prevent title from causing CLS */
+  #shopify-section-{{ section.id }} .split-words.js-invisible {
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  #shopify-section-{{ section.id }} .product__title {
+    min-height: 2em;
+  }
+
+  /* Prevent price shifts */
+  #shopify-section-{{ section.id }} .product__price {
+    min-height: 1.5em;
+  }
+
+  /* Prevent entire product info from shifting */
+  #shopify-section-{{ section.id }} product-info {
+    display: block;
+    min-height: 200px;
+  }
+
+  @media screen and (max-width: 767px) {
+    #shopify-section-{{ section.id }} .product-info__mobile-form {
+      min-height: 100px;
+    }
+  }
+
+  /* Skeleton for Yotpo Reviews Widget */
+  #shopify-section-{{ section.id }} .yotpo-widget-instance {
+    min-height: 35px;
+    position: relative;
+  }
+
+  /* Skeleton for TFC Widget */
+  #shopify-section-{{ section.id }} #tfc-widget {
+    min-height: 50px;
+    position: relative;
+  }
 </style>
  
 
@@ -148,8 +217,6 @@
       <product-info
         id="ProductInfo-{{ section.id }}-{{ product.id }}"
         class="product__info{% if section.settings.enable_sticky_info %} lg:sticky{% endif %} block w-full"
-        data-animate="fade-up"
-        data-immediate
         data-section-id="{{ section.id }}"
         data-product-id="{{ product.id }}"
         data-product-url="{{ product.url }}"
@@ -993,7 +1060,7 @@
                       </span>
                       <span class="sr-only">{{ 'products.price.sale_price' | t }}</span>
                     {%- endif -%}
-                    
+
                     {%- if product.selected_or_first_available_variant.quantity_price_breaks.size > 0 -%}
                       {%- if current_qty_for_volume_pricing < volume_pricing_array.last.minimum_quantity -%}
                         {%- liquid

@@ -23,8 +23,7 @@
           "type": "title",
           "settings": {
             "title_size": "product-title-md",
-            "show_price": true,
-            "show_rating": true
+            "show_price": true
           }
         },
         "description": {

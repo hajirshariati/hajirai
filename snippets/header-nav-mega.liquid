@@ -60,7 +60,7 @@
             <div class="mega-menu__nav-section{% if show_promotions %} flex-1{% else %} w-full{% endif %}">
               <ul class="mega-menu__nav{% if link.links.size > 6 %} mega-menu__nav--more{% endif %} flex flex-wrap">
                 {%- for childlink in link.links -%}
-                  <li class="mega-menu__nav-item opacity-0">
+                  <li class="mega-menu__nav-item">
                     {%- if block.settings.show_menu_image
                       and childlink.type == 'collection_link'
                       and childlink.object.image != blank

@@ -132,7 +132,6 @@
         "image_width": "small",
         "layout": "text_first",
         "text_alignment": "left",
-        "content_position": "align-self-center",
         "image_mobile": "shopify://shop_images/39924e8d-41d5-4fba-a21b-dd584965ec3b.gif",
         "image_height_mobile": "adapt",
         "text_alignment_mobile": "left",

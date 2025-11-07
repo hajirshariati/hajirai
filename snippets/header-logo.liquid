@@ -26,35 +26,41 @@
     >
       <span class="sr-only">{{ shop.name }}</span>
       
-      {%- comment -%} Desktop logo {%- endcomment -%}
+      {%- comment -%} Desktop logo - Force 280:65 aspect ratio (4.31) {%- endcomment -%}
+      {%- assign logo_aspect_ratio = 4.31 -%}
+      {%- assign logo_height = settings.logo_width | divided_by: logo_aspect_ratio | round -%}
+      {%- assign logo_mobile_height = settings.logo_width_mobile | divided_by: logo_aspect_ratio | round -%}
       {%- capture sizes -%}{{ settings.logo_width }}px{%- endcapture -%}
       {%- capture widths -%}{{ settings.logo_width }}, {{ settings.logo_width | times: 2 | at_most: logo.width }}{%- endcapture -%}
-      {%- capture style -%}max-height: {{ settings.logo_width | divided_by: logo.aspect_ratio }}px;max-width: {{ settings.logo_width }}px;{%- endcapture -%}
+      {%- capture style -%}width: {{ settings.logo_width }}px;height: {{ logo_height }}px;{%- endcapture -%}
 
       {%- comment -%} Mobile logo {%- endcomment -%}
       {%- capture mobile_sizes -%}{{ settings.logo_width_mobile }}px{%- endcapture -%}
       {%- capture mobile_widths -%}{{ settings.logo_width_mobile }}, {{ settings.logo_width_mobile | times: 2 | at_most: logo_mobile.width }}{%- endcapture -%}
-      {%- capture mobile_style -%}max-height: {{ settings.logo_width_mobile | divided_by: logo_mobile.aspect_ratio }}px;max-width: {{ settings.logo_width_mobile }}px;{%- endcapture -%}
+      {%- capture mobile_style -%}width: {{ settings.logo_width_mobile }}px;height: {{ logo_mobile_height }}px;{%- endcapture -%}
 
       {%- liquid
-        echo logo | image_url: width: logo.width | image_tag: loading: 'lazy', widths: widths, sizes: sizes, style: style, preload: true, itemprop: 'logo', is: 'lazy-image', class: 'logo hidden md:block'
-        echo logo_mobile | image_url: width: logo_mobile.width | image_tag: loading: 'lazy', widths: mobile_widths, sizes: mobile_sizes, style: mobile_style, preload: true, itemprop: 'logo', is: 'lazy-image', class: 'logo md:hidden'
+        echo logo | image_url: width: logo.width | image_tag: loading: 'lazy', widths: widths, sizes: sizes, style: style, preload: true, itemprop: 'logo', is: 'lazy-image', class: 'logo hidden md:block', width: settings.logo_width, height: logo_height
+        echo logo_mobile | image_url: width: logo_mobile.width | image_tag: loading: 'lazy', widths: mobile_widths, sizes: mobile_sizes, style: mobile_style, preload: true, itemprop: 'logo', is: 'lazy-image', class: 'logo md:hidden', width: settings.logo_width_mobile, height: logo_mobile_height
       -%}
 
       {%- if white_logo -%}
-        {%- comment -%} Desktop logo {%- endcomment -%}
+        {%- comment -%} Desktop logo - Force 280:65 aspect ratio (4.31) {%- endcomment -%}
+        {%- assign white_logo_aspect_ratio = 4.31 -%}
+        {%- assign white_logo_height = settings.logo_width | divided_by: white_logo_aspect_ratio | round -%}
+        {%- assign white_logo_mobile_height = settings.logo_width_mobile | divided_by: white_logo_aspect_ratio | round -%}
         {%- capture sizes -%}{{ settings.logo_width }}px{%- endcapture -%}
         {%- capture widths -%}{{ settings.logo_width }}, {{ settings.logo_width | times: 2 | at_most: white_logo.width }}{%- endcapture -%}
-        {%- capture style -%}max-height: {{ settings.logo_width | divided_by: white_logo.aspect_ratio }}px;max-width: {{ settings.logo_width }}px;{%- endcapture -%}
+        {%- capture style -%}width: {{ settings.logo_width }}px;height: {{ white_logo_height }}px;{%- endcapture -%}
 
-        {%- comment -%} Mobile logo {%- endcomment -%}
+        {%- comment -%} Mobile logo - Force 140:32 aspect ratio (4.375) {%- endcomment -%}
         {%- capture mobile_sizes -%}{{ settings.logo_width_mobile }}px{%- endcapture -%}
         {%- capture mobile_widths -%}{{ settings.logo_width_mobile }}, {{ settings.logo_width_mobile | times: 2 | at_most: white_logo_mobile.width }}{%- endcapture -%}
-        {%- capture mobile_style -%}max-height: {{ settings.logo_width_mobile | divided_by: white_logo_mobile.aspect_ratio }}px;max-width: {{ settings.logo_width_mobile }}px;{%- endcapture -%}
+        {%- capture mobile_style -%}width: {{ settings.logo_width_mobile }}px;height: {{ white_logo_mobile_height }}px;{%- endcapture -%}
 
         {%- liquid
-          echo white_logo | image_url: width: white_logo.width | image_tag: loading: 'lazy', widths: widths, sizes: sizes, style: style, preload: true, itemprop: 'logo', is: 'lazy-image', class: 'white-logo hidden md:block absolute'
-          echo white_logo_mobile | image_url: width: white_logo_mobile.width | image_tag: loading: 'lazy', widths: mobile_widths, sizes: mobile_sizes, style: mobile_style, preload: true, itemprop: 'logo', is: 'lazy-image', class: 'white-logo md:hidden absolute'
+          echo white_logo | image_url: width: white_logo.width | image_tag: loading: 'lazy', widths: widths, sizes: sizes, style: style, preload: true, itemprop: 'logo', is: 'lazy-image', class: 'white-logo hidden md:block absolute', width: settings.logo_width, height: white_logo_height
+          echo white_logo_mobile | image_url: width: white_logo_mobile.width | image_tag: loading: 'lazy', widths: mobile_widths, sizes: mobile_sizes, style: mobile_style, preload: true, itemprop: 'logo', is: 'lazy-image', class: 'white-logo md:hidden absolute', width: settings.logo_width_mobile, height: white_logo_mobile_height
         -%}
       {%- endif -%}
     </a>
@@ -64,9 +70,9 @@
 {%- endcapture -%}
 
 {%- if request.page_type == 'index' and logo_h1 -%}
-  <h1 class="header__logo flex justify-center z-2" itemscope itemtype="http://schema.org/Organization">
+  <div class="header__logo flex justify-center z-2" itemscope itemtype="http://schema.org/Organization">
     {{- logo_content -}}
-  </h1>
+  </div>
 {%- else -%}
   <div class="header__logo flex justify-center z-2" itemscope itemtype="http://schema.org/Organization">
     {{- logo_content -}}

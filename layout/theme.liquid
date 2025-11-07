@@ -6,10 +6,8 @@
   dir="{{ direction }}"
 >
   <head>
- <script src="//embed.typeform.com/next/embed.js"></script>
-<!-- OneTrust Cookies Consent Notice start for aetrex.com -->
-
-<script src="https://cdn.cookielaw.org/scripttemplates/otSDKStub.js"  type="text/javascript" charset="UTF-8" data-domain-script="018e0a40-1844-7f60-845d-6b0849ecced9" ></script>
+ <!-- OneTrust Cookies Consent Notice start for aetrex.com -->
+<script src="https://cdn.cookielaw.org/scripttemplates/otSDKStub.js" type="text/javascript" charset="UTF-8" data-domain-script="018e0a40-1844-7f60-845d-6b0849ecced9" async></script>
 <script type="text/javascript">
 function OptanonWrapper() { }
 </script>
@@ -67,7 +65,7 @@ function OptanonWrapper() { }
 
 
     
-    <script src="https://rapid-cdn.yottaa.com/rapid/lib/HucOtCTdvSMtxQ.js"></script>
+    <script src="https://rapid-cdn.yottaa.com/rapid/lib/HucOtCTdvSMtxQ.js" defer></script>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -76,9 +74,15 @@ function OptanonWrapper() { }
     <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
     <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
     {% # theme-check-disable RemoteAsset %}
+    <link rel="preconnect" href="https://cdn.cookielaw.org">
+    <link rel="preconnect" href="https://rapid-cdn.yottaa.com">
+    <link rel="dns-prefetch" href="https://embed.typeform.com">
+    <link rel="dns-prefetch" href="https://ds-dev.truefitcorp.com">
+    <link rel="dns-prefetch" href="https://cdn.truefitcorp.com">
     <link rel="dns-prefetch" href="https://ajax.googleapis.com">
     <link rel="dns-prefetch" href="https://maps.googleapis.com">
     <link rel="dns-prefetch" href="https://maps.gstatic.com">
+    <link rel="dns-prefetch" href="https://a.klaviyo.com">
     {% # theme-check-enable RemoteAsset %}
 
     {%- if settings.favicon != blank -%}
@@ -106,7 +110,7 @@ function OptanonWrapper() { }
       render 'social-meta-tags'
 
       render 'css-variables'
-      echo 'theme.css' | asset_url | stylesheet_tag: preload: true
+      echo 'theme.min.css' | asset_url | stylesheet_tag: preload: true
 
       if direction == 'rtl'
         echo 'rtl.css' | asset_url | stylesheet_tag: preload: true
@@ -124,13 +128,18 @@ function OptanonWrapper() { }
     {{ content_for_header }}
 
     <script src="{{ 'vendor.js' | asset_url }}" defer="defer"></script>
-    <script src="{{ 'theme.js' | asset_url }}" defer="defer"></script>
+    {% comment %}<script src="{{ 'theme.js' | asset_url }}" defer="defer"></script>{% endcomment %}
+    <script src="{{ 'theme.min.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'dynamic.js' | asset_url }}" defer="defer"></script>
-    <script src="{{ 'swiper-bundle.min.js' | asset_url }}"></script>
-    <script src="{{ 'us-detector.js' | asset_url }} defer"></script>
+    <script src="{{ 'swiper-bundle.min.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'us-detector.js' | asset_url }}" defer="defer"></script>
 
-    {{- 'dynamic.css' | asset_url | stylesheet_tag -}}
-    {{- 'swiper-bundle.min.css' | asset_url | stylesheet_tag -}}
+    <link rel="stylesheet" href="{{ 'dynamic.css' | asset_url }}" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="{{ 'swiper-bundle.min.css' | asset_url }}" media="print" onload="this.media='all'">
+    <noscript>
+      <link rel="stylesheet" href="{{ 'dynamic.css' | asset_url }}">
+      <link rel="stylesheet" href="{{ 'swiper-bundle.min.css' | asset_url }}">
+    </noscript>
 
     {%- if settings.enable_tab_attention -%}
       <script src="{{ 'tab-attention.js' | asset_url }}" defer="defer"></script>
@@ -141,6 +150,7 @@ function OptanonWrapper() { }
     {%- endif -%}
 
     {%- render 'js-variables' -%}
+    {%- render 'performance-monitor' -%}
 
     {% if settings.ss_enable %}
       {% render 'ss-script' %}
@@ -195,7 +205,8 @@ function OptanonWrapper() { }
       <script src="{{ 'instant-page.js' | asset_url }}" type="module" fetchpriority="low" defer="defer"></script>
     {%- endif -%}
 
-    <script src="https://a.klaviyo.com/media/js/onsite/onsite.js"></script>
+    <script src="https://a.klaviyo.com/media/js/onsite/onsite.js" async></script>
+    <script src="//embed.typeform.com/next/embed.js" async></script>
 
   </body>
 </html>

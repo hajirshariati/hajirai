@@ -111,7 +111,6 @@
         "image_width": "large",
         "layout": "image_first",
         "text_alignment": "left",
-        "content_position": "align-self-center",
         "image_mobile": "shopify://shop_images/brandbook_M.webp",
         "image_height_mobile": "adapt",
         "text_alignment_mobile": "center",
