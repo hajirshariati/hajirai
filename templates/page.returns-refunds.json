@@ -30,7 +30,7 @@
         "text_eGXbBJ": {
           "type": "text",
           "settings": {
-            "text": "<h2>NO HASSLE RETURNS</h2><h3>Easy Returns with Our 30 Day Health Guarantee!</h3>",
+            "text": "<h2>NO HASSLE RETURNS</h2>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -75,17 +75,81 @@
         "padding_bottom": 24,
         "divider": false,
         "narrow": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
-    "empty_space_XR7ATn": {
-      "type": "empty-space",
-      "name": "Empty space",
+    "rich_text_hEJNG3": {
+      "type": "rich-text",
+      "blocks": {
+        "text_JTayJL": {
+          "type": "text",
+          "settings": {
+            "text": "<h2>Now EXTENDED to January 31st, 2026 for the Holiday Season</h2>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_qqdzxJ": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Extended Holiday Returns on all items purchased between November 1, 2025 through December 24, 2025 are eligible for returns and exchanges until January 31, 2026. </p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_JTayJL",
+        "text_qqdzxJ"
+      ],
+      "name": "Rich text",
       "settings": {
-        "desktop_height": 40,
-        "mobile_height": 28,
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h3",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#af4743",
         "color_background": "",
-        "gradient_background": ""
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "empty_space_wqedrq": {
@@ -111,6 +175,7 @@
             "heading": "Step 1",
             "heading_size": "text-lg-2xl",
             "text": "<p>Visit our return portal and enter your order details.</p>",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -130,6 +195,7 @@
             "heading": "Step 2",
             "heading_size": "text-lg-2xl",
             "text": "<p>Choose your item and reason, then select the return method.</p>",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -149,6 +215,7 @@
             "heading": "Step 3",
             "heading_size": "text-lg-2xl",
             "text": "<p>You can either print your label or have your QR code ready and drop off your package at the designated store.</p>",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -193,9 +260,11 @@
         "color_button_gradient": "",
         "padding_top": 0,
         "padding_bottom": 0,
-        "divider": false,
         "full_width": false,
-        "rounded": false
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_AKxUXt": {
@@ -257,7 +326,9 @@
         "padding_bottom": 0,
         "divider": false,
         "narrow": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_4kkUMM": {
@@ -311,7 +382,9 @@
         "padding_bottom": 0,
         "divider": false,
         "narrow": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_zbz9Rd": {
@@ -381,14 +454,16 @@
         "padding_bottom": 24,
         "divider": false,
         "narrow": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     }
   },
   "order": [
     "main-page",
     "rich_text_AhWdpk",
-    "empty_space_XR7ATn",
+    "rich_text_hEJNG3",
     "empty_space_wqedrq",
     "multicolumn_BTEYMD",
     "rich_text_AKxUXt",
