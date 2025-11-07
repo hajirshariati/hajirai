@@ -33,8 +33,8 @@
             "notification_subtitle_2": "Give your friends $20 off their first order of $49.95+ and get $20 (in points) for each successful referral* For U.S. Customers Only",
             "notification_link_2": "shopify://pages/give-20-get-20",
             "notification_link_text_2": "REFER A FRIEND",
-            "notification_title_3": "EASY RETURNS",
-            "notification_subtitle_3": "We offer no hassle returns and exchanges within 30 days of purchase if you are not satisfied with your purchase.",
+            "notification_title_3": "EXTENDED HOLIDAY RETURNS",
+            "notification_subtitle_3": "For the holiday season, we are offering extended easy returns and exchanges for all items through January 31st, 2026",
             "notification_link_3": "shopify://pages/returns-exchanges",
             "notification_link_text_3": "RETURN POLICY"
           }
@@ -58,18 +58,18 @@
             "notification_subtitle_2": "Give your friends $20 off their first order of $49.95+ and get $20 (in points) for each successful referral* For U.S. Customers Only",
             "notification_link_2": "shopify://pages/give-20-get-20",
             "notification_link_text_2": "REFER A FRIEND",
-            "notification_title_3": "EASY RETURNS",
-            "notification_subtitle_3": "We offer no hassle returns and exchanges within 30 days of purchase if you are not satisfied with your purchase.",
-            "notification_link_3": "shopify://pages/returns-exchanges",
-            "notification_link_text_3": "RETURN POLICY"
+            "notification_title_3": "",
+            "notification_subtitle_3": "",
+            "notification_link_3": "",
+            "notification_link_text_3": ""
           }
         },
         "text_3qTGqU": {
           "type": "text",
           "settings": {
             "icon": "return",
-            "text": "30 Day No-Hassle Returns",
-            "link": "shopify://pages/returns-exchanges",
+            "text": "",
+            "link": "",
             "hide_icon_mobile": true,
             "text_mobile": "",
             "highlighted_text": "none",
@@ -83,10 +83,10 @@
             "notification_subtitle_2": "Give your friends $20 off their first order of $49.95+ and get $20 (in points) for each successful referral* For U.S. Customers Only",
             "notification_link_2": "shopify://pages/give-20-get-20",
             "notification_link_text_2": "REFER A FRIEND",
-            "notification_title_3": "EASY RETURNS",
-            "notification_subtitle_3": "We offer no hassle returns and exchanges within 30 days of purchase if you are not satisfied with your purchase.",
-            "notification_link_3": "shopify://pages/returns-exchanges",
-            "notification_link_text_3": "RETURN POLICY"
+            "notification_title_3": "",
+            "notification_subtitle_3": "",
+            "notification_link_3": "",
+            "notification_link_text_3": ""
           }
         },
         "tech_hwHFMa": {
