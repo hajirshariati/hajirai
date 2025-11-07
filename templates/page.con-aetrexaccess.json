@@ -80,7 +80,9 @@
         "padding_bottom": 12,
         "divider": false,
         "narrow": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "video_with_text_overlay_m9LDwg": {
@@ -97,8 +99,8 @@
         "heading_FzADcY": {
           "type": "heading",
           "settings": {
-            "heading": "<p>GET FREE SHIPPING</p>",
-            "heading_size": "title-lg tracking-heading",
+            "heading": "<p>Earn Points on your purchases</p>",
+            "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -107,7 +109,7 @@
         "text_rkXYnK": {
           "type": "text",
           "settings": {
-            "text": "<p>Join today to unlock exclusive promotions, earn points on your purchases and more.</p>",
+            "text": "<p>Unlock exclusive promotions and more</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -180,7 +182,9 @@
         "padding_bottom": 0,
         "divider": false,
         "full_width": true,
-        "rounded": true
+        "rounded": true,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "multicolumn_with_icons_dFmMf4": {
@@ -188,6 +192,7 @@
       "blocks": {
         "column_QewKfg": {
           "type": "column",
+          "disabled": true,
           "settings": {
             "icon": "truck",
             "custom_icon": "",
@@ -279,6 +284,7 @@
         },
         "column_ww8fTk": {
           "type": "column",
+          "disabled": true,
           "settings": {
             "icon": "bag",
             "custom_icon": "",
@@ -330,7 +336,9 @@
         "padding_bottom": 72,
         "divider": false,
         "full_width": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "multicolumn_Nqae7T": {
@@ -345,7 +353,7 @@
             "image_ratio": "adapt",
             "heading": "01",
             "heading_size": "text-2xl lg:text-3xl",
-            "text": "<p><strong>SIGN UP </strong></p><p>Create an account and get free shipping.</p>",
+            "text": "<p><strong>SIGN UP </strong></p><p>Create an account</p>",
             "custom_html": "",
             "button_label": "",
             "button_link": "",
@@ -433,7 +441,9 @@
         "padding_bottom": 72,
         "full_width": false,
         "divider": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "multicolumn_ke6Ehd": {
@@ -562,7 +572,9 @@
         "padding_bottom": 72,
         "full_width": false,
         "divider": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "faq_fjtdJ4": {
@@ -750,7 +762,9 @@
         "padding_bottom": 24,
         "divider": false,
         "narrow": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "images_with_text_WEDgx7": {
