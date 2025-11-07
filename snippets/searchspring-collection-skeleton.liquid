@@ -1,8 +1,58 @@
-<div class="ss-collection-skeleton">
+<div class="ss-collection-skeleton" aria-hidden="true">
   <!-- Skeleton Product Grid -->
   <div class="ss-skeleton-grid">
-    {% for i in (1..8) %}
-      <div class="ss-skeleton-card"></div>
+    {% for i in (1..16) %}
+      <div class="ss-skeleton-card">
+        <div class="ss-skeleton-image"></div>
+        <div class="ss-skeleton-content">
+          <div class="ss-skeleton-title"></div>
+          <div class="ss-skeleton-price"></div>
+        </div>
+      </div>
     {% endfor %}
   </div>
 </div>
+
+<style>
+  .ss-skeleton-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background: transparent !important;
+    animation: none !important;
+  }
+
+  .ss-skeleton-image {
+    width: 100%;
+    aspect-ratio: 3/4;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 8px;
+  }
+
+  .ss-skeleton-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0 0.5rem;
+  }
+
+  .ss-skeleton-title {
+    height: 1.25rem;
+    width: 80%;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+  }
+
+  .ss-skeleton-price {
+    height: 1rem;
+    width: 40%;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+  }
+</style>
