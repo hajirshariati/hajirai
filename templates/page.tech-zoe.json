@@ -53,7 +53,9 @@
         "full_width": true,
         "rounded": false,
         "enable_parallax": true,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_MLXerj": {
@@ -107,7 +109,9 @@
         "padding_bottom": 8,
         "divider": false,
         "narrow": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_bGVzXB": {
@@ -161,7 +165,9 @@
         "padding_bottom": 24,
         "divider": false,
         "narrow": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "image_with_text_BazqH8": {
@@ -213,7 +219,9 @@
         "full_width": false,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "image_with_text_iAiy3e": {
@@ -265,7 +273,9 @@
         "full_width": false,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "image_with_text_9EEwK7": {
@@ -317,7 +327,9 @@
         "full_width": false,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "image_with_text_tHrhPR": {
@@ -326,7 +338,7 @@
         "text_YaWNmf": {
           "type": "text",
           "settings": {
-            "text": "<h2>Advanced Features:</h2><p>● 16 Key 3D Foot Measurements<br/>● Dynamic Pressure Mapping Underfoot<br/>● Children-Specific Tootsie™ Software for Kids 3D Scanning<br/>● Zoe AI™ Assistant for guided scans and product recommendations<br/>● Real-Time POS Integration for personalized fit solutions</p>",
+            "text": "<h2>Advanced Features:</h2><p>● 3D reconstruction with 6 key foot measurements<br/>● Static Pressure Mapping Underfoot<br/>● Children-Specific Tootsie™ Software for Kids 3D Scanning<br/>● Zoe AI™ Assistant for guided scans and product recommendations<br/>● Real-Time POS Integration for personalized fit solutions</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -369,7 +381,9 @@
         "full_width": false,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     }
   },
