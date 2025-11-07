@@ -89,7 +89,9 @@
         "padding_bottom": 12,
         "divider": false,
         "narrow": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "main-login": {
@@ -111,6 +113,7 @@
         },
         "icon_with_text_w6m4UM": {
           "type": "icon_with_text",
+          "disabled": true,
           "settings": {
             "icon_image": "shopify://shop_images/free_shipping_icon_8fe11c46-01fb-43c8-b4a5-0659254f215e.png",
             "icon_size": "lg",
