@@ -26,29 +26,16 @@
     },
     "image_with_text_overlay_yHn6tD": {
       "type": "image-with-text-overlay",
-      "blocks": {
-        "heading_6C9Ldx": {
-          "type": "heading",
-          "settings": {
-            "heading": "<p>Enter to be one of 10 lucky winners to WIN a pair of Aetrex Shoes!</p>",
-            "heading_size": "title-md",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "heading_6C9Ldx"
-      ],
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
-        "image_height": "650px",
+        "image": "shopify://shop_images/1_11_1.jpg",
+        "image_height": "600px",
         "content_width": "large",
         "content_position": "md:items-center md:justify-center",
         "text_alignment": "center",
-        "image_height_mobile": "auto",
+        "image_mobile": "shopify://shop_images/2_M_1.jpg",
+        "image_height_mobile": "600px",
         "content_position_mobile": "items-center justify-center",
         "text_alignment_mobile": "center",
         "color_text": "#ffffff",
@@ -65,7 +52,7 @@
         "divider": false,
         "full_width": true,
         "rounded": false,
-        "enable_parallax": true,
+        "enable_parallax": false,
         "parallax_direction": "vertical",
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
@@ -144,7 +131,7 @@
             "text_alignment": "center",
             "text_alignment_mobile": "center",
             "image_ratio": "adapt",
-            "heading": "Step 2",
+            "heading": "Step 2:",
             "heading_size": "text-2xl lg:text-3xl",
             "text": "<h5>Follow Aetrex on Instagram</h5>",
             "custom_html": "",
@@ -164,7 +151,7 @@
             "text_alignment": "center",
             "text_alignment_mobile": "center",
             "image_ratio": "adapt",
-            "heading": "Step 3",
+            "heading": "Step 3:",
             "heading_size": "text-2xl lg:text-3xl",
             "text": "<h5>Follow Erica Bennett on Instagram</h5>",
             "custom_html": "",
@@ -176,40 +163,19 @@
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
-        },
-        "column_RtN6yz": {
-          "type": "column",
-          "settings": {
-            "show_border": true,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image_ratio": "adapt",
-            "heading": "Step 4",
-            "heading_size": "text-2xl lg:text-3xl",
-            "text": "<h5>Sit back and wait to hear if you are a lucky winner! Winners will be announced on 11/17/2025.</h5>",
-            "custom_html": "",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "secondary",
-            "button_external": false,
-            "button_icon": true,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
         }
       },
       "block_order": [
         "column_jT9iDK",
-        "column_x3rxXJ",
-        "column_RtN6yz"
+        "column_x3rxXJ"
       ],
       "name": "t:sections.multicolumn.name",
       "settings": {
         "gap": "large",
-        "columns": 3,
+        "columns": 2,
         "columns_mobile": "2",
         "carousel_on_desktop": false,
-        "swipe_on_mobile": true,
+        "swipe_on_mobile": false,
         "heading": "",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
@@ -231,9 +197,65 @@
         "color_button_background": "#e0e8ee",
         "color_button_gradient": "",
         "padding_top": 24,
-        "padding_bottom": 72,
+        "padding_bottom": 0,
         "full_width": false,
         "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "rich_text_xYDRKF": {
+      "type": "rich-text",
+      "blocks": {
+        "text_aVDtLP": {
+          "type": "text",
+          "settings": {
+            "text": "<h3>Step 4: Sit back and wait to hear if you are a lucky winner! </h3><h3>Winners will be announced on 11/17/2025.</h3>",
+            "text_font": "heading",
+            "text_size": "subtext-xl",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_aVDtLP"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "#366d8d",
+        "color_button_background": "#e0e8ee",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": true,
         "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
@@ -245,7 +267,7 @@
         "text_hHEzjP": {
           "type": "text",
           "settings": {
-            "text": "<p>Entries accepted from 11/10/2025 through 11/16/2025. Winners announced on 11/17/2025.</p>",
+            "text": "<p>Entries accepted from 11/10/2025 through 11/16/2025. Winners announced on 11/17/2025. No purchase necessary. Click <a href=\"https://www.aetrex.com/pages/aetrex-erica-bennett-giveaway-2025-official-rules\" title=\"https://www.aetrex.com/pages/aetrex-erica-bennett-giveaway-2025-official-rules\">HERE</a> for Official Rules.</p>",
             "text_font": "body",
             "text_size": "subtext-sm",
             "text_max_size": 32,
@@ -301,6 +323,7 @@
     "image_with_text_overlay_yHn6tD",
     "rich_text_Q7yxTL",
     "multicolumn_RxtkQV",
+    "rich_text_xYDRKF",
     "rich_text_CqFqBG"
   ]
 }
