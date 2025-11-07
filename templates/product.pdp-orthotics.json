@@ -110,6 +110,7 @@
         },
         "text-3": {
           "type": "text",
+          "disabled": true,
           "settings": {
             "icon": "truck",
             "iwidth": "custom",
@@ -157,6 +158,8 @@
           "disabled": true,
           "settings": {
             "ProductPage": true,
+            "size_recommendation_font_family": "OpenSans, sans-serif",
+            "size_recommendation_vertical_spacing": 5,
             "tab_background": "#f2f2f2",
             "tab_foreground": "#5c6271",
             "active_tab_background": "#5c6271",
