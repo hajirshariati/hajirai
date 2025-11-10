@@ -85,7 +85,9 @@
         "full_width": false,
         "rounded": false,
         "enable_parallax": true,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "image_with_text_overlay_rBfBzp": {
@@ -148,7 +150,9 @@
         "full_width": true,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "faq_zhAACx": {
@@ -206,7 +210,9 @@
         "padding_bottom": 0,
         "divider": false,
         "narrow": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "lookbook_JQDiwd": {
@@ -332,7 +338,9 @@
         "padding_bottom": 0,
         "divider": false,
         "full_width": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "images_with_text_iL8ht6": {
@@ -456,7 +464,9 @@
         "padding_bottom": 72,
         "divider": false,
         "full_width": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_qygTdt": {
@@ -465,7 +475,7 @@
         "text_ekcTtF": {
           "type": "text",
           "settings": {
-            "text": "<p>What Other Pregnancy Foot Pain Sufferers Say</p>",
+            "text": "<p>What Other Plantar Fasciitis Sufferers Say</p>",
             "text_font": "heading",
             "text_size": "subtext-custom",
             "text_max_size": 24,
@@ -498,7 +508,6 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "narrow": true,
         "color_text": "#74a5ba",
         "color_background": "",
         "gradient_background": "",
@@ -510,7 +519,10 @@
         "padding_top": 0,
         "padding_bottom": 0,
         "divider": false,
-        "rounded": false
+        "narrow": true,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "testimonials_byJFpb": {
@@ -661,7 +673,9 @@
         "padding_bottom": 40,
         "divider": false,
         "full_width": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     }
   },
