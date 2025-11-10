@@ -583,7 +583,7 @@
         "cover_image": "shopify://shop_images/pfkit6b.jpg",
         "description": "",
         "enable_video_autoplay": false,
-        "enable_video_looping": false,
+        "enable_video_looping": true,
         "image_height": "adapt",
         "video_mobile": "shopify://files/videos/Plantar__fasciatis__Kit.mp4",
         "video_url_mobile": "",
