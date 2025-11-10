@@ -65,9 +65,11 @@
     {%- unless video %} host="{{ video_url.type }}"{% endunless -%}
     {%- if autoplay %} autoplay{% endif -%}
   >
-    {% if hosted_cover_image != blank and hosted_poster != blank %}
-      {{ hosted_poster }}
-    {% endif %}
+{% if hosted_cover_image != blank and hosted_poster != blank %}
+  {{ hosted_poster }}
+{% elsif poster != blank %}
+  {{ poster }}
+{% endif %}
 
     <template>
       {%- if video != blank -%}
