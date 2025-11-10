@@ -40,7 +40,7 @@
         "text_kL9wCq": {
           "type": "text",
           "settings": {
-            "text": "<p>Your feet are 3-dimensional. So are your shoes. Yet, today online ordering is still just based on length and width. It’s no wonder 30-40% of these orders are returned. And, as e-commerce continues to grow at an exponential rate, this challenge will unfortunately only become more prevalent. Aetrex’s FitGenius AI engine can dramatically reduce your e-commerce footwear returns and create a more personalized customer experience.<br/><br/>One of the challenges when shopping for footwear online is that consumers typically only know their length and possibly their width. But, the reality is that feet are three-dimensional, and shoes are too. So, there are many more factors at play. The combination of an accurate 3D reconstruction of your feet with our FitGenius AI engine, allows us to solve this problem and recommend the right shoes in the appropriate size.<br/><br/></p>",
+            "text": "<p>Your feet are 3-dimensional. So are your shoes. Yet, today online ordering is still just based on length and width. It’s no wonder 30-40% of these orders are returned. And, as e-commerce continues to grow at an exponential rate, this challenge will unfortunately only become more prevalent. Aetrex’s FitAI™ AI engine can dramatically reduce your e-commerce footwear returns and create a more personalized customer experience.<br/><br/>One of the challenges when shopping for footwear online is that consumers typically only know their length and possibly their width. But, the reality is that feet are three-dimensional, and shoes are too. So, there are many more factors at play. The combination of an accurate 3D reconstruction of your feet with our FitAI™ AI engine, allows us to solve this problem and recommend the right shoes in the appropriate size.<br/><br/></p>",
             "text_font": "body",
             "text_size": "subtext-sm",
             "text_max_size": 32,
@@ -94,7 +94,7 @@
         "text_4kk8GD": {
           "type": "text",
           "settings": {
-            "text": "<p>FitGenius is our proprietary Artificial Intelligence platform created to custom match customers’ unique 3D foot profiles with the ideal footwear styles and sizes based on a retailer’s inventory. It works by matching a customer’s unique 3D foot profile & fit preference data with the shoe purchase history of similar profiles to help get the right fit on the first try.</p>",
+            "text": "<p>FitAI™ is our proprietary Artificial Intelligence platform created to custom match customers’ unique 3D foot profiles with the ideal footwear styles and sizes based on a retailer’s inventory. It works by matching a customer’s unique 3D foot profile & fit preference data with the shoe purchase history of similar profiles to help get the right fit on the first try.</p>",
             "text_font": "body",
             "text_size": "subtext-sm",
             "text_max_size": 32,
