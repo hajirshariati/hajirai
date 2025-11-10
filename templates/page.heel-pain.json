@@ -40,7 +40,7 @@
         "text_LHGLnM": {
           "type": "text",
           "settings": {
-            "text": "<p>There are two different categories of heel pain. The first is caused by over-use repetitive stress which refers to a soreness resulting from too much impact on a specific area of the foot. This condition, often referred to as “heel pain syndrome,” can be caused by shoes with heels that are too low, a thinned out fat pad in the heel area, or from a sudden increase in activity. Plantar fasciitis, a very common diagnosis of heel pain, is usually caused from a biomechancial problem, such as over-pronation (flat feet). The plantar fascia is a broad band of fibrous tissue that runs along the bottom surface of the foot, from the heel through the midfoot and into the forefoot.<br/><br/></p>",
+            "text": "<p>Heel pain is a common condition in which weight bearing on the heel causes extreme discomfort.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
