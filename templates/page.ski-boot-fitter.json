@@ -53,7 +53,9 @@
         "full_width": true,
         "rounded": false,
         "enable_parallax": true,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_bGVzXB": {
@@ -107,7 +109,9 @@
         "padding_bottom": 8,
         "divider": false,
         "narrow": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "image_with_text_aPTKgV": {
@@ -202,7 +206,9 @@
         "full_width": false,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "video_zXHN48": {
@@ -220,10 +226,12 @@
         "video_url_mobile": "",
         "image_height_mobile": "auto",
         "padding_top": 0,
-        "padding_bottom": 0,
+        "padding_bottom": 48,
         "divider": false,
         "full_width": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     }
   },
