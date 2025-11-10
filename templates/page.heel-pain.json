@@ -366,12 +366,7 @@
       "name": "t:sections.featured-collection.name",
       "settings": {
         "collection": "",
-        "products": [
-          "danika-light-grey-ap113w",
-          "brianna-black-bw100w",
-          "heel-spurs-orthotics-women",
-          "noelle-black-ck140w"
-        ],
+        "products": [],
         "product_limit": 4,
         "columns": 4,
         "carousel_on_desktop": false,
@@ -403,62 +398,6 @@
         "abra_promo_code_hide": ""
       }
     },
-    "rich_text_3FnjBd": {
-      "type": "rich-text",
-      "blocks": {
-        "text_YXNKpx": {
-          "type": "text",
-          "settings": {
-            "text": "<p>What Other Heel Pain Sufferers Say</p>",
-            "text_font": "heading",
-            "text_size": "subtext-custom",
-            "text_max_size": 24,
-            "text_line_height": 1.2,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "one"
-          }
-        }
-      },
-      "block_order": [
-        "text_YXNKpx"
-      ],
-      "name": "t:sections.rich-text.name",
-      "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 0,
-        "padding_bottom": 0,
-        "divider": false,
-        "narrow": true,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
     "testimonials_byJFpb": {
       "type": "testimonials",
       "blocks": {
@@ -466,8 +405,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>Bought all 4 colors</strong><br/> I bought two pairs and were so elated with the comfort that I bought the last two remaining colors. I suffer from Metatarsalgia and was glad to finally being able to walk without discomfort & pain!!” </h6>",
-            "author": "Ellen o.",
+            "text": "<h6><strong>Immediate relief</strong><br/>I am suffering with planter fasciitis in one foot and immediately after trying on this sandal I felt relief and could walk again. Great arch support and soft heel pad did the trick. thank you!”</h6>",
+            "author": "Susan N.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -479,8 +418,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>I love these sneakers.I love these sneakers. </strong><br/>I have bought three of the same sneakers, but in different colors. What a difference they have made on my feet. I like to take my dog for walks. I had to stop. My feet were in such pain. With these sneakers my feet are fine now. Thank you Aetrex.”</h6>",
-            "author": "Linda P.",
+            "text": "<h6><strong>I'm so grateful forThese shoes</strong><br/>I'm so grateful for shoes of this type which keep my feet happy, healthy, and pain-free from plantar fasciitis. It's comfortable and provides the correct support -- and, it looks great!” </h6>",
+            "author": "Pandora V.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -492,8 +431,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>Comfortable & supportive </strong><br/>I bought these to wear at work. I am a Dental Assistant and on my feet most of the day. With other shoes, I would go home with sore feet and low back pain. The Xspress Runner 2 felt comfortable and supportive right from the first time I laced them up - no break-in required.”</h6>",
-            "author": "Susanne B.",
+            "text": "<h6><strong>Excellent Shoes </strong><br/>Until I started wearing Aetrex shoes l could hardly walk because my feet felt like I was walking on rocks. Now I can walk with no pain when I wear Aetrex shoes.”</h6>",
+            "author": "Annie G.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -546,7 +485,7 @@
             "custom_url": "",
             "image": "shopify://shop_images/Rectangle_60_9.png",
             "title": "",
-            "description": "To Help Relieve Heel Spurs",
+            "description": "To Help Relieve Heel Pain",
             "overlay_content": true,
             "color_text": "#ffffff",
             "color_overlay": "#000000",
@@ -563,7 +502,7 @@
             "custom_url": "",
             "image": "shopify://shop_images/Rectangle_61_668b1198-2250-4e0e-9f58-c1a42125e032.png",
             "title": "",
-            "description": "To Help Relieve Heel Spurs",
+            "description": "To Help Relieve Heel Pain",
             "overlay_content": true,
             "color_text": "#ffffff",
             "color_overlay": "#000000",
@@ -621,7 +560,6 @@
     "images_with_text_iL8ht6",
     "empty_space_gyE8Nr",
     "featured_collection_dXtHeM",
-    "rich_text_3FnjBd",
     "testimonials_byJFpb",
     "collection_list_fbMkYY"
   ]
