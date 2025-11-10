@@ -53,7 +53,9 @@
         "full_width": true,
         "rounded": false,
         "enable_parallax": true,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_MLXerj": {
@@ -107,7 +109,9 @@
         "padding_bottom": 8,
         "divider": false,
         "narrow": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_bGVzXB": {
@@ -161,7 +165,9 @@
         "padding_bottom": 24,
         "divider": false,
         "narrow": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "image_with_text_BazqH8": {
@@ -239,7 +245,9 @@
         "full_width": false,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "image_with_text_iAiy3e": {
@@ -317,7 +325,9 @@
         "full_width": false,
         "rounded": false,
         "enable_parallax": true,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "image_with_text_PJjzGa": {
@@ -435,7 +445,9 @@
         "full_width": false,
         "rounded": false,
         "enable_parallax": true,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_D7P7dh": {
@@ -447,7 +459,7 @@
             "heading": "<strong>What Albert Pro Retailers Are Saying</strong>",
             "heading_size": "title-md",
             "heading_tag": "h3",
-            "highlighted_text": "none",
+            "highlighted_text": "text",
             "highlighted_scribble": "circle"
           }
         }
@@ -484,7 +496,9 @@
         "padding_bottom": 24,
         "divider": false,
         "narrow": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "testimonials_iRP84t": {
