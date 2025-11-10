@@ -14,6 +14,8 @@
 
   if video_mobile
     assign poster_mobile = video_mobile.preview_image | default: section.settings.cover_image_mobile
+  else
+    assign poster_mobile = poster
   endif
 -%}
 
@@ -59,7 +61,7 @@
           autoplay: section.settings.enable_video_autoplay,
           loop: section.settings.enable_video_looping,
           description: section.settings.description,
-          cover_image: section.settings.cover_image_mobile,
+          cover_image: poster_mobile,
           show_play_button: true,
           is_mobile: true,
           class: 'banner__media media media--height w-full h-full relative'
@@ -77,7 +79,7 @@
         autoplay: section.settings.enable_video_autoplay,
         loop: section.settings.enable_video_looping,
         description: section.settings.description,
-        cover_image: section.settings.cover_image,
+        cover_image: poster,
         show_play_button: true,
         class: 'banner__media media media--height w-full h-full relative'
       -%}
