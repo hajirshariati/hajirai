@@ -390,7 +390,7 @@
         "text_kejjaw": {
           "type": "text",
           "settings": {
-            "text": "<p>Your feet are 3-dimensional. So are your shoes. Yet, today online ordering is still just based on length and width. It’s no wonder 30-40% of these orders are returned. And, as e-commerce continues to grow at an exponential rate, this challenge will unfortunately only become more prevalent. Aetrex’s FitGenius AI engine can dramatically reduce your e-commerce footwear returns and create a more personalized customer experience.</p>",
+            "text": "<p>Your feet are 3-dimensional. So are your shoes. Yet, today online ordering is still just based on length and width. It’s no wonder 30-40% of these orders are returned. And, as e-commerce continues to grow at an exponential rate, this challenge will unfortunately only become more prevalent. Aetrex’s FitAI™ engine can dramatically reduce your e-commerce footwear returns and create a more personalized customer experience.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
