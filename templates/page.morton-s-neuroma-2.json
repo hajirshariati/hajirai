@@ -84,7 +84,9 @@
         "full_width": true,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "faq_zhAACx": {
@@ -142,7 +144,9 @@
         "padding_bottom": 0,
         "divider": false,
         "narrow": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "lookbook_w69hfT": {
@@ -268,7 +272,9 @@
         "padding_bottom": 0,
         "divider": false,
         "full_width": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "images_with_text_iL8ht6": {
@@ -364,7 +370,7 @@
           "daisy-brown-sc542w",
           "gabby-white-se263w",
           "morton-neuroma-orthotics-women",
-          "fiji-white-sparkle-l7103w"
+          "fiji-white-l7002w"
         ],
         "product_limit": 4,
         "columns": 4,
@@ -392,7 +398,9 @@
         "padding_bottom": 72,
         "divider": false,
         "full_width": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_6FhT4z": {
@@ -434,7 +442,6 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "narrow": true,
         "color_text": "#74a5ba",
         "color_background": "",
         "gradient_background": "",
@@ -446,7 +453,10 @@
         "padding_top": 0,
         "padding_bottom": 0,
         "divider": false,
-        "rounded": false
+        "narrow": true,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "testimonials_byJFpb": {
@@ -597,7 +607,9 @@
         "padding_bottom": 40,
         "divider": false,
         "full_width": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     }
   },
