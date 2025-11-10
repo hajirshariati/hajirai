@@ -9,22 +9,11 @@
     assign lazyimage = 'lazy-image'
   endif
 
-  if section.settings.cover_image != blank
-    assign poster = section.settings.cover_image
-  elsif section.settings.video.preview_image != blank
-    assign poster = section.settings.video.preview_image
-  else
-    assign poster = section.settings.video.preview_image
-  endif
-
+  assign poster = section.settings.video.preview_image | default: section.settings.cover_image
   assign video_mobile = section.settings.video_mobile | default: section.settings.video
 
-  if section.settings.cover_image_mobile != blank
-    assign poster_mobile = section.settings.cover_image_mobile
-  elsif video_mobile.preview_image != blank
-    assign poster_mobile = video_mobile.preview_image
-  elsif section.settings.cover_image != blank
-    assign poster_mobile = section.settings.cover_image
+  if video_mobile
+    assign poster_mobile = video_mobile.preview_image | default: section.settings.cover_image_mobile
   else
     assign poster_mobile = poster
   endif
@@ -35,7 +24,7 @@
     --section-padding-top: {{ section.settings.padding_top }}px;
     --section-padding-bottom: {{ section.settings.padding_bottom }}px;
     {%- render 'section-variables', section: section -%}
-    {%- if poster != blank and section.settings.image_height == 'adapt' %}
+    {%- if poster != null and section.settings.image_height == 'adapt' %}
       --ratio-percent: {{ 1 | divided_by: poster.aspect_ratio | times: 100 }}%;
     {% endif -%}
   }
