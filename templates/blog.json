@@ -93,7 +93,9 @@
         "full_width": true,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "image_with_text_overlay_GwGiG6": {
@@ -217,7 +219,9 @@
         "full_width": true,
         "rounded": false,
         "enable_parallax": true,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "main-blog": {
@@ -228,15 +232,15 @@
         "heading_tag": "h1",
         "subheading": "",
         "description": "",
-        "show_tag_filter": true,
+        "show_tag_filter": false,
         "per_page": 9,
         "layout": "grid",
-        "image_ratio": "landscape",
-        "show_tags": true,
+        "image_ratio": "wide",
+        "show_tags": false,
         "show_date": true,
         "show_comments": false,
         "show_author": false,
-        "show_excerpt": true,
+        "show_excerpt": false,
         "padding_top": 72,
         "padding_bottom": 120,
         "divider": false,
