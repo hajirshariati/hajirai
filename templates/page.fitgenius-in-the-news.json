@@ -30,7 +30,7 @@
         "text_yKxt79": {
           "type": "text",
           "settings": {
-            "text": "<p>FitGenius Press Highlights</p>",
+            "text": "<p>FitAI™ Press Highlights</p>",
             "text_font": "body",
             "text_size": "subtext-custom",
             "text_max_size": 40,
@@ -137,7 +137,7 @@
             "image_ratio": "adapt",
             "heading": "",
             "heading_size": "text-lg-2xl",
-            "text": "<p><strong>Aetrex FitGenius Platform: a Wise Decision</strong></p><p>Footwear Plus Magazine, July 2021</p><p><a href=\"https://issuu.com/symphonypublishing/docs/footwear_plus_july_2021\" target=\"_blank\">Read more...</a></p>",
+            "text": "<p><strong>Aetrex FitAI™ Platform: a Wise Decision</strong></p><p>Footwear Plus Magazine, July 2021</p><p><a href=\"https://issuu.com/symphonypublishing/docs/footwear_plus_july_2021\" target=\"_blank\">Read more...</a></p>",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
