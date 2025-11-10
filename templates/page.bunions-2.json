@@ -84,7 +84,9 @@
         "full_width": true,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "faq_zhAACx": {
@@ -94,7 +96,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Causes</strong>",
-            "text": "<p>Bunions are a common problem experienced mostly by women. The deformity can develop from an abnormality in foot function, or arthritis, but is more commonly caused by wearing improper fitting footwear. Tight, narrow dress shoes with a constrictive toe box (toe area) can cause the foot to begin to take the shape of the shoe, leading to the formation of a bunion. Women who have bunions normally wear dress shoes that are too small for their feet. Their toes are squeezed together in their shoes causing the first metatarsal bone to protrude on the side of the foot.  The most common cause is a biomechanics abnormality, such as flat feet, that leads to the joint dysfunction.  The abnormal biomechanics can be inherited.  Other less common causes include Rheumatoid arthritis, neuromuscular disorders, and trauma, to name a few.</p><p>It is important for men and women to realize that wearing dress shoes and boots, which are tapered in the toe area, can cause the bunion to worsen to the point where surgery is necessary.<br/><br/><br/><br/></p>",
+            "text": "<p>Bunions are a common problem experienced mostly by women. The deformity can develop from an abnormality in foot function, or arthritis, but is more commonly caused by wearing improper fitting footwear. Tight, narrow dress shoes with a constrictive toe box (toe area) can cause the foot to begin to take the shape of the shoe, leading to the formation of a bunion. Women who have bunions normally wear dress shoes that are too small for their feet. Their toes are squeezed together in their shoes causing the first metatarsal bone to protrude on the side of the foot.  The most common cause is a biomechanics abnormality, such as flat feet, that leads to the joint dysfunction.  The abnormal biomechanics can be inherited.  Other less common causes include Rheumatoid arthritis, neuromuscular disorders, and trauma, to name a few.</p><p>It is important for men and women to realize that wearing dress shoes and boots, which are tapered in the toe area, can cause the bunion to worsen to the point where surgery is necessary.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -142,7 +144,9 @@
         "padding_bottom": 0,
         "divider": false,
         "narrow": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "lookbook_crRFzY": {
@@ -268,7 +272,9 @@
         "padding_bottom": 0,
         "divider": false,
         "full_width": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "empty_space_gyE8Nr": {
@@ -318,7 +324,9 @@
         "padding_bottom": 72,
         "divider": false,
         "full_width": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_dUPwLg": {
@@ -360,7 +368,6 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "narrow": true,
         "color_text": "#74a5ba",
         "color_background": "",
         "gradient_background": "",
@@ -372,7 +379,10 @@
         "padding_top": 0,
         "padding_bottom": 0,
         "divider": false,
-        "rounded": false
+        "narrow": true,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "testimonials_byJFpb": {
@@ -395,7 +405,7 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>Great Styleand Comfort</strong><br/>After bunion surgery I needed to find shoes with more support; these are my third pair of Aetrex shoes. None had to be worn in, my feet felt supported without sacrificing style. Perfect for traveling especially when you have to limit the number of shoes you take.\" </h6>",
+            "text": "<h6><strong>Great Style and Comfort</strong><br/>After bunion surgery I needed to find shoes with more support; these are my third pair of Aetrex shoes. None had to be worn in, my feet felt supported without sacrificing style. Perfect for traveling especially when you have to limit the number of shoes you take.\" </h6>",
             "author": "Susan C.",
             "author_info": "",
             "author_url": "",
@@ -523,7 +533,9 @@
         "padding_bottom": 40,
         "divider": false,
         "full_width": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     }
   },
