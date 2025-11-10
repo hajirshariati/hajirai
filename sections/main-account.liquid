@@ -70,7 +70,7 @@
               <td headers="RowOrder ColumnFulfillment" role="cell" data-label="{{ 'customer.orders.fulfillment_status' | t | escape }}">
                 {{- order.fulfillment_status_label -}}
                 {%- if order.fulfillment_status == 'fulfilled' -%}
-                  
+
                   <button 
                     type="button" 
                     class="track-order-btn" 
@@ -122,20 +122,38 @@
 
 <script src="https://aetrexorders.aftership.com/tracking-clips/sdk.js"></script>
 <script>
-  const clips = new window.AfterShipTrackingClips(
-    "c4310971d8c744f48e557d60b2fb6ca6"
-  );
-  
-  // Add click handlers to all track order buttons
+  // Wait for both the DOM and the SDK to be ready
   document.addEventListener('DOMContentLoaded', function() {
-    const trackButtons = document.querySelectorAll('.track-order-btn');
-    trackButtons.forEach(button => {
-      button.addEventListener('click', function() {
-        const orderNumber = this.getAttribute('data-order-number');
-        const email = this.getAttribute('data-email');
-        clips.open({orderNumber: orderNumber, email: email});
-      });
-    });
+    console.log('DOM loaded, initializing tracking...');
+    
+    // Give the SDK script a moment to load
+    setTimeout(function() {
+      try {
+        // Initialize the tracking clips SDK
+        if (window.AfterShipTrackingClips) {
+          const clips = new window.AfterShipTrackingClips("c4310971d8c744f48e557d60b2fb6ca6");
+          console.log('AfterShip SDK initialized successfully');
+          
+          // Add click handlers to all track order buttons
+          const trackButtons = document.querySelectorAll('.track-order-btn');
+          console.log('Found ' + trackButtons.length + ' track buttons');
+          
+          trackButtons.forEach(function(button) {
+            button.addEventListener('click', function(e) {
+              e.preventDefault();
+              const orderNumber = this.getAttribute('data-order-number');
+              const email = this.getAttribute('data-email');
+              console.log('Opening tracking for order:', orderNumber, 'email:', email);
+              clips.open({orderNumber: orderNumber, email: email});
+            });
+          });
+        } else {
+          console.error('AfterShip SDK not loaded');
+        }
+      } catch (error) {
+        console.error('Error initializing tracking:', error);
+      }
+    }, 500); // Wait 500ms for SDK to load
   });
 </script>
 
