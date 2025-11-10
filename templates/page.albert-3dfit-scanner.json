@@ -249,7 +249,7 @@
         "text_AmBmWA": {
           "type": "text",
           "settings": {
-            "text": "<p>Featuring 4 Intel® RealSense™ depth cameras, voice activation software, a Learning Center where customers can ask questions about foot health, and a FitGenius™ plug-in tool for retailers, the scanner boasts premier technical features at a fraction of the price of the competition.</p>",
+            "text": "<p>Featuring 4 Intel® RealSense™ depth cameras, voice activation software, a Learning Center where customers can ask questions about foot health, and a FitAI™ plug-in tool for retailers, the scanner boasts premier technical features at a fraction of the price of the competition.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
