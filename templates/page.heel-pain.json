@@ -366,7 +366,12 @@
       "name": "t:sections.featured-collection.name",
       "settings": {
         "collection": "",
-        "products": [],
+        "products": [
+          "marz-black-ss500w",
+          "xspress-runner2-grey-xs106w",
+          "compete-orthotics-women",
+          "reese-cognac-brown-sc124w"
+        ],
         "product_limit": 4,
         "columns": 4,
         "carousel_on_desktop": false,
