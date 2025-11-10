@@ -84,7 +84,9 @@
         "full_width": true,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "faq_zhAACx": {
@@ -142,7 +144,9 @@
         "padding_bottom": 0,
         "divider": false,
         "narrow": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "lookbook_w69hfT": {
@@ -268,7 +272,9 @@
         "padding_bottom": 0,
         "divider": false,
         "full_width": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "images_with_text_iL8ht6": {
@@ -392,7 +398,9 @@
         "padding_bottom": 72,
         "divider": false,
         "full_width": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_4FKGVw": {
@@ -434,7 +442,6 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "narrow": true,
         "color_text": "#74a5ba",
         "color_background": "",
         "gradient_background": "",
@@ -446,7 +453,10 @@
         "padding_top": 0,
         "padding_bottom": 0,
         "divider": false,
-        "rounded": false
+        "narrow": true,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "testimonials_byJFpb": {
@@ -456,7 +466,7 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>Bought all 4 colors I</strong><br/>bought two pairs and were so elated with the comfort that I bought the last two remaining colors. I suffer from Metatarsalgia and was glad to finally being able to walk without discomfort & pain!!” </h6>",
+            "text": "<h6><strong>Bought all 4 colors </strong><br/>I bought two pairs and were so elated with the comfort that I bought the last two remaining colors. I suffer from Metatarsalgia and was glad to finally being able to walk without discomfort & pain!!” </h6>",
             "author": "Ellen o.",
             "author_info": "",
             "author_url": "",
@@ -597,7 +607,9 @@
         "padding_bottom": 40,
         "divider": false,
         "full_width": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     }
   },
