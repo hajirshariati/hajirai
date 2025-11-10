@@ -79,33 +79,7 @@
   style="font-weight: bold; background: #ff6b2b; padding: 8px 15px; border-radius: 2em; color: #ffffff; border: none; cursor: pointer; margin-left: 10px; white-space: nowrap; font-size: 14px;"
   onmouseover="this.style.opacity='0.8'" 
   onmouseout="this.style.opacity='1'"
-  onclick="(function(btn) {
-    var orderNumber = btn.getAttribute('data-order-number');
-    var email = btn.getAttribute('data-email');
-    
-    function tryOpen(attempts) {
-      if (attempts > 10) {
-        alert('Unable to load tracking. Please refresh the page and try again.');
-        return;
-      }
-      
-      if (typeof window.AfterShipTrackingClips !== 'undefined') {
-        try {
-          var clips = new window.AfterShipTrackingClips('c4310971d8c744f48e557d60b2fb6ca6');
-          clips.open({orderNumber: orderNumber, email: email});
-          console.log('Tracking opened for:', orderNumber);
-        } catch (e) {
-          console.error('Error:', e);
-          alert('Error opening tracking: ' + e.message);
-        }
-      } else {
-        console.log('SDK not ready, attempt', attempts);
-        setTimeout(function() { tryOpen(attempts + 1); }, 300);
-      }
-    }
-    
-    tryOpen(1);
-  })(this)"
+  onclick="openTracking('{{ order.name }}', '{{ customer.email }}')"
 >
   <svg class="icon icon-truck icon-lg inline-block" viewBox="0 0 24 24" stroke="currentColor" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path class="fill" d="M18.2 2.00001H15.8C14.1198 2.00001 13.2798 2.00001 12.638 2.32699C12.0735 2.61461 11.6146 3.07355 11.327 3.63804C11 4.27977 11 5.11985 11 6.80001V7.80001C11 8.92011 11 9.48017 10.782 9.90799C10.5903 10.2843 10.2843 10.5903 9.90798 10.782C9.48016 11 8.9201 11 7.8 11H4.2C3.0799 11 2.51984 11 2.09202 11.218C1.71569 11.4097 1.40973 11.7157 1.21799 12.092C1 12.5198 1 13.0799 1 14.2V16C1 16.9319 1 17.3978 1.15224 17.7654C1.35523 18.2554 1.74458 18.6448 2.23463 18.8478C2.60218 19 3.06812 19 4 19C4 17.3432 5.34315 16 7 16C8.65685 16 10 17.3432 10 19H14C14 17.3432 15.3431 16 17 16C18.6569 16 20 17.3432 20 19C21.6569 19 23 17.6569 23 16V6.80001C23 5.11985 23 4.27977 22.673 3.63804C22.3854 3.07355 21.9265 2.61461 21.362 2.32699C20.7202 2.00001 19.8802 2.00001 18.2 2.00001Z"></path>
