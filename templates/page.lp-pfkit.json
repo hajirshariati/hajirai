@@ -74,7 +74,9 @@
         "padding_bottom": 12,
         "divider": false,
         "narrow": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_9BT4ax": {
@@ -143,7 +145,9 @@
         "padding_bottom": 32,
         "divider": false,
         "narrow": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "image_with_text_overlay_a863DH": {
@@ -175,7 +179,9 @@
         "full_width": true,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_bGVzXB": {
@@ -268,7 +274,9 @@
         "padding_bottom": 24,
         "divider": false,
         "narrow": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "multicolumn_UXa7xF": {
@@ -285,6 +293,7 @@
             "heading": "<em>Aetrex Compete Orthotics</em>",
             "heading_size": "text-base-xl",
             "text": "",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -305,6 +314,7 @@
             "heading": "<em>Aetrex Orthotic Flips</em>",
             "heading_size": "text-base-xl",
             "text": "<h5>*Color May Vary</h5>",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -325,6 +335,7 @@
             "heading": "<em>Aetrex Foot Roller</em>",
             "heading_size": "text-base-xl",
             "text": "",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -345,6 +356,7 @@
             "heading": "<em>Stretching Guide</em>",
             "heading_size": "text-base-xl",
             "text": "",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -389,9 +401,11 @@
         "color_button_gradient": "",
         "padding_top": 24,
         "padding_bottom": 24,
-        "divider": false,
         "full_width": true,
-        "rounded": false
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_gBRqYf": {
@@ -452,7 +466,9 @@
         "padding_bottom": 12,
         "divider": false,
         "narrow": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_iGwpd6": {
@@ -505,7 +521,9 @@
         "padding_bottom": 12,
         "divider": false,
         "narrow": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "testimonials_pBTDbF": {
@@ -562,17 +580,22 @@
         "transparent_header": false,
         "video": "shopify://files/videos/Plantar__fasciatis__Kit.mp4",
         "video_url": "",
+        "cover_image": "shopify://shop_images/pfkit6b.jpg",
         "description": "",
         "enable_video_autoplay": false,
         "enable_video_looping": false,
         "image_height": "adapt",
+        "video_mobile": "shopify://files/videos/Plantar__fasciatis__Kit.mp4",
         "video_url_mobile": "",
+        "cover_image_mobile": "shopify://shop_images/pfkit6b.jpg",
         "image_height_mobile": "auto",
         "padding_top": 0,
         "padding_bottom": 0,
         "divider": false,
         "full_width": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_483HBz": {
@@ -625,7 +648,9 @@
         "padding_bottom": 12,
         "divider": false,
         "narrow": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "image_with_text_9GjNVF": {
@@ -708,7 +733,9 @@
         "full_width": false,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "multicolumn_AQhJ69": {
@@ -725,6 +752,7 @@
             "heading": "Aetrex Signature Arch Support",
             "heading_size": "text-base-xl",
             "text": "",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -745,6 +773,7 @@
             "heading": "Posted Heel",
             "heading_size": "text-base-xl",
             "text": "",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -765,6 +794,7 @@
             "heading": "High-Tech Premium Materials",
             "heading_size": "text-base-xl",
             "text": "",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -785,6 +815,7 @@
             "heading": "Lightweight & Supportive",
             "heading_size": "text-base-xl",
             "text": "",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -829,9 +860,11 @@
         "color_button_gradient": "",
         "padding_top": 12,
         "padding_bottom": 12,
-        "divider": false,
         "full_width": true,
-        "rounded": false
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "image_with_text_kKFRgk": {
@@ -914,7 +947,9 @@
         "full_width": false,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "multicolumn_ckbhP8": {
@@ -931,6 +966,7 @@
             "heading": "Aetrex Signature Arch Support",
             "heading_size": "text-lg-2xl",
             "text": "",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -951,6 +987,7 @@
             "heading": "Special Pressure Relief Technology Foot-bed",
             "heading_size": "text-lg-2xl",
             "text": "",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -971,6 +1008,7 @@
             "heading": "Water-Friendly & Light-Weight",
             "heading_size": "text-lg-2xl",
             "text": "",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -991,6 +1029,7 @@
             "heading": "Dual density outsole for pressure relief",
             "heading_size": "text-lg-2xl",
             "text": "",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -1035,9 +1074,11 @@
         "color_button_gradient": "",
         "padding_top": 12,
         "padding_bottom": 12,
-        "divider": false,
         "full_width": true,
-        "rounded": false
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_n3NE66": {
@@ -1108,7 +1149,9 @@
         "padding_bottom": 24,
         "divider": false,
         "narrow": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "image_with_text_n7qyiq": {
@@ -1217,7 +1260,9 @@
         "full_width": false,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "image_with_text_bhX6KF": {
@@ -1310,7 +1355,9 @@
         "full_width": false,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_nGmJpt": {
@@ -1379,7 +1426,9 @@
         "padding_bottom": 100,
         "divider": false,
         "narrow": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "image_with_text_4UxBhb": {
@@ -1446,7 +1495,9 @@
         "full_width": false,
         "rounded": false,
         "enable_parallax": true,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_gEAkTq": {
@@ -1549,7 +1600,9 @@
         "padding_bottom": 24,
         "divider": false,
         "narrow": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "testimonials_JBLaqj": {
@@ -1689,6 +1742,7 @@
             "heading": "Aetrex Orthotics",
             "heading_size": "text-lg-2xl",
             "text": "",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -1709,6 +1763,7 @@
             "heading": "Custom Orthotics",
             "heading_size": "text-lg-2xl",
             "text": "",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -1752,9 +1807,11 @@
         "color_button_gradient": "",
         "padding_top": 72,
         "padding_bottom": 24,
-        "divider": false,
         "full_width": false,
-        "rounded": false
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "multicolumn_jcDkPQ": {
@@ -1771,6 +1828,7 @@
             "heading": "Bundle price of $99",
             "heading_size": "text-lg-2xl",
             "text": "<p>Aetrex Orthotics can be up to 250% less expensive than custom orthotics.</p>",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -1791,6 +1849,7 @@
             "heading": "Price $200-$700",
             "heading_size": "text-lg-2xl",
             "text": "<p>Custom orthotics can cost anywhere between $200-$700 plus medical costs.</p>",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -1834,9 +1893,11 @@
         "color_button_gradient": "",
         "padding_top": 24,
         "padding_bottom": 24,
-        "divider": false,
         "full_width": false,
-        "rounded": false
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "multicolumn_F4hwWd": {
@@ -1853,6 +1914,7 @@
             "heading": "High-tech Premium",
             "heading_size": "text-lg-2xl",
             "text": "<p>Aetrex Orthotics are designed using premium materials that promote natural movement while protecting the foot.</p>",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -1873,6 +1935,7 @@
             "heading": "Rigid & Hard Materials",
             "heading_size": "text-lg-2xl",
             "text": "<p>Custom orthotics are typically made from hard, uncomfortable materials that can weaken muscles over time leaving you more prone to injuries.</p>",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -1916,9 +1979,11 @@
         "color_button_gradient": "",
         "padding_top": 24,
         "padding_bottom": 72,
-        "divider": false,
         "full_width": false,
-        "rounded": false
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     }
   },
