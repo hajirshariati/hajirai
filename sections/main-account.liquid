@@ -68,6 +68,7 @@
                 {{- order.financial_status_label -}}
               </td>
               <td headers="RowOrder ColumnFulfillment" role="cell" data-label="{{ 'customer.orders.fulfillment_status' | t | escape }}">
+                <span style="font-size: small;color: #ffffff; text-wrap-mode: nowrap;">-</span>
                 {{- order.fulfillment_status_label -}}
                 {%- if order.fulfillment_status == 'fulfilled' -%}
 <button 
