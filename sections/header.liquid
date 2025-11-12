@@ -1,11 +1,46 @@
 <style>
-  #shopify-section-{{ section.id }} {
+ #shopify-section-{{ section.id }} {
     --section-padding-top: {{ section.settings.padding_top }}px;
     --section-padding-bottom: {{ section.settings.padding_bottom }}px;
     --color-background: {{ section.settings.color_background.rgb }};
     --color-foreground: {{ section.settings.color_text.rgb }};
     --color-transparent: {{ section.settings.transparent_color_text.rgb }};
   }
+
+  {%- if section.settings.colored_menu_text_1 != blank and section.settings.menu_color_1 -%}
+    {%- assign text_1_class = section.settings.colored_menu_text_1 | replace: ' ', '.' -%}
+    header .mega-menu .grandchild-{{ text_1_class }},
+    menu-drawer .drawer__content .grandchild-{{ text_1_class }} {
+      color: {{ section.settings.menu_color_1 }} !important;
+    }
+  {%- endif -%}
+
+  {%- if section.settings.colored_menu_text_2 != blank and section.settings.menu_color_2 -%}
+    {%- assign text_2_class = section.settings.colored_menu_text_2 | replace: ' ', '.' -%}
+    header .mega-menu .grandchild-{{ text_2_class }},
+    menu-drawer .drawer__content .grandchild-{{ text_2_class }},
+    header .mega-menu .grandchild-.{{ text_2_class }},
+    menu-drawer .drawer__content .grandchild-.{{ text_2_class }} {
+      color: {{ section.settings.menu_color_2 }} !important;
+    }
+  {%- endif -%}
+
+  {%- if section.settings.colored_menu_text_3 != blank and section.settings.menu_color_3 -%}
+    {%- assign text_3_class = section.settings.colored_menu_text_3 | replace: ' ', '.' -%}
+    header .mega-menu .grandchild-{{ text_3_class }},
+    menu-drawer .drawer__content .grandchild-{{ text_3_class }} {
+      color: {{ section.settings.menu_color_3 }} !important;
+    }
+  {%- endif -%}
+
+  {%- if section.settings.colored_menu_link_1 != blank and section.settings.menu_link_color_1 -%}
+    a[href="{{ section.settings.colored_menu_link_1 }}"] .btn-text {
+      color: {{ section.settings.menu_link_color_1 }} !important;
+    }
+    a[href="{{ section.settings.colored_menu_link_1 }}"].drawer__menu-item {
+      color: {{ section.settings.menu_link_color_1 }} !important;
+    }
+  {%- endif -%}
 </style>
 
 {%- liquid
