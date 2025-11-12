@@ -29,7 +29,7 @@
       "settings": {
         "transparent_header": true,
         "show_image": true,
-        "image_height": "450px",
+        "image_height": "adapt",
         "content_position": "md:items-center md:justify-center",
         "text_alignment": "left",
         "image_height_mobile": "auto",
