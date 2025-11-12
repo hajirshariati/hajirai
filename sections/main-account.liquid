@@ -101,7 +101,7 @@ style="font-weight: bold;color: rgb(255, 107, 43);border: none;cursor: pointer;m
       <span class="btn-text" style="color: #ffffff;text-wrap-mode: nowrap;background: #171717;padding: 5px 10px;border-radius: 14px;">Start a Return</span>
     </a>
   {%- elsif days_difference > 40 and order.fulfillment_status == 'fulfilled' -%}
-    <span style="color: #666; font-style: italic;">Return window closed</span>
+    <span style="color: #666;text-wrap-mode: nowrap;font-size: small;">Return window<br> closed</span>
   {%- endif -%}
 </td>
             </tr>
