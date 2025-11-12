@@ -1,0 +1,94 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-article-banner": {
+      "type": "main-article-banner",
+      "blocks": {
+        "title": {
+          "type": "title",
+          "settings": {
+            "title_size": "title-sm",
+            "show_tags": true,
+            "show_date": true,
+            "show_comments": false,
+            "show_author": false
+          }
+        }
+      },
+      "block_order": [
+        "title"
+      ],
+      "settings": {
+        "transparent_header": true,
+        "show_image": true,
+        "image_height": "adapt",
+        "content_position": "md:items-center md:justify-center",
+        "text_alignment": "left",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-end justify-center",
+        "text_alignment_mobile": "center",
+        "color_text": "#ffffff",
+        "color_overlay": "#000000",
+        "overlay_opacity": 70,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": true,
+        "parallax_direction": "vertical"
+      }
+    },
+    "main-article": {
+      "type": "main-article-overlay",
+      "blocks": {
+        "share": {
+          "type": "share",
+          "settings": {
+            "share_label": "Share",
+            "show_comments": false
+          }
+        },
+        "next_previous_posts": {
+          "type": "next_previous_posts",
+          "settings": {
+            "show_date": true,
+            "show_comments": false,
+            "show_author": false
+          }
+        },
+        "comments": {
+          "type": "comments",
+          "disabled": true,
+          "settings": {
+            "show_gravatar": true
+          }
+        }
+      },
+      "block_order": [
+        "share",
+        "next_previous_posts",
+        "comments"
+      ],
+      "settings": {
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "narrow": true,
+        "rounded": true
+      }
+    }
+  },
+  "order": [
+    "main-article-banner",
+    "main-article"
+  ]
+}
