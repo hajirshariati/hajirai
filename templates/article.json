@@ -29,7 +29,7 @@
       "settings": {
         "transparent_header": true,
         "show_image": true,
-        "image_height": "adapt",
+        "image_height": "400px",
         "content_position": "md:items-center md:justify-center",
         "text_alignment": "left",
         "image_height_mobile": "auto",
@@ -43,7 +43,7 @@
         "divider": false,
         "full_width": true,
         "rounded": false,
-        "enable_parallax": true,
+        "enable_parallax": false,
         "parallax_direction": "vertical"
       }
     },
