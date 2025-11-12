@@ -1,5 +1,5 @@
 <style>
- #shopify-section-{{ section.id }} {
+  #shopify-section-{{ section.id }} {
     --section-padding-top: {{ section.settings.padding_top }}px;
     --section-padding-bottom: {{ section.settings.padding_bottom }}px;
     --color-background: {{ section.settings.color_background.rgb }};
@@ -34,9 +34,17 @@
   {%- endif -%}
 
   {%- if section.settings.colored_menu_link_1 != blank and section.settings.menu_link_color_1 -%}
-    a[href="{{ section.settings.colored_menu_link_1 }}"] .btn-text {
+    /* For main menu items */
+    summary[data-link="{{ section.settings.colored_menu_link_1 }}"] .btn-text {
       color: {{ section.settings.menu_link_color_1 }} !important;
     }
+    
+    /* For submenu items */
+    a[href="{{ section.settings.colored_menu_link_1 }}"] {
+      color: {{ section.settings.menu_link_color_1 }} !important;
+    }
+    
+    /* For mobile menu */
     a[href="{{ section.settings.colored_menu_link_1 }}"].drawer__menu-item {
       color: {{ section.settings.menu_link_color_1 }} !important;
     }
