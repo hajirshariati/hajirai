@@ -868,6 +868,62 @@
         "rounded": false,
         "enable_parallax": true
       }
+    },
+    "rich_text_4tKmWK": {
+      "type": "rich-text",
+      "blocks": {
+        "text_NGPCyT": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Free shipping for loyalty members will end on November 18th, 2025 at 11:59 PM PT. Orders placed before this date will still qualify for free shipping.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_NGPCyT"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#534e4e",
+        "color_background": "#fafafa",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
     }
   },
   "order": [
@@ -878,6 +934,7 @@
     "multicolumn_Nqae7T",
     "multicolumn_ke6Ehd",
     "faq_fjtdJ4",
-    "images_with_text_WEDgx7"
+    "images_with_text_WEDgx7",
+    "rich_text_4tKmWK"
   ]
 }
