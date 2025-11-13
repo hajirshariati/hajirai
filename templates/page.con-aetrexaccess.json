@@ -45,11 +45,27 @@
             "accessibility_info": "",
             "external": false
           }
+        },
+        "text_aAJned": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Free shipping for loyalty members will end on November 18th, 2025 at 11:59 PM PT. Orders placed before this date will still qualify for free shipping.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
         }
       },
       "block_order": [
         "spacing_3PaJJD",
-        "icon_mzUncQ"
+        "icon_mzUncQ",
+        "text_aAJned"
       ],
       "name": "t:sections.rich-text.name",
       "settings": {
@@ -68,7 +84,7 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "color_text": "",
+        "color_text": "#e7e7e7",
         "color_background": "",
         "gradient_background": "linear-gradient(90deg, rgba(92, 109, 116, 1), rgba(140, 162, 173, 1) 100%)",
         "color_highlight": "",
