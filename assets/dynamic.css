@@ -1027,3 +1027,10 @@ body .yotpo-reviews-main-widget svg {
     width: 100%;
   }
 }
+
+.sort-by[open] .sort-listbox, 
+.sort-by[open] .sort-listbox li {
+    position: relative;
+    top: 0;
+    z-index: 9;
+}
