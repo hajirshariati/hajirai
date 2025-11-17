@@ -15,6 +15,9 @@
         "vendor": {
           "type": "text",
           "settings": {
+            "icon": "none",
+            "iwidth": "custom",
+            "icon_width": 24,
             "text": "{{ product.vendor }}",
             "text_size": "text-base"
           }
@@ -23,6 +26,7 @@
           "type": "title",
           "settings": {
             "title_size": "product-title-md",
+            "title_size_mobile": "product-title-md",
             "show_price": true
           }
         },
@@ -38,6 +42,7 @@
             "show_variant_labels": true,
             "picker_type": "button",
             "enable_color_swatches": true,
+            "color_swatch_type": "color",
             "size_chart": ""
           }
         },
@@ -46,6 +51,7 @@
           "settings": {
             "inventory_threshold": 15,
             "show_inventory_transfer": true,
+            "show_inventory_quantity": "low",
             "color_scheme": "accent-1"
           }
         },
@@ -53,18 +59,23 @@
           "type": "buy_buttons",
           "settings": {
             "show_quantity_selector": true,
+            "show_price": false,
             "show_dynamic_checkout": true,
-            "show_gift_card_recipient": true
+            "show_gift_card_recipient": true,
+            "enable_back_in_stock": false,
+            "show_back_in_stock_name": false,
+            "show_back_in_stock_phone": false
           }
         },
         "share": {
           "type": "share",
           "settings": {
             "share_label": "Share",
-            "show_help_desk": true,
+            "show_help_desk": false,
             "help_label": "Need help?",
             "help_type": "drawer",
-            "help_page": ""
+            "help_page": "",
+            "help_page_external": false
           }
         }
       },
@@ -81,12 +92,14 @@
         "enable_sticky_info": true,
         "media_size": 60,
         "gallery_layout": "thumbnail",
-        "thumbnail_position": "beside",
-        "image_zoom": "lightbox",
-        "hide_variants": false,
+        "thumbnail_position": "below",
+        "image_ratio": "adapt_first",
+        "image_zoom": "none",
+        "hide_variants": true,
         "enable_video_autoplay": true,
         "enable_video_looping": true,
         "mobile_layout": "full_width",
+        "image_ratio_mobile": "adapt_first",
         "mobile_thumbnail": false,
         "padding_top": 24,
         "padding_bottom": 84,
