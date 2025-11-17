@@ -142,10 +142,10 @@
         "sign_up_DcnXLa": {
           "type": "sign_up",
           "settings": {
-            "heading": "Get Free Shipping",
-            "subheading": "with Aetrex Loyalty Program",
-            "button_label": "Join Aetrex Access",
-            "form_heading": "Create your <strong>FREE</strong> account to get free shipping",
+            "heading": "Aetrex Access",
+            "subheading": "earn points on your purchases & more",
+            "button_label": "Join Now",
+            "form_heading": "Create your <strong>FREE</strong> account",
             "checkbox_label": "Must use same email address at checkout for free shipping perk to apply. Free shipping perk only available in the US.",
             "checkbox_is_required": false,
             "form_button_label": "Join Now",
