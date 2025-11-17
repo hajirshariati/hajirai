@@ -368,66 +368,75 @@
       "label": "t:sections.global.settings.color_background.label",
       "default": "#ffffff"
     },
-    {
-      "type": "header",
-      "content": "Menu Item Color Customization"
-    },
-    {
-      "type": "paragraph",
-      "content": "Customize colors for specific menu items"
-    },
-    {
-      "type": "text",
-      "id": "colored_menu_text_1",
-      "label": "Submenu Text 1",
-      "default": "Online Exclusive Sale",
-      "info": "Enter the exact menu item text to color"
-    },
-    {
-      "type": "color",
-      "id": "menu_color_1",
-      "label": "Color for Text 1",
-      "default": "#bb0000"
-    },
-    {
-      "type": "text",
-      "id": "colored_menu_text_2",
-      "label": "Submenu Text 2",
-      "default": "Sale",
-      "info": "Enter the exact menu item text to color"
-    },
-    {
-      "type": "color",
-      "id": "menu_color_2",
-      "label": "Color for Text 2",
-      "default": "#bb0000"
-    },
-    {
-      "type": "text",
-      "id": "colored_menu_text_3",
-      "label": "Submenu Text 3",
-      "default": "NEW Kids Orthotics",
-      "info": "Enter the exact menu item text to color"
-    },
-    {
-      "type": "color",
-      "id": "menu_color_3",
-      "label": "Color for Text 3",
-      "default": "#0171e3"
-    },
-    {
-      "type": "text",
-      "id": "colored_menu_link_1",
-      "label": "Main Menu Link URL",
-      "default": "/collections/online-exclusive",
-      "info": "Enter the URL path for specific link coloring (e.g., /collections/online-exclusive)"
-    },
-    {
-      "type": "color",
-      "id": "menu_link_color_1",
-      "label": "Color for Link 1",
-      "default": "#bb0000"
-    },
+
+
+
+{
+  "type": "header",
+  "content": "Menu Item Color Customization"
+},
+{
+  "type": "paragraph",
+  "content": "Customize colors for specific menu items"
+},
+{
+  "type": "text",
+  "id": "colored_menu_text_1",
+  "label": "Submenu Text 1",
+  "default": "Online Exclusive Sale",
+  "info": "Enter the exact menu item text to color"
+},
+{
+  "type": "color",
+  "id": "menu_color_1",
+  "label": "Color for Text 1",
+  "default": "#bb0000"
+},
+{
+  "type": "text",
+  "id": "colored_menu_text_2",
+  "label": "Submenu Text 2",
+  "default": "Sale",
+  "info": "Enter the exact menu item text to color"
+},
+{
+  "type": "color",
+  "id": "menu_color_2",
+  "label": "Color for Text 2",
+  "default": "#bb0000"
+},
+{
+  "type": "text",
+  "id": "colored_menu_text_3",
+  "label": "Submenu Text 3",
+  "default": "NEW Kids Orthotics",
+  "info": "Enter the exact menu item text to color"
+},
+{
+  "type": "color",
+  "id": "menu_color_3",
+  "label": "Color for Text 3",
+  "default": "#0171e3"
+},
+{
+  "type": "text",
+  "id": "colored_menu_link_1",
+  "label": "Main Menu Link URL",
+  "default": "/collections/online-exclusive",
+  "info": "Enter the URL path for specific link coloring (e.g., /collections/online-exclusive)"
+},
+{
+  "type": "color",
+  "id": "menu_link_color_1",
+  "label": "Color for Link 1",
+  "default": "#bb0000"
+},
+
+
+
+
+
+
     {
       "type": "header",
       "content": "t:sections.global.settings.header__section.content"
@@ -526,12 +535,6 @@
       "type": "url",
       "id": "promo_link_1",
       "label": "t:sections.header.blocks.mega_menu.settings.promo_link.label"
-    },
-    {
-      "visible_if": "{{ section.settings.promo_image_1 != blank }}",
-      "type": "url",
-      "id": "promo_link_1_abra",
-      "label": "Link (Abra)"
     },
     {
       "visible_if": "{{ section.settings.promo_image_1 != blank }}",
@@ -636,12 +639,6 @@
       "type": "url",
       "id": "promo_link_2",
       "label": "t:sections.header.blocks.mega_menu.settings.promo_link.label"
-    },
-    {
-      "visible_if": "{{ section.settings.promo_image_2 != blank }}",
-      "type": "url",
-      "id": "promo_link_2_abra",
-      "label": "Link (Abra)"
     },
     {
       "visible_if": "{{ section.settings.promo_image_2 != blank }}",
@@ -773,6 +770,1428 @@
           "type": "url",
           "id": "button_link",
           "label": "t:sections.global.settings.button_link.label"
+        },
+        {
+          "type": "header",
+          "content": "t:sections.header.blocks.mega_menu.settings.header__promo_1.content"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_image_1",
+          "label": "Image (Default)"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_mobile_image_1",
+          "label": "Mobile image (Default)",
+          "info": "Optional mobile-specific image. If provided, this image will be shown on mobile devices instead of the desktop image."
+        },
+        {
+          "type": "text",
+          "id": "abra_promo_code_1",
+          "label": "Abra Promo Code"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_image_abra_1",
+          "label": "Image (Abra)"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_mobile_image_abra_1",
+          "label": "Mobile image (Abra)",
+          "info": "Optional mobile-specific image. If provided, this image will be shown on mobile devices instead of the desktop image."
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_1 != blank }}",
+          "type": "select",
+          "id": "promo_image_ratio_1",
+          "options": [
+            {
+              "value": "adapt",
+              "label": "t:sections.global.settings.image_ratio.options__1.label"
+            },
+            {
+              "value": "square",
+              "label": "t:sections.global.settings.image_ratio.options__2.label"
+            },
+            {
+              "value": "portrait",
+              "label": "t:sections.global.settings.image_ratio.options__3.label"
+            },
+            {
+              "value": "landscape",
+              "label": "t:sections.global.settings.image_ratio.options__4.label"
+            },
+            {
+              "value": "wide",
+              "label": "t:sections.global.settings.image_ratio.options__5.label"
+            }
+          ],
+          "default": "adapt",
+          "label": "t:sections.global.settings.image_ratio.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_1 != blank }}",
+          "type": "text",
+          "id": "promo_heading_1",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_heading.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_1 != blank }}",
+          "type": "inline_richtext",
+          "id": "promo_subtext_1",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_subtext.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_1 != blank }}",
+          "type": "checkbox",
+          "id": "promo_overlay_content_1",
+          "default": true,
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_overlay_content.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_1 != blank }}",
+          "type": "url",
+          "id": "promo_link_1",
+          "label": "Link (Default)"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_1 != blank }}",
+          "type": "url",
+          "id": "promo_link_1_abra",
+          "label": "Link (Abra)"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_1 != blank }}",
+          "type": "text",
+          "id": "promo_tag_1",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_tag.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_1 != blank }}",
+          "type": "color",
+          "id": "promo_color_text_1",
+          "label": "t:sections.global.settings.color_text.label",
+          "default": "#ffffff"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_1 != blank }}",
+          "type": "color",
+          "id": "promo_color_overlay_1",
+          "label": "t:sections.global.settings.color_overlay.label",
+          "default": "#000000"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_1 != blank }}",
+          "type": "range",
+          "id": "promo_overlay_opacity_1",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "t:sections.global.settings.overlay_opacity.label",
+          "default": 40
+        },
+        {
+          "type": "header",
+          "content": "t:sections.header.blocks.mega_menu.settings.header__promo_2.content"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_image_2",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_image.label"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_mobile_image_2",
+          "label": "Mobile image",
+          "info": "Optional mobile-specific image. If provided, this image will be shown on mobile devices instead of the desktop image."
+        },
+        {
+          "type": "text",
+          "id": "abra_promo_code_2",
+          "label": "Abra Promo Code"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_image_abra_2",
+          "label": "Image (Abra)"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_mobile_image_abra_2",
+          "label": "Mobile image (Abra)",
+          "info": "Optional mobile-specific image. If provided, this image will be shown on mobile devices instead of the desktop image."
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_2 != blank }}",
+          "type": "select",
+          "id": "promo_image_ratio_2",
+          "options": [
+            {
+              "value": "adapt",
+              "label": "t:sections.global.settings.image_ratio.options__1.label"
+            },
+            {
+              "value": "square",
+              "label": "t:sections.global.settings.image_ratio.options__2.label"
+            },
+            {
+              "value": "portrait",
+              "label": "t:sections.global.settings.image_ratio.options__3.label"
+            },
+            {
+              "value": "landscape",
+              "label": "t:sections.global.settings.image_ratio.options__4.label"
+            },
+            {
+              "value": "wide",
+              "label": "t:sections.global.settings.image_ratio.options__5.label"
+            }
+          ],
+          "default": "adapt",
+          "label": "t:sections.global.settings.image_ratio.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_2 != blank }}",
+          "type": "text",
+          "id": "promo_heading_2",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_heading.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_2 != blank }}",
+          "type": "inline_richtext",
+          "id": "promo_subtext_2",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_subtext.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_2 != blank }}",
+          "type": "checkbox",
+          "id": "promo_overlay_content_2",
+          "default": true,
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_overlay_content.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_2 != blank }}",
+          "type": "url",
+          "id": "promo_link_2",
+          "label": "Link (Default)"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_2 != blank }}",
+          "type": "url",
+          "id": "promo_link_2_abra",
+          "label": "Link (Abra)"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_2 != blank }}",
+          "type": "text",
+          "id": "promo_tag_2",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_tag.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_2 != blank }}",
+          "type": "color",
+          "id": "promo_color_text_2",
+          "label": "t:sections.global.settings.color_text.label",
+          "default": "#ffffff"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_2 != blank }}",
+          "type": "color",
+          "id": "promo_color_overlay_2",
+          "label": "t:sections.global.settings.color_overlay.label",
+          "default": "#000000"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_2 != blank }}",
+          "type": "range",
+          "id": "promo_overlay_opacity_2",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "t:sections.global.settings.overlay_opacity.label",
+          "default": 40
+        },
+        {
+          "type": "header",
+          "content": "t:sections.header.blocks.mega_menu.settings.header__promo_3.content"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_image_3",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_image.label"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_mobile_image_3",
+          "label": "Mobile image",
+          "info": "Optional mobile-specific image. If provided, this image will be shown on mobile devices instead of the desktop image."
+        },
+        {
+          "type": "text",
+          "id": "abra_promo_code_3",
+          "label": "Abra Promo Code"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_image_abra_3",
+          "label": "Image (Abra)"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_mobile_image_abra_3",
+          "label": "Mobile image (Abra)",
+          "info": "Optional mobile-specific image. If provided, this image will be shown on mobile devices instead of the desktop image."
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_3 != blank }}",
+          "type": "select",
+          "id": "promo_image_ratio_3",
+          "options": [
+            {
+              "value": "adapt",
+              "label": "t:sections.global.settings.image_ratio.options__1.label"
+            },
+            {
+              "value": "square",
+              "label": "t:sections.global.settings.image_ratio.options__2.label"
+            },
+            {
+              "value": "portrait",
+              "label": "t:sections.global.settings.image_ratio.options__3.label"
+            },
+            {
+              "value": "landscape",
+              "label": "t:sections.global.settings.image_ratio.options__4.label"
+            },
+            {
+              "value": "wide",
+              "label": "t:sections.global.settings.image_ratio.options__5.label"
+            }
+          ],
+          "default": "adapt",
+          "label": "t:sections.global.settings.image_ratio.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_3 != blank }}",
+          "type": "text",
+          "id": "promo_heading_3",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_heading.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_3 != blank }}",
+          "type": "inline_richtext",
+          "id": "promo_subtext_3",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_subtext.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_3 != blank }}",
+          "type": "checkbox",
+          "id": "promo_overlay_content_3",
+          "default": true,
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_overlay_content.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_3 != blank }}",
+          "type": "url",
+          "id": "promo_link_3",
+          "label": "Link (Default)"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_3 != blank }}",
+          "type": "url",
+          "id": "promo_link_3_abra",
+          "label": "Link (Abra)"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_3 != blank }}",
+          "type": "text",
+          "id": "promo_tag_3",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_tag.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_3 != blank }}",
+          "type": "color",
+          "id": "promo_color_text_3",
+          "label": "t:sections.global.settings.color_text.label",
+          "default": "#ffffff"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_3 != blank }}",
+          "type": "color",
+          "id": "promo_color_overlay_3",
+          "label": "t:sections.global.settings.color_overlay.label",
+          "default": "#000000"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_3 != blank }}",
+          "type": "range",
+          "id": "promo_overlay_opacity_3",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "t:sections.global.settings.overlay_opacity.label",
+          "default": 40
+        },
+        {
+          "type": "header",
+          "content": "t:sections.header.blocks.mega_menu.settings.header__promo_4.content"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_image_4",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_image.label"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_mobile_image_4",
+          "label": "Mobile image",
+          "info": "Optional mobile-specific image. If provided, this image will be shown on mobile devices instead of the desktop image."
+        },
+        {
+          "type": "text",
+          "id": "abra_promo_code_4",
+          "label": "Abra Promo Code"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_image_abra_4",
+          "label": "Image (Abra)"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_mobile_image_abra_4",
+          "label": "Mobile image (Abra)",
+          "info": "Optional mobile-specific image. If provided, this image will be shown on mobile devices instead of the desktop image."
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_4 != blank }}",
+          "type": "select",
+          "id": "promo_image_ratio_4",
+          "options": [
+            {
+              "value": "adapt",
+              "label": "t:sections.global.settings.image_ratio.options__1.label"
+            },
+            {
+              "value": "square",
+              "label": "t:sections.global.settings.image_ratio.options__2.label"
+            },
+            {
+              "value": "portrait",
+              "label": "t:sections.global.settings.image_ratio.options__3.label"
+            },
+            {
+              "value": "landscape",
+              "label": "t:sections.global.settings.image_ratio.options__4.label"
+            },
+            {
+              "value": "wide",
+              "label": "t:sections.global.settings.image_ratio.options__5.label"
+            }
+          ],
+          "default": "adapt",
+          "label": "t:sections.global.settings.image_ratio.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_4 != blank }}",
+          "type": "text",
+          "id": "promo_heading_4",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_heading.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_4 != blank }}",
+          "type": "inline_richtext",
+          "id": "promo_subtext_4",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_subtext.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_4 != blank }}",
+          "type": "checkbox",
+          "id": "promo_overlay_content_4",
+          "default": true,
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_overlay_content.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_4 != blank }}",
+          "type": "url",
+          "id": "promo_link_4",
+          "label": "Link (Default)"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_4 != blank }}",
+          "type": "url",
+          "id": "promo_link_4_abra",
+          "label": "Link (Abra)"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_4 != blank }}",
+          "type": "text",
+          "id": "promo_tag_4",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_tag.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_4 != blank }}",
+          "type": "color",
+          "id": "promo_color_text_4",
+          "label": "t:sections.global.settings.color_text.label",
+          "default": "#ffffff"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_4 != blank }}",
+          "type": "color",
+          "id": "promo_color_overlay_4",
+          "label": "t:sections.global.settings.color_overlay.label",
+          "default": "#000000"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_4 != blank }}",
+          "type": "range",
+          "id": "promo_overlay_opacity_4",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "t:sections.global.settings.overlay_opacity.label",
+          "default": 40
+        },
+        {
+          "type": "header",
+          "content": "t:sections.header.blocks.mega_menu.settings.header__promo_5.content"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_image_5",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_image.label"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_mobile_image_5",
+          "label": "Mobile image",
+          "info": "Optional mobile-specific image. If provided, this image will be shown on mobile devices instead of the desktop image."
+        },
+        {
+          "type": "text",
+          "id": "abra_promo_code_5",
+          "label": "Abra Promo Code"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_image_abra_5",
+          "label": "Image (Abra)"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_mobile_image_abra_5",
+          "label": "Mobile image (Abra)",
+          "info": "Optional mobile-specific image. If provided, this image will be shown on mobile devices instead of the desktop image."
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_5 != blank }}",
+          "type": "select",
+          "id": "promo_image_ratio_5",
+          "options": [
+            {
+              "value": "adapt",
+              "label": "t:sections.global.settings.image_ratio.options__1.label"
+            },
+            {
+              "value": "square",
+              "label": "t:sections.global.settings.image_ratio.options__2.label"
+            },
+            {
+              "value": "portrait",
+              "label": "t:sections.global.settings.image_ratio.options__3.label"
+            },
+            {
+              "value": "landscape",
+              "label": "t:sections.global.settings.image_ratio.options__4.label"
+            },
+            {
+              "value": "wide",
+              "label": "t:sections.global.settings.image_ratio.options__5.label"
+            }
+          ],
+          "default": "adapt",
+          "label": "t:sections.global.settings.image_ratio.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_5 != blank }}",
+          "type": "text",
+          "id": "promo_heading_5",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_heading.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_5 != blank }}",
+          "type": "inline_richtext",
+          "id": "promo_subtext_5",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_subtext.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_5 != blank }}",
+          "type": "checkbox",
+          "id": "promo_overlay_content_5",
+          "default": true,
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_overlay_content.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_5 != blank }}",
+          "type": "url",
+          "id": "promo_link_5",
+          "label": "Link (Default)"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_5 != blank }}",
+          "type": "url",
+          "id": "promo_link_5_abra",
+          "label": "Link (Abra)"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_5 != blank }}",
+          "type": "text",
+          "id": "promo_tag_5",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_tag.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_5 != blank }}",
+          "type": "color",
+          "id": "promo_color_text_5",
+          "label": "t:sections.global.settings.color_text.label",
+          "default": "#ffffff"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_5 != blank }}",
+          "type": "color",
+          "id": "promo_color_overlay_5",
+          "label": "t:sections.global.settings.color_overlay.label",
+          "default": "#000000"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_5 != blank }}",
+          "type": "range",
+          "id": "promo_overlay_opacity_5",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "t:sections.global.settings.overlay_opacity.label",
+          "default": 40
+        }
+      ]
+    },
+    {
+      "type": "mega_menu_tab",
+      "name": "t:sections.header.blocks.mega_menu_tab.name",
+      "settings": [
+        {
+          "type": "text",
+          "id": "menu_title",
+          "label": "t:sections.header.blocks.mega_menu.settings.menu_title.label",
+          "info": "t:sections.header.blocks.mega_menu.settings.menu_title.info"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "default": "Button label",
+          "label": "t:sections.global.settings.button_label.label",
+          "info": "t:sections.global.settings.button_label.info"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "t:sections.global.settings.button_link.label"
+        },
+        {
+          "type": "text",
+          "id": "heading_1",
+          "default": "Collections",
+          "label": "t:sections.header.blocks.mega_menu_tab.settings.heading_1.label"
+        },
+        {
+          "type": "text",
+          "id": "heading_2",
+          "default": "Most popular",
+          "label": "t:sections.header.blocks.mega_menu_tab.settings.heading_2.label"
+        },
+        {
+          "type": "header",
+          "content": "t:sections.global.settings.header__mobile.content"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_vendor",
+          "label": "t:sections.global.settings.show_product_vendor.label",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "show_price",
+          "label": "t:sections.global.settings.show_product_price.label",
+          "default": true
+        },
+        {
+          "type": "header",
+          "content": "t:sections.header.blocks.mega_menu_tab.settings.header__tab_1.content"
+        },
+        {
+          "type": "text",
+          "id": "tab_target_1",
+          "default": "Tab heading",
+          "label": "t:sections.header.blocks.mega_menu_tab.settings.target.label"
+        },
+        {
+          "type": "url",
+          "id": "tab_target_link_1",
+          "label": "t:sections.header.blocks.mega_menu_tab.settings.target_link.label"
+        },
+        {
+          "type": "product_list",
+          "id": "tab_products_1",
+          "label": "t:sections.global.settings.products.label"
+        },
+        {
+          "type": "image_picker",
+          "id": "tab_icon_1",
+          "label": "t:sections.global.settings.icon_image.label"
+        },
+        {
+          "type": "range",
+          "id": "tab_icon_width_1",
+          "label": "t:sections.global.settings.icon_width.label",
+          "default": 42,
+          "min": 10,
+          "max": 120,
+          "step": 2,
+          "unit": "px"
+        },
+        {
+          "type": "header",
+          "content": "t:sections.header.blocks.mega_menu.settings.header__promo_1.content"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_image_1",
+          "label": "Image (Default)"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_mobile_image_1",
+          "label": "Mobile image (Default)",
+          "info": "Optional mobile-specific image. If provided, this image will be shown on mobile devices instead of the desktop image."
+        },
+        {
+          "type": "text",
+          "id": "abra_promo_code_1",
+          "label": "Abra Promo Code"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_image_abra_1",
+          "label": "Image (Abra)"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_mobile_image_abra_1",
+          "label": "Mobile image (Abra)",
+          "info": "Optional mobile-specific image. If provided, this image will be shown on mobile devices instead of the desktop image."
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_1 != blank }}",
+          "type": "select",
+          "id": "promo_image_ratio_1",
+          "options": [
+            {
+              "value": "adapt",
+              "label": "t:sections.global.settings.image_ratio.options__1.label"
+            },
+            {
+              "value": "square",
+              "label": "t:sections.global.settings.image_ratio.options__2.label"
+            },
+            {
+              "value": "portrait",
+              "label": "t:sections.global.settings.image_ratio.options__3.label"
+            },
+            {
+              "value": "landscape",
+              "label": "t:sections.global.settings.image_ratio.options__4.label"
+            },
+            {
+              "value": "wide",
+              "label": "t:sections.global.settings.image_ratio.options__5.label"
+            }
+          ],
+          "default": "square",
+          "label": "t:sections.global.settings.image_ratio.label",
+          "info": "t:sections.header.blocks.mega_menu_tab.settings.promo_image_ratio.info"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_1 != blank }}",
+          "type": "text",
+          "id": "promo_heading_1",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_heading.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_1 != blank }}",
+          "type": "inline_richtext",
+          "id": "promo_subtext_1",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_subtext.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_1 != blank }}",
+          "type": "checkbox",
+          "id": "promo_overlay_content_1",
+          "default": true,
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_overlay_content.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_1 != blank }}",
+          "type": "url",
+          "id": "promo_link_1",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_link.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_1 != blank }}",
+          "type": "text",
+          "id": "promo_tag_1",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_tag.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_1 != blank }}",
+          "type": "color",
+          "id": "promo_color_text_1",
+          "label": "t:sections.global.settings.color_text.label",
+          "default": "#ffffff"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_1 != blank }}",
+          "type": "color",
+          "id": "promo_color_overlay_1",
+          "label": "t:sections.global.settings.color_overlay.label",
+          "default": "#000000"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_1 != blank }}",
+          "type": "range",
+          "id": "promo_overlay_opacity_1",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "t:sections.global.settings.overlay_opacity.label",
+          "default": 40
+        },
+        {
+          "type": "header",
+          "content": "t:sections.header.blocks.mega_menu_tab.settings.header__tab_2.content"
+        },
+        {
+          "type": "text",
+          "id": "tab_target_2",
+          "default": "Tab heading",
+          "label": "t:sections.header.blocks.mega_menu_tab.settings.target.label"
+        },
+        {
+          "type": "url",
+          "id": "tab_target_link_2",
+          "label": "t:sections.header.blocks.mega_menu_tab.settings.target_link.label"
+        },
+        {
+          "type": "product_list",
+          "id": "tab_products_2",
+          "label": "t:sections.global.settings.products.label"
+        },
+        {
+          "type": "image_picker",
+          "id": "tab_icon_2",
+          "label": "t:sections.global.settings.icon_image.label"
+        },
+        {
+          "type": "range",
+          "id": "tab_icon_width_2",
+          "label": "t:sections.global.settings.icon_width.label",
+          "default": 42,
+          "min": 10,
+          "max": 120,
+          "step": 2,
+          "unit": "px"
+        },
+        {
+          "type": "header",
+          "content": "t:sections.header.blocks.mega_menu.settings.header__promo_2.content"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_image_2",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_image.label"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_mobile_image_2",
+          "label": "Mobile image",
+          "info": "Optional mobile-specific image. If provided, this image will be shown on mobile devices instead of the desktop image."
+        },
+        {
+          "type": "text",
+          "id": "abra_promo_code_2",
+          "label": "Abra Promo Code"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_image_abra_2",
+          "label": "Image (Abra)"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_mobile_image_abra_2",
+          "label": "Mobile image (Abra)",
+          "info": "Optional mobile-specific image. If provided, this image will be shown on mobile devices instead of the desktop image."
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_2 != blank }}",
+          "type": "select",
+          "id": "promo_image_ratio_2",
+          "options": [
+            {
+              "value": "adapt",
+              "label": "t:sections.global.settings.image_ratio.options__1.label"
+            },
+            {
+              "value": "square",
+              "label": "t:sections.global.settings.image_ratio.options__2.label"
+            },
+            {
+              "value": "portrait",
+              "label": "t:sections.global.settings.image_ratio.options__3.label"
+            },
+            {
+              "value": "landscape",
+              "label": "t:sections.global.settings.image_ratio.options__4.label"
+            },
+            {
+              "value": "wide",
+              "label": "t:sections.global.settings.image_ratio.options__5.label"
+            }
+          ],
+          "default": "square",
+          "label": "t:sections.global.settings.image_ratio.label",
+          "info": "t:sections.header.blocks.mega_menu_tab.settings.promo_image_ratio.info"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_2 != blank }}",
+          "type": "text",
+          "id": "promo_heading_2",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_heading.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_2 != blank }}",
+          "type": "inline_richtext",
+          "id": "promo_subtext_2",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_subtext.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_2 != blank }}",
+          "type": "checkbox",
+          "id": "promo_overlay_content_2",
+          "default": true,
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_overlay_content.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_2 != blank }}",
+          "type": "url",
+          "id": "promo_link_2",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_link.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_2 != blank }}",
+          "type": "text",
+          "id": "promo_tag_2",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_tag.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_2 != blank }}",
+          "type": "color",
+          "id": "promo_color_text_2",
+          "label": "t:sections.global.settings.color_text.label",
+          "default": "#ffffff"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_2 != blank }}",
+          "type": "color",
+          "id": "promo_color_overlay_2",
+          "label": "t:sections.global.settings.color_overlay.label",
+          "default": "#000000"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_2 != blank }}",
+          "type": "range",
+          "id": "promo_overlay_opacity_2",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "t:sections.global.settings.overlay_opacity.label",
+          "default": 40
+        },
+        {
+          "type": "header",
+          "content": "t:sections.header.blocks.mega_menu_tab.settings.header__tab_3.content"
+        },
+        {
+          "type": "text",
+          "id": "tab_target_3",
+          "default": "Tab heading",
+          "label": "t:sections.header.blocks.mega_menu_tab.settings.target.label"
+        },
+        {
+          "type": "url",
+          "id": "tab_target_link_3",
+          "label": "t:sections.header.blocks.mega_menu_tab.settings.target_link.label"
+        },
+        {
+          "type": "product_list",
+          "id": "tab_products_3",
+          "label": "t:sections.global.settings.products.label"
+        },
+        {
+          "type": "image_picker",
+          "id": "tab_icon_3",
+          "label": "t:sections.global.settings.icon_image.label"
+        },
+        {
+          "type": "range",
+          "id": "tab_icon_width_3",
+          "label": "t:sections.global.settings.icon_width.label",
+          "default": 42,
+          "min": 10,
+          "max": 120,
+          "step": 2,
+          "unit": "px"
+        },
+        {
+          "type": "header",
+          "content": "t:sections.header.blocks.mega_menu.settings.header__promo_3.content"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_image_3",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_image.label"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_mobile_image_3",
+          "label": "Mobile image",
+          "info": "Optional mobile-specific image. If provided, this image will be shown on mobile devices instead of the desktop image."
+        },
+        {
+          "type": "text",
+          "id": "abra_promo_code_3",
+          "label": "Abra Promo Code"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_image_abra_3",
+          "label": "Image (Abra)"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_mobile_image_abra_3",
+          "label": "Mobile image (Abra)",
+          "info": "Optional mobile-specific image. If provided, this image will be shown on mobile devices instead of the desktop image."
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_3 != blank }}",
+          "type": "select",
+          "id": "promo_image_ratio_3",
+          "options": [
+            {
+              "value": "adapt",
+              "label": "t:sections.global.settings.image_ratio.options__1.label"
+            },
+            {
+              "value": "square",
+              "label": "t:sections.global.settings.image_ratio.options__2.label"
+            },
+            {
+              "value": "portrait",
+              "label": "t:sections.global.settings.image_ratio.options__3.label"
+            },
+            {
+              "value": "landscape",
+              "label": "t:sections.global.settings.image_ratio.options__4.label"
+            },
+            {
+              "value": "wide",
+              "label": "t:sections.global.settings.image_ratio.options__5.label"
+            }
+          ],
+          "default": "square",
+          "label": "t:sections.global.settings.image_ratio.label",
+          "info": "t:sections.header.blocks.mega_menu_tab.settings.promo_image_ratio.info"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_3 != blank }}",
+          "type": "text",
+          "id": "promo_heading_3",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_heading.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_3 != blank }}",
+          "type": "inline_richtext",
+          "id": "promo_subtext_3",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_subtext.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_3 != blank }}",
+          "type": "checkbox",
+          "id": "promo_overlay_content_3",
+          "default": true,
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_overlay_content.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_3 != blank }}",
+          "type": "url",
+          "id": "promo_link_3",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_link.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_3 != blank }}",
+          "type": "text",
+          "id": "promo_tag_3",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_tag.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_3 != blank }}",
+          "type": "color",
+          "id": "promo_color_text_3",
+          "label": "t:sections.global.settings.color_text.label",
+          "default": "#ffffff"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_3 != blank }}",
+          "type": "color",
+          "id": "promo_color_overlay_3",
+          "label": "t:sections.global.settings.color_overlay.label",
+          "default": "#000000"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_3 != blank }}",
+          "type": "range",
+          "id": "promo_overlay_opacity_3",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "t:sections.global.settings.overlay_opacity.label",
+          "default": 40
+        },
+        {
+          "type": "header",
+          "content": "t:sections.header.blocks.mega_menu_tab.settings.header__tab_4.content"
+        },
+        {
+          "type": "text",
+          "id": "tab_target_4",
+          "default": "Tab heading",
+          "label": "t:sections.header.blocks.mega_menu_tab.settings.target.label"
+        },
+        {
+          "type": "url",
+          "id": "tab_target_link_4",
+          "label": "t:sections.header.blocks.mega_menu_tab.settings.target_link.label"
+        },
+        {
+          "type": "product_list",
+          "id": "tab_products_4",
+          "label": "t:sections.global.settings.products.label"
+        },
+        {
+          "type": "image_picker",
+          "id": "tab_icon_4",
+          "label": "t:sections.global.settings.icon_image.label"
+        },
+        {
+          "type": "range",
+          "id": "tab_icon_width_4",
+          "label": "t:sections.global.settings.icon_width.label",
+          "default": 42,
+          "min": 10,
+          "max": 120,
+          "step": 2,
+          "unit": "px"
+        },
+        {
+          "type": "header",
+          "content": "t:sections.header.blocks.mega_menu.settings.header__promo_4.content"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_image_4",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_image.label"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_mobile_image_4",
+          "label": "Mobile image",
+          "info": "Optional mobile-specific image. If provided, this image will be shown on mobile devices instead of the desktop image."
+        },
+        {
+          "type": "text",
+          "id": "abra_promo_code_4",
+          "label": "Abra Promo Code"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_image_abra_4",
+          "label": "Image (Abra)"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_mobile_image_abra_4",
+          "label": "Mobile image (Abra)",
+          "info": "Optional mobile-specific image. If provided, this image will be shown on mobile devices instead of the desktop image."
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_4 != blank }}",
+          "type": "select",
+          "id": "promo_image_ratio_4",
+          "options": [
+            {
+              "value": "adapt",
+              "label": "t:sections.global.settings.image_ratio.options__1.label"
+            },
+            {
+              "value": "square",
+              "label": "t:sections.global.settings.image_ratio.options__2.label"
+            },
+            {
+              "value": "portrait",
+              "label": "t:sections.global.settings.image_ratio.options__3.label"
+            },
+            {
+              "value": "landscape",
+              "label": "t:sections.global.settings.image_ratio.options__4.label"
+            },
+            {
+              "value": "wide",
+              "label": "t:sections.global.settings.image_ratio.options__5.label"
+            }
+          ],
+          "default": "square",
+          "label": "t:sections.global.settings.image_ratio.label",
+          "info": "t:sections.header.blocks.mega_menu_tab.settings.promo_image_ratio.info"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_4 != blank }}",
+          "type": "text",
+          "id": "promo_heading_4",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_heading.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_4 != blank }}",
+          "type": "inline_richtext",
+          "id": "promo_subtext_4",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_subtext.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_4 != blank }}",
+          "type": "checkbox",
+          "id": "promo_overlay_content_4",
+          "default": true,
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_overlay_content.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_4 != blank }}",
+          "type": "url",
+          "id": "promo_link_4",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_link.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_4 != blank }}",
+          "type": "text",
+          "id": "promo_tag_4",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_tag.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_4 != blank }}",
+          "type": "color",
+          "id": "promo_color_text_4",
+          "label": "t:sections.global.settings.color_text.label",
+          "default": "#ffffff"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_4 != blank }}",
+          "type": "color",
+          "id": "promo_color_overlay_4",
+          "label": "t:sections.global.settings.color_overlay.label",
+          "default": "#000000"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_4 != blank }}",
+          "type": "range",
+          "id": "promo_overlay_opacity_4",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "t:sections.global.settings.overlay_opacity.label",
+          "default": 40
+        },
+        {
+          "type": "header",
+          "content": "t:sections.header.blocks.mega_menu_tab.settings.header__tab_5.content"
+        },
+        {
+          "type": "text",
+          "id": "tab_target_5",
+          "default": "Tab heading",
+          "label": "t:sections.header.blocks.mega_menu_tab.settings.target.label"
+        },
+        {
+          "type": "url",
+          "id": "tab_target_link_5",
+          "label": "t:sections.header.blocks.mega_menu_tab.settings.target_link.label"
+        },
+        {
+          "type": "product_list",
+          "id": "tab_products_5",
+          "label": "t:sections.global.settings.products.label"
+        },
+        {
+          "type": "image_picker",
+          "id": "tab_icon_5",
+          "label": "t:sections.global.settings.icon_image.label"
+        },
+        {
+          "type": "range",
+          "id": "tab_icon_width_5",
+          "label": "t:sections.global.settings.icon_width.label",
+          "default": 42,
+          "min": 10,
+          "max": 120,
+          "step": 2,
+          "unit": "px"
+        },
+        {
+          "type": "header",
+          "content": "t:sections.header.blocks.mega_menu.settings.header__promo_5.content"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_image_5",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_image.label"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_mobile_image_5",
+          "label": "Mobile image",
+          "info": "Optional mobile-specific image. If provided, this image will be shown on mobile devices instead of the desktop image."
+        },
+        {
+          "type": "text",
+          "id": "abra_promo_code_5",
+          "label": "Abra Promo Code"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_image_abra_5",
+          "label": "Image (Abra)"
+        },
+        {
+          "type": "image_picker",
+          "id": "promo_mobile_image_abra_5",
+          "label": "Mobile image (Abra)",
+          "info": "Optional mobile-specific image. If provided, this image will be shown on mobile devices instead of the desktop image."
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_5 != blank }}",
+          "type": "select",
+          "id": "promo_image_ratio_5",
+          "options": [
+            {
+              "value": "adapt",
+              "label": "t:sections.global.settings.image_ratio.options__1.label"
+            },
+            {
+              "value": "square",
+              "label": "t:sections.global.settings.image_ratio.options__2.label"
+            },
+            {
+              "value": "portrait",
+              "label": "t:sections.global.settings.image_ratio.options__3.label"
+            },
+            {
+              "value": "landscape",
+              "label": "t:sections.global.settings.image_ratio.options__4.label"
+            },
+            {
+              "value": "wide",
+              "label": "t:sections.global.settings.image_ratio.options__5.label"
+            }
+          ],
+          "default": "square",
+          "label": "t:sections.global.settings.image_ratio.label",
+          "info": "t:sections.header.blocks.mega_menu_tab.settings.promo_image_ratio.info"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_5 != blank }}",
+          "type": "text",
+          "id": "promo_heading_5",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_heading.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_5 != blank }}",
+          "type": "inline_richtext",
+          "id": "promo_subtext_5",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_subtext.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_5 != blank }}",
+          "type": "checkbox",
+          "id": "promo_overlay_content_5",
+          "default": true,
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_overlay_content.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_5 != blank }}",
+          "type": "url",
+          "id": "promo_link_5",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_link.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_5 != blank }}",
+          "type": "text",
+          "id": "promo_tag_5",
+          "label": "t:sections.header.blocks.mega_menu.settings.promo_tag.label"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_5 != blank }}",
+          "type": "color",
+          "id": "promo_color_text_5",
+          "label": "t:sections.global.settings.color_text.label",
+          "default": "#ffffff"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_5 != blank }}",
+          "type": "color",
+          "id": "promo_color_overlay_5",
+          "label": "t:sections.global.settings.color_overlay.label",
+          "default": "#000000"
+        },
+        {
+          "visible_if": "{{ block.settings.promo_image_5 != blank }}",
+          "type": "range",
+          "id": "promo_overlay_opacity_5",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "t:sections.global.settings.overlay_opacity.label",
+          "default": 40
         }
       ]
     }
