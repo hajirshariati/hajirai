@@ -348,6 +348,81 @@
 }
 </script>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+(function() {
+  // Map incoming query param names to Searchspring field names.
+  // Add or change mapping keys to match params you will use in marketing links.
+  var mapping = {
+    product_type: 'product_type',
+    ss_gender: 'ss_gender',
+    mfield_custom_category_for_filter: 'mfield_custom_category_for_filter'
+  };
+
+  function buildAndApplySearchspringHash() {
+    try {
+      var params = new URLSearchParams(window.location.search);
+      var parts = [];
+
+      Object.keys(mapping).forEach(function(paramKey) {
+        if (!params.has(paramKey)) return;
+        var raw = params.get(paramKey);
+        if (!raw) return;
+
+        // Support comma-separated multi-values in a single param:
+        var values = raw.split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+        values.forEach(function(v) {
+          // productsFilter:<field>:<value>
+          parts.push('productsFilter:' + encodeURIComponent(mapping[paramKey]) + ':' + encodeURIComponent(v));
+        });
+      });
+
+      if (!parts.length) return;
+
+      var newHash = '#/' + parts.join('/');
+
+      // If the hash is already set to a similar productsFilter, skip replacing
+      if (window.location.hash && window.location.hash.indexOf('#/productsFilter') !== -1) return;
+
+      // Replace URL in-place (no new history entry) so the *initial* clicked URL stays clean for analytics/ads.
+      var newUrl = window.location.pathname + window.location.search + newHash;
+      history.replaceState(null, '', newUrl);
+
+      // Dispatch a hashchange so Searchspring (which listens for hash routing) reacts immediately.
+      window.dispatchEvent(new HashChangeEvent('hashchange'));
+    } catch (e) {
+      // silently fail — nothing catastrophic if it doesn't run
+      console.error('Searchspring param-to-hash conversion failed:', e);
+    }
+  }
+
+  // Run after DOM loaded. If Searchspring takes longer, it still reacts to the hashchange when ready.
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    buildAndApplySearchspringHash();
+  } else {
+    document.addEventListener('DOMContentLoaded', buildAndApplySearchspringHash);
+  }
+})();
+</script>
+
+
 {% schema %}
 {
   "name": "t:sections.main-collection.name",
@@ -998,3 +1073,9 @@
   ]
 }
 {% endschema %}
+
+
+
+
+
+
