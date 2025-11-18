@@ -85,7 +85,7 @@
         </details>
       </li>
     {%- elsif link.links != blank -%}
-      <li>
+      <li data-abra-promo="{{ section.settings.abra_additional_menu_code | handleize }}">
         <details is="details-dropdown" trigger="{% if section.settings.hover_menu %}hover{% else %}click{% endif %}" level="top">
           <summary data-link="{{ link.url }}" class="z-2 relative{% if section.settings.menu_active == 'block' %} rounded-full{% endif %}">
             <magnet-element class="menu__item text-sm-lg flex items-center font-medium z-2 relative cursor-pointer"{% if section.settings.menu_active == 'block' %} data-magnet="0"{% endif %}>
@@ -149,7 +149,7 @@
         </details>
       </li>
     {%- else -%}
-      <li>
+      <li data-abra-promo="{{ section.settings.abra_additional_menu_code | handleize }}">
         <a href="{{ link.url }}" class="menu__item text-sm-lg flex items-center font-medium z-2 relative cursor-pointer" is="magnet-link"{% if section.settings.menu_active == 'block' %} data-magnet="0"{% endif %}>
           <span class="btn-text" data-text>{{ link.title }}</span>
           {%- if section.settings.menu_active == 'block' -%}
