@@ -1554,12 +1554,18 @@
           "default": true,
           "label": "t:sections.header.blocks.mega_menu.settings.promo_overlay_content.label"
         },
-        {
-          "visible_if": "{{ block.settings.promo_image_1 != blank }}",
-          "type": "url",
-          "id": "promo_link_1",
-          "label": "t:sections.header.blocks.mega_menu.settings.promo_link.label"
-        },
+{
+  "visible_if": "{{ section.settings.promo_image_1 != blank }}",
+  "type": "url",
+  "id": "promo_link_1_default",
+  "label": "Link (Default)"
+},
+{
+  "visible_if": "{{ section.settings.promo_image_1 != blank }}",
+  "type": "url",
+  "id": "promo_link_1_abra",
+  "label": "Link (Abra)"
+},
         {
           "visible_if": "{{ block.settings.promo_image_1 != blank }}",
           "type": "text",
