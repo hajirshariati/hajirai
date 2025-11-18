@@ -8370,12 +8370,19 @@ class ProductColorSwatchHandler {
     }
 }
 
-// url can contain ?abralink=vip, and we need to hide data-abra-default with that value, and show data-abra-promo with the same value
 document.addEventListener('DOMContentLoaded', function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const interval = setInterval(() => {
-        let abralink = urlParams.get('abralink');
     
+    const urlParams = new URLSearchParams(window.location.search);
+
+    let abralink = urlParams.get('abralink');
+    if(abralink) {
+        localStorage.setItem('abralink', abralink);
+    }
+    else {
+        abralink = localStorage.getItem('abralink');
+    }
+    
+    const interval = setInterval(() => {
         if(abralink) {
             abralink = abralink.toLowerCase();
             const abraDefault = document.querySelectorAll('[data-abra-default]');
