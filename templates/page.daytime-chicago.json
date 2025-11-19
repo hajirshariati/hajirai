@@ -26,6 +26,7 @@
     },
     "image_with_text_overlay_yHn6tD": {
       "type": "image-with-text-overlay",
+      "disabled": true,
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
@@ -87,6 +88,7 @@
         "text_BEtCVe",
         "liquid_UzytBH"
       ],
+      "disabled": true,
       "name": "t:sections.rich-text.name",
       "settings": {
         "text_alignment": "center",
@@ -169,6 +171,7 @@
         "column_jT9iDK",
         "column_x3rxXJ"
       ],
+      "disabled": true,
       "name": "t:sections.multicolumn.name",
       "settings": {
         "gap": "large",
@@ -227,6 +230,7 @@
       "block_order": [
         "text_aVDtLP"
       ],
+      "disabled": true,
       "name": "t:sections.rich-text.name",
       "settings": {
         "text_alignment": "center",
@@ -261,13 +265,85 @@
         "abra_promo_code_hide": ""
       }
     },
+    "rich_text_86MUrX": {
+      "type": "rich-text",
+      "blocks": {
+        "text_6HVwhc": {
+          "type": "text",
+          "settings": {
+            "text": "<h3>Congratulations to the Winners!</h3>",
+            "text_font": "heading",
+            "text_size": "subtext-xl",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_UEhqxM": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Iris Berry</p><p>Ginny Zemel</p><p>Laura Bingham</p><p>Allison Guglielmi</p><p>Megan Masar</p><p>Joanna Rose</p><p>Michelle Tuite</p><p>Bridget Karnick</p><p>Vanessa Jasek</p><p>Andrea Ketza</p>",
+            "text_font": "heading",
+            "text_size": "subtext-xl",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_6HVwhc",
+        "text_UEhqxM"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "#366d8d",
+        "color_button_background": "#e0e8ee",
+        "color_button_gradient": "",
+        "padding_top": 4,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": true,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
     "rich_text_CqFqBG": {
       "type": "rich-text",
       "blocks": {
         "text_hHEzjP": {
           "type": "text",
           "settings": {
-            "text": "<p>Entries accepted from 11/10/2025 through 11/16/2025. Winners announced on 11/17/2025. No purchase necessary. Click <a href=\"https://www.aetrex.com/pages/aetrex-erica-bennett-giveaway-2025-official-rules\" title=\"https://www.aetrex.com/pages/aetrex-erica-bennett-giveaway-2025-official-rules\">HERE</a> for Official Rules.</p>",
+            "text": "<p>All winners will be contacted via email. Entries accepted from 11/10/2025 through 11/16/2025. Winners announced on 11/17/2025. No purchase necessary. Click <a href=\"https://www.aetrex.com/pages/aetrex-erica-bennett-giveaway-2025-official-rules\" title=\"https://www.aetrex.com/pages/aetrex-erica-bennett-giveaway-2025-official-rules\">HERE</a> for Official Rules. </p>",
             "text_font": "body",
             "text_size": "subtext-sm",
             "text_max_size": 32,
@@ -324,6 +400,7 @@
     "rich_text_Q7yxTL",
     "multicolumn_RxtkQV",
     "rich_text_xYDRKF",
+    "rich_text_86MUrX",
     "rich_text_CqFqBG"
   ]
 }
