@@ -49,6 +49,25 @@
       color: {{ section.settings.menu_link_color_1 }} !important;
     }
   {%- endif -%}
+
+
+  {%- if section.settings.colored_menu_link_2 != blank and section.settings.menu_link_color_2 -%}
+    /* For main menu items */
+    summary[data-link="{{ section.settings.colored_menu_link_2 }}"] .btn-text {
+      color: {{ section.settings.menu_link_color_2 }} !important;
+    }
+    
+    /* For submenu items */
+    a[href="{{ section.settings.colored_menu_link_2 }}"] {
+      color: {{ section.settings.menu_link_color_2 }} !important;
+    }
+    
+    /* For mobile menu */
+    a[href="{{ section.settings.colored_menu_link_2 }}"].drawer__menu-item {
+      color: {{ section.settings.menu_link_color_2 }} !important;
+    }
+  {%- endif -%}
+
 </style>
 
 {%- liquid
@@ -429,6 +448,20 @@
   "type": "color",
   "id": "menu_link_color_1",
   "label": "Color for Link 1",
+  "default": "#bb0000"
+},
+
+{
+  "type": "text",
+  "id": "colored_menu_link_2",
+  "label": "Main Menu Link URL",
+  "default": "/collections/online-exclusive",
+  "info": "Enter the URL path for specific link coloring (e.g., /collections/online-exclusive)"
+},
+{
+  "type": "color",
+  "id": "menu_link_color_2",
+  "label": "Color for Link 2",
   "default": "#bb0000"
 },
 
