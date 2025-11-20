@@ -33,40 +33,32 @@
     }
   {%- endif -%}
 
-  {%- if section.settings.colored_menu_link_1 != blank and section.settings.menu_link_color_1 -%}
-    /* For main menu items */
-    summary[data-link="{{ section.settings.colored_menu_link_1 }}"] .btn-text {
-      color: {{ section.settings.menu_link_color_1 }} !important;
-    }
-    
-    /* For submenu items */
-    a[href="{{ section.settings.colored_menu_link_1 }}"] {
-      color: {{ section.settings.menu_link_color_1 }} !important;
-    }
-    
-    /* For mobile menu */
-    a[href="{{ section.settings.colored_menu_link_1 }}"].drawer__menu-item {
-      color: {{ section.settings.menu_link_color_1 }} !important;
-    }
-  {%- endif -%}
+{%- if section.settings.colored_menu_link_1 != blank and section.settings.menu_link_color_1 -%}
+  /* Desktop main menu */
+  .header__menu summary[data-link="{{ section.settings.colored_menu_link_1 }}"] .btn-text,
+  .header__menu > ul > li > a[href="{{ section.settings.colored_menu_link_1 }}"] .btn-text {
+    color: {{ section.settings.menu_link_color_1 }} !important;
+  }
+
+  /* Mobile drawer menu (top-level only) */
+  .drawer__menu-group > .drawer__menu-item[href="{{ section.settings.colored_menu_link_1 }}"] {
+    color: {{ section.settings.menu_link_color_1 }} !important;
+  }
+{%- endif -%}
 
 
-  {%- if section.settings.colored_menu_link_2 != blank and section.settings.menu_link_color_2 -%}
-    /* For main menu items */
-    summary[data-link="{{ section.settings.colored_menu_link_2 }}"] .btn-text {
-      color: {{ section.settings.menu_link_color_2 }} !important;
-    }
-    
-    /* For submenu items */
-    a[href="{{ section.settings.colored_menu_link_2 }}"] {
-      color: {{ section.settings.menu_link_color_2 }} !important;
-    }
-    
-    /* For mobile menu */
-    a[href="{{ section.settings.colored_menu_link_2 }}"].drawer__menu-item {
-      color: {{ section.settings.menu_link_color_2 }} !important;
-    }
-  {%- endif -%}
+{%- if section.settings.colored_menu_link_2 != blank and section.settings.menu_link_color_2 -%}
+  /* Desktop main menu */
+  .header__menu summary[data-link="{{ section.settings.colored_menu_link_2 }}"] .btn-text,
+  .header__menu > ul > li > a[href="{{ section.settings.colored_menu_link_2 }}"] .btn-text {
+    color: {{ section.settings.menu_link_color_2 }} !important;
+  }
+
+  /* Mobile drawer menu (top-level only) */
+  .drawer__menu-group > .drawer__menu-item[href="{{ section.settings.colored_menu_link_2 }}"] {
+    color: {{ section.settings.menu_link_color_2 }} !important;
+  }
+{%- endif -%}
 
 </style>
 
