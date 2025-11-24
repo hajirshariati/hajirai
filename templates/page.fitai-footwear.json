@@ -137,7 +137,7 @@
             "button_label": "Read the Press Release",
             "button_link": "https://www.businesswire.com/news/home/20231128895456/en/Aetrex-Launches-FitStarter-Technology-Platform-to-Offer-Retailers-Immediate-Footwear-Fitting-Solution",
             "button_style": "primary",
-            "button_size": "md",
+            "button_size": "sm",
             "button_external": false,
             "button_icon": false
           }
