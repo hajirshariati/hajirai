@@ -401,7 +401,7 @@
           "settings": {
             "button_label": "Consumers: Find a Foot Scanner Near You",
             "button_link": "https://www.aetrex.com/pages/store-locator",
-            "button_style": "link",
+            "button_style": "primary",
             "button_size": "sm",
             "button_external": false,
             "button_icon": false
@@ -412,7 +412,7 @@
           "settings": {
             "button_label": "Retailers: Book a Demo",
             "button_link": "https://irle3andv1z.typeform.com/to/V3YAATXm",
-            "button_style": "link",
+            "button_style": "primary",
             "button_size": "sm",
             "button_external": false,
             "button_icon": false
