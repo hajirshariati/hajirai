@@ -136,7 +136,7 @@
           "settings": {
             "button_label": "Read the Press Release",
             "button_link": "https://www.businesswire.com/news/home/20231128895456/en/Aetrex-Launches-FitStarter-Technology-Platform-to-Offer-Retailers-Immediate-Footwear-Fitting-Solution",
-            "button_style": "link",
+            "button_style": "primary",
             "button_size": "md",
             "button_external": false,
             "button_icon": false
@@ -220,7 +220,7 @@
             "button_label": "Article in Footwear News",
             "button_link": "https://footwearnews.com/business/business-news/aetrex-launches-fitstarter-shoe-fitting-service-platform-1203561509/",
             "button_video_link": "",
-            "button_style": "link",
+            "button_style": "primary",
             "button_size": "sm",
             "button_external": false,
             "button_icon": false
@@ -232,7 +232,7 @@
             "button_label": "Feature in Sourcing Journal",
             "button_link": "https://sourcingjournal.com/footwear/footwear-retail/aetrex-heeluxe-fitstarter-footwear-recommendation-technology-albert-fitsense-471287/",
             "button_video_link": "",
-            "button_style": "link",
+            "button_style": "primary",
             "button_size": "sm",
             "button_external": false,
             "button_icon": false
@@ -268,7 +268,7 @@
         "color_button_background": "",
         "color_button_gradient": "",
         "padding_top": 24,
-        "padding_bottom": 24,
+        "padding_bottom": 48,
         "divider": false,
         "full_width": false,
         "rounded": false,
@@ -278,10 +278,191 @@
         "abra_promo_code_hide": ""
       }
     },
-    "image_with_text_hCACNV": {
+    "slideshow_qX4H47": {
+      "type": "slideshow",
+      "blocks": {
+        "image_4HhJxL": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/undefined.jpg",
+            "image_mobile": "shopify://shop_images/undefined.jpg",
+            "heading": "",
+            "heading_size": "title-lg tracking-heading",
+            "heading_tag": "h2",
+            "text": "",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color_text": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "image_JzNLxY": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/undefined_1.jpg",
+            "image_mobile": "shopify://shop_images/undefined_1.jpg",
+            "heading": "",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "text": "",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color_text": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "image_4HhJxL",
+        "image_JzNLxY"
+      ],
+      "name": "t:sections.slideshow.name",
+      "settings": {
+        "autoplay": true,
+        "autoplay_speed": 4,
+        "show_navigation": true,
+        "image_height": "adapt",
+        "content_width": "small",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "center",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-center justify-center",
+        "text_alignment_mobile": "center",
+        "accessibility_info": "",
+        "color_text": "#ffffff",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "horizontal",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "rich_text_VqiyPw": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_J6QWXi": {
+          "type": "heading",
+          "settings": {
+            "heading": "FitAI Online- After 5,000 Matching Data Points",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_piXTpr": {
+          "type": "text",
+          "settings": {
+            "text": "<p>As the FitAI InStore program gains traction, retailers can unlock new features that enhance the customer experience further. Once a retailer collects 5,000 scan to in-store purchase matching data points, <strong>FitAI Online</strong> can be activated. The software system can now begin using machine learning to refine its fit predictions, leveraging real-world buying behavior to move beyond rules-based matching and deliver even more accurate, data-driven recommendations. At this stage, shoppers who had previously completed a scan in store can identify themselves on the retailer’s website to receive personalized fit recommendations for available shoes.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_ekngGF": {
+          "type": "button",
+          "settings": {
+            "button_label": "Consumers: Find a Foot Scanner Near You",
+            "button_link": "https://www.aetrex.com/pages/store-locator",
+            "button_style": "link",
+            "button_size": "sm",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_hn8Xyn": {
+          "type": "button",
+          "settings": {
+            "button_label": "Retailers: Book a Demo",
+            "button_link": "https://irle3andv1z.typeform.com/to/V3YAATXm",
+            "button_style": "link",
+            "button_size": "sm",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_J6QWXi",
+        "text_piXTpr",
+        "button_ekngGF",
+        "button_hn8Xyn"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 100,
+        "divider": false,
+        "narrow": true,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "image_with_text_J7Dkq9": {
       "type": "image-with-text",
       "blocks": {
-        "text_XEzAbi": {
+        "text_Tyj7K6": {
           "type": "text",
           "settings": {
             "text": "<p>FitAI Online- After 5,000 Matching Data Points</p>",
@@ -296,7 +477,7 @@
             "highlighted_scribble": "circle"
           }
         },
-        "text_DPg6ET": {
+        "text_BkVEA8": {
           "type": "text",
           "settings": {
             "text": "<p>As the FitAI InStore program gains traction, retailers can unlock new features that enhance the customer experience further. Once a retailer collects 5,000 scan to in-store purchase matching data points, <strong>FitAI Online</strong> can be activated. The software system can now begin using machine learning to refine its fit predictions, leveraging real-world buying behavior to move beyond rules-based matching and deliver even more accurate, data-driven recommendations. At this stage, shoppers who had previously completed a scan in store can identify themselves on the retailer’s website to receive personalized fit recommendations for available shoes.</p>",
@@ -311,7 +492,7 @@
             "highlighted_scribble": "circle"
           }
         },
-        "button_nFJeLK": {
+        "button_f8pjxX": {
           "type": "button",
           "settings": {
             "button_label": "Consumers: Find a Foot Scanner Near You",
@@ -323,7 +504,7 @@
             "button_icon": false
           }
         },
-        "button_ypPfJw": {
+        "button_N7VP6U": {
           "type": "button",
           "settings": {
             "button_label": "Retailers: Book a Demo",
@@ -337,11 +518,12 @@
         }
       },
       "block_order": [
-        "text_XEzAbi",
-        "text_DPg6ET",
-        "button_nFJeLK",
-        "button_ypPfJw"
+        "text_Tyj7K6",
+        "text_BkVEA8",
+        "button_f8pjxX",
+        "button_N7VP6U"
       ],
+      "disabled": true,
       "name": "Image with text",
       "settings": {
         "image": "shopify://shop_images/602x367_FitGenius.jpg",
@@ -374,6 +556,333 @@
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
+    },
+    "logo_list_iJdYbz": {
+      "type": "logo-list",
+      "blocks": {
+        "logo_9gMcCG": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/undefined.jpg",
+            "height": 200,
+            "link": ""
+          }
+        },
+        "logo_WwT6Mq": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/undefined_1.jpg",
+            "height": 200,
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "logo_9gMcCG",
+        "logo_WwT6Mq"
+      ],
+      "name": "t:sections.logo-list.name",
+      "settings": {
+        "layout": "marquee",
+        "grid_horizontal": 50,
+        "direction": "left",
+        "speed": 3,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "text",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "rich_text_PDfTMm": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_ptJB7T": {
+          "type": "heading",
+          "settings": {
+            "heading": "FitAI Online- After 5,000 Matching Data Points",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_daJTx6": {
+          "type": "text",
+          "settings": {
+            "text": "<p>As the FitAI InStore program gains traction, retailers can unlock new features that enhance the customer experience further. Once a retailer collects 5,000 scan to in-store purchase matching data points, <strong>FitAI Online</strong> can be activated. The software system can now begin using machine learning to refine its fit predictions, leveraging real-world buying behavior to move beyond rules-based matching and deliver even more accurate, data-driven recommendations. At this stage, shoppers who had previously completed a scan in store can identify themselves on the retailer’s website to receive personalized fit recommendations for available shoes.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_EDBnfT": {
+          "type": "button",
+          "settings": {
+            "button_label": "Consumers: Find a Foot Scanner Near You",
+            "button_link": "https://www.aetrex.com/pages/store-locator",
+            "button_style": "primary",
+            "button_size": "sm",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_gkBaai": {
+          "type": "button",
+          "settings": {
+            "button_label": "Retailers: Book a Demo",
+            "button_link": "https://irle3andv1z.typeform.com/to/V3YAATXm",
+            "button_style": "primary",
+            "button_size": "sm",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_ptJB7T",
+        "text_daJTx6",
+        "button_EDBnfT",
+        "button_gkBaai"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 100,
+        "divider": false,
+        "narrow": true,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "multicolumn_WdzQBH": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_ehG6UC": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/undefined.jpg",
+            "image_ratio": "square",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "custom_html": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_UFDLak": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/undefined_1.jpg",
+            "image_ratio": "square",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "custom_html": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_ehG6UC",
+        "column_UFDLak"
+      ],
+      "name": "t:sections.multicolumn.name",
+      "settings": {
+        "gap": "small",
+        "columns": 2,
+        "columns_mobile": "1",
+        "carousel_on_desktop": false,
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "text",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "full_width": true,
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "rich_text_WY8DGR": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_HbnTWn": {
+          "type": "heading",
+          "settings": {
+            "heading": "FitAI Online- After 5,000 Matching Data Points",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_RH9jp6": {
+          "type": "text",
+          "settings": {
+            "text": "<p>As the FitAI InStore program gains traction, retailers can unlock new features that enhance the customer experience further. Once a retailer collects 5,000 scan to in-store purchase matching data points, <strong>FitAI Online</strong> can be activated. The software system can now begin using machine learning to refine its fit predictions, leveraging real-world buying behavior to move beyond rules-based matching and deliver even more accurate, data-driven recommendations. At this stage, shoppers who had previously completed a scan in store can identify themselves on the retailer’s website to receive personalized fit recommendations for available shoes.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_F9XEbN": {
+          "type": "button",
+          "settings": {
+            "button_label": "Consumers: Find a Foot Scanner Near You",
+            "button_link": "https://www.aetrex.com/pages/store-locator",
+            "button_style": "primary",
+            "button_size": "sm",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_BMafkD": {
+          "type": "button",
+          "settings": {
+            "button_label": "Retailers: Book a Demo",
+            "button_link": "https://irle3andv1z.typeform.com/to/V3YAATXm",
+            "button_style": "primary",
+            "button_size": "sm",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_HbnTWn",
+        "text_RH9jp6",
+        "button_F9XEbN",
+        "button_BMafkD"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 48,
+        "divider": false,
+        "narrow": true,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
     }
   },
   "order": [
@@ -382,6 +891,12 @@
     "rich_text_MLXerj",
     "rich_text_AhWdpk",
     "image_with_text_cqHnCf",
-    "image_with_text_hCACNV"
+    "slideshow_qX4H47",
+    "rich_text_VqiyPw",
+    "image_with_text_J7Dkq9",
+    "logo_list_iJdYbz",
+    "rich_text_PDfTMm",
+    "multicolumn_WdzQBH",
+    "rich_text_WY8DGR"
   ]
 }
