@@ -268,7 +268,7 @@
         "color_button_background": "",
         "color_button_gradient": "",
         "padding_top": 24,
-        "padding_bottom": 48,
+        "padding_bottom": 24,
         "divider": false,
         "full_width": false,
         "rounded": false,
@@ -278,10 +278,10 @@
         "abra_promo_code_hide": ""
       }
     },
-    "multicolumn_WdzQBH": {
+    "multicolumn_N4rVgM": {
       "type": "multicolumn",
       "blocks": {
-        "column_ehG6UC": {
+        "column_ijdhPy": {
           "type": "column",
           "settings": {
             "show_border": false,
@@ -302,7 +302,7 @@
             "highlighted_scribble": "circle"
           }
         },
-        "column_UFDLak": {
+        "column_NQ9zND": {
           "type": "column",
           "settings": {
             "show_border": false,
@@ -325,8 +325,8 @@
         }
       },
       "block_order": [
-        "column_ehG6UC",
-        "column_UFDLak"
+        "column_ijdhPy",
+        "column_NQ9zND"
       ],
       "name": "t:sections.multicolumn.name",
       "settings": {
@@ -355,7 +355,7 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 0,
+        "padding_top": 24,
         "padding_bottom": 0,
         "full_width": true,
         "divider": false,
@@ -364,20 +364,25 @@
         "abra_promo_code_hide": ""
       }
     },
-    "rich_text_WY8DGR": {
+    "rich_text_fNHedU": {
       "type": "rich-text",
       "blocks": {
-        "heading_HbnTWn": {
-          "type": "heading",
+        "text_3jc44P": {
+          "type": "text",
           "settings": {
-            "heading": "FitAI Online- After 5,000 Matching Data Points",
-            "heading_size": "title-sm",
-            "heading_tag": "h3",
-            "highlighted_text": "text",
+            "text": "<p>FitAI Online- After 5,000 Matching Data Points</p>",
+            "text_font": "heading",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         },
-        "text_RH9jp6": {
+        "text_8xPgk6": {
           "type": "text",
           "settings": {
             "text": "<p>As the FitAI InStore program gains traction, retailers can unlock new features that enhance the customer experience further. Once a retailer collects 5,000 scan to in-store purchase matching data points, <strong>FitAI Online</strong> can be activated. The software system can now begin using machine learning to refine its fit predictions, leveraging real-world buying behavior to move beyond rules-based matching and deliver even more accurate, data-driven recommendations. At this stage, shoppers who had previously completed a scan in store can identify themselves on the retailer’s website to receive personalized fit recommendations for available shoes.</p>",
@@ -392,7 +397,7 @@
             "highlighted_scribble": "circle"
           }
         },
-        "button_F9XEbN": {
+        "button_tPFHen": {
           "type": "button",
           "settings": {
             "button_label": "Consumers: Find a Foot Scanner Near You",
@@ -403,7 +408,7 @@
             "button_icon": false
           }
         },
-        "button_BMafkD": {
+        "button_9jD3Xg": {
           "type": "button",
           "settings": {
             "button_label": "Retailers: Book a Demo",
@@ -416,10 +421,10 @@
         }
       },
       "block_order": [
-        "heading_HbnTWn",
-        "text_RH9jp6",
-        "button_F9XEbN",
-        "button_BMafkD"
+        "text_3jc44P",
+        "text_8xPgk6",
+        "button_tPFHen",
+        "button_9jD3Xg"
       ],
       "name": "t:sections.rich-text.name",
       "settings": {
@@ -462,7 +467,7 @@
     "rich_text_MLXerj",
     "rich_text_AhWdpk",
     "image_with_text_cqHnCf",
-    "multicolumn_WdzQBH",
-    "rich_text_WY8DGR"
+    "multicolumn_N4rVgM",
+    "rich_text_fNHedU"
   ]
 }
