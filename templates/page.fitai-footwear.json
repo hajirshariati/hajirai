@@ -278,104 +278,6 @@
         "abra_promo_code_hide": ""
       }
     },
-    "image_with_text_J7Dkq9": {
-      "type": "image-with-text",
-      "blocks": {
-        "text_Tyj7K6": {
-          "type": "text",
-          "settings": {
-            "text": "<p>FitAI Online- After 5,000 Matching Data Points</p>",
-            "text_font": "heading",
-            "text_size": "subtext-custom",
-            "text_max_size": 32,
-            "text_line_height": 1.2,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_BkVEA8": {
-          "type": "text",
-          "settings": {
-            "text": "<p>As the FitAI InStore program gains traction, retailers can unlock new features that enhance the customer experience further. Once a retailer collects 5,000 scan to in-store purchase matching data points, <strong>FitAI Online</strong> can be activated. The software system can now begin using machine learning to refine its fit predictions, leveraging real-world buying behavior to move beyond rules-based matching and deliver even more accurate, data-driven recommendations. At this stage, shoppers who had previously completed a scan in store can identify themselves on the retailer’s website to receive personalized fit recommendations for available shoes.</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_f8pjxX": {
-          "type": "button",
-          "settings": {
-            "button_label": "Consumers: Find a Foot Scanner Near You",
-            "button_link": "https://www.aetrex.com/pages/store-locator",
-            "button_video_link": "",
-            "button_style": "link",
-            "button_size": "sm",
-            "button_external": false,
-            "button_icon": false
-          }
-        },
-        "button_N7VP6U": {
-          "type": "button",
-          "settings": {
-            "button_label": "Retailers: Book a Demo",
-            "button_link": "https://irle3andv1z.typeform.com/to/V3YAATXm",
-            "button_video_link": "",
-            "button_style": "link",
-            "button_size": "sm",
-            "button_external": false,
-            "button_icon": false
-          }
-        }
-      },
-      "block_order": [
-        "text_Tyj7K6",
-        "text_BkVEA8",
-        "button_f8pjxX",
-        "button_N7VP6U"
-      ],
-      "disabled": true,
-      "name": "Image with text",
-      "settings": {
-        "image": "shopify://shop_images/602x367_FitGenius.jpg",
-        "img_url": "",
-        "image_height": "adapt",
-        "image_width": "small",
-        "layout": "text_first",
-        "text_alignment": "left",
-        "custom_content_position": "items-center",
-        "image_mobile": "shopify://shop_images/602x367_FitGenius.jpg",
-        "image_height_mobile": "adapt",
-        "text_alignment_mobile": "left",
-        "color_text": "rgba(0,0,0,0)",
-        "color_background": "",
-        "gradient_background": "",
-        "color_background_2": "",
-        "gradient_background_2": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 48,
-        "padding_bottom": 48,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "enable_parallax": false,
-        "parallax_direction": "vertical",
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
     "multicolumn_WdzQBH": {
       "type": "multicolumn",
       "blocks": {
@@ -544,7 +446,7 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 0,
+        "padding_top": 24,
         "padding_bottom": 48,
         "divider": false,
         "narrow": true,
@@ -560,7 +462,6 @@
     "rich_text_MLXerj",
     "rich_text_AhWdpk",
     "image_with_text_cqHnCf",
-    "image_with_text_J7Dkq9",
     "multicolumn_WdzQBH",
     "rich_text_WY8DGR"
   ]
