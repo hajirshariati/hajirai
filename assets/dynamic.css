@@ -1034,3 +1034,7 @@ body .yotpo-reviews-main-widget svg {
     top: 0;
     z-index: 9;
 }
+
+.product-form__submit[disabled] {
+    padding-inline: 10px;
+}
