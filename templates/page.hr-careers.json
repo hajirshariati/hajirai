@@ -34,6 +34,9 @@
             "text_font": "body",
             "text_size": "subtext-custom",
             "text_max_size": 40,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -72,7 +75,9 @@
         "padding_bottom": 8,
         "divider": false,
         "narrow": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "video_EfKRVM": {
@@ -93,7 +98,9 @@
         "padding_bottom": 24,
         "divider": false,
         "full_width": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_MBhVy9": {
@@ -106,6 +113,9 @@
             "text_font": "body",
             "text_size": "subtext-custom",
             "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -144,14 +154,16 @@
         "padding_bottom": 0,
         "divider": false,
         "narrow": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "custom_liquid_93Rwi9": {
       "type": "custom-liquid",
       "name": "Custom Liquid",
       "settings": {
-        "liquid": "<div>\n<div class=\"sk-ww-linkedin-page-jobs\" data-embed-id=\"116379\"></div>\n<script src=\"https://widgets.sociablekit.com/linkedin-page-jobs/widget.js\" defer></script>\n</div>",
+        "liquid": "<!--div>\n<div class=\"sk-ww-linkedin-page-jobs\" data-embed-id=\"116379\"></div>\n<script src=\"https://widgets.sociablekit.com/linkedin-page-jobs/widget.js\" defer></script>\n</div-->",
         "color_text": "",
         "color_background": "",
         "gradient_background": "",
@@ -162,7 +174,9 @@
         "padding_bottom": 72,
         "divider": false,
         "narrow": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     }
   },
