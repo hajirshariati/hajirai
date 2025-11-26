@@ -182,9 +182,9 @@
                                       assign money_price = item.original_price | money_with_currency
                                     endif
                                   -%}
-                                  {%- if item.original_price != item.final_price -%}
+                                  {%- if item.product.compare_at_price > 0 and item.product.compare_at_price != item.final_price -%}
                                     <span class="sr-only">{{ 'products.price.regular_price' | t }}</span>
-                                    <span class="price__sale inline-flex items-center relative">{{ money_price }}</span>
+                                    <span class="price__sale inline-flex items-center relative">{{ item.product.compare_at_price | money }}</span>
                                     <span class="sr-only">{{ 'products.price.sale_price' | t }}</span>
                                     <span class="price__regular whitespace-nowrap">
                                       {%- liquid
