@@ -94,7 +94,7 @@
       "settings": {
         "collection": "premium-memory-foam",
         "products": [],
-        "product_limit": 6,
+        "product_limit": 8,
         "columns": 4,
         "carousel_on_desktop": true,
         "show_view_all": false,
