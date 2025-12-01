@@ -11,6 +11,7 @@
   "sections": {
     "main-page": {
       "type": "main-page",
+      "disabled": true,
       "settings": {
         "heading_size": "title-sm",
         "heading_alignment": "text-left",
@@ -22,9 +23,649 @@
         "narrow": true,
         "rounded": false
       }
+    },
+    "slideshow_YULkAz": {
+      "type": "slideshow",
+      "blocks": {
+        "image_hQJFhd": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/banner7.jpg",
+            "image_mobile": "shopify://shop_images/banner_M_02.jpg",
+            "heading": "",
+            "heading_size": "title-lg tracking-heading",
+            "heading_tag": "h2",
+            "text": "",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color_text": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "image_hQJFhd"
+      ],
+      "name": "t:sections.slideshow.name",
+      "settings": {
+        "autoplay": false,
+        "autoplay_speed": 5,
+        "show_navigation": true,
+        "image_height": "650px",
+        "content_width": "small",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
+        "accessibility_info": "",
+        "color_text": "#ffffff",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "featured_collection_KCLXxt": {
+      "type": "featured-collection",
+      "name": "t:sections.featured-collection.name",
+      "settings": {
+        "collection": "premium-memory-foam",
+        "products": [],
+        "product_limit": 6,
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "show_view_all": false,
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "heading": "Add Aetrex Comfort In All Your Shoes",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "image_with_text_EXN6iG": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_zwifUd": {
+          "type": "heading",
+          "settings": {
+            "heading": "World’s Only Orthotic Engineered Based On 30 Million Foot Scans and Backed by Clinical Proof",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_wBV3LE": {
+          "type": "text",
+          "settings": {
+            "text": "<ul><li>Signature Arch Support</li><li>Pressure Relief & Shock Absorption</li><li>Clinically Proven To Help Relieve Foot Pain</li><li>Designed based on 30 Million Foot Scans</li><li>Over 10 Million Pairs Sold</li><li>Premium Materials That Support Natural Foot Movement</li></ul>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_zwifUd",
+        "text_wBV3LE"
+      ],
+      "name": "t:sections.image-with-text.name",
+      "settings": {
+        "image": "shopify://shop_images/scan.gif",
+        "img_url": "",
+        "image_height": "650px",
+        "image_width": "medium",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "multicolumn_6h9Uec": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_EPKYPA": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "left",
+            "text_alignment_mobile": "left",
+            "image": "shopify://shop_images/PMF5.jpg",
+            "image_ratio": "adapt",
+            "heading": "For Normal Arch Type",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Great Starting Pick </p>",
+            "custom_html": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_x6VnRX": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "left",
+            "text_alignment_mobile": "left",
+            "image": "shopify://shop_images/PMF2.jpg",
+            "image_ratio": "adapt",
+            "heading": "With Posted Heel",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Relief for Flat Feet and Plantar Fasciitis</p>",
+            "custom_html": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_AtPjXc": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "left",
+            "text_alignment_mobile": "left",
+            "image": "shopify://shop_images/PMF1_b006e183-e1d9-4220-93ee-9c0c9760546a.jpg",
+            "image_ratio": "adapt",
+            "heading": "With Met Pad",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Relief for Forefoot Pain </p>",
+            "custom_html": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_PGxRr3": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "left",
+            "text_alignment_mobile": "left",
+            "image": "shopify://shop_images/PMF4.jpg",
+            "image_ratio": "adapt",
+            "heading": "With Posted Heel & Met Pad",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Relief for Flat Feet and Forefoot Pain</p>",
+            "custom_html": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_EPKYPA",
+        "column_x6VnRX",
+        "column_AtPjXc",
+        "column_PGxRr3"
+      ],
+      "name": "t:sections.multicolumn.name",
+      "settings": {
+        "gap": "large",
+        "columns": 4,
+        "columns_mobile": "2",
+        "carousel_on_desktop": false,
+        "swipe_on_mobile": true,
+        "heading": "Relieve Different Foot Conditions",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "Customized To Help",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "full_width": false,
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "rich_text_bkFnGQ": {
+      "type": "rich-text",
+      "blocks": {
+        "icon_3qi4Cm": {
+          "type": "icon",
+          "settings": {
+            "icon": "award",
+            "iwidth": "custom",
+            "icon_width": 48,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "heading_axfjaD": {
+          "type": "heading",
+          "settings": {
+            "heading": "Recommended By Doctors and Podiatrists",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "icon_3qi4Cm",
+        "heading_axfjaD"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#ffffff",
+        "color_background": "#487a80",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": true,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "rich_text_WYrTm3": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_DjGJJb": {
+          "type": "heading",
+          "settings": {
+            "heading": "What Makes Aetrex Premium Memory Foam Orthotics Better Than Others",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_DjGJJb"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 100,
+        "divider": false,
+        "narrow": true,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "image_with_text_bNBn9R": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_GAwAgU": {
+          "type": "heading",
+          "settings": {
+            "heading": "Superior Arch Support",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_YfFkcD": {
+          "type": "text",
+          "settings": {
+            "text": "<p>The contour, position and height of Aetrex’s unique arch support aligns anatomically in the proper place to help support our bodies from the ground up.<br/><br/>Clinical studies have confirmed that Aetrex Orthotics positively impact the human foot & leg and helps provide alignment, stability and arch support.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_LWXwBF": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://collections/premium-memory-foam",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_GAwAgU",
+        "text_YfFkcD",
+        "button_LWXwBF"
+      ],
+      "name": "t:sections.image-with-text.name",
+      "settings": {
+        "image": "shopify://shop_images/other2.jpg",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "large",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "image_with_text_GVXQip": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_G67LPe": {
+          "type": "heading",
+          "settings": {
+            "heading": "Premium Materials",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_abyRmB": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Goodbye plastics and other hard, uncomfortable materials. The Aetrex Orthotics Collection utilizes premium, shock absorbing materials designed to cushion and support the body while protecting the foot.<br/><br/>The collection integrates high-tech, light-weight, modern materials such as memory foams, polyurethanes, and slow recovery foams.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_G67LPe",
+        "text_abyRmB"
+      ],
+      "name": "t:sections.image-with-text.name",
+      "settings": {
+        "image": "shopify://shop_images/material_710b11d1-535d-455b-985f-bc23ade4f106.jpg",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "large",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "image_with_text_fX6cAj": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_Xwp478": {
+          "type": "heading",
+          "settings": {
+            "heading": "Equal Distribution Of Pressure",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_6xwbig": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Our feet were meant to walk on soft surfaces like grass or sand. Today, we walk mostly on hard surfaces and our feet aren’t able to distribute pressure evenly.<br/><br/>Aetrex Orthotics help transfer pressure away from high pressure areas and create an equal distribution of pressure as we walk and run.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_FGMxRC": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://collections/premium-memory-foam",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_Xwp478",
+        "text_6xwbig",
+        "button_FGMxRC"
+      ],
+      "name": "t:sections.image-with-text.name",
+      "settings": {
+        "image": "shopify://shop_images/pressure.jpg",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "large",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
     }
   },
   "order": [
-    "main-page"
+    "main-page",
+    "slideshow_YULkAz",
+    "featured_collection_KCLXxt",
+    "image_with_text_EXN6iG",
+    "multicolumn_6h9Uec",
+    "rich_text_bkFnGQ",
+    "rich_text_WYrTm3",
+    "image_with_text_bNBn9R",
+    "image_with_text_GVXQip",
+    "image_with_text_fX6cAj"
   ]
 }
