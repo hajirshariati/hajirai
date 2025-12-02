@@ -165,7 +165,7 @@
             "vertical": 28,
             "horizontal": 61,
             "vertical_mobile": 21,
-            "horizontal_mobile": 50
+            "horizontal_mobile": 35
           }
         },
         "content_HF7yEU": {
@@ -180,8 +180,8 @@
             "color_text": "#74a5ba",
             "vertical": 48,
             "horizontal": 39,
-            "vertical_mobile": 32,
-            "horizontal_mobile": 19
+            "vertical_mobile": 53,
+            "horizontal_mobile": 16
           }
         },
         "content_LjVywH": {
@@ -213,8 +213,8 @@
             "color_text": "#74a5ba",
             "vertical": 56,
             "horizontal": 52,
-            "vertical_mobile": 39,
-            "horizontal_mobile": 44
+            "vertical_mobile": 57,
+            "horizontal_mobile": 37
           }
         },
         "content_Kxzeti": {
@@ -229,7 +229,7 @@
             "color_text": "#74a5ba",
             "vertical": 70,
             "horizontal": 75,
-            "vertical_mobile": 46,
+            "vertical_mobile": 64,
             "horizontal_mobile": 73
           }
         }
