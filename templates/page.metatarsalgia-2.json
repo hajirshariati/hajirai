@@ -40,7 +40,7 @@
         "text_LHGLnM": {
           "type": "text",
           "settings": {
-            "text": "<p>Metatarsalgia is a general term used to denote a painful foot condition in the metatarsal region of the foot (the area just before the toes, more commonly referred to as the ball-of-the-foot). This is a common foot disorder that can affect the bones and joints at the ball-of-the-foot. Metatarsalgia (ball-of-foot-pain) is often located under the 2nd, 3rd, and 4th metatarsal heads, or more isolated at the first metatarsal head (near the big toe).</p>",
+            "text": "<p>Metatarsalgia is a term used to describe pain in the metatarsal region of the foot, commonly known as the ball-of-the-foot. This condition affects the bones and joints at the ball-of-the-foot, often located under the 2nd, 3rd, and 4th metatarsal heads, or more isolated at the first metatarsal head near the big toe.<br/><br/>Improperly fitting footwear, especially women’s dress shoes and other restrictive shoes, commonly causes ball-of-foot pain. Additional causes of excessive pressure in the ball-of-foot area include high heels, high-impact activities without proper footwear or orthotics, and thinning of the fat pad in the foot with age.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -66,7 +66,7 @@
         "content_position": "md:items-center md:justify-start",
         "text_alignment": "left",
         "image_mobile": "shopify://shop_images/Group_19_1.png",
-        "image_height_mobile": "400px",
+        "image_height_mobile": "600px",
         "content_position_mobile": "items-center justify-center",
         "text_alignment_mobile": "left",
         "color_text": "#171717",
