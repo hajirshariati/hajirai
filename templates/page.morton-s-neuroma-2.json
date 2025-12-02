@@ -164,7 +164,7 @@
             "color_text": "#74a5ba",
             "vertical": 36,
             "horizontal": 66,
-            "vertical_mobile": 16,
+            "vertical_mobile": 30,
             "horizontal_mobile": 16
           }
         },
@@ -180,8 +180,8 @@
             "color_text": "#74a5ba",
             "vertical": 48,
             "horizontal": 39,
-            "vertical_mobile": 35,
-            "horizontal_mobile": 16
+            "vertical_mobile": 64,
+            "horizontal_mobile": 12
           }
         },
         "content_LjVywH": {
@@ -213,7 +213,7 @@
             "color_text": "#74a5ba",
             "vertical": 56,
             "horizontal": 52,
-            "vertical_mobile": 44,
+            "vertical_mobile": 69,
             "horizontal_mobile": 48
           }
         },
@@ -229,8 +229,8 @@
             "color_text": "#74a5ba",
             "vertical": 70,
             "horizontal": 75,
-            "vertical_mobile": 46,
-            "horizontal_mobile": 80
+            "vertical_mobile": 71,
+            "horizontal_mobile": 89
           }
         }
       },
