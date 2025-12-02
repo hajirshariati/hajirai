@@ -131,8 +131,8 @@
         "content_width": "small",
         "content_position": "md:items-end md:justify-start",
         "text_alignment": "left",
-        "image_mobile": "shopify://shop_images/Group_7_f05d6d9c-ad86-49bd-9e2e-2fd3063a6bd3.png",
-        "image_height_mobile": "100vh",
+        "image_mobile": "shopify://shop_images/Group_19_1.png",
+        "image_height_mobile": "adapt",
         "content_position_mobile": "items-center justify-center",
         "text_alignment_mobile": "left",
         "color_text": "#171717",
@@ -230,7 +230,7 @@
             "color_text": "#74a5ba",
             "vertical": 21,
             "horizontal": 45,
-            "vertical_mobile": 16,
+            "vertical_mobile": 23,
             "horizontal_mobile": 42
           }
         },
@@ -246,8 +246,8 @@
             "color_text": "#74a5ba",
             "vertical": 48,
             "horizontal": 39,
-            "vertical_mobile": 54,
-            "horizontal_mobile": 40
+            "vertical_mobile": 41,
+            "horizontal_mobile": 16
           }
         },
         "content_enWUHR": {
@@ -279,8 +279,8 @@
             "color_text": "#74a5ba",
             "vertical": 56,
             "horizontal": 52,
-            "vertical_mobile": 56,
-            "horizontal_mobile": 56
+            "vertical_mobile": 41,
+            "horizontal_mobile": 37
           }
         },
         "content_Q3zqni": {
@@ -295,7 +295,7 @@
             "color_text": "#74a5ba",
             "vertical": 70,
             "horizontal": 75,
-            "vertical_mobile": 69,
+            "vertical_mobile": 48,
             "horizontal_mobile": 73
           }
         }
@@ -310,7 +310,7 @@
       "name": "t:sections.lookbook.name",
       "settings": {
         "image": "shopify://shop_images/Group_18_15b06015-9b33-4a8d-adb5-e059ed32723b.png",
-        "image_mobile": "shopify://shop_images/Group_18_15b06015-9b33-4a8d-adb5-e059ed32723b.png",
+        "image_mobile": "shopify://shop_images/Frame_55.png",
         "heading": "",
         "heading_size": "title-sm",
         "heading_alignment": "text-center md:items-center",
