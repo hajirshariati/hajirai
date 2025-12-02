@@ -557,7 +557,7 @@
             "overlay_content": true,
             "color_text": "#ffffff",
             "color_overlay": "#000000",
-            "overlay_opacity": 30,
+            "overlay_opacity": 40,
             "submenu_title_position": "center",
             "enable_title_drop_shadow": true
           }

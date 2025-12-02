@@ -302,7 +302,7 @@
         "description": "",
         "highlighted_text": "text",
         "highlighted_scribble": "circle",
-        "color_text": "#171717",
+        "color_text": "#74a5ba",
         "color_background": "#ffffff",
         "gradient_background": "",
         "color_highlight": "",
@@ -328,7 +328,7 @@
             "text": "<p>What Other Bunion Sufferers Say</p>",
             "text_font": "heading",
             "text_size": "subtext-custom",
-            "text_max_size": 24,
+            "text_max_size": 30,
             "text_line_height": 1.2,
             "text_letter_spacing": 0,
             "text_capitalize": false,
@@ -466,7 +466,7 @@
             "overlay_content": true,
             "color_text": "#ffffff",
             "color_overlay": "#000000",
-            "overlay_opacity": 30,
+            "overlay_opacity": 40,
             "submenu_title_position": "center",
             "enable_title_drop_shadow": true
           }
@@ -483,7 +483,7 @@
             "overlay_content": true,
             "color_text": "#ffffff",
             "color_overlay": "#000000",
-            "overlay_opacity": 30,
+            "overlay_opacity": 40,
             "submenu_title_position": "center",
             "enable_title_drop_shadow": true
           }
