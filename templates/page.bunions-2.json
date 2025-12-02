@@ -164,7 +164,7 @@
             "color_text": "#74a5ba",
             "vertical": 21,
             "horizontal": 45,
-            "vertical_mobile": 14,
+            "vertical_mobile": 25,
             "horizontal_mobile": 25
           }
         },
@@ -180,7 +180,7 @@
             "color_text": "#74a5ba",
             "vertical": 53,
             "horizontal": 73,
-            "vertical_mobile": 35,
+            "vertical_mobile": 62,
             "horizontal_mobile": 16
           }
         },
@@ -213,7 +213,7 @@
             "color_text": "#74a5ba",
             "vertical": 56,
             "horizontal": 52,
-            "vertical_mobile": 41,
+            "vertical_mobile": 55,
             "horizontal_mobile": 41
           }
         },
@@ -229,7 +229,7 @@
             "color_text": "#74a5ba",
             "vertical": 71,
             "horizontal": 68,
-            "vertical_mobile": 50,
+            "vertical_mobile": 75,
             "horizontal_mobile": 73
           }
         }
@@ -271,7 +271,7 @@
         "padding_top": 0,
         "padding_bottom": 0,
         "divider": false,
-        "full_width": false,
+        "full_width": true,
         "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
