@@ -40,7 +40,7 @@
         "text_LHGLnM": {
           "type": "text",
           "settings": {
-            "text": "<p>Heel pain is a common condition in which weight bearing on the heel causes extreme discomfort.</p>",
+            "text": "<p>Heel pain is a common condition where weight-bearing on the heel causes significant discomfort. There are two main categories of heel pain: <br/><br/>The first category is caused by overuse or repetitive stress, resulting from excessive impact on a specific foot area. This condition, often referred to as \"heel pain syndrome,\" can be triggered by shoes with low heels, a thinned-out fat pad in the heel area, or a sudden increase in activity. <br/><br/>The second category is Plantar Fasciitis, which is usually caused by a biomechanical issue such as overpronation (flat feet). The plantar fascia is a fibrous tissue band running from the heel bone through the midfoot and into the forefoot.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -66,7 +66,7 @@
         "content_position": "md:items-center md:justify-start",
         "text_alignment": "left",
         "image_mobile": "shopify://shop_images/Group_19_1.png",
-        "image_height_mobile": "200px",
+        "image_height_mobile": "100vh",
         "content_position_mobile": "items-center justify-center",
         "text_alignment_mobile": "left",
         "color_text": "#171717",
