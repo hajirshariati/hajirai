@@ -818,7 +818,7 @@
           "type": "button",
           "settings": {
             "button_label": "Learn More",
-            "button_link": "",
+            "button_link": "shopify://pages/technology",
             "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
