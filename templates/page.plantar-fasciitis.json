@@ -230,8 +230,8 @@
             "color_text": "#74a5ba",
             "vertical": 21,
             "horizontal": 45,
-            "vertical_mobile": 23,
-            "horizontal_mobile": 42
+            "vertical_mobile": 16,
+            "horizontal_mobile": 23
           }
         },
         "content_9HJCba": {
@@ -667,7 +667,7 @@
         "color_highlight": "",
         "gradient_highlight": "",
         "color_button_text": "",
-        "color_button_background": "",
+        "color_button_background": "rgba(0,0,0,0)",
         "color_button_gradient": "",
         "padding_top": 0,
         "padding_bottom": 40,
