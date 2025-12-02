@@ -164,8 +164,8 @@
             "color_text": "#74a5ba",
             "vertical": 18,
             "horizontal": 50,
-            "vertical_mobile": 16,
-            "horizontal_mobile": 42
+            "vertical_mobile": 23,
+            "horizontal_mobile": 41
           }
         },
         "content_HF7yEU": {
@@ -180,7 +180,7 @@
             "color_text": "#74a5ba",
             "vertical": 48,
             "horizontal": 39,
-            "vertical_mobile": 30,
+            "vertical_mobile": 55,
             "horizontal_mobile": 12
           }
         },
@@ -213,8 +213,8 @@
             "color_text": "#74a5ba",
             "vertical": 56,
             "horizontal": 52,
-            "vertical_mobile": 37,
-            "horizontal_mobile": 30
+            "vertical_mobile": 64,
+            "horizontal_mobile": 37
           }
         },
         "content_Kxzeti": {
@@ -229,7 +229,7 @@
             "color_text": "#74a5ba",
             "vertical": 70,
             "horizontal": 75,
-            "vertical_mobile": 46,
+            "vertical_mobile": 73,
             "horizontal_mobile": 73
           }
         }
@@ -245,134 +245,6 @@
       "settings": {
         "image": "shopify://shop_images/Group_18_8.png",
         "image_mobile": "shopify://shop_images/Frame_91.png",
-        "heading": "",
-        "heading_size": "title-sm",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "heading_position": "items-center justify-start text-left",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "#171717",
-        "color_background": "rgba(0,0,0,0)",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "overlay_opacity": 0,
-        "padding_top": 0,
-        "padding_bottom": 0,
-        "divider": false,
-        "full_width": true,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "lookbook_qBWrW6": {
-      "type": "lookbook",
-      "blocks": {
-        "content_y7GJK9": {
-          "type": "content",
-          "settings": {
-            "icon": "none",
-            "iwidth": "fit",
-            "icon_width": 26,
-            "heading": "Pull Tab",
-            "text": "<p>A piece of looped material that helps you pull the back of the shoe up over your heel.</p>",
-            "link": "",
-            "color_text": "#74a5ba",
-            "vertical": 18,
-            "horizontal": 50,
-            "vertical_mobile": 16,
-            "horizontal_mobile": 42
-          }
-        },
-        "content_A6E7wx": {
-          "type": "content",
-          "settings": {
-            "icon": "none",
-            "iwidth": "fit",
-            "icon_width": 26,
-            "heading": "Complete Underfoot Support",
-            "text": "<p>Our Cobra Orthotic Technology provides a void in the heel area to help alleviate heel pressure and provides metatarsal support.</p>",
-            "link": "",
-            "color_text": "#74a5ba",
-            "vertical": 48,
-            "horizontal": 39,
-            "vertical_mobile": 54,
-            "horizontal_mobile": 40
-          }
-        },
-        "content_F3rTrd": {
-          "type": "content",
-          "disabled": true,
-          "settings": {
-            "icon": "check_mark",
-            "iwidth": "fit",
-            "icon_width": 26,
-            "heading": "3: Signature Arch Support",
-            "text": "<p>With removable insole, our arch support is located further back to support the apex of the foot. This helps proper alignment and help relieve arch and heel pain associated with Plantar Fasciitis</p>",
-            "link": "",
-            "color_text": "#74a5ba",
-            "vertical": 56,
-            "horizontal": 8,
-            "vertical_mobile": 30,
-            "horizontal_mobile": 12
-          }
-        },
-        "content_wzMy46": {
-          "type": "content",
-          "settings": {
-            "icon": "none",
-            "iwidth": "fit",
-            "icon_width": 26,
-            "heading": "Arch Support",
-            "text": "<p>Designed to help support natural alignment, our unique arch support position, height and contour aligns in the proper place to help support our bodies from the ground up and helps to relieve plantar fasciitis and common heel/arch pain.</p>",
-            "link": "",
-            "color_text": "#74a5ba",
-            "vertical": 56,
-            "horizontal": 52,
-            "vertical_mobile": 56,
-            "horizontal_mobile": 56
-          }
-        },
-        "content_tadfiY": {
-          "type": "content",
-          "settings": {
-            "icon": "none",
-            "iwidth": "fit",
-            "icon_width": 26,
-            "heading": "Lightweight",
-            "text": "<p>Aetrex Flips are designed using light-weight UltraSky™ EVA with a water-friendly construction. It is specially engineered with super soft foam to keep your toes comfortable all day long.</p>",
-            "link": "",
-            "color_text": "#74a5ba",
-            "vertical": 70,
-            "horizontal": 75,
-            "vertical_mobile": 69,
-            "horizontal_mobile": 73
-          }
-        }
-      },
-      "block_order": [
-        "content_y7GJK9",
-        "content_A6E7wx",
-        "content_F3rTrd",
-        "content_wzMy46",
-        "content_tadfiY"
-      ],
-      "name": "t:sections.lookbook.name",
-      "settings": {
-        "image": "shopify://shop_images/Group_18_8.png",
-        "image_mobile": "shopify://shop_images/Group_18_8.png",
         "heading": "",
         "heading_size": "title-sm",
         "heading_alignment": "text-center md:items-center",
@@ -477,16 +349,6 @@
         "full_width": false,
         "rounded": false,
         "enable_parallax": true
-      }
-    },
-    "empty_space_gyE8Nr": {
-      "type": "empty-space",
-      "name": "t:sections.empty-space.name",
-      "settings": {
-        "desktop_height": 40,
-        "mobile_height": 28,
-        "color_background": "",
-        "gradient_background": ""
       }
     },
     "featured_collection_dXtHeM": {
@@ -746,9 +608,7 @@
     "image_with_text_overlay_rBfBzp",
     "faq_zhAACx",
     "lookbook_w69hfT",
-    "lookbook_qBWrW6",
     "images_with_text_iL8ht6",
-    "empty_space_gyE8Nr",
     "featured_collection_dXtHeM",
     "rich_text_KiVQ9q",
     "testimonials_byJFpb",
