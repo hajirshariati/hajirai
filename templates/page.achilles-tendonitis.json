@@ -40,7 +40,7 @@
         "text_LHGLnM": {
           "type": "text",
           "settings": {
-            "text": "<p>Achilles tendonitis is inflammation of the Achilles tendon and can lead to degeneration. The achilles tendon is the large tendon located in the back of the leg that inserts into the heel. The pain caused by achilles tendonitis can develop gradually without a history of trauma. The pain can be a shooting pain, burning pain, or even an extremely piercing pain. Achilles tendonitis should not be left untreated due to the danger that the tendon can become weak and ruptured.   Achilles Tendonitis is aggravated by activities that repeatedly stress the tendon, causing inflammation. In some cases even prolonged periods of standing can cause symptoms. It is a common problem often experienced by athletes, particularly distance runners. </p>",
+            "text": "<p>Achilles Tendonitis is inflammation of the Achilles tendon, which can lead to degeneration. The Achilles tendon, a large tendon at the back of the leg that attaches to the heel, can become painful due to this condition.<br/><br/>Pain from Achilles Tendonitis can develop gradually without any history of trauma and may present as shooting, burning, or piercing pain. Untreated Achilles Tendonitis poses a risk of the tendon becoming weak and potentially rupturing.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -66,7 +66,7 @@
         "content_position": "md:items-center md:justify-start",
         "text_alignment": "left",
         "image_mobile": "shopify://shop_images/Group_19_1.png",
-        "image_height_mobile": "600px",
+        "image_height_mobile": "500px",
         "content_position_mobile": "items-center justify-center",
         "text_alignment_mobile": "left",
         "color_text": "#171717",
