@@ -40,7 +40,7 @@
         "text_LHGLnM": {
           "type": "text",
           "settings": {
-            "text": "<p>Diabetes is the seventh leading cause of death in the United States. It’s is a disease in which blood glucose levels are above what is considered the normal level. Most of the food we eat is turned into glucose, or sugar, for our bodies to store and use for energy. The pancreas, makes a hormone called insulin that helps glucose get into the cells of our bodies. When you have diabetes, your body either doesn’t make enough insulin or can’t use its own insulin as well as it should. This causes sugar to build up in your blood. Diabetes can cause serious health complications including heart disease, blindness, kidney failure, and lower-extremity amputations.</p>",
+            "text": "<p>Diabetes is a serious disease caused by either a lack of insulin production or the body's inability to use insulin effectively. Diabetes can lead to various complications, disrupting the vascular system and affecting areas such as the eyes, kidneys, legs, and feet.<br/><br/> People with diabetes should pay special attention to their feet to manage potential complications effectively. Diabetic foot conditions arise from a combination of factors, including poor circulation and neuropathy.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
