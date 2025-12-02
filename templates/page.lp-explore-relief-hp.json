@@ -823,7 +823,7 @@
             "button_style": "primary",
             "button_size": "md",
             "button_external": false,
-            "button_icon": true
+            "button_icon": false
           }
         }
       },
