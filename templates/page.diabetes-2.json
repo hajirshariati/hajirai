@@ -164,7 +164,7 @@
             "color_text": "#74a5ba",
             "vertical": 18,
             "horizontal": 50,
-            "vertical_mobile": 16,
+            "vertical_mobile": 23,
             "horizontal_mobile": 42
           }
         },
@@ -180,8 +180,8 @@
             "color_text": "#74a5ba",
             "vertical": 48,
             "horizontal": 39,
-            "vertical_mobile": 54,
-            "horizontal_mobile": 40
+            "vertical_mobile": 64,
+            "horizontal_mobile": 16
           }
         },
         "content_LjVywH": {
@@ -213,8 +213,8 @@
             "color_text": "#74a5ba",
             "vertical": 56,
             "horizontal": 52,
-            "vertical_mobile": 56,
-            "horizontal_mobile": 56
+            "vertical_mobile": 62,
+            "horizontal_mobile": 39
           }
         },
         "content_Kxzeti": {
@@ -229,7 +229,7 @@
             "color_text": "#74a5ba",
             "vertical": 70,
             "horizontal": 75,
-            "vertical_mobile": 69,
+            "vertical_mobile": 73,
             "horizontal_mobile": 73
           }
         }
@@ -244,7 +244,7 @@
       "name": "t:sections.lookbook.name",
       "settings": {
         "image": "shopify://shop_images/Group_18_7_1.png",
-        "image_mobile": "shopify://shop_images/Group_18_7_1.png",
+        "image_mobile": "shopify://shop_images/Frame_87.png",
         "heading": "",
         "heading_size": "title-sm",
         "heading_alignment": "text-center md:items-center",
@@ -349,16 +349,6 @@
         "full_width": false,
         "rounded": false,
         "enable_parallax": true
-      }
-    },
-    "empty_space_gyE8Nr": {
-      "type": "empty-space",
-      "name": "t:sections.empty-space.name",
-      "settings": {
-        "desktop_height": 40,
-        "mobile_height": 28,
-        "color_background": "",
-        "gradient_background": ""
       }
     },
     "featured_collection_dXtHeM": {
@@ -619,7 +609,6 @@
     "faq_zhAACx",
     "lookbook_w69hfT",
     "images_with_text_iL8ht6",
-    "empty_space_gyE8Nr",
     "featured_collection_dXtHeM",
     "rich_text_g6FDzV",
     "testimonials_byJFpb",
