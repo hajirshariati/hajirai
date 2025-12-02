@@ -164,8 +164,8 @@
             "color_text": "#74a5ba",
             "vertical": 21,
             "horizontal": 45,
-            "vertical_mobile": 16,
-            "horizontal_mobile": 42
+            "vertical_mobile": 14,
+            "horizontal_mobile": 25
           }
         },
         "content_hJdzY7": {
@@ -180,8 +180,8 @@
             "color_text": "#74a5ba",
             "vertical": 53,
             "horizontal": 73,
-            "vertical_mobile": 54,
-            "horizontal_mobile": 40
+            "vertical_mobile": 35,
+            "horizontal_mobile": 16
           }
         },
         "content_VmtXWC": {
@@ -213,8 +213,8 @@
             "color_text": "#74a5ba",
             "vertical": 56,
             "horizontal": 52,
-            "vertical_mobile": 56,
-            "horizontal_mobile": 56
+            "vertical_mobile": 41,
+            "horizontal_mobile": 41
           }
         },
         "content_HXQxdV": {
@@ -229,7 +229,7 @@
             "color_text": "#74a5ba",
             "vertical": 71,
             "horizontal": 68,
-            "vertical_mobile": 69,
+            "vertical_mobile": 50,
             "horizontal_mobile": 73
           }
         }
@@ -244,7 +244,7 @@
       "name": "t:sections.lookbook.name",
       "settings": {
         "image": "shopify://shop_images/Group_18_1.png",
-        "image_mobile": "shopify://shop_images/Group_18_1.png",
+        "image_mobile": "shopify://shop_images/Frame_59.png",
         "heading": "",
         "heading_size": "title-sm",
         "heading_alignment": "text-center md:items-center",
@@ -275,16 +275,6 @@
         "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
-      }
-    },
-    "empty_space_gyE8Nr": {
-      "type": "empty-space",
-      "name": "t:sections.empty-space.name",
-      "settings": {
-        "desktop_height": 40,
-        "mobile_height": 28,
-        "color_background": "",
-        "gradient_background": ""
       }
     },
     "featured_collection_dXtHeM": {
@@ -544,7 +534,6 @@
     "image_with_text_overlay_rBfBzp",
     "faq_zhAACx",
     "lookbook_crRFzY",
-    "empty_space_gyE8Nr",
     "featured_collection_dXtHeM",
     "rich_text_dUPwLg",
     "testimonials_byJFpb",
