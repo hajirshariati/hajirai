@@ -40,7 +40,7 @@
         "text_LHGLnM": {
           "type": "text",
           "settings": {
-            "text": "<p>Bunions, referred to in the medical community as Hallux Valgus, are one of the most common forefoot problems. A bunion is a prominent bump on the inside of the foot around the big toe joint. This bump is actually a bone protruding towards the inside of the foot. With the continued movement of the big toe towards the smaller toes, it is common to find the big toe resting under or over the second toe. This causes a common forefoot condition called overlapping toes. Some of the symptoms of bunions include inflammation, swelling, and soreness on the side surface of the big toe. The discomfort commonly causes a patient to walk improperly.</p>",
+            "text": "<p>A bunion is characterized by a prominent bump on the inside of the foot around the big toe joint, caused by a bone protruding towards the inside of the foot. As the big toe moves toward the smaller toes, it can end up resting under or over the second toe, leading to a condition known as overlapping toes.<br/><br/>Symptoms of bunions include inflammation, swelling, and soreness on the side surface of the big toe, often causing improper walking.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -66,7 +66,7 @@
         "content_position": "md:items-center md:justify-start",
         "text_alignment": "left",
         "image_mobile": "shopify://shop_images/Group_19_1.png",
-        "image_height_mobile": "600px",
+        "image_height_mobile": "500px",
         "content_position_mobile": "items-center justify-center",
         "text_alignment_mobile": "left",
         "color_text": "#171717",
