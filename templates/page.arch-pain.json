@@ -30,7 +30,7 @@
         "heading_axLTnn": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Arch Pain / Arch Strain</p>",
+            "heading": "<p>Arch Pain</p>",
             "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "text",
@@ -40,7 +40,7 @@
         "text_LHGLnM": {
           "type": "text",
           "settings": {
-            "text": "<p>The term arch pain (often referred to as arch strain) refers to an inflammation and/or burning sensation at the arch of the foot.<br/></p>",
+            "text": "<p>Arch pain, also known as arch strain, involves inflammation and/or a burning sensation at the arch of the foot. Various factors can cause arch pain, including structural imbalances or foot injuries. The most common cause of arch pain is Plantar Fasciitis, a condition affecting the plantar fascia, a fibrous tissue band running from the heel to the forefoot.<br/><br/>If untreated and strain on the longitudinal arch continues, a heel spur, a bony protrusion, may develop. Prompt treatment is essential to prevent<br/> the condition from worsening.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
