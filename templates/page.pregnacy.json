@@ -149,134 +149,6 @@
         "abra_promo_code_hide": ""
       }
     },
-    "lookbook_w69hfT": {
-      "type": "lookbook",
-      "blocks": {
-        "content_9ghrzK": {
-          "type": "content",
-          "settings": {
-            "icon": "none",
-            "iwidth": "fit",
-            "icon_width": 26,
-            "heading": "Padded Heel",
-            "text": "<p>Extra padding on the back of the heel helps to reduce discomfort or blisters while providing additional cushioning.</p>",
-            "link": "",
-            "color_text": "#74a5ba",
-            "vertical": 18,
-            "horizontal": 50,
-            "vertical_mobile": 16,
-            "horizontal_mobile": 42
-          }
-        },
-        "content_HF7yEU": {
-          "type": "content",
-          "settings": {
-            "icon": "none",
-            "iwidth": "fit",
-            "icon_width": 26,
-            "heading": "Met Bar Pod",
-            "text": "<p>A pod on the bottom of the shoe that helps to relieve ball-of-foot discomfort or stress.</p>",
-            "link": "",
-            "color_text": "#74a5ba",
-            "vertical": 48,
-            "horizontal": 39,
-            "vertical_mobile": 54,
-            "horizontal_mobile": 40
-          }
-        },
-        "content_LjVywH": {
-          "type": "content",
-          "disabled": true,
-          "settings": {
-            "icon": "check_mark",
-            "iwidth": "fit",
-            "icon_width": 26,
-            "heading": "3: Signature Arch Support",
-            "text": "<p>With removable insole, our arch support is located further back to support the apex of the foot. This helps proper alignment and help relieve arch and heel pain associated with Plantar Fasciitis</p>",
-            "link": "",
-            "color_text": "#74a5ba",
-            "vertical": 56,
-            "horizontal": 8,
-            "vertical_mobile": 30,
-            "horizontal_mobile": 12
-          }
-        },
-        "content_3iTAhx": {
-          "type": "content",
-          "settings": {
-            "icon": "none",
-            "iwidth": "fit",
-            "icon_width": 26,
-            "heading": "Adjustability",
-            "text": "<p>Easy to use, our hook and loop adjustable straps help accommodate multiple widths by being able to shorten or elongate the strap.</p>",
-            "link": "",
-            "color_text": "#74a5ba",
-            "vertical": 56,
-            "horizontal": 52,
-            "vertical_mobile": 56,
-            "horizontal_mobile": 56
-          }
-        },
-        "content_Kxzeti": {
-          "type": "content",
-          "settings": {
-            "icon": "none",
-            "iwidth": "fit",
-            "icon_width": 26,
-            "heading": "Open Toe",
-            "text": "<p>This type of shoe provides ample room for your feet and is beneficial for conditions such as Hammer Toes.</p>",
-            "link": "",
-            "color_text": "#74a5ba",
-            "vertical": 73,
-            "horizontal": 85,
-            "vertical_mobile": 69,
-            "horizontal_mobile": 73
-          }
-        }
-      },
-      "block_order": [
-        "content_9ghrzK",
-        "content_HF7yEU",
-        "content_LjVywH",
-        "content_3iTAhx",
-        "content_Kxzeti"
-      ],
-      "name": "t:sections.lookbook.name",
-      "settings": {
-        "image": "shopify://shop_images/Group_18_9.png",
-        "image_mobile": "shopify://shop_images/Group_18_9.png",
-        "heading": "",
-        "heading_size": "title-sm",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "heading_position": "items-center justify-start text-left",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "#171717",
-        "color_background": "rgba(0,0,0,0)",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "overlay_opacity": 0,
-        "padding_top": 0,
-        "padding_bottom": 0,
-        "divider": false,
-        "full_width": true,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
     "lookbook_DgQ4hL": {
       "type": "lookbook",
       "blocks": {
@@ -477,16 +349,6 @@
         "full_width": false,
         "rounded": false,
         "enable_parallax": true
-      }
-    },
-    "empty_space_gyE8Nr": {
-      "type": "empty-space",
-      "name": "t:sections.empty-space.name",
-      "settings": {
-        "desktop_height": 40,
-        "mobile_height": 28,
-        "color_background": "",
-        "gradient_background": ""
       }
     },
     "featured_collection_dXtHeM": {
@@ -745,10 +607,8 @@
     "main-page",
     "image_with_text_overlay_rBfBzp",
     "faq_zhAACx",
-    "lookbook_w69hfT",
     "lookbook_DgQ4hL",
     "images_with_text_iL8ht6",
-    "empty_space_gyE8Nr",
     "featured_collection_dXtHeM",
     "rich_text_xWahwa",
     "testimonials_byJFpb",
