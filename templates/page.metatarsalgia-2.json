@@ -164,7 +164,7 @@
             "color_text": "#74a5ba",
             "vertical": 8,
             "horizontal": 56,
-            "vertical_mobile": 14,
+            "vertical_mobile": 23,
             "horizontal_mobile": 32
           }
         },
@@ -180,7 +180,7 @@
             "color_text": "#74a5ba",
             "vertical": 48,
             "horizontal": 39,
-            "vertical_mobile": 41,
+            "vertical_mobile": 66,
             "horizontal_mobile": 19
           }
         },
@@ -213,7 +213,7 @@
             "color_text": "#74a5ba",
             "vertical": 56,
             "horizontal": 52,
-            "vertical_mobile": 41,
+            "vertical_mobile": 59,
             "horizontal_mobile": 41
           }
         },
@@ -229,8 +229,8 @@
             "color_text": "#74a5ba",
             "vertical": 70,
             "horizontal": 75,
-            "vertical_mobile": 44,
-            "horizontal_mobile": 73
+            "vertical_mobile": 75,
+            "horizontal_mobile": 82
           }
         }
       },
