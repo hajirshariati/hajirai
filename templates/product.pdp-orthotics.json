@@ -147,6 +147,7 @@
         },
         "sign_up_DcnXLa": {
           "type": "sign_up",
+          "disabled": true,
           "settings": {
             "heading": "Aetrex Access",
             "subheading": "earn points on your purchases & more",
