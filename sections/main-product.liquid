@@ -1022,9 +1022,9 @@
               <div class="grid gap-1">
                 <p class="text-base font-medium leading-tight">{{ product.title }}</p>
                 {%- unless product.has_only_default_variant -%}
-                  <!--div class="text-xs text-opacity leading-tight" data-sticky-product-options>
+                  <div class="text-xs text-opacity leading-tight" data-sticky-product-options>
                     {{- product.selected_or_first_available_variant.title -}}
-                  </div-->
+                  </div>
                 {%- endunless -%}
               </div>
               <!--div id="StickyPrice-{{ section.id }}-{{ product.id }}">
