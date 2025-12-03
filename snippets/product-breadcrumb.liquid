@@ -26,19 +26,26 @@
         {%- render 'icon', icon: 'home', size: 'sm' -%}
       </a>
     </li>
-    {%- if block.settings.show_collections_link -%}
+    {% assign primary_category = product.metafields.custom.primary_category %}
+    {% if product.metafields.custom.primary_category != blank %}
       <li class="flex items-center gap-4 md:gap-6">
-        <a class="reversed-link" href="{{ routes.collections_url }}">{{ 'general.breadcrumbs.collections' | t }}</a>
+        <a class="reversed-link" href="{{ primary_category.value.url }}">{{ primary_category.value.title }}</a>
       </li>
-    {%- endif -%}
-    <li class="flex items-center gap-4 md:gap-6">
-      {%- liquid
-        if collection == blank
-          assign collection = product.collections | first
-        endif
-      -%}
-      <a class="reversed-link" href="{{ collection.url }}">{{ collection.title }}</a>
-    </li>
+    {% else %}
+      {%- if block.settings.show_collections_link -%}
+        <li class="flex items-center gap-4 md:gap-6">
+          <a class="reversed-link" href="{{ routes.collections_url }}">{{ 'general.breadcrumbs.collections' | t }}</a>
+        </li>
+      {%- endif -%}
+      <li class="flex items-center gap-4 md:gap-6">
+        {%- liquid
+          if collection == blank
+            assign collection = product.collections | first
+          endif
+        -%}
+        <a class="reversed-link" href="{{ collection.url }}">{{ collection.title }}</a>
+      </li>
+    {% endif %}
     {% comment %}
       <li class="flex items-center gap-4 md:gap-6">{{ product.title }}</li>
     {% endcomment %}

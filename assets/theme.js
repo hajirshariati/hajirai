@@ -5219,7 +5219,7 @@ class ProductInfo extends HTMLElement {
             this.updateSourceFromDestination(parsedHTML, 'VolumeNote');
 
             this.productForm?.toggleSubmitButton(!variant.available, theme.variantStrings.soldOut);
-            this.productStickyForm?.toggleSubmitButton(!variant.available, theme.variantStrings.soldOut);
+            this.productStickyForm?.toggleSubmitButton(!variant.available, 'SELECT SIZE');
 
             theme.pubsub.publish(theme.pubsub.PUB_SUB_EVENTS.variantChange, {
                 data: {
@@ -5332,7 +5332,7 @@ class ProductInfo extends HTMLElement {
 
     setUnavailable() {
         this.productForm?.toggleSubmitButton(true, theme.variantStrings.unavailable, true);
-        this.productStickyForm?.toggleSubmitButton(true, theme.variantStrings.unavailable, true);
+        this.productStickyForm?.toggleSubmitButton(true, 'SELECT SIZE', true);
 
         const selectors = ['Price', 'BuyButtonPrice', 'StickyPrice', 'Inventory', 'Sku', 'PricePerItem', 'BackInStock', 'ProductBundle', 'VolumeNote', 'Volume', 'QuantityRules', 'QuantityRulesCart']
             .map((id) => `#${id}-${this.sectionId}-${this.productId}`)
@@ -5723,12 +5723,15 @@ class ProductStickyForm extends HTMLElement {
         const submitButtonTextChild = this.submitButton.querySelector('.btn-text>span');
 
         if (disable) {
-            this.submitButton.setAttribute('disabled', '');
+            // sticky disabled
+            // this.submitButton.setAttribute('disabled', '');
+            this.submitButton.classList.add('disabled-btn');
             if (text) {
                 (submitButtonTextChild || submitButtonText).textContent = text;
             }
         } else {
             this.submitButton.removeAttribute('disabled');
+            this.submitButton.classList.remove('disabled-btn');
             (submitButtonTextChild || submitButtonText).textContent = this.submitButton.hasAttribute('data-pre-order') ? theme.variantStrings.preOrder : theme.variantStrings.addToCart;
         }
     }

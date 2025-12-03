@@ -123,7 +123,7 @@
         "filter_color_swatches": true,
         "enable_sorting": true,
         "padding_top": 0,
-        "padding_bottom": 100,
+        "padding_bottom": 120,
         "divider": false,
         "full_width": true,
         "rounded": true

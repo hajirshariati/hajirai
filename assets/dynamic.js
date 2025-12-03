@@ -35,7 +35,6 @@ function refreshAddToCartButton() {
 
         stickyBtn.innerHTML = newSubmitBtn.innerHTML;
         stickyBtn.className = newSubmitBtn.className; // In case classes change
-        stickyBtn.disabled = newSubmitBtn.disabled;   // Sync disabled state
         stickyBtn.setAttribute('type', newSubmitBtn.getAttribute('type')); // Sync type
         // You can add more attributes here if needed
       }
@@ -78,8 +77,8 @@ function resetVariantsAndDisableButton() {
       if (stickyAddTocartBtn) {
         stickyAddTocartBtn.style.display = "flex";
         stickyAddTocartBtn.classList.add("disabled-btn");
-        stickyAddTocartBtn.setAttribute("disabled", "disabled");
-        stickyAddTocartBtn.disabled = true;
+        // stickyAddTocartBtn.setAttribute("disabled", "disabled");
+        // stickyAddTocartBtn.disabled = true;
 
         // Update .btn-text if it exists, otherwise set directly on button
         const btnText = stickyAddTocartBtn.querySelector('.btn-text');
@@ -186,9 +185,9 @@ function attachVariantEventListeners() {
         // Update .btn-text if it exists, otherwise set directly on button
         const btnText = stickyAddTocartBtn.querySelector('.btn-text');
         if (btnText) {
-          btnText.innerText = "PLEASE SELECT " + optName.toUpperCase();
+          btnText.innerText = "SELECT " + optName.toUpperCase();
         } else {
-          stickyAddTocartBtn.innerText = "PLEASE SELECT " + optName.toUpperCase();
+          stickyAddTocartBtn.innerText = "SELECT " + optName.toUpperCase();
         }
       }
     }
