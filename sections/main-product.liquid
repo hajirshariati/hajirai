@@ -1022,12 +1022,12 @@
               <div class="grid gap-1">
                 <p class="text-base font-medium leading-tight">{{ product.title }}</p>
                 {%- unless product.has_only_default_variant -%}
-                  <div class="text-xs text-opacity leading-tight" data-sticky-product-options>
+                  <!--div class="text-xs text-opacity leading-tight" data-sticky-product-options>
                     {{- product.selected_or_first_available_variant.title -}}
-                  </div>
+                  </div-->
                 {%- endunless -%}
               </div>
-              <div id="StickyPrice-{{ section.id }}-{{ product.id }}">
+              <!--div id="StickyPrice-{{ section.id }}-{{ product.id }}">
                 {%- if product.quantity_price_breaks_configured? != true -%}
                   {%- render 'product-price', product: product, use_variant: true, class: 'flex flex-wrap items-center gap-2 lg:gap-1d5' -%}
                 {%- else -%}
@@ -1104,7 +1104,7 @@
                     {%- endif -%}
                   </price-per-item>
                 {%- endif -%}
-              </div>
+              </div-->
             </div>
 
             {%- liquid
