@@ -91,7 +91,7 @@
         "liquid_WaBqBH": {
           "type": "liquid",
           "settings": {
-            "liquid": "<br>{%render 'frontrow'%} \n<style>\n#frontrow-badge {\n    min-inline-size: -webkit-fill-available;\n    background: #f4f4f4;\n    padding: 1em 16px;\n    margin-top: -15px;\n    margin-bottom: 5px;}\n</style>"
+            "liquid": "<br>{%render 'frontrow'%}"
           }
         },
         "text-1": {
