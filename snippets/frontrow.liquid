@@ -1,30 +1,48 @@
 <div id="frontrow-badge">
 
-{% if product.tags contains '00' %}
-  <!-- Combined widget for tag "00" -->
+  {% if product.tags contains '00' %}
   <script async type="text/javascript" src="https://app.thefrontrowhealth.com/api/widgets/script?presentation_type=quant&product_id=3246,3245"></script>
   <iframe class="iframe-frontrow" id="iframe-frontrow-quant" frameborder="0" src="https://app.thefrontrowhealth.com/api/widgets?presentation_type=quant&product_id=3246,3245"></iframe>
 
 
   {% elsif product.tags contains '05' %}
+  <script async type="text/javascript" src="https://app.thefrontrowhealth.com/api/widgets/script?presentation_type=quant&product_id=3248,3247"></script>
+  <iframe class="iframe-frontrow" id="iframe-frontrow-quant" frameborder="0" src="https://app.thefrontrowhealth.com/api/widgets?presentation_type=quant&product_id=3248,3247"></iframe>
 
 
   {% elsif product.tags contains '20' %}  
+  <script async type="text/javascript" src="https://app.thefrontrowhealth.com/api/widgets/script?presentation_type=quant&product_id=3250,3249"></script>
+  <iframe class="iframe-frontrow" id="iframe-frontrow-quant" frameborder="0" src="https://app.thefrontrowhealth.com/api/widgets?presentation_type=quant&product_id=3250,3249"></iframe>
 
 
   {% elsif product.tags contains 'skytech' %}
+  <script async type="text/javascript" src="https://app.thefrontrowhealth.com/api/widgets/script?presentation_type=quant&product_id=3255,3253"></script>
+  <iframe class="iframe-frontrow" id="iframe-frontrow-quant" frameborder="0" src="https://app.thefrontrowhealth.com/api/widgets?presentation_type=quant&product_id=3255,3253"></iframe>
 
 
   {% elsif product.tags contains 'closetoe' %}  
+  <script async type="text/javascript" src="https://app.thefrontrowhealth.com/api/widgets/script?presentation_type=quant&product_id=3252"></script>
+  <iframe class="iframe-frontrow" id="iframe-frontrow-quant" frameborder="0" src="https://app.thefrontrowhealth.com/api/widgets?presentation_type=quant&product_id=3252"></iframe>
 
 
   {% elsif product.tags contains 'sandals' %}
-
+  <script async type="text/javascript" src="https://app.thefrontrowhealth.com/api/widgets/script?presentation_type=quant&product_id=3251"></script>
+  <iframe class="iframe-frontrow" id="iframe-frontrow-quant" frameborder="0" src="https://app.thefrontrowhealth.com/api/widgets?presentation_type=quant&product_id=3251"></iframe>
+  
 
   {% elsif product.tags contains 'mens' %}  
+  <script async type="text/javascript" src="https://app.thefrontrowhealth.com/api/widgets/script?presentation_type=quant&product_id=3254"></script>
+  <iframe class="iframe-frontrow" id="iframe-frontrow-quant" frameborder="0" src="https://app.thefrontrowhealth.com/api/widgets?presentation_type=quant&product_id=3254"></iframe>
 
 
+  {% elsif request.path contains '/products/men-plantar-fasciitis-kit' %}
+  <script async type="text/javascript" src="https://app.thefrontrowhealth.com/api/widgets/script?presentation_type=quant&product_id=3257"></script>
+  <iframe class="iframe-frontrow" id="iframe-frontrow-quant" frameborder="0" src="https://app.thefrontrowhealth.com/api/widgets?presentation_type=quant&product_id=3257"></iframe>
+    
 
+  {% elsif request.path contains '/products/women-plantar-fasciitis-kit' %}
+  <script async type="text/javascript" src="https://app.thefrontrowhealth.com/api/widgets/script?presentation_type=quant&product_id=3256"></script>
+  <iframe class="iframe-frontrow" id="iframe-frontrow-quant" frameborder="0" src="https://app.thefrontrowhealth.com/api/widgets?presentation_type=quant&product_id=3256"></iframe>
 
 
   {% else %}
