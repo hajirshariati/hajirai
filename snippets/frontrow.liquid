@@ -1,64 +1,9 @@
 <div id="frontrow-badge">
 
 {% if product.tags contains '00' %}
-  <!-- Combined widget for tag "00" -->
     <script async type="text/javascript" src="https://app.thefrontrowhealth.com/api/widgets/script?presentation_type=quant&product_id=3246"></script>
     <iframe class="iframe-frontrow" id="iframe-frontrow-quant" frameborder="0" src="https://app.thefrontrowhealth.com/api/widgets?presentation_type=quant&product_id=3246"></iframe>
-  
-{% endif %}
-  
-  {% if request.path contains '/products/men-plantar-fasciitis-kit' %}
-    <script async type="text/javascript" src="https://app.thefrontrowhealth.com/api/widgets/script?presentation_type=quant&product_id=3257"></script>
-    <iframe class="iframe-frontrow" id="iframe-frontrow-quant" frameborder="0" src="https://app.thefrontrowhealth.com/api/widgets?presentation_type=quant&product_id=3257"></iframe>
-    
-  {% elsif request.path contains '/products/women-plantar-fasciitis-kit' %}
-    <script async type="text/javascript" src="https://app.thefrontrowhealth.com/api/widgets/script?presentation_type=quant&product_id=3256"></script>
-    <iframe class="iframe-frontrow" id="iframe-frontrow-quant" frameborder="0" src="https://app.thefrontrowhealth.com/api/widgets?presentation_type=quant&product_id=3256"></iframe>
-  
-  {% elsif request.path contains '/products/maui-navy-l3200m' %}
-    <script async type="text/javascript" src="https://app.thefrontrowhealth.com/api/widgets/script?presentation_type=quant&product_id=3255"></script>
-    <iframe class="iframe-frontrow" id="iframe-frontrow-quant" frameborder="0" src="https://app.thefrontrowhealth.com/api/widgets?presentation_type=quant&product_id=3255"></iframe>
-  
-  {% elsif request.path contains '/products/chase-mens-black-ap900m' %}
-    <script async type="text/javascript" src="https://app.thefrontrowhealth.com/api/widgets/script?presentation_type=quant&product_id=3254"></script>
-    <iframe class="iframe-frontrow" id="iframe-frontrow-quant" frameborder="0" src="https://app.thefrontrowhealth.com/api/widgets?presentation_type=quant&product_id=3254"></iframe>
-  
-  {% elsif request.path contains '/products/maui-ivory-gloss-l3033w' %}
-    <script async type="text/javascript" src="https://app.thefrontrowhealth.com/api/widgets/script?presentation_type=quant&product_id=3253"></script>
-    <iframe class="iframe-frontrow" id="iframe-frontrow-quant" frameborder="0" src="https://app.thefrontrowhealth.com/api/widgets?presentation_type=quant&product_id=3253"></iframe>
-  
-  {% elsif request.path contains '/products/danika-ivory-ap111w' %}
-    <script async type="text/javascript" src="https://app.thefrontrowhealth.com/api/widgets/script?presentation_type=quant&product_id=3252"></script>
-    <iframe class="iframe-frontrow" id="iframe-frontrow-quant" frameborder="0" src="https://app.thefrontrowhealth.com/api/widgets?presentation_type=quant&product_id=3252"></iframe>
-  
-  {% elsif request.path contains '/products/jillian-black-sc450w' %}
-    <script async type="text/javascript" src="https://app.thefrontrowhealth.com/api/widgets/script?presentation_type=quant&product_id=3251"></script>
-    <iframe class="iframe-frontrow" id="iframe-frontrow-quant" frameborder="0" src="https://app.thefrontrowhealth.com/api/widgets?presentation_type=quant&product_id=3251"></iframe>
-  
-  {% elsif request.path contains '/products/l2320m-m' %}
-    <script async type="text/javascript" src="https://app.thefrontrowhealth.com/api/widgets/script?presentation_type=quant&product_id=3250"></script>
-    <iframe class="iframe-frontrow" id="iframe-frontrow-quant" frameborder="0" src="https://app.thefrontrowhealth.com/api/widgets?presentation_type=quant&product_id=3250"></iframe>
-  
-  {% elsif request.path contains '/products/l2320w-m' %}
-    <script async type="text/javascript" src="https://app.thefrontrowhealth.com/api/widgets/script?presentation_type=quant&product_id=3249"></script>
-    <iframe class="iframe-frontrow" id="iframe-frontrow-quant" frameborder="0" src="https://app.thefrontrowhealth.com/api/widgets?presentation_type=quant&product_id=3249"></iframe>
-  
-  {% elsif request.path contains '/products/l2305m-m' %}
-    <script async type="text/javascript" src="https://app.thefrontrowhealth.com/api/widgets/script?presentation_type=quant&product_id=3248"></script>
-    <iframe class="iframe-frontrow" id="iframe-frontrow-quant" frameborder="0" src="https://app.thefrontrowhealth.com/api/widgets?presentation_type=quant&product_id=3248"></iframe>
-  
-  {% elsif request.path contains '/products/l2305w-m' %}
-    <script async type="text/javascript" src="https://app.thefrontrowhealth.com/api/widgets/script?presentation_type=quant&product_id=3247"></script>
-    <iframe class="iframe-frontrow" id="iframe-frontrow-quant" frameborder="0" src="https://app.thefrontrowhealth.com/api/widgets?presentation_type=quant&product_id=3247"></iframe>
-  
-  {% elsif request.path contains '/products/l2300m-m' %}
-    <script async type="text/javascript" src="https://app.thefrontrowhealth.com/api/widgets/script?presentation_type=quant&product_id=3246"></script>
-    <iframe class="iframe-frontrow" id="iframe-frontrow-quant" frameborder="0" src="https://app.thefrontrowhealth.com/api/widgets?presentation_type=quant&product_id=3246"></iframe>
-  
-  {% elsif request.path contains '/products/l2300w-m' %}
-    <script async type="text/javascript" src="https://app.thefrontrowhealth.com/api/widgets/script?presentation_type=quant&product_id=3245"></script>
-    <iframe class="iframe-frontrow" id="iframe-frontrow-quant" frameborder="0" src="https://app.thefrontrowhealth.com/api/widgets?presentation_type=quant&product_id=3245"></iframe>
-  
+
   {% else %}
     <style> #frontrow-badge {display: none !important;} </style>
   {% endif %}
