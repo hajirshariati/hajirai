@@ -998,7 +998,7 @@
       ],
       "name": "t:sections.testimonials.name",
       "settings": {
-        "heading": "Loved by Customers Since 1948",
+        "heading": "Loved by Customers",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
