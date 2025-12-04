@@ -871,8 +871,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
+            "text": "<p>Super comfy and stylish!</p>",
+            "author": "Kimber L.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -884,8 +884,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
+            "text": "<p>Looks Good, Fits Even Better!!</p>",
+            "author": "Doris B.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -897,8 +897,86 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
+            "text": "<p>I feel 15 years younger!</p>",
+            "author": "Mollie B.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_gnAxjY": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>These insoles make my feet soooo happy FEELS LIKE WALKING ON CLOUDS!</p>",
+            "author": "Beverly",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_7qtrnb": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>I went from 100% pain down to 5%</p>",
+            "author": "Deannie",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_3kKnLL": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>I am so happy to walk with no pain with Aetrex shoes!</p>",
+            "author": "Annie G.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_LJx83Q": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Very, very comfortable and supportive</p>",
+            "author": "Cynthia B.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_MM7Bra": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Most comfortable shoes I have put on my feet.</p>",
+            "author": "Kim N.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_jfrkkX": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Very comfortable and stylish. They support my arches, heels, and also accommodate my bunions.</p>",
+            "author": "Jacqueline I.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -910,7 +988,13 @@
       "block_order": [
         "testimonial_bMYXKi",
         "testimonial_MYf74W",
-        "testimonial_VRFqVT"
+        "testimonial_VRFqVT",
+        "testimonial_gnAxjY",
+        "testimonial_7qtrnb",
+        "testimonial_3kKnLL",
+        "testimonial_LJx83Q",
+        "testimonial_MM7Bra",
+        "testimonial_jfrkkX"
       ],
       "name": "t:sections.testimonials.name",
       "settings": {
