@@ -308,7 +308,7 @@
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "",
+            "custom_url": "shopify://collections/relief-for-walking",
             "image": "shopify://shop_images/Group_3.jpg",
             "title": "Walking",
             "description": "",
@@ -325,7 +325,7 @@
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "shopify://collections/orthotics-for-high-arches",
+            "custom_url": "shopify://collections/relief-for-running",
             "image": "shopify://shop_images/Group_4.jpg",
             "title": "Running",
             "description": "",
@@ -342,7 +342,7 @@
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "shopify://collections/casual-everyday",
+            "custom_url": "shopify://collections/relief-for-everyday-wear",
             "image": "shopify://shop_images/Group_5.jpg",
             "title": "Everyday Comfort",
             "description": "",
@@ -359,7 +359,7 @@
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "shopify://collections/compete",
+            "custom_url": "shopify://collections/relief-for-dressing-up",
             "image": "shopify://shop_images/Group_6_8a4c9dce-db6d-4fe4-a466-c7f96dc08773.jpg",
             "title": "Dress Up",
             "description": "",
@@ -376,7 +376,7 @@
           "settings": {
             "link_type": "url",
             "collection": "",
-            "custom_url": "shopify://collections/compete",
+            "custom_url": "shopify://collections/relief-for-gym-training",
             "image": "shopify://shop_images/Group_7.jpg",
             "title": "Gym & Training",
             "description": "",
