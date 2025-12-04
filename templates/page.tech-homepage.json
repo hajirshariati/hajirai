@@ -108,7 +108,9 @@
         "padding_bottom": 12,
         "divider": false,
         "full_width": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "logo_list_zPkHPR": {
@@ -434,7 +436,9 @@
         "padding_bottom": 24,
         "divider": false,
         "full_width": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "video_with_text_overlay_7CHW8p": {
@@ -500,7 +504,7 @@
           "type": "button",
           "settings": {
             "button_label": "CHECK IT OUT",
-            "button_link": "shopify://pages/tech-albert-pressure-scanner",
+            "button_link": "shopify://pages/tech-albert-2-pro-scanner",
             "button_video_link": "",
             "button_style": "primary",
             "button_size": "sm",
@@ -548,7 +552,9 @@
         "padding_bottom": 48,
         "divider": false,
         "full_width": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "video_with_text_overlay_mpYPfk": {
@@ -662,7 +668,9 @@
         "padding_bottom": 48,
         "divider": false,
         "full_width": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "video_with_text_overlay_D7aPRc": {
@@ -775,7 +783,9 @@
         "padding_bottom": 48,
         "divider": false,
         "full_width": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "video_with_text_overlay_fYXVnA": {
@@ -894,7 +904,9 @@
         "padding_bottom": 48,
         "divider": false,
         "full_width": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "image_with_text_gKGMGt": {
@@ -1006,7 +1018,9 @@
         "full_width": false,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "empty_space_EQc6VY": {
@@ -1128,7 +1142,9 @@
         "full_width": true,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "video_with_text_overlay_FXtW7N": {
@@ -1242,7 +1258,9 @@
         "padding_bottom": 40,
         "divider": false,
         "full_width": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "collection_list_tRHkpk": {
@@ -1407,7 +1425,9 @@
         "padding_bottom": 20,
         "divider": false,
         "full_width": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_4yLyNg": {
@@ -1455,7 +1475,9 @@
         "padding_bottom": 0,
         "divider": false,
         "narrow": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "number_counter_DpF4p9": {
@@ -1625,7 +1647,9 @@
         "padding_bottom": 48,
         "divider": false,
         "narrow": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     }
   },
