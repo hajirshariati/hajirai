@@ -169,10 +169,10 @@
             "text": "<p>Stabbing heel pain with your first steps in the morning? Does it return after long periods of standing?</p>",
             "link": "",
             "color_text": "#171717",
-            "vertical": 57,
-            "horizontal": 49,
+            "vertical": 47,
+            "horizontal": 52,
             "vertical_mobile": 50,
-            "horizontal_mobile": 50
+            "horizontal_mobile": 57
           }
         },
         "content_rRPgF4": {
@@ -187,7 +187,7 @@
             "color_text": "#171717",
             "vertical": 82,
             "horizontal": 50,
-            "vertical_mobile": 50,
+            "vertical_mobile": 82,
             "horizontal_mobile": 50
           }
         },
@@ -203,8 +203,8 @@
             "color_text": "#171717",
             "vertical": 76,
             "horizontal": 57,
-            "vertical_mobile": 50,
-            "horizontal_mobile": 50
+            "vertical_mobile": 75,
+            "horizontal_mobile": 64
           }
         },
         "content_eM9a73": {
@@ -219,8 +219,8 @@
             "color_text": "#171717",
             "vertical": 67,
             "horizontal": 56,
-            "vertical_mobile": 50,
-            "horizontal_mobile": 50
+            "vertical_mobile": 68,
+            "horizontal_mobile": 60
           }
         },
         "content_RtGz7V": {
@@ -235,8 +235,8 @@
             "color_text": "#171717",
             "vertical": 83,
             "horizontal": 37,
-            "vertical_mobile": 50,
-            "horizontal_mobile": 50
+            "vertical_mobile": 83,
+            "horizontal_mobile": 21
           }
         },
         "content_bXtYAa": {
@@ -251,8 +251,8 @@
             "color_text": "#171717",
             "vertical": 91,
             "horizontal": 58,
-            "vertical_mobile": 50,
-            "horizontal_mobile": 50
+            "vertical_mobile": 89,
+            "horizontal_mobile": 65
           }
         }
       },
