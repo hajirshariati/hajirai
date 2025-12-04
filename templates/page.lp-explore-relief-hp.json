@@ -510,7 +510,7 @@
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "",
-        "color_background": "",
+        "color_background": "#ffffff",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
@@ -870,7 +870,7 @@
         "testimonial_bMYXKi": {
           "type": "testimonial",
           "settings": {
-            "icon": "quote",
+            "icon": "5-stars",
             "text": "<p>Super comfy and stylish!</p>",
             "author": "Kimber L.",
             "author_info": "",
@@ -883,7 +883,7 @@
         "testimonial_MYf74W": {
           "type": "testimonial",
           "settings": {
-            "icon": "quote",
+            "icon": "5-stars",
             "text": "<p>Looks Good, Fits Even Better!!</p>",
             "author": "Doris B.",
             "author_info": "",
@@ -896,7 +896,7 @@
         "testimonial_VRFqVT": {
           "type": "testimonial",
           "settings": {
-            "icon": "quote",
+            "icon": "5-stars",
             "text": "<p>I feel 15 years younger!</p>",
             "author": "Mollie B.",
             "author_info": "",
@@ -909,7 +909,7 @@
         "testimonial_gnAxjY": {
           "type": "testimonial",
           "settings": {
-            "icon": "quote",
+            "icon": "5-stars",
             "text": "<p>These insoles make my feet soooo happy FEELS LIKE WALKING ON CLOUDS!</p>",
             "author": "Beverly",
             "author_info": "",
@@ -922,7 +922,7 @@
         "testimonial_7qtrnb": {
           "type": "testimonial",
           "settings": {
-            "icon": "quote",
+            "icon": "5-stars",
             "text": "<p>I went from 100% pain down to 5%</p>",
             "author": "Deannie",
             "author_info": "",
@@ -935,7 +935,7 @@
         "testimonial_3kKnLL": {
           "type": "testimonial",
           "settings": {
-            "icon": "quote",
+            "icon": "5-stars",
             "text": "<p>I am so happy to walk with no pain with Aetrex shoes!</p>",
             "author": "Annie G.",
             "author_info": "",
@@ -948,7 +948,7 @@
         "testimonial_LJx83Q": {
           "type": "testimonial",
           "settings": {
-            "icon": "quote",
+            "icon": "5-stars",
             "text": "<p>Very, very comfortable and supportive</p>",
             "author": "Cynthia B.",
             "author_info": "",
@@ -961,7 +961,7 @@
         "testimonial_MM7Bra": {
           "type": "testimonial",
           "settings": {
-            "icon": "quote",
+            "icon": "5-stars",
             "text": "<p>Most comfortable shoes I have put on my feet.</p>",
             "author": "Kim N.",
             "author_info": "",
@@ -974,7 +974,7 @@
         "testimonial_jfrkkX": {
           "type": "testimonial",
           "settings": {
-            "icon": "quote",
+            "icon": "5-stars",
             "text": "<p>Very comfortable and stylish. They support my arches, heels, and also accommodate my bunions.</p>",
             "author": "Jacqueline I.",
             "author_info": "",
@@ -1010,18 +1010,18 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
+        "color_text": "#ffffff",
+        "color_background": "#171717",
+        "gradient_background": "linear-gradient(46deg, rgba(75, 118, 174, 1) 13%, rgba(16, 51, 96, 1) 86%)",
         "color_highlight": "",
         "gradient_highlight": "",
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
+        "padding_top": 36,
+        "padding_bottom": 36,
         "divider": false,
-        "rounded": false
+        "rounded": true
       }
     },
     "faq_f3crHM": {
