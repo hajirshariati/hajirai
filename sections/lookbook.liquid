@@ -140,30 +140,7 @@
                           </span>
                         </button>
                       </gesture-element>
-                      
-                      
-<div class="quick-view__content drawer__content opacity-0 invisible flex flex-col h-full grow shrink"></div>
-                      {%- if section.settings.quickview_cta_label != blank -%}
-                        <div class="drawer__footer p-4 border-t">
-                          <a 
-                            href="{{ section.settings.quickview_cta_link | default: '#' }}" 
-                            class="button button--primary w-full flex items-center justify-center gap-2"
-                            {% if section.settings.quickview_cta_external %}target="_blank" rel="noopener noreferrer"{% endif %}
-                          >
-                            <span>{{ section.settings.quickview_cta_label }}</span>
-                            {%- if section.settings.quickview_cta_icon -%}
-                              {%- render 'icon', icon: 'arrow-right', size: 'sm' -%}
-                            {%- endif -%}
-                          </a>
-                        </div>
-                      {%- endif -%}
-                    </div>
-                  </quick-view>
-
-
-
-
-
+                      <div class="quick-view__content drawer__content opacity-0 invisible flex flex-col h-full grow shrink"></div>
                     </div>
                   </quick-view>
                 {%- else -%}
@@ -456,45 +433,6 @@
       "label": "t:sections.global.settings.button_icon.label",
       "default": true
     },
-
-
-
-
-
-
-{
-  "type": "header",
-  "content": "Quick View CTA"
-},
-{
-  "type": "text",
-  "id": "quickview_cta_label",
-  "label": "CTA Button Label",
-  "info": "Leave blank to hide the CTA button"
-},
-{
-  "type": "url",
-  "id": "quickview_cta_link",
-  "label": "CTA Button Link"
-},
-{
-  "type": "checkbox",
-  "id": "quickview_cta_external",
-  "label": "Open link in new tab",
-  "default": false
-},
-{
-  "type": "checkbox",
-  "id": "quickview_cta_icon",
-  "label": "Show arrow icon",
-  "default": true
-},
-
-
-
-
-
-
     {
       "type": "header",
       "content": "t:sections.global.settings.header__highlight.content",
