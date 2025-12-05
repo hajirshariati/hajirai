@@ -492,7 +492,7 @@
         "logo_MP7zF4"
       ],
       "custom_css": [
-        ".media > img {mix-blend-mode: multiply; }"
+        ".logo-list,.logo-bar {mix-blend-mode: multiply;}"
       ],
       "name": "Logo list",
       "settings": {
@@ -512,9 +512,9 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "color_text": "#ffffff",
+        "color_text": "#171717",
         "color_background": "#ffffff",
-        "gradient_background": "linear-gradient(317deg, rgba(75, 118, 174, 1) 7%, rgba(16, 51, 96, 1) 94%)",
+        "gradient_background": "linear-gradient(12deg, rgba(244, 244, 244, 1) 7%, rgba(154, 176, 204, 1) 94%)",
         "color_highlight": "",
         "gradient_highlight": "",
         "color_button_text": "",
@@ -524,7 +524,7 @@
         "padding_bottom": 24,
         "divider": false,
         "full_width": false,
-        "rounded": false,
+        "rounded": true,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
@@ -676,7 +676,7 @@
         "padding_bottom": 72,
         "divider": false,
         "full_width": false,
-        "rounded": false,
+        "rounded": true,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
