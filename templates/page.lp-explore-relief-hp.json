@@ -141,7 +141,7 @@
         "highlighted_scribble": "circle",
         "color_text": "#ffffff",
         "color_background": "#e7e7e7",
-        "gradient_background": "linear-gradient(15deg, rgba(168, 222, 232, 1) 15%, rgba(16, 51, 96, 1) 85%)",
+        "gradient_background": "linear-gradient(190deg, rgba(168, 222, 232, 1), rgba(16, 51, 96, 1) 85%)",
         "color_highlight": "",
         "gradient_highlight": "",
         "color_button_text": "",
@@ -151,6 +151,104 @@
         "padding_bottom": 52,
         "divider": false,
         "narrow": true,
+        "rounded": true,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "logo_list_ayxHeL": {
+      "type": "logo-list",
+      "blocks": {
+        "logo_hWgdEG": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/metatarsalgia_3ff64022-7dbe-48c5-92a7-3a1c8ad2aae9.jpg",
+            "height": 80,
+            "link": ""
+          }
+        },
+        "logo_TRQAEq": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/high_arch.jpg",
+            "height": 80,
+            "link": ""
+          }
+        },
+        "logo_nWxQdj": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/bunions.jpg",
+            "height": 80,
+            "link": ""
+          }
+        },
+        "logo_CNxTxf": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/flat.jpg",
+            "height": 80,
+            "link": ""
+          }
+        },
+        "logo_hDaUGB": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/ball_of_foot_9ce3beb3-85e2-4cd5-bc29-c1d727f2ab0e.jpg",
+            "height": 80,
+            "link": ""
+          }
+        },
+        "logo_JM8aBa": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/plantar_aee23cac-d06a-4069-9636-95145c7380a1.jpg",
+            "height": 80,
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "logo_hWgdEG",
+        "logo_TRQAEq",
+        "logo_nWxQdj",
+        "logo_CNxTxf",
+        "logo_hDaUGB",
+        "logo_JM8aBa"
+      ],
+      "custom_css": [
+        ".logo-list,.logo-bar {mix-blend-mode: multiply;}"
+      ],
+      "name": "Logo list",
+      "settings": {
+        "layout": "marquee",
+        "grid_horizontal": 200,
+        "direction": "left",
+        "speed": 1,
+        "heading": "<strong>Foot Pain Identifier</strong>",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "<p>Explore common foot conditions, their causes and symptoms, and see Aetrex orthotics and shoes recommended to relieve your pain.</p>",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "#ffffff",
+        "gradient_background": "linear-gradient(1deg, rgba(244, 244, 244, 1) 7%, rgba(168, 222, 232, 1) 94%)",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 36,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
         "rounded": true,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
@@ -292,13 +390,13 @@
       "settings": {
         "image": "shopify://shop_images/footimage.jpg",
         "image_mobile": "shopify://shop_images/foor_mobile_b21a48a1-0d19-431d-b7e5-f00f454ed458.jpg",
-        "heading": "Foot Pain Identifier",
+        "heading": "",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
         "heading_position": "none",
         "subheading": "",
-        "description": "<p>Explore common foot conditions, their causes and symptoms, and see Aetrex orthotics and shoes recommended to relieve your pain.</p>",
+        "description": "",
         "button_label": "",
         "button_link": "",
         "button_external": false,
@@ -306,7 +404,7 @@
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "",
-        "color_background": "rgba(0,0,0,0)",
+        "color_background": "#f4f4f4",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
@@ -315,7 +413,7 @@
         "color_button_gradient": "",
         "color_overlay": "#171717",
         "overlay_opacity": 0,
-        "padding_top": 44,
+        "padding_top": 20,
         "padding_bottom": 44,
         "divider": false,
         "full_width": false,
@@ -439,14 +537,14 @@
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "",
-        "color_background": "",
+        "color_background": "#fafafa",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 0,
+        "padding_top": 24,
         "padding_bottom": 72,
         "divider": false,
         "full_width": false,
@@ -1180,6 +1278,7 @@
     "main-page",
     "image_with_text_overlay_V69QPB",
     "rich_text_eMGQNq",
+    "logo_list_ayxHeL",
     "lookbook_XrVA6j",
     "collection_list_LWrAVe",
     "logo_list_LLgtEB",
