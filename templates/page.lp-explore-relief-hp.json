@@ -102,7 +102,7 @@
             "image_ratio": "adapt",
             "heading": "Example title",
             "heading_size": "text-lg-2xl",
-            "text": "<p>Use this section to explain a set of product features, to link to a series of pages, or to answer common questions about your products.</p>",
+            "text": "",
             "custom_html": "",
             "button_label": "",
             "button_link": "",
@@ -113,16 +113,17 @@
             "highlighted_scribble": "circle"
           }
         },
-        "column_aHxmkp": {
+        "column_dPNNyQ": {
           "type": "column",
           "settings": {
             "show_border": false,
-            "text_alignment": "left",
-            "text_alignment_mobile": "left",
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/icon.Arch_Pain.png",
             "image_ratio": "adapt",
             "heading": "Example title",
             "heading_size": "text-lg-2xl",
-            "text": "<p>Use this section to explain a set of product features, to link to a series of pages, or to answer common questions about your products.</p>",
+            "text": "",
             "custom_html": "",
             "button_label": "",
             "button_link": "",
@@ -133,16 +134,17 @@
             "highlighted_scribble": "circle"
           }
         },
-        "column_48hqaT": {
+        "column_Un66ht": {
           "type": "column",
           "settings": {
             "show_border": false,
-            "text_alignment": "left",
-            "text_alignment_mobile": "left",
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/icon.Arch_Pain.png",
             "image_ratio": "adapt",
             "heading": "Example title",
             "heading_size": "text-lg-2xl",
-            "text": "<p>Use this section to explain a set of product features, to link to a series of pages, or to answer common questions about your products.</p>",
+            "text": "",
             "custom_html": "",
             "button_label": "",
             "button_link": "",
@@ -156,8 +158,11 @@
       },
       "block_order": [
         "column_GPWVT8",
-        "column_aHxmkp",
-        "column_48hqaT"
+        "column_dPNNyQ",
+        "column_Un66ht"
+      ],
+      "custom_css": [
+        ".slider .card {background: transparent !important;}"
       ],
       "name": "t:sections.multicolumn.name",
       "settings": {
@@ -178,7 +183,7 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "color_text": "",
+        "color_text": "#ffffff",
         "color_background": "",
         "gradient_background": "linear-gradient(190deg, rgba(168, 222, 232, 1), rgba(16, 51, 96, 1) 100%)",
         "color_highlight": "",
@@ -186,8 +191,8 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 16,
-        "padding_bottom": 20,
+        "padding_top": 0,
+        "padding_bottom": 0,
         "full_width": false,
         "divider": false,
         "rounded": true,
