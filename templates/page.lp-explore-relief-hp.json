@@ -89,6 +89,102 @@
         "abra_promo_code_hide": ""
       }
     },
+    "multicolumn_with_icons_iYyJjy": {
+      "type": "multicolumn-with-icons",
+      "blocks": {
+        "column_74GMKk": {
+          "type": "column",
+          "settings": {
+            "icon": "shield",
+            "custom_icon": "",
+            "heading": "<strong>Try It Risk-Free for 30 Days</strong>",
+            "text": "",
+            "highlighted_text": "none",
+            "custom_html": "",
+            "us_only": false,
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_YpEwab": {
+          "type": "column",
+          "settings": {
+            "icon": "award",
+            "custom_icon": "",
+            "heading": "<strong>Clinically Proven to Reduce Pain</strong>*",
+            "text": "",
+            "highlighted_text": "none",
+            "custom_html": "",
+            "us_only": false,
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_tPK6pL": {
+          "type": "column",
+          "settings": {
+            "icon": "check_mark",
+            "custom_icon": "",
+            "heading": "<strong>Recommended by Doctors & Podiatrists</strong>",
+            "text": "",
+            "highlighted_text": "none",
+            "custom_html": "",
+            "us_only": false,
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_QcJHeV": {
+          "type": "column",
+          "settings": {
+            "icon": "heart",
+            "custom_icon": "",
+            "heading": "<strong>Loved by Millions</strong>",
+            "text": "",
+            "highlighted_text": "none",
+            "custom_html": "",
+            "us_only": false,
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_74GMKk",
+        "column_YpEwab",
+        "column_tPK6pL",
+        "column_QcJHeV"
+      ],
+      "name": "t:sections.multicolumn-with-icons.name",
+      "settings": {
+        "style": "with-border",
+        "columns": 4,
+        "text_alignment": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#ffffff",
+        "color_background": "#f0f5f6",
+        "gradient_background": "linear-gradient(136deg, rgba(127, 214, 230, 1) 10%, rgba(16, 51, 96, 1) 68%)",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 12,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
     "multicolumn_mjCNzx": {
       "type": "multicolumn",
       "blocks": {
@@ -161,6 +257,7 @@
         "column_dPNNyQ",
         "column_Un66ht"
       ],
+      "disabled": true,
       "custom_css": [
         ".slider .card {background: transparent !important;}"
       ],
@@ -1337,6 +1434,7 @@
   "order": [
     "main-page",
     "image_with_text_overlay_V69QPB",
+    "multicolumn_with_icons_iYyJjy",
     "multicolumn_mjCNzx",
     "rich_text_eMGQNq",
     "logo_list_ayxHeL",
