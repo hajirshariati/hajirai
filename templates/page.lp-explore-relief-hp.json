@@ -491,6 +491,9 @@
         "logo_CDF8CM",
         "logo_MP7zF4"
       ],
+      "custom_css": [
+        "@media screen and (pointer: fine) {.media > img {mix-blend-mode: multiply;}}"
+      ],
       "name": "Logo list",
       "settings": {
         "layout": "default",
