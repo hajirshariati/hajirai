@@ -172,7 +172,11 @@
             "vertical": 47,
             "horizontal": 52,
             "vertical_mobile": 50,
-            "horizontal_mobile": 57
+            "horizontal_mobile": 57,
+            "cta_label": "LEARN MORE",
+            "cta_link": "shopify://pages/explore-relief-for-heel-spurs",
+            "cta_external": false,
+            "cta_icon": true
           }
         },
         "content_rRPgF4": {
@@ -188,7 +192,11 @@
             "vertical": 82,
             "horizontal": 50,
             "vertical_mobile": 82,
-            "horizontal_mobile": 50
+            "horizontal_mobile": 50,
+            "cta_label": "LEARN MORE",
+            "cta_link": "shopify://pages/explore-relief-for-bunions",
+            "cta_external": false,
+            "cta_icon": true
           }
         },
         "content_kkztd7": {
@@ -204,7 +212,11 @@
             "vertical": 76,
             "horizontal": 57,
             "vertical_mobile": 75,
-            "horizontal_mobile": 64
+            "horizontal_mobile": 64,
+            "cta_label": "LEARN MORE",
+            "cta_link": "shopify://pages/explore-relief-for-metatarsalgia",
+            "cta_external": false,
+            "cta_icon": true
           }
         },
         "content_eM9a73": {
@@ -220,7 +232,11 @@
             "vertical": 67,
             "horizontal": 56,
             "vertical_mobile": 68,
-            "horizontal_mobile": 60
+            "horizontal_mobile": 60,
+            "cta_label": "LEARN MORE",
+            "cta_link": "shopify://pages/explore-relief-for-arch-pain",
+            "cta_external": false,
+            "cta_icon": true
           }
         },
         "content_RtGz7V": {
@@ -236,7 +252,11 @@
             "vertical": 83,
             "horizontal": 37,
             "vertical_mobile": 83,
-            "horizontal_mobile": 21
+            "horizontal_mobile": 21,
+            "cta_label": "LEARN MORE",
+            "cta_link": "shopify://pages/explore-relief-for-overpronation",
+            "cta_external": false,
+            "cta_icon": true
           }
         },
         "content_bXtYAa": {
@@ -252,7 +272,11 @@
             "vertical": 91,
             "horizontal": 58,
             "vertical_mobile": 89,
-            "horizontal_mobile": 65
+            "horizontal_mobile": 65,
+            "cta_label": "LEARN MORE",
+            "cta_link": "shopify://pages/explore-relief-for-mortons-neuroma",
+            "cta_external": false,
+            "cta_icon": true
           }
         }
       },
