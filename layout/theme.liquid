@@ -110,7 +110,7 @@ function OptanonWrapper() { }
       render 'social-meta-tags'
 
       render 'css-variables'
-      echo 'theme.min.css' | asset_url | stylesheet_tag: preload: true
+      echo 'theme.css' | asset_url | stylesheet_tag: preload: true
 
       if direction == 'rtl'
         echo 'rtl.css' | asset_url | stylesheet_tag: preload: true
@@ -129,7 +129,7 @@ function OptanonWrapper() { }
 
     <script src="{{ 'vendor.js' | asset_url }}" defer="defer"></script>
     {% comment %}<script src="{{ 'theme.js' | asset_url }}" defer="defer"></script>{% endcomment %}
-    <script src="{{ 'theme.min.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'theme.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'dynamic.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'swiper-bundle.min.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'us-detector.js' | asset_url }}" defer="defer"></script>

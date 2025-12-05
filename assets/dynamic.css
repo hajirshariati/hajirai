@@ -819,6 +819,7 @@ variant-picker .main-pdp-variant-custom-badge.custom-final-sale,
 }
 
 .collection .collection__content .pagination .infinite-scroll {
+  margin-bottom: 8px;
   text-transform: capitalize;
 }
 
@@ -937,6 +938,12 @@ body .yotpo-reviews-main-widget svg {
     display: none;
 }
 
+.ss__theme .ss__slideout__default {
+  position: sticky!important;
+  top: calc(100% - 80px);
+  height: 0;
+}
+
 .ss-skeleton-card:empty {
     display: block;
 }
@@ -992,6 +999,13 @@ body .yotpo-reviews-main-widget svg {
   }
 }
 
+.ss__has-results {
+  gap: 0;
+}
+.ss__has-results .pagination {
+  margin-top: 48px;
+}
+
 /* Responsive adjustments */
 @media (max-width: 1024px) {
   .ss-skeleton-grid {
@@ -1037,4 +1051,8 @@ body .yotpo-reviews-main-widget svg {
 
 .product-form__submit[disabled] {
     padding-inline: 10px;
+}
+
+.rte .html-slot-container {
+  overflow: hidden;
 }

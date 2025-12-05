@@ -1123,7 +1123,6 @@
               id="custom-sticky-cart-btn"
               class="sticky_form__submit button button--primary"
               is="hover-button"
-              {%- if product.selected_or_first_available_variant.available == false or quantity_rule_soldout %} disabled{% endif -%}
               {%- if product.template_suffix == 'pre-order' %} data-pre-order{% endif -%}
             >
               <span class="btn-fill" data-fill></span>
