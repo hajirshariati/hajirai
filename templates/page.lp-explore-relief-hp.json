@@ -163,7 +163,7 @@
           "type": "logo",
           "settings": {
             "image": "shopify://shop_images/metatarsalgia_3ff64022-7dbe-48c5-92a7-3a1c8ad2aae9.jpg",
-            "height": 80,
+            "height": 52,
             "link": ""
           }
         },
@@ -171,7 +171,7 @@
           "type": "logo",
           "settings": {
             "image": "shopify://shop_images/high_arch.jpg",
-            "height": 80,
+            "height": 52,
             "link": ""
           }
         },
@@ -179,7 +179,7 @@
           "type": "logo",
           "settings": {
             "image": "shopify://shop_images/bunions.jpg",
-            "height": 80,
+            "height": 52,
             "link": ""
           }
         },
@@ -187,7 +187,7 @@
           "type": "logo",
           "settings": {
             "image": "shopify://shop_images/flat.jpg",
-            "height": 80,
+            "height": 52,
             "link": ""
           }
         },
@@ -195,7 +195,7 @@
           "type": "logo",
           "settings": {
             "image": "shopify://shop_images/ball_of_foot_9ce3beb3-85e2-4cd5-bc29-c1d727f2ab0e.jpg",
-            "height": 80,
+            "height": 52,
             "link": ""
           }
         },
@@ -203,7 +203,7 @@
           "type": "logo",
           "settings": {
             "image": "shopify://shop_images/plantar_aee23cac-d06a-4069-9636-95145c7380a1.jpg",
-            "height": 80,
+            "height": 52,
             "link": ""
           }
         }
@@ -245,8 +245,8 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 36,
-        "padding_bottom": 24,
+        "padding_top": 40,
+        "padding_bottom": 28,
         "divider": false,
         "full_width": false,
         "rounded": true,
