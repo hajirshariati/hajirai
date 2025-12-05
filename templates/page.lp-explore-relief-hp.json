@@ -543,6 +543,9 @@
         "content_RtGz7V",
         "content_bXtYAa"
       ],
+      "custom_css": [
+        "@media screen and (max-width: 639px) {.js .drawer .drawer__inner {height: 80% !important; }}"
+      ],
       "name": "t:sections.lookbook.name",
       "settings": {
         "image": "shopify://shop_images/footimage.jpg",
