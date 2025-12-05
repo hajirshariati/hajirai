@@ -61,7 +61,7 @@
       "settings": {
         "transparent_header": false,
         "image": "shopify://shop_images/Desktop_Relief__Banner.jpg",
-        "image_height": "adapt",
+        "image_height": "550px",
         "content_width": "small",
         "content_position": "md:items-center md:justify-start",
         "text_alignment": "left",
