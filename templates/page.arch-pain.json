@@ -130,7 +130,7 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
+        "color_text": "#171717",
         "color_background": "#ffffff",
         "gradient_background": "",
         "color_highlight": "",
@@ -165,7 +165,11 @@
             "vertical": 21,
             "horizontal": 45,
             "vertical_mobile": 28,
-            "horizontal_mobile": 28
+            "horizontal_mobile": 28,
+            "cta_label": "",
+            "cta_link": "",
+            "cta_external": false,
+            "cta_icon": true
           }
         },
         "content_3bmtjX": {
@@ -181,7 +185,11 @@
             "vertical": 45,
             "horizontal": 61,
             "vertical_mobile": 71,
-            "horizontal_mobile": 21
+            "horizontal_mobile": 21,
+            "cta_label": "",
+            "cta_link": "",
+            "cta_external": false,
+            "cta_icon": true
           }
         },
         "content_GxtfDc": {
@@ -198,7 +206,11 @@
             "vertical": 56,
             "horizontal": 8,
             "vertical_mobile": 30,
-            "horizontal_mobile": 12
+            "horizontal_mobile": 12,
+            "cta_label": "",
+            "cta_link": "",
+            "cta_external": false,
+            "cta_icon": true
           }
         },
         "content_Di8hGn": {
@@ -214,7 +226,11 @@
             "vertical": 56,
             "horizontal": 52,
             "vertical_mobile": 59,
-            "horizontal_mobile": 48
+            "horizontal_mobile": 48,
+            "cta_label": "",
+            "cta_link": "",
+            "cta_external": false,
+            "cta_icon": true
           }
         },
         "content_eDTngH": {
@@ -230,7 +246,11 @@
             "vertical": 70,
             "horizontal": 75,
             "vertical_mobile": 66,
-            "horizontal_mobile": 78
+            "horizontal_mobile": 78,
+            "cta_label": "",
+            "cta_link": "",
+            "cta_external": false,
+            "cta_icon": true
           }
         }
       },
