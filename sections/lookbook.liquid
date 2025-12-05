@@ -1,4 +1,23 @@
 <style>
+
+ 
+  #shopify-section-{{ section.id }} {
+    /* ... existing styles ... */
+  }
+
+  /* Prevent flash of content on load */
+  #shopify-section-{{ section.id }} .hotspot__content {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  #shopify-section-{{ section.id }} .hotspot:hover .hotspot__content {
+    opacity: 1;
+    visibility: visible;
+  }
+ 
+
+
   #shopify-section-{{ section.id }} {
     --section-padding-top: {{ section.settings.padding_top }}px;
     --section-padding-bottom: {{ section.settings.padding_bottom }}px;
