@@ -390,7 +390,7 @@
         "highlighted_scribble": "circle",
         "color_text": "#171717",
         "color_background": "#ffffff",
-        "gradient_background": "linear-gradient(1deg, rgba(250, 250, 250, 1) 7%, rgba(168, 222, 232, 1) 94%)",
+        "gradient_background": "linear-gradient(1deg, rgba(255, 255, 255, 1) 7%, rgba(168, 222, 232, 1) 94%)",
         "color_highlight": "",
         "gradient_highlight": "",
         "color_button_text": "",
@@ -543,9 +543,7 @@
         "content_RtGz7V",
         "content_bXtYAa"
       ],
-      "custom_css": [
-        "@media screen and (max-width: 639px) {.js .drawer .drawer__inner {height: 80% !important; }}"
-      ],
+      "custom_css": [],
       "name": "t:sections.lookbook.name",
       "settings": {
         "image": "shopify://shop_images/footimage.jpg",
@@ -564,7 +562,7 @@
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "",
-        "color_background": "#fafafa",
+        "color_background": "#ffffff",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
@@ -782,11 +780,11 @@
         "grid_horizontal": 100,
         "direction": "left",
         "speed": 4,
-        "heading": "AS SEEN ON",
+        "heading": "",
         "heading_size": "title-sm",
         "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
-        "subheading": "",
+        "subheading": "AS SEEN ON",
         "description": "",
         "button_label": "",
         "button_link": "",
