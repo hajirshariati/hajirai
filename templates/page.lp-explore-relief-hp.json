@@ -492,11 +492,11 @@
         "logo_MP7zF4"
       ],
       "custom_css": [
-        "@media screen and (pointer: fine) {.media > img {mix-blend-mode: multiply;}}"
+        ".media > img {mix-blend-mode: multiply; }"
       ],
       "name": "Logo list",
       "settings": {
-        "layout": "default",
+        "layout": "marquee",
         "grid_horizontal": 100,
         "direction": "left",
         "speed": 4,
