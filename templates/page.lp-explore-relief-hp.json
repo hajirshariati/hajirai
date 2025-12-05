@@ -292,9 +292,9 @@
         "color_overlay": "#171717",
         "overlay_opacity": 0,
         "padding_top": 44,
-        "padding_bottom": 72,
+        "padding_bottom": 44,
         "divider": false,
-        "full_width": true,
+        "full_width": false,
         "rounded": true,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
@@ -520,7 +520,7 @@
         "padding_top": 24,
         "padding_bottom": 24,
         "divider": false,
-        "full_width": true,
+        "full_width": false,
         "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
