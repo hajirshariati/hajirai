@@ -493,7 +493,7 @@
       ],
       "name": "Logo list",
       "settings": {
-        "layout": "marquee",
+        "layout": "default",
         "grid_horizontal": 100,
         "direction": "left",
         "speed": 4,
