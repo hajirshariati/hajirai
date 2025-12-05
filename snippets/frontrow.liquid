@@ -1,11 +1,10 @@
 <div id="frontrow-badge">
 
-  {% if product.tags contains 'frontrow-00' %}
+  {% if product.metafields.custom.frontrow == '00' %}
   <script async type="text/javascript" src="https://app.thefrontrowhealth.com/api/widgets/script?presentation_type=quant&product_id=3246,3245"></script>
   <iframe class="iframe-frontrow" id="iframe-frontrow-quant" frameborder="0" src="https://app.thefrontrowhealth.com/api/widgets?presentation_type=quant&product_id=3246,3245"></iframe>
 
-
-  {% elsif product.tags contains 'frontrow-05' %}
+  {% elsif product.metafields.custom.frontrow == '05' %}
   <script async type="text/javascript" src="https://app.thefrontrowhealth.com/api/widgets/script?presentation_type=quant&product_id=3248,3247"></script>
   <iframe class="iframe-frontrow" id="iframe-frontrow-quant" frameborder="0" src="https://app.thefrontrowhealth.com/api/widgets?presentation_type=quant&product_id=3248,3247"></iframe>
 
