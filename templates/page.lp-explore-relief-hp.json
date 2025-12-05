@@ -206,6 +206,22 @@
             "height": 52,
             "link": ""
           }
+        },
+        "logo_jkzmkh": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/mortons_neuroma.png",
+            "height": 52,
+            "link": ""
+          }
+        },
+        "logo_g86PpM": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/Overpronation.png",
+            "height": 52,
+            "link": ""
+          }
         }
       },
       "block_order": [
@@ -214,7 +230,9 @@
         "logo_nWxQdj",
         "logo_CNxTxf",
         "logo_hDaUGB",
-        "logo_JM8aBa"
+        "logo_JM8aBa",
+        "logo_jkzmkh",
+        "logo_g86PpM"
       ],
       "custom_css": [
         ".logo-list,.logo-bar {mix-blend-mode: multiply;}"
@@ -222,7 +240,7 @@
       "name": "Logo list",
       "settings": {
         "layout": "marquee",
-        "grid_horizontal": 200,
+        "grid_horizontal": 135,
         "direction": "left",
         "speed": 1,
         "heading": "<strong>Foot Pain Identifier</strong>",
