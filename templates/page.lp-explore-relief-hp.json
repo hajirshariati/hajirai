@@ -176,7 +176,7 @@
             "cta_label": "LEARN MORE",
             "cta_link": "shopify://pages/explore-relief-for-heel-spurs",
             "cta_external": false,
-            "cta_icon": true
+            "cta_icon": false
           }
         },
         "content_rRPgF4": {
@@ -196,7 +196,7 @@
             "cta_label": "LEARN MORE",
             "cta_link": "shopify://pages/explore-relief-for-bunions",
             "cta_external": false,
-            "cta_icon": true
+            "cta_icon": false
           }
         },
         "content_kkztd7": {
@@ -216,7 +216,7 @@
             "cta_label": "LEARN MORE",
             "cta_link": "shopify://pages/explore-relief-for-metatarsalgia",
             "cta_external": false,
-            "cta_icon": true
+            "cta_icon": false
           }
         },
         "content_eM9a73": {
@@ -236,7 +236,7 @@
             "cta_label": "LEARN MORE",
             "cta_link": "shopify://pages/explore-relief-for-arch-pain",
             "cta_external": false,
-            "cta_icon": true
+            "cta_icon": false
           }
         },
         "content_RtGz7V": {
@@ -256,7 +256,7 @@
             "cta_label": "LEARN MORE",
             "cta_link": "shopify://pages/explore-relief-for-overpronation",
             "cta_external": false,
-            "cta_icon": true
+            "cta_icon": false
           }
         },
         "content_bXtYAa": {
@@ -276,7 +276,7 @@
             "cta_label": "LEARN MORE",
             "cta_link": "shopify://pages/explore-relief-for-mortons-neuroma",
             "cta_external": false,
-            "cta_icon": true
+            "cta_icon": false
           }
         }
       },
