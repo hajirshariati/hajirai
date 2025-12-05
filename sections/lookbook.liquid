@@ -224,6 +224,18 @@
                     <div class="drawer__content opacity-0 invisible flex flex-col h-full grow shrink">
                       <div class="drawer__scrollable relative flex flex-col gap-5 md:gap-7 grow shrink">
                         <div class="rte text-base md:text-lg">{{ block.settings.text }}</div>
+                        {%- if block.settings.cta_label != blank -%}
+                          <a 
+                            href="{{ block.settings.cta_link | default: '#' }}" 
+                            class="button button--primary inline-flex items-center justify-center gap-2"
+                            {% if block.settings.cta_external %}target="_blank" rel="noopener noreferrer"{% endif %}
+                          >
+                            <span>{{ block.settings.cta_label }}</span>
+                            {%- if block.settings.cta_icon -%}
+                              {%- render 'icon', icon: 'arrow-right', size: 'sm' -%}
+                            {%- endif -%}
+                          </a>
+                        {%- endif -%}
                       </div>
                     </div>
                   </div>
@@ -1030,6 +1042,33 @@
           "max": 95,
           "step": 1,
           "unit": "%"
+        },
+        {
+          "type": "header",
+          "content": "CTA Button"
+        },
+        {
+          "type": "text",
+          "id": "cta_label",
+          "label": "CTA Button Label",
+          "info": "Leave blank to hide the CTA button"
+        },
+        {
+          "type": "url",
+          "id": "cta_link",
+          "label": "CTA Button Link"
+        },
+        {
+          "type": "checkbox",
+          "id": "cta_external",
+          "label": "Open link in new tab",
+          "default": false
+        },
+        {
+          "type": "checkbox",
+          "id": "cta_icon",
+          "label": "Show arrow icon",
+          "default": true
         }
       ]
     }
