@@ -226,6 +226,7 @@
                         <div class="rte text-base md:text-lg">{{ block.settings.text }}</div>
                         {%- if block.settings.cta_label != blank -%}
                           <a 
+                            style="width: max-content; padding: 2em 3em; margin-top: -2em;"
                             href="{{ block.settings.cta_link | default: '#' }}" 
                             class="button button--primary inline-flex items-center justify-center gap-2"
                             {% if block.settings.cta_external %}target="_blank" rel="noopener noreferrer"{% endif %}
