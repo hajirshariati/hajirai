@@ -1393,6 +1393,9 @@
     },
     "blog_posts_JnT6A7": {
       "type": "blog-posts",
+      "custom_css": [
+        ".article-card__title {text-transform: capitalize; font-size: smaller;}"
+      ],
       "name": "t:sections.blog-posts.name",
       "settings": {
         "blog": "aetrex-blog",
