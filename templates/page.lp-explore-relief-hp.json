@@ -696,7 +696,7 @@
         "highlighted_scribble": "circle",
         "color_text": "",
         "color_background": "#fafafa",
-        "gradient_background": "",
+        "gradient_background": "linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(250, 250, 250, 1) 100%)",
         "color_highlight": "",
         "gradient_highlight": "",
         "color_button_text": "",
