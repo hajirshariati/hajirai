@@ -212,9 +212,9 @@
         "content-1": {
           "type": "content",
           "settings": {
-            "icon": "rocket",
+            "icon": "alert",
             "heading": "Final Sale",
-            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "text": "",
             "highlighted_text": "none",
             "highlighted_scribble": "circle",
             "color_text": "#b45309",
@@ -227,9 +227,9 @@
         "content-2": {
           "type": "content",
           "settings": {
-            "icon": "headphone",
-            "heading": "Customer Support",
-            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "icon": "map_pin",
+            "heading": "Where to Buy and Redeem?",
+            "text": "<p>Aetrex gift cards are currently only available for purchase on aetrex.com in the United States and can only be redeemed for aetrex.com orders shipped to an address in the United States. </p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle",
             "color_text": "#0369a1",
@@ -242,9 +242,9 @@
         "content-3": {
           "type": "content",
           "settings": {
-            "icon": "chat_bubble",
-            "heading": "FAQ’s",
-            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "icon": "gift",
+            "heading": "How do I send a gift card?",
+            "text": "<p>Our Gift Cards are all electronic and can be sent to you or emailed directly to the lucky recipient. If you want to send the gift card directly to the recipient, click \"Send As A Gift\". From there you can also add a personalized note and schedule the email notification.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle",
             "color_text": "#be123c",
