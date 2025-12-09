@@ -25,9 +25,9 @@
         "image_Gjy887": {
           "type": "image",
           "settings": {
-            "image": "shopify://shop_images/02_970bfeef-77c8-44ba-8adb-fe38d70d2510.jpg",
+            "image": "shopify://shop_images/Gemini_Generated_Image_ys3u0pys3u0pys3u_05087f50-09a1-4ee6-97d6-6a5f8c551793.png",
             "image_width": 225,
-            "image_height": 145,
+            "image_height": 90,
             "link": "",
             "accessibility_info": "",
             "image_width_mobile": 90,
@@ -49,6 +49,9 @@
         "heading_w9KdAj",
         "image_Gjy887",
         "heading_NmWtPn"
+      ],
+      "custom_css": [
+        ".highlight-text :is(img, svg) {border-radius: 6em;}"
       ],
       "name": "t:sections.highlight-text.name",
       "settings": {
