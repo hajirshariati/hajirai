@@ -554,10 +554,10 @@
       "settings": {
         "collection": "womens-footwear-for-bunions-copy",
         "products": [],
-        "product_limit": 6,
+        "product_limit": 12,
         "columns": 4,
         "carousel_on_desktop": true,
-        "show_view_all": false,
+        "show_view_all": true,
         "columns_mobile": "1",
         "swipe_on_mobile": true,
         "heading": "{{ section.settings.collection.title }}",
