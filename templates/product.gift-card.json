@@ -272,29 +272,13 @@
             "color_highlight": "#ffddbf",
             "gradient_highlight": ""
           }
-        },
-        "content-4": {
-          "type": "content",
-          "settings": {
-            "icon": "phone",
-            "heading": "Contact Us",
-            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle",
-            "color_text": "#4d7c0f",
-            "color_background": "#f7fee7",
-            "gradient_background": "",
-            "color_highlight": "#ffddbf",
-            "gradient_highlight": ""
-          }
         }
       },
       "block_order": [
         "content-1",
         "content-2",
         "content-3",
-        "content_PWAm7E",
-        "content-4"
+        "content_PWAm7E"
       ],
       "settings": {
         "heading": "Gift Cards FAQ",
