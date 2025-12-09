@@ -232,8 +232,8 @@
             "text": "<p>Aetrex gift cards are currently only available for purchase on aetrex.com in the United States and can only be redeemed for aetrex.com orders shipped to an address in the United States. </p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle",
-            "color_text": "#0369a1",
-            "color_background": "#f0f9ff",
+            "color_text": "#171717",
+            "color_background": "#fafafa",
             "gradient_background": "",
             "color_highlight": "#ffddbf",
             "gradient_highlight": ""
@@ -247,8 +247,23 @@
             "text": "<p>Our Gift Cards are all electronic and can be sent to you or emailed directly to the lucky recipient. If you want to send the gift card directly to the recipient, click \"I want to send this as a gift\". From there you can also add a personalized note and schedule the email notification.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle",
-            "color_text": "#be123c",
-            "color_background": "#fff1f2",
+            "color_text": "#171717",
+            "color_background": "#fafafa",
+            "gradient_background": "",
+            "color_highlight": "#ffddbf",
+            "gradient_highlight": ""
+          }
+        },
+        "content_PWAm7E": {
+          "type": "content",
+          "settings": {
+            "icon": "none",
+            "heading": "How can I check my gift card balance",
+            "text": "<p>Share contact information, store details, and brand content with your customers.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle",
+            "color_text": "#171717",
+            "color_background": "#fafafa",
             "gradient_background": "",
             "color_highlight": "#ffddbf",
             "gradient_highlight": ""
@@ -274,6 +289,7 @@
         "content-1",
         "content-2",
         "content-3",
+        "content_PWAm7E",
         "content-4"
       ],
       "settings": {
