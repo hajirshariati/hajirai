@@ -136,8 +136,8 @@
         "help_desk_TjRzdC"
       ],
       "custom_css": [
-        ".media--contain > img {padding: 2em;}",
-        ".product--thumbnail .product__media-list .product__media {border-radius: 2em;}"
+        ".media--contain > img {padding: 2em; mix-blend-mode: normal;}",
+        ".product--thumbnail .product__media-list .product__media {border-radius: 2em; background: #eef2e8;}"
       ],
       "settings": {
         "enable_sticky_info": false,
