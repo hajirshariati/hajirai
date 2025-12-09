@@ -180,7 +180,7 @@
         "padding_bottom": 12,
         "divider": false,
         "full_width": true,
-        "rounded": false,
+        "rounded": true,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
@@ -1301,6 +1301,9 @@
         "heading_tQFM9G",
         "text_pzrXCq",
         "button_Ftz9KD"
+      ],
+      "custom_css": [
+        ".image-with-text__item .media:not(.media--rounded) {border-radius: 6em;}"
       ],
       "name": "t:sections.image-with-text.name",
       "settings": {
