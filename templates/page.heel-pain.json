@@ -297,6 +297,73 @@
         "abra_promo_code_hide": ""
       }
     },
+    "rich_text_grxwN7": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_rM9wpP": {
+          "type": "heading",
+          "settings": {
+            "heading": "Why our products help with Heel Pain",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_GcUQii": {
+          "type": "text",
+          "settings": {
+            "text": "<p><em>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</em></p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": true,
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_rM9wpP",
+        "text_GcUQii"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#74a5ba",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "#171717",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "narrow": true,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
     "images_with_text_iL8ht6": {
       "type": "images-with-text",
       "blocks": {
@@ -665,6 +732,7 @@
     "image_with_text_overlay_rBfBzp",
     "faq_zhAACx",
     "lookbook_w69hfT",
+    "rich_text_grxwN7",
     "images_with_text_iL8ht6",
     "featured_collection_dXtHeM",
     "rich_text_GiAWeb",
