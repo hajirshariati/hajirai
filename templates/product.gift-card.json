@@ -40,8 +40,8 @@
             "heading": "the <em>Best Gift</em>",
             "heading_size": "title-sm",
             "heading_tag": "h2",
-            "highlighted_text": "scribble",
-            "highlighted_scribble": "squiggle-underline"
+            "highlighted_text": "half_text",
+            "highlighted_scribble": "circle"
           }
         }
       },
@@ -69,10 +69,10 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "color_text": "",
+        "color_text": "#4d7c0f",
         "color_background": "#fafafa",
         "gradient_background": "linear-gradient(8deg, rgba(255, 255, 255, 1) 41%, rgba(77, 124, 15, 0.36) 100%)",
-        "color_highlight": "#4d7c0f",
+        "color_highlight": "#ffffff",
         "gradient_highlight": "",
         "color_button_text": "",
         "color_button_background": "",
@@ -230,7 +230,7 @@
           "type": "rich-text",
           "settings": {
             "heading": "Gift Card Terms & Conditions",
-            "text": "<p>Treat this Card like cash. Purchase or use of this Card constitutes acceptance of the <a href=\"/pages/aetrex-com-e-gift-card-terms-and-conditions\" title=\"Aetrex.com E-Gift Card Terms and Conditions\">E-Gift Card Terms and Conditions</a> and the following terms. This Card is redeemable up to the balance available at the time of redemption in the U.S. only for authorized goods at aetrex.com. This Card is not redeemable for cash or credit, nor will be replaced or refunded except where required by law. For refund or customer service inquiries, contact help@aetrex.com. This Card is issued and administered by Aetrex Inc. This Card is property of Aetrex Inc. until purchased. Possession or removal of a non-activated gift card constitutes illegal possession of an unauthorized device. This Card will not expire. Resale of this Card is strictly prohibited without consent of the Issuer.</p>",
+            "text": "<p>Purchase or use of this Card constitutes acceptance of the <a href=\"/pages/aetrex-com-e-gift-card-terms-and-conditions\" title=\"Aetrex.com E-Gift Card Terms and Conditions\">E-Gift Card Terms and Conditions</a> </p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
