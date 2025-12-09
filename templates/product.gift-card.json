@@ -244,7 +244,7 @@
           "settings": {
             "icon": "gift",
             "heading": "How do I send a gift card?",
-            "text": "<p>Our Gift Cards are all electronic and can be sent to you or emailed directly to the lucky recipient. If you want to send the gift card directly to the recipient, click \"Send As A Gift\". From there you can also add a personalized note and schedule the email notification.</p>",
+            "text": "<p>Our Gift Cards are all electronic and can be sent to you or emailed directly to the lucky recipient. If you want to send the gift card directly to the recipient, click \"I want to send this as a gift\". From there you can also add a personalized note and schedule the email notification.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle",
             "color_text": "#be123c",
