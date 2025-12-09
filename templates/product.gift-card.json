@@ -89,16 +89,6 @@
     "main-product": {
       "type": "main-product",
       "blocks": {
-        "vendor": {
-          "type": "text",
-          "settings": {
-            "icon": "none",
-            "iwidth": "custom",
-            "icon_width": 24,
-            "text": "{{ product.vendor }}",
-            "text_size": "text-base"
-          }
-        },
         "title": {
           "type": "title",
           "settings": {
@@ -107,35 +97,20 @@
             "show_price": true
           }
         },
-        "description": {
-          "type": "description",
-          "settings": {
-            "text_size": "text-base"
-          }
-        },
         "variant_picker": {
           "type": "variant_picker",
           "settings": {
             "show_variant_labels": true,
             "picker_type": "button",
             "enable_color_swatches": true,
-            "color_swatch_type": "color",
+            "color_swatch_type": "variant",
             "size_chart": ""
-          }
-        },
-        "inventory": {
-          "type": "inventory",
-          "settings": {
-            "inventory_threshold": 15,
-            "show_inventory_transfer": true,
-            "show_inventory_quantity": "low",
-            "color_scheme": "accent-1"
           }
         },
         "buy_buttons": {
           "type": "buy_buttons",
           "settings": {
-            "show_quantity_selector": true,
+            "show_quantity_selector": false,
             "show_price": false,
             "show_dynamic_checkout": true,
             "show_gift_card_recipient": true,
@@ -143,27 +118,12 @@
             "show_back_in_stock_name": false,
             "show_back_in_stock_phone": false
           }
-        },
-        "share": {
-          "type": "share",
-          "settings": {
-            "share_label": "Share",
-            "show_help_desk": false,
-            "help_label": "Need help?",
-            "help_type": "drawer",
-            "help_page": "",
-            "help_page_external": false
-          }
         }
       },
       "block_order": [
-        "vendor",
         "title",
-        "description",
         "variant_picker",
-        "inventory",
-        "buy_buttons",
-        "share"
+        "buy_buttons"
       ],
       "settings": {
         "enable_sticky_info": false,
@@ -183,6 +143,57 @@
         "divider": false,
         "full_width": true,
         "rounded": false
+      }
+    },
+    "highlight_text_wJrzj8": {
+      "type": "highlight-text",
+      "blocks": {
+        "heading_paJFQQ": {
+          "type": "heading",
+          "disabled": true,
+          "settings": {
+            "heading": "Comfort Is",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_paJFQQ"
+      ],
+      "name": "t:sections.highlight-text.name",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "#fafafa",
+        "gradient_background": "linear-gradient(186deg, rgba(255, 255, 255, 1) 41%, rgba(77, 124, 15, 0.36) 100%)",
+        "color_highlight": "#4d7c0f",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 76,
+        "padding_bottom": 100,
+        "divider": false,
+        "narrow": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "help-drawer": {
@@ -255,6 +266,7 @@
         "content-3",
         "content-4"
       ],
+      "disabled": true,
       "settings": {
         "heading": "Need help?",
         "description": "<p>If you have any questions, you are always welcome to contact us. We'll get back to you as soon as possible, within 24 hours on weekdays.</p>"
@@ -294,6 +306,7 @@
     },
     "recently-viewed": {
       "type": "recently-viewed",
+      "disabled": true,
       "settings": {
         "product_limit": 6,
         "columns": 4,
@@ -327,6 +340,7 @@
   "order": [
     "highlight_text_yJBW4Q",
     "main-product",
+    "highlight_text_wJrzj8",
     "help-drawer",
     "product-recommendations",
     "recently-viewed"
