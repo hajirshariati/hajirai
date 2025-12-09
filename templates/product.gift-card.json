@@ -118,12 +118,22 @@
             "show_back_in_stock_name": false,
             "show_back_in_stock_phone": false
           }
+        },
+        "help_desk_TjRzdC": {
+          "type": "help_desk",
+          "settings": {
+            "help_label": "Gift Cards FAQ",
+            "help_type": "drawer",
+            "help_page": "",
+            "help_page_external": false
+          }
         }
       },
       "block_order": [
         "title",
         "variant_picker",
-        "buy_buttons"
+        "buy_buttons",
+        "help_desk_TjRzdC"
       ],
       "settings": {
         "enable_sticky_info": false,
@@ -203,7 +213,7 @@
           "type": "content",
           "settings": {
             "icon": "rocket",
-            "heading": "Shipping Information",
+            "heading": "Final Sale",
             "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle",
@@ -266,10 +276,9 @@
         "content-3",
         "content-4"
       ],
-      "disabled": true,
       "settings": {
-        "heading": "Need help?",
-        "description": "<p>If you have any questions, you are always welcome to contact us. We'll get back to you as soon as possible, within 24 hours on weekdays.</p>"
+        "heading": "Gift Cards FAQ",
+        "description": ""
       }
     },
     "product-recommendations": {
