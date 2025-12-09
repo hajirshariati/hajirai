@@ -154,7 +154,7 @@
         "image_ratio_mobile": "adapt",
         "mobile_thumbnail": false,
         "padding_top": 24,
-        "padding_bottom": 84,
+        "padding_bottom": 0,
         "divider": false,
         "full_width": false,
         "rounded": false
@@ -229,8 +229,8 @@
         "rich_text_pDnwQ6": {
           "type": "rich-text",
           "settings": {
-            "heading": "Rich text",
-            "text": "<p>Use this section for any descriptive text you need to fill out your pages or to add introductory headings between other blocks.</p>",
+            "heading": "Gift Card Terms & Conditions",
+            "text": "<p>Treat this Card like cash. Purchase or use of this Card constitutes acceptance of the Gift Card Terms and Conditions found at XXXXXXXX and the following terms. This Card is redeemable up to the balance available at the time of redemption in the U.S. only for authorized goods at aetrex.com. This Card is not redeemable for cash or credit, nor will be replaced or refunded except where required by law. For refund or customer service inquiries, contact help@aetrex.com. This Card is issued and administered by Aetrex Inc. This Card is property of Aetrex Inc. until purchased. Possession or removal of a non-activated gift card constitutes illegal possession of an unauthorized device. This Card will not expire. Resale of this Card is strictly prohibited without consent of the Issuer.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -248,7 +248,7 @@
       ],
       "name": "t:sections.faq.name",
       "settings": {
-        "style": "with-background",
+        "style": "with-border",
         "heading": "FAQs",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
@@ -271,11 +271,11 @@
         "color_button_gradient": "",
         "color_overlay": "#ffffff",
         "overlay_opacity": 4,
-        "padding_top": 0,
+        "padding_top": 52,
         "padding_bottom": 72,
         "divider": false,
-        "narrow": false,
-        "rounded": true,
+        "narrow": true,
+        "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
@@ -316,7 +316,7 @@
         "highlighted_scribble": "circle",
         "color_text": "",
         "color_background": "#fafafa",
-        "gradient_background": "linear-gradient(186deg, rgba(255, 255, 255, 1) 41%, rgba(77, 124, 15, 0.36) 100%)",
+        "gradient_background": "linear-gradient(186deg, rgba(250, 250, 250, 1) 41%, rgba(77, 124, 15, 0.36) 100%)",
         "color_highlight": "#4d7c0f",
         "gradient_highlight": "",
         "color_button_text": "",
