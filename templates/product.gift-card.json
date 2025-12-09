@@ -135,6 +135,9 @@
         "buy_buttons",
         "help_desk_TjRzdC"
       ],
+      "custom_css": [
+        ".media--contain > img {padding: 2em;}"
+      ],
       "settings": {
         "enable_sticky_info": false,
         "media_size": 35,
@@ -146,7 +149,7 @@
         "enable_video_autoplay": true,
         "enable_video_looping": true,
         "mobile_layout": "full_width",
-        "image_ratio_mobile": "wide",
+        "image_ratio_mobile": "adapt",
         "mobile_thumbnail": false,
         "padding_top": 24,
         "padding_bottom": 84,
