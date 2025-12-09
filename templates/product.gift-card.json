@@ -121,6 +121,7 @@
         },
         "help_desk_TjRzdC": {
           "type": "help_desk",
+          "disabled": true,
           "settings": {
             "help_label": "Gift Cards FAQ",
             "help_type": "drawer",
@@ -157,6 +158,126 @@
         "divider": false,
         "full_width": false,
         "rounded": false
+      }
+    },
+    "faq_Qd3Vnm": {
+      "type": "faq",
+      "blocks": {
+        "question_DRHbD4": {
+          "type": "question",
+          "settings": {
+            "title": "Where to Buy and Redeem?",
+            "text": "<p>Aetrex gift cards are currently only available for purchase on aetrex.com in the United States and can only be redeemed for aetrex.com orders shipped to an address in the United States.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_8mTEDK": {
+          "type": "question",
+          "settings": {
+            "title": "How do I send a gift card?",
+            "text": "<p>Our Gift Cards are all electronic and can be sent to you or emailed directly to the lucky recipient. If you want to send the gift card directly to the recipient, click \"I want to send this as a gift\". From there you can also add a personalized note and schedule the email notification.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_Bq4F6L": {
+          "type": "question",
+          "settings": {
+            "title": "How can I check my gift card balance",
+            "text": "<p>Gift card balances can be checked at by applying the gift card to your cart at checkout or by contacting our team at help@aetrex.com</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_JUpq87": {
+          "type": "question",
+          "settings": {
+            "title": "Does Aetrex gift card have an expiration date or any associated non-use fees?",
+            "text": "<p>Aetrex gift cards do not expire or incur any fees.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_YixXrF": {
+          "type": "question",
+          "settings": {
+            "title": "How can I request a refund for my Issued Aetrex gift card if it has a low balance?",
+            "text": "<p>Where required by law, remaining balances on cards may be subject to refund. If your Issued Aetrex gift card has a verifiable balance of $10 or less, please contact help@aetrex.com to request a refund.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_ewehcb": {
+          "type": "question",
+          "settings": {
+            "title": "How can I request a replacement on a lost, stolen or damaged Aetrex gift card?",
+            "text": "<p>To request a replacement or report a lost or stolen card, please contact help@aetrex.com</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_Bryga3": {
+          "type": "question",
+          "settings": {
+            "title": "Who should I contact with concerns about the status of a gift card or gift card fraud?",
+            "text": "<p>If you have any questions or concerns about the status of a gift card, please email us at help@aetrex.com</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "rich_text_pDnwQ6": {
+          "type": "rich-text",
+          "settings": {
+            "heading": "Rich text",
+            "text": "<p>Use this section for any descriptive text you need to fill out your pages or to add introductory headings between other blocks.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "question_DRHbD4",
+        "question_8mTEDK",
+        "question_Bq4F6L",
+        "question_JUpq87",
+        "question_YixXrF",
+        "question_ewehcb",
+        "question_Bryga3",
+        "rich_text_pDnwQ6"
+      ],
+      "name": "t:sections.faq.name",
+      "settings": {
+        "style": "with-background",
+        "heading": "FAQs",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "#fafafa",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#ffffff",
+        "overlay_opacity": 4,
+        "padding_top": 0,
+        "padding_bottom": 72,
+        "divider": false,
+        "narrow": false,
+        "rounded": true,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "highlight_text_wJrzj8": {
@@ -280,6 +401,7 @@
         "content-3",
         "content_PWAm7E"
       ],
+      "disabled": true,
       "settings": {
         "heading": "Gift Cards FAQ",
         "description": ""
@@ -353,6 +475,7 @@
   "order": [
     "highlight_text_yJBW4Q",
     "main-product",
+    "faq_Qd3Vnm",
     "highlight_text_wJrzj8",
     "help-drawer",
     "product-recommendations",
