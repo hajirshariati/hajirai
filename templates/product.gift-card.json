@@ -25,9 +25,9 @@
         "image_Gjy887": {
           "type": "image",
           "settings": {
-            "image": "shopify://shop_images/Gemini_Generated_Image_ys3u0pys3u0pys3u_05087f50-09a1-4ee6-97d6-6a5f8c551793.png",
+            "image": "shopify://shop_images/Rectangle_60_7.png",
             "image_width": 225,
-            "image_height": 90,
+            "image_height": 85,
             "link": "",
             "accessibility_info": "",
             "image_width_mobile": 90,
@@ -71,8 +71,8 @@
         "highlighted_scribble": "circle",
         "color_text": "",
         "color_background": "#fafafa",
-        "gradient_background": "",
-        "color_highlight": "",
+        "gradient_background": "linear-gradient(8deg, rgba(255, 255, 255, 1) 41%, rgba(77, 124, 15, 0.36) 100%)",
+        "color_highlight": "#4d7c0f",
         "gradient_highlight": "",
         "color_button_text": "",
         "color_button_background": "",
@@ -81,7 +81,7 @@
         "padding_bottom": 100,
         "divider": false,
         "narrow": false,
-        "rounded": true,
+        "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
@@ -166,7 +166,7 @@
         "share"
       ],
       "settings": {
-        "enable_sticky_info": true,
+        "enable_sticky_info": false,
         "media_size": 70,
         "gallery_layout": "thumbnail",
         "thumbnail_position": "below",
