@@ -9,6 +9,80 @@
  */
 {
   "sections": {
+    "highlight_text_yJBW4Q": {
+      "type": "highlight-text",
+      "blocks": {
+        "heading_w9KdAj": {
+          "type": "heading",
+          "settings": {
+            "heading": "Comfort Is",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "image_Gjy887": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/02_970bfeef-77c8-44ba-8adb-fe38d70d2510.jpg",
+            "image_width": 225,
+            "image_height": 145,
+            "link": "",
+            "accessibility_info": "",
+            "image_width_mobile": 90,
+            "image_height_mobile": 50
+          }
+        },
+        "heading_NmWtPn": {
+          "type": "heading",
+          "settings": {
+            "heading": "the <em>Best Gift</em>",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "scribble",
+            "highlighted_scribble": "squiggle-underline"
+          }
+        }
+      },
+      "block_order": [
+        "heading_w9KdAj",
+        "image_Gjy887",
+        "heading_NmWtPn"
+      ],
+      "name": "t:sections.highlight-text.name",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "#fafafa",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 100,
+        "divider": false,
+        "narrow": false,
+        "rounded": true,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
     "main-product": {
       "type": "main-product",
       "blocks": {
@@ -90,10 +164,10 @@
       ],
       "settings": {
         "enable_sticky_info": true,
-        "media_size": 60,
+        "media_size": 70,
         "gallery_layout": "thumbnail",
         "thumbnail_position": "below",
-        "image_ratio": "adapt_first",
+        "image_ratio": "wide",
         "image_zoom": "none",
         "hide_variants": true,
         "enable_video_autoplay": true,
@@ -248,6 +322,7 @@
     }
   },
   "order": [
+    "highlight_text_yJBW4Q",
     "main-product",
     "help-drawer",
     "product-recommendations",
