@@ -138,7 +138,7 @@
       ],
       "custom_css": [
         ".media--contain > img {padding: 2em; mix-blend-mode: normal;}",
-        ".product--thumbnail .product__media-list .product__media {border-radius: 2em; background: #eef2e8;}"
+        ".product--thumbnail .product__media-list .product__media {border-radius: 2em; background: #fff;}"
       ],
       "settings": {
         "enable_sticky_info": false,
@@ -203,7 +203,7 @@
           "type": "question",
           "settings": {
             "title": "How can I request a refund for my Issued Aetrex gift card if it has a low balance?",
-            "text": "<p>Where required by law, remaining balances on cards may be subject to refund. If your Issued Aetrex gift card has a verifiable balance of $10 or less, please contact help@aetrex.com to request a refund.</p>",
+            "text": "<p>Where required by law, remaining balances on cards may be subject to refund. If your Issued Aetrex gift card has a verifiable balance of $15 or less, please contact help@aetrex.com to request a refund.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -230,7 +230,7 @@
           "type": "rich-text",
           "settings": {
             "heading": "Gift Card Terms & Conditions",
-            "text": "<p>Treat this Card like cash. Purchase or use of this Card constitutes acceptance of the Gift Card Terms and Conditions found at XXXXXXXX and the following terms. This Card is redeemable up to the balance available at the time of redemption in the U.S. only for authorized goods at aetrex.com. This Card is not redeemable for cash or credit, nor will be replaced or refunded except where required by law. For refund or customer service inquiries, contact help@aetrex.com. This Card is issued and administered by Aetrex Inc. This Card is property of Aetrex Inc. until purchased. Possession or removal of a non-activated gift card constitutes illegal possession of an unauthorized device. This Card will not expire. Resale of this Card is strictly prohibited without consent of the Issuer.</p>",
+            "text": "<p>Treat this Card like cash. Purchase or use of this Card constitutes acceptance of the <a href=\"/pages/aetrex-com-e-gift-card-terms-and-conditions\" title=\"Aetrex.com E-Gift Card Terms and Conditions\">E-Gift Card Terms and Conditions</a> and the following terms. This Card is redeemable up to the balance available at the time of redemption in the U.S. only for authorized goods at aetrex.com. This Card is not redeemable for cash or credit, nor will be replaced or refunded except where required by law. For refund or customer service inquiries, contact help@aetrex.com. This Card is issued and administered by Aetrex Inc. This Card is property of Aetrex Inc. until purchased. Possession or removal of a non-activated gift card constitutes illegal possession of an unauthorized device. This Card will not expire. Resale of this Card is strictly prohibited without consent of the Issuer.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -275,7 +275,7 @@
         "padding_bottom": 72,
         "divider": false,
         "narrow": true,
-        "rounded": false,
+        "rounded": true,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
