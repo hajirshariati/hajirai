@@ -1116,45 +1116,31 @@
                 assign quantity_rule_soldout = true
               endif
             -%}
-            {% if product.gift_card? %}
-  <a
-    href="/cart/{{ product.selected_or_first_available_variant.id }}:1?checkout=1"
-    id="custom-sticky-cart-btn"
-    class="sticky_form__submit button button--primary"
-  >
-    <span class="btn-fill" data-fill></span>
-    <span class="btn-text">
-      Buy Now
-    </span>
-  </a>
-{% else %}
-  <button
-    type="submit"
-    name="add"
-    form="{{ product_form_id }}"
-    id="custom-sticky-cart-btn"
-    class="sticky_form__submit button button--primary"
-    is="hover-button"
-    {%- if product.template_suffix == 'pre-order' %} data-pre-order{% endif -%}
-  >
-    <span class="btn-fill" data-fill></span>
-    <span class="btn-text">
-      {%- render 'icon', icon: 'cart', size: 'sm', class: 'md:hidden' -%}
-      <span class="hidden md:block" data-sold-out="{{ 'products.product.sold_out' | t | escape }}">
-        {%- liquid
-          if product.selected_or_first_available_variant.available == false or quantity_rule_soldout
-            echo 'products.product.sold_out' | t
-          elsif product.template_suffix != 'pre-order'
-            echo 'products.product.add_to_cart' | t
-          else
-            echo 'products.product.pre_order' | t
-          endif
-        -%}
-      </span>
-    </span>
-  </button>
-{% endif %}
-
+            <button
+              type="submit"
+              name="add"
+              form="{{ product_form_id }}"
+              id="custom-sticky-cart-btn"
+              class="sticky_form__submit button button--primary"
+              is="hover-button"
+              {%- if product.template_suffix == 'pre-order' %} data-pre-order{% endif -%}
+            >
+              <span class="btn-fill" data-fill></span>
+              <span class="btn-text">
+                {%- render 'icon', icon: 'cart', size: 'sm', class: 'md:hidden' -%}
+                <span class="hidden md:block" data-sold-out="{{ 'products.product.sold_out' | t | escape }}">
+                  {%- liquid
+                    if product.selected_or_first_available_variant.available == false or quantity_rule_soldout
+                      echo 'products.product.sold_out' | t
+                    elsif product.template_suffix != 'pre-order'
+                      echo 'products.product.add_to_cart' | t
+                    else
+                      echo 'products.product.pre_order' | t
+                    endif
+                  -%}
+                </span>
+              </span>
+            </button>
           </div>
           <div class="product-form__error-message alert alert--error text-sm font-medium leading-tight" role="alert" hidden></div>
         </div>
