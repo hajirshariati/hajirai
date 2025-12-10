@@ -430,50 +430,13 @@
 
 
 
-{% if product.gift_card? %}
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const form = document.getElementById("{{ product_form_id }}");
-
-      if (!form) return;
-
-      form.addEventListener("submit", async function (e) {
-        e.preventDefault();
-
-        const variantId = "{{ product.selected_or_first_available_variant.id }}";
-        const quantityInput = form.querySelector("input[name='quantity']");
-        const qty = quantityInput ? Number(quantityInput.value) : 1;
-
-        // OPTIONAL: Clear existing cart so gift cards are isolated
-        await fetch("/cart/clear.js", { method: "POST" });
-
-        // Add the gift card
-        await fetch("/cart/add.js", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            items: [
-              {
-                id: variantId,
-                quantity: qty
-              }
-            ]
-          })
-        });
-
-        // Redirect to checkout
-        window.location.href = "/checkout";
-      });
-    });
-  </script>
-{% endif %}
 
 
 
 
 
 
-
+  
   {%- if enable_back_in_stock -%}
     <div id="BackInStock-{{ section_id }}-{{ product_id }}">
       {%- if product.selected_or_first_available_variant.available == false or quantity_rule_soldout -%}
