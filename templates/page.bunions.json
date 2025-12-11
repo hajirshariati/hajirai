@@ -593,6 +593,7 @@
         "collection_cPKHdc",
         "collection_gpn6Pp"
       ],
+      "disabled": true,
       "name": "t:sections.collection-list.name",
       "settings": {
         "columns": 2,
