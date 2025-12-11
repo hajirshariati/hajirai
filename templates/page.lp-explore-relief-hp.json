@@ -105,19 +105,6 @@
             "highlighted_scribble": "circle"
           }
         },
-        "column_YpEwab": {
-          "type": "column",
-          "settings": {
-            "icon": "award",
-            "custom_icon": "",
-            "heading": "<strong>Clinically Proven to Reduce Pain</strong>*",
-            "text": "",
-            "highlighted_text": "none",
-            "custom_html": "",
-            "us_only": false,
-            "highlighted_scribble": "circle"
-          }
-        },
         "column_tPK6pL": {
           "type": "column",
           "settings": {
@@ -147,14 +134,13 @@
       },
       "block_order": [
         "column_74GMKk",
-        "column_YpEwab",
         "column_tPK6pL",
         "column_QcJHeV"
       ],
       "name": "t:sections.multicolumn-with-icons.name",
       "settings": {
         "style": "with-border",
-        "columns": 4,
+        "columns": 3,
         "text_alignment": "center",
         "heading": "",
         "heading_size": "title-md",
