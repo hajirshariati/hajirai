@@ -28,10 +28,10 @@
       assign gift_card_recipient_feature_active = true
     endif
 
-assign show_dynamic_checkout = false
-if block.settings.show_dynamic_checkout and (gift_card_recipient_feature_active == false or is_gift_card)
-  assign show_dynamic_checkout = true
-endif
+    assign show_dynamic_checkout = false
+    if block.settings.show_dynamic_checkout and gift_card_recipient_feature_active == false
+      assign show_dynamic_checkout = true
+    endif
 
     assign quantity_block = section.blocks | where: 'type', 'quantity_selector' | first
     assign show_quantity_selector = block.settings.show_quantity_selector
@@ -46,8 +46,6 @@ endif
     endif
 
     assign show_price = block.settings.show_price
-    assign is_gift_card = product.gift_card?
-
   -%}
   {%- form 'product',
     product,
@@ -301,7 +299,7 @@ endif
             </button>
           </quantity-input>
         {%- endif -%}
-{%- unless is_gift_card -%}
+
         <button
           type="submit"
           name="add"
@@ -357,7 +355,6 @@ endif
             {%- endif -%}
           </span>
         </button>
-{%- endunless -%}
 
         {%- if enable_back_in_stock -%}
           <button
