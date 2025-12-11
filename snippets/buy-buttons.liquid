@@ -427,14 +427,6 @@
     </div>
   {%- endform -%}
 
-
-
-
-
-
-
-
-  
   {%- if enable_back_in_stock -%}
     <div id="BackInStock-{{ section_id }}-{{ product_id }}">
       {%- if product.selected_or_first_available_variant.available == false or quantity_rule_soldout -%}
