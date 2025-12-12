@@ -50,7 +50,6 @@
         "image_Gjy887",
         "heading_NmWtPn"
       ],
-      "disabled": true,
       "custom_css": [
         ".highlight-text :is(img, svg) {border-radius: 6em;}"
       ],
