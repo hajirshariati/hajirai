@@ -298,6 +298,78 @@ style="font-weight: bold;color: rgb(255, 107, 43);border: none;cursor: pointer;m
   </div>
 </div>
 
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const birthdayForm = document.getElementById('BirthdayForm');
+  
+  if (birthdayForm) {
+    birthdayForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const month = document.getElementById('AccountBirthMonth').value;
+      const day = document.getElementById('AccountBirthDay').value;
+      const messageDiv = document.getElementById('BirthdayMessage');
+      const submitBtn = birthdayForm.querySelector('button[type="submit"]');
+      
+      if (!month || !day) {
+        messageDiv.style.display = 'block';
+        messageDiv.innerHTML = '<p style="color: #c00;">Please select both month and day.</p>';
+        return;
+      }
+      
+      // Disable button while processing
+      submitBtn.disabled = true;
+      submitBtn.querySelector('.btn-text').textContent = 'Saving...';
+      
+      try {
+        // Send to Klaviyo
+        var _learnq = window._learnq || [];
+        _learnq.push(['identify', {
+          '$email': '{{ customer.email }}',
+          'Birthday': month + '-' + day,
+          'Birth Month': month,
+          'Birth Day': day
+        }]);
+        
+        // Update Shopify customer note via API
+        const response = await fetch('/account', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            'form_type': 'customer',
+            'utf8': '✓',
+            'customer[note][Birthday Month]': month,
+            'customer[note][Birthday Day]': day
+          })
+        });
+        
+        // Show success message
+        messageDiv.style.display = 'block';
+        messageDiv.innerHTML = '<p style="color: #1a7f37;">🎉 Birthday saved! We\'ll send you something special.</p>';
+        
+        // Hide the form after success
+        setTimeout(function() {
+          birthdayForm.innerHTML = '<h3 class="text-base md:text-lg font-medium mb-2">🎂 Birthday Saved</h3><p class="text-sm" style="color: #666;">We\'ll send you something special!</p>';
+        }, 2000);
+        
+      } catch (error) {
+        console.error('Error saving birthday:', error);
+        messageDiv.style.display = 'block';
+        messageDiv.innerHTML = '<p style="color: #c00;">There was an error saving your birthday. Please try again.</p>';
+        submitBtn.disabled = false;
+        submitBtn.querySelector('.btn-text').textContent = 'Save Birthday';
+      }
+    });
+  }
+});
+</script>
+
+
 {% schema %}
 {
   "name": "t:sections.main-account.name",
