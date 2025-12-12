@@ -258,6 +258,34 @@
   </div>
 </div>
 
+
+
+
+
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('#shopify-section-{{ section.id }} form');
+    
+    form.addEventListener('submit', function() {
+      const email = document.getElementById('RegisterFormEmail').value;
+      const month = document.getElementById('RegisterFormBirthMonth').value;
+      const day = document.getElementById('RegisterFormBirthDay').value;
+      
+      if (email && month && day) {
+        var _learnq = window._learnq || [];
+        _learnq.push(['identify', {
+          '$email': email,
+          'Birthday': month + '-' + day,
+          'Birth Month': month,
+          'Birth Day': day
+        }]);
+      }
+    });
+  });
+</script>
+
 {% schema %}
 {
   "name": "t:sections.main-register.name",
