@@ -192,117 +192,19 @@ style="font-weight: bold;color: rgb(255, 107, 43);border: none;cursor: pointer;m
         <sticky-element class="customer__sidebar flex flex-col gap-5 md:gap-7d5 sticky top-0">
           <h2 class="text-xl-3xl font-medium">{{ 'customer.account.details' | t }}</h2>
           <div class="text-base md:text-lg">{{ customer.default_address | format_address }}</div>
-<div>
-  <a class="button button--primary icon-with-text" href="{{ routes.account_addresses_url }}" is="hover-link">
-    <span class="btn-fill" data-fill></span>
-    <span class="btn-text">
-      {%- render 'icon', icon: 'pin', size: 'xs' -%}
-      {{- 'customer.account.view_addresses' | t }} ({{ customer.addresses_count }})
-    </span>
-  </a>
-</div>
-
-{%- assign has_birthday = false -%}
-{%- assign birthday_month_name = '' -%}
-{%- assign birthday_day_value = '' -%}
-
-{%- if customer.note != blank -%}
-  {%- assign note_lines = customer.note | newline_to_br | split: '<br />' -%}
-  {%- for line in note_lines -%}
-    {%- assign line_stripped = line | strip -%}
-    {%- if line_stripped contains 'Birthday Month:' -%}
-      {%- assign birthday_month_num = line_stripped | remove: 'Birthday Month:' | strip -%}
-      {%- case birthday_month_num -%}
-        {%- when '01' -%}{%- assign birthday_month_name = 'January' -%}
-        {%- when '02' -%}{%- assign birthday_month_name = 'February' -%}
-        {%- when '03' -%}{%- assign birthday_month_name = 'March' -%}
-        {%- when '04' -%}{%- assign birthday_month_name = 'April' -%}
-        {%- when '05' -%}{%- assign birthday_month_name = 'May' -%}
-        {%- when '06' -%}{%- assign birthday_month_name = 'June' -%}
-        {%- when '07' -%}{%- assign birthday_month_name = 'July' -%}
-        {%- when '08' -%}{%- assign birthday_month_name = 'August' -%}
-        {%- when '09' -%}{%- assign birthday_month_name = 'September' -%}
-        {%- when '10' -%}{%- assign birthday_month_name = 'October' -%}
-        {%- when '11' -%}{%- assign birthday_month_name = 'November' -%}
-        {%- when '12' -%}{%- assign birthday_month_name = 'December' -%}
-      {%- endcase -%}
-    {%- endif -%}
-    {%- if line_stripped contains 'Birthday Day:' -%}
-      {%- assign birthday_day_value = line_stripped | remove: 'Birthday Day:' | strip | plus: 0 -%}
-    {%- endif -%}
-  {%- endfor -%}
-  
-  {%- if birthday_month_name != blank and birthday_day_value != blank -%}
-    {%- assign has_birthday = true -%}
-  {%- endif -%}
-{%- endif -%}
-
-{%- if has_birthday -%}
-  <div class="birthday-section mt-5 md:mt-7d5">
-    <h3 class="text-base md:text-lg font-medium mb-2">🎂 Your Birthday</h3>
-    <p class="text-base">{{ birthday_month_name }} {{ birthday_day_value }}</p>
-  </div>
-{%- else -%}
-  <div class="birthday-section mt-5 md:mt-7d5">
-    <h3 class="text-base md:text-lg font-medium mb-3">Add Your Birthday</h3>
-    <p class="text-sm mb-4" style="color: #666;">Get a special surprise on your birthday!</p>
-    <form id="BirthdayForm" class="grid gap-4">
-      <div class="grid grid-cols-2 gap-4">
-        <div class="field">
-          <select
-            class="select is-floating"
-            id="AccountBirthMonth"
-            name="birth_month"
-            required
-            style="padding-top: 1.25rem;"
-          >
-            <option value="" disabled selected></option>
-            <option value="01">January</option>
-            <option value="02">February</option>
-            <option value="03">March</option>
-            <option value="04">April</option>
-            <option value="05">May</option>
-            <option value="06">June</option>
-            <option value="07">July</option>
-            <option value="08">August</option>
-            <option value="09">September</option>
-            <option value="10">October</option>
-            <option value="11">November</option>
-            <option value="12">December</option>
-          </select>
-          {%- render 'icon', icon: 'chevron-up', size: 'sm', class: 'absolute pointer-events-none' -%}
-          <label class="label is-floating" for="AccountBirthMonth">Month</label>
-        </div>
-        <div class="field">
-          <select
-            class="select is-floating"
-            id="AccountBirthDay"
-            name="birth_day"
-            required
-            style="padding-top: 1.25rem;"
-          >
-            <option value="" disabled selected></option>
-            {%- for i in (1..31) -%}
-              <option value="{{ i | prepend: '00' | slice: -2, 2 }}">{{ i }}</option>
-            {%- endfor -%}
-          </select>
-          {%- render 'icon', icon: 'chevron-up', size: 'sm', class: 'absolute pointer-events-none' -%}
-          <label class="label is-floating" for="AccountBirthDay">Day</label>
-        </div>
-      </div>
-      <div>
-        <button type="submit" class="button button--primary" is="hover-button">
-          <span class="btn-fill" data-fill></span>
-          <span class="btn-text">Save Birthday</span>
-        </button>
-      </div>
-      <div id="BirthdayMessage" style="display: none;"></div>
-    </form>
-  </div>
-{%- endif -%}
+          <div>
+            <a class="button button--primary icon-with-text" href="{{ routes.account_addresses_url }}" is="hover-link">
+              <span class="btn-fill" data-fill></span>
+              <span class="btn-text">
+                {%- render 'icon', icon: 'pin', size: 'xs' -%}
+                {{- 'customer.account.view_addresses' | t }} ({{ customer.addresses_count }})
+              </span>
+            </a>
+          </div>
 
 <br>
 <hr>
+
 
 
 
@@ -322,66 +224,6 @@ style="font-weight: bold;color: rgb(255, 107, 43);border: none;cursor: pointer;m
     </div>
   </div>
 </div>
-
-
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const birthdayForm = document.getElementById('BirthdayForm');
-  
-  if (birthdayForm) {
-    birthdayForm.addEventListener('submit', async function(e) {
-      e.preventDefault();
-      
-      const month = document.getElementById('AccountBirthMonth').value;
-      const day = document.getElementById('AccountBirthDay').value;
-      const messageDiv = document.getElementById('BirthdayMessage');
-      const submitBtn = birthdayForm.querySelector('button[type="submit"]');
-      
-      if (!month || !day) {
-        messageDiv.style.display = 'block';
-        messageDiv.innerHTML = '<p style="color: #c00;">Please select both month and day.</p>';
-        return;
-      }
-      
-      submitBtn.disabled = true;
-      submitBtn.querySelector('.btn-text').textContent = 'Saving...';
-      
-      try {
-        // Send to Klaviyo
-        var _learnq = window._learnq || [];
-        _learnq.push(['identify', {
-          '$email': '{{ customer.email }}',
-          'Birthday': month + '-' + day,
-          'Birth Month': month,
-          'Birth Day': day
-        }]);
-        
-        // Show success message
-        messageDiv.style.display = 'block';
-        messageDiv.innerHTML = '<p style="color: #1a7f37;">🎉 Birthday saved to your profile!</p>';
-        
-        // Convert month number to name for display
-        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        const monthName = monthNames[parseInt(month) - 1];
-        const dayNum = parseInt(day);
-        
-        setTimeout(function() {
-          document.querySelector('.birthday-section').innerHTML = '<h3 class="text-base md:text-lg font-medium mb-2">🎂 Your Birthday</h3><p class="text-base">' + monthName + ' ' + dayNum + '</p>';
-        }, 1500);
-        
-      } catch (error) {
-        console.error('Error saving birthday:', error);
-        messageDiv.style.display = 'block';
-        messageDiv.innerHTML = '<p style="color: #c00;">There was an error. Please try again.</p>';
-        submitBtn.disabled = false;
-        submitBtn.querySelector('.btn-text').textContent = 'Save Birthday';
-      }
-    });
-  }
-});
-</script>
-
 
 {% schema %}
 {
