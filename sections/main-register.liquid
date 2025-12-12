@@ -3,6 +3,11 @@
     --section-padding-top: {{ section.settings.padding_top }}px;
     --section-padding-bottom: {{ section.settings.padding_bottom }}px;
   }
+  
+  #shopify-section-{{ section.id }} #RegisterFormBirthMonth,
+  #shopify-section-{{ section.id }} #RegisterFormBirthDay {
+    padding-top: 1.25rem;
+  }
 </style>
 
 {{ 'customer.css' | asset_url | stylesheet_tag }}
