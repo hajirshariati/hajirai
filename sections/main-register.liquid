@@ -22,12 +22,12 @@
     
     <div class="customer">
       {%- form 'create_customer', class: 'grid gap-12' -%}
-        {%- liquid
-          if form.errors
-            assign form_errors = form.errors | default_errors
-            render 'alert', status: 'error', content: form_errors
-          endif
-        -%}
+{%- liquid
+  if form.errors
+    assign form_errors = form.errors | default_errors | replace: '&lt;', '<' | replace: '&gt;', '>' | replace: '&quot;', '"'
+    render 'alert', status: 'error', content: form_errors
+  endif
+-%}
 
         <div class="grid gap-5">
           <div class="field">
