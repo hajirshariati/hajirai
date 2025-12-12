@@ -49,6 +49,57 @@
             />
             <label class="label is-floating" for="RegisterFormLastName">{{ 'customer.register.last_name' | t }}</label>
           </div>
+
+
+
+<div class="field-group grid gap-2">
+  <label class="label">{{ 'customer.register.birthday' | t | default: 'Birthday (optional)' }}</label>
+  <div class="grid grid-cols-2 gap-4">
+    <div class="field">
+      <select
+        class="select is-floating"
+        id="RegisterFormBirthMonth"
+        name="customer[note][Birthday Month]"
+        is="custom-select"
+      >
+        <option value="" disabled selected></option>
+        <option value="01">January</option>
+        <option value="02">February</option>
+        <option value="03">March</option>
+        <option value="04">April</option>
+        <option value="05">May</option>
+        <option value="06">June</option>
+        <option value="07">July</option>
+        <option value="08">August</option>
+        <option value="09">September</option>
+        <option value="10">October</option>
+        <option value="11">November</option>
+        <option value="12">December</option>
+      </select>
+      {%- render 'icon', icon: 'chevron-up', size: 'sm', class: 'absolute pointer-events-none' -%}
+      <label class="label is-floating" for="RegisterFormBirthMonth">Month</label>
+    </div>
+    <div class="field">
+      <select
+        class="select is-floating"
+        id="RegisterFormBirthDay"
+        name="customer[note][Birthday Day]"
+        is="custom-select"
+      >
+        <option value="" disabled selected></option>
+        {%- for i in (1..31) -%}
+          <option value="{{ i | prepend: '00' | slice: -2, 2 }}">{{ i }}</option>
+        {%- endfor -%}
+      </select>
+      {%- render 'icon', icon: 'chevron-up', size: 'sm', class: 'absolute pointer-events-none' -%}
+      <label class="label is-floating" for="RegisterFormBirthDay">Day</label>
+    </div>
+  </div>
+</div>
+
+
+
+
           <div class="field">
             <input
               required
