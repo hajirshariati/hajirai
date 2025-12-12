@@ -192,15 +192,79 @@ style="font-weight: bold;color: rgb(255, 107, 43);border: none;cursor: pointer;m
         <sticky-element class="customer__sidebar flex flex-col gap-5 md:gap-7d5 sticky top-0">
           <h2 class="text-xl-3xl font-medium">{{ 'customer.account.details' | t }}</h2>
           <div class="text-base md:text-lg">{{ customer.default_address | format_address }}</div>
-          <div>
-            <a class="button button--primary icon-with-text" href="{{ routes.account_addresses_url }}" is="hover-link">
-              <span class="btn-fill" data-fill></span>
-              <span class="btn-text">
-                {%- render 'icon', icon: 'pin', size: 'xs' -%}
-                {{- 'customer.account.view_addresses' | t }} ({{ customer.addresses_count }})
-              </span>
-            </a>
-          </div>
+ <div>
+  <a class="button button--primary icon-with-text" href="{{ routes.account_addresses_url }}" is="hover-link">
+    <span class="btn-fill" data-fill></span>
+    <span class="btn-text">
+      {%- render 'icon', icon: 'pin', size: 'xs' -%}
+      {{- 'customer.account.view_addresses' | t }} ({{ customer.addresses_count }})
+    </span>
+  </a>
+</div>
+
+<div class="birthday-section mt-5 md:mt-7d5" id="BirthdaySection">
+  <div id="BirthdayDisplay" style="display: none;">
+    <h3 class="text-base md:text-lg font-medium mb-2">🎂 Your Birthday</h3>
+    <p class="text-base" id="BirthdayValue"></p>
+  </div>
+  
+  <div id="BirthdayFormWrapper">
+    <h3 class="text-base md:text-lg font-medium mb-3">Add Your Birthday</h3>
+    <p class="text-sm mb-4" style="color: #666;">Get a special surprise on your birthday!</p>
+    <form id="BirthdayForm" class="grid gap-4">
+      <div class="grid grid-cols-2 gap-4">
+        <div class="field">
+          <select
+            class="select is-floating"
+            id="AccountBirthMonth"
+            name="birth_month"
+            required
+            style="padding-top: 1.25rem;"
+          >
+            <option value="" disabled selected></option>
+            <option value="01">January</option>
+            <option value="02">February</option>
+            <option value="03">March</option>
+            <option value="04">April</option>
+            <option value="05">May</option>
+            <option value="06">June</option>
+            <option value="07">July</option>
+            <option value="08">August</option>
+            <option value="09">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+          </select>
+          {%- render 'icon', icon: 'chevron-up', size: 'sm', class: 'absolute pointer-events-none' -%}
+          <label class="label is-floating" for="AccountBirthMonth">Month</label>
+        </div>
+        <div class="field">
+          <select
+            class="select is-floating"
+            id="AccountBirthDay"
+            name="birth_day"
+            required
+            style="padding-top: 1.25rem;"
+          >
+            <option value="" disabled selected></option>
+            {%- for i in (1..31) -%}
+              <option value="{{ i | prepend: '00' | slice: -2, 2 }}">{{ i }}</option>
+            {%- endfor -%}
+          </select>
+          {%- render 'icon', icon: 'chevron-up', size: 'sm', class: 'absolute pointer-events-none' -%}
+          <label class="label is-floating" for="AccountBirthDay">Day</label>
+        </div>
+      </div>
+      <div>
+        <button type="submit" class="button button--primary" is="hover-button">
+          <span class="btn-fill" data-fill></span>
+          <span class="btn-text">Save Birthday</span>
+        </button>
+      </div>
+      <div id="BirthdayMessage" style="display: none;"></div>
+    </form>
+  </div>
+</div>
 
 <br>
 <hr>
@@ -224,6 +288,98 @@ style="font-weight: bold;color: rgb(255, 107, 43);border: none;cursor: pointer;m
     </div>
   </div>
 </div>
+
+
+
+
+<script>
+(function() {
+  const customerEmail = '{{ customer.email }}';
+  const customerId = '{{ customer.id }}';
+  const cookieName = 'customer_birthday_' + customerId;
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  
+  function getCookie(name) {
+    const value = '; ' + document.cookie;
+    const parts = value.split('; ' + name + '=');
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+  }
+  
+  function setCookie(name, value, days) {
+    const date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    document.cookie = name + '=' + value + ';expires=' + date.toUTCString() + ';path=/';
+  }
+  
+  function showBirthday(month, day) {
+    const monthName = monthNames[parseInt(month) - 1];
+    const dayNum = parseInt(day);
+    document.getElementById('BirthdayValue').textContent = monthName + ' ' + dayNum;
+    document.getElementById('BirthdayDisplay').style.display = 'block';
+    document.getElementById('BirthdayFormWrapper').style.display = 'none';
+  }
+  
+  function showForm() {
+    document.getElementById('BirthdayDisplay').style.display = 'none';
+    document.getElementById('BirthdayFormWrapper').style.display = 'block';
+  }
+  
+  // Check cookie on page load
+  const savedBirthday = getCookie(cookieName);
+  if (savedBirthday) {
+    const parts = savedBirthday.split('-');
+    if (parts.length === 2) {
+      showBirthday(parts[0], parts[1]);
+    } else {
+      showForm();
+    }
+  } else {
+    showForm();
+  }
+  
+  // Handle form submission
+  const form = document.getElementById('BirthdayForm');
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const month = document.getElementById('AccountBirthMonth').value;
+      const day = document.getElementById('AccountBirthDay').value;
+      const messageDiv = document.getElementById('BirthdayMessage');
+      const submitBtn = form.querySelector('button[type="submit"]');
+      
+      if (!month || !day) {
+        messageDiv.style.display = 'block';
+        messageDiv.innerHTML = '<p style="color: #c00;">Please select both month and day.</p>';
+        return;
+      }
+      
+      submitBtn.disabled = true;
+      submitBtn.querySelector('.btn-text').textContent = 'Saving...';
+      
+      // Save to cookie (expires in 5 years)
+      setCookie(cookieName, month + '-' + day, 1825);
+      
+      // Send to Klaviyo
+      var _learnq = window._learnq || [];
+      _learnq.push(['identify', {
+        '$email': customerEmail,
+        'Birthday': month + '-' + day,
+        'Birth Month': month,
+        'Birth Day': day
+      }]);
+      
+      messageDiv.style.display = 'block';
+      messageDiv.innerHTML = '<p style="color: #1a7f37;">🎉 Birthday saved!</p>';
+      
+      setTimeout(function() {
+        showBirthday(month, day);
+      }, 1500);
+    });
+  }
+})();
+</script>
 
 {% schema %}
 {
