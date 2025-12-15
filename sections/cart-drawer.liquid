@@ -47,6 +47,8 @@
         </button>
       </gesture-element>
 
+      {% render 'abra-cart-drawer-banners' %}
+
       <div class="drawer__content opacity-0 invisible flex flex-col h-full grow shrink">
         <div id="MiniCart-{{ section.id }}" class="drawer__panel opacity-0 flex flex-col overflow-hidden" open>
           <span class="sr-only">{{ 'general.cart.title' | t }}</span>

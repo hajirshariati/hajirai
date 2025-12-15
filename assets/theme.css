@@ -17759,4 +17759,79 @@ a[href="#"] {
     }
   }
  
- 
+  .abra-banner-container {
+    position: relative;
+    min-height: auto;
+    display: none;
+  }
+  
+  .abra--initialized .abra-banner-container {
+    display: block !important;
+  }
+  
+  .abra-banner-content {
+    position: relative;
+    z-index: 2;
+    padding: 16px !important;
+    background: white;
+  }
+  
+  .abra-banner-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+  }
+  
+  .abra-banner-spinner {
+    width: 30px;
+    height: 30px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    display: block !important;
+  }
+  
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  
+  .abra-banner__badge {
+      display: none !important;}
+  
+  .abra-banner__discount-image-default {
+      width: 50px !important;
+      height: 50px!important;}
+  
+  
+  .abra-banner__discount
+   {
+      background-color: #f1f1f1 !important;}
+  
+  .abra-banner__content {
+      background-color: #f1f1f1 !important;
+      border-radius: 5px;
+      padding: 1em 0em;}
+  
+  .abra-banner__discount
+   {
+      background: #f1f1f1 !important;}
+  
+  
+   .abra-banner__discount-image img {
+      mix-blend-mode: darken;}
+  
+   .abra-banner__progress-bar {
+      background: #f1f1f1 !important;}   

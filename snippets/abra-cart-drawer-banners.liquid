@@ -1,0 +1,48 @@
+<div id="AbraCartDrawerBannerContainer" class="abra-banner-container">
+  <div class="abra-banner-content">
+    <abra-banner
+      id="AbraGlobalGiftBanner"
+      class="abra-banner abra-gift-banner-global"
+      data-name="AbraGlobalGiftBanner"
+      data-block-id="AbraGlobalGiftBanner"
+    >
+      <div class="abra-banner__content">
+        <div class="abra-banner__icon abra-hide"></div>
+        <p class="abra-banner__text"></p>
+      </div>
+      <div class="abra-banner__progress-bar"></div>
+      <div class="abra-banner__offer"></div>
+    </abra-banner>
+    <abra-tiered-banner
+      id="AbraGlobalTieredBanner"
+      class="abra-tiered-banner abra-tiered-banner--global"
+      data-name="AbraGlobalTieredBanner"
+      data-block-id="AbraGlobalTieredBanner"
+    >
+      <div class="abra-tiered-banner__content">
+        <div class="abra-tiered-banner__icon abra-hide"></div>
+        <p class="abra-tiered-banner__text"></p>
+      </div>
+      <div class="abra-tiered-banner__tiers_container"></div>
+    </abra-tiered-banner>
+  </div>
+  <div class="abra-banner-loading">
+    <div class="abra-banner-spinner"></div>
+  </div>
+</div>
+
+<script>
+(() => {
+  let pending = false;
+  
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('.abra-banner__discount-variant-add') && !pending) {
+      pending = true;
+      setTimeout(function() {
+        document.dispatchEvent(new CustomEvent('cart:refresh', { detail: { open: false } }));
+        pending = false;
+      }, 1200);
+    }
+  });
+})();
+</script>
