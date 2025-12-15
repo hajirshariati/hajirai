@@ -38,6 +38,7 @@
             "heading": "<a href=\"https://rvq643.saas.contentserv.com/admin/rest/gtstream/stream/assets/Aetrex%20B2B/technology_flipbook_singles_2025.pdf\" title=\"Aetrex Foot Scanning Technology\"><em>Aetrex Foot Scanning Technology</em></a>",
             "heading_size": "text-lg-2xl",
             "text": "",
+            "custom_html": "",
             "button_label": "Download PDF",
             "button_link": "https://rvq643.saas.contentserv.com/admin/rest/gtstream/stream/assets/Aetrex%20B2B/technology_flipbook_singles_2025.pdf",
             "button_style": "link",
@@ -55,9 +56,10 @@
             "text_alignment_mobile": "center",
             "image": "shopify://shop_images/ss26fw25catalog.png",
             "image_ratio": "landscape",
-            "heading": "<a href=\"https://rvq643.saas.contentserv.com/admin/rest/gtstream/stream/assets/Files/v7_final_SS26_FW25_FOOTWEAR_CATALOG.pdf\" title=\"Aetrex Footwear Catalog\"><em>Aetrex Footwear Catalog</em></a>",
+            "heading": "<em>Aetrex Footwear Catalog</em>",
             "heading_size": "text-lg-2xl",
             "text": "",
+            "custom_html": "",
             "button_label": "Download PDF",
             "button_link": "https://rvq643.saas.contentserv.com/admin/rest/gtstream/stream/assets/Files/v7_final_SS26_FW25_FOOTWEAR_CATALOG.pdf",
             "button_style": "link",
@@ -78,6 +80,7 @@
             "heading": "<a href=\"https://rvq643.saas.contentserv.com/admin/rest/gtstream/stream/assets/Aetrex%20B2B/NEW.Orthotics.Catalog_2025.pdf\" title=\"New 2024Orthotic Catalog\"><em>Aetrex Orthotic Catalog</em></a>",
             "heading_size": "text-lg-2xl",
             "text": "",
+            "custom_html": "",
             "button_label": "Download PDF",
             "button_link": "https://rvq643.saas.contentserv.com/admin/rest/gtstream/stream/assets/Aetrex%20B2B/NEW.Orthotics.Catalog_2025.pdf",
             "button_style": "link",
@@ -122,9 +125,11 @@
         "color_button_gradient": "",
         "padding_top": 24,
         "padding_bottom": 72,
-        "divider": false,
         "full_width": false,
-        "rounded": false
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     }
   },
