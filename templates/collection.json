@@ -116,7 +116,7 @@
         "products_per_page": 16,
         "columns": 5,
         "columns_mobile": "2",
-        "pagination": "infinite",
+        "pagination": "click",
         "enable_filtering": true,
         "filter_collapsed": false,
         "filter_type": "sidebar",
