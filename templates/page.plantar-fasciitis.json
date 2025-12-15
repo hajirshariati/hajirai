@@ -305,6 +305,7 @@
         "content_eJtVLB",
         "content_Q3zqni"
       ],
+      "disabled": true,
       "name": "t:sections.lookbook.name",
       "settings": {
         "image": "shopify://shop_images/Group_18_15b06015-9b33-4a8d-adb5-e059ed32723b.png",

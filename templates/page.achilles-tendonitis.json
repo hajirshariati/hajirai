@@ -261,6 +261,7 @@
         "content_3iTAhx",
         "content_Kxzeti"
       ],
+      "disabled": true,
       "name": "t:sections.lookbook.name",
       "settings": {
         "image": "shopify://shop_images/Group_18_8.png",
