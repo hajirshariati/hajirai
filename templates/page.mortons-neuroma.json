@@ -51,11 +51,35 @@
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
+        },
+        "spacing_PmRcW4": {
+          "type": "spacing",
+          "settings": {
+            "height": 40,
+            "height_mobile": 28
+          }
+        },
+        "text_A7QKMK": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Medically reviewed by Janine Taddeo, DPM</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
         }
       },
       "block_order": [
         "heading_axLTnn",
-        "text_LHGLnM"
+        "text_LHGLnM",
+        "spacing_PmRcW4",
+        "text_A7QKMK"
       ],
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
@@ -66,7 +90,7 @@
         "content_position": "md:items-center md:justify-start",
         "text_alignment": "left",
         "image_mobile": "shopify://shop_images/Group_19_1.png",
-        "image_height_mobile": "500px",
+        "image_height_mobile": "600px",
         "content_position_mobile": "items-center justify-center",
         "text_alignment_mobile": "left",
         "color_text": "#171717",
