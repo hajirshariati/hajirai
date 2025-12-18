@@ -8003,7 +8003,10 @@ class ProductColorSwatchHandler {
         const newScript = document.createElement('script');
         Array.from(script.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
         newScript.innerHTML = script.innerHTML;
-        document.head.appendChild(newScript).parentNode.removeChild(newScript);
+        const appendedScript = document.head.appendChild(newScript);
+        if (appendedScript.parentNode) {
+            appendedScript.parentNode.removeChild(appendedScript);
+        }
     }
 
     attachSwatchListeners() {
