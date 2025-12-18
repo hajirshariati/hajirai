@@ -328,8 +328,8 @@
         "heading_EngBec": {
           "type": "heading",
           "settings": {
-            "heading": "Why our products help with Arch Pain",
-            "heading_size": "title-md",
+            "heading": "Why Our Products Help Relieve Arch Pain",
+            "heading_size": "title-sm",
             "heading_tag": "h2",
             "highlighted_text": "text",
             "highlighted_scribble": "circle"
