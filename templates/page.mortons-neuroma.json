@@ -328,8 +328,8 @@
         "heading_WPTipp": {
           "type": "heading",
           "settings": {
-            "heading": "Why our products help with Morton's Neuroma",
-            "heading_size": "title-md",
+            "heading": "Why Our Products Help Relieve Morton's Neuroma Pain",
+            "heading_size": "title-sm",
             "heading_tag": "h2",
             "highlighted_text": "text",
             "highlighted_scribble": "circle"
