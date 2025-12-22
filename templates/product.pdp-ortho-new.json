@@ -554,6 +554,43 @@
         "rounded": true
       }
     },
+    "product_comparison_mgUUMV": {
+      "type": "product-comparison",
+      "name": "t:sections.product-comparison.name",
+      "settings": {
+        "highlight_differences": true,
+        "sticky_product_info": true,
+        "first_available_variant": true,
+        "show_vendor": true,
+        "show_price": true,
+        "heading": "Product comparison",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "highlighted_reveal": false,
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 60,
+        "padding_bottom": 60,
+        "divider": false,
+        "full_width": true,
+        "rounded": false
+      }
+    },
     "multicolumn_KyfUdW": {
       "type": "multicolumn",
       "blocks": {
@@ -925,6 +962,7 @@
     "scrolling_text_4DH9VU",
     "help-drawer",
     "product-details",
+    "product_comparison_mgUUMV",
     "multicolumn_KyfUdW",
     "multicolumn_CEQ6Uh",
     "video_with_text_xf4VTt",
