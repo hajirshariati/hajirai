@@ -139,6 +139,9 @@
         "question_XamVPH",
         "question_x9EPUx"
       ],
+      "custom_css": [
+        ".details__content {opacity: 1 !important; transform: none !important;}"
+      ],
       "name": "t:sections.faq.name",
       "settings": {
         "style": "with-background",
