@@ -27,13 +27,13 @@
             "highlighted_scribble": "circle"
           }
         },
-        "column-2": {
+        "column_zr3Myg": {
           "type": "column",
           "settings": {
             "icon": "check_mark",
             "custom_icon": "",
-            "heading": "Extended Holiday Returns",
-            "text": "<p>Now offering extended easy returns for the holiday season</p>",
+            "heading": "No Hassle Returns",
+            "text": "<p>We offer quick, easy returns</p>",
             "highlighted_text": "none",
             "custom_html": "<a href=\"/apps/aftership-returns-center\">Return Center</a>",
             "us_only": false,
@@ -69,7 +69,7 @@
       },
       "block_order": [
         "column-1",
-        "column-2",
+        "column_zr3Myg",
         "column-3",
         "column-4"
       ],
