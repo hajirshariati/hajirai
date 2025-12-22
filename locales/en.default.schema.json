@@ -378,26 +378,25 @@
 
 
 
-"sections": {
-  "product-comparison": {
-    "name": "Product comparison"
-  },
-  "comparison-table": {
-    "settings": {
-      "highlight_differences": {
-        "label": "Highlight differences"
-      },
-      "sticky_product_info": {
-        "label": "Sticky product info"
-      },
-      "first_available_variant": {
-        "label": "Show first available variant"
-      }
-    }
-  }
-},
 
-  "sections": {
+  
+"sections": {
+    "product-comparison": {
+      "name": "Product comparison"
+    },
+    "comparison-table": {
+      "settings": {
+        "highlight_differences": {
+          "label": "Highlight differences"
+        },
+        "sticky_product_info": {
+          "label": "Sticky product info"
+        },
+        "first_available_variant": {
+          "label": "Show first available variant"
+        }
+      }
+    },
     "header-group": {
       "name": "Header group"
     },
