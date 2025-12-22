@@ -217,11 +217,15 @@ function OptanonWrapper() { }
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    if (window.location.pathname.includes('explore-relief-for-')) {
-      document.querySelectorAll('.faq details').forEach(details => {
-        details.setAttribute('open', '');
+    if (!window.location.pathname.includes('explore-relief-for-')) return;
+
+    document.querySelectorAll('.faq details').forEach(details => {
+      if (!details.hasAttribute('data-opened-on-load')) {
+        details.open = true;
         details.setAttribute('aria-expanded', 'true');
-      });
-    }
+        details.setAttribute('data-opened-on-load', 'true');
+      }
+    });
   });
 </script>
+
