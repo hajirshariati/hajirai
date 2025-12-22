@@ -135,13 +135,13 @@
             "text_size": "text-sm"
           }
         },
-        "text-4": {
+        "text_MYnrwp": {
           "type": "text",
           "settings": {
             "icon": "shield",
             "iwidth": "custom",
             "icon_width": 20,
-            "text": "Extended Holiday Returns",
+            "text": "Easy Returns",
             "text_size": "text-sm"
           }
         },
@@ -207,7 +207,7 @@
         "text_tEEMj9",
         "text-3",
         "text-2",
-        "text-4",
+        "text_MYnrwp",
         "sign_up_DcnXLa",
         "aetrex_fitai_pdp_size_recommendation_gUEcCb",
         "sticky_buy_button"
