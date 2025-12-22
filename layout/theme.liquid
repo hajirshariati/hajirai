@@ -210,3 +210,18 @@ function OptanonWrapper() { }
 
   </body>
 </html>
+
+
+
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (window.location.pathname.includes('explore-relief-for-')) {
+      document.querySelectorAll('.faq details').forEach(details => {
+        details.setAttribute('open', '');
+        details.setAttribute('aria-expanded', 'true');
+      });
+    }
+  });
+</script>
