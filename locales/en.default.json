@@ -183,6 +183,11 @@
       "announcement": "Announcement",
       "announcement_bar": "Announcement bar"
     },
+
+    "comparison-table": {
+  "highlight_differences": "Highlight differences"
+},
+
     "blog_posts": {
       "view_all": "View all"
     },
