@@ -234,6 +234,15 @@ function OptanonWrapper() { }
 
 
 <!-- Hide Chat when Cart drawer is open -->
+<script>
+// When drawer opens
+document.querySelector('.wrapper-AtBcr')?.style.setProperty('z-index', '0', 'important');
+
+// When drawer closes
+document.querySelector('.wrapper-AtBcr')?.style.setProperty('z-index', '', '');
+
+</script>
+
 <style>
 /* When cart drawer is open, lower Zendesk widget z-index */
 body.js-drawer-open .wrapper-AtBcr,
