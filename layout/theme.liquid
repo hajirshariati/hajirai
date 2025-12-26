@@ -217,44 +217,48 @@ function OptanonWrapper() { }
 
 
 
-
- <!-- Hide Chat when Cart drawer is open -->
+<!-- Hide Chat when Cart drawer is open -->
 <script>
-// Watch for cart drawer open/close
-const observer = new MutationObserver((mutations) => {
-  const cartDrawer = document.querySelector('#CartDrawer');
-  const zendeskButton = document.querySelector('.wrapper-AtBcr, [data-testid="launcher"]');
-  const zendeskWidget = document.querySelector('iframe#webWidget, iframe[data-product="web_widget"]');
-  
-  if (cartDrawer?.hasAttribute('open')) {
-    zendeskButton?.style.setProperty('z-index', '1', 'important');
-    zendeskWidget?.style.setProperty('z-index', '1', 'important');
-  } else {
-    zendeskButton?.style.removeProperty('z-index');
-    zendeskWidget?.style.removeProperty('z-index');
-  }
-});
+document.addEventListener('DOMContentLoaded', function() {
+  // Watch for cart drawer visibility changes
+  const observer = new MutationObserver((mutations) => {
+    const cartDrawer = document.querySelector('#CartDrawer');
+    const zendeskButton = document.querySelector('.wrapper-AtBcr, [data-testid="launcher"]');
+    const zendeskIframe = document.querySelector('iframe#webWidget, iframe[data-product="web_widget"], iframe[title*="chat"], iframe[title*="Zendesk"]');
+    
+    // Drawer is open when it does NOT have the 'hidden' attribute
+    const isDrawerOpen = cartDrawer && !cartDrawer.hasAttribute('hidden');
+    
+    if (isDrawerOpen) {
+      if (zendeskButton) zendeskButton.style.setProperty('z-index', '1', 'important');
+      if (zendeskIframe) zendeskIframe.style.setProperty('z-index', '1', 'important');
+      // Also try to hide the parent container of Zendesk
+      const zendeskContainer = document.querySelector('[data-product="web_widget"]')?.parentElement;
+      if (zendeskContainer) zendeskContainer.style.setProperty('z-index', '1', 'important');
+    } else {
+      if (zendeskButton) zendeskButton.style.removeProperty('z-index');
+      if (zendeskIframe) zendeskIframe.style.removeProperty('z-index');
+      const zendeskContainer = document.querySelector('[data-product="web_widget"]')?.parentElement;
+      if (zendeskContainer) zendeskContainer.style.removeProperty('z-index');
+    }
+  });
 
-observer.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['open'] });
+  observer.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['hidden', 'class', 'style'] });
+});
 </script>
 
 <style>
-/* Hide Zendesk chat button behind cart drawer when open */
-#CartDrawer[open] ~ .wrapper-AtBcr,
-#CartDrawer[open] .wrapper-AtBcr,
-.drawer[open] ~ .wrapper-AtBcr,
-[aria-controls="CartDrawer"][aria-expanded="true"] ~ .wrapper-AtBcr {
+/* Force Zendesk behind drawer when cart is open */
+#CartDrawer:not([hidden]) ~ .wrapper-AtBcr,
+#CartDrawer:not([hidden]) ~ iframe[data-product="web_widget"],
+#CartDrawer:not([hidden]) ~ div:has(iframe[data-product="web_widget"]),
+body:has(#CartDrawer:not([hidden])) .wrapper-AtBcr,
+body:has(#CartDrawer:not([hidden])) iframe[data-product="web_widget"],
+body:has(#CartDrawer:not([hidden])) [data-testid="launcher"] {
   z-index: 1 !important;
 }
-
-/* Target Zendesk widget iframe - most reliable method */
-#CartDrawer[open] ~ iframe[data-product="web_widget"],
-#CartDrawer[open] ~ #webWidget,
-.drawer[open] ~ iframe[data-product="web_widget"],
-.drawer[open] ~ #webWidget {
-  z-index: 1 !important;
-}
-</style>   
+</style>
+ 
   </body>
 </html>
 
