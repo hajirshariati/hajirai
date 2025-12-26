@@ -28,13 +28,24 @@
         "aetrex_fitai_customer_foot_profile_T38Jgn": {
           "type": "shopify://apps/aetrex-fitai/blocks/customerFootProfile/6c991f1a-1e7d-4325-983c-2984a2e41236",
           "settings": {
-            "AccountPage": true
+            "AccountPage": true,
+            "scanner_locator_url": "https://www.aetrex.com/pages/store-locator",
+            "scanner_locator_background": "#f2f2f2",
+            "scanner_locator_foreground": "#575555",
+            "btn_scanner_locator_background": "#cf6262",
+            "btn_scanner_locator_foreground": "#ffffff",
+            "profile_background": "#dbdbdb",
+            "profile_foreground": "#000000",
+            "result_color": "#d60000",
+            "profile_middle_background": "#838383",
+            "profile_middle_foreground": "#ffffff"
           }
         }
       },
       "block_order": [
         "aetrex_fitai_customer_foot_profile_T38Jgn"
       ],
+      "disabled": true,
       "settings": {
         "color_text": "",
         "color_background": "",
