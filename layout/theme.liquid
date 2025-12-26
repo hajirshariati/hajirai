@@ -229,3 +229,37 @@ function OptanonWrapper() { }
   });
 </script>
 
+
+
+<!-- Hide Chat when Cart drawer is open -->
+
+<script>
+const chatIframe = document.getElementById('launcher');
+const drawer = document.querySelector('.drawer__header');
+
+const observer = new MutationObserver(() => {
+  const isOpen = drawer.querySelector('[aria-expanded="true"]');
+  if (isOpen) {
+    // Move chat widget above the drawer
+    chatIframe.style.bottom = drawer.offsetHeight + 10 + 'px'; // add margin if needed
+  } else {
+    // Reset to bottom
+    chatIframe.style.bottom = '0px';
+  }
+});
+
+observer.observe(drawer, { attributes: true, subtree: true, attributeFilter: ['aria-expanded'] });
+</script>
+
+<style>
+  #launcher {
+  z-index: 999998; /* chat iframe */
+}
+
+.drawer__header {
+  z-index: 999999; /* drawer above chat */
+}
+#launcher {
+  transition: bottom 0.25s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+</style>
