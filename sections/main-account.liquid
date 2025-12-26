@@ -3,6 +3,12 @@
     --section-padding-top: {{ section.settings.padding_top }}px;
     --section-padding-bottom: {{ section.settings.padding_bottom }}px;
   }
+
+  .return-below-popup {
+  position: relative;
+  z-index: 0;
+}
+
 </style>
 
 {{ 'customer.css' | asset_url | stylesheet_tag }}
@@ -112,6 +118,7 @@ style="font-weight: bold;color: rgb(255, 107, 43);border: none;cursor: pointer;m
     {%- assign within_extended_period = true -%}
   {%- endif -%}
 
+  <div class="return-below-popup">
   {%- if order.fulfillment_status == 'fulfilled' -%}
     {%- if is_holiday_order and within_extended_period -%}
        <span style="font-size: small;color: #1a7f37; text-wrap-mode: nowrap;">Holiday Return Eligible</span>
@@ -135,6 +142,7 @@ style="font-weight: bold;color: rgb(255, 107, 43);border: none;cursor: pointer;m
       </span>
     {%- endif -%}
   {%- endif -%}
+  </div>
 </td>
 
             </tr>
