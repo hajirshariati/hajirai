@@ -208,6 +208,28 @@ function OptanonWrapper() { }
     <script src="https://a.klaviyo.com/media/js/onsite/onsite.js" async></script>
     <script src="//embed.typeform.com/next/embed.js" async></script>
 
+ 
+ 
+  </body>
+</html>
+
+
+
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (!window.location.pathname.includes('explore-relief-for-')) return;
+
+    document.querySelectorAll('.faq details').forEach(details => {
+      if (!details.hasAttribute('data-opened-on-load')) {
+        details.open = true;
+        details.setAttribute('aria-expanded', 'true');
+        details.setAttribute('data-opened-on-load', 'true');
+      }
+    });
+  });
+</script>
 
 
 
@@ -244,29 +266,6 @@ body:has(#CartDrawer:not([hidden])) iframe#launcher {
   z-index: 30 !important;
 }
 </style>
-
- 
- 
-  </body>
-</html>
-
-
-
-
-
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    if (!window.location.pathname.includes('explore-relief-for-')) return;
-
-    document.querySelectorAll('.faq details').forEach(details => {
-      if (!details.hasAttribute('data-opened-on-load')) {
-        details.open = true;
-        details.setAttribute('aria-expanded', 'true');
-        details.setAttribute('data-opened-on-load', 'true');
-      }
-    });
-  });
-</script>
 
 
 
