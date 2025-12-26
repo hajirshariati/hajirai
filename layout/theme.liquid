@@ -234,45 +234,40 @@ function OptanonWrapper() { }
 
 
 <!-- Hide Chat when Cart drawer is open -->
-
-<!-- Chat iframe position adjustment -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  const chatIframe = document.getElementById('launcher');
-  const drawer = document.querySelector('.drawer__header');
+  // Poll for Zendesk chat button dynamically
+  const getChatButton = () => document.querySelector('button[data-testid="launcher"]');
 
-  if (!chatIframe || !drawer) return; // exit if elements not found
+  const drawer = document.querySelector('.drawer__inner');
 
-  // Function to update chat position
+  if (!drawer) return;
+
   const updateChatPosition = () => {
-    const isOpen = drawer.classList.contains('drawer--open'); // change class if different
-    chatIframe.style.bottom = isOpen ? (drawer.offsetHeight + 10) + 'px' : '0px';
+    const chatButton = getChatButton();
+    if (!chatButton) return; // chat not loaded yet
+
+    // Check if drawer is visible
+    const drawerVisible = !drawer.classList.contains('invisible') && drawer.style.opacity !== '0';
+    
+    if (drawerVisible) {
+      // Move chat above drawer
+      chatButton.style.position = 'fixed';
+      chatButton.style.bottom = drawer.offsetHeight + 10 + 'px';
+      chatButton.style.right = '20px';
+      chatButton.style.transition = 'bottom 0.25s cubic-bezier(0.645, 0.045, 0.355, 1)';
+      chatButton.style.zIndex = '999998';
+    } else {
+      // Reset to bottom
+      chatButton.style.bottom = '20px';
+    }
   };
 
-  // Initial update
-  updateChatPosition();
-
-  // Observe class changes on drawer
+  // Observe drawer for class changes
   const observer = new MutationObserver(updateChatPosition);
-  observer.observe(drawer, { attributes: true, attributeFilter: ['class'] });
+  observer.observe(drawer, { attributes: true, attributeFilter: ['class', 'style'], subtree: true });
 
-  // Optional: fallback interval if MutationObserver misses updates
+  // Polling interval for Zendesk chat button (in case it loads late)
   setInterval(updateChatPosition, 200);
 });
 </script>
-
-<style>
-  /* Chat iframe styles */
-  #launcher {
-    z-index: 999998; /* below drawer */
-    position: fixed;
-    right: 0;
-    bottom: 0;
-    transition: bottom 0.25s cubic-bezier(0.645, 0.045, 0.355, 1);
-  }
-
-  /* Ensure drawer is above chat */
-  .drawer__header {
-    z-index: 999999;
-  }
-</style>
