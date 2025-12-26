@@ -235,26 +235,38 @@ function OptanonWrapper() { }
 
 <!-- Hide Chat when Cart drawer is open -->
 <script>
-// When drawer opens
-document.querySelector('.wrapper-AtBcr')?.style.setProperty('z-index', '0', 'important');
+// Watch for cart drawer open/close
+const observer = new MutationObserver((mutations) => {
+  const cartDrawer = document.querySelector('#CartDrawer');
+  const zendeskButton = document.querySelector('.wrapper-AtBcr, [data-testid="launcher"]');
+  const zendeskWidget = document.querySelector('iframe#webWidget, iframe[data-product="web_widget"]');
+  
+  if (cartDrawer?.hasAttribute('open')) {
+    zendeskButton?.style.setProperty('z-index', '1', 'important');
+    zendeskWidget?.style.setProperty('z-index', '1', 'important');
+  } else {
+    zendeskButton?.style.removeProperty('z-index');
+    zendeskWidget?.style.removeProperty('z-index');
+  }
+});
 
-// When drawer closes
-document.querySelector('.wrapper-AtBcr')?.style.setProperty('z-index', '', '');
-
+observer.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['open'] });
 </script>
 
 <style>
-/* When cart drawer is open, lower Zendesk widget z-index */
-body.js-drawer-open .wrapper-AtBcr,
-body.js-drawer-open iframe#launcher,
-body.js-drawer-open [data-testid="launcher"] {
-  z-index: 0 !important;
-  pointer-events: none;
+/* Hide Zendesk chat button behind cart drawer when open */
+#CartDrawer[open] ~ .wrapper-AtBcr,
+#CartDrawer[open] .wrapper-AtBcr,
+.drawer[open] ~ .wrapper-AtBcr,
+[aria-controls="CartDrawer"][aria-expanded="true"] ~ .wrapper-AtBcr {
+  z-index: 1 !important;
 }
 
-/* Or target the Zendesk widget iframe container */
-body.js-drawer-open #webWidget,
-body.js-drawer-open .zEWidget-launcher {
-  z-index: 0 !important;
-}  
+/* Target Zendesk widget iframe - most reliable method */
+#CartDrawer[open] ~ iframe[data-product="web_widget"],
+#CartDrawer[open] ~ #webWidget,
+.drawer[open] ~ iframe[data-product="web_widget"],
+.drawer[open] ~ #webWidget {
+  z-index: 1 !important;
+}
 </style>
