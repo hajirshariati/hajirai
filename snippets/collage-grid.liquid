@@ -93,8 +93,8 @@
         {{- block_content -}}
       </div>
 
-    {%- when 'video' -%}
-      <div class="collage__item with-image banner w-full h-full relative overflow-hidden" style="--collage-column: {{ block.settings.column_size | default: 10 }};--collage-row: {{ block.settings.row_size | default: 4 }};" id="shopify-block-{{ block.id }}" {{ block.shopify_attributes }}>
+{%- when 'video' -%}
+  <div class="collage__item with-image banner w-full h-full relative overflow-hidden" style="--collage-column: {{ block.settings.column_size | default: 10 }};--collage-row: {{ block.settings.row_size | default: 4 }};--video-fit: {{ block.settings.video_fit | default: 'cover' }};" id="shopify-block-{{ block.id }}" {{ block.shopify_attributes }}>
         <div class="w-full h-full relative">
           {%- if block.settings.video_mobile or block.settings.video_url_mobile -%}
 {%- render 'video',
