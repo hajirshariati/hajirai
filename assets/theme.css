@@ -17835,3 +17835,33 @@ a[href="#"] {
   
    .abra-banner__progress-bar {
       background: #f1f1f1 !important;}   
+
+
+
+
+
+
+
+
+
+      /* =====================================================
+   COLLAGE – hard disable link visuals when no link
+   ===================================================== */
+
+.media-card__content[data-clickable="false"] {
+  pointer-events: none;
+}
+
+.media-card__content[data-clickable="false"] .heading,
+.media-card__content[data-clickable="false"] .reversed-link {
+  background: none !important;
+  text-decoration: none !important;
+}
+
+/* Kill any arrows (SVG or CSS pseudo-elements) */
+.media-card__content[data-clickable="false"] svg,
+.media-card__content[data-clickable="false"]::after,
+.media-card__content[data-clickable="false"] *::after {
+  display: none !important;
+  content: none !important;
+}
