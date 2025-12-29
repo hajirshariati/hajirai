@@ -139,3 +139,21 @@
 
   {%- endcase -%}
 {%- endfor -%}
+
+
+
+<style>
+.reversed-link--disabled {
+  pointer-events: none;
+}
+
+.reversed-link--disabled::after {
+  display: none !important;
+}
+
+.reversed-link--disabled:hover {
+  text-decoration: none !important;
+  background-size: 0 !important;
+}
+
+</style>
