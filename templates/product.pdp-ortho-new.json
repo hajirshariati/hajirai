@@ -722,7 +722,7 @@
             "enable_video_autoplay": false,
             "enable_video_looping": false,
             "enable_video_controls": true,
-            "video_fit": "none",
+            "video_fit": "scale-down",
             "content_position": "md:items-center md:justify-center",
             "text_alignment": "center",
             "video_url_mobile": "",
