@@ -39,6 +39,7 @@
   assign video_alt = video.alt | default: description
   assign alt = 'general.accessibility.load_video' | t: description: video_alt | escape
   assign preview_image = video.preview_image | default: cover_image
+  assign controls = controls | default: false
 
   capture hosted_poster
     if hosted_cover_image != blank
