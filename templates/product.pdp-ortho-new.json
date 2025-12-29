@@ -1001,7 +1001,8 @@
     "ugc_gallery_9emGbm": {
       "type": "ugc-gallery",
       "custom_css": [
-        "@media (min-width: 1250px) {.yotpo-pictures-widget {padding: 0rem 9.5rem; }}"
+        "@media (min-width: 1250px) {.yotpo-pictures-widget {padding: 0rem 9.5rem; }}",
+        " .yotpo-pictures-widget {padding: 0rem; }"
       ],
       "name": "UGC Gallery",
       "settings": {
