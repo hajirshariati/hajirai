@@ -188,6 +188,7 @@
         },
         "sticky_buy_button": {
           "type": "sticky_buy_button",
+          "disabled": true,
           "settings": {}
         }
       },
