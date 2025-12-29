@@ -1000,7 +1000,9 @@
     },
     "ugc_gallery_9emGbm": {
       "type": "ugc-gallery",
-      "custom_css": [],
+      "custom_css": [
+        "@media (min-width: 1024px) {.yotpo-pictures-widget {padding: 0rem 9.5rem; }}"
+      ],
       "name": "UGC Gallery",
       "settings": {
         "custom_gallery": "{{ product.metafields.product.yotpo_gallery_id.value }}",
