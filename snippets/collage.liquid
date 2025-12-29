@@ -48,23 +48,49 @@
     <div class="media-card__text shrink-1 grid gap-0d5">
       <p>
         {%- if block.settings.link != blank -%}
-          <span class="heading reversed-link lg:text-4xl text-2xl tracking-tighter leading-tight">
-            {%- render 'highlighted-text', content: block.settings.heading, style: block.settings.highlighted_text, scribble: block.settings.highlighted_scribble, gradient: with_gradient -%}
-          </span>
+          <a
+            href="{{ block.settings.link }}"
+            class="heading reversed-link lg:text-4xl text-2xl tracking-tighter leading-tight"
+          >
+            {%- render 'highlighted-text',
+              content: block.settings.heading,
+              style: block.settings.highlighted_text,
+              scribble: block.settings.highlighted_scribble,
+              gradient: with_gradient
+            -%}
+          </a>
         {%- else -%}
           <span class="heading lg:text-4xl text-2xl tracking-tighter leading-tight">
-            {%- render 'highlighted-text', content: block.settings.heading, style: block.settings.highlighted_text, scribble: block.settings.highlighted_scribble, gradient: with_gradient -%}
+            {%- render 'highlighted-text',
+              content: block.settings.heading,
+              style: block.settings.highlighted_text,
+              scribble: block.settings.highlighted_scribble,
+              gradient: with_gradient
+            -%}
           </span>
         {%- endif -%}
       </p>
     </div>
+
     {%- if block.settings.link != blank -%}
-      <svg class="icon icon-arrow-right icon-xs transform shrink-0" viewBox="0 0 21 20" stroke="currentColor" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M3 10H18M18 10L12.1667 4.16675M18 10L12.1667 15.8334"></path>
+      <svg
+        class="icon icon-arrow-right icon-xs transform shrink-0"
+        viewBox="0 0 21 20"
+        stroke="currentColor"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M3 10H18M18 10L12.1667 4.16675M18 10L12.1667 15.8334"
+        ></path>
       </svg>
     {%- endif -%}
   </div>
 {%- endif -%}
+
 
             {%- if block.settings.subheading != blank and block.settings.invert_subheading_heading == true -%}
               <span class="block"></span>
@@ -148,7 +174,3 @@
 
   {%- endcase -%}
 {%- endfor -%}
-
-
-
-<!-- cache bust -->
