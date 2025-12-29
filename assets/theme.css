@@ -17885,3 +17885,38 @@ a[href="#"] {
 .collage__item video[controls] {
   z-index: 10;
 }
+
+
+
+
+
+
+
+/* Video fit setting */
+.collage__item video-media video {
+  object-fit: var(--video-fit, cover);
+  width: 100%;
+  height: 100%;
+}
+
+/* Fix video controls being overlaid */
+.collage__item .banner__overlay {
+  pointer-events: none;
+}
+
+.collage__item .media-card__link {
+  pointer-events: none;
+}
+
+.collage__item .media-card__link .media-card__content {
+  pointer-events: auto;
+}
+
+.collage__item video-media video[controls] {
+  position: relative;
+  z-index: 10;
+}
+
+.collage__item video-media .deferred-poster {
+  z-index: 5;
+}
