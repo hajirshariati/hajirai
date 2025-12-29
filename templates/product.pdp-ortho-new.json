@@ -625,13 +625,14 @@
         "image_hdbL8L": {
           "type": "image",
           "settings": {
-            "column_size": 4,
+            "column_size": 5,
             "row_size": 1,
             "subheading": "",
             "heading": "Goodbye Foot Pain.",
             "link": "",
             "invert_subheading_heading": false,
-            "content_position": "md:items-end md:justify-start",
+            "image": "shopify://shop_images/banner_M.webp",
+            "content_position": "md:items-center md:justify-start",
             "text_alignment": "center",
             "content_position_mobile": "items-end justify-start",
             "text_alignment_mobile": "left",
@@ -652,13 +653,14 @@
         "image_JzRaqe": {
           "type": "image",
           "settings": {
-            "column_size": 6,
+            "column_size": 5,
             "row_size": 1,
             "subheading": "",
             "heading": "Hello Relief.",
             "link": "",
             "invert_subheading_heading": true,
-            "content_position": "md:items-end md:justify-start",
+            "image": "shopify://shop_images/higharches_9ae4da6d-9dd9-493c-a117-bda45123426c.jpg",
+            "content_position": "md:items-center md:justify-center",
             "text_alignment": "left",
             "content_position_mobile": "items-end justify-start",
             "text_alignment_mobile": "left",
@@ -728,8 +730,8 @@
             "color_text": "#171717",
             "color_highlight": "",
             "gradient_highlight": "",
-            "color_overlay": "#171717",
-            "overlay_opacity": 10
+            "color_overlay": "#ffddbf",
+            "overlay_opacity": 67
           }
         },
         "video_Rkj6mF": {
