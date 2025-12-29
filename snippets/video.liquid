@@ -73,7 +73,7 @@
 
     <template>
       {%- if video != blank -%}
-        {{- video | video_tag: playsinline: true, muted: muted, autoplay: true, loop: loop, controls: false, preload: 'metadata', image_size: '800x' -}}
+        {{- video | video_tag: playsinline: true, muted: muted, autoplay: true, loop: loop, controls: controls, preload: 'metadata', image_size: '800x' -}}
       {%- else -%}
         {%- if video_url.type == 'youtube' -%}
           <iframe src="https://www.youtube.com/embed/{{ video_url.id }}?playsinline=1&controls=0{% if autoplay %}&autoplay=1{% endif %}{% if muted %}&mute=1{% endif %}{% if loop %}&loop=1{% endif %}&playlist={{ video_url.id }}&enablejsapi=1&rel=0&modestbranding=1&origin={{ 'https://' | append: request.host | url_encode }}" allow="autoplay; encrypted-media" allowfullscreen="allowfullscreen"></iframe>
