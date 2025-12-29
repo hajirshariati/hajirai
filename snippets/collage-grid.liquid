@@ -49,7 +49,9 @@
               </p>
             {%- endif -%}
           </div>
-          {%- render 'icon', icon: 'arrow-right', size: 'xs', class: 'transform shrink-0' -%}
+          {%- if block.settings.link != blank -%}
+            {%- render 'icon', icon: 'arrow-right', size: 'xs', class: 'transform shrink-0' -%}
+          {%- endif -%}
         </div>
       </a>
     {%- endif -%}
