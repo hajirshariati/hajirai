@@ -17856,3 +17856,32 @@ a[href="#"] {
   text-decoration: none !important;
   background-size: 0 !important;
 }
+
+
+
+
+.collage__item video {
+  object-fit: var(--video-fit, cover);
+  width: 100%;
+  height: 100%;
+}
+
+/* Fix video controls overlay issue */
+.collage__item video-media video {
+  position: relative;
+  z-index: 5;
+}
+
+.collage__item .banner__overlay,
+.collage__item .media-card__link {
+  pointer-events: none;
+}
+
+.collage__item .media-card__link * {
+  pointer-events: auto;
+}
+
+/* When video controls are enabled, adjust overlay positioning */
+.collage__item video[controls] {
+  z-index: 10;
+}
