@@ -36,7 +36,9 @@
         {%- render 'highlighted-text', content: block.settings.heading, style: block.settings.highlighted_text, scribble: block.settings.highlighted_scribble, gradient: with_gradient -%}
       </a>
     {%- else -%}
-      {%- render 'highlighted-text', content: block.settings.heading, style: block.settings.highlighted_text, scribble: block.settings.highlighted_scribble, gradient: with_gradient -%}
+      <span class="reversed-link reversed-link--disabled">
+        {%- render 'highlighted-text', content: block.settings.heading, style: block.settings.highlighted_text, scribble: block.settings.highlighted_scribble, gradient: with_gradient -%}
+      </span>
     {%- endif -%}
   </p>
 {%- endif -%}
