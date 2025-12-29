@@ -97,31 +97,33 @@
       <div class="collage__item with-image banner w-full h-full relative overflow-hidden" style="--collage-column: {{ block.settings.column_size | default: 10 }};--collage-row: {{ block.settings.row_size | default: 4 }};" id="shopify-block-{{ block.id }}" {{ block.shopify_attributes }}>
         <div class="w-full h-full relative">
           {%- if block.settings.video_mobile or block.settings.video_url_mobile -%}
-            {%- render 'video',
-              video: block.settings.video_mobile,
-              video_url: block.settings.video_url_mobile,
-              muted: block.settings.enable_video_autoplay,
-              autoplay: block.settings.enable_video_autoplay,
-              loop: block.settings.enable_video_looping,
-              description: block.settings.description,
-              cover_image: block.settings.cover_image_mobile,
-              show_play_button: true,
-              is_mobile: true,
-              class: 'media media--height w-full h-full'
-            -%}
+{%- render 'video',
+  video: block.settings.video_mobile,
+  video_url: block.settings.video_url_mobile,
+  muted: block.settings.enable_video_autoplay,
+  autoplay: block.settings.enable_video_autoplay,
+  loop: block.settings.enable_video_looping,
+  controls: block.settings.enable_video_controls,
+  description: block.settings.description,
+  cover_image: block.settings.cover_image_mobile,
+  show_play_button: true,
+  is_mobile: true,
+  class: 'media media--height w-full h-full'
+-%}
           {%- endif -%}
     
-          {%- render 'video',
-            video: block.settings.video,
-            video_url: block.settings.video_url,
-            muted: block.settings.enable_video_autoplay,
-            autoplay: block.settings.enable_video_autoplay,
-            loop: block.settings.enable_video_looping,
-            description: block.settings.description,
-            cover_image: block.settings.cover_image,
-            show_play_button: true,
-            class: 'media media--height w-full h-full'
-          -%}
+{%- render 'video',
+  video: block.settings.video,
+  video_url: block.settings.video_url,
+  muted: block.settings.enable_video_autoplay,
+  autoplay: block.settings.enable_video_autoplay,
+  loop: block.settings.enable_video_looping,
+  controls: block.settings.enable_video_controls,
+  description: block.settings.description,
+  cover_image: block.settings.cover_image,
+  show_play_button: true,
+  class: 'media media--height w-full h-full'
+-%}
           
           {{- block_content -}}
         </div>
