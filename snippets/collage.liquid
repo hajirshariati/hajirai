@@ -43,13 +43,19 @@
               <span class="block"></span>
             {%- endif -%}
 
-            {%- if block.settings.heading != blank -%}
-              <p class="heading text-3xl leading-none tracking-tight">
-                <a class="reversed-link"{% if block.settings.link != blank %} href="{{ block.settings.link }}"{% else %} role="link" aria-disabled="true"{% endif %}>
-                  {%- render 'highlighted-text', content: block.settings.heading, style: block.settings.highlighted_text, scribble: block.settings.highlighted_scribble, gradient: with_gradient -%}
-                </a>
-              </p>
-            {%- endif -%}
+{%- if block.settings.heading != blank -%}
+  <p class="heading text-3xl leading-none tracking-tight">
+    {%- if block.settings.link != blank -%}
+      <a class="reversed-link" href="{{ block.settings.link }}">
+        {%- render 'highlighted-text', content: block.settings.heading, style: block.settings.highlighted_text, scribble: block.settings.highlighted_scribble, gradient: with_gradient -%}
+      </a>
+    {%- else -%}
+      <span class="reversed-link reversed-link--disabled">
+        {%- render 'highlighted-text', content: block.settings.heading, style: block.settings.highlighted_text, scribble: block.settings.highlighted_scribble, gradient: with_gradient -%}
+      </span>
+    {%- endif -%}
+  </p>
+{%- endif -%}
 
             {%- if block.settings.subheading != blank and block.settings.invert_subheading_heading == true -%}
               <span class="block"></span>
