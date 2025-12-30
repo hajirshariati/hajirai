@@ -125,21 +125,45 @@ function OptanonWrapper() { }
       onload="this.media='all'"
     >
 
-    {{ content_for_header }}
+      {% if template contains 'product' %}
+          {%- capture __content_for_header -%}
+              {{ content_for_header }}
+          {%- endcapture -%}
 
-    <script src="{{ 'vendor.js' | asset_url }}" defer="defer"></script>
-    {% comment %}<script src="{{ 'theme.js' | asset_url }}" defer="defer"></script>{% endcomment %}
-    <script src="{{ 'theme.js' | asset_url }}" defer="defer"></script>
-    <script src="{{ 'dynamic.js' | asset_url }}" defer="defer"></script>
-    <script src="{{ 'swiper-bundle.min.js' | asset_url }}" defer="defer"></script>
-    <script src="{{ 'us-detector.js' | asset_url }}" defer="defer"></script>
+          {%- assign __content_for_header = __content_for_header
+                  | replace: 'checkouts/internal/preloads.js', ''
+                  | replace: 'https://shop.app', ''
+                  | replace: "window.addEventListener('load', asyncLoad, false);", "['scroll','click','touchstart','mousemove'].forEach(function(e){window.addEventListener(e,function handler(){asyncLoad();['scroll','click','touchstart','mousemove'].forEach(function(e){window.removeEventListener(e,handler);});},{once:true,passive:true});});"
+                  | replace: "window.attachEvent('onload', asyncLoad);", ""
+          -%}
 
-    <link rel="stylesheet" href="{{ 'dynamic.css' | asset_url }}" media="print" onload="this.media='all'">
-    <link rel="stylesheet" href="{{ 'swiper-bundle.min.css' | asset_url }}" media="print" onload="this.media='all'">
-    <noscript>
-      <link rel="stylesheet" href="{{ 'dynamic.css' | asset_url }}">
-      <link rel="stylesheet" href="{{ 'swiper-bundle.min.css' | asset_url }}">
-    </noscript>
+          {{ __content_for_header }}
+
+      {% else %}
+          {{ content_for_header }}
+      {% endif %}
+
+
+      <script src="{{ 'vendor.js' | asset_url }}" defer="defer"></script>
+      {% comment %}<script src="{{ 'theme.js' | asset_url }}" defer="defer"></script>{% endcomment %}
+      <script src="{{ 'theme.js' | asset_url }}" defer="defer"></script>
+      <script src="{{ 'dynamic.js' | asset_url }}" defer="defer"></script>
+      {%  unless template contains 'product' %}
+          <script src="{{ 'swiper-bundle.min.js' | asset_url }}" defer="defer"></script>
+      {% endunless %}
+      <script src="{{ 'us-detector.js' | asset_url }}" defer="defer"></script>
+
+      <link rel="stylesheet" href="{{ 'dynamic.css' | asset_url }}" media="print" onload="this.media='all'">
+      {%  unless template contains 'product' %}
+
+          <link rel="stylesheet" href="{{ 'swiper-bundle.min.css' | asset_url }}" media="print" onload="this.media='all'">
+      {% endunless %}
+      <noscript>
+          <link rel="stylesheet" href="{{ 'dynamic.css' | asset_url }}">
+          {% unless template contains 'product' %}
+              <link rel="stylesheet" href="{{ 'swiper-bundle.min.css' | asset_url }}">
+          {% endunless %}
+      </noscript>
 
     {%- if settings.enable_tab_attention -%}
       <script src="{{ 'tab-attention.js' | asset_url }}" defer="defer"></script>

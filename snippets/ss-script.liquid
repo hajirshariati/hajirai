@@ -45,6 +45,19 @@
 {% endcapture %}
 
 {% comment %}Searchspring Script{% endcomment %}
-<script src="https://snapui.searchspring.io/{{ settings.ss_site_id }}{{ ss_branch_name }}/bundle.js" id="searchspring-context"{{ ss_defer_config }}>
-    {{ ss_shopper_config }}{{ ss_collection_config }}{{ ss_tags_config }}{{ ss_template_config }}{{ ss_money_config }}{{ ss_unexploded_collections }}
-</script>
+{% if template contains 'product' %}
+    {% comment %}Lazy load on product pages - after everything has loaded{% endcomment %}
+    <script>
+        window.addEventListener('load', function() {
+            var script = document.createElement('script');
+            script.src = "https://snapui.searchspring.io/{{ settings.ss_site_id }}{{ ss_branch_name }}/bundle.js";
+            script.id = "searchspring-context";
+            document.body.appendChild(script);
+        });
+    </script>
+{% else %}
+    {% comment %}Normal load on all other pages{% endcomment %}
+    <script src="https://snapui.searchspring.io/{{ settings.ss_site_id }}{{ ss_branch_name }}/bundle.js" id="searchspring-context"{{ ss_defer_config }}>
+        {{ ss_shopper_config }}{{ ss_collection_config }}{{ ss_tags_config }}{{ ss_template_config }}{{ ss_money_config }}{{ ss_unexploded_collections }}
+    </script>
+{% endif %}

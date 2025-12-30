@@ -364,27 +364,28 @@ function initSwatchSlider() {
     sliderMap.set(el, swiperInstance);
   });
 
-  // 3. Init swatch sliders
-  const Swatchswiper = new Swiper('.main-swatch-custom-slider', {
-    slidesPerView: 'auto',
-    loop: false,
-    allowTouchMove: true, 
-    draggable: true,
-    observer: true,
-    navigation: {
-      nextEl: '.swiper-button-next',
-      prevEl: '.swiper-button-prev',
-    },
-    breakpoints: {
-        0: {
-          spaceBetween: 7,
-        },
-        481: {
-          spaceBetween: 10,
-        },
-    },
-  });
-
+    if(typeof Swiper !== 'undefined'){
+        // 3. Init swatch sliders
+        const Swatchswiper = new Swiper('.main-swatch-custom-slider', {
+            slidesPerView: 'auto',
+            loop: false,
+            allowTouchMove: true,
+            draggable: true,
+            observer: true,
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev',
+            },
+            breakpoints: {
+                0: {
+                    spaceBetween: 7,
+                },
+                481: {
+                    spaceBetween: 10,
+                },
+            },
+        });
+    }
 
   // 4. Mouseover handler for swatches
   document.querySelectorAll('.custom-color-swatch-link').forEach((swatch) => {
