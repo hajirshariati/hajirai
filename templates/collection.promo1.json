@@ -52,40 +52,6 @@
         "parallax_direction": "vertical"
       }
     },
-    "image_with_text_overlay_VacPMR": {
-      "type": "image-with-text-overlay",
-      "name": "t:sections.image-with-text-overlay.name",
-      "settings": {
-        "transparent_header": false,
-        "image": "shopify://shop_images/Gift_Guide_Category_Banner_Desktop.jpg",
-        "image_height": "adapt",
-        "content_width": "small",
-        "content_position": "md:items-end md:justify-start",
-        "text_alignment": "left",
-        "image_mobile": "shopify://shop_images/Gift_Guide_Category_Banner_Mobile.jpg",
-        "image_height_mobile": "adapt",
-        "content_position_mobile": "items-end justify-start",
-        "text_alignment_mobile": "left",
-        "color_text": "#ffffff",
-        "color_highlight": "#e0a580",
-        "gradient_highlight": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
-        "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "divider_color": "#111111",
-        "overlay_opacity": 0,
-        "padding_top": 0,
-        "padding_bottom": 0,
-        "divider": false,
-        "full_width": false,
-        "rounded": true,
-        "enable_parallax": false,
-        "parallax_direction": "vertical",
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
     "1750082334ddfccde7": {
       "type": "apps",
       "disabled": true,
@@ -301,7 +267,6 @@
   },
   "order": [
     "main-collection-banner",
-    "image_with_text_overlay_VacPMR",
     "1750082334ddfccde7",
     "main-collection",
     "recently-viewed",
