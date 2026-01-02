@@ -595,7 +595,7 @@
       "settings": {
         "style": "with-border",
         "heading": "Have Questions? We’ve Got Answers.",
-        "heading_size": "title-md",
+        "heading_size": "title-sm",
         "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
         "subheading": "",
@@ -616,7 +616,7 @@
         "color_button_gradient": "",
         "color_overlay": "#c5a370",
         "overlay_opacity": 100,
-        "padding_top": 0,
+        "padding_top": 40,
         "padding_bottom": 0,
         "divider": false,
         "narrow": false,
