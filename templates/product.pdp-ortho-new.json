@@ -737,8 +737,37 @@
             "overlay_opacity": 67
           }
         },
+        "image_JGkH4U": {
+          "type": "image",
+          "settings": {
+            "column_size": 3,
+            "row_size": 2,
+            "subheading": "",
+            "heading": "Comfort Starts with Science",
+            "link": "",
+            "invert_subheading_heading": false,
+            "image": "shopify://shop_images/1256x804_Pressure_monitor_Without.png",
+            "content_position": "md:items-end md:justify-start",
+            "text_alignment": "left",
+            "content_position_mobile": "items-end justify-start",
+            "text_alignment_mobile": "left",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle",
+            "color_text": "#171717",
+            "color_highlight": "",
+            "gradient_highlight": "",
+            "color_overlay": "#e7e7e7",
+            "overlay_opacity": 100,
+            "color_text_hover": "",
+            "color_highlight_hover": "",
+            "gradient_highlight_hover": "",
+            "color_overlay_hover": "",
+            "overlay_opacity_hover": 10
+          }
+        },
         "video_Rkj6mF": {
           "type": "video",
+          "disabled": true,
           "settings": {
             "column_size": 3,
             "row_size": 2,
@@ -801,6 +830,7 @@
         "image_hdbL8L",
         "image_JzRaqe",
         "video_hqYYyc",
+        "image_JGkH4U",
         "video_Rkj6mF",
         "image_pMRXqp"
       ],
