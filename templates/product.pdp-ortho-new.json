@@ -507,20 +507,6 @@
             "metafields": ""
           }
         },
-        "collapsible_tab_eTMkBk": {
-          "type": "collapsible_tab",
-          "settings": {
-            "icon": "newspaper",
-            "iwidth": "custom",
-            "icon_width": 24,
-            "heading": "FAQ",
-            "content": "<p><strong>How do orthotics work?</strong></p><p>Orthotics work by supporting your body from the ground up, promoting proper alignment and reducing stress on your feet, knees, hips, and back. Aetrex Orthotics are designed using data and insights from over 50 million foot scans, providing anatomically correct arch support and using premium materials to absorb shock and help redistribute pressure away from high-impact areas. The result is lasting comfort, injury prevention, and healthier movement with every step.</p><p><strong>What makes Aetrex Orthotics different from other brands?</strong></p><p>Aetrex Orthotics are engineered using data and learnings from over 50 million foot scans to deliver anatomically precise support that helps relieve pain and prevent injury. Each pair features Aetrex’s Signature Arch Support—strategically contoured and positioned to align the body from the ground up.<br/></p><p>Unlike traditional orthotics made with rigid materials, Aetrex Orthotics are crafted with premium, shock-absorbing materials like IQ150 memory foam and advanced polyurethane that offer support and comfort. They also cushion and protect the feet while promoting proper alignment to help reduce stress on the plantar fascia, knees, hips, and back.<br/></p><p>Available in a range of styles, they offer customized comfort based on your foot type and footwear.</p><p><strong>Can orthotics help with plantar fasciitis?</strong></p><p>Yes. Plantar Fasciitis is typically caused by over-pronation (flat feet) or very high arches. Aetrex Orthotics provide alignment and support to keep the foot closer to the neutral position throughout the gait cycle. Proper alignment helps minimize over-pronation, reduces stress on the plantar fascia, and decreases inflammation associated with plantar fasciitis.</p>",
-            "content_metafield": "",
-            "columns": "Size,Chest",
-            "rows": "",
-            "metafields": ""
-          }
-        },
         "specification_Qjh3nn": {
           "type": "specification",
           "repeater": "{{ product.metafields.product.details_icons.value }}",
@@ -536,7 +522,6 @@
         "collapsible_tab_96ewnx",
         "collapsible_tab_C9R9gb",
         "collapsible_tab_6jwNHa",
-        "collapsible_tab_eTMkBk",
         "specification_Qjh3nn"
       ],
       "settings": {
@@ -568,6 +553,76 @@
         "divider": false,
         "full_width": true,
         "rounded": true
+      }
+    },
+    "faq_tA87L7": {
+      "type": "faq",
+      "blocks": {
+        "question_abDy8f": {
+          "type": "question",
+          "settings": {
+            "title": "Frequently asked question",
+            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_yWhBPp": {
+          "type": "question",
+          "settings": {
+            "title": "Frequently asked question",
+            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "question_ddMWr9": {
+          "type": "question",
+          "settings": {
+            "title": "Frequently asked question",
+            "text": "<p>Use this text to answer questions in as much detail as possible for your customers.</p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "question_abDy8f",
+        "question_yWhBPp",
+        "question_ddMWr9"
+      ],
+      "name": "t:sections.faq.name",
+      "settings": {
+        "style": "with-border",
+        "heading": "Have Questions? We’ve Got Answers.",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "#fafafa",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#c5a370",
+        "overlay_opacity": 100,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "narrow": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "multicolumn_KyfUdW": {
@@ -1194,6 +1249,7 @@
     "scrolling_text_4DH9VU",
     "help-drawer",
     "product-details",
+    "faq_tA87L7",
     "multicolumn_KyfUdW",
     "collage_grid_jYjan7",
     "multicolumn_CEQ6Uh",
