@@ -905,6 +905,9 @@
         "video_Rkj6mF",
         "image_pMRXqp"
       ],
+      "custom_css": [
+        ".collage__item .media-card__link {letter-spacing: 1px; line-height: normal;}"
+      ],
       "name": "t:sections.collage-grid.name",
       "settings": {
         "row_height": 300,
@@ -934,7 +937,7 @@
         "divider": false,
         "full_width": false,
         "rounded": false,
-        "enable_parallax": true,
+        "enable_parallax": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
