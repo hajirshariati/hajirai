@@ -18,6 +18,21 @@
 
 {%- for block in section.blocks -%}
   {%- capture block_content -%}
+
+
+{%- if block.settings.icon_image != blank -%}
+  <div class="collage-block__icon">
+    <img 
+      src="{{ block.settings.icon_image | image_url: width: block.settings.icon_width | times: 2 }}"
+      alt="{{ block.settings.icon_image.alt | escape }}"
+      width="{{ block.settings.icon_width }}"
+      height="auto"
+      loading="lazy"
+    >
+  </div>
+{%- endif -%}
+
+
     {%- if block.settings.subheading != blank or block.settings.heading != blank -%}
       <span class="banner__overlay absolute top-0 left-0 w-full h-full pointer-events-none flex {{ block.settings.content_position }} {{ block.settings.content_position_mobile }}"></span>
       <a class="media-card__link absolute z-1 top-0 left-0 w-full h-full flex {{ block.settings.content_position }} {{ block.settings.content_position_mobile }}"{% if block.settings.link != blank %} href="{{ block.settings.link }}"{% else %} role="link" aria-disabled="true"{% endif %}>
@@ -145,4 +160,16 @@
   .media-card__text .heading {
     letter-spacing: 1px;
     font-size: xx-large;}
+
+
+.collage-block__icon {
+  margin-bottom: 0.5rem;
+}
+
+.collage-block__icon img {
+  height: auto;
+  object-fit: contain;
+}
+
+
 </style>
