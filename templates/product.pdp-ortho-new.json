@@ -51,6 +51,16 @@
             "size_chart": "size-chart"
           }
         },
+        "liquid_87RPy3": {
+          "type": "liquid",
+          "settings": {
+            "liquid": "<br>"
+          }
+        },
+        "sku_yjUFQR": {
+          "type": "sku",
+          "settings": {}
+        },
         "true_fit_widget_8cjNbr": {
           "type": "shopify://apps/true-fit/blocks/widget/caa08c3b-c601-47cd-9c2a-32bb0567b191",
           "settings": {}
@@ -65,27 +75,6 @@
             "enable_back_in_stock": false,
             "show_back_in_stock_name": false,
             "show_back_in_stock_phone": false
-          }
-        },
-        "liquid_MK9HPz": {
-          "type": "liquid",
-          "settings": {
-            "liquid": "<br>"
-          }
-        },
-        "product_bundle_QXPWrW": {
-          "type": "product_bundle",
-          "settings": {
-            "icon": "star",
-            "iwidth": "fit",
-            "icon_width": 20,
-            "heading": "Popular upgrades (Shop with Met Pad)",
-            "products": [
-              "l405m-m"
-            ],
-            "metafield": "",
-            "opened": true,
-            "clickable": false
           }
         },
         "liquid_Df3mAF": {
@@ -219,10 +208,10 @@
         "price_TirYdK",
         "yotpo_product_reviews_star_rating_8XQiyE",
         "variant_picker",
+        "liquid_87RPy3",
+        "sku_yjUFQR",
         "true_fit_widget_8cjNbr",
         "buy_buttons",
-        "liquid_MK9HPz",
-        "product_bundle_QXPWrW",
         "liquid_Df3mAF",
         "icon_list_VBaw6z",
         "liquid_anxBGN",
