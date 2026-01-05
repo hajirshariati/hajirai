@@ -67,6 +67,21 @@
             "show_back_in_stock_phone": false
           }
         },
+        "product_bundle_QXPWrW": {
+          "type": "product_bundle",
+          "settings": {
+            "icon": "none",
+            "iwidth": "custom",
+            "icon_width": 20,
+            "heading": "Popular upgrades",
+            "products": [
+              "l405m-m"
+            ],
+            "metafield": "",
+            "opened": false,
+            "clickable": false
+          }
+        },
         "liquid_Df3mAF": {
           "type": "liquid",
           "settings": {
@@ -200,6 +215,7 @@
         "variant_picker",
         "true_fit_widget_8cjNbr",
         "buy_buttons",
+        "product_bundle_QXPWrW",
         "liquid_Df3mAF",
         "icon_list_VBaw6z",
         "liquid_anxBGN",
