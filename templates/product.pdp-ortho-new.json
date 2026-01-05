@@ -694,6 +694,64 @@
     "collage_grid_jYjan7": {
       "type": "collage-grid",
       "blocks": {
+        "video_hqYYyc": {
+          "type": "video",
+          "settings": {
+            "column_size": 4,
+            "row_size": 1,
+            "subheading": "",
+            "heading": "Why Customers Love <em>{{ product.title }}</em>",
+            "link": "",
+            "invert_subheading_heading": false,
+            "video": "{{ product.metafields.product.details_media_content.value.video.value }}",
+            "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
+            "description": "",
+            "enable_video_autoplay": false,
+            "enable_video_looping": false,
+            "enable_video_controls": true,
+            "video_fit": "cover",
+            "content_position": "md:items-center md:justify-center",
+            "text_alignment": "center",
+            "video_url_mobile": "",
+            "content_position_mobile": "items-end justify-start",
+            "text_alignment_mobile": "left",
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle",
+            "color_text": "#171717",
+            "color_highlight": "#835819",
+            "gradient_highlight": "",
+            "color_overlay": "#c5a370",
+            "overlay_opacity": 67
+          }
+        },
+        "image_hdbL8L": {
+          "type": "image",
+          "settings": {
+            "column_size": 3,
+            "row_size": 1,
+            "subheading": "Goodbye Foot Pain.",
+            "heading": "Hello Relief.",
+            "link": "",
+            "invert_subheading_heading": false,
+            "image": "shopify://shop_images/banner_M.webp",
+            "content_position": "md:items-end md:justify-start",
+            "text_alignment": "left",
+            "content_position_mobile": "items-end justify-start",
+            "text_alignment_mobile": "left",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle",
+            "color_text": "#171717",
+            "color_highlight": "",
+            "gradient_highlight": "",
+            "color_overlay": "#e7e7e7",
+            "overlay_opacity": 100,
+            "color_text_hover": "",
+            "color_highlight_hover": "",
+            "gradient_highlight_hover": "",
+            "color_overlay_hover": "",
+            "overlay_opacity_hover": 10
+          }
+        },
         "image_JzRaqe": {
           "type": "image",
           "settings": {
@@ -750,66 +808,9 @@
             "overlay_opacity_hover": 10
           }
         },
-        "image_hdbL8L": {
-          "type": "image",
-          "settings": {
-            "column_size": 3,
-            "row_size": 1,
-            "subheading": "Goodbye Foot Pain.",
-            "heading": "Hello Relief.",
-            "link": "",
-            "invert_subheading_heading": false,
-            "image": "shopify://shop_images/banner_M.webp",
-            "content_position": "md:items-end md:justify-start",
-            "text_alignment": "left",
-            "content_position_mobile": "items-end justify-start",
-            "text_alignment_mobile": "left",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle",
-            "color_text": "#171717",
-            "color_highlight": "",
-            "gradient_highlight": "",
-            "color_overlay": "#e7e7e7",
-            "overlay_opacity": 100,
-            "color_text_hover": "",
-            "color_highlight_hover": "",
-            "gradient_highlight_hover": "",
-            "color_overlay_hover": "",
-            "overlay_opacity_hover": 10
-          }
-        },
-        "video_hqYYyc": {
-          "type": "video",
-          "settings": {
-            "column_size": 4,
-            "row_size": 1,
-            "subheading": "",
-            "heading": "Why Customers Love <em>{{ product.title }}</em>",
-            "link": "",
-            "invert_subheading_heading": false,
-            "video": "{{ product.metafields.product.details_media_content.value.video.value }}",
-            "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
-            "description": "",
-            "enable_video_autoplay": false,
-            "enable_video_looping": false,
-            "enable_video_controls": true,
-            "video_fit": "scale-down",
-            "content_position": "md:items-center md:justify-center",
-            "text_alignment": "center",
-            "video_url_mobile": "",
-            "content_position_mobile": "items-end justify-start",
-            "text_alignment_mobile": "left",
-            "highlighted_text": "text",
-            "highlighted_scribble": "circle",
-            "color_text": "#171717",
-            "color_highlight": "#835819",
-            "gradient_highlight": "",
-            "color_overlay": "#c5a370",
-            "overlay_opacity": 67
-          }
-        },
         "image_JGkH4U": {
           "type": "image",
+          "disabled": true,
           "settings": {
             "column_size": 3,
             "row_size": 1,
@@ -838,10 +839,9 @@
         },
         "video_Rkj6mF": {
           "type": "video",
-          "disabled": true,
           "settings": {
             "column_size": 3,
-            "row_size": 2,
+            "row_size": 1,
             "subheading": "",
             "heading": "",
             "link": "",
@@ -851,7 +851,7 @@
             "description": "",
             "enable_video_autoplay": true,
             "enable_video_looping": true,
-            "enable_video_controls": false,
+            "enable_video_controls": true,
             "video_fit": "cover",
             "content_position": "md:items-end md:justify-start",
             "text_alignment": "left",
@@ -898,10 +898,10 @@
         }
       },
       "block_order": [
+        "video_hqYYyc",
+        "image_hdbL8L",
         "image_JzRaqe",
         "image_XLJFpx",
-        "image_hdbL8L",
-        "video_hqYYyc",
         "image_JGkH4U",
         "video_Rkj6mF",
         "image_pMRXqp"
