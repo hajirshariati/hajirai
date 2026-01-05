@@ -28,7 +28,7 @@
             {%- if block.settings.icon_image != blank -%}
               <div class="collage-block__icon">
                 <img 
-                  src="{{ block.settings.icon_image | image_url: width: block.settings.icon_width | times: 2 }}"
+                  src="{{ block.settings.icon_image | image_url: width: 400 }}"
                   alt="{{ block.settings.icon_image.alt | escape }}"
                   width="{{ block.settings.icon_width }}"
                   height="auto"
