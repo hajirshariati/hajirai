@@ -67,18 +67,24 @@
             "show_back_in_stock_phone": false
           }
         },
+        "liquid_MK9HPz": {
+          "type": "liquid",
+          "settings": {
+            "liquid": "<br>"
+          }
+        },
         "product_bundle_QXPWrW": {
           "type": "product_bundle",
           "settings": {
-            "icon": "none",
-            "iwidth": "custom",
+            "icon": "star",
+            "iwidth": "fit",
             "icon_width": 20,
-            "heading": "Popular upgrades",
+            "heading": "Popular upgrades (Shop with Met Pad)",
             "products": [
               "l405m-m"
             ],
             "metafield": "",
-            "opened": false,
+            "opened": true,
             "clickable": false
           }
         },
@@ -215,6 +221,7 @@
         "variant_picker",
         "true_fit_widget_8cjNbr",
         "buy_buttons",
+        "liquid_MK9HPz",
         "product_bundle_QXPWrW",
         "liquid_Df3mAF",
         "icon_list_VBaw6z",
