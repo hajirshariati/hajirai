@@ -8400,7 +8400,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const abraPromo = document.querySelectorAll('[data-abra-promo]');
             abraPromo.forEach(element => {
                 if (element.dataset.abraPromo === abralink) {
-                    element.style.display = 'block';
+                    element.removeAttribute('data-abra-promo');
                 }
             });
         }
