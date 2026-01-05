@@ -694,6 +694,36 @@
     "collage_grid_jYjan7": {
       "type": "collage-grid",
       "blocks": {
+        "image_XLJFpx": {
+          "type": "image",
+          "settings": {
+            "column_size": 3,
+            "row_size": 2,
+            "subheading": "\"I recommend Aetrex products to my patients because it helps provide the right balance and support to relieve and prevent foot conditions like Plantar Fasciitis. Unlike other brands; the contour, position and height of the Aetrex product arch support aligns anatomically in the proper place to help support our bodies from the ground up.\"- Janine Taddeo, DPM",
+            "heading": "Doctor Approved",
+            "link": "",
+            "invert_subheading_heading": true,
+            "icon_image": "shopify://shop_images/apma_f662bdd7-e32e-4dc7-98fb-b5255f537999.png",
+            "icon_width": 50,
+            "image": "shopify://shop_images/Dr.Janine.jpg",
+            "content_position": "md:items-end md:justify-start",
+            "text_alignment": "left",
+            "content_position_mobile": "items-end justify-start",
+            "text_alignment_mobile": "left",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle",
+            "color_text": "#171717",
+            "color_highlight": "",
+            "gradient_highlight": "",
+            "color_overlay": "#e7e7e7",
+            "overlay_opacity": 100,
+            "color_text_hover": "",
+            "color_highlight_hover": "",
+            "gradient_highlight_hover": "",
+            "color_overlay_hover": "",
+            "overlay_opacity_hover": 10
+          }
+        },
         "video_hqYYyc": {
           "type": "video",
           "settings": {
@@ -721,7 +751,7 @@
             "color_text": "#171717",
             "color_highlight": "#835819",
             "gradient_highlight": "",
-            "color_overlay": "#c5a370",
+            "color_overlay": "#fafafa",
             "overlay_opacity": 67
           }
         },
@@ -765,36 +795,6 @@
             "invert_subheading_heading": false,
             "icon_width": 50,
             "image": "shopify://shop_images/617x640_Hi_tech_Materials.png",
-            "content_position": "md:items-end md:justify-start",
-            "text_alignment": "left",
-            "content_position_mobile": "items-end justify-start",
-            "text_alignment_mobile": "left",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle",
-            "color_text": "#171717",
-            "color_highlight": "",
-            "gradient_highlight": "",
-            "color_overlay": "#e7e7e7",
-            "overlay_opacity": 100,
-            "color_text_hover": "",
-            "color_highlight_hover": "",
-            "gradient_highlight_hover": "",
-            "color_overlay_hover": "",
-            "overlay_opacity_hover": 10
-          }
-        },
-        "image_XLJFpx": {
-          "type": "image",
-          "settings": {
-            "column_size": 3,
-            "row_size": 2,
-            "subheading": "\"I recommend Aetrex products to my patients because it helps provide the right balance and support to relieve and prevent foot conditions like Plantar Fasciitis. Unlike other brands; the contour, position and height of the Aetrex product arch support aligns anatomically in the proper place to help support our bodies from the ground up.\"- Janine Taddeo, DPM",
-            "heading": "Doctor Approved",
-            "link": "",
-            "invert_subheading_heading": true,
-            "icon_image": "shopify://shop_images/apma_f662bdd7-e32e-4dc7-98fb-b5255f537999.png",
-            "icon_width": 50,
-            "image": "shopify://shop_images/Dr.Janine.jpg",
             "content_position": "md:items-end md:justify-start",
             "text_alignment": "left",
             "content_position_mobile": "items-end justify-start",
@@ -906,10 +906,10 @@
         }
       },
       "block_order": [
+        "image_XLJFpx",
         "video_hqYYyc",
         "image_hdbL8L",
         "image_JzRaqe",
-        "image_XLJFpx",
         "image_JGkH4U",
         "video_Rkj6mF",
         "image_pMRXqp"
