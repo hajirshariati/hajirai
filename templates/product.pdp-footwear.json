@@ -152,6 +152,7 @@
         },
         "aetrex_fitai_pdp_size_recommendation_gUEcCb": {
           "type": "shopify://apps/aetrex-fitai/blocks/PDPSizeRecommendation/6c991f1a-1e7d-4325-983c-2984a2e41236",
+          "disabled": true,
           "settings": {
             "ProductPage": true,
             "size_recommendation_font_family": "OpenSans, sans-serif",
