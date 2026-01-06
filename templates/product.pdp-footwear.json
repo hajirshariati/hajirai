@@ -150,6 +150,13 @@
             "already_a_member": "You’re already a member!"
           }
         },
+        "aetrex_sizeright_size_right_dAzW8x": {
+          "type": "shopify://apps/aetrex-sizeright/blocks/size-right/0a01b6e8-c3fe-4d34-a727-cb8b8c326ed3",
+          "settings": {
+            "isActive": true,
+            "OnlyMobile": false
+          }
+        },
         "aetrex_fitai_pdp_size_recommendation_gUEcCb": {
           "type": "shopify://apps/aetrex-fitai/blocks/PDPSizeRecommendation/6c991f1a-1e7d-4325-983c-2984a2e41236",
           "disabled": true,
@@ -198,6 +205,7 @@
         "text-2",
         "text_pxwMnk",
         "sign_up_DcnXLa",
+        "aetrex_sizeright_size_right_dAzW8x",
         "aetrex_fitai_pdp_size_recommendation_gUEcCb",
         "sticky_buy_button"
       ],
