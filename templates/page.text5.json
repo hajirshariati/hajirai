@@ -46,7 +46,7 @@
         "layout": "text_first",
         "text_alignment": "left",
         "custom_content_position": "items-center",
-        "image_height_mobile": "auto",
+        "image_height_mobile": "200px",
         "text_alignment_mobile": "left",
         "color_text": "",
         "color_background": "#fafafa",
