@@ -11,6 +11,7 @@
   "sections": {
     "main-page": {
       "type": "main-page",
+      "disabled": true,
       "settings": {
         "heading_size": "title-sm",
         "heading_alignment": "text-left",
@@ -22,9 +23,30 @@
         "narrow": true,
         "rounded": false
       }
+    },
+    "custom_liquid_LPUrMd": {
+      "type": "custom-liquid",
+      "name": "t:sections.custom-liquid.name",
+      "settings": {
+        "liquid": "<div  class=\"klaviyo-form-UZRRXf\"></div>",
+        "color_text": "",
+        "color_background": "#e7e7e7",
+        "gradient_background": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "narrow": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
     }
   },
   "order": [
-    "main-page"
+    "main-page",
+    "custom_liquid_LPUrMd"
   ]
 }
