@@ -30,7 +30,7 @@
       "settings": {
         "liquid": "<div  class=\"klaviyo-form-UZRRXf\"></div>",
         "color_text": "",
-        "color_background": "#e7e7e7",
+        "color_background": "rgba(0,0,0,0)",
         "gradient_background": "",
         "color_button_text": "",
         "color_button_background": "",
@@ -38,7 +38,7 @@
         "padding_top": 72,
         "padding_bottom": 72,
         "divider": false,
-        "narrow": false,
+        "narrow": true,
         "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
