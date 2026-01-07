@@ -24,22 +24,47 @@
         "rounded": false
       }
     },
-    "custom_liquid_LPUrMd": {
-      "type": "custom-liquid",
-      "name": "t:sections.custom-liquid.name",
+    "image_with_text_JPkYJC": {
+      "type": "image-with-text",
+      "blocks": {
+        "liquid_YndNgq": {
+          "type": "liquid",
+          "settings": {
+            "liquid": "<div  class=\"klaviyo-form-UZRRXf\"></div>"
+          }
+        }
+      },
+      "block_order": [
+        "liquid_YndNgq"
+      ],
+      "name": "t:sections.image-with-text.name",
       "settings": {
-        "liquid": "<div  class=\"klaviyo-form-UZRRXf\"></div>",
+        "image": "shopify://shop_images/6._5_BEST_SHOES_FOR_BUNIONS_WOMEN_FOR_STYLISH_RELIEF.jpg",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "medium",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "left",
         "color_text": "",
-        "color_background": "rgba(0,0,0,0)",
+        "color_background": "",
         "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
+        "padding_top": 0,
+        "padding_bottom": 0,
         "divider": false,
-        "narrow": true,
+        "full_width": false,
         "rounded": false,
+        "enable_parallax": true,
+        "parallax_direction": "vertical",
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
@@ -47,6 +72,6 @@
   },
   "order": [
     "main-page",
-    "custom_liquid_LPUrMd"
+    "image_with_text_JPkYJC"
   ]
 }
