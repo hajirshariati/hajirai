@@ -49,7 +49,7 @@
         "image_height_mobile": "auto",
         "text_alignment_mobile": "left",
         "color_text": "",
-        "color_background": "",
+        "color_background": "#fafafa",
         "gradient_background": "",
         "color_background_2": "",
         "gradient_background_2": "",
