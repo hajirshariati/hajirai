@@ -41,9 +41,9 @@
       "settings": {
         "image": "shopify://shop_images/6._5_BEST_SHOES_FOR_BUNIONS_WOMEN_FOR_STYLISH_RELIEF.jpg",
         "img_url": "",
-        "image_height": "adapt",
-        "image_width": "medium",
-        "layout": "image_first",
+        "image_height": "400px",
+        "image_width": "small",
+        "layout": "text_first",
         "text_alignment": "left",
         "custom_content_position": "items-center",
         "image_height_mobile": "auto",
