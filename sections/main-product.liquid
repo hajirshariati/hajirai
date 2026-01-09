@@ -1115,13 +1115,22 @@
               if product.selected_or_first_available_variant.quantity_rule.min > product.selected_or_first_available_variant.inventory_quantity and check_against_inventory
                 assign quantity_rule_soldout = true
               endif
+
+              assign has_size_or_width_sticky = false
+              for option in product.options_with_values
+                assign option_name_lower = option.name | downcase
+                if option_name_lower == 'size' or option_name_lower == 'width'
+                  assign has_size_or_width_sticky = true
+                  break
+                endif
+              endfor
             -%}
             <button
               type="submit"
               name="add"
               form="{{ product_form_id }}"
               id="custom-sticky-cart-btn"
-              class="sticky_form__submit button button--primary"
+              class="sticky_form__submit button button--primary{% if has_size_or_width_sticky %} disabled-btn{% endif %}"
               is="hover-button"
               {%- if product.template_suffix == 'pre-order' %} data-pre-order{% endif -%}
             >
@@ -1130,8 +1139,21 @@
                 {%- render 'icon', icon: 'cart', size: 'sm', class: 'md:hidden' -%}
                 <span class="hidden md:block" data-sold-out="{{ 'products.product.sold_out' | t | escape }}">
                   {%- liquid
+                    assign has_size_option_sticky = false
+                    assign size_option_name_sticky = 'SIZE'
+                    for option in product.options_with_values
+                      assign option_name_lower = option.name | downcase
+                      if option_name_lower == 'size' or option_name_lower == 'width'
+                        assign has_size_option_sticky = true
+                        assign size_option_name_sticky = option.name | upcase
+                        break
+                      endif
+                    endfor
+
                     if product.selected_or_first_available_variant.available == false or quantity_rule_soldout
                       echo 'products.product.sold_out' | t
+                    elsif has_size_option_sticky
+                      echo 'PLEASE SELECT ' | append: size_option_name_sticky
                     elsif product.template_suffix != 'pre-order'
                       echo 'products.product.add_to_cart' | t
                     else

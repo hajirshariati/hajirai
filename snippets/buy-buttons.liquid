@@ -300,13 +300,23 @@
           </quantity-input>
         {%- endif -%}
 
+        {%- liquid
+          assign has_size_or_width = false
+          for option in product.options_with_values
+            assign option_name_lower = option.name | downcase
+            if option_name_lower == 'size' or option_name_lower == 'width'
+              assign has_size_or_width = true
+              break
+            endif
+          endfor
+        -%}
         <button
           type="submit"
           name="add"
           form="{{ product_form_id }}"
           class="custom-loader-button product-form__submit button button--primary button--fixed grow{% if show_price %} with-price{% endif %}"
           is="hover-button"
-          {%- if product.selected_or_first_available_variant.available == false or quantity_rule_soldout %}
+          {%- if product.selected_or_first_available_variant.available == false or quantity_rule_soldout or has_size_or_width %}
             disabled
           {% endif -%}
           {%- if product.template_suffix == 'pre-order' %}
@@ -325,8 +335,21 @@
           <span class="btn-text">
             <span>
               {%- liquid
+                assign has_size_option = false
+                assign size_option_name = 'SIZE'
+                for option in product.options_with_values
+                  assign option_name_lower = option.name | downcase
+                  if option_name_lower == 'size' or option_name_lower == 'width'
+                    assign has_size_option = true
+                    assign size_option_name = option.name | upcase
+                    break
+                  endif
+                endfor
+
                 if product.selected_or_first_available_variant.available == false or quantity_rule_soldout
                   echo 'products.product.sold_out' | t
+                elsif has_size_option
+                  echo 'PLEASE SELECT ' | append: size_option_name
                 elsif product.template_suffix != 'pre-order'
                   echo 'products.product.add_to_cart' | t
                 else
@@ -334,7 +357,7 @@
                 endif
               -%}
             </span>
-            {%- if show_price -%}
+            {%- if show_price and has_size_option == false -%}
               <div id="BuyButtonPrice-{{ section_id }}-{{ product_id }}" class="flex">
                 <span class="relative">&nbsp;&nbsp;-&nbsp;&nbsp;</span>
                 <product-buy-price

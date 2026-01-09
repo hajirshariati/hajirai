@@ -65,10 +65,20 @@ function resetVariantsAndDisableButton() {
         addTocartBtn.setAttribute("disabled", "disabled");
         addTocartBtn.disabled = true;
 
-        // Update .btn-text if it exists, otherwise set directly on button
+        // Update .btn-text > span (first child) to preserve price div
         const btnText = addTocartBtn.querySelector('.btn-text');
         if (btnText) {
-          btnText.innerText = "PLEASE SELECT " + optName.toUpperCase();
+          const textSpan = btnText.querySelector('span');
+          if (textSpan) {
+            textSpan.innerText = "PLEASE SELECT " + optName.toUpperCase();
+          } else {
+            btnText.innerText = "PLEASE SELECT " + optName.toUpperCase();
+          }
+          // Hide price if it exists
+          const priceDiv = btnText.querySelector('[id^="BuyButtonPrice-"]');
+          if (priceDiv) {
+            priceDiv.style.display = 'none';
+          }
         } else {
           addTocartBtn.innerText = "PLEASE SELECT " + optName.toUpperCase();
         }
@@ -83,7 +93,13 @@ function resetVariantsAndDisableButton() {
         // Update .btn-text if it exists, otherwise set directly on button
         const btnText = stickyAddTocartBtn.querySelector('.btn-text');
         if (btnText) {
-          btnText.innerText = "PLEASE SELECT " + optName.toUpperCase();
+          // Check for nested span structure
+          const nestedSpan = btnText.querySelector('span.hidden.md\\:block');
+          if (nestedSpan) {
+            nestedSpan.innerText = "PLEASE SELECT " + optName.toUpperCase();
+          } else {
+            btnText.innerText = "PLEASE SELECT " + optName.toUpperCase();
+          }
         } else {
           stickyAddTocartBtn.innerText = "PLEASE SELECT " + optName.toUpperCase();
         }
@@ -154,7 +170,7 @@ function attachVariantEventListeners() {
 
 // === Variant Button Handling ===
 // Initialize variant buttons on page load
-(function initializeVariantButtons() {
+function initializeVariantButtons() {
   const variantOptButtons = document.querySelectorAll(".custom-option-buttons");
   const addTocartBtn = document.querySelector("button.product-form__submit");
   const stickyAddTocartBtn = document.querySelector("button.sticky_form__submit");
@@ -165,14 +181,27 @@ function attachVariantEventListeners() {
     
     if (optName === "Size" || optName === "Width") {
       optBtn.removeAttribute("checked");
+      optBtn.checked = false;
+      
       if (addTocartBtn) {
         addTocartBtn.style.display = "flex";
         addTocartBtn.setAttribute("disabled", "disabled");
+        addTocartBtn.disabled = true;
 
-        // Update .btn-text if it exists, otherwise set directly on button
+        // Update .btn-text > span (first child) to preserve price div
         const btnText = addTocartBtn.querySelector('.btn-text');
         if (btnText) {
-          btnText.innerText = "PLEASE SELECT " + optName.toUpperCase();
+          const textSpan = btnText.querySelector('span');
+          if (textSpan) {
+            textSpan.innerText = "PLEASE SELECT " + optName.toUpperCase();
+          } else {
+            btnText.innerText = "PLEASE SELECT " + optName.toUpperCase();
+          }
+          // Hide price if it exists
+          const priceDiv = btnText.querySelector('[id^="BuyButtonPrice-"]');
+          if (priceDiv) {
+            priceDiv.style.display = 'none';
+          }
         } else {
           addTocartBtn.innerText = "PLEASE SELECT " + optName.toUpperCase();
         }
@@ -185,9 +214,15 @@ function attachVariantEventListeners() {
         // Update .btn-text if it exists, otherwise set directly on button
         const btnText = stickyAddTocartBtn.querySelector('.btn-text');
         if (btnText) {
-          btnText.innerText = "SELECT " + optName.toUpperCase();
+          // Check for nested span structure
+          const nestedSpan = btnText.querySelector('span.hidden.md\\:block');
+          if (nestedSpan) {
+            nestedSpan.innerText = "PLEASE SELECT " + optName.toUpperCase();
+          } else {
+            btnText.innerText = "PLEASE SELECT " + optName.toUpperCase();
+          }
         } else {
-          stickyAddTocartBtn.innerText = "SELECT " + optName.toUpperCase();
+          stickyAddTocartBtn.innerText = "PLEASE SELECT " + optName.toUpperCase();
         }
       }
     }
@@ -195,7 +230,15 @@ function attachVariantEventListeners() {
   
   // Attach event listeners
   attachVariantEventListeners();
-})();
+}
+
+// Run on DOMContentLoaded
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeVariantButtons);
+} else {
+  // DOM is already ready, run immediately
+  initializeVariantButtons();
+}
 
 
 document.addEventListener("DOMContentLoaded", function () {
