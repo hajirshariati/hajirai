@@ -12844,10 +12844,6 @@ noscript .product-form__input {
     }
 }
 
-.product-form-wrapper {
-    margin-block-start: var(--sp-8);
-}
-
 .quantity {
     min-height: var(--input-height);
     border: 1px solid rgb(var(--color-border));
