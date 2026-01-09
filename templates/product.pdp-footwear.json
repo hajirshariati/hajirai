@@ -151,7 +151,8 @@
           }
         },
         "aetrex_sizeright_size_right_dAzW8x": {
-          "type": "shopify://apps/aetrex-sizeright/blocks/size-right/0a01b6e8-c3fe-4d34-a727-cb8b8c326ed3",
+          "type": "shopify://apps/aetrex-size-right/blocks/size-right/0a01b6e8-c3fe-4d34-a727-cb8b8c326ed3",
+          "disabled": true,
           "settings": {
             "isActive": true,
             "OnlyMobile": false
