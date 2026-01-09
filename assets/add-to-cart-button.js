@@ -29,19 +29,28 @@ class AddToCartButtonManager {
     // Check if product has size/width option
     this.hasSizeOption = this.mainButton.getAttribute('data-has-size-option') === 'true';
     
-    console.log('AddToCartButtonManager initialized, hasSizeOption:', this.hasSizeOption);
-    
     // Set initial state immediately
     if (this.hasSizeOption) {
       // Check if a size is already selected
       const selectedSize = document.querySelector('.custom-option-buttons[data-opt-name="Size"]:checked, .custom-option-buttons[data-opt-name="Width"]:checked');
-      console.log('Selected size on page load:', selectedSize);
       
       // On initial page load, force uncheck all sizes and show "PLEASE SELECT SIZE"
       const allSizeOptions = document.querySelectorAll('.custom-option-buttons[data-opt-name="Size"], .custom-option-buttons[data-opt-name="Width"]');
       allSizeOptions.forEach(option => {
         option.checked = false;
         option.removeAttribute('checked');
+        
+        // Remove checked class from the label
+        const label = option.nextElementSibling;
+        if (label && label.classList.contains('label-swatch')) {
+          label.classList.remove('checked');
+        }
+        
+        // Also try to find label by for attribute
+        const labelById = document.querySelector(`label[for="${option.id}"]`);
+        if (labelById) {
+          labelById.classList.remove('checked');
+        }
       });
       
       // Force "PLEASE SELECT SIZE" state
@@ -67,7 +76,37 @@ class AddToCartButtonManager {
     if (!this.mainButton) return;
     
     this.hasSizeOption = this.mainButton.getAttribute('data-has-size-option') === 'true';
-    this.updateButtonState();
+    
+    // Reset state like on initial page load
+    if (this.hasSizeOption) {
+      // Uncheck all size options
+      const allSizeOptions = document.querySelectorAll('.custom-option-buttons[data-opt-name="Size"], .custom-option-buttons[data-opt-name="Width"]');
+      allSizeOptions.forEach(option => {
+        option.checked = false;
+        option.removeAttribute('checked');
+        
+        // Remove checked class from the label
+        const label = option.nextElementSibling;
+        if (label && label.classList.contains('label-swatch')) {
+          label.classList.remove('checked');
+        }
+        
+        const labelById = document.querySelector(`label[for="${option.id}"]`);
+        if (labelById) {
+          labelById.classList.remove('checked');
+        }
+      });
+      
+      // Force "PLEASE SELECT SIZE" state
+      this.setButtonText('PLEASE SELECT SIZE');
+      this.disableButton();
+      this.hidePrice();
+    } else {
+      // No size option, show default state
+      this.updateButtonState();
+    }
+    
+    // Re-attach variant listeners
     this.attachVariantListeners();
   }
 
@@ -114,7 +153,7 @@ class AddToCartButtonManager {
     
     if (variantData) {
       if (variantData.available) {
-        this.setButtonText('Add to cart');
+        this.setButtonText('Add to Cart');
         this.enableButton();
         this.showPrice(variantData.price);
       } else {
@@ -133,28 +172,32 @@ class AddToCartButtonManager {
         const product = JSON.parse(productJson.textContent);
         return product.variants.find(v => v.id == variantId);
       } catch (e) {
-        console.error('Error parsing product JSON:', e);
+        // Error parsing product JSON
       }
     }
     return null;
   }
 
   setButtonText(text) {
-    console.log('Setting button text to:', text);
-    
     if (this.mainButton) {
       const btnText = this.mainButton.querySelector('.btn-text');
       if (btnText) {
-        const textSpan = btnText.querySelector('span');
+        let textSpan = btnText.querySelector('span:first-child');
         if (textSpan) {
-          console.log('Found main button text span, updating...');
           textSpan.textContent = text;
         } else {
-          console.log('No span found in main button, setting directly on .btn-text');
-          btnText.textContent = text;
+          // Remove all text nodes
+          Array.from(btnText.childNodes).forEach(node => {
+            if (node.nodeType === Node.TEXT_NODE) {
+              node.remove();
+            }
+          });
+          
+          textSpan = document.createElement('span');
+          textSpan.textContent = text;
+          // Insert at the beginning, before price div
+          btnText.insertBefore(textSpan, btnText.firstChild);
         }
-      } else {
-        console.log('No .btn-text found in main button');
       }
     }
     
@@ -163,13 +206,11 @@ class AddToCartButtonManager {
       if (btnText) {
         const textSpan = btnText.querySelector('span.hidden');
         if (textSpan) {
-          console.log('Found sticky button text span, updating...');
           textSpan.textContent = text;
         } else {
           // Try without the .hidden class
           const anySpan = btnText.querySelector('span:not([class*="icon"])');
           if (anySpan) {
-            console.log('Found sticky button span (no .hidden class), updating...');
             anySpan.textContent = text;
           }
         }
@@ -201,16 +242,48 @@ class AddToCartButtonManager {
 
   showPrice(price) {
     if (this.mainButton) {
-      const priceDiv = this.mainButton.querySelector('[id^="BuyButtonPrice-"]');
-      if (priceDiv) {
+      const btnText = this.mainButton.querySelector('.btn-text');
+      if (!btnText) return;
+      
+      // Look for any price div (with or without ID)
+      let priceDiv = btnText.querySelector('[id^="BuyButtonPrice-"]') || btnText.querySelector('div.flex');
+      
+      if (!priceDiv) {
+        // Create price div if it doesn't exist
+        priceDiv = document.createElement('div');
+        priceDiv.className = 'flex';
         priceDiv.style.display = 'flex';
-        const priceElement = priceDiv.querySelector('product-buy-price');
-        if (priceElement && price) {
-          priceElement.setAttribute('data-price', price);
-          // Format price (assuming Shopify money format)
-          const formattedPrice = this.formatMoney(price);
-          priceElement.textContent = formattedPrice;
+        
+        const separator = document.createElement('span');
+        separator.className = 'relative';
+        separator.innerHTML = '&nbsp;&nbsp;-&nbsp;&nbsp;';
+        
+        const priceElement = document.createElement('product-buy-price');
+        priceElement.className = 'price';
+        
+        priceDiv.appendChild(separator);
+        priceDiv.appendChild(priceElement);
+        btnText.appendChild(priceDiv);
+      } else {
+        // Remove any duplicate price divs
+        const allPriceDivs = btnText.querySelectorAll('div.flex');
+        if (allPriceDivs.length > 1) {
+          allPriceDivs.forEach((div, index) => {
+            if (index > 0) {
+              div.remove();
+            }
+          });
         }
+        priceDiv.style.display = 'flex';
+      }
+      
+      const priceElement = priceDiv.querySelector('product-buy-price');
+      
+      if (priceElement && price) {
+        priceElement.setAttribute('data-price', price);
+        // Format price (assuming Shopify money format)
+        const formattedPrice = this.formatMoney(price);
+        priceElement.textContent = formattedPrice;
       }
     }
   }
