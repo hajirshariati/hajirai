@@ -451,9 +451,9 @@
       "name": "Logo list",
       "settings": {
         "layout": "marquee",
-        "grid_horizontal": 55,
+        "grid_horizontal": 85,
         "direction": "left",
-        "speed": 1,
+        "speed": 2,
         "heading": "<strong>Foot Pain Identifier</strong>",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
