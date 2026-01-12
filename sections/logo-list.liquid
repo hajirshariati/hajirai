@@ -29,24 +29,29 @@
                 assign image_height = block.settings.height
                 assign image_height_2x = block.settings.height | times: 2
               -%}
-              <div class="logo__media media media--transparent relative overflow-hidden shrink-0" style="--image-height: {{ image_height }}px;" {{ block.shopify_attributes }}>
-                {%- if block.settings.image != blank -%}
-                  <img
-                    srcset="{{ block.settings.image | image_url: height: image_height }} 1x, {{ block.settings.image | image_url: height: image_height_2x }} 2x"
-                    src="{{ block.settings.image | image_url: height: image_height }}"
-                    alt="{{ block.settings.image.alt | escape }}"
-                    loading="lazy"
-                    width="{{ image_height | times: block.settings.image.aspect_ratio }}"
-                    height="{{ image_height }}"
-                    is="lazy-image"
-                  />
-                {%- else -%}
-                  {{- 'logo' | placeholder_svg_tag: 'placeholder' -}}
-                {%- endif -%}
-                {%- if block.settings.link != blank -%}
-                  <a href="{{ block.settings.link }}" class="block absolute top-0 left-0 w-full h-full" aria-hidden="true">&nbsp;</a>
-                {%- endif -%}
-              </div>
+<div class="logo__item flex flex-col items-center shrink-0" {{ block.shopify_attributes }}>
+  <div class="logo__media media media--transparent relative overflow-hidden" style="--image-height: {{ image_height }}px;">
+    {%- if block.settings.image != blank -%}
+      <img
+        srcset="{{ block.settings.image | image_url: height: image_height }} 1x, {{ block.settings.image | image_url: height: image_height_2x }} 2x"
+        src="{{ block.settings.image | image_url: height: image_height }}"
+        alt="{{ block.settings.image.alt | escape }}"
+        loading="lazy"
+        width="{{ image_height | times: block.settings.image.aspect_ratio }}"
+        height="{{ image_height }}"
+        is="lazy-image"
+      />
+    {%- else -%}
+      {{- 'logo' | placeholder_svg_tag: 'placeholder' -}}
+    {%- endif -%}
+    {%- if block.settings.link != blank -%}
+      <a href="{{ block.settings.link }}" class="block absolute top-0 left-0 w-full h-full" aria-hidden="true">&nbsp;</a>
+    {%- endif -%}
+  </div>
+  {%- if block.settings.title != blank -%}
+    <span class="logo__title {{ block.settings.title_size }} mt-2 text-center">{{ block.settings.title }}</span>
+  {%- endif -%}
+</div>
             {%- endfor -%}
           </div>
         {%- if section.settings.layout == 'marquee' -%}
