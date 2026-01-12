@@ -317,6 +317,11 @@
                   {{- product.selected_or_first_available_variant.sku -}}
                 </p>
 
+              {%- when 'variant_sku' -%}
+                <p class="variant__sku" id="VariantSku-{{ section.id }}-{{ product.id }}" hidden>SKU:&nbsp;
+                  {{- product.selected_or_first_available_variant.sku -}}
+                </p>
+
               {%- when 'description' -%}
                 <div class="product__text rte {{ block.settings.text_size }}" {{ block.shopify_attributes }}>
                   {{- product.description -}}
@@ -1891,6 +1896,11 @@
     {
       "type": "sku",
       "name": "t:sections.main-product.blocks.sku.name",
+      "limit": 1
+    },
+    {
+      "type": "variant_sku",
+      "name": "Variant SKU",
       "limit": 1
     },
     {

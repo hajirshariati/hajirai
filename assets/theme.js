@@ -5207,6 +5207,19 @@ class ProductInfo extends HTMLElement {
             this.updateSourceFromDestination(parsedHTML, 'BuyButtonPrice');
             this.updateSourceFromDestination(parsedHTML, 'StickyPrice');
             this.updateSourceFromDestination(parsedHTML, 'Sku');
+            
+            // Update VariantSku and hide if empty
+            const variantSkuSource = parsedHTML.getElementById(`VariantSku-${this.sectionId}-${this.productId}`);
+            const variantSkuDestination = document.querySelector(`#VariantSku-${this.sectionId}-${this.productId}`);
+            if (variantSkuSource && variantSkuDestination) {
+                variantSkuDestination.innerHTML = variantSkuSource.innerHTML;
+                if (variant.sku && variant.sku.trim() !== '') {
+                    variantSkuDestination.removeAttribute('hidden');
+                } else {
+                    variantSkuDestination.setAttribute('hidden', '');
+                }
+            }
+            
             this.updateSourceFromDestination(parsedHTML, 'Inventory');
             this.updateSourceFromDestination(parsedHTML, 'Volume');
             this.updateSourceFromDestination(parsedHTML, 'PricePerItem');
@@ -5334,7 +5347,7 @@ class ProductInfo extends HTMLElement {
         this.productForm?.toggleSubmitButton(true, theme.variantStrings.unavailable, true);
         this.productStickyForm?.toggleSubmitButton(true, 'SELECT SIZE', true);
 
-        const selectors = ['Price', 'BuyButtonPrice', 'StickyPrice', 'Inventory', 'Sku', 'PricePerItem', 'BackInStock', 'ProductBundle', 'VolumeNote', 'Volume', 'QuantityRules', 'QuantityRulesCart']
+        const selectors = ['Price', 'BuyButtonPrice', 'StickyPrice', 'Inventory', 'Sku', 'VariantSku', 'PricePerItem', 'BackInStock', 'ProductBundle', 'VolumeNote', 'Volume', 'QuantityRules', 'QuantityRulesCart']
             .map((id) => `#${id}-${this.sectionId}-${this.productId}`)
             .join(', ');
         document.querySelectorAll(selectors).forEach((selector) => selector.setAttribute('hidden', ''));

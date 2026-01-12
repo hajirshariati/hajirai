@@ -57,8 +57,8 @@
             "liquid": "<br>"
           }
         },
-        "sku_yjUFQR": {
-          "type": "sku",
+        "variant_sku_eWJmMw": {
+          "type": "variant_sku",
           "settings": {}
         },
         "true_fit_widget_8cjNbr": {
@@ -209,7 +209,7 @@
         "yotpo_product_reviews_star_rating_8XQiyE",
         "variant_picker",
         "liquid_87RPy3",
-        "sku_yjUFQR",
+        "variant_sku_eWJmMw",
         "true_fit_widget_8cjNbr",
         "buy_buttons",
         "liquid_Df3mAF",
