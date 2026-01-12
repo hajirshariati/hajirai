@@ -353,13 +353,105 @@
     },
     "logo_list_ayxHeL": {
       "type": "logo-list",
+      "blocks": {
+        "logo_NRWTCd": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/icon.Heel_pain.png",
+            "height": 52,
+            "link": "shopify://pages/explore-relief-for-heel-pain",
+            "title": "Heel Pain",
+            "title_size": "text-sm"
+          }
+        },
+        "logo_VTWdxY": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/mortons_neuroma.png",
+            "height": 52,
+            "link": "shopify://pages/explore-relief-for-mortons-neuroma",
+            "title": "Morton's Neuroma ",
+            "title_size": "text-sm"
+          }
+        },
+        "logo_E8m4ef": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/Overpronation.png",
+            "height": 52,
+            "link": "shopify://pages/explore-relief-for-overpronation",
+            "title": "Overpronation",
+            "title_size": "text-sm"
+          }
+        },
+        "logo_tCRaqW": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/metatarsalgia.png",
+            "height": 52,
+            "link": "shopify://pages/explore-relief-for-metatarsalgia",
+            "title": "Metatarsalgia",
+            "title_size": "text-sm"
+          }
+        },
+        "logo_eFfXYy": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/bunion.png",
+            "height": 52,
+            "link": "shopify://pages/explore-relief-for-bunions",
+            "title": "Bunions",
+            "title_size": "text-sm"
+          }
+        },
+        "logo_ARF4GJ": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/icon.Arch_Pain.png",
+            "height": 52,
+            "link": "shopify://pages/explore-relief-for-arch-pain",
+            "title": "Arch Pain",
+            "title_size": "text-sm"
+          }
+        },
+        "logo_MVrUbt": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/icon.Heel_pain.png",
+            "height": 52,
+            "link": "shopify://pages/explore-relief-for-heel-spurs",
+            "title": "Heel Spurs",
+            "title_size": "text-sm"
+          }
+        },
+        "logo_FtA4tN": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/plantar_fasciitis.png",
+            "height": 52,
+            "link": "shopify://pages/explore-relief-for-plantar-fasciitis",
+            "title": "Plantar Fasciitis",
+            "title_size": "text-sm"
+          }
+        }
+      },
+      "block_order": [
+        "logo_NRWTCd",
+        "logo_VTWdxY",
+        "logo_E8m4ef",
+        "logo_tCRaqW",
+        "logo_eFfXYy",
+        "logo_ARF4GJ",
+        "logo_MVrUbt",
+        "logo_FtA4tN"
+      ],
       "custom_css": [
         ".logo-list,.logo-bar {mix-blend-mode: multiply;}"
       ],
       "name": "Logo list",
       "settings": {
         "layout": "marquee",
-        "grid_horizontal": 135,
+        "grid_horizontal": 55,
         "direction": "left",
         "speed": 1,
         "heading": "<strong>Foot Pain Identifier</strong>",
@@ -383,7 +475,7 @@
         "color_button_background": "",
         "color_button_gradient": "",
         "padding_top": 40,
-        "padding_bottom": 0,
+        "padding_bottom": 24,
         "divider": false,
         "full_width": false,
         "rounded": true,
@@ -888,7 +980,9 @@
           "settings": {
             "image": "shopify://shop_images/image_80.png",
             "height": 64,
-            "link": ""
+            "link": "",
+            "title": "",
+            "title_size": "text-sm"
           }
         },
         "logo_UhcTAx": {
@@ -896,7 +990,9 @@
           "settings": {
             "image": "shopify://shop_images/image_81.png",
             "height": 64,
-            "link": ""
+            "link": "",
+            "title": "",
+            "title_size": "text-sm"
           }
         },
         "logo_TjExFq": {
@@ -904,7 +1000,9 @@
           "settings": {
             "image": "shopify://shop_images/image_82.png",
             "height": 64,
-            "link": ""
+            "link": "",
+            "title": "",
+            "title_size": "text-sm"
           }
         },
         "logo_cYFGe3": {
@@ -912,7 +1010,9 @@
           "settings": {
             "image": "shopify://shop_images/image_83.png",
             "height": 64,
-            "link": ""
+            "link": "",
+            "title": "",
+            "title_size": "text-sm"
           }
         },
         "logo_CDF8CM": {
@@ -920,7 +1020,9 @@
           "settings": {
             "image": "shopify://shop_images/image_84.png",
             "height": 64,
-            "link": ""
+            "link": "",
+            "title": "",
+            "title_size": "text-sm"
           }
         },
         "logo_MP7zF4": {
@@ -928,7 +1030,9 @@
           "settings": {
             "image": "shopify://shop_images/image_89.png",
             "height": 64,
-            "link": ""
+            "link": "",
+            "title": "",
+            "title_size": "text-sm"
           }
         }
       },
