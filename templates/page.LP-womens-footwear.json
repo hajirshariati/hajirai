@@ -71,7 +71,7 @@
             "highlighted_text": "none",
             "highlighted_scribble": "circle",
             "button_label": "Shop Fall Collection",
-            "button_link": "shopify://collections/fall-collection",
+            "button_link": "shopify://collections/winter-collection",
             "button_style": "primary",
             "button_external": false,
             "button_icon": false
@@ -497,8 +497,8 @@
         "color_button_gradient": "",
         "padding_top": 36,
         "padding_bottom": 36,
-        "divider": false,
         "full_width": false,
+        "divider": false,
         "rounded": false
       }
     },
@@ -643,7 +643,7 @@
           "type": "button",
           "settings": {
             "button_label": "View Collection",
-            "button_link": "shopify://collections/fall-collection",
+            "button_link": "shopify://collections/winter-collection",
             "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
