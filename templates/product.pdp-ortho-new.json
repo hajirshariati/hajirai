@@ -703,6 +703,44 @@
         "abra_promo_code_hide": ""
       }
     },
+    "multicolumn_ortho_6gXqfH": {
+      "type": "multicolumn-ortho",
+      "name": "Multicolumn Ortho",
+      "settings": {
+        "gap": "small",
+        "columns": 4,
+        "columns_mobile": "1",
+        "carousel_on_desktop": false,
+        "swipe_on_mobile": true,
+        "heading": "Orthotic Features",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "#fafafa",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 40,
+        "padding_bottom": 20,
+        "full_width": false,
+        "divider": false,
+        "rounded": true,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
     "collage_grid_jYjan7": {
       "type": "collage-grid",
       "blocks": {
@@ -1275,6 +1313,7 @@
     "product-details",
     "faq_tA87L7",
     "multicolumn_KyfUdW",
+    "multicolumn_ortho_6gXqfH",
     "collage_grid_jYjan7",
     "multicolumn_CEQ6Uh",
     "video_with_text_xf4VTt",
