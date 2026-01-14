@@ -51,7 +51,7 @@
           "type": "variant_picker",
           "settings": {
             "show_variant_labels": true,
-            "picker_type": "button",
+            "picker_type": "dropdown",
             "enable_color_swatches": true,
             "color_swatch_type": "color",
             "size_chart": ""
