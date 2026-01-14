@@ -95,7 +95,9 @@
         "padding_bottom": 12,
         "divider": false,
         "full_width": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "logo_list_zPkHPR": {
@@ -106,7 +108,9 @@
           "settings": {
             "image": "shopify://shop_images/nike_06b59e60-23dc-4474-807a-22f1c3115ee7.jpg",
             "height": 80,
-            "link": ""
+            "link": "",
+            "title": "",
+            "title_size": "text-sm"
           }
         },
         "logo_hAwnt9": {
@@ -114,7 +118,9 @@
           "settings": {
             "image": "shopify://shop_images/alo.gif",
             "height": 80,
-            "link": ""
+            "link": "",
+            "title": "",
+            "title_size": "text-sm"
           }
         },
         "logo_8kYhtM": {
@@ -122,7 +128,9 @@
           "settings": {
             "image": "shopify://shop_images/lulu.gif",
             "height": 80,
-            "link": ""
+            "link": "",
+            "title": "",
+            "title_size": "text-sm"
           }
         },
         "logo_WPgCzk": {
@@ -130,7 +138,9 @@
           "settings": {
             "image": "shopify://shop_images/north-face.png",
             "height": 80,
-            "link": ""
+            "link": "",
+            "title": "",
+            "title_size": "text-sm"
           }
         },
         "logo_Y6Ctqq": {
@@ -138,7 +148,9 @@
           "settings": {
             "image": "shopify://shop_images/dsw.gif",
             "height": 80,
-            "link": ""
+            "link": "",
+            "title": "",
+            "title_size": "text-sm"
           }
         }
       },
@@ -178,7 +190,9 @@
         "padding_bottom": 24,
         "divider": false,
         "full_width": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "video_with_text_overlay_7CHW8p": {
@@ -189,7 +203,7 @@
           "settings": {
             "heading": "<p>Albert® 2 Pro Scanner</p>",
             "heading_size": "title-sm",
-            "heading_tag": "h1",
+            "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "sketch-underline"
           }
@@ -292,7 +306,9 @@
         "padding_bottom": 48,
         "divider": false,
         "full_width": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "video_with_text_overlay_mpYPfk": {
@@ -303,7 +319,7 @@
           "settings": {
             "heading": "<p>FitAI™ Footwear Recommendations</p>",
             "heading_size": "title-sm",
-            "heading_tag": "h1",
+            "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -406,7 +422,9 @@
         "padding_bottom": 48,
         "divider": false,
         "full_width": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "video_with_text_overlay_D7aPRc": {
@@ -417,7 +435,7 @@
           "settings": {
             "heading": "<p>Foot.com</p>",
             "heading_size": "title-sm",
-            "heading_tag": "h1",
+            "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "sketch-underline"
           }
@@ -519,7 +537,9 @@
         "padding_bottom": 48,
         "divider": false,
         "full_width": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "video_with_text_overlay_fYXVnA": {
@@ -530,7 +550,7 @@
           "settings": {
             "heading": "<p>Footwear Development Package</p>",
             "heading_size": "title-sm",
-            "heading_tag": "h1",
+            "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "sketch-underline"
           }
@@ -633,7 +653,9 @@
         "padding_bottom": 48,
         "divider": false,
         "full_width": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "image_with_text_gKGMGt": {
@@ -644,7 +666,7 @@
           "settings": {
             "heading": "SizeRight™ Mobile App",
             "heading_size": "title-sm",
-            "heading_tag": "h1",
+            "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -740,7 +762,9 @@
         "full_width": true,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "empty_space_EQc6VY": {
@@ -768,7 +792,7 @@
           "settings": {
             "heading": "Albert® 3DFit Scanner",
             "heading_size": "title-sm",
-            "heading_tag": "h1",
+            "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -865,7 +889,9 @@
         "full_width": true,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "video_with_text_overlay_FXtW7N": {
@@ -876,7 +902,7 @@
           "settings": {
             "heading": "<p>Albert Pressure Scanner</p>",
             "heading_size": "title-sm",
-            "heading_tag": "h1",
+            "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -979,7 +1005,9 @@
         "padding_bottom": 48,
         "divider": false,
         "full_width": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "multicolumn_Rz4z98": {
@@ -996,6 +1024,7 @@
             "heading": "Case Studies",
             "heading_size": "text-lg-2xl",
             "text": "",
+            "custom_html": "",
             "button_label": "LEARN MORE",
             "button_link": "",
             "button_style": "primary",
@@ -1016,6 +1045,7 @@
             "heading": "Tootsie™ Kids Foot Scanning",
             "heading_size": "text-lg-2xl",
             "text": "",
+            "custom_html": "",
             "button_label": "LEARN MORE",
             "button_link": "",
             "button_style": "primary",
@@ -1036,6 +1066,7 @@
             "heading": "Control Panel",
             "heading_size": "text-lg-2xl",
             "text": "",
+            "custom_html": "",
             "button_label": "LEARN MORE",
             "button_link": "",
             "button_style": "secondary",
@@ -1056,6 +1087,7 @@
             "heading": "Case Studies",
             "heading_size": "text-lg-2xl",
             "text": "",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -1100,9 +1132,11 @@
         "color_button_gradient": "",
         "padding_top": 72,
         "padding_bottom": 72,
-        "divider": false,
         "full_width": false,
-        "rounded": false
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_4yLyNg": {
@@ -1150,7 +1184,9 @@
         "padding_bottom": 0,
         "divider": false,
         "narrow": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "number_counter_DpF4p9": {
@@ -1320,7 +1356,9 @@
         "padding_bottom": 48,
         "divider": false,
         "narrow": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     }
   },
