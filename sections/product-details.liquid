@@ -118,10 +118,40 @@
               {%- when 'collapsible_tab' -%}
                 {%- capture collapsible_content -%}
               {%- if block.settings.content_metafield != blank -%}
-                {%- assign parts = block.settings.content_metafield | split: '.' -%}
-                {%- assign namespace = parts[0] -%}
-                {%- assign key = parts[1] -%}
-                <div class="col-span-full">
+                {%- liquid
+                  assign metafield_ref = block.settings.content_metafield
+                  assign first_ref = metafield_ref | split: ',' | first | strip
+                  
+                  assign parts = first_ref | split: '.'
+                  assign namespace = parts[0]
+                  assign key = parts[1]
+                  
+                  assign is_dynamic = false
+                  assign base_key = key
+                  
+                  if template.suffix == 'pdp-ortho-new'
+                    if key contains '_no_no' or key contains '_no_yes' or key contains '_yes_no' or key contains '_yes_yes'
+                      assign is_dynamic = true
+                      assign base_key = key | remove: '_no_no' | remove: '_no_yes' | remove: '_yes_no' | remove: '_yes_yes'
+                    endif
+                  endif
+                  
+                  if is_dynamic
+                    assign key_no_no = base_key | append: '_no_no'
+                    assign key_no_yes = base_key | append: '_no_yes'
+                    assign key_yes_no = base_key | append: '_yes_no'
+                    assign key_yes_yes = base_key | append: '_yes_yes'
+                  endif
+                -%}
+                
+                <div class="col-span-full{% if is_dynamic %} dynamic-metafield-content{% endif %}" 
+                     {% if is_dynamic %}data-dynamic-metafield="true" 
+                     data-base-key="{{ base_key }}" 
+                     data-namespace="{{ namespace }}"
+                     data-content-no-no="{{ product.metafields[namespace][key_no_no].value | escape }}"
+                     data-content-no-yes="{{ product.metafields[namespace][key_no_yes].value | escape }}"
+                     data-content-yes-no="{{ product.metafields[namespace][key_yes_no].value | escape }}"
+                     data-content-yes-yes="{{ product.metafields[namespace][key_yes_yes].value | escape }}"{% endif %}>
                   {{ product.metafields[namespace][key].value }}
                 </div>
               {%- elsif block.settings.content != blank -%}
@@ -1568,14 +1598,80 @@
     });
   }
 
+  // Function to update dynamic metafield content
+  function updateDynamicMetafieldContent() {
+    console.log('=== Dynamic Metafield Content Update ===');
+    
+    const dynamicContainers = document.querySelectorAll('.dynamic-metafield-content[data-dynamic-metafield="true"]');
+    console.log('Found dynamic containers:', dynamicContainers.length);
+    
+    if (!dynamicContainers.length) {
+      console.log('No dynamic containers found');
+      return;
+    }
+
+    const option1Checked = document.querySelector('input[name="Do you have flat feet?"]:checked');
+    const option2Checked = document.querySelector('input[name="Do you have ball of foot pain?"]:checked');
+    
+    console.log('Option 1 checked:', option1Checked ? option1Checked.value : 'none');
+    console.log('Option 2 checked:', option2Checked ? option2Checked.value : 'none');
+    
+    if (!option1Checked || !option2Checked) {
+      console.log('Missing option selections');
+      return;
+    }
+    
+    const option1Value = option1Checked.value.trim();
+    const option2Value = option2Checked.value.trim();
+    
+    // Map "No / Unsure" to "no" and "Yes" to "yes"
+    const option1 = (option1Value === "Yes") ? "yes" : "no";
+    const option2 = (option2Value === "Yes") ? "yes" : "no";
+    
+    console.log('Mapped options:', option1, option2);
+    
+    // Build the data key
+    const dataKey = `content${option1.charAt(0).toUpperCase() + option1.slice(1)}${option2.charAt(0).toUpperCase() + option2.slice(1)}`;
+    console.log('Data key:', dataKey);
+    
+    dynamicContainers.forEach((container, index) => {
+      console.log(`Container ${index + 1}:`, {
+        baseKey: container.dataset.baseKey,
+        namespace: container.dataset.namespace,
+        hasContentNoNo: !!container.dataset.contentNoNo,
+        hasContentNoYes: !!container.dataset.contentNoYes,
+        hasContentYesNo: !!container.dataset.contentYesNo,
+        hasContentYesYes: !!container.dataset.contentYesYes
+      });
+      
+      const content = container.dataset[dataKey];
+      console.log(`Content for ${dataKey}:`, content ? content.substring(0, 50) + '...' : 'empty');
+      
+      if (content) {
+        container.innerHTML = content;
+        console.log('Content updated successfully');
+      } else {
+        console.log('No content found for this key');
+      }
+    });
+    
+    console.log('=== End Dynamic Metafield Update ===');
+  }
+
   // Listen for option changes
   document.addEventListener('change', function(e) {
     if (e.target.name === 'Do you have flat feet?' || e.target.name === 'Do you have ball of foot pain?') {
-      setTimeout(updateSidebarIcons, 100);
+      setTimeout(function() {
+        updateSidebarIcons();
+        updateDynamicMetafieldContent();
+      }, 100);
     }
   });
 
   // Initialize on page load with a delay to ensure DOM is ready
-  setTimeout(updateSidebarIcons, 500);
+  setTimeout(function() {
+    updateSidebarIcons();
+    updateDynamicMetafieldContent();
+  }, 500);
 })();
 </script>
