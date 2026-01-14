@@ -241,7 +241,7 @@
                           <div class="specification grid grid-cols-12 gap-6 md:gap-10">
                             {{- collapsible_content -}}
 
-                                {%- if block.settings.heading == "Description" -%}
+                                {%- if block.settings.heading == "Description" and product.template_suffix != 'pdp-ortho-new'-%}
                                   <p class="product__sku col-span-full" id="Sku-{{ section.id }}-{{ product.id }}">SKU:&nbsp;
                                     {{- product.selected_or_first_available_variant.sku -}}
                                   </p>
