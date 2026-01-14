@@ -9,19 +9,41 @@
  */
 {
   "sections": {
-    "featured_collection_k8BHjn": {
-      "type": "featured-collection",
-      "name": "t:sections.featured-collection.name",
+    "featured_collections_ic78k8": {
+      "type": "featured-collections",
+      "blocks": {
+        "collection_PJ3dTJ": {
+          "type": "collection",
+          "settings": {
+            "collection": "best-sellers",
+            "products": [],
+            "title": ""
+          }
+        },
+        "collection_iT9Y6j": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "products": [
+              "brianna-ballet-flat"
+            ],
+            "title": "FREE PRODUCT"
+          }
+        }
+      },
+      "block_order": [
+        "collection_PJ3dTJ",
+        "collection_iT9Y6j"
+      ],
+      "name": "t:sections.featured-collections.name",
       "settings": {
-        "collection": "best-sellers",
-        "products": [],
         "product_limit": 6,
         "columns": 4,
         "carousel_on_desktop": true,
         "show_view_all": false,
         "columns_mobile": "1",
         "swipe_on_mobile": true,
-        "heading": "Featured collection",
+        "heading": "Featured collections",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
@@ -135,7 +157,7 @@
     }
   },
   "order": [
-    "featured_collection_k8BHjn",
+    "featured_collections_ic78k8",
     "newsletter_zcHpyL",
     "main-404",
     "empty-space",
