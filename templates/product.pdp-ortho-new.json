@@ -456,8 +456,8 @@
             "iwidth": "custom",
             "icon_width": 24,
             "heading": "Description",
-            "content": "<p>{{ product.metafields.custom.short_description | metafield_tag }}</p>",
-            "content_metafield": "",
+            "content": "",
+            "content_metafield": "custom.short_description_no_no,custom.short_description_no_yes,custom.short_description_yes_no,custom.short_description_yes_yes",
             "columns": "Size,Chest",
             "rows": "S,36\nM,38\nL,40",
             "metafields": ""
@@ -474,7 +474,7 @@
             "content_metafield": "metafield",
             "columns": "Size,Chest",
             "rows": "S,36\nM,38\nL,40",
-            "metafields": "Comfort:custom.comfort_details\nMaterials:custom.materials_details\nMeasurements:custom.measurements_details"
+            "metafields": "Comfort:custom.comfort_deails_no_no,custom.comfort_details_no_yes,custom.comfort_details_yes_no,custom.comfort_details_yes_yes\nMaterials:custom.materials_details_no_no,custom.materials_details_no_yes,custom.materials_details_yes_no,custom.materials_details_yes_yes\nMeasurements:custom.measurements_details_no_no,custom.measurements_details_no_yes,custom.measurements_details_yes_no,custom.measurements_details_yes_yes"
           }
         },
         "collapsible_tab_96ewnx": {
@@ -485,7 +485,7 @@
             "icon_width": 24,
             "heading": "Care Instructions",
             "content": "<p> </p>",
-            "content_metafield": "custom.care_instructions",
+            "content_metafield": "custom.care_instructions_no_no,custom.care_instructions_no_yes,custom.care_instructions_yes_no,custom.care_instructions_yes_yes",
             "columns": "Size,Chest",
             "rows": "S,36\nM,38\nL,40",
             "metafields": ""

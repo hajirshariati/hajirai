@@ -165,25 +165,73 @@
                 {%- assign metafields = block.settings.metafields | newline_to_br | split: '<br />' -%}
                 {%- for line in metafields -%}
                   {%- liquid
-                    assign metafield_parts = line | strip | split: '.'
+                    assign line_stripped = line | strip
+                    
+                    assign has_custom_label = false
+                    assign custom_label = ''
+                    if line_stripped contains ':'
+                      assign label_parts = line_stripped | split: ':'
+                      if label_parts.size == 2
+                        assign custom_label = label_parts[0] | strip
+                        assign metafield_list = label_parts[1] | strip
+                        assign has_custom_label = true
+                      endif
+                    endif
+                    
+                    unless has_custom_label
+                      assign metafield_list = line_stripped
+                    endunless
+                    
+                    assign metafield_refs = metafield_list | split: ','
+                    
+                    assign first_metafield_ref = metafield_refs[0] | strip
+                    
+                    assign metafield_parts = first_metafield_ref | split: '.'
                     assign metafield_namespace = metafield_parts | first
                     assign metafield_key = metafield_parts | last
-                    assign metafield_name = metafield_key | replace: '_', ' ' | capitalize
-
-                    if metafield_namespace contains ':'
-                      assign parts = metafield_namespace | split: ':'
-                      assign metafield_namespace = parts | last
-                      assign metafield_name = parts | first
+                    
+                    if has_custom_label
+                      assign metafield_name = custom_label
+                    else
+                      assign metafield_name = metafield_key | replace: '_', ' ' | capitalize
+                    endif
+                    
+                    assign is_metafield_dynamic = false
+                    assign metafield_base_key = metafield_key
+                    
+                    if template.suffix == 'pdp-ortho-new'
+                      if metafield_refs.size == 4
+                        assign is_metafield_dynamic = true
+                        assign metafield_base_key = metafield_key | remove: '_no_no' | remove: '_no_yes' | remove: '_yes_no' | remove: '_yes_yes'
+                        
+                        assign ref_0_parts = metafield_refs[0] | strip | split: '.'
+                        assign ref_1_parts = metafield_refs[1] | strip | split: '.'
+                        assign ref_2_parts = metafield_refs[2] | strip | split: '.'
+                        assign ref_3_parts = metafield_refs[3] | strip | split: '.'
+                        
+                        assign mf_key_no_no = ref_0_parts | last
+                        assign mf_key_no_yes = ref_1_parts | last
+                        assign mf_key_yes_no = ref_2_parts | last
+                        assign mf_key_yes_yes = ref_3_parts | last
+                      endif
                     endif
 
                     assign metafield = product.metafields[metafield_namespace][metafield_key]
                   -%}
 
                   {%- if metafield.value != blank -%}
-                    <div class="col-span-full md:col-span-6">
-                      <h6 class="leading-none tracking-none">{{ metafield_name | escape }} <!-- v2 --></h6>
+                    <div class="col-span-full md:col-span-6{% if is_metafield_dynamic %} dynamic-metafield-item{% endif %}"
+                         {% if is_metafield_dynamic %}data-dynamic-metafield-item="true"
+                         data-mf-namespace="{{ metafield_namespace }}"
+                         data-mf-base-key="{{ metafield_base_key }}"
+                         data-mf-name="{{ metafield_name | escape }}"
+                         data-mf-no-no="{{ product.metafields[metafield_namespace][mf_key_no_no].value | escape }}"
+                         data-mf-no-yes="{{ product.metafields[metafield_namespace][mf_key_no_yes].value | escape }}"
+                         data-mf-yes-no="{{ product.metafields[metafield_namespace][mf_key_yes_no].value | escape }}"
+                         data-mf-yes-yes="{{ product.metafields[metafield_namespace][mf_key_yes_yes].value | escape }}"{% endif %}>
+                      <h6 class="leading-none tracking-none">{{ metafield_name | escape }}</h6>
                       {%- if metafield.list? -%}
-                        <p>
+                        <p class="metafield-content">
                           {%- liquid
                             for value in metafield.value
                               echo value
@@ -194,7 +242,7 @@
                           -%}
                         </p>
                       {%- else -%}
-                        <div>{{ metafield.value }}</div>
+                        <div class="metafield-content">{{ metafield.value }}</div>
                       {%- endif -%}
                     </div>
                   {%- endif -%}
@@ -1600,21 +1648,44 @@
 
   // Function to update dynamic metafield content
   function updateDynamicMetafieldContent() {
-    console.log('=== Dynamic Metafield Content Update ===');
-    
     const dynamicContainers = document.querySelectorAll('.dynamic-metafield-content[data-dynamic-metafield="true"]');
-    console.log('Found dynamic containers:', dynamicContainers.length);
+    if (!dynamicContainers.length) return;
+
+    const option1Checked = document.querySelector('input[name="Do you have flat feet?"]:checked');
+    const option2Checked = document.querySelector('input[name="Do you have ball of foot pain?"]:checked');
     
-    if (!dynamicContainers.length) {
-      console.log('No dynamic containers found');
+    if (!option1Checked || !option2Checked) return;
+    
+    const option1Value = option1Checked.value.trim();
+    const option2Value = option2Checked.value.trim();
+    
+    const option1 = (option1Value === "Yes") ? "yes" : "no";
+    const option2 = (option2Value === "Yes") ? "yes" : "no";
+    
+    const dataKey = `content${option1.charAt(0).toUpperCase() + option1.slice(1)}${option2.charAt(0).toUpperCase() + option2.slice(1)}`;
+    
+    dynamicContainers.forEach((container) => {
+      const content = container.dataset[dataKey];
+      if (content) {
+        container.innerHTML = content;
+      }
+    });
+  }
+
+  // Function to update dynamic metafield items
+  function updateDynamicMetafieldItems() {
+    console.log('=== Dynamic Metafield Items Update ===');
+    
+    const dynamicItems = document.querySelectorAll('.dynamic-metafield-item[data-dynamic-metafield-item="true"]');
+    console.log('Found dynamic metafield items:', dynamicItems.length);
+    
+    if (!dynamicItems.length) {
+      console.log('No dynamic metafield items found');
       return;
     }
 
     const option1Checked = document.querySelector('input[name="Do you have flat feet?"]:checked');
     const option2Checked = document.querySelector('input[name="Do you have ball of foot pain?"]:checked');
-    
-    console.log('Option 1 checked:', option1Checked ? option1Checked.value : 'none');
-    console.log('Option 2 checked:', option2Checked ? option2Checked.value : 'none');
     
     if (!option1Checked || !option2Checked) {
       console.log('Missing option selections');
@@ -1624,38 +1695,44 @@
     const option1Value = option1Checked.value.trim();
     const option2Value = option2Checked.value.trim();
     
-    // Map "No / Unsure" to "no" and "Yes" to "yes"
     const option1 = (option1Value === "Yes") ? "yes" : "no";
     const option2 = (option2Value === "Yes") ? "yes" : "no";
     
-    console.log('Mapped options:', option1, option2);
-    
-    // Build the data key
-    const dataKey = `content${option1.charAt(0).toUpperCase() + option1.slice(1)}${option2.charAt(0).toUpperCase() + option2.slice(1)}`;
+    const dataKey = `mf${option1.charAt(0).toUpperCase() + option1.slice(1)}${option2.charAt(0).toUpperCase() + option2.slice(1)}`;
     console.log('Data key:', dataKey);
     
-    dynamicContainers.forEach((container, index) => {
-      console.log(`Container ${index + 1}:`, {
-        baseKey: container.dataset.baseKey,
-        namespace: container.dataset.namespace,
-        hasContentNoNo: !!container.dataset.contentNoNo,
-        hasContentNoYes: !!container.dataset.contentNoYes,
-        hasContentYesNo: !!container.dataset.contentYesNo,
-        hasContentYesYes: !!container.dataset.contentYesYes
+    dynamicItems.forEach((item, index) => {
+      const content = item.dataset[dataKey];
+      const contentDiv = item.querySelector('.metafield-content');
+      
+      console.log(`Item ${index + 1}:`, {
+        name: item.dataset.mfName,
+        baseKey: item.dataset.mfBaseKey,
+        namespace: item.dataset.mfNamespace,
+        dataKey: dataKey,
+        hasContent: !!content,
+        contentLength: content ? content.length : 0,
+        hasContentDiv: !!contentDiv,
+        allDataKeys: {
+          mfNoNo: !!item.dataset.mfNoNo,
+          mfNoYes: !!item.dataset.mfNoYes,
+          mfYesNo: !!item.dataset.mfYesNo,
+          mfYesYes: !!item.dataset.mfYesYes
+        }
       });
       
-      const content = container.dataset[dataKey];
-      console.log(`Content for ${dataKey}:`, content ? content.substring(0, 50) + '...' : 'empty');
-      
-      if (content) {
-        container.innerHTML = content;
-        console.log('Content updated successfully');
+      if (content && contentDiv) {
+        contentDiv.innerHTML = content;
+        console.log(`✓ Updated item ${index + 1}`);
       } else {
-        console.log('No content found for this key');
+        console.warn(`✗ Failed to update item ${index + 1}:`, {
+          hasContent: !!content,
+          hasContentDiv: !!contentDiv
+        });
       }
     });
     
-    console.log('=== End Dynamic Metafield Update ===');
+    console.log('=== End Dynamic Metafield Items Update ===');
   }
 
   // Listen for option changes
@@ -1664,6 +1741,7 @@
       setTimeout(function() {
         updateSidebarIcons();
         updateDynamicMetafieldContent();
+        updateDynamicMetafieldItems();
       }, 100);
     }
   });
@@ -1672,6 +1750,7 @@
   setTimeout(function() {
     updateSidebarIcons();
     updateDynamicMetafieldContent();
+    updateDynamicMetafieldItems();
   }, 500);
 })();
 </script>
