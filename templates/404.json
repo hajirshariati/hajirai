@@ -15,9 +15,11 @@
         "collection_PJ3dTJ": {
           "type": "collection",
           "settings": {
-            "collection": "best-sellers",
-            "products": [],
-            "title": ""
+            "collection": "",
+            "products": [
+              "janey-sport-water-friendly-slide"
+            ],
+            "title": "TEST PRODUCT"
           }
         },
         "collection_iT9Y6j": {
