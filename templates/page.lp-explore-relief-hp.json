@@ -486,6 +486,16 @@
     "logo_list_YNHa44": {
       "type": "logo-list",
       "blocks": {
+        "logo_NC7Ljg": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/Overpronation.png",
+            "height": 52,
+            "link": "shopify://pages/explore-relief-for-overpronation",
+            "title": "Overpronation",
+            "title_size": "text-sm"
+          }
+        },
         "logo_6pVKxX": {
           "type": "logo",
           "settings": {
@@ -536,16 +546,6 @@
             "title_size": "text-sm"
           }
         },
-        "logo_NC7Ljg": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/Overpronation.png",
-            "height": 52,
-            "link": "shopify://pages/explore-relief-for-overpronation",
-            "title": "Overpronation",
-            "title_size": "text-sm"
-          }
-        },
         "logo_bdrNft": {
           "type": "logo",
           "settings": {
@@ -568,12 +568,12 @@
         }
       },
       "block_order": [
+        "logo_NC7Ljg",
         "logo_6pVKxX",
         "logo_tY7e8H",
         "logo_djVGba",
         "logo_EDAnBP",
         "logo_b3Fej8",
-        "logo_NC7Ljg",
         "logo_bdrNft",
         "logo_i3cYxY"
       ],
