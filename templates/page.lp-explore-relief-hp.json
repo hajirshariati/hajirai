@@ -483,6 +483,138 @@
         "abra_promo_code_hide": ""
       }
     },
+    "logo_list_YNHa44": {
+      "type": "logo-list",
+      "blocks": {
+        "logo_EDAnBP": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/icon.Heel_pain.png",
+            "height": 52,
+            "link": "shopify://pages/explore-relief-for-heel-pain",
+            "title": "Heel Pain",
+            "title_size": "text-sm"
+          }
+        },
+        "logo_6pVKxX": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/mortons_neuroma.png",
+            "height": 52,
+            "link": "shopify://pages/explore-relief-for-mortons-neuroma",
+            "title": "Morton's Neuroma ",
+            "title_size": "text-sm"
+          }
+        },
+        "logo_NC7Ljg": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/Overpronation.png",
+            "height": 52,
+            "link": "shopify://pages/explore-relief-for-overpronation",
+            "title": "Overpronation",
+            "title_size": "text-sm"
+          }
+        },
+        "logo_tY7e8H": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/metatarsalgia.png",
+            "height": 52,
+            "link": "shopify://pages/explore-relief-for-metatarsalgia",
+            "title": "Metatarsalgia",
+            "title_size": "text-sm"
+          }
+        },
+        "logo_b3Fej8": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/bunion.png",
+            "height": 52,
+            "link": "shopify://pages/explore-relief-for-bunions",
+            "title": "Bunions",
+            "title_size": "text-sm"
+          }
+        },
+        "logo_bdrNft": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/icon.Arch_Pain.png",
+            "height": 52,
+            "link": "shopify://pages/explore-relief-for-arch-pain",
+            "title": "Arch Pain",
+            "title_size": "text-sm"
+          }
+        },
+        "logo_i3cYxY": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/icon.Heel_pain.png",
+            "height": 52,
+            "link": "shopify://pages/explore-relief-for-heel-spurs",
+            "title": "Heel Spurs",
+            "title_size": "text-sm"
+          }
+        },
+        "logo_djVGba": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/plantar_fasciitis.png",
+            "height": 52,
+            "link": "shopify://pages/explore-relief-for-plantar-fasciitis",
+            "title": "Plantar Fasciitis",
+            "title_size": "text-sm"
+          }
+        }
+      },
+      "block_order": [
+        "logo_EDAnBP",
+        "logo_6pVKxX",
+        "logo_NC7Ljg",
+        "logo_tY7e8H",
+        "logo_b3Fej8",
+        "logo_bdrNft",
+        "logo_i3cYxY",
+        "logo_djVGba"
+      ],
+      "custom_css": [
+        ".logo-list,.logo-bar {mix-blend-mode: multiply;}"
+      ],
+      "name": "Logo list",
+      "settings": {
+        "layout": "marquee",
+        "grid_horizontal": 85,
+        "direction": "right",
+        "speed": 2,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": false,
+        "rounded": true,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
     "lookbook_XrVA6j": {
       "type": "lookbook",
       "blocks": {
@@ -1774,6 +1906,7 @@
     "multicolumn_mjCNzx",
     "rich_text_eMGQNq",
     "logo_list_ayxHeL",
+    "logo_list_YNHa44",
     "lookbook_XrVA6j",
     "lookbookdual_bqTQ7Y",
     "collection_list_LWrAVe",
