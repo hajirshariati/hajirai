@@ -577,6 +577,7 @@
         "logo_bdrNft",
         "logo_i3cYxY"
       ],
+      "disabled": true,
       "custom_css": [
         ".logo-list,.logo-bar {mix-blend-mode: multiply;}"
       ],
