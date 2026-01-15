@@ -558,3 +558,115 @@
   }
 }
 {% endschema %}
+
+
+
+
+<script>
+(function() {
+  const initDraggableLogoList = function() {
+    const logoLists = document.querySelectorAll('logo-list');
+    
+    logoLists.forEach(function(logoList) {
+      // Check if already initialized
+      if (logoList.dataset.draggableInit) return;
+      logoList.dataset.draggableInit = 'true';
+      
+      let isDown = false;
+      let startX;
+      let scrollLeft;
+      let autoScrollPaused = false;
+      
+      // Get the flickity slider element
+      const slider = logoList.querySelector('.flickity-slider');
+      const viewport = logoList.querySelector('.flickity-viewport');
+      
+      if (!viewport) return;
+      
+      // Add grab cursor
+      viewport.style.cursor = 'grab';
+      
+      // Touch and mouse events
+      const handleStart = function(e) {
+        isDown = true;
+        viewport.style.cursor = 'grabbing';
+        startX = (e.pageX || e.touches[0].pageX) - viewport.offsetLeft;
+        
+        // Pause animation
+        if (slider) {
+          slider.style.animationPlayState = 'paused';
+          autoScrollPaused = true;
+        }
+        
+        // Try to pause Flickity if available
+        if (typeof Flickity !== 'undefined') {
+          const flkty = Flickity.data(logoList);
+          if (flkty && flkty.pausePlayer) {
+            flkty.pausePlayer();
+          }
+        }
+      };
+      
+      const handleEnd = function() {
+        isDown = false;
+        viewport.style.cursor = 'grab';
+        
+        // Resume animation after delay
+        setTimeout(function() {
+          if (slider) {
+            slider.style.animationPlayState = 'running';
+            autoScrollPaused = false;
+          }
+          
+          // Try to resume Flickity if available
+          if (typeof Flickity !== 'undefined') {
+            const flkty = Flickity.data(logoList);
+            if (flkty && flkty.unpausePlayer) {
+              flkty.unpausePlayer();
+            }
+          }
+        }, 2000);
+      };
+      
+      const handleMove = function(e) {
+        if (!isDown) return;
+        e.preventDefault();
+        
+        const x = (e.pageX || e.touches[0].pageX) - viewport.offsetLeft;
+        const walk = (x - startX) * 2;
+        
+        // Try to move Flickity if available
+        if (typeof Flickity !== 'undefined') {
+          const flkty = Flickity.data(logoList);
+          if (flkty) {
+            flkty.x = flkty.x + walk;
+            flkty.positionSlider();
+            startX = (e.pageX || e.touches[0].pageX) - viewport.offsetLeft;
+          }
+        }
+      };
+      
+      // Mouse events
+      viewport.addEventListener('mousedown', handleStart);
+      viewport.addEventListener('mouseleave', handleEnd);
+      viewport.addEventListener('mouseup', handleEnd);
+      viewport.addEventListener('mousemove', handleMove);
+      
+      // Touch events
+      viewport.addEventListener('touchstart', handleStart, { passive: true });
+      viewport.addEventListener('touchend', handleEnd);
+      viewport.addEventListener('touchmove', handleMove, { passive: false });
+    });
+  };
+  
+  // Initialize on DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initDraggableLogoList);
+  } else {
+    initDraggableLogoList();
+  }
+  
+  // Also initialize on Shopify section load (for theme editor)
+  document.addEventListener('shopify:section:load', initDraggableLogoList);
+})();
+</script>
