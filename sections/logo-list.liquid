@@ -83,122 +83,67 @@
 
 
 
-
 <script>
 (function() {
-  const initDraggableLogoList = function() {
-    const logoLists = document.querySelectorAll('logo-list');
+  document.addEventListener('DOMContentLoaded', function() {
+    var logoLists = document.querySelectorAll('logo-list');
     
     logoLists.forEach(function(logoList) {
-      // Check if already initialized
-      if (logoList.dataset.draggableInit) return;
-      logoList.dataset.draggableInit = 'true';
+      if (logoList.dataset.touchInit) return;
+      logoList.dataset.touchInit = 'true';
       
-      let isDown = false;
-      let startX;
-      let scrollLeft;
-      let autoScrollPaused = false;
+      var startX = 0;
+      var isDragging = false;
+      var animationsPaused = false;
       
-      // Get the flickity slider element
-      const slider = logoList.querySelector('.flickity-slider');
-      const viewport = logoList.querySelector('.flickity-viewport');
-      
-      if (!viewport) return;
-      
-      // Add grab cursor
-      viewport.style.cursor = 'grab';
-      
-      // Touch and mouse events
-      const handleStart = function(e) {
-        isDown = true;
-        viewport.style.cursor = 'grabbing';
-        startX = (e.pageX || e.touches[0].pageX) - viewport.offsetLeft;
+      var pauseAnimations = function() {
+        if (animationsPaused) return;
+        animationsPaused = true;
         
-        // Pause animation
-        if (slider) {
-          slider.style.animationPlayState = 'paused';
-          autoScrollPaused = true;
-        }
+        var cells = logoList.querySelectorAll('.flickity-cell');
+        cells.forEach(function(cell) {
+          var computedStyle = window.getComputedStyle(cell);
+          var currentTransform = computedStyle.transform;
+          cell.dataset.originalTransform = cell.style.transform;
+          cell.style.transform = currentTransform;
+        });
         
-        // Try to pause Flickity if available
-        if (typeof Flickity !== 'undefined') {
-          const flkty = Flickity.data(logoList);
-          if (flkty && flkty.pausePlayer) {
-            flkty.pausePlayer();
-          }
-        }
+        logoList.classList.add('touch-paused');
       };
       
-      const handleEnd = function() {
-        isDown = false;
-        viewport.style.cursor = 'grab';
+      var resumeAnimations = function() {
+        if (!animationsPaused) return;
         
-        // Resume animation after delay
         setTimeout(function() {
-          if (slider) {
-            slider.style.animationPlayState = 'running';
-            autoScrollPaused = false;
-          }
+          var cells = logoList.querySelectorAll('.flickity-cell');
+          cells.forEach(function(cell) {
+            cell.style.transform = '';
+          });
           
-          // Try to resume Flickity if available
-          if (typeof Flickity !== 'undefined') {
-            const flkty = Flickity.data(logoList);
-            if (flkty && flkty.unpausePlayer) {
-              flkty.unpausePlayer();
-            }
-          }
+          logoList.classList.remove('touch-paused');
+          animationsPaused = false;
         }, 2000);
       };
       
-      const handleMove = function(e) {
-        if (!isDown) return;
-        e.preventDefault();
-        
-        const x = (e.pageX || e.touches[0].pageX) - viewport.offsetLeft;
-        const walk = (x - startX) * 2;
-        
-        // Try to move Flickity if available
-        if (typeof Flickity !== 'undefined') {
-          const flkty = Flickity.data(logoList);
-          if (flkty) {
-            flkty.x = flkty.x + walk;
-            flkty.positionSlider();
-            startX = (e.pageX || e.touches[0].pageX) - viewport.offsetLeft;
-          }
-        }
-      };
+      logoList.addEventListener('touchstart', function(e) {
+        isDragging = true;
+        startX = e.touches[0].clientX;
+        pauseAnimations();
+      }, { passive: true });
       
-      // Mouse events
-      viewport.addEventListener('mousedown', handleStart);
-      viewport.addEventListener('mouseleave', handleEnd);
-      viewport.addEventListener('mouseup', handleEnd);
-      viewport.addEventListener('mousemove', handleMove);
+      logoList.addEventListener('touchmove', function(e) {
+        if (!isDragging) return;
+        // Just let it pause, don't move manually
+      }, { passive: true });
       
-      // Touch events
-      viewport.addEventListener('touchstart', handleStart, { passive: true });
-      viewport.addEventListener('touchend', handleEnd);
-      viewport.addEventListener('touchmove', handleMove, { passive: false });
+      logoList.addEventListener('touchend', function() {
+        isDragging = false;
+        resumeAnimations();
+      });
     });
-  };
-  
-  // Initialize on DOM ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initDraggableLogoList);
-  } else {
-    initDraggableLogoList();
-  }
-  
-  // Also initialize on Shopify section load (for theme editor)
-  document.addEventListener('shopify:section:load', initDraggableLogoList);
+  });
 })();
 </script>
-
-
-
-
-
-
-
 
 {% schema %}
 {
