@@ -450,6 +450,7 @@
       ],
       "name": "Logo list",
       "settings": {
+        "visibility": "all",
         "layout": "marquee",
         "grid_horizontal": 85,
         "direction": "left",
@@ -577,12 +578,12 @@
         "logo_bdrNft",
         "logo_i3cYxY"
       ],
-      "disabled": true,
       "custom_css": [
         ".logo-list,.logo-bar {mix-blend-mode: multiply;}"
       ],
       "name": "Logo list",
       "settings": {
+        "visibility": "mobile",
         "layout": "marquee",
         "grid_horizontal": 85,
         "direction": "right",
@@ -1182,6 +1183,7 @@
       ],
       "name": "Logo list",
       "settings": {
+        "visibility": "all",
         "layout": "marquee",
         "grid_horizontal": 100,
         "direction": "left",
