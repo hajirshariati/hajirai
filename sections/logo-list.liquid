@@ -19,6 +19,47 @@
     }
   }
 
+
+
+
+
+
+
+
+ /* Enable touch scroll on logo list for mobile */
+@media screen and (max-width: 749px) {
+  logo-list {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  logo-list::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Stop the CSS animation when touching */
+  logo-list .logo-bar.animate {
+    animation-play-state: running;
+  }
+  
+  logo-list:active .logo-bar.animate,
+  logo-list:focus .logo-bar.animate {
+    animation-play-state: paused;
+  }
+  
+  /* Make items scrollable */
+  logo-list .logo-bar {
+    flex-wrap: nowrap !important;
+  }
+  
+  logo-list .logo__item {
+    scroll-snap-align: start;
+  }
+} 
 </style>
 
 
