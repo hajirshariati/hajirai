@@ -7,32 +7,35 @@
   }
 
   /* Section visibility classes */
-@media screen and (min-width: 750px) {
-  .mobile-only {
-    display: none !important;
+  @media screen and (min-width: 750px) {
+    .mobile-only {
+      display: none !important;
+    }
   }
-}
 
-@media screen and (max-width: 749px) {
-  .desktop-only {
-    display: none !important;
+  @media screen and (max-width: 749px) {
+    .desktop-only {
+      display: none !important;
+    }
   }
-}
 
+  /* Pause logo list animation on touch drag */
+  logo-list.touch-dragging .flickity-slider {
+    animation: none !important;
+  }
 
+  logo-list.touch-dragging .flickity-cell {
+    animation: none !important;
+    transition: none !important;
+  }
 
-/* Pause logo list animation on touch */
-logo-list.touch-paused .flickity-slider {
-  animation-play-state: paused !important;
-}
+  logo-list.touch-dragging .logo-bar {
+    animation: none !important;
+  }
 
-logo-list.touch-paused .flickity-cell {
-  animation-play-state: paused !important;
-}
-
-logo-list.touch-paused .logo-bar {
-  animation-play-state: paused !important;
-}
+  logo-list.touch-dragging {
+    touch-action: pan-x !important;
+  }
 </style>
 
 
@@ -108,57 +111,105 @@ logo-list.touch-paused .logo-bar {
       logoList.dataset.touchInit = 'true';
       
       var startX = 0;
+      var currentX = 0;
+      var initialOffset = 0;
       var isDragging = false;
-      var animationsPaused = false;
       
-      var pauseAnimations = function() {
-        if (animationsPaused) return;
-        animationsPaused = true;
-        
-        var cells = logoList.querySelectorAll('.flickity-cell');
+      var viewport = logoList.querySelector('.flickity-viewport');
+      var slider = logoList.querySelector('.flickity-slider');
+      
+      if (!viewport || !slider) return;
+      
+      var cells = slider.querySelectorAll('.flickity-cell');
+      if (cells.length === 0) return;
+      
+      var getCurrentOffset = function() {
+        var transform = window.getComputedStyle(cells[0]).transform;
+        if (transform === 'none') return 0;
+        var matrix = new DOMMatrix(transform);
+        return matrix.m41;
+      };
+      
+      var setOffset = function(offset) {
         cells.forEach(function(cell) {
-          var computedStyle = window.getComputedStyle(cell);
-          var currentTransform = computedStyle.transform;
-          cell.dataset.originalTransform = cell.style.transform;
-          cell.style.transform = currentTransform;
-        });
-        
-        logoList.classList.add('touch-paused');
-      };
-      
-      var resumeAnimations = function() {
-        if (!animationsPaused) return;
-        
-        setTimeout(function() {
-          var cells = logoList.querySelectorAll('.flickity-cell');
-          cells.forEach(function(cell) {
-            cell.style.transform = '';
-          });
+          var currentTransform = window.getComputedStyle(cell).transform;
+          var matrix = new DOMMatrix(currentTransform);
+          var currentPercent = cell.style.transform.match(/translateX\(([-\d.]+)%\)/);
           
-          logoList.classList.remove('touch-paused');
-          animationsPaused = false;
-        }, 2000);
+          if (currentPercent) {
+            cell.style.transform = 'translateX(calc(' + currentPercent[1] + '% + ' + offset + 'px))';
+          } else {
+            cell.style.transform = 'translateX(' + offset + 'px)';
+          }
+        });
       };
       
+      var resetOffset = function() {
+        cells.forEach(function(cell) {
+          cell.style.transform = '';
+        });
+      };
+      
+      // Touch Start
       logoList.addEventListener('touchstart', function(e) {
         isDragging = true;
         startX = e.touches[0].clientX;
-        pauseAnimations();
+        currentX = 0;
+        
+        // Pause Flickity animation
+        logoList.classList.add('touch-dragging');
+        
+        // Store initial positions
+        cells.forEach(function(cell) {
+          cell.dataset.startTransform = window.getComputedStyle(cell).transform;
+        });
       }, { passive: true });
       
+      // Touch Move
       logoList.addEventListener('touchmove', function(e) {
         if (!isDragging) return;
-        // Just let it pause, don't move manually
+        
+        var touchX = e.touches[0].clientX;
+        var diff = touchX - startX;
+        currentX = diff;
+        
+        // Apply the drag offset to each cell
+        cells.forEach(function(cell) {
+          var startTransform = cell.dataset.startTransform;
+          if (startTransform && startTransform !== 'none') {
+            var matrix = new DOMMatrix(startTransform);
+            var newX = matrix.m41 + diff;
+            cell.style.transform = 'translateX(' + newX + 'px)';
+          }
+        });
       }, { passive: true });
       
+      // Touch End
       logoList.addEventListener('touchend', function() {
+        if (!isDragging) return;
         isDragging = false;
-        resumeAnimations();
+        
+        // Resume animation after delay
+        setTimeout(function() {
+          cells.forEach(function(cell) {
+            cell.style.transform = '';
+            delete cell.dataset.startTransform;
+          });
+          logoList.classList.remove('touch-dragging');
+        }, 2500);
       });
     });
   });
 })();
 </script>
+
+
+
+
+
+
+
+
 
 {% schema %}
 {
