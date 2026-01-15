@@ -486,16 +486,6 @@
     "logo_list_YNHa44": {
       "type": "logo-list",
       "blocks": {
-        "logo_EDAnBP": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/icon.Heel_pain.png",
-            "height": 52,
-            "link": "shopify://pages/explore-relief-for-heel-pain",
-            "title": "Heel Pain",
-            "title_size": "text-sm"
-          }
-        },
         "logo_6pVKxX": {
           "type": "logo",
           "settings": {
@@ -503,16 +493,6 @@
             "height": 52,
             "link": "shopify://pages/explore-relief-for-mortons-neuroma",
             "title": "Morton's Neuroma ",
-            "title_size": "text-sm"
-          }
-        },
-        "logo_NC7Ljg": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/Overpronation.png",
-            "height": 52,
-            "link": "shopify://pages/explore-relief-for-overpronation",
-            "title": "Overpronation",
             "title_size": "text-sm"
           }
         },
@@ -526,6 +506,26 @@
             "title_size": "text-sm"
           }
         },
+        "logo_djVGba": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/plantar_fasciitis.png",
+            "height": 52,
+            "link": "shopify://pages/explore-relief-for-plantar-fasciitis",
+            "title": "Plantar Fasciitis",
+            "title_size": "text-sm"
+          }
+        },
+        "logo_EDAnBP": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/icon.Heel_pain.png",
+            "height": 52,
+            "link": "shopify://pages/explore-relief-for-heel-pain",
+            "title": "Heel Pain",
+            "title_size": "text-sm"
+          }
+        },
         "logo_b3Fej8": {
           "type": "logo",
           "settings": {
@@ -533,6 +533,16 @@
             "height": 52,
             "link": "shopify://pages/explore-relief-for-bunions",
             "title": "Bunions",
+            "title_size": "text-sm"
+          }
+        },
+        "logo_NC7Ljg": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/Overpronation.png",
+            "height": 52,
+            "link": "shopify://pages/explore-relief-for-overpronation",
+            "title": "Overpronation",
             "title_size": "text-sm"
           }
         },
@@ -555,27 +565,17 @@
             "title": "Heel Spurs",
             "title_size": "text-sm"
           }
-        },
-        "logo_djVGba": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/plantar_fasciitis.png",
-            "height": 52,
-            "link": "shopify://pages/explore-relief-for-plantar-fasciitis",
-            "title": "Plantar Fasciitis",
-            "title_size": "text-sm"
-          }
         }
       },
       "block_order": [
-        "logo_EDAnBP",
         "logo_6pVKxX",
-        "logo_NC7Ljg",
         "logo_tY7e8H",
+        "logo_djVGba",
+        "logo_EDAnBP",
         "logo_b3Fej8",
+        "logo_NC7Ljg",
         "logo_bdrNft",
-        "logo_i3cYxY",
-        "logo_djVGba"
+        "logo_i3cYxY"
       ],
       "custom_css": [
         ".logo-list,.logo-bar {mix-blend-mode: multiply;}"
