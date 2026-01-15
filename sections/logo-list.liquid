@@ -5,9 +5,22 @@
     {%- render 'section-variables', section: section -%}
     --section-grid-gap: {{ section.settings.grid_horizontal }}px;
   }
+
+  /* Section visibility classes */
+@media screen and (min-width: 750px) {
+  .mobile-only {
+    display: none !important;
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .desktop-only {
+    display: none !important;
+  }
+}
 </style>
 
-<div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}{% if section.settings.abra_promo_code_show != blank %} abra--{{ section.settings.abra_promo_code_show | handleize }}-activated{% endif %}"
+<div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}{% if section.settings.abra_promo_code_show != blank %} abra--{{ section.settings.abra_promo_code_show | handleize }}-activated{% endif %}{% if section.settings.visibility == 'mobile' %} mobile-only{% elsif section.settings.visibility == 'desktop' %} desktop-only{% endif %}"
   {% if section.settings.abra_promo_code_hide != blank %}
     data-abra-default="{{ section.settings.abra_promo_code_hide | handleize }}"
   {% endif %}
@@ -61,11 +74,30 @@
     {%- endif -%}
   </div>
 </div>
-
 {% schema %}
 {
   "name": "t:sections.logo-list.name",
   "settings": [
+    {
+      "type": "select",
+      "id": "visibility",
+      "label": "Section visibility",
+      "options": [
+        {
+          "value": "all",
+          "label": "Show on all devices"
+        },
+        {
+          "value": "mobile",
+          "label": "Mobile only"
+        },
+        {
+          "value": "desktop",
+          "label": "Desktop only"
+        }
+      ],
+      "default": "all"
+    },
     {
       "type": "select",
       "id": "layout",
@@ -458,43 +490,35 @@
           "id": "link",
           "label": "t:sections.global.settings.link.label"
         },
-
-
-
-
-{
-  "type": "text",
-  "id": "title",
-  "label": "Logo title"
-},
-{
-  "type": "select",
-  "id": "title_size",
-  "options": [
-    {
-      "value": "text-xs",
-      "label": "Extra small"
-    },
-    {
-      "value": "text-sm",
-      "label": "Small"
-    },
-    {
-      "value": "text-base",
-      "label": "Medium"
-    },
-    {
-      "value": "text-lg",
-      "label": "Large"
-    }
-  ],
-  "default": "text-sm",
-  "label": "Title size"
-}
-
-
-
-
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Logo title"
+        },
+        {
+          "type": "select",
+          "id": "title_size",
+          "options": [
+            {
+              "value": "text-xs",
+              "label": "Extra small"
+            },
+            {
+              "value": "text-sm",
+              "label": "Small"
+            },
+            {
+              "value": "text-base",
+              "label": "Medium"
+            },
+            {
+              "value": "text-lg",
+              "label": "Large"
+            }
+          ],
+          "default": "text-sm",
+          "label": "Title size"
+        }
       ]
     }
   ],
