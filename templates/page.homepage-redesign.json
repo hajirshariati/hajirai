@@ -138,6 +138,115 @@
         "abra_promo_code_hide": ""
       }
     },
+    "collection_list_kXnXYE": {
+      "type": "collection-list",
+      "blocks": {
+        "collection_BnP9eG": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "",
+            "custom_url": "",
+            "title": "New Arrivals",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_6UXnzP": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "",
+            "custom_url": "",
+            "title": "Shop Womens",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_WkUzKH": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "",
+            "custom_url": "",
+            "title": "Shop Mens",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_kdbg39": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "",
+            "custom_url": "",
+            "title": "Shop Best Sellers",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        }
+      },
+      "block_order": [
+        "collection_BnP9eG",
+        "collection_6UXnzP",
+        "collection_WkUzKH",
+        "collection_kdbg39"
+      ],
+      "name": "t:sections.collection-list.name",
+      "settings": {
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "image_type": "collection",
+        "image_ratio": "square",
+        "show_products_count": false,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "Collections",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
     "images_with_text_fzEP3L": {
       "type": "images-with-text",
       "blocks": {
@@ -213,6 +322,7 @@
   "order": [
     "main-page",
     "video_with_text_overlay_6VpNUH",
+    "collection_list_kXnXYE",
     "images_with_text_fzEP3L"
   ]
 }
