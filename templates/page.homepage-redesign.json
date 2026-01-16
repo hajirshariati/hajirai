@@ -222,7 +222,7 @@
         "show_view_all": false,
         "columns_mobile": "1",
         "swipe_on_mobile": true,
-        "heading": "Collections",
+        "heading": "",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
@@ -316,6 +316,81 @@
         "full_width": false,
         "rounded": false,
         "enable_parallax": true
+      }
+    },
+    "featured_collections_pEFF3n": {
+      "type": "featured-collections",
+      "blocks": {
+        "collection_rr6DtE": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "products": [],
+            "title": "Plantar Fasciitis & Heel Pain"
+          }
+        },
+        "collection_bbkpda": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "products": [],
+            "title": "Flat feet & Overpronation"
+          }
+        },
+        "collection_UVQjeB": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "products": [],
+            "title": "High arches & Ball-of-Foot Pain"
+          }
+        },
+        "collection_KdABTX": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "products": [],
+            "title": "All-day Standing & Fatigue"
+          }
+        }
+      },
+      "block_order": [
+        "collection_rr6DtE",
+        "collection_bbkpda",
+        "collection_UVQjeB",
+        "collection_KdABTX"
+      ],
+      "name": "t:sections.featured-collections.name",
+      "settings": {
+        "product_limit": 6,
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "<strong>Find Support for What Your Feet Need Most</strong>",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_gBwcEw": {
@@ -543,67 +618,96 @@
         "abra_promo_code_hide": ""
       }
     },
-    "featured_collections_pEFF3n": {
-      "type": "featured-collections",
+    "image_with_text_m6VEHH": {
+      "type": "image-with-text",
       "blocks": {
-        "collection_rr6DtE": {
-          "type": "collection",
+        "heading_jxhHxB": {
+          "type": "heading",
           "settings": {
-            "collection": "",
-            "products": [],
-            "title": "Plantar Fasciitis & Heel Pain"
+            "heading": "One Scan. Better Fit for Everyone.",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
           }
         },
-        "collection_bbkpda": {
-          "type": "collection",
+        "text_hjDhQV": {
+          "type": "text",
           "settings": {
-            "collection": "",
-            "products": [],
-            "title": "Flat feet & Overpronation"
+            "text": "<p>Great fit starts with understanding the foot. Aetrex foot-scanning technology captures real data on arch height, pressure points, and alignment to create smarter recommendations, more confident purchases, and better outcomes, whether you’re shopping for yourself or fitting customers in-store.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
           }
         },
-        "collection_UVQjeB": {
-          "type": "collection",
+        "text_pVpmRP": {
+          "type": "text",
           "settings": {
-            "collection": "",
-            "products": [],
-            "title": "High arches & Ball-of-Foot Pain"
+            "text": "<ul><li>Understand true fit beyond just shoe size</li><li>Enable more personalized product recommendations</li><li>Create greater confidence at the moment of purchase</li><li>Elevate the overall fitting experience</li><li>Improve conversion and satisfaction</li><li>Reduce size- and fit-related returns</li></ul>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
           }
         },
-        "collection_KdABTX": {
-          "type": "collection",
+        "button_yLGepw": {
+          "type": "button",
           "settings": {
-            "collection": "",
-            "products": [],
-            "title": "All-day Standing & Fatigue"
+            "button_label": "Get Your Foot Scanned",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": true
+          }
+        },
+        "button_GbzfKg": {
+          "type": "button",
+          "settings": {
+            "button_label": "Have a Scanner in Your Store",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": true
           }
         }
       },
       "block_order": [
-        "collection_rr6DtE",
-        "collection_bbkpda",
-        "collection_UVQjeB",
-        "collection_KdABTX"
+        "heading_jxhHxB",
+        "text_hjDhQV",
+        "text_pVpmRP",
+        "button_yLGepw",
+        "button_GbzfKg"
       ],
-      "name": "t:sections.featured-collections.name",
+      "name": "t:sections.image-with-text.name",
       "settings": {
-        "product_limit": 6,
-        "columns": 4,
-        "carousel_on_desktop": true,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "<strong>Find Support for What Your Feet Need Most</strong>",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
+        "img_url": "",
+        "image_height": "650px",
+        "image_width": "medium",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "left",
         "color_text": "",
         "color_background": "",
         "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
         "color_highlight": "",
         "gradient_highlight": "",
         "color_button_text": "",
@@ -614,6 +718,8 @@
         "divider": false,
         "full_width": false,
         "rounded": false,
+        "enable_parallax": true,
+        "parallax_direction": "vertical",
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
@@ -624,8 +730,9 @@
     "video_with_text_overlay_6VpNUH",
     "collection_list_kXnXYE",
     "images_with_text_fzEP3L",
+    "featured_collections_pEFF3n",
     "rich_text_gBwcEw",
     "scrolling_text_zEratJ",
-    "featured_collections_pEFF3n"
+    "image_with_text_m6VEHH"
   ]
 }
