@@ -502,35 +502,54 @@
     "lookbook_qqHQPn": {
       "type": "lookbook",
       "blocks": {
-        "product_4aWzNt": {
-          "type": "product",
+        "content_EEQYnr": {
+          "type": "content",
           "settings": {
-            "product": "",
+            "icon": "none",
+            "iwidth": "custom",
+            "icon_width": 24,
+            "heading": "",
+            "text": "",
+            "link": "",
             "color_text": "#ffffff",
-            "vertical": 25,
-            "horizontal": 25,
-            "vertical_mobile": 25,
-            "horizontal_mobile": 25
+            "vertical": 69,
+            "horizontal": 50,
+            "vertical_mobile": 50,
+            "horizontal_mobile": 50,
+            "cta_label": "",
+            "cta_link": "",
+            "cta_external": false,
+            "cta_icon": true
           }
         },
-        "product_gBnDXq": {
-          "type": "product",
+        "content_YXzLye": {
+          "type": "content",
           "settings": {
-            "product": "",
+            "icon": "none",
+            "iwidth": "custom",
+            "icon_width": 24,
+            "heading": "",
+            "text": "",
+            "link": "",
             "color_text": "#ffffff",
-            "vertical": 75,
-            "horizontal": 65,
-            "vertical_mobile": 75,
-            "horizontal_mobile": 65
+            "vertical": 50,
+            "horizontal": 50,
+            "vertical_mobile": 50,
+            "horizontal_mobile": 50,
+            "cta_label": "",
+            "cta_link": "",
+            "cta_external": false,
+            "cta_icon": true
           }
         }
       },
       "block_order": [
-        "product_4aWzNt",
-        "product_gBnDXq"
+        "content_EEQYnr",
+        "content_YXzLye"
       ],
       "name": "t:sections.lookbook.name",
       "settings": {
+        "image": "shopify://shop_images/AP111W_catalog.jpg",
         "heading": "<strong>Smarter Design Starts With Better Data</strong>",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
