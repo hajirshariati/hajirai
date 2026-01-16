@@ -417,6 +417,26 @@
             "cta_icon": true
           }
         },
+        "content_6pf6bR": {
+          "type": "content",
+          "settings": {
+            "icon": "none",
+            "iwidth": "custom",
+            "icon_width": 24,
+            "heading": "MESH",
+            "text": "<p>MESH FOR BREATHABILITY</p>",
+            "link": "",
+            "color_text": "#ffffff",
+            "vertical": 54,
+            "horizontal": 74,
+            "vertical_mobile": 50,
+            "horizontal_mobile": 50,
+            "cta_label": "",
+            "cta_link": "",
+            "cta_external": false,
+            "cta_icon": true
+          }
+        },
         "content_YXzLye": {
           "type": "content",
           "settings": {
@@ -440,6 +460,7 @@
       },
       "block_order": [
         "content_EEQYnr",
+        "content_6pf6bR",
         "content_YXzLye"
       ],
       "name": "t:sections.lookbook.name",
