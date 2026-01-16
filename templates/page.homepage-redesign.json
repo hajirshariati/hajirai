@@ -11,6 +11,7 @@
   "sections": {
     "main-page": {
       "type": "main-page",
+      "disabled": true,
       "settings": {
         "heading_size": "title-sm",
         "heading_alignment": "text-left",
@@ -22,9 +23,124 @@
         "narrow": true,
         "rounded": false
       }
+    },
+    "video_with_text_overlay_6VpNUH": {
+      "type": "video-with-text-overlay",
+      "blocks": {
+        "subheading_Uqmtd4": {
+          "type": "subheading",
+          "settings": {
+            "subheading": "The Aetrex Technology Difference",
+            "subheading_size": "subtitle-md",
+            "secondary_color": false
+          }
+        },
+        "heading_hd6UAg": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>Better Fit Starts With Better Data.</p>",
+            "heading_size": "title-lg tracking-heading",
+            "heading_tag": "h1",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_UqRkX4": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Footwear and orthotics powered by industry-leading foot-scanning technology, trusted by consumers and retailers worldwide.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_f7aWAh": {
+          "type": "button",
+          "settings": {
+            "button_label": "Shop Footwear",
+            "button_link": "shopify://pages/women-footwear",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": true
+          }
+        },
+        "button_H48qzE": {
+          "type": "button",
+          "settings": {
+            "button_label": "Shop Orthotics",
+            "button_link": "shopify://pages/orthotics",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": true
+          }
+        },
+        "button_8iXTwg": {
+          "type": "button",
+          "settings": {
+            "button_label": "Learn More",
+            "button_link": "",
+            "button_video_link": "https://rvq643.saas.contentserv.com/admin/rest/gtstream/stream/assets/Aetrex B2B/The_Aetrex_Technology_Difference.mp4",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": true
+          }
+        }
+      },
+      "block_order": [
+        "subheading_Uqmtd4",
+        "heading_hd6UAg",
+        "text_UqRkX4",
+        "button_f7aWAh",
+        "button_H48qzE",
+        "button_8iXTwg"
+      ],
+      "name": "t:sections.video-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "video": "shopify://files/videos/1D_2 1.mp4",
+        "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
+        "description": "",
+        "enable_video_autoplay": true,
+        "enable_video_looping": true,
+        "image_height": "650px",
+        "content_width": "small",
+        "content_position": "md:items-center md:justify-end",
+        "text_alignment": "left",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-center justify-center",
+        "text_alignment_mobile": "center",
+        "color_text": "#111111",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
     }
   },
   "order": [
-    "main-page"
+    "main-page",
+    "video_with_text_overlay_6VpNUH"
   ]
 }
