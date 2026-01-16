@@ -169,7 +169,7 @@
         "button_BQ3kPa": {
           "type": "button",
           "settings": {
-            "button_label": "Button label",
+            "button_label": "Learn More",
             "button_link": "",
             "button_video_link": "",
             "button_style": "primary",
