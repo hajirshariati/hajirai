@@ -17926,7 +17926,7 @@ a[href="#"] {
 
 
  
-@media screen and (max-width: 1000px) {
+@media screen and (max-width: 700px) {
   .banner__box--small {
     max-width: 20rem;
   }
