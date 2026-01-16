@@ -63,7 +63,7 @@
         "button_f7aWAh": {
           "type": "button",
           "settings": {
-            "button_label": "Shop Footwear",
+            "button_label": "Shop Mens",
             "button_link": "shopify://pages/women-footwear",
             "button_video_link": "",
             "button_style": "primary",
@@ -75,7 +75,7 @@
         "button_H48qzE": {
           "type": "button",
           "settings": {
-            "button_label": "Shop Orthotics",
+            "button_label": "Shop Womens",
             "button_link": "shopify://pages/orthotics",
             "button_video_link": "",
             "button_style": "primary",
@@ -163,7 +163,7 @@
             "link_type": "collection",
             "collection": "",
             "custom_url": "",
-            "title": "Shop Womens",
+            "title": "Shop Footwear",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -179,7 +179,7 @@
             "link_type": "collection",
             "collection": "",
             "custom_url": "",
-            "title": "Shop Mens",
+            "title": "Shop Orthotics",
             "description": "",
             "overlay_content": false,
             "color_text": "#ffffff",
@@ -499,6 +499,70 @@
         "abra_promo_code_hide": ""
       }
     },
+    "lookbook_qqHQPn": {
+      "type": "lookbook",
+      "blocks": {
+        "product_4aWzNt": {
+          "type": "product",
+          "settings": {
+            "product": "",
+            "color_text": "#ffffff",
+            "vertical": 25,
+            "horizontal": 25,
+            "vertical_mobile": 25,
+            "horizontal_mobile": 25
+          }
+        },
+        "product_gBnDXq": {
+          "type": "product",
+          "settings": {
+            "product": "",
+            "color_text": "#ffffff",
+            "vertical": 75,
+            "horizontal": 65,
+            "vertical_mobile": 75,
+            "horizontal_mobile": 65
+          }
+        }
+      },
+      "block_order": [
+        "product_4aWzNt",
+        "product_gBnDXq"
+      ],
+      "name": "t:sections.lookbook.name",
+      "settings": {
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "heading_position": "none",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 30,
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
     "rich_text_gBwcEw": {
       "type": "rich-text",
       "blocks": {
@@ -723,66 +787,6 @@
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
-    },
-    "image_comparison_rTxVTV": {
-      "type": "image-comparison",
-      "blocks": {
-        "image_DN64b3": {
-          "type": "image",
-          "settings": {
-            "subheading": "",
-            "heading": "",
-            "content_position": "end",
-            "color_text": "#ffffff"
-          }
-        },
-        "image_RDkBpL": {
-          "type": "image",
-          "settings": {
-            "subheading": "",
-            "heading": "",
-            "content_position": "end",
-            "color_text": "#ffffff"
-          }
-        }
-      },
-      "block_order": [
-        "image_DN64b3",
-        "image_RDkBpL"
-      ],
-      "name": "t:sections.image-comparison.name",
-      "settings": {
-        "layout": "horizontal",
-        "image_height": "adapt",
-        "image_height_mobile": "adapt",
-        "heading": "Image comparison",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
     }
   },
   "order": [
@@ -792,7 +796,7 @@
     "images_with_text_fzEP3L",
     "featured_collections_pEFF3n",
     "image_with_text_m6VEHH",
-    "image_comparison_rTxVTV",
+    "lookbook_qqHQPn",
     "rich_text_gBwcEw",
     "scrolling_text_zEratJ"
   ]
