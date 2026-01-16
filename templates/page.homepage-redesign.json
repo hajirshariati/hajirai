@@ -317,12 +317,315 @@
         "rounded": false,
         "enable_parallax": true
       }
+    },
+    "rich_text_gBwcEw": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_RYFk9V": {
+          "type": "heading",
+          "settings": {
+            "heading": "Trusted by the World’s Leading Footwear Brands",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_kLQmbK": {
+          "type": "text",
+          "settings": {
+            "text": "<p>From product development labs to retail floors, Aetrex foot-scanning technology is trusted by some of the biggest names in footwear and wellness. Our scanners help brands design better-fitting products, deliver more personalized in-store experiences, and reduce fit-related friction across the customer journey.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_RYFk9V",
+        "text_kLQmbK"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 20,
+        "divider": false,
+        "narrow": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "scrolling_text_zEratJ": {
+      "type": "scrolling-text",
+      "blocks": {
+        "image_rTRmtm": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/foot.gif",
+            "height": 80,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "image_KQpmtx": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/gucci.gif",
+            "height": 80,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "image_NyQWKy": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/nike_06b59e60-23dc-4474-807a-22f1c3115ee7.jpg",
+            "height": 80,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "image_p9QzTU": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/lulu.gif",
+            "height": 80,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "image_fGcnyX": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/alo.gif",
+            "height": 80,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "image_WBwTXd": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/nf_98a6b0cb-990a-47dc-bdc8-0cac3643c674.jpg",
+            "height": 80,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "image_jCWR6r": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/dsw.gif",
+            "height": 80,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "image_WwiyzJ": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Salvatore-Ferragamo-Logo-500x281.png",
+            "height": 80,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "image_wL4ik9": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/puma.gif",
+            "height": 80,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "image_TfXF8j": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/hoka.gif",
+            "height": 80,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "image_jV6QG9": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/bauer_e13e32a1-4582-4531-a26e-b5740750d87e.jpg",
+            "height": 80,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "image_etpgb4": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/under.gif",
+            "height": 80,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        }
+      },
+      "block_order": [
+        "image_rTRmtm",
+        "image_KQpmtx",
+        "image_NyQWKy",
+        "image_p9QzTU",
+        "image_fGcnyX",
+        "image_WBwTXd",
+        "image_jCWR6r",
+        "image_WwiyzJ",
+        "image_wL4ik9",
+        "image_TfXF8j",
+        "image_jV6QG9",
+        "image_etpgb4"
+      ],
+      "name": "t:sections.scrolling-text.name",
+      "settings": {
+        "direction": "left",
+        "speed": 20,
+        "grid_horizontal": 70,
+        "enable_twin": false,
+        "enable_parallax": true,
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "padding_top": 36,
+        "padding_bottom": 36,
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "featured_collections_pEFF3n": {
+      "type": "featured-collections",
+      "blocks": {
+        "collection_rr6DtE": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "products": [],
+            "title": "Plantar Fasciitis & Heel Pain"
+          }
+        },
+        "collection_bbkpda": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "products": [],
+            "title": "Flat feet & Overpronation"
+          }
+        },
+        "collection_UVQjeB": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "products": [],
+            "title": "High arches & Ball-of-Foot Pain"
+          }
+        },
+        "collection_KdABTX": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "products": [],
+            "title": "All-day Standing & Fatigue"
+          }
+        }
+      },
+      "block_order": [
+        "collection_rr6DtE",
+        "collection_bbkpda",
+        "collection_UVQjeB",
+        "collection_KdABTX"
+      ],
+      "name": "t:sections.featured-collections.name",
+      "settings": {
+        "product_limit": 6,
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "Support That Moves With You",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
     }
   },
   "order": [
     "main-page",
     "video_with_text_overlay_6VpNUH",
     "collection_list_kXnXYE",
-    "images_with_text_fzEP3L"
+    "images_with_text_fzEP3L",
+    "rich_text_gBwcEw",
+    "scrolling_text_zEratJ",
+    "featured_collections_pEFF3n"
   ]
 }
