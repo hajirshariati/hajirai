@@ -531,7 +531,7 @@
       ],
       "name": "t:sections.lookbook.name",
       "settings": {
-        "heading": "",
+        "heading": "<strong>Smarter Design Starts With Better Data</strong>",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
