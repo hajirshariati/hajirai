@@ -137,10 +137,82 @@
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
+    },
+    "images_with_text_fzEP3L": {
+      "type": "images-with-text",
+      "blocks": {
+        "heading_Qje7Un": {
+          "type": "heading",
+          "settings": {
+            "heading": "<strong>The Technology Behind Every Better Fit</strong>",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_yLGccG": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Aetrex pioneered 3D foot-scanning to capture real data on arch height, pressure points, and gait. With over 20 years in foot-scanning innovation and more than 50 million people scanned worldwide, that same technology powers both our products and our retail solutions.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_BQ3kPa": {
+          "type": "button",
+          "settings": {
+            "button_label": "Button label",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": true
+          }
+        }
+      },
+      "block_order": [
+        "heading_Qje7Un",
+        "text_yLGccG",
+        "button_BQ3kPa"
+      ],
+      "name": "t:sections.images-with-text.name",
+      "settings": {
+        "image_url": "",
+        "image2_url": "",
+        "image_ratio": "portrait",
+        "image_width": "medium",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": true
+      }
     }
   },
   "order": [
     "main-page",
-    "video_with_text_overlay_6VpNUH"
+    "video_with_text_overlay_6VpNUH",
+    "images_with_text_fzEP3L"
   ]
 }
