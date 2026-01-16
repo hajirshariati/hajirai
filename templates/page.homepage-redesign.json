@@ -394,6 +394,89 @@
         "abra_promo_code_hide": ""
       }
     },
+    "lookbook_qqHQPn": {
+      "type": "lookbook",
+      "blocks": {
+        "content_EEQYnr": {
+          "type": "content",
+          "settings": {
+            "icon": "none",
+            "iwidth": "custom",
+            "icon_width": 24,
+            "heading": "Super arch support",
+            "text": "<p>clinicially proven to help you jump higher than Lebron James</p>",
+            "link": "",
+            "color_text": "#ffffff",
+            "vertical": 55,
+            "horizontal": 30,
+            "vertical_mobile": 50,
+            "horizontal_mobile": 50,
+            "cta_label": "",
+            "cta_link": "",
+            "cta_external": false,
+            "cta_icon": true
+          }
+        },
+        "content_YXzLye": {
+          "type": "content",
+          "settings": {
+            "icon": "none",
+            "iwidth": "custom",
+            "icon_width": 24,
+            "heading": "SUPER FAST",
+            "text": "<p>Designed to help you run faster than Usain Bolt</p>",
+            "link": "",
+            "color_text": "#ffffff",
+            "vertical": 50,
+            "horizontal": 50,
+            "vertical_mobile": 50,
+            "horizontal_mobile": 50,
+            "cta_label": "",
+            "cta_link": "",
+            "cta_external": false,
+            "cta_icon": true
+          }
+        }
+      },
+      "block_order": [
+        "content_EEQYnr",
+        "content_YXzLye"
+      ],
+      "name": "t:sections.lookbook.name",
+      "settings": {
+        "image": "shopify://shop_images/AP111W_catalog.jpg",
+        "heading": "<strong>Smarter Design Starts With Better Data</strong>",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "heading_position": "none",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 30,
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
     "image_with_text_m6VEHH": {
       "type": "image-with-text",
       "blocks": {
@@ -496,89 +579,6 @@
         "rounded": false,
         "enable_parallax": true,
         "parallax_direction": "vertical",
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "lookbook_qqHQPn": {
-      "type": "lookbook",
-      "blocks": {
-        "content_EEQYnr": {
-          "type": "content",
-          "settings": {
-            "icon": "none",
-            "iwidth": "custom",
-            "icon_width": 24,
-            "heading": "Super arch support",
-            "text": "<p>clinicially proven to help you jump higher than Lebron James</p>",
-            "link": "",
-            "color_text": "#ffffff",
-            "vertical": 55,
-            "horizontal": 30,
-            "vertical_mobile": 50,
-            "horizontal_mobile": 50,
-            "cta_label": "",
-            "cta_link": "",
-            "cta_external": false,
-            "cta_icon": true
-          }
-        },
-        "content_YXzLye": {
-          "type": "content",
-          "settings": {
-            "icon": "none",
-            "iwidth": "custom",
-            "icon_width": 24,
-            "heading": "SUPER FAST",
-            "text": "<p>Designed to help you run faster than Usain Bolt</p>",
-            "link": "",
-            "color_text": "#ffffff",
-            "vertical": 50,
-            "horizontal": 50,
-            "vertical_mobile": 50,
-            "horizontal_mobile": 50,
-            "cta_label": "",
-            "cta_link": "",
-            "cta_external": false,
-            "cta_icon": true
-          }
-        }
-      },
-      "block_order": [
-        "content_EEQYnr",
-        "content_YXzLye"
-      ],
-      "name": "t:sections.lookbook.name",
-      "settings": {
-        "image": "shopify://shop_images/AP111W_catalog.jpg",
-        "heading": "<strong>Smarter Design Starts With Better Data</strong>",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "heading_position": "none",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "overlay_opacity": 30,
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
@@ -815,8 +815,8 @@
     "collection_list_kXnXYE",
     "images_with_text_fzEP3L",
     "featured_collections_pEFF3n",
-    "image_with_text_m6VEHH",
     "lookbook_qqHQPn",
+    "image_with_text_m6VEHH",
     "rich_text_gBwcEw",
     "scrolling_text_zEratJ"
   ]
