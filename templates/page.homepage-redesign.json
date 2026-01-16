@@ -117,6 +117,7 @@
         "content_width": "small",
         "content_position": "md:items-center md:justify-end",
         "text_alignment": "left",
+        "video_url_mobile": "",
         "image_height_mobile": "auto",
         "content_position_mobile": "items-center justify-center",
         "text_alignment_mobile": "center",
@@ -253,7 +254,7 @@
         "heading_Qje7Un": {
           "type": "heading",
           "settings": {
-            "heading": "<strong>The Technology Behind Every Better Fit</strong>",
+            "heading": "<strong>The Technology Behind Better Fit</strong>",
             "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "none",
