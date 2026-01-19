@@ -255,8 +255,8 @@
           "type": "heading",
           "settings": {
             "heading": "<p>Healthy Comfort Starts Here!®</p>",
-            "heading_size": "title-sm",
-            "heading_tag": "h1",
+            "heading_size": "title-md",
+            "heading_tag": "span",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
