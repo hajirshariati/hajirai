@@ -15344,199 +15344,199 @@ video-media
 /*! lookbook */
 
 @keyframes hotspot {
-    0% {
-        transform: scale(1);
-    }
+  0% {
+    transform: scale(1)
+  }
 
-    50% {
-        transform: scale(0.9);
-    }
+  50% {
+    transform: scale(0.9)
+  }
 
-    to {
-        transform: scale(1);
-    }
+  to {
+    transform: scale(1)
+  }
 }
 
 .page-width lookbook-element {
-    overflow: hidden;
-    border-radius: var(--rounded-block);
+  overflow: hidden;
+  border-radius: var(--rounded-block);
 }
 
 .js .page-width lookbook-element.banner :is(.banner__overlay, .banner__media) {
-    height: 100%;
+  height: 100%;
 }
 
 @media screen and (min-width: 768px) {
-    lookbook-element .banner__box {
-        min-width: auto;
-        max-width: 28rem;
-        color: rgb(var(--color-foreground));
-    }
+  lookbook-element .banner__box {
+    min-width: auto;
+    max-width: 28rem;
+    color: rgb(var(--color-foreground));
+  }
+  
+  lookbook-element .banner__box .title-wrapper {
+    text-align: inherit;
+    flex-direction: column;
+  }
+  
+  lookbook-element .banner__content .text-left .title-wrapper {
+    align-items: flex-start;
+  }
 
-    lookbook-element .banner__box .title-wrapper {
-        text-align: inherit;
-        flex-direction: column;
-    }
-
-    lookbook-element .banner__content .text-left .title-wrapper {
-        align-items: flex-start;
-    }
-
-    lookbook-element .banner__content .text-center .title-wrapper {
-        align-items: center;
-    }
-
-    lookbook-element .banner__content .text-right .title-wrapper {
-        align-items: flex-end;
-    }
+  lookbook-element .banner__content .text-center .title-wrapper {
+    align-items: center;
+  }
+  
+  lookbook-element .banner__content .text-right .title-wrapper {
+    align-items: flex-end;
+  }
 }
 
 .hotspot {
-    --hotspot-width: var(--sp-11);
-    width: var(--hotspot-width);
-    height: var(--hotspot-width);
-    inset-inline-start: var(--hotspot-x);
-    inset-block-start: var(--hotspot-y);
-    margin-inline-start: calc(var(--hotspot-width) / -2);
-    margin-block-start: calc(var(--hotspot-width) / -2);
+  --hotspot-width: var(--sp-11);
+  width: var(--hotspot-width);
+  height: var(--hotspot-width);
+  inset-inline-start: var(--hotspot-x);
+  inset-block-start: var(--hotspot-y);
+  margin-inline-start: calc(var(--hotspot-width)/ -2);
+  margin-block-start: calc(var(--hotspot-width)/ -2);
 }
 
 .hotspot::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: var(--rounded-full);
-    background-color: rgb(var(--hotspot-color) / 0.4);
-    transition: box-shadow var(--animation-primary);
-    animation: hotspot 2s ease infinite;
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--rounded-full);
+  background-color: rgb(var(--hotspot-color)/ 0.4);
+  transition: box-shadow var(--animation-primary);
+  animation: hotspot 2s ease infinite;
 }
 
 .hotspot::after {
-    content: "";
-    position: absolute;
-    width: var(--sp-4);
-    height: var(--sp-4);
-    border-radius: var(--rounded-full);
-    background-color: rgb(var(--hotspot-color));
-    transition: transform var(--animation-primary);
+  content: '';
+  position: absolute;
+  width: var(--sp-4);
+  height: var(--sp-4);
+  border-radius: var(--rounded-full);
+  background-color: rgb(var(--hotspot-color));
+  transition: transform var(--animation-primary);
 }
 
 @media screen and (pointer: fine) {
-    .hotspot:hover::before {
-        box-shadow: inset 0 0 0 var(--sp-0d5) rgb(var(--hotspot-color));
-    }
+  .hotspot:hover::before {
+    box-shadow: inset 0 0 0 var(--sp-0d5) rgb(var(--hotspot-color));
+  }
 
-    .hotspot:hover::after {
-        transform: scale(1.7);
-    }
-
-    .hotspot:hover .hotspot__content {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-.hotspot[aria-current="true"] {
-    z-index: 2;
-}
-
-.hotspot[aria-current="true"]::after,
-.hotspot.active::after {
+  .hotspot:hover::after {
     transform: scale(1.7);
+  }
+
+  .hotspot:hover .hotspot__content {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.hotspot[aria-current=true] {
+  z-index: 2;
+}
+
+.hotspot[aria-current=true]::after,
+.hotspot.active::after {
+  transform: scale(1.7);
 }
 
 .hotspot.active .hotspot__content {
-    opacity: 1;
-    transform: scale(1);
+  opacity: 1;
+  transform: scale(1);
 }
 
 .hotspot__content {
-    padding: var(--sp-2);
-    color: rgb(var(--color-foreground));
-    background-color: rgb(var(--color-background));
-    border-radius: var(--sp-2d5);
-    inset-block-start: calc(100% + var(--sp-6));
-    opacity: 0;
-    transform: scale(0.8);
-    transition: var(--animation-primary);
-    transition-property: opacity, transform;
+  padding: var(--sp-2);
+  color: rgb(var(--color-foreground));
+  background-color: rgb(var(--color-background));
+  border-radius: var(--sp-2d5);
+  inset-block-start: calc(100% + var(--sp-6));
+  opacity: 0;
+  transform: scale(0.8);
+  transition: var(--animation-primary);
+  transition-property: opacity, transform;
 }
 
 .hotspot__content.with-left {
-    inset-inline-start: 0;
+  inset-inline-start: 0;
 }
 
 .hotspot__content.with-right {
-    inset-inline-end: 0;
+  inset-inline-end: 0;
 }
 
 .hotspot__content.with-bottom {
-    inset-block-start: auto;
-    inset-block-end: calc(100% + var(--sp-6));
+  inset-block-start: auto;
+  inset-block-end: calc(100% + var(--sp-6));
 }
 
 .with-content .hotspot__content .rte {
-    min-width: var(--sp-72);
+  min-width: var(--sp-72);
 }
 
-.with-content .hotspot__content .rte > .media {
-    margin-block: 0;
+.with-content .hotspot__content .rte>.media {
+  margin-block: 0;
 }
 
 .hotspot__content .rte {
-    min-width: var(--sp-48);
-    padding: var(--sp-2);
+  min-width: var(--sp-48);
+  padding: var(--sp-2);
 }
 
 .hotspot__content .rte p {
-    margin-block: 0;
+  margin-block: 0;
 }
 
 .hotspot__content .icon {
-    height: auto;
-    inset-block-end: 100%;
-    inset-inline-start: 50%;
-    transform: translateX(calc(-50% * var(--transform-logical)));
-    fill: rgb(var(--color-background));
+  height: auto;
+  inset-block-end: 100%;
+  inset-inline-start: 50%;
+  transform: translateX(calc(-50% * var(--transform-logical)));
+  fill: rgb(var(--color-background));
 }
 
 .hotspot__content.with-left .icon {
-    inset-inline-start: var(--sp-8);
+  inset-inline-start: var(--sp-8);
 }
 
 .hotspot__content.with-right .icon {
-    inset-inline-start: auto;
-    inset-inline-end: var(--sp-8);
+  inset-inline-start: auto;
+  inset-inline-end: var(--sp-8);
 }
 
 .hotspot__content.with-bottom .icon {
-    inset-block-end: auto;
-    inset-block-start: 100%;
-    transform: translateX(calc(-50% * var(--transform-logical))) scaleY(-1);
+  inset-block-end: auto;
+  inset-block-start: 100%;
+  transform: translateX(calc(-50% * var(--transform-logical))) scaleY(-1);
 }
 
 .hotspot__content .media {
-    width: var(--sp-15);
-    border-radius: var(--sp-2d5);
+  width: var(--sp-15);
+  border-radius: var(--sp-2d5);
 }
 
 .hotspot__content :is(.unit-price, .price__sale, .price__regular) {
-    font-size: inherit;
+  font-size: inherit;
 }
 
 @media screen and (min-width: 1024px) {
-    .hotspot {
-        --hotspot-width: var(--sp-15);
-    }
+  .hotspot {
+    --hotspot-width: var(--sp-15);
+  }
 
-    .hotspot::after {
-        width: var(--sp-5);
-        height: var(--sp-5);
-    }
+  .hotspot::after {
+    width: var(--sp-5);
+    height: var(--sp-5);
+  }
 
-    .hotspot__content .media {
-        width: var(--sp-20);
-    }
+  .hotspot__content .media {
+    width: var(--sp-20);
+  }
 }
 
 /*! shop-the-look */
