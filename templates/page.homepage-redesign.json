@@ -248,6 +248,74 @@
         "abra_promo_code_hide": ""
       }
     },
+    "reveal_video_with_text_overlay_Hi7Kg4": {
+      "type": "reveal-video-with-text-overlay",
+      "blocks": {
+        "heading_CNJERe": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p><strong>Healthy Comfort Starts Here!</strong>®</p>",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_GfjcyC": {
+          "type": "text",
+          "settings": {
+            "text": "<p><strong>New Arrivals</strong></p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_RWNFYq": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP NOW",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_CNJERe",
+        "text_GfjcyC",
+        "button_RWNFYq"
+      ],
+      "name": "t:sections.reveal-video-with-text-overlay.name",
+      "settings": {
+        "video": "shopify://files/videos/1700x750_Aetrex.com_HP_Lifestyle.mp4",
+        "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
+        "description": "",
+        "content_width": "small",
+        "content_position": "md:items-start md:justify-end",
+        "text_alignment": "left",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
+        "color_text": "#171717",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
+        "enable_parallax": false
+      }
+    },
     "images_with_text_fzEP3L": {
       "type": "images-with-text",
       "blocks": {
@@ -394,6 +462,76 @@
         "abra_promo_code_hide": ""
       }
     },
+    "lookbookdual_zWNdXG": {
+      "type": "lookbookdual",
+      "blocks": {
+        "product_6LAjJC": {
+          "type": "product",
+          "settings": {
+            "product": "",
+            "image_position": "1",
+            "color_text": "#171717",
+            "vertical": 81,
+            "horizontal": 41,
+            "vertical_mobile": 25,
+            "horizontal_mobile": 25
+          }
+        },
+        "product_nfPgm8": {
+          "type": "product",
+          "settings": {
+            "product": "",
+            "image_position": "2",
+            "color_text": "#171717",
+            "vertical": 75,
+            "horizontal": 65,
+            "vertical_mobile": 75,
+            "horizontal_mobile": 65
+          }
+        }
+      },
+      "block_order": [
+        "product_6LAjJC",
+        "product_nfPgm8"
+      ],
+      "name": "Lookbook - Dual Image",
+      "settings": {
+        "image_1": "shopify://shop_images/44959-AP116W_lifestyle1_98cc8bd1-4b12-46d5-b701-d1fc97684fb4.jpg",
+        "image_2": "shopify://shop_images/44957-AP11W6_lifestyle_963d1b39-05a4-4a6b-837f-b2406abcaad9.jpg",
+        "image_gap": 0,
+        "image_gap_mobile": 12,
+        "heading": "Smarter Design",
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "heading_position": "items-center justify-center text-center",
+        "subheading": "Meet Danika",
+        "description": "<p>Take on your most active days in complete comfort with the Danika. These supportive mesh sneakers feature arch support, extra thick UltraSKY™; cushioning, and adjustable laces to help you get the perfect fit.</p>",
+        "button_label": "Shop Danika",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "rgba(0,0,0,0)",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#ffffff",
+        "overlay_opacity": 50,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
     "lookbook_qqHQPn": {
       "type": "lookbook",
       "blocks": {
@@ -463,6 +601,7 @@
         "content_6pf6bR",
         "content_YXzLye"
       ],
+      "disabled": true,
       "name": "t:sections.lookbook.name",
       "settings": {
         "image": "shopify://shop_images/AP111W_catalog.jpg",
@@ -834,8 +973,10 @@
     "main-page",
     "video_with_text_overlay_6VpNUH",
     "collection_list_kXnXYE",
+    "reveal_video_with_text_overlay_Hi7Kg4",
     "images_with_text_fzEP3L",
     "featured_collections_pEFF3n",
+    "lookbookdual_zWNdXG",
     "lookbook_qqHQPn",
     "image_with_text_m6VEHH",
     "rich_text_gBwcEw",
