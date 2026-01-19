@@ -39,7 +39,7 @@
           "type": "heading",
           "settings": {
             "heading": "<p>Better Fit Starts With Better Data.</p>",
-            "heading_size": "title-lg tracking-heading",
+            "heading_size": "title-md",
             "heading_tag": "h1",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -254,7 +254,7 @@
         "heading_CNJERe": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Healthy Comfort Starts Here!®</p>",
+            "heading": "<p>The Technology Behind Better Fit</p>",
             "heading_size": "title-md",
             "heading_tag": "span",
             "highlighted_text": "none",
@@ -264,9 +264,9 @@
         "text_GfjcyC": {
           "type": "text",
           "settings": {
-            "text": "<p><strong>New Arrivals</strong></p>",
+            "text": "<p>Aetrex pioneered 3D foot-scanning to capture real data on arch height, pressure points, and gait. With over 20 years in foot-scanning innovation and more than 50 million people scanned worldwide, that same technology powers both our products and our retail solutions.</p>",
             "text_font": "body",
-            "text_size": "subtext-custom",
+            "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -279,13 +279,13 @@
         "button_RWNFYq": {
           "type": "button",
           "settings": {
-            "button_label": "SHOP NOW",
+            "button_label": "Learn More",
             "button_link": "",
             "button_video_link": "",
-            "button_style": "primary",
+            "button_style": "secondary",
             "button_size": "md",
             "button_external": false,
-            "button_icon": false
+            "button_icon": true
           }
         }
       },
@@ -363,6 +363,7 @@
         "text_yLGccG",
         "button_BQ3kPa"
       ],
+      "disabled": true,
       "name": "t:sections.images-with-text.name",
       "settings": {
         "image_url": "",
