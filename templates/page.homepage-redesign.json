@@ -254,7 +254,7 @@
         "heading_CNJERe": {
           "type": "heading",
           "settings": {
-            "heading": "<p><strong>Healthy Comfort Starts Here!</strong>®</p>",
+            "heading": "<p>Healthy Comfort Starts Here!®</p>",
             "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "none",
@@ -302,6 +302,7 @@
         "content_width": "small",
         "content_position": "md:items-start md:justify-end",
         "text_alignment": "left",
+        "video_url_mobile": "",
         "content_position_mobile": "items-end justify-start",
         "text_alignment_mobile": "left",
         "color_text": "#171717",
