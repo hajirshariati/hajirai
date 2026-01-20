@@ -126,8 +126,14 @@
       <div class="form__label flex items-center justify-between gap-2 w-full">
         {%- if show_variant_labels -%}
           <div class="flex gap-2">
-            {{- option.name -}}:
-            <span class="font-medium" id="{{ section_id }}-{{ product_id }}-option{{ option.position }}">{{ option.selected_value }}</span>
+            {{- option.name -}}
+            {%- if product.template_suffix != 'pdp-ortho-new' -%}
+              {%- if option.name == 'Size' -%}
+                :<span class="font-medium" id="{{ section_id }}-{{ product_id }}-option{{ option.position }}">{{ option.selected_value }}</span>
+              {%- endif -%}
+            {%- else -%}
+              <span class="font-medium" id="{{ section_id }}-{{ product_id }}-option{{ option.position }}">{{ option.selected_value }}</span>
+            {%- endif -%}
           </div>
         {%- endif -%}
         {%- if is_size -%}
