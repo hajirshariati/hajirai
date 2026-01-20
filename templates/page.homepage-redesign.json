@@ -439,7 +439,7 @@
         "show_view_all": false,
         "columns_mobile": "1",
         "swipe_on_mobile": true,
-        "heading": "<strong>Find Support for What Your Feet Need Most</strong>",
+        "heading": "<strong>Curated to Support You</strong>",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
@@ -467,34 +467,52 @@
     "lookbookdual_zWNdXG": {
       "type": "lookbookdual",
       "blocks": {
-        "product_6LAjJC": {
-          "type": "product",
+        "content_DeedDW": {
+          "type": "content",
           "settings": {
-            "product": "",
             "image_position": "1",
-            "color_text": "#171717",
-            "vertical": 81,
-            "horizontal": 41,
-            "vertical_mobile": 25,
-            "horizontal_mobile": 25
+            "icon": "none",
+            "iwidth": "custom",
+            "icon_width": 24,
+            "heading": "Arch support",
+            "text": "<p>arch support</p>",
+            "link": "",
+            "color_text": "#ffffff",
+            "vertical": 79,
+            "horizontal": 40,
+            "vertical_mobile": 50,
+            "horizontal_mobile": 50,
+            "cta_label": "",
+            "cta_link": "",
+            "cta_external": false,
+            "cta_icon": true
           }
         },
-        "product_nfPgm8": {
-          "type": "product",
+        "content_MpaDPD": {
+          "type": "content",
           "settings": {
-            "product": "",
-            "image_position": "2",
-            "color_text": "#171717",
-            "vertical": 75,
-            "horizontal": 65,
-            "vertical_mobile": 75,
-            "horizontal_mobile": 65
+            "image_position": "1",
+            "icon": "none",
+            "iwidth": "custom",
+            "icon_width": 24,
+            "heading": "Toe Box",
+            "text": "<p>design for roomier toe box</p>",
+            "link": "",
+            "color_text": "#ffffff",
+            "vertical": 79,
+            "horizontal": 70,
+            "vertical_mobile": 50,
+            "horizontal_mobile": 50,
+            "cta_label": "",
+            "cta_link": "",
+            "cta_external": false,
+            "cta_icon": true
           }
         }
       },
       "block_order": [
-        "product_6LAjJC",
-        "product_nfPgm8"
+        "content_DeedDW",
+        "content_MpaDPD"
       ],
       "name": "Lookbook - Dual Image",
       "settings": {
@@ -645,7 +663,7 @@
         "heading_jxhHxB": {
           "type": "heading",
           "settings": {
-            "heading": "One Scan. Better Fit for Everyone.",
+            "heading": "A better fit, just for you.",
             "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "none",
