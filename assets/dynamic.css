@@ -125,6 +125,14 @@ span.price__item--tooltip.tooltip {
     margin-left: 0;
 }
 
+.pdp-ortho-new .tooltip__message {
+    min-width: unset;
+}
+
+.pdp-ortho-new .tooltip__image {
+    max-width: 150px;
+}
+
 .tooltip__message-content-text {
     display: block;
     margin-top: .5rem;
