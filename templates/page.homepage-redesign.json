@@ -314,7 +314,7 @@
         "color_overlay": "#171717",
         "divider_color": "#111111",
         "overlay_opacity": 0,
-        "enable_parallax": false
+        "enable_parallax": true
       }
     },
     "images_with_text_fzEP3L": {
