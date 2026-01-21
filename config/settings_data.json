@@ -228,6 +228,11 @@
           "inject_modules_loader": true,
           "inject_sdk_loader": false
         }
+      },
+      "15685250022964305326": {
+        "type": "shopify://apps/elevar-conversion-tracking/blocks/dataLayerEmbed/bc30ab68-b15c-4311-811f-8ef485877ad6",
+        "disabled": false,
+        "settings": {}
       }
     }
   },
