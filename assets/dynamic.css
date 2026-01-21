@@ -1056,3 +1056,7 @@ body .yotpo-reviews-main-widget svg {
 .rte .html-slot-container {
   overflow: hidden;
 }
+
+#CartDrawer {
+  z-index: 9999999;
+}
