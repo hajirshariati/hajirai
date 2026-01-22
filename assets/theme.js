@@ -8533,5 +8533,289 @@ theme.DOMready(() => {
     });
 });
 
+class ComparisonTable extends HTMLElement {
+    constructor() {
+        super();
+
+        this.highlighted = false;
+        this.tableSticky = this.querySelector('.comparison-table__sticky');
+        if (this.tableSticky) {
+            Motion.inView(this, this.init.bind(this));
+        }
+    }
+
+    get items() {
+        return Array.from(this.querySelectorAll('.comparison-table__row'));
+    }
+
+    init() {
+        this.addEventListener('scroll', theme.utils.throttle(this.onScrollHandler.bind(this)));
+        this.tableSticky.addEventListener('scroll', theme.utils.throttle(this.onStickyScrollHandler.bind(this)));
+
+        Motion.scroll(({ y }) =>
+            {
+                if (y.current >= y.targetOffset + this.tableSticky.clientHeight / 2 && y.progress < 0.85) {
+                    this.tableSticky.classList.add('active');
+                }
+                else {
+                    this.tableSticky.classList.remove('active');
+                }
+            },
+            { target: this, offset: ['0 start', 'end 0'] }
+        );
+    }
+
+    onScrollHandler(event) {
+        this.tableSticky.scrollTo({
+            left: event.target.scrollLeft
+        });
+    }
+
+    onStickyScrollHandler(event) {
+        this.scrollTo({
+            left: event.target.scrollLeft
+        });
+    }
+
+    highlight() {
+        this.items.forEach((item) => {
+            const classesToCheck = ['thead', 'tfoot', 'sticky'];
+            if (classesToCheck.every(className => !item.classList.contains(className))) {
+                if (this.highlighted) {
+                    const columns = Array.from(item.querySelectorAll('.comparison-table__column'));
+                    const first_column = columns[0];
+
+                    let highlighted = false;
+                    columns.forEach((column) => {
+                        if (first_column.innerHTML != column.innerHTML) {
+                            highlighted = true;
+                        }
+                    });
+
+                    item.classList.toggle('info', highlighted);
+                }
+                else {
+                    item.classList.remove('info');
+                }
+            }
+        });
+    }
+}
+customElements.define('comparison-table', ComparisonTable);
+
+class ProductComparison extends HTMLSelectElement {
+    constructor() {
+        super();
+
+        this.oldValue = this.value;
+        this.addEventListener('change', this.onChange);
+    }
+
+    get sectionId() {
+        return this.getAttribute('data-section-id');
+    }
+
+    get column() {
+        return this.getAttribute('data-column');
+    }
+
+    get controlledElement() {
+        return this.hasAttribute('aria-controls') ? document.getElementById(this.getAttribute('aria-controls')) : null;
+    }
+
+    get items() {
+        return Array.from(this.controlledElement.querySelectorAll('select[is="product-comparison"]'));
+    }
+
+    get selectedArr() {
+        return this.items.map((item) => item !== this ? item.value : this.oldValue);
+    }
+
+    onChange() {
+        const index = this.selectedArr.indexOf(this.value);
+        if (index !== -1) {
+            this.changeSelected(this.value);
+
+            const sibling = this.items[index];
+            if (sibling) {
+                sibling.value = this.oldValue;
+                sibling.dispatchEvent(new Event('change'));
+            }
+        }
+        else {
+            this.changeSelected(this.value);
+        }
+        this.oldValue = this.value;
+    }
+
+    changeSelected(productId) {
+        const blockJSON = theme.ProductComparisonJSON[this.sectionId]?.[productId];
+        if (typeof blockJSON === 'undefined') return;
+
+        const column = this.items.indexOf(this) + 1;
+
+        for (let index = 1; index <= 25; index++) {
+            const element = this.controlledElement.querySelector(`[data-column="${column}"][data-index="${index}"]`);
+            if (element) {
+                const heading = blockJSON[`heading_${index}`];
+                const value = blockJSON[`value_${index}`];
+                element.innerHTML = heading.length ? `<p class="h6 leading-tight tracking-none">${heading}</p>${this.unescape(value)}` : this.unescape(value);
+            }
+        }
+
+        const product = this.controlledElement.querySelector(`[data-product="${column}"]`);
+        if (product) {
+            product.innerHTML = document.getElementById(`ProductComparisonInfo-${this.sectionId}-${productId}`).innerHTML;
+        }
+
+        const productSticky = this.controlledElement.querySelector(`[data-product-sticky="${column}"]`);
+        if (productSticky) {
+            productSticky.innerHTML = document.getElementById(`ProductComparisonInfo-${this.sectionId}-${productId}`).innerHTML;
+        }
+
+        const productAction = this.controlledElement.querySelector(`[data-product-action="${column}"]`);
+        if (productAction) {
+            productAction.innerHTML = document.getElementById(`ProductComparisonAction-${this.sectionId}-${productId}`).innerHTML;
+        }
+
+        if (this.controlledElement) {
+            this.controlledElement.highlight();
+        }
+    }
+
+    unescape(input) {
+        const doc = new DOMParser().parseFromString(input, 'text/html');
+        return doc.documentElement.textContent;
+    }
+}
+customElements.define('product-comparison', ProductComparison, { extends: 'select' });
+
+class ComparisonHighlight extends HTMLInputElement {
+    constructor() {
+        super();
+
+        this.addEventListener('change', this.onChange);
+    }
+
+    get controlledElement() {
+        return this.hasAttribute('aria-controls') ? document.getElementById(this.getAttribute('aria-controls')) : null;
+    }
+
+    get items() {
+        return Array.from(this.controlledElement.querySelectorAll('.comparison-table__row'));
+    }
+
+    onChange() {
+        if (this.controlledElement) {
+            this.controlledElement.highlighted = this.checked;
+            this.controlledElement.highlight();
+        }
+    }
+}
+customElements.define('comparison-highlight', ComparisonHighlight, { extends: 'input' });
+
+class ScrollSpy extends HTMLElement {
+    constructor() {
+        super();
+    }
+
+    get scrollspyLinks() {
+        return Array.from(this.querySelectorAll('.scrollspy-link'));
+    }
+
+    get backToTopButton() {
+        return this.querySelector('.back-to-top');
+    }
+
+    get headerHeight() {
+        let header = document.querySelector('.header-section header[is="sticky-header"]');
+        if (this.hasAttribute('aria-controls')) {
+            header = document.getElementById(this.getAttribute('aria-controls'));
+        }
+        return header ? (header.getBoundingClientRect().height + this.topGap) : (this.offsetHeight < window.innerHeight ? this.topGap : 0);
+    }
+
+    get topGap() {
+        return this.hasAttribute('data-gap') ? parseInt(this.getAttribute('data-gap')) : 20;
+    }
+
+    get showHighlight() {
+        return this.hasAttribute('data-highlight');
+    }
+
+    connectedCallback() {
+        this.scrollspyLinks.forEach(link => {
+            link.addEventListener('click', this.handleScrollspyLinkClick.bind(this));
+        });
+
+        if (this.backToTopButton) {
+            this.backToTopButton.addEventListener('click', this.handleBackToTopClick.bind(this));
+        }
+
+        if (this.showHighlight) {
+            window.addEventListener('scroll', this.updateActiveLink.bind(this));
+            this.updateActiveLink.bind(this);
+        }
+    }
+
+    handleScrollspyLinkClick(event) {
+        event.preventDefault();
+        const link = event.currentTarget;
+
+        const targetIds = link.hasAttribute('data-target') ? link.getAttribute('data-target').split(',') : [];
+        const section = document.getElementById(targetIds[0]);
+
+        if (section) {
+            const sectionTop = window.scrollY + section.getBoundingClientRect().top - this.headerHeight;
+            window.scrollTo({
+                top: sectionTop,
+                behavior: theme.config.motionReduced ? 'auto' : 'smooth'
+            });
+        }
+    }
+
+    handleBackToTopClick() {
+        window.scrollTo({
+            top: 0,
+            behavior: theme.config.motionReduced ? 'auto' : 'smooth'
+        });
+    }
+
+    updateActiveLink() {
+        let current = '';
+
+        this.scrollspyLinks.forEach(link => {
+            const targetIds = link.hasAttribute('data-target') ? link.getAttribute('data-target').split(',') : [];
+
+            targetIds.forEach((targetId) => {
+                const section = document.getElementById(targetId);
+
+                if (section) {
+                    const offset = 0;
+                    const sectionTop = section.offsetTop - offset;
+                    const sectionBottom = sectionTop + section.offsetHeight;
+
+                    if (window.pageYOffset >= sectionTop && window.pageYOffset < sectionBottom) {
+                        current = targetId;
+                    }
+                }
+            });
+        });
+
+        this.scrollspyLinks.forEach(link => {
+            const targetIds = link.hasAttribute('data-target') ? link.getAttribute('data-target').split(',') : [];
+            let active = false;
+
+            targetIds.forEach((targetId) => {
+                if (targetId !== '' && targetId === current) {
+                    active = true;
+                }
+            });
+
+            link.classList.toggle('active', active);
+        });
+    }
+};
+customElements.define('scroll-spy', ScrollSpy, { extends: 'nav' });
 
 
