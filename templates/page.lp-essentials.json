@@ -75,7 +75,9 @@
         "padding_bottom": 24,
         "divider": false,
         "narrow": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_bGVzXB": {
@@ -124,7 +126,9 @@
         "padding_bottom": 24,
         "divider": false,
         "narrow": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_QYQntw": {
@@ -173,7 +177,9 @@
         "padding_bottom": 24,
         "divider": false,
         "narrow": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "multicolumn_eRyRcY": {
@@ -190,6 +196,7 @@
             "heading": "<em>Premium Casual Orthotics</em>",
             "heading_size": "text-lg-2xl",
             "text": "<ul><li>Recommended for everyday and casual shoes</li><li>Helps provide superior cushioning and comfort inside your shoes</li></ul>",
+            "custom_html": "",
             "button_label": "SHOP NOW",
             "button_link": "shopify://collections/premium-casual",
             "button_style": "primary",
@@ -210,6 +217,7 @@
             "heading": "<em>Performance Comfort Orthotics</em>",
             "heading_size": "text-lg-2xl",
             "text": "<ul><li>Recommended for Sports & Athletic Shoes</li><li>Helps provide superior shock absorption & impact reduction</li></ul>",
+            "custom_html": "",
             "button_label": "SHOP NOW",
             "button_link": "shopify://collections/performance-comfort",
             "button_style": "primary",
@@ -230,6 +238,7 @@
             "heading": "<em>Extreme Comfort Orthotics</em>",
             "heading_size": "text-lg-2xl",
             "text": "<ul><li>Recommended for everyday and casual shoes</li><li>Helps offer a pressure free environment in your shoes & relieve pain</li></ul>",
+            "custom_html": "",
             "button_label": "SHOP NOW",
             "button_link": "shopify://collections/extreme-comfort",
             "button_style": "primary",
@@ -250,7 +259,7 @@
         "gap": "small",
         "columns": 3,
         "columns_mobile": "1",
-        "carousel_on_desktop": true,
+        "carousel_on_desktop": false,
         "swipe_on_mobile": true,
         "heading": "",
         "heading_size": "title-md",
@@ -274,9 +283,11 @@
         "color_button_gradient": "",
         "padding_top": 12,
         "padding_bottom": 12,
-        "divider": false,
         "full_width": false,
-        "rounded": false
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "image_with_text_overlay_aqVqmD": {
@@ -308,7 +319,9 @@
         "full_width": true,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_EBbb6H": {
@@ -372,7 +385,9 @@
         "padding_bottom": 24,
         "divider": false,
         "narrow": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_R6ajUj": {
@@ -426,7 +441,9 @@
         "padding_bottom": 24,
         "divider": false,
         "narrow": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "image_with_text_9zxJzx": {
@@ -495,7 +512,9 @@
         "full_width": false,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "image_with_text_RRYyLX": {
@@ -564,7 +583,9 @@
         "full_width": false,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "image_with_text_x4G9GV": {
@@ -633,7 +654,9 @@
         "full_width": false,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "image_with_text_6aaTM3": {
@@ -702,7 +725,9 @@
         "full_width": false,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "multicolumn_H448mL": {
@@ -719,6 +744,7 @@
             "heading": "For Everyday Use",
             "heading_size": "text-lg-2xl",
             "text": "<p>Aetrex Premium<br/>Casual Orthotics</p>",
+            "custom_html": "",
             "button_label": "LEARN MORE",
             "button_link": "shopify://pages/aetrex-premium-casual",
             "button_style": "primary",
@@ -739,6 +765,7 @@
             "heading": "For Pressure Relief",
             "heading_size": "text-lg-2xl",
             "text": "<p>Aetrex Extreme<br/>Comfort Orthotics</p>",
+            "custom_html": "",
             "button_label": "LEARN MORE",
             "button_link": "shopify://pages/aetrex-extreme-comfort-orthotic-collection",
             "button_style": "primary",
@@ -759,6 +786,7 @@
             "heading": "For Sports Activities",
             "heading_size": "text-lg-2xl",
             "text": "<p>Aetrex Performance<br/>Comfort Orthotics</p>",
+            "custom_html": "",
             "button_label": "LEARN MORE",
             "button_link": "shopify://pages/aetrex-premium-casual",
             "button_style": "primary",
@@ -803,9 +831,11 @@
         "color_button_gradient": "",
         "padding_top": 72,
         "padding_bottom": 72,
-        "divider": false,
         "full_width": false,
-        "rounded": false
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_iJnhfH": {
@@ -859,7 +889,9 @@
         "padding_bottom": 60,
         "divider": false,
         "narrow": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "multicolumn_6U8mrj": {
@@ -876,6 +908,7 @@
             "heading": "Custom Orthotics",
             "heading_size": "text-lg-2xl",
             "text": "",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -896,6 +929,7 @@
             "heading": "Aetrex Orthotics",
             "heading_size": "text-lg-2xl",
             "text": "",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -939,9 +973,11 @@
         "color_button_gradient": "",
         "padding_top": 0,
         "padding_bottom": 52,
-        "divider": false,
         "full_width": false,
-        "rounded": false
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "multicolumn_djEXnq": {
@@ -958,6 +994,7 @@
             "heading": "Price $200 - $700",
             "heading_size": "text-base-xl",
             "text": "<p>Custom orthotics can cost anywhere between $200-$700 plus medical costs.</p>",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -978,6 +1015,7 @@
             "heading": "$59.95 - $74.95",
             "heading_size": "text-base-xl",
             "text": "<p>Aetrex Orthotics can be up to 250% less expensive than custom orthotics.</p>",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -1021,9 +1059,11 @@
         "color_button_gradient": "",
         "padding_top": 0,
         "padding_bottom": 52,
-        "divider": false,
         "full_width": false,
-        "rounded": false
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "multicolumn_gmchwD": {
@@ -1040,6 +1080,7 @@
             "heading": "Rigid & Hard Materials",
             "heading_size": "text-base-xl",
             "text": "<p>Custom orthotics are typically made from hard, uncomfortable materials that can weaken muscles over time leaving you more prone to injuries.</p>",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -1060,6 +1101,7 @@
             "heading": "High-tech Premium Materials",
             "heading_size": "text-base-xl",
             "text": "<p>Aetrex Orthotics are designed using premium materials that promote natural movement while protecting the foot.</p>",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -1103,9 +1145,11 @@
         "color_button_gradient": "",
         "padding_top": 0,
         "padding_bottom": 52,
-        "divider": false,
         "full_width": false,
-        "rounded": false
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "testimonials_qrf4RY": {
@@ -1268,7 +1312,9 @@
         "padding_bottom": 72,
         "divider": false,
         "full_width": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     }
   },
