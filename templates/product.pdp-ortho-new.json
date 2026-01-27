@@ -287,7 +287,7 @@
         "dot_border_color": "#000000",
         "dot_border_width": 3,
         "line_color": "#000000",
-        "line_width": 2,
+        "line_width": 0.5,
         "line_breaks": 1,
         "callout_background": "#ffffff",
         "callout_radius": 8,
