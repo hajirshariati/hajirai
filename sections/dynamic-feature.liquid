@@ -194,22 +194,38 @@
     padding: 24px;
   }
 
-
-
-
-
   /* ✅ Enable modal interaction when open */
-#shopify-section-{{ section.id }} .drawer.is-open {
-  pointer-events: auto;
-}
+  #shopify-section-{{ section.id }} .drawer.is-open {
+    pointer-events: auto;
+  }
 
-#shopify-section-{{ section.id }} .drawer.is-open overlay-element {
-  pointer-events: auto;
-}
+  #shopify-section-{{ section.id }} .drawer.is-open overlay-element {
+    pointer-events: auto;
+  }
 
-#shopify-section-{{ section.id }} .drawer.is-open .drawer__inner {
-  transform: translateY(0);
-}
+  #shopify-section-{{ section.id }} .drawer.is-open .drawer__inner {
+    transform: translateY(0);
+  }
+
+  /* Mobile Drawer Styles - Match Cart Drawer */
+  #shopify-section-{{ section.id }} .drawer__close-menu {
+    position: absolute;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 9999px;
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    top: 16px;
+    right: 16px;
+  }
+
+  #shopify-section-{{ section.id }} .drawer__close-menu:hover {
+    background-color: #f5f5f5;
+  }
 
 </style>
 
@@ -270,9 +286,12 @@
               <x-modal id="Feature-{{ section.id }}-{{ block.id }}" class="x-modal drawer z-30 fixed bottom-0 left-0 h-full w-full pointer-events-none" role="dialog" aria-modal="true" aria-label="{{ block.settings.heading | escape }}" hidden>
                 <overlay-element class="overlay fixed-modal invisible opacity-0 fixed bottom-0 left-0 w-full h-screen pointer-events-none" aria-controls="Feature-{{ section.id }}-{{ block.id }}" aria-expanded="false"></overlay-element>
                 <div class="drawer__inner z-10 absolute top-0 flex flex-col w-full h-full overflow-hidden">
+                  <button class="drawer__close-menu absolute z-20 flex items-center justify-center w-10 h-10 rounded-full bg-white shadow-md" type="button" aria-controls="Feature-{{ section.id }}-{{ block.id }}" aria-expanded="false" aria-label="{{ 'general.accessibility.close' | t | escape }}">
+                    {%- render 'icon', icon: 'close' -%}
+                  </button>
                   <gesture-element class="drawer__header flex justify-between opacity-0 invisible relative">
                     <span class="drawer__title heading title-md">{{ block.settings.heading | escape }}</span>
-                    <button class="button button--secondary button--close drawer__close hidden sm:flex items-center justify-center" type="button" is="hover-button" aria-controls="Feature-{{ section.id }}-{{ block.id }}" aria-expanded="false" aria-label="Close">
+                    <button class="button button--secondary button--close drawer__close hidden sm:flex items-center justify-center" type="button" is="hover-button" aria-controls="Feature-{{ section.id }}-{{ block.id }}" aria-expanded="false" aria-label="{{ 'general.accessibility.close' | t | escape }}">
                       <span class="btn-fill" data-fill></span>
                       <span class="btn-text">×</span>
                     </button>
@@ -291,10 +310,6 @@
     </div>
   </div>
 </div>
-
-
-
-
 
 <script>
 class DynamicFeatureSection {
@@ -400,7 +415,6 @@ document.addEventListener('DOMContentLoaded', () => initDynamicFeatures());
 document.addEventListener('shopify:section:load', e => initDynamicFeatures(e.target));
 </script>
 
-
 <script>
 (function () {
   function isMobile() {
@@ -453,7 +467,7 @@ document.addEventListener('shopify:section:load', e => initDynamicFeatures(e.tar
       });
     });
 
-    scope.querySelectorAll('overlay-element, .drawer__close').forEach(el => {
+    scope.querySelectorAll('overlay-element, .drawer__close-menu, .drawer__close').forEach(el => {
       el.addEventListener('click', () => {
         closeModal(el.closest('.x-modal'));
       });
@@ -464,8 +478,6 @@ document.addEventListener('shopify:section:load', e => initDynamicFeatures(e.tar
   document.addEventListener('shopify:section:load', e => initMobilePopups(e.target));
 })();
 </script>
-
-
 
 {% schema %}
 {
