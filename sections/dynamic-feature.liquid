@@ -299,57 +299,59 @@ class DynamicFeatureSection {
     }
   }
 
-  drawLines() {
-    const mediaRect = this.media.getBoundingClientRect();
-    const contents = this.section.querySelectorAll('.dynamic-feature__content');
+drawLines() {
+  const mediaRect = this.media.getBoundingClientRect();
+  const contents = this.section.querySelectorAll('.dynamic-feature__content');
 
-    this.lines.forEach((line, index) => {
-      const sx = parseFloat(line.dataset.startX);
-      const sy = parseFloat(line.dataset.startY);
-      const ex = parseFloat(line.dataset.endX);
-      const ey = parseFloat(line.dataset.endY);
-      const hasBend = parseInt(line.dataset.breaks, 10) === 1;
+  this.lines.forEach((line, index) => {
+    const sx = parseFloat(line.dataset.startX);
+    const sy = parseFloat(line.dataset.startY);
+    const hasBend = parseInt(line.dataset.breaks, 10) === 1;
 
-      const content = contents[index];
-      if (!content) return;
+    const content = contents[index];
+    if (!content) return;
 
-      const box = content.getBoundingClientRect();
+    const box = content.getBoundingClientRect();
 
-      // Stop line BEFORE the callout box
-      const endX =
-        ((box.left - mediaRect.left) / mediaRect.width) * 100 - 2;
-      const endY =
-        ((box.top + box.height / 2 - mediaRect.top) / mediaRect.height) * 100;
+    const endX =
+      ((box.left - mediaRect.left) / mediaRect.width) * 100 - 2;
+    const endY =
+      ((box.top + box.height / 2 - mediaRect.top) / mediaRect.height) * 100;
 
-      let path;
+    let path;
 
-      if (!hasBend) {
-        // ✅ STRAIGHT LINE
-        path = `M ${sx},${sy} L ${endX},${endY}`;
-      } else {
-        // ✅ ELBOW IN THE MIDDLE
-        const midX = (sx + endX) / 2;
-        const radius = 4;
+    if (!hasBend) {
+      // ✅ STRAIGHT LINE
+      path = `M ${sx},${sy} L ${endX},${endY}`;
+    } else {
+      // ✅ DIRECTION-AWARE ELBOW
+      const goingRight = endX > sx;
+      const elbowX = goingRight
+        ? sx + Math.abs(endX - sx) * 0.5
+        : sx - Math.abs(endX - sx) * 0.5;
 
-        path = `
-          M ${sx},${sy}
-          L ${midX - radius},${sy}
-          Q ${midX},${sy} ${midX},${sy + radius}
-          L ${midX},${endY - radius}
-          Q ${midX},${endY} ${midX + radius},${endY}
-          L ${endX},${endY}
-        `;
-      }
+      const radius = 4;
+      const vertDir = endY > sy ? 1 : -1;
 
-      line.setAttribute('d', path);
+      path = `
+        M ${sx},${sy}
+        L ${elbowX - radius * (goingRight ? 1 : -1)},${sy}
+        Q ${elbowX},${sy} ${elbowX},${sy + radius * vertDir}
+        L ${elbowX},${endY - radius * vertDir}
+        Q ${elbowX},${endY} ${elbowX + radius * (goingRight ? 1 : -1)},${endY}
+        L ${endX},${endY}
+      `;
+    }
 
-      // Solid stroke animation (no dashes ever)
-      const length = line.getTotalLength();
-      line.style.strokeDasharray = length;
-      line.style.strokeDashoffset = length;
-      line.style.animationDelay = `${0.6 + index * 0.2}s`;
-    });
-  }
+    line.setAttribute('d', path);
+
+    const length = line.getTotalLength();
+    line.style.strokeDasharray = length;
+    line.style.strokeDashoffset = length;
+    line.style.animationDelay = `${0.6 + index * 0.2}s`;
+  });
+}
+
 }
 
 function initDynamicFeatures(scope = document) {
