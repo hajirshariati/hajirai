@@ -177,6 +177,8 @@
             "ProductPage": true,
             "size_recommendation_font_family": "OpenSans, sans-serif",
             "size_recommendation_vertical_spacing": 5,
+            "expansion_panel_background": "#d06263",
+            "expansion_panel_foreground": "#ffffff",
             "tab_background": "#f2f2f2",
             "tab_foreground": "#5c6271",
             "active_tab_background": "#5c6271",
@@ -243,6 +245,47 @@
         "divider": false,
         "full_width": true,
         "rounded": true
+      }
+    },
+    "dynamic_feature_m7Hp4e": {
+      "type": "dynamic-feature",
+      "blocks": {
+        "feature_nCMXww": {
+          "type": "feature",
+          "settings": {
+            "heading": "Feature 1",
+            "text": "Description",
+            "horizontal": 25,
+            "vertical": 30,
+            "text_horizontal": 10,
+            "text_vertical": 20
+          }
+        }
+      },
+      "block_order": [
+        "feature_nCMXww"
+      ],
+      "name": "Dynamic Feature",
+      "settings": {
+        "image": "shopify://shop_images/24513-EW704W_left.jpg",
+        "heading": "",
+        "dot_size": 20,
+        "dot_size_mobile": 16,
+        "dot_color": "#ffffff",
+        "dot_border_color": "#000000",
+        "dot_border_width": 3,
+        "line_color": "#000000",
+        "line_width": 2,
+        "callout_background": "#ffffff",
+        "callout_radius": 8,
+        "callout_max_width": 220,
+        "callout_title_color": "#000000",
+        "callout_text_color": "#666666",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
       }
     },
     "scrolling_text_4DH9VU": {
@@ -1270,6 +1313,7 @@
   },
   "order": [
     "main-product",
+    "dynamic_feature_m7Hp4e",
     "scrolling_text_4DH9VU",
     "help-drawer",
     "product-details",
