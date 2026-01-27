@@ -268,121 +268,90 @@
     </div>
   </div>
 </div>
-
 <script>
-  class DynamicFeatureSection {
-    constructor(section) {
-      this.section = section;
-      this.sectionId = section.dataset.sectionId;
-      this.svg = section.querySelector('.dynamic-feature__lines');
-      this.lines = this.svg?.querySelectorAll('.dynamic-feature__line') || [];
-      this.dots = section.querySelectorAll('.dynamic-feature__dot');
-      this.isMobile = window.innerWidth <= 768;
+class DynamicFeatureSection {
+  constructor(section) {
+    this.section = section;
+    this.sectionId = section.dataset.sectionId;
+    this.svg = section.querySelector('.dynamic-feature__lines');
+    this.lines = this.svg?.querySelectorAll('.dynamic-feature__line') || [];
+    this.isMobile = window.innerWidth <= 768;
 
-      this.init();
-      this.bindEvents();
-    }
+    this.init();
+    window.addEventListener('resize', () => this.onResize());
+  }
 
-    init() {
-      if (!this.isMobile) {
-        this.drawLines();
-      }
-    }
+  init() {
+    if (!this.isMobile) this.drawLines();
+  }
 
-    bindEvents() {
-      window.addEventListener('resize', () => this.onResize());
-
-      this.dots.forEach(dot => {
-        dot.addEventListener('click', (e) => this.openModal(e));
-      });
-    }
-
-    onResize() {
-      const wasMobile = this.isMobile;
-      this.isMobile = window.innerWidth <= 768;
-
-      if (wasMobile !== this.isMobile && !this.isMobile) {
-        this.drawLines();
-      }
-    }
-
-    openModal(e) {
-      const blockId = e.currentTarget.id.replace('shopify-block-', '');
-      const modal = document.getElementById(
-        `Feature-${this.sectionId}-${blockId}`
-      );
-      if (modal) modal.open();
-    }
-
-    drawLines() {
-      if (!this.svg) return;
-
-      const svgRect = this.svg.getBoundingClientRect();
-
-      this.lines.forEach((line, index) => {
-        const sx = parseFloat(line.dataset.startX);
-        const sy = parseFloat(line.dataset.startY);
-        const ex = parseFloat(line.dataset.endX);
-        const ey = parseFloat(line.dataset.endY);
-
-        // --- OFFSET so line stops before text box ---
-        const OFFSET = 6;
-        const dx = ex - sx;
-        const dy = ey - sy;
-        const dist = Math.hypot(dx, dy) || 1;
-
-        const endX = ex - (dx / dist) * OFFSET;
-        const endY = ey - (dy / dist) * OFFSET;
-
-        // --- SMOOTH CURVE CONTROL POINTS ---
-        const midX = (sx + endX) / 2;
-        const midY = (sy + endY) / 2;
-
-        const curveStrength = 12;
-
-        const c1x = midX;
-        const c1y = sy;
-        const c2x = midX;
-        const c2y = endY;
-
-        const path = `
-          M ${sx},${sy}
-          C ${c1x},${c1y}
-            ${c2x},${c2y}
-            ${endX},${endY}
-        `;
-
-        line.setAttribute('d', path);
-
-        // --- Proper stroke animation ---
-        try {
-          const length = line.getTotalLength();
-          line.style.strokeDasharray = length;
-          line.style.strokeDashoffset = length;
-          line.style.animationDelay = `${0.6 + index * 0.2}s`;
-        } catch (err) {
-          console.warn('SVG path error', err);
-        }
-      });
+  onResize() {
+    const wasMobile = this.isMobile;
+    this.isMobile = window.innerWidth <= 768;
+    if (wasMobile !== this.isMobile && !this.isMobile) {
+      this.drawLines();
     }
   }
 
-  function initDynamicFeatures(scope = document) {
-    scope.querySelectorAll('[data-section-id]').forEach(section => {
-      if (section.querySelector('.dynamic-feature')) {
-        new DynamicFeatureSection(section);
-      }
+  drawLines() {
+    this.lines.forEach((line, index) => {
+      const sx = parseFloat(line.dataset.startX);
+      const sy = parseFloat(line.dataset.startY);
+      const ex = parseFloat(line.dataset.endX);
+      const ey = parseFloat(line.dataset.endY);
+      const bends = parseFloat(line.dataset.breaks || 1); // YOUR BEND SETTING
+
+      // 🔹 Find matching callout
+      const content = this.section.querySelectorAll('.dynamic-feature__content')[index];
+      if (!content) return;
+
+      const box = content.getBoundingClientRect();
+      const media = this.section.querySelector('.dynamic-feature__media').getBoundingClientRect();
+
+      // Convert callout edge into %
+      const stopX =
+        ((box.left - media.left) / media.width) * 100 - 2;
+      const stopY =
+        ((box.top + box.height / 2 - media.top) / media.height) * 100;
+
+      // 🔹 Bend strength (THIS NOW WORKS)
+      const bend = 8 * bends;
+
+      const c1x = sx + bend;
+      const c1y = sy;
+      const c2x = stopX - bend;
+      const c2y = stopY;
+
+      const path = `
+        M ${sx},${sy}
+        C ${c1x},${c1y}
+          ${c2x},${c2y}
+          ${stopX},${stopY}
+      `;
+
+      line.setAttribute('d', path);
+
+      // 🔹 Proper solid animation
+      const length = line.getTotalLength();
+      line.style.strokeDasharray = length;
+      line.style.strokeDashoffset = length;
+      line.style.animationDelay = `${0.5 + index * 0.2}s`;
     });
   }
+}
 
-  document.addEventListener('DOMContentLoaded', () => {
-    initDynamicFeatures();
+function initDynamicFeatures(scope = document) {
+  scope.querySelectorAll('[data-section-id]').forEach(section => {
+    if (section.querySelector('.dynamic-feature')) {
+      new DynamicFeatureSection(section);
+    }
   });
+}
 
-  document.addEventListener('shopify:section:load', (e) => {
-    initDynamicFeatures(e.target);
-  });
+document.addEventListener('DOMContentLoaded', () => initDynamicFeatures());
+document.addEventListener('shopify:section:load', e => initDynamicFeatures(e.target));
 </script>
+
 
 
 {% schema %}
