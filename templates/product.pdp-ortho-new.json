@@ -247,23 +247,35 @@
         "rounded": true
       }
     },
-    "dynamic_feature_F4VNzt": {
+    "dynamic_feature_eYpKnr": {
       "type": "dynamic-feature",
       "blocks": {
-        "feature_Qycmep": {
+        "feature_QBfrNr": {
+          "type": "feature",
+          "settings": {
+            "heading": "dddd",
+            "text": "ddd",
+            "horizontal": 50,
+            "vertical": 66,
+            "text_horizontal": 96,
+            "text_vertical": 67
+          }
+        },
+        "feature_bET7bH": {
           "type": "feature",
           "settings": {
             "heading": "Feature 1",
             "text": "Description",
-            "horizontal": 20,
-            "vertical": 40,
-            "text_horizontal": 32,
-            "text_vertical": 39
+            "horizontal": 43,
+            "vertical": 91,
+            "text_horizontal": 15,
+            "text_vertical": 72
           }
         }
       },
       "block_order": [
-        "feature_Qycmep"
+        "feature_QBfrNr",
+        "feature_bET7bH"
       ],
       "name": "Dynamic Feature",
       "settings": {
@@ -275,8 +287,8 @@
         "dot_border_color": "#000000",
         "dot_border_width": 3,
         "line_color": "#000000",
-        "line_width": 0.5,
-        "line_breaks": 2,
+        "line_width": 2,
+        "line_breaks": 1,
         "callout_background": "#ffffff",
         "callout_radius": 8,
         "callout_max_width": 220,
@@ -1314,7 +1326,7 @@
   },
   "order": [
     "main-product",
-    "dynamic_feature_F4VNzt",
+    "dynamic_feature_eYpKnr",
     "scrolling_text_4DH9VU",
     "help-drawer",
     "product-details",
