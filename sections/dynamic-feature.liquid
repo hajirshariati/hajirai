@@ -312,9 +312,17 @@ drawLines() {
     if (!content) return;
 
     const box = content.getBoundingClientRect();
+const GAP_PX = 12;
 
-    const endX =
-      ((box.left - mediaRect.left) / mediaRect.width) * 100 - 2;
+const goingRight = box.left > mediaRect.left + (sx / 100) * mediaRect.width;
+
+const endXPx = goingRight
+  ? box.left - GAP_PX
+  : box.right + GAP_PX;
+
+const endX =
+  ((endXPx - mediaRect.left) / mediaRect.width) * 100;
+
     const endY =
       ((box.top + box.height / 2 - mediaRect.top) / mediaRect.height) * 100;
 
