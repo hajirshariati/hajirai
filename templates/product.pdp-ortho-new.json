@@ -256,8 +256,8 @@
             "heading": "Feature 1",
             "text": "Description",
             "horizontal": 25,
-            "vertical": 30,
-            "text_horizontal": 10,
+            "vertical": 61,
+            "text_horizontal": 35,
             "text_vertical": 20
           }
         }
@@ -273,9 +273,9 @@
         "dot_size_mobile": 16,
         "dot_color": "#ffffff",
         "dot_border_color": "#000000",
-        "dot_border_width": 3,
-        "line_color": "#000000",
-        "line_width": 2,
+        "dot_border_width": 1,
+        "line_color": "#171717",
+        "line_width": 1,
         "callout_background": "#ffffff",
         "callout_radius": 8,
         "callout_max_width": 220,
