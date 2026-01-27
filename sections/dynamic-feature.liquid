@@ -2,10 +2,8 @@
   #shopify-section-{{ section.id }} {
     --section-padding-top: {{ section.settings.padding_top }}px;
     --section-padding-bottom: {{ section.settings.padding_bottom }}px;
-    {%- render 'section-variables', section: section -%}
   }
 
-  /* Container and layout */
   #shopify-section-{{ section.id }} .dynamic-feature {
     position: relative;
     overflow: hidden;
@@ -14,9 +12,6 @@
   #shopify-section-{{ section.id }} .dynamic-feature__wrapper {
     position: relative;
     width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 
   #shopify-section-{{ section.id }} .dynamic-feature__media {
@@ -31,7 +26,6 @@
     height: auto;
   }
 
-  /* SVG Lines Container */
   #shopify-section-{{ section.id }} .dynamic-feature__lines {
     position: absolute;
     top: 0;
@@ -44,12 +38,8 @@
   }
 
   @keyframes fadeInLines {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 
   #shopify-section-{{ section.id }} .dynamic-feature__line {
@@ -58,21 +48,15 @@
     fill: none;
     stroke-linecap: round;
     stroke-linejoin: round;
-  }
-
-  #shopify-section-{{ section.id }} .dynamic-feature__line {
-    stroke-dasharray: var(--line-length);
-    stroke-dashoffset: var(--line-length);
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
     animation: drawLine 1.2s ease-out 0.6s forwards;
   }
 
   @keyframes drawLine {
-    to {
-      stroke-dashoffset: 0;
-    }
+    to { stroke-dashoffset: 0; }
   }
 
-  /* Dots */
   #shopify-section-{{ section.id }} .dynamic-feature__dot {
     position: absolute;
     transform: translate(-50%, -50%);
@@ -110,14 +94,12 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
   }
 
-  /* Dot animation delays */
   {%- for block in section.blocks -%}
     #shopify-block-{{ block.id }} .dynamic-feature__dot-inner {
       animation-delay: {{ forloop.index0 | times: 0.1 }}s;
     }
   {%- endfor -%}
 
-  /* Content Callouts */
   #shopify-section-{{ section.id }} .dynamic-feature__content {
     position: absolute;
     pointer-events: auto;
@@ -138,12 +120,11 @@
 
   #shopify-section-{{ section.id }} .dynamic-feature__callout {
     background: {{ section.settings.callout_background | default: '#ffffff' }};
-    padding: {{ section.settings.callout_padding | default: '16px 20px' }};
-    border-radius: {{ section.settings.callout_radius | default: '8px' }};
+    padding: 16px 20px;
+    border-radius: {{ section.settings.callout_radius | default: 8 }}px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    max-width: {{ section.settings.callout_max_width | default: '220px' }};
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    max-width: {{ section.settings.callout_max_width | default: 220 }}px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
   }
 
   #shopify-section-{{ section.id }} .dynamic-feature__callout-title {
@@ -161,7 +142,6 @@
     color: {{ section.settings.callout_text_color | default: '#666666' }};
   }
 
-  /* Content positioning helper classes */
   #shopify-section-{{ section.id }} .dynamic-feature__content.with-left {
     transform-origin: right center;
   }
@@ -174,7 +154,6 @@
     transform-origin: center top;
   }
 
-  /* Mobile */
   @media screen and (max-width: 768px) {
     #shopify-section-{{ section.id }} .dynamic-feature__lines {
       display: none;
@@ -184,18 +163,12 @@
       display: none;
     }
 
-    #shopify-section-{{ section.id }} .dynamic-feature__dot {
-      width: {{ section.settings.dot_size_mobile | default: 16 }}px;
-      height: {{ section.settings.dot_size_mobile | default: 16 }}px;
-    }
-
     #shopify-section-{{ section.id }} .dynamic-feature__dot-inner {
       width: {{ section.settings.dot_size_mobile | default: 16 }}px !important;
       height: {{ section.settings.dot_size_mobile | default: 16 }}px !important;
     }
   }
 
-  /* Modal/Drawer styling for mobile */
   #shopify-section-{{ section.id }} .drawer {
     transition: all 0.3s ease;
   }
@@ -209,72 +182,45 @@
   }
 </style>
 
-<div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}"
-  data-section-id="{{ section.id }}"
->
+<div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}" data-section-id="{{ section.id }}">
   <div class="{% unless section.settings.full_width %}page-width {% endunless %}relative">
-    {%- if section.settings.heading_position != 'none' -%}
-      <div class="md:hidden">
-    {%- endif -%}
-      {%- render 'section-heading', section: section, section_full_width: section.settings.full_width -%}
-    {%- if section.settings.heading_position != 'none' -%}
+    {%- if section.settings.heading != blank -%}
+      <div class="mb-8">
+        <h2 class="heading title-md">{{ section.settings.heading }}</h2>
       </div>
     {%- endif -%}
 
-    <div class="dynamic-feature block media--adapt mobile:media--adapt relative">
+    <div class="dynamic-feature relative">
       <div class="dynamic-feature__wrapper">
         <div class="dynamic-feature__media relative w-full">
-          <!-- Main Image -->
-          <picture class="media media--height w-full h-full block relative">
-            {%- if section.settings.image != blank -%}
-              {%- capture sizes -%}{% if section.settings.full_width %}100vw{% else %}min({{ settings.page_width }}px, 100vw){% endif %}{%- endcapture -%}
+          {%- if section.settings.image != blank -%}
+            <picture>
               {%- if section.settings.image_mobile -%}
-                <source
-                  media="(max-width: 767px)"
-                  srcset="{{ section.settings.image_mobile | image_url: width: '400x' }} 400w, {{ section.settings.image_mobile | image_url: width: '600x' }} 600w, {{ section.settings.image_mobile | image_url: width: '800x' }} 800w, {{ section.settings.image_mobile | image_url: width: '1000x' }} 1000w"
-                  width="{{ section.settings.image_mobile.width }}"
-                  height="{{ section.settings.image_mobile.height }}"
-                >
+                <source media="(max-width: 767px)" srcset="{{ section.settings.image_mobile | image_url: width: '400x' }} 400w, {{ section.settings.image_mobile | image_url: width: '800x' }} 800w">
               {%- endif -%}
+              <img src="{{ section.settings.image | image_url: width: '1200x' }}" alt="{{ section.settings.image.alt }}" class="dynamic-feature__image w-full block">
+            </picture>
+          {%- else -%}
+            <div class="bg-gray-200 w-full aspect-square flex items-center justify-center">
+              <span class="text-gray-500">No image selected</span>
+            </div>
+          {%- endif -%}
 
-              {{- section.settings.image | image_url: width: section.settings.image.width | image_tag: loading: 'lazy', sizes: sizes, widths: '300,400,500,600,700,800,900,1000,1200,1400,1600,1800,2000,2200,2400,2600,2800,3000,3200', is: 'lazy-image', class: 'dynamic-feature__image' -}}
-            {%- else -%}
-              {{- 'lifestyle-1' | placeholder_svg_tag: 'dynamic-feature__image placeholder' -}}
-            {%- endif -%}
-          </picture>
-
-          <!-- SVG Lines Container -->
-          <svg class="dynamic-feature__lines" preserveAspectRatio="none" aria-hidden="true">
+          <svg class="dynamic-feature__lines" preserveAspectRatio="none" viewBox="0 0 100 100" aria-hidden="true">
             {%- for block in section.blocks -%}
               {%- if block.type == 'feature' -%}
-                <path
-                  class="dynamic-feature__line"
-                  d="M {{ block.settings.horizontal }}%, {{ block.settings.vertical }}% Q {{ block.settings.text_horizontal | times: 0.5 | plus: block.settings.horizontal | times: 0.5 }}%, {{ block.settings.text_vertical | times: 0.5 | plus: block.settings.vertical | times: 0.5 }}% {{ block.settings.text_horizontal }}%, {{ block.settings.text_vertical }}%"
-                  style="--line-length: 500;"
-                  data-line-from="{{ block.id }}"
-                ></path>
+                <path class="dynamic-feature__line" d="M {{ block.settings.horizontal }}% {{ block.settings.vertical }}% Q {{ block.settings.horizontal | times: 0.3 | plus: block.settings.text_horizontal | times: 0.7 }}% {{ block.settings.vertical | times: 0.3 | plus: block.settings.text_vertical | times: 0.7 }}% {{ block.settings.text_horizontal }}% {{ block.settings.text_vertical }}%"></path>
               {%- endif -%}
             {%- endfor -%}
           </svg>
 
-          <!-- Dots and Content -->
           {%- for block in section.blocks -%}
             {%- if block.type == 'feature' -%}
-              <!-- Dot -->
-              <div
-                class="dynamic-feature__dot"
-                id="shopify-block-{{ block.id }}"
-                style="--dot-x: {{ block.settings.horizontal }}%; --dot-y: {{ block.settings.vertical }}%; left: {{ block.settings.horizontal }}%; top: {{ block.settings.vertical }}%;"
-                {{ block.shopify_attributes }}
-              >
+              <div class="dynamic-feature__dot" id="shopify-block-{{ block.id }}" style="left: {{ block.settings.horizontal }}%; top: {{ block.settings.vertical }}%;" {{ block.shopify_attributes }}>
                 <div class="dynamic-feature__dot-inner"></div>
               </div>
 
-              <!-- Content/Text -->
-              <div
-                class="dynamic-feature__content{% if block.settings.text_horizontal < 20 %} with-left{% elsif block.settings.text_horizontal > 80 %} with-right{% endif %}{% if block.settings.text_vertical > 70 %} with-bottom{% endif %}"
-                style="left: {{ block.settings.text_horizontal }}%; top: {{ block.settings.text_vertical }}%; animation-delay: {{ forloop.index0 | times: 0.1 | plus: 1.8 }}s;"
-              >
+              <div class="dynamic-feature__content{% if block.settings.text_horizontal < 20 %} with-left{% elsif block.settings.text_horizontal > 80 %} with-right{% endif %}{% if block.settings.text_vertical > 70 %} with-bottom{% endif %}" style="left: {{ block.settings.text_horizontal }}%; top: {{ block.settings.text_vertical }}%; animation-delay: {{ forloop.index0 | times: 0.1 | plus: 1.8 }}s;">
                 <div class="dynamic-feature__callout">
                   {%- if block.settings.heading != blank -%}
                     <p class="dynamic-feature__callout-title">{{ block.settings.heading }}</p>
@@ -285,24 +231,14 @@
                 </div>
               </div>
 
-              <!-- Mobile Modal -->
-              <x-modal
-                id="Feature-{{ section.id }}-{{ block.id }}"
-                class="x-modal drawer z-30 fixed bottom-0 left-0 h-full w-full pointer-events-none"
-                role="dialog"
-                aria-modal="true"
-                aria-label="{{ block.settings.heading | escape }}"
-                hidden
-              >
+              <x-modal id="Feature-{{ section.id }}-{{ block.id }}" class="x-modal drawer z-30 fixed bottom-0 left-0 h-full w-full pointer-events-none" role="dialog" aria-modal="true" aria-label="{{ block.settings.heading | escape }}" hidden>
                 <overlay-element class="overlay fixed-modal invisible opacity-0 fixed bottom-0 left-0 w-full h-screen pointer-events-none" aria-controls="Feature-{{ section.id }}-{{ block.id }}" aria-expanded="false"></overlay-element>
                 <div class="drawer__inner z-10 absolute top-0 flex flex-col w-full h-full overflow-hidden">
                   <gesture-element class="drawer__header flex justify-between opacity-0 invisible relative">
                     <span class="drawer__title heading title-md">{{ block.settings.heading | escape }}</span>
-                    <button class="button button--secondary button--close drawer__close hidden sm:flex items-center justify-center" type="button" is="hover-button" aria-controls="Feature-{{ section.id }}-{{ block.id }}" aria-expanded="false" aria-label="{{ 'general.accessibility.close' | t | escape }}">
+                    <button class="button button--secondary button--close drawer__close hidden sm:flex items-center justify-center" type="button" is="hover-button" aria-controls="Feature-{{ section.id }}-{{ block.id }}" aria-expanded="false" aria-label="Close">
                       <span class="btn-fill" data-fill></span>
-                      <span class="btn-text">
-                        {%- render 'icon', icon: 'close', size: 'sm' -%}
-                      </span>
+                      <span class="btn-text">×</span>
                     </button>
                   </gesture-element>
                   <div class="drawer__content opacity-0 invisible flex flex-col h-full grow shrink">
@@ -334,11 +270,10 @@
     }
 
     init() {
-      if (this.isMobile) {
-        this.setupMobileInteractions();
-      } else {
+      if (!this.isMobile) {
         this.calculateLineLength();
       }
+      this.setupMobileInteractions();
     }
 
     setupEventListeners() {
@@ -349,65 +284,57 @@
     }
 
     handleDotClick(e) {
-      if (this.isMobile) {
-        const blockId = e.currentTarget.id;
-        const sectionId = this.section.dataset.sectionId;
-        const modalId = `Feature-${sectionId}-${blockId.replace('shopify-block-', '')}`;
-        const modal = document.getElementById(modalId);
-        if (modal) {
-          modal.open();
-        }
+      const blockId = e.currentTarget.id;
+      const sectionId = this.section.dataset.sectionId;
+      const realBlockId = blockId.replace('shopify-block-', '');
+      const modalId = `Feature-${sectionId}-${realBlockId}`;
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.open();
       }
     }
 
     calculateLineLength() {
       if (!this.svg) return;
-
-      const lines = this.svg.querySelectorAll('.dynamic-feature__line');
-      lines.forEach(line => {
-        try {
-          const length = line.getTotalLength();
-          line.style.setProperty('--line-length', length);
-        } catch (e) {
-          console.warn('Could not calculate line length:', e);
-        }
-      });
+      setTimeout(() => {
+        const lines = this.svg.querySelectorAll('.dynamic-feature__line');
+        lines.forEach(line => {
+          try {
+            const length = line.getTotalLength();
+            line.style.strokeDasharray = length;
+            line.style.strokeDashoffset = length;
+          } catch (e) {
+            console.warn('Line calculation failed:', e);
+          }
+        });
+      }, 100);
     }
 
     setupMobileInteractions() {
       this.dots.forEach(dot => {
         dot.style.cursor = 'pointer';
-        dot.addEventListener('touchstart', () => {
-          dot.style.transform = 'scale(1.2)';
-        });
-        dot.addEventListener('touchend', () => {
-          dot.style.transform = '';
-        });
       });
     }
 
     handleResize() {
       const wasMobile = this.isMobile;
       this.isMobile = window.innerWidth <= 768;
-
       if (wasMobile !== this.isMobile) {
-        // Layout has changed from mobile to desktop or vice versa
         this.init();
       }
     }
   }
 
-  // Initialize when section is loaded
-  document.addEventListener('shopify:section:load', (e) => {
-    if (e.detail.sectionId === '{{ section.id }}') {
-      new DynamicFeatureSection(e.detail.section);
+  document.addEventListener('DOMContentLoaded', () => {
+    const section = document.querySelector('[data-section-id]');
+    if (section && section.querySelector('.dynamic-feature')) {
+      new DynamicFeatureSection(section);
     }
   });
 
-  // Initialize on page load
-  document.addEventListener('DOMContentLoaded', () => {
-    const section = document.querySelector('[data-section-id="{{ section.id }}"]');
-    if (section) {
+  document.addEventListener('shopify:section:load', (e) => {
+    const section = e.detail.section;
+    if (section.querySelector('.dynamic-feature')) {
       new DynamicFeatureSection(section);
     }
   });
@@ -429,65 +356,9 @@
       "label": "Mobile Image"
     },
     {
-      "type": "header",
-      "content": "Heading & Content"
-    },
-    {
-      "type": "inline_richtext",
+      "type": "text",
       "id": "heading",
       "label": "Heading"
-    },
-    {
-      "type": "select",
-      "id": "heading_size",
-      "options": [
-        {
-          "value": "title-sm",
-          "label": "Small"
-        },
-        {
-          "value": "title-md",
-          "label": "Medium"
-        },
-        {
-          "value": "title-lg tracking-heading",
-          "label": "Large"
-        },
-        {
-          "value": "title-xl tracking-heading",
-          "label": "Extra Large"
-        }
-      ],
-      "default": "title-md",
-      "label": "Heading Size"
-    },
-    {
-      "type": "select",
-      "id": "heading_position",
-      "options": [
-        {
-          "value": "none",
-          "label": "Hide"
-        },
-        {
-          "value": "items-start justify-start text-left",
-          "label": "Top Left"
-        },
-        {
-          "value": "items-start justify-center text-center",
-          "label": "Top Center"
-        },
-        {
-          "value": "items-start justify-end text-right",
-          "label": "Top Right"
-        }
-      ],
-      "default": "none",
-      "label": "Heading Position"
-    },
-    {
-      "type": "header",
-      "content": "Dots"
     },
     {
       "type": "range",
@@ -496,7 +367,7 @@
       "max": 40,
       "step": 2,
       "unit": "px",
-      "label": "Dot Size (Desktop)",
+      "label": "Dot Size",
       "default": 20
     },
     {
@@ -506,19 +377,19 @@
       "max": 30,
       "step": 2,
       "unit": "px",
-      "label": "Dot Size (Mobile)",
+      "label": "Dot Size Mobile",
       "default": 16
     },
     {
       "type": "color",
       "id": "dot_color",
-      "label": "Dot Fill Color",
+      "label": "Dot Color",
       "default": "#ffffff"
     },
     {
       "type": "color",
       "id": "dot_border_color",
-      "label": "Dot Border Color",
+      "label": "Dot Border",
       "default": "#000000"
     },
     {
@@ -528,12 +399,8 @@
       "max": 6,
       "step": 1,
       "unit": "px",
-      "label": "Dot Border Width",
+      "label": "Border Width",
       "default": 3
-    },
-    {
-      "type": "header",
-      "content": "Lines"
     },
     {
       "type": "color",
@@ -552,13 +419,9 @@
       "default": 2
     },
     {
-      "type": "header",
-      "content": "Callout Boxes"
-    },
-    {
       "type": "color",
       "id": "callout_background",
-      "label": "Background Color",
+      "label": "Callout Background",
       "default": "#ffffff"
     },
     {
@@ -578,7 +441,7 @@
       "max": 350,
       "step": 10,
       "unit": "px",
-      "label": "Max Width",
+      "label": "Callout Width",
       "default": 220
     },
     {
@@ -592,10 +455,6 @@
       "id": "callout_text_color",
       "label": "Text Color",
       "default": "#666666"
-    },
-    {
-      "type": "header",
-      "content": "Section Settings"
     },
     {
       "type": "range",
@@ -632,35 +491,29 @@
     {
       "type": "checkbox",
       "id": "rounded",
-      "label": "Rounded Corners",
+      "label": "Rounded",
       "default": false
     }
   ],
   "blocks": [
     {
       "type": "feature",
-      "name": "Feature Point",
+      "name": "Feature",
       "settings": [
         {
           "type": "text",
           "id": "heading",
-          "label": "Title",
-          "placeholder": "Feature name"
+          "label": "Title"
         },
         {
           "type": "textarea",
           "id": "text",
-          "label": "Description",
-          "placeholder": "Feature description"
-        },
-        {
-          "type": "header",
-          "content": "Dot Position"
+          "label": "Description"
         },
         {
           "type": "range",
           "id": "horizontal",
-          "label": "Horizontal Position",
+          "label": "Dot Horizontal",
           "default": 50,
           "min": 0,
           "max": 100,
@@ -670,7 +523,7 @@
         {
           "type": "range",
           "id": "vertical",
-          "label": "Vertical Position",
+          "label": "Dot Vertical",
           "default": 50,
           "min": 0,
           "max": 100,
@@ -678,13 +531,9 @@
           "unit": "%"
         },
         {
-          "type": "header",
-          "content": "Text Position"
-        },
-        {
           "type": "range",
           "id": "text_horizontal",
-          "label": "Text Horizontal Position",
+          "label": "Text Horizontal",
           "default": 70,
           "min": 0,
           "max": 100,
@@ -694,7 +543,7 @@
         {
           "type": "range",
           "id": "text_vertical",
-          "label": "Text Vertical Position",
+          "label": "Text Vertical",
           "default": 50,
           "min": 0,
           "max": 100,
@@ -712,40 +561,15 @@
           "type": "feature",
           "settings": {
             "heading": "Feature 1",
-            "text": "Description of this feature",
+            "text": "Description",
             "horizontal": 25,
             "vertical": 30,
             "text_horizontal": 10,
             "text_vertical": 20
           }
-        },
-        {
-          "type": "feature",
-          "settings": {
-            "heading": "Feature 2",
-            "text": "Description of this feature",
-            "horizontal": 75,
-            "vertical": 50,
-            "text_horizontal": 85,
-            "text_vertical": 45
-          }
-        },
-        {
-          "type": "feature",
-          "settings": {
-            "heading": "Feature 3",
-            "text": "Description of this feature",
-            "horizontal": 50,
-            "vertical": 75,
-            "text_horizontal": 50,
-            "text_vertical": 90
-          }
         }
       ]
     }
-  ],
-  "disabled_on": {
-    "templates": ["password"]
-  }
+  ]
 }
 {% endschema %}
