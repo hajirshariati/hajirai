@@ -213,33 +213,18 @@
             </div>
           {%- endif -%}
 
-          <svg class="dynamic-feature__lines" preserveAspectRatio="none" viewBox="0 0 100 100" aria-hidden="true">
-            {%- for block in section.blocks -%}
-              {%- if block.type == 'feature' -%}
-                {%- assign start_x = block.settings.horizontal -%}
-                {%- assign start_y = block.settings.vertical -%}
-                {%- assign end_x = block.settings.text_horizontal -%}
-                {%- assign end_y = block.settings.text_vertical -%}
-                {%- assign breaks = block.settings.line_breaks | default: 1 -%}
-                
-                {%- if breaks == 1 -%}
-                  <path class="dynamic-feature__line" d="M {{ start_x }},{{ start_y }} L {{ end_x | minus: 5 }},{{ end_y }}"></path>
-                {%- elsif breaks == 2 -%}
-                  {%- assign mid1_x = start_x | times: 0.5 | plus: end_x | times: 0.5 -%}
-                  {%- assign mid1_y = start_y | plus: 15 -%}
-                  <path class="dynamic-feature__line" d="M {{ start_x }},{{ start_y }} L {{ mid1_x }},{{ mid1_y }} L {{ end_x | minus: 5 }},{{ end_y }}"></path>
-                {%- elsif breaks == 3 -%}
-                  {%- assign mid1_x = start_x | times: 0.66 | plus: end_x | times: 0.34 -%}
-                  {%- assign mid1_y = start_y | plus: 10 -%}
-                  {%- assign mid2_x = start_x | times: 0.33 | plus: end_x | times: 0.67 -%}
-                  {%- assign mid2_y = start_y | plus: 25 -%}
-                  <path class="dynamic-feature__line" d="M {{ start_x }},{{ start_y }} L {{ mid1_x }},{{ mid1_y }} L {{ mid2_x }},{{ mid2_y }} L {{ end_x | minus: 5 }},{{ end_y }}"></path>
-                {%- else -%}
-                  <path class="dynamic-feature__line" d="M {{ start_x }},{{ start_y }} L {{ end_x | minus: 5 }},{{ end_y }}"></path>
-                {%- endif -%}
-              {%- endif -%}
-            {%- endfor -%}
-          </svg>
+    <svg class="dynamic-feature__lines" viewBox="0 0 100 100" preserveAspectRatio="none">
+      {% for block in section.blocks %}
+        <path
+          class="dynamic-feature__line"
+          data-start-x="{{ block.settings.horizontal }}"
+          data-start-y="{{ block.settings.vertical }}"
+          data-end-x="{{ block.settings.text_horizontal }}"
+          data-end-y="{{ block.settings.text_vertical }}"
+          data-breaks="{{ block.settings.line_breaks | default: 1 }}"
+        />
+      {% endfor %}
+    </svg>
 
           {%- for block in section.blocks -%}
             {%- if block.type == 'feature' -%}
