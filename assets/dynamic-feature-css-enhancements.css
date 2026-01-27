@@ -1,0 +1,474 @@
+/* 
+  DYNAMIC FEATURE SECTION - ADVANCED CSS ENHANCEMENTS
+  
+  These styles can be added to your section or main theme CSS for additional
+  customization options and animation variations.
+*/
+
+/* ============================================
+   ANIMATION VARIATIONS
+   ============================================ */
+
+/* Smooth, elegant animation (default is "ease-out") */
+.dynamic-feature__dot-inner.animation-smooth {
+  animation-timing-function: ease-in-out;
+}
+
+/* Bouncy, playful animation */
+.dynamic-feature__dot-inner.animation-bounce {
+  animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Snappy animation */
+.dynamic-feature__dot-inner.animation-snappy {
+  animation-timing-function: cubic-bezier(0.34, 1.2, 0.64, 1);
+}
+
+/* ============================================
+   DOT STYLES
+   ============================================ */
+
+/* Glow effect on dots */
+.dynamic-feature__dot-inner.has-glow {
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.15),
+    0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+.dynamic-feature__dot-inner.has-glow:hover {
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.25),
+    0 0 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Pulse effect on hover */
+@keyframes dotPulse {
+  0%, 100% {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+  50% {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.dynamic-feature__dot-inner.has-pulse:hover {
+  animation: dotPulse 1s infinite;
+}
+
+/* Outlined dots (no fill) */
+.dynamic-feature__dot-inner.style-outline {
+  background: transparent;
+}
+
+/* Solid filled dots */
+.dynamic-feature__dot-inner.style-solid {
+  background: var(--dot-fill-color, currentColor);
+  border-width: 0;
+}
+
+/* Ring dots (large border, small fill) */
+.dynamic-feature__dot-inner.style-ring {
+  border-width: 4px;
+  background: transparent;
+}
+
+/* ============================================
+   LINE ANIMATIONS
+   ============================================ */
+
+/* Faster line draw */
+.dynamic-feature__line.speed-fast {
+  animation-duration: 0.8s;
+  animation-delay: 0.4s;
+}
+
+/* Slower line draw */
+.dynamic-feature__line.speed-slow {
+  animation-duration: 1.6s;
+  animation-delay: 0.8s;
+}
+
+/* Dashed lines */
+.dynamic-feature__line.style-dashed {
+  stroke-dasharray: 5, 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Dotted lines */
+.dynamic-feature__line.style-dotted {
+  stroke-dasharray: 2, 4;
+  stroke-linecap: round;
+}
+
+/* ============================================
+   CALLOUT STYLES
+   ============================================ */
+
+/* Glassmorphism style (enhanced) */
+.dynamic-feature__callout.style-glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.1),
+    inset 0 1px 1px rgba(255, 255, 255, 0.5);
+}
+
+/* Dark glassmorphism */
+.dynamic-feature__callout.style-glass-dark {
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.dynamic-feature__callout.style-glass-dark .dynamic-feature__callout-title {
+  color: white;
+}
+
+.dynamic-feature__callout.style-glass-dark .dynamic-feature__callout-text {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Solid background style */
+.dynamic-feature__callout.style-solid {
+  backdrop-filter: none;
+  border: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* Minimal style (no shadow, subtle border) */
+.dynamic-feature__callout.style-minimal {
+  background: white;
+  border: 1px solid #e5e5e5;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+/* Bold style (darker, high contrast) */
+.dynamic-feature__callout.style-bold {
+  background: #1a1a1a;
+  color: white;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  border: none;
+}
+
+.dynamic-feature__callout.style-bold .dynamic-feature__callout-title {
+  color: white;
+}
+
+.dynamic-feature__callout.style-bold .dynamic-feature__callout-text {
+  color: #ccc;
+}
+
+/* ============================================
+   LAYOUT HELPERS
+   ============================================ */
+
+/* Force text to right side */
+.dynamic-feature__content.force-right {
+  left: auto;
+  right: 5%;
+}
+
+/* Force text to left side */
+.dynamic-feature__content.force-left {
+  right: auto;
+  left: 5%;
+}
+
+/* Force text to bottom */
+.dynamic-feature__content.force-bottom {
+  bottom: 5%;
+  top: auto;
+}
+
+/* ============================================
+   RESPONSIVE HELPERS
+   ============================================ */
+
+/* Show content on mobile (override default hide) */
+@media screen and (max-width: 768px) {
+  .dynamic-feature__content.show-mobile {
+    display: block !important;
+    opacity: 1 !important;
+    animation: fadeInContent 0.8s ease-out forwards !important;
+  }
+
+  .dynamic-feature__lines.show-mobile {
+    display: block !important;
+    opacity: 1 !important;
+  }
+}
+
+/* ============================================
+   TEXT STYLING
+   ============================================ */
+
+/* Large text variant */
+.dynamic-feature__callout-title.text-lg {
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+/* Small text variant */
+.dynamic-feature__callout-title.text-sm {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Caption variant for description text */
+.dynamic-feature__callout-text.text-caption {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  opacity: 0.8;
+}
+
+/* ============================================
+   ADVANCED ANIMATIONS
+   ============================================ */
+
+/* Stagger entrance animation for content */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.dynamic-feature__content.with-left {
+  animation: slideInLeft 0.8s ease-out 1.8s forwards;
+}
+
+.dynamic-feature__content.with-right {
+  animation: slideInRight 0.8s ease-out 1.8s forwards;
+}
+
+/* Zoom entrance for callouts */
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.dynamic-feature__content.animation-zoom {
+  animation: zoomIn 0.8s ease-out 1.8s forwards !important;
+}
+
+/* Bounce entrance */
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.dynamic-feature__content.animation-bounce {
+  animation: bounceIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 1.8s forwards !important;
+}
+
+/* ============================================
+   INTERACTION STATES
+   ============================================ */
+
+/* Dot hover state */
+.dynamic-feature__dot.is-hovered .dynamic-feature__dot-inner {
+  transform: scale(1.4);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Dot active state (mobile) */
+.dynamic-feature__dot.is-active .dynamic-feature__dot-inner {
+  transform: scale(1.25);
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+/* Opacity variations */
+.dynamic-feature__callout.opacity-80 {
+  opacity: 0.8;
+}
+
+.dynamic-feature__callout.opacity-90 {
+  opacity: 0.9;
+}
+
+/* Spacing variations */
+.dynamic-feature__callout.spacing-compact {
+  padding: 12px 16px;
+}
+
+.dynamic-feature__callout.spacing-comfortable {
+  padding: 20px 24px;
+}
+
+.dynamic-feature__callout.spacing-loose {
+  padding: 24px 32px;
+}
+
+/* Shadow variations */
+.dynamic-feature__callout.shadow-sm {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dynamic-feature__callout.shadow-lg {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.dynamic-feature__callout.shadow-xl {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================
+   THEME SPECIFIC (Examples)
+   ============================================ */
+
+/* Light theme - minimal */
+.dynamic-feature.theme-light-minimal .dynamic-feature__callout {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Dark theme - bold */
+.dynamic-feature.theme-dark-bold .dynamic-feature__callout {
+  background: #1f1f1f;
+  color: white;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.dynamic-feature.theme-dark-bold .dynamic-feature__callout-title {
+  color: white;
+}
+
+.dynamic-feature.theme-dark-bold .dynamic-feature__callout-text {
+  color: #aaa;
+}
+
+.dynamic-feature.theme-dark-bold .dynamic-feature__dot-inner {
+  background: white;
+  border-color: #333;
+}
+
+/* Professional theme */
+.dynamic-feature.theme-professional .dynamic-feature__callout {
+  background: white;
+  border-left: 4px solid #2563eb;
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.1);
+}
+
+.dynamic-feature.theme-professional .dynamic-feature__callout-title {
+  color: #2563eb;
+  font-weight: 700;
+}
+
+/* Vibrant theme */
+.dynamic-feature.theme-vibrant .dynamic-feature__dot-inner {
+  animation: dotGlow 2s ease-in-out infinite;
+}
+
+@keyframes dotGlow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.8);
+  }
+}
+
+/* ============================================
+   ACCESSIBILITY
+   ============================================ */
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .dynamic-feature__dot-inner,
+  .dynamic-feature__content,
+  .dynamic-feature__line {
+    animation-duration: 0.1s !important;
+    animation-delay: 0 !important;
+  }
+
+  .dynamic-feature__dot:hover .dynamic-feature__dot-inner {
+    transition: none;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: more) {
+  .dynamic-feature__dot-inner {
+    border-width: 4px;
+  }
+
+  .dynamic-feature__callout {
+    border: 2px solid currentColor;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Dark color scheme */
+@media (prefers-color-scheme: dark) {
+  .dynamic-feature__callout {
+    background: rgba(30, 30, 30, 0.8);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #f5f5f5;
+  }
+
+  .dynamic-feature__callout-title {
+    color: white;
+  }
+
+  .dynamic-feature__callout-text {
+    color: #d0d0d0;
+  }
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+
+@media print {
+  .dynamic-feature__dot-inner,
+  .dynamic-feature__lines,
+  .dynamic-feature__content {
+    animation: none !important;
+    opacity: 1 !important;
+    display: none !important; /* Hide interactive elements in print */
+  }
+}
