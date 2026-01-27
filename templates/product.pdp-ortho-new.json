@@ -250,12 +250,23 @@
     "dynamic_feature_GLrM4a": {
       "type": "dynamic-feature",
       "blocks": {
+        "feature_VfizrX": {
+          "type": "feature",
+          "settings": {
+            "heading": "Title 1",
+            "text": "Text 1",
+            "horizontal": 38,
+            "vertical": 43,
+            "text_horizontal": 61,
+            "text_vertical": 20
+          }
+        },
         "feature_QAYbpG": {
           "type": "feature",
           "settings": {
-            "heading": "Test",
-            "text": "Test",
-            "horizontal": 50,
+            "heading": "Title 2",
+            "text": "Text 2",
+            "horizontal": 49,
             "vertical": 53,
             "text_horizontal": 73,
             "text_vertical": 50
@@ -266,20 +277,21 @@
           "settings": {
             "heading": "Feature 1",
             "text": "Description",
-            "horizontal": 39,
-            "vertical": 36,
-            "text_horizontal": 10,
+            "horizontal": 21,
+            "vertical": 39,
+            "text_horizontal": 30,
             "text_vertical": 20
           }
         }
       },
       "block_order": [
+        "feature_VfizrX",
         "feature_QAYbpG",
         "feature_LTj7Jr"
       ],
       "name": "Dynamic Feature",
       "settings": {
-        "image": "shopify://shop_images/91067-AS227W_top_d2fe647b-6b84-4de7-b72a-6a911a3d27b0.jpg",
+        "image": "shopify://shop_images/34629-L405W_bottom.jpg",
         "heading": "",
         "dot_size": 20,
         "dot_size_mobile": 16,
