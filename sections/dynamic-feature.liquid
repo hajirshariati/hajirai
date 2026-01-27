@@ -318,34 +318,32 @@ drawLines() {
     const endY =
       ((box.top + box.height / 2 - mediaRect.top) / mediaRect.height) * 100;
 
+    const deltaY = Math.abs(endY - sy);
+    const MIN_BEND_DISTANCE = 3;
+
     let path;
 
-    const deltaY = Math.abs(endY - sy);
-const MIN_BEND_DISTANCE = 3; // % threshold — tweak if needed
+    if (!hasBend || deltaY < MIN_BEND_DISTANCE) {
+      // ✅ CLEAN STRAIGHT LINE
+      path = `M ${sx},${sy} L ${endX},${endY}`;
+    } else {
+      const goingRight = endX > sx;
+      const elbowX = goingRight
+        ? sx + Math.abs(endX - sx) * 0.5
+        : sx - Math.abs(endX - sx) * 0.5;
 
-if (!hasBend || deltaY < MIN_BEND_DISTANCE) {
-  // ✅ CLEAN FLAT LINE — NO ELBOW, NO CURVE
-  path = `M ${sx},${sy} L ${endX},${sy}`;
-} else {
-  // ✅ DIRECTION-AWARE ELBOW
-  const goingRight = endX > sx;
-  const elbowX = goingRight
-    ? sx + Math.abs(endX - sx) * 0.5
-    : sx - Math.abs(endX - sx) * 0.5;
+      const radius = Math.min(4, Math.abs(endX - sx) / 4);
+      const vertDir = endY > sy ? 1 : -1;
 
-  const radius = 4;
-  const vertDir = endY > sy ? 1 : -1;
-
-  path = `
-    M ${sx},${sy}
-    L ${elbowX - radius * (goingRight ? 1 : -1)},${sy}
-    Q ${elbowX},${sy} ${elbowX},${sy + radius * vertDir}
-    L ${elbowX},${endY - radius * vertDir}
-    Q ${elbowX},${endY} ${elbowX + radius * (goingRight ? 1 : -1)},${endY}
-    L ${endX},${endY}
-  `;
-}
-
+      path = `
+        M ${sx},${sy}
+        L ${elbowX - radius * (goingRight ? 1 : -1)},${sy}
+        Q ${elbowX},${sy} ${elbowX},${sy + radius * vertDir}
+        L ${elbowX},${endY - radius * vertDir}
+        Q ${elbowX},${endY} ${elbowX + radius * (goingRight ? 1 : -1)},${endY}
+        L ${endX},${endY}
+      `;
+    }
 
     line.setAttribute('d', path);
 
@@ -355,6 +353,7 @@ if (!hasBend || deltaY < MIN_BEND_DISTANCE) {
     line.style.animationDelay = `${0.6 + index * 0.2}s`;
   });
 }
+
 
 }
 
