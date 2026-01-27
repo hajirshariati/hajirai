@@ -1,79 +1,217 @@
 <style>
-#shopify-section-{{ section.id }} {
-  --section-padding-top: {{ section.settings.padding_top }}px;
-  --section-padding-bottom: {{ section.settings.padding_bottom }}px;
-}
-
-#shopify-section-{{ section.id }} .dynamic-feature {
-  position: relative;
-  overflow: hidden;
-}
-
-.dynamic-feature__lines {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
 
 .dynamic-feature__line {
-  stroke: {{ section.settings.line_color }};
-  stroke-width: {{ section.settings.line_width }};
-  fill: none;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-
-  /* 🔑 fixes thick line issue */
   vector-effect: non-scaling-stroke;
   shape-rendering: geometricPrecision;
-
-  animation: drawLine 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
-@keyframes drawLine {
-  to { stroke-dashoffset: 0; }
-}
 
-.dynamic-feature__dot {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  z-index: 5;
-}
 
-.dynamic-feature__dot-inner {
-  width: {{ section.settings.dot_size }}px;
-  height: {{ section.settings.dot_size }}px;
-  border-radius: 50%;
-  background: {{ section.settings.dot_color }};
-  border: {{ section.settings.dot_border_width }}px solid {{ section.settings.dot_border_color }};
-}
+  #shopify-section-{{ section.id }} {
+    --section-padding-top: {{ section.settings.padding_top }}px;
+    --section-padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
 
-.dynamic-feature__content {
-  position: absolute;
-  opacity: 0;
-  animation: fadeIn 0.6s ease-out forwards;
-  animation-delay: 1.4s;
-}
+  #shopify-section-{{ section.id }} .dynamic-feature {
+    position: relative;
+    overflow: hidden;
+  }
 
-@keyframes fadeIn {
-  to { opacity: 1; transform: translateY(0); }
-}
+  #shopify-section-{{ section.id }} .dynamic-feature__wrapper {
+    position: relative;
+    width: 100%;
+  }
 
-.dynamic-feature__callout {
-  background: {{ section.settings.callout_background }};
-  padding: 16px 20px;
-  border-radius: {{ section.settings.callout_radius }}px;
-  max-width: {{ section.settings.callout_max_width }}px;
-  box-shadow: 0 4px 12px rgba(0,0,0,.15);
-}
+  #shopify-section-{{ section.id }} .dynamic-feature__media {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  #shopify-section-{{ section.id }} .dynamic-feature__image {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  #shopify-section-{{ section.id }} .dynamic-feature__lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 1;
+  }
+
+  @keyframes fadeInLines {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  #shopify-section-{{ section.id }} .dynamic-feature__line {
+    stroke: {{ section.settings.line_color | default: '#000000' }};
+    stroke-width: {{ section.settings.line_width | default: 2 }};
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: drawLine 1.2s ease-out 0.6s forwards;
+  }
+
+  @keyframes drawLine {
+    to { stroke-dashoffset: 0; }
+  }
+
+  #shopify-section-{{ section.id }} .dynamic-feature__dot {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    z-index: 10;
+  }
+
+  #shopify-section-{{ section.id }} .dynamic-feature__dot-inner {
+    width: {{ section.settings.dot_size | default: 20 }}px;
+    height: {{ section.settings.dot_size | default: 20 }}px;
+    background: {{ section.settings.dot_color | default: '#ffffff' }};
+    border: {{ section.settings.dot_border_width | default: 3 }}px solid {{ section.settings.dot_border_color | default: '#000000' }};
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    animation: scaleInDot 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @keyframes scaleInDot {
+    from {
+      opacity: 0;
+      transform: scale(0);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  #shopify-section-{{ section.id }} .dynamic-feature__dot:hover .dynamic-feature__dot-inner {
+    transform: scale(1.3);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  }
+
+  {%- for block in section.blocks -%}
+    #shopify-block-{{ block.id }} .dynamic-feature__dot-inner {
+      animation-delay: {{ forloop.index0 | times: 0.1 }}s;
+    }
+  {%- endfor -%}
+
+  #shopify-section-{{ section.id }} .dynamic-feature__content {
+    position: absolute;
+    pointer-events: auto;
+    opacity: 0;
+    animation: fadeInContent 0.8s ease-out 1.8s forwards;
+  }
+
+  @keyframes fadeInContent {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  #shopify-section-{{ section.id }} .dynamic-feature__callout {
+    background: {{ section.settings.callout_background | default: '#ffffff' }};
+    padding: 16px 20px;
+    border-radius: {{ section.settings.callout_radius | default: 8 }}px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    max-width: {{ section.settings.callout_max_width | default: 220 }}px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  #shopify-section-{{ section.id }} .dynamic-feature__callout-title {
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1.3;
+    margin: 0 0 8px 0;
+    color: {{ section.settings.callout_title_color | default: '#000000' }};
+  }
+
+  #shopify-section-{{ section.id }} .dynamic-feature__callout-text {
+    font-size: 12px;
+    line-height: 1.4;
+    margin: 0;
+    color: {{ section.settings.callout_text_color | default: '#666666' }};
+  }
+
+  #shopify-section-{{ section.id }} .dynamic-feature__content.with-left {
+    transform-origin: right center;
+  }
+
+  #shopify-section-{{ section.id }} .dynamic-feature__content.with-right {
+    transform-origin: left center;
+  }
+
+  #shopify-section-{{ section.id }} .dynamic-feature__content.with-bottom {
+    transform-origin: center top;
+  }
+
+  @media screen and (max-width: 768px) {
+    #shopify-section-{{ section.id }} .dynamic-feature__lines {
+      display: none;
+    }
+
+    #shopify-section-{{ section.id }} .dynamic-feature__content {
+      display: none;
+    }
+
+    #shopify-section-{{ section.id }} .dynamic-feature__dot-inner {
+      width: {{ section.settings.dot_size_mobile | default: 16 }}px !important;
+      height: {{ section.settings.dot_size_mobile | default: 16 }}px !important;
+    }
+  }
+
+  #shopify-section-{{ section.id }} .drawer {
+    transition: all 0.3s ease;
+  }
+
+  #shopify-section-{{ section.id }} .drawer.is-open {
+    pointer-events: auto;
+  }
+
+  #shopify-section-{{ section.id }} .drawer__content {
+    padding: 24px;
+  }
 </style>
 
-<div class="dynamic-feature" data-section-id="{{ section.id }}">
-  <div class="dynamic-feature__media">
-    <img
-      src="{{ section.settings.image | image_url: width: 1200 }}"
-      class="dynamic-feature__image"
-      alt=""
-    >
+<div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}" data-section-id="{{ section.id }}">
+  <div class="{% unless section.settings.full_width %}page-width {% endunless %}relative">
+    {%- if section.settings.heading != blank -%}
+      <div class="mb-8">
+        <h2 class="heading title-md">{{ section.settings.heading }}</h2>
+      </div>
+    {%- endif -%}
+
+    <div class="dynamic-feature relative">
+      <div class="dynamic-feature__wrapper">
+        <div class="dynamic-feature__media relative w-full">
+          {%- if section.settings.image != blank -%}
+            <picture>
+              {%- if section.settings.image_mobile -%}
+                <source media="(max-width: 767px)" srcset="{{ section.settings.image_mobile | image_url: width: '400x' }} 400w, {{ section.settings.image_mobile | image_url: width: '800x' }} 800w">
+              {%- endif -%}
+              <img src="{{ section.settings.image | image_url: width: '1200x' }}" alt="{{ section.settings.image.alt }}" class="dynamic-feature__image w-full block">
+            </picture>
+          {%- else -%}
+            <div class="bg-gray-200 w-full aspect-square flex items-center justify-center">
+              <span class="text-gray-500">No image selected</span>
+            </div>
+          {%- endif -%}
 
     <svg class="dynamic-feature__lines" viewBox="0 0 100 100" preserveAspectRatio="none">
       {% for block in section.blocks %}
@@ -88,89 +226,133 @@
       {% endfor %}
     </svg>
 
-    {% for block in section.blocks %}
-      <div
-        class="dynamic-feature__dot"
-        style="left: {{ block.settings.horizontal }}%; top: {{ block.settings.vertical }}%;"
-      >
-        <div class="dynamic-feature__dot-inner"></div>
-      </div>
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'feature' -%}
+              <div class="dynamic-feature__dot" id="shopify-block-{{ block.id }}" style="left: {{ block.settings.horizontal }}%; top: {{ block.settings.vertical }}%;" {{ block.shopify_attributes }}>
+                <div class="dynamic-feature__dot-inner"></div>
+              </div>
 
-      <div
-        class="dynamic-feature__content"
-        style="left: {{ block.settings.text_horizontal }}%; top: {{ block.settings.text_vertical }}%;"
-      >
-        <div class="dynamic-feature__callout">
-          <p><strong>{{ block.settings.heading }}</strong></p>
-          <p>{{ block.settings.text }}</p>
+              <div class="dynamic-feature__content{% if block.settings.text_horizontal < 20 %} with-left{% elsif block.settings.text_horizontal > 80 %} with-right{% endif %}{% if block.settings.text_vertical > 70 %} with-bottom{% endif %}" style="left: {{ block.settings.text_horizontal }}%; top: {{ block.settings.text_vertical }}%; animation-delay: {{ forloop.index0 | times: 0.1 | plus: 1.8 }}s;">
+                <div class="dynamic-feature__callout">
+                  {%- if block.settings.heading != blank -%}
+                    <p class="dynamic-feature__callout-title">{{ block.settings.heading }}</p>
+                  {%- endif -%}
+                  {%- if block.settings.text != blank -%}
+                    <p class="dynamic-feature__callout-text">{{ block.settings.text }}</p>
+                  {%- endif -%}
+                </div>
+              </div>
+
+              <x-modal id="Feature-{{ section.id }}-{{ block.id }}" class="x-modal drawer z-30 fixed bottom-0 left-0 h-full w-full pointer-events-none" role="dialog" aria-modal="true" aria-label="{{ block.settings.heading | escape }}" hidden>
+                <overlay-element class="overlay fixed-modal invisible opacity-0 fixed bottom-0 left-0 w-full h-screen pointer-events-none" aria-controls="Feature-{{ section.id }}-{{ block.id }}" aria-expanded="false"></overlay-element>
+                <div class="drawer__inner z-10 absolute top-0 flex flex-col w-full h-full overflow-hidden">
+                  <gesture-element class="drawer__header flex justify-between opacity-0 invisible relative">
+                    <span class="drawer__title heading title-md">{{ block.settings.heading | escape }}</span>
+                    <button class="button button--secondary button--close drawer__close hidden sm:flex items-center justify-center" type="button" is="hover-button" aria-controls="Feature-{{ section.id }}-{{ block.id }}" aria-expanded="false" aria-label="Close">
+                      <span class="btn-fill" data-fill></span>
+                      <span class="btn-text">×</span>
+                    </button>
+                  </gesture-element>
+                  <div class="drawer__content opacity-0 invisible flex flex-col h-full grow shrink">
+                    <div class="drawer__scrollable relative flex flex-col gap-5 md:gap-7 grow shrink">
+                      <div class="rte text-base md:text-lg">{{ block.settings.text }}</div>
+                    </div>
+                  </div>
+                </div>
+              </x-modal>
+            {%- endif -%}
+          {%- endfor -%}
         </div>
       </div>
-    {% endfor %}
+    </div>
   </div>
 </div>
 
 <script>
-class DynamicFeature {
-  constructor(section) {
-    this.section = section;
-    this.svg = section.querySelector('svg');
-    this.lines = this.svg.querySelectorAll('.dynamic-feature__line');
-    this.contents = section.querySelectorAll('.dynamic-feature__content');
-    this.draw();
-  }
+  class DynamicFeatureSection {
+    constructor(section) {
+      this.section = section;
+      this.sectionId = section.dataset.sectionId;
+      this.isMobile = window.innerWidth <= 768;
+      this.dots = section.querySelectorAll('.dynamic-feature__dot');
+      this.svg = section.querySelector('.dynamic-feature__lines');
 
-  generatePath(sx, sy, ex, ey, breaks) {
-    const points = [{ x: sx, y: sy }];
+      this.init();
+      this.setupEventListeners();
+    }
 
-    for (let i = 1; i <= breaks; i++) {
-      const t = i / (breaks + 1);
-      points.push({
-        x: sx + (ex - sx) * t + (Math.random() * 8 - 4),
-        y: sy + (ey - sy) * t + (Math.random() * 8 - 4)
+    init() {
+      if (!this.isMobile) {
+        this.calculateLineLength();
+      }
+      this.setupMobileInteractions();
+    }
+
+    setupEventListeners() {
+      window.addEventListener('resize', () => this.handleResize());
+      this.dots.forEach(dot => {
+        dot.addEventListener('click', (e) => this.handleDotClick(e));
       });
     }
 
-    points.push({ x: ex, y: ey });
-
-    return points.map((p, i) =>
-      `${i === 0 ? 'M' : 'L'} ${p.x},${p.y}`
-    ).join(' ');
-  }
-
-  draw() {
-    this.lines.forEach((line, i) => {
-      let sx = +line.dataset.startX;
-      let sy = +line.dataset.startY;
-      let ex = +line.dataset.endX;
-      let ey = +line.dataset.endY;
-      const breaks = +line.dataset.breaks;
-
-      /* 🔑 stop before callout */
-      const content = this.contents[i];
-      if (content) {
-        const contentRect = content.getBoundingClientRect();
-        const svgRect = this.svg.getBoundingClientRect();
-        ex = ((contentRect.left - svgRect.left) / svgRect.width) * 100 - 1.5;
+    handleDotClick(e) {
+      const blockId = e.currentTarget.id;
+      const sectionId = this.section.dataset.sectionId;
+      const realBlockId = blockId.replace('shopify-block-', '');
+      const modalId = `Feature-${sectionId}-${realBlockId}`;
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.open();
       }
+    }
 
-      const path = this.generatePath(sx, sy, ex, ey, breaks);
-      line.setAttribute('d', path);
+    calculateLineLength() {
+      if (!this.svg) return;
 
-      const length = line.getTotalLength();
-      line.style.strokeDasharray = length;
-      line.style.strokeDashoffset = length;
-      line.style.animationDelay = `${0.3 + i * 0.2}s`;
-    });
+      setTimeout(() => {
+        const lines = this.svg.querySelectorAll('.dynamic-feature__line');
+        lines.forEach((line, index) => {
+          try {
+            const length = line.getTotalLength();
+            line.style.strokeDasharray = length;
+            line.style.strokeDashoffset = length;
+            line.style.animationDelay = (0.6 + index * 0.2) + 's';
+          } catch (e) {
+            console.warn('Line calculation failed:', e);
+          }
+        });
+      }, 100);
+    }
+
+    setupMobileInteractions() {
+      this.dots.forEach(dot => {
+        dot.style.cursor = 'pointer';
+      });
+    }
+
+    handleResize() {
+      const wasMobile = this.isMobile;
+      this.isMobile = window.innerWidth <= 768;
+      if (wasMobile !== this.isMobile) {
+        this.init();
+      }
+    }
   }
-}
 
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.dynamic-feature').forEach(section => {
-    new DynamicFeature(section);
+  document.addEventListener('DOMContentLoaded', () => {
+    const section = document.querySelector('[data-section-id]');
+    if (section && section.querySelector('.dynamic-feature')) {
+      new DynamicFeatureSection(section);
+    }
   });
-});
-</script>
 
+  document.addEventListener('shopify:section:load', (e) => {
+    const section = e.detail.section;
+    if (section.querySelector('.dynamic-feature')) {
+      new DynamicFeatureSection(section);
+    }
+  });
+</script>
 
 {% schema %}
 {
