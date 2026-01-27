@@ -206,10 +206,10 @@
             </div>
           {%- endif -%}
 
-          <svg class="dynamic-feature__lines" preserveAspectRatio="none" aria-hidden="true">
+          <svg class="dynamic-feature__lines" preserveAspectRatio="none" viewBox="0 0 100 100" aria-hidden="true">
             {%- for block in section.blocks -%}
               {%- if block.type == 'feature' -%}
-                <path class="dynamic-feature__line" d="M {{ block.settings.horizontal }}, {{ block.settings.vertical }} Q {{ block.settings.horizontal | times: 0.3 | plus: block.settings.text_horizontal | times: 0.7 }}, {{ block.settings.vertical | times: 0.3 | plus: block.settings.text_vertical | times: 0.7 }} {{ block.settings.text_horizontal }}, {{ block.settings.text_vertical }}"></path>
+                <path class="dynamic-feature__line" d="M {{ block.settings.horizontal }},{{ block.settings.vertical }} L {{ block.settings.text_horizontal }},{{ block.settings.text_vertical }}"></path>
               {%- endif -%}
             {%- endfor -%}
           </svg>
@@ -263,7 +263,6 @@
       this.sectionId = section.dataset.sectionId;
       this.isMobile = window.innerWidth <= 768;
       this.dots = section.querySelectorAll('.dynamic-feature__dot');
-      this.media = section.querySelector('.dynamic-feature__media');
       this.svg = section.querySelector('.dynamic-feature__lines');
 
       this.init();
@@ -272,7 +271,7 @@
 
     init() {
       if (!this.isMobile) {
-        this.drawLines();
+        this.calculateLineLength();
       }
       this.setupMobileInteractions();
     }
@@ -295,16 +294,10 @@
       }
     }
 
-    drawLines() {
-      if (!this.svg || !this.media) return;
+    calculateLineLength() {
+      if (!this.svg) return;
 
       setTimeout(() => {
-        const rect = this.media.getBoundingClientRect();
-        const width = rect.width;
-        const height = rect.height;
-
-        this.svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
-
         const lines = this.svg.querySelectorAll('.dynamic-feature__line');
         lines.forEach(line => {
           try {
