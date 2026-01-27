@@ -273,86 +273,116 @@
     constructor(section) {
       this.section = section;
       this.sectionId = section.dataset.sectionId;
-      this.isMobile = window.innerWidth <= 768;
-      this.dots = section.querySelectorAll('.dynamic-feature__dot');
       this.svg = section.querySelector('.dynamic-feature__lines');
+      this.lines = this.svg?.querySelectorAll('.dynamic-feature__line') || [];
+      this.dots = section.querySelectorAll('.dynamic-feature__dot');
+      this.isMobile = window.innerWidth <= 768;
 
       this.init();
-      this.setupEventListeners();
+      this.bindEvents();
     }
 
     init() {
       if (!this.isMobile) {
-        this.calculateLineLength();
-      }
-      this.setupMobileInteractions();
-    }
-
-    setupEventListeners() {
-      window.addEventListener('resize', () => this.handleResize());
-      this.dots.forEach(dot => {
-        dot.addEventListener('click', (e) => this.handleDotClick(e));
-      });
-    }
-
-    handleDotClick(e) {
-      const blockId = e.currentTarget.id;
-      const sectionId = this.section.dataset.sectionId;
-      const realBlockId = blockId.replace('shopify-block-', '');
-      const modalId = `Feature-${sectionId}-${realBlockId}`;
-      const modal = document.getElementById(modalId);
-      if (modal) {
-        modal.open();
+        this.drawLines();
       }
     }
 
-    calculateLineLength() {
-      if (!this.svg) return;
+    bindEvents() {
+      window.addEventListener('resize', () => this.onResize());
 
-      setTimeout(() => {
-        const lines = this.svg.querySelectorAll('.dynamic-feature__line');
-        lines.forEach((line, index) => {
-          try {
-            const length = line.getTotalLength();
-            line.style.strokeDasharray = length;
-            line.style.strokeDashoffset = length;
-            line.style.animationDelay = (0.6 + index * 0.2) + 's';
-          } catch (e) {
-            console.warn('Line calculation failed:', e);
-          }
-        });
-      }, 100);
-    }
-
-    setupMobileInteractions() {
       this.dots.forEach(dot => {
-        dot.style.cursor = 'pointer';
+        dot.addEventListener('click', (e) => this.openModal(e));
       });
     }
 
-    handleResize() {
+    onResize() {
       const wasMobile = this.isMobile;
       this.isMobile = window.innerWidth <= 768;
-      if (wasMobile !== this.isMobile) {
-        this.init();
+
+      if (wasMobile !== this.isMobile && !this.isMobile) {
+        this.drawLines();
       }
+    }
+
+    openModal(e) {
+      const blockId = e.currentTarget.id.replace('shopify-block-', '');
+      const modal = document.getElementById(
+        `Feature-${this.sectionId}-${blockId}`
+      );
+      if (modal) modal.open();
+    }
+
+    drawLines() {
+      if (!this.svg) return;
+
+      const svgRect = this.svg.getBoundingClientRect();
+
+      this.lines.forEach((line, index) => {
+        const sx = parseFloat(line.dataset.startX);
+        const sy = parseFloat(line.dataset.startY);
+        const ex = parseFloat(line.dataset.endX);
+        const ey = parseFloat(line.dataset.endY);
+
+        // --- OFFSET so line stops before text box ---
+        const OFFSET = 6;
+        const dx = ex - sx;
+        const dy = ey - sy;
+        const dist = Math.hypot(dx, dy) || 1;
+
+        const endX = ex - (dx / dist) * OFFSET;
+        const endY = ey - (dy / dist) * OFFSET;
+
+        // --- SMOOTH CURVE CONTROL POINTS ---
+        const midX = (sx + endX) / 2;
+        const midY = (sy + endY) / 2;
+
+        const curveStrength = 12;
+
+        const c1x = midX;
+        const c1y = sy;
+        const c2x = midX;
+        const c2y = endY;
+
+        const path = `
+          M ${sx},${sy}
+          C ${c1x},${c1y}
+            ${c2x},${c2y}
+            ${endX},${endY}
+        `;
+
+        line.setAttribute('d', path);
+
+        // --- Proper stroke animation ---
+        try {
+          const length = line.getTotalLength();
+          line.style.strokeDasharray = length;
+          line.style.strokeDashoffset = length;
+          line.style.animationDelay = `${0.6 + index * 0.2}s`;
+        } catch (err) {
+          console.warn('SVG path error', err);
+        }
+      });
     }
   }
 
+  function initDynamicFeatures(scope = document) {
+    scope.querySelectorAll('[data-section-id]').forEach(section => {
+      if (section.querySelector('.dynamic-feature')) {
+        new DynamicFeatureSection(section);
+      }
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
-    const section = document.querySelector('[data-section-id]');
-    if (section && section.querySelector('.dynamic-feature')) {
-      new DynamicFeatureSection(section);
-    }
+    initDynamicFeatures();
   });
 
   document.addEventListener('shopify:section:load', (e) => {
-    const section = e.detail.section;
-    if (section.querySelector('.dynamic-feature')) {
-      new DynamicFeatureSection(section);
-    }
+    initDynamicFeatures(e.target);
   });
 </script>
+
 
 {% schema %}
 {
