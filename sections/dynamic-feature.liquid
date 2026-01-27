@@ -193,6 +193,24 @@
   #shopify-section-{{ section.id }} .drawer__content {
     padding: 24px;
   }
+
+
+
+
+
+  /* ✅ Enable modal interaction when open */
+#shopify-section-{{ section.id }} .drawer.is-open {
+  pointer-events: auto;
+}
+
+#shopify-section-{{ section.id }} .drawer.is-open overlay-element {
+  pointer-events: auto;
+}
+
+#shopify-section-{{ section.id }} .drawer.is-open .drawer__inner {
+  transform: translateY(0);
+}
+
 </style>
 
 <div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}" data-section-id="{{ section.id }}">
@@ -400,12 +418,14 @@ document.addEventListener('shopify:section:load', e => initDynamicFeatures(e.tar
     const content = modal.querySelector('.drawer__content');
 
     overlay?.classList.remove('invisible', 'opacity-0');
+    overlay?.classList.add('opacity-100');
     overlay?.setAttribute('aria-expanded', 'true');
 
     header?.classList.remove('invisible', 'opacity-0');
     content?.classList.remove('invisible', 'opacity-0');
 
-    document.body.classList.add('overflow-hidden');
+    modal.style.pointerEvents = 'auto';
+    document.body.style.overflow = 'hidden';
   }
 
   function closeModal(modal) {
@@ -413,8 +433,9 @@ document.addEventListener('shopify:section:load', e => initDynamicFeatures(e.tar
 
     modal.classList.remove('is-open');
     modal.hidden = true;
+    modal.style.pointerEvents = '';
 
-    document.body.classList.remove('overflow-hidden');
+    document.body.style.overflow = '';
   }
 
   function initMobilePopups(scope = document) {
@@ -424,7 +445,9 @@ document.addEventListener('shopify:section:load', e => initDynamicFeatures(e.tar
       dot.addEventListener('click', () => {
         const blockId = dot.id.replace('shopify-block-', '');
         const section = dot.closest('[data-section-id]');
-        const modal = section.querySelector(`#Feature-${section.dataset.sectionId}-${blockId}`);
+        const modal = section.querySelector(
+          `#Feature-${section.dataset.sectionId}-${blockId}`
+        );
 
         openModal(modal);
       });
@@ -432,8 +455,7 @@ document.addEventListener('shopify:section:load', e => initDynamicFeatures(e.tar
 
     scope.querySelectorAll('overlay-element, .drawer__close').forEach(el => {
       el.addEventListener('click', () => {
-        const modal = el.closest('.x-modal');
-        closeModal(modal);
+        closeModal(el.closest('.x-modal'));
       });
     });
   }
@@ -442,6 +464,7 @@ document.addEventListener('shopify:section:load', e => initDynamicFeatures(e.tar
   document.addEventListener('shopify:section:load', e => initMobilePopups(e.target));
 })();
 </script>
+
 
 
 {% schema %}
