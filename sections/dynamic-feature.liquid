@@ -182,30 +182,58 @@
     }
   }
 
-  #shopify-section-{{ section.id }} .drawer {
-    transition: all 0.3s ease;
-  }
+/* ===============================
+   MOBILE POPUP FIXES
+================================ */
 
-  #shopify-section-{{ section.id }} .drawer.is-open {
-    pointer-events: auto;
-  }
+#shopify-section-{{ section.id }} .x-modal {
+  display: none;
+  pointer-events: none;
+}
 
-  #shopify-section-{{ section.id }} .drawer__content {
-    padding: 24px;
-  }
+#shopify-section-{{ section.id }} .x-modal.is-open {
+  display: block;
+  pointer-events: auto;
+}
 
-  /* ✅ Enable modal interaction when open */
-  #shopify-section-{{ section.id }} .drawer.is-open {
-    pointer-events: auto;
-  }
+/* Overlay */
+#shopify-section-{{ section.id }} overlay-element {
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s ease;
+}
 
-  #shopify-section-{{ section.id }} .drawer.is-open overlay-element {
-    pointer-events: auto;
-  }
+#shopify-section-{{ section.id }} .x-modal.is-open overlay-element {
+  pointer-events: auto;
+  opacity: 1;
+  visibility: visible;
+}
 
-  #shopify-section-{{ section.id }} .drawer.is-open .drawer__inner {
-    transform: translateY(0);
-  }
+/* Drawer animation */
+#shopify-section-{{ section.id }} .drawer__inner {
+  transform: translateY(100%);
+  transition: transform 0.35s ease;
+}
+
+#shopify-section-{{ section.id }} .x-modal.is-open .drawer__inner {
+  transform: translateY(0);
+}
+
+/* Force content visible (mobile Safari fix) */
+#shopify-section-{{ section.id }} .drawer__header,
+#shopify-section-{{ section.id }} .drawer__content {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Body scroll lock */
+body.modal-open {
+  position: fixed;
+  width: 100%;
+  overflow: hidden;
+}
+
 
   /* Mobile Drawer Styles - Match Cart Drawer */
   #shopify-section-{{ section.id }} .drawer__close-menu {
@@ -417,45 +445,40 @@ document.addEventListener('shopify:section:load', e => initDynamicFeatures(e.tar
 
 <script>
 (function () {
+  const MOBILE_MAX = 767;
+
   function isMobile() {
-    return window.innerWidth <= 768;
+    return window.innerWidth <= MOBILE_MAX;
   }
 
   function openModal(modal) {
     if (!modal) return;
 
     modal.hidden = false;
+    modal.removeAttribute('aria-hidden');
     modal.classList.add('is-open');
 
-    const overlay = modal.querySelector('overlay-element');
-    const header = modal.querySelector('.drawer__header');
-    const content = modal.querySelector('.drawer__content');
-
-    overlay?.classList.remove('invisible', 'opacity-0');
-    overlay?.classList.add('opacity-100');
-    overlay?.setAttribute('aria-expanded', 'true');
-
-    header?.classList.remove('invisible', 'opacity-0');
-    content?.classList.remove('invisible', 'opacity-0');
-
-    modal.style.pointerEvents = 'auto';
-    document.body.style.overflow = 'hidden';
+    document.body.classList.add('modal-open');
   }
 
   function closeModal(modal) {
     if (!modal) return;
 
     modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
     modal.hidden = true;
-    modal.style.pointerEvents = '';
 
-    document.body.style.overflow = '';
+    document.body.classList.remove('modal-open');
   }
 
   function initMobilePopups(scope = document) {
     if (!isMobile()) return;
 
+    /* Open */
     scope.querySelectorAll('.dynamic-feature__dot').forEach(dot => {
+      if (dot.dataset.popupBound) return;
+      dot.dataset.popupBound = 'true';
+
       dot.addEventListener('click', () => {
         const blockId = dot.id.replace('shopify-block-', '');
         const section = dot.closest('[data-section-id]');
@@ -467,17 +490,29 @@ document.addEventListener('shopify:section:load', e => initDynamicFeatures(e.tar
       });
     });
 
-    scope.querySelectorAll('overlay-element, .drawer__close-menu, .drawer__close').forEach(el => {
+    /* Close */
+    scope.querySelectorAll(
+      'overlay-element, .drawer__close-menu, .drawer__close'
+    ).forEach(el => {
+      if (el.dataset.popupCloseBound) return;
+      el.dataset.popupCloseBound = 'true';
+
       el.addEventListener('click', () => {
         closeModal(el.closest('.x-modal'));
       });
     });
   }
 
-  document.addEventListener('DOMContentLoaded', () => initMobilePopups());
-  document.addEventListener('shopify:section:load', e => initMobilePopups(e.target));
+  document.addEventListener('DOMContentLoaded', () => {
+    initMobilePopups();
+  });
+
+  document.addEventListener('shopify:section:load', e => {
+    initMobilePopups(e.target);
+  });
 })();
 </script>
+
 
 {% schema %}
 {
