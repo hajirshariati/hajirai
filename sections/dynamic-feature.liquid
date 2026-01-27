@@ -383,6 +383,65 @@ document.addEventListener('shopify:section:load', e => initDynamicFeatures(e.tar
 </script>
 
 
+<script>
+(function () {
+  function isMobile() {
+    return window.innerWidth <= 768;
+  }
+
+  function openModal(modal) {
+    if (!modal) return;
+
+    modal.hidden = false;
+    modal.classList.add('is-open');
+
+    const overlay = modal.querySelector('overlay-element');
+    const header = modal.querySelector('.drawer__header');
+    const content = modal.querySelector('.drawer__content');
+
+    overlay?.classList.remove('invisible', 'opacity-0');
+    overlay?.setAttribute('aria-expanded', 'true');
+
+    header?.classList.remove('invisible', 'opacity-0');
+    content?.classList.remove('invisible', 'opacity-0');
+
+    document.body.classList.add('overflow-hidden');
+  }
+
+  function closeModal(modal) {
+    if (!modal) return;
+
+    modal.classList.remove('is-open');
+    modal.hidden = true;
+
+    document.body.classList.remove('overflow-hidden');
+  }
+
+  function initMobilePopups(scope = document) {
+    if (!isMobile()) return;
+
+    scope.querySelectorAll('.dynamic-feature__dot').forEach(dot => {
+      dot.addEventListener('click', () => {
+        const blockId = dot.id.replace('shopify-block-', '');
+        const section = dot.closest('[data-section-id]');
+        const modal = section.querySelector(`#Feature-${section.dataset.sectionId}-${blockId}`);
+
+        openModal(modal);
+      });
+    });
+
+    scope.querySelectorAll('overlay-element, .drawer__close').forEach(el => {
+      el.addEventListener('click', () => {
+        const modal = el.closest('.x-modal');
+        closeModal(modal);
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => initMobilePopups());
+  document.addEventListener('shopify:section:load', e => initMobilePopups(e.target));
+})();
+</script>
 
 
 {% schema %}
