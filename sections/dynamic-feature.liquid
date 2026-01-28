@@ -1,4 +1,19 @@
 <style>
+  /* Lines */
+#shopify-section-{{ section.id }}.is-visible .dynamic-feature__line {
+  animation: drawLine 2.5s ease-out forwards;
+}
+
+/* Dots */
+#shopify-section-{{ section.id }}.is-visible .dynamic-feature__dot-inner {
+  animation: scaleInDot 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Callouts */
+#shopify-section-{{ section.id }}.is-visible .dynamic-feature__content {
+  animation: fadeInContent 0.8s ease-out forwards;
+}
+
   @media (min-width: 769px) {
   #shopify-section-{{ section.id }} .dynamic-feature__dot {
     pointer-events: none;
