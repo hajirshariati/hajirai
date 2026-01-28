@@ -5,10 +5,6 @@
   stroke-dashoffset: 0;
 }
 
-.dynamic-feature__line.line-paused {
-  stroke-dashoffset: var(--line-length);
-  animation: none !important;
-}
 
 @media (max-width: 767px) {
   .hotspot__content {
@@ -67,7 +63,7 @@
     stroke-linejoin: round;
     stroke-dasharray: 1000;
     stroke-dashoffset: 1000;
-    animation: drawLine 2s ease-out forwards;
+    animation: drawLine 1.2s ease-out 0.6s forwards;
   }
 
   @keyframes drawLine {
@@ -106,6 +102,11 @@
     }
   }
 
+  #shopify-section-{{ section.id }} .dynamic-feature__dot:hover .dynamic-feature__dot-inner {
+    transform: scale(1.3);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  }
+
   {%- for block in section.blocks -%}
     #shopify-block-{{ block.id }} .dynamic-feature__dot-inner {
       animation-delay: {{ forloop.index0 | times: 0.1 }}s;
@@ -116,7 +117,7 @@
     position: absolute;
     pointer-events: auto;
     opacity: 0;
-    animation: fadeInContent 0.8s ease-out forwards;
+    animation: fadeInContent 0.8s ease-out 1.8s forwards;
   }
 
   @keyframes fadeInContent {
@@ -347,54 +348,13 @@ class DynamicFeatureSection {
     this.lines = this.svg?.querySelectorAll('.dynamic-feature__line') || [];
     this.media = section.querySelector('.dynamic-feature__media');
     this.isMobile = window.innerWidth <= 768;
-    this.linesAnimated = false;
 
     this.init();
     window.addEventListener('resize', () => this.onResize());
-    this.setupIntersectionObserver();
   }
 
   init() {
-    if (!this.isMobile) {
-      // Set up lines but don't animate yet
-      this.drawLines();
-      // Reset animation state for viewport trigger
-      this.resetLineAnimations();
-    }
-  }
-
-  setupIntersectionObserver() {
-    if (!this.isMobile) {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting && !this.linesAnimated) {
-            this.linesAnimated = true;
-            this.triggerLineAnimations();
-          }
-        });
-      }, {
-        threshold: 0.3 // Trigger when 30% of section is visible
-      });
-
-      observer.observe(this.section);
-    }
-  }
-
-  resetLineAnimations() {
-    this.lines.forEach((line) => {
-      const length = line.getTotalLength();
-      line.style.setProperty('--line-length', length);
-      line.style.strokeDasharray = length;
-      line.style.strokeDashoffset = length;
-      line.classList.add('line-paused');
-    });
-  }
-
-  triggerLineAnimations() {
-    this.lines.forEach((line, index) => {
-      line.classList.remove('line-paused');
-      line.style.animationDelay = `${index * 0.3}s`;
-    });
+    if (!this.isMobile) this.drawLines();
   }
 
   onResize() {
@@ -402,73 +362,73 @@ class DynamicFeatureSection {
     this.isMobile = window.innerWidth <= 768;
     if (wasMobile !== this.isMobile && !this.isMobile) {
       this.drawLines();
-      this.resetLineAnimations();
-      this.linesAnimated = false;
     }
   }
 
-  drawLines() {
-    const mediaRect = this.media.getBoundingClientRect();
-    const contents = this.section.querySelectorAll('.dynamic-feature__content');
+drawLines() {
+  const mediaRect = this.media.getBoundingClientRect();
+  const contents = this.section.querySelectorAll('.dynamic-feature__content');
 
-    this.lines.forEach((line, index) => {
-      const sx = parseFloat(line.dataset.startX);
-      const sy = parseFloat(line.dataset.startY);
-      const hasBend = parseInt(line.dataset.breaks, 10) === 1;
+  this.lines.forEach((line, index) => {
+    const sx = parseFloat(line.dataset.startX);
+    const sy = parseFloat(line.dataset.startY);
+    const hasBend = parseInt(line.dataset.breaks, 10) === 1;
 
-      const content = contents[index];
-      if (!content) return;
+    const content = contents[index];
+    if (!content) return;
 
-      const box = content.getBoundingClientRect();
-      const GAP_PX = 12;
+    const box = content.getBoundingClientRect();
+const GAP_PX = 12;
 
-      const goingRight = box.left > mediaRect.left + (sx / 100) * mediaRect.width;
+const goingRight = box.left > mediaRect.left + (sx / 100) * mediaRect.width;
 
-      const endXPx = goingRight
-        ? box.left - GAP_PX
-        : box.right + GAP_PX;
+const endXPx = goingRight
+  ? box.left - GAP_PX
+  : box.right + GAP_PX;
 
-      const endX =
-        ((endXPx - mediaRect.left) / mediaRect.width) * 100;
+const endX =
+  ((endXPx - mediaRect.left) / mediaRect.width) * 100;
 
-      const endY =
-        ((box.top + box.height / 2 - mediaRect.top) / mediaRect.height) * 100;
+    const endY =
+      ((box.top + box.height / 2 - mediaRect.top) / mediaRect.height) * 100;
 
-      const deltaY = Math.abs(endY - sy);
-      const MIN_BEND_DISTANCE = 3;
+    const deltaY = Math.abs(endY - sy);
+    const MIN_BEND_DISTANCE = 3;
 
-      let path;
+    let path;
 
-      if (!hasBend || deltaY < MIN_BEND_DISTANCE) {
-        // ✅ CLEAN STRAIGHT LINE
-        path = `M ${sx},${sy} L ${endX},${endY}`;
-      } else {
-        const goingRight = endX > sx;
-        const elbowX = goingRight
-          ? sx + Math.abs(endX - sx) * 0.5
-          : sx - Math.abs(endX - sx) * 0.5;
+    if (!hasBend || deltaY < MIN_BEND_DISTANCE) {
+      // ✅ CLEAN STRAIGHT LINE
+      path = `M ${sx},${sy} L ${endX},${endY}`;
+    } else {
+      const goingRight = endX > sx;
+      const elbowX = goingRight
+        ? sx + Math.abs(endX - sx) * 0.5
+        : sx - Math.abs(endX - sx) * 0.5;
 
-        const radius = Math.min(4, Math.abs(endX - sx) / 4);
-        const vertDir = endY > sy ? 1 : -1;
+      const radius = Math.min(4, Math.abs(endX - sx) / 4);
+      const vertDir = endY > sy ? 1 : -1;
 
-        path = `
-          M ${sx},${sy}
-          L ${elbowX - radius * (goingRight ? 1 : -1)},${sy}
-          Q ${elbowX},${sy} ${elbowX},${sy + radius * vertDir}
-          L ${elbowX},${endY - radius * vertDir}
-          Q ${elbowX},${endY} ${elbowX + radius * (goingRight ? 1 : -1)},${endY}
-          L ${endX},${endY}
-        `;
-      }
+      path = `
+        M ${sx},${sy}
+        L ${elbowX - radius * (goingRight ? 1 : -1)},${sy}
+        Q ${elbowX},${sy} ${elbowX},${sy + radius * vertDir}
+        L ${elbowX},${endY - radius * vertDir}
+        Q ${elbowX},${endY} ${elbowX + radius * (goingRight ? 1 : -1)},${endY}
+        L ${endX},${endY}
+      `;
+    }
 
-      line.setAttribute('d', path);
+    line.setAttribute('d', path);
 
-      const length = line.getTotalLength();
-      line.style.setProperty('--line-length', length);
-      line.style.strokeDasharray = length;
-      line.style.strokeDashoffset = length;
-    });
-  }
+    const length = line.getTotalLength();
+    line.style.strokeDasharray = length;
+    line.style.strokeDashoffset = length;
+    line.style.animationDelay = `${0.6 + index * 0.2}s`;
+  });
+}
+
+
 }
 
 function initDynamicFeatures(scope = document) {
