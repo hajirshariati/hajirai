@@ -1168,6 +1168,7 @@
       "block_order": [
         "text_6G8By7"
       ],
+      "disabled": true,
       "name": "Rich text",
       "settings": {
         "text_alignment": "center",
@@ -1296,6 +1297,7 @@
         "column_ykp6PA",
         "column_w768Xw"
       ],
+      "disabled": true,
       "name": "Multicolumn",
       "settings": {
         "gap": "small",
