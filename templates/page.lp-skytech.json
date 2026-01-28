@@ -79,9 +79,7 @@
         "text_Riw6cp",
         "button_qntBAe"
       ],
-      "custom_css": [
-        ".flickity-slider {mix-blend-mode: multiply;}"
-      ],
+      "custom_css": [],
       "name": "t:sections.video-with-text.name",
       "settings": {
         "video": "shopify://files/videos/NewSkyTech2.mov",
@@ -188,6 +186,9 @@
         "logo_GHQxK8",
         "logo_YVtwbx",
         "logo_QYdkeq"
+      ],
+      "custom_css": [
+        ".flickity-slider {mix-blend-mode: multiply;}"
       ],
       "name": "Logo list",
       "settings": {
