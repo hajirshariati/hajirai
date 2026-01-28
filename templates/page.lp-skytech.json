@@ -79,7 +79,9 @@
         "text_Riw6cp",
         "button_qntBAe"
       ],
-      "custom_css": [],
+      "custom_css": [
+        "video {max-height: calc(100% - 79px);}"
+      ],
       "name": "t:sections.video-with-text.name",
       "settings": {
         "video": "shopify://files/videos/NewSkyTech2.mov",
