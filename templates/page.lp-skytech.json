@@ -92,6 +92,7 @@
         "layout": "text_first",
         "text_alignment": "center",
         "content_position": "align-self-start",
+        "video_url_mobile": "",
         "image_height_mobile": "200px",
         "text_alignment_mobile": "center",
         "color_text": "",
@@ -925,7 +926,7 @@
           "type": "button",
           "settings": {
             "button_label": "SHOP MEN´S",
-            "button_link": "shopify://products/maui-men",
+            "button_link": "shopify://products/maui-black-l3000m",
             "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
@@ -937,7 +938,7 @@
           "type": "button",
           "settings": {
             "button_label": "SHOP WOMEN´S",
-            "button_link": "shopify://products/maui-women",
+            "button_link": "shopify://products/maui-matte-black-l3000w",
             "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
