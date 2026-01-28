@@ -260,7 +260,7 @@ body.modal-open {
 </style>
 
 <div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}" data-section-id="{{ section.id }}">
-  <div class="{% unless section.settings.full_width %}page-width {% endunless %}relative">
+  <div class="{% unless section.settings.full_width %}page-width {% endunless %}relative" style="width: fit-content;">
     {%- if section.settings.heading != blank -%}
       <div class="mb-8">
         <h2 class="heading title-md">{{ section.settings.heading }}</h2>
