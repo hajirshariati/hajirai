@@ -194,7 +194,7 @@
       "settings": {
         "visibility": "all",
         "layout": "marquee",
-        "grid_horizontal": 50,
+        "grid_horizontal": 120,
         "direction": "left",
         "speed": 1,
         "heading": "As Seen On",
@@ -211,7 +211,7 @@
         "highlighted_scribble": "circle",
         "color_text": "",
         "color_background": "#fafafa",
-        "gradient_background": "linear-gradient(358deg, rgba(145, 183, 201, 1) 13%, rgba(170, 248, 219, 0) 86%)",
+        "gradient_background": "linear-gradient(358deg, rgba(168, 227, 255, 1) 13%, rgba(170, 248, 219, 0) 86%)",
         "color_highlight": "",
         "gradient_highlight": "",
         "color_button_text": "",
