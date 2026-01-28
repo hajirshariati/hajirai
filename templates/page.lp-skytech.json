@@ -105,7 +105,7 @@
         "color_button_background": "#91b7c9",
         "color_button_gradient": "",
         "padding_top": 72,
-        "padding_bottom": 72,
+        "padding_bottom": 0,
         "divider": false,
         "full_width": false,
         "rounded": false,
