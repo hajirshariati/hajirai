@@ -938,7 +938,7 @@
           "type": "button",
           "settings": {
             "button_label": "SHOP WOMEN´S",
-            "button_link": "shopify://products/maui-matte-black-l3000w",
+            "button_link": "shopify://products/maui-black-gloss-l3030w",
             "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
@@ -1018,7 +1018,7 @@
           "type": "button",
           "settings": {
             "button_label": "SHOP NOW",
-            "button_link": "shopify://products/jillian-sport-sandal",
+            "button_link": "shopify://products/jillian-sport-black-l8000w",
             "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
@@ -1097,7 +1097,7 @@
           "type": "button",
           "settings": {
             "button_label": "SHOP NOW",
-            "button_link": "shopify://products/janey-sport-water-friendly-slide",
+            "button_link": "shopify://products/janey-sport-white-l9503w",
             "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
