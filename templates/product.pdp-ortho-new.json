@@ -569,6 +569,84 @@
         "rounded": true
       }
     },
+    "dynamic_feature_T4LpAL": {
+      "type": "dynamic-feature",
+      "blocks": {
+        "feature_TpMpnB": {
+          "type": "feature",
+          "settings": {
+            "heading": "Feature 1",
+            "text": "Description",
+            "horizontal": 44,
+            "vertical": 72,
+            "text_horizontal": 2,
+            "text_vertical": 58
+          }
+        },
+        "feature_hFAA6k": {
+          "type": "feature",
+          "settings": {
+            "heading": "Feature 2",
+            "text": "Description",
+            "horizontal": 37,
+            "vertical": 50,
+            "text_horizontal": 70,
+            "text_vertical": 47
+          }
+        },
+        "feature_4xBxK7": {
+          "type": "feature",
+          "settings": {
+            "heading": "Feature 3",
+            "text": "Description",
+            "horizontal": 30,
+            "vertical": 38,
+            "text_horizontal": 1,
+            "text_vertical": 11
+          }
+        },
+        "feature_NPdmKr": {
+          "type": "feature",
+          "settings": {
+            "heading": "Feature 4",
+            "text": "Description",
+            "horizontal": 44,
+            "vertical": 36,
+            "text_horizontal": 71,
+            "text_vertical": 20
+          }
+        }
+      },
+      "block_order": [
+        "feature_TpMpnB",
+        "feature_hFAA6k",
+        "feature_4xBxK7",
+        "feature_NPdmKr"
+      ],
+      "name": "Dynamic Feature",
+      "settings": {
+        "image": "shopify://shop_images/dynamicjillian.png",
+        "heading": "",
+        "dot_size": 28,
+        "dot_size_mobile": 24,
+        "dot_color": "#ffffff",
+        "dot_border_color": "#c5a370",
+        "dot_border_width": 3,
+        "line_color": "#c5a370",
+        "line_width": 0.5,
+        "line_breaks": 1,
+        "callout_background": "#ffffff",
+        "callout_radius": 8,
+        "callout_max_width": 220,
+        "callout_title_color": "#9c763d",
+        "callout_text_color": "#666666",
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
     "faq_tA87L7": {
       "type": "faq",
       "blocks": {
@@ -965,72 +1043,6 @@
         "abra_promo_code_hide": ""
       }
     },
-    "dynamic_feature_GLrM4a": {
-      "type": "dynamic-feature",
-      "blocks": {
-        "feature_VfizrX": {
-          "type": "feature",
-          "settings": {
-            "heading": "Title 1",
-            "text": "Text 1",
-            "horizontal": 38,
-            "vertical": 43,
-            "text_horizontal": 61,
-            "text_vertical": 20
-          }
-        },
-        "feature_QAYbpG": {
-          "type": "feature",
-          "settings": {
-            "heading": "Title 2",
-            "text": "Text 2",
-            "horizontal": 49,
-            "vertical": 53,
-            "text_horizontal": 73,
-            "text_vertical": 50
-          }
-        },
-        "feature_LTj7Jr": {
-          "type": "feature",
-          "settings": {
-            "heading": "Feature 1",
-            "text": "Description",
-            "horizontal": 21,
-            "vertical": 39,
-            "text_horizontal": 30,
-            "text_vertical": 20
-          }
-        }
-      },
-      "block_order": [
-        "feature_VfizrX",
-        "feature_QAYbpG",
-        "feature_LTj7Jr"
-      ],
-      "name": "Dynamic Feature",
-      "settings": {
-        "image": "shopify://shop_images/34629-L405W_bottom.jpg",
-        "heading": "",
-        "dot_size": 20,
-        "dot_size_mobile": 16,
-        "dot_color": "#ffffff",
-        "dot_border_color": "#171717",
-        "dot_border_width": 3,
-        "line_color": "#000000",
-        "line_width": 0.5,
-        "line_breaks": 1,
-        "callout_background": "#e7e7e7",
-        "callout_radius": 8,
-        "callout_max_width": 220,
-        "callout_title_color": "#000000",
-        "callout_text_color": "#666666",
-        "padding_top": 0,
-        "padding_bottom": 0,
-        "divider": false,
-        "full_width": false,
-        "rounded": false
-      }
-    },
     "multicolumn_CEQ6Uh": {
       "type": "multicolumn",
       "blocks": {
@@ -1341,10 +1353,10 @@
     "scrolling_text_4DH9VU",
     "help-drawer",
     "product-details",
+    "dynamic_feature_T4LpAL",
     "faq_tA87L7",
     "multicolumn_KyfUdW",
     "collage_grid_jYjan7",
-    "dynamic_feature_GLrM4a",
     "multicolumn_CEQ6Uh",
     "video_with_text_xf4VTt",
     "ugc_gallery_9emGbm",
