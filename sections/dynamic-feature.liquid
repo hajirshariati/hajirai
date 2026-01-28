@@ -431,21 +431,25 @@ class DynamicFeatureSection {
     }
   }
 
-  setupObserver() {
-    const observer = new IntersectionObserver(
-      entries => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            this.drawLines(true);
-            observer.disconnect();
-          }
-        });
-      },
-      { threshold: 0.4 }
-    );
+setupObserver() {
+  const observer = new IntersectionObserver(
+    entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          this.section.classList.add('is-visible');
+          this.drawLines(true);
+          observer.disconnect(); // run once
+        }
+      });
+    },
+    {
+      threshold: 0.4,
+      rootMargin: '0px 0px -10% 0px'
+    }
+  );
 
-    observer.observe(this.section);
-  }
+  observer.observe(this.section);
+}
 
   drawLines(animate = false) {
     const mediaRect = this.media.getBoundingClientRect();
