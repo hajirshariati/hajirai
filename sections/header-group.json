@@ -559,17 +559,6 @@
     "countdown_condensed_4b8jxE": {
       "type": "countdown-condensed",
       "blocks": {
-        "text_qEJJK9": {
-          "type": "text",
-          "disabled": true,
-          "settings": {
-            "text": "<p>The Healthiest Shoes You'll Ever Wear</p>",
-            "text_font": "heading",
-            "text_alignment": "left",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
         "text_Dq7adz": {
           "type": "text",
           "settings": {
@@ -582,9 +571,9 @@
         }
       },
       "block_order": [
-        "text_qEJJK9",
         "text_Dq7adz"
       ],
+      "disabled": true,
       "name": "t:sections.countdown-timer.name",
       "settings": {
         "color_text": "#0d96af",

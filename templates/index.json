@@ -94,7 +94,7 @@
         "padding_bottom": 0,
         "divider": false,
         "full_width": true,
-        "rounded": true,
+        "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
