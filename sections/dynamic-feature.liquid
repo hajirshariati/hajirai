@@ -1,4 +1,36 @@
 <style>
+  @media (min-width: 769px) {
+  #shopify-section-{{ section.id }} .dynamic-feature__dot {
+    pointer-events: none;
+    cursor: default;
+  }
+}
+
+@media (min-width: 769px) {
+  #shopify-section-{{ section.id }} .dynamic-feature__dot-inner {
+    box-shadow: none;
+    transform: none;
+  }
+}
+
+
+.x-modal,
+.x-modal .overlay {
+  pointer-events: none;
+}
+
+.x-modal:not(.invisible),
+.x-modal:not(.invisible) .overlay {
+  pointer-events: auto;
+}
+
+ 
+
+#shopify-section-{{ section.id }} .drawer__scrollable {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 
 .dynamic-feature__line {
   stroke-dasharray: var(--line-length, 1000);
@@ -6,14 +38,11 @@
   animation: none;
 }
 
-
-
 @media (max-width: 767px) {
   .hotspot__content {
     display: none !important;
   }
 }
-
 
   #shopify-section-{{ section.id }} {
     --section-padding-top: {{ section.settings.padding_top }}px;
@@ -137,9 +166,9 @@
     background: {{ section.settings.callout_background | default: '#ffffff' }};
     padding: 16px 20px;
     border-radius: {{ section.settings.callout_radius | default: 8 }}px;
-    ox-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     max-width: {{ section.settings.callout_max_width | default: 220 }}px;
-    order: 1px solid rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.1);
   }
 
   #shopify-section-{{ section.id }} .dynamic-feature__callout-title {
@@ -185,28 +214,45 @@
   }
 
 /* ===============================
-   MOBILE POPUP FIXES
+   MOBILE POPUP FIXES - Lookbook Style
 ================================ */
 
 #shopify-section-{{ section.id }} .x-modal {
-  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 30;
   pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
 }
 
-#shopify-section-{{ section.id }} .x-modal.is-open {
-  display: block;
-  pointer-events: auto;
+
+#shopify-section-{{ section.id }} .x-modal[open] {
+  pointer-events: auto !important;
+  visibility: visible;
+  opacity: 1;
 }
+
 
 /* Overlay */
 #shopify-section-{{ section.id }} overlay-element {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.25s ease;
+  background: rgba(0, 0, 0, 0.3);
+  transition: opacity 0.25s ease, visibility 0.25s ease;
+  z-index: 5;
 }
 
-#shopify-section-{{ section.id }} .x-modal.is-open overlay-element {
+#shopify-section-{{ section.id }} .x-modal[open] overlay-element {
   pointer-events: auto;
   opacity: 1;
   visibility: visible;
@@ -214,48 +260,57 @@
 
 /* Drawer animation */
 #shopify-section-{{ section.id }} .drawer__inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+  overflow: hidden;
   transform: translateY(100%);
   transition: transform 0.35s ease;
 }
 
-#shopify-section-{{ section.id }} .x-modal.is-open .drawer__inner {
+#shopify-section-{{ section.id }} .x-modal[open] .drawer__inner {
   transform: translateY(0);
 }
 
-/* Force content visible (mobile Safari fix) */
+/* Drawer content visibility */
 #shopify-section-{{ section.id }} .drawer__header,
 #shopify-section-{{ section.id }} .drawer__content {
-  opacity: 1 !important;
-  visibility: visible !important;
+  opacity: 1;
+  visibility: visible;
 }
 
-/* Body scroll lock */
-body.modal-open {
-  position: fixed;
-  width: 100%;
-  overflow: hidden;
+/* Close button */
+#shopify-section-{{ section.id }} .drawer__close-menu {
+  position: absolute;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  top: 16px;
+  right: 16px;
+  cursor: pointer;
+  border: none;
+  padding: 0;
 }
 
+#shopify-section-{{ section.id }} .drawer__close-menu:hover {
+  background-color: #f5f5f5;
+}
 
-  /* Mobile Drawer Styles - Match Cart Drawer */
-  #shopify-section-{{ section.id }} .drawer__close-menu {
-    position: absolute;
-    z-index: 20;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 9999px;
-    background-color: white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    top: 16px;
-    right: 16px;
-  }
-
-  #shopify-section-{{ section.id }} .drawer__close-menu:hover {
-    background-color: #f5f5f5;
-  }
+#shopify-section-{{ section.id }} .drawer__close-menu svg {
+  width: 20px;
+  height: 20px;
+}
 
 </style>
 
@@ -313,10 +368,18 @@ body.modal-open {
                 </div>
               </div>
 
-              <x-modal id="Feature-{{ section.id }}-{{ block.id }}" class="x-modal drawer z-30 fixed bottom-0 left-0 h-full w-full pointer-events-none" role="dialog" aria-modal="true" aria-label="{{ block.settings.heading | escape }}" hidden>
+             <x-modal
+  id="Feature-{{ section.id }}-{{ block.id }}"
+  class="x-modal drawer z-30 fixed bottom-0 left-0 h-full w-full pointer-events-none invisible"
+  role="dialog"
+  aria-modal="true"
+  aria-label="{{ block.settings.heading | escape }}"
+  aria-hidden="true"
+>
+
                 <overlay-element class="overlay fixed-modal invisible opacity-0 fixed bottom-0 left-0 w-full h-screen pointer-events-none" aria-controls="Feature-{{ section.id }}-{{ block.id }}" aria-expanded="false"></overlay-element>
                 <div class="drawer__inner z-10 absolute top-0 flex flex-col w-full h-full overflow-hidden">
-                  <button class="drawer__close-menu absolute z-20 flex items-center justify-center w-10 h-10 rounded-full bg-white shadow-md" type="button" aria-controls="Feature-{{ section.id }}-{{ block.id }}" aria-expanded="false" aria-label="{{ 'general.accessibility.close' | t | escape }}">
+                  <button class="drawer__close-menu" type="button" aria-label="{{ 'general.accessibility.close' | t | escape }}">
                     {%- render 'icon', icon: 'close' -%}
                   </button>
                   <gesture-element class="drawer__header flex justify-between opacity-0 invisible relative">
@@ -355,12 +418,10 @@ class DynamicFeatureSection {
     window.addEventListener('resize', () => this.onResize());
   }
 
-init() {
-  if (this.isMobile) return;
-
-  this.setupObserver();
-}
-
+  init() {
+    if (this.isMobile) return;
+    this.setupObserver();
+  }
 
   onResize() {
     const wasMobile = this.isMobile;
@@ -370,101 +431,89 @@ init() {
     }
   }
 
+  setupObserver() {
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            this.drawLines(true);
+            observer.disconnect();
+          }
+        });
+      },
+      { threshold: 0.4 }
+    );
 
+    observer.observe(this.section);
+  }
 
-setupObserver() {
-  const observer = new IntersectionObserver(
-    entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          this.drawLines(true);
-          observer.disconnect();
-        }
-      });
-    },
-    { threshold: 0.4 }
-  );
+  drawLines(animate = false) {
+    const mediaRect = this.media.getBoundingClientRect();
+    const contents = this.section.querySelectorAll('.dynamic-feature__content');
 
-  observer.observe(this.section);
-}
+    this.lines.forEach((line, index) => {
+      const sx = parseFloat(line.dataset.startX);
+      const sy = parseFloat(line.dataset.startY);
+      const hasBend = parseInt(line.dataset.breaks, 10) === 1;
 
+      const content = contents[index];
+      if (!content) return;
 
+      const box = content.getBoundingClientRect();
+      const GAP_PX = 12;
 
+      const goingRight = box.left > mediaRect.left + (sx / 100) * mediaRect.width;
 
+      const endXPx = goingRight
+        ? box.left - GAP_PX
+        : box.right + GAP_PX;
 
-drawLines(animate = false) {
+      const endX =
+        ((endXPx - mediaRect.left) / mediaRect.width) * 100;
 
-  const mediaRect = this.media.getBoundingClientRect();
-  const contents = this.section.querySelectorAll('.dynamic-feature__content');
+      const endY =
+        ((box.top + box.height / 2 - mediaRect.top) / mediaRect.height) * 100;
 
-  this.lines.forEach((line, index) => {
-    const sx = parseFloat(line.dataset.startX);
-    const sy = parseFloat(line.dataset.startY);
-    const hasBend = parseInt(line.dataset.breaks, 10) === 1;
+      const deltaY = Math.abs(endY - sy);
+      const MIN_BEND_DISTANCE = 3;
 
-    const content = contents[index];
-    if (!content) return;
+      let path;
 
-    const box = content.getBoundingClientRect();
-const GAP_PX = 12;
+      if (!hasBend || deltaY < MIN_BEND_DISTANCE) {
+        path = `M ${sx},${sy} L ${endX},${endY}`;
+      } else {
+        const goingRight = endX > sx;
+        const elbowX = goingRight
+          ? sx + Math.abs(endX - sx) * 0.5
+          : sx - Math.abs(endX - sx) * 0.5;
 
-const goingRight = box.left > mediaRect.left + (sx / 100) * mediaRect.width;
+        const radius = Math.min(4, Math.abs(endX - sx) / 4);
+        const vertDir = endY > sy ? 1 : -1;
 
-const endXPx = goingRight
-  ? box.left - GAP_PX
-  : box.right + GAP_PX;
+        path = `
+          M ${sx},${sy}
+          L ${elbowX - radius * (goingRight ? 1 : -1)},${sy}
+          Q ${elbowX},${sy} ${elbowX},${sy + radius * vertDir}
+          L ${elbowX},${endY - radius * vertDir}
+          Q ${elbowX},${endY} ${elbowX + radius * (goingRight ? 1 : -1)},${endY}
+          L ${endX},${endY}
+        `;
+      }
 
-const endX =
-  ((endXPx - mediaRect.left) / mediaRect.width) * 100;
+      line.setAttribute('d', path);
 
-    const endY =
-      ((box.top + box.height / 2 - mediaRect.top) / mediaRect.height) * 100;
+      const length = line.getTotalLength();
 
-    const deltaY = Math.abs(endY - sy);
-    const MIN_BEND_DISTANCE = 3;
+      line.style.setProperty('--line-length', length);
+      line.style.strokeDasharray = length;
+      line.style.strokeDashoffset = length;
 
-    let path;
-
-    if (!hasBend || deltaY < MIN_BEND_DISTANCE) {
-      // ✅ CLEAN STRAIGHT LINE
-      path = `M ${sx},${sy} L ${endX},${endY}`;
-    } else {
-      const goingRight = endX > sx;
-      const elbowX = goingRight
-        ? sx + Math.abs(endX - sx) * 0.5
-        : sx - Math.abs(endX - sx) * 0.5;
-
-      const radius = Math.min(4, Math.abs(endX - sx) / 4);
-      const vertDir = endY > sy ? 1 : -1;
-
-      path = `
-        M ${sx},${sy}
-        L ${elbowX - radius * (goingRight ? 1 : -1)},${sy}
-        Q ${elbowX},${sy} ${elbowX},${sy + radius * vertDir}
-        L ${elbowX},${endY - radius * vertDir}
-        Q ${elbowX},${endY} ${elbowX + radius * (goingRight ? 1 : -1)},${endY}
-        L ${endX},${endY}
-      `;
-    }
-
-    line.setAttribute('d', path);
-
-const length = line.getTotalLength();
-
-line.style.setProperty('--line-length', length);
-line.style.strokeDasharray = length;
-line.style.strokeDashoffset = length;
-
-if (animate) {
-line.style.animation = `drawLine 2.5s ease-out forwards`; // slower
-
-  line.style.animationDelay = `${index * 0.35}s`;
-}
-
-  });
-}
-
-
+      if (animate) {
+        line.style.animation = `drawLine 2.5s ease-out forwards`;
+        line.style.animationDelay = `${index * 0.35}s`;
+      }
+    });
+  }
 }
 
 function initDynamicFeatures(scope = document) {
@@ -481,74 +530,69 @@ document.addEventListener('shopify:section:load', e => initDynamicFeatures(e.tar
 
 <script>
 (function () {
-  const MOBILE_MAX = 767;
+  function handleModals(scope = document) {
+    // Handle all x-modal elements
+    scope.querySelectorAll('.x-modal').forEach(modal => {
+      // Get overlay and close buttons
+      const overlay = modal.querySelector('overlay-element');
+      const closeButtons = modal.querySelectorAll('.drawer__close-menu, .drawer__close');
 
-  function isMobile() {
-    return window.innerWidth <= MOBILE_MAX;
-  }
+      // Handle overlay click
+      if (overlay) {
+        overlay.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          modal.removeAttribute('open');
+          modal.hidden = true;
+        });
+      }
 
-  function openModal(modal) {
-    if (!modal) return;
+      // Handle close button clicks
+      closeButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+modal.removeAttribute('open');
+modal.classList.add('invisible');
+modal.setAttribute('aria-hidden', 'true');
 
-    modal.hidden = false;
-    modal.removeAttribute('aria-hidden');
-    modal.classList.add('is-open');
 
-    document.body.classList.add('modal-open');
-  }
+        });
+      });
+    });
 
-  function closeModal(modal) {
-    if (!modal) return;
-
-    modal.classList.remove('is-open');
-    modal.setAttribute('aria-hidden', 'true');
-    modal.hidden = true;
-
-    document.body.classList.remove('modal-open');
-  }
-
-  function initMobilePopups(scope = document) {
-    if (!isMobile()) return;
-
-    /* Open */
+    // Handle hotspot clicks to open modals
     scope.querySelectorAll('.dynamic-feature__dot').forEach(dot => {
-      if (dot.dataset.popupBound) return;
-      dot.dataset.popupBound = 'true';
+      if (dot.dataset.handlerBound) return;
+      dot.dataset.handlerBound = 'true';
 
-      dot.addEventListener('click', () => {
+      dot.addEventListener('click', (e) => {
+          if (window.innerWidth > 768) return; // 🚫 desktop
+
+        e.preventDefault();
+        e.stopPropagation();
+        
         const blockId = dot.id.replace('shopify-block-', '');
         const section = dot.closest('[data-section-id]');
         const modal = section.querySelector(
           `#Feature-${section.dataset.sectionId}-${blockId}`
         );
 
-        openModal(modal);
-      });
-    });
+        if (modal) {
+modal.setAttribute('open', '');
+modal.classList.remove('invisible');
+modal.setAttribute('aria-hidden', 'false');
 
-    /* Close */
-    scope.querySelectorAll(
-      'overlay-element, .drawer__close-menu, .drawer__close'
-    ).forEach(el => {
-      if (el.dataset.popupCloseBound) return;
-      el.dataset.popupCloseBound = 'true';
 
-      el.addEventListener('click', () => {
-        closeModal(el.closest('.x-modal'));
+        }
       });
     });
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    initMobilePopups();
-  });
-
-  document.addEventListener('shopify:section:load', e => {
-    initMobilePopups(e.target);
-  });
+  document.addEventListener('DOMContentLoaded', () => handleModals());
+  document.addEventListener('shopify:section:load', e => handleModals(e.target));
 })();
 </script>
-
 
 {% schema %}
 {
