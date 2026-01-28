@@ -1,9 +1,11 @@
 <style>
 
 .dynamic-feature__line {
-  stroke-dasharray: none !important;
-  stroke-dashoffset: 0;
+  stroke-dasharray: var(--line-length, 1000);
+  stroke-dashoffset: var(--line-length, 1000);
+  animation: none;
 }
+
 
 
 @media (max-width: 767px) {
@@ -353,9 +355,12 @@ class DynamicFeatureSection {
     window.addEventListener('resize', () => this.onResize());
   }
 
-  init() {
-    if (!this.isMobile) this.drawLines();
-  }
+init() {
+  if (this.isMobile) return;
+
+  this.setupObserver();
+}
+
 
   onResize() {
     const wasMobile = this.isMobile;
@@ -365,7 +370,30 @@ class DynamicFeatureSection {
     }
   }
 
-drawLines() {
+
+
+setupObserver() {
+  const observer = new IntersectionObserver(
+    entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          this.drawLines(true);
+          observer.disconnect();
+        }
+      });
+    },
+    { threshold: 0.4 }
+  );
+
+  observer.observe(this.section);
+}
+
+
+
+
+
+drawLines(animate = false) {
+
   const mediaRect = this.media.getBoundingClientRect();
   const contents = this.section.querySelectorAll('.dynamic-feature__content');
 
@@ -421,10 +449,17 @@ const endX =
 
     line.setAttribute('d', path);
 
-    const length = line.getTotalLength();
-    line.style.strokeDasharray = length;
-    line.style.strokeDashoffset = length;
-    line.style.animationDelay = `${0.6 + index * 0.2}s`;
+const length = line.getTotalLength();
+
+line.style.setProperty('--line-length', length);
+line.style.strokeDasharray = length;
+line.style.strokeDashoffset = length;
+
+if (animate) {
+  line.style.animation = `drawLine 1.4s ease-out forwards`;
+  line.style.animationDelay = `${index * 0.35}s`;
+}
+
   });
 }
 
