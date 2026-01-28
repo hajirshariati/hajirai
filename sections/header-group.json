@@ -555,10 +555,53 @@
         "promo_overlay_opacity_2": 0,
         "abra_promo_code_2": ""
       }
+    },
+    "countdown_condensed_4b8jxE": {
+      "type": "countdown-condensed",
+      "blocks": {
+        "text_qEJJK9": {
+          "type": "text",
+          "disabled": true,
+          "settings": {
+            "text": "<p>The Healthiest Shoes You'll Ever Wear</p>",
+            "text_font": "heading",
+            "text_alignment": "left",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_Dq7adz": {
+          "type": "text",
+          "settings": {
+            "text": "<p><a href=\"/pages/explore-relief\" title=\"Explore Relief\"><strong>Explore Relief Solutions</strong></a></p>",
+            "text_font": "subtitle",
+            "text_alignment": "right",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_qEJJK9",
+        "text_Dq7adz"
+      ],
+      "name": "t:sections.countdown-timer.name",
+      "settings": {
+        "color_text": "#0d96af",
+        "color_background": "#a8dee8ff",
+        "gradient_background": "linear-gradient(179deg, rgba(255, 255, 255, 1) 32%, rgba(168, 222, 232, 1) 100%)",
+        "color_highlight": "#ffddbf",
+        "gradient_highlight": "",
+        "padding_top": 0,
+        "padding_bottom": 8,
+        "full_width": true,
+        "rounded": false
+      }
     }
   },
   "order": [
     "announcement-bar",
-    "header"
+    "header",
+    "countdown_condensed_4b8jxE"
   ]
 }
