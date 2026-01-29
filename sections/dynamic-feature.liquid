@@ -166,9 +166,9 @@
     background: {{ section.settings.callout_background | default: '#ffffff' }};
     padding: 16px 20px;
     border-radius: {{ section.settings.callout_radius | default: 8 }}px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    ox-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     max-width: {{ section.settings.callout_max_width | default: 220 }}px;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    order: 1px solid rgba(0, 0, 0, 0.1);
   }
 
   #shopify-section-{{ section.id }} .dynamic-feature__callout-title {
@@ -418,11 +418,10 @@ class DynamicFeatureSection {
     window.addEventListener('resize', () => this.onResize());
   }
 
-init() {
-  if (this.isMobile) return;
-  this.hasAnimated = false;
-  this.setupObserver();
-}
+  init() {
+    if (this.isMobile) return;
+    this.setupObserver();
+  }
 
   onResize() {
     const wasMobile = this.isMobile;
@@ -431,29 +430,28 @@ init() {
       this.drawLines();
     }
   }
-setupObserver() {
-  const observer = new IntersectionObserver(
-    entries => {
-      entries.forEach(entry => {
-        if (entry.intersectionRatio >= 0.5 && !this.hasAnimated) {
-          this.hasAnimated = true;
-          this.drawLines(true);
-        }
-      });
-    },
-    { threshold: 0.5 }
-  );
 
-  observer.observe(this.section);
-}
+  setupObserver() {
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            this.drawLines(true);
+            observer.disconnect();
+          }
+        });
+      },
+      { threshold: 0.4 }
+    );
 
-drawLines(animate = false) {
-  if (!animate) return; // Prevent drawing lines without animation
-  
-  const mediaRect = this.media.getBoundingClientRect();
-  const contents = this.section.querySelectorAll('.dynamic-feature__content');
+    observer.observe(this.section);
+  }
 
-  this.lines.forEach((line, index) => {
+  drawLines(animate = false) {
+    const mediaRect = this.media.getBoundingClientRect();
+    const contents = this.section.querySelectorAll('.dynamic-feature__content');
+
+    this.lines.forEach((line, index) => {
       const sx = parseFloat(line.dataset.startX);
       const sy = parseFloat(line.dataset.startY);
       const hasBend = parseInt(line.dataset.breaks, 10) === 1;
@@ -512,7 +510,7 @@ drawLines(animate = false) {
 
       if (animate) {
         line.style.animation = `drawLine 2.5s ease-out forwards`;
-        line.style.animationDelay = `${index * 0.35}s`;
+        line.style.animationDelay = `${index * 1.35}s`;
       }
     });
   }
