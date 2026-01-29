@@ -247,6 +247,22 @@
             "submenu_title_position": "bottom",
             "enable_title_drop_shadow": false
           }
+        },
+        "collection_rdcKtc": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "womens-slippers",
+            "custom_url": "",
+            "title": "Slippers",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
         }
       },
       "block_order": [
@@ -256,7 +272,8 @@
         "collection_nipcdf",
         "collection_kiGRtH",
         "collection_dQdHzw",
-        "collection_Pfncqg"
+        "collection_Pfncqg",
+        "collection_rdcKtc"
       ],
       "name": "t:sections.collection-list.name",
       "settings": {
