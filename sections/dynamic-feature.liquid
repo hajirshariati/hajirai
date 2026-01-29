@@ -9,10 +9,6 @@
     pointer-events: none;
     cursor: default;
   }
-
-  #shopify-section-{{ section.id }} .dynamic-feature__dot-inner {
-    box-shadow: none;
-  }
 }
 
 @media (max-width: 767px) {
@@ -201,8 +197,9 @@
   }
 
   #shopify-section-{{ section.id }} .dynamic-feature__dot-inner {
-    width: {{ section.settings.dot_size_mobile | default: 16 }}px;
-    height: {{ section.settings.dot_size_mobile | default: 16 }}px;
+    width: {{ section.settings.dot_size_mobile | default: 16 }}px !important;
+    height: {{ section.settings.dot_size_mobile | default: 16 }}px !important;
+    transform: scale(1) !important;
   }
 }
 
