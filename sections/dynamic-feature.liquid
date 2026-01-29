@@ -1,10 +1,4 @@
 <style>
-
-.dynamic-feature__dot-inner {
-  background: red !important;
-  border: 2px solid blue !important;
-}
-
 /* ===============================
    DESKTOP / MOBILE BEHAVIOR
 ================================ */
@@ -125,7 +119,7 @@
   border: {{ section.settings.dot_border_width | default: 3 }}px solid {{ section.settings.dot_border_color | default: '#000000' }};
   border-radius: 50%;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  transform: scale(1);
+  transform: scale(0);
   transition: transform 0.3s ease;
   display: flex;
   align-items: center;
