@@ -133,14 +133,147 @@
         "abra_promo_code_hide": ""
       }
     },
-    "empty_space_9eTXx8": {
-      "type": "empty-space",
-      "name": "t:sections.empty-space.name",
+    "collection_list_64mUWx": {
+      "type": "collection-list",
+      "blocks": {
+        "collection_e9A8Fb": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "womens-sandals",
+            "custom_url": "",
+            "title": "Sandals",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_k6CKbq": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "womens-sneakers",
+            "custom_url": "",
+            "title": "Sneakers",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_WXFwfw": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "womens-wedges-heels",
+            "custom_url": "",
+            "title": "Wedges & Heels",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_nipcdf": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "womens-platform-sandals",
+            "custom_url": "",
+            "title": "Platforms",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_kiGRtH": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "loafers-oxfords",
+            "custom_url": "",
+            "title": "Loafers & Oxfords",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_dQdHzw": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "womens-boots",
+            "custom_url": "",
+            "title": "Boots",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        }
+      },
+      "block_order": [
+        "collection_e9A8Fb",
+        "collection_k6CKbq",
+        "collection_WXFwfw",
+        "collection_nipcdf",
+        "collection_kiGRtH",
+        "collection_dQdHzw"
+      ],
+      "name": "t:sections.collection-list.name",
       "settings": {
-        "desktop_height": 20,
-        "mobile_height": 20,
+        "columns": 5,
+        "carousel_on_desktop": false,
+        "image_type": "collection",
+        "image_ratio": "square",
+        "show_products_count": false,
+        "show_view_all": true,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "Collections",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
         "color_background": "",
-        "gradient_background": ""
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "multicolumn_with_icons_C37PFY": {
@@ -1241,7 +1374,7 @@
   "order": [
     "main-page",
     "video_with_text_overlay_TgKph8",
-    "empty_space_9eTXx8",
+    "collection_list_64mUWx",
     "multicolumn_with_icons_C37PFY",
     "featured_collections_9d3ge7",
     "collection_list_mPHCpz",
