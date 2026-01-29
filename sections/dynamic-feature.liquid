@@ -105,14 +105,9 @@
   position: absolute;
   transform: translate(-50%, -50%);
   z-index: 20;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
 }
 
-/* Reveal dots only when visible */
-#shopify-section-{{ section.id }} .dynamic-feature.is-visible
-.dynamic-feature__dot {
+#shopify-section-{{ section.id }} .dynamic-feature__dot {
   opacity: 1;
   visibility: visible;
 }
