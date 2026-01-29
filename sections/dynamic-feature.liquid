@@ -170,15 +170,11 @@
   font-weight: 700;
   font-size: 14px;
   margin-bottom: 8px;
-  color: var(--callout-title-color);
-
 }
 
 #shopify-section-{{ section.id }} .dynamic-feature__callout-text {
   font-size: 12px;
   line-height: 1.4;
-  color: var(--callout-text-color);
-
 }
 
 /* ===============================
@@ -304,7 +300,10 @@
                 <div class="dynamic-feature__dot-inner"></div>
               </div>
 
-              <div class="dynamic-feature__content{% if block.settings.text_horizontal < 20 %} with-left{% elsif block.settings.text_horizontal > 80 %} with-right{% endif %}{% if block.settings.text_vertical > 70 %} with-bottom{% endif %}" style="left: {{ block.settings.text_horizontal }}%; top: {{ block.settings.text_vertical }}%; animation-delay: {{ forloop.index0 | times: 0.1 | plus: 1.8 }}s;">
+              <div  style="
+    --callout-title-color: {{ block.settings.title_color }};
+    --callout-text-color: {{ block.settings.text_color }};
+  " class="dynamic-feature__content{% if block.settings.text_horizontal < 20 %} with-left{% elsif block.settings.text_horizontal > 80 %} with-right{% endif %}{% if block.settings.text_vertical > 70 %} with-bottom{% endif %}" style="left: {{ block.settings.text_horizontal }}%; top: {{ block.settings.text_vertical }}%; animation-delay: {{ forloop.index0 | times: 0.1 | plus: 1.8 }}s;">
                 <div class="dynamic-feature__callout">
                   {%- if block.settings.heading != blank -%}
                     <p class="dynamic-feature__callout-title">{{ block.settings.heading }}</p>
