@@ -231,6 +231,22 @@
             "submenu_title_position": "bottom",
             "enable_title_drop_shadow": false
           }
+        },
+        "collection_Pfncqg": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "womens-clogs",
+            "custom_url": "",
+            "title": "Clogs",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
         }
       },
       "block_order": [
@@ -239,7 +255,8 @@
         "collection_WXFwfw",
         "collection_nipcdf",
         "collection_kiGRtH",
-        "collection_dQdHzw"
+        "collection_dQdHzw",
+        "collection_Pfncqg"
       ],
       "name": "t:sections.collection-list.name",
       "settings": {
