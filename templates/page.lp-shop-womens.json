@@ -30,7 +30,7 @@
         "heading_64L34p": {
           "type": "heading",
           "settings": {
-            "heading": "<h5>Goodbye Foot Pain. Hello Relief. </h5>",
+            "heading": "<p>Spring into Motion</p>",
             "heading_size": "title-sm",
             "heading_tag": "h2",
             "highlighted_text": "none",
@@ -52,33 +52,28 @@
             "highlighted_scribble": "circle"
           }
         },
-        "spacing_f6U9b4": {
-          "type": "spacing",
+        "button_AGih6p": {
+          "type": "button",
           "settings": {
-            "height": 120,
-            "height_mobile": 28
+            "button_label": "Shop Footwear",
+            "button_link": "shopify://collections/shop-all-orthotics",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "sm",
+            "button_external": false,
+            "button_icon": false
           }
         },
-        "spacing_m49QdA": {
-          "type": "spacing",
+        "button_AgkNnK": {
+          "type": "button",
           "settings": {
-            "height": 120,
-            "height_mobile": 28
-          }
-        },
-        "text_H4rWEH": {
-          "type": "text",
-          "settings": {
-            "text": "<p>• OVER 30 MILLION PAIRS SOLD • </p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
+            "button_label": "Shop Orthotics",
+            "button_link": "shopify://collections/shop-all-orthotics",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
           }
         },
         "button_PwAQDY": {
@@ -92,28 +87,14 @@
             "button_external": false,
             "button_icon": false
           }
-        },
-        "button_AGih6p": {
-          "type": "button",
-          "settings": {
-            "button_label": "Shop All",
-            "button_link": "shopify://collections/shop-all-orthotics",
-            "button_video_link": "",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": false
-          }
         }
       },
       "block_order": [
         "heading_64L34p",
         "text_EGcVH3",
-        "spacing_f6U9b4",
-        "spacing_m49QdA",
-        "text_H4rWEH",
-        "button_PwAQDY",
-        "button_AGih6p"
+        "button_AGih6p",
+        "button_AgkNnK",
+        "button_PwAQDY"
       ],
       "custom_css": [
         ".banner__box--medium {height: inherit;}"
@@ -127,9 +108,9 @@
         "enable_video_autoplay": true,
         "enable_video_looping": true,
         "image_height": "650px",
-        "content_width": "small",
+        "content_width": "large",
         "content_position": "md:items-center md:justify-center",
-        "text_alignment": "center",
+        "text_alignment": "left",
         "video_url_mobile": "",
         "image_height_mobile": "auto",
         "content_position_mobile": "items-center justify-center",
@@ -147,7 +128,9 @@
         "padding_bottom": 0,
         "divider": false,
         "full_width": true,
-        "rounded": true
+        "rounded": true,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "empty_space_9eTXx8": {
@@ -251,7 +234,9 @@
         "padding_bottom": 12,
         "divider": false,
         "full_width": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "multicolumn_GC6LFG": {
@@ -267,6 +252,7 @@
             "heading": "New to Aetrex Orthotics?",
             "heading_size": "text-lg-2xl",
             "text": "<p>Let us guide you to the perfect pair for your unique feet. Start with our quiz or explore by your pain type.</p>",
+            "custom_html": "",
             "button_label": "Take Our Quiz",
             "button_link": "https://irle3andv1z.typeform.com/to/gujvKvEg?typeform-source=f031fc-3.myshopify.com",
             "button_style": "primary",
@@ -286,6 +272,7 @@
             "heading": "Returning Customer?",
             "heading_size": "text-lg-2xl",
             "text": "<p>Welcome back. Reorder your favorite pair or use our tool to quickly identify your previous orthotic</p>",
+            "custom_html": "",
             "button_label": "Find My Orthotic",
             "button_link": "https://irle3andv1z.typeform.com/to/ojyWbTvZ?typeform-source=www.aetrex.com",
             "button_style": "primary",
@@ -332,9 +319,11 @@
         "color_button_gradient": "",
         "padding_top": 52,
         "padding_bottom": 24,
-        "divider": false,
         "full_width": false,
-        "rounded": false
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "featured_collections_9d3ge7": {
@@ -425,7 +414,9 @@
         "padding_bottom": 72,
         "divider": false,
         "full_width": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "collection_list_mPHCpz": {
@@ -590,7 +581,9 @@
         "padding_bottom": 0,
         "divider": false,
         "full_width": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "collage_ntqjfh": {
@@ -722,7 +715,9 @@
         "divider": false,
         "full_width": false,
         "rounded": false,
-        "enable_parallax": false
+        "enable_parallax": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "image_with_text_overlay_M6AhUn": {
@@ -797,7 +792,9 @@
         "full_width": true,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "image_comparison_i6BATK": {
@@ -857,7 +854,9 @@
         "padding_bottom": 72,
         "divider": false,
         "full_width": false,
-        "rounded": true
+        "rounded": true,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "testimonials_banner_P8DMGU": {
@@ -955,6 +954,8 @@
         "divider": false,
         "rounded": false,
         "enable_parallax": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": "",
         "parallax_direction": "vertical"
       }
     },
@@ -972,6 +973,7 @@
             "heading": "",
             "heading_size": "text-lg-2xl",
             "text": "<p><strong>Premium Memory Foam Orthotics </strong>are Clinically Proven to: </p><ul><li>Decrease foot pain by 39.5%</li><li>Decrease back pain by 27.4%</li><li>Increase foot function by 34.6%</li></ul>",
+            "custom_html": "",
             "button_label": "Read the Study",
             "button_link": "shopify://pages/case-premmem",
             "button_style": "primary",
@@ -992,6 +994,7 @@
             "heading": "",
             "heading_size": "text-lg-2xl",
             "text": "<p><strong>Compete Orthotics & Orthotic Flips</strong> are Clinically Proven to: </p><ul><li>Decrease Plantar Fasciitis pain by 52.6%</li><li>Decrease back pain by 41.9%</li><li>Increase foot function by 37%</li></ul>",
+            "custom_html": "",
             "button_label": "Read the Study",
             "button_link": "shopify://pages/casestudy-pfkit",
             "button_style": "primary",
@@ -1012,6 +1015,7 @@
             "heading": "",
             "heading_size": "text-lg-2xl",
             "text": "<p><strong>Speed Orthotics</strong> are Clinically Proven to: </p><ul><li>Increase comfort while running by 1.27 pts</li><li>Increase speed by 0.35 mph</li><li>Decrease chance of injury by 2.2x</li></ul>",
+            "custom_html": "",
             "button_label": "Read the Study",
             "button_link": "shopify://pages/casestudy-speed",
             "button_style": "primary",
@@ -1059,9 +1063,11 @@
         "color_button_gradient": "",
         "padding_top": 72,
         "padding_bottom": 72,
-        "divider": false,
         "full_width": false,
-        "rounded": false
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "faq_XM3i3D": {
@@ -1189,7 +1195,9 @@
         "padding_bottom": 52,
         "divider": false,
         "narrow": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "blog_posts_PJxFGa": {
