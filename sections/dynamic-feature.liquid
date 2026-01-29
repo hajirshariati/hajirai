@@ -111,9 +111,7 @@
   border: {{ section.settings.dot_border_width | default: 3 }}px solid {{ section.settings.dot_border_color | default: '#000000' }};
   border-radius: 50%;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-
   transform: scale(0);
-  animation: scaleInDot 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;  /* ✅ Always animate */
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
@@ -330,19 +328,20 @@
 
 
 /* ===============================
-   FINAL DOT VISIBILITY OVERRIDE
-   (must be LAST in file)
+   FINAL DOT SAFETY OVERRIDE
 ================================ */
 
 #shopify-section-{{ section.id }} .dynamic-feature__dot {
   z-index: 50;
 }
 
-#shopify-section-{{ section.id }} .dynamic-feature__dot-inner {
-  opacity: 1 !important;
-  transform: scale(1) !important;
-  animation: none !important;
+/* Only force visibility AFTER section is visible */
+#shopify-section-{{ section.id }} .dynamic-feature.is-visible
+.dynamic-feature__dot-inner {
+  opacity: 1;
+  transform: scale(1);
 }
+
 
 </style>
 
