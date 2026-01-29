@@ -1,14 +1,5 @@
 <style>
-.dynamic-feature__dot {
-  outline: 2px solid red; /* Shows where dots are positioned */
-}
 
-.dynamic-feature__dot-inner {
-  transform: scale(1) !important;
-  background: red !important;
-  width: 30px !important;
-  height: 30px !important;
-}
 /* ===============================
    DESKTOP / MOBILE BEHAVIOR
 ================================ */
@@ -137,8 +128,8 @@
 }
 
 /* Animate dots in */
-.dynamic-feature.is-visible .dynamic-feature__dot-inner {
-  transform: scale(1);
+#shopify-section-{{ section.id }} .dynamic-feature.is-visible .dynamic-feature__dot-inner {
+  transform: scale(1) !important;
 }
 
 /* Hover only when visible & desktop */
@@ -152,7 +143,7 @@
 
 /* Stagger dot animation */
 {%- for block in section.blocks -%}
-#shopify-block-{{ block.id }} .dynamic-feature__dot-inner {
+#shopify-section-{{ section.id }} #shopify-block-{{ block.id }} .dynamic-feature__dot-inner {
   transition-delay: {{ forloop.index0 | times: 0.1 }}s;
 }
 {%- endfor -%}
