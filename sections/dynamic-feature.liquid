@@ -447,11 +447,13 @@ class DynamicFeatureSection {
     observer.observe(this.section);
   }
 
-  drawLines(animate = false) {
-    const mediaRect = this.media.getBoundingClientRect();
-    const contents = this.section.querySelectorAll('.dynamic-feature__content');
+drawLines(animate = false) {
+  if (!animate) return; // Prevent drawing lines without animation
+  
+  const mediaRect = this.media.getBoundingClientRect();
+  const contents = this.section.querySelectorAll('.dynamic-feature__content');
 
-    this.lines.forEach((line, index) => {
+  this.lines.forEach((line, index) => {
       const sx = parseFloat(line.dataset.startX);
       const sy = parseFloat(line.dataset.startY);
       const hasBend = parseInt(line.dataset.breaks, 10) === 1;
