@@ -1,4 +1,26 @@
 <style>
+/* ===============================
+   FORCE DOT VISIBILITY
+================================ */
+
+/* Ensure dots are always on top */
+#shopify-section-{{ section.id }} .dynamic-feature__dot {
+  z-index: 25;
+}
+
+/* Make sure SVG lines stay behind dots */
+#shopify-section-{{ section.id }} .dynamic-feature__lines {
+  z-index: 5;
+}
+
+/* Ensure dots are visible even if animation fails */
+#shopify-section-{{ section.id }} .dynamic-feature__dot-inner {
+  opacity: 1;
+  transform: scale(1);
+}
+
+
+
   @media (min-width: 769px) {
   #shopify-section-{{ section.id }} .dynamic-feature__dot {
     pointer-events: none;
