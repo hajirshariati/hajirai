@@ -418,10 +418,11 @@ class DynamicFeatureSection {
     window.addEventListener('resize', () => this.onResize());
   }
 
-  init() {
-    if (this.isMobile) return;
-    this.setupObserver();
-  }
+init() {
+  if (this.isMobile) return;
+  this.hasAnimated = false;
+  this.setupObserver();
+}
 
   onResize() {
     const wasMobile = this.isMobile;
@@ -430,22 +431,22 @@ class DynamicFeatureSection {
       this.drawLines();
     }
   }
+setupObserver() {
+  const observer = new IntersectionObserver(
+    entries => {
+      entries.forEach(entry => {
+        if (entry.intersectionRatio >= 0.5 && !this.hasAnimated) {
+          this.hasAnimated = true;
+          this.drawLines(true);
+          observer.disconnect();
+        }
+      });
+    },
+    { threshold: 0.5 }
+  );
 
-  setupObserver() {
-    const observer = new IntersectionObserver(
-      entries => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            this.drawLines(true);
-            observer.disconnect();
-          }
-        });
-      },
-      { threshold: 0.4 }
-    );
-
-    observer.observe(this.section);
-  }
+  observer.observe(this.section);
+}
 
 drawLines(animate = false) {
   if (!animate) return; // Prevent drawing lines without animation
