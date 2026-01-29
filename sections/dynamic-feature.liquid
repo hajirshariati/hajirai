@@ -31,12 +31,7 @@
   -webkit-overflow-scrolling: touch;
 }
 
-
-.dynamic-feature__line {
-  stroke-dasharray: var(--line-length, 1000);
-  stroke-dashoffset: var(--line-length, 1000);
-  animation: none;
-}
+ 
 
 @media (max-width: 767px) {
   .hotspot__content {
@@ -86,16 +81,17 @@
     to { opacity: 1; }
   }
 
-  #shopify-section-{{ section.id }} .dynamic-feature__line {
-    stroke: {{ section.settings.line_color | default: '#000000' }};
-    stroke-width: {{ section.settings.line_width | default: 2 }};
-    fill: none;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    stroke-dasharray: 1000;
-    stroke-dashoffset: 1000;
-    animation: drawLine 1.2s ease-out 0.6s forwards;
-  }
+.dynamic-feature__line {
+  stroke: {{ section.settings.line_color | default: '#000000' }};
+  stroke-width: {{ section.settings.line_width | default: 2 }};
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: var(--line-length, 1000);
+  stroke-dashoffset: var(--line-length, 1000);
+  animation: none;
+}
+
 
   @keyframes drawLine {
     to { stroke-dashoffset: 0; }
@@ -108,19 +104,22 @@
     z-index: 10;
   }
 
-  #shopify-section-{{ section.id }} .dynamic-feature__dot-inner {
-    width: {{ section.settings.dot_size | default: 20 }}px;
-    height: {{ section.settings.dot_size | default: 20 }}px;
-    background: {{ section.settings.dot_color | default: '#ffffff' }};
-    border: {{ section.settings.dot_border_width | default: 3 }}px solid {{ section.settings.dot_border_color | default: '#000000' }};
-    border-radius: 50%;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    animation: scaleInDot 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+.dynamic-feature__dot-inner {
+  width: {{ section.settings.dot_size | default: 20 }}px;
+  height: {{ section.settings.dot_size | default: 20 }}px;
+  background: {{ section.settings.dot_color | default: '#ffffff' }};
+  border: {{ section.settings.dot_border_width | default: 3 }}px solid {{ section.settings.dot_border_color | default: '#000000' }};
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  transform: scale(0);
+  animation: none;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 
   @keyframes scaleInDot {
     from {
@@ -144,12 +143,13 @@
     }
   {%- endfor -%}
 
-  #shopify-section-{{ section.id }} .dynamic-feature__content {
-    position: absolute;
-    pointer-events: auto;
-    opacity: 0;
-    animation: fadeInContent 0.8s ease-out 1.8s forwards;
-  }
+#shopify-section-{{ section.id }} .dynamic-feature__content {
+  position: absolute;
+  pointer-events: auto;
+  opacity: 0;
+  transform: translateY(10px);
+  animation: none;
+}
 
   @keyframes fadeInContent {
     from {
@@ -312,6 +312,22 @@
   height: 20px;
 }
 
+
+
+.dynamic-feature.is-visible .dynamic-feature__line {
+  animation: drawLine 2.5s ease-out forwards;
+}
+
+.dynamic-feature.is-visible .dynamic-feature__dot-inner {
+  animation: scaleInDot 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+
+.dynamic-feature.is-visible .dynamic-feature__content {
+  animation: fadeInContent 0.8s ease-out forwards;
+  animation-delay: inherit;
+}
+
+
 </style>
 
 <div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}" data-section-id="{{ section.id }}">
@@ -435,10 +451,15 @@ class DynamicFeatureSection {
     const observer = new IntersectionObserver(
       entries => {
         entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            this.drawLines(true);
-            observer.disconnect();
-          }
+if (entry.isIntersecting) {
+  this.section
+    .querySelector('.dynamic-feature')
+    .classList.add('is-visible');
+
+  this.drawLines(true);
+  observer.disconnect();
+}
+
         });
       },
       { threshold: 0.4 }
