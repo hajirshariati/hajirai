@@ -451,20 +451,17 @@ class DynamicFeatureSection {
     }
   }
 
-setupObserver() {
-  const observer = new IntersectionObserver(
-    entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          this.section.querySelector('.dynamic-feature').classList.add('is-visible');  // ✅ Add this!
-          this.drawLines(true);
-          observer.disconnect();
-        }
-      });
-    },
-    { threshold: 0.4 }
-  );
-  observer.observe(this.section);
+  setupObserver() {
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+if (entry.isIntersecting) {
+  this.section
+    .querySelector('.dynamic-feature')
+    .classList.add('is-visible');
+
+  this.drawLines(true);
+  observer.disconnect();
 }
 
         });
