@@ -366,8 +366,12 @@ class DynamicFeatureSection {
     window.addEventListener('resize', () => this.onResize());
   }
 
-  init() {
-    if (this.isMobile) return;
+init() {
+    if (this.isMobile) {
+      // On mobile, add is-visible immediately since we don't need line animations
+      this.section.querySelector('.dynamic-feature').classList.add('is-visible');
+      return;
+    }
     this.setupObserver();
   }
 
