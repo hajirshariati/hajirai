@@ -124,8 +124,9 @@
 }
 
 /* Animate dots in */
-#shopify-section-{{ section.id }} .dynamic-feature.is-visible .dynamic-feature__dot-inner {
+.dynamic-feature.is-visible .dynamic-feature__dot-inner {
   transform: scale(1) !important;
+  transition: transform 0.3s ease !important;
 }
 
 /* Hover only when visible & desktop */
