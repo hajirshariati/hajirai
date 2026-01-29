@@ -79,7 +79,7 @@
         "button_PwAQDY": {
           "type": "button",
           "settings": {
-            "button_label": "Find Your Perfect Pair",
+            "button_label": "Take Quiz",
             "button_link": "https://irle3andv1z.typeform.com/to/gujvKvEg?typeform-source=f031fc-3.myshopify.com",
             "button_video_link": "",
             "button_style": "primary",
@@ -234,93 +234,6 @@
         "padding_bottom": 12,
         "divider": false,
         "full_width": true,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "multicolumn_GC6LFG": {
-      "type": "multicolumn",
-      "blocks": {
-        "column_WGPbTD": {
-          "type": "column",
-          "settings": {
-            "show_border": true,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image_ratio": "adapt",
-            "heading": "New to Aetrex Orthotics?",
-            "heading_size": "text-lg-2xl",
-            "text": "<p>Let us guide you to the perfect pair for your unique feet. Start with our quiz or explore by your pain type.</p>",
-            "custom_html": "",
-            "button_label": "Take Our Quiz",
-            "button_link": "https://irle3andv1z.typeform.com/to/gujvKvEg?typeform-source=f031fc-3.myshopify.com",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_KdBDtQ": {
-          "type": "column",
-          "settings": {
-            "show_border": true,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image_ratio": "adapt",
-            "heading": "Returning Customer?",
-            "heading_size": "text-lg-2xl",
-            "text": "<p>Welcome back. Reorder your favorite pair or use our tool to quickly identify your previous orthotic</p>",
-            "custom_html": "",
-            "button_label": "Find My Orthotic",
-            "button_link": "https://irle3andv1z.typeform.com/to/ojyWbTvZ?typeform-source=www.aetrex.com",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "column_WGPbTD",
-        "column_KdBDtQ"
-      ],
-      "custom_css": [
-        ".multicolumn-card {background: #c7dadd !important;}"
-      ],
-      "name": "t:sections.multicolumn.name",
-      "settings": {
-        "gap": "large",
-        "columns": 2,
-        "columns_mobile": "1",
-        "carousel_on_desktop": false,
-        "swipe_on_mobile": false,
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "rgba(0,0,0,0)",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 52,
-        "padding_bottom": 24,
-        "full_width": false,
-        "divider": false,
         "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
@@ -1330,7 +1243,6 @@
     "video_with_text_overlay_TgKph8",
     "empty_space_9eTXx8",
     "multicolumn_with_icons_C37PFY",
-    "multicolumn_GC6LFG",
     "featured_collections_9d3ge7",
     "collection_list_mPHCpz",
     "collage_ntqjfh",
