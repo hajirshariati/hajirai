@@ -438,7 +438,6 @@ setupObserver() {
         if (entry.intersectionRatio >= 0.5 && !this.hasAnimated) {
           this.hasAnimated = true;
           this.drawLines(true);
-          observer.disconnect();
         }
       });
     },
