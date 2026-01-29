@@ -45,7 +45,7 @@
 
   #shopify-section-{{ section.id }} .dynamic-feature {
     position: relative;
-    overflow: hidden;
+    overflow: visible;
   }
 
   #shopify-section-{{ section.id }} .dynamic-feature__wrapper {
@@ -148,7 +148,9 @@
   opacity: 0;
   transform: translateY(10px);
   animation: none;
+  will-change: opacity, transform;
 }
+
 
   @keyframes fadeInContent {
     from {
