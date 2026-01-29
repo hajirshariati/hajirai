@@ -366,12 +366,18 @@ class DynamicFeatureSection {
     window.addEventListener('resize', () => this.onResize());
   }
 
-init() {
+  init() {
+    const dynamicFeature = this.section.querySelector('.dynamic-feature');
+    
     if (this.isMobile) {
-      // On mobile, add is-visible immediately since we don't need line animations
-      this.section.querySelector('.dynamic-feature').classList.add('is-visible');
+      // On mobile, add is-visible immediately
+      console.log('Mobile: Adding is-visible class immediately');
+      dynamicFeature.classList.add('is-visible');
       return;
     }
+    
+    // On desktop, wait for scroll into view
+    console.log('Desktop: Setting up observer');
     this.setupObserver();
   }
 
@@ -387,15 +393,15 @@ init() {
     const observer = new IntersectionObserver(
       entries => {
         entries.forEach(entry => {
-if (entry.isIntersecting) {
-  this.section
-    .querySelector('.dynamic-feature')
-    .classList.add('is-visible');
+          if (entry.isIntersecting) {
+            console.log('Desktop: Section visible, adding is-visible class');
+            this.section
+              .querySelector('.dynamic-feature')
+              .classList.add('is-visible');
 
-  this.drawLines(true);
-  observer.disconnect();
-}
-
+            this.drawLines(true);
+            observer.disconnect();
+          }
         });
       },
       { threshold: 0.4 }
@@ -481,8 +487,14 @@ function initDynamicFeatures(scope = document) {
   });
 }
 
-document.addEventListener('DOMContentLoaded', () => initDynamicFeatures());
-document.addEventListener('shopify:section:load', e => initDynamicFeatures(e.target));
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('DOM loaded, initializing features');
+  initDynamicFeatures();
+});
+document.addEventListener('shopify:section:load', e => {
+  console.log('Section loaded, initializing features');
+  initDynamicFeatures(e.target);
+});
 </script>
 
 <script>
