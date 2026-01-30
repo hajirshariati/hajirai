@@ -732,7 +732,7 @@
       "settings": {
         "liquid": "{%render 'fr-testimonials'%}",
         "color_text": "",
-        "color_background": "",
+        "color_background": "#fafafa",
         "gradient_background": "",
         "color_button_text": "",
         "color_button_background": "",
