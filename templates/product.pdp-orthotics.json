@@ -167,6 +167,8 @@
             "ProductPage": true,
             "size_recommendation_font_family": "OpenSans, sans-serif",
             "size_recommendation_vertical_spacing": 5,
+            "expansion_panel_background": "#d06263",
+            "expansion_panel_foreground": "#ffffff",
             "tab_background": "#f2f2f2",
             "tab_foreground": "#5c6271",
             "active_tab_background": "#5c6271",
@@ -718,10 +720,30 @@
         "color_button_background": "",
         "color_button_gradient": "",
         "padding_top": 28,
-        "padding_bottom": 36,
+        "padding_bottom": 0,
         "full_width": false,
         "divider": false,
         "rounded": true,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "custom_liquid_eQeYMN": {
+      "type": "custom-liquid",
+      "name": "t:sections.custom-liquid.name",
+      "settings": {
+        "liquid": "{%render 'fr-testimonials'%}",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 72,
+        "divider": false,
+        "narrow": false,
+        "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
@@ -927,6 +949,7 @@
     "product-details",
     "multicolumn_KyfUdW",
     "multicolumn_CEQ6Uh",
+    "custom_liquid_eQeYMN",
     "video_with_text_xf4VTt",
     "ugc_gallery_9emGbm",
     "17477533508981334f",
