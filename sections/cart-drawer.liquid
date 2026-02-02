@@ -1,4 +1,6 @@
 {%- if request.page_type != 'cart' and settings.cart_type == 'drawer' -%}
+  {{ 'cart-savings.css' | asset_url | stylesheet_tag }}
+  {{ 'cart-drawer-mobile.css' | asset_url | stylesheet_tag }}
   <script src="{{ 'cart.js' | asset_url }}" defer></script>
   {%- if linklists.gift-wrapping.links != blank and linklists.gift-wrapping.links.first.type == 'product_link' -%}
     <script src="{{ 'gift-wrapping.js' | asset_url }}" defer="defer"></script>
@@ -90,7 +92,7 @@
                 </div>
               </div>
             {%- endif -%}
-            <div class="drawer__scrollable relative flex flex-col gap-9 grow shrink{% if cart == empty %} hidden{% endif %}">
+            <div class="drawer__scrollable relative flex flex-col gap-5 grow shrink{% if cart == empty %} hidden{% endif %}">
               {%- liquid
                 if section.settings.show_free_shipping_bar and section.settings.free_shipping_minimum_amount != blank
                   assign minimum_amounts = section.settings.free_shipping_minimum_amount | remove: ' '
@@ -682,7 +684,7 @@
                   {%- endif -%}
                 </div>
               {%- endif -%}
-              <div class="drawer__footer-bottom grid gap-6">
+              <div class="drawer__footer-bottom drawer__footer-bottom--sticky grid gap-2">
                 <div class="grid gap-4 sm:grid-6">
                   {%- if cart.cart_level_discount_applications.size > 0 -%}
                     <ul class="discounts grid gap-2" role="list" aria-label="{{ 'customer.order.discounts' | t | escape }}">
@@ -719,6 +721,40 @@
                     </div>
                   </div>
                 </div>
+                
+                {%- liquid
+                  assign total_savings = 0
+                  assign cart_discount_total = 0
+                  
+                  for discount in cart.cart_level_discount_applications
+                    assign cart_discount_total = cart_discount_total | plus: discount.total_allocated_amount
+                  endfor
+                  
+                  for item in cart.items
+                    if item.original_price > item.final_price
+                      assign item_discount = item.original_price | minus: item.final_price
+                      assign item_discount_total = item_discount | times: item.quantity
+                      assign total_savings = total_savings | plus: item_discount_total
+                    endif
+                    
+                    if item.product.compare_at_price > item.final_price
+                      assign compare_savings = item.product.compare_at_price | minus: item.final_price
+                      assign compare_savings_total = compare_savings | times: item.quantity
+                      assign total_savings = total_savings | plus: compare_savings_total
+                    endif
+                  endfor
+                  
+                  assign total_savings = total_savings | plus: cart_discount_total
+                -%}
+                
+                {%- if total_savings > 0 -%}
+                  <div class="cart-savings">
+                    <p>
+                      <span>You save </span>
+                      <span data-cart-savings>{{ total_savings | money_with_currency }}</span>
+                    </p>
+                  </div>
+                {%- endif -%}
   
                 {%- if section.settings.show_checkout_button or section.settings.show_view_cart_button -%}
                   <form action="{{ routes.cart_url }}" method="POST" novalidate class="drawer__footer-buttons grid grid-cols-12 gap-4">
