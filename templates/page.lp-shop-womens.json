@@ -789,6 +789,47 @@
         "abra_promo_code_hide": ""
       }
     },
+    "dynamic_feature_8mHNEE": {
+      "type": "dynamic-feature",
+      "blocks": {
+        "feature_kYjpfr": {
+          "type": "feature",
+          "settings": {
+            "heading": "Feature 1",
+            "text": "Description",
+            "horizontal": 25,
+            "vertical": 30,
+            "text_horizontal": 10,
+            "text_vertical": 20
+          }
+        }
+      },
+      "block_order": [
+        "feature_kYjpfr"
+      ],
+      "name": "Dynamic Feature",
+      "settings": {
+        "heading": " Inside Select Aetrex Shoes",
+        "dot_size": 20,
+        "dot_size_mobile": 16,
+        "dot_color": "#ffffff",
+        "dot_border_color": "#000000",
+        "dot_border_width": 3,
+        "line_color": "#000000",
+        "line_width": 0.5,
+        "line_breaks": 1,
+        "callout_background": "#ffffff",
+        "callout_radius": 8,
+        "callout_max_width": 220,
+        "callout_title_color": "#000000",
+        "callout_text_color": "#666666",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
     "image_with_text_overlay_M6AhUn": {
       "type": "image-with-text-overlay",
       "blocks": {
@@ -835,6 +876,7 @@
         "text_CVjrUt",
         "button_mgbN3C"
       ],
+      "disabled": true,
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
@@ -866,413 +908,10 @@
         "abra_promo_code_hide": ""
       }
     },
-    "image_comparison_i6BATK": {
-      "type": "image-comparison",
-      "blocks": {
-        "image_ezxGf9": {
-          "type": "image",
-          "settings": {
-            "image": "shopify://shop_images/1256x804_Pressure_monitor_With.jpg",
-            "subheading": "With Aetrex",
-            "heading": "",
-            "content_position": "end",
-            "color_text": "#2c2c2c"
-          }
-        },
-        "image_AE8JMC": {
-          "type": "image",
-          "settings": {
-            "image": "shopify://shop_images/1256x804_Pressure_monitor_Without.png",
-            "subheading": "Without Aetrex",
-            "heading": "",
-            "content_position": "end",
-            "color_text": "#2c2c2c"
-          }
-        }
-      },
-      "block_order": [
-        "image_ezxGf9",
-        "image_AE8JMC"
-      ],
-      "name": "Image comparison",
-      "settings": {
-        "layout": "horizontal",
-        "image_height": "adapt",
-        "image_height_mobile": "auto",
-        "heading": "<strong>Proof is in the Results</strong>",
-        "heading_size": "title-sm",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "<p>When comparing a foot scan before wearing Aetrex Orthotics and a foot scan while wearing Aetrex Orthotics, you can clearly see the difference.</p>",
-        "button_label": "Find a Scanner Near You",
-        "button_link": "shopify://pages/store-locator",
-        "button_external": false,
-        "button_icon": false,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": true,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "testimonials_banner_P8DMGU": {
-      "type": "testimonials-banner",
-      "blocks": {
-        "testimonial_CRjWCe": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "none",
-            "text": "<p>Best Orthotics I've found and I've tried them all!</p>",
-            "author": "Sandra M.",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "testimonial_RnLxLb": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "none",
-            "text": "<p>I love these orthotics! They are more comfortable and supportive than the custom orthotics made by a pediatrist.</p>",
-            "author": "Ellen H.",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "testimonial_GUBLhy": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "none",
-            "text": "<p>These orthotics are are great quality and are helping with my foot issues.</p>",
-            "author": "Jamie M.",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "testimonial_C38kUD": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "none",
-            "text": "<p>These orthotics give me the support I need for any activity from taking long walks to running errands. Being on my feet pain free means everything!</p>",
-            "author": "Ann B.",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "testimonial_xbNEwN": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "none",
-            "text": "<p>THANK YOU!!!! These orthotics relieved my plantar fasciitis pain.</p>",
-            "author": "Susan L.",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "testimonial_CRjWCe",
-        "testimonial_RnLxLb",
-        "testimonial_GUBLhy",
-        "testimonial_C38kUD",
-        "testimonial_xbNEwN"
-      ],
-      "custom_css": [],
-      "name": "Testimonials banner",
-      "settings": {
-        "transparent_header": false,
-        "image": "shopify://shop_images/testa_1.jpg",
-        "image_height": "450px",
-        "content_position": "md:items-center md:justify-center",
-        "image_height_mobile": "300px",
-        "content_position_mobile": "items-center justify-center",
-        "color_text": "#171717",
-        "color_highlight": "#e0a580",
-        "gradient_highlight": "",
-        "color_overlay": "#171717",
-        "overlay_opacity": 0,
-        "padding_top": 0,
-        "padding_bottom": 0,
-        "divider": false,
-        "rounded": false,
-        "enable_parallax": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": "",
-        "parallax_direction": "vertical"
-      }
-    },
-    "multicolumn_VaVtEc": {
-      "type": "multicolumn",
-      "blocks": {
-        "column_ye8FxL": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "left",
-            "text_alignment_mobile": "left",
-            "image": "shopify://shop_images/555x536_L2300_Female.png",
-            "image_ratio": "adapt",
-            "heading": "",
-            "heading_size": "text-lg-2xl",
-            "text": "<p><strong>Premium Memory Foam Orthotics </strong>are Clinically Proven to: </p><ul><li>Decrease foot pain by 39.5%</li><li>Decrease back pain by 27.4%</li><li>Increase foot function by 34.6%</li></ul>",
-            "custom_html": "",
-            "button_label": "Read the Study",
-            "button_link": "shopify://pages/case-premmem",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_jyqVGy": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "left",
-            "text_alignment_mobile": "left",
-            "image": "shopify://shop_images/555x536_plantar.png",
-            "image_ratio": "adapt",
-            "heading": "",
-            "heading_size": "text-lg-2xl",
-            "text": "<p><strong>Compete Orthotics & Orthotic Flips</strong> are Clinically Proven to: </p><ul><li>Decrease Plantar Fasciitis pain by 52.6%</li><li>Decrease back pain by 41.9%</li><li>Increase foot function by 37%</li></ul>",
-            "custom_html": "",
-            "button_label": "Read the Study",
-            "button_link": "shopify://pages/casestudy-pfkit",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_e6aHPg": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "left",
-            "text_alignment_mobile": "left",
-            "image": "shopify://shop_images/555x536_speed.png",
-            "image_ratio": "adapt",
-            "heading": "",
-            "heading_size": "text-lg-2xl",
-            "text": "<p><strong>Speed Orthotics</strong> are Clinically Proven to: </p><ul><li>Increase comfort while running by 1.27 pts</li><li>Increase speed by 0.35 mph</li><li>Decrease chance of injury by 2.2x</li></ul>",
-            "custom_html": "",
-            "button_label": "Read the Study",
-            "button_link": "shopify://pages/casestudy-speed",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "column_ye8FxL",
-        "column_jyqVGy",
-        "column_e6aHPg"
-      ],
-      "custom_css": [
-        ".multicolumn-card {background: #f0f5f6 !important;}"
-      ],
-      "name": "t:sections.multicolumn.name",
-      "settings": {
-        "gap": "small",
-        "columns": 3,
-        "columns_mobile": "1",
-        "carousel_on_desktop": false,
-        "swipe_on_mobile": true,
-        "heading": "<strong>Clinical Studies</strong>",
-        "heading_size": "title-sm",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "#ffffff",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "full_width": false,
-        "divider": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "faq_XM3i3D": {
-      "type": "faq",
-      "blocks": {
-        "question_PtH3YU": {
-          "type": "question",
-          "settings": {
-            "title": "<strong>How do orthotics work?</strong> ",
-            "text": "<p>Orthotics work by supporting your body from the ground up, promoting proper alignment and reducing stress on your feet, knees, hips, and back. Aetrex Orthotics are designed using data and insights from over 50 million foot scans, providing anatomically correct arch support and using premium materials to absorb shock and help redistribute pressure away from high-impact areas. The result is lasting comfort, injury prevention, and healthier movement with every step.</p>",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "question_G6BnhB": {
-          "type": "question",
-          "settings": {
-            "title": "<strong>What makes Aetrex Orthotics different from other brands?</strong>",
-            "text": "<p>Aetrex Orthotics are engineered using data and learnings from over 50 million foot scans to deliver anatomically precise support that helps relieve pain and prevent injury. Each pair features Aetrex’s Signature Arch Support—strategically contoured and positioned to align the body from the ground up.<br/></p><p>Unlike traditional orthotics made with rigid materials, Aetrex Orthotics are crafted with premium, shock-absorbing materials like IQ150 memory foam and advanced polyurethane that offer support and comfort. They also cushion and protect the feet while promoting proper alignment to help reduce stress on the plantar fascia, knees, hips, and back.<br/></p><p>Available in a range of styles, they offer customized comfort based on your foot type and footwear.<br/></p>",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "question_HFPm8X": {
-          "type": "question",
-          "settings": {
-            "title": "<strong>Can orthotics help with plantar fasciitis?</strong>",
-            "text": "<p>Yes. Plantar Fasciitis is typically caused by over-pronation (flat feet) or very high arches. Aetrex Orthotics provide alignment and support to keep the foot closer to the neutral position throughout the gait cycle. Proper alignment helps minimize over-pronation, reduces stress on the plantar fascia, and decreases inflammation associated with plantar fasciitis. </p>",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "question_HKXX4p": {
-          "type": "question",
-          "settings": {
-            "title": "<strong>Do I need orthotics if I have flat feet?</strong>",
-            "text": "<p>People with flat feet have very little arch definition, causing their feet to be more flexible and less shock absorbent. When you have flat feet, your arches can make complete contact with the ground when standing or walking. As a result, foot pain and other conditions can occur, such as over-pronation, plantar fasciitis, post-tibial tendonitis, or heel spurs. <br/><br/>Aetrex Orthotics with a medial rearfoot post and arch support are designed for flat feet which can help keep your feet aligned and control over-pronation so you can stay active and healthy doing the things you love. <a href=\"/collections/orthotics-for-flat-feet\" title=\"Orthotics for Flat Feet\">Shop Now</a></p>",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "question_xpY86j": {
-          "type": "question",
-          "settings": {
-            "title": "<strong>What is the bump on the top cover found on some of your orthotics?</strong>",
-            "text": "<p>That small raised area near the ball-of-the-foot on select orthotics is called a metatarsal pad. It’s designed to help redistribute pressure away from the forefoot and relieve discomfort caused by conditions such as metatarsalgia or ball-of-foot pain. By slightly lifting the metatarsal bones, it provides added comfort during walking or standing.</p>",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "question_pFxxpt": {
-          "type": "question",
-          "settings": {
-            "title": "<strong>How long will it take for my orthotics to relieve my foot pain?</strong>",
-            "text": "<p>Every foot is unique, so pain relief times can vary. Most people begin to feel more comfortable after a short period of time, typically after several days of regular wear. <br/></p><p>Our orthotics are designed to be worn right out of the box with no break in period required. However, some people find wearing their new orthotics for a few hours a day and gradually increasing wear time can help their feet adjust. <br/></p><p>If your pain persists, please consult a healthcare professional for personalized guidance.<br/></p>",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "question_H3pMh4": {
-          "type": "question",
-          "settings": {
-            "title": "<strong>Do orthotics help with overpronation?</strong>",
-            "text": "<p>Yes. Aetrex Orthotics are designed to help with overpronation, a condition that occurs when the foot rolls excessively inward. It’s prominent in people who have flexible, flat feet. Overpronation can often lead to other foot conditions such as Plantar Fasciitis, Heel Spurs, Metatarsalgia, Post-tib Tendonitis and/or Bunions. <br/></p><p>Overpronation can be treated with orthotics designed with proper arch support and medial rearfoot posting to help prevent the excessive inward rolling motion. Footwear should also be examined; footwear with firm heel counters are often recommended for extra support and stability. <br/></p>",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "question_f98WVQ": {
-          "type": "question",
-          "settings": {
-            "title": "<strong>Are Aetrex Orthotics HSA/FSA eligible?</strong>",
-            "text": "<p>Yes. All Aetrex Orthotics are eligible for purchase with your HSA, FSA, or HRA accounts. Simply save your receipt and submit it for reimbursement based on your plan’s requirements.</p>",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "question_na7dUd": {
-          "type": "question",
-          "settings": {
-            "title": "<strong>How do I know which orthotics are right for me?</strong>",
-            "text": "<p>We make it easy to find your perfect fit. You can take our <a href=\"https://irle3andv1z.typeform.com/to/gujvKvEg?typeform-source=f031fc-3.myshopify.com\" title=\"https://irle3andv1z.typeform.com/to/gujvKvEg?typeform-source=f031fc-3.myshopify.com\"><strong>Orthotic Finder Quiz</strong> </a>on Aetrex.com, visit a local Aetrex retailer for a <a href=\"https://www.aetrex.com/pages/store-locator?ose=false\" title=\"https://www.aetrex.com/pages/store-locator?ose=false\"><strong>3D foot scan</strong></a>, or follow our<br/>simple model guide:</p><ul><li>Fit A: Recommended for low to flat arches or those who overpronate (Orthotic Category: 20)</li><li>Fit B: Recommended for those with medium arches who do not have high forefoot pressure (Orthotic Category: 00)</li><li>Fit C: Recommended for high arches or those with high forefoot pressure (Orthotic Category: 05)</li><li>Fit D: Recommended for those with low to flat arches and high forefoot pressure (Orthotic Category: 25)<br/></li></ul><p>Each collection is designed for specific activities and footwear styles — from<br/>running and work to everyday wear — so you can find the support that fits your<br/>lifestyle.</p>",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "question_PtH3YU",
-        "question_G6BnhB",
-        "question_HFPm8X",
-        "question_HKXX4p",
-        "question_xpY86j",
-        "question_pFxxpt",
-        "question_H3pMh4",
-        "question_f98WVQ",
-        "question_na7dUd"
-      ],
-      "name": "FAQ",
-      "settings": {
-        "style": "with-border",
-        "heading": "<strong>Have Questions? We’ve Got Answers.</strong>",
-        "heading_size": "title-sm",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h3",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "#f4f4f4",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "color_overlay": "#ffffff",
-        "overlay_opacity": 4,
-        "padding_top": 72,
-        "padding_bottom": 52,
-        "divider": false,
-        "narrow": true,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "reveal_testimonials_qdKmq3": {
+    "reveal_testimonials_YRQjjR": {
       "type": "reveal-testimonials",
       "blocks": {
-        "testimonial_9kdxFB": {
+        "testimonial_yi9Gai": {
           "type": "testimonial",
           "settings": {
             "icon": "quote",
@@ -1285,7 +924,7 @@
             "highlighted_scribble": "circle"
           }
         },
-        "testimonial_LqtKRq": {
+        "testimonial_tCrkDw": {
           "type": "testimonial",
           "settings": {
             "icon": "quote",
@@ -1298,7 +937,7 @@
             "highlighted_scribble": "circle"
           }
         },
-        "testimonial_P6wm4T": {
+        "testimonial_hPdmxn": {
           "type": "testimonial",
           "settings": {
             "icon": "quote",
@@ -1311,7 +950,7 @@
             "highlighted_scribble": "circle"
           }
         },
-        "testimonial_nMArbr": {
+        "testimonial_nE3Y8R": {
           "type": "testimonial",
           "settings": {
             "icon": "quote",
@@ -1324,7 +963,7 @@
             "highlighted_scribble": "circle"
           }
         },
-        "testimonial_MtxFwt": {
+        "testimonial_rkPVNy": {
           "type": "testimonial",
           "settings": {
             "icon": "quote",
@@ -1339,11 +978,11 @@
         }
       },
       "block_order": [
-        "testimonial_9kdxFB",
-        "testimonial_LqtKRq",
-        "testimonial_P6wm4T",
-        "testimonial_nMArbr",
-        "testimonial_MtxFwt"
+        "testimonial_yi9Gai",
+        "testimonial_tCrkDw",
+        "testimonial_hPdmxn",
+        "testimonial_nE3Y8R",
+        "testimonial_rkPVNy"
       ],
       "name": "t:sections.reveal-testimonials.name",
       "settings": {
@@ -1366,10 +1005,10 @@
         "abra_promo_code_hide": ""
       }
     },
-    "dynamic_feature_8mHNEE": {
+    "dynamic_feature_jJRXFJ": {
       "type": "dynamic-feature",
       "blocks": {
-        "feature_kYjpfr": {
+        "feature_bBXedp": {
           "type": "feature",
           "settings": {
             "heading": "Feature 1",
@@ -1382,11 +1021,11 @@
         }
       },
       "block_order": [
-        "feature_kYjpfr"
+        "feature_bBXedp"
       ],
       "name": "Dynamic Feature",
       "settings": {
-        "heading": " Inside Select Aetrex Shoes",
+        "heading": "",
         "dot_size": 20,
         "dot_size_mobile": 16,
         "dot_color": "#ffffff",
@@ -1406,6 +1045,128 @@
         "full_width": false,
         "rounded": false
       }
+    },
+    "lookbook_rDjEEa": {
+      "type": "lookbook",
+      "blocks": {
+        "product_3tKDdQ": {
+          "type": "product",
+          "settings": {
+            "product": "",
+            "color_text": "#ffffff",
+            "vertical": 25,
+            "horizontal": 25,
+            "vertical_mobile": 25,
+            "horizontal_mobile": 25
+          }
+        },
+        "product_jVeLyJ": {
+          "type": "product",
+          "settings": {
+            "product": "",
+            "color_text": "#ffffff",
+            "vertical": 75,
+            "horizontal": 65,
+            "vertical_mobile": 75,
+            "horizontal_mobile": 65
+          }
+        }
+      },
+      "block_order": [
+        "product_3tKDdQ",
+        "product_jVeLyJ"
+      ],
+      "name": "t:sections.lookbook.name",
+      "settings": {
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "heading_position": "none",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 30,
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "images_with_text_tkFKJb": {
+      "type": "images-with-text",
+      "blocks": {
+        "heading_XchtBD": {
+          "type": "heading",
+          "settings": {
+            "heading": "<strong>Reviews from doctors</strong>",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_XdwRGb": {
+          "type": "text",
+          "settings": {
+            "text": "<p>\"I recommend Aetrex products to my patients because it helps provide the right balance and support to relieve and prevent foot conditions like Plantar Fasciitis. Unlike other brands; the contour, position and height of the Aetrex product arch support aligns anatomically in the proper place to help support our bodies from the ground up.\" </p><p>- Janine Taddeo, DPM </p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_XchtBD",
+        "text_XdwRGb"
+      ],
+      "name": "t:sections.images-with-text.name",
+      "settings": {
+        "image_url": "",
+        "image2_url": "",
+        "image_ratio": "portrait",
+        "image_width": "medium",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": true
+      }
     }
   },
   "order": [
@@ -1416,12 +1177,11 @@
     "collection_list_mPHCpz",
     "image_with_text_overlay_zKNTxj",
     "collage_ntqjfh",
+    "dynamic_feature_8mHNEE",
     "image_with_text_overlay_M6AhUn",
-    "image_comparison_i6BATK",
-    "testimonials_banner_P8DMGU",
-    "multicolumn_VaVtEc",
-    "faq_XM3i3D",
-    "reveal_testimonials_qdKmq3",
-    "dynamic_feature_8mHNEE"
+    "reveal_testimonials_YRQjjR",
+    "dynamic_feature_jJRXFJ",
+    "lookbook_rDjEEa",
+    "images_with_text_tkFKJb"
   ]
 }
