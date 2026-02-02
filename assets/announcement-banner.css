@@ -1,3 +1,67 @@
+/* Announcement Dropdown Toggle Button */
+.announcement-dropdown-toggle {
+    cursor: pointer;
+    padding: 0;
+    margin-left: 0.375rem;
+    border: none;
+    background: transparent;
+    color: inherit;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+    opacity: 0.7;
+    flex-shrink: 0;
+}
+
+.announcement-dropdown-toggle:hover {
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+.announcement-dropdown-toggle:active {
+    transform: scale(1.05);
+}
+
+.announcement-dropdown-toggle[aria-expanded="true"] .icon-chevron-down {
+    transform: rotate(180deg);
+}
+
+.announcement-bar {
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.announcement__content {
+    pointer-events: auto;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.25s ease;
+}
+
+.announcement__content::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: currentColor;
+    transition: width 0.3s ease;
+}
+
+.announcement__content:hover::after {
+    width: calc(100% - 1.5rem);
+}
+
+.announcement__content:hover {
+    opacity: 0.85;
+}
+
+.announcement__slides {
+    display: inline-flex;
+    align-items: center;
+}
+
 /* Notification Banner Popup Styles */
 .notification-banner-popup {
     display: none;
@@ -166,6 +230,16 @@
     }
 }
 
+@media (max-width: 768px) {
+    .announcement-dropdown-toggle {
+        padding: 0.375rem;
+    }
+    
+    .announcement-bar {
+        font-size: 0.9rem;
+    }
+}
+
 @media (max-width: 480px) {
     .notification-banner-content {
         padding: 2.5rem;
@@ -197,5 +271,9 @@
     .notification-banner-link {
         padding: 0.625rem 1.25rem;
         font-size: 0.85rem;
+    }
+    
+    .announcement-dropdown-toggle {
+        padding: 0.25rem;
     }
 }
