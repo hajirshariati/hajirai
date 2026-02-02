@@ -1365,6 +1365,47 @@
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
+    },
+    "dynamic_feature_8mHNEE": {
+      "type": "dynamic-feature",
+      "blocks": {
+        "feature_kYjpfr": {
+          "type": "feature",
+          "settings": {
+            "heading": "Feature 1",
+            "text": "Description",
+            "horizontal": 25,
+            "vertical": 30,
+            "text_horizontal": 10,
+            "text_vertical": 20
+          }
+        }
+      },
+      "block_order": [
+        "feature_kYjpfr"
+      ],
+      "name": "Dynamic Feature",
+      "settings": {
+        "heading": " Inside Select Aetrex Shoes",
+        "dot_size": 20,
+        "dot_size_mobile": 16,
+        "dot_color": "#ffffff",
+        "dot_border_color": "#000000",
+        "dot_border_width": 3,
+        "line_color": "#000000",
+        "line_width": 0.5,
+        "line_breaks": 1,
+        "callout_background": "#ffffff",
+        "callout_radius": 8,
+        "callout_max_width": 220,
+        "callout_title_color": "#000000",
+        "callout_text_color": "#666666",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
     }
   },
   "order": [
@@ -1380,6 +1421,7 @@
     "testimonials_banner_P8DMGU",
     "multicolumn_VaVtEc",
     "faq_XM3i3D",
-    "reveal_testimonials_qdKmq3"
+    "reveal_testimonials_qdKmq3",
+    "dynamic_feature_8mHNEE"
   ]
 }
