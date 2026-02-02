@@ -3,6 +3,8 @@
 
     {% if product.metafields.custom.frontrow == '00' %}
         {% assign frontrow_product_ids = '3246,3245' %}
+    {% elsif product.metafields.custom.frontrow == '00memory' %}
+        {% assign frontrow_product_ids = '3246,3245' %}    
     {% elsif product.metafields.custom.frontrow == '5' %}
         {% assign frontrow_product_ids = '3248,3247' %}
     {% elsif product.metafields.custom.frontrow == '20' %}
