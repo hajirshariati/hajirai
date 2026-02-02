@@ -952,6 +952,19 @@
     "reveal_testimonials_YRQjjR": {
       "type": "reveal-testimonials",
       "blocks": {
+        "testimonial_WJ44zi": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
         "testimonial_yi9Gai": {
           "type": "testimonial",
           "settings": {
@@ -1019,6 +1032,7 @@
         }
       },
       "block_order": [
+        "testimonial_WJ44zi",
         "testimonial_yi9Gai",
         "testimonial_tCrkDw",
         "testimonial_hPdmxn",
@@ -1104,68 +1118,88 @@
         "enable_parallax": true
       }
     },
-    "lookbook_rDjEEa": {
-      "type": "lookbook",
+    "testimonials_banner_AfWJRh": {
+      "type": "testimonials-banner",
       "blocks": {
-        "product_3tKDdQ": {
-          "type": "product",
+        "testimonial_dETLit": {
+          "type": "testimonial",
           "settings": {
-            "product": "",
-            "color_text": "#ffffff",
-            "vertical": 25,
-            "horizontal": 25,
-            "vertical_mobile": 25,
-            "horizontal_mobile": 25
+            "icon": "quote",
+            "text": "<p>“Podiatristinformedthat deliver actually supportive flats.”</p>",
+            "author": "BuzzFeed",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
           }
         },
-        "product_jVeLyJ": {
-          "type": "product",
+        "testimonial_xxaFnm": {
+          "type": "testimonial",
           "settings": {
-            "product": "",
-            "color_text": "#ffffff",
-            "vertical": 75,
-            "horizontal": 65,
-            "vertical_mobile": 75,
-            "horizontal_mobile": 65
+            "icon": "quote",
+            "text": "<p>\"Top pick <strong>for arch support </strong>and allday comfort.”</p>",
+            "author": "Everyday Health",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_TwC9HF": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_ycUdTi": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
           }
         }
       },
       "block_order": [
-        "product_3tKDdQ",
-        "product_jVeLyJ"
+        "testimonial_dETLit",
+        "testimonial_xxaFnm",
+        "testimonial_TwC9HF",
+        "testimonial_ycUdTi"
       ],
-      "name": "t:sections.lookbook.name",
+      "name": "t:sections.testimonials-banner.name",
       "settings": {
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "heading_position": "none",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
+        "transparent_header": false,
+        "image_height": "650px",
+        "content_position": "md:items-center md:justify-center",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-center justify-center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
         "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
         "color_overlay": "#171717",
-        "overlay_opacity": 30,
-        "padding_top": 72,
-        "padding_bottom": 72,
+        "overlay_opacity": 70,
+        "padding_top": 0,
+        "padding_bottom": 0,
         "divider": false,
-        "full_width": false,
         "rounded": false,
+        "enable_parallax": true,
         "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
+        "abra_promo_code_hide": "",
+        "parallax_direction": "vertical"
       }
     }
   },
@@ -1182,6 +1216,6 @@
     "dynamic_feature_jJRXFJ",
     "reveal_testimonials_YRQjjR",
     "images_with_text_tkFKJb",
-    "lookbook_rDjEEa"
+    "testimonials_banner_AfWJRh"
   ]
 }
