@@ -704,6 +704,78 @@
         "abra_promo_code_hide": ""
       }
     },
+    "image_with_text_overlay_zKNTxj": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "subheading_f78ejn": {
+          "type": "subheading",
+          "settings": {
+            "subheading": "Powered by BioRocker™ Technology",
+            "subheading_size": "subtitle-md",
+            "secondary_color": true
+          }
+        },
+        "heading_fQG6rk": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>SPRING INTO MOTION. MOVE WITH AETREX</p>",
+            "heading_size": "title-lg tracking-heading",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_Qnjw43": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Natural motion. Effortless steps.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "subheading_f78ejn",
+        "heading_fQG6rk",
+        "text_Qnjw43"
+      ],
+      "name": "t:sections.image-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "image_height": "650px",
+        "content_width": "small",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 70,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": true,
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
     "image_with_text_overlay_M6AhUn": {
       "type": "image-with-text-overlay",
       "blocks": {
@@ -1184,32 +1256,87 @@
         "abra_promo_code_hide": ""
       }
     },
-    "blog_posts_PJxFGa": {
-      "type": "blog-posts",
-      "disabled": true,
-      "name": "Blog posts",
+    "reveal_testimonials_qdKmq3": {
+      "type": "reveal-testimonials",
+      "blocks": {
+        "testimonial_9kdxFB": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_LqtKRq": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_P6wm4T": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_nMArbr": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_MtxFwt": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_9kdxFB",
+        "testimonial_LqtKRq",
+        "testimonial_P6wm4T",
+        "testimonial_nMArbr",
+        "testimonial_MtxFwt"
+      ],
+      "name": "t:sections.reveal-testimonials.name",
       "settings": {
-        "blog": "",
-        "post_limit": 3,
-        "columns": 3,
-        "carousel_on_desktop": false,
-        "show_view_all": false,
-        "columns_mobile": "2",
-        "swipe_on_mobile": true,
-        "image_ratio": "landscape",
-        "show_tags": true,
-        "show_date": true,
-        "show_comments": true,
-        "show_author": false,
-        "show_excerpt": true,
-        "heading": "<strong>Backed by Science: Real Results from Clinical Trials on Aetrex Orthotics</strong>",
-        "heading_size": "title-sm",
-        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading": "What people are saying",
+        "heading_size": "title-md",
         "heading_tag": "h2",
-        "subheading": "BUILT ON PROOF, NOT PROMISES.",
-        "description": "<p>We don’t guess — we measure. Independent clinical studies have validated the effectiveness of Aetrex orthotics in delivering meaningful pressure relief and biomechanical support. Because your comfort should be proven, not promised.</p>",
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
         "color_text": "",
         "color_background": "",
         "gradient_background": "",
@@ -1221,91 +1348,9 @@
         "padding_top": 72,
         "padding_bottom": 72,
         "divider": false,
-        "full_width": false,
-        "rounded": false
-      }
-    },
-    "images_with_text_overlay_pgicH3": {
-      "type": "images-with-text-overlay",
-      "blocks": {
-        "subheading_9hKYJe": {
-          "type": "subheading",
-          "settings": {
-            "subheading": "Not sure? No problem.",
-            "subheading_size": "subtitle-md",
-            "secondary_color": false
-          }
-        },
-        "heading_LgFJaa": {
-          "type": "heading",
-          "settings": {
-            "heading": "<p>New to Orthotics? Take Our Quiz</p>",
-            "heading_size": "title-md",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_HbcxnX": {
-          "type": "text",
-          "settings": {
-            "text": "",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_y7PWVx": {
-          "type": "button",
-          "settings": {
-            "button_label": "Find Your Perfect Pair Now",
-            "button_link": "https://irle3andv1z.typeform.com/to/gujvKvEg?typeform-source=www.aetrex.com",
-            "button_video_link": "",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": false
-          }
-        }
-      },
-      "block_order": [
-        "subheading_9hKYJe",
-        "heading_LgFJaa",
-        "text_HbcxnX",
-        "button_y7PWVx"
-      ],
-      "disabled": true,
-      "name": "t:sections.images-with-text-overlay.name",
-      "settings": {
-        "transparent_header": false,
-        "image_height": "650px",
-        "content_width": "medium",
-        "content_position": "md:items-center md:justify-center",
-        "text_alignment": "center",
-        "image_height_mobile": "auto",
-        "content_position_mobile": "items-end justify-start",
-        "text_alignment_mobile": "left",
-        "color_text": "#ffffff",
-        "color_highlight": "#e0a580",
-        "gradient_highlight": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
-        "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "divider_color": "#111111",
-        "overlay_opacity": 100,
-        "padding_top": 0,
-        "padding_bottom": 0,
-        "divider": false,
-        "full_width": true,
         "rounded": false,
-        "enable_parallax": false
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     }
   },
@@ -1316,12 +1361,12 @@
     "featured_collections_9d3ge7",
     "collection_list_mPHCpz",
     "collage_ntqjfh",
+    "image_with_text_overlay_zKNTxj",
     "image_with_text_overlay_M6AhUn",
     "image_comparison_i6BATK",
     "testimonials_banner_P8DMGU",
     "multicolumn_VaVtEc",
     "faq_XM3i3D",
-    "blog_posts_PJxFGa",
-    "images_with_text_overlay_pgicH3"
+    "reveal_testimonials_qdKmq3"
   ]
 }
