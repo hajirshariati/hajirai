@@ -732,7 +732,7 @@
       "type": "custom-liquid",
       "name": "t:sections.custom-liquid.name",
       "settings": {
-        "liquid": "<div id=\"fr-testimonials\">\n  {% render 'fr-testimonials' %}\n</div>",
+        "liquid": "{% render 'fr-testimonials' %}",
         "color_text": "",
         "color_background": "",
         "gradient_background": "",
