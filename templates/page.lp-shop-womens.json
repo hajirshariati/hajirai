@@ -739,12 +739,25 @@
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
+        },
+        "button_htdE3j": {
+          "type": "button",
+          "settings": {
+            "button_label": "Shop BioRocker™ Collection",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": true
+          }
         }
       },
       "block_order": [
         "subheading_f78ejn",
         "heading_fQG6rk",
-        "text_Qnjw43"
+        "text_Qnjw43",
+        "button_htdE3j"
       ],
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
