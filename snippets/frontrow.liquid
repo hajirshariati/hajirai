@@ -26,31 +26,10 @@
 
 
 
-<br> <button
-  class="testimonial-cta"
-  onclick="scrollToTestimonials(event)"
-  aria-label="Click to read reviews from clinicians sharing this product"
->
-  <p>Read their reviews</p>
-  <svg xmlns="http://www.w3.org/2000/svg" width="7" height="11" viewBox="0 0 7 11" fill="none">
-    <path d="M1.33057 9.5L5.33057 5.5L1.33057 1.5" stroke="#212121" stroke-width="1.5" />
-  </svg>
-</button><script>
-  function scrollToTestimonials(e) {
-    e.preventDefault();
-    const target = document.getElementById('fr-testimonials');
-    if (!target) return;
-
-    target.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start'
-    });
-  }
-</script>
 
 
 
-
+        
         <script>
             window.addEventListener('load', function() {
                 var productIds = '{{ frontrow_product_ids }}';
