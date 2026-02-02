@@ -6,6 +6,7 @@
 </style>
 
 {{ 'cart.css' | asset_url | stylesheet_tag }}
+{{ 'cart-savings.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'cart.js' | asset_url }}" defer></script>
 {%- if linklists.gift-wrapping.links != blank and linklists.gift-wrapping.links.first.type == 'product_link' -%}
   <script src="{{ 'gift-wrapping.js' | asset_url }}" defer="defer"></script>
@@ -690,6 +691,40 @@
 
                   {%- when 'buttons' -%}
                     <div class="grid gap-3" {{ block.shopify_attributes }}>
+                      {%- liquid
+                        assign total_savings = 0
+                        assign cart_discount_total = 0
+                        
+                        for discount in cart.cart_level_discount_applications
+                          assign cart_discount_total = cart_discount_total | plus: discount.total_allocated_amount
+                        endfor
+                        
+                        for item in cart.items
+                          if item.original_price > item.final_price
+                            assign item_discount = item.original_price | minus: item.final_price
+                            assign item_discount_total = item_discount | times: item.quantity
+                            assign total_savings = total_savings | plus: item_discount_total
+                          endif
+                          
+                          if item.product.compare_at_price > item.final_price
+                            assign compare_savings = item.product.compare_at_price | minus: item.final_price
+                            assign compare_savings_total = compare_savings | times: item.quantity
+                            assign total_savings = total_savings | plus: compare_savings_total
+                          endif
+                        endfor
+                        
+                        assign total_savings = total_savings | plus: cart_discount_total
+                      -%}
+                      
+                      {%- if total_savings > 0 -%}
+                        <div class="cart-savings">
+                          <p>
+                            <span>You save </span>
+                            <span data-cart-savings>{{ total_savings | money_with_currency }}</span>
+                          </p>
+                        </div>
+                      {%- endif -%}
+                      
                       <noscript>
                         <button class="button button--secondary w-full" type="submit" name="update" form="cart">
                           {{- 'cart.general.update' | t -}}
