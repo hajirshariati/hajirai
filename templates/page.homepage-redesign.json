@@ -146,8 +146,9 @@
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "",
+            "collection": "active",
             "custom_url": "",
+            "image": "shopify://shop_images/LeighChar_Womens_footwear_435x600_5fb32f05-04a8-4cfe-b0d9-843b3f8641be.jpg",
             "title": "New Arrivals",
             "description": "",
             "overlay_content": false,
