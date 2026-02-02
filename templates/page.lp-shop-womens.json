@@ -535,6 +535,7 @@
         "collection_C3dagf",
         "collection_4RE3QR"
       ],
+      "disabled": true,
       "name": "Collection list",
       "settings": {
         "columns": 5,
@@ -810,47 +811,6 @@
       "name": "Dynamic Feature",
       "settings": {
         "heading": " Inside Select Aetrex Shoes",
-        "dot_size": 20,
-        "dot_size_mobile": 16,
-        "dot_color": "#ffffff",
-        "dot_border_color": "#000000",
-        "dot_border_width": 3,
-        "line_color": "#000000",
-        "line_width": 0.5,
-        "line_breaks": 1,
-        "callout_background": "#ffffff",
-        "callout_radius": 8,
-        "callout_max_width": 220,
-        "callout_title_color": "#000000",
-        "callout_text_color": "#666666",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false
-      }
-    },
-    "dynamic_feature_jJRXFJ": {
-      "type": "dynamic-feature",
-      "blocks": {
-        "feature_bBXedp": {
-          "type": "feature",
-          "settings": {
-            "heading": "Feature 1",
-            "text": "Description",
-            "horizontal": 25,
-            "vertical": 30,
-            "text_horizontal": 10,
-            "text_vertical": 20
-          }
-        }
-      },
-      "block_order": [
-        "feature_bBXedp"
-      ],
-      "name": "Dynamic Feature",
-      "settings": {
-        "heading": "",
         "dot_size": 20,
         "dot_size_mobile": 16,
         "dot_color": "#ffffff",
@@ -1212,7 +1172,6 @@
     "image_with_text_overlay_zKNTxj",
     "collage_ntqjfh",
     "dynamic_feature_8mHNEE",
-    "dynamic_feature_jJRXFJ",
     "reveal_testimonials_YRQjjR",
     "images_with_text_tkFKJb",
     "testimonials_banner_AfWJRh",
