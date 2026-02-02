@@ -1,39 +1,70 @@
-<section class="fr-testimonials">
-  {% assign fr_testimonial_product_id = '' %}
+<section class="fr-testimonials" id="frontrow-testimonials-wrapper">
+  {% assign frontrow_product_ids = '' %}
 
-  {% if product.metafields.custom.frontrow == 'mens' %}
-    {% assign fr_testimonial_product_id = '3255' %}
-  {% elsif product.metafields.custom.frontrow == 'skytech' %}
-    {% assign fr_testimonial_product_id = '3252' %}
+  {% if product.metafields.custom.frontrow == 'skytech' %}
+    {% assign frontrow_product_ids = '3255' %}
+
+  {% elsif product.metafields.custom.frontrow == 'closetoe' %}
+    {% assign frontrow_product_ids = '3252' %}
+
+  {% elsif product.metafields.custom.frontrow == 'sandals' %}
+    {% assign frontrow_product_ids = '3252' %}
+
+  {% elsif product.metafields.custom.frontrow == 'mens' %}
+    {% assign frontrow_product_ids = '3252' %}
+
   {% elsif product.metafields.custom.frontrow == '20' %}
-    {% assign fr_testimonial_product_id = '3250' %}
+    {% assign frontrow_product_ids = '3250' %}
+
   {% elsif product.metafields.custom.frontrow == '05' %}
-    {% assign fr_testimonial_product_id = '3248' %}
+    {% assign frontrow_product_ids = '3248' %}
+
   {% elsif product.metafields.custom.frontrow == '00' %}
-    {% assign fr_testimonial_product_id = '3246' %}
+    {% assign frontrow_product_ids = '3246' %}
   {% endif %}
 
-  {% if fr_testimonial_product_id != '' %}
-    <script
-      async
-      type="text/javascript"
-      src="https://app.thefrontrowhealth.com/api/widgets/script?presentation_type=qual&product_id={{ fr_testimonial_product_id }}">
-    </script>
-
+  {% if frontrow_product_ids != '' %}
     <iframe
       id="frontrow-testimonials"
       class="iframe-frontrow-testimonials"
-      frameborder="0"
-      src="https://app.thefrontrowhealth.com/api/widgets?presentation_type=qual&product_id={{ fr_testimonial_product_id }}">
+      frameborder="0">
     </iframe>
-  {% endif %}
 
-  <style>
-    iframe.iframe-frontrow-testimonials {
-      width: 100%;
-    }
-    iframe.iframe-modal-testimonials {
-      z-index: 99999998;
-    }
-  </style>
+    <script>
+      window.addEventListener('load', function () {
+        var productIds = '{{ frontrow_product_ids }}';
+        var iframe = document.getElementById('frontrow-testimonials');
+        var container = document.getElementById('frontrow-testimonials-wrapper');
+
+        iframe.src =
+          'https://app.thefrontrowhealth.com/api/widgets?presentation_type=qual&product_id=' +
+          productIds;
+
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.async = true;
+        script.src =
+          'https://app.thefrontrowhealth.com/api/widgets/script?presentation_type=qual&product_id=' +
+          productIds;
+
+        container.appendChild(script);
+      });
+    </script>
+  {% else %}
+    <style>
+      #frontrow-testimonials-wrapper {
+        display: none !important;
+      }
+    </style>
+  {% endif %}
 </section>
+
+<style>
+  iframe.iframe-frontrow-testimonials {
+    width: 100%;
+  }
+
+  iframe.iframe-modal-testimonials {
+    z-index: 99999998;
+  }
+</style>
