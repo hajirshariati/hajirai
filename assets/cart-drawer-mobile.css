@@ -1,0 +1,154 @@
+/* Cart Drawer Mobile Optimizations */
+
+/* Reduce spacing on mobile for more compact layout */
+@media screen and (max-width: 767px) {
+  .cart-drawer .drawer__scrollable {
+    padding: var(--sp-4) var(--sp-4);
+    gap: var(--sp-4);
+  }
+
+  .cart-drawer .horizontal-products {
+    gap: var(--sp-4);
+  }
+
+  .cart-drawer .horizontal-product {
+    gap: var(--sp-3);
+    padding-block: var(--sp-3);
+  }
+
+  .cart-drawer .horizontal-product__details {
+    gap: var(--sp-1);
+  }
+
+  /* Reduce footer padding on mobile */
+  .cart-drawer .drawer__footer-bottom {
+    padding: var(--sp-4) var(--sp-4);
+  }
+
+  .cart-drawer .drawer__footer-bottom .grid.gap-4 {
+    gap: var(--sp-3);
+  }
+}
+
+/* Sticky footer for mobile devices */
+@media screen and (max-width: 767px) {
+  .cart-drawer .drawer__footer-bottom--sticky {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    background-color: rgb(var(--color-background));
+    border-top: 1px solid rgb(var(--color-border-light));
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
+    margin-top: auto;
+  }
+
+  /* Ensure scrollable area has bottom padding to prevent content being hidden */
+  .cart-drawer .drawer__scrollable {
+    padding-bottom: var(--sp-6);
+  }
+
+  /* Make checkout button more prominent on mobile */
+  .cart-drawer .drawer__footer-buttons .button--primary {
+    font-size: var(--text-base);
+    padding-block: var(--sp-3d5);
+    font-weight: 600;
+  }
+
+  /* Compact savings display on mobile */
+  .cart-drawer .cart-savings {
+    padding: var(--sp-2d5) var(--sp-3);
+  }
+
+  .cart-drawer .cart-savings p {
+    font-size: var(--text-sm);
+  }
+
+  /* Reduce tax note font size */
+  .cart-drawer .tax-note {
+    font-size: var(--text-xs);
+    line-height: 1.3;
+  }
+
+  /* Compact totals display */
+  .cart-drawer .totals__subtotal {
+    font-size: var(--text-sm);
+  }
+
+  .cart-drawer .totals__subtotal-value {
+    font-size: var(--text-xl);
+  }
+}
+
+/* Tablet optimization */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .cart-drawer .drawer__scrollable {
+    padding: var(--sp-5) var(--sp-5);
+  }
+
+  .cart-drawer .drawer__footer-bottom {
+    padding: var(--sp-5) var(--sp-5);
+  }
+}
+
+/* Smooth scroll behavior when footer is sticky */
+.cart-drawer .drawer__scrollable {
+  scroll-padding-bottom: 200px;
+}
+
+/* Animation for sticky footer appearance */
+@media screen and (max-width: 767px) {
+  .cart-drawer .drawer__footer-bottom--sticky {
+    animation: slideUpFooter 0.3s ease-out;
+  }
+}
+
+@keyframes slideUpFooter {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Ensure gift wrapping section is compact on mobile */
+@media screen and (max-width: 767px) {
+  .cart-drawer .gift-wrapping {
+    padding: var(--sp-3);
+  }
+}
+
+/* Compact discount display on mobile */
+@media screen and (max-width: 767px) {
+  .cart-drawer .discounts {
+    gap: var(--sp-1d5);
+    padding-block-end: var(--sp-3);
+  }
+
+  .cart-drawer .discounts__discount {
+    font-size: var(--text-xs);
+  }
+}
+
+/* Optimize quantity controls on mobile */
+@media screen and (max-width: 767px) {
+  .cart-drawer .horizontal-product__quantity {
+    font-size: var(--text-sm);
+  }
+
+  .cart-drawer quantity-input.cart-quantity {
+    min-width: 80px;
+  }
+}
+
+/* Ensure proper spacing for free shipping bar on mobile */
+@media screen and (max-width: 767px) {
+  .cart-drawer .free-shipping-bar {
+    padding: var(--sp-3);
+    font-size: var(--text-xs);
+  }
+}

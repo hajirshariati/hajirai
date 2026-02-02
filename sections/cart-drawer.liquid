@@ -1,5 +1,6 @@
 {%- if request.page_type != 'cart' and settings.cart_type == 'drawer' -%}
   {{ 'cart-savings.css' | asset_url | stylesheet_tag }}
+  {{ 'cart-drawer-mobile.css' | asset_url | stylesheet_tag }}
   <script src="{{ 'cart.js' | asset_url }}" defer></script>
   {%- if linklists.gift-wrapping.links != blank and linklists.gift-wrapping.links.first.type == 'product_link' -%}
     <script src="{{ 'gift-wrapping.js' | asset_url }}" defer="defer"></script>
@@ -91,7 +92,7 @@
                 </div>
               </div>
             {%- endif -%}
-            <div class="drawer__scrollable relative flex flex-col gap-9 grow shrink{% if cart == empty %} hidden{% endif %}">
+            <div class="drawer__scrollable relative flex flex-col gap-5 grow shrink{% if cart == empty %} hidden{% endif %}">
               {%- liquid
                 if section.settings.show_free_shipping_bar and section.settings.free_shipping_minimum_amount != blank
                   assign minimum_amounts = section.settings.free_shipping_minimum_amount | remove: ' '
@@ -683,7 +684,7 @@
                   {%- endif -%}
                 </div>
               {%- endif -%}
-              <div class="drawer__footer-bottom grid gap-4">
+              <div class="drawer__footer-bottom drawer__footer-bottom--sticky grid gap-2">
                 <div class="grid gap-4 sm:grid-6">
                   {%- if cart.cart_level_discount_applications.size > 0 -%}
                     <ul class="discounts grid gap-2" role="list" aria-label="{{ 'customer.order.discounts' | t | escape }}">
