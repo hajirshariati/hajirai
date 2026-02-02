@@ -1164,8 +1164,21 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<p>“Styleforwardboots with support you can wear all night.”</p>",
+            "text": "<p>“Styleforward boots with support you can wear all night.”</p>",
             "author": "Forbes",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_JwKxY6": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>“Expertnoted cushioning, builtin arch support, and a secure heel cup.”</p>",
+            "author": "NBC Select",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -1178,7 +1191,8 @@
         "testimonial_dETLit",
         "testimonial_xxaFnm",
         "testimonial_TwC9HF",
-        "testimonial_ycUdTi"
+        "testimonial_ycUdTi",
+        "testimonial_JwKxY6"
       ],
       "name": "t:sections.testimonials-banner.name",
       "settings": {
