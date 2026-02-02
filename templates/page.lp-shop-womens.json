@@ -830,84 +830,6 @@
         "rounded": false
       }
     },
-    "image_with_text_overlay_M6AhUn": {
-      "type": "image-with-text-overlay",
-      "blocks": {
-        "heading_CE9MYn": {
-          "type": "heading",
-          "settings": {
-            "heading": "<p>The Technology Behind Everything We Do</p>",
-            "heading_size": "title-sm",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_CVjrUt": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Each Aetrex Orthotic is designed based on the data and insights from our state-of-the-art 3D foot scanners. </p>",
-            "text_font": "body",
-            "text_size": "subtext-lg",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_mgbN3C": {
-          "type": "button",
-          "settings": {
-            "button_label": "Find a Scanner Near You",
-            "button_link": "shopify://pages/store-locator",
-            "button_video_link": "",
-            "button_style": "primary",
-            "button_size": "sm",
-            "button_external": true,
-            "button_icon": false
-          }
-        }
-      },
-      "block_order": [
-        "heading_CE9MYn",
-        "text_CVjrUt",
-        "button_mgbN3C"
-      ],
-      "disabled": true,
-      "name": "t:sections.image-with-text-overlay.name",
-      "settings": {
-        "transparent_header": false,
-        "image": "shopify://shop_images/1920x710_Albert_scanner_feet.png",
-        "image_height": "650px",
-        "content_width": "small",
-        "content_position": "md:items-center md:justify-start",
-        "text_alignment": "left",
-        "image_height_mobile": "300px",
-        "content_position_mobile": "items-start justify-start",
-        "text_alignment_mobile": "left",
-        "color_text": "#171717",
-        "color_highlight": "#e0a580",
-        "gradient_highlight": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
-        "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "divider_color": "#111111",
-        "overlay_opacity": 0,
-        "padding_top": 0,
-        "padding_bottom": 0,
-        "divider": true,
-        "full_width": true,
-        "rounded": false,
-        "enable_parallax": false,
-        "parallax_direction": "vertical",
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
     "dynamic_feature_jJRXFJ": {
       "type": "dynamic-feature",
       "blocks": {
@@ -1215,6 +1137,70 @@
         "abra_promo_code_hide": "",
         "parallax_direction": "vertical"
       }
+    },
+    "image_with_text_overlay_M6AhUn": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "heading_CE9MYn": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p><strong>About Aetrex</strong></p>",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_CVjrUt": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Aetrex designs footwear and orthotics that support the way you move through life. Guided by data from over 50 million global foot scans, every style is thoughtfully engineered to promote alignment, comfort, and confidence—so you can move better, feel better, and stay in motion every day.</p>",
+            "text_font": "body",
+            "text_size": "subtext-lg",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_CE9MYn",
+        "text_CVjrUt"
+      ],
+      "name": "t:sections.image-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/1920x710_Albert_scanner_feet.png",
+        "image_height": "650px",
+        "content_width": "small",
+        "content_position": "md:items-center md:justify-start",
+        "text_alignment": "left",
+        "image_height_mobile": "300px",
+        "content_position_mobile": "items-start justify-start",
+        "text_alignment_mobile": "left",
+        "color_text": "#171717",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": true,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
     }
   },
   "order": [
@@ -1226,10 +1212,10 @@
     "image_with_text_overlay_zKNTxj",
     "collage_ntqjfh",
     "dynamic_feature_8mHNEE",
-    "image_with_text_overlay_M6AhUn",
     "dynamic_feature_jJRXFJ",
     "reveal_testimonials_YRQjjR",
     "images_with_text_tkFKJb",
-    "testimonials_banner_AfWJRh"
+    "testimonials_banner_AfWJRh",
+    "image_with_text_overlay_M6AhUn"
   ]
 }
