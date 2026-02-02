@@ -908,6 +908,47 @@
         "abra_promo_code_hide": ""
       }
     },
+    "dynamic_feature_jJRXFJ": {
+      "type": "dynamic-feature",
+      "blocks": {
+        "feature_bBXedp": {
+          "type": "feature",
+          "settings": {
+            "heading": "Feature 1",
+            "text": "Description",
+            "horizontal": 25,
+            "vertical": 30,
+            "text_horizontal": 10,
+            "text_vertical": 20
+          }
+        }
+      },
+      "block_order": [
+        "feature_bBXedp"
+      ],
+      "name": "Dynamic Feature",
+      "settings": {
+        "heading": "",
+        "dot_size": 20,
+        "dot_size_mobile": 16,
+        "dot_color": "#ffffff",
+        "dot_border_color": "#000000",
+        "dot_border_width": 3,
+        "line_color": "#000000",
+        "line_width": 0.5,
+        "line_breaks": 1,
+        "callout_background": "#ffffff",
+        "callout_radius": 8,
+        "callout_max_width": 220,
+        "callout_title_color": "#000000",
+        "callout_text_color": "#666666",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
     "reveal_testimonials_YRQjjR": {
       "type": "reveal-testimonials",
       "blocks": {
@@ -915,8 +956,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
+            "text": "<p>\"The only sneakers that don't hurt myfeet!“I have plantar fasciitis and rheumatoid arthritis. I can comfortably wear these sneakers for my 6–8 mile walks every day!”</p>",
+            "author": "Lesina C. ",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -986,7 +1027,7 @@
       ],
       "name": "t:sections.reveal-testimonials.name",
       "settings": {
-        "heading": "What people are saying",
+        "heading": "Customer quotes",
         "heading_size": "title-md",
         "heading_tag": "h2",
         "color_text": "",
@@ -1005,45 +1046,62 @@
         "abra_promo_code_hide": ""
       }
     },
-    "dynamic_feature_jJRXFJ": {
-      "type": "dynamic-feature",
+    "images_with_text_tkFKJb": {
+      "type": "images-with-text",
       "blocks": {
-        "feature_bBXedp": {
-          "type": "feature",
+        "heading_XchtBD": {
+          "type": "heading",
           "settings": {
-            "heading": "Feature 1",
-            "text": "Description",
-            "horizontal": 25,
-            "vertical": 30,
-            "text_horizontal": 10,
-            "text_vertical": 20
+            "heading": "<strong>Reviews from doctors</strong>",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_XdwRGb": {
+          "type": "text",
+          "settings": {
+            "text": "<p>\"I recommend Aetrex products to my patients because it helps provide the right balance and support to relieve and prevent foot conditions like Plantar Fasciitis. Unlike other brands; the contour, position and height of the Aetrex product arch support aligns anatomically in the proper place to help support our bodies from the ground up.\" </p><p>- Janine Taddeo, DPM </p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
           }
         }
       },
       "block_order": [
-        "feature_bBXedp"
+        "heading_XchtBD",
+        "text_XdwRGb"
       ],
-      "name": "Dynamic Feature",
+      "name": "t:sections.images-with-text.name",
       "settings": {
-        "heading": "",
-        "dot_size": 20,
-        "dot_size_mobile": 16,
-        "dot_color": "#ffffff",
-        "dot_border_color": "#000000",
-        "dot_border_width": 3,
-        "line_color": "#000000",
-        "line_width": 0.5,
-        "line_breaks": 1,
-        "callout_background": "#ffffff",
-        "callout_radius": 8,
-        "callout_max_width": 220,
-        "callout_title_color": "#000000",
-        "callout_text_color": "#666666",
+        "image_url": "",
+        "image2_url": "",
+        "image_ratio": "portrait",
+        "image_width": "medium",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
         "padding_top": 72,
         "padding_bottom": 72,
         "divider": false,
         "full_width": false,
-        "rounded": false
+        "rounded": false,
+        "enable_parallax": true
       }
     },
     "lookbook_rDjEEa": {
@@ -1109,64 +1167,6 @@
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
-    },
-    "images_with_text_tkFKJb": {
-      "type": "images-with-text",
-      "blocks": {
-        "heading_XchtBD": {
-          "type": "heading",
-          "settings": {
-            "heading": "<strong>Reviews from doctors</strong>",
-            "heading_size": "title-md",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_XdwRGb": {
-          "type": "text",
-          "settings": {
-            "text": "<p>\"I recommend Aetrex products to my patients because it helps provide the right balance and support to relieve and prevent foot conditions like Plantar Fasciitis. Unlike other brands; the contour, position and height of the Aetrex product arch support aligns anatomically in the proper place to help support our bodies from the ground up.\" </p><p>- Janine Taddeo, DPM </p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "heading_XchtBD",
-        "text_XdwRGb"
-      ],
-      "name": "t:sections.images-with-text.name",
-      "settings": {
-        "image_url": "",
-        "image2_url": "",
-        "image_ratio": "portrait",
-        "image_width": "medium",
-        "layout": "image_first",
-        "text_alignment": "left",
-        "text_alignment_mobile": "left",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "enable_parallax": true
-      }
     }
   },
   "order": [
@@ -1179,9 +1179,9 @@
     "collage_ntqjfh",
     "dynamic_feature_8mHNEE",
     "image_with_text_overlay_M6AhUn",
-    "reveal_testimonials_YRQjjR",
     "dynamic_feature_jJRXFJ",
-    "lookbook_rDjEEa",
-    "images_with_text_tkFKJb"
+    "reveal_testimonials_YRQjjR",
+    "images_with_text_tkFKJb",
+    "lookbook_rDjEEa"
   ]
 }
