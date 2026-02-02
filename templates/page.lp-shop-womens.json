@@ -570,6 +570,91 @@
         "abra_promo_code_hide": ""
       }
     },
+    "image_with_text_overlay_zKNTxj": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "subheading_f78ejn": {
+          "type": "subheading",
+          "settings": {
+            "subheading": "Powered by BioRocker™ Technology",
+            "subheading_size": "subtitle-md",
+            "secondary_color": true
+          }
+        },
+        "heading_fQG6rk": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>SPRING INTO MOTION. MOVE WITH AETREX</p>",
+            "heading_size": "title-lg tracking-heading",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_Qnjw43": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Natural motion. Effortless steps.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_htdE3j": {
+          "type": "button",
+          "settings": {
+            "button_label": "Shop BioRocker™ Collection",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": true
+          }
+        }
+      },
+      "block_order": [
+        "subheading_f78ejn",
+        "heading_fQG6rk",
+        "text_Qnjw43",
+        "button_htdE3j"
+      ],
+      "name": "t:sections.image-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "image_height": "650px",
+        "content_width": "small",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 70,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": true,
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
     "collage_ntqjfh": {
       "type": "collage",
       "blocks": {
@@ -674,12 +759,12 @@
       ],
       "name": "t:sections.collage.name",
       "settings": {
-        "heading": "<strong>The World’s #1 Premium Foot Orthotic.</strong>",
+        "heading": "TECHNOLOGY <strong>IMPROVING THE WAY YOU MOVE</strong> ",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
         "subheading": "",
-        "description": "<p>Trusted Worldwide for Comfort, Support, & Alignment</p>",
+        "description": "<p>Aetrex Signature Features</p>",
         "button_label": "",
         "button_link": "",
         "button_external": false,
@@ -700,91 +785,6 @@
         "full_width": false,
         "rounded": false,
         "enable_parallax": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "image_with_text_overlay_zKNTxj": {
-      "type": "image-with-text-overlay",
-      "blocks": {
-        "subheading_f78ejn": {
-          "type": "subheading",
-          "settings": {
-            "subheading": "Powered by BioRocker™ Technology",
-            "subheading_size": "subtitle-md",
-            "secondary_color": true
-          }
-        },
-        "heading_fQG6rk": {
-          "type": "heading",
-          "settings": {
-            "heading": "<p>SPRING INTO MOTION. MOVE WITH AETREX</p>",
-            "heading_size": "title-lg tracking-heading",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_Qnjw43": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Natural motion. Effortless steps.</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_htdE3j": {
-          "type": "button",
-          "settings": {
-            "button_label": "Shop BioRocker™ Collection",
-            "button_link": "",
-            "button_video_link": "",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": true
-          }
-        }
-      },
-      "block_order": [
-        "subheading_f78ejn",
-        "heading_fQG6rk",
-        "text_Qnjw43",
-        "button_htdE3j"
-      ],
-      "name": "t:sections.image-with-text-overlay.name",
-      "settings": {
-        "transparent_header": false,
-        "image_height": "650px",
-        "content_width": "small",
-        "content_position": "md:items-end md:justify-start",
-        "text_alignment": "left",
-        "image_height_mobile": "auto",
-        "content_position_mobile": "items-end justify-start",
-        "text_alignment_mobile": "left",
-        "color_text": "#ffffff",
-        "color_highlight": "#e0a580",
-        "gradient_highlight": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
-        "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "divider_color": "#111111",
-        "overlay_opacity": 70,
-        "padding_top": 0,
-        "padding_bottom": 0,
-        "divider": false,
-        "full_width": true,
-        "rounded": false,
-        "enable_parallax": true,
-        "parallax_direction": "vertical",
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
@@ -1373,8 +1373,8 @@
     "collection_list_64mUWx",
     "featured_collections_9d3ge7",
     "collection_list_mPHCpz",
-    "collage_ntqjfh",
     "image_with_text_overlay_zKNTxj",
+    "collage_ntqjfh",
     "image_with_text_overlay_M6AhUn",
     "image_comparison_i6BATK",
     "testimonials_banner_P8DMGU",
