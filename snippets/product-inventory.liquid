@@ -20,7 +20,7 @@
 {%- enddoc -%}
 
 {%- assign product_variant = product.selected_or_first_available_variant -%}
-<div
+<br><div
   class="product__inventory no-js-hidden{% if product_variant.inventory_management != 'shopify' %} sr-only{% endif %}"
   id="Inventory-{{ section_id }}-{{ product_id }}"
   role="status"
