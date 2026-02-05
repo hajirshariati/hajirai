@@ -667,6 +667,7 @@
         "text_Qnjw43",
         "button_htdE3j"
       ],
+      "disabled": true,
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
@@ -799,6 +800,7 @@
         "image_UMzkxc",
         "image_DEUPz8"
       ],
+      "disabled": true,
       "name": "t:sections.collage.name",
       "settings": {
         "heading": "TECHNOLOGY <strong>IMPROVING THE WAY YOU MOVE</strong> ",
@@ -849,6 +851,7 @@
       "block_order": [
         "feature_kYjpfr"
       ],
+      "disabled": true,
       "name": "Dynamic Feature",
       "settings": {
         "heading": " Inside Select Aetrex Shoes",
@@ -962,6 +965,7 @@
         "testimonial_nE3Y8R",
         "testimonial_rkPVNy"
       ],
+      "disabled": true,
       "name": "t:sections.reveal-testimonials.name",
       "settings": {
         "heading": "Customer quotes",
@@ -1016,6 +1020,7 @@
         "heading_XchtBD",
         "text_XdwRGb"
       ],
+      "disabled": true,
       "name": "t:sections.images-with-text.name",
       "settings": {
         "image_url": "",
@@ -1117,6 +1122,7 @@
         "testimonial_ycUdTi",
         "testimonial_JwKxY6"
       ],
+      "disabled": true,
       "name": "t:sections.testimonials-banner.name",
       "settings": {
         "transparent_header": false,
@@ -1172,6 +1178,7 @@
         "heading_CE9MYn",
         "text_CVjrUt"
       ],
+      "disabled": true,
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
@@ -1202,6 +1209,95 @@
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
+    },
+    "timeline_qYdmVm": {
+      "type": "timeline",
+      "blocks": {
+        "content_tN7gJr": {
+          "type": "content",
+          "settings": {
+            "img_url": "",
+            "subheading": "Step 1",
+            "heading": "Every Foot Is Different",
+            "heading_tag": "h2",
+            "text": "<p>Foot shape, arch height, and pressure distribution vary from person to person.</p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "content_AnWX4Q": {
+          "type": "content",
+          "settings": {
+            "img_url": "",
+            "subheading": "Step 2",
+            "heading": "Diagnostic Insight Guides Design",
+            "heading_tag": "h2",
+            "text": "<p>Aetrex uses biomechanical data and foot scanning technology to design products that support real movement patterns.</p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "content_3xbnmH": {
+          "type": "content",
+          "settings": {
+            "img_url": "",
+            "subheading": "Step 3",
+            "heading": "Choose Solutions Built For You",
+            "heading_tag": "h2",
+            "text": "<p>Selecting footwear and orthotics based on foot type helps improve comfort, alignment, and long-term mobility.</p>",
+            "button_label": "Find a Scan Location",
+            "button_link": "shopify://pages/store-locator",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "content_tN7gJr",
+        "content_AnWX4Q",
+        "content_3xbnmH"
+      ],
+      "name": "t:sections.timeline.name",
+      "settings": {
+        "image_ratio": "landscape",
+        "image_ratio_mobile": "wide",
+        "heading": "Better Movement Starts With Understanding Your Feet",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
     }
   },
   "order": [
@@ -1217,6 +1313,7 @@
     "reveal_testimonials_YRQjjR",
     "images_with_text_tkFKJb",
     "testimonials_banner_AfWJRh",
-    "image_with_text_overlay_M6AhUn"
+    "image_with_text_overlay_M6AhUn",
+    "timeline_qYdmVm"
   ]
 }
