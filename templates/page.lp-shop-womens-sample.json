@@ -1298,6 +1298,123 @@
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
+    },
+    "image_with_text_7TcxCw": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_kUKTxt": {
+          "type": "heading",
+          "settings": {
+            "heading": "Powered by Fit Science and Biomechanical Data",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_4jMPwf": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Aetrex products are developed using insights from 50 million foot scans. By combining advanced foot scanning technology with biomechanical research, we design footwear and orthotics that support alignment, improve comfort, and enhance movement performance.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_JpGzWw": {
+          "type": "button",
+          "settings": {
+            "button_label": "Button label",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": true
+          }
+        }
+      },
+      "block_order": [
+        "heading_kUKTxt",
+        "text_4jMPwf",
+        "button_JpGzWw"
+      ],
+      "name": "t:sections.image-with-text.name",
+      "settings": {
+        "img_url": "",
+        "image_height": "650px",
+        "image_width": "medium",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": true,
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "blog_posts_hKgXCU": {
+      "type": "blog-posts",
+      "name": "t:sections.blog-posts.name",
+      "settings": {
+        "blog": "case-studies",
+        "post_limit": 3,
+        "columns": 3,
+        "carousel_on_desktop": false,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "image_ratio": "landscape",
+        "show_tags": true,
+        "show_date": true,
+        "show_comments": true,
+        "show_author": false,
+        "show_excerpt": true,
+        "heading": "REAL WOMEN. REAL MOVEMENT STORIES",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "Helping Women Stay Active and Comfortable Every Day",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
     }
   },
   "order": [
@@ -1314,6 +1431,8 @@
     "images_with_text_tkFKJb",
     "testimonials_banner_AfWJRh",
     "image_with_text_overlay_M6AhUn",
-    "timeline_qYdmVm"
+    "timeline_qYdmVm",
+    "image_with_text_7TcxCw",
+    "blog_posts_hKgXCU"
   ]
 }
