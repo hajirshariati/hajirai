@@ -30,7 +30,7 @@
         "heading_64L34p": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Spring into Motion</p>",
+            "heading": "<p>Move Comfortably. Stay Active Longer.</p>",
             "heading_size": "title-sm",
             "heading_tag": "h2",
             "highlighted_text": "none",
@@ -40,7 +40,7 @@
         "text_EGcVH3": {
           "type": "text",
           "settings": {
-            "text": "<p>Unmatched Comfort & Support Starts with Science. Engineered with Insights from Over 50 Million Foot Scans</p>",
+            "text": "<p>Aetrex designs premium footwear and orthotics using real biomechanical data and fit science. By combining diagnostic insight with performance-driven design, we help women reduce pain, improve alignment, and move with confidence every day.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -102,19 +102,18 @@
       "name": "t:sections.video-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
-        "video": "shopify://files/videos/OrthoticLPdesktop.mp4",
         "video_url": "",
         "description": "",
         "enable_video_autoplay": true,
         "enable_video_looping": true,
         "image_height": "650px",
-        "content_width": "large",
-        "content_position": "md:items-center md:justify-center",
+        "content_width": "medium",
+        "content_position": "md:items-end md:justify-start",
         "text_alignment": "left",
         "video_url_mobile": "",
         "image_height_mobile": "auto",
-        "content_position_mobile": "items-center justify-center",
-        "text_alignment_mobile": "center",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
         "color_text": "#171717",
         "color_highlight": "#e0a580",
         "gradient_highlight": "",
