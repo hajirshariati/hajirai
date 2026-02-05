@@ -1380,7 +1380,7 @@
       "type": "blog-posts",
       "name": "t:sections.blog-posts.name",
       "settings": {
-        "blog": "case-studies",
+        "blog": "aetrex-blog",
         "post_limit": 3,
         "columns": 3,
         "carousel_on_desktop": false,
