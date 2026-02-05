@@ -102,6 +102,7 @@
       "name": "t:sections.video-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
+        "video": "shopify://files/videos/41368-ew700w_video (1080p)_716785f8-2e8f-4136-bb03-79b2cb2708eb.mp4",
         "video_url": "",
         "description": "",
         "enable_video_autoplay": true,
