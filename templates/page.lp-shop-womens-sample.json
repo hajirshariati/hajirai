@@ -1274,7 +1274,19 @@
         "button_JpGzWw": {
           "type": "button",
           "settings": {
-            "button_label": "Button label",
+            "button_label": "Shop Footwear",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": true
+          }
+        },
+        "button_nLPBTc": {
+          "type": "button",
+          "settings": {
+            "button_label": "Shop Orthotics",
             "button_link": "",
             "button_video_link": "",
             "button_style": "primary",
@@ -1287,7 +1299,8 @@
       "block_order": [
         "heading_kUKTxt",
         "text_4jMPwf",
-        "button_JpGzWw"
+        "button_JpGzWw",
+        "button_nLPBTc"
       ],
       "name": "t:sections.image-with-text.name",
       "settings": {
