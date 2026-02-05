@@ -326,12 +326,105 @@
         "show_view_all": false,
         "columns_mobile": "1",
         "swipe_on_mobile": true,
-        "heading": "<strong>Aetrex Orthotics</strong>",
+        "heading": "Women’s Best Sellers",
         "heading_size": "title-sm",
         "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
-        "subheading": "Find the orthotic that fits your needs",
-        "description": "<p>Unmatched comfort & support starts with Science. Aetrex orthotics is engineered with data from over50 million footscans to fit each specific need. Shop by foot condition</p>",
+        "subheading": "",
+        "description": "<p>Discover customer-favorite styles engineered for comfort, support, and long-lasting performance.</p>",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "featured_collections_XzEbqb": {
+      "type": "featured-collections",
+      "blocks": {
+        "collection_AwTzXp": {
+          "type": "collection",
+          "settings": {
+            "collection": "orthotics-for-flat-feet",
+            "products": [],
+            "title": "Flat Feet"
+          }
+        },
+        "collection_7eh6XJ": {
+          "type": "collection",
+          "settings": {
+            "collection": "orthotics-for-high-arches",
+            "products": [],
+            "title": "High Arches"
+          }
+        },
+        "collection_En7GRA": {
+          "type": "collection",
+          "settings": {
+            "collection": "orthotics-plantar-fasciitis",
+            "products": [],
+            "title": "Plantar Fasciitis"
+          }
+        },
+        "collection_TRTJHk": {
+          "type": "collection",
+          "settings": {
+            "collection": "orthotics-for-metatarsalgia",
+            "products": [],
+            "title": "Metatarsalgia"
+          }
+        },
+        "collection_idHLtb": {
+          "type": "collection",
+          "settings": {
+            "collection": "orthotics-for-heel-spurs",
+            "products": [],
+            "title": "Heel Spurs"
+          }
+        },
+        "collection_HYR4LD": {
+          "type": "collection",
+          "settings": {
+            "collection": "orthotics-for-mortons-neuroma",
+            "products": [],
+            "title": "Morton's Neuroma"
+          }
+        }
+      },
+      "block_order": [
+        "collection_AwTzXp",
+        "collection_7eh6XJ",
+        "collection_En7GRA",
+        "collection_TRTJHk",
+        "collection_idHLtb",
+        "collection_HYR4LD"
+      ],
+      "name": "Multiple featured collections",
+      "settings": {
+        "product_limit": 6,
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "COMPLETE YOUR FIT SYSTEM",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "<p>Every foot is unique. Aetrex orthotics are designed to deliver personalized comfort, alignment support, and pressure relief. Pairing footwear with the right orthotic can improve stability, reduce fatigue, and enhance overall movement.</p>",
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "",
@@ -1116,6 +1209,7 @@
     "video_with_text_overlay_TgKph8",
     "collection_list_64mUWx",
     "featured_collections_9d3ge7",
+    "featured_collections_XzEbqb",
     "collection_list_mPHCpz",
     "image_with_text_overlay_zKNTxj",
     "collage_ntqjfh",
