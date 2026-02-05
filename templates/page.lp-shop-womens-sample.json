@@ -139,10 +139,10 @@
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "womens-sandals",
+            "collection": "",
             "custom_url": "",
-            "title": "Sandals",
-            "description": "",
+            "title": "Relieve Foot & Heel Pain",
+            "description": "Footwear and orthotics designed to reduce pressure, support alignment, and help relieve plantar fasciitis and heel discomfort.",
             "overlay_content": false,
             "color_text": "#ffffff",
             "color_overlay": "#000000",
@@ -155,10 +155,10 @@
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "womens-sneakers",
+            "collection": "",
             "custom_url": "",
-            "title": "Sneakers",
-            "description": "",
+            "title": "All-Day Comfort & Standing Support",
+            "description": "Solutions designed for long hours on your feet, helping reduce fatigue and improve stability.",
             "overlay_content": false,
             "color_text": "#ffffff",
             "color_overlay": "#000000",
@@ -171,10 +171,10 @@
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "womens-wedges-heels",
+            "collection": "",
             "custom_url": "",
-            "title": "Wedges & Heels",
-            "description": "",
+            "title": "Everyday Walking & Travel Comfort",
+            "description": "Lightweight cushioning and ergonomic support built for daily movement.",
             "overlay_content": false,
             "color_text": "#ffffff",
             "color_overlay": "#000000",
@@ -187,10 +187,10 @@
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "womens-platform-sandals",
+            "collection": "",
             "custom_url": "",
-            "title": "Platforms",
-            "description": "",
+            "title": "Arch Support & Stability",
+            "description": "Designed to support flat feet, high arches, and overpronation.",
             "overlay_content": false,
             "color_text": "#ffffff",
             "color_overlay": "#000000",
@@ -199,62 +199,14 @@
             "enable_title_drop_shadow": false
           }
         },
-        "collection_kiGRtH": {
+        "collection_DiknGT": {
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "loafers-oxfords",
+            "collection": "",
             "custom_url": "",
-            "title": "Loafers & Oxfords",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_dQdHzw": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "womens-boots",
-            "custom_url": "",
-            "title": "Boots",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_Pfncqg": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "womens-clogs",
-            "custom_url": "",
-            "title": "Clogs",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_rdcKtc": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "womens-slippers",
-            "custom_url": "",
-            "title": "Slippers",
-            "description": "",
+            "title": "Athletic Recovery & Active Lifestyle",
+            "description": "Performance comfort solutions to help your body recover and stay active.",
             "overlay_content": false,
             "color_text": "#ffffff",
             "color_overlay": "#000000",
@@ -269,20 +221,17 @@
         "collection_k6CKbq",
         "collection_WXFwfw",
         "collection_nipcdf",
-        "collection_kiGRtH",
-        "collection_dQdHzw",
-        "collection_Pfncqg",
-        "collection_rdcKtc"
+        "collection_DiknGT"
       ],
       "name": "t:sections.collection-list.name",
       "settings": {
-        "columns": 4,
-        "carousel_on_desktop": false,
+        "columns": 5,
+        "carousel_on_desktop": true,
         "image_type": "collection",
         "image_ratio": "square",
         "show_products_count": false,
         "show_view_all": true,
-        "columns_mobile": "1",
+        "columns_mobile": "2",
         "swipe_on_mobile": true,
         "heading": "Find Support Designed For How You Move",
         "heading_size": "title-md",
