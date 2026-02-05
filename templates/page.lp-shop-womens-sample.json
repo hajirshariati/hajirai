@@ -1,0 +1,1180 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-xl tracking-heading",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "video_with_text_overlay_TgKph8": {
+      "type": "video-with-text-overlay",
+      "blocks": {
+        "heading_64L34p": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>Spring into Motion</p>",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_EGcVH3": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Unmatched Comfort & Support Starts with Science. Engineered with Insights from Over 50 Million Foot Scans</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_AGih6p": {
+          "type": "button",
+          "settings": {
+            "button_label": "Shop Footwear",
+            "button_link": "shopify://collections/shop-all-orthotics",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "sm",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_AgkNnK": {
+          "type": "button",
+          "settings": {
+            "button_label": "Shop Orthotics",
+            "button_link": "shopify://collections/shop-all-orthotics",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_PwAQDY": {
+          "type": "button",
+          "settings": {
+            "button_label": "Take Quiz",
+            "button_link": "https://irle3andv1z.typeform.com/to/gujvKvEg?typeform-source=f031fc-3.myshopify.com",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_64L34p",
+        "text_EGcVH3",
+        "button_AGih6p",
+        "button_AgkNnK",
+        "button_PwAQDY"
+      ],
+      "custom_css": [
+        ".banner__box--medium {height: inherit;}"
+      ],
+      "name": "t:sections.video-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "video": "shopify://files/videos/OrthoticLPdesktop.mp4",
+        "video_url": "",
+        "description": "",
+        "enable_video_autoplay": true,
+        "enable_video_looping": true,
+        "image_height": "650px",
+        "content_width": "large",
+        "content_position": "md:items-center md:justify-center",
+        "text_alignment": "left",
+        "video_url_mobile": "",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-center justify-center",
+        "text_alignment_mobile": "center",
+        "color_text": "#171717",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": true,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "collection_list_64mUWx": {
+      "type": "collection-list",
+      "blocks": {
+        "collection_e9A8Fb": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "womens-sandals",
+            "custom_url": "",
+            "title": "Sandals",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_k6CKbq": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "womens-sneakers",
+            "custom_url": "",
+            "title": "Sneakers",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_WXFwfw": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "womens-wedges-heels",
+            "custom_url": "",
+            "title": "Wedges & Heels",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_nipcdf": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "womens-platform-sandals",
+            "custom_url": "",
+            "title": "Platforms",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_kiGRtH": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "loafers-oxfords",
+            "custom_url": "",
+            "title": "Loafers & Oxfords",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_dQdHzw": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "womens-boots",
+            "custom_url": "",
+            "title": "Boots",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_Pfncqg": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "womens-clogs",
+            "custom_url": "",
+            "title": "Clogs",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_rdcKtc": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "womens-slippers",
+            "custom_url": "",
+            "title": "Slippers",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        }
+      },
+      "block_order": [
+        "collection_e9A8Fb",
+        "collection_k6CKbq",
+        "collection_WXFwfw",
+        "collection_nipcdf",
+        "collection_kiGRtH",
+        "collection_dQdHzw",
+        "collection_Pfncqg",
+        "collection_rdcKtc"
+      ],
+      "name": "t:sections.collection-list.name",
+      "settings": {
+        "columns": 4,
+        "carousel_on_desktop": false,
+        "image_type": "collection",
+        "image_ratio": "square",
+        "show_products_count": false,
+        "show_view_all": true,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "Shop by Category",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "featured_collections_9d3ge7": {
+      "type": "featured-collections",
+      "blocks": {
+        "collection_g9AqYk": {
+          "type": "collection",
+          "settings": {
+            "collection": "orthotics-for-flat-feet",
+            "products": [],
+            "title": "Flat Feet"
+          }
+        },
+        "collection_3qxYYM": {
+          "type": "collection",
+          "settings": {
+            "collection": "orthotics-for-high-arches",
+            "products": [],
+            "title": "High Arches"
+          }
+        },
+        "collection_xxeKq7": {
+          "type": "collection",
+          "settings": {
+            "collection": "orthotics-plantar-fasciitis",
+            "products": [],
+            "title": "Plantar Fasciitis"
+          }
+        },
+        "collection_Wzc8ka": {
+          "type": "collection",
+          "settings": {
+            "collection": "orthotics-for-metatarsalgia",
+            "products": [],
+            "title": "Metatarsalgia"
+          }
+        },
+        "collection_BbmnMe": {
+          "type": "collection",
+          "settings": {
+            "collection": "orthotics-for-heel-spurs",
+            "products": [],
+            "title": "Heel Spurs"
+          }
+        },
+        "collection_Uccwbn": {
+          "type": "collection",
+          "settings": {
+            "collection": "orthotics-for-mortons-neuroma",
+            "products": [],
+            "title": "Morton's Neuroma"
+          }
+        }
+      },
+      "block_order": [
+        "collection_g9AqYk",
+        "collection_3qxYYM",
+        "collection_xxeKq7",
+        "collection_Wzc8ka",
+        "collection_BbmnMe",
+        "collection_Uccwbn"
+      ],
+      "name": "Multiple featured collections",
+      "settings": {
+        "product_limit": 6,
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "<strong>Aetrex Orthotics</strong>",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "Find the orthotic that fits your needs",
+        "description": "<p>Unmatched comfort & support starts with Science. Aetrex orthotics is engineered with data from over50 million footscans to fit each specific need. Shop by foot condition</p>",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "collection_list_mPHCpz": {
+      "type": "collection-list",
+      "blocks": {
+        "collection_BMqtdJ": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "walking-orthotics",
+            "custom_url": "",
+            "image": "shopify://shop_images/Group_10_a493438e-77f4-4a5e-88b1-04ac1f5a4bf1.png",
+            "title": "Walking",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_hHkQLw": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "running-orthotics",
+            "custom_url": "",
+            "image": "shopify://shop_images/Group_11_cc45e757-0dfe-4e9d-999f-40a29c1844a1.png",
+            "title": "Running",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_FWgTeX": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "gym-training",
+            "custom_url": "",
+            "image": "shopify://shop_images/Group_7_53cd5509-a4e6-4e01-9140-21ba10532f65.png",
+            "title": "Gym",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_xjQV8H": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "all-day-standing-orthotics",
+            "custom_url": "",
+            "image": "shopify://shop_images/Group_8_c53ae63b-9703-4298-89f2-64bf44b0eca0.png",
+            "title": "Working",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_ELYLBC": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "tennis-pickleball-orthotics",
+            "custom_url": "",
+            "image": "shopify://shop_images/tennis_48cd18cf-4003-416c-bade-c07694a1de28.png",
+            "title": "Tennis",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_C3dagf": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "golf-orthotics",
+            "custom_url": "",
+            "image": "shopify://shop_images/golf_d9721c22-b996-4b0f-a445-56e0f5cf9ed6.png",
+            "title": "Golf",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_4RE3QR": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "tennis-pickleball-orthotics",
+            "custom_url": "",
+            "image": "shopify://shop_images/pickleball.png",
+            "title": "Pickleball",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        }
+      },
+      "block_order": [
+        "collection_BMqtdJ",
+        "collection_hHkQLw",
+        "collection_FWgTeX",
+        "collection_xjQV8H",
+        "collection_ELYLBC",
+        "collection_C3dagf",
+        "collection_4RE3QR"
+      ],
+      "disabled": true,
+      "name": "Collection list",
+      "settings": {
+        "columns": 5,
+        "carousel_on_desktop": true,
+        "image_type": "collection",
+        "image_ratio": "square",
+        "show_products_count": false,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "<strong>Shop by Activity</strong>",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h4",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "#f4f4f4",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 40,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "image_with_text_overlay_zKNTxj": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "subheading_f78ejn": {
+          "type": "subheading",
+          "settings": {
+            "subheading": "Powered by BioRocker™ Technology",
+            "subheading_size": "subtitle-md",
+            "secondary_color": true
+          }
+        },
+        "heading_fQG6rk": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>SPRING INTO MOTION. MOVE WITH AETREX</p>",
+            "heading_size": "title-lg tracking-heading",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_Qnjw43": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Natural motion. Effortless steps.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_htdE3j": {
+          "type": "button",
+          "settings": {
+            "button_label": "Shop BioRocker™ Collection",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": true
+          }
+        }
+      },
+      "block_order": [
+        "subheading_f78ejn",
+        "heading_fQG6rk",
+        "text_Qnjw43",
+        "button_htdE3j"
+      ],
+      "name": "t:sections.image-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "image_height": "650px",
+        "content_width": "small",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 70,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": true,
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "collage_ntqjfh": {
+      "type": "collage",
+      "blocks": {
+        "image_i7MLJM": {
+          "type": "image",
+          "settings": {
+            "subheading": "Strategically Placed Arch Support",
+            "heading": "",
+            "link": "",
+            "invert_subheading_heading": false,
+            "image": "shopify://shop_images/617x640_signature_arch.png",
+            "image_ratio": "adapt",
+            "content_position": "md:items-end md:justify-center",
+            "text_alignment": "center",
+            "image_ratio_mobile": "adapt",
+            "content_position_mobile": "items-end justify-center",
+            "text_alignment_mobile": "center",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle",
+            "color_text": "#171717",
+            "color_highlight": "",
+            "gradient_highlight": "",
+            "color_overlay": "#171717",
+            "overlay_opacity": 0
+          }
+        },
+        "image_kirkAq": {
+          "type": "image",
+          "settings": {
+            "subheading": "Alignment & Biomechanical Efficiency",
+            "heading": "",
+            "link": "",
+            "invert_subheading_heading": false,
+            "image": "shopify://shop_images/617x640_alignment.png",
+            "image_ratio": "adapt",
+            "content_position": "md:items-end md:justify-center",
+            "text_alignment": "center",
+            "image_ratio_mobile": "adapt",
+            "content_position_mobile": "items-end justify-center",
+            "text_alignment_mobile": "center",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle",
+            "color_text": "#171717",
+            "color_highlight": "",
+            "gradient_highlight": "",
+            "color_overlay": "#171717",
+            "overlay_opacity": 0
+          }
+        },
+        "image_UMzkxc": {
+          "type": "image",
+          "settings": {
+            "subheading": "Hi-Tech Materials to Benefit Your Health",
+            "heading": "",
+            "link": "",
+            "invert_subheading_heading": false,
+            "image": "shopify://shop_images/617x640_Hi_tech_Materials.png",
+            "image_ratio": "adapt",
+            "content_position": "md:items-end md:justify-center",
+            "text_alignment": "center",
+            "image_ratio_mobile": "adapt",
+            "content_position_mobile": "items-end justify-center",
+            "text_alignment_mobile": "center",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle",
+            "color_text": "#171717",
+            "color_highlight": "",
+            "gradient_highlight": "",
+            "color_overlay": "#171717",
+            "overlay_opacity": 0
+          }
+        },
+        "image_DEUPz8": {
+          "type": "image",
+          "settings": {
+            "subheading": "All-Day Comfort and Energy",
+            "heading": "",
+            "link": "",
+            "invert_subheading_heading": false,
+            "image": "shopify://shop_images/sneaker_ortho.png",
+            "image_ratio": "adapt",
+            "content_position": "md:items-end md:justify-center",
+            "text_alignment": "center",
+            "image_ratio_mobile": "adapt",
+            "content_position_mobile": "items-end justify-center",
+            "text_alignment_mobile": "center",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle",
+            "color_text": "#171717",
+            "color_highlight": "",
+            "gradient_highlight": "",
+            "color_overlay": "#171717",
+            "overlay_opacity": 0
+          }
+        }
+      },
+      "block_order": [
+        "image_i7MLJM",
+        "image_kirkAq",
+        "image_UMzkxc",
+        "image_DEUPz8"
+      ],
+      "name": "t:sections.collage.name",
+      "settings": {
+        "heading": "TECHNOLOGY <strong>IMPROVING THE WAY YOU MOVE</strong> ",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "<p>Aetrex Signature Features</p>",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "dynamic_feature_8mHNEE": {
+      "type": "dynamic-feature",
+      "blocks": {
+        "feature_kYjpfr": {
+          "type": "feature",
+          "settings": {
+            "heading": "Feature 1",
+            "text": "Description",
+            "horizontal": 25,
+            "vertical": 30,
+            "text_horizontal": 10,
+            "text_vertical": 20
+          }
+        }
+      },
+      "block_order": [
+        "feature_kYjpfr"
+      ],
+      "name": "Dynamic Feature",
+      "settings": {
+        "heading": " Inside Select Aetrex Shoes",
+        "dot_size": 20,
+        "dot_size_mobile": 16,
+        "dot_color": "#ffffff",
+        "dot_border_color": "#000000",
+        "dot_border_width": 3,
+        "line_color": "#000000",
+        "line_width": 0.5,
+        "line_breaks": 1,
+        "callout_background": "#ffffff",
+        "callout_radius": 8,
+        "callout_max_width": 220,
+        "callout_title_color": "#000000",
+        "callout_text_color": "#666666",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "reveal_testimonials_YRQjjR": {
+      "type": "reveal-testimonials",
+      "blocks": {
+        "testimonial_WJ44zi": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_yi9Gai": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>\"The only sneakers that don't hurt myfeet!“I have plantar fasciitis and rheumatoid arthritis. I can comfortably wear these sneakers for my 6–8 mile walks every day!”</p>",
+            "author": "Lesina C. ",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_tCrkDw": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_hPdmxn": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_nE3Y8R": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_rkPVNy": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_WJ44zi",
+        "testimonial_yi9Gai",
+        "testimonial_tCrkDw",
+        "testimonial_hPdmxn",
+        "testimonial_nE3Y8R",
+        "testimonial_rkPVNy"
+      ],
+      "name": "t:sections.reveal-testimonials.name",
+      "settings": {
+        "heading": "Customer quotes",
+        "heading_size": "title-md",
+        "heading_tag": "h2",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "images_with_text_tkFKJb": {
+      "type": "images-with-text",
+      "blocks": {
+        "heading_XchtBD": {
+          "type": "heading",
+          "settings": {
+            "heading": "<strong>Reviews from doctors</strong>",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_XdwRGb": {
+          "type": "text",
+          "settings": {
+            "text": "<p>\"I recommend Aetrex products to my patients because it helps provide the right balance and support to relieve and prevent foot conditions like Plantar Fasciitis. Unlike other brands; the contour, position and height of the Aetrex product arch support aligns anatomically in the proper place to help support our bodies from the ground up.\" </p><p>- Janine Taddeo, DPM </p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_XchtBD",
+        "text_XdwRGb"
+      ],
+      "name": "t:sections.images-with-text.name",
+      "settings": {
+        "image_url": "",
+        "image2_url": "",
+        "image_ratio": "portrait",
+        "image_width": "medium",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": true
+      }
+    },
+    "testimonials_banner_AfWJRh": {
+      "type": "testimonials-banner",
+      "blocks": {
+        "testimonial_dETLit": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>“Podiatristinformedthat deliver actually supportive flats.”</p>",
+            "author": "BuzzFeed",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_xxaFnm": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>\"Top pick <strong>for arch support </strong>and allday comfort.”</p>",
+            "author": "Everyday Health",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_TwC9HF": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>“Chosen for travelready comfort with true arch support.”</p>",
+            "author": "USA TODAY 10Best",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_ycUdTi": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>“Styleforward boots with support you can wear all night.”</p>",
+            "author": "Forbes",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_JwKxY6": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>“Expertnoted cushioning, builtin arch support, and a secure heel cup.”</p>",
+            "author": "NBC Select",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_dETLit",
+        "testimonial_xxaFnm",
+        "testimonial_TwC9HF",
+        "testimonial_ycUdTi",
+        "testimonial_JwKxY6"
+      ],
+      "name": "t:sections.testimonials-banner.name",
+      "settings": {
+        "transparent_header": false,
+        "image_height": "650px",
+        "content_position": "md:items-center md:justify-center",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-center justify-center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 70,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "rounded": false,
+        "enable_parallax": true,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": "",
+        "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_overlay_M6AhUn": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "heading_CE9MYn": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p><strong>About Aetrex</strong></p>",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_CVjrUt": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Aetrex designs footwear and orthotics that support the way you move through life. Guided by data from over 50 million global foot scans, every style is thoughtfully engineered to promote alignment, comfort, and confidence—so you can move better, feel better, and stay in motion every day.</p>",
+            "text_font": "body",
+            "text_size": "subtext-lg",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_CE9MYn",
+        "text_CVjrUt"
+      ],
+      "name": "t:sections.image-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/1920x710_Albert_scanner_feet.png",
+        "image_height": "650px",
+        "content_width": "small",
+        "content_position": "md:items-center md:justify-start",
+        "text_alignment": "left",
+        "image_height_mobile": "300px",
+        "content_position_mobile": "items-start justify-start",
+        "text_alignment_mobile": "left",
+        "color_text": "#171717",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": true,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "video_with_text_overlay_TgKph8",
+    "collection_list_64mUWx",
+    "featured_collections_9d3ge7",
+    "collection_list_mPHCpz",
+    "image_with_text_overlay_zKNTxj",
+    "collage_ntqjfh",
+    "dynamic_feature_8mHNEE",
+    "reveal_testimonials_YRQjjR",
+    "images_with_text_tkFKJb",
+    "testimonials_banner_AfWJRh",
+    "image_with_text_overlay_M6AhUn"
+  ]
+}
