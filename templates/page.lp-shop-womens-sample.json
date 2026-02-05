@@ -258,76 +258,20 @@
         "abra_promo_code_hide": ""
       }
     },
-    "featured_collections_9d3ge7": {
-      "type": "featured-collections",
-      "blocks": {
-        "collection_g9AqYk": {
-          "type": "collection",
-          "settings": {
-            "collection": "orthotics-for-flat-feet",
-            "products": [],
-            "title": "Flat Feet"
-          }
-        },
-        "collection_3qxYYM": {
-          "type": "collection",
-          "settings": {
-            "collection": "orthotics-for-high-arches",
-            "products": [],
-            "title": "High Arches"
-          }
-        },
-        "collection_xxeKq7": {
-          "type": "collection",
-          "settings": {
-            "collection": "orthotics-plantar-fasciitis",
-            "products": [],
-            "title": "Plantar Fasciitis"
-          }
-        },
-        "collection_Wzc8ka": {
-          "type": "collection",
-          "settings": {
-            "collection": "orthotics-for-metatarsalgia",
-            "products": [],
-            "title": "Metatarsalgia"
-          }
-        },
-        "collection_BbmnMe": {
-          "type": "collection",
-          "settings": {
-            "collection": "orthotics-for-heel-spurs",
-            "products": [],
-            "title": "Heel Spurs"
-          }
-        },
-        "collection_Uccwbn": {
-          "type": "collection",
-          "settings": {
-            "collection": "orthotics-for-mortons-neuroma",
-            "products": [],
-            "title": "Morton's Neuroma"
-          }
-        }
-      },
-      "block_order": [
-        "collection_g9AqYk",
-        "collection_3qxYYM",
-        "collection_xxeKq7",
-        "collection_Wzc8ka",
-        "collection_BbmnMe",
-        "collection_Uccwbn"
-      ],
-      "name": "Multiple featured collections",
+    "featured_collection_aJXHHi": {
+      "type": "featured-collection",
+      "name": "t:sections.featured-collection.name",
       "settings": {
+        "collection": "womens-best-sellers-footwear",
+        "products": [],
         "product_limit": 6,
         "columns": 4,
         "carousel_on_desktop": true,
         "show_view_all": false,
         "columns_mobile": "1",
         "swipe_on_mobile": true,
-        "heading": "Women’s Best Sellers",
-        "heading_size": "title-sm",
+        "heading": "Women’s Best Sellers",
+        "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
         "subheading": "",
@@ -1421,7 +1365,7 @@
     "main-page",
     "video_with_text_overlay_TgKph8",
     "collection_list_64mUWx",
-    "featured_collections_9d3ge7",
+    "featured_collection_aJXHHi",
     "featured_collections_XzEbqb",
     "collection_list_mPHCpz",
     "image_with_text_overlay_zKNTxj",
