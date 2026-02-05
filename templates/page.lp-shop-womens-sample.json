@@ -228,7 +228,7 @@
         "columns": 5,
         "carousel_on_desktop": true,
         "image_type": "collection",
-        "image_ratio": "square",
+        "image_ratio": "portrait",
         "show_products_count": false,
         "show_view_all": true,
         "columns_mobile": "2",
