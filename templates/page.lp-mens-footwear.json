@@ -24,20 +24,20 @@
         "rounded": false
       }
     },
-    "image_with_text_overlay_HEWGdX": {
+    "image_with_text_overlay_NVr9Vm": {
       "type": "image-with-text-overlay",
       "blocks": {
-        "heading_67Mz3K": {
+        "heading_ADewGc": {
           "type": "heading",
           "settings": {
-            "heading": "<p>New Fall Styles</p>",
+            "heading": "<p>Redefining Everyday Comfort</p>",
             "heading_size": "title-sm",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         },
-        "divider_AGUC4Q": {
+        "divider_cHNjLR": {
           "type": "divider",
           "settings": {
             "divider_width": 120,
@@ -45,10 +45,10 @@
             "divider_mb": 5
           }
         },
-        "text_7kb9cy": {
+        "text_8kjLCJ": {
           "type": "text",
           "settings": {
-            "text": "<p>Healthy Comfort Starts Here!</p>",
+            "text": "<p>Supportive men’s sneakers built for all-day versatility.</p>",
             "text_font": "body",
             "text_size": "subtext-custom",
             "text_max_size": 22,
@@ -60,11 +60,11 @@
             "highlighted_scribble": "circle"
           }
         },
-        "button_MLhezL": {
+        "button_NbbjWb": {
           "type": "button",
           "settings": {
-            "button_label": "SHOP NEW ARRIVALS",
-            "button_link": "shopify://collections/mens-new-arrivals",
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://collections/mens-sneakers",
             "button_video_link": "",
             "button_style": "secondary",
             "button_size": "md",
@@ -74,10 +74,10 @@
         }
       },
       "block_order": [
-        "heading_67Mz3K",
-        "divider_AGUC4Q",
-        "text_7kb9cy",
-        "button_MLhezL"
+        "heading_ADewGc",
+        "divider_cHNjLR",
+        "text_8kjLCJ",
+        "button_NbbjWb"
       ],
       "settings": {
         "transparent_header": false,
@@ -105,7 +105,9 @@
         "full_width": true,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_PKdTPU": {
@@ -159,7 +161,9 @@
         "padding_bottom": 12,
         "divider": false,
         "narrow": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "collection_list_q7Rypj": {
@@ -270,7 +274,9 @@
         "padding_bottom": 36,
         "divider": false,
         "full_width": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "multicolumn_LcGaHb": {
@@ -287,6 +293,7 @@
             "heading": "Pain Relief",
             "heading_size": "text-lg-2xl",
             "text": "",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -307,6 +314,7 @@
             "heading": "Arch Support",
             "heading_size": "text-lg-2xl",
             "text": "",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -327,6 +335,7 @@
             "heading": "Alignment",
             "heading_size": "text-lg-2xl",
             "text": "",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -347,6 +356,7 @@
             "heading": "Cushioning",
             "heading_size": "text-lg-2xl",
             "text": "",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -394,9 +404,11 @@
         "color_button_gradient": "",
         "padding_top": 36,
         "padding_bottom": 36,
-        "divider": false,
         "full_width": false,
-        "rounded": false
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "image_with_text_overlay_GNC4KT": {
@@ -490,7 +502,9 @@
         "full_width": true,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "image_with_text_overlay_cLVdgJ": {
@@ -584,7 +598,9 @@
         "full_width": false,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "image_with_text_overlay_9BfJhL": {
@@ -678,13 +694,15 @@
         "full_width": true,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     }
   },
   "order": [
     "main-page",
-    "image_with_text_overlay_HEWGdX",
+    "image_with_text_overlay_NVr9Vm",
     "rich_text_PKdTPU",
     "collection_list_q7Rypj",
     "multicolumn_LcGaHb",
