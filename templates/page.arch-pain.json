@@ -85,7 +85,7 @@
       "settings": {
         "transparent_header": false,
         "image": "shopify://shop_images/Group_10_76daefab-458a-4883-8570-5f570d93b672.png",
-        "image_height": "adapt",
+        "image_height": "650px",
         "content_width": "small",
         "content_position": "md:items-center md:justify-start",
         "text_alignment": "left",
@@ -139,6 +139,10 @@
         "question_XamVPH",
         "question_x9EPUx"
       ],
+      "custom_css": [
+        ".faqs.with-background > :is(div, form) {padding: 2em 0em !important;}",
+        ".details__summary .icon-plus-2 {display: none;}"
+      ],
       "name": "t:sections.faq.name",
       "settings": {
         "style": "with-background",
@@ -168,7 +172,7 @@
         "padding_bottom": 0,
         "divider": false,
         "narrow": false,
-        "rounded": false,
+        "rounded": true,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
@@ -385,8 +389,8 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
-        "color_background": "#e0edf2",
+        "color_text": "#606060",
+        "color_background": "#fafafa",
         "gradient_background": "",
         "color_highlight": "#171717",
         "gradient_highlight": "",
@@ -397,7 +401,7 @@
         "padding_bottom": 24,
         "divider": false,
         "narrow": true,
-        "rounded": false,
+        "rounded": true,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
@@ -476,88 +480,27 @@
         "enable_parallax": true
       }
     },
-    "featured_collection_dXtHeM": {
+    "featured_collection_zAQDU9": {
       "type": "featured-collection",
       "name": "t:sections.featured-collection.name",
       "settings": {
-        "collection": "",
-        "products": [
-          "danika-light-grey-ap113w",
-          "l420w-m",
-          "sydney-black-ew700w",
-          "rachel-white-ae723w"
-        ],
-        "product_limit": 4,
+        "collection": "womens-footwear-for-high-arches-copy",
+        "products": [],
+        "product_limit": 6,
         "columns": 4,
-        "carousel_on_desktop": false,
-        "show_view_all": false,
+        "carousel_on_desktop": true,
+        "show_view_all": true,
         "columns_mobile": "1",
-        "swipe_on_mobile": false,
-        "heading": "",
+        "swipe_on_mobile": true,
+        "heading": "{{ section.settings.collection.title }}",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
+        "heading_tag": "h3",
         "subheading": "",
         "description": "",
         "highlighted_text": "text",
         "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
-        "color_background": "#ffffff",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "rich_text_TjbjcG": {
-      "type": "rich-text",
-      "blocks": {
-        "text_JgN8mA": {
-          "type": "text",
-          "settings": {
-            "text": "<p>What Other Arch Pain Sufferers Say</p>",
-            "text_font": "heading",
-            "text_size": "subtext-custom",
-            "text_max_size": 30,
-            "text_line_height": 1.2,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "one"
-          }
-        }
-      },
-      "block_order": [
-        "text_JgN8mA"
-      ],
-      "name": "t:sections.rich-text.name",
-      "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
+        "color_text": "",
         "color_background": "",
         "gradient_background": "",
         "color_highlight": "",
@@ -565,10 +508,10 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 0,
-        "padding_bottom": 0,
+        "padding_top": 48,
+        "padding_bottom": 48,
         "divider": false,
-        "narrow": true,
+        "full_width": false,
         "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
@@ -624,7 +567,7 @@
       ],
       "name": "t:sections.testimonials.name",
       "settings": {
-        "heading": "",
+        "heading": "What Other Arch Pain Sufferers Say",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
@@ -637,17 +580,17 @@
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "#171717",
-        "color_background": "#ffffff",
+        "color_background": "#fafafa",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 20,
-        "padding_bottom": 20,
+        "padding_top": 48,
+        "padding_bottom": 48,
         "divider": false,
-        "rounded": false
+        "rounded": true
       }
     },
     "collection_list_fbMkYY": {
@@ -728,43 +671,6 @@
         "abra_promo_code_hide": ""
       }
     },
-    "featured_collection_zAQDU9": {
-      "type": "featured-collection",
-      "name": "t:sections.featured-collection.name",
-      "settings": {
-        "collection": "womens-footwear-for-high-arches-copy",
-        "products": [],
-        "product_limit": 6,
-        "columns": 4,
-        "carousel_on_desktop": true,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "{{ section.settings.collection.title }}",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h3",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "text",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 48,
-        "padding_bottom": 24,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
     "rich_text_hkApnx": {
       "type": "rich-text",
       "blocks": {
@@ -829,11 +735,9 @@
     "lookbook_g7R8JN",
     "rich_text_egdfpx",
     "images_with_text_iL8ht6",
-    "featured_collection_dXtHeM",
-    "rich_text_TjbjcG",
+    "featured_collection_zAQDU9",
     "testimonials_byJFpb",
     "collection_list_fbMkYY",
-    "featured_collection_zAQDU9",
     "rich_text_hkApnx"
   ]
 }
