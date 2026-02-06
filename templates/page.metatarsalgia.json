@@ -140,7 +140,7 @@
         "question_x9EPUx"
       ],
       "custom_css": [
-        ".faqs.with-background > :is(div, form) {padding: 2em 0px !important;}",
+        ".faqs.with-background > :is(div, form) {padding: 2em 5em !important;}",
         ".details__summary .icon-plus-2 {display: none;}"
       ],
       "name": "t:sections.faq.name",
@@ -374,7 +374,7 @@
       ],
       "name": "t:sections.rich-text.name",
       "settings": {
-        "text_alignment": "center",
+        "text_alignment": "left",
         "text_alignment_mobile": "center",
         "heading": "",
         "heading_size": "title-md",
@@ -480,84 +480,6 @@
         "enable_parallax": true
       }
     },
-    "collection_list_fbMkYY": {
-      "type": "collection-list",
-      "blocks": {
-        "collection_cPKHdc": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "womens-footwear-for-metatarsalgia",
-            "custom_url": "",
-            "image": "shopify://shop_images/Rectangle_60_3.png",
-            "title": "Shoes",
-            "description": "To Help Relieve Metatarsalgia",
-            "overlay_content": true,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 40,
-            "submenu_title_position": "center",
-            "enable_title_drop_shadow": true
-          }
-        },
-        "collection_gpn6Pp": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "orthotics-for-metatarsalgia",
-            "custom_url": "",
-            "image": "shopify://shop_images/Rectangle_61_668b1198-2250-4e0e-9f58-c1a42125e032.png",
-            "title": "Orthotics",
-            "description": "To Help Relieve Metatarsalgia",
-            "overlay_content": true,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 40,
-            "submenu_title_position": "center",
-            "enable_title_drop_shadow": true
-          }
-        }
-      },
-      "block_order": [
-        "collection_cPKHdc",
-        "collection_gpn6Pp"
-      ],
-      "disabled": true,
-      "name": "t:sections.collection-list.name",
-      "settings": {
-        "columns": 2,
-        "carousel_on_desktop": true,
-        "image_type": "collection",
-        "image_ratio": "landscape",
-        "show_products_count": false,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "#fafafa",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 0,
-        "padding_bottom": 40,
-        "divider": false,
-        "full_width": true,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
     "featured_collection_Xk34kf": {
       "type": "featured-collection",
       "name": "t:sections.featured-collection.name",
@@ -567,7 +489,7 @@
         "product_limit": 6,
         "columns": 4,
         "carousel_on_desktop": true,
-        "show_view_all": false,
+        "show_view_all": true,
         "columns_mobile": "1",
         "swipe_on_mobile": true,
         "heading": "{{ section.settings.collection.title }}",
@@ -735,7 +657,6 @@
     "lookbook_w69hfT",
     "rich_text_mPwWDc",
     "images_with_text_iL8ht6",
-    "collection_list_fbMkYY",
     "featured_collection_Xk34kf",
     "testimonials_byJFpb",
     "rich_text_WBLppD"
