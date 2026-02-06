@@ -140,8 +140,8 @@
         "question_x9EPUx"
       ],
       "custom_css": [
-        ".faqs.with-background > :is(div, form) {padding: 0px !important;}",
-        " .details__summary .icon-plus-2 {display: none;}"
+        ".faqs.with-background > :is(div, form) {padding: 2em 0px !important;}",
+        ".details__summary .icon-plus-2 {display: none;}"
       ],
       "name": "t:sections.faq.name",
       "settings": {
@@ -389,16 +389,16 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
-        "color_background": "#e0edf2",
+        "color_text": "#606060",
+        "color_background": "#e7e7e7",
         "gradient_background": "",
         "color_highlight": "#171717",
         "gradient_highlight": "",
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 24,
-        "padding_bottom": 24,
+        "padding_top": 48,
+        "padding_bottom": 48,
         "divider": false,
         "narrow": true,
         "rounded": false,
@@ -478,180 +478,6 @@
         "full_width": false,
         "rounded": false,
         "enable_parallax": true
-      }
-    },
-    "featured_collection_dXtHeM": {
-      "type": "featured-collection",
-      "name": "t:sections.featured-collection.name",
-      "settings": {
-        "collection": "",
-        "products": [
-          "maui-black-gloss-l3030w",
-          "metatarsalgia-orthotics-men",
-          "xspress-runner2-white-xs103w",
-          "blake-black-pc130w"
-        ],
-        "product_limit": 4,
-        "columns": 4,
-        "carousel_on_desktop": false,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": false,
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "text",
-        "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
-        "color_background": "#ffffff",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "rich_text_4FKGVw": {
-      "type": "rich-text",
-      "blocks": {
-        "text_jJWFPp": {
-          "type": "text",
-          "settings": {
-            "text": "<p>What Other Metatarsalgia Sufferers Say</p>",
-            "text_font": "heading",
-            "text_size": "subtext-custom",
-            "text_max_size": 30,
-            "text_line_height": 1.2,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "one"
-          }
-        }
-      },
-      "block_order": [
-        "text_jJWFPp"
-      ],
-      "name": "t:sections.rich-text.name",
-      "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 0,
-        "padding_bottom": 0,
-        "divider": false,
-        "narrow": true,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "testimonials_byJFpb": {
-      "type": "testimonials",
-      "blocks": {
-        "testimonial_UPjm8b": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "quote",
-            "text": "<h6><strong>Bought all 4 colors</strong><br/>I bought two pairs and were so elated with the comfort that I bought the last two remaining colors. I suffer from Metatarsalgia and was glad to finally being able to walk without discomfort & pain!!”</h6>",
-            "author": "Ellen o.",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "testimonial_xPKLWB": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "quote",
-            "text": "<h6><strong>I love these sneakers.</strong><br/>I love these sneakers. I have bought three of the same sneakers, but in different colors. What a difference they have made on my feet. I like to take my dog for walks. I had to stop. My feet were in such pain. With these sneakers my feet are fine now. Thank you Aetrex.</h6>",
-            "author": "Linda P.",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "testimonial_RixBWT": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "quote",
-            "text": "<h6><strong>Comfortable & Supportive </strong><br/>I bought these to wear at work. I am a Dental Assistant and on my feet most of the day. With other shoes, I would go home with sore feet and low back pain. The Xspress Runner 2 felt comfortable and supportive right from the first time I laced them up - no break-in required.</h6>",
-            "author": "Susanne B.",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "testimonial_UPjm8b",
-        "testimonial_xPKLWB",
-        "testimonial_RixBWT"
-      ],
-      "name": "t:sections.testimonials.name",
-      "settings": {
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "#171717",
-        "color_background": "#ffffff",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 20,
-        "padding_bottom": 20,
-        "divider": false,
-        "rounded": false
       }
     },
     "collection_list_fbMkYY": {
@@ -769,6 +595,82 @@
         "abra_promo_code_hide": ""
       }
     },
+    "testimonials_byJFpb": {
+      "type": "testimonials",
+      "blocks": {
+        "testimonial_UPjm8b": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<h6><strong>Bought all 4 colors</strong><br/>I bought two pairs and were so elated with the comfort that I bought the last two remaining colors. I suffer from Metatarsalgia and was glad to finally being able to walk without discomfort & pain!!”</h6>",
+            "author": "Ellen o.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_xPKLWB": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<h6><strong>I love these sneakers.</strong><br/>I love these sneakers. I have bought three of the same sneakers, but in different colors. What a difference they have made on my feet. I like to take my dog for walks. I had to stop. My feet were in such pain. With these sneakers my feet are fine now. Thank you Aetrex.</h6>",
+            "author": "Linda P.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_RixBWT": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<h6><strong>Comfortable & Supportive </strong><br/>I bought these to wear at work. I am a Dental Assistant and on my feet most of the day. With other shoes, I would go home with sore feet and low back pain. The Xspress Runner 2 felt comfortable and supportive right from the first time I laced them up - no break-in required.</h6>",
+            "author": "Susanne B.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_UPjm8b",
+        "testimonial_xPKLWB",
+        "testimonial_RixBWT"
+      ],
+      "name": "t:sections.testimonials.name",
+      "settings": {
+        "heading": "What Other Metatarsalgia Sufferers Say",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 20,
+        "padding_bottom": 20,
+        "divider": false,
+        "rounded": false
+      }
+    },
     "rich_text_WBLppD": {
       "type": "rich-text",
       "blocks": {
@@ -833,11 +735,9 @@
     "lookbook_w69hfT",
     "rich_text_mPwWDc",
     "images_with_text_iL8ht6",
-    "featured_collection_dXtHeM",
-    "rich_text_4FKGVw",
-    "testimonials_byJFpb",
     "collection_list_fbMkYY",
     "featured_collection_Xk34kf",
+    "testimonials_byJFpb",
     "rich_text_WBLppD"
   ]
 }
