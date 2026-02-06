@@ -40,7 +40,7 @@
         "text_LHGLnM": {
           "type": "text",
           "settings": {
-            "text": "<p>Achilles Tendonitis is inflammation of the Achilles tendon, which can lead to degeneration. The Achilles tendon, a large tendon at the back of the leg that attaches to the heel, can become painful due to this condition.<br/><br/>Pain from Achilles Tendonitis can develop gradually without any history of trauma and may present as shooting, burning, or piercing pain. Untreated Achilles Tendonitis poses a risk of the tendon becoming weak and potentially rupturing.</p>",
+            "text": "<p>Achilles Tendonitis is inflammation of the achilles tendon, which can lead to degeneration. The achilles tendon, a large tendon at the back of the leg that attaches to the heel, can become painful due to this condition.<br/><br/>Pain from achilles tendonitis can develop gradually without any history of trauma and may present as shooting, burning, or piercing pain. Untreated achilles tendonitis poses a risk of the tendon becoming weak and potentially rupturing.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -120,7 +120,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Causes</strong>",
-            "text": "<p>There are several factors that can cause achilles tendonitis. The most common cause is over-pronation. Over-pronation occurs in the walking process, when the arch collapses upon weight bearing, adding stress on the achilles tendon.   Other factors that lead to achilles tendonitis are improper shoe selection, inadequate stretching prior to engaging in athletics, a short achilles tendon, direct trauma (injury) to the tendon, and heel bone deformity.</p>",
+            "text": "<p>There are several factors that can cause achilles tendonitis. The most common cause is overpronation. Overpronation occurs in the walking process, when the arch collapses upon weight bearing, adding stress on the achilles tendon. Other factors that lead to achilles tendonitis are improper shoe selection, inadequate stretching prior to engaging in athletics, a short achilles tendon, direct trauma (injury) to the tendon, and heel bone deformity.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
