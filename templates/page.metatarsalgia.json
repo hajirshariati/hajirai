@@ -139,6 +139,10 @@
         "question_XamVPH",
         "question_x9EPUx"
       ],
+      "custom_css": [
+        ".faqs.with-background > :is(div, form) {padding: 0px !important;}",
+        " .details__summary .icon-plus-2 {display: none;}"
+      ],
       "name": "t:sections.faq.name",
       "settings": {
         "style": "with-background",
