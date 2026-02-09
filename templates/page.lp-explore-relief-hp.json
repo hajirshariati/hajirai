@@ -815,7 +815,11 @@
             "cta_label": "LEARN MORE",
             "cta_link": "shopify://pages/explore-relief-for-mortons-neuroma",
             "cta_external": false,
-            "cta_icon": false
+            "cta_icon": false,
+            "cta_label_2": "",
+            "cta_link_2": "",
+            "cta_external_2": false,
+            "cta_icon_2": true
           }
         },
         "content_MECM4b": {
@@ -837,7 +841,11 @@
             "cta_label": "LEARN MORE",
             "cta_link": "shopify://pages/explore-relief-for-overpronation",
             "cta_external": false,
-            "cta_icon": false
+            "cta_icon": false,
+            "cta_label_2": "",
+            "cta_link_2": "",
+            "cta_external_2": false,
+            "cta_icon_2": true
           }
         },
         "content_mANPLU": {
@@ -859,7 +867,11 @@
             "cta_label": "LEARN MORE",
             "cta_link": "shopify://pages/explore-relief-for-bunions",
             "cta_external": false,
-            "cta_icon": false
+            "cta_icon": false,
+            "cta_label_2": "",
+            "cta_link_2": "",
+            "cta_external_2": false,
+            "cta_icon_2": true
           }
         },
         "content_f7qMzy": {
@@ -881,7 +893,11 @@
             "cta_label": "LEARN MORE",
             "cta_link": "shopify://pages/explore-relief-for-metatarsalgia",
             "cta_external": false,
-            "cta_icon": false
+            "cta_icon": false,
+            "cta_label_2": "",
+            "cta_link_2": "",
+            "cta_external_2": false,
+            "cta_icon_2": true
           }
         },
         "content_T3pkMV": {
@@ -903,7 +919,11 @@
             "cta_label": "LEARN MORE",
             "cta_link": "shopify://collections/womens-footwear-for-plantar-fasciitis-copy",
             "cta_external": false,
-            "cta_icon": false
+            "cta_icon": false,
+            "cta_label_2": "",
+            "cta_link_2": "",
+            "cta_external_2": false,
+            "cta_icon_2": true
           }
         },
         "content_BjVPLd": {
@@ -922,10 +942,14 @@
             "horizontal": 55,
             "vertical_mobile": 51,
             "horizontal_mobile": 57,
-            "cta_label": "LEARN MORE",
+            "cta_label": "ABOUT HEEL SPURS",
             "cta_link": "shopify://pages/explore-relief-for-heel-spurs",
             "cta_external": false,
-            "cta_icon": false
+            "cta_icon": false,
+            "cta_label_2": "ABOUT HEEL PAIN",
+            "cta_link_2": "shopify://pages/explore-relief-for-heel-pain",
+            "cta_external_2": false,
+            "cta_icon_2": false
           }
         }
       },
