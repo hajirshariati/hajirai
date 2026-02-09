@@ -326,86 +326,6 @@
         "abra_promo_code_hide": ""
       }
     },
-    "rich_text_73ERKg": {
-      "type": "rich-text",
-      "blocks": {
-        "heading_RpcMxt": {
-          "type": "heading",
-          "settings": {
-            "heading": "Why Our Products Help Relieve Bunion Related Foot Pain",
-            "heading_size": "title-sm",
-            "heading_tag": "h2",
-            "highlighted_text": "text",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_xKhGeN": {
-          "type": "text",
-          "settings": {
-            "text": "<p><em>Aetrex products can help correct the alignment and alleviate the pressure on the affected joint.Aetrex shoes with a wide toe area are recommended to accommodate the deformity and Aetrex Orthotics that help reduce bunion pain and increase the toe’s mobility. </em></p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.2,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": true,
-            "highlighted_text": "text",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_rWCLDJ": {
-          "type": "button",
-          "disabled": true,
-          "settings": {
-            "button_label": "Button label",
-            "button_link": "",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": true
-          }
-        }
-      },
-      "block_order": [
-        "heading_RpcMxt",
-        "text_xKhGeN",
-        "button_rWCLDJ"
-      ],
-      "name": "t:sections.rich-text.name",
-      "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "#171717",
-        "color_background": "#fafafa",
-        "gradient_background": "",
-        "color_highlight": "#171717",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 48,
-        "padding_bottom": 48,
-        "divider": false,
-        "narrow": true,
-        "rounded": true,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
     "featured_collection_3fWrTX": {
       "type": "featured-collection",
       "name": "t:sections.featured-collection.name",
@@ -416,14 +336,14 @@
         "columns": 4,
         "carousel_on_desktop": true,
         "show_view_all": true,
-        "columns_mobile": "1",
+        "columns_mobile": "2",
         "swipe_on_mobile": true,
         "heading": "{{ section.settings.collection.title }}",
         "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
+        "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h3",
         "subheading": "",
-        "description": "",
+        "description": "<p><em>Aetrex products can help correct the alignment and alleviate the pressure on the affected joint.Aetrex shoes with a wide toe area are recommended to accommodate the deformity and Aetrex Orthotics that help reduce bunion pain and increase the toe’s mobility. </em></p>",
         "highlighted_text": "text",
         "highlighted_scribble": "circle",
         "color_text": "",
@@ -436,7 +356,7 @@
         "color_button_gradient": "",
         "padding_top": 48,
         "padding_bottom": 48,
-        "divider": false,
+        "divider": true,
         "full_width": false,
         "rounded": true,
         "abra_promo_code_show": "",
@@ -603,9 +523,9 @@
         "text_rFtanA": {
           "type": "text",
           "settings": {
-            "text": "<p>The information contained on this website is for educational, informational and retail purposes only. No material on this site is intended to be a substitute for medical advice, diagnosis or treatment of any medical condition. Accordingly, if you are experiencing ongoing pain or discomfort, we encourage you to consult with a doctor or medical professional.</p>",
+            "text": "<p><em>The information contained on this website is for educational, informational and retail purposes only. No material on this site is intended to be a substitute for medical advice, diagnosis or treatment of any medical condition. Accordingly, if you are experiencing ongoing pain or discomfort, we encourage you to consult with a doctor or medical professional.</em></p>",
             "text_font": "body",
-            "text_size": "subtext-md",
+            "text_size": "subtext-sm",
             "text_max_size": 32,
             "text_line_height": 1.2,
             "text_letter_spacing": 0,
@@ -659,7 +579,6 @@
     "image_with_text_overlay_rBfBzp",
     "faq_zhAACx",
     "lookbook_crRFzY",
-    "rich_text_73ERKg",
     "featured_collection_3fWrTX",
     "testimonials_byJFpb",
     "collection_list_fbMkYY",
