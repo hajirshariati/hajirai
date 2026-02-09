@@ -326,86 +326,6 @@
         "abra_promo_code_hide": ""
       }
     },
-    "rich_text_egdfpx": {
-      "type": "rich-text",
-      "blocks": {
-        "heading_EngBec": {
-          "type": "heading",
-          "settings": {
-            "heading": "Why Our Products Help Relieve Arch Pain",
-            "heading_size": "title-sm",
-            "heading_tag": "h2",
-            "highlighted_text": "text",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_LG9FeJ": {
-          "type": "text",
-          "settings": {
-            "text": "<p><em>Aetrex products can provide metatarsal relief, cushioning, and the arch support needed to provide a more equal distribution of pressure to help you feel great on your feet.</em></p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.2,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": true,
-            "highlighted_text": "text",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_6DwARJ": {
-          "type": "button",
-          "disabled": true,
-          "settings": {
-            "button_label": "Button label",
-            "button_link": "",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": true
-          }
-        }
-      },
-      "block_order": [
-        "heading_EngBec",
-        "text_LG9FeJ",
-        "button_6DwARJ"
-      ],
-      "name": "t:sections.rich-text.name",
-      "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "#171717",
-        "color_background": "#fafafa",
-        "gradient_background": "",
-        "color_highlight": "#171717",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 24,
-        "padding_bottom": 24,
-        "divider": false,
-        "narrow": true,
-        "rounded": true,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
     "images_with_text_iL8ht6": {
       "type": "images-with-text",
       "blocks": {
@@ -490,14 +410,14 @@
         "columns": 4,
         "carousel_on_desktop": true,
         "show_view_all": true,
-        "columns_mobile": "1",
+        "columns_mobile": "2",
         "swipe_on_mobile": true,
         "heading": "{{ section.settings.collection.title }}",
         "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
+        "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h3",
         "subheading": "",
-        "description": "",
+        "description": "<p><em>Aetrex products can provide metatarsal relief, cushioning, and the arch support needed to provide a more equal distribution of pressure to help you feel great on your feet.</em></p>",
         "highlighted_text": "text",
         "highlighted_scribble": "circle",
         "color_text": "",
@@ -510,7 +430,7 @@
         "color_button_gradient": "",
         "padding_top": 48,
         "padding_bottom": 48,
-        "divider": false,
+        "divider": true,
         "full_width": false,
         "rounded": false,
         "abra_promo_code_show": "",
@@ -677,9 +597,9 @@
         "text_68kBaL": {
           "type": "text",
           "settings": {
-            "text": "<p>The information contained on this website is for educational, informational and retail purposes only. No material on this site is intended to be a substitute for medical advice, diagnosis or treatment of any medical condition. Accordingly, if you are experiencing ongoing pain or discomfort, we encourage you to consult with a doctor or medical professional.</p>",
+            "text": "<p><em>The information contained on this website is for educational, informational and retail purposes only. No material on this site is intended to be a substitute for medical advice, diagnosis or treatment of any medical condition. Accordingly, if you are experiencing ongoing pain or discomfort, we encourage you to consult with a doctor or medical professional.</em></p>",
             "text_font": "body",
-            "text_size": "subtext-md",
+            "text_size": "subtext-sm",
             "text_max_size": 32,
             "text_line_height": 1.2,
             "text_letter_spacing": 0,
@@ -733,7 +653,6 @@
     "image_with_text_overlay_rBfBzp",
     "faq_zhAACx",
     "lookbook_g7R8JN",
-    "rich_text_egdfpx",
     "images_with_text_iL8ht6",
     "featured_collection_zAQDU9",
     "testimonials_byJFpb",
