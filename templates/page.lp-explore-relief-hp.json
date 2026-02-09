@@ -409,7 +409,7 @@
           "settings": {
             "image": "shopify://shop_images/icon.Arch_Pain.png",
             "height": 52,
-            "link": "shopify://pages/explore-relief-for-arch-pain",
+            "link": "shopify://pages/explore-relief-for-plantar-fasciitis",
             "title": "Arch Pain",
             "title_size": "text-sm"
           }
@@ -901,7 +901,7 @@
             "vertical_mobile": 71,
             "horizontal_mobile": 53,
             "cta_label": "LEARN MORE",
-            "cta_link": "shopify://pages/explore-relief-for-arch-pain",
+            "cta_link": "shopify://collections/womens-footwear-for-plantar-fasciitis-copy",
             "cta_external": false,
             "cta_icon": false
           }
