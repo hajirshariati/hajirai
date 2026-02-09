@@ -521,11 +521,24 @@
             "highlighted_scribble": "circle"
           }
         },
+        "testimonial_qzGWCp": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
         "testimonial_xPKLWB": {
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>I love these sneakers. I love these sneakers. </strong><br/>I have bought three of the same sneakers, but in different colors. What a difference they have made on my feet. I like to take my dog for walks. I had to stop. My feet were in such pain. With these sneakers my feet are fine now. Thank you Aetrex.”</h6>",
+            "text": "<h6>I love these sneakers. I love these sneakers.<strong> </strong>I have bought three of the same sneakers, but in different colors. What a difference they have made on my feet. I like to take my dog for walks. I had to stop. My feet were in such pain. With these sneakers my feet are fine now. Thank you Aetrex.</h6>",
             "author": "Linda P.",
             "author_info": "",
             "author_url": "",
@@ -538,7 +551,7 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>Comfortable & supportive </strong><br/>I bought these to wear at work. I am a Dental Assistant and on my feet most of the day. With other shoes, I would go home with sore feet and low back pain. The Xspress Runner 2 felt comfortable and supportive right from the first time I laced them up - no break-in required.”</h6>",
+            "text": "<h6>I bought these to wear at work. I am a Dental Assistant and on my feet most of the day. With other shoes, I would go home with sore feet and low back pain. The Xspress Runner 2 felt comfortable and supportive right from the first time I laced them up - no break-in required.</h6>",
             "author": "Susanne B.",
             "author_info": "",
             "author_url": "",
@@ -550,6 +563,7 @@
       },
       "block_order": [
         "testimonial_UPjm8b",
+        "testimonial_qzGWCp",
         "testimonial_xPKLWB",
         "testimonial_RixBWT"
       ],
