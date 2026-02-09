@@ -326,6 +326,43 @@
         "abra_promo_code_hide": ""
       }
     },
+    "featured_collection_pKTHac": {
+      "type": "featured-collection",
+      "name": "t:sections.featured-collection.name",
+      "settings": {
+        "collection": "explore-relief-for-mortons-neuroma",
+        "products": [],
+        "product_limit": 6,
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "show_view_all": true,
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "heading": "{{ section.settings.collection.title }}",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h3",
+        "subheading": "",
+        "description": "<p>Aetrex products help reduce the forefoot pressure commonly associated with Morton’s Neuroma. With strategically placed metatarsal support, Aetrexhelps to relieve pressure, providing relief from burning, tingling, or sharp pain in the ball of the foot.</p>",
+        "highlighted_text": "text",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 48,
+        "padding_bottom": 48,
+        "divider": true,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
     "images_with_text_iL8ht6": {
       "type": "images-with-text",
       "blocks": {
@@ -476,43 +513,6 @@
         "rounded": false
       }
     },
-    "featured_collection_pKTHac": {
-      "type": "featured-collection",
-      "name": "t:sections.featured-collection.name",
-      "settings": {
-        "collection": "explore-relief-for-mortons-neuroma",
-        "products": [],
-        "product_limit": 6,
-        "columns": 4,
-        "carousel_on_desktop": true,
-        "show_view_all": true,
-        "columns_mobile": "2",
-        "swipe_on_mobile": true,
-        "heading": "{{ section.settings.collection.title }}",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h3",
-        "subheading": "",
-        "description": "<p><em>Aetrex products help reduce the forefoot pressure commonly associated with Morton’s Neuroma. With strategically placed metatarsal support, Aetrexhelps to relieve pressure, providing relief from burning, tingling, or sharp pain in the ball of the foot.</em></p>",
-        "highlighted_text": "text",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 48,
-        "padding_bottom": 48,
-        "divider": true,
-        "full_width": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
     "rich_text_8XprQB": {
       "type": "rich-text",
       "blocks": {
@@ -575,9 +575,9 @@
     "image_with_text_overlay_rBfBzp",
     "faq_zhAACx",
     "lookbook_w69hfT",
+    "featured_collection_pKTHac",
     "images_with_text_iL8ht6",
     "testimonials_byJFpb",
-    "featured_collection_pKTHac",
     "rich_text_8XprQB"
   ]
 }
