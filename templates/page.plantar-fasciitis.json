@@ -370,73 +370,6 @@
         "abra_promo_code_hide": ""
       }
     },
-    "rich_text_TFXrR6": {
-      "type": "rich-text",
-      "blocks": {
-        "heading_irceXm": {
-          "type": "heading",
-          "settings": {
-            "heading": "Why Our Products Help Relieve Plantar Fasciitis Pain",
-            "heading_size": "title-sm",
-            "heading_tag": "h2",
-            "highlighted_text": "text",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_iABtHx": {
-          "type": "text",
-          "settings": {
-            "text": "<p><em>Aetrex products are designed to help keep the foot in a neutral position throughout the gait cycle and to reduce stretching of the plantar fascia. Within days of use, most people begin to experience relief from the pain or discomfort.</em></p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.2,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": true,
-            "highlighted_text": "text",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "heading_irceXm",
-        "text_iABtHx"
-      ],
-      "name": "t:sections.rich-text.name",
-      "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "#171717",
-        "color_background": "#fafafa",
-        "gradient_background": "",
-        "color_highlight": "#171717",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 48,
-        "padding_bottom": 48,
-        "divider": false,
-        "narrow": true,
-        "rounded": true,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
     "featured_collection_p7Jjwd": {
       "type": "featured-collection",
       "name": "t:sections.featured-collection.name",
@@ -451,10 +384,10 @@
         "swipe_on_mobile": true,
         "heading": "{{ section.settings.collection.title }}",
         "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
+        "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h3",
         "subheading": "",
-        "description": "",
+        "description": "<p><em>Aetrex products are designed to help keep the foot in a neutral position throughout the gait cycle and to reduce stretching of the plantar fascia. Within days of use, most people begin to experience relief from the pain or discomfort.</em></p>",
         "highlighted_text": "text",
         "highlighted_scribble": "circle",
         "color_text": "",
@@ -467,7 +400,7 @@
         "color_button_gradient": "",
         "padding_top": 48,
         "padding_bottom": 48,
-        "divider": false,
+        "divider": true,
         "full_width": false,
         "rounded": true,
         "abra_promo_code_show": "",
@@ -634,9 +567,9 @@
         "text_qD8b89": {
           "type": "text",
           "settings": {
-            "text": "<p>The information contained on this website is for educational, informational and retail purposes only. No material on this site is intended to be a substitute for medical advice, diagnosis or treatment of any medical condition. Accordingly, if you are experiencing ongoing pain or discomfort, we encourage you to consult with a doctor or medical professional.</p>",
+            "text": "<p><em>The information contained on this website is for educational, informational and retail purposes only. No material on this site is intended to be a substitute for medical advice, diagnosis or treatment of any medical condition. Accordingly, if you are experiencing ongoing pain or discomfort, we encourage you to consult with a doctor or medical professional.</em></p>",
             "text_font": "body",
-            "text_size": "subtext-md",
+            "text_size": "subtext-sm",
             "text_max_size": 32,
             "text_line_height": 1.2,
             "text_letter_spacing": 0,
@@ -691,7 +624,6 @@
     "image_with_text_overlay_rBfBzp",
     "faq_zhAACx",
     "lookbook_JQDiwd",
-    "rich_text_TFXrR6",
     "featured_collection_p7Jjwd",
     "testimonials_byJFpb",
     "collection_list_fbMkYY",
