@@ -200,6 +200,57 @@
     "collection_list_q7Rypj": {
       "type": "collection-list",
       "blocks": {
+        "collection_tHYraX": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "womens-sandals",
+            "custom_url": "",
+            "image": "shopify://shop_images/Sandals_0e3a64ec-f790-4efd-b3ec-b1b92f015ed3.png",
+            "title": "SANDALS",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#171717",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_LCmgJQ": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "womens-flip-flop-sandals",
+            "custom_url": "",
+            "image": "shopify://shop_images/flips_8c5c4a61-3b54-451e-acd8-35bdc2c948f6.png",
+            "title": "FLIPS",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#171717",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_AefeLJ": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "womens-wedges-heels",
+            "custom_url": "",
+            "image": "shopify://shop_images/Wedges_Heels_ee9e52bb-58bc-4edc-85c2-5b6b70590fd1.png",
+            "title": "WEDGES & HEELS",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#171717",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
         "collection_6iykJg": {
           "type": "collection",
           "settings": {
@@ -251,23 +302,6 @@
             "enable_title_drop_shadow": false
           }
         },
-        "collection_b6zYFq": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "womens-clogs",
-            "custom_url": "",
-            "image": "shopify://shop_images/Clog_6aa98460-00b3-41c4-8d51-b33a611b361e.png",
-            "title": "CLOGS",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#171717",
-            "color_overlay": "#000000",
-            "overlay_opacity": 0,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
         "collection_D7JLdh": {
           "type": "collection",
           "settings": {
@@ -285,48 +319,14 @@
             "enable_title_drop_shadow": false
           }
         },
-        "collection_AefeLJ": {
+        "collection_b6zYFq": {
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "womens-wedges-heels",
+            "collection": "womens-clogs",
             "custom_url": "",
-            "image": "shopify://shop_images/Wedges_Heels_ee9e52bb-58bc-4edc-85c2-5b6b70590fd1.png",
-            "title": "WEDGES & HEELS",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#171717",
-            "color_overlay": "#000000",
-            "overlay_opacity": 0,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_tHYraX": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "womens-sandals",
-            "custom_url": "",
-            "image": "shopify://shop_images/Sandals_0e3a64ec-f790-4efd-b3ec-b1b92f015ed3.png",
-            "title": "SANDALS",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#171717",
-            "color_overlay": "#000000",
-            "overlay_opacity": 0,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_LCmgJQ": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "womens-flip-flop-sandals",
-            "custom_url": "",
-            "image": "shopify://shop_images/flips_8c5c4a61-3b54-451e-acd8-35bdc2c948f6.png",
-            "title": "FLIPS",
+            "image": "shopify://shop_images/Clog_6aa98460-00b3-41c4-8d51-b33a611b361e.png",
+            "title": "CLOGS",
             "description": "",
             "overlay_content": false,
             "color_text": "#171717",
@@ -338,14 +338,14 @@
         }
       },
       "block_order": [
+        "collection_tHYraX",
+        "collection_LCmgJQ",
+        "collection_AefeLJ",
         "collection_6iykJg",
         "collection_UFADDM",
         "collection_6NeXRg",
-        "collection_b6zYFq",
         "collection_D7JLdh",
-        "collection_AefeLJ",
-        "collection_tHYraX",
-        "collection_LCmgJQ"
+        "collection_b6zYFq"
       ],
       "custom_css": [],
       "settings": {
