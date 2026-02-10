@@ -747,14 +747,14 @@
                   assign total_savings = total_savings | plus: cart_discount_total
                 -%}
                 
-                {%- if total_savings > 0 -%}
+                {% comment %}{%- if total_savings > 0 -%}
                   <div class="cart-savings">
                     <p>
                       <span>You save </span>
                       <span data-cart-savings>{{ total_savings | money_with_currency }}</span>
                     </p>
                   </div>
-                {%- endif -%}
+                {%- endif -%}{% endcomment %}
   
                 {%- if section.settings.show_checkout_button or section.settings.show_view_cart_button -%}
                   <form action="{{ routes.cart_url }}" method="POST" novalidate class="drawer__footer-buttons grid grid-cols-12 gap-4">
