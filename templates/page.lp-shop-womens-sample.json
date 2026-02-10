@@ -30,7 +30,7 @@
         "heading_64L34p": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Spring into Motion</p>",
+            "heading": "<p>Move Comfortably. Stay Active Longer.</p>",
             "heading_size": "title-sm",
             "heading_tag": "h2",
             "highlighted_text": "none",
@@ -40,7 +40,7 @@
         "text_EGcVH3": {
           "type": "text",
           "settings": {
-            "text": "<p>Unmatched Comfort & Support Starts with Science. Engineered with Insights from Over 50 Million Foot Scans</p>",
+            "text": "<p>Aetrex designs premium footwear and orthotics using real biomechanical data and fit science. By combining diagnostic insight with performance-driven design, we help women reduce pain, improve alignment, and move with confidence every day.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -102,19 +102,19 @@
       "name": "t:sections.video-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
-        "video": "shopify://files/videos/OrthoticLPdesktop.mp4",
+        "video": "shopify://files/videos/41368-ew700w_video (1080p)_716785f8-2e8f-4136-bb03-79b2cb2708eb.mp4",
         "video_url": "",
         "description": "",
         "enable_video_autoplay": true,
         "enable_video_looping": true,
         "image_height": "650px",
-        "content_width": "large",
-        "content_position": "md:items-center md:justify-center",
+        "content_width": "medium",
+        "content_position": "md:items-end md:justify-start",
         "text_alignment": "left",
         "video_url_mobile": "",
         "image_height_mobile": "auto",
-        "content_position_mobile": "items-center justify-center",
-        "text_alignment_mobile": "center",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
         "color_text": "#171717",
         "color_highlight": "#e0a580",
         "gradient_highlight": "",
@@ -140,10 +140,10 @@
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "womens-sandals",
+            "collection": "",
             "custom_url": "",
-            "title": "Sandals",
-            "description": "",
+            "title": "Relieve Foot & Heel Pain",
+            "description": "Footwear and orthotics designed to reduce pressure, support alignment, and help relieve plantar fasciitis and heel discomfort.",
             "overlay_content": false,
             "color_text": "#ffffff",
             "color_overlay": "#000000",
@@ -156,10 +156,10 @@
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "womens-sneakers",
+            "collection": "",
             "custom_url": "",
-            "title": "Sneakers",
-            "description": "",
+            "title": "All-Day Comfort & Standing Support",
+            "description": "Solutions designed for long hours on your feet, helping reduce fatigue and improve stability.",
             "overlay_content": false,
             "color_text": "#ffffff",
             "color_overlay": "#000000",
@@ -172,10 +172,10 @@
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "womens-wedges-heels",
+            "collection": "",
             "custom_url": "",
-            "title": "Wedges & Heels",
-            "description": "",
+            "title": "Everyday Walking & Travel Comfort",
+            "description": "Lightweight cushioning and ergonomic support built for daily movement.",
             "overlay_content": false,
             "color_text": "#ffffff",
             "color_overlay": "#000000",
@@ -188,10 +188,10 @@
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "womens-platform-sandals",
+            "collection": "",
             "custom_url": "",
-            "title": "Platforms",
-            "description": "",
+            "title": "Arch Support & Stability",
+            "description": "Designed to support flat feet, high arches, and overpronation.",
             "overlay_content": false,
             "color_text": "#ffffff",
             "color_overlay": "#000000",
@@ -200,62 +200,14 @@
             "enable_title_drop_shadow": false
           }
         },
-        "collection_kiGRtH": {
+        "collection_DiknGT": {
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "loafers-oxfords",
+            "collection": "",
             "custom_url": "",
-            "title": "Loafers & Oxfords",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_dQdHzw": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "womens-boots",
-            "custom_url": "",
-            "title": "Boots",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_Pfncqg": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "womens-clogs",
-            "custom_url": "",
-            "title": "Clogs",
-            "description": "",
-            "overlay_content": false,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 30,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
-          }
-        },
-        "collection_rdcKtc": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "womens-slippers",
-            "custom_url": "",
-            "title": "Slippers",
-            "description": "",
+            "title": "Athletic Recovery & Active Lifestyle",
+            "description": "Performance comfort solutions to help your body recover and stay active.",
             "overlay_content": false,
             "color_text": "#ffffff",
             "color_overlay": "#000000",
@@ -270,22 +222,19 @@
         "collection_k6CKbq",
         "collection_WXFwfw",
         "collection_nipcdf",
-        "collection_kiGRtH",
-        "collection_dQdHzw",
-        "collection_Pfncqg",
-        "collection_rdcKtc"
+        "collection_DiknGT"
       ],
       "name": "t:sections.collection-list.name",
       "settings": {
-        "columns": 4,
-        "carousel_on_desktop": false,
+        "columns": 5,
+        "carousel_on_desktop": true,
         "image_type": "collection",
-        "image_ratio": "square",
+        "image_ratio": "portrait",
         "show_products_count": false,
         "show_view_all": true,
-        "columns_mobile": "1",
+        "columns_mobile": "2",
         "swipe_on_mobile": true,
-        "heading": "Shop by Category",
+        "heading": "Find Support Designed For How You Move",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
@@ -310,10 +259,47 @@
         "abra_promo_code_hide": ""
       }
     },
-    "featured_collections_9d3ge7": {
+    "featured_collection_aJXHHi": {
+      "type": "featured-collection",
+      "name": "t:sections.featured-collection.name",
+      "settings": {
+        "collection": "womens-best-sellers-footwear",
+        "products": [],
+        "product_limit": 6,
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "Women’s Best Sellers",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "<p>Discover customer-favorite styles engineered for comfort, support, and long-lasting performance.</p>",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "featured_collections_XzEbqb": {
       "type": "featured-collections",
       "blocks": {
-        "collection_g9AqYk": {
+        "collection_AwTzXp": {
           "type": "collection",
           "settings": {
             "collection": "orthotics-for-flat-feet",
@@ -321,7 +307,7 @@
             "title": "Flat Feet"
           }
         },
-        "collection_3qxYYM": {
+        "collection_7eh6XJ": {
           "type": "collection",
           "settings": {
             "collection": "orthotics-for-high-arches",
@@ -329,7 +315,7 @@
             "title": "High Arches"
           }
         },
-        "collection_xxeKq7": {
+        "collection_En7GRA": {
           "type": "collection",
           "settings": {
             "collection": "orthotics-plantar-fasciitis",
@@ -337,7 +323,7 @@
             "title": "Plantar Fasciitis"
           }
         },
-        "collection_Wzc8ka": {
+        "collection_TRTJHk": {
           "type": "collection",
           "settings": {
             "collection": "orthotics-for-metatarsalgia",
@@ -345,7 +331,7 @@
             "title": "Metatarsalgia"
           }
         },
-        "collection_BbmnMe": {
+        "collection_idHLtb": {
           "type": "collection",
           "settings": {
             "collection": "orthotics-for-heel-spurs",
@@ -353,7 +339,7 @@
             "title": "Heel Spurs"
           }
         },
-        "collection_Uccwbn": {
+        "collection_HYR4LD": {
           "type": "collection",
           "settings": {
             "collection": "orthotics-for-mortons-neuroma",
@@ -363,12 +349,12 @@
         }
       },
       "block_order": [
-        "collection_g9AqYk",
-        "collection_3qxYYM",
-        "collection_xxeKq7",
-        "collection_Wzc8ka",
-        "collection_BbmnMe",
-        "collection_Uccwbn"
+        "collection_AwTzXp",
+        "collection_7eh6XJ",
+        "collection_En7GRA",
+        "collection_TRTJHk",
+        "collection_idHLtb",
+        "collection_HYR4LD"
       ],
       "name": "Multiple featured collections",
       "settings": {
@@ -378,12 +364,12 @@
         "show_view_all": false,
         "columns_mobile": "1",
         "swipe_on_mobile": true,
-        "heading": "<strong>Aetrex Orthotics</strong>",
-        "heading_size": "title-sm",
+        "heading": "Personalized Comfort for Every Shoe",
+        "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
-        "subheading": "Find the orthotic that fits your needs",
-        "description": "<p>Unmatched comfort & support starts with Science. Aetrex orthotics is engineered with data from over50 million footscans to fit each specific need. Shop by foot condition</p>",
+        "subheading": "",
+        "description": "<p>Every foot is unique. Aetrex orthotics are designed to deliver personalized comfort, alignment support, and pressure relief. Pairing footwear with the right orthotic can improve stability, reduce fatigue, and enhance overall movement.</p>",
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "",
@@ -626,6 +612,7 @@
         "text_Qnjw43",
         "button_htdE3j"
       ],
+      "disabled": true,
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
@@ -758,6 +745,7 @@
         "image_UMzkxc",
         "image_DEUPz8"
       ],
+      "disabled": true,
       "name": "t:sections.collage.name",
       "settings": {
         "heading": "TECHNOLOGY <strong>IMPROVING THE WAY YOU MOVE</strong> ",
@@ -808,6 +796,7 @@
       "block_order": [
         "feature_kYjpfr"
       ],
+      "disabled": true,
       "name": "Dynamic Feature",
       "settings": {
         "heading": " Inside Select Aetrex Shoes",
@@ -921,6 +910,7 @@
         "testimonial_nE3Y8R",
         "testimonial_rkPVNy"
       ],
+      "disabled": true,
       "name": "t:sections.reveal-testimonials.name",
       "settings": {
         "heading": "Customer quotes",
@@ -975,6 +965,7 @@
         "heading_XchtBD",
         "text_XdwRGb"
       ],
+      "disabled": true,
       "name": "t:sections.images-with-text.name",
       "settings": {
         "image_url": "",
@@ -1076,6 +1067,7 @@
         "testimonial_ycUdTi",
         "testimonial_JwKxY6"
       ],
+      "disabled": true,
       "name": "t:sections.testimonials-banner.name",
       "settings": {
         "transparent_header": false,
@@ -1131,6 +1123,7 @@
         "heading_CE9MYn",
         "text_CVjrUt"
       ],
+      "disabled": true,
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
@@ -1161,13 +1154,233 @@
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
+    },
+    "timeline_qYdmVm": {
+      "type": "timeline",
+      "blocks": {
+        "content_tN7gJr": {
+          "type": "content",
+          "settings": {
+            "img_url": "",
+            "subheading": "Step 1",
+            "heading": "Every Foot Is Different",
+            "heading_tag": "h2",
+            "text": "<p>Foot shape, arch height, and pressure distribution vary from person to person.</p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "content_AnWX4Q": {
+          "type": "content",
+          "settings": {
+            "img_url": "",
+            "subheading": "Step 2",
+            "heading": "Diagnostic Insight Guides Design",
+            "heading_tag": "h2",
+            "text": "<p>Aetrex uses biomechanical data and foot scanning technology to design products that support real movement patterns.</p>",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "content_3xbnmH": {
+          "type": "content",
+          "settings": {
+            "img_url": "",
+            "subheading": "Step 3",
+            "heading": "Choose Solutions Built For You",
+            "heading_tag": "h2",
+            "text": "<p>Selecting footwear and orthotics based on foot type helps improve comfort, alignment, and long-term mobility.</p>",
+            "button_label": "Find a Scan Location",
+            "button_link": "shopify://pages/store-locator",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "content_tN7gJr",
+        "content_AnWX4Q",
+        "content_3xbnmH"
+      ],
+      "name": "t:sections.timeline.name",
+      "settings": {
+        "image_ratio": "landscape",
+        "image_ratio_mobile": "wide",
+        "heading": "Better Movement Starts With Understanding Your Feet",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "image_with_text_7TcxCw": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_kUKTxt": {
+          "type": "heading",
+          "settings": {
+            "heading": "Powered by Fit Science and Biomechanical Data",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_4jMPwf": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Aetrex products are developed using insights from 50 million foot scans. By combining advanced foot scanning technology with biomechanical research, we design footwear and orthotics that support alignment, improve comfort, and enhance movement performance.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_JpGzWw": {
+          "type": "button",
+          "settings": {
+            "button_label": "Shop Footwear",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": true
+          }
+        },
+        "button_nLPBTc": {
+          "type": "button",
+          "settings": {
+            "button_label": "Shop Orthotics",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": true
+          }
+        }
+      },
+      "block_order": [
+        "heading_kUKTxt",
+        "text_4jMPwf",
+        "button_JpGzWw",
+        "button_nLPBTc"
+      ],
+      "name": "t:sections.image-with-text.name",
+      "settings": {
+        "img_url": "",
+        "image_height": "650px",
+        "image_width": "medium",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": true,
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "blog_posts_hKgXCU": {
+      "type": "blog-posts",
+      "name": "t:sections.blog-posts.name",
+      "settings": {
+        "blog": "aetrex-blog",
+        "post_limit": 3,
+        "columns": 3,
+        "carousel_on_desktop": false,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "image_ratio": "landscape",
+        "show_tags": true,
+        "show_date": true,
+        "show_comments": true,
+        "show_author": false,
+        "show_excerpt": true,
+        "heading": "REAL WOMEN. REAL MOVEMENT STORIES",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "Helping Women Stay Active and Comfortable Every Day",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
     }
   },
   "order": [
     "main-page",
     "video_with_text_overlay_TgKph8",
     "collection_list_64mUWx",
-    "featured_collections_9d3ge7",
+    "featured_collection_aJXHHi",
+    "featured_collections_XzEbqb",
     "collection_list_mPHCpz",
     "image_with_text_overlay_zKNTxj",
     "collage_ntqjfh",
@@ -1175,6 +1388,9 @@
     "reveal_testimonials_YRQjjR",
     "images_with_text_tkFKJb",
     "testimonials_banner_AfWJRh",
-    "image_with_text_overlay_M6AhUn"
+    "image_with_text_overlay_M6AhUn",
+    "timeline_qYdmVm",
+    "image_with_text_7TcxCw",
+    "blog_posts_hKgXCU"
   ]
 }

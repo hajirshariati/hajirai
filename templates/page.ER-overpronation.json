@@ -30,7 +30,7 @@
         "heading_axLTnn": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Metatarsalgia</p>",
+            "heading": "<p>Overpronation</p>",
             "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "text",
@@ -40,7 +40,7 @@
         "text_LHGLnM": {
           "type": "text",
           "settings": {
-            "text": "<p>Metatarsalgia is a term used to describe pain in the metatarsal region of the foot, commonly known as the ball-of-the-foot. This condition affects the bones and joints at the ball-of-the-foot, often located under the 2nd, 3rd, and 4th metatarsal heads, or more isolated at the first metatarsal head near the big toe.<br/><br/>Improperly fitting footwear, especially women’s dress shoes and other restrictive shoes, commonly causes ball-of-foot pain. Additional causes of excessive pressure in the ball-of-foot area include high heels, high-impact activities without proper footwear or orthotics, and thinning of the fat pad in the foot with age.</p>",
+            "text": "<p>Overpronation, or flat feet, is a common biomechanical issue where the arch collapses upon weight bearing, causing stress or inflammation on the plantar fascia. This condition can lead to discomfort and contribute to other foot problems. This added stress can result in conditions such as Plantar Fasciitis,<br/> Heel Spurs, Metatarsalgia, Post-tib Tendonitis, and Bunions.<br/><br/>Causes of flat feet include obesity, pregnancy, or repetitive pounding on hard surfaces, which weaken the arch.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -52,14 +52,14 @@
             "highlighted_scribble": "circle"
           }
         },
-        "spacing_4ykkHA": {
+        "spacing_CrjREc": {
           "type": "spacing",
           "settings": {
             "height": 40,
             "height_mobile": 28
           }
         },
-        "text_aghkDA": {
+        "text_99bxt7": {
           "type": "text",
           "settings": {
             "text": "<p>Medically reviewed by Janine Taddeo, DPM</p>",
@@ -78,14 +78,14 @@
       "block_order": [
         "heading_axLTnn",
         "text_LHGLnM",
-        "spacing_4ykkHA",
-        "text_aghkDA"
+        "spacing_CrjREc",
+        "text_99bxt7"
       ],
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
-        "image": "shopify://shop_images/Group_13_ec3af216-7398-40b8-926f-ad790764baca.png",
-        "image_height": "adapt",
+        "image": "shopify://shop_images/Group_12_bd5993c6-563d-408b-9abe-82db20e1d611.png",
+        "image_height": "650px",
         "content_width": "small",
         "content_position": "md:items-center md:justify-start",
         "text_alignment": "left",
@@ -106,7 +106,7 @@
         "padding_bottom": 0,
         "divider": false,
         "full_width": true,
-        "rounded": false,
+        "rounded": true,
         "enable_parallax": false,
         "parallax_direction": "vertical",
         "abra_promo_code_show": "",
@@ -120,7 +120,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Causes</strong>",
-            "text": "<p>With this common foot condition, one or more of the metatarsal heads become painful and/or inflamed, usually due to excessive pressure over a long period of time. It is common to experience acute, recurrent, or chronic pain with metatarsalgia. Ball-of-foot pain is often caused from improper fitting footwear, most frequently by women’s dress shoes and other restrictive footwear. Footwear with a narrow toe box (toe area) forces the ball-of-foot area to be forced into a minimal amount of space. This can inhibit the walking process and lead to extreme discomfort in the forefoot. Other factors can cause excessive pressure in the ball-of-foot area that can result in metatarsalgia. These include shoes with heels that are too high or participating in high impact activities without proper footwear and/or orthotics. Also as we get older, the fat pad in our foot tends to thin out, making us much more susceptible to pain in the ball-of-the-foot.</p>",
+            "text": "<p>Overpronation is very prominent in people who have flexible, flat feet. The framework of the foot begins to collapse, causing the foot to flatten and adding stress to other parts of the foot. As a result, overpronation, often leads to Plantar Fasciitis, Heel Spurs, Metatarsalgia, Posttib Tendonitis and/or Bunions. There are many causes of flat feet. Obesity, pregnancy or repetitive pounding on a hard surface can weaken the arch leading to overpronation. Often people with flat feet do not experience discomfort immediately, and some never suffer from any discomfort at all. However, when symptoms develop and become painful, walking becomes awkward and causes increased strain on the feet and calves.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -129,7 +129,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Treatment and Prevention</strong>",
-            "text": "<p>The first step in treating metatarsalgia is to determine the cause of the pain. If improper fitting footwear is the cause of the pain, the footwear must be changed. Footwear designed with a high, wide toe box (toe area) and a rocker sole is ideal for treating metatarsalgia. The high, wide toe box allows the foot to spread out while the rocker sole reduces stress on the ball-of-the-foot. Unloading pressure to the ball-of-the-foot can be accomplished with a variety of footcare products. Orthotics designed to relieve ball-of-foot pain usually feature a metatarsal pad. The orthotic is constructed with the pad placed behind the ball-of-the-foot to relieve pressure and redistribute weight from the painful area to more tolerant areas. Other products often recommended include gel metatarsal cushions and metatarsal bandages. When these products are used with proper footwear, you should experience significant relief.</p><p>If problem persists, consult your foot doctor.</p>",
+            "text": "<p>Overpronation can be treated conservatively (non surgical treatments) with custom made orthotics. These orthotics should be designed with appropriate arch support and medial rearfoot posting to prevent the overpronation. Footwear should also be examined to ensure there is a proper fit. Footwear with a firm heel counter is often recommended for extra support and stability. Improperly fitting footwear can lead to additional foot problems.<br/><br/>If the problem persists, consult your foot doctor.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -138,6 +138,10 @@
       "block_order": [
         "question_XamVPH",
         "question_x9EPUx"
+      ],
+      "custom_css": [
+        ".faqs.with-background > :is(div, form) {padding: 2em 0em !important;}",
+        ".details__summary .icon-plus-2 {display: none;}"
       ],
       "name": "t:sections.faq.name",
       "settings": {
@@ -168,7 +172,7 @@
         "padding_bottom": 0,
         "divider": false,
         "narrow": false,
-        "rounded": false,
+        "rounded": true,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
@@ -182,14 +186,14 @@
             "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
-            "heading": "Padded Heel Sneakers",
-            "text": "<p>Extra padding on the back of the heel helps to reduce discomfort or blisters while providing additional cushioning.</p>",
+            "heading": "Padded Collar",
+            "text": "<p>Extra padding around the ankle area helps to reduce discomfort or blisters while providing additional cushioning.</p>",
             "link": "",
             "color_text": "#74a5ba",
-            "vertical": 8,
-            "horizontal": 56,
-            "vertical_mobile": 23,
-            "horizontal_mobile": 32,
+            "vertical": 30,
+            "horizontal": 45,
+            "vertical_mobile": 30,
+            "horizontal_mobile": 30,
             "cta_label": "",
             "cta_link": "",
             "cta_external": false,
@@ -200,16 +204,16 @@
           "type": "content",
           "settings": {
             "icon": "none",
-            "iwidth": "custom",
+            "iwidth": "fit",
             "icon_width": 26,
-            "heading": "Memory Foam",
-            "text": "<p>A material meant to cushion and conform to your foot, helping to evenly distribute weight and providing ultimate comfort.</p>",
+            "heading": "Dual Density Outsole",
+            "text": "<p>A feature that provides pressure relief and shock absorption in the ball-of-foot and heel area.</p>",
             "link": "",
             "color_text": "#74a5ba",
             "vertical": 48,
             "horizontal": 39,
-            "vertical_mobile": 66,
-            "horizontal_mobile": 19,
+            "vertical_mobile": 64,
+            "horizontal_mobile": 14,
             "cta_label": "",
             "cta_link": "",
             "cta_external": false,
@@ -220,7 +224,7 @@
           "type": "content",
           "disabled": true,
           "settings": {
-            "icon": "none",
+            "icon": "check_mark",
             "iwidth": "fit",
             "icon_width": 26,
             "heading": "3: Signature Arch Support",
@@ -249,8 +253,8 @@
             "color_text": "#74a5ba",
             "vertical": 56,
             "horizontal": 52,
-            "vertical_mobile": 59,
-            "horizontal_mobile": 41,
+            "vertical_mobile": 64,
+            "horizontal_mobile": 39,
             "cta_label": "",
             "cta_link": "",
             "cta_external": false,
@@ -263,14 +267,14 @@
             "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
-            "heading": "Metatarsal Support",
-            "text": "<p>Built in forefoot support that helps unload pressure at the metatarsal area and provides cushioning to help relieve discomfort.</p>",
+            "heading": "Complete Underfoot Support",
+            "text": "<p>Our Cobra Orthotic Technology provides a void in the heel area to help alleviate heel pressure and provides metatarsal support.</p>",
             "link": "",
             "color_text": "#74a5ba",
             "vertical": 70,
             "horizontal": 75,
-            "vertical_mobile": 75,
-            "horizontal_mobile": 82,
+            "vertical_mobile": 71,
+            "horizontal_mobile": 80,
             "cta_label": "",
             "cta_link": "",
             "cta_external": false,
@@ -288,8 +292,8 @@
       "disabled": true,
       "name": "t:sections.lookbook.name",
       "settings": {
-        "image": "shopify://shop_images/Group_18_3.png",
-        "image_mobile": "shopify://shop_images/Frame_67.png",
+        "image": "shopify://shop_images/Group_18_4.png",
+        "image_mobile": "shopify://shop_images/Frame_71.png",
         "heading": "",
         "heading_size": "title-sm",
         "heading_alignment": "text-center md:items-center",
@@ -322,81 +326,38 @@
         "abra_promo_code_hide": ""
       }
     },
-    "rich_text_mPwWDc": {
-      "type": "rich-text",
-      "blocks": {
-        "heading_KXGYgD": {
-          "type": "heading",
-          "settings": {
-            "heading": "Why Our Products Help Relieve Metatarsalgia Pain",
-            "heading_size": "title-sm",
-            "heading_tag": "h2",
-            "highlighted_text": "text",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_ypRDJw": {
-          "type": "text",
-          "settings": {
-            "text": "<p><em>Aetrex products are available with built-in metatarsal pads to help unload pressure at the metatarsal area while providing the cushioning and shock absorption needed to help relieve discomfort.</em></p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.2,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": true,
-            "highlighted_text": "text",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_dxFhdX": {
-          "type": "button",
-          "disabled": true,
-          "settings": {
-            "button_label": "Button label",
-            "button_link": "",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": true
-          }
-        }
-      },
-      "block_order": [
-        "heading_KXGYgD",
-        "text_ypRDJw",
-        "button_dxFhdX"
-      ],
-      "name": "t:sections.rich-text.name",
+    "featured_collection_k86GjP": {
+      "type": "featured-collection",
+      "name": "t:sections.featured-collection.name",
       "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
+        "collection": "womens-footwear-for-flat-feet-copy",
+        "products": [],
+        "product_limit": 6,
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "show_view_all": true,
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "heading": "{{ section.settings.collection.title }}",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
-        "heading_tag": "h2",
+        "heading_tag": "h3",
         "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
+        "description": "<p>Aetrex products feature rearfoot posting and Aetrex’s proprietary arch support to help keep your feet aligned and control overpronation, helping you stay active and comfortable on your feet.</p>",
+        "highlighted_text": "text",
         "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
-        "color_background": "#e0edf2",
+        "color_text": "",
+        "color_background": "",
         "gradient_background": "",
-        "color_highlight": "#171717",
+        "color_highlight": "",
         "gradient_highlight": "",
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 24,
+        "padding_top": 48,
         "padding_bottom": 24,
-        "divider": false,
-        "narrow": true,
+        "divider": true,
+        "full_width": false,
         "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
@@ -476,104 +437,6 @@
         "enable_parallax": true
       }
     },
-    "featured_collection_dXtHeM": {
-      "type": "featured-collection",
-      "name": "t:sections.featured-collection.name",
-      "settings": {
-        "collection": "",
-        "products": [
-          "maui-black-gloss-l3030w",
-          "metatarsalgia-orthotics-men",
-          "xspress-runner2-white-xs103w",
-          "blake-black-pc130w"
-        ],
-        "product_limit": 4,
-        "columns": 4,
-        "carousel_on_desktop": false,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": false,
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "text",
-        "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
-        "color_background": "#ffffff",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "rich_text_4FKGVw": {
-      "type": "rich-text",
-      "blocks": {
-        "text_jJWFPp": {
-          "type": "text",
-          "settings": {
-            "text": "<p>What Other Metatarsalgia Sufferers Say</p>",
-            "text_font": "heading",
-            "text_size": "subtext-custom",
-            "text_max_size": 30,
-            "text_line_height": 1.2,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "one"
-          }
-        }
-      },
-      "block_order": [
-        "text_jJWFPp"
-      ],
-      "name": "t:sections.rich-text.name",
-      "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 0,
-        "padding_bottom": 0,
-        "divider": false,
-        "narrow": true,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
     "testimonials_byJFpb": {
       "type": "testimonials",
       "blocks": {
@@ -581,8 +444,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>Bought all 4 colors</strong><br/>I bought two pairs and were so elated with the comfort that I bought the last two remaining colors. I suffer from Metatarsalgia and was glad to finally being able to walk without discomfort & pain!!”</h6>",
-            "author": "Ellen o.",
+            "text": "<h6><strong>These Saved My Life! </strong><br/>These flip flops saved my summer! My plantar fasciitis was really bad and when I put these on I felt relief almost immediately. The discomfort continues to subside more and more each day, and is still improving, which I largely attribute to wearing these all day, every day. Plus, they felt very secure even when wet. Very thankful for these!\"</h6>",
+            "author": "Lisa R.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -594,8 +457,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>I love these sneakers.</strong><br/>I love these sneakers. I have bought three of the same sneakers, but in different colors. What a difference they have made on my feet. I like to take my dog for walks. I had to stop. My feet were in such pain. With these sneakers my feet are fine now. Thank you Aetrex.</h6>",
-            "author": "Linda P.",
+            "text": "<h6><strong>My Favorite! </strong><br/>These were the first shoe I ordered from Aetrex. I loved them immediately. I am now on my 3rd pair, including one for my daughter since she kept stealing mine! They are cushiony & supportive enough for a day at an amusement park plus the strap keeps them secure. Casual enough for everyday, but dressy enough for a night out means only packing one pair for trips.\"</h6>",
+            "author": "Holly J.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -607,8 +470,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>Comfortable & Supportive </strong><br/>I bought these to wear at work. I am a Dental Assistant and on my feet most of the day. With other shoes, I would go home with sore feet and low back pain. The Xspress Runner 2 felt comfortable and supportive right from the first time I laced them up - no break-in required.</h6>",
-            "author": "Susanne B.",
+            "text": "<h6><strong>Better Than My Bare Feet! </strong><br/>These sandals are perfect. They are very cushioned and supportive in all the right places. I can already feel the difference with my pronation issues when I wear these slides. I also love that they are cute and so easy to wear. I wear them out or just around the house. I couldn't recommend more!!!\" </h6>",
+            "author": "Kimberly S.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -624,7 +487,7 @@
       ],
       "name": "t:sections.testimonials.name",
       "settings": {
-        "heading": "",
+        "heading": "What Other Overpronation Sufferers Say",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
@@ -637,81 +500,6 @@
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "#171717",
-        "color_background": "#ffffff",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 20,
-        "padding_bottom": 20,
-        "divider": false,
-        "rounded": false
-      }
-    },
-    "collection_list_fbMkYY": {
-      "type": "collection-list",
-      "blocks": {
-        "collection_cPKHdc": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "womens-footwear-for-metatarsalgia",
-            "custom_url": "",
-            "image": "shopify://shop_images/Rectangle_60_3.png",
-            "title": "Shoes",
-            "description": "To Help Relieve Metatarsalgia",
-            "overlay_content": true,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 40,
-            "submenu_title_position": "center",
-            "enable_title_drop_shadow": true
-          }
-        },
-        "collection_gpn6Pp": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "orthotics-for-metatarsalgia",
-            "custom_url": "",
-            "image": "shopify://shop_images/Rectangle_61_668b1198-2250-4e0e-9f58-c1a42125e032.png",
-            "title": "Orthotics",
-            "description": "To Help Relieve Metatarsalgia",
-            "overlay_content": true,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 40,
-            "submenu_title_position": "center",
-            "enable_title_drop_shadow": true
-          }
-        }
-      },
-      "block_order": [
-        "collection_cPKHdc",
-        "collection_gpn6Pp"
-      ],
-      "disabled": true,
-      "name": "t:sections.collection-list.name",
-      "settings": {
-        "columns": 2,
-        "carousel_on_desktop": true,
-        "image_type": "collection",
-        "image_ratio": "landscape",
-        "show_products_count": false,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
         "color_background": "#fafafa",
         "gradient_background": "",
         "color_highlight": "",
@@ -719,61 +507,21 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 0,
-        "padding_bottom": 40,
-        "divider": false,
-        "full_width": true,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "featured_collection_Xk34kf": {
-      "type": "featured-collection",
-      "name": "t:sections.featured-collection.name",
-      "settings": {
-        "collection": "womens-footwear-for-metatarsalgia-copy",
-        "products": [],
-        "product_limit": 6,
-        "columns": 4,
-        "carousel_on_desktop": true,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "{{ section.settings.collection.title }}",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h3",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "text",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
         "padding_top": 48,
-        "padding_bottom": 24,
+        "padding_bottom": 48,
         "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
+        "rounded": true
       }
     },
-    "rich_text_WBLppD": {
+    "rich_text_qrWq4k": {
       "type": "rich-text",
       "blocks": {
-        "text_x43C7b": {
+        "text_B46MGH": {
           "type": "text",
           "settings": {
-            "text": "<p>The information contained on this website is for educational, informational and retail purposes only. No material on this site is intended to be a substitute for medical advice, diagnosis or treatment of any medical condition. Accordingly, if you are experiencing ongoing pain or discomfort, we encourage you to consult with a doctor or medical professional.</p>",
+            "text": "<p><em>The information contained on this website is for educational, informational and retail purposes only. No material on this site is intended to be a substitute for medical advice, diagnosis or treatment of any medical condition. Accordingly, if you are experiencing ongoing pain or discomfort, we encourage you to consult with a doctor or medical professional.</em></p>",
             "text_font": "body",
-            "text_size": "subtext-md",
+            "text_size": "subtext-sm",
             "text_max_size": 32,
             "text_line_height": 1.2,
             "text_letter_spacing": 0,
@@ -785,7 +533,7 @@
         }
       },
       "block_order": [
-        "text_x43C7b"
+        "text_B46MGH"
       ],
       "name": "t:sections.rich-text.name",
       "settings": {
@@ -827,13 +575,9 @@
     "image_with_text_overlay_rBfBzp",
     "faq_zhAACx",
     "lookbook_w69hfT",
-    "rich_text_mPwWDc",
+    "featured_collection_k86GjP",
     "images_with_text_iL8ht6",
-    "featured_collection_dXtHeM",
-    "rich_text_4FKGVw",
     "testimonials_byJFpb",
-    "collection_list_fbMkYY",
-    "featured_collection_Xk34kf",
-    "rich_text_WBLppD"
+    "rich_text_qrWq4k"
   ]
 }

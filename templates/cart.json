@@ -87,26 +87,6 @@
         "rounded": false
       }
     },
-    "custom_liquid_PhmGeD": {
-      "type": "custom-liquid",
-      "name": "t:sections.custom-liquid.name",
-      "settings": {
-        "liquid": "<script src=\"https://cdn-widgetsrepository.yotpo.com/v1/loader/sLWxrvqVMH9MjsmLSwdnWA\" async></script>\n<div class=\"yotpo-widget-instance\" data-yotpo-instance-id=\"1271065\"></div>",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "narrow": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
     "recently-viewed": {
       "type": "recently-viewed",
       "disabled": true,
@@ -176,7 +156,6 @@
   },
   "order": [
     "main",
-    "custom_liquid_PhmGeD",
     "recently-viewed",
     "ss_recs_script_txc4Dp",
     "ss_recs_target_zxHQEG"

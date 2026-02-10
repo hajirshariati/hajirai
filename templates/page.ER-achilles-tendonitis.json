@@ -30,7 +30,7 @@
         "heading_axLTnn": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Bunions</p>",
+            "heading": "<p><strong>Achilles Tendonitis</strong></p>",
             "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "text",
@@ -40,7 +40,7 @@
         "text_LHGLnM": {
           "type": "text",
           "settings": {
-            "text": "<p>A bunion is characterized by a prominent bump on the inside of the foot around the big toe joint, caused by a bone protruding towards the inside of the foot. As the big toe moves toward the smaller toes, it can end up resting under or over the second toe, leading to a condition known as overlapping toes.<br/><br/>Symptoms of bunions include inflammation, swelling, and soreness on the side surface of the big toe, often causing improper walking.</p>",
+            "text": "<p>Achilles Tendonitis is inflammation of the achilles tendon, which can lead to degeneration. The achilles tendon, a large tendon at the back of the leg that attaches to the heel, can become painful due to this condition.<br/><br/>Pain from achilles tendonitis can develop gradually without any history of trauma and may present as shooting, burning, or piercing pain. Untreated achilles tendonitis poses a risk of the tendon becoming weak and potentially rupturing.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -52,14 +52,14 @@
             "highlighted_scribble": "circle"
           }
         },
-        "spacing_imdPrm": {
+        "spacing_8aC8iV": {
           "type": "spacing",
           "settings": {
             "height": 40,
             "height_mobile": 28
           }
         },
-        "text_K4fhDh": {
+        "text_qDwpRX": {
           "type": "text",
           "settings": {
             "text": "<p>Medically reviewed by Janine Taddeo, DPM</p>",
@@ -78,14 +78,14 @@
       "block_order": [
         "heading_axLTnn",
         "text_LHGLnM",
-        "spacing_imdPrm",
-        "text_K4fhDh"
+        "spacing_8aC8iV",
+        "text_qDwpRX"
       ],
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
-        "image": "shopify://shop_images/Group_8_a872f6a0-f2ec-48c9-b9d4-2da3568f1adb.png",
-        "image_height": "adapt",
+        "image": "shopify://shop_images/Group_16.png",
+        "image_height": "650px",
         "content_width": "small",
         "content_position": "md:items-center md:justify-start",
         "text_alignment": "left",
@@ -106,7 +106,7 @@
         "padding_bottom": 0,
         "divider": false,
         "full_width": true,
-        "rounded": false,
+        "rounded": true,
         "enable_parallax": false,
         "parallax_direction": "vertical",
         "abra_promo_code_show": "",
@@ -120,7 +120,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Causes</strong>",
-            "text": "<p>Bunions are a common problem experienced mostly by women. The deformity can develop from an abnormality in foot function, or arthritis, but is more commonly caused by wearing improper fitting footwear. Tight, narrow dress shoes with a constrictive toe box (toe area) can cause the foot to begin to take the shape of the shoe, leading to the formation of a bunion. Women who have bunions normally wear dress shoes that are too small for their feet. Their toes are squeezed together in their shoes causing the first metatarsal bone to protrude on the side of the foot.  The most common cause is a biomechanics abnormality, such as flat feet, that leads to the joint dysfunction.  The abnormal biomechanics can be inherited.  Other less common causes include Rheumatoid arthritis, neuromuscular disorders, and trauma, to name a few.</p><p>It is important for men and women to realize that wearing dress shoes and boots, which are tapered in the toe area, can cause the bunion to worsen to the point where surgery is necessary.</p>",
+            "text": "<p>There are several factors that can cause achilles tendonitis. The most common cause is overpronation. Overpronation occurs in the walking process, when the arch collapses upon weight bearing, adding stress on the achilles tendon. Other factors that lead to achilles tendonitis are improper shoe selection, inadequate stretching prior to engaging in athletics, a short achilles tendon, direct trauma (injury) to the tendon, and heel bone deformity.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -129,7 +129,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Treatment and Prevention</strong>",
-            "text": "<p>Conservative treatment to alleviate the pain associated with bunions is to wear shoes that accommodate the deformity.  Shoes designed with a wide toe box are recommended.  Orthotics are also recommended for this condition to support the arch in the case of flat feet.  Orthotics can limit the progression of the bunion formation.  Lastly, surgery is an option to correct the deformity.</p><p>If the problem persists, consult your foot doctor.</p>",
+            "text": "<p>Athletes, particularly runners, should incorporate a thorough stretching program to properly warm-up the muscles. They should decrease the distance of their walk or run, apply ice after the activity and avoid any uphill climbs. Athletes should use an orthotic device, heel cup, or heel cradle for extra support.   A heel cup or heel cradle elevates the heel to reduce stress and pressure on the achilles tendon. The device should be made with light-weight, shock absorbing materials. An orthotic device can be used to control over-pronation, support the longitudinal arch, and reduce stress on the achilles tendon.</p><p>If the problem persists, consult your foot doctor.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -138,6 +138,10 @@
       "block_order": [
         "question_XamVPH",
         "question_x9EPUx"
+      ],
+      "custom_css": [
+        ".faqs.with-background > :is(div, form) {padding: 2em 0em !important;}",
+        ".details__summary .icon-plus-2 {display: none;}"
       ],
       "name": "t:sections.faq.name",
       "settings": {
@@ -168,55 +172,55 @@
         "padding_bottom": 0,
         "divider": false,
         "narrow": false,
-        "rounded": false,
+        "rounded": true,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
     },
-    "lookbook_crRFzY": {
+    "lookbook_w69hfT": {
       "type": "lookbook",
       "blocks": {
-        "content_YrpNak": {
+        "content_9ghrzK": {
           "type": "content",
           "settings": {
             "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
-            "heading": "Adjustability for Everyone",
-            "text": "<p>Easy to use, our hook and loop adjustable straps help accommodate multiple widths by being able to shorten or elongate the strap.</p>",
+            "heading": "Pull Tab",
+            "text": "<p>A piece of looped material that helps you pull the back of the shoe up over your heel.</p>",
             "link": "",
             "color_text": "#74a5ba",
-            "vertical": 21,
-            "horizontal": 45,
-            "vertical_mobile": 25,
-            "horizontal_mobile": 25,
+            "vertical": 18,
+            "horizontal": 50,
+            "vertical_mobile": 23,
+            "horizontal_mobile": 41,
             "cta_label": "",
             "cta_link": "",
             "cta_external": false,
             "cta_icon": true
           }
         },
-        "content_hJdzY7": {
+        "content_HF7yEU": {
           "type": "content",
           "settings": {
             "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
-            "heading": "Bunion Relief",
-            "text": "<p>By strategically placing the straps, this shoe provides a void for bunions without any pressure or restriction and gives you comfort where you need it most.</p>",
+            "heading": "Complete Underfoot Support",
+            "text": "<p>Our Cobra Orthotic Technology provides a void in the heel area to help alleviate heel pressure and provides metatarsal support.</p>",
             "link": "",
             "color_text": "#74a5ba",
-            "vertical": 53,
-            "horizontal": 73,
-            "vertical_mobile": 62,
-            "horizontal_mobile": 16,
+            "vertical": 48,
+            "horizontal": 39,
+            "vertical_mobile": 55,
+            "horizontal_mobile": 12,
             "cta_label": "",
             "cta_link": "",
             "cta_external": false,
             "cta_icon": true
           }
         },
-        "content_VmtXWC": {
+        "content_LjVywH": {
           "type": "content",
           "disabled": true,
           "settings": {
@@ -237,7 +241,7 @@
             "cta_icon": true
           }
         },
-        "content_8XPnNg": {
+        "content_3iTAhx": {
           "type": "content",
           "settings": {
             "icon": "none",
@@ -249,27 +253,27 @@
             "color_text": "#74a5ba",
             "vertical": 56,
             "horizontal": 52,
-            "vertical_mobile": 55,
-            "horizontal_mobile": 41,
+            "vertical_mobile": 64,
+            "horizontal_mobile": 37,
             "cta_label": "",
             "cta_link": "",
             "cta_external": false,
             "cta_icon": true
           }
         },
-        "content_HXQxdV": {
+        "content_Kxzeti": {
           "type": "content",
           "settings": {
             "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
-            "heading": "Open Toe",
-            "text": "<p>This type of shoe provides ample room for your feet and is beneficial for conditions such as Hammer Toes.</p>",
+            "heading": "Lightweight",
+            "text": "<p>Aetrex Flips are designed using light-weight UltraSky™ EVA with a water-friendly construction. It is specially engineered with super soft foam to keep your toes comfortable all day long.</p>",
             "link": "",
             "color_text": "#74a5ba",
-            "vertical": 71,
-            "horizontal": 68,
-            "vertical_mobile": 75,
+            "vertical": 70,
+            "horizontal": 75,
+            "vertical_mobile": 73,
             "horizontal_mobile": 73,
             "cta_label": "",
             "cta_link": "",
@@ -279,17 +283,17 @@
         }
       },
       "block_order": [
-        "content_YrpNak",
-        "content_hJdzY7",
-        "content_VmtXWC",
-        "content_8XPnNg",
-        "content_HXQxdV"
+        "content_9ghrzK",
+        "content_HF7yEU",
+        "content_LjVywH",
+        "content_3iTAhx",
+        "content_Kxzeti"
       ],
       "disabled": true,
       "name": "t:sections.lookbook.name",
       "settings": {
-        "image": "shopify://shop_images/Group_18_1.png",
-        "image_mobile": "shopify://shop_images/Frame_59.png",
+        "image": "shopify://shop_images/Group_18_8.png",
+        "image_mobile": "shopify://shop_images/Frame_91.png",
         "heading": "",
         "heading_size": "title-sm",
         "heading_alignment": "text-center md:items-center",
@@ -322,41 +326,41 @@
         "abra_promo_code_hide": ""
       }
     },
-    "rich_text_73ERKg": {
-      "type": "rich-text",
+    "images_with_text_iL8ht6": {
+      "type": "images-with-text",
       "blocks": {
-        "heading_RpcMxt": {
+        "heading_e4NMJi": {
           "type": "heading",
           "settings": {
-            "heading": "Why Our Products Help Relieve Bunion Related Foot Pain",
-            "heading_size": "title-sm",
+            "heading": "Signature Arch Support",
+            "heading_size": "title-md",
             "heading_tag": "h2",
-            "highlighted_text": "text",
+            "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         },
-        "text_xKhGeN": {
+        "text_Bw6Yfi": {
           "type": "text",
           "settings": {
-            "text": "<p><em>Aetrex products can help correct the alignment and alleviate the pressure on the affected joint.Aetrex shoes with a wide toe area are recommended to accommodate the deformity and Aetrex Orthotics that help reduce bunion pain and increase the toe’s mobility. </em></p>",
+            "text": "<p>With removable insole, our arch support is located further back to support the apex of the foot. This helps proper alignment and help relieve arch and heel pain associated with Plantar Fasciitis</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
-            "text_line_height": 1.2,
+            "text_line_height": 1.6,
             "text_letter_spacing": 0,
             "text_capitalize": false,
-            "secondary_color": true,
-            "highlighted_text": "text",
+            "secondary_color": false,
+            "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         },
-        "button_rWCLDJ": {
+        "button_TWhPGJ": {
           "type": "button",
-          "disabled": true,
           "settings": {
-            "button_label": "Button label",
-            "button_link": "",
-            "button_style": "primary",
+            "button_label": "Shop Jillian",
+            "button_link": "shopify://products/jillian-black-sc450w",
+            "button_video_link": "",
+            "button_style": "link",
             "button_size": "md",
             "button_external": false,
             "button_icon": true
@@ -364,71 +368,24 @@
         }
       },
       "block_order": [
-        "heading_RpcMxt",
-        "text_xKhGeN",
-        "button_rWCLDJ"
+        "heading_e4NMJi",
+        "text_Bw6Yfi",
+        "button_TWhPGJ"
       ],
-      "name": "t:sections.rich-text.name",
+      "disabled": true,
+      "name": "t:sections.images-with-text.name",
       "settings": {
+        "image": "shopify://shop_images/ee4e2fe8a874fb5c106a8cc3c4247add5d9048ed.png",
+        "image_url": "",
+        "image_2": "shopify://shop_images/recommended_1_2x_21163cd2-e758-4725-87c5-117210d3d3c9.png",
+        "image2_url": "",
+        "image_ratio": "adapt",
+        "image_width": "large",
+        "layout": "text_first",
         "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
-        "color_background": "#e0edf2",
-        "gradient_background": "",
-        "color_highlight": "#171717",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 24,
-        "padding_bottom": 24,
-        "divider": false,
-        "narrow": true,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "featured_collection_dXtHeM": {
-      "type": "featured-collection",
-      "name": "t:sections.featured-collection.name",
-      "settings": {
-        "collection": "",
-        "products": [
-          "carly-black-as100w",
-          "danika-light-grey-ap113w",
-          "l2300m-m",
-          "jillian-black-sc450w"
-        ],
-        "product_limit": 4,
-        "columns": 4,
-        "carousel_on_desktop": false,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": false,
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "text",
-        "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
-        "color_background": "#ffffff",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "#fafafa",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
@@ -440,50 +397,30 @@
         "divider": false,
         "full_width": false,
         "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
+        "enable_parallax": true
       }
     },
-    "rich_text_dUPwLg": {
-      "type": "rich-text",
-      "blocks": {
-        "text_7zmBDU": {
-          "type": "text",
-          "settings": {
-            "text": "<p>What Other Bunion Sufferers Say</p>",
-            "text_font": "heading",
-            "text_size": "subtext-custom",
-            "text_max_size": 30,
-            "text_line_height": 1.2,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "one"
-          }
-        }
-      },
-      "block_order": [
-        "text_7zmBDU"
-      ],
-      "name": "t:sections.rich-text.name",
+    "featured_collection_mnqjNx": {
+      "type": "featured-collection",
+      "name": "t:sections.featured-collection.name",
       "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
+        "collection": "explore-relief-for-achilles-tendonitis",
+        "products": [],
+        "product_limit": 6,
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "show_view_all": true,
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "heading": "{{ section.settings.collection.title }}",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
-        "heading_tag": "h2",
+        "heading_tag": "h3",
         "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
+        "description": "<p>Aetrex products help support proper foot alignment to reduce strain on the Achilles tendon during walking and standing. With shock-absorbing materials and heel stabilization, Aetrex products help minimize tension and promote a more natural, supported gait ideal for soothing Achilles discomfort.</p>",
+        "highlighted_text": "text",
         "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
+        "color_text": "",
         "color_background": "",
         "gradient_background": "",
         "color_highlight": "",
@@ -491,10 +428,10 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 0,
-        "padding_bottom": 0,
-        "divider": false,
-        "narrow": true,
+        "padding_top": 48,
+        "padding_bottom": 48,
+        "divider": true,
+        "full_width": false,
         "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
@@ -507,8 +444,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>Favorite Sandals </strong><br/>I have flat feet, bunions, plantar fasciitis, and have suffered from Achilles tendinitis. These sandals are wonderful! They look very attractive and fashionable while also providing the desperately needed support so that I can walk. I love the Velcro closures that can be adjusted across the toes, as well as around the ankle. I wish that I could get a pair in every color!”</h6>",
-            "author": "Shan",
+            "text": "<h6><strong>Bought all 4 colors</strong><br/>I bought two pairs and were so elated with the comfort that I bought the last two remaining colors. I suffer from Metatarsalgia and was glad to finally being able to walk without discomfort & pain!!”</h6>",
+            "author": "Ellen o.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -520,8 +457,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>Great Style and Comfort</strong><br/>After bunion surgery I needed to find shoes with more support; these are my third pair of Aetrex shoes. None had to be worn in, my feet felt supported without sacrificing style. Perfect for traveling especially when you have to limit the number of shoes you take.\" </h6>",
-            "author": "Susan C.",
+            "text": "<h6><strong>I love these sneakers.</strong><br/>I have bought three of the same sneakers, but in different colors. What a difference they have made on my feet. I like to take my dog for walks. I had to stop. My feet were in such pain. With these sneakers my feet are fine now. Thank you Aetrex.”</h6>",
+            "author": "Linda P.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -533,8 +470,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>Very comfortable!</strong><br/>I have bunions and I need good arch support so I don’t skimp on shoes. These sandals were comfortable right out of the box. The adjustable straps make them a perfect fit and the arch support is great. <br/></h6><h6></h6>",
-            "author": "Susanne B.",
+            "text": "<h6><strong>I love these sandals!!!</strong><br/>I have achilles Tendinitis which made wearing my $10 ultra flat thong sandals impossible. I ordered these and LOVE them. I walked 1.5 miles in them at lunch the other day and had ZERO pain. Plus they are CUTE and dont look like orthopaedic sandals!”</h6>",
+            "author": "Janet C.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -550,7 +487,7 @@
       ],
       "name": "t:sections.testimonials.name",
       "settings": {
-        "heading": "",
+        "heading": "What Other Achilles Tendonitis Sufferers Say",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
@@ -563,81 +500,6 @@
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "#171717",
-        "color_background": "#ffffff",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 20,
-        "padding_bottom": 20,
-        "divider": false,
-        "rounded": false
-      }
-    },
-    "collection_list_fbMkYY": {
-      "type": "collection-list",
-      "blocks": {
-        "collection_cPKHdc": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "womens-footwear-for-bunions",
-            "custom_url": "",
-            "image": "shopify://shop_images/Rectangle_60_1.png",
-            "title": "Shoes",
-            "description": "To Help Relieve Bunions",
-            "overlay_content": true,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 40,
-            "submenu_title_position": "center",
-            "enable_title_drop_shadow": true
-          }
-        },
-        "collection_gpn6Pp": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "orthotics-for-bunions",
-            "custom_url": "",
-            "image": "shopify://shop_images/Rectangle_61_668b1198-2250-4e0e-9f58-c1a42125e032.png",
-            "title": "Orthotics",
-            "description": "To Help Relieve Bunions",
-            "overlay_content": true,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 40,
-            "submenu_title_position": "center",
-            "enable_title_drop_shadow": true
-          }
-        }
-      },
-      "block_order": [
-        "collection_cPKHdc",
-        "collection_gpn6Pp"
-      ],
-      "disabled": true,
-      "name": "t:sections.collection-list.name",
-      "settings": {
-        "columns": 2,
-        "carousel_on_desktop": true,
-        "image_type": "collection",
-        "image_ratio": "adapt",
-        "show_products_count": false,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
         "color_background": "#fafafa",
         "gradient_background": "",
         "color_highlight": "",
@@ -645,61 +507,21 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 0,
-        "padding_bottom": 40,
-        "divider": false,
-        "full_width": true,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "featured_collection_3fWrTX": {
-      "type": "featured-collection",
-      "name": "t:sections.featured-collection.name",
-      "settings": {
-        "collection": "womens-footwear-for-bunions-copy",
-        "products": [],
-        "product_limit": 12,
-        "columns": 4,
-        "carousel_on_desktop": true,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "{{ section.settings.collection.title }}",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h3",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "text",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
         "padding_top": 48,
-        "padding_bottom": 24,
+        "padding_bottom": 48,
         "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
+        "rounded": true
       }
     },
-    "rich_text_E8xXXk": {
+    "rich_text_LXafeq": {
       "type": "rich-text",
       "blocks": {
-        "text_rFtanA": {
+        "text_NmqAfm": {
           "type": "text",
           "settings": {
-            "text": "<p>The information contained on this website is for educational, informational and retail purposes only. No material on this site is intended to be a substitute for medical advice, diagnosis or treatment of any medical condition. Accordingly, if you are experiencing ongoing pain or discomfort, we encourage you to consult with a doctor or medical professional.</p>",
+            "text": "<p><em>The information contained on this website is for educational, informational and retail purposes only. No material on this site is intended to be a substitute for medical advice, diagnosis or treatment of any medical condition. Accordingly, if you are experiencing ongoing pain or discomfort, we encourage you to consult with a doctor or medical professional.</em></p>",
             "text_font": "body",
-            "text_size": "subtext-md",
+            "text_size": "subtext-sm",
             "text_max_size": 32,
             "text_line_height": 1.2,
             "text_letter_spacing": 0,
@@ -711,7 +533,7 @@
         }
       },
       "block_order": [
-        "text_rFtanA"
+        "text_NmqAfm"
       ],
       "name": "t:sections.rich-text.name",
       "settings": {
@@ -752,13 +574,10 @@
     "main-page",
     "image_with_text_overlay_rBfBzp",
     "faq_zhAACx",
-    "lookbook_crRFzY",
-    "rich_text_73ERKg",
-    "featured_collection_dXtHeM",
-    "rich_text_dUPwLg",
+    "lookbook_w69hfT",
+    "images_with_text_iL8ht6",
+    "featured_collection_mnqjNx",
     "testimonials_byJFpb",
-    "collection_list_fbMkYY",
-    "featured_collection_3fWrTX",
-    "rich_text_E8xXXk"
+    "rich_text_LXafeq"
   ]
 }

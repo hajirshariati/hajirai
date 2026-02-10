@@ -55,6 +55,15 @@
           "type": "shopify://apps/true-fit/blocks/widget/caa08c3b-c601-47cd-9c2a-32bb0567b191",
           "settings": {}
         },
+        "inventory_VdMPmM": {
+          "type": "inventory",
+          "settings": {
+            "inventory_threshold": 10,
+            "show_inventory_transfer": true,
+            "show_inventory_quantity": "low",
+            "color_scheme": "accent-3"
+          }
+        },
         "buy_buttons": {
           "type": "buy_buttons",
           "settings": {
@@ -198,6 +207,7 @@
         "yotpo_product_reviews_star_rating_NHcRBy",
         "variant_picker",
         "true_fit_widget_8cjNbr",
+        "inventory_VdMPmM",
         "buy_buttons",
         "liquid_Df3mAF",
         "icon_list_VBaw6z",

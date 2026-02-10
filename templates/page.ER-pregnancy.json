@@ -30,7 +30,7 @@
         "heading_axLTnn": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Heel Spurs</p>",
+            "heading": "<p><strong>Pregnancy and Your Feet</strong></p>",
             "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "text",
@@ -40,7 +40,7 @@
         "text_LHGLnM": {
           "type": "text",
           "settings": {
-            "text": "<p>A heel spur is an abnormal growth of the heel bone caused by calcium deposits. Calcium deposits form when the plantar fascia pulls away from the heel, leading to a bony protrusion known as a heel spur. <br/><br/>Heel spurs can cause severe pain in the rearfoot, especially while standing or walking. Women have a higher incidence of heel spurs, partly due to the types of footwear they commonly wear.</p>",
+            "text": "<p>Pregnancy triggers many changes in a woman’s body, including weight gain that alters her center of gravity. This shift causes a new weight-bearing stance and increases pressure on the knees and feet.<br/><br/>Two common foot problems during pregnancy are overpronation and edema, which can lead to pain in the heel, arch, or ball of the foot.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -52,14 +52,14 @@
             "highlighted_scribble": "circle"
           }
         },
-        "spacing_6YxCNB": {
+        "spacing_LAkd9E": {
           "type": "spacing",
           "settings": {
             "height": 40,
             "height_mobile": 28
           }
         },
-        "text_6r6q6Y": {
+        "text_NBMXtw": {
           "type": "text",
           "settings": {
             "text": "<p>Medically reviewed by Janine Taddeo, DPM</p>",
@@ -78,14 +78,14 @@
       "block_order": [
         "heading_axLTnn",
         "text_LHGLnM",
-        "spacing_6YxCNB",
-        "text_6r6q6Y"
+        "spacing_LAkd9E",
+        "text_NBMXtw"
       ],
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
-        "image": "shopify://shop_images/Group_14.png",
-        "image_height": "adapt",
+        "image": "shopify://shop_images/Group_15_532d5b16-7c7d-4bc4-9bf8-14d5bdf9e14c.png",
+        "image_height": "650px",
         "content_width": "small",
         "content_position": "md:items-center md:justify-start",
         "text_alignment": "left",
@@ -106,7 +106,7 @@
         "padding_bottom": 0,
         "divider": false,
         "full_width": true,
-        "rounded": false,
+        "rounded": true,
         "enable_parallax": false,
         "parallax_direction": "vertical",
         "abra_promo_code_show": "",
@@ -120,7 +120,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Causes</strong>",
-            "text": "<p>Heel spurs develop as an abnormal growth in the heel bone due to calcium deposits that form when the plantar fascia pulls away from the heel. This stretching of the plantar fascia is usually the result of over-pronation (flat feet), but people with unusually high arches (pes cavus) can also develop heel spurs. Women have a significantly higher incidence of heel spurs due to the types of footwear often worn on a regular basis.</p>",
+            "text": "<p>Overpronation and edema a very common foot problem experienced during pregnancy. OverPronation, also referred to as flat feet, is caused when a person’s arch flattens out upon weight bearing and their feet roll inward when walking. This can create extreme stress or inflammation on the plantar fascia, the fibrous band of tissue that runs from the heel to the forefoot. Overpronation can make walking very painful and can increase strain on the feet, calves and/or back. The reason many pregnant women suffer from overpronation is the added pressure on the body as a result of weight gain. Overpronation is also very prominent in people who have flexible, flat feet or in people who are obese. Edema, also referred to as swelling in the feet, normally occurs in the latter part of pregnancy. Edema results from the extra blood accumulated during pregnancy. The enlarging uterus puts pressure on the blood vessels in the pelvis and legs causing circulation to slow down and blood to pool in the lower extremities. The total water fluid in the body remains the same as before pregnancy, however it becomes displaced. When feet are swollen, they can become purplish in color. Sometimes extra water is retained during pregnancy, adding to the swelling. If there is swelling in the face or hands, a doctor should be contacted immediately.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -129,7 +129,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Treatment and Prevention</strong>",
-            "text": "<p>The key for the proper treatment of heel spurs is determining what is causing the excessive stretching of the plantar fascia. When the cause is over-pronation (flat feet), an orthotic with rearfoot posting and longitudinal arch support is an effective device to reduce the over-pronation, and allow the condition to heal. Other common treatments include stretching exercises, losing weight, wearing shoes that have a cushioned heel that absorbs shock, and elevating the heel with the use of a heel cradle, heel cup, or orthotic. Heel cradles and heel cups provide extra comfort and cushion to the heel, and reduce the amount of shock and shear forces experienced from everyday activities.<br/><br/><br/>If the problem persists, consult your foot doctor.</p>",
+            "text": "<p>There are effective ways to treat both over-pronation and edema during pregnancy. OverPronation can be treated conservatively with “ready-made” orthotics. These orthotics should be designed with appropriate arch support and medial rearfoot posting to correct the overpronation. Proper fitting footwear is also very important in treating overpronation. Choose comfortable footwear that provides extra support and shock absorption. It is important to treat overpronation for pain relief but also to prevent other foot conditions from developing such as Plantar Fasciitis, Heel Spurs, Metatarsalgia, Post-Tib Tendonitis and/or Bunions. Edema in the feet can be minimized by the following methods: Elevate your feet as often as possible. If you have to sit for long periods of time, place a small stool by your feet to elevate them. Wear proper fitting footwear. Footwear that is too narrow or short will constrict circulation. Have your feet measured several times throughout your pregnancy. They will probably change sizes. Wear seamless socks that do not constrict circulation. If you are driving for a long period of time, take regular breaks to stretch your legs to promote circulation. Exercise regularly to promote overall health; walking is the best exercise. Drink plenty of water to keep the body hydrated. This helps the body retain less fluid. Eat a well-balanced diet and avoid foods high in salt that can cause water retention. Swelling is normally similar in both feet. If swelling is not symmetrical in both feet, this may be a sign of a vascular problem and a doctor should be contacted immediately.</p><p>If the problem persists, consult your foot doctor.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -139,7 +139,10 @@
         "question_XamVPH",
         "question_x9EPUx"
       ],
-      "custom_css": [],
+      "custom_css": [
+        ".faqs.with-background > :is(div, form) {padding: 2em 0em !important;}",
+        ".details__summary .icon-plus-2 {display: none;}"
+      ],
       "name": "t:sections.faq.name",
       "settings": {
         "style": "with-background",
@@ -169,55 +172,55 @@
         "padding_bottom": 0,
         "divider": false,
         "narrow": false,
-        "rounded": false,
+        "rounded": true,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
     },
-    "lookbook_w69hfT": {
+    "lookbook_DgQ4hL": {
       "type": "lookbook",
       "blocks": {
-        "content_9ghrzK": {
+        "content_gB9QCi": {
           "type": "content",
           "settings": {
             "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
-            "heading": "Padded Tongue",
-            "text": "<p>Extra cushioning around the instep helps to reduce discomfort and provides a comfortable fit.</p>",
+            "heading": "Padded Heel",
+            "text": "<p>Extra padding on the back of the heel helps to reduce discomfort or blisters while providing additional cushioning.</p>",
             "link": "",
             "color_text": "#74a5ba",
             "vertical": 18,
             "horizontal": 50,
-            "vertical_mobile": 20,
-            "horizontal_mobile": 28,
+            "vertical_mobile": 23,
+            "horizontal_mobile": 24,
             "cta_label": "",
             "cta_link": "",
             "cta_external": false,
             "cta_icon": true
           }
         },
-        "content_HF7yEU": {
+        "content_fUf7PX": {
           "type": "content",
           "settings": {
             "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
-            "heading": "Removable Insole",
-            "text": "<p>Included is a removable arch support & premium foam cushioning insole that can easily be replaced with a more customized Aetrex Orthotic.</p>",
+            "heading": "Met Bar Pod",
+            "text": "<p>A pod on the bottom of the shoe that helps to relieve ball-of-foot discomfort or stress.</p>",
             "link": "",
             "color_text": "#74a5ba",
             "vertical": 48,
             "horizontal": 39,
-            "vertical_mobile": 69,
-            "horizontal_mobile": 12,
+            "vertical_mobile": 50,
+            "horizontal_mobile": 9,
             "cta_label": "",
             "cta_link": "",
             "cta_external": false,
             "cta_icon": true
           }
         },
-        "content_LjVywH": {
+        "content_EqdMMx": {
           "type": "content",
           "disabled": true,
           "settings": {
@@ -238,40 +241,40 @@
             "cta_icon": true
           }
         },
-        "content_3iTAhx": {
+        "content_Lqb7WE": {
           "type": "content",
           "settings": {
             "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
-            "heading": "Arch Support",
-            "text": "<p>Designed to help support natural alignment, our unique arch support position, height and contour aligns in the proper place to help support our bodies from the ground up and helps to relieve plantar fasciitis and common heel/arch pain.</p>",
+            "heading": "Adjustability",
+            "text": "<p>Easy to use, our hook and loop adjustable straps help accommodate multiple widths by being able to shorten or elongate the strap.</p>",
             "link": "",
             "color_text": "#74a5ba",
             "vertical": 56,
             "horizontal": 52,
-            "vertical_mobile": 66,
-            "horizontal_mobile": 41,
+            "vertical_mobile": 36,
+            "horizontal_mobile": 56,
             "cta_label": "",
             "cta_link": "",
             "cta_external": false,
             "cta_icon": true
           }
         },
-        "content_Kxzeti": {
+        "content_x6pNLe": {
           "type": "content",
           "settings": {
             "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
-            "heading": "Lightweight",
-            "text": "<p>Aetrex Flips are designed using light-weight UltraSky™ EVA with a water-friendly construction. It is specially engineered with super soft foam to keep your toes comfortable all day long.</p>",
+            "heading": "Open Toe",
+            "text": "<p>This type of shoe provides ample room for your feet and is beneficial for conditions such as Hammer Toes.</p>",
             "link": "",
             "color_text": "#74a5ba",
-            "vertical": 70,
-            "horizontal": 75,
+            "vertical": 73,
+            "horizontal": 85,
             "vertical_mobile": 69,
-            "horizontal_mobile": 82,
+            "horizontal_mobile": 73,
             "cta_label": "",
             "cta_link": "",
             "cta_external": false,
@@ -280,17 +283,17 @@
         }
       },
       "block_order": [
-        "content_9ghrzK",
-        "content_HF7yEU",
-        "content_LjVywH",
-        "content_3iTAhx",
-        "content_Kxzeti"
+        "content_gB9QCi",
+        "content_fUf7PX",
+        "content_EqdMMx",
+        "content_Lqb7WE",
+        "content_x6pNLe"
       ],
       "disabled": true,
       "name": "t:sections.lookbook.name",
       "settings": {
-        "image": "shopify://shop_images/Group_18_4_d349ced9-1792-4d04-8195-d74ef54693ba.png",
-        "image_mobile": "shopify://shop_images/Frame_78.png",
+        "image": "shopify://shop_images/Group_18_9.png",
+        "image_mobile": "shopify://shop_images/Frame_95.png",
         "heading": "",
         "heading_size": "title-sm",
         "heading_alignment": "text-center md:items-center",
@@ -318,73 +321,6 @@
         "padding_bottom": 0,
         "divider": false,
         "full_width": true,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "rich_text_Jndehn": {
-      "type": "rich-text",
-      "blocks": {
-        "heading_qQ7BhE": {
-          "type": "heading",
-          "settings": {
-            "heading": "Why Our Products Help Relieve Heel Spur Pain",
-            "heading_size": "title-sm",
-            "heading_tag": "h2",
-            "highlighted_text": "text",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_CANkmY": {
-          "type": "text",
-          "settings": {
-            "text": "<p><em>Aetrex products are designed with targeted cushioning and superior shock absorption to help minimize the repetitive impact that can irritate heel spurs. By supporting the arch and reducing stress on the heel bone, Aetrex products help to diminish discomfort and promote more comfortable movement throughout the day.</em></p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.2,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": true,
-            "highlighted_text": "text",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "heading_qQ7BhE",
-        "text_CANkmY"
-      ],
-      "name": "t:sections.rich-text.name",
-      "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
-        "color_background": "#e0edf2",
-        "gradient_background": "",
-        "color_highlight": "#171717",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 24,
-        "padding_bottom": 24,
-        "divider": false,
-        "narrow": true,
         "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
@@ -464,88 +400,27 @@
         "enable_parallax": true
       }
     },
-    "featured_collection_dXtHeM": {
+    "featured_collection_cX43bX": {
       "type": "featured-collection",
       "name": "t:sections.featured-collection.name",
       "settings": {
-        "collection": "",
-        "products": [
-          "brianna-black-bw100w",
-          "danika-light-grey-ap113w",
-          "heel-spurs-orthotics-women",
-          "noelle-black-ck140w"
-        ],
-        "product_limit": 4,
+        "collection": "explore-relief-for-pregnacy",
+        "products": [],
+        "product_limit": 6,
         "columns": 4,
-        "carousel_on_desktop": false,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": false,
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "text",
-        "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
-        "color_background": "#ffffff",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "rich_text_xhMWGU": {
-      "type": "rich-text",
-      "blocks": {
-        "text_HAAyLx": {
-          "type": "text",
-          "settings": {
-            "text": "<p>What Other Heel Spur Sufferers Say</p>",
-            "text_font": "heading",
-            "text_size": "subtext-custom",
-            "text_max_size": 30,
-            "text_line_height": 1.2,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "one"
-          }
-        }
-      },
-      "block_order": [
-        "text_HAAyLx"
-      ],
-      "name": "t:sections.rich-text.name",
-      "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
+        "carousel_on_desktop": true,
+        "show_view_all": true,
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "heading": "{{ section.settings.collection.title }}",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
-        "heading_tag": "h2",
+        "heading_tag": "h3",
         "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
+        "description": "<p>Aetrex products are designed to provide essential arch support, cushioning, and stability to help counteract overpronation and fatigue during pregnancy. As added weight and hormonal changes can alter foot alignment and increase discomfort, Aetrex products help expecting mothers stay comfortable and supported as their bodies change.</p>",
+        "highlighted_text": "text",
         "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
+        "color_text": "",
         "color_background": "",
         "gradient_background": "",
         "color_highlight": "",
@@ -553,11 +428,11 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 0,
-        "padding_bottom": 0,
-        "divider": false,
-        "narrow": true,
-        "rounded": false,
+        "padding_top": 48,
+        "padding_bottom": 48,
+        "divider": true,
+        "full_width": false,
+        "rounded": true,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
@@ -569,8 +444,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>Bought all 4 colors</strong><br/>I bought two pairs and were so elated with the comfort that I bought the last two remaining colors. I suffer from Metatarsalgia and was glad to finally being able to walk without discomfort & pain!!”</h6>",
-            "author": "Ellen o.",
+            "text": "<h6><strong>Amazing Sandals!</strong><br/>Im pregnant and the pain in my feet was horrible! I got these and have been a lifesaver!”</h6>",
+            "author": "Kenia P.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -582,8 +457,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>I love these sneakers.I love these sneakers. </strong><br/>I have bought three of the same sneakers, but in different colors. What a difference they have made on my feet. I like to take my dog for walks. I had to stop. My feet were in such pain. With these sneakers my feet are fine now. Thank you Aetrex.”</h6>",
-            "author": "Linda P.",
+            "text": "<h6><strong>Excellent Shoes</strong><br/>Until I started wearing Aetrex shoes l could hardly walk because my feet felt like I was walking on rocks.Now I can walk with no pain when I wear Aetrex shoes.</h6>",
+            "author": "Annie G.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -595,7 +470,7 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>Comfortable & supportive </strong><br/>I bought these to wear at work. I am a Dental Assistant and on my feet most of the day. With other shoes, I would go home with sore feet and low back pain. The Xspress Runner 2 felt comfortable and supportive right from the first time I laced them up - no break-in required.”</h6>",
+            "text": "<h6><strong>Comfortable & supportive </strong><br/>I bought these to wear at work. I am a Dental Assistant and on my feet most of the day. With other shoes, I would go home with sore feet and low back pain. The Xspress Runner 2 felt comfortable and supportive right from the first time I laced them up - no break-in required. </h6>",
             "author": "Susanne B.",
             "author_info": "",
             "author_url": "",
@@ -612,7 +487,7 @@
       ],
       "name": "t:sections.testimonials.name",
       "settings": {
-        "heading": "",
+        "heading": "What Other Pregnancy Foot Pain Sufferers Say",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
@@ -625,81 +500,6 @@
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "#171717",
-        "color_background": "#ffffff",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 20,
-        "padding_bottom": 20,
-        "divider": false,
-        "rounded": false
-      }
-    },
-    "collection_list_fbMkYY": {
-      "type": "collection-list",
-      "blocks": {
-        "collection_cPKHdc": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "womens-sneakers",
-            "custom_url": "",
-            "image": "shopify://shop_images/Rectangle_60_5_e14913d2-607f-409b-976e-d6b2001c5a44.png",
-            "title": "Shoes",
-            "description": "To Help Relieve Heel Spurs",
-            "overlay_content": true,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 40,
-            "submenu_title_position": "center",
-            "enable_title_drop_shadow": true
-          }
-        },
-        "collection_gpn6Pp": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "orthotics-for-heel-spurs",
-            "custom_url": "",
-            "image": "shopify://shop_images/Rectangle_61_668b1198-2250-4e0e-9f58-c1a42125e032.png",
-            "title": "Orthotics",
-            "description": "To Help Relieve Heel Spurs",
-            "overlay_content": true,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 40,
-            "submenu_title_position": "center",
-            "enable_title_drop_shadow": true
-          }
-        }
-      },
-      "block_order": [
-        "collection_cPKHdc",
-        "collection_gpn6Pp"
-      ],
-      "disabled": true,
-      "name": "t:sections.collection-list.name",
-      "settings": {
-        "columns": 2,
-        "carousel_on_desktop": true,
-        "image_type": "collection",
-        "image_ratio": "landscape",
-        "show_products_count": false,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
         "color_background": "#fafafa",
         "gradient_background": "",
         "color_highlight": "",
@@ -707,61 +507,21 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 0,
-        "padding_bottom": 40,
-        "divider": false,
-        "full_width": true,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "featured_collection_zRBhpd": {
-      "type": "featured-collection",
-      "name": "t:sections.featured-collection.name",
-      "settings": {
-        "collection": "explore-relief-for-heel-pain-copy",
-        "products": [],
-        "product_limit": 6,
-        "columns": 4,
-        "carousel_on_desktop": true,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "{{ section.settings.collection.title }}",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h3",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "text",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
         "padding_top": 48,
-        "padding_bottom": 24,
+        "padding_bottom": 48,
         "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
+        "rounded": true
       }
     },
-    "rich_text_njqzCM": {
+    "rich_text_h7UkRa": {
       "type": "rich-text",
       "blocks": {
-        "text_CJeEDN": {
+        "text_AGCnH4": {
           "type": "text",
           "settings": {
-            "text": "<p>The information contained on this website is for educational, informational and retail purposes only. No material on this site is intended to be a substitute for medical advice, diagnosis or treatment of any medical condition. Accordingly, if you are experiencing ongoing pain or discomfort, we encourage you to consult with a doctor or medical professional.</p>",
+            "text": "<p><em>The information contained on this website is for educational, informational and retail purposes only. No material on this site is intended to be a substitute for medical advice, diagnosis or treatment of any medical condition. Accordingly, if you are experiencing ongoing pain or discomfort, we encourage you to consult with a doctor or medical professional.</em></p>",
             "text_font": "body",
-            "text_size": "subtext-md",
+            "text_size": "subtext-sm",
             "text_max_size": 32,
             "text_line_height": 1.2,
             "text_letter_spacing": 0,
@@ -773,7 +533,7 @@
         }
       },
       "block_order": [
-        "text_CJeEDN"
+        "text_AGCnH4"
       ],
       "name": "t:sections.rich-text.name",
       "settings": {
@@ -814,14 +574,10 @@
     "main-page",
     "image_with_text_overlay_rBfBzp",
     "faq_zhAACx",
-    "lookbook_w69hfT",
-    "rich_text_Jndehn",
+    "lookbook_DgQ4hL",
     "images_with_text_iL8ht6",
-    "featured_collection_dXtHeM",
-    "rich_text_xhMWGU",
+    "featured_collection_cX43bX",
     "testimonials_byJFpb",
-    "collection_list_fbMkYY",
-    "featured_collection_zRBhpd",
-    "rich_text_njqzCM"
+    "rich_text_h7UkRa"
   ]
 }

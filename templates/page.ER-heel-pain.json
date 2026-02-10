@@ -30,7 +30,7 @@
         "heading_axLTnn": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Diabetes</p>",
+            "heading": "<p>Heel Pain</p>",
             "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "text",
@@ -40,7 +40,7 @@
         "text_LHGLnM": {
           "type": "text",
           "settings": {
-            "text": "<p>Diabetes is a serious disease caused by either a lack of insulin production or the body's inability to use insulin effectively. Diabetes can lead to various complications, disrupting the vascular system and affecting areas such as the eyes, kidneys, legs, and feet.<br/><br/> People with diabetes should pay special attention to their feet to manage potential complications effectively. Diabetic foot conditions arise from a combination of factors, including poor circulation and neuropathy.</p>",
+            "text": "<p>Heel pain is a common condition where weight-bearing on the heel causes significant discomfort. There are two main categories of heel pain: <br/><br/>The first category is caused by overuse or repetitive stress, resulting from excessive impact on a specific foot area. This condition, often referred to as \"heel pain syndrome,\" can be triggered by shoes with low heels, a thinned-out fat pad in the heel area, or a sudden increase in activity. <br/><br/>The second category is Plantar Fasciitis, which is usually caused by a biomechanical issue such as overpronation (flat feet). The plantar fascia is a fibrous tissue band running from the heel bone through the midfoot and into the forefoot.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -52,14 +52,14 @@
             "highlighted_scribble": "circle"
           }
         },
-        "spacing_CmCEJ7": {
+        "spacing_4c47TL": {
           "type": "spacing",
           "settings": {
             "height": 40,
             "height_mobile": 28
           }
         },
-        "text_rNHpcA": {
+        "text_mKApVr": {
           "type": "text",
           "settings": {
             "text": "<p>Medically reviewed by Janine Taddeo, DPM</p>",
@@ -78,19 +78,19 @@
       "block_order": [
         "heading_axLTnn",
         "text_LHGLnM",
-        "spacing_CmCEJ7",
-        "text_rNHpcA"
+        "spacing_4c47TL",
+        "text_mKApVr"
       ],
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
-        "image": "shopify://shop_images/Group_15_532d5b16-7c7d-4bc4-9bf8-14d5bdf9e14c.png",
-        "image_height": "adapt",
+        "image": "shopify://shop_images/Group_14.png",
+        "image_height": "650px",
         "content_width": "small",
         "content_position": "md:items-center md:justify-start",
         "text_alignment": "left",
         "image_mobile": "shopify://shop_images/Group_19_1.png",
-        "image_height_mobile": "600px",
+        "image_height_mobile": "100vh",
         "content_position_mobile": "items-center justify-center",
         "text_alignment_mobile": "left",
         "color_text": "#171717",
@@ -106,7 +106,7 @@
         "padding_bottom": 0,
         "divider": false,
         "full_width": true,
-        "rounded": false,
+        "rounded": true,
         "enable_parallax": false,
         "parallax_direction": "vertical",
         "abra_promo_code_show": "",
@@ -120,7 +120,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Causes</strong>",
-            "text": "<p>Diabetes can lead to various complications, disrupting the vascular system and affecting areas such as the eyes, kidneys, legs, and feet.<br/><br/>People with diabetes should pay special attention to their feet to manage potential complications effectively.Diabetic foot conditions arise from a combination of factors, including poor circulation and neuropathy.<br/><br/>Neuropathy can diminish sensation in the feet, making individuals less aware of injuries or pressure sores that can develop. Additionally, impaired blood flow due to vascular complications can slow down the healing process, increasing the risk of infections and ulcers if injuries do occur.<br/><br/></p>",
+            "text": "<p>There are two different categories of heel pain. The first is caused by over-use repetitive stress which refers to a soreness resulting from too much impact on a specific area of the foot. This condition, often referred to as “heel pain syndrome,” can be caused by shoes with heels that are too low, a thinned out fat pad in the heel area, or from a sudden increase in activity. Plantar fasciitis, a very common diagnosis of heel pain, is usually caused from a biomechancial problem, such as overpronation (flat feet). The plantar fascia is a broad band of fibrous tissue that runs along the bottom surface of the foot, from the heel through the midfoot and into the forefoot. Overpronation can cause the plantar fascia to be excessively stretched and inflamed, resulting in pain in the heel and arch areas of the foot. Often the pain will be most intense first thing in the morning or after a prolonged period of rest. The pain can gradually subside as the day progresses.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -129,7 +129,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Treatment and Prevention</strong>",
-            "text": "<p>Studies have shown that moderate weight loss and exercising can help prevent or possibly delay type 2 diabetes among adults at high-risk of diabetes. Change your eating habits. Eat smaller portions and less fat. Select fewer high-fat foods and try to use less fat when cooking. Lmit foods that are high in saturated fats or trans fat, some of which are:</p><ul><li>Fatty cuts of meat</li><li>Fried Foods</li><li>Whole milk and dairy products made from whole milk</li><li>Cakes, candy, cookies, crackers, and pies</li><li>Salad dressings.</li></ul><p>Put more fiber in your diet by eating more whole grain foods & a variety of fruits and vegetables daily, such as:</p><ul><li>Breakfast cereals made with 100% whole grains</li><li>Oatmeal</li><li>Whole grain rice</li><li>Whole-wheat bread, bagels, pita bread, and tortillas</li><li>Dark green veggies (e.g., broccoli, spinach, brussels sprouts)</li><li>Orange veggies (e.g., carrots, sweet potatoes, pumpkin, winter squash)</li></ul><p>Most of all stay away from foods that are high in sugar, such as:</p><ul><li>Fruit-flavored drinks</li><li>Sodas</li><li>Tea or coffee sweetened with sugar.</li></ul>",
+            "text": "<p>To properly treat heel pain, you must absorb shock, provide cushioning and elevate the heel to transfer pressure. This can be accomplished with a heel cup, visco heel cradle, or an orthotic designed with materials that will absorb shock and shear forces. When the condition is pronation related (usually plantar fasciitis), an orthotic with medial posting and good arch support will control the pronation and prevent the inflammation of the plantar fascia. Footwear selection is also an important criteria when treating heel pain. Shoes with a firm heel counter, good arch support, and appropriate heel height are the ideal choice. In addition, breaking the pain cycle with the use of oral anti inflammatory medications, cortisone injections, stretching and icing are all treatments as well.<br/><br/><br/>If the problem persists, consult your foot doctor.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -138,6 +138,10 @@
       "block_order": [
         "question_XamVPH",
         "question_x9EPUx"
+      ],
+      "custom_css": [
+        ".faqs.with-background > :is(div, form) {padding: 2em 0em !important;}",
+        ".details__summary .icon-plus-2 {display: none;}"
       ],
       "name": "t:sections.faq.name",
       "settings": {
@@ -168,7 +172,7 @@
         "padding_bottom": 0,
         "divider": false,
         "narrow": false,
-        "rounded": false,
+        "rounded": true,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
@@ -182,14 +186,14 @@
             "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
-            "heading": "Padded Tongue",
-            "text": "<p>Extra padding on the back of the heel helps to reduce discomfort or blisters while providing additional cushioning.</p>",
+            "heading": "Adjustability",
+            "text": "<p>Easy to use, our hook and loop adjustable straps help accommodate multiple widths by being able to shorten or elongate the strap.</p>",
             "link": "",
             "color_text": "#74a5ba",
-            "vertical": 18,
-            "horizontal": 50,
-            "vertical_mobile": 23,
-            "horizontal_mobile": 42,
+            "vertical": 28,
+            "horizontal": 61,
+            "vertical_mobile": 21,
+            "horizontal_mobile": 35,
             "cta_label": "",
             "cta_link": "",
             "cta_external": false,
@@ -202,13 +206,13 @@
             "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
-            "heading": "Removable Insole",
-            "text": "<p>Included is a removable arch support & premium foam cushioning insole that can easily be replaced with a more customized Aetrex Orthotic.</p>",
+            "heading": "Dual Density Outsole",
+            "text": "<p>A feature that provides pressure relief and shock absorption in the ball-of-foot and heel area.</p>",
             "link": "",
             "color_text": "#74a5ba",
             "vertical": 48,
             "horizontal": 39,
-            "vertical_mobile": 64,
+            "vertical_mobile": 53,
             "horizontal_mobile": 16,
             "cta_label": "",
             "cta_link": "",
@@ -249,8 +253,8 @@
             "color_text": "#74a5ba",
             "vertical": 56,
             "horizontal": 52,
-            "vertical_mobile": 62,
-            "horizontal_mobile": 39,
+            "vertical_mobile": 57,
+            "horizontal_mobile": 37,
             "cta_label": "",
             "cta_link": "",
             "cta_external": false,
@@ -263,13 +267,13 @@
             "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
-            "heading": "Stretch Material",
-            "text": "<p>A material that stretches in many directions for additional comfort and provides more room in the shoe, when needed.</p>",
+            "heading": "Open Toe",
+            "text": "<p>This type of shoe provides ample room for your feet and is beneficial for conditions such as Hammer Toes.</p>",
             "link": "",
             "color_text": "#74a5ba",
             "vertical": 70,
             "horizontal": 75,
-            "vertical_mobile": 73,
+            "vertical_mobile": 64,
             "horizontal_mobile": 73,
             "cta_label": "",
             "cta_link": "",
@@ -288,8 +292,8 @@
       "disabled": true,
       "name": "t:sections.lookbook.name",
       "settings": {
-        "image": "shopify://shop_images/Group_18_7_1.png",
-        "image_mobile": "shopify://shop_images/Frame_87.png",
+        "image": "shopify://shop_images/Group_18_6.png",
+        "image_mobile": "shopify://shop_images/Frame_83.png",
         "heading": "",
         "heading_size": "title-sm",
         "heading_alignment": "text-center md:items-center",
@@ -317,73 +321,6 @@
         "padding_bottom": 0,
         "divider": false,
         "full_width": true,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "rich_text_HwG4gj": {
-      "type": "rich-text",
-      "blocks": {
-        "heading_6fQrzP": {
-          "type": "heading",
-          "settings": {
-            "heading": "Why Our Products Help Relieve Diabetic Foot Pain",
-            "heading_size": "title-sm",
-            "heading_tag": "h2",
-            "highlighted_text": "text",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_6ijU8k": {
-          "type": "text",
-          "settings": {
-            "text": "<p><em>Aetrex products are designed to provide premium cushioning and pressure redistribution to help protect sensitive feet for individuals with diabetes. The supportive design helps reduce the risk of developing pressure points, calluses, or ulcers, while enhancing overall comfort for better daily mobility.</em></p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.2,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": true,
-            "highlighted_text": "text",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "heading_6fQrzP",
-        "text_6ijU8k"
-      ],
-      "name": "t:sections.rich-text.name",
-      "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
-        "color_background": "#e0edf2",
-        "gradient_background": "",
-        "color_highlight": "#171717",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 24,
-        "padding_bottom": 24,
-        "divider": false,
-        "narrow": true,
         "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
@@ -463,88 +400,27 @@
         "enable_parallax": true
       }
     },
-    "featured_collection_dXtHeM": {
+    "featured_collection_PCNwMD": {
       "type": "featured-collection",
       "name": "t:sections.featured-collection.name",
       "settings": {
-        "collection": "",
-        "products": [
-          "jess-bronze-se214w",
-          "sadie-navy-ap155w",
-          "l200m-m",
-          "jillian-sport-shimmer-grey-l8006w"
-        ],
-        "product_limit": 4,
+        "collection": "heel-pain-copy",
+        "products": [],
+        "product_limit": 6,
         "columns": 4,
-        "carousel_on_desktop": false,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": false,
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "text",
-        "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
-        "color_background": "#ffffff",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "rich_text_g6FDzV": {
-      "type": "rich-text",
-      "blocks": {
-        "text_Q7zwcQ": {
-          "type": "text",
-          "settings": {
-            "text": "<p>What Other Diabetes Sufferers Say</p>",
-            "text_font": "heading",
-            "text_size": "subtext-custom",
-            "text_max_size": 30,
-            "text_line_height": 1.2,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "one"
-          }
-        }
-      },
-      "block_order": [
-        "text_Q7zwcQ"
-      ],
-      "name": "t:sections.rich-text.name",
-      "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
+        "carousel_on_desktop": true,
+        "show_view_all": true,
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "heading": "{{ section.settings.collection.title }}",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
-        "heading_tag": "h2",
+        "heading_tag": "h3",
         "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
+        "description": "<p>Whether caused by plantar fasciitis, overuse, or improper foot alignment, Aetrex products are designed to provide the essential cushioning and support needed to help reduce strain on the heel. Aetrex products help to diminish discomfort and promote more comfortable movement throughout the day.</p>",
+        "highlighted_text": "text",
         "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
+        "color_text": "",
         "color_background": "",
         "gradient_background": "",
         "color_highlight": "",
@@ -552,10 +428,10 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 0,
-        "padding_bottom": 0,
-        "divider": false,
-        "narrow": true,
+        "padding_top": 48,
+        "padding_bottom": 48,
+        "divider": true,
+        "full_width": false,
         "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
@@ -568,8 +444,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>Bought all 4 colors</strong><br/>I bought two pairs and were so elated with the comfort that I bought the last two remaining colors. I suffer from Metatarsalgia and was glad to finally being able to walk without discomfort & pain!!”</h6>",
-            "author": "Ellen o.",
+            "text": "<h6><strong>Immediate Relief</strong><br/>I am suffering with planter fasciitis in one foot and immediately after trying on this sandal I felt relief and could walk again. Great arch support and soft heel pad did the trick. Thank you!”</h6>",
+            "author": "Susan N.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -581,8 +457,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>I love these sneakers.</strong><br/>I have bought three of the same sneakers, but in different colors. What a difference they have made on my feet. I like to take my dog for walks. I had to stop. My feet were in such pain. With these sneakers my feet are fine now. Thank you Aetrex.”</h6>",
-            "author": "Linda P.",
+            "text": "<h6><strong>I'm so grateful forThese shoes</strong><br/>I'm so grateful for shoes of this type which keep my feet happy, healthy, and pain-free from plantar fasciitis. It's comfortable and provides the correct support -- and, it looks great!”</h6>",
+            "author": "Pandora V.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -594,8 +470,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>Comfortable & supportive </strong><br/>I bought these to wear at work. I am a Dental Assistant and on my feet most of the day. With other shoes, I would go home with sore feet and low back pain. The Xspress Runner 2 felt comfortable and supportive right from the first time I laced them up - no break-in required.”</h6>",
-            "author": "Susanne B.",
+            "text": "<h6><strong>Excellent Shoes </strong><br/>Until I started wearing Aetrex shoes l could hardly walk because my feet felt like I was walking on rocks. Now I can walk with no pain when I wear Aetrex shoes.”</h6>",
+            "author": "Annie G.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -611,7 +487,7 @@
       ],
       "name": "t:sections.testimonials.name",
       "settings": {
-        "heading": "",
+        "heading": "What Other Heel Pain Sufferers Say",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
@@ -624,81 +500,6 @@
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "#171717",
-        "color_background": "#ffffff",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 20,
-        "padding_bottom": 20,
-        "divider": false,
-        "rounded": false
-      }
-    },
-    "collection_list_fbMkYY": {
-      "type": "collection-list",
-      "blocks": {
-        "collection_cPKHdc": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "womens-sneakers",
-            "custom_url": "",
-            "image": "shopify://shop_images/Rectangle_60_6.png",
-            "title": "Shoes",
-            "description": "To Help Relieve Diabetes",
-            "overlay_content": true,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 40,
-            "submenu_title_position": "center",
-            "enable_title_drop_shadow": true
-          }
-        },
-        "collection_gpn6Pp": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "conform",
-            "custom_url": "",
-            "image": "shopify://shop_images/Rectangle_61_668b1198-2250-4e0e-9f58-c1a42125e032.png",
-            "title": "Orthotics",
-            "description": "To Help Relieve Diabetes",
-            "overlay_content": true,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 40,
-            "submenu_title_position": "center",
-            "enable_title_drop_shadow": true
-          }
-        }
-      },
-      "block_order": [
-        "collection_cPKHdc",
-        "collection_gpn6Pp"
-      ],
-      "disabled": true,
-      "name": "t:sections.collection-list.name",
-      "settings": {
-        "columns": 2,
-        "carousel_on_desktop": true,
-        "image_type": "collection",
-        "image_ratio": "landscape",
-        "show_products_count": false,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "",
-        "heading_size": "title-lg tracking-heading",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
         "color_background": "#fafafa",
         "gradient_background": "",
         "color_highlight": "",
@@ -706,61 +507,21 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 0,
-        "padding_bottom": 40,
-        "divider": false,
-        "full_width": true,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "featured_collection_tWYaX9": {
-      "type": "featured-collection",
-      "name": "t:sections.featured-collection.name",
-      "settings": {
-        "collection": "explore-relief-for-diabetes",
-        "products": [],
-        "product_limit": 6,
-        "columns": 4,
-        "carousel_on_desktop": true,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "{{ section.settings.collection.title }}",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h3",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "text",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
         "padding_top": 48,
-        "padding_bottom": 24,
+        "padding_bottom": 48,
         "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
+        "rounded": true
       }
     },
-    "rich_text_AkVLrg": {
+    "rich_text_j7HbXJ": {
       "type": "rich-text",
       "blocks": {
-        "text_TNFAXz": {
+        "text_ztqREE": {
           "type": "text",
           "settings": {
-            "text": "<p>The information contained on this website is for educational, informational and retail purposes only. No material on this site is intended to be a substitute for medical advice, diagnosis or treatment of any medical condition. Accordingly, if you are experiencing ongoing pain or discomfort, we encourage you to consult with a doctor or medical professional.</p>",
+            "text": "<p><em>The information contained on this website is for educational, informational and retail purposes only. No material on this site is intended to be a substitute for medical advice, diagnosis or treatment of any medical condition. Accordingly, if you are experiencing ongoing pain or discomfort, we encourage you to consult with a doctor or medical professional.</em></p>",
             "text_font": "body",
-            "text_size": "subtext-md",
+            "text_size": "subtext-sm",
             "text_max_size": 32,
             "text_line_height": 1.2,
             "text_letter_spacing": 0,
@@ -772,7 +533,7 @@
         }
       },
       "block_order": [
-        "text_TNFAXz"
+        "text_ztqREE"
       ],
       "name": "t:sections.rich-text.name",
       "settings": {
@@ -814,13 +575,9 @@
     "image_with_text_overlay_rBfBzp",
     "faq_zhAACx",
     "lookbook_w69hfT",
-    "rich_text_HwG4gj",
     "images_with_text_iL8ht6",
-    "featured_collection_dXtHeM",
-    "rich_text_g6FDzV",
+    "featured_collection_PCNwMD",
     "testimonials_byJFpb",
-    "collection_list_fbMkYY",
-    "featured_collection_tWYaX9",
-    "rich_text_AkVLrg"
+    "rich_text_j7HbXJ"
   ]
 }

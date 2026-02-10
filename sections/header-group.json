@@ -518,7 +518,7 @@
         "color_background": "#ffffff",
         "colored_menu_text_1": "",
         "menu_color_1": "#bb0000",
-        "colored_menu_text_2": "Sale",
+        "colored_menu_text_2": "Last Chance",
         "menu_color_2": "#bb0000",
         "colored_menu_text_3": "NEW Kids Orthotics",
         "menu_color_3": "#0b61cd",
@@ -577,7 +577,7 @@
       "name": "t:sections.countdown-timer.name",
       "settings": {
         "color_text": "#0d96af",
-        "color_background": "#a8dee8ff",
+        "color_background": "#a8dee8",
         "gradient_background": "linear-gradient(179deg, rgba(255, 255, 255, 1) 32%, rgba(168, 222, 232, 1) 100%)",
         "color_highlight": "#ffddbf",
         "gradient_highlight": "",

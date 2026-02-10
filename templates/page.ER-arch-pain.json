@@ -40,7 +40,7 @@
         "text_LHGLnM": {
           "type": "text",
           "settings": {
-            "text": "<p>Arch pain, also known as arch strain, involves inflammation and/or a burning sensation at the arch of the foot. Various factors can cause arch pain, including structural imbalances or foot injuries. The most common cause of arch pain is Plantar Fasciitis, a condition affecting the plantar fascia, a fibrous tissue band running from the heel to the forefoot.<br/><br/>If untreated and strain on the longitudinal arch continues, a heel spur, a bony protrusion, may develop. Prompt treatment is essential to prevent<br/> the condition from worsening.</p>",
+            "text": "<p>Arch pain, also known as arch strain, involves inflammation and/or a burning sensation at the arch of the foot. Various factors can cause arch pain, including structural imbalances or foot injuries. The most common cause of arch pain is Plantar Fasciitis, a condition affecting the plantar fascia, a fibrous tissue band running from the heel to the forefoot.<br/><br/>If untreated and strain on the longitudinal arch continues, a heel spur, a bony protrusion, may develop. Prompt treatment is essential to prevent the condition from worsening.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -85,7 +85,7 @@
       "settings": {
         "transparent_header": false,
         "image": "shopify://shop_images/Group_10_76daefab-458a-4883-8570-5f570d93b672.png",
-        "image_height": "adapt",
+        "image_height": "650px",
         "content_width": "small",
         "content_position": "md:items-center md:justify-start",
         "text_alignment": "left",
@@ -139,6 +139,10 @@
         "question_XamVPH",
         "question_x9EPUx"
       ],
+      "custom_css": [
+        ".faqs.with-background > :is(div, form) {padding: 2em 0em !important;}",
+        ".details__summary .icon-plus-2 {display: none;}"
+      ],
       "name": "t:sections.faq.name",
       "settings": {
         "style": "with-background",
@@ -168,7 +172,7 @@
         "padding_bottom": 0,
         "divider": false,
         "narrow": false,
-        "rounded": false,
+        "rounded": true,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
@@ -322,86 +326,6 @@
         "abra_promo_code_hide": ""
       }
     },
-    "rich_text_egdfpx": {
-      "type": "rich-text",
-      "blocks": {
-        "heading_EngBec": {
-          "type": "heading",
-          "settings": {
-            "heading": "Why Our Products Help Relieve Arch Pain",
-            "heading_size": "title-sm",
-            "heading_tag": "h2",
-            "highlighted_text": "text",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_LG9FeJ": {
-          "type": "text",
-          "settings": {
-            "text": "<p><em>Aetrex products can provide metatarsal relief, cushioning, and the arch support needed to provide a more equal distribution of pressure to help you feel great on your feet.</em></p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.2,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": true,
-            "highlighted_text": "text",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_6DwARJ": {
-          "type": "button",
-          "disabled": true,
-          "settings": {
-            "button_label": "Button label",
-            "button_link": "",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": true
-          }
-        }
-      },
-      "block_order": [
-        "heading_EngBec",
-        "text_LG9FeJ",
-        "button_6DwARJ"
-      ],
-      "name": "t:sections.rich-text.name",
-      "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
-        "color_background": "#e0edf2",
-        "gradient_background": "",
-        "color_highlight": "#171717",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 24,
-        "padding_bottom": 24,
-        "divider": false,
-        "narrow": true,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
     "images_with_text_iL8ht6": {
       "type": "images-with-text",
       "blocks": {
@@ -476,88 +400,27 @@
         "enable_parallax": true
       }
     },
-    "featured_collection_dXtHeM": {
+    "featured_collection_zAQDU9": {
       "type": "featured-collection",
       "name": "t:sections.featured-collection.name",
       "settings": {
-        "collection": "",
-        "products": [
-          "danika-light-grey-ap113w",
-          "l420w-m",
-          "sydney-black-ew700w",
-          "rachel-white-ae723w"
-        ],
-        "product_limit": 4,
+        "collection": "womens-footwear-for-high-arches-copy",
+        "products": [],
+        "product_limit": 6,
         "columns": 4,
-        "carousel_on_desktop": false,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": false,
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "text",
-        "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
-        "color_background": "#ffffff",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "rich_text_TjbjcG": {
-      "type": "rich-text",
-      "blocks": {
-        "text_JgN8mA": {
-          "type": "text",
-          "settings": {
-            "text": "<p>What Other Arch Pain Sufferers Say</p>",
-            "text_font": "heading",
-            "text_size": "subtext-custom",
-            "text_max_size": 30,
-            "text_line_height": 1.2,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "one"
-          }
-        }
-      },
-      "block_order": [
-        "text_JgN8mA"
-      ],
-      "name": "t:sections.rich-text.name",
-      "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
+        "carousel_on_desktop": true,
+        "show_view_all": true,
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "heading": "{{ section.settings.collection.title }}",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
-        "heading_tag": "h2",
+        "heading_tag": "h3",
         "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
+        "description": "<p>Aetrex products can provide metatarsal relief, cushioning, and the arch support needed to provide a more equal distribution of pressure to help you feel great on your feet.</p>",
+        "highlighted_text": "text",
         "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
+        "color_text": "",
         "color_background": "",
         "gradient_background": "",
         "color_highlight": "",
@@ -565,10 +428,10 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 0,
-        "padding_bottom": 0,
-        "divider": false,
-        "narrow": true,
+        "padding_top": 48,
+        "padding_bottom": 48,
+        "divider": true,
+        "full_width": false,
         "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
@@ -624,7 +487,7 @@
       ],
       "name": "t:sections.testimonials.name",
       "settings": {
-        "heading": "",
+        "heading": "What Other Arch Pain Sufferers Say",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
@@ -637,17 +500,17 @@
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "#171717",
-        "color_background": "#ffffff",
+        "color_background": "#fafafa",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 20,
-        "padding_bottom": 20,
+        "padding_top": 48,
+        "padding_bottom": 48,
         "divider": false,
-        "rounded": false
+        "rounded": true
       }
     },
     "collection_list_fbMkYY": {
@@ -728,52 +591,15 @@
         "abra_promo_code_hide": ""
       }
     },
-    "featured_collection_zAQDU9": {
-      "type": "featured-collection",
-      "name": "t:sections.featured-collection.name",
-      "settings": {
-        "collection": "womens-footwear-for-high-arches-copy",
-        "products": [],
-        "product_limit": 6,
-        "columns": 4,
-        "carousel_on_desktop": true,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "{{ section.settings.collection.title }}",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h3",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "text",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 48,
-        "padding_bottom": 24,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
     "rich_text_hkApnx": {
       "type": "rich-text",
       "blocks": {
         "text_68kBaL": {
           "type": "text",
           "settings": {
-            "text": "<p>The information contained on this website is for educational, informational and retail purposes only. No material on this site is intended to be a substitute for medical advice, diagnosis or treatment of any medical condition. Accordingly, if you are experiencing ongoing pain or discomfort, we encourage you to consult with a doctor or medical professional.</p>",
+            "text": "<p><em>The information contained on this website is for educational, informational and retail purposes only. No material on this site is intended to be a substitute for medical advice, diagnosis or treatment of any medical condition. Accordingly, if you are experiencing ongoing pain or discomfort, we encourage you to consult with a doctor or medical professional.</em></p>",
             "text_font": "body",
-            "text_size": "subtext-md",
+            "text_size": "subtext-sm",
             "text_max_size": 32,
             "text_line_height": 1.2,
             "text_letter_spacing": 0,
@@ -827,13 +653,10 @@
     "image_with_text_overlay_rBfBzp",
     "faq_zhAACx",
     "lookbook_g7R8JN",
-    "rich_text_egdfpx",
     "images_with_text_iL8ht6",
-    "featured_collection_dXtHeM",
-    "rich_text_TjbjcG",
+    "featured_collection_zAQDU9",
     "testimonials_byJFpb",
     "collection_list_fbMkYY",
-    "featured_collection_zAQDU9",
     "rich_text_hkApnx"
   ]
 }

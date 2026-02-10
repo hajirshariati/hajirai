@@ -267,19 +267,47 @@
                         <div class="drawer__content opacity-0 invisible flex flex-col h-full grow shrink">
                           <div class="drawer__scrollable relative flex flex-col gap-5 md:gap-7 grow shrink">
                             <div class="rte text-base md:text-lg">{{ block.settings.text }}</div>
-                            {%- if block.settings.cta_label != blank -%}
-                              <a 
-                                style="width: max-content; padding: 2em 3em; margin-top: -2em;"
-                                href="{{ block.settings.cta_link | default: '#' }}" 
-                                class="button button--primary inline-flex items-center justify-center gap-2"
-                                {% if block.settings.cta_external %}target="_blank" rel="noopener noreferrer"{% endif %}
-                              >
-                                <span>{{ block.settings.cta_label }}</span>
-                                {%- if block.settings.cta_icon -%}
-                                  {%- render 'icon', icon: 'arrow-right', size: 'sm' -%}
-                                {%- endif -%}
-                              </a>
-                            {%- endif -%}
+
+                            
+
+
+
+
+<div class="flex gap-4 items-center" style="margin-top: -2em;">
+  {%- if block.settings.cta_label != blank -%}
+    <a 
+      style="width: max-content; padding: 2em 3em;"
+      href="{{ block.settings.cta_link | default: '#' }}" 
+      class="button button--primary inline-flex items-center justify-center gap-2"
+      {% if block.settings.cta_external %}target="_blank" rel="noopener noreferrer"{% endif %}
+    >
+      <span>{{ block.settings.cta_label }}</span>
+      {%- if block.settings.cta_icon -%}
+        {%- render 'icon', icon: 'arrow-right', size: 'sm' -%}
+      {%- endif -%}
+    </a>
+  {%- endif -%}
+  {%- if block.settings.cta_label_2 != blank -%}
+    <a 
+      style="width: max-content; padding: 2em 3em;"
+      href="{{ block.settings.cta_link_2 | default: '#' }}" 
+      class="button button--secondary inline-flex items-center justify-center gap-2"
+      {% if block.settings.cta_external_2 %}target="_blank" rel="noopener noreferrer"{% endif %}
+    >
+      <span>{{ block.settings.cta_label_2 }}</span>
+      {%- if block.settings.cta_icon_2 -%}
+        {%- render 'icon', icon: 'arrow-right', size: 'sm' -%}
+      {%- endif -%}
+    </a>
+  {%- endif -%}
+</div>
+
+
+
+
+
+
+
                           </div>
                         </div>
                       </div>
@@ -444,19 +472,45 @@
                         <div class="drawer__content opacity-0 invisible flex flex-col h-full grow shrink">
                           <div class="drawer__scrollable relative flex flex-col gap-5 md:gap-7 grow shrink">
                             <div class="rte text-base md:text-lg">{{ block.settings.text }}</div>
-                            {%- if block.settings.cta_label != blank -%}
-                              <a 
-                                style="width: max-content; padding: 2em 3em; margin-top: -2em;"
-                                href="{{ block.settings.cta_link | default: '#' }}" 
-                                class="button button--primary inline-flex items-center justify-center gap-2"
-                                {% if block.settings.cta_external %}target="_blank" rel="noopener noreferrer"{% endif %}
-                              >
-                                <span>{{ block.settings.cta_label }}</span>
-                                {%- if block.settings.cta_icon -%}
-                                  {%- render 'icon', icon: 'arrow-right', size: 'sm' -%}
-                                {%- endif -%}
-                              </a>
-                            {%- endif -%}
+
+                            
+
+
+
+<div class="flex gap-4 items-center" style="margin-top: -2em;">
+  {%- if block.settings.cta_label != blank -%}
+    <a 
+      style="width: max-content; padding: 2em 3em;"
+      href="{{ block.settings.cta_link | default: '#' }}" 
+      class="button button--primary inline-flex items-center justify-center gap-2"
+      {% if block.settings.cta_external %}target="_blank" rel="noopener noreferrer"{% endif %}
+    >
+      <span>{{ block.settings.cta_label }}</span>
+      {%- if block.settings.cta_icon -%}
+        {%- render 'icon', icon: 'arrow-right', size: 'sm' -%}
+      {%- endif -%}
+    </a>
+  {%- endif -%}
+  {%- if block.settings.cta_label_2 != blank -%}
+    <a 
+      style="width: max-content; padding: 2em 3em;"
+      href="{{ block.settings.cta_link_2 | default: '#' }}" 
+      class="button button--secondary inline-flex items-center justify-center gap-2"
+      {% if block.settings.cta_external_2 %}target="_blank" rel="noopener noreferrer"{% endif %}
+    >
+      <span>{{ block.settings.cta_label_2 }}</span>
+      {%- if block.settings.cta_icon_2 -%}
+        {%- render 'icon', icon: 'arrow-right', size: 'sm' -%}
+      {%- endif -%}
+    </a>
+  {%- endif -%}
+</div>
+
+
+
+
+
+
                           </div>
                         </div>
                       </div>
@@ -1173,33 +1227,60 @@
           "step": 1,
           "unit": "%"
         },
-        {
-          "type": "header",
-          "content": "CTA Button"
-        },
-        {
-          "type": "text",
-          "id": "cta_label",
-          "label": "CTA Button Label",
-          "info": "Leave blank to hide the CTA button"
-        },
-        {
-          "type": "url",
-          "id": "cta_link",
-          "label": "CTA Button Link"
-        },
-        {
-          "type": "checkbox",
-          "id": "cta_external",
-          "label": "Open link in new tab",
-          "default": false
-        },
-        {
-          "type": "checkbox",
-          "id": "cta_icon",
-          "label": "Show arrow icon",
-          "default": true
-        }
+{
+  "type": "header",
+  "content": "CTA Button 1"
+},
+{
+  "type": "text",
+  "id": "cta_label",
+  "label": "CTA Button Label",
+  "info": "Leave blank to hide the CTA button"
+},
+{
+  "type": "url",
+  "id": "cta_link",
+  "label": "CTA Button Link"
+},
+{
+  "type": "checkbox",
+  "id": "cta_external",
+  "label": "Open link in new tab",
+  "default": false
+},
+{
+  "type": "checkbox",
+  "id": "cta_icon",
+  "label": "Show arrow icon",
+  "default": true
+},
+{
+  "type": "header",
+  "content": "CTA Button 2"
+},
+{
+  "type": "text",
+  "id": "cta_label_2",
+  "label": "CTA Button 2 Label",
+  "info": "Leave blank to hide the second CTA button"
+},
+{
+  "type": "url",
+  "id": "cta_link_2",
+  "label": "CTA Button 2 Link"
+},
+{
+  "type": "checkbox",
+  "id": "cta_external_2",
+  "label": "Open link in new tab",
+  "default": false
+},
+{
+  "type": "checkbox",
+  "id": "cta_icon_2",
+  "label": "Show arrow icon",
+  "default": true
+}
       ]
     }
   ],

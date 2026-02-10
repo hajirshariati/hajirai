@@ -30,7 +30,7 @@
         "heading_axLTnn": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Morton’s Neuroma</p>",
+            "heading": "<p>Bunions</p>",
             "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "text",
@@ -40,7 +40,7 @@
         "text_LHGLnM": {
           "type": "text",
           "settings": {
-            "text": "<p>Morton’s Neuroma is a common foot condition characterized by pain, swelling, and inflammation of a nerve, typically located at the ball of the foot between the 3rd and 4th toes. Symptoms include sharp pain, burning sensations, and possibly a lack of feeling in the affected area, as well as tingling or cramping in the forefoot.<br/><br/>Footwear with pointed toes and/or high heels can contribute to Morton’s Neuroma, as constricting shoes can pinch the nerve between the toes, causing discomfort and extreme pain.</p>",
+            "text": "<p>A bunion is characterized by a prominent bump on the inside of the foot around the big toe joint, caused by a bone protruding towards the inside of the foot. As the big toe moves toward the smaller toes, it can end up resting under or over the second toe, leading to a condition known as overlapping toes.<br/><br/>Symptoms of bunions include inflammation, swelling, and soreness on the side surface of the big toe, often causing improper walking.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -52,14 +52,14 @@
             "highlighted_scribble": "circle"
           }
         },
-        "spacing_PmRcW4": {
+        "spacing_imdPrm": {
           "type": "spacing",
           "settings": {
             "height": 40,
             "height_mobile": 28
           }
         },
-        "text_A7QKMK": {
+        "text_K4fhDh": {
           "type": "text",
           "settings": {
             "text": "<p>Medically reviewed by Janine Taddeo, DPM</p>",
@@ -78,14 +78,14 @@
       "block_order": [
         "heading_axLTnn",
         "text_LHGLnM",
-        "spacing_PmRcW4",
-        "text_A7QKMK"
+        "spacing_imdPrm",
+        "text_K4fhDh"
       ],
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
-        "image": "shopify://shop_images/Group_13_1_3f082577-5bd1-47ef-8cfc-53df3ea51c0c.png",
-        "image_height": "adapt",
+        "image": "shopify://shop_images/Group_8_a872f6a0-f2ec-48c9-b9d4-2da3568f1adb.png",
+        "image_height": "650px",
         "content_width": "small",
         "content_position": "md:items-center md:justify-start",
         "text_alignment": "left",
@@ -120,7 +120,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Causes</strong>",
-            "text": "<p>Morton’s Neuroma is a foot condition caused from an abnormal function of the foot that leads to bones squeezing a nerve usually between the 3rd and 4th metatarsal heads. Symptoms of Morton’s Neuroma often occur during or after you have been placing significant pressure on the forefoot area, while walking, standing, jumping, or sprinting. This condition can also be caused by footwear selection. Footwear with pointed toes and/or high heels can often lead to a neuroma. Constricting shoes can pinch the nerve between the toes, causing discomfort and extreme pain.</p>",
+            "text": "<p>Bunions are a common problem experienced mostly by women. The deformity can develop from an abnormality in foot function, or arthritis, but is more commonly caused by wearing improper fitting footwear. Tight, narrow dress shoes with a constrictive toe box (toe area) can cause the foot to begin to take the shape of the shoe, leading to the formation of a bunion. Women who have bunions normally wear dress shoes that are too small for their feet. Their toes are squeezed together in their shoes causing the first metatarsal bone to protrude on the side of the foot. The most common cause is a biomechanics abnormality, such as flat feet, that leads to the joint dysfunction. The abnormal biomechanics can be inherited. Other less common causes include Rheumatoid arthritis, neuromuscular disorders, and trauma, to name a few.It is important for men and women to realize that wearing dress shoes and boots, which are tapered in the toe area, can cause the bunion to worsen to the point where surgery is necessary.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -129,7 +129,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Treatment and Prevention</strong>",
-            "text": "<p>The first step in treating Morton’s Neuroma is to select proper footwear. Footwear with a high and wide toe box (toe area) is ideal for treating and relieving the pain. The next step in treatment is to use an orthotic designed with a metatarsal pad. This pad is located behind the ball-of-the-foot to unload pressure, and relieve the pain caused by the neuroma. The use of cortisone injections are very useful as well.  Surgery for this condition, should always be a last resort.<br/><br/>If the problem persists, consult your foot doctor.</p>",
+            "text": "<p>Conservative treatment to alleviate the pain associated with bunions is to wear shoes that accommodate the deformity. Shoes designed with a wide toe box are recommended. Orthotics are also recommended for this condition to support the arch in the case of flat feet. Orthotics can limit the progression of the bunion formation. Lastly, surgery is an option to correct the deformity.If the problem persists, consult your foot doctor.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -138,6 +138,10 @@
       "block_order": [
         "question_XamVPH",
         "question_x9EPUx"
+      ],
+      "custom_css": [
+        ".faqs.with-background > :is(div, form) {padding: 2em 0em !important;}",
+        ".details__summary .icon-plus-2 {display: none;}"
       ],
       "name": "t:sections.faq.name",
       "settings": {
@@ -168,15 +172,15 @@
         "padding_bottom": 0,
         "divider": false,
         "narrow": false,
-        "rounded": false,
+        "rounded": true,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
     },
-    "lookbook_w69hfT": {
+    "lookbook_crRFzY": {
       "type": "lookbook",
       "blocks": {
-        "content_9ghrzK": {
+        "content_YrpNak": {
           "type": "content",
           "settings": {
             "icon": "none",
@@ -186,9 +190,29 @@
             "text": "<p>Easy to use, our hook and loop adjustable straps help accommodate multiple widths by being able to shorten or elongate the strap.</p>",
             "link": "",
             "color_text": "#74a5ba",
-            "vertical": 36,
-            "horizontal": 66,
-            "vertical_mobile": 30,
+            "vertical": 21,
+            "horizontal": 45,
+            "vertical_mobile": 25,
+            "horizontal_mobile": 25,
+            "cta_label": "",
+            "cta_link": "",
+            "cta_external": false,
+            "cta_icon": true
+          }
+        },
+        "content_hJdzY7": {
+          "type": "content",
+          "settings": {
+            "icon": "none",
+            "iwidth": "fit",
+            "icon_width": 26,
+            "heading": "Bunion Relief",
+            "text": "<p>By strategically placing the straps, this shoe provides a void for bunions without any pressure or restriction and gives you comfort where you need it most.</p>",
+            "link": "",
+            "color_text": "#74a5ba",
+            "vertical": 53,
+            "horizontal": 73,
+            "vertical_mobile": 62,
             "horizontal_mobile": 16,
             "cta_label": "",
             "cta_link": "",
@@ -196,27 +220,7 @@
             "cta_icon": true
           }
         },
-        "content_HF7yEU": {
-          "type": "content",
-          "settings": {
-            "icon": "none",
-            "iwidth": "fit",
-            "icon_width": 26,
-            "heading": "Met Bar Pod",
-            "text": "<p>A pod on the bottom of the shoe that helps to relieve ball-of-foot discomfort or stress.</p>",
-            "link": "",
-            "color_text": "#74a5ba",
-            "vertical": 48,
-            "horizontal": 39,
-            "vertical_mobile": 64,
-            "horizontal_mobile": 12,
-            "cta_label": "",
-            "cta_link": "",
-            "cta_external": false,
-            "cta_icon": true
-          }
-        },
-        "content_LjVywH": {
+        "content_VmtXWC": {
           "type": "content",
           "disabled": true,
           "settings": {
@@ -237,7 +241,7 @@
             "cta_icon": true
           }
         },
-        "content_3iTAhx": {
+        "content_8XPnNg": {
           "type": "content",
           "settings": {
             "icon": "none",
@@ -249,15 +253,15 @@
             "color_text": "#74a5ba",
             "vertical": 56,
             "horizontal": 52,
-            "vertical_mobile": 69,
-            "horizontal_mobile": 48,
+            "vertical_mobile": 55,
+            "horizontal_mobile": 41,
             "cta_label": "",
             "cta_link": "",
             "cta_external": false,
             "cta_icon": true
           }
         },
-        "content_Kxzeti": {
+        "content_HXQxdV": {
           "type": "content",
           "settings": {
             "icon": "none",
@@ -267,10 +271,10 @@
             "text": "<p>This type of shoe provides ample room for your feet and is beneficial for conditions such as Hammer Toes.</p>",
             "link": "",
             "color_text": "#74a5ba",
-            "vertical": 70,
-            "horizontal": 75,
-            "vertical_mobile": 71,
-            "horizontal_mobile": 89,
+            "vertical": 71,
+            "horizontal": 68,
+            "vertical_mobile": 75,
+            "horizontal_mobile": 73,
             "cta_label": "",
             "cta_link": "",
             "cta_external": false,
@@ -279,17 +283,17 @@
         }
       },
       "block_order": [
-        "content_9ghrzK",
-        "content_HF7yEU",
-        "content_LjVywH",
-        "content_3iTAhx",
-        "content_Kxzeti"
+        "content_YrpNak",
+        "content_hJdzY7",
+        "content_VmtXWC",
+        "content_8XPnNg",
+        "content_HXQxdV"
       ],
       "disabled": true,
       "name": "t:sections.lookbook.name",
       "settings": {
-        "image": "shopify://shop_images/Group_18_5_5cd3a5cf-914f-4cce-adf2-e54cc9a16f80.png",
-        "image_mobile": "shopify://shop_images/Frame_75.png",
+        "image": "shopify://shop_images/Group_18_1.png",
+        "image_mobile": "shopify://shop_images/Frame_59.png",
         "heading": "",
         "heading_size": "title-sm",
         "heading_alignment": "text-center md:items-center",
@@ -322,229 +326,27 @@
         "abra_promo_code_hide": ""
       }
     },
-    "rich_text_wfBi9q": {
-      "type": "rich-text",
-      "blocks": {
-        "heading_WPTipp": {
-          "type": "heading",
-          "settings": {
-            "heading": "Why Our Products Help Relieve Morton's Neuroma Pain",
-            "heading_size": "title-sm",
-            "heading_tag": "h2",
-            "highlighted_text": "text",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_p39Qdb": {
-          "type": "text",
-          "settings": {
-            "text": "<p><em>Aetrex products help reduce the forefoot pressure commonly associated with Morton’s Neuroma. With strategically placed metatarsal support, Aetrexhelps to relieve pressure, providing relief from burning, tingling, or sharp pain in the ball of the foot.</em></p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.2,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": true,
-            "highlighted_text": "text",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "heading_WPTipp",
-        "text_p39Qdb"
-      ],
-      "name": "t:sections.rich-text.name",
-      "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
-        "color_background": "#e0edf2",
-        "gradient_background": "",
-        "color_highlight": "#171717",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 24,
-        "padding_bottom": 24,
-        "divider": false,
-        "narrow": true,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "images_with_text_iL8ht6": {
-      "type": "images-with-text",
-      "blocks": {
-        "heading_e4NMJi": {
-          "type": "heading",
-          "settings": {
-            "heading": "Signature Arch Support",
-            "heading_size": "title-md",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_Bw6Yfi": {
-          "type": "text",
-          "settings": {
-            "text": "<p>With removable insole, our arch support is located further back to support the apex of the foot. This helps proper alignment and help relieve arch and heel pain associated with Plantar Fasciitis</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_TWhPGJ": {
-          "type": "button",
-          "settings": {
-            "button_label": "Shop Jillian",
-            "button_link": "shopify://products/jillian-black-sc450w",
-            "button_video_link": "",
-            "button_style": "link",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": true
-          }
-        }
-      },
-      "block_order": [
-        "heading_e4NMJi",
-        "text_Bw6Yfi",
-        "button_TWhPGJ"
-      ],
-      "disabled": true,
-      "name": "t:sections.images-with-text.name",
-      "settings": {
-        "image": "shopify://shop_images/ee4e2fe8a874fb5c106a8cc3c4247add5d9048ed.png",
-        "image_url": "",
-        "image_2": "shopify://shop_images/recommended_1_2x_21163cd2-e758-4725-87c5-117210d3d3c9.png",
-        "image2_url": "",
-        "image_ratio": "adapt",
-        "image_width": "large",
-        "layout": "text_first",
-        "text_alignment": "center",
-        "text_alignment_mobile": "left",
-        "color_text": "",
-        "color_background": "#fafafa",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "enable_parallax": true
-      }
-    },
-    "featured_collection_dXtHeM": {
+    "featured_collection_3fWrTX": {
       "type": "featured-collection",
       "name": "t:sections.featured-collection.name",
       "settings": {
-        "collection": "",
-        "products": [
-          "gabby-white-se263w",
-          "morton-neuroma-orthotics-women",
-          "daisy-brown-sc542w",
-          "fiji-white-l7002w"
-        ],
-        "product_limit": 4,
+        "collection": "womens-footwear-for-bunions-copy",
+        "products": [],
+        "product_limit": 12,
         "columns": 4,
-        "carousel_on_desktop": false,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": false,
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "text",
-        "highlighted_scribble": "circle",
-        "color_text": "#171717",
-        "color_background": "#ffffff",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "rich_text_6FhT4z": {
-      "type": "rich-text",
-      "blocks": {
-        "text_F8YY9T": {
-          "type": "text",
-          "settings": {
-            "text": "<p>What Other Morton’s Neuroma Sufferers Say</p>",
-            "text_font": "heading",
-            "text_size": "subtext-custom",
-            "text_max_size": 24,
-            "text_line_height": 1.2,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "one"
-          }
-        }
-      },
-      "block_order": [
-        "text_F8YY9T"
-      ],
-      "name": "t:sections.rich-text.name",
-      "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
+        "carousel_on_desktop": true,
+        "show_view_all": true,
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "heading": "{{ section.settings.collection.title }}",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
-        "heading_tag": "h2",
+        "heading_tag": "h3",
         "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
+        "description": "<p>Aetrex products can help correct the alignment and alleviate the pressure on the affected joint.Aetrex shoes with a wide toe area are recommended to accommodate the deformity and Aetrex Orthotics that help reduce bunion pain and increase the toe’s mobility. </p>",
+        "highlighted_text": "text",
         "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
+        "color_text": "",
         "color_background": "",
         "gradient_background": "",
         "color_highlight": "",
@@ -552,11 +354,11 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 0,
-        "padding_bottom": 0,
-        "divider": false,
-        "narrow": true,
-        "rounded": false,
+        "padding_top": 48,
+        "padding_bottom": 48,
+        "divider": true,
+        "full_width": false,
+        "rounded": true,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
@@ -568,8 +370,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>These Saved My Life! </strong><br/>These flip flops saved my summer! My plantar fasciitis was really bad and when I put these on I felt relief almost immediately. The discomfort continues to subside more and more each day, and is still improving, which I largely attribute to wearing these all day, every day. Plus, they felt very secure even when wet. Very thankful for these!\"</h6>",
-            "author": "Lisa R",
+            "text": "<h6><strong>Favorite Sandals </strong><br/>I have flat feet, bunions, plantar fasciitis, and have suffered from Achilles tendinitis. These sandals are wonderful! They look very attractive and fashionable while also providing the desperately needed support so that I can walk. I love the Velcro closures that can be adjusted across the toes, as well as around the ankle. I wish that I could get a pair in every color!”</h6>",
+            "author": "Shan",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -581,8 +383,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>My Favorite! </strong><br/>These were the first shoe I ordered from Aetrex. I loved them immediately. I am now on my 3rd pair, including one for my daughter since she kept stealing mine! They are cushiony & supportive enough for a day at an amusement park plus the strap keeps them secure. Casual enough for everyday, but dressy enough for a night out means only packing one pair for trips.\"</h6>",
-            "author": "Holly J.",
+            "text": "<h6><strong>Great Style and Comfort</strong><br/>After bunion surgery I needed to find shoes with more support; these are my third pair of Aetrex shoes. None had to be worn in, my feet felt supported without sacrificing style. Perfect for traveling especially when you have to limit the number of shoes you take.\" </h6>",
+            "author": "Susan C.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -594,8 +396,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>Better Than My Bare Feet! </strong><br/>These sandals are perfect. They are very cushioned and supportive in all the right places. I can already feel the difference with my pronation issues when I wear these slides. I also love that they are cute and so easy to wear. I wear them out or just around the house. I couldn't recommend more!!!\" </h6>",
-            "author": "Kimberly S.",
+            "text": "<h6><strong>Very comfortable!</strong><br/>I have bunions and I need good arch support so I don’t skimp on shoes. These sandals were comfortable right out of the box. The adjustable straps make them a perfect fit and the arch support is great. <br/></h6><h6></h6>",
+            "author": "Susanne B.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -611,7 +413,7 @@
       ],
       "name": "t:sections.testimonials.name",
       "settings": {
-        "heading": "",
+        "heading": "What Other Bunion Sufferers Say",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
@@ -624,17 +426,17 @@
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "#171717",
-        "color_background": "#ffffff",
+        "color_background": "#fafafa",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 20,
-        "padding_bottom": 20,
+        "padding_top": 48,
+        "padding_bottom": 48,
         "divider": false,
-        "rounded": false
+        "rounded": true
       }
     },
     "collection_list_fbMkYY": {
@@ -644,15 +446,15 @@
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "womens-sandals",
+            "collection": "womens-footwear-for-bunions",
             "custom_url": "",
-            "image": "shopify://shop_images/Rectangle_60_4_8fba1eeb-4515-403b-b70d-520de17a5324.png",
-            "title": "",
-            "description": "To Help Relieve Morton’s Neuroma",
+            "image": "shopify://shop_images/Rectangle_60_1.png",
+            "title": "Shoes",
+            "description": "To Help Relieve Bunions",
             "overlay_content": true,
             "color_text": "#ffffff",
             "color_overlay": "#000000",
-            "overlay_opacity": 0,
+            "overlay_opacity": 40,
             "submenu_title_position": "center",
             "enable_title_drop_shadow": true
           }
@@ -661,15 +463,15 @@
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "orthotics-for-mortons-neuroma",
+            "collection": "orthotics-for-bunions",
             "custom_url": "",
             "image": "shopify://shop_images/Rectangle_61_668b1198-2250-4e0e-9f58-c1a42125e032.png",
-            "title": "",
-            "description": "To Help Relieve Morton’s Neuroma",
+            "title": "Orthotics",
+            "description": "To Help Relieve Bunions",
             "overlay_content": true,
             "color_text": "#ffffff",
             "color_overlay": "#000000",
-            "overlay_opacity": 0,
+            "overlay_opacity": 40,
             "submenu_title_position": "center",
             "enable_title_drop_shadow": true
           }
@@ -685,7 +487,7 @@
         "columns": 2,
         "carousel_on_desktop": true,
         "image_type": "collection",
-        "image_ratio": "landscape",
+        "image_ratio": "adapt",
         "show_products_count": false,
         "show_view_all": false,
         "columns_mobile": "1",
@@ -715,52 +517,15 @@
         "abra_promo_code_hide": ""
       }
     },
-    "featured_collection_pKTHac": {
-      "type": "featured-collection",
-      "name": "t:sections.featured-collection.name",
-      "settings": {
-        "collection": "explore-relief-for-mortons-neuroma",
-        "products": [],
-        "product_limit": 6,
-        "columns": 4,
-        "carousel_on_desktop": true,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "{{ section.settings.collection.title }}",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h3",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "text",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 48,
-        "padding_bottom": 24,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "rich_text_8XprQB": {
+    "rich_text_E8xXXk": {
       "type": "rich-text",
       "blocks": {
-        "text_46g8QB": {
+        "text_rFtanA": {
           "type": "text",
           "settings": {
-            "text": "<p>The information contained on this website is for educational, informational and retail purposes only. No material on this site is intended to be a substitute for medical advice, diagnosis or treatment of any medical condition. Accordingly, if you are experiencing ongoing pain or discomfort, we encourage you to consult with a doctor or medical professional.</p>",
+            "text": "<p><em>The information contained on this website is for educational, informational and retail purposes only. No material on this site is intended to be a substitute for medical advice, diagnosis or treatment of any medical condition. Accordingly, if you are experiencing ongoing pain or discomfort, we encourage you to consult with a doctor or medical professional.</em></p>",
             "text_font": "body",
-            "text_size": "subtext-md",
+            "text_size": "subtext-sm",
             "text_max_size": 32,
             "text_line_height": 1.2,
             "text_letter_spacing": 0,
@@ -772,7 +537,7 @@
         }
       },
       "block_order": [
-        "text_46g8QB"
+        "text_rFtanA"
       ],
       "name": "t:sections.rich-text.name",
       "settings": {
@@ -813,14 +578,10 @@
     "main-page",
     "image_with_text_overlay_rBfBzp",
     "faq_zhAACx",
-    "lookbook_w69hfT",
-    "rich_text_wfBi9q",
-    "images_with_text_iL8ht6",
-    "featured_collection_dXtHeM",
-    "rich_text_6FhT4z",
+    "lookbook_crRFzY",
+    "featured_collection_3fWrTX",
     "testimonials_byJFpb",
     "collection_list_fbMkYY",
-    "featured_collection_pKTHac",
-    "rich_text_8XprQB"
+    "rich_text_E8xXXk"
   ]
 }

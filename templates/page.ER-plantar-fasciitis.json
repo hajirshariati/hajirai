@@ -151,7 +151,7 @@
       "settings": {
         "transparent_header": false,
         "image": "shopify://shop_images/Group_7_f05d6d9c-ad86-49bd-9e2e-2fd3063a6bd3.png",
-        "image_height": "adapt",
+        "image_height": "650px",
         "content_width": "small",
         "content_position": "md:items-end md:justify-start",
         "text_alignment": "left",
@@ -205,6 +205,10 @@
         "question_XamVPH",
         "question_x9EPUx"
       ],
+      "custom_css": [
+        ".faqs.with-background > :is(div, form) {padding: 2em 0em !important;}",
+        ".details__summary .icon-plus-2 {display: none;}"
+      ],
       "name": "t:sections.faq.name",
       "settings": {
         "style": "with-background",
@@ -234,7 +238,7 @@
         "padding_bottom": 0,
         "divider": false,
         "narrow": false,
-        "rounded": false,
+        "rounded": true,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
@@ -366,173 +370,27 @@
         "abra_promo_code_hide": ""
       }
     },
-    "rich_text_TFXrR6": {
-      "type": "rich-text",
-      "blocks": {
-        "heading_irceXm": {
-          "type": "heading",
-          "settings": {
-            "heading": "Why Our Products Help Relieve Plantar Fasciitis Pain",
-            "heading_size": "title-sm",
-            "heading_tag": "h2",
-            "highlighted_text": "text",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_iABtHx": {
-          "type": "text",
-          "settings": {
-            "text": "<p><em>Aetrex products are designed to help keep the foot in a neutral position throughout the gait cycle and to reduce stretching of the plantar fascia. Within days of use, most people begin to experience relief from the pain or discomfort.</em></p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.2,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": true,
-            "highlighted_text": "text",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "heading_irceXm",
-        "text_iABtHx"
-      ],
-      "name": "t:sections.rich-text.name",
-      "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
-        "color_background": "#e0edf2",
-        "gradient_background": "",
-        "color_highlight": "#171717",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 24,
-        "padding_bottom": 24,
-        "divider": false,
-        "narrow": true,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "images_with_text_iL8ht6": {
-      "type": "images-with-text",
-      "blocks": {
-        "heading_e4NMJi": {
-          "type": "heading",
-          "settings": {
-            "heading": "Signature Arch Support",
-            "heading_size": "title-md",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_Bw6Yfi": {
-          "type": "text",
-          "settings": {
-            "text": "<p>With removable insole, our arch support is located further back to support the apex of the foot. This helps proper alignment and help relieve arch and heel pain associated with Plantar Fasciitis</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_TWhPGJ": {
-          "type": "button",
-          "settings": {
-            "button_label": "Shop Jillian",
-            "button_link": "shopify://products/jillian-black-sc450w",
-            "button_video_link": "",
-            "button_style": "link",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": true
-          }
-        }
-      },
-      "block_order": [
-        "heading_e4NMJi",
-        "text_Bw6Yfi",
-        "button_TWhPGJ"
-      ],
-      "disabled": true,
-      "name": "t:sections.images-with-text.name",
-      "settings": {
-        "image": "shopify://shop_images/ee4e2fe8a874fb5c106a8cc3c4247add5d9048ed.png",
-        "image_url": "",
-        "image_2": "shopify://shop_images/recommended_1_2x_21163cd2-e758-4725-87c5-117210d3d3c9.png",
-        "image2_url": "",
-        "image_ratio": "adapt",
-        "image_width": "large",
-        "layout": "text_first",
-        "text_alignment": "center",
-        "text_alignment_mobile": "left",
-        "color_text": "",
-        "color_background": "#fafafa",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "enable_parallax": true
-      }
-    },
-    "featured_collection_dXtHeM": {
+    "featured_collection_p7Jjwd": {
       "type": "featured-collection",
       "name": "t:sections.featured-collection.name",
       "settings": {
-        "collection": "",
-        "products": [
-          "women-plantar-fasciitis-kit",
-          "danika-light-grey-ap113w",
-          "l2300m-m",
-          "jillian-black-sc450w"
-        ],
-        "product_limit": 4,
+        "collection": "womens-footwear-for-plantar-fasciitis-copy",
+        "products": [],
+        "product_limit": 6,
         "columns": 4,
-        "carousel_on_desktop": false,
-        "show_view_all": false,
-        "columns_mobile": "1",
+        "carousel_on_desktop": true,
+        "show_view_all": true,
+        "columns_mobile": "2",
         "swipe_on_mobile": true,
-        "heading": "",
+        "heading": "{{ section.settings.collection.title }}",
         "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h3",
         "subheading": "",
-        "description": "",
+        "description": "<p>Aetrex products are designed to help keep the foot in a neutral position throughout the gait cycle and to reduce stretching of the plantar fascia. Within days of use, most people begin to experience relief from the pain or discomfort.</p>",
         "highlighted_text": "text",
         "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
+        "color_text": "",
         "color_background": "#ffffff",
         "gradient_background": "",
         "color_highlight": "",
@@ -541,66 +399,10 @@
         "color_button_background": "",
         "color_button_gradient": "",
         "padding_top": 48,
-        "padding_bottom": 72,
-        "divider": false,
+        "padding_bottom": 48,
+        "divider": true,
         "full_width": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "rich_text_qygTdt": {
-      "type": "rich-text",
-      "blocks": {
-        "text_ekcTtF": {
-          "type": "text",
-          "settings": {
-            "text": "<p>What Other Plantar Fasciitis Sufferers Say</p>",
-            "text_font": "heading",
-            "text_size": "subtext-custom",
-            "text_max_size": 30,
-            "text_line_height": 1.2,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "one"
-          }
-        }
-      },
-      "block_order": [
-        "text_ekcTtF"
-      ],
-      "name": "t:sections.rich-text.name",
-      "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 0,
-        "padding_bottom": 0,
-        "divider": false,
-        "narrow": true,
-        "rounded": false,
+        "rounded": true,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
@@ -613,7 +415,7 @@
           "settings": {
             "icon": "quote",
             "text": "<h6>These Saved My Life! </h6><h6>These flip flops saved my summer! My plantar fasciitis was really bad and when I put these on I felt relief almost immediately. The discomfort continues to subside more and more each day, and is still improving, which I largely attribute to wearing these all day, every day. Plus, they felt very secure even when wet. Very thankful for these!\" </h6>",
-            "author": "Lisa R",
+            "author": "Lisa R.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -655,7 +457,7 @@
       ],
       "name": "t:sections.testimonials.name",
       "settings": {
-        "heading": "",
+        "heading": "What Other Plantar Fasciitis Sufferers Say",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
@@ -668,17 +470,17 @@
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "#171717",
-        "color_background": "#ffffff",
+        "color_background": "#fafafa",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 20,
-        "padding_bottom": 20,
+        "padding_top": 48,
+        "padding_bottom": 48,
         "divider": false,
-        "rounded": false
+        "rounded": true
       }
     },
     "collection_list_fbMkYY": {
@@ -759,52 +561,15 @@
         "abra_promo_code_hide": ""
       }
     },
-    "featured_collection_p7Jjwd": {
-      "type": "featured-collection",
-      "name": "t:sections.featured-collection.name",
-      "settings": {
-        "collection": "womens-footwear-for-plantar-fasciitis-copy",
-        "products": [],
-        "product_limit": 6,
-        "columns": 4,
-        "carousel_on_desktop": true,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "{{ section.settings.collection.title }}",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h3",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "text",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 48,
-        "padding_bottom": 24,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
     "rich_text_cFytfU": {
       "type": "rich-text",
       "blocks": {
         "text_qD8b89": {
           "type": "text",
           "settings": {
-            "text": "<p>The information contained on this website is for educational, informational and retail purposes only. No material on this site is intended to be a substitute for medical advice, diagnosis or treatment of any medical condition. Accordingly, if you are experiencing ongoing pain or discomfort, we encourage you to consult with a doctor or medical professional.</p>",
+            "text": "<p><em>The information contained on this website is for educational, informational and retail purposes only. No material on this site is intended to be a substitute for medical advice, diagnosis or treatment of any medical condition. Accordingly, if you are experiencing ongoing pain or discomfort, we encourage you to consult with a doctor or medical professional.</em></p>",
             "text_font": "body",
-            "text_size": "subtext-md",
+            "text_size": "subtext-sm",
             "text_max_size": 32,
             "text_line_height": 1.2,
             "text_letter_spacing": 0,
@@ -859,13 +624,9 @@
     "image_with_text_overlay_rBfBzp",
     "faq_zhAACx",
     "lookbook_JQDiwd",
-    "rich_text_TFXrR6",
-    "images_with_text_iL8ht6",
-    "featured_collection_dXtHeM",
-    "rich_text_qygTdt",
+    "featured_collection_p7Jjwd",
     "testimonials_byJFpb",
     "collection_list_fbMkYY",
-    "featured_collection_p7Jjwd",
     "rich_text_cFytfU"
   ]
 }

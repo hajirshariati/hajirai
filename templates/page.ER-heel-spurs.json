@@ -30,7 +30,7 @@
         "heading_axLTnn": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Heel Pain</p>",
+            "heading": "<p>Heel Spurs</p>",
             "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "text",
@@ -40,7 +40,7 @@
         "text_LHGLnM": {
           "type": "text",
           "settings": {
-            "text": "<p>Heel pain is a common condition where weight-bearing on the heel causes significant discomfort. There are two main categories of heel pain: <br/><br/>The first category is caused by overuse or repetitive stress, resulting from excessive impact on a specific foot area. This condition, often referred to as \"heel pain syndrome,\" can be triggered by shoes with low heels, a thinned-out fat pad in the heel area, or a sudden increase in activity. <br/><br/>The second category is Plantar Fasciitis, which is usually caused by a biomechanical issue such as overpronation (flat feet). The plantar fascia is a fibrous tissue band running from the heel bone through the midfoot and into the forefoot.</p>",
+            "text": "<p>A heel spur is an abnormal growth of the heel bone caused by calcium deposits. Calcium deposits form when the plantar fascia pulls away from the heel, leading to a bony protrusion known as a heel spur. <br/><br/>Heel spurs can cause severe pain in the rearfoot, especially while standing or walking. Women have a higher incidence of heel spurs, partly due to the types of footwear they commonly wear.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -52,14 +52,14 @@
             "highlighted_scribble": "circle"
           }
         },
-        "spacing_4c47TL": {
+        "spacing_6YxCNB": {
           "type": "spacing",
           "settings": {
             "height": 40,
             "height_mobile": 28
           }
         },
-        "text_mKApVr": {
+        "text_6r6q6Y": {
           "type": "text",
           "settings": {
             "text": "<p>Medically reviewed by Janine Taddeo, DPM</p>",
@@ -78,19 +78,19 @@
       "block_order": [
         "heading_axLTnn",
         "text_LHGLnM",
-        "spacing_4c47TL",
-        "text_mKApVr"
+        "spacing_6YxCNB",
+        "text_6r6q6Y"
       ],
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
         "image": "shopify://shop_images/Group_14.png",
-        "image_height": "adapt",
+        "image_height": "650px",
         "content_width": "small",
         "content_position": "md:items-center md:justify-start",
         "text_alignment": "left",
         "image_mobile": "shopify://shop_images/Group_19_1.png",
-        "image_height_mobile": "100vh",
+        "image_height_mobile": "600px",
         "content_position_mobile": "items-center justify-center",
         "text_alignment_mobile": "left",
         "color_text": "#171717",
@@ -106,7 +106,7 @@
         "padding_bottom": 0,
         "divider": false,
         "full_width": true,
-        "rounded": false,
+        "rounded": true,
         "enable_parallax": false,
         "parallax_direction": "vertical",
         "abra_promo_code_show": "",
@@ -120,7 +120,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Causes</strong>",
-            "text": "<p>There are two different categories of heel pain. The first is caused by over-use repetitive stress which refers to a soreness resulting from too much impact on a specific area of the foot. This condition, often referred to as “heel pain syndrome,” can be caused by shoes with heels that are too low, a thinned out fat pad in the heel area, or from a sudden increase in activity. Plantar fasciitis, a very common diagnosis of heel pain, is usually caused from a biomechancial problem, such as over-pronation (flat feet). The plantar fascia is a broad band of fibrous tissue that runs along the bottom surface of the foot, from the heel through the midfoot and into the forefoot. Over-pronation can cause the plantar fascia to be excessively stretched and inflamed, resulting in pain in the heel and arch areas of the foot. Often the pain will be most intense first thing in the morning or after a prolonged period of rest. The pain can gradually subside as the day progresses.</p>",
+            "text": "<p>Heel spurs develop as an abnormal growth in the heel bone due to calcium deposits that form when the plantar fascia pulls away from the heel. This stretching of the plantar fascia is usually the result of overpronation (flat feet), but people with unusually high arches (pes cavus) can also develop heel spurs. Women have a significantly higher incidence of heel spurs due to the types of footwear often worn on a regular basis.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -129,7 +129,7 @@
           "type": "question",
           "settings": {
             "title": "<strong>Treatment and Prevention</strong>",
-            "text": "<p>To properly treat heel pain, you must absorb shock, provide cushioning and elevate the heel to transfer pressure. This can be accomplished with a heel cup, visco heel cradle, or an orthotic designed with materials that will absorb shock and shear forces. When the condition is pronation related (usually plantar fasciitis), an orthotic with medial posting and good arch support will control the pronation and prevent the inflammation of the plantar fascia. Footwear selection is also an important criteria when treating heel pain. Shoes with a firm heel counter, good arch support, and appropriate heel height are the ideal choice.  In addition, breaking the pain cycle with the use of oral anti inflammatory medications, cortisone injections, stretching and icing are all treatments as well.<br/><br/><br/>If the problem persists, consult your foot doctor.</p>",
+            "text": "<p>The key for the proper treatment of heel spurs is determining what is causing the excessive stretching of the plantar fascia. When the cause is over-pronation (flat feet), an orthotic with rearfoot posting and longitudinal arch support is an effective device to reduce the overpronation, and allow the condition to heal. Other common treatments include stretching exercises, losing weight, wearing shoes that have a cushioned heel that absorbs shock, and elevating the heel with the use of a heel cradle, heel cup, or orthotic. Heel cradles and heel cups provide extra comfort and cushion to the heel, and reduce the amount of shock and shear forces experienced from everyday activities.<br/><br/><br/>If the problem persists, consult your foot doctor.</p>",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
@@ -138,6 +138,10 @@
       "block_order": [
         "question_XamVPH",
         "question_x9EPUx"
+      ],
+      "custom_css": [
+        ".faqs.with-background > :is(div, form) {padding: 2em 0em !important;}",
+        ".details__summary .icon-plus-2 {display: none;}"
       ],
       "name": "t:sections.faq.name",
       "settings": {
@@ -168,7 +172,7 @@
         "padding_bottom": 0,
         "divider": false,
         "narrow": false,
-        "rounded": false,
+        "rounded": true,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
@@ -182,14 +186,14 @@
             "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
-            "heading": "Adjustability",
-            "text": "<p>Easy to use, our hook and loop adjustable straps help accommodate multiple widths by being able to shorten or elongate the strap.</p>",
+            "heading": "Padded Tongue",
+            "text": "<p>Extra cushioning around the instep helps to reduce discomfort and provides a comfortable fit.</p>",
             "link": "",
             "color_text": "#74a5ba",
-            "vertical": 28,
-            "horizontal": 61,
-            "vertical_mobile": 21,
-            "horizontal_mobile": 35,
+            "vertical": 18,
+            "horizontal": 50,
+            "vertical_mobile": 20,
+            "horizontal_mobile": 28,
             "cta_label": "",
             "cta_link": "",
             "cta_external": false,
@@ -202,14 +206,14 @@
             "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
-            "heading": "Dual Density Outsole",
-            "text": "<p>A feature that provides pressure relief and shock absorption in the ball-of-foot and heel area.</p>",
+            "heading": "Removable Insole",
+            "text": "<p>Included is a removable arch support & premium foam cushioning insole that can easily be replaced with a more customized Aetrex Orthotic.</p>",
             "link": "",
             "color_text": "#74a5ba",
             "vertical": 48,
             "horizontal": 39,
-            "vertical_mobile": 53,
-            "horizontal_mobile": 16,
+            "vertical_mobile": 69,
+            "horizontal_mobile": 12,
             "cta_label": "",
             "cta_link": "",
             "cta_external": false,
@@ -249,8 +253,8 @@
             "color_text": "#74a5ba",
             "vertical": 56,
             "horizontal": 52,
-            "vertical_mobile": 57,
-            "horizontal_mobile": 37,
+            "vertical_mobile": 66,
+            "horizontal_mobile": 41,
             "cta_label": "",
             "cta_link": "",
             "cta_external": false,
@@ -263,14 +267,14 @@
             "icon": "none",
             "iwidth": "fit",
             "icon_width": 26,
-            "heading": "Open Toe",
-            "text": "<p>This type of shoe provides ample room for your feet and is beneficial for conditions such as Hammer Toes.</p>",
+            "heading": "Lightweight",
+            "text": "<p>Aetrex Flips are designed using light-weight UltraSky™ EVA with a water-friendly construction. It is specially engineered with super soft foam to keep your toes comfortable all day long.</p>",
             "link": "",
             "color_text": "#74a5ba",
             "vertical": 70,
             "horizontal": 75,
-            "vertical_mobile": 64,
-            "horizontal_mobile": 73,
+            "vertical_mobile": 69,
+            "horizontal_mobile": 82,
             "cta_label": "",
             "cta_link": "",
             "cta_external": false,
@@ -288,8 +292,8 @@
       "disabled": true,
       "name": "t:sections.lookbook.name",
       "settings": {
-        "image": "shopify://shop_images/Group_18_6.png",
-        "image_mobile": "shopify://shop_images/Frame_83.png",
+        "image": "shopify://shop_images/Group_18_4_d349ced9-1792-4d04-8195-d74ef54693ba.png",
+        "image_mobile": "shopify://shop_images/Frame_78.png",
         "heading": "",
         "heading_size": "title-sm",
         "heading_alignment": "text-center md:items-center",
@@ -322,23 +326,23 @@
         "abra_promo_code_hide": ""
       }
     },
-    "rich_text_grxwN7": {
+    "rich_text_Jndehn": {
       "type": "rich-text",
       "blocks": {
-        "heading_rM9wpP": {
+        "heading_qQ7BhE": {
           "type": "heading",
           "settings": {
-            "heading": "Why Our Products Help Relieve Heel Pain",
+            "heading": "Why Our Products Help Relieve Heel Spur Pain",
             "heading_size": "title-sm",
             "heading_tag": "h2",
             "highlighted_text": "text",
             "highlighted_scribble": "circle"
           }
         },
-        "text_GcUQii": {
+        "text_CANkmY": {
           "type": "text",
           "settings": {
-            "text": "<p><em> Whether caused by plantar fasciitis, overuse, or improper foot alignment, Aetrex products are designed to provide the essential cushioning and support needed to help reduce strain on the heel. Aetrex products help to diminish discomfort and promote more comfortable movement throughout the day.</em></p>",
+            "text": "<p><em>Aetrex products are designed with targeted cushioning and superior shock absorption to help minimize the repetitive impact that can irritate heel spurs. By supporting the arch and reducing stress on the heel bone, Aetrex products help to diminish discomfort and promote more comfortable movement throughout the day.</em></p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -352,9 +356,10 @@
         }
       },
       "block_order": [
-        "heading_rM9wpP",
-        "text_GcUQii"
+        "heading_qQ7BhE",
+        "text_CANkmY"
       ],
+      "disabled": true,
       "name": "t:sections.rich-text.name",
       "settings": {
         "text_alignment": "center",
@@ -372,19 +377,19 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
-        "color_background": "#e0edf2",
+        "color_text": "#171717",
+        "color_background": "#fafafa",
         "gradient_background": "",
         "color_highlight": "#171717",
         "gradient_highlight": "",
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 24,
-        "padding_bottom": 24,
+        "padding_top": 48,
+        "padding_bottom": 48,
         "divider": false,
         "narrow": true,
-        "rounded": false,
+        "rounded": true,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
@@ -463,88 +468,27 @@
         "enable_parallax": true
       }
     },
-    "featured_collection_dXtHeM": {
+    "featured_collection_zRBhpd": {
       "type": "featured-collection",
       "name": "t:sections.featured-collection.name",
       "settings": {
-        "collection": "",
-        "products": [
-          "xspress-runner2-grey-xs106w",
-          "marz-black-ss500w",
-          "compete-orthotics-women",
-          "reese-cognac-brown-sc124w"
-        ],
-        "product_limit": 4,
-        "columns": 4,
-        "carousel_on_desktop": false,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": false,
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "text",
-        "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
-        "color_background": "#ffffff",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "rich_text_GiAWeb": {
-      "type": "rich-text",
-      "blocks": {
-        "text_giAFky": {
-          "type": "text",
-          "settings": {
-            "text": "<p>What Other Heel Pain Sufferers Say</p>",
-            "text_font": "heading",
-            "text_size": "subtext-custom",
-            "text_max_size": 30,
-            "text_line_height": 1.2,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "one"
-          }
-        }
-      },
-      "block_order": [
-        "text_giAFky"
-      ],
-      "name": "t:sections.rich-text.name",
-      "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
+        "collection": "explore-relief-for-heel-pain-copy",
+        "products": [],
+        "product_limit": 6,
+        "columns": 5,
+        "carousel_on_desktop": true,
+        "show_view_all": true,
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "heading": "{{ section.settings.collection.title }}",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
-        "heading_tag": "h2",
+        "heading_tag": "h3",
         "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
+        "description": "<p><em>Aetrex products are designed with targeted cushioning and superior shock absorption to help minimize the repetitive impact that can irritate heel spurs. By supporting the arch and reducing stress on the heel bone, Aetrex products help to diminish discomfort and promote more comfortable movement throughout the day.</em></p>",
+        "highlighted_text": "text",
         "highlighted_scribble": "circle",
-        "color_text": "#74a5ba",
+        "color_text": "",
         "color_background": "",
         "gradient_background": "",
         "color_highlight": "",
@@ -552,10 +496,10 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 0,
-        "padding_bottom": 0,
+        "padding_top": 48,
+        "padding_bottom": 48,
         "divider": false,
-        "narrow": true,
+        "full_width": false,
         "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
@@ -568,8 +512,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>Immediate relief</strong><br/>I am suffering with planter fasciitis in one foot and immediately after trying on this sandal I felt relief and could walk again. Great arch support and soft heel pad did the trick. thank you!”</h6>",
-            "author": "Susan N.",
+            "text": "<h5>Bought all 4 colors I bought two pairs and were so elated with the comfort that I bought the last two remaining colors. I suffer from Metatarsalgia and was glad to finally being able to walk without discomfort & pain!!</h5>",
+            "author": "Ellen o.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -581,8 +525,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>I'm so grateful forThese shoes</strong><br/>I'm so grateful for shoes of this type which keep my feet happy, healthy, and pain-free from plantar fasciitis. It's comfortable and provides the correct support -- and, it looks great!”</h6>",
-            "author": "Pandora V.",
+            "text": "<h5>I love these sneakers. I love these sneakers.<strong> </strong>I have bought three of the same sneakers, but in different colors. What a difference they have made on my feet. I like to take my dog for walks. I had to stop. My feet were in such pain. With these sneakers my feet are fine now. Thank you Aetrex.</h5>",
+            "author": "Linda P.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -594,8 +538,8 @@
           "type": "testimonial",
           "settings": {
             "icon": "quote",
-            "text": "<h6><strong>Excellent Shoes </strong><br/>Until I started wearing Aetrex shoes l could hardly walk because my feet felt like I was walking on rocks. Now I can walk with no pain when I wear Aetrex shoes.”</h6>",
-            "author": "Annie G.",
+            "text": "<h5>I bought these to wear at work. I am a Dental Assistant and on my feet most of the day. With other shoes, I would go home with sore feet and low back pain. The Xspress Runner 2 felt comfortable and supportive right from the first time I laced them up - no break-in required.</h5>",
+            "author": "Susanne B.",
             "author_info": "",
             "author_url": "",
             "image_ratio": "rounded",
@@ -611,7 +555,7 @@
       ],
       "name": "t:sections.testimonials.name",
       "settings": {
-        "heading": "",
+        "heading": "What Other Heel Spur Sufferers Say",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
@@ -624,17 +568,17 @@
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "#171717",
-        "color_background": "#ffffff",
+        "color_background": "#fafafa",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 20,
-        "padding_bottom": 20,
+        "padding_top": 48,
+        "padding_bottom": 48,
         "divider": false,
-        "rounded": false
+        "rounded": true
       }
     },
     "collection_list_fbMkYY": {
@@ -644,11 +588,11 @@
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "womens-sandals",
+            "collection": "womens-sneakers",
             "custom_url": "",
-            "image": "shopify://shop_images/Rectangle_60_9.png",
+            "image": "shopify://shop_images/Rectangle_60_5_e14913d2-607f-409b-976e-d6b2001c5a44.png",
             "title": "Shoes",
-            "description": "To Help Relieve Heel Pain",
+            "description": "To Help Relieve Heel Spurs",
             "overlay_content": true,
             "color_text": "#ffffff",
             "color_overlay": "#000000",
@@ -661,11 +605,11 @@
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "heel-pain",
+            "collection": "orthotics-for-heel-spurs",
             "custom_url": "",
             "image": "shopify://shop_images/Rectangle_61_668b1198-2250-4e0e-9f58-c1a42125e032.png",
             "title": "Orthotics",
-            "description": "To Help Relieve Heel Pain",
+            "description": "To Help Relieve Heel Spurs",
             "overlay_content": true,
             "color_text": "#ffffff",
             "color_overlay": "#000000",
@@ -715,52 +659,15 @@
         "abra_promo_code_hide": ""
       }
     },
-    "featured_collection_PCNwMD": {
-      "type": "featured-collection",
-      "name": "t:sections.featured-collection.name",
-      "settings": {
-        "collection": "heel-pain-copy",
-        "products": [],
-        "product_limit": 6,
-        "columns": 4,
-        "carousel_on_desktop": true,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "{{ section.settings.collection.title }}",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h3",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "text",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 48,
-        "padding_bottom": 24,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "rich_text_j7HbXJ": {
+    "rich_text_njqzCM": {
       "type": "rich-text",
       "blocks": {
-        "text_ztqREE": {
+        "text_CJeEDN": {
           "type": "text",
           "settings": {
-            "text": "<p>The information contained on this website is for educational, informational and retail purposes only. No material on this site is intended to be a substitute for medical advice, diagnosis or treatment of any medical condition. Accordingly, if you are experiencing ongoing pain or discomfort, we encourage you to consult with a doctor or medical professional.</p>",
+            "text": "<p><em>The information contained on this website is for educational, informational and retail purposes only. No material on this site is intended to be a substitute for medical advice, diagnosis or treatment of any medical condition. Accordingly, if you are experiencing ongoing pain or discomfort, we encourage you to consult with a doctor or medical professional.</em></p>",
             "text_font": "body",
-            "text_size": "subtext-md",
+            "text_size": "subtext-sm",
             "text_max_size": 32,
             "text_line_height": 1.2,
             "text_letter_spacing": 0,
@@ -772,7 +679,7 @@
         }
       },
       "block_order": [
-        "text_ztqREE"
+        "text_CJeEDN"
       ],
       "name": "t:sections.rich-text.name",
       "settings": {
@@ -814,13 +721,11 @@
     "image_with_text_overlay_rBfBzp",
     "faq_zhAACx",
     "lookbook_w69hfT",
-    "rich_text_grxwN7",
+    "rich_text_Jndehn",
     "images_with_text_iL8ht6",
-    "featured_collection_dXtHeM",
-    "rich_text_GiAWeb",
+    "featured_collection_zRBhpd",
     "testimonials_byJFpb",
     "collection_list_fbMkYY",
-    "featured_collection_PCNwMD",
-    "rich_text_j7HbXJ"
+    "rich_text_njqzCM"
   ]
 }
