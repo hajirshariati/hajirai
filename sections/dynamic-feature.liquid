@@ -43,6 +43,37 @@
 #shopify-section-{{ section.id }} {
   --section-padding-top: {{ section.settings.padding_top }}px;
   --section-padding-bottom: {{ section.settings.padding_bottom }}px;
+  
+  {%- if section.settings.use_gradient and section.settings.gradient_color_1 and section.settings.gradient_color_2 -%}
+    --section-background: linear-gradient({{ section.settings.gradient_angle }}deg, {{ section.settings.gradient_color_1 }}, {{ section.settings.gradient_color_2 }});
+  {%- elsif section.settings.background_color -%}
+    --section-background: {{ section.settings.background_color }};
+  {%- else -%}
+    --section-background: transparent;
+  {%- endif -%}
+}
+
+/* ===============================
+   BACKGROUND TEXT
+================================ */
+
+#shopify-section-{{ section.id }} .dynamic-feature__bg-text {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: {{ section.settings.bg_text_font_size }}px;
+  font-weight: 700;
+  color: {{ section.settings.bg_text_color | default: 'rgba(0,0,0,0.05)' }};
+  letter-spacing: {{ section.settings.bg_text_letter_spacing }}px;
+  line-height: {{ section.settings.bg_text_line_height }}%;
+  opacity: {{ section.settings.bg_text_opacity | default: 100 | times: 0.01 }};
 }
 
 /* ===============================
@@ -52,6 +83,7 @@
 #shopify-section-{{ section.id }} .dynamic-feature {
   position: relative;
   overflow: visible;
+  background: var(--section-background);
 }
 
 #shopify-section-{{ section.id }} .dynamic-feature__wrapper,
@@ -161,24 +193,22 @@
   background: {{ section.settings.callout_background | default: '#ffffff' }};
   padding: 16px 20px;
   border-radius: {{ section.settings.callout_radius | default: 8 }}px;
-  ox-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   max-width: {{ section.settings.callout_max_width | default: 220 }}px;
-  order: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0,0,0,0.1);
 }
 
 #shopify-section-{{ section.id }} .dynamic-feature__callout-title {
   font-weight: 700;
   font-size: 14px;
   margin-bottom: 8px;
-    color: {{ section.settings.callout_title_color }};
-
+  color: {{ section.settings.callout_title_color }};
 }
 
 #shopify-section-{{ section.id }} .dynamic-feature__callout-text {
   font-size: 12px;
   line-height: 1.4;
-    color: {{ section.settings.callout_text_color }};
-
+  color: {{ section.settings.callout_text_color }};
 }
 
 /* ===============================
@@ -199,6 +229,10 @@
     width: {{ section.settings.dot_size_mobile | default: 16 }}px !important;
     height: {{ section.settings.dot_size_mobile | default: 16 }}px !important;
     transform: scale(1) !important;
+  }
+  
+  #shopify-section-{{ section.id }} .dynamic-feature__bg-text {
+    font-size: {{ section.settings.bg_text_font_size_mobile | default: section.settings.bg_text_font_size | times: 0.7 | round }}px;
   }
 }
 
@@ -272,6 +306,11 @@
     <div class="dynamic-feature relative">
       <div class="dynamic-feature__wrapper">
         <div class="dynamic-feature__media relative w-full">
+          
+          {%- if section.settings.show_bg_text and section.settings.bg_text != blank -%}
+            <div class="dynamic-feature__bg-text" data-text="{{ section.settings.bg_text | escape }}"></div>
+          {%- endif -%}
+          
           {%- if section.settings.image != blank -%}
             <picture>
               {%- if section.settings.image_mobile -%}
@@ -359,6 +398,7 @@ class DynamicFeatureSection {
     this.svg = section.querySelector('.dynamic-feature__lines');
     this.lines = this.svg?.querySelectorAll('.dynamic-feature__line') || [];
     this.media = section.querySelector('.dynamic-feature__media');
+    this.bgTextEl = section.querySelector('.dynamic-feature__bg-text');
     this.isMobile = window.innerWidth <= 768;
 
     this.init();
@@ -366,8 +406,8 @@ class DynamicFeatureSection {
   }
 
 init() {
+    this.populateBackgroundText();
     if (this.isMobile) {
-      // On mobile, add is-visible immediately since we don't need line animations
       this.section.querySelector('.dynamic-feature').classList.add('is-visible');
       return;
     }
@@ -380,6 +420,25 @@ init() {
     if (wasMobile !== this.isMobile && !this.isMobile) {
       this.drawLines();
     }
+  }
+
+  populateBackgroundText() {
+    if (!this.bgTextEl) return;
+    
+    const text = this.bgTextEl.dataset.text;
+    const mediaWidth = this.media.offsetWidth;
+    const mediaHeight = this.media.offsetHeight;
+    
+    // Estimate how many repetitions we need
+    const estimatedCharsPerLine = Math.ceil(mediaWidth / 12); // Rough estimate
+    const estimatedLines = Math.ceil(mediaHeight / 40); // Rough estimate
+    
+    let fullText = '';
+    for (let i = 0; i < estimatedLines + 2; i++) {
+      fullText += text + ' ';
+    }
+    
+    this.bgTextEl.textContent = fullText;
   }
 
   setupObserver() {
@@ -571,6 +630,120 @@ modal.setAttribute('aria-hidden', 'false');
       "label": "Heading"
     },
     {
+      "type": "header",
+      "content": "Background Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_gradient",
+      "label": "Use Gradient Background",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_1",
+      "label": "Gradient Color 1",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "gradient_color_2",
+      "label": "Gradient Color 2",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "gradient_angle",
+      "min": 0,
+      "max": 360,
+      "step": 15,
+      "unit": "deg",
+      "label": "Gradient Angle",
+      "default": 45
+    },
+    {
+      "type": "header",
+      "content": "Background Text"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_bg_text",
+      "label": "Enable Background Text",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "bg_text",
+      "label": "Background Text",
+      "placeholder": "Enter text to repeat in background"
+    },
+    {
+      "type": "range",
+      "id": "bg_text_font_size",
+      "min": 20,
+      "max": 200,
+      "step": 5,
+      "unit": "px",
+      "label": "Font Size",
+      "default": 80
+    },
+    {
+      "type": "range",
+      "id": "bg_text_font_size_mobile",
+      "min": 12,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "Font Size Mobile",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "bg_text_letter_spacing",
+      "min": -5,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Letter Spacing",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "bg_text_line_height",
+      "min": 80,
+      "max": 200,
+      "step": 10,
+      "unit": "%",
+      "label": "Line Height",
+      "default": 120
+    },
+    {
+      "type": "color",
+      "id": "bg_text_color",
+      "label": "Text Color",
+      "default": "rgba(0, 0, 0, 0.05)"
+    },
+    {
+      "type": "range",
+      "id": "bg_text_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Text Opacity",
+      "default": 10
+    },
+    {
+      "type": "header",
+      "content": "Dots"
+    },
+    {
       "type": "range",
       "id": "dot_size",
       "min": 10,
@@ -613,6 +786,10 @@ modal.setAttribute('aria-hidden', 'false');
       "default": 3
     },
     {
+      "type": "header",
+      "content": "Lines"
+    },
+    {
       "type": "color",
       "id": "line_color",
       "label": "Line Color",
@@ -636,6 +813,10 @@ modal.setAttribute('aria-hidden', 'false');
       "step": 1,
       "label": "Line Bends",
       "default": 1
+    },
+    {
+      "type": "header",
+      "content": "Callouts"
     },
     {
       "type": "color",
@@ -674,6 +855,10 @@ modal.setAttribute('aria-hidden', 'false');
       "id": "callout_text_color",
       "label": "Text Color",
       "default": "#666666"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
     },
     {
       "type": "range",
