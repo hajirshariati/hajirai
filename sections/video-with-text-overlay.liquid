@@ -54,7 +54,7 @@
     }
   {% endif -%}
 
-  /* Crop mobile video from bottom only - keep top visible */
+/* Crop mobile video from bottom only - keep top visible */
   @media screen and (max-width: 767px) {
     #shopify-section-{{ section.id }} .banner__media.media video,
     #shopify-section-{{ section.id }} .banner__media.media iframe,
@@ -62,8 +62,20 @@
       object-position: top center !important;
     }
   }
-</style>
 
+{%- if section.settings.mobile_content_space > 0 %}
+@media screen and (max-width: 767px) {
+
+  #shopify-section-{{ section.id }} .video-hero {
+    padding-bottom: {{ section.settings.mobile_content_space }}px;
+    background-color: {{ section.settings.mobile_content_space_color }};
+  }
+
+}
+{%- endif %}
+
+</style>
+ 
 <div
   class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}{% if section.settings.abra_promo_code_show != blank %} abra--{{ section.settings.abra_promo_code_show | handleize }}-activated{% endif %}"
   {% if section.settings.transparent_header %}
@@ -77,7 +89,8 @@
   {% endif %}
 >
   <div class="{% unless section.settings.full_width %}page-width {% endunless %}relative">
-    <div class="video-hero banner media--{{ section.settings.image_height }} mobile:media--{{ section.settings.image_height_mobile }} relative">
+<div class="video-hero banner media--{{ section.settings.image_height }} mobile:media--{{ section.settings.image_height_mobile }} relative">
+
       {%- capture sizes -%}{% if section.settings.full_width %}100vw{% else %}min({{ settings.page_width }}px, 100vw){% endif %}{%- endcapture -%}
       {%- if section.settings.video_mobile or section.settings.video_url_mobile -%}
         {%- render 'video',
@@ -117,6 +130,8 @@
       {%- if section.blocks.size > 0 -%}
         <span class="banner__overlay absolute top-0 left-0 w-full h-full pointer-events-none"></span>
         <div class="banner__content overflow-hidden absolute z-1 top-0 left-0 w-full h-full">
+
+
           <div class="page-width w-full h-full flex {{ section.settings.content_position }} {{ section.settings.content_position_mobile }}">
             <div class="banner__box banner__box--{{ section.settings.content_width }} md:text-{{ section.settings.text_alignment }} text-{{ section.settings.text_alignment_mobile }}">
               {%- liquid
@@ -317,6 +332,7 @@
       {%- endif -%}
     </div>
   </div>
+ 
 </div>
 
 <div id="videoModal" class="video-modal">
@@ -513,9 +529,25 @@
       "default": "center",
       "label": "t:sections.global.settings.text_alignment.label"
     },
-    {
+{
       "type": "header",
       "content": "t:sections.global.settings.header__mobile.content"
+    },
+    {
+      "type": "range",
+      "id": "mobile_content_space",
+      "label": "Mobile extra space below video",
+      "min": 0,
+      "max": 400,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "mobile_content_space_color",
+      "label": "Mobile extra space background color",
+      "default": "#ffffff"
     },
     {
       "type": "video",
