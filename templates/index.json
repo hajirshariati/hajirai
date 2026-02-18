@@ -9,10 +9,10 @@
  */
 {
   "sections": {
-    "video_with_text_overlay_84weNe": {
+    "video_with_text_overlay_akXxKy": {
       "type": "video-with-text-overlay",
       "blocks": {
-        "text_BH4iVp": {
+        "text_LaCwLq": {
           "type": "text",
           "settings": {
             "text": "<p>THE AETREX TECHNOLOGY DIFFERENCE</p>",
@@ -27,7 +27,7 @@
             "highlighted_scribble": "circle"
           }
         },
-        "divider_nd3AeW": {
+        "divider_YkCdzi": {
           "type": "divider",
           "settings": {
             "divider_width": 260,
@@ -35,7 +35,7 @@
             "divider_mb": 0
           }
         },
-        "heading_WMGPBB": {
+        "heading_BGMMGA": {
           "type": "heading",
           "settings": {
             "heading": "<p>It All Starts with </p><p>a 3D Foot Scan.</p>",
@@ -45,7 +45,7 @@
             "highlighted_scribble": "circle"
           }
         },
-        "text_ty3xHk": {
+        "text_wdbJj8": {
           "type": "text",
           "settings": {
             "text": "<p>Footwear and Orthotics built <br/>from millions of real foot scans, <br/>where comprehensive data <br/>delivers superior fit and comfort.</p>",
@@ -60,7 +60,31 @@
             "highlighted_scribble": "circle"
           }
         },
-        "button_qiiHDC": {
+        "button_nkD4fr": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP FOOTWEAR",
+            "button_link": "shopify://collections/shop-all-footwear",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_XM9iCX": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP ORTHOTICS",
+            "button_link": "shopify://pages/orthotics",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_bgh9yH": {
           "type": "button",
           "settings": {
             "button_label": "WATCH MOVIE",
@@ -74,11 +98,13 @@
         }
       },
       "block_order": [
-        "text_BH4iVp",
-        "divider_nd3AeW",
-        "heading_WMGPBB",
-        "text_ty3xHk",
-        "button_qiiHDC"
+        "text_LaCwLq",
+        "divider_YkCdzi",
+        "heading_BGMMGA",
+        "text_wdbJj8",
+        "button_nkD4fr",
+        "button_XM9iCX",
+        "button_bgh9yH"
       ],
       "name": "t:sections.video-with-text-overlay.name",
       "settings": {
@@ -92,7 +118,7 @@
         "content_width": "medium",
         "content_position": "md:items-center md:justify-end",
         "text_alignment": "center",
-        "mobile_content_space": 388,
+        "mobile_content_space": 488,
         "mobile_content_space_color": "#e7e7e7",
         "video_mobile": "shopify://files/videos/SS26_HP_Banner_mobile_600_R2.mp4",
         "video_url_mobile": "",
@@ -1175,7 +1201,7 @@
     }
   },
   "order": [
-    "video_with_text_overlay_84weNe",
+    "video_with_text_overlay_akXxKy",
     "collection_list_kK69i9",
     "video_with_text_Mpqjh8",
     "featured_collections_g6b3ht",
