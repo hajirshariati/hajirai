@@ -121,7 +121,7 @@
         "content_width": "medium",
         "content_position": "md:items-center md:justify-end",
         "text_alignment": "center",
-        "mobile_content_space": 488,
+        "mobile_content_space": 448,
         "mobile_content_space_color": "#e7e7e7",
         "video_mobile": "shopify://files/videos/SS26_HP_Banner_mobile_600_R2.mp4",
         "video_url_mobile": "",
