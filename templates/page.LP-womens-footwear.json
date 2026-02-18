@@ -30,9 +30,9 @@
         "image_t4b7Uf": {
           "type": "image",
           "settings": {
-            "image": "shopify://shop_images/1920x700_Collette_Taupe.jpg",
-            "image_mobile": "shopify://shop_images/footwear1.jpg",
-            "heading": "Fall-Winter '25 Styles",
+            "image": "shopify://shop_images/1920x700_Charlotte_Wht.jpg",
+            "image_mobile": "shopify://shop_images/home3.jpg",
+            "heading": "Spring-Summer '26 Styles",
             "heading_size": "title-sm",
             "heading_tag": "h3",
             "text": "<p>Healthy Comfort Starts Here!®</p>",
@@ -55,14 +55,14 @@
         "image_89rbRz": {
           "type": "image",
           "settings": {
-            "image": "shopify://shop_images/1920x700_Gianna_Taupe.jpg",
-            "image_mobile": "shopify://shop_images/footwear6b.jpg",
-            "heading": "Proven Comfort, Perfected by Science",
+            "image": "shopify://shop_images/1920x700_Ashley_HazyBlueMulti_EW794.jpg",
+            "image_mobile": "shopify://shop_images/home5.jpg",
+            "heading": "Spring-Summer '26 Styles",
             "heading_size": "title-sm",
             "heading_tag": "h3",
-            "text": "<p>Every pair is designed using scientific data and insights from more than 50 million global 3D foot scans.</p>",
+            "text": "<p>Healthy Comfort Starts Here!®</p>",
             "text_font": "body",
-            "text_size": "subtext-md",
+            "text_size": "subtext-lg",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -70,8 +70,33 @@
             "secondary_color_text": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle",
-            "button_label": "Shop Winter Collection",
-            "button_link": "shopify://collections/winter-collection",
+            "button_label": "SHOP NEW ARRIVALS",
+            "button_link": "shopify://collections/womens-new-arrivals",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "image_RHWcLV": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/1920x700_Flora_AntiqueRose_MW139.jpg",
+            "image_mobile": "shopify://shop_images/home2.jpg",
+            "heading": "Spring-Summer '26 Styles",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "text": "<p>Healthy Comfort Starts Here!®</p>",
+            "text_font": "body",
+            "text_size": "subtext-lg",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color_text": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle",
+            "button_label": "SHOP NEW ARRIVALS",
+            "button_link": "shopify://collections/womens-new-arrivals",
             "button_style": "primary",
             "button_external": false,
             "button_icon": false
@@ -80,14 +105,14 @@
         "image_GBXdxP": {
           "type": "image",
           "settings": {
-            "image": "shopify://shop_images/1920x700_CarlySparklwe_Wine.jpg",
-            "image_mobile": "shopify://shop_images/footwear7.jpg",
-            "heading": "Redefining Everyday Comfort",
+            "image": "shopify://shop_images/1920x700_Cass_Terracota_SF179.jpg",
+            "image_mobile": "shopify://shop_images/home4.jpg",
+            "heading": "Spring-Summer '26 Styles",
             "heading_size": "title-sm",
             "heading_tag": "h3",
-            "text": "<p>Explore sneakers with innovative support and effortless versatility.</p>",
+            "text": "<p>Healthy Comfort Starts Here!®</p>",
             "text_font": "body",
-            "text_size": "subtext-md",
+            "text_size": "subtext-lg",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -95,8 +120,33 @@
             "secondary_color_text": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle",
-            "button_label": "Shop Sneakers",
-            "button_link": "shopify://collections/womens-sneakers",
+            "button_label": "SHOP NEW ARRIVALS",
+            "button_link": "shopify://collections/womens-new-arrivals",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "image_fKnc73": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/1920x700_ss26_group.jpg",
+            "image_mobile": "shopify://shop_images/home1.jpg",
+            "heading": "Spring-Summer '26 Styles",
+            "heading_size": "title-sm",
+            "heading_tag": "h3",
+            "text": "<p>Healthy Comfort Starts Here!®</p>",
+            "text_font": "body",
+            "text_size": "subtext-lg",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color_text": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle",
+            "button_label": "SHOP NEW ARRIVALS",
+            "button_link": "shopify://collections/womens-new-arrivals",
             "button_style": "primary",
             "button_external": false,
             "button_icon": false
@@ -106,27 +156,29 @@
       "block_order": [
         "image_t4b7Uf",
         "image_89rbRz",
-        "image_GBXdxP"
+        "image_RHWcLV",
+        "image_GBXdxP",
+        "image_fKnc73"
       ],
       "custom_css": [],
       "name": "Slideshow",
       "settings": {
-        "autoplay": false,
+        "autoplay": true,
         "autoplay_speed": 5,
         "show_navigation": true,
         "image_height": "adapt",
         "content_width": "large",
         "content_position": "md:items-center md:justify-end",
         "text_alignment": "center",
-        "image_height_mobile": "600px",
+        "image_height_mobile": "adapt",
         "content_position_mobile": "items-end justify-center",
         "text_alignment_mobile": "center",
-        "accessibility_info": "Slideshow about our brand",
+        "accessibility_info": "",
         "color_text": "#171717",
         "color_background": "rgba(0,0,0,0)",
         "gradient_background": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
+        "color_button_text": "#ffffff",
+        "color_button_background": "#171717",
         "color_button_gradient": "",
         "color_overlay": "#171717",
         "overlay_opacity": 0,
@@ -206,7 +258,7 @@
             "link_type": "collection",
             "collection": "womens-sandals",
             "custom_url": "",
-            "image": "shopify://shop_images/Sandals_0e3a64ec-f790-4efd-b3ec-b1b92f015ed3.png",
+            "image": "shopify://shop_images/22025-SE216W_catalog.jpg",
             "title": "SANDALS",
             "description": "",
             "overlay_content": false,
@@ -223,7 +275,7 @@
             "link_type": "collection",
             "collection": "womens-flip-flop-sandals",
             "custom_url": "",
-            "image": "shopify://shop_images/flips_8c5c4a61-3b54-451e-acd8-35bdc2c948f6.png",
+            "image": "shopify://shop_images/93429-ST3518W_catalog.jpg",
             "title": "FLIPS",
             "description": "",
             "overlay_content": false,
@@ -240,7 +292,7 @@
             "link_type": "collection",
             "collection": "womens-wedges-heels",
             "custom_url": "",
-            "image": "shopify://shop_images/Wedges_Heels_ee9e52bb-58bc-4edc-85c2-5b6b70590fd1.png",
+            "image": "shopify://shop_images/93104-EW796W_catalog.jpg",
             "title": "WEDGES & HEELS",
             "description": "",
             "overlay_content": false,
@@ -257,7 +309,7 @@
             "link_type": "collection",
             "collection": "womens-sneakers",
             "custom_url": "",
-            "image": "shopify://shop_images/Sneakers_9347202f-883a-4054-a367-840d1673a259.png",
+            "image": "shopify://shop_images/22209-AS106W_catalog.jpg",
             "title": "SNEAKERS",
             "description": "",
             "overlay_content": false,
@@ -274,7 +326,7 @@
             "link_type": "collection",
             "collection": "loafers-oxfords",
             "custom_url": "",
-            "image": "shopify://shop_images/Casuals_2ed0a5bd-d5c0-401d-a8d3-0f617e069b02.png",
+            "image": "shopify://shop_images/90764-LL114W_catalog.jpg",
             "title": "LOAFERS & OXFORDS",
             "description": "",
             "overlay_content": false,
@@ -291,7 +343,7 @@
             "link_type": "collection",
             "collection": "womens-boots",
             "custom_url": "",
-            "image": "shopify://shop_images/Boots_31d6a537-6d19-4f8c-baf9-de93206db007.png",
+            "image": "shopify://shop_images/25109-AH402W_catalog.jpg",
             "title": "BOOTS",
             "description": "",
             "overlay_content": false,
@@ -308,7 +360,7 @@
             "link_type": "collection",
             "collection": "womens-slippers",
             "custom_url": "",
-            "image": "shopify://shop_images/FE203W_catalog.png",
+            "image": "shopify://shop_images/23341-Mandy20Ivory20FE203W20catalog.jpg",
             "title": "SLIPPERS",
             "description": "",
             "overlay_content": false,
@@ -325,7 +377,7 @@
             "link_type": "collection",
             "collection": "womens-clogs",
             "custom_url": "",
-            "image": "shopify://shop_images/Clog_6aa98460-00b3-41c4-8d51-b33a611b361e.png",
+            "image": "shopify://shop_images/20862-DM200W_catalog.jpg",
             "title": "CLOGS",
             "description": "",
             "overlay_content": false,
@@ -523,8 +575,25 @@
             "link_type": "collection",
             "collection": "womens-new-arrivals",
             "custom_url": "",
-            "image": "shopify://shop_images/600x480_Aubry_Tan3.jpg",
+            "image": "shopify://shop_images/500x480_Jenny_Navy_2.jpg",
             "title": "NEW ARRIVALS",
+            "description": "",
+            "overlay_content": true,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0,
+            "submenu_title_position": "center",
+            "enable_title_drop_shadow": true
+          }
+        },
+        "collection_Y6AhJP": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "womens-sneakers",
+            "custom_url": "",
+            "image": "shopify://shop_images/500x480_Kinsley_Grey_1.jpg",
+            "title": "ARCH SUPPORT SNEAKERS",
             "description": "",
             "overlay_content": true,
             "color_text": "#ffffff",
@@ -540,25 +609,8 @@
             "link_type": "collection",
             "collection": "womens-best-sellers-footwear",
             "custom_url": "",
-            "image": "shopify://shop_images/600x480_Danika_SkyBlue2.jpg",
+            "image": "shopify://shop_images/500x480_Sydney_Denim.jpg",
             "title": "BEST SELLERS",
-            "description": "",
-            "overlay_content": true,
-            "color_text": "#ffffff",
-            "color_overlay": "#000000",
-            "overlay_opacity": 0,
-            "submenu_title_position": "center",
-            "enable_title_drop_shadow": true
-          }
-        },
-        "collection_Y6AhJP": {
-          "type": "collection",
-          "settings": {
-            "link_type": "collection",
-            "collection": "womens-boots",
-            "custom_url": "",
-            "image": "shopify://shop_images/600x480_Reagan_red.jpg",
-            "title": "ARCH SUPPORT BOOTS",
             "description": "",
             "overlay_content": true,
             "color_text": "#ffffff",
@@ -571,8 +623,8 @@
       },
       "block_order": [
         "collection_YbUxUk",
-        "collection_z3JcHD",
-        "collection_Y6AhJP"
+        "collection_Y6AhJP",
+        "collection_z3JcHD"
       ],
       "settings": {
         "columns": 3,
@@ -608,26 +660,54 @@
         "abra_promo_code_hide": ""
       }
     },
+    "featured_collection_T7yxrw": {
+      "type": "featured-collection",
+      "name": "t:sections.featured-collection.name",
+      "settings": {
+        "collection": "spring-collection",
+        "products": [],
+        "product_limit": 12,
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "show_view_all": true,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "FEATURED STYLES",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 40,
+        "padding_bottom": 40,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
     "image_with_text_overlay_GNC4KT": {
       "type": "image-with-text-overlay",
       "blocks": {
         "heading_reH96V": {
           "type": "heading",
           "settings": {
-            "heading": "<p>FALL FAVORITES</p>",
+            "heading": "<p>SPRING INTO MOTION</p>",
             "heading_size": "title-sm",
             "heading_tag": "h2",
             "highlighted_text": "text",
             "highlighted_scribble": "circle"
-          }
-        },
-        "subheading_yJRt4d": {
-          "type": "subheading",
-          "disabled": true,
-          "settings": {
-            "subheading": "FALL FAVORITES",
-            "subheading_size": "subtitle-lg",
-            "secondary_color": true
           }
         },
         "divider_RDiA8A": {
@@ -641,7 +721,7 @@
         "text_YWeqgi": {
           "type": "text",
           "settings": {
-            "text": "<p>Step out in comfort this season in styles that will have you looking good and feeling even better. Each pair features our Aetrex Signature Arch Support and orthotic footbed to provide maximum comfort and support each and every step</p>",
+            "text": "<p>Step into the season with lightweight styles designed to move with you. Each pair features our Aetrex Signature Arch Support and premium materials to keep you aligned, supported, and comfortable from morning to night.</p>",
             "text_font": "body",
             "text_size": "subtext-sm",
             "text_max_size": 32,
@@ -657,7 +737,7 @@
           "type": "button",
           "settings": {
             "button_label": "View Collection",
-            "button_link": "shopify://collections/winter-collection",
+            "button_link": "shopify://collections/spring-collection",
             "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
@@ -668,27 +748,26 @@
       },
       "block_order": [
         "heading_reH96V",
-        "subheading_yJRt4d",
         "divider_RDiA8A",
         "text_YWeqgi",
         "button_nae79B"
       ],
       "settings": {
         "transparent_header": false,
-        "image": "shopify://shop_images/1920x655_Fall_Favorites.jpg",
+        "image": "shopify://shop_images/1920x655_Spring_Favorites.jpg",
         "image_height": "adapt",
         "content_width": "small",
         "content_position": "md:items-center md:justify-end",
         "text_alignment": "center",
-        "image_mobile": "shopify://shop_images/footwear4c.jpg",
+        "image_mobile": "shopify://shop_images/m1.jpg",
         "image_height_mobile": "600px",
         "content_position_mobile": "items-end justify-center",
         "text_alignment_mobile": "center",
         "color_text": "#525252",
         "color_highlight": "#525252",
         "gradient_highlight": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
+        "color_button_text": "#ffffff",
+        "color_button_background": "#171717",
         "color_button_gradient": "",
         "color_overlay": "#171717",
         "divider_color": "#111111",
@@ -715,15 +794,6 @@
             "heading_tag": "h2",
             "highlighted_text": "text",
             "highlighted_scribble": "circle"
-          }
-        },
-        "subheading_rhiKn9": {
-          "type": "subheading",
-          "disabled": true,
-          "settings": {
-            "subheading": "ATHLEISURE",
-            "subheading_size": "subtitle-lg",
-            "secondary_color": true
           }
         },
         "divider_bFyxXA": {
@@ -764,27 +834,26 @@
       },
       "block_order": [
         "heading_LgwFNV",
-        "subheading_rhiKn9",
         "divider_bFyxXA",
         "text_Dd6NMF",
         "button_KN7cRW"
       ],
       "settings": {
         "transparent_header": false,
-        "image": "shopify://shop_images/1780x655_Kinsley_Grey_R2.jpg",
+        "image": "shopify://shop_images/1780x655_Carly_Grey.jpg",
         "image_height": "adapt",
         "content_width": "small",
         "content_position": "md:items-center md:justify-start",
         "text_alignment": "center",
-        "image_mobile": "shopify://shop_images/footwear6c.jpg",
+        "image_mobile": "shopify://shop_images/m2.jpg",
         "image_height_mobile": "600px",
         "content_position_mobile": "items-end justify-center",
         "text_alignment_mobile": "center",
         "color_text": "#525252",
         "color_highlight": "#525252",
         "gradient_highlight": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
+        "color_button_text": "#ffffff",
+        "color_button_background": "#171717",
         "color_button_gradient": "",
         "color_overlay": "#171717",
         "divider_color": "#111111",
@@ -806,20 +875,11 @@
         "heading_wRLhrU": {
           "type": "heading",
           "settings": {
-            "heading": "<p>THE AETREX TECHNOLOGY DIFFERENCE</p>",
+            "heading": "<p>DATA DRIVEN DESIGN</p>",
             "heading_size": "title-sm",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
-          }
-        },
-        "subheading_GVkqAc": {
-          "type": "subheading",
-          "disabled": true,
-          "settings": {
-            "subheading": "THE AETREX TECHNOLOGY DIFFERENCE",
-            "subheading_size": "subtitle-lg",
-            "secondary_color": true
           }
         },
         "divider_AGUC4Q": {
@@ -833,7 +893,7 @@
         "text_84bkF8": {
           "type": "text",
           "settings": {
-            "text": "<p>What makes our shoes different is all tied to our technology and our knowledge of feet. When a shoe is made, it’s built over a last which determines its 3D shape. We have millions of 3D foot scans in our database which help us develop our unique lasts and footwear.</p>",
+            "text": "<p>At Aetrex, our shoes are engineered using data from more than 50 million foot scans. This unmatched depth of knowledge allows us to design footwear with superior fit, alignment, and function—helping you move more comfortably and with less strain on your body.</p>",
             "text_font": "body",
             "text_size": "subtext-sm",
             "text_max_size": 32,
@@ -860,27 +920,26 @@
       },
       "block_order": [
         "heading_wRLhrU",
-        "subheading_GVkqAc",
         "divider_AGUC4Q",
         "text_84bkF8",
         "button_MLhezL"
       ],
       "settings": {
         "transparent_header": false,
-        "image": "shopify://shop_images/Aetrex_difference_1920x655_2.jpg",
+        "image": "shopify://shop_images/1920x655_Data_Driven.jpg",
         "image_height": "adapt",
         "content_width": "small",
         "content_position": "md:items-center md:justify-end",
         "text_alignment": "center",
-        "image_mobile": "shopify://shop_images/footwear5b.jpg",
+        "image_mobile": "shopify://shop_images/m4.jpg",
         "image_height_mobile": "600px",
         "content_position_mobile": "items-end justify-center",
         "text_alignment_mobile": "center",
         "color_text": "#525252",
         "color_highlight": "#525252",
         "gradient_highlight": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
+        "color_button_text": "#ffffff",
+        "color_button_background": "#171717",
         "color_button_gradient": "",
         "color_overlay": "#171717",
         "divider_color": "#111111",
@@ -909,15 +968,6 @@
             "highlighted_scribble": "circle"
           }
         },
-        "subheading_LJCnPX": {
-          "type": "subheading",
-          "disabled": true,
-          "settings": {
-            "subheading": "AETREX SIGNATURE ARCH SUPPORT",
-            "subheading_size": "subtitle-lg",
-            "secondary_color": true
-          }
-        },
         "divider_kDdRMY": {
           "type": "divider",
           "settings": {
@@ -929,7 +979,7 @@
         "text_jNDWWq": {
           "type": "text",
           "settings": {
-            "text": "<p>Every Aetrex shoe features our signature arch support. The contour, position and height of Aetrex’s unique arch aligns anatomically in the proper place (at the apex of the arch) to help support your body from the ground up. Designed to help create natural alignment throughout the gait cycle, proper arch support can help reduce pronation and prevent injuries.</p>",
+            "text": "<p>The contour, position and height of Aetrex’s unique arch aligns anatomically in the proper place (at the apex of the arch) to help support your body from the ground up. Designed to help create natural alignment throughout the gait cycle, proper arch support can help reduce pronation and prevent injuries.</p>",
             "text_font": "body",
             "text_size": "subtext-sm",
             "text_max_size": 32,
@@ -956,27 +1006,26 @@
       },
       "block_order": [
         "heading_eEwP4h",
-        "subheading_LJCnPX",
         "divider_kDdRMY",
         "text_jNDWWq",
         "button_dNQmH3"
       ],
       "settings": {
         "transparent_header": false,
-        "image": "shopify://shop_images/1780x655_aetrex_arch_Dash.jpg",
+        "image": "shopify://shop_images/1780x655_aetrex_arch_Dash_1.jpg",
         "image_height": "adapt",
         "content_width": "small",
         "content_position": "md:items-center md:justify-end",
         "text_alignment": "center",
-        "image_mobile": "shopify://shop_images/footwear2b.jpg",
-        "image_height_mobile": "100vh",
+        "image_mobile": "shopify://shop_images/m3.jpg",
+        "image_height_mobile": "600px",
         "content_position_mobile": "items-end justify-center",
         "text_alignment_mobile": "center",
         "color_text": "#525252",
         "color_highlight": "#525252",
         "gradient_highlight": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
+        "color_button_text": "#ffffff",
+        "color_button_background": "#171717",
         "color_button_gradient": "",
         "color_overlay": "#171717",
         "divider_color": "#111111",
@@ -1000,6 +1049,7 @@
     "collection_list_q7Rypj",
     "multicolumn_9UNM8U",
     "collection_list_fgPMz9",
+    "featured_collection_T7yxrw",
     "image_with_text_overlay_GNC4KT",
     "image_with_text_overlay_cLVdgJ",
     "image_with_text_overlay_HEWGdX",
