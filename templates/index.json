@@ -106,6 +106,9 @@
         "button_XM9iCX",
         "button_bgh9yH"
       ],
+      "custom_css": [
+        "@media screen and (min-width: 768px) {.banner__box--medium {max-width: 26rem; left: 2em; position: relative; }}"
+      ],
       "name": "t:sections.video-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
