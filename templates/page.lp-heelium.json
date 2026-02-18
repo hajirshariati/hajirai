@@ -41,7 +41,9 @@
         "padding_bottom": 0,
         "divider": false,
         "full_width": true,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_qhigBb": {
@@ -95,7 +97,9 @@
         "padding_bottom": 12,
         "divider": false,
         "narrow": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_EA7EPA": {
@@ -104,7 +108,7 @@
         "heading_EYYxYX": {
           "type": "heading",
           "settings": {
-            "heading": "<strong>By Aetrex</strong>",
+            "heading": "By Aetrex",
             "heading_size": "title-sm",
             "heading_tag": "h3",
             "highlighted_text": "none",
@@ -160,7 +164,9 @@
         "padding_bottom": 0,
         "divider": false,
         "narrow": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "multicolumn_R8kcbF": {
@@ -177,6 +183,7 @@
             "heading": "",
             "heading_size": "text-lg-2xl",
             "text": "",
+            "custom_html": "",
             "button_label": "SHOP BRIANNA",
             "button_link": "shopify://products/brianna",
             "button_style": "secondary",
@@ -197,6 +204,7 @@
             "heading": "",
             "heading_size": "text-lg-2xl",
             "text": "",
+            "custom_html": "",
             "button_label": "SHOP JOANNE",
             "button_link": "shopify://products/joanne",
             "button_style": "secondary",
@@ -217,6 +225,7 @@
             "heading": "",
             "heading_size": "text-lg-2xl",
             "text": "",
+            "custom_html": "",
             "button_label": "SHOP ZOEY",
             "button_link": "shopify://products/zoey-boot",
             "button_style": "secondary",
@@ -237,6 +246,7 @@
             "heading": "",
             "heading_size": "text-lg-2xl",
             "text": "",
+            "custom_html": "",
             "button_label": "SHOP LIZ",
             "button_link": "shopify://products/liz",
             "button_style": "secondary",
@@ -282,9 +292,11 @@
         "color_button_gradient": "",
         "padding_top": 24,
         "padding_bottom": 24,
-        "divider": false,
         "full_width": true,
-        "rounded": false
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_fCwh9h": {
@@ -338,7 +350,9 @@
         "padding_bottom": 12,
         "divider": false,
         "narrow": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "multicolumn_w48Twe": {
@@ -355,6 +369,7 @@
             "heading": "",
             "heading_size": "text-base-xl",
             "text": "<p><strong>Signature Arch Support<br/></strong>to Help Relieve Heel/Arch Pain</p>",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -375,6 +390,7 @@
             "heading": "",
             "heading_size": "text-base-xl",
             "text": "<p><strong>Extreme Lightweight Design</strong><br/>for Durability & Comfort</p>",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -395,6 +411,7 @@
             "heading": "",
             "heading_size": "text-base-xl",
             "text": "<p><strong>Genuine Leather Construction</strong><br/>Quality Nubuck Leather</p>",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -415,6 +432,7 @@
             "heading": "",
             "heading_size": "text-base-xl",
             "text": "<p><strong>Memory Foam Footbed</strong><br/>for Cushioning and Comfort</p>",
+            "custom_html": "",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -460,9 +478,11 @@
         "color_button_gradient": "",
         "padding_top": 24,
         "padding_bottom": 36,
-        "divider": false,
         "full_width": false,
-        "rounded": false
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "image_with_text_tqMWGc": {
@@ -552,7 +572,9 @@
         "full_width": true,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "video_with_text_frd6gc": {
@@ -645,6 +667,8 @@
         "full_width": false,
         "rounded": false,
         "enable_parallax": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": "",
         "parallax_direction": "vertical"
       }
     },
@@ -735,7 +759,9 @@
         "full_width": true,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "video_with_text_TkUzn6": {
@@ -828,6 +854,8 @@
         "full_width": false,
         "rounded": false,
         "enable_parallax": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": "",
         "parallax_direction": "vertical"
       }
     },
@@ -837,7 +865,7 @@
       "settings": {
         "transparent_header": false,
         "image": "shopify://shop_images/image_65_6305c9ae-4056-40a2-99e6-fbe0a4131851.png",
-        "image_height": "500px",
+        "image_height": "adapt",
         "content_width": "small",
         "content_position": "md:items-end md:justify-start",
         "text_alignment": "left",
@@ -860,7 +888,9 @@
         "full_width": false,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "testimonials_R8MBQU": {
