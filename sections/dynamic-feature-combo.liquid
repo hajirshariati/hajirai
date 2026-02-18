@@ -37,6 +37,13 @@
   gap: {{ section.settings.gap }}px;
 }
 
+
+@media (max-width: 768px) {
+  #shopify-section-{{ section.id }} .tile-lifestyle {
+    display: none !important;
+  }
+}
+
 /* Hide lifestyle image and expand feature tile on medium screens */
 @media (max-width: 1250px) and (min-width: 769px) {
   #shopify-section-{{ section.id }} .combo-grid {
