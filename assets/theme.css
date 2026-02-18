@@ -8165,6 +8165,8 @@ details.active .drawer__promotions .mega-menu__item,
 .media-card--standard .media,
 .media-card--overlap .media {
     border-radius: var(--card-radius);
+        mix-blend-mode: darken;
+    background: #fafafa;
 }
 
 .media-card--overlap .media-card__link .media:not(.loading)::after {
@@ -9631,7 +9633,7 @@ input[type="email"]:is(
 
 @media screen and (min-width: 1536px) {
     .page-width .banner__content > .page-width {
-        padding-inline: calc(var(--grid-gap) * 2);
+        padding-inline: calc(var(--grid-gap) * 1);
     }
 }
 
