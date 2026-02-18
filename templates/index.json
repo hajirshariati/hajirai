@@ -12,28 +12,43 @@
     "video_with_text_overlay_84weNe": {
       "type": "video-with-text-overlay",
       "blocks": {
-        "heading_WMGPBB": {
-          "type": "heading",
+        "text_BH4iVp": {
+          "type": "text",
           "settings": {
-            "heading": "<p>The Aetrex <br/>Technology <br/>Difference</p>",
-            "heading_size": "title-sm",
-            "heading_tag": "h1",
-            "highlighted_text": "text",
+            "text": "<p>THE AETREX TECHNOLOGY DIFFERENCE</p>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         },
         "divider_nd3AeW": {
           "type": "divider",
           "settings": {
-            "divider_width": 120,
+            "divider_width": 260,
             "divider_mt": 0,
             "divider_mb": 0
+          }
+        },
+        "heading_WMGPBB": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>It All Starts with </p><p>a 3D Foot Scan.</p>",
+            "heading_size": "title-sm",
+            "heading_tag": "h1",
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
           }
         },
         "text_ty3xHk": {
           "type": "text",
           "settings": {
-            "text": "<p>How Aetrex uses <br/>foot scanning technology <br/>to develop footwear that’s <br/>better for your health</p>",
+            "text": "<p>Footwear and Orthotics built <br/>from millions of real foot scans, <br/>where comprehensive data <br/>delivers superior fit and comfort.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -59,15 +74,16 @@
         }
       },
       "block_order": [
-        "heading_WMGPBB",
+        "text_BH4iVp",
         "divider_nd3AeW",
+        "heading_WMGPBB",
         "text_ty3xHk",
         "button_qiiHDC"
       ],
       "name": "t:sections.video-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
-        "video": "shopify://files/videos/1D_2 1.mp4",
+        "video": "shopify://files/videos/SS26_HP_Banner_R2 1.mp4",
         "video_url": "",
         "description": "",
         "enable_video_autoplay": true,
@@ -76,9 +92,11 @@
         "content_width": "medium",
         "content_position": "md:items-center md:justify-end",
         "text_alignment": "center",
-        "video_mobile": "shopify://files/videos/1D_2 (1) (1).mp4",
+        "mobile_content_space": 388,
+        "mobile_content_space_color": "#e7e7e7",
+        "video_mobile": "shopify://files/videos/SS26_HP_Banner_mobile_600_R2.mp4",
         "video_url_mobile": "",
-        "image_height_mobile": "adapt",
+        "image_height_mobile": "100vh",
         "content_position_mobile": "items-end justify-center",
         "text_alignment_mobile": "center",
         "color_text": "#111111",
@@ -93,8 +111,8 @@
         "padding_top": 0,
         "padding_bottom": 0,
         "divider": false,
-        "full_width": true,
-        "rounded": false,
+        "full_width": false,
+        "rounded": true,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
@@ -106,68 +124,85 @@
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "womens-shop-all-footwear",
+            "collection": "womens-new-arrivals",
             "custom_url": "",
-            "image": "shopify://shop_images/LeighChar_Womens_footwear_435x600_5fb32f05-04a8-4cfe-b0d9-843b3f8641be.jpg",
-            "title": "Women's  Footwear",
+            "image": "shopify://shop_images/435x600_NewArrivals_Jillian_Champagne2.png",
+            "title": "New Arrivals",
             "description": "",
             "overlay_content": true,
-            "color_text": "#171717",
+            "color_text": "#ffffff",
             "color_overlay": "rgba(0,0,0,0)",
             "overlay_opacity": 0,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
+            "submenu_title_position": "center",
+            "enable_title_drop_shadow": true
           }
         },
         "collection_pcPnMc": {
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "mens-shop-all-footwear",
+            "collection": "womens-shop-all-footwear",
             "custom_url": "",
-            "image": "shopify://shop_images/Graham_Charcoal_mens_footwear_435x600_dd80abe0-56b1-45d4-add7-6a277d6dd07a.jpg",
-            "title": "Men's <br> Footwear",
+            "image": "shopify://shop_images/435x600_Vania_HazyBlue.jpg",
+            "title": "Women’s Footwear",
             "description": "",
             "overlay_content": true,
-            "color_text": "#171717",
+            "color_text": "#ffffff",
             "color_overlay": "rgba(0,0,0,0)",
             "overlay_opacity": 0,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
+            "submenu_title_position": "center",
+            "enable_title_drop_shadow": true
           }
         },
         "collection_9YDiHe": {
           "type": "collection",
           "settings": {
             "link_type": "collection",
-            "collection": "shop-all-orthotics",
+            "collection": "mens-shop-all-footwear",
             "custom_url": "",
-            "image": "shopify://shop_images/PMF2.webp",
-            "title": "Orthotics <br> Collection",
+            "image": "shopify://shop_images/435x600_Chase_navy.jpg",
+            "title": "Men’s Footwear",
             "description": "",
             "overlay_content": true,
-            "color_text": "#171717",
+            "color_text": "#ffffff",
             "color_overlay": "rgba(0,0,0,0)",
             "overlay_opacity": 0,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
+            "submenu_title_position": "center",
+            "enable_title_drop_shadow": true
           }
         },
         "collection_mT6zg6": {
           "type": "collection",
           "settings": {
-            "link_type": "url",
-            "collection": "",
-            "custom_url": "https://irle3andv1z.typeform.com/to/gujvKvEg",
-            "image": "shopify://shop_images/orthotics2.webp",
-            "title": "Find Your <br> Orthotics",
+            "link_type": "collection",
+            "collection": "shop-all-orthotics",
+            "custom_url": "",
+            "image": "shopify://shop_images/435x600_L2300_podium.jpg",
+            "title": "Orthotics",
             "description": "",
             "overlay_content": true,
-            "color_text": "#171717",
+            "color_text": "#ffffff",
             "color_overlay": "rgba(0,0,0,0)",
             "overlay_opacity": 0,
-            "submenu_title_position": "bottom",
-            "enable_title_drop_shadow": false
+            "submenu_title_position": "center",
+            "enable_title_drop_shadow": true
+          }
+        },
+        "collection_wyXadj": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "womens-best-sellers-footwear",
+            "custom_url": "",
+            "image": "shopify://shop_images/435x600_Danika_LtGrey.jpg",
+            "title": "Best Seller",
+            "description": "",
+            "overlay_content": true,
+            "color_text": "#ffffff",
+            "color_overlay": "rgba(0,0,0,0)",
+            "overlay_opacity": 0,
+            "submenu_title_position": "center",
+            "enable_title_drop_shadow": true
           }
         }
       },
@@ -175,7 +210,8 @@
         "collection_hQM3j9",
         "collection_pcPnMc",
         "collection_9YDiHe",
-        "collection_mT6zg6"
+        "collection_mT6zg6",
+        "collection_wyXadj"
       ],
       "name": "t:sections.collection-list.name",
       "settings": {
@@ -203,56 +239,48 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 48,
-        "padding_bottom": 48,
+        "padding_top": 40,
+        "padding_bottom": 40,
         "divider": false,
-        "full_width": true,
+        "full_width": false,
         "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
     },
-    "video_with_text_overlay_A3ncH7": {
-      "type": "video-with-text-overlay",
+    "video_with_text_Mpqjh8": {
+      "type": "video-with-text",
       "blocks": {
-        "heading_bLaqMU": {
+        "heading_dUBqDk": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Healthy Comfort<br/>Starts Here!®</p>",
+            "heading": "The Technology Behind Better Fit",
             "heading_size": "title-sm",
             "heading_tag": "h2",
-            "highlighted_text": "text",
+            "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         },
-        "divider_itRrKx": {
-          "type": "divider",
-          "settings": {
-            "divider_width": 120,
-            "divider_mt": 20,
-            "divider_mb": 0
-          }
-        },
-        "text_y39eP6": {
+        "text_6PG3z7": {
           "type": "text",
           "settings": {
-            "text": "<p>New Arrivals</p>",
-            "text_font": "heading",
-            "text_size": "subtext-custom",
-            "text_max_size": 30,
+            "text": "<p>Feet are 3D. Your fit should be too. Aetrex 3D Foot Scanners are revolutionizing how consumers understand fit, while empowering the world’s most recognized brands to create smarter, better-fitting shoes.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
             "text_line_height": 1.6,
-            "text_letter_spacing": 50,
+            "text_letter_spacing": 0,
             "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         },
-        "button_cVamqp": {
+        "button_kyXjne": {
           "type": "button",
           "settings": {
-            "button_label": "SHOP NOW",
-            "button_link": "shopify://collections/womens-new-arrivals",
+            "button_label": "Learn More",
+            "button_link": "shopify://pages/technology",
             "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
@@ -262,253 +290,372 @@
         }
       },
       "block_order": [
-        "heading_bLaqMU",
-        "divider_itRrKx",
-        "text_y39eP6",
-        "button_cVamqp"
+        "heading_dUBqDk",
+        "text_6PG3z7",
+        "button_kyXjne"
       ],
-      "name": "t:sections.video-with-text-overlay.name",
+      "name": "t:sections.video-with-text.name",
       "settings": {
-        "transparent_header": false,
-        "video": "shopify://files/videos/1700x750_Aetrex.com_HP_Lifestyle.mp4",
+        "video": "shopify://files/videos/980x820_Better_Fit_banner.mp4",
         "video_url": "",
         "description": "",
         "enable_video_autoplay": true,
         "enable_video_looping": true,
         "image_height": "adapt",
-        "content_width": "medium",
-        "content_position": "md:items-center md:justify-end",
-        "text_alignment": "center",
-        "video_mobile": "shopify://files/videos/2d_da34363e-cae2-45ac-862f-33df12c10fee.mp4",
+        "video_width": "medium",
+        "layout": "video_first",
+        "text_alignment": "left",
+        "content_position": "align-self-center",
         "video_url_mobile": "",
-        "image_height_mobile": "600px",
-        "content_position_mobile": "items-end justify-center",
-        "text_alignment_mobile": "center",
-        "color_text": "#111111",
-        "color_highlight": "#111111",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
         "gradient_highlight": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
+        "color_button_text": "",
+        "color_button_background": "",
         "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "divider_color": "#111111",
-        "overlay_opacity": 0,
-        "padding_top": 48,
-        "padding_bottom": 48,
-        "divider": false,
-        "full_width": true,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "image_with_text_overlay_ahU44t": {
-      "type": "image-with-text-overlay",
-      "blocks": {
-        "heading_dxjdAV": {
-          "type": "heading",
-          "settings": {
-            "heading": "<p>Celebrating 20 Years of Foot Scanning Technology</p>",
-            "heading_size": "title-sm",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "divider_f4br8p": {
-          "type": "divider",
-          "settings": {
-            "divider_width": 160,
-            "divider_mt": 20,
-            "divider_mb": 5
-          }
-        },
-        "text_XtWfRH": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Over the past 20 years we’ve scanned more than 50 million people. With all of this global foot data, we really know feet. This is what makes us different from the rest.</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_AaYDtV": {
-          "type": "button",
-          "settings": {
-            "button_label": "HOW WE USE TECH TO CREATE SHOES",
-            "button_link": "shopify://pages/tech-aetrex-footwear",
-            "button_video_link": "",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": false
-          }
-        }
-      },
-      "block_order": [
-        "heading_dxjdAV",
-        "divider_f4br8p",
-        "text_XtWfRH",
-        "button_AaYDtV"
-      ],
-      "name": "t:sections.image-with-text-overlay.name",
-      "settings": {
-        "transparent_header": false,
-        "image": "shopify://shop_images/Media_52.png",
-        "image_height": "adapt",
-        "content_width": "small",
-        "content_position": "md:items-center md:justify-end",
-        "text_alignment": "center",
-        "image_mobile": "shopify://shop_images/655x1090_aetrex_difference_Dahlia_370d5e4b-8656-4104-bb17-ab8efba61352.jpg",
-        "image_height_mobile": "adapt",
-        "content_position_mobile": "items-end justify-center",
-        "text_alignment_mobile": "center",
-        "color_text": "#000000",
-        "color_highlight": "#e0a580",
-        "gradient_highlight": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
-        "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "divider_color": "#111111",
-        "overlay_opacity": 0,
-        "padding_top": 48,
-        "padding_bottom": 48,
+        "padding_top": 0,
+        "padding_bottom": 40,
         "divider": false,
         "full_width": false,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical",
         "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
+        "abra_promo_code_hide": "",
+        "parallax_direction": "vertical"
       }
     },
-    "collection_list_cLB6dX": {
-      "type": "collection-list",
+    "featured_collections_g6b3ht": {
+      "type": "featured-collections",
       "blocks": {
-        "collection_FwLVtb": {
+        "collection_gWWaEp": {
           "type": "collection",
           "settings": {
-            "link_type": "collection",
-            "collection": "winter-collection",
-            "custom_url": "",
-            "image": "shopify://shop_images/600x550_Reagan_Cognac.jpg",
-            "title": "FALL COLLECTION",
-            "description": "",
-            "overlay_content": true,
-            "color_text": "#ffffff",
-            "color_overlay": "rgba(0,0,0,0)",
-            "overlay_opacity": 0,
-            "submenu_title_position": "center",
-            "enable_title_drop_shadow": true
+            "collection": "",
+            "products": [
+              "l420w-m",
+              "l420m-m",
+              "ariel-sand-mw112w",
+              "skyler-pewter-st4506w",
+              "chase-mens-silver-ap904m",
+              "hannah-black-ll300w",
+              "women-plantar-fasciitis-kit",
+              "men-plantar-fasciitis-kit",
+              "paula-walnut-cp151w",
+              "drew-tan-am236m",
+              "graham-charcoal-am204m",
+              "skyler-champagne-embellished-st4553w",
+              "drew-taupe-am234m",
+              "daisy-black-sc540w"
+            ],
+            "title": "Plantar Fasciitis & Heel Pain"
           }
         },
-        "collection_9Ryhfw": {
+        "collection_kFgqpm": {
           "type": "collection",
           "settings": {
-            "link_type": "collection",
-            "collection": "womens-best-sellers-footwear",
-            "custom_url": "",
-            "image": "shopify://shop_images/600x550_Charlotte_butterYellow.jpg",
-            "title": "BEST SELLERS",
-            "description": "",
-            "overlay_content": true,
-            "color_text": "#ffffff",
-            "color_overlay": "rgba(0,0,0,0)",
-            "overlay_opacity": 0,
-            "submenu_title_position": "center",
-            "enable_title_drop_shadow": true
+            "collection": "",
+            "products": [
+              "izzy-black-se220w",
+              "jillian-cognac-sc363w",
+              "sadie-navy-ap155w",
+              "charli-white-ae663w",
+              "jess-smoke-se216w",
+              "maui-charcoal-camo-l3040m",
+              "milos-mens-army-l9204m",
+              "teagan-oatmeal-nc102w",
+              "janey-white-sc533w",
+              "dash-mens-white-ap953m",
+              "maui-mocha-l3012w",
+              "bondi-white-l5003m"
+            ],
+            "title": "Bunion Comfort"
           }
         },
-        "collection_czGEyj": {
+        "collection_wHTbPh": {
           "type": "collection",
           "settings": {
-            "link_type": "collection",
-            "collection": "womens-sneakers",
-            "custom_url": "",
-            "image": "shopify://shop_images/600x550_Aubry_Taupe.jpg",
-            "title": "SNEAKERS COLLECTION",
-            "description": "",
-            "overlay_content": true,
-            "color_text": "#ffffff",
-            "color_overlay": "rgba(0,0,0,0)",
-            "overlay_opacity": 0,
-            "submenu_title_position": "center",
-            "enable_title_drop_shadow": true
+            "collection": "",
+            "products": [
+              "sydney-walnut-ew754w",
+              "claire-champagne-fc173w",
+              "l2305w-m",
+              "l2305m-m",
+              "graham-navy-am205m",
+              "julia-walnut-cp131w",
+              "dash-mens-white-ap953m",
+              "summer-taupe-ew732w",
+              "l605w-m",
+              "l605m-m",
+              "thea-ginger-sf152w",
+              "paula-walnut-cp151w",
+              "dash-mens-grey-ap956m"
+            ],
+            "title": "High Arches & Ball-of-Foot Pain"
+          }
+        },
+        "collection_9q9VeQ": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "products": [
+              "summer-taupe-ew732w",
+              "emily-chalk-af101w",
+              "l2320w-m",
+              "l2320m-m",
+              "jess-white-se211w",
+              "lilly-navy-cutout-sc571w",
+              "rebecca-heels-cognac-ah402w",
+              "reese-black-sc120w",
+              "milos-mens-white-ombre-l9209m",
+              "overpronation-orthotics-women",
+              "overpronation-orthotics-men",
+              "dash-mens-black-black-ap951m",
+              "dash-mens-taupe-ap954m",
+              "dash-mens-grey-ap956m"
+            ],
+            "title": "Flat Feet & Overpronation"
+          }
+        },
+        "collection_q8VtNP": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "products": [
+              "l2300w-m",
+              "l2300m-m",
+              "kinsley-light-grey-as224w",
+              "carly-black-black-as110w",
+              "sadie-charcoal-ap156w",
+              "l2200w-m",
+              "l2200m-m",
+              "courtney-casual-taupe-ca106w",
+              "danika-sky-blue-ap118w",
+              "morgan-black-ca730w",
+              "brianna-black-bw100w",
+              "chase-mens-navy-ap907m",
+              "zoey-dark-taupe-bw702w",
+              "bondi-white-l5003m"
+            ],
+            "title": "All-Day Standing & Fatigue"
           }
         }
       },
       "block_order": [
-        "collection_FwLVtb",
-        "collection_9Ryhfw",
-        "collection_czGEyj"
+        "collection_gWWaEp",
+        "collection_kFgqpm",
+        "collection_wHTbPh",
+        "collection_9q9VeQ",
+        "collection_q8VtNP"
       ],
-      "name": "t:sections.collection-list.name",
+      "name": "t:sections.featured-collections.name",
       "settings": {
-        "columns": 3,
-        "carousel_on_desktop": false,
-        "image_type": "collection",
-        "image_ratio": "adapt",
-        "show_products_count": false,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": false,
-        "heading": "",
+        "product_limit": 12,
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "show_view_all": true,
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "heading": "Curated to Support You",
         "heading_size": "title-sm",
-        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
         "subheading": "",
-        "description": "",
-        "highlighted_text": "text",
+        "description": "<p>Every product is designed using insights from over 50 million foot scans, helping deliver better fit, alignment, and comfort so you can move with less strain and more confidence.</p>",
+        "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "color_text": "#ffffff",
-        "color_background": "#ffffff",
+        "color_text": "",
+        "color_background": "",
         "gradient_background": "",
-        "color_highlight": "#ffffff",
+        "color_highlight": "",
         "gradient_highlight": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#171717",
+        "color_button_text": "",
+        "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 48,
-        "padding_bottom": 48,
+        "padding_top": 40,
+        "padding_bottom": 40,
         "divider": false,
-        "full_width": true,
+        "full_width": false,
         "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
     },
-    "image_with_text_overlay_TNKwpP": {
-      "type": "image-with-text-overlay",
+    "dynamic_feature_combo_74fjyM": {
+      "type": "dynamic-feature-combo",
       "blocks": {
-        "heading_eVKtCM": {
+        "feature_point_mR3jYL": {
+          "type": "feature_point",
+          "settings": {
+            "heading": "Heel Cleft",
+            "text": "to Improve Heel Striking",
+            "horizontal": 74,
+            "vertical": 56,
+            "text_horizontal": 70,
+            "text_vertical": 79
+          }
+        },
+        "feature_point_axnEnT": {
+          "type": "feature_point",
+          "settings": {
+            "heading": "Arch Support",
+            "text": "Aetrex Signature Arch Support",
+            "horizontal": 59,
+            "vertical": 51,
+            "text_horizontal": 70,
+            "text_vertical": 29
+          }
+        },
+        "feature_point_Afqqzj": {
+          "type": "feature_point",
+          "settings": {
+            "heading": "EVA Foam Midsole",
+            "text": "Thick EVA Foam Midsole for Maximum Shock Absorption",
+            "horizontal": 20,
+            "vertical": 76,
+            "text_horizontal": 38,
+            "text_vertical": 60
+          }
+        },
+        "feature_point_hHnhKK": {
+          "type": "feature_point",
+          "settings": {
+            "heading": "Breathable",
+            "text": "Non-Stretchy Mesh for Extra Comfort",
+            "horizontal": 11,
+            "vertical": 70,
+            "text_horizontal": 38,
+            "text_vertical": 4
+          }
+        },
+        "feature_point_pFeFBd": {
+          "type": "feature_point",
+          "settings": {
+            "heading": "Extra Cushioning",
+            "text": "Padded Heel, Tongue & Collar",
+            "horizontal": 37,
+            "vertical": 32,
+            "text_horizontal": 55,
+            "text_vertical": 18
+          }
+        },
+        "heading_xbEzK8": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Data Driven Design</p>",
+            "heading": "<p>Data Meets </p><p>Design.</p>",
             "heading_size": "title-sm",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         },
-        "divider_bmhBmt": {
-          "type": "divider",
-          "settings": {
-            "divider_width": 270,
-            "divider_mt": 20,
-            "divider_mb": 5
-          }
-        },
-        "text_xMJiMQ": {
+        "text_bmDJGA": {
           "type": "text",
           "settings": {
-            "text": "<p>At Aetrex, our shoes are engineered using data from more than 50 million foot scans. This unmatched depth of knowledge allows us to design footwear with superior fit, alignment, and function—helping you move more comfortably and with less strain on your body.</p>",
+            "text": "<p><strong>From scan to product.</strong></p><p>Take on your most active days in complete comfort with the Danika. These supportive mesh sneakers feature arch support, extra thick UltraSKY™ cushioning, and adjustable laces to help you get the perfect fit.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 0.8,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "spacing_k8zKdN": {
+          "type": "spacing",
+          "settings": {
+            "height": 40,
+            "height_mobile": 28
+          }
+        },
+        "button_JpantQ": {
+          "type": "button",
+          "settings": {
+            "button_label": "Shop Danika",
+            "button_link": "shopify://products/danika-sky-blue-ap118w",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "feature_point_mR3jYL",
+        "feature_point_axnEnT",
+        "feature_point_Afqqzj",
+        "feature_point_hHnhKK",
+        "feature_point_pFeFBd",
+        "heading_xbEzK8",
+        "text_bmDJGA",
+        "spacing_k8zKdN",
+        "button_JpantQ"
+      ],
+      "name": "Dynamic Feature Combo",
+      "settings": {
+        "tile1_width": 2,
+        "tile2_width": 2,
+        "tile3_width": 2,
+        "gap": 16,
+        "gap_mobile": 16,
+        "feature_image": "shopify://shop_images/622X800_danika_hotspots.png",
+        "lifestyle_image": "shopify://shop_images/705x800_Danika_lifestyle_2x_16c8662e-8446-4217-9972-dd286969783d.png",
+        "text_background": "#f5f5f5",
+        "text_padding": 40,
+        "text_vertical_align": "center",
+        "text_horizontal_align": "center",
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "text_max_width": 500,
+        "dot_size": 16,
+        "dot_size_mobile": 26,
+        "dot_color": "#ffffff",
+        "dot_border_color": "#536c9d",
+        "dot_border_width": 2,
+        "line_color": "#465e8d",
+        "line_width": 0.4,
+        "callout_background": "#ffffff",
+        "callout_radius": 8,
+        "callout_max_width": 220,
+        "callout_title_color": "#456094",
+        "callout_text_color": "#484848",
+        "color_text": "#000000",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "divider_color": "#111111",
+        "padding_top": 0,
+        "padding_bottom": 40,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "video_with_text_nmP7r3": {
+      "type": "video-with-text",
+      "blocks": {
+        "heading_4QyJ8E": {
+          "type": "heading",
+          "settings": {
+            "heading": "A Better Fit, Just for You.",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_Vjana6": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Great fit starts with understanding the foot. Aetrex foot-scanning technology captures real data on arch height, pressure points, and alignment to create smarter recommendations, more confident purchases, and better outcomes, whether you’re shopping for yourself or fitting customers in-store. </p><ul><li>Understand true fit beyond just shoe size</li><li>Enable more personalized product recommendations</li><li>Create greater confidence at the moment of purchase</li><li>Elevate the overall fitting experience</li><li>Improve conversion and satisfaction</li><li>Reduce size- and fit-related returns</li></ul>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -520,11 +667,23 @@
             "highlighted_scribble": "circle"
           }
         },
-        "button_AEVmYq": {
+        "button_ynaekD": {
           "type": "button",
           "settings": {
-            "button_label": "SHOP NOW",
-            "button_link": "shopify://pages/women-footwear",
+            "button_label": "Get Scanned",
+            "button_link": "shopify://pages/store-locator",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_Gz7ePK": {
+          "type": "button",
+          "settings": {
+            "button_label": "Get a Scanner in Your Store",
+            "button_link": "https://irle3andv1z.typeform.com/to/V3YAATXm?typeform-source=www.aetrex.com",
             "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
@@ -534,41 +693,45 @@
         }
       },
       "block_order": [
-        "heading_eVKtCM",
-        "divider_bmhBmt",
-        "text_xMJiMQ",
-        "button_AEVmYq"
+        "heading_4QyJ8E",
+        "text_Vjana6",
+        "button_ynaekD",
+        "button_Gz7ePK"
       ],
-      "name": "t:sections.image-with-text-overlay.name",
+      "name": "t:sections.video-with-text.name",
       "settings": {
-        "transparent_header": false,
-        "image": "shopify://shop_images/1920x655_aetrex_difference_Dahlia.jpg",
-        "image_height": "650px",
-        "content_width": "small",
-        "content_position": "md:items-center md:justify-end",
-        "text_alignment": "center",
-        "image_mobile": "shopify://shop_images/655x1090_aetrex_difference_Dahlia_b48823ab-56ce-4478-bae2-9aaa4a0b992c.png",
-        "image_height_mobile": "adapt",
-        "content_position_mobile": "items-end justify-center",
-        "text_alignment_mobile": "center",
-        "color_text": "#ffffff",
-        "color_highlight": "#e0a580",
+        "video": "shopify://files/videos/800x810_StoreLocator_banner.mp4",
+        "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
+        "description": "",
+        "enable_video_autoplay": true,
+        "enable_video_looping": true,
+        "image_height": "adapt",
+        "video_width": "medium",
+        "layout": "video_first",
+        "text_alignment": "left",
+        "content_position": "align-self-center",
+        "video_url_mobile": "",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
         "gradient_highlight": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
+        "color_button_text": "",
+        "color_button_background": "",
         "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "divider_color": "#ffffff",
-        "overlay_opacity": 0,
-        "padding_top": 48,
-        "padding_bottom": 48,
+        "padding_top": 0,
+        "padding_bottom": 40,
         "divider": false,
-        "full_width": true,
+        "full_width": false,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical",
         "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
+        "abra_promo_code_hide": "",
+        "parallax_direction": "vertical"
       }
     },
     "rich_text_mVRDXW": {
@@ -1014,10 +1177,10 @@
   "order": [
     "video_with_text_overlay_84weNe",
     "collection_list_kK69i9",
-    "video_with_text_overlay_A3ncH7",
-    "image_with_text_overlay_ahU44t",
-    "collection_list_cLB6dX",
-    "image_with_text_overlay_TNKwpP",
+    "video_with_text_Mpqjh8",
+    "featured_collections_g6b3ht",
+    "dynamic_feature_combo_74fjyM",
+    "video_with_text_nmP7r3",
     "rich_text_mVRDXW",
     "scrolling_text_byhkGn",
     "ss_recs_script_EYXn3V"
