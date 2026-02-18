@@ -13899,6 +13899,7 @@ button:is(
 
 .image-with-text__item .media:not(.media--rounded) {
     border-radius: var(--rounded-block);
+    border-radius: 1em;
 }
 
 .image-with-text__image-second {
