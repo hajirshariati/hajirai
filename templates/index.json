@@ -9,15 +9,6 @@
  */
 {
   "sections": {
-    "comparison_modal_ttgjDd": {
-      "type": "comparison-modal",
-      "disabled": true,
-      "name": "Comparison Modal",
-      "settings": {
-        "cta_text": "Compare Models",
-        "modal_headline": "Compare latest models."
-      }
-    },
     "video_with_text_overlay_akXxKy": {
       "type": "video-with-text-overlay",
       "blocks": {
@@ -1207,7 +1198,6 @@
     }
   },
   "order": [
-    "comparison_modal_ttgjDd",
     "video_with_text_overlay_akXxKy",
     "collection_list_kK69i9",
     "video_with_text_Mpqjh8",
