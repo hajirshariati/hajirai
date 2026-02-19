@@ -664,8 +664,18 @@
       "type": "featured-collection",
       "name": "t:sections.featured-collection.name",
       "settings": {
-        "collection": "spring-collection",
-        "products": [],
+        "collection": "",
+        "products": [
+          "maui-matte-black-l3000w",
+          "jillian-walnut-sc441w",
+          "carly-black-as100w",
+          "sydney-natural-ew762w",
+          "danika-navy-ap105w",
+          "gabby-cognac-multi-se314w",
+          "ashley-hazy-blue-multi-ew794w",
+          "kinsley-warm-grey-as226w",
+          "vicki-white-gloss-st3501w"
+        ],
         "product_limit": 12,
         "columns": 4,
         "carousel_on_desktop": true,
