@@ -269,7 +269,7 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 40,
+        "padding_top": 20,
         "padding_bottom": 40,
         "divider": false,
         "full_width": false,
