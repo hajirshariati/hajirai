@@ -1,0 +1,273 @@
+{% schema %}
+{
+  "name": "Comparison Modal",
+  "settings": [
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "CTA Text To Trigger Modal",
+      "default": "Compare Models"
+    },
+    {
+      "type": "text",
+      "id": "modal_heading",
+      "label": "Modal Heading",
+      "default": "Compare Our Models"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Comparison Modal"
+    }
+  ]
+}
+{% endschema %}
+
+<style>
+/* ===== Modal Base ===== */
+.comparison-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  backdrop-filter: blur(10px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.comparison-modal.active {
+  display: flex;
+}
+
+.comparison-modal__inner {
+  width: 95%;
+  max-width: 1200px;
+  max-height: 90vh;
+  background: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn .3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px);}
+  to { opacity:1; transform: translateY(0);}
+}
+
+/* Header */
+.comparison-modal__header {
+  padding: 20px 30px;
+  border-bottom: 1px solid #eee;
+  display:flex;
+  justify-content: space-between;
+  align-items:center;
+}
+
+.comparison-modal__title {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.comparison-close {
+  cursor:pointer;
+  font-size:22px;
+  border:none;
+  background:none;
+}
+
+/* Tabs */
+.comparison-tabs {
+  display:flex;
+  gap:20px;
+  padding:15px 30px;
+  border-bottom:1px solid #eee;
+  overflow-x:auto;
+}
+
+.comparison-tab {
+  cursor:pointer;
+  padding:8px 16px;
+  border-radius:20px;
+  white-space:nowrap;
+  font-size:14px;
+  border:1px solid #ddd;
+}
+
+.comparison-tab.active {
+  background:#111;
+  color:#fff;
+  border-color:#111;
+}
+
+/* Gallery */
+.comparison-gallery {
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  display:flex;
+  padding:30px;
+  gap:30px;
+}
+
+.comparison-card {
+  flex:0 0 320px;
+  background:#fafafa;
+  border-radius:18px;
+  padding:20px;
+  scroll-snap-align:start;
+  text-align:center;
+}
+
+.comparison-card img {
+  width:100%;
+  height:auto;
+  border-radius:12px;
+  margin-bottom:15px;
+}
+
+.comparison-card h4 {
+  margin:0 0 10px;
+  font-size:18px;
+}
+
+.comparison-card p {
+  font-size:14px;
+  color:#555;
+}
+
+@media(max-width:768px){
+  .comparison-card {
+    flex:0 0 85%;
+  }
+}
+</style>
+
+<div id="comparisonModal" class="comparison-modal">
+  <div class="comparison-modal__inner">
+    
+    <div class="comparison-modal__header">
+      <div class="comparison-modal__title">
+        {{ section.settings.modal_heading }}
+      </div>
+      <button class="comparison-close">&times;</button>
+    </div>
+
+    <div class="comparison-tabs">
+      <div class="comparison-tab active" data-tab="design">Design</div>
+      <div class="comparison-tab" data-tab="camera">Camera</div>
+      <div class="comparison-tab" data-tab="chip">Chip</div>
+      <div class="comparison-tab" data-tab="battery">Battery</div>
+      <div class="comparison-tab" data-tab="price">Price</div>
+    </div>
+
+    <!-- DESIGN -->
+    <div class="comparison-gallery" data-content="design">
+      <div class="comparison-card">
+        <img src="https://via.placeholder.com/400x400">
+        <h4>Model Pro</h4>
+        <p>Innovative design with pro performance.</p>
+      </div>
+      <div class="comparison-card">
+        <img src="https://via.placeholder.com/400x400">
+        <h4>Model Air</h4>
+        <p>Super thin. Shockingly strong.</p>
+      </div>
+      <div class="comparison-card">
+        <img src="https://via.placeholder.com/400x400">
+        <h4>Model Standard</h4>
+        <p>Durable and delightful.</p>
+      </div>
+    </div>
+
+    <!-- CAMERA -->
+    <div class="comparison-gallery" data-content="camera" style="display:none;">
+      <div class="comparison-card">
+        <h4>Pro Camera</h4>
+        <p>48MP triple camera system.</p>
+      </div>
+      <div class="comparison-card">
+        <h4>Air Camera</h4>
+        <p>Dual lens fusion system.</p>
+      </div>
+      <div class="comparison-card">
+        <h4>Standard Camera</h4>
+        <p>Advanced dual camera.</p>
+      </div>
+    </div>
+
+    <!-- CHIP -->
+    <div class="comparison-gallery" data-content="chip" style="display:none;">
+      <div class="comparison-card"><h4>A17 Pro</h4></div>
+      <div class="comparison-card"><h4>A16</h4></div>
+      <div class="comparison-card"><h4>A15</h4></div>
+    </div>
+
+    <!-- BATTERY -->
+    <div class="comparison-gallery" data-content="battery" style="display:none;">
+      <div class="comparison-card"><h4>29 hrs video</h4></div>
+      <div class="comparison-card"><h4>24 hrs video</h4></div>
+      <div class="comparison-card"><h4>22 hrs video</h4></div>
+    </div>
+
+    <!-- PRICE -->
+    <div class="comparison-gallery" data-content="price" style="display:none;">
+      <div class="comparison-card"><h4>$999</h4></div>
+      <div class="comparison-card"><h4>$799</h4></div>
+      <div class="comparison-card"><h4>$699</h4></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function(){
+
+  const modal = document.getElementById("comparisonModal");
+  const closeBtn = document.querySelector(".comparison-close");
+  const tabs = document.querySelectorAll(".comparison-tab");
+  const galleries = document.querySelectorAll(".comparison-gallery");
+
+  // ===== Open Modal based on CTA text =====
+  const ctaText = "{{ section.settings.cta_text | escape }}";
+
+  document.querySelectorAll("a,button").forEach(el => {
+    if(el.textContent.trim() === ctaText){
+      el.addEventListener("click", function(e){
+        e.preventDefault();
+        modal.classList.add("active");
+        document.body.style.overflow="hidden";
+      });
+    }
+  });
+
+  // Close
+  closeBtn.addEventListener("click", function(){
+    modal.classList.remove("active");
+    document.body.style.overflow="";
+  });
+
+  modal.addEventListener("click", function(e){
+    if(e.target === modal){
+      modal.classList.remove("active");
+      document.body.style.overflow="";
+    }
+  });
+
+  // Tabs
+  tabs.forEach(tab=>{
+    tab.addEventListener("click", function(){
+      tabs.forEach(t=>t.classList.remove("active"));
+      this.classList.add("active");
+
+      const target = this.dataset.tab;
+
+      galleries.forEach(g=>{
+        g.style.display = g.dataset.content === target ? "flex" : "none";
+      });
+    });
+  });
+
+});
+</script>
