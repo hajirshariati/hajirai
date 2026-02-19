@@ -12,6 +12,8 @@
 
 <style>
  
+
+
  
 
     #shopify-section-{{ section.id }} .combo-tile {
@@ -319,17 +321,11 @@ font-size: calc(9px + 0.1vw);
   opacity: 1;
   visibility: visible;
 }
+ 
 
-#shopify-section-{{ section.id }} .drawer__inner {
-  position: absolute;
-  inset: 0;
-  transform: translateY(100%);
-  transition: transform 0.35s ease;
-}
 
-#shopify-section-{{ section.id }} .x-modal[open] .drawer__inner {
-  transform: translateY(0);
-}
+
+ 
 
 .dynamic-feature.is-visible .dynamic-feature__line {
   animation: drawLine 2.5s ease-out forwards;
@@ -393,6 +389,11 @@ font-size: calc(9px + 0.1vw);
 #shopify-section-{{ section.id }} .custom-divider {
   height: 2px;
 }
+
+
+ 
+
+
 </style>
 
 <div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}" data-section-id="{{ section.id }}">
@@ -458,7 +459,7 @@ font-size: calc(9px + 0.1vw);
                     aria-hidden="true"
                   >
                     <overlay-element class="overlay fixed-modal invisible opacity-0 fixed bottom-0 left-0 w-full h-screen pointer-events-none" aria-controls="Feature-{{ section.id }}-{{ block.id }}" aria-expanded="false"></overlay-element>
-                    <div class="drawer__inner z-10 absolute top-0 flex flex-col w-full h-full overflow-hidden">
+                    <div class="drawer__inner z-10 absolute flex flex-col w-full">
                       <button class="drawer__close-menu absolute z-20 flex items-center justify-center w-10 h-10 rounded-full bg-white shadow-md" type="button" aria-label="Close">
                         {%- render 'icon', icon: 'close' -%}
                       </button>
@@ -486,6 +487,8 @@ font-size: calc(9px + 0.1vw);
       <!-- TILE 2: LIFESTYLE IMAGE -->
       <div class="combo-tile tile-lifestyle">
         {%- if section.settings.lifestyle_image != blank -%}
+                    <a href="https://www.aetrex.com/products/danika-sky-blue-ap118w" target="_blank" rel="noopener" style="display:block;height:100%;">
+
           <picture>
             {%- if section.settings.lifestyle_image_mobile -%}
               <source media="(max-width: 767px)" srcset="{{ section.settings.lifestyle_image_mobile | image_url: width: '800x' }} 800w">
@@ -501,6 +504,7 @@ font-size: calc(9px + 0.1vw);
                 is: lazyimage
             -}}
           </picture>
+           </a>
         {%- else -%}
           <div class="bg-gray-200 w-full h-full flex items-center justify-center" style="min-height: 400px;">
             <span class="text-gray-500">Lifestyle Image</span>
@@ -807,10 +811,14 @@ document.addEventListener('shopify:section:load', e => initDynamicFeatures(e.tar
           `#Feature-${section.dataset.sectionId}-${blockId}`
         );
 
-        if (modal) {
+if (modal) {
           modal.setAttribute('open', '');
           modal.classList.remove('invisible');
           modal.setAttribute('aria-hidden', 'false');
+          const inner = modal.querySelector('.drawer__inner');
+          if (inner) {
+            inner.style.cssText = 'position:fixed !important; bottom:0 !important; left:0 !important; right:0 !important; top:auto !important; height:auto !important; max-height:90vh !important; overflow-y:auto !important; transform:translateY(0) !important; width:100% !important; z-index:40 !important; background:#fff;padding-bottom:4em !important;';
+          }
         }
       });
     });
