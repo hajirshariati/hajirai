@@ -1,273 +1,819 @@
+{% comment %}
+  Compare Modal Section
+  - Renders a CTA button whose text is configurable in the schema
+  - Clicking that button opens an Apple-style comparison modal
+  - Tabs: Design | Camera | Chip | Battery | Price/Storage
+  - Each tab can have multiple slides navigated with prev/next arrows
+{% endcomment %}
+
+<div class="compare-section" data-compare-section>
+  <button
+    class="compare-cta-btn"
+    data-compare-open
+    aria-haspopup="dialog"
+  >
+    {{ section.settings.cta_text | default: 'Compare models' }}
+  </button>
+</div>
+
+<!-- ===================== MODAL ===================== -->
+<div
+  class="ric-modal ric-modal-scrim ric-modal-scrim-blur"
+  id="compare-modal"
+  aria-modal="true"
+  role="dialog"
+  aria-labelledby="compare-modal-headline"
+  tabindex="-1"
+  data-compare-modal
+  hidden
+>
+  <div class="ric-modal-overlay-container" data-compare-backdrop>
+    <div class="ric-modal-overlay">
+
+      <!-- Header -->
+      <div class="modal-header">
+        <h2 class="modal-header-headline" id="compare-modal-headline">
+          {{ section.settings.modal_headline | default: 'Compare latest models.' }}
+        </h2>
+      </div>
+
+      <!-- Tab Nav -->
+      <nav class="tabnav-wrapper" aria-label="Lineup features">
+        <div class="tabnav">
+          <ul class="tabnav-items" role="list">
+            <li class="tabnav-item tabnav-item-active" data-tab="design">
+              <a href="#" class="tabnav-link" data-tab-control="design" aria-current="true">
+                <span class="tabnav-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 25 25"><path d="m11.2515 20c.157.375.3848.7115.6626 1h-4.9141c-1.1046 0-2-.8954-2-2v-13c0-1.1046.8954-2 2-2h6c1.1046 0 2 .8954 2 2v.5h-.75c-.0857 0-.166.0188-.25.0253v-.5253c0-.5514-.4486-1-1-1h-6c-.5514 0-1 .4486-1 1v13c0 .5514.4486 1 1 1zm-2.0016-14c-.2764 0-.5.2236-.5.5s.2236.5.5.5h1.5c.2764 0 .5-.2236.5-.5s-.2236-.5-.5-.5zm10.7501 3.75v9c0 1.2427-1.0073 2.25-2.25 2.25h-3.5c-.2246 0-.4373-.043-.6421-.1042-.5059-.1515-.9406-.4667-1.228-.8958-.2395-.3577-.3799-.7872-.3799-1.25v-9c0-1.157.8766-2.0989 2-2.2249.0831-.0093 3.75-.0251 3.75-.0251 1.2427 0 2.25 1.0073 2.25 2.25zm-1 0c0-.6892-.5608-1.25-1.25-1.25h-3.5c-.0886 0-.1665.033-.25.0505-.5657.1194-1 .5989-1 1.1995v9c0 .4419.2439.8125.5911 1.0349.1942.1245.4116.2151.6589.2151h3.5c.6892 0 1.25-.5608 1.25-1.25zm-2.2501-.25h-1.5c-.0931 0-.1753.0322-.2499.0764-.1469.087-.2501.2402-.2501.4236s.1033.3365.2501.4236c.0746.0442.1567.0764.2499.0764h1.5c.2764 0 .5-.2236.5-.5s-.2236-.5-.5-.5z"/></svg>
+                </span>
+                <span class="tabnav-label">Design</span>
+              </a>
+            </li>
+            <li class="tabnav-item" data-tab="camera">
+              <a href="#" class="tabnav-link" data-tab-control="camera" aria-current="false">
+                <span class="tabnav-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 25 25"><path d="m14.1304 5c.6078 0 .7352.1111.976.37l.7201.8072c.6138.6906 1.0953.8228 2.0607.8228h2.5475c1.1411 0 1.5653.4194 1.5653 1.5475v9.9134c0 1.122-.4242 1.5391-1.5653 1.5391h-15.8694c-1.1411 0-1.5653-.4171-1.5653-1.5391v-9.9134c0-1.1281.4242-1.5475 1.5653-1.5475h2.4176c.9667 0 1.4484-.1324 2.0557-.817l.7274-.8055c.2444-.2685.3678-.3775.9736-.3775zm0-1h-3.3907c-.87 0-1.2698.2172-1.7131.7043l-.7302.8085c-.4088.4608-.6181.4872-1.3135.4872h-2.4176c-1.6953 0-2.5653.8695-2.5653 2.5475v9.9134c0 1.6696.87 2.5391 2.5653 2.5391h15.8694c1.6963 0 2.5653-.8695 2.5653-2.5391v-9.9134c0-1.678-.869-2.5475-2.5653-2.5475h-2.5475c-.6954 0-.8959-.0175-1.3135-.4872l-.7212-.8085c-.4524-.4871-.8521-.7043-1.7221-.7043zm-1.6259 5.7423c2.1035 0 3.7514 1.6489 3.7514 3.7538 0 2.1093-1.6479 3.7617-3.7514 3.7617-2.1086 0-3.7604-1.6523-3.7604-3.7617 0-2.105 1.6518-3.7538 3.7604-3.7538m0-.9923c-2.6362 0-4.7545 2.1055-4.7545 4.7461 0 2.6489 2.1183 4.7539 4.7545 4.7539 2.6281 0 4.7455-2.105 4.7455-4.7539 0-2.6406-2.1085-4.7461-4.7455-4.7461z"/></svg>
+                </span>
+                <span class="tabnav-label">Camera</span>
+              </a>
+            </li>
+            <li class="tabnav-item" data-tab="chip">
+              <a href="#" class="tabnav-link" data-tab-control="chip" aria-current="false">
+                <span class="tabnav-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 25 25"><path d="m15.75 8h-6.5c-.6903 0-1.25.5597-1.25 1.25v6.5c0 .6903.5597 1.25 1.25 1.25h6.5c.6903 0 1.25-.5597 1.25-1.25v-6.5c0-.6903-.5597-1.25-1.25-1.25zm.25 7.75c0 .1378-.1122.25-.25.25h-6.5c-.1378 0-.25-.1122-.25-.25v-6.5c0-.1378.1122-.25.25-.25h6.5c.1378 0 .25.1122.25.25zm5-2.75c.2761 0 .5-.2239.5-.5s-.2239-.5-.5-.5h-2v-2h2c.2761 0 .5-.2239.5-.5s-.2239-.5-.5-.5h-2v-1c0-1.3807-.6193-2-2-2h-1v-2c0-.2761-.2239-.5-.5-.5s-.5.2239-.5.5v2h-2v-2c0-.2761-.2239-.5-.5-.5s-.5.2239-.5.5v2h-2v-2c0-.2761-.2239-.5-.5-.5s-.5.2239-.5.5v2h-1c-1.3807 0-2 .6193-2 2v1h-2c-.2761 0-.5.2239-.5.5s.2239.5.5.5h2v2h-2c-.2761 0-.5.2239-.5.5s.2239.5.5.5h2v2h-2c-.2761 0-.5.2239-.5.5s.2239.5.5.5h2v1c0 1.3807.6193 2 2 2h1v2c0 .2761.2239.5.5.5s.5-.2239.5-.5v-2h2v2c0 .2761.2239.5.5.5s.5-.2239.5-.5v-2h2v2c0 .2761.2239.5.5.5s.5-.2239.5-.5v-2h1c1.3807 0 2-.6193 2-2v-1h2c.2761 0 .5-.2239.5-.5s-.2239-.5-.5-.5h-2v-2zm-3 4c0 .8271-.1729 1-1 1h-9c-.8271 0-1-.1729-1-1v-9c0-.8271.1729-1 1-1h9c.8271 0 1 .1729 1 1z"/></svg>
+                </span>
+                <span class="tabnav-label">Chip</span>
+              </a>
+            </li>
+            <li class="tabnav-item" data-tab="battery">
+              <a href="#" class="tabnav-link" data-tab-control="battery" aria-current="false">
+                <span class="tabnav-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 25 25"><path d="M19,10.5v4c0,.8271-.6729,1.5-1.5,1.5H4.5c-.8271,0-1.5-.6729-1.5-1.5v-4c0-.8271,.6729-1.5,1.5-1.5h13c.8271,0,1.5,.6729,1.5,1.5Zm2,0v4c0,1.9297-1.5703,3.5-3.5,3.5H4.5c-1.9297,0-3.5-1.5703-3.5-3.5v-4c0-1.9297,1.5703-3.5,3.5-3.5h13c1.9297,0,3.5,1.5703,3.5,3.5Zm-1,0c0-1.3789-1.1211-2.5-2.5-2.5H4.5c-1.3789,0-2.5,1.1211-2.5,2.5v4c0,1.3789,1.1211,2.5,2.5,2.5h13c1.3789,0,2.5-1.1211,2.5-2.5v-4Zm2,4c.6382-.0409,1.5-.8213,1.5-2.004,0-1.1746-.8618-1.9631-1.5-1.996v4Z"/></svg>
+                </span>
+                <span class="tabnav-label">Battery</span>
+              </a>
+            </li>
+            <li class="tabnav-item" data-tab="price">
+              <a href="#" class="tabnav-link" data-tab-control="price" aria-current="false">
+                <span class="tabnav-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 25 25"><path d="M12.124,17.529v-.742a2.774,2.774,0,0,1-2.676-1.992.446.446,0,0,1,.459-.479.477.477,0,0,1,.479.41A1.854,1.854,0,0,0,12.124,15.9V12.764l-.107-.02c-1.6-.381-2.412-1.1-2.412-2.275a2.494,2.494,0,0,1,2.52-2.324V7.471A.367.367,0,0,1,12.5,7.08a.374.374,0,0,1,.391.391v.674a2.7,2.7,0,0,1,2.51,1.885.444.444,0,0,1-.469.459.479.479,0,0,1-.479-.4,1.768,1.768,0,0,0-1.6-1.309V12l.205.039c1.66.332,2.49,1.084,2.49,2.344,0,1.387-1.143,2.295-2.7,2.412v.732a.374.374,0,0,1-.391.391A.367.367,0,0,1,12.124,17.529Zm0-8.467c-.928.117-1.562.664-1.562,1.367,0,.674.488,1.084,1.494,1.357l.068.02ZM12.9,15.9c1.1-.1,1.729-.684,1.729-1.465,0-.713-.43-1.143-1.514-1.426l-.215-.049Z M12.5,4.1a8.4,8.4,0,1,1-8.4,8.4,8.41,8.41,0,0,1,8.4-8.4m0-1.1A9.5,9.5,0,1,0,22,12.5,9.5,9.5,0,0,0,12.5,3Z"/></svg>
+                </span>
+                <span class="tabnav-label">Price</span>
+              </a>
+            </li>
+          </ul>
+          <span class="tabnav-indicator" data-tabnav-indicator></span>
+        </div>
+      </nav>
+
+      <!-- Gallery -->
+      <div class="compare-gallery-wrapper" data-gallery-wrapper>
+
+        <!-- ---- DESIGN slides ---- -->
+        <div class="slide-group" data-slide-group="design">
+          <div class="slide active" data-slide>
+            <div class="gallery-card">
+              <div class="gallery-card-img-placeholder" style="background: linear-gradient(135deg,#1a1a2e,#16213e);">
+                <span class="img-label">iPhone 17 Pro</span>
+              </div>
+              <div class="copy-container">
+                <p class="card-headline">Innovative design with breakthrough pro performance.</p>
+              </div>
+            </div>
+            <div class="gallery-card">
+              <div class="gallery-card-img-placeholder" style="background: linear-gradient(135deg,#0f3443,#34e89e 120%);">
+                <span class="img-label">iPhone Air</span>
+              </div>
+              <div class="copy-container">
+                <p class="card-headline">Super thin. Strikingly light. Shockingly strong.</p>
+              </div>
+            </div>
+            <div class="gallery-card">
+              <div class="gallery-card-img-placeholder" style="background: linear-gradient(135deg,#c471f5,#fa71cd 120%);">
+                <span class="img-label">iPhone 17</span>
+              </div>
+              <div class="copy-container">
+                <p class="card-headline">Even more delightful. Even more durable.</p>
+              </div>
+            </div>
+          </div>
+          <div class="slide" data-slide>
+            <div class="gallery-card">
+              <div class="gallery-card-img-placeholder" style="background: linear-gradient(135deg,#1a1a2e,#16213e);">
+                <span class="img-label">iPhone 17 Pro</span>
+              </div>
+              <div class="copy-container">
+                <p class="card-callout">6.9"&nbsp;/&nbsp;6.3"</p>
+                <p class="card-feature">Super Retina XDR display<br>Forged aluminum unibody</p>
+              </div>
+            </div>
+            <div class="gallery-card">
+              <div class="gallery-card-img-placeholder" style="background: linear-gradient(135deg,#0f3443,#34e89e 120%);">
+                <span class="img-label">iPhone Air</span>
+              </div>
+              <div class="copy-container">
+                <p class="card-callout">6.5"</p>
+                <p class="card-feature">Super Retina XDR display<br>Polished titanium frame</p>
+              </div>
+            </div>
+            <div class="gallery-card">
+              <div class="gallery-card-img-placeholder" style="background: linear-gradient(135deg,#c471f5,#fa71cd 120%);">
+                <span class="img-label">iPhone 17</span>
+              </div>
+              <div class="copy-container">
+                <p class="card-callout">6.3"</p>
+                <p class="card-feature">Super Retina XDR display<br>Durable aluminum frame</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ---- CAMERA slides ---- -->
+        <div class="slide-group hidden" data-slide-group="camera">
+          <div class="slide active" data-slide>
+            <div class="gallery-card">
+              <div class="gallery-card-img-placeholder" style="background: linear-gradient(135deg,#1a1a2e,#16213e);">
+                <span class="img-label">iPhone 17 Pro</span>
+              </div>
+              <div class="copy-container">
+                <p class="card-headline">Ultimate pro camera system.</p>
+                <p class="card-feature">48MP Fusion Main<br>48MP Fusion Ultra Wide<br>48MP Fusion Telephoto</p>
+              </div>
+            </div>
+            <div class="gallery-card">
+              <div class="gallery-card-img-placeholder" style="background: linear-gradient(135deg,#0f3443,#34e89e 120%);">
+                <span class="img-label">iPhone Air</span>
+              </div>
+              <div class="copy-container">
+                <p class="card-headline">Two advanced cameras in one.</p>
+                <p class="card-feature">48MP Fusion Main</p>
+              </div>
+            </div>
+            <div class="gallery-card">
+              <div class="gallery-card-img-placeholder" style="background: linear-gradient(135deg,#c471f5,#fa71cd 120%);">
+                <span class="img-label">iPhone 17</span>
+              </div>
+              <div class="copy-container">
+                <p class="card-headline">Superstunning shots up close or far away.</p>
+                <p class="card-feature">48MP Fusion Main<br>48MP Fusion Ultra Wide</p>
+              </div>
+            </div>
+          </div>
+          <div class="slide" data-slide>
+            <div class="gallery-card">
+              <div class="copy-container">
+                <p class="card-headline">48MP Pro Fusion camera system</p>
+                <p class="card-feature">Optical zoom options:</p>
+                <ul class="zoom-levels"><li>.5x</li><li>1x</li><li>2x</li><li>4x</li><li>8x</li></ul>
+              </div>
+            </div>
+            <div class="gallery-card">
+              <div class="copy-container">
+                <p class="card-headline">48MP Fusion camera system</p>
+                <p class="card-feature">Optical zoom options:</p>
+                <ul class="zoom-levels"><li>1x</li><li>2x</li></ul>
+              </div>
+            </div>
+            <div class="gallery-card">
+              <div class="copy-container">
+                <p class="card-headline">48MP Dual Fusion camera system</p>
+                <p class="card-feature">Optical zoom options:</p>
+                <ul class="zoom-levels"><li>.5x</li><li>1x</li><li>2x</li></ul>
+              </div>
+            </div>
+          </div>
+          <div class="slide" data-slide>
+            <div class="gallery-card">
+              <div class="gallery-card-img-placeholder" style="background: linear-gradient(135deg,#1a1a2e,#16213e);">
+                <span class="img-label">iPhone 17 Pro</span>
+              </div>
+              <div class="copy-container">
+                <p class="card-headline">18MP Center Stage front camera</p>
+                <p class="card-feature">Center Stage for photos<br>Ultra-stabilized video<br>Dual Capture video</p>
+              </div>
+            </div>
+            <div class="gallery-card">
+              <div class="gallery-card-img-placeholder" style="background: linear-gradient(135deg,#0f3443,#34e89e 120%);">
+                <span class="img-label">iPhone Air</span>
+              </div>
+              <div class="copy-container">
+                <p class="card-headline">18MP Center Stage front camera</p>
+                <p class="card-feature">Center Stage for photos<br>Ultra-stabilized video<br>Dual Capture video</p>
+              </div>
+            </div>
+            <div class="gallery-card">
+              <div class="gallery-card-img-placeholder" style="background: linear-gradient(135deg,#c471f5,#fa71cd 120%);">
+                <span class="img-label">iPhone 17</span>
+              </div>
+              <div class="copy-container">
+                <p class="card-headline">18MP Center Stage front camera</p>
+                <p class="card-feature">Center Stage for photos<br>Ultra-stabilized video<br>Dual Capture video</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ---- CHIP slides ---- -->
+        <div class="slide-group hidden" data-slide-group="chip">
+          <div class="slide active" data-slide>
+            <div class="gallery-card">
+              <div class="gallery-card-img-placeholder" style="background: linear-gradient(135deg,#1a1a2e,#16213e);">
+                <span class="img-label">A19 Pro</span>
+              </div>
+              <div class="copy-container">
+                <p class="card-headline">Exceptional pro performance.</p>
+                <p class="card-feature">6-core CPU<br>6-Core GPU with Neural Accelerators</p>
+              </div>
+            </div>
+            <div class="gallery-card">
+              <div class="gallery-card-img-placeholder" style="background: linear-gradient(135deg,#0f3443,#34e89e 120%);">
+                <span class="img-label">A19</span>
+              </div>
+              <div class="copy-container">
+                <p class="card-headline">Hyperspeed. Hyperefficient.</p>
+                <p class="card-feature">6-core CPU<br>5-Core GPU with Neural Accelerators</p>
+              </div>
+            </div>
+            <div class="gallery-card">
+              <div class="gallery-card-img-placeholder" style="background: linear-gradient(135deg,#c471f5,#fa71cd 120%);">
+                <span class="img-label">A19</span>
+              </div>
+              <div class="copy-container">
+                <p class="card-headline">Power player. Energy expert.</p>
+                <p class="card-feature">6-core CPU<br>5-Core GPU with Neural Accelerators</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ---- BATTERY slides ---- -->
+        <div class="slide-group hidden" data-slide-group="battery">
+          <div class="slide active" data-slide>
+            <div class="gallery-card">
+              <div class="copy-container">
+                <p class="card-feature">Up to</p>
+                <p class="card-callout">39 hours</p>
+                <p class="card-feature">of video playback<br>Up to 50% charge in 20 minutes</p>
+              </div>
+            </div>
+            <div class="gallery-card">
+              <div class="copy-container">
+                <p class="card-feature">Up to</p>
+                <p class="card-callout">27 hours</p>
+                <p class="card-feature">of video playback<br>Up to 50% charge in 30 minutes</p>
+              </div>
+            </div>
+            <div class="gallery-card">
+              <div class="copy-container">
+                <p class="card-feature">Up to</p>
+                <p class="card-callout">30 hours</p>
+                <p class="card-feature">of video playback<br>Up to 50% charge in 20 minutes</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ---- PRICE slides ---- -->
+        <div class="slide-group hidden" data-slide-group="price">
+          <div class="slide active" data-slide>
+            <div class="gallery-card">
+              <div class="copy-container">
+                <p class="card-feature">256GB model from</p>
+                <p class="card-callout">$1099</p>
+                <p class="card-feature">Storage up to 2TB on iPhone 17 Pro Max</p>
+              </div>
+            </div>
+            <div class="gallery-card">
+              <div class="copy-container">
+                <p class="card-feature">256GB model from</p>
+                <p class="card-callout">$999</p>
+                <p class="card-feature">Storage up to 1TB</p>
+              </div>
+            </div>
+            <div class="gallery-card">
+              <div class="copy-container">
+                <p class="card-feature">256GB model from</p>
+                <p class="card-callout">$799</p>
+                <p class="card-feature">Storage up to 512GB</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product name overlay -->
+        <div class="product-names-overlay" aria-hidden="true">
+          <span class="product-name-tag">iPhone 17 Pro</span>
+          <span class="product-name-tag">iPhone Air</span>
+          <span class="product-name-tag">iPhone 17</span>
+        </div>
+
+        <!-- Paddle nav -->
+        <div class="paddlenav">
+          <button class="paddlenav-arrow paddlenav-arrow-previous" data-gallery-prev aria-label="Previous" disabled>
+            <svg viewBox="0 0 36 36"><path d="m20 25c-.3838 0-.7676-.1465-1.0605-.4395l-5.5-5.5c-.5859-.5854-.5859-1.5356 0-2.1211l5.5-5.5c.5859-.5859 1.5352-.5859 2.1211 0 .5859.5854.5859 1.5356 0 2.1211l-4.4395 4.4395 4.4395 4.4395c.5859.5854.5859 1.5356 0 2.1211-.293.293-.6768.4395-1.0605.4395z"/></svg>
+          </button>
+          <button class="paddlenav-arrow paddlenav-arrow-next" data-gallery-next aria-label="Next">
+            <svg viewBox="0 0 36 36"><path d="m22.5597 16.9375-5.5076-5.5c-.5854-.5854-1.5323-.5825-2.1157.0039-.5835.5869-.5815 1.5366.0039 2.1211l4.4438 4.4375-4.4438 4.4375c-.5854.5845-.5874 1.5342-.0039 2.1211.2922.2944.676.4414 1.0598.4414.3818 0 .7637-.1455 1.0559-.4375l5.5076-5.5c.2815-.2812.4403-.6636.4403-1.0625s-.1588-.7812-.4403-1.0625z"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Close button -->
+      <button class="ric-modal-close-button" data-compare-close aria-label="Close compare modal">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" width="20" height="20">
+          <path d="m20.1211 18 3.4395-3.4395c.5859-.5854.5859-1.5356 0-2.1211-.5859-.5859-1.5352-.5859-2.1211 0l-3.4395 3.4395-3.4395-3.4395c-.5859-.5859-1.5352-.5859-2.1211 0-.5859.5854-.5859 1.5356 0 2.1211l3.4395 3.4395-3.4395 3.4395c-.5859.5854-.5859 1.5356 0 2.1211.293.293.6768.4395 1.0605.4395s.7676-.1465 1.0605-.4395l3.4395-3.4395 3.4395 3.4395c.293.293.6768.4395 1.0605.4395s.7676-.1465 1.0605-.4395c.5859-.5854.5859-1.5356 0-2.1211l-3.4395-3.4395z"/>
+        </svg>
+      </button>
+
+    </div>
+  </div>
+</div>
+
+<style>
+/* ===================== RESET / BASE ===================== */
+#shopify-section-{{ section.id }} *,
+#shopify-section-{{ section.id }} *::before,
+#shopify-section-{{ section.id }} *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ===================== CTA BUTTON ===================== */
+.compare-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 28px;
+  background: #0071e3;
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+  font-size: 17px;
+  font-weight: 400;
+  letter-spacing: -0.022em;
+  border: none;
+  border-radius: 980px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.compare-cta-btn:hover { background: #0077ed; }
+.compare-cta-btn:active { transform: scale(0.97); }
+
+/* ===================== MODAL SCRIM ===================== */
+.ric-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.48);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.ric-modal.is-open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ===================== OVERLAY ===================== */
+.ric-modal-overlay-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.ric-modal-overlay {
+  position: relative;
+  background: #fff;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 780px;
+  max-height: 90vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.3);
+  transform: translateY(20px) scale(0.98);
+  transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+.ric-modal.is-open .ric-modal-overlay {
+  transform: translateY(0) scale(1);
+}
+
+/* ===================== MODAL HEADER ===================== */
+.modal-header {
+  padding: 44px 32px 0;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 10;
+  border-radius: 20px 20px 0 0;
+}
+.modal-header-headline {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+  font-size: clamp(24px, 3.5vw, 36px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: #1d1d1f;
+  line-height: 1.08;
+}
+
+/* ===================== TAB NAV ===================== */
+.tabnav-wrapper {
+  padding: 20px 32px 0;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 9;
+}
+.tabnav {
+  position: relative;
+  display: inline-flex;
+  background: #f5f5f7;
+  border-radius: 980px;
+  padding: 4px;
+}
+.tabnav-items {
+  list-style: none;
+  display: flex;
+  gap: 2px;
+  position: relative;
+  z-index: 2;
+}
+.tabnav-item { display: flex; }
+.tabnav-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 980px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #1d1d1f;
+  text-decoration: none;
+  transition: color 0.2s;
+  white-space: nowrap;
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+}
+.tabnav-icon { display: flex; align-items: center; flex-shrink: 0; }
+.tabnav-indicator {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  height: calc(100% - 8px);
+  background: #fff;
+  border-radius: 980px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), width 0.3s cubic-bezier(0.4,0,0.2,1);
+  z-index: 1;
+  pointer-events: none;
+}
+.tabnav-item-active .tabnav-link { color: #1d1d1f; }
+
+/* ===================== GALLERY WRAPPER ===================== */
+.compare-gallery-wrapper {
+  position: relative;
+  padding: 24px 32px 32px;
+  flex: 1;
+}
+
+/* ===================== PRODUCT NAME TAGS ===================== */
+.product-names-overlay {
+  display: flex;
+  gap: 0;
+  margin-bottom: 12px;
+}
+.product-name-tag {
+  flex: 1;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6e6e73;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+/* ===================== SLIDE GROUPS ===================== */
+.slide-group { display: block; }
+.slide-group.hidden { display: none; }
+
+/* ===================== SLIDE (row of 3 cards) ===================== */
+.slide { display: none; }
+.slide.active { display: flex; gap: 12px; }
+
+/* ===================== GALLERY CARD ===================== */
+.gallery-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.gallery-card-img-placeholder {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3/4;
+  border-radius: 12px;
+  display: flex;
+  align-items: flex-end;
+  padding: 12px;
+  overflow: hidden;
+}
+.gallery-card-img-placeholder img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+}
+.img-label {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.85);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  position: relative;
+  z-index: 1;
+}
+.copy-container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 4px;
+}
+.card-headline {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+  font-size: clamp(13px, 1.6vw, 16px);
+  font-weight: 600;
+  color: #1d1d1f;
+  letter-spacing: -0.022em;
+  line-height: 1.25;
+}
+.card-callout {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+  font-size: clamp(24px, 3vw, 36px);
+  font-weight: 700;
+  color: #1d1d1f;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+.card-feature {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-size: clamp(11px, 1.3vw, 13px);
+  color: #6e6e73;
+  line-height: 1.5;
+}
+.zoom-levels {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+.zoom-levels li {
+  background: #f5f5f7;
+  border-radius: 980px;
+  padding: 3px 10px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: #1d1d1f;
+}
+
+/* ===================== PADDLE NAV ===================== */
+.paddlenav {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+.paddlenav-arrow {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #f5f5f7;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.paddlenav-arrow:hover:not(:disabled) { background: #e8e8ed; }
+.paddlenav-arrow:disabled { opacity: 0.3; cursor: default; }
+.paddlenav-arrow svg { width: 20px; height: 20px; fill: #1d1d1f; }
+
+/* ===================== CLOSE BUTTON ===================== */
+.ric-modal-close-button {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #f5f5f7;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.1s;
+  z-index: 20;
+}
+.ric-modal-close-button:hover { background: #e8e8ed; }
+.ric-modal-close-button:active { transform: scale(0.92); }
+.ric-modal-close-button svg { fill: #1d1d1f; }
+
+/* ===================== RESPONSIVE ===================== */
+@media (max-width: 600px) {
+  .modal-header, .tabnav-wrapper { padding-left: 20px; padding-right: 20px; }
+  .compare-gallery-wrapper { padding: 16px 20px 24px; }
+  .tabnav-link { padding: 7px 10px; font-size: 11px; }
+  .tabnav-icon { display: none; }
+  .slide.active { flex-direction: column; }
+  .gallery-card-img-placeholder { aspect-ratio: 16/9; }
+  .product-names-overlay { flex-direction: column; gap: 0; }
+  .product-name-tag { text-align: left; padding: 2px 0; }
+}
+</style>
+
+<script>
+(function() {
+  const section = document.querySelector('[data-compare-section]') 
+    || document.currentScript.closest('section') 
+    || document.body;
+
+  const modal        = document.querySelector('[data-compare-modal]');
+  const backdrop     = document.querySelector('[data-compare-backdrop]');
+  const openBtn      = document.querySelector('[data-compare-open]');
+  const closeBtn     = document.querySelector('[data-compare-close]');
+  const tabLinks     = document.querySelectorAll('[data-tab-control]');
+  const indicator    = document.querySelector('[data-tabnav-indicator]');
+  const prevBtn      = document.querySelector('[data-gallery-prev]');
+  const nextBtn      = document.querySelector('[data-gallery-next]');
+
+  if (!modal) return;
+
+  let currentTab = 'design';
+  let currentSlide = 0;
+
+  // ---------- helpers ----------
+  function getSlides() {
+    return modal.querySelectorAll(`[data-slide-group="${currentTab}"] [data-slide]`);
+  }
+
+  function updatePaddles() {
+    const slides = getSlides();
+    prevBtn.disabled = currentSlide === 0;
+    nextBtn.disabled = currentSlide >= slides.length - 1;
+  }
+
+  function showSlide(index) {
+    const slides = getSlides();
+    slides.forEach((s, i) => s.classList.toggle('active', i === index));
+    currentSlide = index;
+    updatePaddles();
+  }
+
+  function positionIndicator(linkEl) {
+    if (!indicator || !linkEl) return;
+    const nav   = indicator.closest('.tabnav');
+    const navR  = nav.getBoundingClientRect();
+    const linkR = linkEl.closest('.tabnav-item').getBoundingClientRect();
+    indicator.style.width  = linkR.width + 'px';
+    indicator.style.transform = `translateX(${linkR.left - navR.left - 4}px)`;
+  }
+
+  function switchTab(tab) {
+    currentTab = tab;
+    currentSlide = 0;
+
+    // hide all slide groups, show target
+    modal.querySelectorAll('[data-slide-group]').forEach(g => {
+      g.classList.toggle('hidden', g.dataset.slideGroup !== tab);
+    });
+
+    // mark active tab
+    tabLinks.forEach(l => {
+      const active = l.dataset.tabControl === tab;
+      l.setAttribute('aria-current', active ? 'true' : 'false');
+      l.closest('.tabnav-item').classList.toggle('tabnav-item-active', active);
+      if (active) positionIndicator(l);
+    });
+
+    showSlide(0);
+  }
+
+  // ---------- open / close ----------
+  function openModal() {
+    modal.removeAttribute('hidden');
+    requestAnimationFrame(() => modal.classList.add('is-open'));
+    document.body.style.overflow = 'hidden';
+    switchTab('design');
+    closeBtn.focus();
+  }
+
+  function closeModal() {
+    modal.classList.remove('is-open');
+    document.body.style.overflow = '';
+    setTimeout(() => modal.setAttribute('hidden', ''), 320);
+    openBtn && openBtn.focus();
+  }
+
+  // ---------- event listeners ----------
+  openBtn && openBtn.addEventListener('click', openModal);
+  closeBtn && closeBtn.addEventListener('click', closeModal);
+
+  // close on backdrop click
+  backdrop && backdrop.addEventListener('click', function(e) {
+    if (e.target === backdrop) closeModal();
+  });
+
+  // ESC key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
+  });
+
+  // tabs
+  tabLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      switchTab(link.dataset.tabControl);
+    });
+  });
+
+  // paddle nav
+  prevBtn && prevBtn.addEventListener('click', () => showSlide(currentSlide - 1));
+  nextBtn && nextBtn.addEventListener('click', () => showSlide(currentSlide + 1));
+
+  // init indicator after fonts/layout
+  window.addEventListener('load', () => {
+    const activeLink = modal.querySelector('[data-tab-control="design"]');
+    positionIndicator(activeLink);
+  });
+})();
+</script>
+
 {% schema %}
 {
-  "name": "Comparison Modal",
+  "name": "Compare Modal",
+  "tag": "section",
+  "class": "compare-modal-section",
   "settings": [
     {
       "type": "text",
       "id": "cta_text",
-      "label": "CTA Text To Trigger Modal",
-      "default": "Compare Models"
+      "label": "CTA Button Text",
+      "default": "Compare models",
+      "info": "Text shown on the button that opens the comparison modal."
     },
     {
       "type": "text",
-      "id": "modal_heading",
-      "label": "Modal Heading",
-      "default": "Compare Our Models"
+      "id": "modal_headline",
+      "label": "Modal Headline",
+      "default": "Compare latest models."
     }
   ],
   "presets": [
     {
-      "name": "Comparison Modal"
+      "name": "Compare Modal"
     }
   ]
 }
 {% endschema %}
-
-<style>
-/* ===== Modal Base ===== */
-.comparison-modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.5);
-  backdrop-filter: blur(10px);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-
-.comparison-modal.active {
-  display: flex;
-}
-
-.comparison-modal__inner {
-  width: 95%;
-  max-width: 1200px;
-  max-height: 90vh;
-  background: #fff;
-  border-radius: 20px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  animation: fadeIn .3s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px);}
-  to { opacity:1; transform: translateY(0);}
-}
-
-/* Header */
-.comparison-modal__header {
-  padding: 20px 30px;
-  border-bottom: 1px solid #eee;
-  display:flex;
-  justify-content: space-between;
-  align-items:center;
-}
-
-.comparison-modal__title {
-  font-size: 22px;
-  font-weight: 600;
-}
-
-.comparison-close {
-  cursor:pointer;
-  font-size:22px;
-  border:none;
-  background:none;
-}
-
-/* Tabs */
-.comparison-tabs {
-  display:flex;
-  gap:20px;
-  padding:15px 30px;
-  border-bottom:1px solid #eee;
-  overflow-x:auto;
-}
-
-.comparison-tab {
-  cursor:pointer;
-  padding:8px 16px;
-  border-radius:20px;
-  white-space:nowrap;
-  font-size:14px;
-  border:1px solid #ddd;
-}
-
-.comparison-tab.active {
-  background:#111;
-  color:#fff;
-  border-color:#111;
-}
-
-/* Gallery */
-.comparison-gallery {
-  overflow-x:auto;
-  scroll-snap-type:x mandatory;
-  display:flex;
-  padding:30px;
-  gap:30px;
-}
-
-.comparison-card {
-  flex:0 0 320px;
-  background:#fafafa;
-  border-radius:18px;
-  padding:20px;
-  scroll-snap-align:start;
-  text-align:center;
-}
-
-.comparison-card img {
-  width:100%;
-  height:auto;
-  border-radius:12px;
-  margin-bottom:15px;
-}
-
-.comparison-card h4 {
-  margin:0 0 10px;
-  font-size:18px;
-}
-
-.comparison-card p {
-  font-size:14px;
-  color:#555;
-}
-
-@media(max-width:768px){
-  .comparison-card {
-    flex:0 0 85%;
-  }
-}
-</style>
-
-<div id="comparisonModal" class="comparison-modal">
-  <div class="comparison-modal__inner">
-    
-    <div class="comparison-modal__header">
-      <div class="comparison-modal__title">
-        {{ section.settings.modal_heading }}
-      </div>
-      <button class="comparison-close">&times;</button>
-    </div>
-
-    <div class="comparison-tabs">
-      <div class="comparison-tab active" data-tab="design">Design</div>
-      <div class="comparison-tab" data-tab="camera">Camera</div>
-      <div class="comparison-tab" data-tab="chip">Chip</div>
-      <div class="comparison-tab" data-tab="battery">Battery</div>
-      <div class="comparison-tab" data-tab="price">Price</div>
-    </div>
-
-    <!-- DESIGN -->
-    <div class="comparison-gallery" data-content="design">
-      <div class="comparison-card">
-        <img src="https://via.placeholder.com/400x400">
-        <h4>Model Pro</h4>
-        <p>Innovative design with pro performance.</p>
-      </div>
-      <div class="comparison-card">
-        <img src="https://via.placeholder.com/400x400">
-        <h4>Model Air</h4>
-        <p>Super thin. Shockingly strong.</p>
-      </div>
-      <div class="comparison-card">
-        <img src="https://via.placeholder.com/400x400">
-        <h4>Model Standard</h4>
-        <p>Durable and delightful.</p>
-      </div>
-    </div>
-
-    <!-- CAMERA -->
-    <div class="comparison-gallery" data-content="camera" style="display:none;">
-      <div class="comparison-card">
-        <h4>Pro Camera</h4>
-        <p>48MP triple camera system.</p>
-      </div>
-      <div class="comparison-card">
-        <h4>Air Camera</h4>
-        <p>Dual lens fusion system.</p>
-      </div>
-      <div class="comparison-card">
-        <h4>Standard Camera</h4>
-        <p>Advanced dual camera.</p>
-      </div>
-    </div>
-
-    <!-- CHIP -->
-    <div class="comparison-gallery" data-content="chip" style="display:none;">
-      <div class="comparison-card"><h4>A17 Pro</h4></div>
-      <div class="comparison-card"><h4>A16</h4></div>
-      <div class="comparison-card"><h4>A15</h4></div>
-    </div>
-
-    <!-- BATTERY -->
-    <div class="comparison-gallery" data-content="battery" style="display:none;">
-      <div class="comparison-card"><h4>29 hrs video</h4></div>
-      <div class="comparison-card"><h4>24 hrs video</h4></div>
-      <div class="comparison-card"><h4>22 hrs video</h4></div>
-    </div>
-
-    <!-- PRICE -->
-    <div class="comparison-gallery" data-content="price" style="display:none;">
-      <div class="comparison-card"><h4>$999</h4></div>
-      <div class="comparison-card"><h4>$799</h4></div>
-      <div class="comparison-card"><h4>$699</h4></div>
-    </div>
-
-  </div>
-</div>
-
-<script>
-document.addEventListener("DOMContentLoaded", function(){
-
-  const modal = document.getElementById("comparisonModal");
-  const closeBtn = document.querySelector(".comparison-close");
-  const tabs = document.querySelectorAll(".comparison-tab");
-  const galleries = document.querySelectorAll(".comparison-gallery");
-
-  // ===== Open Modal based on CTA text =====
-  const ctaText = "{{ section.settings.cta_text | escape }}";
-
-  document.querySelectorAll("a,button").forEach(el => {
-    if(el.textContent.trim() === ctaText){
-      el.addEventListener("click", function(e){
-        e.preventDefault();
-        modal.classList.add("active");
-        document.body.style.overflow="hidden";
-      });
-    }
-  });
-
-  // Close
-  closeBtn.addEventListener("click", function(){
-    modal.classList.remove("active");
-    document.body.style.overflow="";
-  });
-
-  modal.addEventListener("click", function(e){
-    if(e.target === modal){
-      modal.classList.remove("active");
-      document.body.style.overflow="";
-    }
-  });
-
-  // Tabs
-  tabs.forEach(tab=>{
-    tab.addEventListener("click", function(){
-      tabs.forEach(t=>t.classList.remove("active"));
-      this.classList.add("active");
-
-      const target = this.dataset.tab;
-
-      galleries.forEach(g=>{
-        g.style.display = g.dataset.content === target ? "flex" : "none";
-      });
-    });
-  });
-
-});
-</script>
