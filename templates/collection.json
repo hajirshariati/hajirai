@@ -51,25 +51,6 @@
         "parallax_direction": "vertical"
       }
     },
-    "1750082334ddfccde7": {
-      "type": "apps",
-      "disabled": true,
-      "settings": {
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 0,
-        "padding_bottom": 0,
-        "divider": false,
-        "full_width": true,
-        "rounded": true
-      }
-    },
     "main-collection": {
       "type": "main-collection",
       "blocks": {
@@ -129,89 +110,28 @@
         "rounded": true
       }
     },
-    "recently-viewed": {
-      "type": "recently-viewed",
-      "disabled": true,
-      "settings": {
-        "product_limit": 6,
-        "columns": 4,
-        "carousel_on_desktop": true,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "Recently Viewed",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 80,
-        "divider": false,
-        "full_width": false,
-        "rounded": true
-      }
-    },
-    "rich_text_ARCqRb": {
-      "type": "rich-text",
+    "17715083590c9e8395": {
+      "type": "apps",
       "blocks": {
-        "heading_JecEV8": {
-          "type": "heading",
+        "aetrex_fitai_plp_shoe_fit_rating_JJe3tM": {
+          "type": "shopify://apps/aetrex-fitai/blocks/PLPShoeFitRating/6c991f1a-1e7d-4325-983c-2984a2e41236",
           "settings": {
-            "heading": "{{ collection.title }}",
-            "heading_size": "title-sm",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_hWMiHh": {
-          "type": "text",
-          "settings": {
-            "text": "{{ collection.description }}",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.2,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
+            "CategoryPage": true,
+            "rating_background": "#d06263",
+            "rating_foreground": "#fff",
+            "rating_font_size": 14,
+            "rating_font_family": "'Open Sans', sans-serif",
+            "rating_vertical_spacing": 5,
+            "rating_justify_content": "flex-start",
+            "info_popup_title_background": "#cf6262",
+            "info_popup_title_foreground": "#ffffff"
           }
         }
       },
       "block_order": [
-        "heading_JecEV8",
-        "text_hWMiHh"
+        "aetrex_fitai_plp_shoe_fit_rating_JJe3tM"
       ],
-      "disabled": true,
-      "name": "t:sections.rich-text.presets.name",
       "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
         "color_text": "",
         "color_background": "",
         "gradient_background": "",
@@ -221,12 +141,10 @@
         "color_button_background": "",
         "color_button_gradient": "",
         "padding_top": 72,
-        "padding_bottom": 100,
+        "padding_bottom": 72,
         "divider": false,
-        "narrow": true,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
+        "full_width": false,
+        "rounded": false
       }
     },
     "ss_recs_script_nYBUNj": {
@@ -266,10 +184,8 @@
   },
   "order": [
     "main-collection-banner",
-    "1750082334ddfccde7",
     "main-collection",
-    "recently-viewed",
-    "rich_text_ARCqRb",
+    "17715083590c9e8395",
     "ss_recs_script_nYBUNj",
     "ss_recs_target_Rwfepp"
   ]
