@@ -6934,7 +6934,7 @@ p::after {
 
 .drawer .modal {
     transition: all 0.3s ease;
-    z-index: 3;
+    z-index: 11;
 }
 
 .drawer .modal .fixed-modal {
