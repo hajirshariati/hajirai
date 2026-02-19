@@ -11,62 +11,11 @@
   "sections": {
     "comparison_modal_ttgjDd": {
       "type": "comparison-modal",
+      "disabled": true,
       "name": "Comparison Modal",
       "settings": {
         "cta_text": "Compare Models",
-        "modal_heading": "Compare Our Models"
-      }
-    },
-    "rich_text_JxrViK": {
-      "type": "rich-text",
-      "blocks": {
-        "button_PTw3Vh": {
-          "type": "button",
-          "settings": {
-            "button_label": "Compare Models",
-            "button_link": "",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": true
-          }
-        }
-      },
-      "block_order": [
-        "button_PTw3Vh"
-      ],
-      "name": "t:sections.rich-text.name",
-      "settings": {
-        "text_alignment": "left",
-        "text_alignment_mobile": "left",
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 100,
-        "divider": false,
-        "narrow": true,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
+        "modal_headline": "Compare latest models."
       }
     },
     "video_with_text_overlay_akXxKy": {
@@ -1259,7 +1208,6 @@
   },
   "order": [
     "comparison_modal_ttgjDd",
-    "rich_text_JxrViK",
     "video_with_text_overlay_akXxKy",
     "collection_list_kK69i9",
     "video_with_text_Mpqjh8",
