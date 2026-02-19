@@ -55,6 +55,33 @@
           "type": "shopify://apps/true-fit/blocks/widget/caa08c3b-c601-47cd-9c2a-32bb0567b191",
           "settings": {}
         },
+        "aetrex_fitai_pdp_size_recommendation_qchMDf": {
+          "type": "shopify://apps/aetrex-fitai/blocks/PDPSizeRecommendation/6c991f1a-1e7d-4325-983c-2984a2e41236",
+          "settings": {
+            "ProductPage": true,
+            "size_recommendation_font_family": "'Open Sans', sans-serif",
+            "size_recommendation_vertical_spacing": 5,
+            "expansion_panel_background": "#d06263",
+            "expansion_panel_foreground": "#ffffff",
+            "tab_background": "#f2f2f2",
+            "tab_foreground": "#5c6271",
+            "active_tab_background": "#5c6271",
+            "acitve_tab_foreground": "#fff",
+            "button_background": "#f2f2f2",
+            "button_foreground": "#5c6271",
+            "acive_button_background": "#5c6271",
+            "acive_button_foreground": "#fff",
+            "size_color": "#d60000",
+            "result_header_background": "#d06263",
+            "result_header_foreground": "#fff",
+            "result_content_background": "#F1F1F1",
+            "result_content_foreground": "#707070",
+            "result_footer_background": "#c8c8c8",
+            "result_footer_foreground": "#363636",
+            "popup_title_background": "#cf6262",
+            "popup_title_foreground": "#ffffff"
+          }
+        },
         "inventory_VdMPmM": {
           "type": "inventory",
           "settings": {
@@ -207,6 +234,7 @@
         "yotpo_product_reviews_star_rating_NHcRBy",
         "variant_picker",
         "true_fit_widget_8cjNbr",
+        "aetrex_fitai_pdp_size_recommendation_qchMDf",
         "inventory_VdMPmM",
         "buy_buttons",
         "liquid_Df3mAF",
