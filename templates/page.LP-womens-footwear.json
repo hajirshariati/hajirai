@@ -26,6 +26,7 @@
     },
     "video_VzjDta": {
       "type": "video",
+      "disabled": true,
       "name": "t:sections.video.name",
       "settings": {
         "transparent_header": false,
@@ -36,6 +37,7 @@
         "enable_video_looping": true,
         "image_height": "adapt",
         "video_mobile": "shopify://files/videos/Spring_into_mobile.mp4",
+        "video_url_mobile": "",
         "image_height_mobile": "600px",
         "padding_top": 0,
         "padding_bottom": 0,
@@ -182,7 +184,6 @@
         "image_GBXdxP",
         "image_fKnc73"
       ],
-      "disabled": true,
       "custom_css": [],
       "name": "Slideshow",
       "settings": {
