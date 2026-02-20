@@ -107,7 +107,7 @@
         "button_bgh9yH"
       ],
       "custom_css": [
-        "@media screen and (min-width: 768px) {.banner__box--medium {max-width: 26rem; left: 2em; position: relative; }}",
+        "@media screen and (min-width: 768px) {.banner__box--medium {max-width: 27rem; left: 2em; position: relative; }}",
         "@media screen and (max-width: 767px) {.video-hero {height: auto; }}"
       ],
       "name": "t:sections.video-with-text-overlay.name",
