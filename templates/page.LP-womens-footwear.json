@@ -35,7 +35,7 @@
         "description": "",
         "enable_video_autoplay": true,
         "enable_video_looping": true,
-        "image_height": "adapt",
+        "image_height": "700px",
         "video_mobile": "shopify://files/videos/Spring_into_mobile.mp4",
         "video_url_mobile": "",
         "image_height_mobile": "600px",
