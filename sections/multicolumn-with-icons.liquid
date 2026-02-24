@@ -4,7 +4,12 @@
     --section-padding-bottom: {{ section.settings.padding_bottom }}px;
     {%- render 'section-variables', section: section -%}
   }
- 
+  {% if section.settings.limit_section_width %}
+  #shopify-section-{{ section.id }} .section {
+    width: 1920px;
+    margin: 0 auto;
+  }
+  {% endif %}
 </style>
 
 <div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}{% if section.settings.abra_promo_code_show != blank %} abra--{{ section.settings.abra_promo_code_show | handleize }}-activated{% endif %}"
@@ -419,6 +424,12 @@
       "type": "text",
       "id": "abra_promo_code_hide",
       "label": "Abra Code to Hide"
+    },
+    {
+      "type": "checkbox",
+      "id": "limit_section_width",
+      "label": "Limit section to 1920px",
+      "default": false
     }
   ],
   "blocks": [
