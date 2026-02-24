@@ -379,7 +379,8 @@
         "full_width": false,
         "rounded": true,
         "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
+        "abra_promo_code_hide": "",
+        "limit_section_width": false
       }
     },
     "logo_list_YNHa44": {
@@ -512,7 +513,8 @@
         "full_width": false,
         "rounded": true,
         "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
+        "abra_promo_code_hide": "",
+        "limit_section_width": false
       }
     },
     "lookbook_XrVA6j": {
@@ -1134,9 +1136,10 @@
         "padding_bottom": 40,
         "divider": false,
         "full_width": false,
-        "rounded": true,
+        "rounded": false,
         "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
+        "abra_promo_code_hide": "",
+        "limit_section_width": true
       }
     },
     "collection_list_LhqV7k": {
