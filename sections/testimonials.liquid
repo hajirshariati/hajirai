@@ -1,4 +1,14 @@
 <style>
+@media screen and (min-width: 1280px) and (max-width: 3000px)  {
+  {% if section.settings.limit_section_width %}
+  #shopify-section-{{ section.id }} .section {
+    width: 1920px;
+    margin: 0 auto;
+  }
+  {% endif %}
+  }
+
+
   #shopify-section-{{ section.id }} {
     --section-padding-top: {{ section.settings.padding_top }}px;
     --section-padding-bottom: {{ section.settings.padding_bottom }}px;
@@ -341,6 +351,12 @@
       "id": "rounded",
       "default": false,
       "label": "t:sections.global.settings.rounded.label"
+    },
+        {
+      "type": "checkbox",
+      "id": "limit_section_width",
+      "label": "Limit section to 1920px",
+      "default": false
     }
   ],
   "blocks": [
