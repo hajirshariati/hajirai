@@ -35,7 +35,7 @@
         "enable_video_autoplay": true,
         "enable_video_looping": true,
         "image_height": "adapt",
-        "video_mobile": "shopify://files/videos/Spring_into_mobile_NO_COPY.mp4",
+        "video_mobile": "shopify://files/videos/Spring_into_mobile.mp4",
         "video_url_mobile": "",
         "image_height_mobile": "600px",
         "padding_top": 0,
