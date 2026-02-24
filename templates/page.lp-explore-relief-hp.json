@@ -210,6 +210,7 @@
         "column_tPK6pL",
         "column_QcJHeV"
       ],
+      "custom_css": [],
       "name": "t:sections.multicolumn-with-icons.name",
       "settings": {
         "style": "with-border",
@@ -238,7 +239,7 @@
         "padding_top": 24,
         "padding_bottom": 12,
         "divider": false,
-        "full_width": false,
+        "full_width": true,
         "rounded": true,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
