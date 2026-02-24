@@ -1452,7 +1452,7 @@
       "settings": {
         "image": "shopify://shop_images/Zoe_scanning.jpg",
         "img_url": "",
-        "image_height": "500px",
+        "image_height": "adapt",
         "image_width": "large",
         "layout": "text_first",
         "text_alignment": "left",
