@@ -57,6 +57,9 @@
         "heading_jRxDBN",
         "text_hFPLaw"
       ],
+      "custom_css": [
+        "@media screen and (min-width: 1280px) {.banner__box--small {max-width: 27rem; }}"
+      ],
       "name": "t:sections.video-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
@@ -71,6 +74,7 @@
         "text_alignment": "left",
         "mobile_content_space": 304,
         "mobile_content_space_color": "#f3f2ec",
+        "video_url_mobile": "",
         "image_height_mobile": "600px",
         "content_position_mobile": "items-end justify-start",
         "text_alignment_mobile": "left",
@@ -84,10 +88,10 @@
         "divider_color": "#111111",
         "overlay_opacity": 0,
         "padding_top": 0,
-        "padding_bottom": 0,
+        "padding_bottom": 12,
         "divider": false,
-        "full_width": true,
-        "rounded": false,
+        "full_width": false,
+        "rounded": true,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
@@ -234,187 +238,7 @@
         "padding_top": 24,
         "padding_bottom": 12,
         "divider": false,
-        "full_width": true,
-        "rounded": true,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "multicolumn_mjCNzx": {
-      "type": "multicolumn",
-      "blocks": {
-        "column_GPWVT8": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image": "shopify://shop_images/icon.Arch_Pain.png",
-            "image_ratio": "adapt",
-            "heading": "Example title",
-            "heading_size": "text-lg-2xl",
-            "text": "",
-            "custom_html": "",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "secondary",
-            "button_external": false,
-            "button_icon": true,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_dPNNyQ": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image": "shopify://shop_images/icon.Arch_Pain.png",
-            "image_ratio": "adapt",
-            "heading": "Example title",
-            "heading_size": "text-lg-2xl",
-            "text": "",
-            "custom_html": "",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "secondary",
-            "button_external": false,
-            "button_icon": true,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_Un66ht": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image": "shopify://shop_images/icon.Arch_Pain.png",
-            "image_ratio": "adapt",
-            "heading": "Example title",
-            "heading_size": "text-lg-2xl",
-            "text": "",
-            "custom_html": "",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "secondary",
-            "button_external": false,
-            "button_icon": true,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "column_GPWVT8",
-        "column_dPNNyQ",
-        "column_Un66ht"
-      ],
-      "disabled": true,
-      "custom_css": [
-        ".slider .card {background: transparent !important;}"
-      ],
-      "name": "t:sections.multicolumn.name",
-      "settings": {
-        "gap": "small",
-        "columns": 3,
-        "columns_mobile": "1",
-        "carousel_on_desktop": true,
-        "swipe_on_mobile": false,
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "#ffffff",
-        "color_background": "",
-        "gradient_background": "linear-gradient(190deg, rgba(168, 222, 232, 1), rgba(16, 51, 96, 1) 100%)",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 0,
-        "padding_bottom": 0,
         "full_width": false,
-        "divider": false,
-        "rounded": true,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "rich_text_eMGQNq": {
-      "type": "rich-text",
-      "blocks": {
-        "heading_HaBHQJ": {
-          "type": "heading",
-          "settings": {
-            "heading": "Foot Health & the Right Aetrex Solution for You",
-            "heading_size": "title-sm",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_3RWLBR": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Our Explore page is your guide to foot health and the best Aetrex orthotics and shoes for your needs. Learn about conditions like plantar fasciitis, bunions, and flat feet. See how work and daily activities affect your feet, and discover curated product recommendations built for comfort, support, and lasting relief.</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.2,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "heading_HaBHQJ",
-        "text_3RWLBR"
-      ],
-      "disabled": true,
-      "name": "t:sections.rich-text.name",
-      "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "#ffffff",
-        "color_background": "#e7e7e7",
-        "gradient_background": "linear-gradient(190deg, rgba(168, 222, 232, 1), rgba(16, 51, 96, 1) 85%)",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 52,
-        "padding_bottom": 52,
-        "divider": false,
-        "narrow": true,
         "rounded": true,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
@@ -2000,8 +1824,6 @@
     "video_with_text_overlay_ymchpw",
     "image_with_text_overlay_V69QPB",
     "multicolumn_with_icons_iYyJjy",
-    "multicolumn_mjCNzx",
-    "rich_text_eMGQNq",
     "logo_list_ayxHeL",
     "logo_list_YNHa44",
     "lookbook_XrVA6j",
