@@ -1,69 +1,90 @@
 <div id="frontrow-badge">
-    {% assign frontrow_product_ids = '' %}
+  {% assign frontrow_product_ids = '' %}
 
-    {% if product.metafields.custom.frontrow == '00' %}
-        {% assign frontrow_product_ids = '3246,3245' %}
-    {% elsif product.metafields.custom.frontrow == '00memory' %}
-        {% assign frontrow_product_ids = '3246,3245' %}    
-    {% elsif product.metafields.custom.frontrow == '5' %}
-        {% assign frontrow_product_ids = '3248,3247' %}
-    {% elsif product.metafields.custom.frontrow == '20' %}
-        {% assign frontrow_product_ids = '3250,3249' %}
-    {% elsif product.metafields.custom.frontrow == 'skytech' %}
-        {% assign frontrow_product_ids = '3255,3253' %}
-    {% elsif product.metafields.custom.frontrow == 'closetoe' %}
-        {% assign frontrow_product_ids = '3252' %}
-    {% elsif product.metafields.custom.frontrow == 'sandals' %}
-        {% assign frontrow_product_ids = '3251' %}
-    {% elsif product.metafields.custom.frontrow == 'mens' %}
-        {% assign frontrow_product_ids = '3254' %}
-    {% elsif request.path contains '/products/men-plantar-fasciitis-kit' %}
-        {% assign frontrow_product_ids = '3257' %}
-    {% elsif request.path contains '/products/women-plantar-fasciitis-kit' %}
-        {% assign frontrow_product_ids = '3256' %}
-    {% endif %}
+  {% if product.metafields.custom.frontrow == '00' %}
+    {% assign frontrow_product_ids = '3246,3245' %}
+  {% elsif product.metafields.custom.frontrow == '00memory' %}
+    {% assign frontrow_product_ids = '3246,3245' %}
+  {% elsif product.metafields.custom.frontrow == '5' %}
+    {% assign frontrow_product_ids = '3248,3247' %}
+  {% elsif product.metafields.custom.frontrow == '20' %}
+    {% assign frontrow_product_ids = '3250,3249' %}
+  {% elsif product.metafields.custom.frontrow == 'skytech' %}
+    {% assign frontrow_product_ids = '3255,3253' %}
+  {% elsif product.metafields.custom.frontrow == 'closetoe' %}
+    {% assign frontrow_product_ids = '3252' %}
+  {% elsif product.metafields.custom.frontrow == 'sandals' %}
+    {% assign frontrow_product_ids = '3251' %}
+  {% elsif product.metafields.custom.frontrow == 'mens' %}
+    {% assign frontrow_product_ids = '3254' %}
+  {% elsif request.path contains '/products/men-plantar-fasciitis-kit' %}
+    {% assign frontrow_product_ids = '3257' %}
+  {% elsif request.path contains '/products/women-plantar-fasciitis-kit' %}
+    {% assign frontrow_product_ids = '3256' %}
+  {% endif %}
 
-    {% if frontrow_product_ids != '' %}
-        <iframe class="iframe-frontrow" id="iframe-frontrow-quant" frameborder="0"></iframe>
+  {% if frontrow_product_ids != '' %}
+    <iframe class="iframe-frontrow" id="iframe-frontrow-quant" frameborder="0"></iframe>
 
+    <script>
+      window.loadFrontrow = function () {
+        var productIds = '{{ frontrow_product_ids }}';
+        var container = document.getElementById('frontrow-badge');
+        var iframe = document.getElementById('iframe-frontrow-quant');
 
+        // Set iframe src
+        iframe.src = 'https://app.thefrontrowhealth.com/api/widgets?presentation_type=quant&product_id=' + productIds;
 
-
-
-
-        
-        <script>
-            window.addEventListener('load', function() {
-                var productIds = '{{ frontrow_product_ids }}';
-                var container = document.getElementById('frontrow-badge');
-                var iframe = document.getElementById('iframe-frontrow-quant');
-
-                // Set iframe src
-                iframe.src = 'https://app.thefrontrowhealth.com/api/widgets?presentation_type=quant&product_id=' + productIds;
-
-                // Create and append the external script
-                var script = document.createElement('script');
-                script.type = 'text/javascript';
-                script.async = true;
-                script.src = 'https://app.thefrontrowhealth.com/api/widgets/script?presentation_type=quant&product_id=' + productIds;
-                container.appendChild(script);
-            });
-        </script>
-    {% else %}
-        <style>#frontrow-badge { display: none !important; }</style>
-    {% endif %}
+        // Create and append the external script
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.async = true;
+        script.src =
+          'https://app.thefrontrowhealth.com/api/widgets/script?presentation_type=quant&product_id=' + productIds;
+        container.appendChild(script);
+      };
+      window.addEventListener('load', function () {
+        window.loadFrontrow();
+      });
+    </script>
+  {% else %}
+    <style>
+      #frontrow-badge {
+        display: none !important;
+      }
+    </style>
+  {% endif %}
 </div>
 
 <style>
-    #iframe-frontrow-quant { height: 0px; }
-    #frontrow-badge { position: relative; display: flex; }
-    .iframe-frontrow { width: 100%; margin: 0; }
-    .iframe-modal-frontrow { display: none; position: fixed; z-index: 99999999; left: 0; top: 0; right: 0; bottom: 0; width: 100%; height: 100%; overflow: hidden; }
-    #frontrow-badge {
-        min-inline-size: -webkit-fill-available;
-        background: #f4f4f4;
-        padding: 1em 16px;
-        margin-top: -15px;
-        margin-bottom: 5px;
-    }
+  #iframe-frontrow-quant {
+    height: 0px;
+  }
+  #frontrow-badge {
+    position: relative;
+    display: flex;
+  }
+  .iframe-frontrow {
+    width: 100%;
+    margin: 0;
+  }
+  .iframe-modal-frontrow {
+    display: none;
+    position: fixed;
+    z-index: 99999999;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  #frontrow-badge {
+    min-inline-size: -webkit-fill-available;
+    background: #f4f4f4;
+    padding: 1em 16px;
+    margin-top: -15px;
+    margin-bottom: 5px;
+  }
 </style>

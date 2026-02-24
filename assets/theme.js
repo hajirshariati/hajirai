@@ -8364,6 +8364,8 @@ class ProductColorSwatchHandler {
                 setTimeout(() => {
                     this.isProductSwitching = false;
                 }, 500);
+
+                window.loadFrontrow();
             })
             .catch(error => {
                 console.error('Error fetching product page:', error);
