@@ -242,7 +242,7 @@
         "padding_bottom": 40,
         "divider": false,
         "full_width": false,
-        "rounded": true,
+        "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": "",
         "limit_section_width": true
