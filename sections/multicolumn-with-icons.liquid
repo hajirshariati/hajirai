@@ -4,11 +4,14 @@
     --section-padding-bottom: {{ section.settings.padding_bottom }}px;
     {%- render 'section-variables', section: section -%}
   }
+
+
+  @media screen and (min-width: 1280px) {
   {% if section.settings.limit_section_width %}
   #shopify-section-{{ section.id }} .section {
     width: 1920px;
     margin: 0 auto;
-  }
+  }}
   {% endif %}
 </style>
 
