@@ -80,7 +80,7 @@
         "text_alignment_mobile": "left",
         "color_text": "#171717",
         "color_highlight": "#0e4389",
-        "gradient_highlight": "linear-gradient(180deg, rgba(190, 18, 60, 1), rgba(94, 17, 4, 1) 100%)",
+        "gradient_highlight": "linear-gradient(180deg, rgba(66, 125, 202, 1), rgba(14, 67, 137, 1) 100%)",
         "color_button_text": "#171717",
         "color_button_background": "#ffffff",
         "color_button_gradient": "",
