@@ -26,6 +26,7 @@
     },
     "video_VzjDta": {
       "type": "video",
+      "disabled": true,
       "name": "t:sections.video.name",
       "settings": {
         "transparent_header": false,
@@ -183,7 +184,6 @@
         "image_GBXdxP",
         "image_fKnc73"
       ],
-      "disabled": true,
       "custom_css": [],
       "name": "Slideshow",
       "settings": {
