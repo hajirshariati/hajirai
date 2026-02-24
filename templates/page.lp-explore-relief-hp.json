@@ -1455,8 +1455,8 @@
       "settings": {
         "image": "shopify://shop_images/Zoe_scanning.jpg",
         "img_url": "",
-        "image_height": "500px",
-        "image_width": "large",
+        "image_height": "adapt",
+        "image_width": "small",
         "layout": "text_first",
         "text_alignment": "left",
         "custom_content_position": "items-center",
@@ -1477,7 +1477,7 @@
         "divider": false,
         "full_width": false,
         "rounded": true,
-        "enable_parallax": true,
+        "enable_parallax": false,
         "parallax_direction": "zoom",
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
