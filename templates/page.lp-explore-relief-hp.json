@@ -72,8 +72,9 @@
         "content_width": "small",
         "content_position": "md:items-center md:justify-start",
         "text_alignment": "left",
-        "mobile_content_space": 304,
+        "mobile_content_space": 352,
         "mobile_content_space_color": "#f3f2ec",
+        "video_mobile": "shopify://files/videos/600px_explore_relief_mobile.mp4",
         "video_url_mobile": "",
         "image_height_mobile": "600px",
         "content_position_mobile": "items-end justify-start",
@@ -245,7 +246,7 @@
         "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": "",
-        "limit_section_width": true
+        "limit_section_width": false
       }
     },
     "logo_list_ayxHeL": {
