@@ -11,8 +11,9 @@
   #shopify-section-{{ section.id }} .section {
     width: 1920px;
     margin: 0 auto;
-  }}
+  }
   {% endif %}
+  }
 </style>
 
 <div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}{% if section.settings.abra_promo_code_show != blank %} abra--{{ section.settings.abra_promo_code_show | handleize }}-activated{% endif %}"
