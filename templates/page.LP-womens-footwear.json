@@ -37,7 +37,7 @@
         "image_height": "adapt",
         "video_mobile": "shopify://files/videos/Spring_into_mobile.mp4",
         "video_url_mobile": "",
-        "image_height_mobile": "600px",
+        "image_height_mobile": "adapt",
         "padding_top": 0,
         "padding_bottom": 0,
         "divider": false,
