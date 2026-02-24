@@ -24,6 +24,74 @@
         "rounded": false
       }
     },
+    "video_with_text_overlay_ymchpw": {
+      "type": "video-with-text-overlay",
+      "blocks": {
+        "heading_jRxDBN": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>Explore <em>Foot Health</em> & Find the Right <em>Support</em> for You</p>",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_hFPLaw": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Learn about common foot issues and discover products designed for your lifestyle. Benefit from expert guidance from Aetrex with 80 years of experience.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_jRxDBN",
+        "text_hFPLaw"
+      ],
+      "name": "t:sections.video-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "video": "shopify://files/videos/1920x800_Explore_relief 1.mp4",
+        "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
+        "description": "",
+        "enable_video_autoplay": true,
+        "enable_video_looping": true,
+        "image_height": "650px",
+        "content_width": "small",
+        "content_position": "md:items-center md:justify-start",
+        "text_alignment": "left",
+        "mobile_content_space": 304,
+        "mobile_content_space_color": "#f3f2ec",
+        "image_height_mobile": "600px",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
+        "color_text": "#171717",
+        "color_highlight": "#0e4389",
+        "gradient_highlight": "linear-gradient(180deg, rgba(75, 118, 174, 1), rgba(5, 24, 49, 1) 99%)",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
     "image_with_text_overlay_V69QPB": {
       "type": "image-with-text-overlay",
       "blocks": {
@@ -57,6 +125,7 @@
         "heading_38bgHq",
         "text_arQdc3"
       ],
+      "disabled": true,
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
@@ -154,8 +223,8 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "color_text": "#ffffff",
-        "color_background": "#0d2850",
+        "color_text": "#171717",
+        "color_background": "#edf3f4",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
@@ -468,8 +537,8 @@
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "#171717",
-        "color_background": "#ffffff",
-        "gradient_background": "linear-gradient(1deg, rgba(255, 255, 255, 1) 7%, rgba(168, 222, 232, 1) 94%)",
+        "color_background": "rgba(0,0,0,0)",
+        "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
         "color_button_text": "",
@@ -1225,8 +1294,8 @@
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "#171717",
-        "color_background": "#fafafa",
-        "gradient_background": "linear-gradient(183deg, rgba(250, 250, 250, 1) 7%, rgba(168, 222, 232, 1) 94%)",
+        "color_background": "#edf3f4",
+        "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
         "color_button_text": "",
@@ -1552,13 +1621,13 @@
         "button_Ftz9KD"
       ],
       "custom_css": [
-        ".image-with-text__item .media:not(.media--rounded) {border-radius: 6em;}"
+        ".image-with-text__item .media:not(.media--rounded) {border-radius: 2em;}"
       ],
       "name": "t:sections.image-with-text.name",
       "settings": {
-        "image": "shopify://shop_images/Gemini_Generated_Image_wiuq2twiuq2twiuq.jpg",
+        "image": "shopify://shop_images/Zoe_scanning.jpg",
         "img_url": "",
-        "image_height": "450px",
+        "image_height": "500px",
         "image_width": "large",
         "layout": "text_first",
         "text_alignment": "left",
@@ -1580,7 +1649,7 @@
         "divider": false,
         "full_width": false,
         "rounded": true,
-        "enable_parallax": true,
+        "enable_parallax": false,
         "parallax_direction": "vertical",
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
@@ -1733,8 +1802,8 @@
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "#171717",
-        "color_background": "#171717",
-        "gradient_background": "linear-gradient(8deg, rgba(168, 222, 232, 1) 13%, rgba(255, 255, 255, 1) 86%)",
+        "color_background": "#edf3f4",
+        "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
         "color_button_text": "",
@@ -1855,7 +1924,7 @@
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "",
-        "color_background": "#efefef",
+        "color_background": "#ffffff",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
@@ -1928,6 +1997,7 @@
   },
   "order": [
     "main-page",
+    "video_with_text_overlay_ymchpw",
     "image_with_text_overlay_V69QPB",
     "multicolumn_with_icons_iYyJjy",
     "multicolumn_mjCNzx",
