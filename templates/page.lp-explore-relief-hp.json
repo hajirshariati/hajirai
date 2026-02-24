@@ -244,7 +244,8 @@
         "full_width": false,
         "rounded": true,
         "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
+        "abra_promo_code_hide": "",
+        "limit_section_width": true
       }
     },
     "logo_list_ayxHeL": {
