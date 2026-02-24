@@ -72,7 +72,7 @@
         "content_width": "small",
         "content_position": "md:items-center md:justify-start",
         "text_alignment": "left",
-        "mobile_content_space": 328,
+        "mobile_content_space": 296,
         "mobile_content_space_color": "#f3f2ec",
         "video_mobile": "shopify://files/videos/600px_explore_relief_mobile.mp4",
         "video_url_mobile": "",
