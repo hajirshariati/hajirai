@@ -352,7 +352,7 @@
         "grid_horizontal": 85,
         "direction": "left",
         "speed": 2,
-        "heading": "<em>Foot Pain</em> Identifier",
+        "heading": "<strong>Foot Pain Identifier</strong>",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
