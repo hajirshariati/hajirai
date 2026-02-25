@@ -24,22 +24,47 @@
         "rounded": false
       }
     },
-    "video_VzjDta": {
-      "type": "video",
-      "name": "t:sections.video.name",
+    "video_with_text_overlay_niepRV": {
+      "type": "video-with-text-overlay",
+      "blocks": {
+        "liquid_MjBEXL": {
+          "type": "liquid",
+          "settings": {
+            "liquid": "<a href=\"https://www.aetrex.com/collections/spring-collection\" \n   style=\"\n     width: 100vw;\n     height: 100vh;\n     display: block;\n   \">\n</a>"
+          }
+        }
+      },
+      "block_order": [
+        "liquid_MjBEXL"
+      ],
+      "name": "t:sections.video-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
-        "video": "shopify://files/videos/Spring_into_desktop (1).mp4",
+        "video": "shopify://files/videos/Spring_into_desktop_NO_COPY.mp4",
         "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
         "description": "",
         "enable_video_autoplay": true,
         "enable_video_looping": true,
-        "image_height": "adapt",
-        "video_mobile": "shopify://files/videos/Spring_into_mobile.mp4",
-        "video_url_mobile": "",
-        "image_height_mobile": "adapt",
+        "image_height": "650px",
+        "content_width": "small",
+        "content_position": "md:items-center md:justify-center",
+        "text_alignment": "center",
+        "mobile_content_space": 0,
+        "mobile_content_space_color": "#ffffff",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-center justify-center",
+        "text_alignment_mobile": "center",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
         "padding_top": 0,
-        "padding_bottom": 20,
+        "padding_bottom": 24,
         "divider": false,
         "full_width": false,
         "rounded": true,
@@ -1079,7 +1104,7 @@
   },
   "order": [
     "main-page",
-    "video_VzjDta",
+    "video_with_text_overlay_niepRV",
     "slideshow_FWtLKn",
     "rich_text_PKdTPU",
     "collection_list_q7Rypj",
