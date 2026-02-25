@@ -55,70 +55,38 @@ class NotificationBannerPopup {
         });
     }
 
-    bindAnnouncementClicks() {
-        // Find all dropdown toggle buttons (now inside announcement content)
-        const dropdownToggles = document.querySelectorAll('.announcement-dropdown-toggle');
-        
-        if (dropdownToggles.length === 0) {
-            console.log('No dropdown toggles found');
-            return;
-        }
-
-        // Find all announcement slides to get the first one with a popup
+bindAnnouncementClicks() {
         const announcementSlides = document.querySelectorAll('.announcement__slide');
-        console.log('Found announcement slides:', announcementSlides.length);
 
-        let targetPopup = null;
-        
-        // Find the first slide with an associated popup
-        for (const slide of announcementSlides) {
-            const blockId = this.getBlockIdFromSlide(slide);
-            console.log('Block ID for slide:', blockId);
+        announcementSlides.forEach(slide => {
+            const blockId = slide.getAttribute('data-block-id');
+            if (!blockId) return;
 
-            if (blockId) {
-                const popup = document.getElementById(`notification-banner-popup-${blockId}`);
-                console.log('Found popup for block:', popup);
+            const popup = document.getElementById(`notification-banner-popup-${blockId}`);
+            if (!popup) return;
 
-                if (popup) {
-                    targetPopup = popup;
-                    break;
-                }
+            const toggle = slide.querySelector('.announcement-dropdown-toggle');
+            if (toggle) {
+                toggle.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    if (this.isVisible && this.activePopup === popup) {
+                        this.hide();
+                    } else {
+                        this.showPopup(popup);
+                    }
+                });
             }
-        }
 
-        if (!targetPopup) {
-            console.log('No popup found for any announcement');
-            return;
-        }
-
-        // Add click event to all dropdown toggle buttons with toggle functionality
-        dropdownToggles.forEach(toggle => {
-            toggle.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('Dropdown toggle clicked!');
-                
-                // Toggle: if popup is visible, hide it; otherwise show it
-                if (this.isVisible && this.activePopup === targetPopup) {
-                    this.hide();
-                } else {
-                    this.showPopup(targetPopup);
-                }
-            });
-        });
-
-        // Add click event to announcement content (but not the toggle button)
-        const announcementContents = document.querySelectorAll('.announcement__content');
-        announcementContents.forEach(content => {
-            content.addEventListener('click', (e) => {
-                // Don't trigger if clicking the toggle button itself
-                if (e.target.closest('.announcement-dropdown-toggle')) {
-                    return;
-                }
-                e.preventDefault();
-                console.log('Announcement content clicked!');
-                this.showPopup(targetPopup);
-            });
+            const content = slide.querySelector('.announcement__content');
+            if (content) {
+                content.addEventListener('click', (e) => {
+                    if (e.target.closest('.announcement-dropdown-toggle')) return;
+                    e.preventDefault();
+                    this.showPopup(popup);
+                });
+            }
         });
     }
 
