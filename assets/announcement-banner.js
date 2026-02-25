@@ -67,16 +67,15 @@ bindAnnouncementClicks() {
 
             const toggle = slide.querySelector('.announcement-dropdown-toggle');
             if (toggle) {
-                toggle.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
+toggle.addEventListener('click', (e) => {
+    e.preventDefault();
 
-                    if (this.isVisible && this.activePopup === popup) {
-                        this.hide();
-                    } else {
-                        this.showPopup(popup);
-                    }
-                });
+    if (this.isVisible && this.activePopup === popup) {
+        this.hide();
+    } else {
+        this.showPopup(popup);
+    }
+});
             }
 
             const content = slide.querySelector('.announcement__content');
