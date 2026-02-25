@@ -7985,6 +7985,10 @@ class ProductColorSwatchHandler {
             'multicolumn_KyfUdW',
             'multicolumn_CEQ6Uh'
         ];
+
+        this.SECTIONS_TO_RERENDER = [
+            'shopify-block-AcnpEa1pFSjQ0elVRc__true_fit_widget_8cjNbr',
+        ]
         
         this.observer = null;
         this.isProductSwitching = false;
@@ -8162,6 +8166,15 @@ class ProductColorSwatchHandler {
         document.body.classList.add('page-loading');
 
         const url = `/products/${handle}`;
+        
+        let saveContent = [];
+
+        this.SECTIONS_TO_RERENDER.forEach(sectionId => {
+            const section = document.getElementById(sectionId);
+            if(section) {
+                saveContent[sectionId] = section.innerHTML;
+            }
+        });
 
         fetch(url)
             .then(response => {
@@ -8359,6 +8372,13 @@ class ProductColorSwatchHandler {
                         }
                     }
                 }, 500);
+
+                this.SECTIONS_TO_RERENDER.forEach(sectionId => {
+                    const section = document.getElementById(sectionId);
+                    if(section) {
+                        section.innerHTML = saveContent[sectionId];
+                    }
+                });
                 
                 // Reset the product switching flag after a delay to ensure all updates are complete
                 setTimeout(() => {
