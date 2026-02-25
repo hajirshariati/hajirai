@@ -7987,7 +7987,7 @@ class ProductColorSwatchHandler {
         ];
 
         this.SECTIONS_TO_RERENDER = [
-            'shopify-block-AcnpEa1pFSjQ0elVRc__true_fit_widget_8cjNbr',
+            
         ]
         
         this.observer = null;
@@ -8168,6 +8168,11 @@ class ProductColorSwatchHandler {
         const url = `/products/${handle}`;
         
         let saveContent = [];
+        
+        const tfcWidgetId = document.querySelector('#tfc-widget')?.closest('.shopify-app-block')?.getAttribute('id');
+        if(tfcWidgetId) {
+            this.SECTIONS_TO_RERENDER.push(tfcWidgetId);
+        }
 
         this.SECTIONS_TO_RERENDER.forEach(sectionId => {
             const section = document.getElementById(sectionId);
