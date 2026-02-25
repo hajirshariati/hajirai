@@ -27,7 +27,7 @@
     <iframe class="iframe-frontrow" id="iframe-frontrow-quant" frameborder="0"></iframe>
 
     <script>
-      window.loadFrontrow = function () {
+      window.addEventListener('load', function () {
         var productIds = '{{ frontrow_product_ids }}';
         var container = document.getElementById('frontrow-badge');
         var iframe = document.getElementById('iframe-frontrow-quant');
@@ -42,9 +42,6 @@
         script.src =
           'https://app.thefrontrowhealth.com/api/widgets/script?presentation_type=quant&product_id=' + productIds;
         container.appendChild(script);
-      };
-      window.addEventListener('load', function () {
-        window.loadFrontrow();
       });
     </script>
   {% else %}
