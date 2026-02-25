@@ -30,7 +30,7 @@
         "heading_jRxDBN": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Explore <em>Foot Health</em> & Find the Right <em>Support</em> for You</p>",
+            "heading": "<p>Explore Foot Health & Find the Right Support for You</p>",
             "heading_size": "title-sm",
             "heading_tag": "h2",
             "highlighted_text": "text",
@@ -169,7 +169,7 @@
         "column_74GMKk": {
           "type": "column",
           "settings": {
-            "icon": "shoe",
+            "icon": "check_mark",
             "custom_icon": "",
             "heading": "<strong>Foot Health Backed By Science</strong>",
             "text": "",
@@ -182,7 +182,7 @@
         "column_tPK6pL": {
           "type": "column",
           "settings": {
-            "icon": "check_mark",
+            "icon": "award",
             "custom_icon": "",
             "heading": "<strong>Recommended by Doctors & Podiatrists</strong>",
             "text": "",

@@ -39,7 +39,7 @@
         "video_url_mobile": "",
         "image_height_mobile": "adapt",
         "padding_top": 0,
-        "padding_bottom": 0,
+        "padding_bottom": 20,
         "divider": false,
         "full_width": false,
         "rounded": true,
