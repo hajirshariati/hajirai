@@ -13,17 +13,9 @@
     --section-padding-top: {{ section.settings.padding_top }}px;
     --section-padding-bottom: {{ section.settings.padding_bottom }}px;
     {%- render 'section-variables', section: section -%}
-{%- if section.settings.image_height == 'adapt' and first_block != blank -%}
-
-  {%- if first_block.type == 'image' and first_block.settings.image != blank -%}
-    --ratio-percent: {{ 1 | divided_by: first_block.settings.image.aspect_ratio | times: 100 }}%;
-  
-  {%- elsif first_block.type == 'video' and first_block.settings.cover_image != blank -%}
-    --ratio-percent: {{ 1 | divided_by: first_block.settings.cover_image.aspect_ratio | times: 100 }}%;
-  
-  {%- endif -%}
-
-{%- endif -%}
+    {%- if first_block != blank and first_block.settings.image != blank and section.settings.image_height == 'adapt' %}
+      --ratio-percent: {{ 1 | divided_by: first_block.settings.image.aspect_ratio | times: 100 }}%;
+    {% endif -%}
   }
 
   {%- assign first_block_image_mobile = first_block.settings.image_mobile | default: first_block.settings.image -%}
@@ -170,9 +162,9 @@
           <div class="slideshow-word flex flex-col gap-6 md:text-{{ section.settings.text_alignment }} text-{{ section.settings.text_alignment_mobile }}" data-index="{{ forloop.index0 }}" aria-current="{% if forloop.first %}true{% else %}false{% endif %}">
             {%- if block.settings.heading != blank -%}
               <div class="banner__box banner__box--{{ section.settings.content_width }}">
-<{{ block.settings.heading_tag }} class="heading leading-none {{ block.settings.heading_size }}">
-  {{ block.settings.heading | newline_to_br }}
-</{{ block.settings.heading_tag }}>
+                <{{ block.settings.heading_tag }} class="heading leading-none {{ block.settings.heading_size }}">
+                  {{ block.settings.heading }}
+                </{{ block.settings.heading_tag }}>
               </div>
             {%- endif -%}
 
@@ -658,12 +650,12 @@
           "type": "header",
           "content": "Content"
         },
-{
-  "type": "textarea",
-  "id": "heading",
-  "label": "Heading",
-  "default": "Image slide"
-},
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "t:sections.global.settings.heading.label",
+          "default": "Image slide"
+        },
         {
           "type": "select",
           "id": "heading_size",
