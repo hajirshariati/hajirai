@@ -85,8 +85,8 @@
     </template>
 
     {%- if show_play_button -%}
-      <button type="button" id="DeferredPoster-{{ video_id }}" class="deferred-poster absolute top-0 left-0 w-full h-full" aria-label="{{ 'general.accessibility.play_video' | t | escape }}">
-        <span class="play-button absolute flex items-center justify-center rounded-full pointer-events-auto z-10">
+<button type="button" id="DeferredPoster-{{ video_id }}" class="deferred-poster absolute inset-0 w-full h-full" style="display: flex; align-items: center; justify-content: center;" aria-label="{{ 'general.accessibility.play_video' | t | escape }}">
+  <span class="play-button flex items-center justify-center rounded-full pointer-events-auto z-10" style="position: static;">
           {%- render 'icon', icon: 'play' -%}
           {%- render 'icon', icon: 'pause' -%}
         </span>
