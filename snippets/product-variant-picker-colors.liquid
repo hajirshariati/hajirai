@@ -1,50 +1,75 @@
 {% assign metaProducts = product.metafields.custom.product_reference.value %}
- {% assign productcolor = product.metafields.custom.color | metafield_tag | strip_html %}
-  {% if productcolor != blank and metaProducts != blank %}
-    <div class="form__label flex items-center justify-between gap-2 w-full form__label--color">
-      <div class="flex gap-2">Color:
-        <span class="font-medium">{{ productcolor }}</span>
-      </div>
+{% assign productcolor = product.metafields.custom.color | metafield_tag | strip_html %}
+{% if productcolor != blank and metaProducts != blank %}
+  <div class="form__label flex items-center justify-between gap-2 w-full form__label--color">
+    <div class="flex gap-2">
+      Color:
+      <span class="font-medium">{{ productcolor }}</span>
     </div>
-    <ul class="swatches swatches--{{ settings.rounded_swatch }} swatches--color swatches--variant flex items-start flex-wrap gap-4">
-      {% for metaproduct in metaProducts %}
-        <li>
-          {%- assign variant_badge = metaproduct.selected_or_first_available_variant.metafields.variant.badge -%}
-          {%- if metaproduct.selected_or_first_available_variant.compare_at_price and metaproduct.selected_or_first_available_variant.compare_at_price > metaproduct.selected_or_first_available_variant.price -%}
-            {%- assign discount = metaproduct.selected_or_first_available_variant.compare_at_price | minus: metaproduct.selected_or_first_available_variant.price -%}
-            {%- assign saved_amount_int = discount | times: 100.0 | divided_by: metaproduct.selected_or_first_available_variant.compare_at_price | round -%}
-          {%- endif -%}
-         <div class="product-form__swatch custom-meta-url" 
-              data-product-handle="{{ metaproduct.handle }}"
-              {{ productcolor }}>
-            <magnet-element class="block">
-              <label class="{%- if metaproduct.handle == product.handle -%}active-swatch {%- endif %} custom-meta-label color-swatch with-image inline-block cursor-pointer relative aspect-adapt_first mobile:aspect-adapt_first aspect-contain"
-                style="background-image:url({{ metaproduct.featured_image | image_url }});">
-                {%- if metaproduct.selected_or_first_available_variant.compare_at_price and metaproduct.selected_or_first_available_variant.compare_at_price > metaproduct.selected_or_first_available_variant.price -%}
-                {%- if saved_amount_int >= 60 -%} 
+  </div>
+  <ul class="swatches swatches--{{ settings.rounded_swatch }} swatches--color swatches--variant flex items-start flex-wrap gap-4">
+    {% for metaproduct in metaProducts %}
+      <li>
+        {%- assign variant_badge = metaproduct.selected_or_first_available_variant.metafields.variant.badge -%}
+        {%- if metaproduct.selected_or_first_available_variant.compare_at_price
+          and metaproduct.selected_or_first_available_variant.compare_at_price
+            > metaproduct.selected_or_first_available_variant.price
+        -%}
+          {%- assign discount = metaproduct.selected_or_first_available_variant.compare_at_price
+            | minus: metaproduct.selected_or_first_available_variant.price
+          -%}
+          {%- assign saved_amount_int = discount
+            | times: 100.0
+            | divided_by: metaproduct.selected_or_first_available_variant.compare_at_price
+            | round
+          -%}
+        {%- endif -%}
+        <div
+          class="product-form__swatch custom-meta-url"
+          data-product-handle="{{ metaproduct.handle }}"
+          {{ productcolor }}
+        >
+          <magnet-element class="block">
+            <label
+              class="{%- if metaproduct.handle == product.handle -%}active-swatch {%- endif %} custom-meta-label color-swatch with-image inline-block cursor-pointer relative aspect-adapt_first mobile:aspect-adapt_first aspect-contain"
+              style="background-image:url({{ metaproduct.featured_image | image_url }});"
+            >
+              {%- if metaproduct.selected_or_first_available_variant.compare_at_price
+                and metaproduct.selected_or_first_available_variant.compare_at_price
+                  > metaproduct.selected_or_first_available_variant.price
+              -%}
+                {%- if saved_amount_int >= 60 -%}
                   <div class="main-pdp-variant-custom-badge custom-final-sale">
-                    {{- "Final Sale" -}}
+                    {{- 'Final Sale' -}}
                   </div>
                 {%- elsif saved_amount_int > 0 -%}
                   <div class="main-pdp-variant-custom-badge custom-normal-sale">
-                    {{- "SALE" -}}
+                    {{- 'SALE' -}}
                   </div>
                 {%- endif -%}
               {%- elsif variant_badge != blank -%}
                 {%- assign allowed_badges = 'NEW,Best Selle,SALE' | split: ',' -%}
                 {%- if allowed_badges contains variant_badge -%}
                   <div class="main-pdp-variant-custom-badge custom-meta-badge">
-                  {{- variant_badge -}}
+                    {{- variant_badge -}}
                   </div>
                 {%- endif -%}
               {%- endif -%}
 
-                {% assign metaproductcolor = metaproduct.metafields.custom.color | metafield_tag | strip_html %}
-              <span class="tooltip opacity-0 pointer-events-none text-xs rounded-full z-10">{{ metaproductcolor | capitalize }}</span>
-              </label>
-            </magnet-element>
-          </div>
-        </li>
-      {% endfor %}
-    </ul>
-  {% endif %}
+              {% assign metaproductcolor = metaproduct.metafields.custom.color | metafield_tag | strip_html %}
+              <span class="tooltip opacity-0 pointer-events-none text-xs rounded-full z-10">
+                {{- metaproductcolor | capitalize -}}
+              </span>
+            </label>
+          </magnet-element>
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <style>
+    .product-info__mobile-form {
+      display: none;
+    }
+  </style>
+{% endif %}
