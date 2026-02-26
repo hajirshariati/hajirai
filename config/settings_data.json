@@ -74,7 +74,7 @@
     "enable_page_transition": false,
     "enable_lazy_image": true,
     "buttons_hover": "none",
-    "buttons_border_thickness": 0,
+    "buttons_border_thickness": 2,
     "buttons_border_opacity": 100,
     "buttons_shadow_opacity": 0,
     "buttons_shadow_horizontal_offset": 0,
