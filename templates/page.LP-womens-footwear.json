@@ -38,7 +38,7 @@
             "video_url_mobile": "",
             "cover_image_mobile": "shopify://shop_images/25784-MicrosoftTeams-image203_10a1ef7e-cf07-4b5b-b8e0-2449238b716b.jpg",
             "content_position": "md:items-end md:justify-start",
-            "content_position_mobile": "items-end justify-start",
+            "content_position_mobile": "items-center justify-center",
             "heading": "<span style=\"color:#FFDDBF\">SPRING<br>\ninto<br>\nMOTION</span>",
             "heading_size": "title-lg tracking-heading",
             "heading_tag": "h2",
