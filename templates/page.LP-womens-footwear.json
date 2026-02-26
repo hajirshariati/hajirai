@@ -30,8 +30,8 @@
         "heading_q3AHTi": {
           "type": "heading",
           "settings": {
-            "heading": "<h2>Spring </h2><p>into </p><h2>Motion</h2>",
-            "heading_size": "title-lg tracking-heading",
+            "heading": "<h2>SPRING</h2><p>into </p><h2>MOTION</h2>",
+            "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -81,11 +81,11 @@
         "image_height_mobile": "adapt",
         "content_position_mobile": "items-end justify-start",
         "text_alignment_mobile": "left",
-        "color_text": "#ffffff",
+        "color_text": "#f7e3ce",
         "color_highlight": "#e0a580",
         "gradient_highlight": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
+        "color_button_text": "#ffffff",
+        "color_button_background": "#e97544",
         "color_button_gradient": "",
         "color_overlay": "#171717",
         "divider_color": "#111111",
