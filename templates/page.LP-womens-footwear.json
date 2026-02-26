@@ -27,14 +27,39 @@
     "video_with_text_overlay_niepRV": {
       "type": "video-with-text-overlay",
       "blocks": {
+        "heading_q3AHTi": {
+          "type": "heading",
+          "settings": {
+            "heading": "<h2>Spring </h2><p>into </p><h2>Motion</h2>",
+            "heading_size": "title-lg tracking-heading",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_etrgEN": {
+          "type": "button",
+          "settings": {
+            "button_label": "Shop Now",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "sm",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
         "liquid_MjBEXL": {
           "type": "liquid",
+          "disabled": true,
           "settings": {
             "liquid": "<a href=\"https://www.aetrex.com/collections/spring-collection\" \n   style=\"\n     width: 100vw;\n     height: 100vh;\n     display: block;\n   \">\n</a>"
           }
         }
       },
       "block_order": [
+        "heading_q3AHTi",
+        "button_etrgEN",
         "liquid_MjBEXL"
       ],
       "name": "t:sections.video-with-text-overlay.name",
@@ -46,9 +71,9 @@
         "enable_video_autoplay": true,
         "enable_video_looping": true,
         "image_height": "adapt",
-        "content_width": "small",
-        "content_position": "md:items-center md:justify-center",
-        "text_alignment": "center",
+        "content_width": "medium",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
         "mobile_content_space": 0,
         "mobile_content_space_color": "#ffffff",
         "video_mobile": "shopify://files/videos/Spring_into_mobile.mp4",
