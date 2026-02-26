@@ -13,9 +13,17 @@
     --section-padding-top: {{ section.settings.padding_top }}px;
     --section-padding-bottom: {{ section.settings.padding_bottom }}px;
     {%- render 'section-variables', section: section -%}
-    {%- if first_block != blank and first_block.settings.image != blank and section.settings.image_height == 'adapt' %}
-      --ratio-percent: {{ 1 | divided_by: first_block.settings.image.aspect_ratio | times: 100 }}%;
-    {% endif -%}
+{%- if section.settings.image_height == 'adapt' and first_block != blank -%}
+
+  {%- if first_block.type == 'image' and first_block.settings.image != blank -%}
+    --ratio-percent: {{ 1 | divided_by: first_block.settings.image.aspect_ratio | times: 100 }}%;
+  
+  {%- elsif first_block.type == 'video' and first_block.settings.cover_image != blank -%}
+    --ratio-percent: {{ 1 | divided_by: first_block.settings.cover_image.aspect_ratio | times: 100 }}%;
+  
+  {%- endif -%}
+
+{%- endif -%}
   }
 
   {%- assign first_block_image_mobile = first_block.settings.image_mobile | default: first_block.settings.image -%}
