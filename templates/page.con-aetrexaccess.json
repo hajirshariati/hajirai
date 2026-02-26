@@ -165,6 +165,8 @@
         "content_width": "large",
         "content_position": "md:items-center md:justify-center",
         "text_alignment": "center",
+        "mobile_content_space": 0,
+        "mobile_content_space_color": "#ffffff",
         "video_url_mobile": "",
         "image_height_mobile": "auto",
         "content_position_mobile": "items-center justify-center",
@@ -338,7 +340,8 @@
         "full_width": false,
         "rounded": false,
         "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
+        "abra_promo_code_hide": "",
+        "limit_section_width": false
       }
     },
     "multicolumn_Nqae7T": {
@@ -859,7 +862,7 @@
         "text_T8JqrT": {
           "type": "text",
           "settings": {
-            "text": "<p>Aetrex reserves the right to modify, amend, update or terminate the terms and conditions of the loyalty program at any time without prior notice. Continued use of the loyalty program services after any such changes constitutes acceptance of any revised T&C.</p><p>Free shipping for loyalty members will end on November 18th, 2025 at 11:59 PM PT. Orders placed before this date will still qualify for free shipping.</p>",
+            "text": "<p>Aetrex reserves the right to modify, amend, update or terminate the terms and conditions of the loyalty program at any time without prior notice. Continued use of the loyalty program services after any such changes constitutes acceptance of any revised T&C.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
