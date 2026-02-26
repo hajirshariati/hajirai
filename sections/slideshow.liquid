@@ -212,7 +212,7 @@
       <div class="slideshow-content" style="padding-bottom: 2em;">
         {%- if section.blocks.size > 1 and section.settings.show_navigation -%}
 <div class="slideshow-dots flex items-end justify-end gap-4">
-  <slider-dots class="flickity-page-dots w-auto pointer-events-auto" aria-controls="Slider-{{ section.id }}">
+  <slider-dots style="height: 2.5em;" class="flickity-page-dots w-auto pointer-events-auto" aria-controls="Slider-{{ section.id }}">
     {%- for block in section.blocks -%}
       <button type="button" class="flickity-page-dot" data-index="{{ forloop.index0 }}" aria-current="{% if forloop.first %}true{% else %}false{% endif %}">
         <span class="sr-only">{{ 'general.pagination.page' | t: number: forloop.index }}</span>
