@@ -98,3 +98,23 @@
     {{- poster -}}
   </div>
 {%- endif -%}
+
+
+<script>
+document.addEventListener('click', function(e) {
+  const media = e.target.closest('video-media');
+  if (!media) return;
+
+  const video = media.querySelector('video');
+  if (!video) return;
+
+  // Prevent double trigger if clicking the button
+  if (e.target.closest('button')) return;
+
+  if (video.paused) {
+    video.play();
+  } else {
+    video.pause();
+  }
+});
+</script>
