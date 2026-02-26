@@ -73,7 +73,7 @@
     "rounded_block": "square",
     "enable_page_transition": false,
     "enable_lazy_image": true,
-    "buttons_hover": "standard",
+    "buttons_hover": "none",
     "buttons_border_thickness": 0,
     "buttons_border_opacity": 100,
     "buttons_shadow_opacity": 0,
