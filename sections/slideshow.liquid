@@ -170,9 +170,9 @@
           <div class="slideshow-word flex flex-col gap-6 md:text-{{ section.settings.text_alignment }} text-{{ section.settings.text_alignment_mobile }}" data-index="{{ forloop.index0 }}" aria-current="{% if forloop.first %}true{% else %}false{% endif %}">
             {%- if block.settings.heading != blank -%}
               <div class="banner__box banner__box--{{ section.settings.content_width }}">
-                <{{ block.settings.heading_tag }} class="heading leading-none {{ block.settings.heading_size }}">
-                  {{ block.settings.heading }}
-                </{{ block.settings.heading_tag }}>
+<{{ block.settings.heading_tag }} class="heading leading-none {{ block.settings.heading_size }}">
+  {{ block.settings.heading | newline_to_br }}
+</{{ block.settings.heading_tag }}>
               </div>
             {%- endif -%}
 
