@@ -570,7 +570,7 @@
                   assign discount_codes = discount_codes | uniq
                 -%}
                 <div class="cart-details">
-                  <details class="details" is="accordion-details" id="CartDiscount-{{ section.id }}">
+                  <details class="details" is="accordion-details" id="CartDiscount-{{ section.id }}" open>
                     <summary class="details__summary flex items-center justify-between gap-2 cursor-pointer">
                       <p class="flex items-center gap-2d5">
                         <span class="text-sm md:text-2xl font-medium leading-none">{{ 'general.cart.discount.caption' | t }}</span>
