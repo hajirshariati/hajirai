@@ -208,8 +208,8 @@
 </div>
 
     {%- comment -%} Fixed navigation at bottom {%- endcomment -%}
-    <div class="{% unless section.settings.full_width %}page-width {% endunless %}absolute bottom-0 left-0 w-full pointer-events-none">
-      <div class="slideshow-content">
+<div class="{% unless section.settings.full_width %}page-width {% endunless %}absolute bottom-0 left-0 w-full pointer-events-none">
+      <div class="slideshow-content" style="padding-bottom: 2em;">
         {%- if section.blocks.size > 1 and section.settings.show_navigation -%}
 <div class="slideshow-dots flex items-end justify-end gap-4">
   <slider-dots class="flickity-page-dots w-auto pointer-events-auto" aria-controls="Slider-{{ section.id }}">
