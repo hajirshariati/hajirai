@@ -9,116 +9,6 @@
  */
 {
   "sections": {
-    "slideshow_LdBKik": {
-      "type": "slideshow",
-      "blocks": {
-        "image_RaqBtg": {
-          "type": "image",
-          "settings": {
-            "heading": "Image slide",
-            "heading_size": "title-lg tracking-heading",
-            "heading_tag": "h2",
-            "text": "<p>Pair text with an image to focus on your chosen product, collection, or blog post. Add details on availability, style, or even provide a review.</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color_text": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": false
-          }
-        },
-        "image_eVftNK": {
-          "type": "image",
-          "settings": {
-            "heading": "Image slide",
-            "heading_size": "title-lg tracking-heading",
-            "heading_tag": "h2",
-            "text": "<p>Pair text with an image to focus on your chosen product, collection, or blog post. Add details on availability, style, or even provide a review.</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color_text": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": false
-          }
-        },
-        "image_kTrCEf": {
-          "type": "image",
-          "settings": {
-            "heading": "Image slide",
-            "heading_size": "title-lg tracking-heading",
-            "heading_tag": "h2",
-            "text": "<p>Pair text with an image to focus on your chosen product, collection, or blog post. Add details on availability, style, or even provide a review.</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color_text": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "primary",
-            "button_external": false,
-            "button_icon": false
-          }
-        }
-      },
-      "block_order": [
-        "image_RaqBtg",
-        "image_eVftNK",
-        "image_kTrCEf"
-      ],
-      "name": "t:sections.slideshow.name",
-      "settings": {
-        "autoplay": false,
-        "autoplay_speed": 5,
-        "show_navigation": true,
-        "image_height": "650px",
-        "content_width": "small",
-        "content_position": "md:items-end md:justify-start",
-        "text_alignment": "left",
-        "image_height_mobile": "auto",
-        "content_position_mobile": "items-end justify-start",
-        "text_alignment_mobile": "left",
-        "accessibility_info": "Slideshow about our brand",
-        "color_text": "#ffffff",
-        "color_background": "#ffffff",
-        "gradient_background": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
-        "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "overlay_opacity": 20,
-        "padding_top": 0,
-        "padding_bottom": 0,
-        "divider": false,
-        "full_width": true,
-        "rounded": false,
-        "enable_parallax": false,
-        "parallax_direction": "vertical",
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
     "video_with_text_overlay_akXxKy": {
       "type": "video-with-text-overlay",
       "blocks": {
@@ -1307,7 +1197,6 @@
     }
   },
   "order": [
-    "slideshow_LdBKik",
     "video_with_text_overlay_akXxKy",
     "collection_list_kK69i9",
     "video_with_text_Mpqjh8",
