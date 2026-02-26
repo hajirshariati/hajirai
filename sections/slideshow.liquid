@@ -163,11 +163,11 @@
     </slideshow-element>
 {%- comment -%} Positioned content overlay for text and CTA {%- endcomment -%}
 <div class="absolute top-0 left-0 w-full h-full pointer-events-none">
-  <div class="{% unless section.settings.full_width %}page-width {% endunless %}w-full h-full flex {{ block.settings.content_position }} {{ block.settings.content_position_mobile }}">
-    <div class="slideshow-content-positioned mobile-padding " style="max-width: max-content;position: absolute;margin: 2em;" >
-      <nav is="slideshow-words" class="slideshow-words grid items-center" aria-controls="Slider-{{ section.id }}" aria-labelledby="Slider-{{ section.id }}">
-        {%- for block in section.blocks -%}
-          <div class="slideshow-word flex flex-col gap-6 md:text-{{ section.settings.text_alignment }} text-{{ section.settings.text_alignment_mobile }}" data-index="{{ forloop.index0 }}" aria-current="{% if forloop.first %}true{% else %}false{% endif %}">
+  <div class="{% unless section.settings.full_width %}page-width {% endunless %}w-full h-full relative">
+    <nav is="slideshow-words" class="slideshow-words grid w-full h-full" aria-controls="Slider-{{ section.id }}" aria-labelledby="Slider-{{ section.id }}">
+      {%- for block in section.blocks -%}
+        <div class="slideshow-word w-full h-full flex {{ block.settings.content_position }} {{ block.settings.content_position_mobile }}" data-index="{{ forloop.index0 }}" aria-current="{% if forloop.first %}true{% else %}false{% endif %}">
+          <div class="slideshow-content-positioned mobile-padding flex flex-col gap-6 md:text-{{ section.settings.text_alignment }} text-{{ section.settings.text_alignment_mobile }}" style="max-width: max-content;margin: 2em;">
             {%- if block.settings.heading != blank -%}
               <div class="banner__box banner__box--{{ section.settings.content_width }}">
                 <{{ block.settings.heading_tag }} class="heading leading-none {{ block.settings.heading_size }}">
@@ -201,9 +201,9 @@
               </div>
             {%- endif -%}
           </div>
-        {%- endfor -%}
-      </nav>
-    </div>
+        </div>
+      {%- endfor -%}
+    </nav>
   </div>
 </div>
 
