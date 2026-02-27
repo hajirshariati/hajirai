@@ -18223,3 +18223,9 @@ cart-count.count::before {
     top: -0.25rem;
     right: -0.25rem;
 }
+
+
+
+#onetrust-consent-sdk #onetrust-banner-sdk {
+    z-index: 5;
+}
