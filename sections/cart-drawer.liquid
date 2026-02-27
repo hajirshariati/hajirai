@@ -524,7 +524,7 @@
 
                       assign discount_codes = discount_codes | uniq
                     -%}
-                    <button type="button" class="flex gap-2d5 grow items-center justify-center" aria-controls="CartDiscount-{{ section.id }}" aria-expanded="false">
+                    <button type="button" class="flex gap-2d5 grow items-center justify-center" aria-controls="CartDiscount-{{ section.id }}" aria-expanded="true">
                       {%- render 'icon', icon: 'sale', size: 'lg', class: 'icon-light shrink-0' -%}
                       <span class="reversed-link text-sm leading-tight">Apply Discount</span>
                       {%- if discount_codes.size > 0 -%}
