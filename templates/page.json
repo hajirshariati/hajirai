@@ -61,7 +61,7 @@
         "autoplay": false,
         "autoplay_speed": 5,
         "show_navigation": true,
-        "image_height": "650px",
+        "image_height": "100vh",
         "content_width": "small",
         "text_alignment": "left",
         "image_height_mobile": "auto",
