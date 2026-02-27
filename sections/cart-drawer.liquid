@@ -632,12 +632,12 @@
                     </modal-element>
                   {%- endif -%}
                   {%- if section.settings.add_discount_code -%}
-                    <modal-element id="CartDiscount-{{ section.id }}" class="modal invisible absolute bottom-0 left-0 w-full h-full" role="dialog" hidden>
-                      <overlay-element class="fixed-modal opacity-0 z-1 absolute top-0 left-0 w-full h-full" aria-controls="CartDiscount-{{ section.id }}" aria-expanded="false"></overlay-element>
+                    <modal-element id="CartDiscount-{{ section.id }}" class="modal absolute bottom-0 left-0 w-full h-full" role="dialog">
+                      <overlay-element class="fixed-modal opacity-100 z-1 absolute top-0 left-0 w-full h-full" aria-controls="CartDiscount-{{ section.id }}" aria-expanded="true"></overlay-element>
                       <div class="modal__container flex flex-col z-3 absolute left-0 bottom-0 w-full">
                         <div class="modal__header flex items-center justify-between relative">
                           <span class="font-medium text-sm md:text-base">{{ 'general.cart.discount.caption' | t }}</span>
-                          <button type="button" class="close flex items-center justify-center absolute top-0 right-0" is="magnet-button" aria-controls="CartDiscount-{{ section.id }}" aria-expanded="false" aria-label="{{ 'general.accessibility.close' | t | escape }}">
+                          <button type="button" class="close flex items-center justify-center absolute top-0 right-0" is="magnet-button" aria-controls="CartDiscount-{{ section.id }}" aria-expanded="true" aria-label="{{ 'general.accessibility.close' | t | escape }}">
                             {%- render 'icon', icon: 'close' -%}
                           </button>
                         </div>
