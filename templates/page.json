@@ -11,7 +11,6 @@
   "sections": {
     "main-page": {
       "type": "main-page",
-      "disabled": true,
       "settings": {
         "heading_size": "title-sm",
         "heading_alignment": "text-left",
@@ -56,6 +55,7 @@
       "block_order": [
         "image_gPRPDR"
       ],
+      "disabled": true,
       "name": "t:sections.slideshow.name",
       "settings": {
         "autoplay": false,
@@ -132,6 +132,7 @@
         "text_dAb3eB",
         "button_Byr8RP"
       ],
+      "disabled": true,
       "name": "t:sections.image-with-text.name",
       "settings": {
         "img_url": "",
@@ -209,6 +210,7 @@
         "text_VfxCP8",
         "button_jmwimp"
       ],
+      "disabled": true,
       "name": "t:sections.image-with-text.name",
       "settings": {
         "img_url": "",
@@ -282,6 +284,7 @@
         "collection_4APaY8",
         "collection_nw4kBW"
       ],
+      "disabled": true,
       "name": "t:sections.featured-collections.name",
       "settings": {
         "product_limit": 6,
@@ -361,6 +364,7 @@
         "text_pa49k3",
         "button_yUALRG"
       ],
+      "disabled": true,
       "name": "t:sections.images-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
@@ -464,6 +468,7 @@
         "testimonial_3GipyW",
         "testimonial_rkJDdN"
       ],
+      "disabled": true,
       "name": "t:sections.reveal-testimonials.name",
       "settings": {
         "heading": "REAL PEOPLE. REAL STORIES.",
@@ -531,6 +536,7 @@
         "text_VLXVGm",
         "button_cdCdK8"
       ],
+      "disabled": true,
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
@@ -590,6 +596,7 @@
         "heading_RGW4XY",
         "button_KwLG46"
       ],
+      "disabled": true,
       "name": "t:sections.rich-text.name",
       "settings": {
         "text_alignment": "center",
