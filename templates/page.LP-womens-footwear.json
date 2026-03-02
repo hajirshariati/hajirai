@@ -39,7 +39,7 @@
             "cover_image_mobile": "shopify://shop_images/25784-MicrosoftTeams-image203_10a1ef7e-cf07-4b5b-b8e0-2449238b716b.jpg",
             "content_position": "md:items-end md:justify-start",
             "content_position_mobile": "items-center justify-center",
-            "heading": "<span style=\"color:#FFDDBF\">SPRING<br>\ninto<br>\nMOTION</span>",
+            "heading": "<span style=\"color:#FFDDBF; text-shadow: 2px 2px 6px rgba(0,0,0,0.4);\">\n  SPRING<br> into<br> MOTION\n</span>",
             "heading_size": "title-lg tracking-heading",
             "heading_tag": "h2",
             "text": "",
