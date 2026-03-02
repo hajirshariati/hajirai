@@ -133,27 +133,17 @@
                            id="{{ section_id }}-{{ product_id }}-option{{ option.position }}">{{ option.selected_value }}</span>
                 {% else %}
                     {%- liquid
-                      assign tooltip_no_no = product.metafields.custom.tooltip_no_no.value
-                      assign tooltip_no_yes = product.metafields.custom.tooltip_no_yes.value
-                      assign tooltip_yes_no = product.metafields.custom.tooltip_fit_yes_no.value
-                      assign tooltip_yes_yes = product.metafields.custom.tooltip_yes_yes.value
+                      assign tooltip_foot_pain = product.metafields.custom.tooltip_fit_yes_no.value
+                      assign tooltip_flat_feet = product.metafields.custom.tooltip_yes_yes.value
                       
-                      assign default_tooltip = tooltip_no_no
+                      if option.name == 'Do you have ball of foot pain?'
+                        assign current_tooltip = tooltip_foot_pain
+                      elsif option.name == 'Do you have flat feet?'
+                        assign current_tooltip = tooltip_flat_feet
+                      endif
                     -%}
-                    <span class="price__item--tooltip tooltip visually-hidden dynamic-tooltip" role="tooltip"
-                          aria-describedby="tooltip-message-{{ option.position }}"
-                          data-tooltip-no-no-title="{{ tooltip_no_no.title.value | escape }}"
-                          data-tooltip-no-no-text="{{ tooltip_no_no.text.value | escape }}"
-                          data-tooltip-no-no-image="{% if tooltip_no_no.image.value != blank %}{{ tooltip_no_no.image.value | image_url: width: 300 }}{% endif %}"
-                          data-tooltip-no-yes-title="{{ tooltip_no_yes.title.value | escape }}"
-                          data-tooltip-no-yes-text="{{ tooltip_no_yes.text.value | escape }}"
-                          data-tooltip-no-yes-image="{% if tooltip_no_yes.image.value != blank %}{{ tooltip_no_yes.image.value | image_url: width: 300 }}{% endif %}"
-                          data-tooltip-yes-no-title="{{ tooltip_yes_no.title.value | escape }}"
-                          data-tooltip-yes-no-text="{{ tooltip_yes_no.text.value | escape }}"
-                          data-tooltip-yes-no-image="{% if tooltip_yes_no.image.value != blank %}{{ tooltip_yes_no.image.value | image_url: width: 300 }}{% endif %}"
-                          data-tooltip-yes-yes-title="{{ tooltip_yes_yes.title.value | escape }}"
-                          data-tooltip-yes-yes-text="{{ tooltip_yes_yes.text.value | escape }}"
-                          data-tooltip-yes-yes-image="{% if tooltip_yes_yes.image.value != blank %}{{ tooltip_yes_yes.image.value | image_url: width: 300 }}{% endif %}">
+                    <span class="price__item--tooltip tooltip visually-hidden" role="tooltip"
+                          aria-describedby="tooltip-message-{{ option.position }}">
                   <svg class="icon icon--price-tooltip tooltip-icon" width="16" height="17" viewBox="0 0 16 17"
                        fill="none" xmlns="http://www.w3.org/2000/svg">
                   <g opacity="0.6">
@@ -164,12 +154,12 @@
                 </svg>
                   <span class="tooltip__message" id="tooltip-message-{{ option.position }}">
                       <span class="tooltip__message-content">
-                          {%- if default_tooltip.image.value != blank -%}
-                              <img src="{{ default_tooltip.image.value | image_url: width: 300 }}" alt="{{ default_tooltip.title.value | escape }}" class="tooltip__image" loading="lazy">
+                          {%- if current_tooltip.image.value != blank -%}
+                              <img src="{{ current_tooltip.image.value | image_url: width: 300 }}" alt="{{ current_tooltip.title.value | escape }}" class="tooltip__image" loading="lazy">
                           {%- endif -%}
                           <span class="tooltip__message-content-text">
-                            <p class="tooltip__heading">{{ default_tooltip.title.value }}</p>
-                            <p class="tooltip__description">{{ default_tooltip.text.value }}</p>
+                            <p class="tooltip__heading">{{ current_tooltip.title.value }}</p>
+                            <p class="tooltip__description">{{ current_tooltip.text.value }}</p>
                           </span>
                       </span>
                   </span>
@@ -357,84 +347,4 @@
   <script type="application/json" data-selected-variant>{{ product.selected_or_first_available_variant | json }}</script>
 </variant-picker>
 
-<script>
-(function() {
-  let isUpdating = false;
-
-  function updateTooltips() {
-    if (isUpdating) return;
-    isUpdating = true;
-    
-    const tooltips = document.querySelectorAll('.dynamic-tooltip');
-    if (!tooltips.length) {
-      isUpdating = false;
-      return;
-    }
-    
-    const option1Checked = document.querySelector('input[name="Do you have flat feet?"]:checked');
-    const option2Checked = document.querySelector('input[name="Do you have ball of foot pain?"]:checked');
-    
-    if (!option1Checked || !option2Checked) {
-      isUpdating = false;
-      return;
-    }
-    
-    const option1Value = option1Checked.value.trim();
-    const option2Value = option2Checked.value.trim();
-    
-    const option1 = (option1Value === "Yes") ? "yes" : "no";
-    const option2 = (option2Value === "Yes") ? "yes" : "no";
-    
-    const suffix = `${option1.charAt(0).toUpperCase() + option1.slice(1)}${option2.charAt(0).toUpperCase() + option2.slice(1)}`;
-    const titleKey = `tooltip${suffix}Title`;
-    const textKey = `tooltip${suffix}Text`;
-    const imageKey = `tooltip${suffix}Image`;
-    
-    tooltips.forEach((tooltip) => {
-      const title = tooltip.dataset[titleKey];
-      const text = tooltip.dataset[textKey];
-      const image = tooltip.dataset[imageKey];
-      
-      const messageEl = tooltip.querySelector('.tooltip__message');
-      if (!messageEl) return;
-      
-      const contentEl = messageEl.querySelector('.tooltip__message-content');
-      if (!contentEl) return;
-      
-      let newContent = '';
-      if (image && image !== 'null' && image !== '') {
-        newContent += `<img src="${image}" alt="${title || ''}" class="tooltip__image" loading="lazy">`;
-      }
-      newContent += `<span class="tooltip__message-content-text">
-        <p class="tooltip__heading">${title || ''}</p>
-        <p class="tooltip__description">${text || ''}</p>
-      </span>`;
-      
-      contentEl.innerHTML = newContent;
-      
-      if (title && text) {
-        tooltip.setAttribute('aria-label', `${title}: ${text}`);
-      }
-    });
-    
-    setTimeout(() => { isUpdating = false; }, 100);
-  }
-
-  document.addEventListener('variant:change', function() {
-    setTimeout(updateTooltips, 100);
-    setTimeout(updateTooltips, 300);
-    setTimeout(updateTooltips, 500);
-  });
-
-  document.addEventListener('change', function(e) {
-    if (e.target.name === 'Do you have flat feet?' || e.target.name === 'Do you have ball of foot pain?') {
-      setTimeout(updateTooltips, 600);
-      setTimeout(updateTooltips, 800);
-      setTimeout(updateTooltips, 1200);
-    }
-  });
-
-  setTimeout(updateTooltips, 500);
-})();
-</script>
 
