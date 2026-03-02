@@ -600,6 +600,8 @@
     }
   },
   "platform_customizations": {
-    "custom_css": []
+    "custom_css": [
+      ".fg-score .score-label {border-radius: 0px 26px 25px 0px;}"
+    ]
   }
 }
