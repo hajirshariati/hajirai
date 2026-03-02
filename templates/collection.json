@@ -117,19 +117,24 @@
           "type": "shopify://apps/aetrex-fitai/blocks/PLPShoeFitRating/6c991f1a-1e7d-4325-983c-2984a2e41236",
           "settings": {
             "CategoryPage": true,
-            "rating_background": "#d06263",
-            "rating_foreground": "#fff",
+            "rating_background": "#ebebeb",
+            "rating_foreground": "#d06263",
             "rating_font_size": 14,
             "rating_font_family": "'Open Sans', sans-serif",
-            "rating_vertical_spacing": 5,
+            "rating_vertical_spacing": 20,
+            "rating_overlay": true,
             "rating_justify_content": "flex-start",
             "info_popup_title_background": "#cf6262",
-            "info_popup_title_foreground": "#ffffff"
+            "info_popup_title_foreground": "#ffffff",
+            "class_selector": "product-card__content"
           }
         }
       },
       "block_order": [
         "aetrex_fitai_plp_shoe_fit_rating_JJe3tM"
+      ],
+      "custom_css": [
+        ".fg-score .score-label {border-radius: 0px 26px 25px 0px;}"
       ],
       "settings": {
         "color_text": "",
