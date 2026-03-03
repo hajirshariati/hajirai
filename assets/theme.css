@@ -18229,3 +18229,10 @@ cart-count.count::before {
 #onetrust-consent-sdk #onetrust-banner-sdk {
     z-index: 10;
 }
+
+.fg-score .score-label {
+  border-radius: 0px 26px 25px 0px;
+}
+.iframe-modal-frontrow-gpt {
+  display: none !important;
+}
