@@ -103,6 +103,16 @@
             "liquid": "<br>{%render 'frontrow'%}"
           }
         },
+        "text-3": {
+          "type": "text",
+          "settings": {
+            "icon": "truck",
+            "iwidth": "custom",
+            "icon_width": 20,
+            "text": "Free Shipping",
+            "text_size": "text-sm"
+          }
+        },
         "text-1": {
           "type": "text",
           "settings": {
@@ -121,16 +131,6 @@
             "iwidth": "custom",
             "icon_width": 20,
             "text": "Product In stock!",
-            "text_size": "text-sm"
-          }
-        },
-        "text-3": {
-          "type": "text",
-          "settings": {
-            "icon": "truck",
-            "iwidth": "custom",
-            "icon_width": 20,
-            "text": "Free Shipping",
             "text_size": "text-sm"
           }
         },
@@ -215,9 +215,9 @@
         "icon_list_VBaw6z",
         "liquid_anxBGN",
         "liquid_WaBqBH",
+        "text-3",
         "text-1",
         "text_tEEMj9",
-        "text-3",
         "text-2",
         "text_RzDJHr",
         "sign_up_DcnXLa",
