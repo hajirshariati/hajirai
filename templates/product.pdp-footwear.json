@@ -66,15 +66,15 @@
             "tab_background": "#f2f2f2",
             "tab_foreground": "#5c6271",
             "active_tab_background": "#5c6271",
-            "acitve_tab_foreground": "#fff",
+            "acitve_tab_foreground": "#ffffff",
             "button_background": "#f2f2f2",
             "button_foreground": "#5c6271",
             "acive_button_background": "#5c6271",
-            "acive_button_foreground": "#fff",
+            "acive_button_foreground": "#ffffff",
             "size_color": "#d60000",
             "result_header_background": "#d06263",
-            "result_header_foreground": "#fff",
-            "result_content_background": "#F1F1F1",
+            "result_header_foreground": "#ffffff",
+            "result_content_background": "#f1f1f1",
             "result_content_foreground": "#707070",
             "result_footer_background": "#c8c8c8",
             "result_footer_foreground": "#363636",
@@ -132,6 +132,7 @@
         },
         "text-1": {
           "type": "text",
+          "disabled": true,
           "settings": {
             "icon": "lightning",
             "iwidth": "custom",
@@ -142,12 +143,11 @@
         },
         "text-3": {
           "type": "text",
-          "disabled": true,
           "settings": {
             "icon": "truck",
             "iwidth": "custom",
             "icon_width": 20,
-            "text": "Free Shipping with Aetrex Access",
+            "text": "Free Shipping",
             "text_size": "text-sm"
           }
         },
