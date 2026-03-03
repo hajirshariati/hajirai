@@ -18229,7 +18229,7 @@ cart-count.count::before {
 
 
 #onetrust-consent-sdk #onetrust-banner-sdk {
-    z-index: 10;
+    z-index: 999999999;
 }
 
 .fg-score .score-label {
