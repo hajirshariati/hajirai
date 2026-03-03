@@ -14,9 +14,8 @@
       "blocks": {
         "free_shipping": {
           "type": "free_shipping",
-          "disabled": true,
           "settings": {
-            "minimum_amount": "1000"
+            "minimum_amount": "0"
           }
         },
         "subtotal": {
