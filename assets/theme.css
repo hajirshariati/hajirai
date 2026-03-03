@@ -18233,5 +18233,5 @@ cart-count.count::before {
 }
 
 .fg-score .score-label {
-  border-radius: 0px 26px 25px 0px;
+  border-radius: 0px 26px 25px 0px !important;
 }
