@@ -29,6 +29,7 @@
         "breadcrumb",
         "title"
       ],
+      "disabled": true,
       "custom_css": [],
       "settings": {
         "transparent_header": false,
@@ -49,6 +50,137 @@
         "rounded": true,
         "enable_parallax": true,
         "parallax_direction": "vertical"
+      }
+    },
+    "collection_list_XLN8AK": {
+      "type": "collection-list",
+      "blocks": {
+        "collection_icneqn": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "womens-new-arrivals",
+            "custom_url": "",
+            "image": "shopify://shop_images/435x600_NewArrivals_Jillian_Champagne2.png",
+            "title": "New Arrivals",
+            "description": "",
+            "overlay_content": true,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0,
+            "submenu_title_position": "center",
+            "enable_title_drop_shadow": true
+          }
+        },
+        "collection_DYXqWU": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "womens-shop-all-footwear",
+            "custom_url": "",
+            "image": "shopify://shop_images/435x600_Vania_HazyBlue.jpg",
+            "title": "Women’s Footwear",
+            "description": "",
+            "overlay_content": true,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0,
+            "submenu_title_position": "center",
+            "enable_title_drop_shadow": true
+          }
+        },
+        "collection_QNjVpC": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "mens-shop-all-footwear",
+            "custom_url": "",
+            "image": "shopify://shop_images/435x600_Chase_navy.jpg",
+            "title": "Men’s Footwear",
+            "description": "",
+            "overlay_content": true,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0,
+            "submenu_title_position": "center",
+            "enable_title_drop_shadow": true
+          }
+        },
+        "collection_4XGrM8": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "shop-all-orthotics",
+            "custom_url": "",
+            "image": "shopify://shop_images/435x600_L2300_podium.jpg",
+            "title": "Orthotics",
+            "description": "",
+            "overlay_content": true,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0,
+            "submenu_title_position": "center",
+            "enable_title_drop_shadow": true
+          }
+        },
+        "collection_WREUPB": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "womens-best-sellers-footwear",
+            "custom_url": "",
+            "image": "shopify://shop_images/435x600_Danika_LtGrey.jpg",
+            "title": "Best Sellers",
+            "description": "",
+            "overlay_content": true,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 0,
+            "submenu_title_position": "center",
+            "enable_title_drop_shadow": true
+          }
+        }
+      },
+      "block_order": [
+        "collection_icneqn",
+        "collection_DYXqWU",
+        "collection_QNjVpC",
+        "collection_4XGrM8",
+        "collection_WREUPB"
+      ],
+      "name": "t:sections.collection-list.name",
+      "settings": {
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "image_type": "collection",
+        "image_ratio": "adapt",
+        "show_products_count": false,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-lg tracking-heading",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "#fafafa",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "main-collection": {
@@ -103,7 +235,7 @@
         "filter_type": "sidebar",
         "filter_color_swatches": true,
         "enable_sorting": true,
-        "padding_top": 0,
+        "padding_top": 44,
         "padding_bottom": 120,
         "divider": false,
         "full_width": true,
@@ -189,6 +321,7 @@
   },
   "order": [
     "main-collection-banner",
+    "collection_list_XLN8AK",
     "main-collection",
     "17715083590c9e8395",
     "ss_recs_script_nYBUNj",
