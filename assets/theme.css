@@ -16170,15 +16170,17 @@ video-media
 
 @media screen and (min-width: 768px) {
     .product-sticky-form {
-        width: 550px;
+        width: 700px;
         inset-inline-end: var(--sp-5);
         inset-block-end: var(--sp-5);
-        padding-bottom: 3.5em;
+        padding-right: 9em;
+        margin-bottom: -7px;
     }
 
     .product-sticky-form__card {
         padding: var(--sp-4);
         border: 1px solid rgb(var(--color-border));
+        border-radius: 1em;
     }
 
     [data-rounded-block="round"] .product-sticky-form__card {
