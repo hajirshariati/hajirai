@@ -1,0 +1,197 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-collection-banner": {
+      "type": "main-collection-banner",
+      "blocks": {
+        "breadcrumb": {
+          "type": "breadcrumb",
+          "settings": {
+            "show_collections_link": false
+          }
+        },
+        "title": {
+          "type": "title",
+          "settings": {
+            "title_size": "title-md"
+          }
+        }
+      },
+      "block_order": [
+        "breadcrumb",
+        "title"
+      ],
+      "custom_css": [],
+      "settings": {
+        "transparent_header": false,
+        "show_image": false,
+        "image_height": "adapt",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
+        "image_height_mobile": "auto",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
+        "color_text": "#ffffff",
+        "color_overlay": "#000000",
+        "overlay_opacity": 40,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": true,
+        "enable_parallax": true,
+        "parallax_direction": "vertical"
+      }
+    },
+    "main-collection": {
+      "type": "main-collection",
+      "blocks": {
+        "subcollections": {
+          "type": "subcollections",
+          "disabled": true,
+          "settings": {
+            "menu": "",
+            "per_row": 5,
+            "show_count": true
+          }
+        },
+        "promotion": {
+          "type": "promotion",
+          "disabled": true,
+          "settings": {
+            "position": 8,
+            "column_size": "1",
+            "heading": "Example heading",
+            "content": "<p>Share information about your brand with your customers.</p>",
+            "button_label": "Shop now",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "content_position": "md:items-center",
+            "text_alignment": "center",
+            "content_position_mobile": "items-center",
+            "text_alignment_mobile": "center",
+            "color_text": "#ffffff",
+            "color_button_text": "#4d5940",
+            "color_button_background": "#ffffff",
+            "color_button_gradient": "",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30
+          }
+        }
+      },
+      "block_order": [
+        "subcollections",
+        "promotion"
+      ],
+      "settings": {
+        "products_per_page": 16,
+        "columns": 5,
+        "columns_mobile": "2",
+        "pagination": "click",
+        "enable_filtering": true,
+        "filter_collapsed": false,
+        "filter_type": "sidebar",
+        "filter_color_swatches": true,
+        "enable_sorting": true,
+        "padding_top": 0,
+        "padding_bottom": 120,
+        "divider": false,
+        "full_width": true,
+        "rounded": true
+      }
+    },
+    "17715083590c9e8395": {
+      "type": "apps",
+      "blocks": {
+        "aetrex_fitai_plp_shoe_fit_rating_JJe3tM": {
+          "type": "shopify://apps/aetrex-fitai/blocks/PLPShoeFitRating/6c991f1a-1e7d-4325-983c-2984a2e41236",
+          "settings": {
+            "CategoryPage": true,
+            "rating_background": "#ebebeb",
+            "rating_foreground": "#d06263",
+            "rating_font_size": 14,
+            "rating_font_family": "'Open Sans', sans-serif",
+            "rating_vertical_spacing": 20,
+            "rating_overlay": true,
+            "rating_justify_content": "flex-start",
+            "info_popup_title_background": "#cf6262",
+            "info_popup_title_foreground": "#ffffff",
+            "class_selector": "product-card__content"
+          }
+        }
+      },
+      "block_order": [
+        "aetrex_fitai_plp_shoe_fit_rating_JJe3tM"
+      ],
+      "custom_css": [
+        ".fg-score .score-label {border-radius: 0px 26px 25px 0px;}"
+      ],
+      "settings": {
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "ss_recs_script_nYBUNj": {
+      "type": "ss-recs-script",
+      "blocks": {
+        "ss_profile_block_GCHbrj": {
+          "type": "ss_profile_block",
+          "settings": {
+            "ss_profile_id": "recently-viewed",
+            "ss_collection_list": [],
+            "ss_batched": true
+          }
+        }
+      },
+      "block_order": [
+        "ss_profile_block_GCHbrj"
+      ],
+      "name": "Searchspring Recommendations",
+      "settings": {}
+    },
+    "ss_recs_target_Rwfepp": {
+      "type": "ss-recs-target",
+      "blocks": {
+        "ss_profile_block_ptjwra": {
+          "type": "ss_profile_block",
+          "settings": {
+            "ss_profile_id": "recently-viewed"
+          }
+        }
+      },
+      "block_order": [
+        "ss_profile_block_ptjwra"
+      ],
+      "name": "Searchspring Recommendations Target",
+      "settings": {}
+    }
+  },
+  "order": [
+    "main-collection-banner",
+    "main-collection",
+    "17715083590c9e8395",
+    "ss_recs_script_nYBUNj",
+    "ss_recs_target_Rwfepp"
+  ]
+}
