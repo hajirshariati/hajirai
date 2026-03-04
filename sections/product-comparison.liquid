@@ -105,15 +105,30 @@
                     </div>
                   </div>
                 </div>
-                {%- capture tfoot_content -%}
+{%- capture tfoot_content -%}
                   {{- tfoot_content -}}
                   <div class="comparison-table__column" data-product-action="{{ forloop.index }}">
-                    <a href="{{ card_product.url }}" class="button button--primary w-full" is="hover-link" aria-label="Select Size">
+                    <a href="{{ card_product.url }}" class="button button--primary w-full" is="hover-link" aria-label="{{ block.settings.primary_cta_label | default: 'Select Size' }}">
                       <span class="btn-fill" data-fill></span>
                       <span class="btn-text">
-                        Select Size
+                        {{ block.settings.primary_cta_label | default: 'Select Size' }}
                       </span>
                     </a>
+                    {%- if block.settings.secondary_cta_label != blank -%}
+                      <a href="{{ block.settings.secondary_cta_link | default: card_product.url }}"
+                        class="button {{ block.settings.secondary_cta_style }} w-full"
+                        is="hover-link"
+                        aria-label="{{ block.settings.secondary_cta_label }}"
+                        {% if block.settings.secondary_cta_external %}target="_blank" rel="noopener"{% endif %}>
+                        <span class="btn-fill" data-fill></span>
+                        <span class="btn-text">
+                          {{ block.settings.secondary_cta_label }}
+                          {%- if block.settings.secondary_cta_icon -%}
+                            {%- render 'icon', icon: 'arrow-right', size: 'sm' -%}
+                          {%- endif -%}
+                        </span>
+                      </a>
+                    {%- endif -%}
                   </div>
                 {%- endcapture -%}
               {%- else -%}
@@ -139,13 +154,13 @@
                     </div>
                   </div>
                 </div>
-                {%- capture tfoot_content -%}
+{%- capture tfoot_content -%}
                   {{- tfoot_content -}}
                   <div class="comparison-table__column" data-product-action="{{ forloop.index }}">
-                    <a href="#" class="button button--primary w-full" is="hover-link" aria-label="Select Size">
+                    <a href="#" class="button button--primary w-full" is="hover-link" aria-label="{{ block.settings.primary_cta_label | default: 'Select Size' }}">
                       <span class="btn-fill" data-fill></span>
                       <span class="btn-text">
-                        Select Size
+                        {{ block.settings.primary_cta_label | default: 'Select Size' }}
                       </span>
                     </a>
                   </div>
@@ -339,12 +354,27 @@
                     assign first_available_variant = card_product.first_available_variant
                   endif
                 -%}
-                <a href="{{ card_product.url }}" class="button button--primary w-full" is="hover-link" aria-label="Select Size">
+<a href="{{ card_product.url }}" class="button button--primary w-full" is="hover-link" aria-label="{{ block.settings.primary_cta_label | default: 'Select Size' }}">
                   <span class="btn-fill" data-fill></span>
                   <span class="btn-text">
-                    Select Size
+                    {{ block.settings.primary_cta_label | default: 'Select Size' }}
                   </span>
                 </a>
+                {%- if block.settings.secondary_cta_label != blank -%}
+                  <a href="{{ block.settings.secondary_cta_link | default: card_product.url }}"
+                    class="button {{ block.settings.secondary_cta_style }} w-full"
+                    is="hover-link"
+                    aria-label="{{ block.settings.secondary_cta_label }}"
+                    {% if block.settings.secondary_cta_external %}target="_blank" rel="noopener"{% endif %}>
+                    <span class="btn-fill" data-fill></span>
+                    <span class="btn-text">
+                      {{ block.settings.secondary_cta_label }}
+                      {%- if block.settings.secondary_cta_icon -%}
+                        {%- render 'icon', icon: 'arrow-right', size: 'sm' -%}
+                      {%- endif -%}
+                    </span>
+                  </a>
+                {%- endif -%}
               {%- endif -%}
             </script>
           {%- endif -%}
@@ -729,6 +759,52 @@
   "id": "custom_product_name",
   "label": "Custom product name",
   "info": "Leave blank to use the product title"
+},
+{
+  "type": "text",
+  "id": "primary_cta_label",
+  "label": "Primary button label",
+  "default": "Select Size",
+  "info": "Customize the main CTA button text"
+},
+{
+  "type": "text",
+  "id": "secondary_cta_label",
+  "label": "Secondary button label",
+  "info": "Leave blank to hide secondary button"
+},
+{
+  "type": "url",
+  "id": "secondary_cta_link",
+  "label": "Secondary button link"
+},
+{
+  "visible_if": "{{ block.settings.secondary_cta_label != blank }}",
+  "type": "select",
+  "id": "secondary_cta_style",
+  "label": "Secondary button style",
+  "options": [
+    { "value": "button--primary", "label": "Primary" },
+    { "value": "button--secondary", "label": "Secondary" },
+    { "value": "button--outline", "label": "Outline" },
+    { "value": "button--ghost", "label": "Ghost" },
+    { "value": "button--link", "label": "Link" }
+  ],
+  "default": "button--secondary"
+},
+{
+  "visible_if": "{{ block.settings.secondary_cta_label != blank }}",
+  "type": "checkbox",
+  "id": "secondary_cta_external",
+  "label": "Open in new tab",
+  "default": false
+},
+{
+  "visible_if": "{{ block.settings.secondary_cta_label != blank }}",
+  "type": "checkbox",
+  "id": "secondary_cta_icon",
+  "label": "Show button icon",
+  "default": true
 },
 {
   "type": "image_picker",
