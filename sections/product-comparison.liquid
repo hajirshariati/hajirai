@@ -348,23 +348,27 @@
   "name": "Product comparison",
   "class": "comparison-table-section",
   "settings": [
+{
+  "type": "select",
+  "id": "visible_products",
+  "options": [
     {
-      "type": "select",
-      "id": "visible_products",
-      "options": [
-        {
-          "value": "2",
-          "label": "2 products"
-        },
-        {
-          "value": "3",
-          "label": "3 products"
-        }
-      ],
-      "label": "Number of visible products",
-      "info": "Choose how many products to display. Additional products will appear in dropdowns.",
-      "default": "3"
+      "value": "2",
+      "label": "2 products"
     },
+    {
+      "value": "3",
+      "label": "3 products"
+    },
+    {
+      "value": "4",
+      "label": "4 products"
+    }
+  ],
+  "label": "Number of visible products",
+  "info": "Choose how many products to display. Additional products will appear in dropdowns.",
+  "default": "3"
+},
     {
       "type": "checkbox",
       "id": "highlight_differences",
