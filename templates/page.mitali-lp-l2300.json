@@ -197,6 +197,7 @@
           "type": "product",
           "settings": {
             "product": "l2300w-m",
+            "custom_product_name": "For Normal Arch Type",
             "product_badge_image": "shopify://shop_images/PMF5.jpg",
             "product_badge_position": "center",
             "product_badge_width": 300,
@@ -257,6 +258,7 @@
           "type": "product",
           "settings": {
             "product": "l2320w-m",
+            "custom_product_name": "With Posted Heel",
             "product_badge_image": "shopify://shop_images/PMF2.jpg",
             "product_badge_position": "center",
             "product_badge_width": 300,
@@ -317,6 +319,7 @@
           "type": "product",
           "settings": {
             "product": "l2305w-m",
+            "custom_product_name": "With Met Pad",
             "product_badge_image": "shopify://shop_images/PMF1_b006e183-e1d9-4220-93ee-9c0c9760546a.jpg",
             "product_badge_position": "center",
             "product_badge_width": 300,
@@ -377,6 +380,7 @@
           "type": "product",
           "settings": {
             "product": "l2325w-m",
+            "custom_product_name": "With Posted Heel & Met Pad",
             "product_badge_image": "shopify://shop_images/PMF4.jpg",
             "product_badge_position": "center",
             "product_badge_width": 300,
