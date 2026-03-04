@@ -86,7 +86,7 @@
                         {%- if section.settings.show_vendor -%}
                           <p class="horizontal-product__vendor text-xs text-opacity">{{ card_product.vendor }}</p>
                         {%- endif -%}
-                        <a href="{{ card_product.url }}" class="horizontal-product__title reversed-link font-medium text-base leading-tight">{{ card_product.title }}</a>
+                        <a href="{{ card_product.url }}" class="horizontal-product__title reversed-link font-medium text-base leading-tight">{{ block.settings.custom_product_name | default: card_product.title }}</a>
                       </div>
                       {%- if first_available_variant != blank -%}
                         <p class="text-xs text-opacity leading-tight">{{ first_available_variant.title }}</p>
@@ -309,7 +309,7 @@
                         {%- if section.settings.show_vendor -%}
                           <p class="horizontal-product__vendor text-xs text-opacity">{{ card_product.vendor }}</p>
                         {%- endif -%}
-                        <a href="{{ card_product.url }}" class="horizontal-product__title reversed-link font-medium text-base leading-tight">{{ card_product.title }}</a>
+                        <a href="{{ card_product.url }}" class="horizontal-product__title reversed-link font-medium text-base leading-tight">{{ block.settings.custom_product_name | default: card_product.title }}</a>
                       </div>
                       {%- if first_available_variant != blank -%}
                         <p class="text-xs text-opacity leading-tight">{{ first_available_variant.title }}</p>
@@ -723,6 +723,12 @@
   "type": "product",
   "id": "product",
   "label": "Product"
+},
+{
+  "type": "text",
+  "id": "custom_product_name",
+  "label": "Custom product name",
+  "info": "Leave blank to use the product title"
 },
 {
   "type": "image_picker",
