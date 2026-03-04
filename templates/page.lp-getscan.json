@@ -27,11 +27,19 @@
     "images_with_text_Tw6Mmh": {
       "type": "images-with-text",
       "blocks": {
+        "subheading_xfWiy6": {
+          "type": "subheading",
+          "settings": {
+            "subheading": "SCAN NOW",
+            "subheading_size": "subtitle-md",
+            "secondary_color": false
+          }
+        },
         "heading_WAHhkk": {
           "type": "heading",
           "settings": {
             "heading": "SizeRight™",
-            "heading_size": "title-md",
+            "heading_size": "title-lg tracking-heading",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -54,6 +62,7 @@
         }
       },
       "block_order": [
+        "subheading_xfWiy6",
         "heading_WAHhkk",
         "text_CRMmFe"
       ],
@@ -65,7 +74,7 @@
         "image2_url": "",
         "image_ratio": "adapt",
         "image_width": "medium",
-        "layout": "image_first",
+        "layout": "text_first",
         "text_alignment": "left",
         "text_alignment_mobile": "left",
         "color_text": "",
@@ -77,7 +86,7 @@
         "color_button_background": "",
         "color_button_gradient": "",
         "padding_top": 72,
-        "padding_bottom": 72,
+        "padding_bottom": 20,
         "divider": false,
         "full_width": false,
         "rounded": false,
@@ -121,7 +130,7 @@
         "speed": 5,
         "heading": "",
         "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
+        "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
         "subheading": "",
         "description": "",
@@ -149,69 +158,24 @@
         "limit_section_width": false
       }
     },
-    "images_with_text_yEDDJh": {
-      "type": "images-with-text",
+    "rich_text_kWnTFF": {
+      "type": "rich-text",
       "blocks": {
-        "heading_DJTytV": {
-          "type": "heading",
-          "settings": {
-            "heading": "FitAI™",
-            "heading_size": "title-md",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_UiTBM9": {
+        "text_UBw8Hy": {
           "type": "text",
           "settings": {
-            "text": "<p>Get a quick 3D foot scan at a participating retail store<br/>and view your personalized shoe size and fit recommendations online</p>",
-            "text_font": "body",
+            "text": "<p>SCAN IN SOTRE</p>",
+            "text_font": "subtitle",
             "text_size": "subtext-md",
             "text_max_size": 32,
-            "text_line_height": 1.6,
+            "text_line_height": 1.2,
             "text_letter_spacing": 0,
             "text_capitalize": false,
             "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
-        }
-      },
-      "block_order": [
-        "heading_DJTytV",
-        "text_UiTBM9"
-      ],
-      "name": "t:sections.images-with-text.name",
-      "settings": {
-        "image": "shopify://shop_images/Zoe_scanning.jpg",
-        "image_url": "",
-        "image_2": "shopify://shop_images/fit_starter.webp",
-        "image2_url": "",
-        "image_ratio": "adapt",
-        "image_width": "medium",
-        "layout": "image_first",
-        "text_alignment": "left",
-        "text_alignment_mobile": "left",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "linear-gradient(180deg, rgba(242, 242, 242, 1), rgba(255, 255, 255, 1) 100%)",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "enable_parallax": true
-      }
-    },
-    "rich_text_kWnTFF": {
-      "type": "rich-text",
-      "blocks": {
+        },
         "heading_jpVrnR": {
           "type": "heading",
           "settings": {
@@ -239,13 +203,13 @@
         }
       },
       "block_order": [
+        "text_UBw8Hy",
         "heading_jpVrnR",
         "text_4E7dyC"
       ],
-      "disabled": true,
       "name": "t:sections.rich-text.name",
       "settings": {
-        "text_alignment": "center",
+        "text_alignment": "left",
         "text_alignment_mobile": "center",
         "heading": "",
         "heading_size": "title-md",
@@ -268,7 +232,7 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 72,
+        "padding_top": 104,
         "padding_bottom": 16,
         "divider": false,
         "narrow": false,
@@ -312,7 +276,6 @@
     "main-page",
     "images_with_text_Tw6Mmh",
     "logo_list_KqMFHW",
-    "images_with_text_yEDDJh",
     "rich_text_kWnTFF",
     "custom_liquid_NjQLKh",
     "empty_space_8dnkVF"
