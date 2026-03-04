@@ -570,6 +570,7 @@
         "column_AtPjXc",
         "column_PGxRr3"
       ],
+      "disabled": true,
       "name": "t:sections.multicolumn.name",
       "settings": {
         "gap": "small",
