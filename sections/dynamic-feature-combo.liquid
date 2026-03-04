@@ -404,7 +404,16 @@ font-size: calc(9px + 0.1vw);
 
  
 
-
+@media (max-width: 768px) {
+  #shopify-section-{{ section.id }} .feature-image-link[data-link-target="desktop"] {
+    pointer-events: none;
+  }
+}
+@media (min-width: 769px) {
+  #shopify-section-{{ section.id }} .feature-image-link[data-link-target="mobile"] {
+    pointer-events: none;
+  }
+}
 </style>
 
 <div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}" data-section-id="{{ section.id }}">
@@ -420,7 +429,7 @@ font-size: calc(9px + 0.1vw);
           {%- if section.settings.feature_image_link_target == 'desktop' and request.device_type != 'mobile' -%}{%- assign show_feature_link = true -%}{%- endif -%}
           {%- if section.settings.feature_image_link_target == 'mobile' and request.device_type == 'mobile' -%}{%- assign show_feature_link = true -%}{%- endif -%}
         {%- endif -%}
-        {%- if show_feature_link -%}<a href="{{ section.settings.feature_image_link }}" {% if section.settings.feature_image_link_external %}target="_blank" rel="noopener"{% endif %} style="display:block;">{%- endif -%}
+        {%- if section.settings.feature_image_link != blank -%}<a href="{{ section.settings.feature_image_link }}" {% if section.settings.feature_image_link_external %}target="_blank" rel="noopener"{% endif %} style="display:block;" data-link-target="{{ section.settings.feature_image_link_target }}" class="feature-image-link">{%- endif -%}
         <div class="dynamic-feature relative">
           <div class="dynamic-feature__wrapper">
             <div class="dynamic-feature__media relative w-full">
@@ -502,7 +511,7 @@ font-size: calc(9px + 0.1vw);
           </div>
         </div>
       </div>
-        {%- if show_feature_link -%}</a>{%- endif -%}
+        {%- if section.settings.feature_image_link != blank -%}</a>{%- endif -%}
 
       <!-- TILE 2: LIFESTYLE IMAGE -->
       <div class="combo-tile tile-lifestyle">
