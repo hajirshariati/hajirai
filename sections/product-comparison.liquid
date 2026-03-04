@@ -116,7 +116,7 @@
                     </a>
                     {%- if block.settings.secondary_cta_label != blank -%}
                       <a href="{{ block.settings.secondary_cta_link | default: card_product.url }}"
-                        class="button {{ block.settings.secondary_cta_style }} w-full"
+                        class="button {{ block.settings.secondary_cta_style }} w-full" style="margin-top: 8px;"
                         is="hover-link"
                         aria-label="{{ block.settings.secondary_cta_label }}"
                         {% if block.settings.secondary_cta_external %}target="_blank" rel="noopener"{% endif %}>
@@ -362,7 +362,7 @@
                 </a>
                 {%- if block.settings.secondary_cta_label != blank -%}
                   <a href="{{ block.settings.secondary_cta_link | default: card_product.url }}"
-                    class="button {{ block.settings.secondary_cta_style }} w-full"
+                    class="button {{ block.settings.secondary_cta_style }} w-full" style="margin-top: 8px;"
                     is="hover-link"
                     aria-label="{{ block.settings.secondary_cta_label }}"
                     {% if block.settings.secondary_cta_external %}target="_blank" rel="noopener"{% endif %}>
