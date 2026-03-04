@@ -50,9 +50,20 @@
                   {%- render 'icon', icon: 'chevron-up', size: 'sm', class: 'absolute pointer-events-none' -%}
                 </div>
               {%- endif -%}
-              {%- if block.settings.product != blank -%}
-                {%- liquid
-                  assign card_product = block.settings.product
+{%- if block.settings.product != blank -%}
+  {%- if block.settings.product_badge_image != blank -%}
+    {%- assign badge_align = block.settings.product_badge_position | default: 'center' -%}
+    {%- assign badge_width = block.settings.product_badge_width | default: 100 -%}
+    <div class="comparison-table__badge{% if badge_align == 'left' %} text-left{% elsif badge_align == 'right' %} text-right{% else %} text-center{% endif %}" style="margin-bottom: 12px;">
+      <img src="{{ block.settings.product_badge_image | image_url: width: badge_width }}"
+           alt="{{ block.settings.product_badge_image.alt | escape }}"
+           width="{{ badge_width }}"
+           loading="lazy"
+           style="display: inline-block; max-width: 100%;">
+    </div>
+  {%- endif -%}
+  {%- liquid
+    assign card_product = block.settings.product
                   assign first_available_variant = blank
                   if card_product.has_only_default_variant == false and section.settings.first_available_variant
                     assign first_available_variant = card_product.first_available_variant
@@ -708,11 +719,39 @@
       "type": "product",
       "name": "Product",
       "settings": [
-        {
-          "type": "product",
-          "id": "product",
-          "label": "Product"
-        },
+{
+  "type": "product",
+  "id": "product",
+  "label": "Product"
+},
+{
+  "type": "image_picker",
+  "id": "product_badge_image",
+  "label": "Badge image"
+},
+{
+  "visible_if": "{{ block.settings.product_badge_image != blank }}",
+  "type": "select",
+  "id": "product_badge_position",
+  "label": "Badge position",
+  "options": [
+    { "value": "left", "label": "Left" },
+    { "value": "center", "label": "Center" },
+    { "value": "right", "label": "Right" }
+  ],
+  "default": "center"
+},
+{
+  "visible_if": "{{ block.settings.product_badge_image != blank }}",
+  "type": "range",
+  "id": "product_badge_width",
+  "label": "Badge width",
+  "min": 20,
+  "max": 300,
+  "step": 10,
+  "unit": "px",
+  "default": 100
+},
         {
           "type": "text",
           "id": "heading_1",
