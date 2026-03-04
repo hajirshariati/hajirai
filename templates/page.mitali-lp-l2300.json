@@ -197,6 +197,9 @@
           "type": "product",
           "settings": {
             "product": "l2300w-m",
+            "product_badge_image": "shopify://shop_images/PMF5.jpg",
+            "product_badge_position": "center",
+            "product_badge_width": 300,
             "heading_1": "Support Features",
             "value_1": "<p>Contoured memory foam with balanced arch support for everyday comfort.</p>",
             "heading_2": "Best For",
@@ -254,6 +257,9 @@
           "type": "product",
           "settings": {
             "product": "l2320w-m",
+            "product_badge_image": "shopify://shop_images/PMF2.jpg",
+            "product_badge_position": "center",
+            "product_badge_width": 300,
             "heading_1": "Support Features",
             "value_1": "<p>Posted heel design to improve rearfoot alignment and stability.</p>",
             "heading_2": "Best For",
@@ -310,7 +316,10 @@
         "product_bTqp4E": {
           "type": "product",
           "settings": {
-            "product": "l2320w-m",
+            "product": "l2305w-m",
+            "product_badge_image": "shopify://shop_images/PMF1_b006e183-e1d9-4220-93ee-9c0c9760546a.jpg",
+            "product_badge_position": "center",
+            "product_badge_width": 300,
             "heading_1": "Support Features",
             "value_1": "<p>Posted heel design to improve rearfoot alignment and stability.</p>",
             "heading_2": "Best For",
@@ -368,6 +377,9 @@
           "type": "product",
           "settings": {
             "product": "l2325w-m",
+            "product_badge_image": "shopify://shop_images/PMF4.jpg",
+            "product_badge_position": "center",
+            "product_badge_width": 300,
             "heading_1": "Support Features",
             "value_1": "<p>Posted heel and metatarsal pad for enhanced stability and targeted forefoot relief.<br/></p>",
             "heading_2": "Best For",
@@ -432,7 +444,7 @@
       "settings": {
         "visible_products": "4",
         "highlight_differences": false,
-        "sticky_product_info": true,
+        "sticky_product_info": false,
         "first_available_variant": false,
         "show_vendor": false,
         "show_price": false,
