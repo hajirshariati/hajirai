@@ -108,7 +108,7 @@
 {%- capture tfoot_content -%}
                   {{- tfoot_content -}}
                   <div class="comparison-table__column" data-product-action="{{ forloop.index }}">
-                    <br><a href="{{ card_product.url }}" class="button button--primary w-full" is="hover-link" aria-label="{{ block.settings.primary_cta_label | default: 'Select Size' }}">
+                    <a href="{{ card_product.url }}" class="button button--primary w-full" is="hover-link" aria-label="{{ block.settings.primary_cta_label | default: 'Select Size' }}">
                       <span class="btn-fill" data-fill></span>
                       <span class="btn-text">
                         {{ block.settings.primary_cta_label | default: 'Select Size' }}
