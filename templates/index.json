@@ -644,7 +644,7 @@
         "text_alignment_mobile": "left",
         "text_max_width": 500,
         "dot_size": 16,
-        "dot_size_mobile": 26,
+        "dot_size_mobile": 20,
         "dot_color": "#ffffff",
         "dot_border_color": "#536c9d",
         "dot_border_width": 2,
