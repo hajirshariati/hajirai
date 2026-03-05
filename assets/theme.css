@@ -18235,3 +18235,7 @@ cart-count.count::before {
 .fg-score .score-label {
   border-radius: 0px 26px 25px 0px !important;
 }
+
+.meta-option.active-meta .label-swatch {
+  border: 2px solid #000;
+}
