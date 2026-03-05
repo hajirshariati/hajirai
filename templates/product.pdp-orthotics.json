@@ -702,6 +702,7 @@
         "column_8EnLJG",
         "column_XQQ7Wy"
       ],
+      "disabled": true,
       "name": "Multicolumn",
       "settings": {
         "gap": "large",
