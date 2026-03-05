@@ -209,7 +209,7 @@
               {{ productcolor }}>
             <magnet-element class="block">
               <label class="{%- if metaproduct.handle == product.handle -%}active-swatch {%- endif %} custom-meta-label color-swatch with-image inline-block cursor-pointer relative aspect-adapt_first mobile:aspect-adapt_first aspect-contain"
-                style="background-image:url({{ metaproduct.featured_image | image_url }});">
+                style="background-image:url({{ metaproduct.featured_image | image_url: width: 80, height: 80, crop: 'center' }});"
                 {%- if metaproduct.selected_or_first_available_variant.compare_at_price and metaproduct.selected_or_first_available_variant.compare_at_price > metaproduct.selected_or_first_available_variant.price -%}
                   {%- if saved_amount_int >= 60 -%} 
                     <div class="main-pdp-variant-custom-badge custom-final-sale">
@@ -377,7 +377,7 @@
 
                     assign swatch_image = blank
                     if images[file_name] != blank
-                      assign swatch_image = images[file_name] | image_url: width: 72
+                      assign swatch_image = images[file_name] | image_url: width: 80, height: 80, crop: 'center'
                     elsif file_name contains '//cdn.shopify.com/'
                       assign swatch_image = file_name
                     endif
@@ -385,7 +385,7 @@
                     assign swatch_image = blank
                     assign swatch_fallback = value | split: ' ' | last | handle
                     if value.swatch.image
-                      assign swatch_image = value.swatch.image | image_url: width: 72
+                      assign swatch_image = value.swatch.image | image_url: width: 80, height: 80, crop: 'center'
                       assign swatch_fallback_override = false
                     elsif value.swatch.color
                       assign swatch_fallback = value.swatch.color
@@ -395,7 +395,7 @@
                   for variant in product.variants
                     assign variant_value = variant.options[option_index_0]
                     if variant_value contains value and variant.image
-                      assign swatch_image = variant.image | image_url: width: 72
+                      assign swatch_image = variant.image | image_url: width: 80, height: 80, crop: 'center'
                       assign swatch_fallback_override = false
                       break
                     endif
