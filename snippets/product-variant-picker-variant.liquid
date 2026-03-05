@@ -209,8 +209,7 @@
               {{ productcolor }}>
             <magnet-element class="block">
               <label class="{%- if metaproduct.handle == product.handle -%}active-swatch {%- endif %} custom-meta-label color-swatch with-image inline-block cursor-pointer relative aspect-adapt_first mobile:aspect-adapt_first aspect-contain"
-               style="background-image:url({{ metaproduct.featured_image | image_url: width: 80, height: 80 }})">
-                {%- if metaproduct.selected_or_first_available_variant.compare_at_price and metaproduct.selected_or_first_available_variant.compare_at_price > metaproduct.selected_or_first_available_variant.price -%}
+               style="background-image:url({{ metaproduct.featured_image | image_url: width: 80, height: 80}})">{%- if metaproduct.selected_or_first_available_variant.compare_at_price and metaproduct.selected_or_first_available_variant.compare_at_price > metaproduct.selected_or_first_available_variant.price -%}
                   {%- if saved_amount_int >= 60 -%} 
                     <div class="main-pdp-variant-custom-badge custom-final-sale">
                       {{- "Final Sale" -}}
