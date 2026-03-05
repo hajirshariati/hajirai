@@ -8166,7 +8166,7 @@ class ProductColorSwatchHandler {
         document.body.classList.add('page-loading');
 
         const url = `/products/${handle}`;
-        console.log(url,'/products/${handle}');
+    
 
         fetch(url)
             .then(response => {
