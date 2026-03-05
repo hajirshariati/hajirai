@@ -7985,6 +7985,10 @@ class ProductColorSwatchHandler {
             'multicolumn_KyfUdW',
             'multicolumn_CEQ6Uh'
         ];
+
+        this.SECTIONS_TO_RERENDER = [
+            
+        ]
         
         this.observer = null;
         this.isProductSwitching = false;
@@ -8166,7 +8170,20 @@ class ProductColorSwatchHandler {
         document.body.classList.add('page-loading');
 
         const url = `/products/${handle}`;
-    
+        
+        let saveContent = [];
+        
+        const tfcWidgetId = document.querySelector('#tfc-widget')?.closest('.shopify-app-block')?.getAttribute('id');
+        if(tfcWidgetId) {
+            this.SECTIONS_TO_RERENDER.push(tfcWidgetId);
+        }
+
+        this.SECTIONS_TO_RERENDER.forEach(sectionId => {
+            const section = document.getElementById(sectionId);
+            if(section) {
+                saveContent[sectionId] = section.innerHTML;
+            }
+        });
 
         fetch(url)
             .then(response => {
@@ -8367,11 +8384,20 @@ class ProductColorSwatchHandler {
                         }
                     }
                 }, 500);
+
+                this.SECTIONS_TO_RERENDER.forEach(sectionId => {
+                    const section = document.getElementById(sectionId);
+                    if(section) {
+                        section.innerHTML = saveContent[sectionId];
+                    }
+                });
                 
                 // Reset the product switching flag after a delay to ensure all updates are complete
                 setTimeout(() => {
                     this.isProductSwitching = false;
                 }, 500);
+
+                window.loadFrontrow();
             })
             .catch(error => {
                 console.error('Error fetching product page:', error);
