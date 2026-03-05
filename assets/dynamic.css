@@ -1060,3 +1060,19 @@ body .yotpo-reviews-main-widget svg {
 #CartDrawer {
   z-index: 9999999;
 }
+
+.swatches li.custom-list-items .label-swatch {
+    height: 100%;
+    text-align: center;
+    display: flex;
+    gap: 4px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    line-height: 100%;
+    font-weight: 600;
+    text-transform: capitalize;
+    min-height: 65px;
+    width: 100%;
+}
