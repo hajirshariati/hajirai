@@ -8166,6 +8166,7 @@ class ProductColorSwatchHandler {
         document.body.classList.add('page-loading');
 
         const url = `/products/${handle}`;
+        console.log(url,'/products/${handle}');
 
         fetch(url)
             .then(response => {
@@ -8420,7 +8421,7 @@ class ProductColorSwatchHandler {
                 );
 
                 if (ballOfFootPainChecked && flatFeetChecked) {
-                      console.log(event,customDataProduct,'customDataProduct');
+                   
                 this.handleSwatchClick(event, customDataProduct);
 
             }
