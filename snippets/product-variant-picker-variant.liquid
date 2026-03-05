@@ -136,6 +136,7 @@
           class="swatches swatches--round-slight swatches--variant flex items-start flex-wrap gap-4"
           data-group="ball-of-foot-pain"
         >
+          {{ is_active }}-active
           {% for item in metafield_ball_of_foot_pain %}
             {% assign input_id = 'ball-of-foot-pain-' | append: forloop.index0 %}
 
