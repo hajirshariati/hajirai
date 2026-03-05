@@ -8386,15 +8386,15 @@ class ProductColorSwatchHandler {
         // Prevent multiple bindings if method runs again
         if (this._metaOptionDelegated) return;
         this._metaOptionDelegated = true;
-              console.log(customDataProduct,'customDataProduct');
-
+        
         document.addEventListener('click', (event) => {
             setTimeout(() => {
-
+                
                 const option = event.target.closest('.meta-option');
                 if (!option) return;
-
+                
                 const customDataProduct = document.querySelector('.custom-data-product');
+                console.log(customDataProduct,'customDataProduct');
                 if (!customDataProduct) {
                 console.warn('No .custom-data-product element found');
                 return;
