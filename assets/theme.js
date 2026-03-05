@@ -8393,8 +8393,8 @@ class ProductColorSwatchHandler {
                 const option = event.target.closest('.meta-option');
                 if (!option) return;
                 
+           
                 const customDataProduct = document.querySelector('.custom-data-product');
-                console.log(customDataProduct,'customDataProduct');
                 if (!customDataProduct) {
                 console.warn('No .custom-data-product element found');
                 return;
@@ -8420,6 +8420,7 @@ class ProductColorSwatchHandler {
                 );
 
                 if (ballOfFootPainChecked && flatFeetChecked) {
+                      console.log(event,customDataProduct,'customDataProduct');
                 this.handleSwatchClick(event, customDataProduct);
 
             }
