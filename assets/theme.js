@@ -7993,9 +7993,13 @@ class ProductColorSwatchHandler {
 
     init() {
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => this.attachSwatchListeners());
+        document.addEventListener('DOMContentLoaded', () => {
+            this.attachSwatchListeners();
+            this.attachOptionButtonListeners();   // ← add here
+        });
         } else {
             this.attachSwatchListeners();
+            this.attachOptionButtonListeners();  
         }
     }
 
@@ -8220,6 +8224,9 @@ class ProductColorSwatchHandler {
 
                 // Re-attach listeners for the new content
                 this.attachSwatchListeners();
+
+                   // ← Add_code 
+                    this.attachOptionButtonListeners();
                 
                 // Immediate reset since we've already prevented checked attributes during DOM replacement
                 this.resetVariantSelection();
@@ -8374,6 +8381,54 @@ class ProductColorSwatchHandler {
                 document.body.classList.remove('page-loading');
             });
     }
+
+        attachOptionButtonListeners() {
+        // Prevent multiple bindings if method runs again
+        if (this._metaOptionDelegated) return;
+        this._metaOptionDelegated = true;
+
+        document.addEventListener('click', (event) => {
+            setTimeout(() => {
+
+                const option = event.target.closest('.meta-option');
+                if (!option) return;
+
+                const customDataProduct = document.querySelector('.custom-data-product');
+                if (!customDataProduct) {
+                console.warn('No .custom-data-product element found');
+                return;
+                }
+
+                const optionGroup = option.dataset.option;
+
+                // Remove active-meta from same group
+                document
+                .querySelectorAll(`.meta-option[data-option="${optionGroup}"]`)
+                .forEach(el => el.classList.remove('active-meta'));
+
+                // Add active-meta to clicked item
+                option.classList.add('active-meta');
+
+                // SAME CHECK AS BEFORE (replacement for :checked)
+                const ballOfFootPainChecked = document.querySelector(
+                'fieldset[data-option-index="custom-ball-of-foot-pain"] .meta-option.active-meta'
+                );
+
+                const flatFeetChecked = document.querySelector(
+                'fieldset[data-option-index="custom-flat-feet"] .meta-option.active-meta'
+                );
+
+                if (ballOfFootPainChecked && flatFeetChecked) {
+                this.handleSwatchClick(event, customDataProduct);
+
+            }
+            }, 500);
+        });
+    }
+
+
+
+
 }
 
 document.addEventListener('DOMContentLoaded', function() {
