@@ -22,8 +22,172 @@
   %}
 {%- enddoc -%}
 
+
+{% assign colorProductData = true %}
+
 <variant-picker id="VariantPicker-{{ section_id }}-{{ product_id }}{% if context == 'bundle' %}-variant{% endif %}" class="variant-picker grid gap-5 no-js-hidden" {{ shopify_attributes }}>
 
+    {% comment %}  No / Unsure and Yes  code {% endcomment %}
+
+  {% if product.template_suffix == 'pdp-ortho-v2' %}
+    {% if product.metafields.custom.custom_product_reference_code.value %}
+      {% assign variant_code = product.metafields.custom.custom_product_reference_code.value %}
+    {% else %}
+      {% assign variant_code = '00' %}
+    {% endif %}
+    {% assign ball_of_foot_pain = 'No / Unsure' %}
+    {% assign flat_feet = 'No / Unsure' %}
+    {% if product.metafields.custom.ball_of_foot_pain.value and product.metafields.custom.flat_feet.value %}
+      {% assign colorProductData = false %}
+    {% endif %}
+
+    {% assign metafield_flat_feet = product.metafields.custom.flat_feet.value %}
+    {% if metafield_flat_feet != blank %}
+      <fieldset
+        class="js product-form__input variant-input-wrapper relative"
+        data-option-index="custom-flat-feet"
+      >
+        <legend class="sr-only">Do you have flat feet?:</legend>
+
+        <div class="form__label flex items-center justify-between gap-2 w-full">
+          <div class="flex gap-2">
+            Do you have flat feet?:
+            <span class="font-medium" id="flat-feet-selected">
+              {% for item in metafield_flat_feet %}
+                {% if variant_code == '20' or variant_code == '25' %}
+                  Yes
+                  {% break %}
+                {% else %}
+                  No / Unsure
+                  {% break %}
+                {% endif %}
+              {% endfor %}
+            </span>
+          </div>
+        </div>
+
+        <ul
+          class="swatches swatches--round-slight swatches--variant flex items-start flex-wrap gap-4"
+          data-group="flat-feet"
+        >
+          {% for item in metafield_flat_feet %}
+            {% assign input_id = 'flat-feet-' | append: forloop.index0 %}
+
+            {% assign is_active = false %}
+            {% if variant_code == '20' or variant_code == '25' %}
+              {% if item == 'Yes' %}
+                {% assign is_active = true %}
+              {% endif %}
+            {% else %}
+              {% if item == 'No / Unsure' %}
+                {% assign is_active = true %}
+              {% endif %}
+            {% endif %}
+
+            <li
+              class="custom-list-items flat-feet meta-option {% if is_active %} active-meta {% endif %}"
+              data-option="flat-feet"
+              data-value="{{ item }}"
+            >
+              <div
+                class="label-swatch text-sm font-medium leading-none cursor-pointer relative"
+                title="{{ item }}"
+              >
+                {{ item }}
+              </div>
+            {% if is_active %}
+              <input    form="ProductForm-{{ section_id }}-{{ product_id }}"  type="hidden" value="{{ item }}" name="properties[Do you have flat feet?]">
+            {% endif %}
+            
+            </li>
+          {% endfor %}
+        </ul>
+        
+      </fieldset>
+    {% endif %}
+
+    {% assign metafield_ball_of_foot_pain = product.metafields.custom.ball_of_foot_pain.value %}
+    {% if metafield_ball_of_foot_pain != blank %}
+      <fieldset
+        class="js product-form__input variant-input-wrapper relative"
+        data-option-index="custom-ball-of-foot-pain"
+      >
+        <legend class="sr-only">Do you have ball of foot pain?:</legend>
+
+        <div class="form__label flex items-center justify-between gap-2 w-full">
+          <div class="flex gap-2">
+            Do you have ball of foot pain?:
+            <span class="font-medium" id="ball-of-foot-pain-selected">
+             {% for item in metafield_flat_feet %}
+             {% if variant_code == '05' or variant_code == '25' %}
+                  Yes
+                  {% break %}
+                {% else %}
+                  No / Unsure
+                  {%  break %}
+
+                {% endif %}
+              {% endfor %}
+            </span>
+          </div>
+        </div>
+
+        <ul
+          class="swatches swatches--round-slight swatches--variant flex items-start flex-wrap gap-4"
+          data-group="ball-of-foot-pain"
+        >
+          {% for item in metafield_ball_of_foot_pain %}
+            {% assign input_id = 'ball-of-foot-pain-' | append: forloop.index0 %}
+
+            {% assign is_active = false %}
+            <!-- Define logic based on variant code -->
+            {% if variant_code == '05' or variant_code == '25' %}
+              {% if item == 'Yes' %}
+                {% assign is_active = true %}
+              {% endif %}
+            {% else %}
+              {% if item == 'No / Unsure' %}
+                {% assign is_active = true %}
+              {% endif %}
+            {% endif %}
+
+            <li
+              class="custom-list-items ball-of-foot-pain meta-option {% if is_active %} active-meta {% endif %}"
+              data-option="ball-of-foot-pain"
+              data-value="{{ item }}"
+            >
+              <div
+                class="label-swatch text-sm font-medium leading-none cursor-pointer relative "
+                title="{{ item }}"
+              >
+                {{ item }}
+              </div>
+            </li>
+            {% if is_active %}
+              <input form="ProductForm-{{ section_id }}-{{ product_id }}"  type="hidden" value="{{ item }}" name="properties[Do you have ball of foot pain?]">
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </fieldset>
+    {% endif %}
+
+    {% assign products_list = product.metafields.custom.product_reference.value %}
+    {% if products_list != blank %}
+      {% for ref_product in products_list %}
+        {% if variant_code == ref_product.metafields.custom.custom_product_reference_code.value %}
+          <div
+            class="custom-data-product"
+            style=""
+            data-variant-code="{{ variant_code }}"
+            data-product-handle="{{ ref_product.handle }}"
+          ></div>
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  {% endif %}
+  {% comment %}  No / Unsure and Yes  code {% endcomment %}
+
+  {% if colorProductData == true %}
  {% assign metaProducts = product.metafields.custom.product_reference.value %}
  {% assign productcolor = product.metafields.custom.color | metafield_tag | strip_html %}
   {% if productcolor != blank and metaProducts != blank %}
@@ -85,6 +249,7 @@
         </li>
       {% endfor %}
     </ul>
+  {% endif %}
   {% endif %}
   
   {%- for option in product.options_with_values -%}

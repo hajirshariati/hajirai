@@ -154,7 +154,14 @@
                                       {%- assign property_first_char = property.first | slice: 0 -%}
                                       {%- if property.last != blank and property_first_char != '_' -%}
                                         <div class="flex gap-1 text-xs text-opacity leading-tight">
-                                          <dt class="font-medium">{{ property.first }}:&nbsp;</dt>
+                                          <dt class="font-medium">{{ property.first }}:&nbsp; {%- if property.last contains '/uploads/' -%}
+                                              <a href="{{ property.last }}" class="link" target="_blank" aria-describedby="a11y-new-window-message">
+                                                {{- property.last | split: '/' | last -}}
+                                              </a>
+                                            {%- else -%}
+                                              {{- property.last -}}
+                                          {%- endif -%}</dt>
+                                          {% comment %} <dt class="font-medium">{{ property.first }}:&nbsp;</dt>
                                           <dd>
                                             {%- if property.last contains '/uploads/' -%}
                                               <a href="{{ property.last }}" class="link" target="_blank" aria-describedby="a11y-new-window-message">
@@ -163,7 +170,7 @@
                                             {%- else -%}
                                               {{- property.last -}}
                                             {%- endif -%}
-                                          </dd>
+                                          </dd> {% endcomment %}
                                         </div>
                                       {%- endif -%}
                                     {%- endfor -%}
@@ -541,7 +548,7 @@
           {%- endif -%}
 
         <!--div style="background: #fafafa;"{% if section.settings.loyalty_us_only %} data-us-only{% endif %}><div class="yotpo-widget-instance" data-yotpo-instance-id="1064470"></div></div-->
-        <div style="background: #fafafa;"{% if section.settings.loyalty_us_only %} data-us-only{% endif %}><div class="yotpo-widget-instance" data-yotpo-instance-id="1064464"></div></div>
+        <!--div style="background: #fafafa;"{% if section.settings.loyalty_us_only %} data-us-only{% endif %}><div class="yotpo-widget-instance" data-yotpo-instance-id="1064464"></div></div-->
         
         </div>
 
