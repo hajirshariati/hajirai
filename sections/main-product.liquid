@@ -1175,6 +1175,85 @@
   </script>
 </div>
 
+
+{% if product.template_suffix == 'pdp-ortho-v2' %}
+  <script>
+  console.log('testData123');
+  {% assign products_list = product.metafields.custom.product_reference.value %}
+  {% comment %} document.addEventListener('DOMContentLoaded', logAllSelections); {% endcomment %}
+
+  
+  var ref_products = [];
+  {% for ref_product in products_list %}
+    ref_products.push({
+      handle: "{{ ref_product.handle }}",
+      custom_product_reference_code: "{{ ref_product.metafields.custom.custom_product_reference_code.value }}"
+    });
+  {% endfor %}
+
+  function logAllSelections() {
+    var answers = {};
+    document.querySelectorAll('.meta-option.active-meta').forEach(option => {
+      var optionType = option.dataset.option;
+      var value = option.dataset.value;
+      if (optionType == 'flat-feet') {
+        answers.flat_feet = value;
+        var flat_feet_selected = document.getElementById('flat-feet-selected');
+        if (flat_feet_selected) {
+          flat_feet_selected.textContent = value;
+        }
+        
+      }
+      if (optionType == 'ball-of-foot-pain') {
+        answers.ball_of_foot_pain = value;
+        var ball_of_foot_pain_selected = document.getElementById('ball-of-foot-pain-selected');
+        if (ball_of_foot_pain_selected) {
+          ball_of_foot_pain_selected.textContent = value;
+        }
+      }
+    
+    });
+
+    var flatFeet = answers.flat_feet ;
+    var ballOfFootPain = answers.ball_of_foot_pain ;
+  
+        let variantCode = '';
+          if (flatFeet == 'No / Unsure' && ballOfFootPain == 'No / Unsure') {
+            variantCode = '00';
+          } else if (flatFeet == 'No / Unsure' && ballOfFootPain == 'Yes') {
+            variantCode = '05';
+          } else if (flatFeet == 'Yes' && ballOfFootPain == 'No / Unsure') {
+            variantCode = '20';
+          } else if (flatFeet == 'Yes' && ballOfFootPain == 'Yes') {
+            variantCode = '25';
+          }
+            ref_products.forEach(product => {
+              if (product.custom_product_reference_code === variantCode) {
+                var customDataProduct = document.querySelector('.custom-data-product');
+                if (customDataProduct) {
+                  console.log('data-product-handle', product.handle);
+                  customDataProduct.setAttribute('data-product-handle', product.handle);
+                }
+              }
+            });
+          }
+
+    document.addEventListener('click', function (e) {
+      
+    const option = e.target.closest('.meta-option');
+    if (!option) return;
+    const optionGroup = option.dataset.option;
+    document
+      .querySelectorAll(`.meta-option[data-option="${optionGroup}"]`)
+      .forEach(el => el.classList.remove('active-meta'));
+      option.classList.add('active-meta');
+      setTimeout(() => {
+    logAllSelections();
+    }, 300);
+  });
+  </script>
+{% endif %}
+
 {% schema %}
 {
   "name": "t:sections.main-product.name",
