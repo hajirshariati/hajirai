@@ -636,6 +636,7 @@ div.pswp__img--placeholder {
 .flickity-slider .flickity-cell {
     position: absolute;
     left: 0;
+    align-items: anchor-center;
 }
 
 .flickity-rtl .flickity-cell {
