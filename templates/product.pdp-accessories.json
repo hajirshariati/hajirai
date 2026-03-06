@@ -106,6 +106,8 @@
             "ProductPage": true,
             "size_recommendation_font_family": "OpenSans, sans-serif",
             "size_recommendation_vertical_spacing": 5,
+            "expansion_panel_background": "#d06263",
+            "expansion_panel_foreground": "#ffffff",
             "tab_background": "#f2f2f2",
             "tab_foreground": "#5c6271",
             "active_tab_background": "#5c6271",
@@ -516,6 +518,7 @@
         },
         "ss_profile_block_B4KtFM": {
           "type": "ss_profile_block",
+          "disabled": true,
           "settings": {
             "ss_profile_id": "similar",
             "ss_collection_list": [],
@@ -566,6 +569,7 @@
         "ss_profile_block_BYUhAA",
         "ss_profile_block_AXb8Di"
       ],
+      "disabled": true,
       "name": "Searchspring Recommendations Target",
       "settings": {}
     }
