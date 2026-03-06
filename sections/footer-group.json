@@ -49,7 +49,7 @@
             "heading": "Doctor Approved & Recommended",
             "text": "",
             "highlighted_text": "none",
-            "custom_html": "<a href=\"pages/medical-consultants\">Learn More</a>",
+            "custom_html": "<a href=\"/pages/medical-consultants\">Learn More</a>",
             "us_only": false,
             "highlighted_scribble": "circle"
           }
