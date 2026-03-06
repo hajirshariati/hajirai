@@ -16172,11 +16172,11 @@ video-media
 
 @media screen and (min-width: 768px) {
     .product-sticky-form {
-        width: 700px;
+        width: 550px;
         inset-inline-end: var(--sp-5);
         inset-block-end: var(--sp-5);
-        padding-right: 9em;
-        margin-bottom: -7px;
+        padding-right: 0em;
+        margin-bottom: 3.5em;
     }
 
     .product-sticky-form__card {
