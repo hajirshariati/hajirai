@@ -29,6 +29,7 @@
       "blocks": {
         "video_ETdLMT": {
           "type": "video",
+          "disabled": true,
           "settings": {
             "video": "shopify://files/videos/Spring_into_desktop_NO_COPY.mp4",
             "video_url": "https://www.youtube.com/watch?v=_9VUPq3SxOc",
@@ -1247,8 +1248,8 @@
     "rich_text_PKdTPU",
     "collection_list_q7Rypj",
     "multicolumn_9UNM8U",
-    "collection_list_fgPMz9",
     "featured_collection_T7yxrw",
+    "collection_list_fgPMz9",
     "image_with_text_overlay_GNC4KT",
     "image_with_text_overlay_cLVdgJ",
     "image_with_text_overlay_HEWGdX",
