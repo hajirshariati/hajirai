@@ -11981,6 +11981,7 @@ input[type="email"]:is(
     .text-with-icons.with-border .column + .column {
         border-inline-start: 1px solid rgb(var(--color-border));
         align-self: center;
+        align-items: anchor-center;
     }
 
     .text-with-icons.with-border.grid--2 .column:nth-child(2n + 1),
