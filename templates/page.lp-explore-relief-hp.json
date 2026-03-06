@@ -211,9 +211,7 @@
         "column_tPK6pL",
         "column_QcJHeV"
       ],
-      "custom_css": [
-        "& {max-width: 1920px; margin: 0px auto;}"
-      ],
+      "custom_css": [],
       "name": "t:sections.multicolumn-with-icons.name",
       "settings": {
         "style": "with-border",
