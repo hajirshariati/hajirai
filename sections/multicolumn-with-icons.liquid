@@ -41,15 +41,26 @@
 
 
 
-          {%- if block.settings.custom_icon != blank -%}
-            <div class="column__icon with-svg">
-              {{- block.settings.custom_icon -}}
-            </div>
-          {%- elsif block.settings.icon != 'none' -%}
-            <div class="column__icon">
-              {%- render 'icon-guarantee', icon: block.settings.icon, size: 'lg', class: 'inline-block' -%}
-            </div>
-          {%- endif -%}
+{%- if block.settings.custom_icon != blank -%}
+  <div class="column__icon with-svg">
+    {{- block.settings.custom_icon -}}
+  </div>
+
+{%- elsif block.settings.custom_icon_image != blank -%}
+  <div class="column__icon">
+    <img 
+      src="{{ block.settings.custom_icon_image | image_url: width: 120 }}" 
+      alt="{{ block.settings.heading | escape }}" 
+      loading="lazy"
+      style="max-width:60px;height:auto;"
+    >
+  </div>
+
+{%- elsif block.settings.icon != 'none' -%}
+  <div class="column__icon">
+    {%- render 'icon-guarantee', icon: block.settings.icon, size: 'lg', class: 'inline-block' -%}
+  </div>
+{%- endif -%}
           
           <div class="column__content">
 
@@ -686,6 +697,11 @@
           "label": "t:sections.multicolumn.blocks.column.settings.custom_icon.label",
           "info": "t:sections.multicolumn.blocks.column.settings.custom_icon.info"
         },
+        {
+  "type": "image_picker",
+  "id": "custom_icon_image",
+  "label": "Custom icon image (PNG / JPG)"
+},
         {
           "type": "inline_richtext",
           "id": "heading",
