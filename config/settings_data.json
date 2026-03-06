@@ -262,6 +262,11 @@
         "type": "shopify://apps/criteo-sales-growth-ads/blocks/theme-extension/b74e0e19-7ecc-4a61-b469-888ea2cdf8f5",
         "disabled": true,
         "settings": {}
+      },
+      "8367999757253633140": {
+        "type": "shopify://apps/schema-plus-for-seo/blocks/schemaplus_app_embed/0199c405-aef8-7230-87a6-aacc5fab62ed",
+        "disabled": false,
+        "settings": {}
       }
     }
   },
