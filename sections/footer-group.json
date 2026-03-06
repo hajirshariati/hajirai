@@ -45,10 +45,11 @@
           "settings": {
             "icon": "users",
             "custom_icon": "",
-            "heading": "Refer a friend",
-            "text": "<p>Refer a friend and get 20% off each other.</p>",
+            "custom_icon_image": "shopify://shop_images/APMA_white_logo_aceea0a0-0c9b-4da4-934b-29b4387ccbfe.png",
+            "heading": "Doctor Approved & Recommended",
+            "text": "",
             "highlighted_text": "none",
-            "custom_html": "<a href=\"/pages/give-20-get-20\">Start Here</a>",
+            "custom_html": "<a href=\"pages/medical-consultants\">Learn More</a>",
             "us_only": false,
             "highlighted_scribble": "circle"
           }
@@ -103,7 +104,8 @@
         "full_width": false,
         "rounded": false,
         "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
+        "abra_promo_code_hide": "",
+        "limit_section_width": false
       }
     },
     "multicolumn_with_icons_4NxwpQ": {
@@ -185,7 +187,8 @@
         "full_width": false,
         "rounded": true,
         "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
+        "abra_promo_code_hide": "",
+        "limit_section_width": false
       }
     },
     "footer": {
