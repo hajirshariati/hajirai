@@ -925,6 +925,7 @@
         },
         "ss_profile_block_B4KtFM": {
           "type": "ss_profile_block",
+          "disabled": true,
           "settings": {
             "ss_profile_id": "similar",
             "ss_collection_list": [],
@@ -959,7 +960,6 @@
         },
         "ss_profile_block_BYUhAA": {
           "type": "ss_profile_block",
-          "disabled": true,
           "settings": {
             "ss_profile_id": "similar"
           }
@@ -976,6 +976,7 @@
         "ss_profile_block_BYUhAA",
         "ss_profile_block_AXb8Di"
       ],
+      "disabled": true,
       "name": "Searchspring Recommendations Target",
       "settings": {}
     }
