@@ -935,7 +935,7 @@
           "type": "button",
           "settings": {
             "button_label": "View Collection",
-            "button_link": "shopify://collections/spring-collection",
+            "button_link": "shopify://collections/womens-new-arrivals",
             "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
