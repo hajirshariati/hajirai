@@ -315,6 +315,12 @@ label.active-swatch.custom-meta-label:before{
   width: 100%;
 }
 
+@media all and (max-width: 767px) {
+  .product .swatches--variant {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
 .product fieldset[data-option-slug="size"] .swatches--variant {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
@@ -1075,4 +1081,15 @@ body .yotpo-reviews-main-widget svg {
     text-transform: capitalize;
     min-height: 65px;
     width: 100%;
+}
+
+@media all and (max-width: 767px) {
+  .swatches li.custom-list-items .label-swatch {
+    flex-direction: row;
+    min-height: 44px;
+    font-size: 14px;
+  }
+  .swatches li.custom-list-items .label-swatch p { 
+    opacity: .65;
+  }
 }

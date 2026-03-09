@@ -1,5 +1,7 @@
 <style>
   #shopify-section-{{ section.id }} {
+    --section-padding-top-mobile: {{ section.settings.padding_top | times: 0.3 }}px;
+    --section-padding-bottom-mobile: {{ section.settings.padding_bottom | times: 0.3 }}px;
     --section-padding-top: {{ section.settings.padding_top }}px;
     --section-padding-bottom: {{ section.settings.padding_bottom }}px;
     --color-background: {{ section.settings.color_background.rgb }};
@@ -59,6 +61,13 @@
     color: {{ section.settings.menu_link_color_2 }} !important;
   }
 {%- endif -%}
+
+@media screen and (max-width: 600px) {
+  #shopify-section-{{ section.id }} {
+    --section-padding-top: var(--section-padding-top-mobile);
+    --section-padding-bottom: var(--section-padding-bottom-mobile);
+  }
+}
 
 </style>
 

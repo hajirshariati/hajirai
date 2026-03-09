@@ -29,6 +29,9 @@
     @media screen and (min-width: 1536px) {
       :root {--topbar-height: var(--sp-14);}
     }
+    @media screen and (max-width: 767px) {
+      :root {--topbar-height: 38px;}
+    }
     #shopify-section-{{ section.id }},
     #shopify-section-{{ section.id }} .topbar-section {
       background: {% if section.settings.gradient_background != blank %}{{ section.settings.gradient_background }}{% else %}{{ section.settings.color_background }}{% endif %};

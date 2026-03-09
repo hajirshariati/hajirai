@@ -44,8 +44,18 @@
   /* Prevent layout shifts from variant picker images */
   #shopify-section-{{ section.id }} .product-info__mobile-form .color-swatch,
   #shopify-section-{{ section.id }} .product-info__blocks .color-swatch {
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
+    min-height: 60px;
+  }
+
+  @media all and (min-width: 768px) {
+    #shopify-section-{{ section.id }} .product-info__mobile-form .color-swatch,
+    #shopify-section-{{ section.id }} .product-info__blocks .color-swatch {
+      width: 80px;
+      height: 80px;
+      min-height: 65px;
+    }
   }
 
   #shopify-section-{{ section.id }} .product-info__mobile-form magnet-element,
