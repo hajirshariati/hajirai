@@ -609,7 +609,8 @@
       ".product-card__content {margin-top: 0 !important; padding-top: 0 !important;}",
       ".product-card__details {gap: 4px !important;}",
       ".product-card__details .ss__title {margin: 0;}",
-      ".product-card__media {margin-bottom: 0px;}"
+      ".product-card__media {margin-bottom: 0px;}",
+      ".product-card__content [name=\"aetrex_fitai_rating_container\"]{margin: 0 !important;}"
     ]
   }
 }
