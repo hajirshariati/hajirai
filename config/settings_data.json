@@ -609,7 +609,10 @@
       ".product-card__content {margin-top: 0 !important; padding-top: 0 !important;}",
       ".product-card__details {gap: 4px !important;}",
       ".product-card__details .ss__title {margin: 0;}",
-      ".product-card__media {margin-bottom: 0px;}"
+      ".product-card__media {margin-bottom: 0px;}",
+      ".product-card__media {margin-bottom: 4px !important;}",
+      ".product-card__image {margin-bottom: 0 !important; padding-bottom: 0 !important;}",
+      ".product-card__content {margin-top: 0 !important; padding-top: 0 !important;}"
     ]
   }
 }
