@@ -612,7 +612,11 @@
       ".product-card__media {margin-bottom: 0px;}",
       ".product-card__media {margin-bottom: 4px !important;}",
       ".product-card__image {margin-bottom: 0 !important; padding-bottom: 0 !important;}",
-      ".product-card__content {margin-top: 0 !important; padding-top: 0 !important;}"
+      ".product-card__content {margin-top: 0 !important; padding-top: 0 !important;}",
+      ".product-card__media {position: relative;}",
+      ".product-card__image--secondary {position: absolute; inset: 0; opacity: 0;}",
+      ".product-card__media:hover .product-card__image--secondary {opacity: 1;}",
+      ".product-card__media:hover .product-card__image--primary {opacity: 0;}"
     ]
   }
 }
