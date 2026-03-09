@@ -22,10 +22,9 @@
   %}
 {%- enddoc -%}
 
+<variant-picker id="VariantPicker-{{ section_id }}-{{ product_id }}{% if context == 'bundle' %}-variant{% endif %}" class="variant-picker grid gap-5 no-js-hidden {% if product.template_suffix == 'pdp-ortho-new' %}pdp-ortho-new{% endif %}" {{ shopify_attributes }}>
 
 {% assign colorProductData = true %}
-
-<variant-picker id="VariantPicker-{{ section_id }}-{{ product_id }}{% if context == 'bundle' %}-variant{% endif %}" class="variant-picker grid gap-5 no-js-hidden" {{ shopify_attributes }}>
 
     {% comment %}  No / Unsure and Yes  code {% endcomment %}
 
@@ -98,11 +97,11 @@
             {% if is_active %}
               <input    form="ProductForm-{{ section_id }}-{{ product_id }}"  type="hidden" value="{{ item }}" name="properties[Do you have flat feet?]">
             {% endif %}
-            
+
             </li>
           {% endfor %}
         </ul>
-        
+
       </fieldset>
     {% endif %}
 
@@ -250,7 +249,7 @@
     </ul>
   {% endif %}
   {% endif %}
-  
+
   {%- for option in product.options_with_values -%}
     {%- liquid
       assign is_color = false
@@ -289,9 +288,49 @@
       <legend class="sr-only">{{ option.name }}</legend>
       <div class="form__label flex items-center justify-between gap-2 w-full">
         {%- if show_variant_labels -%}
-          <div class="flex gap-2">
-            {{- option.name -}}:
-            <span class="font-medium" id="{{ section_id }}-{{ product_id }}-option{{ option.position }}">{{ option.selected_value }}</span>
+          <div class="flex gap-2 items-center">
+            {{- option.name -}}
+            {%- if product.template_suffix == 'pdp-ortho-new' -%}
+                {%- if option.name == 'Size' -%}
+                    :<span class="font-medium"
+                           id="{{ section_id }}-{{ product_id }}-option{{ option.position }}">{{ option.selected_value }}</span>
+                {% else %}
+                    {%- liquid
+                      assign tooltip_foot_pain = product.metafields.custom.tooltip_fit_yes_no.value
+                      assign tooltip_flat_feet = product.metafields.custom.tooltip_yes_yes.value
+
+                      if option.name == 'Do you have ball of foot pain?'
+                        assign current_tooltip = tooltip_foot_pain
+                      elsif option.name == 'Do you have flat feet?'
+                        assign current_tooltip = tooltip_flat_feet
+                      endif
+                    -%}
+                    <span class="price__item--tooltip tooltip visually-hidden" role="tooltip"
+                          aria-describedby="tooltip-message-{{ option.position }}">
+                  <svg class="icon icon--price-tooltip tooltip-icon" width="16" height="17" viewBox="0 0 16 17"
+                       fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <g opacity="0.6">
+                    <rect x="0.5" y="0.570312" width="15" height="15" rx="7.5" stroke="#111111"></rect>
+                    <path d="M7.42045 12.0703V5.52486H8.42614V12.0703H7.42045ZM7.93182 4.43395C7.7358 4.43395 7.56676 4.36719 7.42472 4.23366C7.28551 4.10014 7.21591 3.93963 7.21591 3.75213C7.21591 3.56463 7.28551 3.40412 7.42472 3.2706C7.56676 3.13707 7.7358 3.07031 7.93182 3.07031C8.12784 3.07031 8.29545 3.13707 8.43466 3.2706C8.5767 3.40412 8.64773 3.56463 8.64773 3.75213C8.64773 3.93963 8.5767 4.10014 8.43466 4.23366C8.29545 4.36719 8.12784 4.43395 7.93182 4.43395Z"
+                          fill="#111111"></path>
+                  </g>
+                </svg>
+                  <span class="tooltip__message" id="tooltip-message-{{ option.position }}">
+                      <span class="tooltip__message-content">
+                          {%- if current_tooltip.image.value != blank -%}
+                              <img src="{{ current_tooltip.image.value | image_url: width: 300 }}" alt="{{ current_tooltip.title.value | escape }}" class="tooltip__image" loading="lazy">
+                          {%- endif -%}
+                          <span class="tooltip__message-content-text">
+                            <p class="tooltip__heading">{{ current_tooltip.title.value }}</p>
+                            <p class="tooltip__description">{{ current_tooltip.text.value }}</p>
+                          </span>
+                      </span>
+                  </span>
+                </span>
+                {%- endif -%}
+            {%- else -%}
+              :<span class="font-medium" id="{{ section_id }}-{{ product_id }}-option{{ option.position }}">{{ option.selected_value }}</span>
+            {%- endif -%}
           </div>
         {%- endif -%}
         {%- if is_size -%}
@@ -470,3 +509,5 @@
 
   <script type="application/json" data-selected-variant>{{ product.selected_or_first_available_variant | json }}</script>
 </variant-picker>
+
+

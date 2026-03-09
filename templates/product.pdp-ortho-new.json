@@ -57,8 +57,8 @@
             "liquid": "<br>"
           }
         },
-        "sku_yjUFQR": {
-          "type": "sku",
+        "variant_sku_eWJmMw": {
+          "type": "variant_sku",
           "settings": {}
         },
         "true_fit_widget_8cjNbr": {
@@ -211,7 +211,7 @@
         "yotpo_product_reviews_star_rating_8XQiyE",
         "variant_picker",
         "liquid_87RPy3",
-        "sku_yjUFQR",
+        "variant_sku_eWJmMw",
         "true_fit_widget_8cjNbr",
         "buy_buttons",
         "liquid_Df3mAF",
@@ -458,8 +458,8 @@
             "iwidth": "custom",
             "icon_width": 24,
             "heading": "Description",
-            "content": "<p>{{ product.metafields.custom.short_description | metafield_tag }}</p>",
-            "content_metafield": "",
+            "content": "",
+            "content_metafield": "custom.short_description_no_no,custom.short_description_no_yes,custom.short_description_yes_no,custom.short_description_yes_yes",
             "columns": "Size,Chest",
             "rows": "S,36\nM,38\nL,40",
             "metafields": ""
@@ -476,7 +476,7 @@
             "content_metafield": "metafield",
             "columns": "Size,Chest",
             "rows": "S,36\nM,38\nL,40",
-            "metafields": "Comfort:custom.comfort_details\nMaterials:custom.materials_details\nMeasurements:custom.measurements_details"
+            "metafields": "Comfort:custom.comfort_deails_no_no,custom.comfort_details_no_yes,custom.comfort_details_yes_no,custom.comfort_details_yes_yes\nMaterials:custom.materials_details_no_no,custom.materials_details_no_yes,custom.materials_details_yes_no,custom.materials_details_yes_yes\nMeasurements:custom.measurements_details_no_no,custom.measurements_details_no_yes,custom.measurements_details_yes_no,custom.measurements_details_yes_yes"
           }
         },
         "collapsible_tab_96ewnx": {
@@ -487,7 +487,7 @@
             "icon_width": 24,
             "heading": "Care Instructions",
             "content": "<p> </p>",
-            "content_metafield": "custom.care_instructions",
+            "content_metafield": "custom.care_instructions_no_no,custom.care_instructions_no_yes,custom.care_instructions_yes_no,custom.care_instructions_yes_yes",
             "columns": "Size,Chest",
             "rows": "S,36\nM,38\nL,40",
             "metafields": ""
@@ -1115,6 +1115,44 @@
         "abra_promo_code_hide": ""
       }
     },
+    "multicolumn_ortho_6gXqfH": {
+      "type": "multicolumn-ortho",
+      "name": "Multicolumn Ortho",
+      "settings": {
+        "gap": "small",
+        "columns": 4,
+        "columns_mobile": "1",
+        "carousel_on_desktop": false,
+        "swipe_on_mobile": true,
+        "heading": "Orthotic Features",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "#fafafa",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 40,
+        "padding_bottom": 20,
+        "full_width": false,
+        "divider": false,
+        "rounded": true,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
     "collage_grid_jYjan7": {
       "type": "collage-grid",
       "blocks": {
@@ -1689,6 +1727,7 @@
     "dynamic_feature_T4LpAL",
     "faq_tA87L7",
     "multicolumn_KyfUdW",
+    "multicolumn_ortho_6gXqfH",
     "collage_grid_jYjan7",
     "multicolumn_CEQ6Uh",
     "video_with_text_xf4VTt",

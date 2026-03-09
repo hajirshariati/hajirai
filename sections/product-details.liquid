@@ -117,66 +117,139 @@
   
               {%- when 'collapsible_tab' -%}
                 {%- capture collapsible_content -%}
-  {%- if block.settings.content_metafield != blank -%}
-    {%- assign parts = block.settings.content_metafield | split: '.' -%}
-    {%- assign namespace = parts[0] -%}
-    {%- assign key = parts[1] -%}
-    <div class="col-span-full">
-      {{ product.metafields[namespace][key].value }}
-    </div>
-  {%- elsif block.settings.content != blank -%}
-    <div class="col-span-full">
-      
-      {{ block.settings.content }}
-    </div>
-  {%- endif -%}
+              {%- if block.settings.content_metafield != blank -%}
+                {%- liquid
+                  assign metafield_ref = block.settings.content_metafield
+                  assign first_ref = metafield_ref | split: ',' | first | strip
 
-  {%- if block.settings.metafields != blank -%}
-    {%- assign metafields = block.settings.metafields | newline_to_br | split: '<br />' -%}
-    {%- for line in metafields -%}
-      {%- liquid
-        assign metafield_parts = line | strip | split: '.'
-        assign metafield_namespace = metafield_parts | first
-        assign metafield_key = metafield_parts | last
-        assign metafield_name = metafield_key | replace: '_', ' ' | capitalize
+                  assign parts = first_ref | split: '.'
+                  assign namespace = parts[0]
+                  assign key = parts[1]
 
-        if metafield_namespace contains ':'
-          assign parts = metafield_namespace | split: ':'
-          assign metafield_namespace = parts | last
-          assign metafield_name = parts | first
-        endif
+                  assign is_dynamic = false
+                  assign base_key = key
 
-        assign metafield = product.metafields[metafield_namespace][metafield_key]
-      -%}
+                  if template.suffix == 'pdp-ortho-new'
+                    if key contains '_no_no' or key contains '_no_yes' or key contains '_yes_no' or key contains '_yes_yes'
+                      assign is_dynamic = true
+                      assign base_key = key | remove: '_no_no' | remove: '_no_yes' | remove: '_yes_no' | remove: '_yes_yes'
+                    endif
+                  endif
 
-      {%- if metafield.value != blank -%}
-        <div class="col-span-full md:col-span-6">
-          <h6 class="leading-none tracking-none">{{ metafield_name | escape }} <!-- v2 --></h6>
-          {%- if metafield.list? -%}
-            <p>
-              {%- liquid
-                for value in metafield.value
-                  echo value
-                  unless forloop.last
-                    echo '<br />'
-                  endunless
-                endfor
-              -%}
-            </p>
-          {%- else -%}
-            <div>{{ metafield.value }}</div>
-          {%- endif -%}
-        </div>
-      {%- endif -%}
-    {%- endfor -%}
-  {%- endif -%}
-{%- endcapture -%}
+                  if is_dynamic
+                    assign key_no_no = base_key | append: '_no_no'
+                    assign key_no_yes = base_key | append: '_no_yes'
+                    assign key_yes_no = base_key | append: '_yes_no'
+                    assign key_yes_yes = base_key | append: '_yes_yes'
+                  endif
+                -%}
 
+                <div class="col-span-full{% if is_dynamic %} dynamic-metafield-content{% endif %}"
+                     {% if is_dynamic %}data-dynamic-metafield="true"
+                     data-base-key="{{ base_key }}"
+                     data-namespace="{{ namespace }}"
+                     data-content-no-no="{{ product.metafields[namespace][key_no_no].value | escape }}"
+                     data-content-no-yes="{{ product.metafields[namespace][key_no_yes].value | escape }}"
+                     data-content-yes-no="{{ product.metafields[namespace][key_yes_no].value | escape }}"
+                     data-content-yes-yes="{{ product.metafields[namespace][key_yes_yes].value | escape }}"{% endif %}>
+                  {{ product.metafields[namespace][key].value }}
+                </div>
+              {%- elsif block.settings.content != blank -%}
+                <div class="col-span-full">
 
+                  {{ block.settings.content }}
+                </div>
+              {%- endif -%}
 
+              {%- if block.settings.metafields != blank -%}
+                {%- assign metafields = block.settings.metafields | newline_to_br | split: '<br />' -%}
+                {%- for line in metafields -%}
+                  {%- liquid
+                    assign line_stripped = line | strip
 
-                
-  
+                    assign has_custom_label = false
+                    assign custom_label = ''
+                    if line_stripped contains ':'
+                      assign label_parts = line_stripped | split: ':'
+                      if label_parts.size == 2
+                        assign custom_label = label_parts[0] | strip
+                        assign metafield_list = label_parts[1] | strip
+                        assign has_custom_label = true
+                      endif
+                    endif
+
+                    unless has_custom_label
+                      assign metafield_list = line_stripped
+                    endunless
+
+                    assign metafield_refs = metafield_list | split: ','
+
+                    assign first_metafield_ref = metafield_refs[0] | strip
+
+                    assign metafield_parts = first_metafield_ref | split: '.'
+                    assign metafield_namespace = metafield_parts | first
+                    assign metafield_key = metafield_parts | last
+
+                    if has_custom_label
+                      assign metafield_name = custom_label
+                    else
+                      assign metafield_name = metafield_key | replace: '_', ' ' | capitalize
+                    endif
+
+                    assign is_metafield_dynamic = false
+                    assign metafield_base_key = metafield_key
+
+                    if template.suffix == 'pdp-ortho-new'
+                      if metafield_refs.size == 4
+                        assign is_metafield_dynamic = true
+                        assign metafield_base_key = metafield_key | remove: '_no_no' | remove: '_no_yes' | remove: '_yes_no' | remove: '_yes_yes'
+
+                        assign ref_0_parts = metafield_refs[0] | strip | split: '.'
+                        assign ref_1_parts = metafield_refs[1] | strip | split: '.'
+                        assign ref_2_parts = metafield_refs[2] | strip | split: '.'
+                        assign ref_3_parts = metafield_refs[3] | strip | split: '.'
+
+                        assign mf_key_no_no = ref_0_parts | last
+                        assign mf_key_no_yes = ref_1_parts | last
+                        assign mf_key_yes_no = ref_2_parts | last
+                        assign mf_key_yes_yes = ref_3_parts | last
+                      endif
+                    endif
+
+                    assign metafield = product.metafields[metafield_namespace][metafield_key]
+                  -%}
+
+                  {%- if metafield.value != blank -%}
+                    <div class="col-span-full md:col-span-6{% if is_metafield_dynamic %} dynamic-metafield-item{% endif %}"
+                         {% if is_metafield_dynamic %}data-dynamic-metafield-item="true"
+                         data-mf-namespace="{{ metafield_namespace }}"
+                         data-mf-base-key="{{ metafield_base_key }}"
+                         data-mf-name="{{ metafield_name | escape }}"
+                         data-mf-no-no="{{ product.metafields[metafield_namespace][mf_key_no_no].value | escape }}"
+                         data-mf-no-yes="{{ product.metafields[metafield_namespace][mf_key_no_yes].value | escape }}"
+                         data-mf-yes-no="{{ product.metafields[metafield_namespace][mf_key_yes_no].value | escape }}"
+                         data-mf-yes-yes="{{ product.metafields[metafield_namespace][mf_key_yes_yes].value | escape }}"{% endif %}>
+                      <h6 class="leading-none tracking-none">{{ metafield_name | escape }}</h6>
+                      {%- if metafield.list? -%}
+                        <p class="metafield-content">
+                          {%- liquid
+                            for value in metafield.value
+                              echo value
+                              unless forloop.last
+                                echo '<br />'
+                              endunless
+                            endfor
+                          -%}
+                        </p>
+                      {%- else -%}
+                        <div class="metafield-content">{{ metafield.value }}</div>
+                      {%- endif -%}
+                    </div>
+                  {%- endif -%}
+                {%- endfor -%}
+              {%- endif -%}
+            {%- endcapture -%}
+
                 {%- if collapsible_content != blank -%}
                   {%- if block.settings.heading != blank -%}
                     <div class="accordion">
@@ -213,127 +286,126 @@
                         </summary>
                         <div class="details__content text-base rte">
 
-
-  
-
                           <div class="specification grid grid-cols-12 gap-6 md:gap-10">
                             {{- collapsible_content -}}
 
-{%- if block.settings.heading == "Description" -%}
-      <p class="product__sku col-span-full" id="Sku-{{ section.id }}-{{ product.id }}">SKU:&nbsp;
-        {{- product.selected_or_first_available_variant.sku -}}
-      </p>
-    {%- endif -%}
-
-
-
+                                {%- if block.settings.heading == "Description" and product.template_suffix != 'pdp-ortho-new'-%}
+                                  <p class="product__sku col-span-full" id="Sku-{{ section.id }}-{{ product.id }}">SKU:&nbsp;
+                                    {{- product.selected_or_first_available_variant.sku -}}
+                                  </p>
+                                {%- endif -%}
                           </div>
+             {%- if block.settings.heading == 'Size Chart' and block.settings.columns != blank and block.settings.rows != blank -%}
+              {%- assign columns = block.settings.columns | split: ',' -%}
+              {%- assign rows_raw = block.settings.rows | newline_to_br | split: '<br />' -%}
+              {%- if columns.size > 0 and rows_raw.size > 0 -%}
+                <!-- Main container -->
 
+                        <!-- True Fit Start -->
+                    <script>
+                    (function(r,e,o){
+                      var w=window,d=document,t,s,x;
+                      w.tfcapi=t=w.tfcapi||function(){t.q=t.q||[]; t.q.push(arguments);};
+                      t('init', {storeKey: r, environment: e, ...o});
+                      x=d.getElementsByTagName('script')[0];
+                      s=d.createElement('script');
+                      s.type='text/javascript';s.async=true;
+                      s.src='https://'+r+'-cdn'+(e==='dev'||e==='staging'?'.'+e:'')+ '.truefitcorp.com/fitrec/global/js/tf-integration.js?storeKey='+r;
+                      x.parentNode.insertBefore(s,x);
+                    })('atx', 'prd', {autoCalculate: true});
+                    </script>
 
-                          
- 
+                    <div class="tfc-fitrec-product"
+                         data-styleid="{{ product.id }}"
+                         data-userid=""
+                         data-colorid="{{ product.selected_or_first_available_variant.id }}"
+                         data-locale="{{ request.locale.iso_code }}">
+                    </div>
+                    <!-- True Fit Ends -->
 
- {%- if block.settings.heading == 'Size Chart' and block.settings.columns != blank and block.settings.rows != blank -%}
-  {%- assign columns = block.settings.columns | split: ',' -%}
-  {%- assign rows_raw = block.settings.rows | newline_to_br | split: '<br />' -%}
-  {%- if columns.size > 0 and rows_raw.size > 0 -%}
-    <!-- Main container -->
+                    <div style="
+                      max-width: 40em;
+                      min-width: -webkit-fill-available;
+                      width: 100%;
+                      margin: 16px 0;
+                      border-radius: 1em;
+                      display: flex;
+                      border: 1px solid #e5e5e5;
+                      border-radius: 8px;
+                      background: white;
+                      overflow: hidden;">
+                      <!-- Fixed first column -->
+                      <div style="
+                        flex-shrink: 0;
+                        background: white;
+                        border-right: 2px solid #ddd;
+                        max-width: 150px;
+                        overflow: hidden;">
+                        <table style="border-collapse: collapse; width: 100%;">
+                          <thead>
+                            <tr style="background-color: #f8f8f8;">
+                              <th style="border-bottom: 1px solid #e5e5e5;padding: 8px 12px;text-align: left;font-weight: 600;white-space: normal;word-break: break-word;line-height: 1.2;vertical-align: top;font-size: 12px;letter-spacing: 1px;">
+                                {{ columns[0] | strip }}
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {%- for row_raw in rows_raw -%}
+                              {%- assign row_data = row_raw | strip | split: ',' -%}
+                              {%- if row_data.size > 0 and row_raw != blank -%}
+                                <tr style="border-bottom: 1px solid #f0f0f0;">
+                                  <td style="padding: 6px 12px; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: white;">
+                                    {{ row_data[0] | strip }}
+                                  </td>
+                                </tr>
+                              {%- endif -%}
+                            {%- endfor -%}
+                          </tbody>
+                        </table>
+                      </div>
 
+                      <!-- Scrollable remaining columns -->
+                      <div style="
+                        flex: 1;
+                        overflow-x: auto;
+                        -webkit-overflow-scrolling: touch;">
+                        <table style="border-collapse: collapse; width: 100%; min-width: 400px;">
+                          <thead>
+                            <tr style="background-color: #f8f8f8;">
+                              {%- for column in columns -%}
+                                {%- unless forloop.first -%}
+                                  <th style="border-bottom: 1px solid #e5e5e5; padding: 12.5px 12px; text-align: left; font-weight: 600; white-space: nowrap; font-size: 12px;">
+                                    {{ column | strip }}
+                                  </th>
+                                {%- endunless -%}
+                              {%- endfor -%}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {%- for row_raw in rows_raw -%}
+                              {%- assign row_data = row_raw | strip | split: ',' -%}
+                              {%- if row_data.size > 0 and row_raw != blank -%}
+                                <tr style="border-bottom: 1px solid #f0f0f0;">
+                                  {%- for cell in row_data -%}
+                                    {%- unless forloop.first -%}
+                                      <td style="padding: 6px 12px; border-right: 1px solid #f0f0f0; white-space: nowrap; font-size: 11px;">
+                                        {{ cell | strip }}
+                                      </td>
+                                    {%- endunless -%}
+                                  {%- endfor -%}
+                                </tr>
+                              {%- endif -%}
+                            {%- endfor -%}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
 
-    <div style="
-      max-width: 40em; 
-      min-width: -webkit-fill-available; 
-      width: 100%; 
-      margin: 16px 0; 
-      border-radius: 1em;
-      display: flex;
-      border: 1px solid #e5e5e5;
-      border-radius: 8px;
-      background: white;
-      overflow: hidden;">
-      
-      <!-- Fixed first column -->
-      <div style="
-        flex-shrink: 0;
-        background: white;
-        border-right: 2px solid #ddd;
-        max-width: 150px;
-        overflow: hidden;">
-        <table style="border-collapse: collapse; width: 100%;">
-          <thead>
-            <tr style="background-color: #f8f8f8;">
-              <th style="border-bottom: 1px solid #e5e5e5;padding: 8px 12px;text-align: left;font-weight: 600;white-space: normal;word-break: break-word;line-height: 1.2;vertical-align: top;font-size: 12px;letter-spacing: 1px;">
-                {{ columns[0] | strip }}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {%- for row_raw in rows_raw -%}
-              {%- assign row_data = row_raw | strip | split: ',' -%}
-              {%- if row_data.size > 0 and row_raw != blank -%}
-                <tr style="border-bottom: 1px solid #f0f0f0;">
-                  <td style="padding: 6px 12px; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: white;">
-                    {{ row_data[0] | strip }}
-                  </td>
-                </tr>
-              {%- endif -%}
-            {%- endfor -%}
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Scrollable remaining columns -->
-      <div style="
-        flex: 1;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;">
-        <table style="border-collapse: collapse; width: 100%; min-width: 400px;">
-          <thead>
-            <tr style="background-color: #f8f8f8;">
-              {%- for column in columns -%}
-                {%- unless forloop.first -%}
-                  <th style="border-bottom: 1px solid #e5e5e5; padding: 12.5px 12px; text-align: left; font-weight: 600; white-space: nowrap; font-size: 12px;">
-                    {{ column | strip }}
-                  </th>
-                {%- endunless -%}
-              {%- endfor -%}
-            </tr>
-          </thead>
-          <tbody>
-            {%- for row_raw in rows_raw -%}
-              {%- assign row_data = row_raw | strip | split: ',' -%}
-              {%- if row_data.size > 0 and row_raw != blank -%}
-                <tr style="border-bottom: 1px solid #f0f0f0;">
-                  {%- for cell in row_data -%}
-                    {%- unless forloop.first -%}
-                      <td style="padding: 6px 12px; border-right: 1px solid #f0f0f0; white-space: nowrap; font-size: 11px;">
-                        {{ cell | strip }}
-                      </td>
-                    {%- endunless -%}
-                  {%- endfor -%}
-                </tr>
-              {%- endif -%}
-            {%- endfor -%}
-          </tbody>
-        </table>
-      </div>
-    </div>
-    
-    <div style="text-align: center; font-size: 11px; color: #c00000; margin: 4px 0 16px 0;">
-      ← Scroll horizontally to see all sizes →
-    </div>
- 
-
-  {%- endif -%}
-{%- endif -%}
-
-
-
-
-
-
-
-
+                    <div style="text-align: center; font-size: 11px; color: #c00000; margin: 4px 0 16px 0;">
+                      ← Scroll horizontally to see all sizes →
+                    </div>
+                  {%- endif -%}
+                {%- endif -%}
 
                         </div>
                       </details>
@@ -347,42 +419,85 @@
                   {%- endif -%}
                   {%- assign first_row = false -%}
                 {%- endif -%}
-
-
-
-
-
-
-                
             {%- endcase -%}
           {%- endfor -%}
         </accordions-details>
       </div>
-      {%- if specifications.size > 0 -%}
+      {%- liquid
+        assign show_sidebar = false
+        assign sidebar_icons = null
+        assign is_ortho_new = false
+
+        if template.suffix == 'pdp-ortho-new'
+          assign is_ortho_new = true
+          assign show_sidebar = true
+          assign sidebar_icons = product.metafields.custom.details_icons_no_no.value
+        elsif specifications.size > 0
+          assign show_sidebar = true
+        endif
+      -%}
+
+      {%- if show_sidebar -%}
         <div class="grow-0">
-          <sticky-element class="specs__sidebar flex flex-col gap-7d5 md:gap-10 sticky top-0 text-center">
+          <sticky-element class="specs__sidebar flex flex-col gap-7d5 md:gap-10 sticky top-0 text-center"
+            id="dynamic-specs-sidebar"
+            {%- if template.suffix == 'pdp-ortho-new' -%}
+              {%- capture metafield_no_no_json -%}[{%- for item in product.metafields.custom.details_icons_no_no.value -%}{"icon":"{{ item.icon.value | image_url: width: 192 }}","label":"{{ item.label.value | escape }}"}{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- endcapture -%}
+              {%- capture metafield_no_yes_json -%}[{%- for item in product.metafields.custom.details_icons_no_yes.value -%}{"icon":"{{ item.icon.value | image_url: width: 192 }}","label":"{{ item.label.value | escape }}"}{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- endcapture -%}
+              {%- capture metafield_yes_no_json -%}[{%- for item in product.metafields.custom.details_icons_yes_no.value -%}{"icon":"{{ item.icon.value | image_url: width: 192 }}","label":"{{ item.label.value | escape }}"}{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- endcapture -%}
+              {%- capture metafield_yes_yes_json -%}[{%- for item in product.metafields.custom.details_icons_yes_yes.value -%}{"icon":"{{ item.icon.value | image_url: width: 192 }}","label":"{{ item.label.value | escape }}"}{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- endcapture -%}
+              data-metafield-no-no='{{ metafield_no_no_json }}'
+              data-metafield-no-yes='{{ metafield_no_yes_json }}'
+              data-metafield-yes-no='{{ metafield_yes_no_json }}'
+              data-metafield-yes-yes='{{ metafield_yes_yes_json }}'
+            {%- endif -%}>
             <svg class="icon-box" viewBox="0 0 234 74" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M0 20C0 8.95431 8.95431 0 20 0H214C225.046 0 234 8.9543 234 20V74H0V20Z" fill="currentColor"/>
               <rect x="58" y="32" width="118" height="19" rx="9.5" class="fill"/>
               <circle cx="117.5" cy="32.5" r="11.5" class="fill"/>
             </svg>
             <p class="heading lg:text-3xl text-2xl leading-none tracking-tight">{{ section.settings.specifications_heading | escape }}</p>
-            <ul class="flex flex-wrap items-start justify-center gap-6 md:gap-10">
-              {%- for block in specifications -%}
-                {%- if block.settings.icon != blank or block.settings.heading != blank -%}
-                  <li class="shrink-0 grid gap-2d5">
-                    {%- if block.settings.icon != blank -%}
-                      <div class="media relative flex items-center justify-center rounded-full">
-                        {{- block.settings.icon | image_url: width: block.settings.icon.width | image_tag: loading: 'lazy', widths: '80,96,160,192', is: 'lazy-image' -}}
-                      </div>
-                    {%- endif -%}
+            <ul class="flex flex-wrap items-start justify-center gap-6 md:gap-10" id="specs-icon-list">
+              {%- if template.suffix == 'pdp-ortho-new' and sidebar_icons != blank -%}
+                {%- for item in sidebar_icons -%}
+                  {%- assign item_icon = item.icon.value -%}
+                  {%- assign item_label = item.label.value -%}
+                  {%- if item_icon != blank or item_label != blank -%}
+                    <li class="shrink-0 grid gap-2d5">
+                      {%- if item_icon != blank -%}
+                        <div class="media relative flex items-center justify-center rounded-full">
+                          <img src="{{ item_icon | image_url: width: 192 }}"
+                               srcset="{{ item_icon | image_url: width: 80 }} 80w, {{ item_icon | image_url: width: 96 }} 96w, {{ item_icon | image_url: width: 160 }} 160w, {{ item_icon | image_url: width: 192 }} 192w"
+                               sizes="(min-width: 768px) 96px, 80px"
+                               loading="lazy"
+                               is="lazy-image"
+                               alt="{{ item_label | escape }}">
+                        </div>
+                      {%- endif -%}
 
-                    {%- if block.settings.heading != blank -%}
-                      <p class="text-sm">{{ block.settings.heading | escape }}</p>
-                    {%- endif -%}
-                  </li>
-                {%- endif -%}
-              {%- endfor -%}
+                      {%- if item_label != blank -%}
+                        <p class="text-sm">{{ item_label | escape }}</p>
+                      {%- endif -%}
+                    </li>
+                  {%- endif -%}
+                {%- endfor -%}
+              {%- else -%}
+                {%- for block in specifications -%}
+                  {%- if block.settings.icon != blank or block.settings.heading != blank -%}
+                    <li class="shrink-0 grid gap-2d5">
+                      {%- if block.settings.icon != blank -%}
+                        <div class="media relative flex items-center justify-center rounded-full">
+                          {{- block.settings.icon | image_url: width: block.settings.icon.width | image_tag: loading: 'lazy', widths: '80,96,160,192', is: 'lazy-image' -}}
+                        </div>
+                      {%- endif -%}
+
+                      {%- if block.settings.heading != blank -%}
+                        <p class="text-sm">{{ block.settings.heading | escape }}</p>
+                      {%- endif -%}
+                    </li>
+                  {%- endif -%}
+                {%- endfor -%}
+              {%- endif -%}
             </ul>
           </sticky-element>
         </div>
@@ -1445,5 +1560,198 @@
   if (currentVariantInput && currentVariantInput.value) {
     updateSKU(parseInt(currentVariantInput.value));
   }
+})();
+</script>
+
+<script>
+(function() {
+  const sidebar = document.getElementById('dynamic-specs-sidebar');
+  if (!sidebar) return;
+
+  const iconList = document.getElementById('specs-icon-list');
+  if (!iconList) return;
+
+  // Function to get current option values
+  function getCurrentOptions() {
+    const option1Checked = document.querySelector('input[name="Do you have flat feet?"]:checked');
+    const option2Checked = document.querySelector('input[name="Do you have ball of foot pain?"]:checked');
+
+    if (!option1Checked || !option2Checked) return null;
+
+    const option1Value = option1Checked.value.trim();
+    const option2Value = option2Checked.value.trim();
+
+    // Map "No / Unsure" to "no" and "Yes" to "yes"
+    const option1 = (option1Value === "Yes") ? "yes" : "no";
+    const option2 = (option2Value === "Yes") ? "yes" : "no";
+
+    return { option1, option2 };
+  }
+
+  // Function to update sidebar icons
+  function updateSidebarIcons() {
+    const options = getCurrentOptions();
+    if (!options) return;
+
+    // Build the dataset key (camelCase for dataset API)
+    const dataKey = `metafield${options.option1.charAt(0).toUpperCase() + options.option1.slice(1)}${options.option2.charAt(0).toUpperCase() + options.option2.slice(1)}`;
+
+    const metafieldData = sidebar.dataset[dataKey];
+
+    if (!metafieldData || metafieldData === 'null') return;
+
+    let icons;
+    try {
+      icons = JSON.parse(metafieldData);
+    } catch (e) {
+      console.error('Error parsing metafield data:', e);
+      return;
+    }
+
+    if (!icons || !Array.isArray(icons)) return;
+
+    // Clear current icons
+    iconList.innerHTML = '';
+
+    // Add new icons
+    icons.forEach(item => {
+      if (!item.icon && !item.label) return;
+
+      const li = document.createElement('li');
+      li.className = 'shrink-0 grid gap-2d5';
+
+      if (item.icon) {
+        const mediaDiv = document.createElement('div');
+        mediaDiv.className = 'media relative flex items-center justify-center rounded-full';
+
+        const img = document.createElement('img');
+        img.src = item.icon;
+        img.loading = 'lazy';
+        img.setAttribute('is', 'lazy-image');
+        img.sizes = '(min-width: 768px) 96px, 80px';
+        img.srcset = `${item.icon.replace('width=192', 'width=80')} 80w, ${item.icon.replace('width=192', 'width=96')} 96w, ${item.icon.replace('width=192', 'width=160')} 160w, ${item.icon} 192w`;
+        img.alt = item.label || '';
+
+        mediaDiv.appendChild(img);
+        li.appendChild(mediaDiv);
+      }
+
+      if (item.label) {
+        const p = document.createElement('p');
+        p.className = 'text-sm';
+        p.textContent = item.label;
+        li.appendChild(p);
+      }
+
+      iconList.appendChild(li);
+    });
+  }
+
+  // Function to update dynamic metafield content
+  function updateDynamicMetafieldContent() {
+    const dynamicContainers = document.querySelectorAll('.dynamic-metafield-content[data-dynamic-metafield="true"]');
+    if (!dynamicContainers.length) return;
+
+    const option1Checked = document.querySelector('input[name="Do you have flat feet?"]:checked');
+    const option2Checked = document.querySelector('input[name="Do you have ball of foot pain?"]:checked');
+
+    if (!option1Checked || !option2Checked) return;
+
+    const option1Value = option1Checked.value.trim();
+    const option2Value = option2Checked.value.trim();
+
+    const option1 = (option1Value === "Yes") ? "yes" : "no";
+    const option2 = (option2Value === "Yes") ? "yes" : "no";
+
+    const dataKey = `content${option1.charAt(0).toUpperCase() + option1.slice(1)}${option2.charAt(0).toUpperCase() + option2.slice(1)}`;
+
+    dynamicContainers.forEach((container) => {
+      const content = container.dataset[dataKey];
+      if (content) {
+        container.innerHTML = content;
+      }
+    });
+  }
+
+  // Function to update dynamic metafield items
+  function updateDynamicMetafieldItems() {
+    console.log('=== Dynamic Metafield Items Update ===');
+
+    const dynamicItems = document.querySelectorAll('.dynamic-metafield-item[data-dynamic-metafield-item="true"]');
+    console.log('Found dynamic metafield items:', dynamicItems.length);
+
+    if (!dynamicItems.length) {
+      console.log('No dynamic metafield items found');
+      return;
+    }
+
+    const option1Checked = document.querySelector('input[name="Do you have flat feet?"]:checked');
+    const option2Checked = document.querySelector('input[name="Do you have ball of foot pain?"]:checked');
+
+    if (!option1Checked || !option2Checked) {
+      console.log('Missing option selections');
+      return;
+    }
+
+    const option1Value = option1Checked.value.trim();
+    const option2Value = option2Checked.value.trim();
+
+    const option1 = (option1Value === "Yes") ? "yes" : "no";
+    const option2 = (option2Value === "Yes") ? "yes" : "no";
+
+    const dataKey = `mf${option1.charAt(0).toUpperCase() + option1.slice(1)}${option2.charAt(0).toUpperCase() + option2.slice(1)}`;
+    console.log('Data key:', dataKey);
+
+    dynamicItems.forEach((item, index) => {
+      const content = item.dataset[dataKey];
+      const contentDiv = item.querySelector('.metafield-content');
+
+      console.log(`Item ${index + 1}:`, {
+        name: item.dataset.mfName,
+        baseKey: item.dataset.mfBaseKey,
+        namespace: item.dataset.mfNamespace,
+        dataKey: dataKey,
+        hasContent: !!content,
+        contentLength: content ? content.length : 0,
+        hasContentDiv: !!contentDiv,
+        allDataKeys: {
+          mfNoNo: !!item.dataset.mfNoNo,
+          mfNoYes: !!item.dataset.mfNoYes,
+          mfYesNo: !!item.dataset.mfYesNo,
+          mfYesYes: !!item.dataset.mfYesYes
+        }
+      });
+
+      if (content && contentDiv) {
+        contentDiv.innerHTML = content;
+        console.log(`✓ Updated item ${index + 1}`);
+      } else {
+        console.warn(`✗ Failed to update item ${index + 1}:`, {
+          hasContent: !!content,
+          hasContentDiv: !!contentDiv
+        });
+      }
+    });
+
+    console.log('=== End Dynamic Metafield Items Update ===');
+  }
+
+  // Listen for option changes
+  document.addEventListener('change', function(e) {
+    if (e.target.name === 'Do you have flat feet?' || e.target.name === 'Do you have ball of foot pain?') {
+      setTimeout(function() {
+        updateSidebarIcons();
+        updateDynamicMetafieldContent();
+        updateDynamicMetafieldItems();
+      }, 100);
+    }
+  });
+
+  // Initialize on page load with a delay to ensure DOM is ready
+  setTimeout(function() {
+    updateSidebarIcons();
+    updateDynamicMetafieldContent();
+    updateDynamicMetafieldItems();
+  }, 500);
 })();
 </script>
