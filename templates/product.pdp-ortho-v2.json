@@ -232,7 +232,7 @@
         "thumbnail_position": "beside",
         "image_ratio": "adapt_first",
         "image_zoom": "lightbox",
-        "hide_variants": true,
+        "hide_variants": false,
         "enable_video_autoplay": true,
         "enable_video_looping": true,
         "mobile_layout": "full_width",
