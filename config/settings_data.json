@@ -605,6 +605,10 @@
     }
   },
   "platform_customizations": {
-    "custom_css": []
+    "custom_css": [
+      ".product-card__content {margin-top: 0 !important; padding-top: 0 !important;}",
+      ".product-card__details {gap: 4px !important;}",
+      ".product-card__details .ss__title {margin: 0;}"
+    ]
   }
 }
