@@ -201,6 +201,23 @@ function OptanonWrapper() { }
     {% if settings.ss_enable %}
       {% render 'ss-script' %}
     {% endif %}
+
+
+
+{%- if template contains 'pdp' -%}
+  {%- assign lcp_image = product.selected_or_first_available_variant.featured_media | default: product.media.first -%}
+  {%- if lcp_image -%}
+    <link
+      rel="preload"
+      as="image"
+      href="{{ lcp_image | image_url: width: 800 }}"
+      imagesrcset="{{ lcp_image | image_url: width: 400 }} 400w, {{ lcp_image | image_url: width: 800 }} 800w, {{ lcp_image | image_url: width: 1200 }} 1200w"
+      imagesizes="(max-width: 768px) 100vw, 50vw"
+    >
+  {%- endif -%}
+{%- endif -%}
+
+
   </head>
 
   <body
