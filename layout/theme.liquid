@@ -20,7 +20,8 @@ function OptanonWrapper() { }
 
 <!-- TruFit Widget -->
 
-{% comment %} True Fit Script {% endcomment %}   
+{% comment %} True Fit Script {% endcomment %} 
+ {% if template contains 'product' %}  
 <script>
   ;(function (r, e, o) {
     var w = window, d = document, t, s, x;
@@ -63,7 +64,7 @@ function OptanonWrapper() { }
   }
   observeCartChanges();
 </script>
-
+{% endif %}
 
 <!-- TruFit Widget -->
 
