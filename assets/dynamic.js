@@ -456,3 +456,46 @@ function initSwatchSlider() {
 }
 document.addEventListener("DOMContentLoaded", function () { initSwatchSlider()});
 // custom PLP swatch slider end //
+
+
+//  Inject hidden sale badge into SearchSpring cards that don't have one
+function injectMissingSSBadges() {
+  document.querySelectorAll('.ss__result').forEach(function (card) {
+    const isSoldOut =
+      card.classList.contains('ss__result--soldout') ||
+      card.querySelector('[aria-label*="sold out" i]') !== null ||
+      card.querySelector('.ss__result__soldout') !== null;
+
+    if (isSoldOut) return;
+
+    const mediaDiv = card.querySelector('.product-card__media, [sstracking]');
+    if (!mediaDiv) return;
+
+    if (mediaDiv.querySelector('.badges')) return;
+
+    const badgesDiv = document.createElement('div');
+    badgesDiv.className = 'badges z-2 absolute grid gap-3 pointer-events-none';
+
+    const badgeSpan = document.createElement('span');
+    badgeSpan.className =
+      'custom-product-badges badge flex items-center gap-1d5 font-medium leading-none rounded-full discount-badge';
+    badgeSpan.style.display = 'none';
+    badgeSpan.textContent = 'Sale';
+
+    badgesDiv.appendChild(badgeSpan);
+    mediaDiv.insertBefore(badgesDiv, mediaDiv.firstChild);
+  });
+}
+
+(function () {
+  let ssObserverTimer = null;
+
+  const ssObserver = new MutationObserver(function () {
+    clearTimeout(ssObserverTimer);
+    ssObserverTimer = setTimeout(injectMissingSSBadges, 150);
+  });
+
+  ssObserver.observe(document.body, { childList: true, subtree: true });
+
+  document.addEventListener('DOMContentLoaded', injectMissingSSBadges);
+})();
