@@ -89,7 +89,7 @@
         "button_bgh9yH": {
           "type": "button",
           "settings": {
-            "button_label": "WATCH MOVIE",
+            "button_label": "OUR STORY",
             "button_link": "",
             "button_video_link": "https://rvq643.saas.contentserv.com/admin/rest/gtstream/stream/assets/Aetrex B2B/The_Aetrex_Technology_Difference.mp4",
             "button_style": "primary",
@@ -206,9 +206,9 @@
         "collection_mT6zg6": {
           "type": "collection",
           "settings": {
-            "link_type": "collection",
-            "collection": "shop-all-orthotics",
-            "custom_url": "",
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "shopify://pages/orthotics",
             "image": "shopify://shop_images/435x600_L2300_podium.jpg",
             "title": "Orthotics",
             "description": "",
