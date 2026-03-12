@@ -326,6 +326,7 @@
         "text_6PG3z7",
         "button_kyXjne"
       ],
+      "disabled": true,
       "name": "t:sections.video-with-text.name",
       "settings": {
         "video": "shopify://files/videos/980x820_Better_Fit_banner.mp4",
@@ -1204,9 +1205,9 @@
   "order": [
     "video_with_text_overlay_akXxKy",
     "collection_list_kK69i9",
+    "dynamic_feature_combo_74fjyM",
     "video_with_text_Mpqjh8",
     "featured_collections_g6b3ht",
-    "dynamic_feature_combo_74fjyM",
     "video_with_text_nmP7r3",
     "rich_text_mVRDXW",
     "scrolling_text_byhkGn",
