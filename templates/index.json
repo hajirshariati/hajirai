@@ -527,8 +527,8 @@
         "feature_point_axnEnT": {
           "type": "feature_point",
           "settings": {
-            "heading": "Arch Support",
-            "text": "Aetrex Signature Arch Support",
+            "heading": "Signature Arch Support",
+            "text": "for alignment and balance",
             "horizontal": 59,
             "vertical": 51,
             "text_horizontal": 70,
@@ -571,7 +571,7 @@
         "heading_xbEzK8": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Data Meets </p><p>Design.</p>",
+            "heading": "<p>Engineered for </p><p>Movement</p>",
             "heading_size": "title-sm",
             "heading_tag": "h2",
             "highlighted_text": "none",
@@ -581,7 +581,7 @@
         "text_bmDJGA": {
           "type": "text",
           "settings": {
-            "text": "<p><strong>From scan to product.</strong></p><p>Take on your most active days in complete comfort with the Danika. These supportive mesh sneakers feature arch support, extra thick UltraSKY™ cushioning, and adjustable laces to help you get the perfect fit.</p>",
+            "text": "<p>Performance and walking styles designed with breathable materials, arch support, and lightweight cushioning to help reduce foot pain.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -603,8 +603,8 @@
         "button_JpantQ": {
           "type": "button",
           "settings": {
-            "button_label": "Shop Danika",
-            "button_link": "shopify://products/danika-sky-blue-ap118w",
+            "button_label": "Shop Sneakers",
+            "button_link": "shopify://collections/womens-sneakers",
             "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
@@ -632,7 +632,7 @@
         "gap": 16,
         "gap_mobile": 16,
         "feature_image": "shopify://shop_images/622X800_danika_hotspots.png",
-        "feature_image_link": "shopify://products/danika-sky-blue-ap118w",
+        "feature_image_link": "shopify://collections/womens-sneakers",
         "feature_image_link_external": false,
         "feature_image_link_target": "desktop",
         "lifestyle_image": "shopify://shop_images/705x800_Danika_lifestyle_2x_16c8662e-8446-4217-9972-dd286969783d.png",
