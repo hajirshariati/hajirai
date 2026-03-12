@@ -726,6 +726,7 @@
         "button_ynaekD",
         "button_Gz7ePK"
       ],
+      "disabled": true,
       "name": "t:sections.video-with-text.name",
       "settings": {
         "video": "shopify://files/videos/800x810_StoreLocator_banner.mp4",
