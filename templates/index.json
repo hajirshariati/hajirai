@@ -280,6 +280,162 @@
         "abra_promo_code_hide": ""
       }
     },
+    "dynamic_feature_combo_74fjyM": {
+      "type": "dynamic-feature-combo",
+      "blocks": {
+        "feature_point_mR3jYL": {
+          "type": "feature_point",
+          "settings": {
+            "heading": "Heel Cleft",
+            "text": "to Improve Heel Striking",
+            "horizontal": 74,
+            "vertical": 56,
+            "text_horizontal": 70,
+            "text_vertical": 79
+          }
+        },
+        "feature_point_axnEnT": {
+          "type": "feature_point",
+          "settings": {
+            "heading": "Signature Arch Support",
+            "text": "for alignment and balance",
+            "horizontal": 59,
+            "vertical": 51,
+            "text_horizontal": 70,
+            "text_vertical": 29
+          }
+        },
+        "feature_point_Afqqzj": {
+          "type": "feature_point",
+          "settings": {
+            "heading": "EVA Foam Midsole",
+            "text": "Thick EVA Foam Midsole for Maximum Shock Absorption",
+            "horizontal": 20,
+            "vertical": 76,
+            "text_horizontal": 38,
+            "text_vertical": 60
+          }
+        },
+        "feature_point_hHnhKK": {
+          "type": "feature_point",
+          "settings": {
+            "heading": "Breathable",
+            "text": "Non-Stretchy Mesh for Extra Comfort",
+            "horizontal": 11,
+            "vertical": 70,
+            "text_horizontal": 38,
+            "text_vertical": 4
+          }
+        },
+        "feature_point_pFeFBd": {
+          "type": "feature_point",
+          "settings": {
+            "heading": "Extra Cushioning",
+            "text": "Padded Heel, Tongue & Collar",
+            "horizontal": 37,
+            "vertical": 32,
+            "text_horizontal": 55,
+            "text_vertical": 18
+          }
+        },
+        "heading_xbEzK8": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>Engineered for </p><p>Movement</p>",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_bmDJGA": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Performance and walking styles designed with breathable materials, arch support, and lightweight cushioning to help reduce foot pain.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 0.8,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "spacing_k8zKdN": {
+          "type": "spacing",
+          "settings": {
+            "height": 40,
+            "height_mobile": 28
+          }
+        },
+        "button_JpantQ": {
+          "type": "button",
+          "settings": {
+            "button_label": "Shop Sneakers",
+            "button_link": "shopify://collections/womens-sneakers",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "feature_point_mR3jYL",
+        "feature_point_axnEnT",
+        "feature_point_Afqqzj",
+        "feature_point_hHnhKK",
+        "feature_point_pFeFBd",
+        "heading_xbEzK8",
+        "text_bmDJGA",
+        "spacing_k8zKdN",
+        "button_JpantQ"
+      ],
+      "name": "Dynamic Feature Combo",
+      "settings": {
+        "tile1_width": 2,
+        "tile2_width": 2,
+        "tile3_width": 2,
+        "gap": 16,
+        "gap_mobile": 16,
+        "feature_image": "shopify://shop_images/622X800_danika_hotspots.png",
+        "feature_image_link": "shopify://collections/womens-sneakers",
+        "feature_image_link_external": false,
+        "feature_image_link_target": "desktop",
+        "lifestyle_image": "shopify://shop_images/705x800_Danika_lifestyle_2x_16c8662e-8446-4217-9972-dd286969783d.png",
+        "text_background": "#f5f5f5",
+        "text_padding": 40,
+        "text_vertical_align": "center",
+        "text_horizontal_align": "center",
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "text_max_width": 500,
+        "dot_size": 16,
+        "dot_size_mobile": 20,
+        "dot_color": "#ffffff",
+        "dot_border_color": "#536c9d",
+        "dot_border_width": 2,
+        "line_color": "#465e8d",
+        "line_width": 0.4,
+        "callout_background": "#ffffff",
+        "callout_radius": 8,
+        "callout_max_width": 220,
+        "callout_title_color": "#456094",
+        "callout_text_color": "#484848",
+        "color_text": "#000000",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "divider_color": "#111111",
+        "padding_top": 0,
+        "padding_bottom": 40,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
     "video_with_text_Mpqjh8": {
       "type": "video-with-text",
       "blocks": {
@@ -511,162 +667,6 @@
         "abra_promo_code_hide": ""
       }
     },
-    "dynamic_feature_combo_74fjyM": {
-      "type": "dynamic-feature-combo",
-      "blocks": {
-        "feature_point_mR3jYL": {
-          "type": "feature_point",
-          "settings": {
-            "heading": "Heel Cleft",
-            "text": "to Improve Heel Striking",
-            "horizontal": 74,
-            "vertical": 56,
-            "text_horizontal": 70,
-            "text_vertical": 79
-          }
-        },
-        "feature_point_axnEnT": {
-          "type": "feature_point",
-          "settings": {
-            "heading": "Signature Arch Support",
-            "text": "for alignment and balance",
-            "horizontal": 59,
-            "vertical": 51,
-            "text_horizontal": 70,
-            "text_vertical": 29
-          }
-        },
-        "feature_point_Afqqzj": {
-          "type": "feature_point",
-          "settings": {
-            "heading": "EVA Foam Midsole",
-            "text": "Thick EVA Foam Midsole for Maximum Shock Absorption",
-            "horizontal": 20,
-            "vertical": 76,
-            "text_horizontal": 38,
-            "text_vertical": 60
-          }
-        },
-        "feature_point_hHnhKK": {
-          "type": "feature_point",
-          "settings": {
-            "heading": "Breathable",
-            "text": "Non-Stretchy Mesh for Extra Comfort",
-            "horizontal": 11,
-            "vertical": 70,
-            "text_horizontal": 38,
-            "text_vertical": 4
-          }
-        },
-        "feature_point_pFeFBd": {
-          "type": "feature_point",
-          "settings": {
-            "heading": "Extra Cushioning",
-            "text": "Padded Heel, Tongue & Collar",
-            "horizontal": 37,
-            "vertical": 32,
-            "text_horizontal": 55,
-            "text_vertical": 18
-          }
-        },
-        "heading_xbEzK8": {
-          "type": "heading",
-          "settings": {
-            "heading": "<p>Engineered for </p><p>Movement</p>",
-            "heading_size": "title-sm",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_bmDJGA": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Performance and walking styles designed with breathable materials, arch support, and lightweight cushioning to help reduce foot pain.</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 0.8,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "spacing_k8zKdN": {
-          "type": "spacing",
-          "settings": {
-            "height": 40,
-            "height_mobile": 28
-          }
-        },
-        "button_JpantQ": {
-          "type": "button",
-          "settings": {
-            "button_label": "Shop Sneakers",
-            "button_link": "shopify://collections/womens-sneakers",
-            "button_video_link": "",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": false
-          }
-        }
-      },
-      "block_order": [
-        "feature_point_mR3jYL",
-        "feature_point_axnEnT",
-        "feature_point_Afqqzj",
-        "feature_point_hHnhKK",
-        "feature_point_pFeFBd",
-        "heading_xbEzK8",
-        "text_bmDJGA",
-        "spacing_k8zKdN",
-        "button_JpantQ"
-      ],
-      "name": "Dynamic Feature Combo",
-      "settings": {
-        "tile1_width": 2,
-        "tile2_width": 2,
-        "tile3_width": 2,
-        "gap": 16,
-        "gap_mobile": 16,
-        "feature_image": "shopify://shop_images/622X800_danika_hotspots.png",
-        "feature_image_link": "shopify://collections/womens-sneakers",
-        "feature_image_link_external": false,
-        "feature_image_link_target": "desktop",
-        "lifestyle_image": "shopify://shop_images/705x800_Danika_lifestyle_2x_16c8662e-8446-4217-9972-dd286969783d.png",
-        "text_background": "#f5f5f5",
-        "text_padding": 40,
-        "text_vertical_align": "center",
-        "text_horizontal_align": "center",
-        "text_alignment": "left",
-        "text_alignment_mobile": "left",
-        "text_max_width": 500,
-        "dot_size": 16,
-        "dot_size_mobile": 20,
-        "dot_color": "#ffffff",
-        "dot_border_color": "#536c9d",
-        "dot_border_width": 2,
-        "line_color": "#465e8d",
-        "line_width": 0.4,
-        "callout_background": "#ffffff",
-        "callout_radius": 8,
-        "callout_max_width": 220,
-        "callout_title_color": "#456094",
-        "callout_text_color": "#484848",
-        "color_text": "#000000",
-        "color_highlight": "#e0a580",
-        "gradient_highlight": "",
-        "divider_color": "#111111",
-        "padding_top": 0,
-        "padding_bottom": 40,
-        "divider": false,
-        "full_width": false,
-        "rounded": false
-      }
-    },
     "video_with_text_nmP7r3": {
       "type": "video-with-text",
       "blocks": {
@@ -760,6 +760,97 @@
         "abra_promo_code_show": "",
         "abra_promo_code_hide": "",
         "parallax_direction": "vertical"
+      }
+    },
+    "image_with_text_TThAWX": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_EmwdCX": {
+          "type": "heading",
+          "settings": {
+            "heading": "A Better Fit, Just for You.",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_FzmgBm": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Great fit starts with understanding the foot. Aetrex foot-scanning technology captures real data on arch height, pressure points, and alignment to create smarter recommendations, more confident purchases, and better outcomes, whether you’re shopping for yourself or fitting customers in-store. </p><ul><li>Understand true fit beyond just shoe size</li><li>Enable more personalized product recommendations</li><li>Create greater confidence at the moment of purchase</li><li>Elevate the overall fitting experience</li><li>Improve conversion and satisfaction</li><li>Reduce size- and fit-related returns</li></ul>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_bi9nFt": {
+          "type": "button",
+          "settings": {
+            "button_label": "Get Scanned",
+            "button_link": "shopify://pages/store-locator",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_QbqRTn": {
+          "type": "button",
+          "settings": {
+            "button_label": "Get a Scanner in Your Store",
+            "button_link": "https://irle3andv1z.typeform.com/to/V3YAATXm?typeform-source=www.aetrex.com",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_EmwdCX",
+        "text_FzmgBm",
+        "button_bi9nFt",
+        "button_QbqRTn"
+      ],
+      "name": "t:sections.image-with-text.name",
+      "settings": {
+        "image": "shopify://shop_images/9a56530c-0517-453e-a68a-e2726e473f55.jpg",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "medium",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 40,
+        "padding_bottom": 40,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_mVRDXW": {
@@ -1209,6 +1300,7 @@
     "video_with_text_Mpqjh8",
     "featured_collections_g6b3ht",
     "video_with_text_nmP7r3",
+    "image_with_text_TThAWX",
     "rich_text_mVRDXW",
     "scrolling_text_byhkGn",
     "ss_recs_script_EYXn3V"
