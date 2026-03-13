@@ -115,7 +115,7 @@
       "name": "t:sections.video-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
-        "video": "shopify://files/videos/SS26_HP_Banner_R2 1.mp4",
+        "video": "shopify://files/videos/SS26_HP_Banner_r2_b.mp4",
         "video_url": "",
         "description": "",
         "enable_video_autoplay": true,
@@ -126,7 +126,7 @@
         "text_alignment": "center",
         "mobile_content_space": 488,
         "mobile_content_space_color": "#e7e7e7",
-        "video_mobile": "shopify://files/videos/SS26_HP_Banner_mobile_600_R2.mp4",
+        "video_mobile": "shopify://files/videos/SS26_HP_Banner_600px_r2_b.mp4",
         "video_url_mobile": "",
         "image_height_mobile": "100vh",
         "content_position_mobile": "items-end justify-center",
