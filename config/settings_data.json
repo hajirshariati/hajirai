@@ -599,9 +599,6 @@
     }
   },
   "platform_customizations": {
-    "custom_css": [
-      "/* Fix FitAI overlap */[name=\"aetrex_fitai_rating_container\"]{height:auto !important; overflow:visible !important; margin:8px 0 !important;}",
-      "/* visually remove bottom whitespace in images */.product-card__image img{object-fit:cover; object-position:center 25%;}"
-    ]
+    "custom_css": []
   }
 }
