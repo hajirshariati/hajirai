@@ -1,0 +1,329 @@
+{%- comment -%}
+  Comprehensive Schema Markup File
+  Renders appropriate schemas based on page type
+  Usage: {% render 'microdata-schema' %} or {% render 'microdata-schema', blocks: section.blocks %} for FAQ
+{%- endcomment -%}
+
+{%- liquid
+  assign org_name = shop.name
+  assign org_url = shop.url
+  assign org_logo = settings.logo | default: settings.favicon
+-%}
+
+{%- comment -%} ========== ORGANIZATION SCHEMA ========== {%- endcomment -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": {{ org_name | json }},
+  "url": {{ org_url | json }},
+  {%- if org_logo -%}
+  "logo": {
+    "@type": "ImageObject",
+    "url": {{ org_logo | image_url: width: 600 | prepend: 'https:' | json }},
+    "width": "600",
+    "height": "600"
+  },
+  {%- endif -%}
+  {%- if shop.email or shop.customer_email -%}
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "email": {{ shop.email | default: shop.customer_email | json }},
+    "contactType": "Customer Service"
+  },
+  {%- endif -%}
+  "sameAs": [
+    {%- if settings.social_facebook_link != blank -%}
+    {{ settings.social_facebook_link | json }}{% unless settings.social_instagram_link == blank or settings.social_twitter_link == blank or settings.social_youtube_link == blank or settings.social_pinterest_link == blank or settings.social_linkedin_link == blank %},{% endunless %}
+    {%- endif -%}
+    {%- if settings.social_instagram_link != blank -%}
+    {{ settings.social_instagram_link | json }}{% unless settings.social_twitter_link == blank or settings.social_youtube_link == blank or settings.social_pinterest_link == blank or settings.social_linkedin_link == blank %},{% endunless %}
+    {%- endif -%}
+    {%- if settings.social_twitter_link != blank -%}
+    {{ settings.social_twitter_link | json }}{% unless settings.social_youtube_link == blank or settings.social_pinterest_link == blank or settings.social_linkedin_link == blank %},{% endunless %}
+    {%- endif -%}
+    {%- if settings.social_youtube_link != blank -%}
+    {{ settings.social_youtube_link | json }}{% unless settings.social_pinterest_link == blank or settings.social_linkedin_link == blank %},{% endunless %}
+    {%- endif -%}
+    {%- if settings.social_pinterest_link != blank -%}
+    {{ settings.social_pinterest_link | json }}{% unless settings.social_linkedin_link == blank %},{% endunless %}
+    {%- endif -%}
+    {%- if settings.social_linkedin_link != blank -%}
+    {{ settings.social_linkedin_link | json }}
+    {%- endif -%}
+  ]
+}
+</script>
+
+{%- comment -%} ========== BREADCRUMB SCHEMA ========== {%- endcomment -%}
+{%- if product or collection or article or blog or page -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": {{ shop.url | json }}
+    }
+    {%- if collection -%}
+    ,
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": {{ collection.title | json }},
+      "item": {{ collection.url | prepend: shop.url | json }}
+    }
+    {%- endif -%}
+    {%- if product and collection -%}
+    ,
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": {{ product.title | json }},
+      "item": {{ product.url | within: collection | prepend: shop.url | json }}
+    }
+    {%- elsif product -%}
+    ,
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": {{ product.title | json }},
+      "item": {{ product.url | prepend: shop.url | json }}
+    }
+    {%- elsif article -%}
+    ,
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": {{ blog.title | json }},
+      "item": {{ blog.url | prepend: shop.url | json }}
+    }
+    ,
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": {{ article.title | json }},
+      "item": {{ article.url | prepend: shop.url | json }}
+    }
+    {%- elsif blog -%}
+    ,
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": {{ blog.title | json }},
+      "item": {{ blog.url | prepend: shop.url | json }}
+    }
+    {%- elsif page -%}
+    ,
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": {{ page.title | json }},
+      "item": {{ page.url | prepend: shop.url | json }}
+    }
+    {%- endif -%}
+  ]
+}
+</script>
+{%- endif -%}
+
+{%- comment -%} ========== PRODUCT SCHEMA ========== {%- endcomment -%}
+{%- if product -%}
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign product_url = product.url | within: collection | default: product.url | prepend: shop.url
+  
+  if current_variant.available
+    assign availability = 'https://schema.org/InStock'
+  else
+    assign availability = 'https://schema.org/OutOfStock'
+  endif
+
+  assign rating_value = product.metafields.reviews.rating.value | default: product.metafields.spr.reviews.rating
+  assign review_count = product.metafields.reviews.rating_count | default: product.metafields.spr.reviews.count
+-%}
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": {{ product.title | json }},
+  "description": {{ product.description | strip_html | truncate: 5000 | json }},
+  "url": {{ product_url | json }},
+  "sku": {{ current_variant.sku | default: current_variant.id | json }},
+  "brand": {
+    "@type": "Brand",
+    "name": {{ shop.name | json }}
+  },
+  {%- if product.featured_image -%}
+  "image": [
+    {%- for image in product.images limit: 5 -%}
+    {{ image | image_url: width: 1200 | prepend: 'https:' | json }}{% unless forloop.last %},{% endunless %}
+    {%- endfor -%}
+  ],
+  {%- endif -%}
+  "offers": {
+    "@type": "Offer",
+    "url": {{ product_url | json }},
+    "priceCurrency": {{ cart.currency.iso_code | json }},
+    "price": {{ current_variant.price | divided_by: 100.0 | json }},
+    {%- if current_variant.compare_at_price and current_variant.compare_at_price > current_variant.price -%}
+    "priceSpecification": {
+      "@type": "PriceSpecification",
+      "price": {{ current_variant.price | divided_by: 100.0 | json }},
+      "priceCurrency": {{ cart.currency.iso_code | json }}
+    },
+    {%- endif -%}
+    "availability": {{ availability | json }},
+    "seller": {
+      "@type": "Organization",
+      "name": {{ shop.name | json }}
+    }
+    {%- if current_variant.compare_at_price and current_variant.compare_at_price > current_variant.price -%}
+    ,
+    "priceValidUntil": {{ 'now' | date: '%s' | plus: 2592000 | date: '%Y-%m-%d' | json }}
+    {%- endif -%}
+  }
+  {%- if rating_value and review_count and review_count > 0 -%}
+  ,
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": {{ rating_value | json }},
+    "reviewCount": {{ review_count | json }},
+    "bestRating": "5",
+    "worstRating": "1"
+  }
+  {%- endif -%}
+}
+</script>
+{%- endif -%}
+
+{%- comment -%} ========== COLLECTION SCHEMA ========== {%- endcomment -%}
+{%- if collection and template.name == 'collection' -%}
+{%- liquid
+  assign collection_url = collection.url | prepend: shop.url
+-%}
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": {{ collection.title | json }},
+  "url": {{ collection_url | json }},
+  {%- if collection.description != blank -%}
+  "description": {{ collection.description | strip_html | json }},
+  {%- endif -%}
+  {%- if collection.image -%}
+  "image": {{ collection.image | image_url: width: 1200 | prepend: 'https:' | json }},
+  {%- endif -%}
+  "mainEntity": {
+    "@type": "ItemList",
+    "numberOfItems": {{ collection.products_count | json }},
+    "itemListElement": [
+      {%- for product in collection.products limit: 50 -%}
+      {
+        "@type": "ListItem",
+        "position": {{ forloop.index | json }},
+        "url": {{ product.url | within: collection | prepend: shop.url | json }},
+        "name": {{ product.title | json }}
+      }{% unless forloop.last %},{% endunless %}
+      {%- endfor -%}
+    ]
+  }
+}
+</script>
+{%- endif -%}
+
+{%- comment -%} ========== ARTICLE SCHEMA ========== {%- endcomment -%}
+{%- if article -%}
+{%- liquid
+  assign article_url = article.url | prepend: shop.url
+  assign author_name = article.author | default: shop.name
+-%}
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": {{ article.title | json }},
+  "url": {{ article_url | json }},
+  {%- if article.excerpt != blank -%}
+  "description": {{ article.excerpt | strip_html | json }},
+  {%- elsif article.content != blank -%}
+  "description": {{ article.content | strip_html | truncate: 300 | json }},
+  {%- endif -%}
+  {%- if article.image -%}
+  "image": {
+    "@type": "ImageObject",
+    "url": {{ article.image | image_url: width: 1200 | prepend: 'https:' | json }},
+    "width": "1200",
+    "height": "630"
+  },
+  {%- endif -%}
+  "datePublished": {{ article.published_at | date: '%Y-%m-%dT%H:%M:%S%z' | json }},
+  {%- if article.updated_at -%}
+  "dateModified": {{ article.updated_at | date: '%Y-%m-%dT%H:%M:%S%z' | json }},
+  {%- else -%}
+  "dateModified": {{ article.published_at | date: '%Y-%m-%dT%H:%M:%S%z' | json }},
+  {%- endif -%}
+  "author": {
+    "@type": "Person",
+    "name": {{ author_name | json }}
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": {{ shop.name | json }},
+    {%- if settings.logo -%}
+    "logo": {
+      "@type": "ImageObject",
+      "url": {{ settings.logo | image_url: width: 600 | prepend: 'https:' | json }},
+      "width": "600",
+      "height": "600"
+    },
+    {%- endif -%}
+    "url": {{ shop.url | json }}
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": {{ article_url | json }}
+  }
+}
+</script>
+{%- endif -%}
+
+{%- comment -%} ========== FAQ SCHEMA ========== {%- endcomment -%}
+{%- if blocks != blank -%}
+{%- liquid
+  assign faq_items = blocks | where: 'type', 'faq' | default: blocks | where: 'type', 'question'
+-%}
+
+{%- if faq_items.size > 0 -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {%- for block in faq_items -%}
+    {%- liquid
+      assign question = block.settings.question | default: block.settings.title | default: block.settings.heading
+      assign answer = block.settings.answer | default: block.settings.text | default: block.settings.content
+    -%}
+    {%- if question != blank and answer != blank -%}
+    {
+      "@type": "Question",
+      "name": {{ question | json }},
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": {{ answer | strip_html | json }}
+      }
+    }{% unless forloop.last %},{% endunless %}
+    {%- endif -%}
+    {%- endfor -%}
+  ]
+}
+</script>
+{%- endif -%}
+{%- endif -%}
