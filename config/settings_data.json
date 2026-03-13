@@ -600,11 +600,9 @@
   },
   "platform_customizations": {
     "custom_css": [
-      "/* Remove any spacing under product image */.product-card__media {margin-bottom: 0 !important; padding-bottom: 0 !important;}",
-      "/* Kill spacing inside product content */.product-card__content {margin-top: 0 !important; padding-top: 0 !important; gap: 0 !important;}",
-      "/* Remove FitAI placeholder spacing */[name=\"aetrex_fitai_rating_container\"]{margin: 0 !important; padding: 0 !important; height: auto !important; min-height: 0 !important; line-height: 0 !important;}",
-      "/* Remove spacing above title */.product-card__details{margin-top: 0 !important; padding-top: 0 !important;}",
-      "/* Remove spacing from title wrapper */.ss__title{margin-top: 0 !important; padding-top: 0 !important;}"
+      "/* Remove square image container */.product-card__media,.product-card__image {aspect-ratio: auto !important; padding-bottom: 0 !important; height: auto !important;}",
+      "/* Let image define the card height */.product-card__image img{display:block; width:100%; height:auto;}",
+      "/* tighten FitAI spacing */[name=\"aetrex_fitai_rating_container\"]{margin:6px 0 !important;}"
     ]
   }
 }
