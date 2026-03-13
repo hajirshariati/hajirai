@@ -14,6 +14,15 @@
 </div>
 
 <style>
+
+[name="aetrex_fitai_rating_container"]:not([style*="height: 0px"]) {
+  margin: 20px 0 !important; /* margin only when visible */
+}
+
+[name="aetrex_fitai_rating_container"][style*="height: 0px"] {
+  display: none !important; /* fully remove from layout when empty */
+}
+
   .ss-skeleton-card {
     display: flex;
     flex-direction: column;
