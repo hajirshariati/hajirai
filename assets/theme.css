@@ -18298,10 +18298,14 @@ cart-count.count::before {
 
 
 
-[name="aetrex_fitai_rating_container"]:not([style*="height: 0px"]) {
-  margin: 20px 0 !important;
+/* 1. Hide overflow so child content doesn't spill out */
+[name="aetrex_fitai_rating_container"][style*="height: 0px"] {
+  overflow: hidden !important;
+  margin: 0 !important;
 }
 
-[name="aetrex_fitai_rating_container"][style*="height: 0px"] {
-  display: none !important;
+/* 2. When it has actual height (widget loaded), show it properly */
+[name="aetrex_fitai_rating_container"]:not([style*="height: 0px"]) {
+  overflow: visible !important;
+  margin: 20px 0 !important;
 }
