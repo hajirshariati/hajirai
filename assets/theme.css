@@ -18295,3 +18295,13 @@ cart-count.count::before {
 .meta-option.active-meta .label-swatch {
   border: 2px solid #000;
 }
+
+
+
+[name="aetrex_fitai_rating_container"]:not([style*="height: 0px"]) {
+  margin: 20px 0 !important;
+}
+
+[name="aetrex_fitai_rating_container"][style*="height: 0px"] {
+  display: none !important;
+}
