@@ -600,9 +600,8 @@
   },
   "platform_customizations": {
     "custom_css": [
-      "/* Remove square image container */.product-card__media,.product-card__image {aspect-ratio: auto !important; padding-bottom: 0 !important; height: auto !important;}",
-      "/* Let image define the card height */.product-card__image img{display:block; width:100%; height:auto;}",
-      "/* tighten FitAI spacing */[name=\"aetrex_fitai_rating_container\"]{margin:6px 0 !important;}"
+      "/* Fix FitAI overlap */[name=\"aetrex_fitai_rating_container\"]{height:auto !important; overflow:visible !important; margin:8px 0 !important;}",
+      "/* visually remove bottom whitespace in images */.product-card__image img{object-fit:cover; object-position:center 25%;}"
     ]
   }
 }
