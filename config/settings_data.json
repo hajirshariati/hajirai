@@ -245,7 +245,6 @@
           "popup_placement": "bottom-center",
           "popup_dismiss": "manual",
           "popup_dismiss_delay": 5,
-          "announcement_bar_enabled": false,
           "announcement_bar_background_color": "#119d52",
           "announcement_bar_border_color": "#119d52",
           "announcement_bar_color": "#ffffff",
@@ -600,6 +599,12 @@
     }
   },
   "platform_customizations": {
-    "custom_css": []
+    "custom_css": [
+      "/* Remove any spacing under product image */.product-card__media {margin-bottom: 0 !important; padding-bottom: 0 !important;}",
+      "/* Kill spacing inside product content */.product-card__content {margin-top: 0 !important; padding-top: 0 !important; gap: 0 !important;}",
+      "/* Remove FitAI placeholder spacing */[name=\"aetrex_fitai_rating_container\"]{margin: 0 !important; padding: 0 !important; height: auto !important; min-height: 0 !important; line-height: 0 !important;}",
+      "/* Remove spacing above title */.product-card__details{margin-top: 0 !important; padding-top: 0 !important;}",
+      "/* Remove spacing from title wrapper */.ss__title{margin-top: 0 !important; padding-top: 0 !important;}"
+    ]
   }
 }
