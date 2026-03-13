@@ -3,11 +3,20 @@
   
  
   /* Apply only on mobile (max width 768px for example) */
-  @media (max-width: 768px) {
+@media (max-width: 768px) {
     .mobile-padding {
       padding-bottom: 12vw;
     }
   }
+
+{%- if section.settings.mobile_content_space > 0 %}
+@media screen and (max-width: 767px) {
+  #shopify-section-{{ section.id }} .slideshow {
+    padding-bottom: {{ section.settings.mobile_content_space }}px;
+    background-color: {{ section.settings.mobile_content_space_color }};
+  }
+}
+{%- endif %}
  
   #shopify-section-{{ section.id }} {
     --section-padding-top: {{ section.settings.padding_top }}px;
@@ -395,11 +404,27 @@
       "default": "auto",
       "label": "t:sections.global.settings.image_height_mobile.label"
     },
-    {
+{
       "type": "text_alignment",
       "id": "text_alignment_mobile",
       "default": "left",
       "label": "t:sections.global.settings.text_alignment_mobile.label"
+    },
+    {
+      "type": "range",
+      "id": "mobile_content_space",
+      "label": "Mobile extra space below video",
+      "min": 0,
+      "max": 800,
+      "step": 8,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "mobile_content_space_color",
+      "label": "Mobile extra space background color",
+      "default": "#ffffff"
     },
     {
       "type": "header",
