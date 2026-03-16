@@ -741,6 +741,7 @@
     },
     "custom_liquid_eQeYMN": {
       "type": "custom-liquid",
+      "disabled": true,
       "name": "t:sections.custom-liquid.name",
       "settings": {
         "liquid": "{% render 'fr-testimonials' %}",
