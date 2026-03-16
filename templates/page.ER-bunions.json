@@ -330,7 +330,7 @@
       "type": "featured-collection",
       "name": "t:sections.featured-collection.name",
       "settings": {
-        "collection": "womens-footwear-for-bunions-copy",
+        "collection": "footwear-orthotics-for-bunions",
         "products": [],
         "product_limit": 12,
         "columns": 4,
