@@ -9,8 +9,73 @@
  */
 {
   "sections": {
+    "featured_product_hFWtkY": {
+      "type": "featured-product",
+      "blocks": {
+        "title_F4dW9G": {
+          "type": "title",
+          "settings": {
+            "title_size": "product-title-md",
+            "title_size_mobile": "product-title-md",
+            "title_tag": "h2",
+            "show_price": true,
+            "show_rating": true
+          }
+        },
+        "variant_picker_9xwAfD": {
+          "type": "variant_picker",
+          "settings": {
+            "enable_dynamic_variants": true,
+            "show_variant_labels": true,
+            "picker_type": "dropdown",
+            "enable_color_swatches": true,
+            "color_swatch_type": "color",
+            "size_chart": ""
+          }
+        },
+        "buy_buttons_LFdtQc": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_quantity_selector": false,
+            "show_price": true,
+            "show_dynamic_checkout": false,
+            "show_gift_card_recipient": false,
+            "enable_back_in_stock": false,
+            "show_back_in_stock_name": false,
+            "show_back_in_stock_phone": false
+          }
+        }
+      },
+      "block_order": [
+        "title_F4dW9G",
+        "variant_picker_9xwAfD",
+        "buy_buttons_LFdtQc"
+      ],
+      "name": "t:sections.featured-product.name",
+      "settings": {
+        "product": "jillian-cognac-sc363w",
+        "enable_sticky_info": false,
+        "media_size": 41,
+        "gallery_layout": "thumbnail",
+        "thumbnail_position": "beside",
+        "image_ratio": "wide",
+        "image_zoom": "lightbox",
+        "hide_variants": false,
+        "enable_video_autoplay": true,
+        "enable_video_looping": true,
+        "mobile_layout": "partial",
+        "image_ratio_mobile": "adapt_first",
+        "mobile_thumbnail": false,
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
     "main-page": {
       "type": "main-page",
+      "disabled": true,
       "settings": {
         "heading_size": "title-sm",
         "heading_alignment": "text-left",
@@ -66,6 +131,8 @@
         "text_alignment": "left",
         "image_height_mobile": "auto",
         "text_alignment_mobile": "left",
+        "mobile_content_space": 0,
+        "mobile_content_space_color": "#ffffff",
         "accessibility_info": "Slideshow about our brand",
         "color_text": "#ffffff",
         "color_background": "#ffffff",
@@ -633,6 +700,7 @@
     }
   },
   "order": [
+    "featured_product_hFWtkY",
     "main-page",
     "slideshow_rcT8py",
     "image_with_text_7FkUzY",
