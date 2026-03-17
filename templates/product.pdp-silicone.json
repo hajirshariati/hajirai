@@ -167,6 +167,8 @@
             "ProductPage": true,
             "size_recommendation_font_family": "OpenSans, sans-serif",
             "size_recommendation_vertical_spacing": 5,
+            "expansion_panel_background": "#d06263",
+            "expansion_panel_foreground": "#ffffff",
             "tab_background": "#f2f2f2",
             "tab_foreground": "#5c6271",
             "active_tab_background": "#5c6271",
@@ -690,6 +692,7 @@
         "column_8EnLJG",
         "column_XQQ7Wy"
       ],
+      "disabled": true,
       "name": "Multicolumn",
       "settings": {
         "gap": "large",
