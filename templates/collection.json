@@ -121,7 +121,7 @@
             "rating_foreground": "#d06263",
             "rating_font_size": 14,
             "rating_font_family": "'Open Sans', sans-serif",
-            "rating_vertical_spacing": 0,
+            "rating_vertical_spacing": 20,
             "rating_overlay": true,
             "rating_justify_content": "flex-start",
             "info_popup_title_background": "#cf6262",
