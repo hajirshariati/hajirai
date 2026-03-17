@@ -193,6 +193,9 @@
   "description": {{ product.description | strip_html | truncate: 5000 | json }},
   "url": "{{ product_url }}",
   "sku": {{ current_variant.sku | default: current_variant.id | json }},
+  {%- if current_variant.barcode != blank -%}
+  "gtin": {{ current_variant.barcode | json }},
+  {%- endif -%}
   "brand": {
     "@type": "Brand",
     "name": {{ shop.name | json }}
@@ -216,7 +219,7 @@
       "priceCurrency": {{ cart.currency.iso_code | json }}
     },
     {%- endif -%}
-    "availability": {{ availability }},
+    "availability": {{ availability | json }},
     "seller": {
       "@type": "Organization",
       "name": {{ shop.name | json }}
