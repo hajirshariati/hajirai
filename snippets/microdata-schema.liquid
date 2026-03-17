@@ -196,6 +196,8 @@
   {%- if current_variant.barcode != blank -%}
   "gtin": {{ current_variant.barcode | json }},
   {%- endif -%}
+  "productID": {{ product.id | json }},
+  "itemGroupID": {{ product.id | json }},
   "brand": {
     "@type": "Brand",
     "name": {{ shop.name | json }}
