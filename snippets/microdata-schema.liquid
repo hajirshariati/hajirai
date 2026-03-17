@@ -68,7 +68,24 @@
       "name": "Home",
       "item": {{ shop.url | json }}
     }
-    {%- if collection -%}
+    {%- if product -%}
+      {%- assign primary_category = product.metafields.custom.primary_category -%}
+      {%- if primary_category != blank -%}
+    ,
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": {{ primary_category.value.title | json }},
+      "item": {{ primary_category.value.url | prepend: shop.url | json }}
+    }
+    ,
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": {{ product.title | json }},
+      "item": {{ product.url | prepend: shop.url | json }}
+    }
+      {%- elsif collection -%}
     ,
     {
       "@type": "ListItem",
@@ -76,8 +93,6 @@
       "name": {{ collection.title | json }},
       "item": {{ collection.url | prepend: shop.url | json }}
     }
-    {%- endif -%}
-    {%- if product and collection -%}
     ,
     {
       "@type": "ListItem",
@@ -85,13 +100,32 @@
       "name": {{ product.title | json }},
       "item": {{ product.url | within: collection | prepend: shop.url | json }}
     }
-    {%- elsif product -%}
+      {%- else -%}
+        {%- assign fallback_collection = product.collections | first -%}
+        {%- if fallback_collection -%}
     ,
     {
       "@type": "ListItem",
       "position": 2,
+      "name": {{ fallback_collection.title | json }},
+      "item": {{ fallback_collection.url | prepend: shop.url | json }}
+    }
+        {%- endif -%}
+    ,
+    {
+      "@type": "ListItem",
+      "position": {% if fallback_collection %}3{% else %}2{% endif %},
       "name": {{ product.title | json }},
       "item": {{ product.url | prepend: shop.url | json }}
+    }
+      {%- endif -%}
+    {%- elsif collection -%}
+    ,
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": {{ collection.title | json }},
+      "item": {{ collection.url | prepend: shop.url | json }}
     }
     {%- elsif article -%}
     ,
