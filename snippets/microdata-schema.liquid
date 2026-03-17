@@ -333,6 +333,53 @@
 </script>
 {%- endif -%}
 
+{%- comment -%} ========== MEDICAL WEB PAGE SCHEMA ========== {%- endcomment -%}
+{%- if page -%}
+{%- liquid
+  assign is_medical_page = false
+  assign medical_condition = ''
+  
+  # Check if page should have medical schema via metafield or handle
+  if page.metafields.custom.medical_page == true or page.metafields.custom.medical_condition != blank
+    assign is_medical_page = true
+    assign medical_condition = page.metafields.custom.medical_condition
+  elsif page.handle contains 'explore-relief' or page.handle contains 'clinical' or page.handle contains 'case-' or page.handle contains 'ER-' or page.handle contains 'plantar' or page.handle contains 'bunions' or page.handle contains 'metatarsalgia' or page.handle contains 'diabetes' or page.handle contains 'athletic'
+    assign is_medical_page = true
+  endif
+-%}
+
+{%- if is_medical_page -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "MedicalWebPage",
+  "name": {{ page.title | json }},
+  "url": "{{ page.url | prepend: shop.url }}",
+  {%- if page.content != blank -%}
+  "description": {{ page.content | strip_html | truncate: 300 | json }},
+  {%- endif -%}
+  "lastReviewed": "{{ page.updated_at | default: page.published_at | date: '%Y-%m-%d' }}",
+  "reviewedBy": {
+    "@type": "Organization",
+    "name": {{ shop.name | json }}
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": {{ shop.name | json }},
+    "url": "{{ shop.url }}"
+  }
+  {%- if medical_condition != blank -%}
+  ,
+  "about": {
+    "@type": "MedicalCondition",
+    "name": {{ medical_condition | json }}
+  }
+  {%- endif -%}
+}
+</script>
+{%- endif -%}
+{%- endif -%}
+
 {%- comment -%} ========== FAQ SCHEMA ========== {%- endcomment -%}
 {%- if blocks != blank -%}
 {%- liquid
