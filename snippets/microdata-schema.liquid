@@ -16,11 +16,11 @@
   "@context": "https://schema.org",
   "@type": "Organization",
   "name": {{ org_name | json }},
-  "url": {{ org_url | json }},
+  "url": "{{ org_url }}",
   {%- if org_logo -%}
   "logo": {
     "@type": "ImageObject",
-    "url": {{ org_logo | image_url: width: 600 | prepend: 'https:' | json }},
+    "url": "{{ org_logo | image_url: width: 600 | prepend: 'https:' }}",
     "width": "600",
     "height": "600"
   },
@@ -33,24 +33,29 @@
   },
   {%- endif -%}
   "sameAs": [
-    {%- if settings.social_facebook_link != blank -%}
-    {{ settings.social_facebook_link | json }}{% unless settings.social_instagram_link == blank or settings.social_twitter_link == blank or settings.social_youtube_link == blank or settings.social_pinterest_link == blank or settings.social_linkedin_link == blank %},{% endunless %}
-    {%- endif -%}
-    {%- if settings.social_instagram_link != blank -%}
-    {{ settings.social_instagram_link | json }}{% unless settings.social_twitter_link == blank or settings.social_youtube_link == blank or settings.social_pinterest_link == blank or settings.social_linkedin_link == blank %},{% endunless %}
-    {%- endif -%}
-    {%- if settings.social_twitter_link != blank -%}
-    {{ settings.social_twitter_link | json }}{% unless settings.social_youtube_link == blank or settings.social_pinterest_link == blank or settings.social_linkedin_link == blank %},{% endunless %}
-    {%- endif -%}
-    {%- if settings.social_youtube_link != blank -%}
-    {{ settings.social_youtube_link | json }}{% unless settings.social_pinterest_link == blank or settings.social_linkedin_link == blank %},{% endunless %}
-    {%- endif -%}
-    {%- if settings.social_pinterest_link != blank -%}
-    {{ settings.social_pinterest_link | json }}{% unless settings.social_linkedin_link == blank %},{% endunless %}
-    {%- endif -%}
-    {%- if settings.social_linkedin_link != blank -%}
-    {{ settings.social_linkedin_link | json }}
-    {%- endif -%}
+{%- if settings.social_facebook_link != blank -%}
+    "{{ settings.social_facebook_link }}"
+{%- endif -%}
+{%- if settings.social_instagram_link != blank -%}
+{%- if settings.social_facebook_link != blank -%},{%- endif -%}
+    "{{ settings.social_instagram_link }}"
+{%- endif -%}
+{%- if settings.social_twitter_link != blank -%}
+{%- if settings.social_facebook_link != blank or settings.social_instagram_link != blank -%},{%- endif -%}
+    "{{ settings.social_twitter_link }}"
+{%- endif -%}
+{%- if settings.social_youtube_link != blank -%}
+{%- if settings.social_facebook_link != blank or settings.social_instagram_link != blank or settings.social_twitter_link != blank -%},{%- endif -%}
+    "{{ settings.social_youtube_link }}"
+{%- endif -%}
+{%- if settings.social_pinterest_link != blank -%}
+{%- if settings.social_facebook_link != blank or settings.social_instagram_link != blank or settings.social_twitter_link != blank or settings.social_youtube_link != blank -%},{%- endif -%}
+    "{{ settings.social_pinterest_link }}"
+{%- endif -%}
+{%- if settings.social_linkedin_link != blank -%}
+{%- if settings.social_facebook_link != blank or settings.social_instagram_link != blank or settings.social_twitter_link != blank or settings.social_youtube_link != blank or settings.social_pinterest_link != blank -%},{%- endif -%}
+    "{{ settings.social_linkedin_link }}"
+{%- endif -%}
   ]
 }
 </script>
@@ -66,7 +71,7 @@
       "@type": "ListItem",
       "position": 1,
       "name": "Home",
-      "item": {{ shop.url | json }}
+      "item": "{{ shop.url }}"
     }
     {%- if product -%}
       {%- assign primary_category = product.metafields.custom.primary_category -%}
@@ -76,14 +81,14 @@
       "@type": "ListItem",
       "position": 2,
       "name": {{ primary_category.value.title | json }},
-      "item": {{ primary_category.value.url | prepend: shop.url | json }}
+      "item": "{{ primary_category.value.url | prepend: shop.url }}"
     }
     ,
     {
       "@type": "ListItem",
       "position": 3,
       "name": {{ product.title | json }},
-      "item": {{ product.url | prepend: shop.url | json }}
+      "item": "{{ product.url | prepend: shop.url }}"
     }
       {%- elsif collection -%}
     ,
@@ -91,14 +96,14 @@
       "@type": "ListItem",
       "position": 2,
       "name": {{ collection.title | json }},
-      "item": {{ collection.url | prepend: shop.url | json }}
+      "item": "{{ collection.url | prepend: shop.url }}"
     }
     ,
     {
       "@type": "ListItem",
       "position": 3,
       "name": {{ product.title | json }},
-      "item": {{ product.url | within: collection | prepend: shop.url | json }}
+      "item": "{{ product.url | within: collection | prepend: shop.url }}"
     }
       {%- else -%}
         {%- assign fallback_collection = product.collections | first -%}
@@ -108,7 +113,7 @@
       "@type": "ListItem",
       "position": 2,
       "name": {{ fallback_collection.title | json }},
-      "item": {{ fallback_collection.url | prepend: shop.url | json }}
+      "item": "{{ fallback_collection.url | prepend: shop.url }}"
     }
         {%- endif -%}
     ,
@@ -116,7 +121,7 @@
       "@type": "ListItem",
       "position": {% if fallback_collection %}3{% else %}2{% endif %},
       "name": {{ product.title | json }},
-      "item": {{ product.url | prepend: shop.url | json }}
+      "item": "{{ product.url | prepend: shop.url }}"
     }
       {%- endif -%}
     {%- elsif collection -%}
@@ -125,7 +130,7 @@
       "@type": "ListItem",
       "position": 2,
       "name": {{ collection.title | json }},
-      "item": {{ collection.url | prepend: shop.url | json }}
+      "item": "{{ collection.url | prepend: shop.url }}"
     }
     {%- elsif article -%}
     ,
@@ -133,14 +138,14 @@
       "@type": "ListItem",
       "position": 2,
       "name": {{ blog.title | json }},
-      "item": {{ blog.url | prepend: shop.url | json }}
+      "item": "{{ blog.url | prepend: shop.url }}"
     }
     ,
     {
       "@type": "ListItem",
       "position": 3,
       "name": {{ article.title | json }},
-      "item": {{ article.url | prepend: shop.url | json }}
+      "item": "{{ article.url | prepend: shop.url }}"
     }
     {%- elsif blog -%}
     ,
@@ -148,7 +153,7 @@
       "@type": "ListItem",
       "position": 2,
       "name": {{ blog.title | json }},
-      "item": {{ blog.url | prepend: shop.url | json }}
+      "item": "{{ blog.url | prepend: shop.url }}"
     }
     {%- elsif page -%}
     ,
@@ -156,7 +161,7 @@
       "@type": "ListItem",
       "position": 2,
       "name": {{ page.title | json }},
-      "item": {{ page.url | prepend: shop.url | json }}
+      "item": "{{ page.url | prepend: shop.url }}"
     }
     {%- endif -%}
   ]
@@ -186,7 +191,7 @@
   "@type": "Product",
   "name": {{ product.title | json }},
   "description": {{ product.description | strip_html | truncate: 5000 | json }},
-  "url": {{ product_url | json }},
+  "url": "{{ product_url }}",
   "sku": {{ current_variant.sku | default: current_variant.id | json }},
   "brand": {
     "@type": "Brand",
@@ -195,13 +200,13 @@
   {%- if product.featured_image -%}
   "image": [
     {%- for image in product.images limit: 5 -%}
-    {{ image | image_url: width: 1200 | prepend: 'https:' | json }}{% unless forloop.last %},{% endunless %}
+    "{{ image | image_url: width: 1200 | prepend: 'https:' }}"{% unless forloop.last %},{% endunless %}
     {%- endfor -%}
   ],
   {%- endif -%}
   "offers": {
     "@type": "Offer",
-    "url": {{ product_url | json }},
+    "url": "{{ product_url }}",
     "priceCurrency": {{ cart.currency.iso_code | json }},
     "price": {{ current_variant.price | divided_by: 100.0 | json }},
     {%- if current_variant.compare_at_price and current_variant.compare_at_price > current_variant.price -%}
@@ -211,7 +216,7 @@
       "priceCurrency": {{ cart.currency.iso_code | json }}
     },
     {%- endif -%}
-    "availability": {{ availability | json }},
+    "availability": {{ availability }},
     "seller": {
       "@type": "Organization",
       "name": {{ shop.name | json }}
@@ -246,12 +251,12 @@
   "@context": "https://schema.org",
   "@type": "CollectionPage",
   "name": {{ collection.title | json }},
-  "url": {{ collection_url | json }},
+  "url": "{{ collection_url }}",
   {%- if collection.description != blank -%}
   "description": {{ collection.description | strip_html | json }},
   {%- endif -%}
   {%- if collection.image -%}
-  "image": {{ collection.image | image_url: width: 1200 | prepend: 'https:' | json }},
+  "image": "{{ collection.image | image_url: width: 1200 | prepend: 'https:' }}",
   {%- endif -%}
   "mainEntity": {
     "@type": "ItemList",
@@ -261,7 +266,7 @@
       {
         "@type": "ListItem",
         "position": {{ forloop.index | json }},
-        "url": {{ product.url | within: collection | prepend: shop.url | json }},
+        "url": "{{ product.url | within: collection | prepend: shop.url }}",
         "name": {{ product.title | json }}
       }{% unless forloop.last %},{% endunless %}
       {%- endfor -%}
@@ -283,7 +288,7 @@
   "@context": "https://schema.org",
   "@type": "BlogPosting",
   "headline": {{ article.title | json }},
-  "url": {{ article_url | json }},
+  "url": "{{ article_url }}",
   {%- if article.excerpt != blank -%}
   "description": {{ article.excerpt | strip_html | json }},
   {%- elsif article.content != blank -%}
@@ -292,7 +297,7 @@
   {%- if article.image -%}
   "image": {
     "@type": "ImageObject",
-    "url": {{ article.image | image_url: width: 1200 | prepend: 'https:' | json }},
+    "url": "{{ article.image | image_url: width: 1200 | prepend: 'https:' }}",
     "width": "1200",
     "height": "630"
   },
@@ -313,16 +318,16 @@
     {%- if settings.logo -%}
     "logo": {
       "@type": "ImageObject",
-      "url": {{ settings.logo | image_url: width: 600 | prepend: 'https:' | json }},
+      "url": "{{ settings.logo | image_url: width: 600 | prepend: 'https:' }}",
       "width": "600",
       "height": "600"
     },
     {%- endif -%}
-    "url": {{ shop.url | json }}
+    "url": "{{ shop.url }}"
   },
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": {{ article_url | json }}
+    "@id": "{{ article_url }}"
   }
 }
 </script>
