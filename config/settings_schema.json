@@ -1376,5 +1376,45 @@
         "limit": 10
       }
     ]
+  },
+  {
+    "name": "Schema Markup",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Shipping Details"
+      },
+      {
+        "type": "text",
+        "id": "schema_shipping_rate",
+        "label": "Shipping Rate",
+        "info": "Enter shipping cost (e.g., 0 for free shipping, 5.99 for paid). Leave blank to omit from schema.",
+        "default": "0"
+      },
+      {
+        "type": "text",
+        "id": "schema_shipping_destination",
+        "label": "Shipping Destination Country",
+        "info": "Two-letter country code (e.g., US, CA, GB). Used for shipping and return policy.",
+        "default": "US"
+      },
+      {
+        "type": "header",
+        "content": "Return Policy"
+      },
+      {
+        "type": "text",
+        "id": "schema_return_days",
+        "label": "Return Window (Days)",
+        "info": "Number of days customers have to return items (e.g., 30). Leave blank for unlimited returns.",
+        "default": "30"
+      },
+      {
+        "type": "url",
+        "id": "schema_return_policy_url",
+        "label": "Return Policy URL",
+        "info": "Link to your full return policy page."
+      }
+    ]
   }
 ]

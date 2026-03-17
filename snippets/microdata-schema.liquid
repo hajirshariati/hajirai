@@ -228,6 +228,40 @@
     ,
     "priceValidUntil": {{ 'now' | date: '%s' | plus: 2592000 | date: '%Y-%m-%d' | json }}
     {%- endif -%}
+    {%- if settings.schema_shipping_rate != blank or settings.schema_shipping_destination != blank -%}
+    ,
+    "shippingDetails": {
+      "@type": "OfferShippingDetails",
+      "shippingRate": {
+        "@type": "MonetaryAmount",
+        "value": {{ settings.schema_shipping_rate | default: 0 | json }},
+        "currency": {{ cart.currency.iso_code | json }}
+      }
+      {%- if settings.schema_shipping_destination != blank -%}
+      ,
+      "shippingDestination": {
+        "@type": "DefinedRegion",
+        "addressCountry": {{ settings.schema_shipping_destination | json }}
+      }
+      {%- endif -%}
+    }
+    {%- endif -%}
+    {%- if settings.schema_return_policy_url != blank or settings.schema_return_days != blank -%}
+    ,
+    "hasMerchantReturnPolicy": {
+      "@type": "MerchantReturnPolicy",
+      {%- if settings.schema_return_days != blank -%}
+      "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+      "merchantReturnDays": {{ settings.schema_return_days | json }},
+      {%- else -%}
+      "returnPolicyCategory": "https://schema.org/MerchantReturnUnlimitedWindow",
+      {%- endif -%}
+      {%- if settings.schema_return_policy_url != blank -%}
+      "returnPolicyUrl": "{{ settings.schema_return_policy_url }}",
+      {%- endif -%}
+      "applicableCountry": {{ settings.schema_shipping_destination | default: 'US' | json }}
+    }
+    {%- endif -%}
   }
   {%- if rating_value and review_count and review_count > 0 -%}
   ,
