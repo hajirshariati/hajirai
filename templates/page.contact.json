@@ -73,7 +73,6 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "narrow": false,
         "color_text": "",
         "color_background": "#f4f4f4",
         "gradient_background": "",
@@ -85,7 +84,10 @@
         "padding_top": 72,
         "padding_bottom": 20,
         "divider": false,
-        "rounded": true
+        "narrow": false,
+        "rounded": true,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "multicolumn_kYm3fj": {
@@ -101,7 +103,7 @@
             "heading": "<strong>Order Center</strong>",
             "heading_size": "text-lg-2xl",
             "text": "",
-            "custom_html": "<div id=\"as-root\"></div><script>(function(e,t,n){var r,i=e.getElementsByTagName(t)[0];if(e.getElementById(n))return;r=e.createElement(t);r.id=n;r.src=\"https://button.aftership.com/all.js?username=aetrexorders\";i.parentNode.insertBefore(r,i)})(document,\"script\",\"aftership-jssdk\")</script>\n\n<div class=\"as-track-button\" data-size=\"medium\" data-domain=\"orders.aetrex.com/\" data-look-up-option=\"both\" data-btn-label=\"Track\" data-center=\"true\"></div>\n<br><br>\nNeed to Return Something? <br><div style=\"margin-top:5px\">\n<a href=\"/apps/aftership-returns-center\">\nUS Customer</a>   /   <a href=\"https://web.global-e.com/Returns/Portal/mZnr\">Non-US Customer</a>\n</div>",
+            "custom_html": "<div id=\"as-root\"></div><script>(function(e,t,n){var r,i=e.getElementsByTagName(t)[0];if(e.getElementById(n))return;r=e.createElement(t);r.id=n;r.src=\"https://button.aftership.com/all.js?username=aetrexorders\";i.parentNode.insertBefore(r,i)})(document,\"script\",\"aftership-jssdk\")</script>\n\n<div class=\"as-track-button\" data-size=\"medium\" data-domain=\"orders.aetrex.com/\" data-look-up-option=\"both\" data-btn-label=\"Track\" data-center=\"true\"></div>\n<br><br>\nNeed to Return Something? <br><div style=\"margin-top:5px\">\n<a href=\"/apps/aftership-returns-center\">\nUS Customer</a>   /   <a href=\"https://portal.returngo.ai/?shop=f031fc-3.myshopify.com\">Non-US Customer</a>\n</div>",
             "button_label": "",
             "button_link": "",
             "button_style": "secondary",
@@ -191,7 +193,9 @@
         "padding_bottom": 20,
         "full_width": false,
         "divider": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "multicolumn_with_icons_igCrVg": {
@@ -272,7 +276,10 @@
         "padding_bottom": 52,
         "divider": false,
         "full_width": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": "",
+        "limit_section_width": false
       }
     },
     "rich_text_QPQyyd": {
@@ -325,7 +332,6 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "narrow": false,
         "color_text": "",
         "color_background": "#f4f4f4",
         "gradient_background": "",
@@ -337,7 +343,10 @@
         "padding_top": 20,
         "padding_bottom": 20,
         "divider": false,
-        "rounded": false
+        "narrow": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "faq_zendesk_iW4B8T": {
@@ -359,9 +368,9 @@
           "settings": {
             "button_label": "Visit FAQ Page",
             "button_link": "https://support.aetrex.com/hc/en-us",
-            "button_external": false,
-            "button_size": "sm",
             "button_style": "link",
+            "button_size": "sm",
+            "button_external": false,
             "button_icon": false
           }
         }
@@ -386,7 +395,6 @@
         "button_icon": true,
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
-        "narrow": false,
         "color_text": "",
         "color_background": "#f4f4f4",
         "gradient_background": "",
@@ -398,7 +406,10 @@
         "padding_top": 0,
         "padding_bottom": 40,
         "divider": false,
-        "rounded": false
+        "narrow": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     }
   },

@@ -213,7 +213,7 @@
           "type": "button",
           "settings": {
             "button_label": "Non-US Customer Returns",
-            "button_link": "https://web.global-e.com/Returns/Portal/mZnr",
+            "button_link": "https://portal.returngo.ai/?shop=f031fc-3.myshopify.com",
             "button_style": "primary",
             "button_size": "md",
             "button_external": false,
