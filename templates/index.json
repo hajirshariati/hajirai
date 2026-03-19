@@ -280,6 +280,76 @@
         "abra_promo_code_hide": ""
       }
     },
+    "video_with_text_overlay_9LhhDH": {
+      "type": "video-with-text-overlay",
+      "blocks": {
+        "heading_6K4nxE": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>Spring '26 Styles Are Here!</p>",
+            "heading_size": "title-md",
+            "heading_tag": "h3",
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_c8LdGV": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP NOW",
+            "button_link": "shopify://collections/womens-new-arrivals",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_6K4nxE",
+        "button_c8LdGV"
+      ],
+      "custom_css": [
+        "@media screen and (max-width: 767px) {.video-hero {height: auto; }}"
+      ],
+      "name": "t:sections.video-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "video": "shopify://files/videos/1920x700_SS26_Styles_b.mp4",
+        "video_url": "",
+        "description": "",
+        "enable_video_autoplay": true,
+        "enable_video_looping": true,
+        "image_height": "adapt",
+        "content_width": "medium",
+        "content_position": "md:items-center md:justify-end",
+        "text_alignment": "center",
+        "mobile_content_space": 200,
+        "mobile_content_space_color": "#e7e7e7",
+        "video_mobile": "shopify://files/videos/600x562_SS26_Styles_mobile_b.mp4",
+        "video_url_mobile": "",
+        "image_height_mobile": "100vh",
+        "content_position_mobile": "items-end justify-center",
+        "text_alignment_mobile": "center",
+        "color_text": "#111111",
+        "color_highlight": "#111111",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": false,
+        "rounded": true,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
     "video_with_text_Mpqjh8": {
       "type": "video-with-text",
       "blocks": {
@@ -1297,6 +1367,7 @@
   "order": [
     "video_with_text_overlay_akXxKy",
     "collection_list_kK69i9",
+    "video_with_text_overlay_9LhhDH",
     "video_with_text_Mpqjh8",
     "featured_collections_g6b3ht",
     "dynamic_feature_combo_74fjyM",
