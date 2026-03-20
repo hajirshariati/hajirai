@@ -457,7 +457,7 @@
               <circle cx="117.5" cy="32.5" r="11.5" class="fill"/>
             </svg>
             <p class="heading lg:text-3xl text-2xl leading-none tracking-tight">{{ section.settings.specifications_heading | escape }}</p>
-            <ul class="flex flex-wrap items-start justify-center gap-6 md:gap-10" id="specs-icon-list">
+            <ul class="flex flex-wrap items-start justify-center gap-3 md:gap-5" id="specs-icon-list">
               {%- if template.suffix == 'pdp-ortho-new' and sidebar_icons != blank -%}
                 {%- for item in sidebar_icons -%}
                   {%- assign item_icon = item.icon.value -%}
