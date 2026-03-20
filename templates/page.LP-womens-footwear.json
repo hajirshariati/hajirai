@@ -24,10 +24,10 @@
         "rounded": false
       }
     },
-    "slideshow_68iQFC": {
+    "slideshow_3LzedB": {
       "type": "slideshow",
       "blocks": {
-        "video_ETdLMT": {
+        "video_7y9wKG": {
           "type": "video",
           "disabled": true,
           "settings": {
@@ -60,7 +60,7 @@
             "button_icon": false
           }
         },
-        "video_WbaEWr": {
+        "video_TxBhD6": {
           "type": "video",
           "settings": {
             "video": "shopify://files/videos/New_Arrivals_topbanenr_DT.mp4",
@@ -70,7 +70,7 @@
             "video_mobile": "shopify://files/videos/New_Arrivals_topbanenr_Mobile.mp4",
             "video_url_mobile": "",
             "content_position": "md:items-center md:justify-end",
-            "content_position_mobile": "items-center justify-center",
+            "content_position_mobile": "items-end justify-center",
             "heading": "Spring-Summer '26 Styles",
             "heading_size": "title-md",
             "heading_tag": "h2",
@@ -93,8 +93,8 @@
         }
       },
       "block_order": [
-        "video_ETdLMT",
-        "video_WbaEWr"
+        "video_7y9wKG",
+        "video_TxBhD6"
       ],
       "name": "t:sections.slideshow.name",
       "settings": {
@@ -104,8 +104,10 @@
         "image_height": "adapt",
         "content_width": "medium",
         "text_alignment": "left",
-        "image_height_mobile": "400px",
+        "image_height_mobile": "250px",
         "text_alignment_mobile": "center",
+        "mobile_content_space": 280,
+        "mobile_content_space_color": "#e3ddcf",
         "accessibility_info": "Slideshow about our brand",
         "color_text": "#171717",
         "color_background": "#ffffff",
@@ -123,7 +125,7 @@
         "enable_parallax": false,
         "parallax_direction": "zoom",
         "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
+        "abra_promo_code_hide": "VIPSPRING"
       }
     },
     "video_with_text_overlay_niepRV": {
@@ -360,6 +362,8 @@
         "text_alignment": "center",
         "image_height_mobile": "adapt",
         "text_alignment_mobile": "center",
+        "mobile_content_space": 0,
+        "mobile_content_space_color": "#ffffff",
         "accessibility_info": "",
         "color_text": "#171717",
         "color_background": "rgba(0,0,0,0)",
@@ -1242,7 +1246,7 @@
   },
   "order": [
     "main-page",
-    "slideshow_68iQFC",
+    "slideshow_3LzedB",
     "video_with_text_overlay_niepRV",
     "slideshow_FWtLKn",
     "rich_text_PKdTPU",
