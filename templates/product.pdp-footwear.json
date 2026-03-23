@@ -767,7 +767,6 @@
     },
     "custom_liquid_T9rexX": {
       "type": "custom-liquid",
-      "disabled": true,
       "name": "t:sections.custom-liquid.name",
       "settings": {
         "liquid": "{%render 'fr-testimonials'%}",
