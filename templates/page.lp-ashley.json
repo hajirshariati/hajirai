@@ -109,36 +109,79 @@
         "abra_promo_code_hide": ""
       }
     },
-    "image_with_text_overlay_FyEA8J": {
-      "type": "image-with-text-overlay",
-      "name": "t:sections.image-with-text-overlay.name",
+    "rich_text_xGhmjk": {
+      "type": "rich-text",
+      "blocks": {
+        "image_8GyHpy": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/footwear-logo-67eae71e5b26b.avif",
+            "image_width": "custom",
+            "image_max_width": 400,
+            "image_max_width_mobile": 50
+          }
+        },
+        "heading_4zcYJA": {
+          "type": "heading",
+          "settings": {
+            "heading": "Best Sandal for Bunions",
+            "heading_size": "title-lg tracking-heading",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_WC4kT3": {
+          "type": "text",
+          "settings": {
+            "text": "<p><em>\"These wedge sandals have an adjustable front strap with a hook and loop closure to accommodate the bunion area with an extra comfortable fit. There is another strap at your ankle as well to keep you securely in the shoe. There is also memory foam in the footbed and arch support which is helpful for other conditions like plantar fasciitis.\"</em></p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "image_8GyHpy",
+        "heading_4zcYJA",
+        "text_WC4kT3"
+      ],
+      "name": "t:sections.rich-text.name",
       "settings": {
-        "transparent_header": false,
-        "image": "shopify://shop_images/ashley_D.jpg",
-        "image_height": "adapt",
-        "content_width": "small",
-        "content_position": "md:items-end md:justify-start",
-        "text_alignment": "left",
-        "image_mobile": "shopify://shop_images/ashley_M.jpg",
-        "image_height_mobile": "adapt",
-        "content_position_mobile": "items-end justify-start",
-        "text_alignment_mobile": "left",
-        "color_text": "#ffffff",
-        "color_highlight": "#e0a580",
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
         "gradient_highlight": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
+        "color_button_text": "",
+        "color_button_background": "",
         "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "divider_color": "#111111",
-        "overlay_opacity": 0,
-        "padding_top": 0,
-        "padding_bottom": 0,
+        "padding_top": 20,
+        "padding_bottom": 20,
         "divider": false,
-        "full_width": false,
-        "rounded": true,
-        "enable_parallax": false,
-        "parallax_direction": "vertical",
+        "narrow": true,
+        "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
@@ -585,7 +628,7 @@
   "order": [
     "main-page",
     "image_with_text_overlay_Hnzn9F",
-    "image_with_text_overlay_FyEA8J",
+    "rich_text_xGhmjk",
     "multicolumn_4AAJyd",
     "featured_product_iDEY6W",
     "reveal_testimonials_EU8z7L",
