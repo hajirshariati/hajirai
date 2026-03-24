@@ -224,7 +224,7 @@
         "button_Vd4x9h"
       ],
       "custom_css": [
-        ".bg-gray-200.w-full.h-full.flex.items-center.justify-center {display: none;}"
+        ".bg-gray-200.w-full.h-full.flex.items-center.justify-center {background: none; width: auto; height: auto; display: block;}"
       ],
       "name": "Dynamic Feature Combo",
       "settings": {
