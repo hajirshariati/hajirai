@@ -375,6 +375,15 @@
         "rounded": false
       }
     },
+    "ugc_gallery_bWECXN": {
+      "type": "ugc-gallery",
+      "name": "UGC Gallery",
+      "settings": {
+        "custom_gallery": "",
+        "global_pdp_sourced_gallery": "67807363501d9d972ff9bf48",
+        "global_fallback_sourced_gallery": "67806b650c1215001c37bb7e"
+      }
+    },
     "reveal_testimonials_EU8z7L": {
       "type": "reveal-testimonials",
       "blocks": {
@@ -631,6 +640,7 @@
     "rich_text_xGhmjk",
     "multicolumn_4AAJyd",
     "featured_product_iDEY6W",
+    "ugc_gallery_bWECXN",
     "reveal_testimonials_EU8z7L",
     "multicolumn_6BANL4",
     "featured_collection_ytWEYw"
