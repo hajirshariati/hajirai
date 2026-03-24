@@ -265,59 +265,59 @@
         "rounded": false
       }
     },
-    "testimonials_RUj7hg": {
-      "type": "testimonials",
+    "rich_text_F7J38f": {
+      "type": "rich-text",
       "blocks": {
-        "testimonial_Lxpczp": {
-          "type": "testimonial",
+        "heading_BWnxLx": {
+          "type": "heading",
           "settings": {
-            "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
+            "heading": "Rich text",
+            "heading_size": "title-lg tracking-heading",
+            "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         },
-        "testimonial_6tGP3w": {
-          "type": "testimonial",
+        "text_ffQkw8": {
+          "type": "text",
           "settings": {
-            "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
+            "text": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         },
-        "testimonial_FtVrxQ": {
-          "type": "testimonial",
+        "button_raFiWR": {
+          "type": "button",
           "settings": {
-            "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
+            "button_label": "Button label",
+            "button_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": true
           }
         }
       },
       "block_order": [
-        "testimonial_Lxpczp",
-        "testimonial_6tGP3w",
-        "testimonial_FtVrxQ"
+        "heading_BWnxLx",
+        "text_ffQkw8",
+        "button_raFiWR"
       ],
-      "name": "t:sections.testimonials.name",
+      "name": "t:sections.rich-text.name",
       "settings": {
-        "heading": "Testimonials",
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "heading": "",
         "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
         "heading_tag": "h2",
         "subheading": "",
         "description": "",
@@ -336,10 +336,12 @@
         "color_button_background": "",
         "color_button_gradient": "",
         "padding_top": 72,
-        "padding_bottom": 72,
+        "padding_bottom": 100,
         "divider": false,
+        "narrow": true,
         "rounded": false,
-        "limit_section_width": false
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "featured_product_wtCJrb": {
@@ -361,7 +363,7 @@
             "enable_dynamic_variants": true,
             "show_variant_labels": true,
             "picker_type": "button",
-            "enable_color_swatches": false,
+            "enable_color_swatches": true,
             "color_swatch_type": "variant",
             "size_chart": ""
           }
@@ -826,7 +828,7 @@
     "main-page",
     "image_with_text_overlay_Hnzn9F",
     "dynamic_feature_combo_8NW3dN",
-    "testimonials_RUj7hg",
+    "rich_text_F7J38f",
     "featured_product_wtCJrb",
     "reveal_testimonials_EU8z7L",
     "featured_collection_ytWEYw",
