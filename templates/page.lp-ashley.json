@@ -48,7 +48,7 @@
         "text_cQCMec": {
           "type": "text",
           "settings": {
-            "text": "<p>Genuine leather construction, built-in arch support and a memory foam footbed. Designed using insights from over 50 million foot scans.</p>",
+            "text": "<p>Genuine leather construction, built-in arch support and a memory foam footbed. Designed using insights from over 50 million foot scans, <strong>made to make you move better. </strong></p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -579,7 +579,7 @@
       ],
       "name": "t:sections.testimonials.name",
       "settings": {
-        "heading": "Testimonials",
+        "heading": "Customer Reviews",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
@@ -841,7 +841,7 @@
         "show_view_all": false,
         "columns_mobile": "1",
         "swipe_on_mobile": true,
-        "heading": "More Colors, Same Comfort",
+        "heading": "Choose Your Color",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
