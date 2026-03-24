@@ -364,7 +364,7 @@
             "show_variant_labels": true,
             "picker_type": "button",
             "enable_color_swatches": true,
-            "color_swatch_type": "color",
+            "color_swatch_type": "variant",
             "size_chart": ""
           }
         },
