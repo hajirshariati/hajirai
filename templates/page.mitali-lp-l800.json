@@ -93,7 +93,7 @@
       "type": "featured-collection",
       "name": "t:sections.featured-collection.name",
       "settings": {
-        "collection": "premium-memory-foam",
+        "collection": "train",
         "products": [],
         "product_limit": 8,
         "columns": 4,
@@ -129,20 +129,10 @@
     "image_with_text_EXN6iG": {
       "type": "image-with-text",
       "blocks": {
-        "heading_zwifUd": {
-          "type": "heading",
-          "settings": {
-            "heading": "World’s Only Orthotic Engineered Based On 30 Million Foot Scans and Backed by Clinical Proof",
-            "heading_size": "title-md",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
         "text_wBV3LE": {
           "type": "text",
           "settings": {
-            "text": "<ul><li>Signature Arch Support</li><li>Pressure Relief & Shock Absorption</li><li>Clinically Proven To Help Relieve Foot Pain</li><li>Designed based on 30 Million Foot Scans</li><li>Over 10 Million Pairs Sold</li><li>Premium Materials That Support Natural Foot Movement</li></ul>",
+            "text": "<ul><li>Turn Every Workout Into a Power Move</li><li>Whether you’re lifting, sprinting, jumping, or grinding through HIIT — your foundation matters.</li><li><strong>Aetrex Train Orthotics</strong> help:</li></ul><p>✔ Support your arch under heavy load</p><p> ✔ Stabilize your stride during explosive movement </p><p>✔ Reduce pressure on heels and forefoot </p><p>✔ Help relieve common foot pain like plantar fasciitis </p><p>✔ Improve alignment from the ground upBecause when your feet are aligned — everything performs better.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -156,7 +146,6 @@
         }
       },
       "block_order": [
-        "heading_zwifUd",
         "text_wBV3LE"
       ],
       "name": "t:sections.image-with-text.name",
@@ -197,7 +186,7 @@
         "product_W8WVXT": {
           "type": "product",
           "settings": {
-            "product": "l2300w-m",
+            "product": "l800w-m",
             "custom_product_name": "For Normal Arch Type",
             "primary_cta_label": "Shop Women",
             "secondary_cta_label": "Shop Men",
@@ -205,7 +194,7 @@
             "secondary_cta_style": "button--primary",
             "secondary_cta_external": false,
             "secondary_cta_icon": false,
-            "product_badge_image": "shopify://shop_images/PMF5.jpg",
+            "product_badge_image": "shopify://shop_images/800.jpg",
             "product_badge_position": "center",
             "product_badge_width": 300,
             "heading_1": "Support Features",
@@ -264,7 +253,7 @@
         "product_h8KYqC": {
           "type": "product",
           "settings": {
-            "product": "l2320w-m",
+            "product": "l820m-m",
             "custom_product_name": "With Posted Heel",
             "primary_cta_label": "Shop Women",
             "secondary_cta_label": "Shop Men",
@@ -272,7 +261,7 @@
             "secondary_cta_style": "button--primary",
             "secondary_cta_external": false,
             "secondary_cta_icon": false,
-            "product_badge_image": "shopify://shop_images/PMF2.jpg",
+            "product_badge_image": "shopify://shop_images/L820.jpg",
             "product_badge_position": "center",
             "product_badge_width": 300,
             "heading_1": "Support Features",
@@ -331,7 +320,7 @@
         "product_bTqp4E": {
           "type": "product",
           "settings": {
-            "product": "l2305w-m",
+            "product": "l805w-m",
             "custom_product_name": "With Met Pad",
             "primary_cta_label": "Shop Women",
             "secondary_cta_label": "Shop Men",
@@ -339,7 +328,7 @@
             "secondary_cta_style": "button--primary",
             "secondary_cta_external": false,
             "secondary_cta_icon": false,
-            "product_badge_image": "shopify://shop_images/PMF1_b006e183-e1d9-4220-93ee-9c0c9760546a.jpg",
+            "product_badge_image": "shopify://shop_images/805.jpg",
             "product_badge_position": "center",
             "product_badge_width": 300,
             "heading_1": "Support Features",
@@ -398,7 +387,7 @@
         "product_PfT8Lp": {
           "type": "product",
           "settings": {
-            "product": "l2325w-m",
+            "product": "l825m-m",
             "custom_product_name": "With Posted Heel & Met Pad",
             "primary_cta_label": "Shop Women",
             "secondary_cta_label": "Shop Men",
@@ -406,7 +395,7 @@
             "secondary_cta_style": "button--primary",
             "secondary_cta_external": false,
             "secondary_cta_icon": false,
-            "product_badge_image": "shopify://shop_images/PMF4.jpg",
+            "product_badge_image": "shopify://shop_images/L825.jpg",
             "product_badge_position": "center",
             "product_badge_width": 300,
             "heading_1": "Support Features",
@@ -705,7 +694,7 @@
         "heading_DjGJJb": {
           "type": "heading",
           "settings": {
-            "heading": "What Makes Aetrex Premium Memory Foam Orthotics Better Than Others",
+            "heading": "What Makes Aetrex Train Orthotics Better Than Others",
             "heading_size": "title-sm",
             "heading_tag": "h2",
             "highlighted_text": "none",
@@ -798,7 +787,7 @@
       ],
       "name": "t:sections.image-with-text.name",
       "settings": {
-        "image": "shopify://shop_images/other2.jpg",
+        "image": "shopify://shop_images/vs.jpg",
         "img_url": "",
         "image_height": "adapt",
         "image_width": "large",
@@ -863,7 +852,7 @@
       ],
       "name": "t:sections.image-with-text.name",
       "settings": {
-        "image": "shopify://shop_images/material_710b11d1-535d-455b-985f-bc23ade4f106.jpg",
+        "image": "shopify://shop_images/material_1.gif",
         "img_url": "",
         "image_height": "adapt",
         "image_width": "large",
@@ -970,6 +959,110 @@
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
+    },
+    "rich_text_3gJ9jd": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_K6LjVd": {
+          "type": "heading",
+          "settings": {
+            "heading": "ONE SIMPLE UPGRADE. <em>MASSIVE IMPACT.</em>",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "half_text",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_7cCJrH": {
+          "type": "text",
+          "settings": {
+            "text": "<p>You don’t need new shoes. <br/>You need better support inside them.<br/>Train longer. Recover smarter. Move without limits.</p>",
+            "text_font": "body",
+            "text_size": "subtext-xl",
+            "text_max_size": 32,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_K6LjVd",
+        "text_7cCJrH"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "#f0c404",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 100,
+        "divider": false,
+        "narrow": true,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "featured_collection_RHLmGF": {
+      "type": "featured-collection",
+      "name": "t:sections.featured-collection.name",
+      "settings": {
+        "collection": "train",
+        "products": [],
+        "product_limit": 8,
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "show_view_all": false,
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
     }
   },
   "order": [
@@ -983,6 +1076,8 @@
     "rich_text_WYrTm3",
     "image_with_text_bNBn9R",
     "image_with_text_GVXQip",
-    "image_with_text_fX6cAj"
+    "image_with_text_fX6cAj",
+    "rich_text_3gJ9jd",
+    "featured_collection_RHLmGF"
   ]
 }
