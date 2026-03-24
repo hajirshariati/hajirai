@@ -101,7 +101,7 @@
         "padding_top": 0,
         "padding_bottom": 0,
         "divider": false,
-        "full_width": true,
+        "full_width": false,
         "rounded": false,
         "enable_parallax": true,
         "parallax_direction": "vertical",
@@ -109,57 +109,41 @@
         "abra_promo_code_hide": ""
       }
     },
-    "rich_text_xGhmjk": {
-      "type": "rich-text",
+    "shop_the_look_PMrCTP": {
+      "type": "shop-the-look",
       "blocks": {
-        "image_8GyHpy": {
-          "type": "image",
+        "product_3fyemU": {
+          "type": "product",
           "settings": {
-            "image": "shopify://shop_images/footwear-logo-67eae71e5b26b.avif",
-            "image_width": "custom",
-            "image_max_width": 400,
-            "image_max_width_mobile": 50
+            "product": "ashley-hazy-blue-multi-ew794w",
+            "color_text": "#ffffff",
+            "vertical": 25,
+            "horizontal": 25,
+            "vertical_mobile": 25,
+            "horizontal_mobile": 25
           }
         },
-        "heading_4zcYJA": {
-          "type": "heading",
+        "product_xxPbQC": {
+          "type": "product",
           "settings": {
-            "heading": "Best Sandal for Bunions",
-            "heading_size": "title-lg tracking-heading",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_WC4kT3": {
-          "type": "text",
-          "settings": {
-            "text": "<p><em>\"These wedge sandals have an adjustable front strap with a hook and loop closure to accommodate the bunion area with an extra comfortable fit. There is another strap at your ankle as well to keep you securely in the shoe. There is also memory foam in the footbed and arch support which is helpful for other conditions like plantar fasciitis.\"</em></p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.2,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
+            "product": "ashley-off-white-ew793w",
+            "color_text": "#ffffff",
+            "vertical": 75,
+            "horizontal": 65,
+            "vertical_mobile": 75,
+            "horizontal_mobile": 65
           }
         }
       },
       "block_order": [
-        "image_8GyHpy",
-        "heading_4zcYJA",
-        "text_WC4kT3"
+        "product_3fyemU",
+        "product_xxPbQC"
       ],
-      "name": "t:sections.rich-text.name",
+      "name": "t:sections.shop-the-look.name",
       "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
         "heading": "",
         "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
+        "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
         "subheading": "",
         "description": "",
@@ -177,11 +161,90 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 20,
-        "padding_bottom": 20,
+        "color_overlay": "#171717",
+        "overlay_opacity": 30,
+        "padding_top": 72,
+        "padding_bottom": 72,
         "divider": false,
-        "narrow": true,
+        "full_width": false,
         "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "image_with_text_MkkLVQ": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_qCJUjT": {
+          "type": "heading",
+          "settings": {
+            "heading": "Best Sandal for Bunions",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_RKiGwU": {
+          "type": "text",
+          "settings": {
+            "text": "<p><em>\"These wedge sandals have an adjustable front strap with a hook and loop closure to accommodate the bunion area with an extra comfortable fit. There is another strap at your ankle as well to keep you securely in the shoe. There is also memory foam in the footbed and arch support which is helpful for other conditions like plantar fasciitis.\"</em></p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_LjPLnD": {
+          "type": "button",
+          "settings": {
+            "button_label": "Button label",
+            "button_link": "",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": true
+          }
+        }
+      },
+      "block_order": [
+        "heading_qCJUjT",
+        "text_RKiGwU",
+        "button_LjPLnD"
+      ],
+      "name": "t:sections.image-with-text.name",
+      "settings": {
+        "img_url": "",
+        "image_height": "650px",
+        "image_width": "medium",
+        "layout": "image_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": true,
+        "parallax_direction": "vertical",
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
@@ -335,90 +398,6 @@
         "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
-      }
-    },
-    "featured_product_iDEY6W": {
-      "type": "featured-product",
-      "blocks": {
-        "title_BBEMCm": {
-          "type": "title",
-          "settings": {
-            "title_size": "product-title-md",
-            "title_size_mobile": "product-title-md",
-            "title_tag": "h2",
-            "show_price": true,
-            "show_rating": true
-          }
-        },
-        "description_yNKzmN": {
-          "type": "description",
-          "disabled": true,
-          "settings": {
-            "text_size": "text-base"
-          }
-        },
-        "variant_picker_KjzYx6": {
-          "type": "variant_picker",
-          "settings": {
-            "enable_dynamic_variants": true,
-            "show_variant_labels": true,
-            "picker_type": "button",
-            "enable_color_swatches": true,
-            "color_swatch_type": "variant",
-            "size_chart": ""
-          }
-        },
-        "buy_buttons_3Btg8N": {
-          "type": "buy_buttons",
-          "settings": {
-            "show_quantity_selector": true,
-            "show_price": false,
-            "show_dynamic_checkout": false,
-            "show_gift_card_recipient": false,
-            "enable_back_in_stock": false,
-            "show_back_in_stock_name": false,
-            "show_back_in_stock_phone": false
-          }
-        },
-        "read_more_GYdnTe": {
-          "type": "read_more",
-          "settings": {}
-        },
-        "spinning_text_WbB9Rk": {
-          "type": "spinning_text",
-          "settings": {
-            "text": "Oprah Daily's 2025"
-          }
-        }
-      },
-      "block_order": [
-        "title_BBEMCm",
-        "description_yNKzmN",
-        "variant_picker_KjzYx6",
-        "buy_buttons_3Btg8N",
-        "read_more_GYdnTe",
-        "spinning_text_WbB9Rk"
-      ],
-      "name": "t:sections.featured-product.name",
-      "settings": {
-        "product": "ashley-black-ew790w",
-        "enable_sticky_info": true,
-        "media_size": 55,
-        "gallery_layout": "thumbnail",
-        "thumbnail_position": "beside",
-        "image_ratio": "adapt_first",
-        "image_zoom": "lightbox",
-        "hide_variants": false,
-        "enable_video_autoplay": false,
-        "enable_video_looping": false,
-        "mobile_layout": "partial",
-        "image_ratio_mobile": "adapt_first",
-        "mobile_thumbnail": false,
-        "padding_top": 120,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false
       }
     },
     "ugc_gallery_bWECXN": {
@@ -683,12 +662,12 @@
   "order": [
     "main-page",
     "image_with_text_overlay_Hnzn9F",
-    "rich_text_xGhmjk",
-    "multicolumn_QJbrRQ",
-    "featured_product_iDEY6W",
-    "ugc_gallery_bWECXN",
+    "shop_the_look_PMrCTP",
+    "image_with_text_MkkLVQ",
     "reveal_testimonials_EU8z7L",
+    "featured_collection_ytWEYw",
+    "multicolumn_QJbrRQ",
     "multicolumn_6BANL4",
-    "featured_collection_ytWEYw"
+    "ugc_gallery_bWECXN"
   ]
 }
