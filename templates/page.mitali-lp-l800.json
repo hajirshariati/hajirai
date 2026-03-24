@@ -130,12 +130,22 @@
     "image_with_text_EXN6iG": {
       "type": "image-with-text",
       "blocks": {
+        "heading_gNUcCh": {
+          "type": "heading",
+          "settings": {
+            "heading": "Turn Every Workout Into a Power Move",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
         "text_wBV3LE": {
           "type": "text",
           "settings": {
-            "text": "<ul><li>Turn Every Workout Into a Power Move</li><li>Whether you’re lifting, sprinting, jumping, or grinding through HIIT — your foundation matters.</li><li><strong>Aetrex Train Orthotics</strong> help:</li></ul><p>✔ Support your arch under heavy load</p><p> ✔ Stabilize your stride during explosive movement </p><p>✔ Reduce pressure on heels and forefoot </p><p>✔ Help relieve common foot pain like plantar fasciitis </p><p>✔ Improve alignment from the ground upBecause when your feet are aligned — everything performs better.</p>",
+            "text": "<p>Whether you’re lifting, sprinting, jumping, or grinding through HIIT — your foundation matters</p><p><strong>Aetrex Train Orthotics</strong> help:</p>",
             "text_font": "body",
-            "text_size": "subtext-md",
+            "text_size": "subtext-lg",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
@@ -144,20 +154,37 @@
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
+        },
+        "text_rn7GTN": {
+          "type": "text",
+          "settings": {
+            "text": "<ul><li>Support your arch under heavy load<br/></li><li>Stabilize your stride during explosive movement<br/></li><li>Reduce pressure on heels and forefoot<br/></li><li>Help relieve common foot pain like plantar fasciitis<br/></li><li>Improve alignment from the ground upBecause when your feet are aligned — everything performs better. </li></ul>",
+            "text_font": "body",
+            "text_size": "subtext-sm",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
         }
       },
       "block_order": [
-        "text_wBV3LE"
+        "heading_gNUcCh",
+        "text_wBV3LE",
+        "text_rn7GTN"
       ],
       "name": "t:sections.image-with-text.name",
       "settings": {
         "image": "shopify://shop_images/scan.gif",
         "img_url": "",
-        "image_height": "500px",
+        "image_height": "adapt",
         "image_width": "small",
-        "layout": "image_first",
+        "layout": "text_first",
         "text_alignment": "left",
-        "custom_content_position": "items-start",
+        "custom_content_position": "items-center",
         "image_height_mobile": "adapt",
         "text_alignment_mobile": "left",
         "color_text": "",
@@ -174,7 +201,7 @@
         "padding_bottom": 48,
         "divider": false,
         "full_width": false,
-        "rounded": true,
+        "rounded": false,
         "enable_parallax": false,
         "parallax_direction": "vertical",
         "abra_promo_code_show": "",
