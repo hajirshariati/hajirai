@@ -109,67 +109,80 @@
         "abra_promo_code_hide": ""
       }
     },
-    "shop_the_look_PMrCTP": {
-      "type": "shop-the-look",
+    "featured_product_wtCJrb": {
+      "type": "featured-product",
       "blocks": {
-        "product_3fyemU": {
-          "type": "product",
+        "title_kFqqXf": {
+          "type": "title",
           "settings": {
-            "product": "ashley-hazy-blue-multi-ew794w",
-            "color_text": "#ffffff",
-            "vertical": 25,
-            "horizontal": 25,
-            "vertical_mobile": 25,
-            "horizontal_mobile": 25
+            "title_size": "product-title-md",
+            "title_size_mobile": "product-title-md",
+            "title_tag": "h2",
+            "show_price": true,
+            "show_rating": true
           }
         },
-        "product_xxPbQC": {
-          "type": "product",
+        "variant_picker_7r6hdp": {
+          "type": "variant_picker",
           "settings": {
-            "product": "ashley-off-white-ew793w",
-            "color_text": "#ffffff",
-            "vertical": 75,
-            "horizontal": 65,
-            "vertical_mobile": 75,
-            "horizontal_mobile": 65
+            "enable_dynamic_variants": true,
+            "show_variant_labels": true,
+            "picker_type": "button",
+            "enable_color_swatches": true,
+            "color_swatch_type": "variant",
+            "size_chart": ""
+          }
+        },
+        "buy_buttons_4dEzXk": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_quantity_selector": true,
+            "show_price": false,
+            "show_dynamic_checkout": false,
+            "show_gift_card_recipient": false,
+            "enable_back_in_stock": false,
+            "show_back_in_stock_name": false,
+            "show_back_in_stock_phone": false
+          }
+        },
+        "read_more_nGzagb": {
+          "type": "read_more",
+          "settings": {}
+        },
+        "spinning_text_8miQNP": {
+          "type": "spinning_text",
+          "settings": {
+            "text": "Oprah's Daily 2025"
           }
         }
       },
       "block_order": [
-        "product_3fyemU",
-        "product_xxPbQC"
+        "title_kFqqXf",
+        "variant_picker_7r6hdp",
+        "buy_buttons_4dEzXk",
+        "read_more_nGzagb",
+        "spinning_text_8miQNP"
       ],
-      "name": "t:sections.shop-the-look.name",
+      "name": "t:sections.featured-product.name",
       "settings": {
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "overlay_opacity": 30,
-        "padding_top": 72,
+        "product": "ashley-off-white-ew793w",
+        "enable_sticky_info": true,
+        "media_size": 66,
+        "gallery_layout": "thumbnail",
+        "thumbnail_position": "beside",
+        "image_ratio": "adapt_first",
+        "image_zoom": "lightbox",
+        "hide_variants": false,
+        "enable_video_autoplay": false,
+        "enable_video_looping": false,
+        "mobile_layout": "partial",
+        "image_ratio_mobile": "adapt_first",
+        "mobile_thumbnail": false,
+        "padding_top": 100,
         "padding_bottom": 72,
         "divider": false,
         "full_width": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
+        "rounded": false
       }
     },
     "image_with_text_MkkLVQ": {
@@ -662,7 +675,7 @@
   "order": [
     "main-page",
     "image_with_text_overlay_Hnzn9F",
-    "shop_the_look_PMrCTP",
+    "featured_product_wtCJrb",
     "image_with_text_MkkLVQ",
     "reveal_testimonials_EU8z7L",
     "featured_collection_ytWEYw",
