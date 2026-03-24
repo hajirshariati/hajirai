@@ -249,6 +249,150 @@
         "abra_promo_code_hide": ""
       }
     },
+    "reveal_testimonials_EU8z7L": {
+      "type": "reveal-testimonials",
+      "blocks": {
+        "testimonial_TeakBY": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_fd8RXY": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_FptCJy": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_3GipyW": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_rkJDdN": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_TeakBY",
+        "testimonial_fd8RXY",
+        "testimonial_FptCJy",
+        "testimonial_3GipyW",
+        "testimonial_rkJDdN"
+      ],
+      "name": "t:sections.reveal-testimonials.name",
+      "settings": {
+        "heading": "REAL PEOPLE. REAL STORIES.",
+        "heading_size": "title-md",
+        "heading_tag": "h2",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "featured_collection_ytWEYw": {
+      "type": "featured-collection",
+      "name": "t:sections.featured-collection.name",
+      "settings": {
+        "collection": "",
+        "products": [
+          "ashley-black-ew790w",
+          "ashley-champagne-ew795w",
+          "ashley-coffee-multi-ew796w",
+          "ashley-hazy-blue-multi-ew794w",
+          "ashley-navy-ew791w",
+          "ashley-off-white-ew793w",
+          "ashley-rose-ew797w",
+          "ashley-scotch-ew798w",
+          "ashley-taupe-ew792w"
+        ],
+        "product_limit": 6,
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "Featured collection",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
     "multicolumn_QJbrRQ": {
       "type": "multicolumn",
       "blocks": {
@@ -400,112 +544,6 @@
         "abra_promo_code_hide": ""
       }
     },
-    "ugc_gallery_bWECXN": {
-      "type": "ugc-gallery",
-      "name": "UGC Gallery",
-      "settings": {
-        "custom_gallery": "",
-        "global_pdp_sourced_gallery": "67807363501d9d972ff9bf48",
-        "global_fallback_sourced_gallery": "67806b650c1215001c37bb7e"
-      }
-    },
-    "reveal_testimonials_EU8z7L": {
-      "type": "reveal-testimonials",
-      "blocks": {
-        "testimonial_TeakBY": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "testimonial_fd8RXY": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "testimonial_FptCJy": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "testimonial_3GipyW": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "testimonial_rkJDdN": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "testimonial_TeakBY",
-        "testimonial_fd8RXY",
-        "testimonial_FptCJy",
-        "testimonial_3GipyW",
-        "testimonial_rkJDdN"
-      ],
-      "name": "t:sections.reveal-testimonials.name",
-      "settings": {
-        "heading": "REAL PEOPLE. REAL STORIES.",
-        "heading_size": "title-md",
-        "heading_tag": "h2",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
     "multicolumn_6BANL4": {
       "type": "multicolumn",
       "blocks": {
@@ -611,51 +649,13 @@
         "abra_promo_code_hide": ""
       }
     },
-    "featured_collection_ytWEYw": {
-      "type": "featured-collection",
-      "name": "t:sections.featured-collection.name",
+    "ugc_gallery_bWECXN": {
+      "type": "ugc-gallery",
+      "name": "UGC Gallery",
       "settings": {
-        "collection": "",
-        "products": [
-          "ashley-black-ew790w",
-          "ashley-champagne-ew795w",
-          "ashley-coffee-multi-ew796w",
-          "ashley-hazy-blue-multi-ew794w",
-          "ashley-navy-ew791w",
-          "ashley-off-white-ew793w",
-          "ashley-rose-ew797w",
-          "ashley-scotch-ew798w",
-          "ashley-taupe-ew792w"
-        ],
-        "product_limit": 6,
-        "columns": 4,
-        "carousel_on_desktop": true,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "Featured collection",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
+        "custom_gallery": "",
+        "global_pdp_sourced_gallery": "67807363501d9d972ff9bf48",
+        "global_fallback_sourced_gallery": "67806b650c1215001c37bb7e"
       }
     }
   },
