@@ -251,7 +251,7 @@
           "type": "button",
           "settings": {
             "button_label": "Shop Now",
-            "button_link": "shopify://products/ashley-navy-ew791w",
+            "button_link": "shopify://products/ashley-off-white-ew793w",
             "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
@@ -280,7 +280,7 @@
         "gap": 16,
         "gap_mobile": 16,
         "feature_image": "shopify://shop_images/93088-EW793W_catalog.webp",
-        "feature_image_link": "shopify://collections/womens-sneakers",
+        "feature_image_link": "shopify://products/ashley-off-white-ew793w",
         "feature_image_link_external": false,
         "feature_image_link_target": "desktop",
         "text_background": "#f5f5f5",
