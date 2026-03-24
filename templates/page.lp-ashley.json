@@ -38,7 +38,7 @@
         "heading_ChxeEC": {
           "type": "heading",
           "settings": {
-            "heading": "<p>Style that feels as good as it looks</p>",
+            "heading": "<p>A Style That Feels as Good as it Looks</p>",
             "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "none",
@@ -316,10 +316,20 @@
     "image_with_text_K47tcA": {
       "type": "image-with-text",
       "blocks": {
+        "heading_T98yTk": {
+          "type": "heading",
+          "settings": {
+            "heading": "What Oprah Daily Is Saying",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
         "text_HtYPP9": {
           "type": "text",
           "settings": {
-            "text": "<p>\"We love that these wedge sandals have an adjustable front strap with a hook and loop closure to accommodate the bunion area with an extra comfortable fit. And there’s another strap at your ankle as well to keep you securely in the shoe. There’s also memory foam in the foot bed and arch support which is helpful for other conditions like plantar fasciitis.\"</p><p><em>OPRAH DAILY</em></p>",
+            "text": "<p>\"We love that these wedge sandals have an adjustable front strap with a hook and loop closure to accommodate the bunion area with an extra comfortable fit. And there’s another strap at your ankle as well to keep you securely in the shoe. There’s also memory foam in the foot bed and arch support which is helpful for other conditions like plantar fasciitis.\"</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -345,6 +355,7 @@
         }
       },
       "block_order": [
+        "heading_T98yTk",
         "text_HtYPP9",
         "button_AVPJUf"
       ],
