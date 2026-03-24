@@ -202,8 +202,8 @@
         "button_Vd4x9h": {
           "type": "button",
           "settings": {
-            "button_label": "Shop Sneakers",
-            "button_link": "shopify://collections/womens-sneakers",
+            "button_label": "Shop Now",
+            "button_link": "shopify://products/ashley-navy-ew791w",
             "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
