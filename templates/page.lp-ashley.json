@@ -265,6 +265,83 @@
         "rounded": false
       }
     },
+    "testimonials_RUj7hg": {
+      "type": "testimonials",
+      "blocks": {
+        "testimonial_Lxpczp": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_6tGP3w": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_FtVrxQ": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
+            "author": "Author's name",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_Lxpczp",
+        "testimonial_6tGP3w",
+        "testimonial_FtVrxQ"
+      ],
+      "name": "t:sections.testimonials.name",
+      "settings": {
+        "heading": "Testimonials",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "rounded": false,
+        "limit_section_width": false
+      }
+    },
     "featured_product_wtCJrb": {
       "type": "featured-product",
       "blocks": {
@@ -332,83 +409,6 @@
         "divider": false,
         "full_width": false,
         "rounded": false
-      }
-    },
-    "image_with_text_MkkLVQ": {
-      "type": "image-with-text",
-      "blocks": {
-        "heading_qCJUjT": {
-          "type": "heading",
-          "settings": {
-            "heading": "Where <em>Science</em> Meets <em>Style</em>",
-            "heading_size": "title-md",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_RKiGwU": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Engineered using data from over 50 million global foot scans, every curve and contour of the Ashley is designed to support your body from the ground up.</p><p>Genuine leather construction, a memory foam footbed, and a built in arch support system that podiatrists actually recommend.</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_LjPLnD": {
-          "type": "button",
-          "settings": {
-            "button_label": "Button label",
-            "button_link": "",
-            "button_video_link": "",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": true
-          }
-        }
-      },
-      "block_order": [
-        "heading_qCJUjT",
-        "text_RKiGwU",
-        "button_LjPLnD"
-      ],
-      "name": "t:sections.image-with-text.name",
-      "settings": {
-        "img_url": "",
-        "image_height": "650px",
-        "image_width": "medium",
-        "layout": "image_first",
-        "text_alignment": "left",
-        "custom_content_position": "items-center",
-        "image_height_mobile": "auto",
-        "text_alignment_mobile": "left",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_background_2": "",
-        "gradient_background_2": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "enable_parallax": true,
-        "parallax_direction": "vertical",
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
       }
     },
     "reveal_testimonials_EU8z7L": {
@@ -671,6 +671,7 @@
         "column_cTgRzk",
         "column_jYJyfT"
       ],
+      "disabled": true,
       "settings": {
         "gap": "small",
         "columns": 4,
@@ -825,8 +826,8 @@
     "main-page",
     "image_with_text_overlay_Hnzn9F",
     "dynamic_feature_combo_8NW3dN",
+    "testimonials_RUj7hg",
     "featured_product_wtCJrb",
-    "image_with_text_MkkLVQ",
     "reveal_testimonials_EU8z7L",
     "featured_collection_ytWEYw",
     "multicolumn_QJbrRQ",
