@@ -11,6 +11,7 @@
   "sections": {
     "main-page": {
       "type": "main-page",
+      "disabled": true,
       "settings": {
         "heading_size": "title-sm",
         "heading_alignment": "text-left",
@@ -23,349 +24,62 @@
         "rounded": false
       }
     },
-    "slideshow_rcT8py": {
-      "type": "slideshow",
+    "image_with_text_overlay_Hnzn9F": {
+      "type": "image-with-text-overlay",
       "blocks": {
-        "image_gPRPDR": {
-          "type": "image",
+        "subheading_ijjb78": {
+          "type": "subheading",
           "settings": {
-            "content_position": "md:items-end md:justify-start",
-            "content_position_mobile": "items-end justify-start",
-            "heading": "Foot Pain is not normal.",
+            "subheading": "Ashley Arch Support Wedge",
+            "subheading_size": "subtitle-md",
+            "secondary_color": true
+          }
+        },
+        "heading_ChxeEC": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>Style that feels as good as it looks</p>",
             "heading_size": "title-lg tracking-heading",
             "heading_tag": "h2",
-            "text": "<p><em>Move with stability. Live with confidence.</em></p><p></p>",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_cQCMec": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Genuine leather construction, built-in arch support and a memory foam footbed. Designed using insights from over 50 million foot scans.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
             "text_capitalize": false,
-            "secondary_color_text": false,
+            "secondary_color": false,
             "highlighted_text": "none",
-            "highlighted_scribble": "circle",
-            "button_label": "Discover Your Support",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_fnaDLP": {
+          "type": "button",
+          "settings": {
+            "button_label": "SHOP NOW",
             "button_link": "",
+            "button_video_link": "",
             "button_style": "primary",
+            "button_size": "md",
             "button_external": false,
             "button_icon": false
           }
         }
       },
       "block_order": [
-        "image_gPRPDR"
+        "subheading_ijjb78",
+        "heading_ChxeEC",
+        "text_cQCMec",
+        "button_fnaDLP"
       ],
-      "disabled": true,
-      "name": "t:sections.slideshow.name",
-      "settings": {
-        "autoplay": false,
-        "autoplay_speed": 5,
-        "show_navigation": true,
-        "image_height": "100vh",
-        "content_width": "small",
-        "text_alignment": "left",
-        "image_height_mobile": "auto",
-        "text_alignment_mobile": "left",
-        "accessibility_info": "Slideshow about our brand",
-        "color_text": "#ffffff",
-        "color_background": "#ffffff",
-        "gradient_background": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
-        "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "overlay_opacity": 20,
-        "padding_top": 0,
-        "padding_bottom": 0,
-        "divider": false,
-        "full_width": true,
-        "rounded": false,
-        "enable_parallax": false,
-        "parallax_direction": "vertical",
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "image_with_text_7FkUzY": {
-      "type": "image-with-text",
-      "blocks": {
-        "heading_mYJBhg": {
-          "type": "heading",
-          "settings": {
-            "heading": "It’s not just age.",
-            "heading_size": "title-md",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_dAb3eB": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Long days. Travel. Standing at work.<br/><br/>Pain has been normalized. It shouldn’t be.</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_Byr8RP": {
-          "type": "button",
-          "settings": {
-            "button_label": "Button label",
-            "button_link": "",
-            "button_video_link": "",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": true
-          }
-        }
-      },
-      "block_order": [
-        "heading_mYJBhg",
-        "text_dAb3eB",
-        "button_Byr8RP"
-      ],
-      "disabled": true,
-      "name": "t:sections.image-with-text.name",
-      "settings": {
-        "img_url": "",
-        "image_height": "650px",
-        "image_width": "medium",
-        "layout": "image_first",
-        "text_alignment": "left",
-        "custom_content_position": "items-center",
-        "image_height_mobile": "auto",
-        "text_alignment_mobile": "left",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_background_2": "",
-        "gradient_background_2": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "enable_parallax": true,
-        "parallax_direction": "vertical",
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "image_with_text_hKzaWF": {
-      "type": "image-with-text",
-      "blocks": {
-        "heading_VB6Gen": {
-          "type": "heading",
-          "settings": {
-            "heading": "Real comfort is structure.",
-            "heading_size": "title-md",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_VfxCP8": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Softness fades. Support lasts.<br/><br/>We build from structure first — not cushioning alone.</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_jmwimp": {
-          "type": "button",
-          "settings": {
-            "button_label": "Button label",
-            "button_link": "",
-            "button_video_link": "",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": true
-          }
-        }
-      },
-      "block_order": [
-        "heading_VB6Gen",
-        "text_VfxCP8",
-        "button_jmwimp"
-      ],
-      "disabled": true,
-      "name": "t:sections.image-with-text.name",
-      "settings": {
-        "img_url": "",
-        "image_height": "650px",
-        "image_width": "medium",
-        "layout": "text_first",
-        "text_alignment": "left",
-        "custom_content_position": "items-center",
-        "image_height_mobile": "auto",
-        "text_alignment_mobile": "left",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_background_2": "",
-        "gradient_background_2": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "enable_parallax": true,
-        "parallax_direction": "vertical",
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "featured_collections_FLxc7H": {
-      "type": "featured-collections",
-      "blocks": {
-        "collection_34eK49": {
-          "type": "collection",
-          "settings": {
-            "collection": "",
-            "products": [],
-            "title": "All-day stability"
-          }
-        },
-        "collection_QHpTMj": {
-          "type": "collection",
-          "settings": {
-            "collection": "",
-            "products": [],
-            "title": "Travel"
-          }
-        },
-        "collection_4APaY8": {
-          "type": "collection",
-          "settings": {
-            "collection": "",
-            "products": [],
-            "title": "Structured support"
-          }
-        },
-        "collection_nw4kBW": {
-          "type": "collection",
-          "settings": {
-            "collection": "",
-            "products": [],
-            "title": "Flat Feet"
-          }
-        }
-      },
-      "block_order": [
-        "collection_34eK49",
-        "collection_QHpTMj",
-        "collection_4APaY8",
-        "collection_nw4kBW"
-      ],
-      "disabled": true,
-      "name": "t:sections.featured-collections.name",
-      "settings": {
-        "product_limit": 6,
-        "columns": 4,
-        "carousel_on_desktop": true,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "<strong>Support, thoughtfully designed</strong>",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "<p>Each style is built with structured support and refined materials — so you never have to choose between elegance and stability.</p><p></p>",
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "images_with_text_overlay_dtnRUF": {
-      "type": "images-with-text-overlay",
-      "blocks": {
-        "heading_8dPhTc": {
-          "type": "heading",
-          "settings": {
-            "heading": "<p>Designed from real foot intelligence</p>",
-            "heading_size": "title-lg tracking-heading",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_pa49k3": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Decades of foot data.<br/>Structural arch systems.<br/>Built for the way women’s feet change.</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_yUALRG": {
-          "type": "button",
-          "settings": {
-            "button_label": "Learn About Our Support",
-            "button_link": "",
-            "button_video_link": "",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": true
-          }
-        }
-      },
-      "block_order": [
-        "heading_8dPhTc",
-        "text_pa49k3",
-        "button_yUALRG"
-      ],
-      "disabled": true,
-      "name": "t:sections.images-with-text-overlay.name",
+      "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
         "image_height": "650px",
@@ -383,13 +97,239 @@
         "color_button_gradient": "",
         "color_overlay": "#171717",
         "divider_color": "#111111",
-        "overlay_opacity": 100,
+        "overlay_opacity": 70,
         "padding_top": 0,
         "padding_bottom": 0,
         "divider": false,
         "full_width": true,
         "rounded": false,
-        "enable_parallax": true
+        "enable_parallax": true,
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "image_with_text_overlay_FyEA8J": {
+      "type": "image-with-text-overlay",
+      "name": "t:sections.image-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/ashley_D.jpg",
+        "image_height": "adapt",
+        "content_width": "small",
+        "content_position": "md:items-end md:justify-start",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/ashley_M.jpg",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-end justify-start",
+        "text_alignment_mobile": "left",
+        "color_text": "#ffffff",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": false,
+        "rounded": true,
+        "enable_parallax": false,
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "multicolumn_4AAJyd": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_3KjM84": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "left",
+            "text_alignment_mobile": "left",
+            "image_ratio": "adapt",
+            "heading": "Example title",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Use this section to explain a set of product features, to link to a series of pages, or to answer common questions about your products.</p>",
+            "custom_html": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_Wn6MH8": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "left",
+            "text_alignment_mobile": "left",
+            "image_ratio": "adapt",
+            "heading": "Example title",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Use this section to explain a set of product features, to link to a series of pages, or to answer common questions about your products.</p>",
+            "custom_html": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_JYDUCN": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "left",
+            "text_alignment_mobile": "left",
+            "image_ratio": "adapt",
+            "heading": "Example title",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Use this section to explain a set of product features, to link to a series of pages, or to answer common questions about your products.</p>",
+            "custom_html": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_3KjM84",
+        "column_Wn6MH8",
+        "column_JYDUCN"
+      ],
+      "name": "t:sections.multicolumn.name",
+      "settings": {
+        "gap": "large",
+        "columns": 3,
+        "columns_mobile": "1",
+        "carousel_on_desktop": true,
+        "swipe_on_mobile": true,
+        "heading": "Features",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "full_width": false,
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "featured_product_iDEY6W": {
+      "type": "featured-product",
+      "blocks": {
+        "title_BBEMCm": {
+          "type": "title",
+          "settings": {
+            "title_size": "product-title-md",
+            "title_size_mobile": "product-title-md",
+            "title_tag": "h2",
+            "show_price": true,
+            "show_rating": true
+          }
+        },
+        "description_yNKzmN": {
+          "type": "description",
+          "disabled": true,
+          "settings": {
+            "text_size": "text-base"
+          }
+        },
+        "variant_picker_KjzYx6": {
+          "type": "variant_picker",
+          "settings": {
+            "enable_dynamic_variants": true,
+            "show_variant_labels": true,
+            "picker_type": "button",
+            "enable_color_swatches": true,
+            "color_swatch_type": "color",
+            "size_chart": ""
+          }
+        },
+        "buy_buttons_3Btg8N": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_quantity_selector": true,
+            "show_price": false,
+            "show_dynamic_checkout": true,
+            "show_gift_card_recipient": true,
+            "enable_back_in_stock": false,
+            "show_back_in_stock_name": false,
+            "show_back_in_stock_phone": false
+          }
+        },
+        "read_more_GYdnTe": {
+          "type": "read_more",
+          "settings": {}
+        },
+        "spinning_text_WbB9Rk": {
+          "type": "spinning_text",
+          "settings": {
+            "text": "Oprah Daily's 2025"
+          }
+        }
+      },
+      "block_order": [
+        "title_BBEMCm",
+        "description_yNKzmN",
+        "variant_picker_KjzYx6",
+        "buy_buttons_3Btg8N",
+        "read_more_GYdnTe",
+        "spinning_text_WbB9Rk"
+      ],
+      "name": "t:sections.featured-product.name",
+      "settings": {
+        "product": "ashley-black-ew790w",
+        "enable_sticky_info": true,
+        "media_size": 55,
+        "gallery_layout": "thumbnail",
+        "thumbnail_position": "beside",
+        "image_ratio": "adapt_first",
+        "image_zoom": "lightbox",
+        "hide_variants": false,
+        "enable_video_autoplay": false,
+        "enable_video_looping": false,
+        "mobile_layout": "partial",
+        "image_ratio_mobile": "adapt_first",
+        "mobile_thumbnail": false,
+        "padding_top": 120,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
       }
     },
     "reveal_testimonials_EU8z7L": {
@@ -468,7 +408,6 @@
         "testimonial_3GipyW",
         "testimonial_rkJDdN"
       ],
-      "disabled": true,
       "name": "t:sections.reveal-testimonials.name",
       "settings": {
         "heading": "REAL PEOPLE. REAL STORIES.",
@@ -490,121 +429,85 @@
         "abra_promo_code_hide": ""
       }
     },
-    "image_with_text_overlay_kgdapg": {
-      "type": "image-with-text-overlay",
+    "multicolumn_6BANL4": {
+      "type": "multicolumn",
       "blocks": {
-        "heading_gneyk3": {
-          "type": "heading",
+        "column_UA8ECR": {
+          "type": "column",
           "settings": {
-            "heading": "<p>Move with confidence</p>",
-            "heading_size": "title-lg tracking-heading",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_VLXVGm": {
-          "type": "text",
-          "settings": {
-            "text": "<p>For every day you don’t want to think about your feet.</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_cdCdK8": {
-          "type": "button",
-          "settings": {
-            "button_label": "Shop Support That Lasts",
+            "show_border": false,
+            "text_alignment": "left",
+            "text_alignment_mobile": "left",
+            "image_ratio": "adapt",
+            "heading": "Example title",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Use this section to explain a set of product features, to link to a series of pages, or to answer common questions about your products.</p>",
+            "custom_html": "",
+            "button_label": "",
             "button_link": "",
-            "button_video_link": "",
-            "button_style": "primary",
-            "button_size": "md",
+            "button_style": "secondary",
             "button_external": false,
-            "button_icon": true
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_Tj7DRV": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "left",
+            "text_alignment_mobile": "left",
+            "image_ratio": "adapt",
+            "heading": "Example title",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Use this section to explain a set of product features, to link to a series of pages, or to answer common questions about your products.</p>",
+            "custom_html": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_jYpbcP": {
+          "type": "column",
+          "settings": {
+            "show_border": false,
+            "text_alignment": "left",
+            "text_alignment_mobile": "left",
+            "image_ratio": "adapt",
+            "heading": "Example title",
+            "heading_size": "text-lg-2xl",
+            "text": "<p>Use this section to explain a set of product features, to link to a series of pages, or to answer common questions about your products.</p>",
+            "custom_html": "",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": true,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
           }
         }
       },
       "block_order": [
-        "heading_gneyk3",
-        "text_VLXVGm",
-        "button_cdCdK8"
+        "column_UA8ECR",
+        "column_Tj7DRV",
+        "column_jYpbcP"
       ],
-      "disabled": true,
-      "name": "t:sections.image-with-text-overlay.name",
+      "name": "t:sections.multicolumn.name",
       "settings": {
-        "transparent_header": false,
-        "image_height": "650px",
-        "content_width": "small",
-        "content_position": "md:items-end md:justify-start",
-        "text_alignment": "left",
-        "image_height_mobile": "auto",
-        "content_position_mobile": "items-end justify-start",
-        "text_alignment_mobile": "left",
-        "color_text": "#ffffff",
-        "color_highlight": "#e0a580",
-        "gradient_highlight": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
-        "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "divider_color": "#111111",
-        "overlay_opacity": 70,
-        "padding_top": 0,
-        "padding_bottom": 0,
-        "divider": false,
-        "full_width": true,
-        "rounded": false,
-        "enable_parallax": true,
-        "parallax_direction": "vertical",
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "rich_text_Ep8Mfk": {
-      "type": "rich-text",
-      "blocks": {
-        "heading_RGW4XY": {
-          "type": "heading",
-          "settings": {
-            "heading": "You deserve better support.",
-            "heading_size": "title-lg tracking-heading",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_KwLG46": {
-          "type": "button",
-          "settings": {
-            "button_label": "Find Your Fit",
-            "button_link": "",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": true
-          }
-        }
-      },
-      "block_order": [
-        "heading_RGW4XY",
-        "button_KwLG46"
-      ],
-      "disabled": true,
-      "name": "t:sections.rich-text.name",
-      "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
+        "gap": "large",
+        "columns": 3,
+        "columns_mobile": "1",
+        "carousel_on_desktop": true,
+        "swipe_on_mobile": true,
+        "heading": "Multicolumn",
         "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
+        "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
         "subheading": "",
         "description": "",
@@ -623,9 +526,56 @@
         "color_button_background": "",
         "color_button_gradient": "",
         "padding_top": 72,
-        "padding_bottom": 100,
+        "padding_bottom": 72,
+        "full_width": false,
         "divider": false,
-        "narrow": true,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "featured_collection_ytWEYw": {
+      "type": "featured-collection",
+      "name": "t:sections.featured-collection.name",
+      "settings": {
+        "collection": "",
+        "products": [
+          "ashley-black-ew790w",
+          "ashley-champagne-ew795w",
+          "ashley-coffee-multi-ew796w",
+          "ashley-hazy-blue-multi-ew794w",
+          "ashley-navy-ew791w",
+          "ashley-off-white-ew793w",
+          "ashley-rose-ew797w",
+          "ashley-scotch-ew798w",
+          "ashley-taupe-ew792w"
+        ],
+        "product_limit": 6,
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "Featured collection",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
         "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
@@ -634,13 +584,12 @@
   },
   "order": [
     "main-page",
-    "slideshow_rcT8py",
-    "image_with_text_7FkUzY",
-    "image_with_text_hKzaWF",
-    "featured_collections_FLxc7H",
-    "images_with_text_overlay_dtnRUF",
+    "image_with_text_overlay_Hnzn9F",
+    "image_with_text_overlay_FyEA8J",
+    "multicolumn_4AAJyd",
+    "featured_product_iDEY6W",
     "reveal_testimonials_EU8z7L",
-    "image_with_text_overlay_kgdapg",
-    "rich_text_Ep8Mfk"
+    "multicolumn_6BANL4",
+    "featured_collection_ytWEYw"
   ]
 }
