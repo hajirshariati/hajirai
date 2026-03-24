@@ -509,7 +509,7 @@
             "text_alignment": "left",
             "text_alignment_mobile": "left",
             "image_ratio": "adapt",
-            "heading": "<strong>Love this style!</strong>",
+            "heading": "Love this style!",
             "heading_size": "text-lg-2xl",
             "text": "<p>I’ve never been able to wear a shoe with any heel. These are so COMFORTABLE and attractive. Thank you Aetrex!</p><p>-Gina S.</p>",
             "custom_html": "",
@@ -633,6 +633,9 @@
         "column_dDxHLC",
         "column_aXUHkG"
       ],
+      "custom_css": [
+        ".multicolumn-card {background: #e7e7e7 !important;}"
+      ],
       "name": "t:sections.multicolumn.name",
       "settings": {
         "gap": "large",
@@ -653,7 +656,7 @@
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "",
-        "color_background": "",
+        "color_background": "#e7e7e7",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
@@ -663,7 +666,7 @@
         "padding_top": 72,
         "padding_bottom": 72,
         "full_width": false,
-        "divider": false,
+        "divider": true,
         "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
