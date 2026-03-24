@@ -115,19 +115,19 @@
         "feature_point_wG8TzX": {
           "type": "feature_point",
           "settings": {
-            "heading": "Heel Cleft",
-            "text": "to Improve Heel Striking",
-            "horizontal": 74,
-            "vertical": 56,
-            "text_horizontal": 70,
+            "heading": "Memory Foam Footbed",
+            "text": "for Cushioning & Comfort",
+            "horizontal": 70,
+            "vertical": 63,
+            "text_horizontal": 17,
             "text_vertical": 79
           }
         },
         "feature_point_gn8GxX": {
           "type": "feature_point",
           "settings": {
-            "heading": "Signature Arch Support",
-            "text": "for alignment and balance",
+            "heading": "Aetrex Signature Arch Support",
+            "text": "to Help Relieve Heel/Arch Pain",
             "horizontal": 59,
             "vertical": 51,
             "text_horizontal": 70,
@@ -137,34 +137,34 @@
         "feature_point_K3DUcM": {
           "type": "feature_point",
           "settings": {
-            "heading": "EVA Foam Midsole",
-            "text": "Thick EVA Foam Midsole for Maximum Shock Absorption",
-            "horizontal": 20,
-            "vertical": 76,
-            "text_horizontal": 38,
-            "text_vertical": 60
+            "heading": "Adjustable Straps",
+            "text": "for the Perfect Fit Each Wear",
+            "horizontal": 26,
+            "vertical": 46,
+            "text_horizontal": 7,
+            "text_vertical": 70
           }
         },
         "feature_point_FXjfXC": {
           "type": "feature_point",
           "settings": {
-            "heading": "Breathable",
-            "text": "Non-Stretchy Mesh for Extra Comfort",
-            "horizontal": 11,
-            "vertical": 70,
-            "text_horizontal": 38,
+            "heading": "Stretchy Gore",
+            "text": "for Extra Comfort",
+            "horizontal": 37,
+            "vertical": 21,
+            "text_horizontal": 55,
             "text_vertical": 4
           }
         },
         "feature_point_6fhNb6": {
           "type": "feature_point",
           "settings": {
-            "heading": "Extra Cushioning",
-            "text": "Padded Heel, Tongue & Collar",
-            "horizontal": 37,
-            "vertical": 32,
-            "text_horizontal": 55,
-            "text_vertical": 18
+            "heading": "Genuine Suede",
+            "text": "Leather Construction",
+            "horizontal": 49,
+            "vertical": 25,
+            "text_horizontal": 69,
+            "text_vertical": 14
           }
         },
         "heading_Q7f3Ca": {
@@ -230,11 +230,10 @@
         "tile3_width": 2,
         "gap": 16,
         "gap_mobile": 16,
-        "feature_image": "shopify://shop_images/622X800_danika_hotspots.png",
+        "feature_image": "shopify://shop_images/93088-EW793W_catalog.webp",
         "feature_image_link": "shopify://collections/womens-sneakers",
         "feature_image_link_external": false,
         "feature_image_link_target": "desktop",
-        "lifestyle_image": "shopify://shop_images/705x800_Danika_lifestyle_2x_16c8662e-8446-4217-9972-dd286969783d.png",
         "text_background": "#f5f5f5",
         "text_padding": 40,
         "text_vertical_align": "center",
@@ -245,14 +244,14 @@
         "dot_size": 16,
         "dot_size_mobile": 20,
         "dot_color": "#ffffff",
-        "dot_border_color": "#536c9d",
+        "dot_border_color": "#171717",
         "dot_border_width": 2,
-        "line_color": "#465e8d",
+        "line_color": "#171717",
         "line_width": 0.4,
         "callout_background": "#ffffff",
         "callout_radius": 8,
         "callout_max_width": 220,
-        "callout_title_color": "#456094",
+        "callout_title_color": "#171717",
         "callout_text_color": "#484848",
         "color_text": "#000000",
         "color_highlight": "#e0a580",
