@@ -63,7 +63,7 @@
         "button_fnaDLP": {
           "type": "button",
           "settings": {
-            "button_label": "SHOP NOW",
+            "button_label": "SHOP ASHLEY WEDGE",
             "button_link": "",
             "button_video_link": "",
             "button_style": "primary",
@@ -109,67 +109,160 @@
         "abra_promo_code_hide": ""
       }
     },
-    "shop_the_look_AmgHQB": {
-      "type": "shop-the-look",
+    "dynamic_feature_combo_8NW3dN": {
+      "type": "dynamic-feature-combo",
       "blocks": {
-        "product_Wcz86r": {
-          "type": "product",
+        "feature_point_wG8TzX": {
+          "type": "feature_point",
           "settings": {
-            "product": "ashley-hazy-blue-multi-ew794w",
-            "color_text": "#ffffff",
-            "vertical": 25,
-            "horizontal": 25,
-            "vertical_mobile": 25,
-            "horizontal_mobile": 25
+            "heading": "Heel Cleft",
+            "text": "to Improve Heel Striking",
+            "horizontal": 74,
+            "vertical": 56,
+            "text_horizontal": 70,
+            "text_vertical": 79
           }
         },
-        "product_ziy7YK": {
-          "type": "product",
+        "feature_point_gn8GxX": {
+          "type": "feature_point",
           "settings": {
-            "product": "ashley-off-white-ew793w",
-            "color_text": "#ffffff",
-            "vertical": 75,
-            "horizontal": 65,
-            "vertical_mobile": 75,
-            "horizontal_mobile": 65
+            "heading": "Signature Arch Support",
+            "text": "for alignment and balance",
+            "horizontal": 59,
+            "vertical": 51,
+            "text_horizontal": 70,
+            "text_vertical": 29
+          }
+        },
+        "feature_point_K3DUcM": {
+          "type": "feature_point",
+          "settings": {
+            "heading": "EVA Foam Midsole",
+            "text": "Thick EVA Foam Midsole for Maximum Shock Absorption",
+            "horizontal": 20,
+            "vertical": 76,
+            "text_horizontal": 38,
+            "text_vertical": 60
+          }
+        },
+        "feature_point_FXjfXC": {
+          "type": "feature_point",
+          "settings": {
+            "heading": "Breathable",
+            "text": "Non-Stretchy Mesh for Extra Comfort",
+            "horizontal": 11,
+            "vertical": 70,
+            "text_horizontal": 38,
+            "text_vertical": 4
+          }
+        },
+        "feature_point_6fhNb6": {
+          "type": "feature_point",
+          "settings": {
+            "heading": "Extra Cushioning",
+            "text": "Padded Heel, Tongue & Collar",
+            "horizontal": 37,
+            "vertical": 32,
+            "text_horizontal": 55,
+            "text_vertical": 18
+          }
+        },
+        "heading_Q7f3Ca": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>Where <em>Science</em> </p><p>Meets <em>Style</em></p>",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_HnQg7Q": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Engineered using data from over 50 million global foot scans, every curve and contour of the Ashley is designed to support your body from the ground up.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 0.8,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "spacing_h83m86": {
+          "type": "spacing",
+          "settings": {
+            "height": 40,
+            "height_mobile": 28
+          }
+        },
+        "button_Vd4x9h": {
+          "type": "button",
+          "settings": {
+            "button_label": "Shop Sneakers",
+            "button_link": "shopify://collections/womens-sneakers",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
           }
         }
       },
       "block_order": [
-        "product_Wcz86r",
-        "product_ziy7YK"
+        "feature_point_wG8TzX",
+        "feature_point_gn8GxX",
+        "feature_point_K3DUcM",
+        "feature_point_FXjfXC",
+        "feature_point_6fhNb6",
+        "heading_Q7f3Ca",
+        "text_HnQg7Q",
+        "spacing_h83m86",
+        "button_Vd4x9h"
       ],
-      "name": "t:sections.shop-the-look.name",
+      "name": "Dynamic Feature Combo",
       "settings": {
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
+        "tile1_width": 2,
+        "tile2_width": 2,
+        "tile3_width": 2,
+        "gap": 16,
+        "gap_mobile": 16,
+        "feature_image": "shopify://shop_images/622X800_danika_hotspots.png",
+        "feature_image_link": "shopify://collections/womens-sneakers",
+        "feature_image_link_external": false,
+        "feature_image_link_target": "desktop",
+        "lifestyle_image": "shopify://shop_images/705x800_Danika_lifestyle_2x_16c8662e-8446-4217-9972-dd286969783d.png",
+        "text_background": "#f5f5f5",
+        "text_padding": 40,
+        "text_vertical_align": "center",
+        "text_horizontal_align": "center",
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "text_max_width": 500,
+        "dot_size": 16,
+        "dot_size_mobile": 20,
+        "dot_color": "#ffffff",
+        "dot_border_color": "#536c9d",
+        "dot_border_width": 2,
+        "line_color": "#465e8d",
+        "line_width": 0.4,
+        "callout_background": "#ffffff",
+        "callout_radius": 8,
+        "callout_max_width": 220,
+        "callout_title_color": "#456094",
+        "callout_text_color": "#484848",
+        "color_text": "#000000",
+        "color_highlight": "#e0a580",
         "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "overlay_opacity": 30,
-        "padding_top": 72,
-        "padding_bottom": 72,
+        "divider_color": "#111111",
+        "padding_top": 0,
+        "padding_bottom": 40,
         "divider": false,
         "full_width": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
+        "rounded": false
       }
     },
     "featured_product_wtCJrb": {
@@ -247,7 +340,7 @@
         "heading_qCJUjT": {
           "type": "heading",
           "settings": {
-            "heading": "Best Sandal for Bunions",
+            "heading": "Where <em>Science</em> Meets <em>Style</em>",
             "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "none",
@@ -257,7 +350,7 @@
         "text_RKiGwU": {
           "type": "text",
           "settings": {
-            "text": "<p><em>\"These wedge sandals have an adjustable front strap with a hook and loop closure to accommodate the bunion area with an extra comfortable fit. There is another strap at your ankle as well to keep you securely in the shoe. There is also memory foam in the footbed and arch support which is helpful for other conditions like plantar fasciitis.\"</em></p>",
+            "text": "<p>Engineered using data from over 50 million global foot scans, every curve and contour of the Ashley is designed to support your body from the ground up.</p><p>Genuine leather construction, a memory foam footbed, and a built in arch support system that podiatrists actually recommend.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -731,7 +824,7 @@
   "order": [
     "main-page",
     "image_with_text_overlay_Hnzn9F",
-    "shop_the_look_AmgHQB",
+    "dynamic_feature_combo_8NW3dN",
     "featured_product_wtCJrb",
     "image_with_text_MkkLVQ",
     "reveal_testimonials_EU8z7L",
