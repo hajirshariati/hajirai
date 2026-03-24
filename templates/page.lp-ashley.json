@@ -459,6 +459,153 @@
         "rounded": false
       }
     },
+    "testimonials_rmN7kx": {
+      "type": "testimonials",
+      "blocks": {
+        "testimonial_i8hpLw": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Beautifully Comfortable. I could walk in these all day. They are perfect for work.</p>",
+            "author": "Marjolyn M.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_iaNxmK": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>My favorite dressy shoe! I have these sandals are so comfortable. They add height when I need it. I also feel like I have a study walk. I am on my feet most of the day.</p>",
+            "author": "Amy S.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_WptKCX": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Love this style! I’ve never been able to wear a shoe with any heel. These are so COMFORTABLE and attractive. Thank you Aetrex!</p>",
+            "author": "Gina S.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_cMqe8h": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Holy grail of wedges! They are the most comfortable wedges ever! I wear them all day with no issues. The arch support is fantastic.</p>",
+            "author": "Sherri J.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_DUKJrG": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Highly recommend! Love these shoes! The Ashley Arch Support Wedge is not only fashionable but also comfortable to wear from the get-go.</p>",
+            "author": "Julie S.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_UfMJFq": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Divine! These are the most comfortable and soft supportive shoes ever!</p>",
+            "author": "Tash",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_KMjBFE": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>These are wonderful shoes. I have high arches and very bad knee arthritis. I never wear heels, but these are a real exception. I can wear them all day without exacerbating my knee pain, and they look great!</p>",
+            "author": "Joan S.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_J6K3XV": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>What a great shoe! This is the most comfortable shoe I own. The arch support is perfect and the adjustable straps are terrific. All of this and stylish too!</p>",
+            "author": "Kathy C.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_i8hpLw",
+        "testimonial_iaNxmK",
+        "testimonial_WptKCX",
+        "testimonial_cMqe8h",
+        "testimonial_DUKJrG",
+        "testimonial_UfMJFq",
+        "testimonial_KMjBFE",
+        "testimonial_J6K3XV"
+      ],
+      "name": "t:sections.testimonials.name",
+      "settings": {
+        "heading": "Testimonials",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "rounded": false,
+        "limit_section_width": false
+      }
+    },
     "multicolumn_yWBeay": {
       "type": "multicolumn",
       "blocks": {
@@ -1327,6 +1474,7 @@
     "dynamic_feature_combo_8NW3dN",
     "image_with_text_K47tcA",
     "featured_product_wtCJrb",
+    "testimonials_rmN7kx",
     "multicolumn_yWBeay",
     "featured_collection_ytWEYw",
     "multicolumn_QJbrRQ",
