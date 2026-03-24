@@ -39,7 +39,7 @@
           "type": "heading",
           "settings": {
             "heading": "<p>Style that feels as good as it looks</p>",
-            "heading_size": "title-lg tracking-heading",
+            "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
