@@ -109,6 +109,54 @@
         "abra_promo_code_hide": ""
       }
     },
+    "scrolling_text_r9arYW": {
+      "type": "scrolling-text",
+      "blocks": {
+        "image_Nj4fnz": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/footwear-logo-67eae71e5b26b.avif",
+            "height": 100,
+            "link": "",
+            "accessibility_info": "",
+            "external": false
+          }
+        },
+        "text_pJyAJw": {
+          "type": "text",
+          "settings": {
+            "text": "Best Sandal for Bunions",
+            "text_size": 46,
+            "text_font": "subtitle",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "image_Nj4fnz",
+        "text_pJyAJw"
+      ],
+      "name": "t:sections.scrolling-text.name",
+      "settings": {
+        "direction": "left",
+        "speed": 20,
+        "grid_horizontal": 70,
+        "enable_twin": false,
+        "enable_parallax": true,
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "padding_top": 36,
+        "padding_bottom": 36,
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
     "dynamic_feature_combo_8NW3dN": {
       "type": "dynamic-feature-combo",
       "blocks": {
@@ -268,11 +316,20 @@
     "rich_text_F7J38f": {
       "type": "rich-text",
       "blocks": {
+        "image_em7ngD": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/footwear-logo-67eae71e5b26b.avif",
+            "image_width": "custom",
+            "image_max_width": 460,
+            "image_max_width_mobile": 50
+          }
+        },
         "heading_BWnxLx": {
           "type": "heading",
           "settings": {
-            "heading": "Rich text",
-            "heading_size": "title-lg tracking-heading",
+            "heading": "Best Sandal for Bunions",
+            "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
@@ -292,28 +349,18 @@
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
-        },
-        "button_raFiWR": {
-          "type": "button",
-          "settings": {
-            "button_label": "Button label",
-            "button_link": "",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": true
-          }
         }
       },
       "block_order": [
+        "image_em7ngD",
         "heading_BWnxLx",
-        "text_ffQkw8",
-        "button_raFiWR"
+        "text_ffQkw8"
       ],
+      "disabled": true,
       "name": "t:sections.rich-text.name",
       "settings": {
-        "text_alignment": "left",
-        "text_alignment_mobile": "left",
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
         "heading": "",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
@@ -335,8 +382,8 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 100,
+        "padding_top": 20,
+        "padding_bottom": 52,
         "divider": false,
         "narrow": true,
         "rounded": false,
@@ -827,6 +874,7 @@
   "order": [
     "main-page",
     "image_with_text_overlay_Hnzn9F",
+    "scrolling_text_r9arYW",
     "dynamic_feature_combo_8NW3dN",
     "rich_text_F7J38f",
     "featured_product_wtCJrb",
