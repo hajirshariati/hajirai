@@ -30,8 +30,7 @@
         "image_hQJFhd": {
           "type": "image",
           "settings": {
-            "image": "shopify://shop_images/banner7.jpg",
-            "image_mobile": "shopify://shop_images/banner_M_02.jpg",
+            "image": "shopify://shop_images/banner_D3.jpg",
             "content_position": "md:items-end md:justify-start",
             "content_position_mobile": "items-end justify-start",
             "heading": "",
@@ -68,6 +67,8 @@
         "text_alignment": "left",
         "image_height_mobile": "adapt",
         "text_alignment_mobile": "left",
+        "mobile_content_space": 0,
+        "mobile_content_space_color": "#ffffff",
         "accessibility_info": "",
         "color_text": "#ffffff",
         "color_background": "#ffffff",
