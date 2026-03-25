@@ -439,6 +439,9 @@
         "buy_buttons_4dEzXk",
         "read_more_nGzagb"
       ],
+      "custom_css": [
+        ".installment {display: none !important;}"
+      ],
       "name": "t:sections.featured-product.name",
       "settings": {
         "product": "ashley-off-white-ew793w",
@@ -650,158 +653,6 @@
         "padding_bottom": 72,
         "divider": false,
         "full_width": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "multicolumn_QJbrRQ": {
-      "type": "multicolumn",
-      "blocks": {
-        "column_h44RfT": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image": "shopify://shop_images/Feature1.png",
-            "image_ratio": "adapt",
-            "heading": "Aetrex Signature Arch Support",
-            "heading_size": "text-base-xl",
-            "text": "<p>to Help Relieve Heel/Arch Pain</p>",
-            "custom_html": "",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "secondary",
-            "button_external": false,
-            "button_icon": true,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_rTCT4m": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image": "shopify://shop_images/Feature2.png",
-            "image_ratio": "adapt",
-            "heading": "Memory Foam Footbed",
-            "heading_size": "text-base-xl",
-            "text": "<p>for Cushioning & Comfort</p>",
-            "custom_html": "",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "secondary",
-            "button_external": false,
-            "button_icon": true,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_dC4PLV": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image": "shopify://shop_images/Feature3_shoes_Materials.png",
-            "image_ratio": "adapt",
-            "heading": "Adjustable Straps",
-            "heading_size": "text-base-xl",
-            "text": "<p>for the Perfect Fit Each Wear</p>",
-            "custom_html": "",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "secondary",
-            "button_external": false,
-            "button_icon": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_cTgRzk": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image": "shopify://shop_images/Feature4_shoes_Lightweight.png",
-            "image_ratio": "adapt",
-            "heading": "Stretchy Gore",
-            "heading_size": "text-base-xl",
-            "text": "<p>for Extra Comfort</p>",
-            "custom_html": "",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "secondary",
-            "button_external": false,
-            "button_icon": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_jYJyfT": {
-          "type": "column",
-          "settings": {
-            "show_border": false,
-            "text_alignment": "center",
-            "text_alignment_mobile": "center",
-            "image": "shopify://shop_images/Feature1.png",
-            "image_ratio": "adapt",
-            "heading": "Genuine Suede",
-            "heading_size": "text-base-xl",
-            "text": "<p>Leather Construction</p>",
-            "custom_html": "",
-            "button_label": "",
-            "button_link": "",
-            "button_style": "secondary",
-            "button_external": false,
-            "button_icon": true,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "column_h44RfT",
-        "column_rTCT4m",
-        "column_dC4PLV",
-        "column_cTgRzk",
-        "column_jYJyfT"
-      ],
-      "disabled": true,
-      "settings": {
-        "gap": "small",
-        "columns": 4,
-        "columns_mobile": "2",
-        "carousel_on_desktop": true,
-        "swipe_on_mobile": true,
-        "heading": "FEATURES",
-        "heading_size": "title-sm",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": false,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "#171717",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 12,
-        "padding_bottom": 12,
-        "full_width": true,
-        "divider": false,
         "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
@@ -1267,7 +1118,6 @@
     "featured_product_wtCJrb",
     "testimonials_rmN7kx",
     "featured_collection_ytWEYw",
-    "multicolumn_QJbrRQ",
     "ugc_gallery_bWECXN",
     "shop_the_feed_ThdnXC"
   ]
