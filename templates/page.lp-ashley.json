@@ -374,7 +374,7 @@
         "text_alignment": "left",
         "custom_content_position": "items-center",
         "image_mobile": "shopify://shop_images/oprah.jpg",
-        "image_height_mobile": "auto",
+        "image_height_mobile": "adapt",
         "text_alignment_mobile": "left",
         "color_text": "",
         "color_background": "",
