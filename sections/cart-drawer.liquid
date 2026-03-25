@@ -114,8 +114,8 @@
                     assign show_free_shipping_bar = true
                   endif
                   
-                  if show_free_shipping_bar
-                    render 'free-shipping-bar', minimum_amount: minimum_amount
+if show_free_shipping_bar
+                    render 'free-shipping-bar', minimum_amount: minimum_amount, second_threshold_amount: section.settings.free_shipping_second_threshold_amount, second_threshold_message: section.settings.free_shipping_second_threshold_message
                   endif
                 endif
               -%}
@@ -888,6 +888,24 @@
       "label": "t:sections.cart-drawer.settings.free_shipping_minimum_amount.label",
       "info": "t:sections.cart-drawer.settings.free_shipping_minimum_amount.info"
     },
+
+
+{
+  "visible_if": "{{ section.settings.show_free_shipping_bar == true }}",
+  "type": "number",
+  "id": "free_shipping_second_threshold_amount",
+  "label": "Second threshold amount",
+  "info": "Optional. Must be higher than the first threshold. Leave blank to disable."
+},
+{
+  "visible_if": "{{ section.settings.show_free_shipping_bar == true }}",
+  "type": "richtext",
+  "id": "free_shipping_second_threshold_message",
+  "label": "Second threshold message",
+  "info": "Shown when the cart reaches the second threshold. E.g. 'You unlocked a free gift! 🎁'"
+},
+
+
     {
       "type": "header",
       "content": "t:sections.cart-drawer.settings.header__cart_recommendations.content",
