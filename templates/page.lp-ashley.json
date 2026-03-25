@@ -482,53 +482,6 @@
         "rounded": false
       }
     },
-    "featured_collection_ytWEYw": {
-      "type": "featured-collection",
-      "disabled": true,
-      "name": "t:sections.featured-collection.name",
-      "settings": {
-        "collection": "",
-        "products": [
-          "ashley-champagne-ew795w",
-          "ashley-coffee-multi-ew796w",
-          "ashley-hazy-blue-multi-ew794w",
-          "ashley-navy-ew791w",
-          "ashley-off-white-ew793w",
-          "ashley-rose-ew797w",
-          "ashley-scotch-ew798w",
-          "ashley-taupe-ew792w"
-        ],
-        "product_limit": 12,
-        "columns": 4,
-        "carousel_on_desktop": true,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "More Colors, Same Comfort",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
     "testimonials_rmN7kx": {
       "type": "testimonials",
       "blocks": {
@@ -674,6 +627,53 @@
         "divider": false,
         "rounded": false,
         "limit_section_width": false
+      }
+    },
+    "featured_collection_ytWEYw": {
+      "type": "featured-collection",
+      "name": "t:sections.featured-collection.name",
+      "settings": {
+        "collection": "",
+        "products": [
+          "ashley-champagne-ew795w",
+          "ashley-coffee-multi-ew796w",
+          "ashley-hazy-blue-multi-ew794w",
+          "ashley-navy-ew791w",
+          "ashley-off-white-ew793w",
+          "ashley-rose-ew797w",
+          "ashley-scotch-ew798w",
+          "ashley-taupe-ew792w",
+          "ashley-black-ew790w"
+        ],
+        "product_limit": 12,
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "More Colors, Same Comfort",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "ugc_gallery_bWECXN": {
@@ -1134,8 +1134,8 @@
     "dynamic_feature_combo_8NW3dN",
     "image_with_text_K47tcA",
     "featured_product_wtCJrb",
-    "featured_collection_ytWEYw",
     "testimonials_rmN7kx",
+    "featured_collection_ytWEYw",
     "ugc_gallery_bWECXN",
     "shop_the_feed_ThdnXC"
   ]
