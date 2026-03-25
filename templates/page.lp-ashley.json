@@ -420,9 +420,9 @@
         "complementary_myAUcB": {
           "type": "complementary",
           "settings": {
-            "heading": "More Colors, Same Comfort",
+            "heading": "Additional Colors",
             "product_limit": 10,
-            "show_vendor": true,
+            "show_vendor": false,
             "show_price": true
           }
         },
