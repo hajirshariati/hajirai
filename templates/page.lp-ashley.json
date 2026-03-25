@@ -484,6 +484,7 @@
     },
     "featured_collection_ytWEYw": {
       "type": "featured-collection",
+      "disabled": true,
       "name": "t:sections.featured-collection.name",
       "settings": {
         "collection": "",
