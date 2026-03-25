@@ -271,9 +271,7 @@
         "spacing_h83m86",
         "button_Vd4x9h"
       ],
-      "custom_css": [
-        ".tile-lifestyle {display: none;}"
-      ],
+      "custom_css": [],
       "name": "Dynamic Feature Combo",
       "settings": {
         "tile1_width": 2,
