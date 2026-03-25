@@ -143,7 +143,7 @@
         "text_wBV3LE": {
           "type": "text",
           "settings": {
-            "text": "<p>Whether you’re lifting, sprinting, jumping, or grinding through HIIT — your foundation matters</p><p><strong>Aetrex Train Orthotics</strong> help:</p>",
+            "text": "<p>Whether you’re lifting, sprinting, jumping, or grinding through HIIT — your foundation matters.</p><p><strong>Aetrex Train Orthotics</strong> help:</p>",
             "text_font": "body",
             "text_size": "subtext-lg",
             "text_max_size": 32,
@@ -158,7 +158,7 @@
         "text_rn7GTN": {
           "type": "text",
           "settings": {
-            "text": "<ul><li>Support your arch under heavy load<br/></li><li>Stabilize your stride during explosive movement<br/></li><li>Reduce pressure on heels and forefoot<br/></li><li>Help relieve common foot pain like plantar fasciitis<br/></li><li>Improve alignment from the ground upBecause when your feet are aligned — everything performs better. </li></ul>",
+            "text": "<ul><li>Support your arch under heavy load<br/></li><li>Stabilize your stride during explosive movement<br/></li><li>Reduce pressure on heels and forefoot<br/></li><li>Relieve common foot conditions like Plantar Fasciitis, Flat Feet Pain<br/></li><li>Improve alignment from the ground up</li></ul>",
             "text_font": "body",
             "text_size": "subtext-sm",
             "text_max_size": 32,
@@ -226,9 +226,9 @@
             "product_badge_position": "center",
             "product_badge_width": 300,
             "heading_1": "Support Features",
-            "value_1": "<p>Contoured memory foam with balanced arch support for everyday comfort.</p>",
+            "value_1": "<p>Cupped heel with signature arch support for everyday comfort and stability.</p>",
             "heading_2": "Best For",
-            "value_2": "<p>Normal arches seeking cushioned, all-day support.</p>",
+            "value_2": "<p>Normal arches seeking injury prevention, all-day support.</p>",
             "heading_3": "",
             "value_3": "",
             "heading_4": "",
@@ -293,7 +293,7 @@
             "product_badge_position": "center",
             "product_badge_width": 300,
             "heading_1": "Support Features",
-            "value_1": "<p>Posted heel design to improve rearfoot alignment and stability.</p>",
+            "value_1": "<p>With posted heel that helps keep your feet aligned and controls overpronation.</p><p></p>",
             "heading_2": "Best For",
             "value_2": "<p>Flat feet and plantar fasciitis discomfort.</p>",
             "heading_3": "",
