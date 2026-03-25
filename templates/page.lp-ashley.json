@@ -416,10 +416,14 @@
             "size_chart": ""
           }
         },
+        "quantity_selector_479EwC": {
+          "type": "quantity_selector",
+          "settings": {}
+        },
         "buy_buttons_4dEzXk": {
           "type": "buy_buttons",
           "settings": {
-            "show_quantity_selector": true,
+            "show_quantity_selector": false,
             "show_price": false,
             "show_dynamic_checkout": true,
             "show_gift_card_recipient": false,
@@ -436,6 +440,7 @@
       "block_order": [
         "title_kFqqXf",
         "variant_picker_7r6hdp",
+        "quantity_selector_479EwC",
         "buy_buttons_4dEzXk",
         "read_more_nGzagb"
       ],
