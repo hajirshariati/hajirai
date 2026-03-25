@@ -418,6 +418,15 @@
             "size_chart": ""
           }
         },
+        "complementary_myAUcB": {
+          "type": "complementary",
+          "settings": {
+            "heading": "More Colors, Same Comfort",
+            "product_limit": 10,
+            "show_vendor": true,
+            "show_price": true
+          }
+        },
         "quantity_selector_479EwC": {
           "type": "quantity_selector",
           "settings": {}
@@ -442,6 +451,7 @@
       "block_order": [
         "title_kFqqXf",
         "variant_picker_7r6hdp",
+        "complementary_myAUcB",
         "quantity_selector_479EwC",
         "buy_buttons_4dEzXk",
         "read_more_nGzagb"
@@ -453,9 +463,9 @@
       "settings": {
         "product": "ashley-black-ew790w",
         "enable_sticky_info": true,
-        "media_size": 66,
+        "media_size": 50,
         "gallery_layout": "thumbnail",
-        "thumbnail_position": "beside",
+        "thumbnail_position": "below",
         "image_ratio": "adapt_first",
         "image_zoom": "lightbox",
         "hide_variants": false,
