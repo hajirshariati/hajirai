@@ -83,13 +83,8 @@
   {%- if bar_stage == 2 -%}
     {{- second_threshold_message -}}
 
-  {%- elsif bar_stage == 1 -%}
-    {%- if has_second_threshold -%}
-      {%- capture remaining_for_gift -%}<span class="font-bold">{{ total_price | minus: second_threshold_amount_in_cents | abs | money }}</span>{%- endcapture -%}
-      <span class="text-sm leading-tight">{{ 'general.cart.free_shipping.congratulations_html' | t }} Spend {{ remaining_for_gift }} more to unlock your reward!</span>
-    {%- else -%}
-      <span class="text-sm leading-tight">{{ 'general.cart.free_shipping.congratulations_html' | t }}</span>
-    {%- endif -%}
+{%- elsif bar_stage == 1 -%}
+    <span class="text-sm leading-tight">{{ 'general.cart.free_shipping.congratulations_html' | t }}</span>
 
   {%- else -%}
     {%- capture remaining_amount -%}<span class="font-bold">{{ total_price | minus: minimum_amount_in_cents | abs | money }}</span>{%- endcapture -%}
