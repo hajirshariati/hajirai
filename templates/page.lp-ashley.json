@@ -408,7 +408,6 @@
         },
         "variant_picker_7r6hdp": {
           "type": "variant_picker",
-          "disabled": true,
           "settings": {
             "enable_dynamic_variants": true,
             "show_variant_labels": true,
@@ -429,6 +428,7 @@
         },
         "quantity_selector_479EwC": {
           "type": "quantity_selector",
+          "disabled": true,
           "settings": {}
         },
         "buy_buttons_4dEzXk": {
@@ -457,7 +457,8 @@
         "read_more_nGzagb"
       ],
       "custom_css": [
-        ".installment {display: none !important;}"
+        ".installment {display: none !important;}",
+        "ul.swatches.swatches--round-slight.swatches--color.swatches--variant {display: none !important;}"
       ],
       "name": "t:sections.featured-product.name",
       "settings": {
