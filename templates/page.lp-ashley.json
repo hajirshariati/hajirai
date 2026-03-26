@@ -89,7 +89,7 @@
         "text_alignment": "left",
         "image_mobile": "shopify://shop_images/Ash_banner_M.jpg",
         "image_height_mobile": "adapt",
-        "content_position_mobile": "items-end justify-start",
+        "content_position_mobile": "items-end justify-center",
         "text_alignment_mobile": "left",
         "color_text": "#171717",
         "color_highlight": "#e0a580",
