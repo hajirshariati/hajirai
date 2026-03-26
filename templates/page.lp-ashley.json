@@ -38,7 +38,7 @@
         "heading_ChxeEC": {
           "type": "heading",
           "settings": {
-            "heading": "<p>A Style That Feels as Good</p><p> as it Looks</p>",
+            "heading": "<p>A Style That Feels as Good as it Looks</p>",
             "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "none",
@@ -85,7 +85,7 @@
         "image": "shopify://shop_images/Ash_banner_D.jpg",
         "image_height": "adapt",
         "content_width": "small",
-        "content_position": "md:items-end md:justify-start",
+        "content_position": "md:items-center md:justify-start",
         "text_alignment": "left",
         "image_mobile": "shopify://shop_images/Ash_banner_M.jpg",
         "image_height_mobile": "adapt",
