@@ -368,7 +368,7 @@
       "settings": {
         "image": "shopify://shop_images/oprah.jpg",
         "img_url": "",
-        "image_height": "650px",
+        "image_height": "adapt",
         "image_width": "medium",
         "layout": "text_first",
         "text_alignment": "left",
