@@ -1,38 +1,15 @@
 {% comment %}
   ============================================================
-  3D Shoe Scroll Section — Syntilay-Style
+  3D Shoe Scroll Section
   ============================================================
-  SETUP:
-  1. Upload your .glb file to Shopify Admin → Content → Files
-  2. Copy the CDN URL and paste it in section settings
-  3. Add this section to your homepage via Shopify theme editor
-
   NOTATIONS:
-  - Each scroll panel block supports up to 2 annotation dots
-  - On desktop: dot + animated SVG line + callout label
-  - On mobile: dot only (tap to open drawer modal)
-  - Line always connects dot to callout automatically
-
-  PERFORMANCE:
-  - Three.js loaded from CDN with defer
-  - GLB loaded only when section enters viewport (IntersectionObserver)
-  - requestAnimationFrame loop only runs when visible
-  - Canvas resized with ResizeObserver + debounce
-  - Will-change: transform only on active animation targets
-  - Lazy image loading on mobile fallbacks
-  - Prefers-reduced-motion respected throughout
-
-  ADA / WCAG 2.2:
-  - All interactive elements keyboard-accessible
-  - ARIA roles, labels, live regions
-  - Focus-visible styles on modals and CTAs
-  - Motion disabled via prefers-reduced-motion
-  - role="img" + aria-label on canvas
-
-  SEO / STRUCTURED DATA:
-  - Semantic heading hierarchy (h2 → h3)
-  - Section aria-label
-  - Schema.org compatible markup
+  - Notation overlays live INSIDE .shoe3d-canvas-wrap so they
+    render on top of the sticky 3D canvas at the correct position
+  - JS uses IntersectionObserver on each .shoe3d-panel with a
+    generous rootMargin so notations appear as soon as the panel
+    enters the viewport center zone, and hide when it leaves
+  - On desktop: dot + animated SVG elbow-line + callout
+  - On mobile:  dot only (44px touch target) → bottom-sheet modal
   ============================================================
 {% endcomment %}
 
@@ -49,14 +26,18 @@
   class="shoe3d-section"
   aria-label="{{ section.settings.aria_label | default: '3D Product Showcase' }}"
   data-model="{{ model_url | escape }}"
-  data-bg="{{ bg_color }}"
   data-section-id="{{ section.id }}"
   itemscope
   itemtype="https://schema.org/Product"
 >
 
-  {% comment %} ── Canvas — full-width sticky, behind all content ── {% endcomment %}
-  <div class="shoe3d-canvas-wrap" aria-hidden="true">
+  {% comment %}
+    STICKY CANVAS WRAP
+    The canvas AND all notation overlays live here together.
+    This is the key fix — notations must be siblings of the canvas
+    inside the sticky container so they appear ON the shoe.
+  {% endcomment %}
+  <div class="shoe3d-canvas-wrap" id="{{ section_id }}-sticky" aria-hidden="true">
     <canvas
       id="{{ section_id }}-canvas"
       class="shoe3d-canvas"
@@ -68,31 +49,181 @@
       <div class="shoe3d-loader__ring" aria-hidden="true"></div>
       <span class="shoe3d-loader__text">Loading model…</span>
     </div>
-  </div>
 
-  {% comment %} ── Content locked to max-width, pulled up over canvas ── {% endcomment %}
-  <div class="shoe3d-section__inner">
+    {% comment %} ALL notation overlays — one per panel block, hidden by default {% endcomment %}
+    {%- for block in section.blocks -%}
+      {%- assign has_n1 = false -%}
+      {%- assign has_n2 = false -%}
+      {%- if block.settings.notation_1_heading != blank or block.settings.notation_1_text != blank -%}
+        {%- assign has_n1 = true -%}
+      {%- endif -%}
+      {%- if block.settings.notation_2_heading != blank or block.settings.notation_2_text != blank -%}
+        {%- assign has_n2 = true -%}
+      {%- endif -%}
+      {%- if has_n1 or has_n2 -%}
+        <div
+          class="shoe3d-notations"
+          id="{{ section_id }}-notations-{{ forloop.index0 }}"
+          data-notation-panel="{{ forloop.index0 }}"
+          aria-hidden="true"
+        >
+          {% comment %} SVG lines — redrawn by JS on activation {% endcomment %}
+          <svg class="shoe3d-notations__svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+            {%- if has_n1 -%}
+              <path
+                class="shoe3d-notations__line"
+                data-idx="0"
+                data-dot-x="{{ block.settings.notation_1_dot_x | default: 35 }}"
+                data-dot-y="{{ block.settings.notation_1_dot_y | default: 40 }}"
+                data-callout-x="{{ block.settings.notation_1_text_x | default: 55 }}"
+                data-callout-y="{{ block.settings.notation_1_text_y | default: 40 }}"
+                data-breaks="{{ block.settings.notation_1_line_breaks | default: '1' }}"
+              />
+            {%- endif -%}
+            {%- if has_n2 -%}
+              <path
+                class="shoe3d-notations__line"
+                data-idx="1"
+                data-dot-x="{{ block.settings.notation_2_dot_x | default: 60 }}"
+                data-dot-y="{{ block.settings.notation_2_dot_y | default: 65 }}"
+                data-callout-x="{{ block.settings.notation_2_text_x | default: 40 }}"
+                data-callout-y="{{ block.settings.notation_2_text_y | default: 65 }}"
+                data-breaks="{{ block.settings.notation_2_line_breaks | default: '1' }}"
+              />
+            {%- endif -%}
+          </svg>
 
-    {% comment %} ── Hero entry panel ── {% endcomment %}
-    <div class="shoe3d-hero" aria-hidden="true">
-      {%- if section.settings.hero_badge != blank -%}
-        <div class="shoe3d-hero__badge">
-          <span>{{ section.settings.hero_badge }}</span>
+          {% comment %} Dots {% endcomment %}
+          {%- if has_n1 -%}
+            <button
+              class="shoe3d-notations__dot"
+              id="{{ section_id }}-p{{ forloop.index0 }}-dot0"
+              style="left:{{ block.settings.notation_1_dot_x | default: 35 }}%;top:{{ block.settings.notation_1_dot_y | default: 40 }}%;"
+              aria-label="{{ block.settings.notation_1_heading | default: 'Feature detail' | escape }}"
+              aria-expanded="false"
+              aria-controls="{{ section_id }}-p{{ forloop.index0 }}-modal0"
+              type="button"
+              tabindex="-1"
+            ><span class="shoe3d-notations__dot-inner" aria-hidden="true"></span></button>
+          {%- endif -%}
+          {%- if has_n2 -%}
+            <button
+              class="shoe3d-notations__dot"
+              id="{{ section_id }}-p{{ forloop.index0 }}-dot1"
+              style="left:{{ block.settings.notation_2_dot_x | default: 60 }}%;top:{{ block.settings.notation_2_dot_y | default: 65 }}%;"
+              aria-label="{{ block.settings.notation_2_heading | default: 'Feature detail' | escape }}"
+              aria-expanded="false"
+              aria-controls="{{ section_id }}-p{{ forloop.index0 }}-modal1"
+              type="button"
+              tabindex="-1"
+            ><span class="shoe3d-notations__dot-inner" aria-hidden="true"></span></button>
+          {%- endif -%}
+
+          {% comment %} Desktop callouts {% endcomment %}
+          {%- if has_n1 -%}
+            <div
+              class="shoe3d-notations__callout"
+              data-callout-idx="0"
+              style="left:{{ block.settings.notation_1_text_x | default: 55 }}%;top:{{ block.settings.notation_1_text_y | default: 40 }}%;"
+              aria-hidden="true"
+            >
+              {%- if block.settings.notation_1_heading != blank -%}
+                <p class="shoe3d-notations__callout-title">{{ block.settings.notation_1_heading }}</p>
+              {%- endif -%}
+              {%- if block.settings.notation_1_text != blank -%}
+                <p class="shoe3d-notations__callout-body">{{ block.settings.notation_1_text }}</p>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+          {%- if has_n2 -%}
+            <div
+              class="shoe3d-notations__callout"
+              data-callout-idx="1"
+              style="left:{{ block.settings.notation_2_text_x | default: 40 }}%;top:{{ block.settings.notation_2_text_y | default: 65 }}%;"
+              aria-hidden="true"
+            >
+              {%- if block.settings.notation_2_heading != blank -%}
+                <p class="shoe3d-notations__callout-title">{{ block.settings.notation_2_heading }}</p>
+              {%- endif -%}
+              {%- if block.settings.notation_2_text != blank -%}
+                <p class="shoe3d-notations__callout-body">{{ block.settings.notation_2_text }}</p>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+
         </div>
       {%- endif -%}
-      <h2 class="shoe3d-hero__headline" itemprop="name">
-        {{ section.settings.hero_headline | default: 'The Jillian' }}
-      </h2>
-      <p class="shoe3d-hero__sub">
-        {{ section.settings.hero_subtext | default: 'Scroll to explore' }}
-      </p>
+
+      {% comment %} Mobile modals — outside sticky wrap so they can be fixed {% endcomment %}
+    {%- endfor -%}
+
+  </div>{% comment %} /.shoe3d-canvas-wrap {% endcomment %}
+
+  {% comment %} Mobile modals rendered outside the sticky wrap {% endcomment %}
+  {%- for block in section.blocks -%}
+    {%- assign has_n1 = false -%}
+    {%- assign has_n2 = false -%}
+    {%- if block.settings.notation_1_heading != blank or block.settings.notation_1_text != blank -%}{%- assign has_n1 = true -%}{%- endif -%}
+    {%- if block.settings.notation_2_heading != blank or block.settings.notation_2_text != blank -%}{%- assign has_n2 = true -%}{%- endif -%}
+    {%- if has_n1 -%}
+      <div
+        class="shoe3d-modal"
+        id="{{ section_id }}-p{{ forloop.index0 }}-modal0"
+        role="dialog"
+        aria-modal="true"
+        aria-label="{{ block.settings.notation_1_heading | default: 'Feature detail' | escape }}"
+        aria-hidden="true"
+        hidden
+      >
+        <div class="shoe3d-modal__overlay" data-modal-close></div>
+        <div class="shoe3d-modal__inner">
+          <button class="shoe3d-modal__close" type="button" aria-label="Close" data-modal-close>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+          {%- if block.settings.notation_1_heading != blank -%}<p class="shoe3d-modal__title">{{ block.settings.notation_1_heading }}</p>{%- endif -%}
+          {%- if block.settings.notation_1_text != blank -%}<p class="shoe3d-modal__body">{{ block.settings.notation_1_text }}</p>{%- endif -%}
+        </div>
+      </div>
+    {%- endif -%}
+    {%- if has_n2 -%}
+      <div
+        class="shoe3d-modal"
+        id="{{ section_id }}-p{{ forloop.index0 }}-modal1"
+        role="dialog"
+        aria-modal="true"
+        aria-label="{{ block.settings.notation_2_heading | default: 'Feature detail' | escape }}"
+        aria-hidden="true"
+        hidden
+      >
+        <div class="shoe3d-modal__overlay" data-modal-close></div>
+        <div class="shoe3d-modal__inner">
+          <button class="shoe3d-modal__close" type="button" aria-label="Close" data-modal-close>
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+          {%- if block.settings.notation_2_heading != blank -%}<p class="shoe3d-modal__title">{{ block.settings.notation_2_heading }}</p>{%- endif -%}
+          {%- if block.settings.notation_2_text != blank -%}<p class="shoe3d-modal__body">{{ block.settings.notation_2_text }}</p>{%- endif -%}
+        </div>
+      </div>
+    {%- endif -%}
+  {%- endfor -%}
+
+  {% comment %} SCROLLABLE CONTENT — pulled up over canvas via negative margin-top {% endcomment %}
+  <div class="shoe3d-section__inner">
+
+    {% comment %} Hero {% endcomment %}
+    <div class="shoe3d-hero">
+      {%- if section.settings.hero_badge != blank -%}
+        <div class="shoe3d-hero__badge"><span>{{ section.settings.hero_badge }}</span></div>
+      {%- endif -%}
+      <h2 class="shoe3d-hero__headline" itemprop="name">{{ section.settings.hero_headline | default: 'The Jillian' }}</h2>
+      <p class="shoe3d-hero__sub">{{ section.settings.hero_subtext | default: 'Scroll to explore' }}</p>
       <div class="shoe3d-hero__scroll-hint" aria-hidden="true">
         <span class="shoe3d-hero__scroll-line"></span>
         <span class="shoe3d-hero__scroll-label">Scroll</span>
       </div>
     </div>
 
-    {% comment %} ── Scroll panels ── {% endcomment %}
+    {% comment %} Scroll panels {% endcomment %}
     <div class="shoe3d-panels" id="{{ section_id }}-panels">
 
       {%- liquid
@@ -102,40 +233,17 @@
       -%}
 
       {%- for block in section.blocks -%}
-        {%- assign is_right      = forloop.index | modulo: 2 -%}
-        {%- assign panel_side    = 'left' -%}
+        {%- assign is_right   = forloop.index | modulo: 2 -%}
+        {%- assign panel_side = 'left' -%}
         {%- if is_right == 0 -%}{%- assign panel_side = 'right' -%}{%- endif -%}
         {%- assign idx = forloop.index0 -%}
 
-        {%- if block.settings.eyebrow != blank -%}
-          {%- assign eyebrow_text = block.settings.eyebrow -%}
-        {%- else -%}
-          {%- assign eyebrow_text = jillian_eyebrows[idx] -%}
-        {%- endif -%}
-        {%- if block.settings.heading != blank -%}
-          {%- assign heading_text = block.settings.heading -%}
-        {%- else -%}
-          {%- assign heading_text = jillian_headings[idx] -%}
-        {%- endif -%}
-        {%- if block.settings.body != blank -%}
-          {%- assign body_text = block.settings.body -%}
-        {%- else -%}
-          {%- assign body_text = jillian_bodies[idx] -%}
-        {%- endif -%}
-
-        {% comment %} Check if either notation slot is filled {% endcomment %}
-        {%- assign has_notation_1 = false -%}
-        {%- assign has_notation_2 = false -%}
-        {%- if block.settings.notation_1_heading != blank or block.settings.notation_1_text != blank -%}
-          {%- assign has_notation_1 = true -%}
-        {%- endif -%}
-        {%- if block.settings.notation_2_heading != blank or block.settings.notation_2_text != blank -%}
-          {%- assign has_notation_2 = true -%}
-        {%- endif -%}
-        {%- assign has_notations = false -%}
-        {%- if has_notation_1 or has_notation_2 -%}
-          {%- assign has_notations = true -%}
-        {%- endif -%}
+        {%- assign eyebrow_text = jillian_eyebrows[idx] -%}
+        {%- if block.settings.eyebrow != blank -%}{%- assign eyebrow_text = block.settings.eyebrow -%}{%- endif -%}
+        {%- assign heading_text = jillian_headings[idx] -%}
+        {%- if block.settings.heading != blank -%}{%- assign heading_text = block.settings.heading -%}{%- endif -%}
+        {%- assign body_text = jillian_bodies[idx] -%}
+        {%- if block.settings.body != blank -%}{%- assign body_text = block.settings.body -%}{%- endif -%}
 
         <div
           class="shoe3d-panel shoe3d-panel--{{ panel_side }}"
@@ -145,272 +253,73 @@
           data-shoe-rot-z="{{ block.settings.rot_z | default: 0 }}"
           data-shoe-pos-x="{{ block.settings.pos_x | default: 0 }}"
           data-shoe-pos-y="{{ block.settings.pos_y | default: 0 }}"
-          data-shoe-light-intensity="{{ block.settings.light_intensity | default: 1.0 }}"
+          data-shoe-light-intensity="{{ block.settings.light_intensity | default: 12 }}"
           data-shoe-light-x="{{ block.settings.light_x | default: 5 }}"
           data-shoe-light-y="{{ block.settings.light_y | default: 5 }}"
           data-shoe-light-z="{{ block.settings.light_z | default: 5 }}"
           {{ block.shopify_attributes }}
         >
-
-          {%- comment %} ── Text content block ── {% endcomment %}
           <div class="shoe3d-panel__content shoe3d-panel__content--{{ panel_side }}">
-
             <span class="shoe3d-panel__eyebrow">{{ eyebrow_text }}</span>
             <h3 class="shoe3d-panel__heading">{{ heading_text }}</h3>
             <p class="shoe3d-panel__body">{{ body_text }}</p>
 
             {%- if block.settings.feature_1 != blank or block.settings.feature_2 != blank or block.settings.feature_3 != blank -%}
               <ul class="shoe3d-panel__features" aria-label="Features">
-                {%- if block.settings.feature_1 != blank -%}
-                  <li class="shoe3d-panel__feature">{{ block.settings.feature_1 }}</li>
-                {%- endif -%}
-                {%- if block.settings.feature_2 != blank -%}
-                  <li class="shoe3d-panel__feature">{{ block.settings.feature_2 }}</li>
-                {%- endif -%}
-                {%- if block.settings.feature_3 != blank -%}
-                  <li class="shoe3d-panel__feature">{{ block.settings.feature_3 }}</li>
-                {%- endif -%}
+                {%- if block.settings.feature_1 != blank -%}<li class="shoe3d-panel__feature">{{ block.settings.feature_1 }}</li>{%- endif -%}
+                {%- if block.settings.feature_2 != blank -%}<li class="shoe3d-panel__feature">{{ block.settings.feature_2 }}</li>{%- endif -%}
+                {%- if block.settings.feature_3 != blank -%}<li class="shoe3d-panel__feature">{{ block.settings.feature_3 }}</li>{%- endif -%}
               </ul>
             {%- endif -%}
 
             {%- if block.settings.cta_label != blank and block.settings.cta_url != blank -%}
-              <a
-                class="shoe3d-panel__cta"
-                href="{{ block.settings.cta_url }}"
-                {%- if block.settings.cta_new_tab %} target="_blank" rel="noopener noreferrer"{%- endif -%}
-              >
+              <a class="shoe3d-panel__cta" href="{{ block.settings.cta_url }}"
+                {%- if block.settings.cta_new_tab %} target="_blank" rel="noopener noreferrer"{%- endif -%}>
                 <span>{{ block.settings.cta_label }}</span>
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
                   <path d="M3.75 9h10.5M9.75 4.5 14.25 9l-4.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
               </a>
             {%- endif -%}
-
           </div>
 
-          {%- comment %} ── Mobile fallback image ── {% endcomment %}
           {%- if block.settings.image != blank -%}
-            <div class="shoe3d-panel__image-wrap shoe3d-panel__image-wrap--{{ panel_side }}">
-              {{
-                block.settings.image
-                | image_url: width: 600
-                | image_tag:
-                  loading: 'lazy',
-                  class: 'shoe3d-panel__image',
-                  widths: '300,400,600',
-                  sizes: '(max-width:768px) 90vw, 400px'
-              }}
+            <div class="shoe3d-panel__image-wrap">
+              {{- block.settings.image | image_url: width: 600 | image_tag: loading: 'lazy', class: 'shoe3d-panel__image', widths: '300,400,600', sizes: '(max-width:768px) 90vw, 400px' -}}
             </div>
           {%- endif -%}
-
-          {%- comment %} ── Notation overlay — sits on top of canvas area ── {% endcomment %}
-          {%- if has_notations -%}
-            <div
-              class="shoe3d-notation-overlay"
-              aria-hidden="true"
-              data-panel-notation="{{ forloop.index0 }}"
-            >
-
-              {%- comment %} SVG lines container ── {% endcomment %}
-              <svg
-                class="shoe3d-notation__lines"
-                viewBox="0 0 100 100"
-                preserveAspectRatio="none"
-                aria-hidden="true"
-                focusable="false"
-              >
-                {%- if has_notation_1 -%}
-                  <path
-                    class="shoe3d-notation__line"
-                    data-notation-index="0"
-                    data-start-x="{{ block.settings.notation_1_dot_x }}"
-                    data-start-y="{{ block.settings.notation_1_dot_y }}"
-                    data-end-x="{{ block.settings.notation_1_text_x }}"
-                    data-end-y="{{ block.settings.notation_1_text_y }}"
-                    data-breaks="{{ block.settings.notation_1_line_breaks | default: 1 }}"
-                  />
-                {%- endif -%}
-                {%- if has_notation_2 -%}
-                  <path
-                    class="shoe3d-notation__line"
-                    data-notation-index="1"
-                    data-start-x="{{ block.settings.notation_2_dot_x }}"
-                    data-start-y="{{ block.settings.notation_2_dot_y }}"
-                    data-end-x="{{ block.settings.notation_2_text_x }}"
-                    data-end-y="{{ block.settings.notation_2_text_y }}"
-                    data-breaks="{{ block.settings.notation_2_line_breaks | default: 1 }}"
-                  />
-                {%- endif -%}
-              </svg>
-
-              {%- comment %} Dots ── {% endcomment %}
-              {%- if has_notation_1 -%}
-                <button
-                  class="shoe3d-notation__dot"
-                  id="{{ section_id }}-panel{{ forloop.index0 }}-dot0"
-                  style="left: {{ block.settings.notation_1_dot_x }}%; top: {{ block.settings.notation_1_dot_y }}%;"
-                  aria-label="{{ block.settings.notation_1_heading | default: 'Feature detail' | escape }}"
-                  aria-expanded="false"
-                  aria-controls="{{ section_id }}-panel{{ forloop.index0 }}-modal0"
-                  type="button"
-                >
-                  <span class="shoe3d-notation__dot-inner" aria-hidden="true"></span>
-                </button>
-              {%- endif -%}
-              {%- if has_notation_2 -%}
-                <button
-                  class="shoe3d-notation__dot"
-                  id="{{ section_id }}-panel{{ forloop.index0 }}-dot1"
-                  style="left: {{ block.settings.notation_2_dot_x }}%; top: {{ block.settings.notation_2_dot_y }}%;"
-                  aria-label="{{ block.settings.notation_2_heading | default: 'Feature detail' | escape }}"
-                  aria-expanded="false"
-                  aria-controls="{{ section_id }}-panel{{ forloop.index0 }}-modal1"
-                  type="button"
-                >
-                  <span class="shoe3d-notation__dot-inner" aria-hidden="true"></span>
-                </button>
-              {%- endif -%}
-
-              {%- comment %} Desktop callouts ── {% endcomment %}
-              {%- if has_notation_1 -%}
-                <div
-                  class="shoe3d-notation__callout"
-                  data-notation-callout="0"
-                  style="left: {{ block.settings.notation_1_text_x }}%; top: {{ block.settings.notation_1_text_y }}%; animation-delay: 1.8s;"
-                  aria-hidden="true"
-                >
-                  <div class="shoe3d-notation__callout-inner">
-                    {%- if block.settings.notation_1_heading != blank -%}
-                      <p class="shoe3d-notation__callout-title">{{ block.settings.notation_1_heading }}</p>
-                    {%- endif -%}
-                    {%- if block.settings.notation_1_text != blank -%}
-                      <p class="shoe3d-notation__callout-text">{{ block.settings.notation_1_text }}</p>
-                    {%- endif -%}
-                  </div>
-                </div>
-              {%- endif -%}
-              {%- if has_notation_2 -%}
-                <div
-                  class="shoe3d-notation__callout"
-                  data-notation-callout="1"
-                  style="left: {{ block.settings.notation_2_text_x }}%; top: {{ block.settings.notation_2_text_y }}%; animation-delay: 2.2s;"
-                  aria-hidden="true"
-                >
-                  <div class="shoe3d-notation__callout-inner">
-                    {%- if block.settings.notation_2_heading != blank -%}
-                      <p class="shoe3d-notation__callout-title">{{ block.settings.notation_2_heading }}</p>
-                    {%- endif -%}
-                    {%- if block.settings.notation_2_text != blank -%}
-                      <p class="shoe3d-notation__callout-text">{{ block.settings.notation_2_text }}</p>
-                    {%- endif -%}
-                  </div>
-                </div>
-              {%- endif -%}
-
-              {%- comment %} Mobile modals (drawer) ── {% endcomment %}
-              {%- if has_notation_1 -%}
-                <div
-                  class="shoe3d-notation__modal"
-                  id="{{ section_id }}-panel{{ forloop.index0 }}-modal0"
-                  role="dialog"
-                  aria-modal="true"
-                  aria-label="{{ block.settings.notation_1_heading | default: 'Feature detail' | escape }}"
-                  aria-hidden="true"
-                  hidden
-                >
-                  <div class="shoe3d-notation__modal-overlay" data-modal-close></div>
-                  <div class="shoe3d-notation__modal-inner" role="document">
-                    <button
-                      class="shoe3d-notation__modal-close"
-                      type="button"
-                      aria-label="Close"
-                      data-modal-close
-                    >
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                        <path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                      </svg>
-                    </button>
-                    {%- if block.settings.notation_1_heading != blank -%}
-                      <p class="shoe3d-notation__modal-title">{{ block.settings.notation_1_heading }}</p>
-                    {%- endif -%}
-                    {%- if block.settings.notation_1_text != blank -%}
-                      <p class="shoe3d-notation__modal-text">{{ block.settings.notation_1_text }}</p>
-                    {%- endif -%}
-                  </div>
-                </div>
-              {%- endif -%}
-              {%- if has_notation_2 -%}
-                <div
-                  class="shoe3d-notation__modal"
-                  id="{{ section_id }}-panel{{ forloop.index0 }}-modal1"
-                  role="dialog"
-                  aria-modal="true"
-                  aria-label="{{ block.settings.notation_2_heading | default: 'Feature detail' | escape }}"
-                  aria-hidden="true"
-                  hidden
-                >
-                  <div class="shoe3d-notation__modal-overlay" data-modal-close></div>
-                  <div class="shoe3d-notation__modal-inner" role="document">
-                    <button
-                      class="shoe3d-notation__modal-close"
-                      type="button"
-                      aria-label="Close"
-                      data-modal-close
-                    >
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                        <path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                      </svg>
-                    </button>
-                    {%- if block.settings.notation_2_heading != blank -%}
-                      <p class="shoe3d-notation__modal-title">{{ block.settings.notation_2_heading }}</p>
-                    {%- endif -%}
-                    {%- if block.settings.notation_2_text != blank -%}
-                      <p class="shoe3d-notation__modal-text">{{ block.settings.notation_2_text }}</p>
-                    {%- endif -%}
-                  </div>
-                </div>
-              {%- endif -%}
-
-            </div>
-          {%- endif -%}
-
         </div>
       {%- endfor -%}
 
       <div class="shoe3d-end-spacer" aria-hidden="true"></div>
-
-    </div>{%- comment %} /.shoe3d-panels ── {% endcomment %}
-
-  </div>{%- comment %} /.shoe3d-section__inner ── {% endcomment %}
+    </div>
+  </div>
 
 </section>
 
-{%- comment %} ════════════════════════════════════════════
-  STYLES
-════════════════════════════════════════════ {% endcomment %}
 <style>
-/* ── CSS custom properties ── */
+/* ── CSS variables ── */
 #{{ section_id }} {
-  --bg: {{ bg_color }};
-  --text: {{ text_color }};
-  --accent: {{ accent_color }};
-  --panel-h: 70vh;
+  --bg:      {{ bg_color }};
+  --text:    {{ text_color }};
+  --accent:  {{ accent_color }};
+  --panel-h: 80vh;
   --content-w: min(400px, 42vw);
   --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
   --max-w: 1520px;
-  /* Notation variables — sourced from section settings */
-  --notation-dot-size: {{ section.settings.notation_dot_size | default: 20 }}px;
-  --notation-dot-size-mobile: {{ section.settings.notation_dot_size_mobile | default: 16 }}px;
-  --notation-dot-color: {{ section.settings.notation_dot_color | default: '#ffffff' }};
-  --notation-dot-border: {{ section.settings.notation_dot_border_color | default: '#000000' }};
-  --notation-dot-border-w: {{ section.settings.notation_dot_border_width | default: 2 }}px;
-  --notation-line-color: {{ section.settings.notation_line_color | default: '#ffffff' }};
-  --notation-line-width: {{ section.settings.notation_line_width | default: 0.8 }};
-  --notation-callout-title-color: {{ section.settings.notation_callout_title_color | default: '#000000' }};
-  --notation-callout-text-color: {{ section.settings.notation_callout_text_color | default: '#666666' }};
+  /* Notation tokens */
+  --n-dot:        {{ section.settings.notation_dot_size   | default: 20 }}px;
+  --n-dot-mob:    {{ section.settings.notation_dot_size_mobile | default: 16 }}px;
+  --n-dot-fill:   {{ section.settings.notation_dot_color  | default: '#ffffff' }};
+  --n-dot-border: {{ section.settings.notation_dot_border_color | default: '#000000' }};
+  --n-dot-bw:     {{ section.settings.notation_dot_border_width | default: 2 }}px;
+  --n-line:       {{ section.settings.notation_line_color | default: '#ffffff' }};
+  --n-line-w:     {{ section.settings.notation_line_width | default: 0.8 }};
+  --n-title:      {{ section.settings.notation_callout_title_color | default: '#000000' }};
+  --n-body:       {{ section.settings.notation_callout_text_color  | default: '#555555' }};
 }
 
-/* ── Section wrapper ── */
+/* ── Section ── */
 .shoe3d-section {
   position: relative;
   background: var(--bg);
@@ -418,16 +327,7 @@
   contain: layout style;
 }
 
-/* ── Inner content — locked to max-width, pulled over canvas ── */
-.shoe3d-section__inner {
-  max-width: var(--max-w);
-  margin: 0 auto;
-  position: relative;
-  margin-top: -100vh;
-  padding-top: 0;
-}
-
-/* ── Sticky canvas ── */
+/* ── Sticky canvas layer ── */
 .shoe3d-canvas-wrap {
   position: sticky;
   top: 0;
@@ -436,6 +336,7 @@
   height: 100vh;
   z-index: 1;
   pointer-events: none;
+  overflow: hidden;
 }
 .shoe3d-canvas {
   display: block;
@@ -462,472 +363,342 @@
   justify-content: center;
   gap: 1rem;
   transition: opacity .4s ease, visibility .4s ease;
-}
-.shoe3d-loader.is-hidden {
-  opacity: 0;
-  visibility: hidden;
   pointer-events: none;
 }
+.shoe3d-loader.is-hidden { opacity: 0; visibility: hidden; }
 .shoe3d-loader__ring {
-  width: 36px;
-  height: 36px;
+  width: 36px; height: 36px;
   border: 2px solid rgba(255,255,255,.15);
   border-top-color: rgba(255,255,255,.7);
   border-radius: 50%;
   animation: shoe3d-spin .8s linear infinite;
 }
 .shoe3d-loader__text {
-  font-size: .7rem;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,.4);
+  font-size: .7rem; letter-spacing: .12em;
+  text-transform: uppercase; color: rgba(255,255,255,.4);
+}
+
+/* ════════════════════════════════════════
+   NOTATION OVERLAYS
+   Live inside .shoe3d-canvas-wrap so they
+   always overlay the sticky 3D canvas.
+════════════════════════════════════════ */
+.shoe3d-notations {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* Hidden state */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .5s var(--ease-spring), visibility .5s var(--ease-spring);
+}
+/* Visible state — toggled by JS when panel is active */
+.shoe3d-notations.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: none; /* dots re-enable pointer-events below */
+}
+
+/* SVG lines container */
+.shoe3d-notations__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.shoe3d-notations__line {
+  fill: none;
+  stroke: var(--n-line);
+  stroke-width: var(--n-line-w);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: var(--line-length, 2000);
+  stroke-dashoffset: var(--line-length, 2000);
+}
+.shoe3d-notations.is-active .shoe3d-notations__line {
+  animation: shoe3d-draw 1.8s ease-out forwards;
+}
+.shoe3d-notations.is-active .shoe3d-notations__line[data-idx="1"] {
+  animation-delay: .3s;
+}
+
+@keyframes shoe3d-draw { to { stroke-dashoffset: 0; } }
+
+/* Dots */
+.shoe3d-notations__dot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 44px; height: 44px;         /* WCAG touch target */
+  display: flex; align-items: center; justify-content: center;
+  background: none; border: none; padding: 0;
+  cursor: default;
+  pointer-events: none;              /* desktop: no pointer needed */
+  z-index: 2;
+}
+.shoe3d-notations__dot-inner {
+  width: var(--n-dot); height: var(--n-dot);
+  background: var(--n-dot-fill);
+  border: var(--n-dot-bw) solid var(--n-dot-border);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0,0,0,.3);
+  transform: scale(0);
+  transition: transform .4s var(--ease-spring);
+  display: block;
+}
+.shoe3d-notations.is-active .shoe3d-notations__dot-inner {
+  transform: scale(1);
+}
+/* Stagger second dot */
+.shoe3d-notations__dot:nth-of-type(3) .shoe3d-notations__dot-inner { transition-delay: .12s; }
+
+/* Desktop hover scale */
+@media (hover: hover) and (pointer: fine) {
+  .shoe3d-notations.is-active .shoe3d-notations__dot:hover .shoe3d-notations__dot-inner {
+    transform: scale(1.3);
+  }
+}
+
+/* Callouts — desktop only */
+.shoe3d-notations__callout {
+  position: absolute;
+  transform: translate(0, -50%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .5s ease .8s, transform .5s var(--ease-spring) .8s;
+}
+.shoe3d-notations.is-active .shoe3d-notations__callout {
+  opacity: 1;
+}
+.shoe3d-notations.is-active .shoe3d-notations__callout[data-callout-idx="1"] {
+  transition-delay: 1.1s;
+}
+.shoe3d-notations__callout-inner-wrap {
+  background: rgba(255,255,255,.82);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 7px 13px;
+  border-radius: 9px;
+  max-width: 200px;
+  box-shadow: 0 2px 12px rgba(0,0,0,.12);
+}
+.shoe3d-notations__callout-title {
+  font-weight: 600; font-size: 13px;
+  color: var(--n-title); margin: 0 0 2px; line-height: 1.3;
+}
+.shoe3d-notations__callout-body {
+  font-size: 11px; line-height: 1.45;
+  color: var(--n-body); margin: 0;
+}
+
+/* Mobile: hide lines + callouts, enable dot taps, pulse dots */
+@media (max-width: 768px) {
+  .shoe3d-notations__svg,
+  .shoe3d-notations__callout { display: none; }
+
+  .shoe3d-notations__dot {
+    pointer-events: all;
+    cursor: pointer;
+  }
+  .shoe3d-notations__dot-inner {
+    width: var(--n-dot-mob) !important;
+    height: var(--n-dot-mob) !important;
+    transform: scale(1) !important;
+  }
+
+  @keyframes shoe3d-pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(255,255,255,.8); }
+    50%      { box-shadow: 0 0 0 8px rgba(255,255,255,0); }
+  }
+  .shoe3d-notations.is-active .shoe3d-notations__dot-inner {
+    animation: shoe3d-pulse 2.5s ease-in-out infinite;
+  }
+}
+
+/* ── Mobile modals (fixed, outside sticky wrap) ── */
+.shoe3d-modal {
+  position: fixed; inset: 0;
+  z-index: 9999;
+  display: flex; align-items: flex-end;
+  opacity: 0; visibility: hidden;
+  transition: opacity .25s ease, visibility .25s ease;
+  pointer-events: none;
+}
+.shoe3d-modal:not([hidden]) {
+  opacity: 1; visibility: visible; pointer-events: all;
+}
+.shoe3d-modal__overlay {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,.45); cursor: pointer;
+}
+.shoe3d-modal__inner {
+  position: relative; z-index: 1;
+  background: #fff;
+  border-radius: 20px 20px 0 0;
+  padding: 2.2rem 1.5rem 3rem;
+  width: 100%; max-height: 60vh;
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+  box-shadow: 0 -8px 40px rgba(0,0,0,.18);
+}
+.shoe3d-modal__close {
+  position: absolute; top: 1rem; right: 1rem;
+  width: 36px; height: 36px;
+  background: rgba(0,0,0,.06); border: none; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: #000;
+  transition: background .2s ease;
+}
+.shoe3d-modal__close:hover { background: rgba(0,0,0,.13); }
+.shoe3d-modal__close:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.shoe3d-modal__title {
+  font-weight: 700; font-size: 1.1rem;
+  color: #111; margin: 0 0 .5rem; padding-right: 2.5rem;
+}
+.shoe3d-modal__body {
+  font-size: .9rem; line-height: 1.65; color: #555; margin: 0;
+}
+
+/* ── Scrollable inner content ── */
+.shoe3d-section__inner {
+  max-width: var(--max-w);
+  margin: -100vh auto 0;
+  position: relative;
+  z-index: 2;
 }
 
 /* ── Hero ── */
 .shoe3d-hero {
   position: relative;
   z-index: 3;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
   min-height: 100vh;
-  padding: 2rem;
-  text-align: center;
+  padding: 2rem; text-align: center;
   pointer-events: none;
 }
 .shoe3d-hero__badge {
-  display: inline-flex;
-  align-items: center;
-  gap: .5rem;
+  display: inline-flex; align-items: center;
   border: 1px solid rgba(255,255,255,.25);
-  border-radius: 50px;
-  padding: .35em 1.1em;
-  font-size: .7rem;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,.75);
+  border-radius: 50px; padding: .35em 1.1em;
+  font-size: .7rem; letter-spacing: .18em;
+  text-transform: uppercase; color: rgba(255,255,255,.75);
   margin-bottom: 1.5rem;
 }
 .shoe3d-hero__headline {
-  font-family: var(--font-heading-family, 'Georgia', serif);
+  font-family: var(--font-heading-family, Georgia, serif);
   font-size: clamp(2.5rem, 8vw, 7rem);
-  font-weight: 300;
-  letter-spacing: -.04em;
-  line-height: .95;
-  color: var(--text);
+  font-weight: 300; letter-spacing: -.04em;
+  line-height: .95; color: var(--text);
   margin: 0 0 1rem;
 }
 .shoe3d-hero__sub {
   font-size: clamp(.85rem, 1.3vw, 1.1rem);
   color: rgba(255,255,255,.5);
-  letter-spacing: .06em;
-  text-transform: uppercase;
+  letter-spacing: .06em; text-transform: uppercase;
   margin: 0 0 3rem;
 }
 .shoe3d-hero__scroll-hint {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: .6rem;
+  display: flex; flex-direction: column;
+  align-items: center; gap: .6rem;
   animation: shoe3d-bounce 2s ease-in-out infinite;
 }
 .shoe3d-hero__scroll-line {
-  display: block;
-  width: 1px;
-  height: 48px;
+  display: block; width: 1px; height: 48px;
   background: linear-gradient(to bottom, transparent, rgba(255,255,255,.6));
 }
 .shoe3d-hero__scroll-label {
-  font-size: .65rem;
-  letter-spacing: .2em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,.4);
+  font-size: .65rem; letter-spacing: .2em;
+  text-transform: uppercase; color: rgba(255,255,255,.4);
 }
 
-/* ── Scroll panels ── */
-.shoe3d-panels {
-  position: relative;
-  z-index: 2;
-}
+/* ── Panels ── */
+.shoe3d-panels { position: relative; z-index: 2; }
 .shoe3d-panel {
   min-height: var(--panel-h);
-  display: flex;
-  align-items: center;
+  display: flex; align-items: center;
   padding: 2rem 5vw;
   pointer-events: none;
-  position: relative;
 }
 .shoe3d-panel--left  { justify-content: flex-end; }
 .shoe3d-panel--right { justify-content: flex-start; }
 
-/* ── Panel text content ── */
 .shoe3d-panel__content {
   pointer-events: all;
   width: var(--content-w);
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  opacity: 0;
-  transform: translateY(40px);
-  transition:
-    opacity .7s var(--ease-spring),
-    transform .7s var(--ease-spring);
-  position: relative;
-  z-index: 4;
+  display: flex; flex-direction: column; gap: 1.25rem;
+  opacity: 0; transform: translateY(40px);
+  transition: opacity .7s var(--ease-spring), transform .7s var(--ease-spring);
+  position: relative; z-index: 4;
 }
-.shoe3d-panel__content.is-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
+.shoe3d-panel__content.is-visible { opacity: 1; transform: translateY(0); }
+
 .shoe3d-panel__eyebrow {
   display: inline-block;
-  font-size: .65rem;
-  font-weight: 600;
-  letter-spacing: .2em;
-  text-transform: uppercase;
-  color: var(--accent);
-  border: 1px solid var(--accent);
-  border-radius: 50px;
-  padding: .3em .9em;
-  width: fit-content;
+  font-size: .65rem; font-weight: 600;
+  letter-spacing: .2em; text-transform: uppercase;
+  color: var(--accent); border: 1px solid var(--accent);
+  border-radius: 50px; padding: .3em .9em; width: fit-content;
 }
 .shoe3d-panel__heading {
-  font-family: var(--font-heading-family, 'Georgia', serif);
+  font-family: var(--font-heading-family, Georgia, serif);
   font-size: clamp(1.6rem, 3.5vw, 3rem);
-  font-weight: 300;
-  letter-spacing: -.04em;
-  line-height: 1.05;
-  color: var(--text);
-  margin: 0;
+  font-weight: 300; letter-spacing: -.04em;
+  line-height: 1.05; color: var(--text); margin: 0;
 }
 .shoe3d-panel__body {
   font-size: clamp(.85rem, 1.1vw, 1rem);
-  line-height: 1.75;
-  color: rgba(255,255,255,.6);
-  margin: 0;
-  max-width: 38ch;
+  line-height: 1.75; color: rgba(255,255,255,.6);
+  margin: 0; max-width: 38ch;
 }
 .shoe3d-panel__features {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: .5rem;
+  list-style: none; padding: 0; margin: 0;
+  display: flex; flex-direction: column; gap: .5rem;
 }
 .shoe3d-panel__feature {
-  font-size: .85rem;
-  color: rgba(255,255,255,.7);
-  padding-left: 1.2em;
-  position: relative;
-  letter-spacing: .02em;
+  font-size: .85rem; color: rgba(255,255,255,.7);
+  padding-left: 1.2em; position: relative; letter-spacing: .02em;
 }
 .shoe3d-panel__feature::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: .5em;
-  width: 5px;
-  height: 5px;
-  background: var(--accent);
-  border-radius: 50%;
+  content: ''; position: absolute;
+  left: 0; top: .5em;
+  width: 5px; height: 5px;
+  background: var(--accent); border-radius: 50%;
 }
 .shoe3d-panel__cta {
-  display: inline-flex;
-  align-items: center;
-  gap: .6rem;
-  font-size: .75rem;
-  font-weight: 600;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  text-decoration: none;
-  color: var(--bg);
-  background: var(--text);
-  padding: .8em 1.7em;
-  border-radius: 50px;
-  width: fit-content;
+  display: inline-flex; align-items: center; gap: .6rem;
+  font-size: .75rem; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase;
+  text-decoration: none; color: var(--bg); background: var(--text);
+  padding: .8em 1.7em; border-radius: 50px; width: fit-content;
   transition: background .2s ease, color .2s ease, transform .2s ease;
 }
-.shoe3d-panel__cta:hover {
-  background: var(--accent);
-  color: var(--bg);
-  transform: translateX(4px);
-}
-.shoe3d-panel__cta:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 3px;
-}
-.shoe3d-panel__cta svg {
-  flex-shrink: 0;
-  transition: transform .2s ease;
-}
+.shoe3d-panel__cta:hover { background: var(--accent); color: var(--bg); transform: translateX(4px); }
+.shoe3d-panel__cta:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.shoe3d-panel__cta svg { flex-shrink: 0; transition: transform .2s ease; }
 .shoe3d-panel__cta:hover svg { transform: translateX(4px); }
 
-/* Mobile image */
 .shoe3d-panel__image-wrap { display: none; }
 @media (max-width: 767px) {
   .shoe3d-panel__image-wrap {
-    display: block;
-    border-radius: 16px;
-    overflow: hidden;
-    width: 100%;
-    max-width: 280px;
-    aspect-ratio: 1;
-    margin-top: 1rem;
-    box-shadow: 0 20px 50px rgba(0,0,0,.5);
+    display: block; border-radius: 16px; overflow: hidden;
+    width: 100%; max-width: 280px; aspect-ratio: 1;
+    margin-top: 1rem; box-shadow: 0 20px 50px rgba(0,0,0,.5);
   }
-  .shoe3d-panel__image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
+  .shoe3d-panel__image { width: 100%; height: 100%; object-fit: cover; display: block; }
 }
 
-/* ══════════════════════════════════════════
-   NOTATION SYSTEM
-   Mirrors dynamic-feature-combo.liquid
-══════════════════════════════════════════ */
-
-/* ── Overlay — fills the canvas viewport area ── */
-.shoe3d-notation-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  pointer-events: none;
-  z-index: 3;
-  opacity: 0;
-  transition: opacity .4s ease;
-}
-.shoe3d-notation-overlay.is-visible {
-  opacity: 1;
-}
-
-/* ── SVG lines ── */
-.shoe3d-notation__lines {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  overflow: visible;
-}
-
-.shoe3d-notation__line {
-  stroke: var(--notation-line-color);
-  stroke-width: var(--notation-line-width);
-  fill: none;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-dasharray: var(--line-length, 1000);
-  stroke-dashoffset: var(--line-length, 1000);
-  animation: none;
-}
-
-@keyframes shoe3d-drawLine {
-  to { stroke-dashoffset: 0; }
-}
-
-.shoe3d-notation-overlay.is-visible .shoe3d-notation__line {
-  animation: shoe3d-drawLine 2.5s ease-out forwards;
-}
-.shoe3d-notation-overlay.is-visible .shoe3d-notation__line[data-notation-index="1"] {
-  animation-delay: .35s;
-}
-
-/* ── Dots ── */
-.shoe3d-notation__dot {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  z-index: 5;
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  /* Desktop: non-interactive visual only */
-  pointer-events: none;
-}
-.shoe3d-notation__dot-inner {
-  width: var(--notation-dot-size);
-  height: var(--notation-dot-size);
-  background: var(--notation-dot-color);
-  border: var(--notation-dot-border-w) solid var(--notation-dot-border);
-  border-radius: 50%;
-  box-shadow: 0 2px 8px rgba(0,0,0,.25);
-  transform: scale(0);
-  transition: transform .3s ease;
-  display: block;
-}
-.shoe3d-notation-overlay.is-visible .shoe3d-notation__dot-inner {
-  transform: scale(1);
-}
-/* Stagger second dot */
-.shoe3d-notation__dot:nth-child(3) .shoe3d-notation__dot-inner {
-  transition-delay: .1s;
-}
-
-/* Hover scale (desktop, hover-capable devices) */
-@media (hover: hover) and (pointer: fine) {
-  .shoe3d-notation-overlay.is-visible .shoe3d-notation__dot:hover .shoe3d-notation__dot-inner {
-    transform: scale(1.3);
-    box-shadow: 0 4px 16px rgba(0,0,0,.35);
-  }
-}
-
-/* Mobile: pulsing dot + tap-to-open */
-@media (max-width: 768px) {
-  @keyframes shoe3d-dotPulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,.9), 0 2px 8px rgba(255,255,255,.4); }
-    50%       { box-shadow: 0 0 0 10px rgba(255,255,255,.0), 0 2px 20px rgba(255,255,255,.8); }
-  }
-  .shoe3d-notation__dot {
-    pointer-events: all;
-    width: 44px; /* WCAG 2.5.5 — min touch target */
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .shoe3d-notation__dot-inner {
-    width: var(--notation-dot-size-mobile) !important;
-    height: var(--notation-dot-size-mobile) !important;
-    transform: scale(1) !important;
-  }
-  .shoe3d-notation-overlay.is-visible .shoe3d-notation__dot-inner {
-    animation: shoe3d-dotPulse 4s ease-in-out infinite;
-  }
-  /* Hide lines and callouts on mobile */
-  .shoe3d-notation__lines,
-  .shoe3d-notation__callout {
-    display: none;
-  }
-}
-
-/* ── Callouts (desktop only) ── */
-.shoe3d-notation__callout {
-  position: absolute;
-  pointer-events: none;
-  opacity: 0;
-  transform: translateY(10px);
-  z-index: 5;
-  transition: opacity .4s ease, transform .4s ease;
-}
-.shoe3d-notation-overlay.is-visible .shoe3d-notation__callout {
-  opacity: 1;
-  transform: translateY(0);
-}
-.shoe3d-notation__callout-inner {
-  background: rgba(255,255,255,.8);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  padding: 6px 12px;
-  border-radius: 8px;
-  max-width: 220px;
-  margin: 0 13px 0 0;
-}
-.shoe3d-notation__callout-title {
-  font-weight: 500;
-  font-size: 14px;
-  color: var(--notation-callout-title-color);
-  margin: 0 0 2px;
-  line-height: 1.3;
-}
-.shoe3d-notation__callout-text {
-  font-size: clamp(9px, calc(9px + .1vw), 12px);
-  line-height: 1.4;
-  color: var(--notation-callout-text-color);
-  margin: 0;
-}
-
-/* ── Mobile drawer modals ── */
-.shoe3d-notation__modal {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity .25s ease, visibility .25s ease;
-  pointer-events: none;
-}
-.shoe3d-notation__modal:not([hidden]) {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: all;
-}
-.shoe3d-notation__modal-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,.4);
-  cursor: pointer;
-}
-.shoe3d-notation__modal-inner {
-  position: relative;
-  background: #fff;
-  border-radius: 20px 20px 0 0;
-  padding: 2rem 1.5rem 3rem;
-  max-height: 60vh;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  z-index: 1;
-  box-shadow: 0 -8px 40px rgba(0,0,0,.2);
-}
-.shoe3d-notation__modal-close {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: rgba(0,0,0,.06);
-  border: none;
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background .2s ease;
-  color: #000;
-  flex-shrink: 0;
-}
-.shoe3d-notation__modal-close:hover { background: rgba(0,0,0,.12); }
-.shoe3d-notation__modal-close:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-.shoe3d-notation__modal-title {
-  font-weight: 600;
-  font-size: 1.1rem;
-  color: #000;
-  margin: 0 0 .5rem;
-  padding-right: 2.5rem;
-}
-.shoe3d-notation__modal-text {
-  font-size: .9rem;
-  line-height: 1.6;
-  color: #555;
-  margin: 0;
-}
-
-/* ── End spacer ── */
 .shoe3d-end-spacer { height: 20vh; }
 
-/* ── Mobile: stack layout ── */
+/* ── Mobile layout ── */
 @media (max-width: 767px) {
   .shoe3d-panel {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: column; align-items: flex-start;
     padding: 3rem 1.5rem;
     justify-content: flex-start;
-    min-height: auto;
-    padding-top: 20vh;
+    min-height: auto; padding-top: 20vh;
   }
-  .shoe3d-panel--left,
-  .shoe3d-panel--right { justify-content: flex-start; }
+  .shoe3d-panel--left, .shoe3d-panel--right { justify-content: flex-start; }
   .shoe3d-panel__content { width: 100%; }
   .shoe3d-hero__headline { font-size: clamp(2rem, 10vw, 4rem); }
 }
@@ -935,232 +706,236 @@
 /* ── Keyframes ── */
 @keyframes shoe3d-spin   { to { transform: rotate(360deg); } }
 @keyframes shoe3d-bounce {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(8px); }
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(8px); }
 }
 
 /* ── Reduced motion ── */
 @media (prefers-reduced-motion: reduce) {
-  .shoe3d-hero__scroll-hint       { animation: none; }
-  .shoe3d-loader__ring            { animation: none; border-top-color: rgba(255,255,255,.5); }
-  .shoe3d-panel__content          { opacity: 1; transform: none; transition: none; }
-  .shoe3d-notation__line          { animation: none; stroke-dashoffset: 0; }
-  .shoe3d-notation__dot-inner     { transform: scale(1) !important; transition: none; animation: none !important; }
-  .shoe3d-notation__callout       { opacity: 1; transform: none; transition: none; }
-  .shoe3d-notation-overlay        { opacity: 1; transition: none; }
+  .shoe3d-hero__scroll-hint { animation: none; }
+  .shoe3d-loader__ring { animation: none; border-top-color: rgba(255,255,255,.5); }
+  .shoe3d-panel__content { opacity: 1; transform: none; transition: none; }
+  .shoe3d-notations__line { animation: none !important; stroke-dashoffset: 0 !important; }
+  .shoe3d-notations__dot-inner { transform: scale(1) !important; transition: none; animation: none !important; }
+  .shoe3d-notations__callout { opacity: 1; transition: none; }
 }
 </style>
 
-{%- comment %} ════════════════════════════════════════════
-  JAVASCRIPT
-════════════════════════════════════════════ {% endcomment %}
 <script>
 (function () {
   'use strict';
 
-  /* ── Utility: load a script tag sequentially ── */
+  /* ── Script loader ── */
   function loadScript(src, cb) {
     var s = document.createElement('script');
-    s.src = src;
-    s.async = false;
+    s.src = src; s.async = false;
     s.onload = cb;
-    s.onerror = function () { console.error('[Shoe3D] Script load failed:', src); };
+    s.onerror = function () { console.error('[Shoe3D] Failed:', src); };
     document.head.appendChild(s);
   }
 
-  /* ── Load Three.js → GLTFLoader → DRACOLoader → MeshoptDecoder ── */
   loadScript('https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js', function () {
     loadScript('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js', function () {
       loadScript('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js', function () {
         loadScript('https://cdn.jsdelivr.net/npm/meshoptimizer@0.18.1/meshopt_decoder.js', function () {
-
-          var T   = window.THREE;
-          var GL  = T && T.GLTFLoader;
-          var DL  = T && T.DRACOLoader;
-          var MOD = window.MeshoptDecoder;
-
-          if (!T || !GL || !DL) {
-            console.error('[Shoe3D] THREE libs not ready');
-            return;
-          }
-          if (MOD && GL.setMeshoptDecoder) { GL.setMeshoptDecoder(MOD); }
-
+          var T = window.THREE, GL = T && T.GLTFLoader, DL = T && T.DRACOLoader, MOD = window.MeshoptDecoder;
+          if (!T || !GL || !DL) { console.error('[Shoe3D] THREE not ready'); return; }
+          if (MOD && GL.setMeshoptDecoder) GL.setMeshoptDecoder(MOD);
           initShoe3D(T, GL, DL, MOD);
         });
       });
     });
   });
 
-  /* ══════════════════════════════════════════════════════════
-     NOTATION SYSTEM
-     Mirrors DynamicFeatureSection from dynamic-feature-combo
-  ══════════════════════════════════════════════════════════ */
-  function NotationController(sectionEl) {
-    this.section       = sectionEl;
-    this.activeOverlay = null;
-    this.isMobile      = window.innerWidth <= 768;
-    this._resizeTimer  = null;
+  /* ════════════════════════════════════════════
+     NOTATION CONTROLLER
+     Manages show/hide and line drawing per panel
+  ════════════════════════════════════════════ */
+  function NotationController(sectionEl, sectionId) {
+    this.section    = sectionEl;
+    this.sectionId  = sectionId;
+    this.active     = null;   // currently visible overlay element
+    this.activeIdx  = -1;
+    this.isMobile   = window.innerWidth <= 768;
+    this._rTimer    = null;
 
-    this._bindModals();
+    this._bindMobileModals();
     window.addEventListener('resize', this._onResize.bind(this), { passive: true });
   }
 
   NotationController.prototype._onResize = function () {
-    clearTimeout(this._resizeTimer);
+    clearTimeout(this._rTimer);
     var self = this;
-    this._resizeTimer = setTimeout(function () {
-      var wasMobile = self.isMobile;
+    this._rTimer = setTimeout(function () {
+      var was = self.isMobile;
       self.isMobile = window.innerWidth <= 768;
-      /* Re-draw lines on desktop if switching from mobile */
-      if (wasMobile && !self.isMobile && self.activeOverlay) {
-        self._drawLines(self.activeOverlay, false);
+      /* Redraw lines if switching to desktop while an overlay is active */
+      if (was && !self.isMobile && self.active) {
+        self._drawLines(self.active, false);
       }
     }, 150);
   };
 
-  NotationController.prototype.activate = function (panelIndex) {
-    var overlay = this.section.querySelector(
-      '.shoe3d-notation-overlay[data-panel-notation="' + panelIndex + '"]'
-    );
-    if (!overlay) return;
-    if (this.activeOverlay && this.activeOverlay !== overlay) {
-      this.deactivate();
+  /* Show the notation overlay for panel at index idx */
+  NotationController.prototype.show = function (idx) {
+    if (this.activeIdx === idx) return;
+
+    /* Hide previous */
+    if (this.active) {
+      this._resetOverlay(this.active);
+      this.active.classList.remove('is-active');
+      this.active = null;
     }
-    this.activeOverlay = overlay;
-    overlay.classList.add('is-visible');
+
+    var overlay = this.section.querySelector(
+      '.shoe3d-notations[data-notation-panel="' + idx + '"]'
+    );
+    if (!overlay) { this.activeIdx = idx; return; } /* panel has no notations */
+
+    this.active    = overlay;
+    this.activeIdx = idx;
+
+    /* Draw lines BEFORE adding is-active so getBoundingClientRect is accurate */
     if (!this.isMobile) {
       this._drawLines(overlay, true);
     }
-  };
 
-  NotationController.prototype.deactivate = function () {
-    if (!this.activeOverlay) return;
-    this.activeOverlay.classList.remove('is-visible');
-    /* Reset line animations */
-    var lines = this.activeOverlay.querySelectorAll('.shoe3d-notation__line');
-    lines.forEach(function (l) {
-      l.style.animation = 'none';
-      l.style.strokeDashoffset = l.style.strokeDasharray;
+    overlay.classList.add('is-active');
+
+    /* Enable keyboard access on dots when visible */
+    overlay.querySelectorAll('.shoe3d-notations__dot').forEach(function (d) {
+      d.removeAttribute('tabindex');
     });
-    this.activeOverlay = null;
   };
 
+  /* Hide all overlays */
+  NotationController.prototype.hide = function () {
+    if (!this.active) return;
+    this._resetOverlay(this.active);
+    this.active.classList.remove('is-active');
+    this.active.querySelectorAll('.shoe3d-notations__dot').forEach(function (d) {
+      d.setAttribute('tabindex', '-1');
+    });
+    this.active    = null;
+    this.activeIdx = -1;
+  };
+
+  /* Reset line animations so they can replay next time */
+  NotationController.prototype._resetOverlay = function (overlay) {
+    overlay.querySelectorAll('.shoe3d-notations__line').forEach(function (l) {
+      l.style.animation      = 'none';
+      l.style.strokeDashoffset = l.style.strokeDasharray || '2000';
+    });
+  };
+
+  /* ── Line drawing — same elbow algorithm as dynamic-feature-combo ── */
   NotationController.prototype._drawLines = function (overlay, animate) {
-    if (this.isMobile) return;
-    var self = this;
-    var svg  = overlay.querySelector('.shoe3d-notation__lines');
-    if (!svg) return;
+    var svg      = overlay.querySelector('.shoe3d-notations__svg');
+    var lines    = overlay.querySelectorAll('.shoe3d-notations__line');
+    var dots     = overlay.querySelectorAll('.shoe3d-notations__dot');
+    var callouts = overlay.querySelectorAll('.shoe3d-notations__callout');
+    if (!svg || !lines.length) return;
 
-    var lines    = overlay.querySelectorAll('.shoe3d-notation__line');
-    var callouts = overlay.querySelectorAll('.shoe3d-notation__callout');
-    var dots     = overlay.querySelectorAll('.shoe3d-notation__dot');
+    var svgRect = svg.getBoundingClientRect();
+    if (svgRect.width === 0) return;
 
-    lines.forEach(function (line, index) {
-      var dot     = dots[index];
-      var callout = callouts[index];
+    lines.forEach(function (line, i) {
+      var dot     = dots[i];
+      var callout = callouts[i];
       if (!dot || !callout) return;
 
-      var svgRect     = svg.getBoundingClientRect();
-      var dotRect     = dot.getBoundingClientRect();
-      var calloutRect = callout.getBoundingClientRect();
-      var GAP         = 12;
+      var dotR     = dot.getBoundingClientRect();
+      var calR     = callout.getBoundingClientRect();
+      var GAP      = 10;
 
-      var sx = ((dotRect.left + dotRect.width  / 2 - svgRect.left) / svgRect.width)  * 100;
-      var sy = ((dotRect.top  + dotRect.height / 2 - svgRect.top)  / svgRect.height) * 100;
+      /* dot centre in SVG % coords */
+      var sx = ((dotR.left + dotR.width  / 2 - svgRect.left) / svgRect.width)  * 100;
+      var sy = ((dotR.top  + dotR.height / 2 - svgRect.top)  / svgRect.height) * 100;
 
-      var goingRight = calloutRect.left > dotRect.left;
-      var endXpx     = goingRight ? calloutRect.left - GAP : calloutRect.right + GAP;
-      var endX       = ((endXpx - svgRect.left) / svgRect.width)  * 100;
-      var endY       = ((calloutRect.top + calloutRect.height / 2 - svgRect.top) / svgRect.height) * 100;
+      /* callout edge in SVG % coords */
+      var goRight = calR.left > dotR.left;
+      var exPx    = goRight ? calR.left - GAP : calR.right + GAP;
+      var ex      = ((exPx - svgRect.left) / svgRect.width) * 100;
+      var ey      = ((calR.top + calR.height / 2 - svgRect.top) / svgRect.height) * 100;
 
-      var hasBend     = parseInt(line.dataset.breaks, 10) === 1;
-      var deltaY      = Math.abs(endY - sy);
-      var MIN_BEND    = 3;
+      var hasBend  = parseInt(line.dataset.breaks, 10) === 1;
+      var deltaY   = Math.abs(ey - sy);
       var path;
 
-      if (!hasBend || deltaY < MIN_BEND) {
-        path = 'M ' + sx + ',' + sy + ' L ' + endX + ',' + endY;
+      if (!hasBend || deltaY < 3) {
+        path = 'M ' + sx + ',' + sy + ' L ' + ex + ',' + ey;
       } else {
-        var elbowX  = goingRight
-          ? sx + Math.abs(endX - sx) * 0.5
-          : sx - Math.abs(endX - sx) * 0.5;
-        var radius  = Math.min(4, Math.abs(endX - sx) / 4);
-        var vertDir = endY > sy ? 1 : -1;
+        var elbowX  = goRight
+          ? sx + Math.abs(ex - sx) * 0.5
+          : sx - Math.abs(ex - sx) * 0.5;
+        var r       = Math.min(4, Math.abs(ex - sx) / 4);
+        var vd      = ey > sy ? 1 : -1;
+        var sign    = goRight ? 1 : -1;
         path = [
-          'M '  + sx + ',' + sy,
-          'L '  + (elbowX - radius * (goingRight ? 1 : -1)) + ',' + sy,
-          'Q '  + elbowX + ',' + sy + ' ' + elbowX + ',' + (sy + radius * vertDir),
-          'L '  + elbowX + ',' + (endY - radius * vertDir),
-          'Q '  + elbowX + ',' + endY + ' ' + (elbowX + radius * (goingRight ? 1 : -1)) + ',' + endY,
-          'L '  + endX + ',' + endY,
+          'M ' + sx + ',' + sy,
+          'L ' + (elbowX - r * sign) + ',' + sy,
+          'Q ' + elbowX + ',' + sy + ' ' + elbowX + ',' + (sy + r * vd),
+          'L ' + elbowX + ',' + (ey - r * vd),
+          'Q ' + elbowX + ',' + ey + ' ' + (elbowX + r * sign) + ',' + ey,
+          'L ' + ex + ',' + ey
         ].join(' ');
       }
 
       line.setAttribute('d', path);
-      var length = line.getTotalLength();
-      line.style.setProperty('--line-length', length);
-      line.style.strokeDasharray  = length;
-      line.style.strokeDashoffset = length;
+      var len = line.getTotalLength();
+      line.style.setProperty('--line-length', len);
+      line.style.strokeDasharray  = len;
+      line.style.strokeDashoffset = len;
 
       if (animate) {
-        line.style.animation      = 'shoe3d-drawLine 2.5s ease-out forwards';
-        line.style.animationDelay = (index * 0.35) + 's';
+        /* Void reflow so CSS animation restarts */
+        void line.offsetWidth;
+        line.style.animation      = 'shoe3d-draw 1.8s ease-out forwards';
+        line.style.animationDelay = (i * 0.3) + 's';
       } else {
         line.style.strokeDashoffset = 0;
       }
     });
   };
 
-  /* ── Modal binding ── */
-  NotationController.prototype._bindModals = function () {
+  /* ── Mobile modal binding ── */
+  NotationController.prototype._bindMobileModals = function () {
     var self = this;
 
-    /* Dot buttons — open modal on mobile */
-    var dots = this.section.querySelectorAll('.shoe3d-notation__dot');
-    dots.forEach(function (dot) {
+    /* Dot tap → open modal on mobile */
+    this.section.querySelectorAll('.shoe3d-notations__dot').forEach(function (dot) {
       dot.addEventListener('click', function (e) {
         if (window.innerWidth > 768) return;
-        e.preventDefault();
-        e.stopPropagation();
-        var targetId = dot.getAttribute('aria-controls');
-        if (!targetId) return;
-        var modal = document.getElementById(targetId);
+        e.preventDefault(); e.stopPropagation();
+        var modalId = dot.getAttribute('aria-controls');
+        if (!modalId) return;
+        var modal = document.getElementById(modalId);
         if (modal) self._openModal(modal, dot);
       });
-
-      /* Keyboard: Enter / Space */
       dot.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          dot.click();
-        }
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); dot.click(); }
       });
     });
 
-    /* Close triggers inside modals */
-    var modals = this.section.querySelectorAll('.shoe3d-notation__modal');
-    modals.forEach(function (modal) {
-      modal.querySelectorAll('[data-modal-close]').forEach(function (trigger) {
-        trigger.addEventListener('click', function () { self._closeModal(modal); });
+    /* Close triggers */
+    document.querySelectorAll('.shoe3d-modal').forEach(function (modal) {
+      modal.querySelectorAll('[data-modal-close]').forEach(function (t) {
+        t.addEventListener('click', function () { self._closeModal(modal); });
       });
-      /* ESC key */
       modal.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') self._closeModal(modal);
       });
     });
   };
 
-  NotationController.prototype._openModal = function (modal, triggerEl) {
+  NotationController.prototype._openModal = function (modal, trigger) {
     modal.removeAttribute('hidden');
     modal.setAttribute('aria-hidden', 'false');
-    if (triggerEl) triggerEl.setAttribute('aria-expanded', 'true');
-    /* Trap focus into modal */
-    var focusable = modal.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    );
-    if (focusable.length) focusable[0].focus();
+    if (trigger) trigger.setAttribute('aria-expanded', 'true');
+    var first = modal.querySelector('button,[href],[tabindex]');
+    if (first) first.focus();
     document.body.style.overflow = 'hidden';
-    this._lastTrigger = triggerEl;
+    this._lastTrigger = trigger;
   };
 
   NotationController.prototype._closeModal = function (modal) {
@@ -1174,66 +949,52 @@
     }
   };
 
-  /* ══════════════════════════════════════════════════════════
+  /* ════════════════════════════════════════════
      3D RENDERER
-  ══════════════════════════════════════════════════════════ */
+  ════════════════════════════════════════════ */
   function initShoe3D(THREE, GLTFLoader, DRACOLoader, MeshoptDecoder) {
     var SECTION_ID = '{{ section_id }}';
     var section    = document.getElementById(SECTION_ID);
     if (!section) return;
 
     var MODEL_URL = section.dataset.model;
-    if (!MODEL_URL) {
-      console.warn('[Shoe3D] No model URL set in section settings.');
-      return;
-    }
+    if (!MODEL_URL) { console.warn('[Shoe3D] No model URL.'); return; }
 
     var canvas     = document.getElementById(SECTION_ID + '-canvas');
-    var loader     = document.getElementById(SECTION_ID + '-loader');
-    var panelEls   = Array.prototype.slice.call(section.querySelectorAll('.shoe3d-panel'));
-    var contentEls = Array.prototype.slice.call(section.querySelectorAll('.shoe3d-panel__content'));
+    var loaderEl   = document.getElementById(SECTION_ID + '-loader');
+    var panelEls   = [].slice.call(section.querySelectorAll('.shoe3d-panel'));
+    var contentEls = [].slice.call(section.querySelectorAll('.shoe3d-panel__content'));
 
-    /* Init notation controller */
-    var notation = new NotationController(section);
+    var notation = new NotationController(section, SECTION_ID);
 
-    /* ── Lerp ── */
-    var LERP_SPEED = 0.08;
-    function lerp(a, b, t) { return a + (b - a) * t; }
+    /* ── Helpers ── */
+    var LERP  = 0.08;
+    var lerp  = function (a, b, t) { return a + (b - a) * t; };
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    /* ── Read panel pose from data attributes ── */
-    function getPanelPose(el) {
+    function getPose(el) {
       return {
-        rotX:  parseFloat(el.dataset.shoeRotX  || 0) * (Math.PI / 180),
-        rotY:  parseFloat(el.dataset.shoeRotY  || 0) * (Math.PI / 180),
-        rotZ:  parseFloat(el.dataset.shoeRotZ  || 0) * (Math.PI / 180),
-        posX:  parseFloat(el.dataset.shoePosX  || 0) / 10,
-        posY:  parseFloat(el.dataset.shoePosY  || 0) / 10,
-        lightIntensity: parseFloat(el.dataset.shoeLightIntensity || 10) / 10,
-        lightX: parseFloat(el.dataset.shoeLightX || 5),
-        lightY: parseFloat(el.dataset.shoeLightY || 5),
-        lightZ: parseFloat(el.dataset.shoeLightZ || 5),
+        rotX: parseFloat(el.dataset.shoeRotX || 0) * Math.PI / 180,
+        rotY: parseFloat(el.dataset.shoeRotY || 0) * Math.PI / 180,
+        rotZ: parseFloat(el.dataset.shoeRotZ || 0) * Math.PI / 180,
+        posX: parseFloat(el.dataset.shoePosX || 0) / 10,
+        posY: parseFloat(el.dataset.shoePosY || 0) / 10,
+        lI:   parseFloat(el.dataset.shoeLightIntensity || 12) / 10,
+        lX:   parseFloat(el.dataset.shoeLightX || 5),
+        lY:   parseFloat(el.dataset.shoeLightY || 5),
+        lZ:   parseFloat(el.dataset.shoeLightZ || 5),
       };
     }
 
     /* ── State ── */
-    var shoe = null;
-    var raf  = null;
-    var isVisible = false;
-    var W = 0, H = 0;
-    var cur = { rotX: 0, rotY: 0, rotZ: 0.2, posX: 0, posY: 0, lX: 5, lY: 5, lZ: 5, lI: 1.0 };
-    var tgt = { rotX: 0, rotY: 0, rotZ: 0.2, posX: 0, posY: 0, lX: 5, lY: 5, lZ: 5, lI: 1.0 };
-    var idleAngle        = 0;
-    var activePanelIndex = -1;
-    var prefersReduced   = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var shoe = null, raf = null, isVis = false, W = 0, H = 0;
+    var idle = 0, activePanelIdx = -1;
+    var cur  = { rotX:0, rotY:0, rotZ:.2, posX:0, posY:0, lI:1, lX:5, lY:5, lZ:5 };
+    var tgt  = { rotX:0, rotY:0, rotZ:.2, posX:0, posY:0, lI:1, lX:5, lY:5, lZ:5 };
 
     /* ── Renderer ── */
-    var renderer = new THREE.WebGLRenderer({
-      canvas: canvas,
-      antialias: true,
-      alpha: true,
-      powerPreference: 'high-performance',
-    });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     renderer.outputEncoding    = THREE.sRGBEncoding;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type    = THREE.PCFSoftShadowMap;
@@ -1244,674 +1005,260 @@
     var camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
     camera.position.set(0, 0, 5);
 
-    /* ── Lighting ── */
+    /* Lights */
     scene.add(new THREE.AmbientLight(0xffffff, 0.4));
-    var keyLight = new THREE.DirectionalLight(0xffffff, 1.0);
-    keyLight.position.set(5, 5, 5);
-    keyLight.castShadow = true;
-    keyLight.shadow.mapSize.set(1024, 1024);
-    keyLight.shadow.camera.near = 0.1;
-    keyLight.shadow.camera.far  = 20;
-    scene.add(keyLight);
-    var rimLight = new THREE.DirectionalLight(0x8899ff, 0.3);
-    rimLight.position.set(-5, 2, -5);
-    scene.add(rimLight);
+    var key = new THREE.DirectionalLight(0xffffff, 1.0);
+    key.position.set(5,5,5); key.castShadow = true;
+    key.shadow.mapSize.set(1024,1024);
+    scene.add(key);
+    var rim = new THREE.DirectionalLight(0x8899ff, 0.3);
+    rim.position.set(-5,2,-5); scene.add(rim);
     scene.add(new THREE.HemisphereLight(0xffffff, 0x333333, 0.2));
 
-    /* ── Resize ── */
+    /* Resize */
     function onResize() {
-      W = canvas.clientWidth  || section.clientWidth  || window.innerWidth;
+      W = canvas.clientWidth  || window.innerWidth;
       H = canvas.clientHeight || window.innerHeight;
       renderer.setSize(W, H, false);
       camera.aspect = W / H;
       camera.updateProjectionMatrix();
     }
-    var resizeTimer;
-    var ro = new ResizeObserver(function () {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(onResize, 100);
-    });
-    ro.observe(canvas);
+    var rzTimer;
+    new ResizeObserver(function () { clearTimeout(rzTimer); rzTimer = setTimeout(onResize, 100); }).observe(canvas);
     onResize();
 
-    /* ── IntersectionObserver ── */
-    var io = new IntersectionObserver(function (entries) {
-      isVisible = entries[0].isIntersecting;
-      if (isVisible && !raf) startLoop();
-      if (!isVisible && raf) { cancelAnimationFrame(raf); raf = null; }
-    }, { threshold: 0 });
-    io.observe(section);
+    /* Visibility gate */
+    new IntersectionObserver(function (e) {
+      isVis = e[0].isIntersecting;
+      if (isVis && !raf) startLoop();
+      if (!isVis && raf) { cancelAnimationFrame(raf); raf = null; }
+    }, { threshold: 0 }).observe(section);
 
-    /* ── Scroll handler ── */
-    function getActivePanelIndex() {
-      var vh     = window.innerHeight;
-      var center = vh * 0.5;
-      var best   = -1;
-      var bestDist = Infinity;
-      panelEls.forEach(function (el, i) {
-        var rect = el.getBoundingClientRect();
-        if (rect.bottom < 0 || rect.top > vh) return;
-        var mid  = rect.top + rect.height * 0.5;
-        var dist = Math.abs(mid - center);
-        if (dist < bestDist) { bestDist = dist; best = i; }
+    /* ── SCROLL HANDLER ──
+       Uses IntersectionObserver with a tight rootMargin so each panel
+       "activates" when it's roughly centred in the viewport.
+       ACTIVATION_ZONE = -30% top/bottom means the panel must occupy
+       at least 40% of viewport height before it triggers.
+    ─────────────────────────────────────────────────────────────────── */
+    var ACTIVATION_ZONE = '-30% 0px -30% 0px';
+
+    var panelObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        var idx = parseInt(entry.target.dataset.panelIndex, 10);
+
+        if (entry.isIntersecting) {
+          /* Panel entered the activation zone */
+          activePanelIdx = idx;
+          notation.show(idx);
+
+          /* Update 3D pose target */
+          var pose = getPose(entry.target);
+          tgt.rotX = pose.rotX; tgt.rotY = pose.rotY; tgt.rotZ = pose.rotZ;
+          tgt.posX = pose.posX; tgt.posY = pose.posY;
+          tgt.lX = pose.lX;    tgt.lY = pose.lY;    tgt.lZ = pose.lZ;
+          tgt.lI = pose.lI;
+
+          /* Show text content */
+          contentEls.forEach(function (el, i) {
+            el.classList.toggle('is-visible', i === idx);
+          });
+        } else {
+          /* Panel left the zone — hide notation only if it was the active one */
+          if (activePanelIdx === idx) {
+            notation.hide();
+            activePanelIdx = -1;
+            /* Hide all text content */
+            contentEls.forEach(function (el) { el.classList.remove('is-visible'); });
+          }
+        }
       });
-      return best;
-    }
+    }, { rootMargin: ACTIVATION_ZONE, threshold: 0 });
 
-    function onScroll() {
-      var idx = getActivePanelIndex();
-
-      /* Panel content fade */
-      contentEls.forEach(function (el, i) {
-        el.classList.toggle('is-visible', i === idx);
-      });
-
-      /* Notation overlays */
-      if (idx !== activePanelIndex) {
-        if (activePanelIndex >= 0) notation.deactivate();
-        activePanelIndex = idx;
-        if (idx >= 0) notation.activate(idx);
-      }
-
-      if (idx >= 0 && panelEls[idx]) {
-        var pose = getPanelPose(panelEls[idx]);
-        tgt.rotX = pose.rotX;
-        tgt.rotY = pose.rotY;
-        tgt.rotZ = pose.rotZ;
-        tgt.posX = pose.posX;
-        tgt.posY = pose.posY;
-        tgt.lX   = pose.lightX;
-        tgt.lY   = pose.lightY;
-        tgt.lZ   = pose.lightZ;
-        tgt.lI   = pose.lightIntensity;
-      }
-    }
-
-    window.addEventListener('scroll', onScroll, { passive: true });
+    panelEls.forEach(function (el) { panelObserver.observe(el); });
 
     /* ── Render loop ── */
     function startLoop() {
-      function frame() {
+      (function frame() {
         raf = requestAnimationFrame(frame);
         if (!shoe) return;
 
-        var speed = prefersReduced ? 1 : LERP_SPEED;
+        var speed = reduced ? 1 : LERP;
 
-        if (activePanelIndex === -1) {
+        /* Hero idle when no panel active */
+        if (activePanelIdx === -1) {
           tgt.posX = 0;
-          tgt.posY = prefersReduced ? 0 : Math.sin(idleAngle * 0.5) * 0.1;
+          tgt.posY = reduced ? 0 : Math.sin(idle * .5) * .1;
           tgt.lX = 5; tgt.lY = 5; tgt.lZ = 5; tgt.lI = 1.0;
-          if (!prefersReduced) idleAngle += 0.004;
-          tgt.rotX = 0;
-          tgt.rotY = prefersReduced ? 0.3 : idleAngle;
-          tgt.rotZ = 0.15;
+          if (!reduced) idle += .004;
+          tgt.rotX = 0; tgt.rotY = reduced ? .3 : idle; tgt.rotZ = .15;
         }
 
-        cur.rotX = lerp(cur.rotX, tgt.rotX, speed);
-        cur.rotY = lerp(cur.rotY, tgt.rotY, speed);
-        cur.rotZ = lerp(cur.rotZ, tgt.rotZ, speed);
-        cur.posX = lerp(cur.posX, tgt.posX, speed);
-        cur.posY = lerp(cur.posY, tgt.posY, speed);
-        cur.lX   = lerp(cur.lX,   tgt.lX,   speed);
-        cur.lY   = lerp(cur.lY,   tgt.lY,   speed);
-        cur.lZ   = lerp(cur.lZ,   tgt.lZ,   speed);
-        cur.lI   = lerp(cur.lI,   tgt.lI,   speed);
+        for (var k in cur) cur[k] = lerp(cur[k], tgt[k], speed);
 
-        var worldOffsetX = -cur.posX * (camera.aspect * 1.6);
         shoe.rotation.set(cur.rotX, cur.rotY, cur.rotZ);
-        shoe.position.set(worldOffsetX, cur.posY, 0);
-        keyLight.position.set(cur.lX, cur.lY, cur.lZ);
-        keyLight.intensity = cur.lI;
+        shoe.position.set(-cur.posX * (camera.aspect * 1.6), cur.posY, 0);
+        key.position.set(cur.lX, cur.lY, cur.lZ);
+        key.intensity = cur.lI;
 
         renderer.render(scene, camera);
-      }
-      frame();
+      })();
     }
 
-    /* ── Load GLB ── */
-    var dracoLoader = new DRACOLoader();
-    dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.4.1/');
-    var gltfLoader = new GLTFLoader();
-    gltfLoader.setDRACOLoader(dracoLoader);
+    /* ── Load model ── */
+    var draco = new DRACOLoader();
+    draco.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.4.1/');
+    var gltf = new GLTFLoader();
+    gltf.setDRACOLoader(draco);
 
     function doLoad() {
-      gltfLoader.load(MODEL_URL, onModelLoad, onModelProgress, onModelError);
-    }
-
-    if (typeof MeshoptDecoder !== 'undefined' && MeshoptDecoder && gltfLoader.setMeshoptDecoder) {
-      var meshoptReady = (MeshoptDecoder.ready instanceof Promise) ? MeshoptDecoder.ready : Promise.resolve();
-      meshoptReady.then(function () {
-        gltfLoader.setMeshoptDecoder(MeshoptDecoder);
-        doLoad();
-      });
-    } else {
-      doLoad();
-    }
-
-    function onModelLoad(gltf) {
-      shoe = gltf.scene;
-
-      var box    = new THREE.Box3().setFromObject(shoe);
-      var size   = new THREE.Vector3();
-      var center = new THREE.Vector3();
-      box.getSize(size);
-      box.getCenter(center);
-      shoe.position.sub(center);
-
-      var maxDim = Math.max(size.x, size.y, size.z);
-      shoe.scale.setScalar(3.6 / maxDim);
-
-      shoe.traverse(function (child) {
-        if (child.isMesh) {
-          child.castShadow    = true;
-          child.receiveShadow = true;
-          if (child.material) child.material.envMapIntensity = 0.6;
+      gltf.load(MODEL_URL, function (g) {
+        shoe = g.scene;
+        var box = new THREE.Box3().setFromObject(shoe);
+        var sz  = new THREE.Vector3(); var ct = new THREE.Vector3();
+        box.getSize(sz); box.getCenter(ct);
+        shoe.position.sub(ct);
+        shoe.scale.setScalar(3.6 / Math.max(sz.x, sz.y, sz.z));
+        shoe.traverse(function (c) {
+          if (c.isMesh) {
+            c.castShadow = c.receiveShadow = true;
+            if (c.material) c.material.envMapIntensity = .6;
+          }
+        });
+        cur.rotX = 0; cur.rotY = .3; cur.rotZ = .15; idle = .3;
+        if (panelEls[0]) {
+          var p0 = getPose(panelEls[0]);
+          cur.posX = tgt.posX = p0.posX;
+          cur.posY = tgt.posY = p0.posY;
+          tgt.lX=p0.lX; tgt.lY=p0.lY; tgt.lZ=p0.lZ; tgt.lI=p0.lI;
+        }
+        scene.add(shoe);
+        if (loaderEl) loaderEl.classList.add('is-hidden');
+      },
+      function (xhr) {
+        if (loaderEl && xhr.total) {
+          var t = loaderEl.querySelector('.shoe3d-loader__text');
+          if (t) t.textContent = 'Loading\u2026 ' + Math.round(xhr.loaded/xhr.total*100) + '%';
+        }
+      },
+      function (err) {
+        console.error('[Shoe3D] Load error:', err);
+        if (loaderEl) {
+          var t = loaderEl.querySelector('.shoe3d-loader__text');
+          var r = loaderEl.querySelector('.shoe3d-loader__ring');
+          if (t) t.textContent = 'Could not load 3D model.';
+          if (r) r.parentNode.removeChild(r);
         }
       });
-
-      cur.rotX    = 0;
-      cur.rotY    = 0.3;
-      cur.rotZ    = 0.15;
-      idleAngle   = 0.3;
-
-      if (panelEls[0]) {
-        var firstPose = getPanelPose(panelEls[0]);
-        cur.posX = firstPose.posX; tgt.posX = firstPose.posX;
-        cur.posY = firstPose.posY; tgt.posY = firstPose.posY;
-        tgt.lX = firstPose.lightX;
-        tgt.lY = firstPose.lightY;
-        tgt.lZ = firstPose.lightZ;
-        tgt.lI = firstPose.lightIntensity;
-      }
-
-      scene.add(shoe);
-      if (loader) loader.classList.add('is-hidden');
-      onScroll();
     }
 
-    function onModelProgress(xhr) {
-      if (loader && xhr.total) {
-        var pct = Math.round((xhr.loaded / xhr.total) * 100);
-        var txt = loader.querySelector('.shoe3d-loader__text');
-        if (txt) txt.textContent = 'Loading\u2026 ' + pct + '%';
-      }
-    }
+    if (typeof MeshoptDecoder !== 'undefined' && MeshoptDecoder && gltf.setMeshoptDecoder) {
+      var rdy = MeshoptDecoder.ready instanceof Promise ? MeshoptDecoder.ready : Promise.resolve();
+      rdy.then(function () { gltf.setMeshoptDecoder(MeshoptDecoder); doLoad(); });
+    } else { doLoad(); }
 
-    function onModelError(err) {
-      console.error('[Shoe3D] Failed to load model:', err);
-      if (loader) {
-        var txt  = loader.querySelector('.shoe3d-loader__text');
-        var ring = loader.querySelector('.shoe3d-loader__ring');
-        if (txt)  txt.textContent = 'Could not load 3D model.';
-        if (ring) ring.parentNode.removeChild(ring);
-      }
-    }
-
-    /* ── BFCache / visibility cleanup ── */
+    /* BFCache */
     document.addEventListener('visibilitychange', function () {
-      if (document.hidden && raf) {
-        cancelAnimationFrame(raf);
-        raf = null;
-      } else if (!document.hidden && isVisible && !raf) {
-        startLoop();
-      }
+      if (document.hidden && raf) { cancelAnimationFrame(raf); raf = null; }
+      else if (!document.hidden && isVis && !raf) startLoop();
     });
-  } // end initShoe3D
+  }
 
-})(); // end IIFE
+})();
 </script>
 
-{%- comment %} ════════════════════════════════════════════
-  SCHEMA
-════════════════════════════════════════════ {% endcomment %}
 {% schema %}
 {
   "name": "3D Shoe Scroll",
   "tag": "section",
   "class": "shoe3d-section-wrapper",
   "settings": [
-    {
-      "type": "header",
-      "content": "3D Model"
-    },
+    { "type": "header", "content": "3D Model" },
     {
       "type": "url",
       "id": "model_url",
       "label": "GLB Model URL",
-      "info": "Upload your .glb file to Content → Files and paste the CDN URL here."
+      "info": "Upload your .glb to Content → Files and paste the CDN URL here."
     },
-    {
-      "type": "header",
-      "content": "Hero Section"
-    },
-    {
-      "type": "text",
-      "id": "hero_badge",
-      "label": "Badge text",
-      "default": "Best Seller"
-    },
-    {
-      "type": "text",
-      "id": "hero_headline",
-      "label": "Hero headline",
-      "default": "The Jillian"
-    },
-    {
-      "type": "text",
-      "id": "hero_subtext",
-      "label": "Hero subtext",
-      "default": "Scroll to explore"
-    },
-    {
-      "type": "header",
-      "content": "Colors"
-    },
-    {
-      "type": "color",
-      "id": "background_color",
-      "label": "Background",
-      "default": "#080808"
-    },
-    {
-      "type": "color",
-      "id": "text_color",
-      "label": "Text color",
-      "default": "#ffffff"
-    },
-    {
-      "type": "color",
-      "id": "accent_color",
-      "label": "Accent color",
-      "default": "#c8956c"
-    },
-    {
-      "type": "header",
-      "content": "Notation — Dots"
-    },
-    {
-      "type": "range",
-      "id": "notation_dot_size",
-      "label": "Dot size (Desktop)",
-      "min": 10,
-      "max": 40,
-      "step": 2,
-      "unit": "px",
-      "default": 20
-    },
-    {
-      "type": "range",
-      "id": "notation_dot_size_mobile",
-      "label": "Dot size (Mobile)",
-      "min": 8,
-      "max": 30,
-      "step": 2,
-      "unit": "px",
-      "default": 16
-    },
-    {
-      "type": "color",
-      "id": "notation_dot_color",
-      "label": "Dot fill color",
-      "default": "#ffffff"
-    },
-    {
-      "type": "color",
-      "id": "notation_dot_border_color",
-      "label": "Dot border color",
-      "default": "#000000"
-    },
-    {
-      "type": "range",
-      "id": "notation_dot_border_width",
-      "label": "Dot border width",
-      "min": 1,
-      "max": 6,
-      "step": 1,
-      "unit": "px",
-      "default": 2
-    },
-    {
-      "type": "header",
-      "content": "Notation — Lines"
-    },
-    {
-      "type": "color",
-      "id": "notation_line_color",
-      "label": "Line color",
-      "default": "#ffffff"
-    },
-    {
-      "type": "range",
-      "id": "notation_line_width",
-      "label": "Line width",
-      "min": 0.4,
-      "max": 3,
-      "step": 0.1,
-      "unit": "px",
-      "default": 0.8
-    },
-    {
-      "type": "header",
-      "content": "Notation — Callouts"
-    },
-    {
-      "type": "color",
-      "id": "notation_callout_title_color",
-      "label": "Callout title color",
-      "default": "#000000"
-    },
-    {
-      "type": "color",
-      "id": "notation_callout_text_color",
-      "label": "Callout text color",
-      "default": "#666666"
-    },
-    {
-      "type": "header",
-      "content": "Accessibility"
-    },
-    {
-      "type": "text",
-      "id": "aria_label",
-      "label": "Section ARIA label",
-      "default": "3D Product Showcase — Scroll to explore"
-    }
+    { "type": "header", "content": "Hero" },
+    { "type": "text", "id": "hero_badge",    "label": "Badge text",   "default": "Best Seller" },
+    { "type": "text", "id": "hero_headline", "label": "Headline",     "default": "The Jillian" },
+    { "type": "text", "id": "hero_subtext",  "label": "Subtext",      "default": "Scroll to explore" },
+    { "type": "header", "content": "Colors" },
+    { "type": "color", "id": "background_color", "label": "Background", "default": "#080808" },
+    { "type": "color", "id": "text_color",        "label": "Text",       "default": "#ffffff" },
+    { "type": "color", "id": "accent_color",      "label": "Accent",     "default": "#c8956c" },
+    { "type": "header", "content": "Notation — Dots" },
+    { "type": "range", "id": "notation_dot_size",        "label": "Dot size desktop", "min": 10, "max": 40, "step": 2, "unit": "px", "default": 20 },
+    { "type": "range", "id": "notation_dot_size_mobile", "label": "Dot size mobile",  "min": 8,  "max": 30, "step": 2, "unit": "px", "default": 16 },
+    { "type": "color", "id": "notation_dot_color",         "label": "Dot fill",   "default": "#ffffff" },
+    { "type": "color", "id": "notation_dot_border_color",  "label": "Dot border", "default": "#000000" },
+    { "type": "range", "id": "notation_dot_border_width",  "label": "Border width", "min": 1, "max": 6, "step": 1, "unit": "px", "default": 2 },
+    { "type": "header", "content": "Notation — Lines" },
+    { "type": "color", "id": "notation_line_color", "label": "Line color", "default": "#ffffff" },
+    { "type": "range", "id": "notation_line_width", "label": "Line width", "min": 0.4, "max": 3, "step": 0.1, "unit": "px", "default": 0.8 },
+    { "type": "header", "content": "Notation — Callouts" },
+    { "type": "color", "id": "notation_callout_title_color", "label": "Title color", "default": "#000000" },
+    { "type": "color", "id": "notation_callout_text_color",  "label": "Text color",  "default": "#555555" },
+    { "type": "header", "content": "Accessibility" },
+    { "type": "text", "id": "aria_label", "label": "Section ARIA label", "default": "3D Product Showcase — Scroll to explore" }
   ],
   "blocks": [
     {
       "type": "panel",
       "name": "Scroll Panel",
       "settings": [
+        { "type": "header", "content": "Content" },
+        { "type": "text",     "id": "eyebrow",   "label": "Eyebrow",   "default": "Feature 01" },
+        { "type": "text",     "id": "heading",   "label": "Heading",   "default": "Crafted for Every Step" },
+        { "type": "textarea", "id": "body",      "label": "Body text", "default": "Precision-engineered for all-day comfort." },
+        { "type": "text", "id": "feature_1", "label": "Feature 1" },
+        { "type": "text", "id": "feature_2", "label": "Feature 2" },
+        { "type": "text", "id": "feature_3", "label": "Feature 3" },
+        { "type": "text",         "id": "cta_label",   "label": "Button label" },
+        { "type": "url",          "id": "cta_url",     "label": "Button URL" },
+        { "type": "checkbox",     "id": "cta_new_tab", "label": "Open in new tab", "default": false },
+        { "type": "image_picker", "id": "image",       "label": "Mobile fallback image" },
+
+        { "type": "header",    "content": "Notation 1" },
+        { "type": "paragraph", "content": "Desktop: dot + animated line + callout. Mobile: tap dot to open drawer. Leave title & description blank to hide." },
+        { "type": "text",     "id": "notation_1_heading", "label": "Title" },
+        { "type": "textarea", "id": "notation_1_text",    "label": "Description" },
+        { "type": "range", "id": "notation_1_dot_x",    "label": "Dot horizontal",     "min": 0, "max": 100, "step": 1, "default": 35, "unit": "%" },
+        { "type": "range", "id": "notation_1_dot_y",    "label": "Dot vertical",       "min": 0, "max": 100, "step": 1, "default": 40, "unit": "%" },
+        { "type": "range", "id": "notation_1_text_x",   "label": "Callout horizontal", "min": 0, "max": 100, "step": 1, "default": 55, "unit": "%" },
+        { "type": "range", "id": "notation_1_text_y",   "label": "Callout vertical",   "min": 0, "max": 100, "step": 1, "default": 40, "unit": "%" },
         {
-          "type": "header",
-          "content": "Content"
-        },
-        {
-          "type": "text",
-          "id": "eyebrow",
-          "label": "Eyebrow label",
-          "default": "Feature 01"
-        },
-        {
-          "type": "text",
-          "id": "heading",
-          "label": "Heading",
-          "default": "Crafted for Every Step"
-        },
-        {
-          "type": "textarea",
-          "id": "body",
-          "label": "Body text",
-          "default": "Precision-engineered with over 5,000 data points from your unique foot scan."
-        },
-        {
-          "type": "text",
-          "id": "feature_1",
-          "label": "Feature 1"
-        },
-        {
-          "type": "text",
-          "id": "feature_2",
-          "label": "Feature 2"
-        },
-        {
-          "type": "text",
-          "id": "feature_3",
-          "label": "Feature 3"
-        },
-        {
-          "type": "text",
-          "id": "cta_label",
-          "label": "Button label"
-        },
-        {
-          "type": "url",
-          "id": "cta_url",
-          "label": "Button URL"
-        },
-        {
-          "type": "checkbox",
-          "id": "cta_new_tab",
-          "label": "Open in new tab",
-          "default": false
-        },
-        {
-          "type": "image_picker",
-          "id": "image",
-          "label": "Supporting image (mobile fallback)"
-        },
-        {
-          "type": "header",
-          "content": "Notation 1"
-        },
-        {
-          "type": "paragraph",
-          "content": "Dot + animated line + callout shown on desktop. Tap-to-open drawer on mobile. Leave both fields blank to hide."
-        },
-        {
-          "type": "text",
-          "id": "notation_1_heading",
-          "label": "Notation 1 — Title"
-        },
-        {
-          "type": "textarea",
-          "id": "notation_1_text",
-          "label": "Notation 1 — Description"
-        },
-        {
-          "type": "range",
-          "id": "notation_1_dot_x",
-          "label": "Dot — Horizontal position",
-          "min": 0,
-          "max": 100,
-          "step": 1,
-          "default": 35,
-          "unit": "%"
-        },
-        {
-          "type": "range",
-          "id": "notation_1_dot_y",
-          "label": "Dot — Vertical position",
-          "min": 0,
-          "max": 100,
-          "step": 1,
-          "default": 40,
-          "unit": "%"
-        },
-        {
-          "type": "range",
-          "id": "notation_1_text_x",
-          "label": "Callout — Horizontal position",
-          "min": 0,
-          "max": 100,
-          "step": 1,
-          "default": 55,
-          "unit": "%"
-        },
-        {
-          "type": "range",
-          "id": "notation_1_text_y",
-          "label": "Callout — Vertical position",
-          "min": 0,
-          "max": 100,
-          "step": 1,
-          "default": 40,
-          "unit": "%"
-        },
-        {
-          "type": "select",
-          "id": "notation_1_line_breaks",
-          "label": "Line style",
-          "options": [
-            { "value": "0", "label": "Straight" },
-            { "value": "1", "label": "Elbow (one bend)" }
-          ],
+          "type": "select", "id": "notation_1_line_breaks", "label": "Line style",
+          "options": [{ "value": "0", "label": "Straight" }, { "value": "1", "label": "Elbow (one bend)" }],
           "default": "1"
         },
+
+        { "type": "header",    "content": "Notation 2" },
+        { "type": "paragraph", "content": "Optional second notation. Leave title & description blank to hide." },
+        { "type": "text",     "id": "notation_2_heading", "label": "Title" },
+        { "type": "textarea", "id": "notation_2_text",    "label": "Description" },
+        { "type": "range", "id": "notation_2_dot_x",    "label": "Dot horizontal",     "min": 0, "max": 100, "step": 1, "default": 60, "unit": "%" },
+        { "type": "range", "id": "notation_2_dot_y",    "label": "Dot vertical",       "min": 0, "max": 100, "step": 1, "default": 65, "unit": "%" },
+        { "type": "range", "id": "notation_2_text_x",   "label": "Callout horizontal", "min": 0, "max": 100, "step": 1, "default": 40, "unit": "%" },
+        { "type": "range", "id": "notation_2_text_y",   "label": "Callout vertical",   "min": 0, "max": 100, "step": 1, "default": 65, "unit": "%" },
         {
-          "type": "header",
-          "content": "Notation 2"
-        },
-        {
-          "type": "paragraph",
-          "content": "Second optional notation. Leave both fields blank to hide."
-        },
-        {
-          "type": "text",
-          "id": "notation_2_heading",
-          "label": "Notation 2 — Title"
-        },
-        {
-          "type": "textarea",
-          "id": "notation_2_text",
-          "label": "Notation 2 — Description"
-        },
-        {
-          "type": "range",
-          "id": "notation_2_dot_x",
-          "label": "Dot — Horizontal position",
-          "min": 0,
-          "max": 100,
-          "step": 1,
-          "default": 60,
-          "unit": "%"
-        },
-        {
-          "type": "range",
-          "id": "notation_2_dot_y",
-          "label": "Dot — Vertical position",
-          "min": 0,
-          "max": 100,
-          "step": 1,
-          "default": 65,
-          "unit": "%"
-        },
-        {
-          "type": "range",
-          "id": "notation_2_text_x",
-          "label": "Callout — Horizontal position",
-          "min": 0,
-          "max": 100,
-          "step": 1,
-          "default": 40,
-          "unit": "%"
-        },
-        {
-          "type": "range",
-          "id": "notation_2_text_y",
-          "label": "Callout — Vertical position",
-          "min": 0,
-          "max": 100,
-          "step": 1,
-          "default": 65,
-          "unit": "%"
-        },
-        {
-          "type": "select",
-          "id": "notation_2_line_breaks",
-          "label": "Line style",
-          "options": [
-            { "value": "0", "label": "Straight" },
-            { "value": "1", "label": "Elbow (one bend)" }
-          ],
+          "type": "select", "id": "notation_2_line_breaks", "label": "Line style",
+          "options": [{ "value": "0", "label": "Straight" }, { "value": "1", "label": "Elbow (one bend)" }],
           "default": "1"
         },
-        {
-          "type": "header",
-          "content": "Shoe Rotation"
-        },
-        {
-          "type": "range",
-          "id": "rot_x",
-          "label": "Rotation X (tilt forward/back)",
-          "min": -180,
-          "max": 180,
-          "step": 5,
-          "default": 0,
-          "unit": "°"
-        },
-        {
-          "type": "range",
-          "id": "rot_y",
-          "label": "Rotation Y (spin left/right)",
-          "min": -180,
-          "max": 180,
-          "step": 5,
-          "default": 0,
-          "unit": "°"
-        },
-        {
-          "type": "range",
-          "id": "rot_z",
-          "label": "Rotation Z (roll)",
-          "min": -180,
-          "max": 180,
-          "step": 5,
-          "default": 0,
-          "unit": "°"
-        },
-        {
-          "type": "header",
-          "content": "Shoe Position"
-        },
-        {
-          "type": "range",
-          "id": "pos_x",
-          "label": "Position X",
-          "min": -10,
-          "max": 10,
-          "step": 1,
-          "default": 5
-        },
-        {
-          "type": "range",
-          "id": "pos_y",
-          "label": "Position Y",
-          "min": -10,
-          "max": 10,
-          "step": 1,
-          "default": 0
-        },
-        {
-          "type": "header",
-          "content": "Lighting"
-        },
-        {
-          "type": "range",
-          "id": "light_intensity",
-          "label": "Key light intensity",
-          "min": 0,
-          "max": 30,
-          "step": 1,
-          "default": 12
-        },
-        {
-          "type": "range",
-          "id": "light_x",
-          "label": "Light X position",
-          "min": -10,
-          "max": 10,
-          "step": 0.5,
-          "default": 5
-        },
-        {
-          "type": "range",
-          "id": "light_y",
-          "label": "Light Y position",
-          "min": -10,
-          "max": 10,
-          "step": 0.5,
-          "default": 5
-        },
-        {
-          "type": "range",
-          "id": "light_z",
-          "label": "Light Z position",
-          "min": -10,
-          "max": 10,
-          "step": 0.5,
-          "default": 5
-        }
+
+        { "type": "header", "content": "Shoe Rotation" },
+        { "type": "range", "id": "rot_x", "label": "Rotation X (tilt)", "min": -180, "max": 180, "step": 5, "default": 0,  "unit": "°" },
+        { "type": "range", "id": "rot_y", "label": "Rotation Y (spin)", "min": -180, "max": 180, "step": 5, "default": 0,  "unit": "°" },
+        { "type": "range", "id": "rot_z", "label": "Rotation Z (roll)", "min": -180, "max": 180, "step": 5, "default": 0,  "unit": "°" },
+        { "type": "header", "content": "Shoe Position" },
+        { "type": "range", "id": "pos_x", "label": "Position X", "min": -10, "max": 10, "step": 1, "default": 5 },
+        { "type": "range", "id": "pos_y", "label": "Position Y", "min": -10, "max": 10, "step": 1, "default": 0 },
+        { "type": "header", "content": "Lighting" },
+        { "type": "range", "id": "light_intensity", "label": "Key light intensity", "min": 0, "max": 30, "step": 1, "default": 12 },
+        { "type": "range", "id": "light_x", "label": "Light X", "min": -10, "max": 10, "step": 0.5, "default": 5 },
+        { "type": "range", "id": "light_y", "label": "Light Y", "min": -10, "max": 10, "step": 0.5, "default": 5 },
+        { "type": "range", "id": "light_z", "label": "Light Z", "min": -10, "max": 10, "step": 0.5, "default": 5 }
       ]
     }
   ],
@@ -1922,94 +1269,57 @@
         {
           "type": "panel",
           "settings": {
-            "eyebrow": "All-Day Comfort",
-            "heading": "Feels Like Walking on Air",
+            "eyebrow": "All-Day Comfort", "heading": "Feels Like Walking on Air",
             "body": "Memory foam cushioning and an ultra-light cork midsole work together to reduce fatigue — so you can go further, longer.",
-            "feature_1": "Memory foam + cork midsole",
-            "feature_2": "Padded collar & heel",
-            "feature_3": "Met bar pod for ball-of-foot relief",
+            "feature_1": "Memory foam + cork midsole", "feature_2": "Padded collar & heel", "feature_3": "Met bar pod",
             "cta_label": "Shop the Jillian",
-            "rot_x": 10, "rot_y": 90, "rot_z": 5,
-            "pos_x": 6, "pos_y": 0,
+            "rot_x": 10, "rot_y": 90, "rot_z": 5, "pos_x": 6, "pos_y": 0,
             "light_intensity": 12, "light_x": 8, "light_y": 6, "light_z": 5,
-            "notation_1_heading": "Memory Foam",
-            "notation_1_text": "Conforms to your foot shape instantly.",
-            "notation_1_dot_x": 50, "notation_1_dot_y": 70,
-            "notation_1_text_x": 65, "notation_1_text_y": 55,
-            "notation_1_line_breaks": "1",
-            "notation_2_heading": "Cork Midsole",
-            "notation_2_text": "Ultra-light and shock-absorbing.",
-            "notation_2_dot_x": 40, "notation_2_dot_y": 85,
-            "notation_2_text_x": 22, "notation_2_text_y": 72,
-            "notation_2_line_breaks": "1"
+            "notation_1_heading": "Memory Foam", "notation_1_text": "Conforms to your foot shape instantly.",
+            "notation_1_dot_x": 50, "notation_1_dot_y": 68, "notation_1_text_x": 65, "notation_1_text_y": 55, "notation_1_line_breaks": "1",
+            "notation_2_heading": "Cork Midsole", "notation_2_text": "Ultra-light and shock-absorbing.",
+            "notation_2_dot_x": 38, "notation_2_dot_y": 82, "notation_2_text_x": 22, "notation_2_text_y": 70, "notation_2_line_breaks": "1"
           }
         },
         {
           "type": "panel",
           "settings": {
-            "eyebrow": "Premium Materials",
-            "heading": "Genuine Leather. Built to Last.",
-            "body": "Crafted from real leather uppers with a soft microfiber footbed treated with antimicrobial technology — fresh all day, every day.",
-            "feature_1": "Genuine leather upper",
-            "feature_2": "Antimicrobial microfiber footbed",
-            "feature_3": "Blown rubber outsole for grip",
-            "rot_x": -75, "rot_y": 10, "rot_z": 0,
-            "pos_x": -6, "pos_y": 0,
+            "eyebrow": "Premium Materials", "heading": "Genuine Leather. Built to Last.",
+            "body": "Crafted from real leather uppers with antimicrobial microfiber footbed — fresh all day, every day.",
+            "feature_1": "Genuine leather upper", "feature_2": "Antimicrobial microfiber footbed", "feature_3": "Blown rubber outsole",
+            "rot_x": -75, "rot_y": 10, "rot_z": 0, "pos_x": -6, "pos_y": 0,
             "light_intensity": 14, "light_x": -5, "light_y": 8, "light_z": 3,
-            "notation_1_heading": "Leather Upper",
-            "notation_1_text": "Full-grain leather — durable and breathable.",
-            "notation_1_dot_x": 55, "notation_1_dot_y": 35,
-            "notation_1_text_x": 68, "notation_1_text_y": 22,
-            "notation_1_line_breaks": "1",
-            "notation_2_heading": "Rubber Outsole",
-            "notation_2_text": "Blown rubber for grip and longevity.",
-            "notation_2_dot_x": 48, "notation_2_dot_y": 88,
-            "notation_2_text_x": 30, "notation_2_text_y": 75,
-            "notation_2_line_breaks": "1"
+            "notation_1_heading": "Leather Upper", "notation_1_text": "Full-grain leather — durable and breathable.",
+            "notation_1_dot_x": 55, "notation_1_dot_y": 35, "notation_1_text_x": 68, "notation_1_text_y": 22, "notation_1_line_breaks": "1",
+            "notation_2_heading": "Rubber Outsole", "notation_2_text": "Blown rubber for grip and longevity.",
+            "notation_2_dot_x": 45, "notation_2_dot_y": 85, "notation_2_text_x": 28, "notation_2_text_y": 72, "notation_2_line_breaks": "1"
           }
         },
         {
           "type": "panel",
           "settings": {
-            "eyebrow": "Signature Arch Support",
-            "heading": "Aligned From the Ground Up",
-            "body": "Aetrex Signature Arch Support is strategically placed to align your entire body — relieving pressure from your feet all the way to your back.",
-            "feature_1": "Aetrex Signature Arch Support",
-            "feature_2": "Strategically placed straps",
-            "feature_3": "Bunion-friendly strap design",
-            "rot_x": 95, "rot_y": 0, "rot_z": 5,
-            "pos_x": 6, "pos_y": 0,
+            "eyebrow": "Signature Arch Support", "heading": "Aligned From the Ground Up",
+            "body": "Aetrex Arch Support strategically placed to align your entire body.",
+            "feature_1": "Aetrex Signature Arch Support", "feature_2": "Strategically placed straps", "feature_3": "Bunion-friendly design",
+            "rot_x": 95, "rot_y": 0, "rot_z": 5, "pos_x": 6, "pos_y": 0,
             "light_intensity": 13, "light_x": 3, "light_y": -5, "light_z": 8,
-            "notation_1_heading": "Arch Support",
-            "notation_1_text": "Strategically positioned for full-body alignment.",
-            "notation_1_dot_x": 50, "notation_1_dot_y": 50,
-            "notation_1_text_x": 65, "notation_1_text_y": 35,
-            "notation_1_line_breaks": "1"
+            "notation_1_heading": "Arch Support", "notation_1_text": "Full-body alignment from the ground up.",
+            "notation_1_dot_x": 50, "notation_1_dot_y": 50, "notation_1_text_x": 65, "notation_1_text_y": 35, "notation_1_line_breaks": "1"
           }
         },
         {
           "type": "panel",
           "settings": {
-            "eyebrow": "Style Meets Function",
-            "heading": "Comfort You Can See.",
-            "body": "The signature braided detailing makes the Jillian the sandal you'll reach for every morning — whether you're running errands or spending a full day on your feet.",
-            "feature_1": "Fully adjustable hook & loop closure",
-            "feature_2": "1.1\" heel height",
-            "feature_3": "Our #1 best-selling sandal",
+            "eyebrow": "Style Meets Function", "heading": "Comfort You Can See.",
+            "body": "Signature braided detailing makes the Jillian the sandal you'll reach for every morning.",
+            "feature_1": "Adjustable hook & loop closure", "feature_2": "1.1\" heel height", "feature_3": "#1 best-selling sandal",
             "cta_label": "Shop the Jillian",
-            "rot_x": 0, "rot_y": 0, "rot_z": 0,
-            "pos_x": -4, "pos_y": -2,
+            "rot_x": 0, "rot_y": 0, "rot_z": 0, "pos_x": -4, "pos_y": -2,
             "light_intensity": 15, "light_x": 0, "light_y": 5, "light_z": 10,
-            "notation_1_heading": "Braided Detail",
-            "notation_1_text": "Signature weave elevates every outfit.",
-            "notation_1_dot_x": 45, "notation_1_dot_y": 30,
-            "notation_1_text_x": 60, "notation_1_text_y": 18,
-            "notation_1_line_breaks": "1",
-            "notation_2_heading": "Hook & Loop",
-            "notation_2_text": "Fully adjustable for a perfect fit.",
-            "notation_2_dot_x": 55, "notation_2_dot_y": 55,
-            "notation_2_text_x": 68, "notation_2_text_y": 68,
-            "notation_2_line_breaks": "0"
+            "notation_1_heading": "Braided Detail", "notation_1_text": "Signature weave — style you can see.",
+            "notation_1_dot_x": 45, "notation_1_dot_y": 30, "notation_1_text_x": 60, "notation_1_text_y": 18, "notation_1_line_breaks": "1",
+            "notation_2_heading": "Hook & Loop", "notation_2_text": "Fully adjustable for a perfect fit.",
+            "notation_2_dot_x": 55, "notation_2_dot_y": 58, "notation_2_text_x": 68, "notation_2_text_y": 70, "notation_2_line_breaks": "0"
           }
         }
       ]
