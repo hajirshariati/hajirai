@@ -306,11 +306,10 @@
 .shoe3d-vignette {
   position: absolute;
   inset: 0;
-  /* The vignette color is updated by JS when the active panel changes */
+  /* Strong vignette — edges are solid bg colour, centre is clear
+     so the shoe is always visible against the branded background */
   background:
-    radial-gradient(ellipse 55% 55% at 50% 50%, transparent 30%, var(--bg) 100%),
-    linear-gradient(to bottom, var(--bg) 0%, transparent 15%, transparent 85%, var(--bg) 100%);
-  transition: background 0.6s ease;
+    radial-gradient(ellipse 50% 60% at 50% 50%, transparent 20%, var(--bg) 75%);
   pointer-events: none;
 }
 
@@ -541,7 +540,7 @@
 .shoe3d-panels {
   position: relative;
   z-index: 2;
-  background: var(--bg); /* bg lives HERE — below hero, above canvas */
+  background: transparent; /* transparent — shoe canvas shows through */
 }
 
 .shoe3d-panel {
@@ -604,6 +603,10 @@
   transform: translateY(40px);
   transition: opacity .7s var(--ease-spring), transform .7s var(--ease-spring);
   color: var(--panel-text, var(--text));
+  /* Subtle backdrop so text is legible without covering the shoe */
+  background: linear-gradient(135deg, rgba(0,0,0,0.45) 0%, transparent 100%);
+  padding: 2rem;
+  border-radius: 16px;
 }
 .shoe3d-panel__content.is-visible { opacity: 1; transform: translateY(0); }
 
