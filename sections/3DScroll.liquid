@@ -1,34 +1,46 @@
 {% comment %}
   ============================================================
-  3D Shoe Scroll Section — Syntilay-Style
+  3D Shoe Scroll Section — Syntilay-Style (Enhanced)
   ============================================================
+  CHANGES FROM ORIGINAL:
+  1. Per-panel background color/gradient (hero has its own too)
+     — Uses Shopify native color + gradient pickers
+  2. Supporting image always visible on desktop AND mobile
+  3. Two annotation pins per panel — bullet-proof positioning
+     via a CSS custom property approach: the pin anchor is set
+     as a percentage of the *canvas element* size (measured
+     at runtime), then converted to absolute px so pins stay
+     locked to the model on every screen size / orientation.
+  4. Annotation content pre-filled from Jillian product data
+  ============================================================
+
   SETUP:
-  1. Upload your .glb file to Shopify Admin → Content → Files
-  2. Copy the CDN URL and paste it in section settings
-  3. Add this section to your homepage via Shopify theme editor
+  1. Upload your .glb to Shopify Admin → Content → Files
+  2. Paste the CDN URL in section settings
+  3. Add to homepage via theme editor
 
-  FEATURE BADGES:
-  - Each panel has up to 2 optional floating feature badges
-  - Badges live inside the sticky canvas-wrap → always on the shoe
-  - Positioned with left/top in vw/vh so they never shift across screens
-  - Show/hide per active panel via JS panel observer
-  - Desktop: pill with dot + label (+ optional sub-label)
-  - Mobile: same pill, slightly smaller, same position logic
-
-  PERFORMANCE:
-  - Three.js loaded from CDN sequentially
-  - GLB loaded only when section enters viewport (IntersectionObserver)
-  - rAF only runs when visible
-  - ResizeObserver + debounce for canvas
+  ANNOTATION PIN POSITIONING:
+  - Use the range sliders (0–100) in each panel block.
+  - 0,0 = top-left of the 3D canvas; 100,100 = bottom-right.
+  - Pins are positioned in JS against the canvas bounding rect
+    so they are immune to page layout shifts, scrollbars, and
+    responsive reflowing.
   ============================================================
 {% endcomment %}
 
 {%- liquid
   assign section_id   = 'shoe3d-' | append: section.id
   assign model_url    = section.settings.model_url
-  assign bg_color     = section.settings.background_color
-  assign accent_color = section.settings.accent_color
   assign text_color   = section.settings.text_color
+  assign accent_color = section.settings.accent_color
+
+  comment
+    Hero background — prefer gradient if set, else solid color
+  endcomment
+  assign hero_bg = section.settings.hero_background_color
+  if section.settings.hero_background_gradient != blank
+    assign hero_bg = section.settings.hero_background_gradient
+  endif
 -%}
 
 <section
@@ -36,19 +48,17 @@
   class="shoe3d-section"
   aria-label="{{ section.settings.aria_label | default: '3D Product Showcase' }}"
   data-model="{{ model_url | escape }}"
-  data-bg="{{ bg_color }}"
   data-section-id="{{ section.id }}"
   itemscope
   itemtype="https://schema.org/Product"
 >
 
-  {% comment %}
+  {%- comment -%}
     ── STICKY CANVAS WRAP ──
-    The canvas + ALL feature badges live here.
-    Because this is sticky 100vw × 100vh, left/top % coords
-    always map to the same screen pixel regardless of scroll or
-    window width. Badges never drift or reflow.
-  {% endcomment %}
+    Contains the Three.js canvas, vignette, loader and
+    annotation pins. Pins are repositioned by JS on every
+    resize so they always track the model correctly.
+  {%- endcomment -%}
   <div class="shoe3d-canvas-wrap" aria-hidden="true">
     <canvas
       id="{{ section_id }}-canvas"
@@ -56,62 +66,91 @@
       role="img"
       aria-label="{{ section.settings.aria_label | default: '3D rotating shoe model' }}"
     ></canvas>
-    <div class="shoe3d-vignette"></div>
+    <div class="shoe3d-vignette" id="{{ section_id }}-vignette"></div>
     <div class="shoe3d-loader" id="{{ section_id }}-loader" aria-live="polite" aria-atomic="true">
       <div class="shoe3d-loader__ring" aria-hidden="true"></div>
       <span class="shoe3d-loader__text">Loading model…</span>
     </div>
 
-    {% comment %}
-      Feature badge groups — one group per panel block.
-      JS adds .is-active to the group whose panel is in view,
-      removes it from all others. CSS handles show/hide + animation.
-    {% endcomment %}
+    {%- comment -%}
+      ANNOTATION PINS
+      One group per panel. Each group holds two pins.
+      JS places them via inline `style="left:Xpx; top:Ypx"`
+      computed from the canvas bounding rect + the % sliders.
+      The data-ax / data-ay attributes carry the raw % values.
+    {%- endcomment -%}
     {%- for block in section.blocks -%}
-      {%- assign has_b1 = false -%}
-      {%- assign has_b2 = false -%}
-      {%- if block.settings.badge_1_label != blank -%}{%- assign has_b1 = true -%}{%- endif -%}
-      {%- if block.settings.badge_2_label != blank -%}{%- assign has_b2 = true -%}{%- endif -%}
-      {%- if has_b1 or has_b2 -%}
+      {%- assign idx = forloop.index0 -%}
+
+      {%- comment -%} Resolve annotation content from block settings OR product defaults {%- endcomment -%}
+      {%- assign default_a1_labels  = "Memory Foam Cushioning,Genuine Leather Upper,Aetrex Arch Support,Braided Leather Strap" | split: "," -%}
+      {%- assign default_a1_descs   = "Conforms to your foot, distributes weight evenly,Full-grain leather — breathable & durable,Strategically placed for full-body alignment,Signature style detail — comfort meets fashion" | split: "," -%}
+      {%- assign default_a2_labels  = "Ultra-Light Cork Midsole,Antimicrobial Footbed,Met Bar Pod,Hook & Loop Closure" | split: "," -%}
+      {%- assign default_a2_descs   = "Reduces fatigue for all-day wear,Fights everyday odors all day,Relieves ball-of-foot discomfort,Fully adjustable for multiple widths" | split: "," -%}
+
+      {%- assign a1_label = default_a1_labels[idx] -%}
+      {%- assign a1_desc  = default_a1_descs[idx] -%}
+      {%- assign a2_label = default_a2_labels[idx] -%}
+      {%- assign a2_desc  = default_a2_descs[idx] -%}
+      {%- if block.settings.ann_1_label != blank -%}{%- assign a1_label = block.settings.ann_1_label -%}{%- endif -%}
+      {%- if block.settings.ann_1_desc  != blank -%}{%- assign a1_desc  = block.settings.ann_1_desc  -%}{%- endif -%}
+      {%- if block.settings.ann_2_label != blank -%}{%- assign a2_label = block.settings.ann_2_label -%}{%- endif -%}
+      {%- if block.settings.ann_2_desc  != blank -%}{%- assign a2_desc  = block.settings.ann_2_desc  -%}{%- endif -%}
+
+      <div
+        class="shoe3d-annotations"
+        data-ann-panel="{{ idx }}"
+        aria-hidden="true"
+      >
+        {%- comment -%} Pin 1 {%- endcomment -%}
         <div
-          class="shoe3d-badges"
-          data-badges-panel="{{ forloop.index0 }}"
-          aria-hidden="true"
+          class="shoe3d-pin shoe3d-pin--1"
+          data-ax="{{ block.settings.ann_1_x | default: 52 }}"
+          data-ay="{{ block.settings.ann_1_y | default: 38 }}"
+          data-side="{{ block.settings.ann_1_side | default: 'right' }}"
         >
-          {%- if has_b1 -%}
-            <div
-              class="shoe3d-badge shoe3d-badge--1"
-              style="--bx:{{ block.settings.badge_1_x | default: 55 }}%;--by:{{ block.settings.badge_1_y | default: 35 }}%;"
-            >
-              <span class="shoe3d-badge__dot" aria-hidden="true"></span>
-              <span class="shoe3d-badge__label">{{ block.settings.badge_1_label }}</span>
-              {%- if block.settings.badge_1_sub != blank -%}
-                <span class="shoe3d-badge__sub">{{ block.settings.badge_1_sub }}</span>
-              {%- endif -%}
-            </div>
-          {%- endif -%}
-          {%- if has_b2 -%}
-            <div
-              class="shoe3d-badge shoe3d-badge--2"
-              style="--bx:{{ block.settings.badge_2_x | default: 40 }}%;--by:{{ block.settings.badge_2_y | default: 65 }}%;"
-            >
-              <span class="shoe3d-badge__dot" aria-hidden="true"></span>
-              <span class="shoe3d-badge__label">{{ block.settings.badge_2_label }}</span>
-              {%- if block.settings.badge_2_sub != blank -%}
-                <span class="shoe3d-badge__sub">{{ block.settings.badge_2_sub }}</span>
-              {%- endif -%}
-            </div>
-          {%- endif -%}
+          <div class="shoe3d-pin__dot" aria-hidden="true">
+            <span class="shoe3d-pin__pulse"></span>
+          </div>
+          <div class="shoe3d-pin__card shoe3d-pin__card--{{ block.settings.ann_1_side | default: 'right' }}">
+            <span class="shoe3d-pin__label">{{ a1_label }}</span>
+            {%- if a1_desc != blank -%}
+              <span class="shoe3d-pin__desc">{{ a1_desc }}</span>
+            {%- endif -%}
+          </div>
         </div>
-      {%- endif -%}
+
+        {%- comment -%} Pin 2 {%- endcomment -%}
+        <div
+          class="shoe3d-pin shoe3d-pin--2"
+          data-ax="{{ block.settings.ann_2_x | default: 48 }}"
+          data-ay="{{ block.settings.ann_2_y | default: 65 }}"
+          data-side="{{ block.settings.ann_2_side | default: 'left' }}"
+        >
+          <div class="shoe3d-pin__dot" aria-hidden="true">
+            <span class="shoe3d-pin__pulse"></span>
+          </div>
+          <div class="shoe3d-pin__card shoe3d-pin__card--{{ block.settings.ann_2_side | default: 'left' }}">
+            <span class="shoe3d-pin__label">{{ a2_label }}</span>
+            {%- if a2_desc != blank -%}
+              <span class="shoe3d-pin__desc">{{ a2_desc }}</span>
+            {%- endif -%}
+          </div>
+        </div>
+      </div>
     {%- endfor -%}
 
-  </div>{% comment %} /.shoe3d-canvas-wrap {% endcomment %}
+  </div>
 
-  {% comment %} Scrollable content — pulled up over the sticky canvas {% endcomment %}
+  {%- comment -%} ── Scrollable content ── {%- endcomment -%}
   <div class="shoe3d-section__inner">
 
-    <div class="shoe3d-hero" aria-hidden="true">
+    {%- comment -%} HERO PANEL — own background {%- endcomment -%}
+    <div
+      class="shoe3d-hero"
+      aria-hidden="true"
+      style="background: {{ hero_bg }};"
+    >
       {%- if section.settings.hero_badge != blank -%}
         <div class="shoe3d-hero__badge"><span>{{ section.settings.hero_badge }}</span></div>
       {%- endif -%}
@@ -144,9 +183,17 @@
         {%- assign body_text = jillian_bodies[idx] -%}
         {%- if block.settings.body != blank -%}{%- assign body_text = block.settings.body -%}{%- endif -%}
 
+        {%- comment -%} Resolve panel background — gradient takes priority over solid {%- endcomment -%}
+        {%- assign panel_bg = block.settings.panel_background_color -%}
+        {%- if block.settings.panel_background_gradient != blank -%}
+          {%- assign panel_bg = block.settings.panel_background_gradient -%}
+        {%- endif -%}
+        {%- comment -%} Resolve panel text color {%- endcomment -%}
+        {%- assign panel_text = block.settings.panel_text_color | default: text_color -%}
+
         <div
           class="shoe3d-panel shoe3d-panel--{{ panel_side }}"
-          data-panel-index="{{ forloop.index0 }}"
+          data-panel-index="{{ idx }}"
           data-shoe-rot-x="{{ block.settings.rot_x | default: 0 }}"
           data-shoe-rot-y="{{ block.settings.rot_y | default: 0 }}"
           data-shoe-rot-z="{{ block.settings.rot_z | default: 0 }}"
@@ -156,65 +203,84 @@
           data-shoe-light-x="{{ block.settings.light_x | default: 5 }}"
           data-shoe-light-y="{{ block.settings.light_y | default: 5 }}"
           data-shoe-light-z="{{ block.settings.light_z | default: 5 }}"
+          style="--panel-bg: {{ panel_bg }}; --panel-text: {{ panel_text }};"
           {{ block.shopify_attributes }}
         >
-          <div class="shoe3d-panel__content shoe3d-panel__content--{{ panel_side }}">
-            <span class="shoe3d-panel__eyebrow">{{ eyebrow_text }}</span>
-            <h3 class="shoe3d-panel__heading">{{ heading_text }}</h3>
-            <p class="shoe3d-panel__body">{{ body_text }}</p>
+          {%- comment -%} Background layer so gradient/color fills only this panel's scroll height {%- endcomment -%}
+          <div class="shoe3d-panel__bg" aria-hidden="true"></div>
 
-            {%- if block.settings.feature_1 != blank or block.settings.feature_2 != blank or block.settings.feature_3 != blank -%}
-              <ul class="shoe3d-panel__features" aria-label="Features">
-                {%- if block.settings.feature_1 != blank -%}<li class="shoe3d-panel__feature">{{ block.settings.feature_1 }}</li>{%- endif -%}
-                {%- if block.settings.feature_2 != blank -%}<li class="shoe3d-panel__feature">{{ block.settings.feature_2 }}</li>{%- endif -%}
-                {%- if block.settings.feature_3 != blank -%}<li class="shoe3d-panel__feature">{{ block.settings.feature_3 }}</li>{%- endif -%}
-              </ul>
+          <div class="shoe3d-panel__inner shoe3d-panel__inner--{{ panel_side }}">
+
+            {%- comment -%} ── Supporting image — shown on BOTH desktop and mobile ── {%- endcomment -%}
+            {%- if block.settings.image != blank -%}
+              <div class="shoe3d-panel__image-wrap shoe3d-panel__image-wrap--{{ panel_side }}">
+                {{- block.settings.image | image_url: width: 800 | image_tag:
+                    loading: 'lazy',
+                    class: 'shoe3d-panel__image',
+                    widths: '300,400,600,800',
+                    sizes: '(max-width:767px) 90vw, (max-width:1024px) 40vw, 360px'
+                -}}
+              </div>
             {%- endif -%}
 
-            {%- if block.settings.cta_label != blank and block.settings.cta_url != blank -%}
-              <a class="shoe3d-panel__cta" href="{{ block.settings.cta_url }}"
-                {%- if block.settings.cta_new_tab %} target="_blank" rel="noopener noreferrer"{%- endif -%}>
-                <span>{{ block.settings.cta_label }}</span>
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-                  <path d="M3.75 9h10.5M9.75 4.5 14.25 9l-4.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-              </a>
-            {%- endif -%}
-          </div>
+            <div class="shoe3d-panel__content shoe3d-panel__content--{{ panel_side }}">
+              <span class="shoe3d-panel__eyebrow">{{ eyebrow_text }}</span>
+              <h3 class="shoe3d-panel__heading">{{ heading_text }}</h3>
+              <p class="shoe3d-panel__body">{{ body_text }}</p>
 
-          {%- if block.settings.image != blank -%}
-            <div class="shoe3d-panel__image-wrap shoe3d-panel__image-wrap--{{ panel_side }}">
-              {{- block.settings.image | image_url: width: 600 | image_tag: loading: 'lazy', class: 'shoe3d-panel__image', widths: '300,400,600', sizes: '(max-width:768px) 90vw, 400px' -}}
+              {%- if block.settings.feature_1 != blank or block.settings.feature_2 != blank or block.settings.feature_3 != blank -%}
+                <ul class="shoe3d-panel__features" aria-label="Features">
+                  {%- if block.settings.feature_1 != blank -%}<li class="shoe3d-panel__feature">{{ block.settings.feature_1 }}</li>{%- endif -%}
+                  {%- if block.settings.feature_2 != blank -%}<li class="shoe3d-panel__feature">{{ block.settings.feature_2 }}</li>{%- endif -%}
+                  {%- if block.settings.feature_3 != blank -%}<li class="shoe3d-panel__feature">{{ block.settings.feature_3 }}</li>{%- endif -%}
+                </ul>
+              {%- endif -%}
+
+              {%- if block.settings.cta_label != blank and block.settings.cta_url != blank -%}
+                <a class="shoe3d-panel__cta" href="{{ block.settings.cta_url }}"
+                  {%- if block.settings.cta_new_tab %} target="_blank" rel="noopener noreferrer"{%- endif -%}>
+                  <span>{{ block.settings.cta_label }}</span>
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                    <path d="M3.75 9h10.5M9.75 4.5 14.25 9l-4.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </a>
+              {%- endif -%}
             </div>
-          {%- endif -%}
+
+          </div>
         </div>
       {%- endfor -%}
 
       <div class="shoe3d-end-spacer" aria-hidden="true"></div>
     </div>
 
-  </div>{% comment %} /.shoe3d-section__inner {% endcomment %}
+  </div>
 
 </section>
 
 <style>
+/* ────────────────────────────────────────────────────────────
+   DESIGN TOKENS  (section-scoped)
+──────────────────────────────────────────────────────────── */
 #{{ section_id }} {
-  --bg:     {{ bg_color }};
-  --text:   {{ text_color }};
-  --accent: {{ accent_color }};
-  --panel-h: 70vh;
-  --content-w: min(400px, 42vw);
-  --ease-spring: cubic-bezier(0.22, 1, 0.36, 1);
-  --max-w: 1520px;
+  --text:         {{ text_color }};
+  --accent:       {{ accent_color }};
+  --panel-h:      80vh;
+  --content-w:    min(380px, 40vw);
+  --ease-spring:  cubic-bezier(0.22, 1, 0.36, 1);
+  --max-w:        1520px;
+  --pin-dot-size: 14px;
+  --pin-card-w:   180px;
 }
 
-/* ── Section ── */
+/* ── Section shell ── */
 .shoe3d-section {
   position: relative;
-  background: var(--bg);
   color: var(--text);
   contain: layout style;
 }
+
+/* The inner scroll container sits above the sticky canvas */
 .shoe3d-section__inner {
   max-width: var(--max-w);
   margin: -100vh auto 0;
@@ -241,9 +307,11 @@
 .shoe3d-vignette {
   position: absolute;
   inset: 0;
+  /* The vignette color is updated by JS when the active panel changes */
   background:
-    radial-gradient(ellipse 55% 55% at 50% 50%, transparent 30%, var(--bg) 100%),
-    linear-gradient(to bottom, var(--bg) 0%, transparent 15%, transparent 85%, var(--bg) 100%);
+    radial-gradient(ellipse 55% 55% at 50% 50%, transparent 30%, var(--vignette-color, #080808) 100%),
+    linear-gradient(to bottom, var(--vignette-color, #080808) 0%, transparent 15%, transparent 85%, var(--vignette-color, #080808) 100%);
+  transition: background 0.6s ease;
   pointer-events: none;
 }
 
@@ -272,119 +340,132 @@
   text-transform: uppercase; color: rgba(255,255,255,.4);
 }
 
-/* ════════════════════════════════════
-   FEATURE BADGES
-   Live inside .shoe3d-canvas-wrap so
-   they always sit on top of the shoe.
-   Position via CSS vars --bx / --by
-   set as inline % values in Liquid.
-════════════════════════════════════ */
-.shoe3d-badges {
+/* ════════════════════════════════════════════════════════════
+   ANNOTATION PINS
+   ─────────────────────────────────────────────────────────
+   Each .shoe3d-annotations group is positioned absolute
+   inside .shoe3d-canvas-wrap (inset:0).
+   Each .shoe3d-pin is positioned absolute with left/top set
+   by JS in pixels (derived from canvas bounding rect + %).
+   This makes them 100% immune to layout reflow.
+   The card flips left/right based on data-side attribute.
+════════════════════════════════════════════════════════════ */
+.shoe3d-annotations {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  /* Hidden by default */
   visibility: hidden;
 }
-.shoe3d-badges.is-active {
+.shoe3d-annotations.is-active {
   visibility: visible;
 }
 
-/* Individual badge */
-.shoe3d-badge {
+/* Individual pin — JS sets left/top via style attribute */
+.shoe3d-pin {
   position: absolute;
-  left: var(--bx);
-  top:  var(--by);
+  /* transform centres the dot on the exact coordinate */
   transform: translate(-50%, -50%);
-
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 100px;
-  padding: 7px 14px 7px 10px;
-  white-space: nowrap;
-
+  pointer-events: none;
   /* Entry animation */
   opacity: 0;
-  transform: translate(-50%, calc(-50% + 6px));
-  transition:
-    opacity   .45s var(--ease-spring),
-    transform .45s var(--ease-spring);
+  transition: opacity .45s var(--ease-spring);
 }
-.shoe3d-badge--2 {
-  transition-delay: .1s;
-}
+.shoe3d-pin--2 { transition-delay: .12s; }
+.shoe3d-annotations.is-active .shoe3d-pin { opacity: 1; }
 
-/* Visible state */
-.shoe3d-badges.is-active .shoe3d-badge {
-  opacity: 1;
-  transform: translate(-50%, -50%);
-}
-
-/* Coloured dot */
-.shoe3d-badge__dot {
-  flex-shrink: 0;
-  width: 8px; height: 8px;
+/* Pulsing dot */
+.shoe3d-pin__dot {
+  position: relative;
+  width: var(--pin-dot-size);
+  height: var(--pin-dot-size);
   border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 0 2px rgba(255,255,255,.3);
+  box-shadow: 0 0 0 2px rgba(255,255,255,.35);
+  flex-shrink: 0;
+}
+.shoe3d-pin__pulse {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  opacity: 0;
+  animation: shoe3d-pulse 2.2s ease-out infinite;
+}
+.shoe3d-pin--2 .shoe3d-pin__pulse { animation-delay: .6s; }
+
+/* Card — positioned absolutely relative to the pin dot */
+.shoe3d-pin__card {
+  position: absolute;
+  /* Vertical centre on the dot */
+  top: 50%;
+  transform: translateY(-50%);
+  width: var(--pin-card-w);
+  background: rgba(10, 10, 12, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 10px;
+  padding: 9px 13px;
+  white-space: normal;
+  pointer-events: none;
 }
 
-/* Label */
-.shoe3d-badge__label {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: .04em;
+/* Card to the right of the dot */
+.shoe3d-pin__card--right {
+  left: calc(var(--pin-dot-size) + 10px);
+}
+/* Card to the left of the dot */
+.shoe3d-pin__card--left {
+  right: calc(var(--pin-dot-size) + 10px);
+  left: auto;
+  text-align: right;
+}
+
+/* Connector line between dot and card */
+.shoe3d-pin__card::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 10px;
+  height: 1px;
+  background: rgba(255,255,255,.3);
+  transform: translateY(-50%);
+}
+.shoe3d-pin__card--right::before {
+  right: 100%;
+}
+.shoe3d-pin__card--left::before {
+  left: 100%;
+}
+
+.shoe3d-pin__label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
   color: #fff;
-  line-height: 1;
+  line-height: 1.2;
+  margin-bottom: 3px;
+}
+.shoe3d-pin__desc {
+  display: block;
+  font-size: 10px;
+  font-weight: 400;
+  color: rgba(255,255,255,.55);
+  letter-spacing: .02em;
+  line-height: 1.45;
 }
 
-/* Optional sub-label — sits below label, smaller */
-.shoe3d-badge__sub {
-  display: none; /* inline on larger screens below */
-}
-
-@media (min-width: 768px) {
-  .shoe3d-badge {
-    gap: 9px;
-    padding: 8px 16px 8px 11px;
-    flex-direction: column;
-    align-items: flex-start;
-    border-radius: 14px;
-    gap: 3px;
+/* Mobile: slightly smaller cards */
+@media (max-width: 767px) {
+  #{{ section_id }} {
+    --pin-dot-size: 12px;
+    --pin-card-w: 140px;
   }
-  /* Re-layout: dot inline with label on first row */
-  .shoe3d-badge {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 6px;
-  }
-  .shoe3d-badge__label {
-    font-size: 13px;
-  }
-  .shoe3d-badge__sub {
-    display: block;
-    width: 100%;
-    font-size: 11px;
-    font-weight: 400;
-    color: rgba(255,255,255,.65);
-    letter-spacing: .02em;
-    line-height: 1.3;
-    padding-left: 14px; /* align under label, past dot */
-    margin-top: -2px;
-  }
-  .shoe3d-badge {
-    border-radius: 12px;
-    padding: 8px 14px 8px 10px;
-    max-width: 200px;
-    white-space: normal;
-  }
+  .shoe3d-pin__label { font-size: 10px; }
+  .shoe3d-pin__desc  { font-size: 9px; }
+  .shoe3d-pin__card  { padding: 7px 10px; border-radius: 8px; }
 }
 
 /* ── Hero ── */
@@ -399,6 +480,7 @@
   padding: 2rem;
   text-align: center;
   pointer-events: none;
+  /* background set via inline style from Liquid */
 }
 .shoe3d-hero__badge {
   display: inline-flex;
@@ -451,16 +533,63 @@
 
 /* ── Panels ── */
 .shoe3d-panels { position: relative; z-index: 2; }
+
 .shoe3d-panel {
+  position: relative;
   min-height: var(--panel-h);
   display: flex;
-  align-items: center;
-  padding: 2rem 5vw;
+  align-items: stretch;
+  padding: 0;
+}
+
+/* Per-panel background layer fills the full panel height */
+.shoe3d-panel__bg {
+  position: absolute;
+  inset: 0;
+  background: var(--panel-bg, transparent);
+  z-index: 0;
   pointer-events: none;
 }
-.shoe3d-panel--left  { justify-content: flex-end; }
-.shoe3d-panel--right { justify-content: flex-start; }
 
+/* Inner flex row — content + image side by side */
+.shoe3d-panel__inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  padding: 4rem 5vw;
+}
+
+/* Content side */
+.shoe3d-panel--left  .shoe3d-panel__inner { justify-content: flex-end; }
+.shoe3d-panel--right .shoe3d-panel__inner { justify-content: flex-start; }
+
+/* ── Supporting image — always visible ── */
+.shoe3d-panel__image-wrap {
+  flex-shrink: 0;
+  width: clamp(160px, 22vw, 320px);
+  aspect-ratio: 1 / 1;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 24px 64px rgba(0,0,0,.55);
+  order: 0; /* will be overridden per side below */
+}
+
+/* On left-aligned panels, image goes to the left of the text */
+.shoe3d-panel--left  .shoe3d-panel__image-wrap { order: -1; }
+/* On right-aligned panels, image goes to the right */
+.shoe3d-panel--right .shoe3d-panel__image-wrap { order: 1; }
+
+.shoe3d-panel__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ── Panel text content ── */
 .shoe3d-panel__content {
   pointer-events: all;
   width: var(--content-w);
@@ -470,7 +599,7 @@
   opacity: 0;
   transform: translateY(40px);
   transition: opacity .7s var(--ease-spring), transform .7s var(--ease-spring);
-  position: relative; z-index: 4;
+  color: var(--panel-text, var(--text));
 }
 .shoe3d-panel__content.is-visible { opacity: 1; transform: translateY(0); }
 
@@ -485,11 +614,14 @@
   font-family: var(--font-heading-family, 'Georgia', serif);
   font-size: clamp(1.6rem, 3.5vw, 3rem);
   font-weight: 300; letter-spacing: -.04em;
-  line-height: 1.05; color: var(--text); margin: 0;
+  line-height: 1.05;
+  color: var(--panel-text, var(--text));
+  margin: 0;
 }
 .shoe3d-panel__body {
   font-size: clamp(.85rem, 1.1vw, 1rem);
-  line-height: 1.75; color: rgba(255,255,255,.6);
+  line-height: 1.75;
+  color: rgba(255,255,255,.6);
   margin: 0; max-width: 38ch;
 }
 .shoe3d-panel__features {
@@ -510,34 +642,40 @@
   display: inline-flex; align-items: center; gap: .6rem;
   font-size: .75rem; font-weight: 600;
   letter-spacing: .08em; text-transform: uppercase;
-  text-decoration: none; color: var(--bg); background: var(--text);
+  text-decoration: none;
+  color: var(--panel-bg, #080808);
+  background: var(--panel-text, var(--text));
   padding: .8em 1.7em; border-radius: 50px; width: fit-content;
   transition: background .2s ease, color .2s ease, transform .2s ease;
 }
-.shoe3d-panel__cta:hover { background: var(--accent); color: var(--bg); transform: translateX(4px); }
+.shoe3d-panel__cta:hover { background: var(--accent); color: #000; transform: translateX(4px); }
 .shoe3d-panel__cta:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .shoe3d-panel__cta svg { flex-shrink: 0; transition: transform .2s ease; }
 .shoe3d-panel__cta:hover svg { transform: translateX(4px); }
 
-.shoe3d-panel__image-wrap { display: none; }
-@media (max-width: 767px) {
-  .shoe3d-panel__image-wrap {
-    display: block; border-radius: 16px; overflow: hidden;
-    width: 100%; max-width: 280px; aspect-ratio: 1;
-    margin-top: 1rem; box-shadow: 0 20px 50px rgba(0,0,0,.5);
-  }
-  .shoe3d-panel__image { width: 100%; height: 100%; object-fit: cover; display: block; }
-}
-
 .shoe3d-end-spacer { height: 20vh; }
 
+/* ── Mobile layout ── */
 @media (max-width: 767px) {
-  .shoe3d-panel {
-    flex-direction: column; align-items: flex-start;
-    padding: 3rem 1.5rem; justify-content: flex-start;
-    min-height: auto; padding-top: 20vh;
+  .shoe3d-panel__inner {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 3rem 1.5rem 3rem;
+    gap: 1.5rem;
+    min-height: auto;
   }
-  .shoe3d-panel--left, .shoe3d-panel--right { justify-content: flex-start; }
+  .shoe3d-panel--left  .shoe3d-panel__inner,
+  .shoe3d-panel--right .shoe3d-panel__inner {
+    justify-content: flex-start;
+  }
+  /* Image always on top on mobile */
+  .shoe3d-panel__image-wrap {
+    order: -1 !important;
+    width: 100%;
+    max-width: 280px;
+    aspect-ratio: 1;
+    align-self: center;
+  }
   .shoe3d-panel__content { width: 100%; }
   .shoe3d-hero__headline { font-size: clamp(2rem, 10vw, 4rem); }
 }
@@ -548,19 +686,34 @@
   0%,100% { transform: translateY(0); }
   50%     { transform: translateY(8px); }
 }
+@keyframes shoe3d-pulse {
+  0%   { opacity: .7; transform: scale(1); }
+  100% { opacity: 0;  transform: scale(2.4); }
+}
 
 /* ── Reduced motion ── */
 @media (prefers-reduced-motion: reduce) {
   .shoe3d-hero__scroll-hint { animation: none; }
   .shoe3d-loader__ring { animation: none; border-top-color: rgba(255,255,255,.5); }
   .shoe3d-panel__content { opacity: 1; transform: none; transition: none; }
-  .shoe3d-badge { transition: none; opacity: 1; transform: translate(-50%, -50%) !important; }
+  .shoe3d-pin { opacity: 1; transition: none; }
+  .shoe3d-pin__pulse { animation: none; opacity: 0; }
 }
 </style>
 
 <script>
 (function () {
   'use strict';
+
+  /* ── Tiny helper: extract a dominant "solid" colour from a CSS
+     background value so we can feed it to the canvas vignette.
+     Works for both solid hex/rgb and gradient strings. ── */
+  function extractSolidColor(bg) {
+    if (!bg) return '#080808';
+    // If it IS a gradient, pull the first colour token
+    var m = bg.match(/#[0-9a-f]{3,8}|rgba?\([^)]+\)/i);
+    return m ? m[0] : '#080808';
+  }
 
   function loadScript(src, cb) {
     var s = document.createElement('script');
@@ -573,7 +726,10 @@
     loadScript('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js', function () {
       loadScript('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js', function () {
         loadScript('https://cdn.jsdelivr.net/npm/meshoptimizer@0.18.1/meshopt_decoder.js', function () {
-          var T = window.THREE, GL = T && T.GLTFLoader, DL = T && T.DRACOLoader, MOD = window.MeshoptDecoder;
+          var T  = window.THREE,
+              GL = T && T.GLTFLoader,
+              DL = T && T.DRACOLoader,
+              MOD= window.MeshoptDecoder;
           if (!T || !GL || !DL) { console.error('[Shoe3D] THREE not ready'); return; }
           if (MOD && GL.setMeshoptDecoder) GL.setMeshoptDecoder(MOD);
           initShoe3D(T, GL, DL, MOD);
@@ -591,16 +747,67 @@
     if (!MODEL_URL) { console.warn('[Shoe3D] No model URL.'); return; }
 
     var canvas     = document.getElementById(SECTION_ID + '-canvas');
+    var vignette   = document.getElementById(SECTION_ID + '-vignette');
     var loaderEl   = document.getElementById(SECTION_ID + '-loader');
     var panelEls   = [].slice.call(section.querySelectorAll('.shoe3d-panel'));
     var contentEls = [].slice.call(section.querySelectorAll('.shoe3d-panel__content'));
 
-    /* All badge groups, keyed by panel index */
-    var badgeGroups = {};
-    [].slice.call(section.querySelectorAll('.shoe3d-badges')).forEach(function (el) {
-      badgeGroups[el.dataset.badgesPanel] = el;
+    /* ── Annotation pin groups ── */
+    var annGroups = {};
+    [].slice.call(section.querySelectorAll('.shoe3d-annotations')).forEach(function (el) {
+      annGroups[el.dataset.annPanel] = el;
     });
 
+    /* ────────────────────────────────────────────────────────
+       PIN POSITIONING
+       Called on load, on panel change, and on window resize.
+       Reads the canvas bounding rect + the % data attrs on
+       each .shoe3d-pin, then sets absolute left/top in px.
+       Because left/top are in px (not %) they do NOT shift
+       when anything on the page reflows.
+    ──────────────────────────────────────────────────────── */
+    function positionPins() {
+      var rect = canvas.getBoundingClientRect();
+      /* rect is relative to viewport; because the canvas-wrap
+         is sticky top:0 and we're inside it, offsetTop of the
+         canvas-wrap is 0 while it's visible.  We only need the
+         width/height to convert %. */
+      var W = rect.width;
+      var H = rect.height;
+
+      [].slice.call(section.querySelectorAll('.shoe3d-pin')).forEach(function (pin) {
+        var ax = parseFloat(pin.dataset.ax || 50) / 100;
+        var ay = parseFloat(pin.dataset.ay || 50) / 100;
+        /* left/top set relative to the .shoe3d-annotations div
+           which has inset:0 (same size as the canvas-wrap) */
+        pin.style.left = (ax * W) + 'px';
+        pin.style.top  = (ay * H) + 'px';
+      });
+    }
+
+    /* ── Activate / deactivate annotation groups ── */
+    function activateAnnotations(idx) {
+      Object.keys(annGroups).forEach(function (k) {
+        annGroups[k].classList.remove('is-active');
+      });
+      if (idx >= 0 && annGroups[idx]) {
+        annGroups[idx].classList.add('is-active');
+      }
+    }
+
+    /* ── Vignette colour update ──
+       Smoothly transitions the radial/linear vignette to match
+       the active panel background so the 3D model blends in. */
+    function updateVignette(panelEl) {
+      if (!vignette) return;
+      var bg = panelEl
+        ? getComputedStyle(panelEl).getPropertyValue('--panel-bg').trim()
+        : '';
+      var col = extractSolidColor(bg) || '#080808';
+      vignette.style.setProperty('--vignette-color', col);
+    }
+
+    /* ── Interpolation helpers ── */
     var lerp = function (a, b, t) { return a + (b - a) * t; };
     var LERP_SPEED = 0.08;
     var reduced    = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -625,12 +832,15 @@
     var tgt = { rotX:0, rotY:0, rotZ:.2, posX:0, posY:0, lI:1, lX:5, lY:5, lZ:5 };
 
     /* ── Renderer ── */
-    var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+    var renderer = new THREE.WebGLRenderer({
+      canvas: canvas, antialias: true, alpha: true,
+      powerPreference: 'high-performance'
+    });
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-    renderer.outputEncoding     = THREE.sRGBEncoding;
-    renderer.shadowMap.enabled  = true;
-    renderer.shadowMap.type     = THREE.PCFSoftShadowMap;
-    renderer.toneMapping        = THREE.ACESFilmicToneMapping;
+    renderer.outputEncoding      = THREE.sRGBEncoding;
+    renderer.shadowMap.enabled   = true;
+    renderer.shadowMap.type      = THREE.PCFSoftShadowMap;
+    renderer.toneMapping         = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.2;
 
     var scene  = new THREE.Scene();
@@ -640,10 +850,10 @@
     scene.add(new THREE.AmbientLight(0xffffff, 0.4));
     var key = new THREE.DirectionalLight(0xffffff, 1.0);
     key.position.set(5,5,5); key.castShadow = true;
-    key.shadow.mapSize.set(1024,1024);
+    key.shadow.mapSize.set(1024, 1024);
     scene.add(key);
     var rim = new THREE.DirectionalLight(0x8899ff, 0.3);
-    rim.position.set(-5,2,-5); scene.add(rim);
+    rim.position.set(-5, 2, -5); scene.add(rim);
     scene.add(new THREE.HemisphereLight(0xffffff, 0x333333, 0.2));
 
     /* Resize */
@@ -654,8 +864,12 @@
       renderer.setSize(W, H, false);
       camera.aspect = W / H;
       camera.updateProjectionMatrix();
+      positionPins(); /* re-anchor all pins after resize */
     }
-    new ResizeObserver(function () { clearTimeout(rzTimer); rzTimer = setTimeout(onResize, 100); }).observe(canvas);
+    new ResizeObserver(function () {
+      clearTimeout(rzTimer);
+      rzTimer = setTimeout(onResize, 80);
+    }).observe(canvas);
     onResize();
 
     /* Visibility gate */
@@ -665,72 +879,36 @@
       if (!isVis && raf) { cancelAnimationFrame(raf); raf = null; }
     }, { threshold: 0 }).observe(section);
 
-    /* ── Badge activation helper ── */
-    function activateBadges(idx) {
-      /* Hide all groups */
-      Object.keys(badgeGroups).forEach(function (k) {
-        badgeGroups[k].classList.remove('is-active');
-      });
-      /* Show group for this panel index if it exists */
-      if (idx >= 0 && badgeGroups[idx]) {
-        badgeGroups[idx].classList.add('is-active');
-      }
-    }
-
-    /* ── Panel IntersectionObserver ──
-       rootMargin -30% top/bottom = panel must be in the middle
-       40% of the viewport before activating.
-    ── */
-    new IntersectionObserver(function (entries) {
+    /* ── Panel observer ── */
+    var panelIO = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         var idx = parseInt(entry.target.dataset.panelIndex, 10);
         if (entry.isIntersecting) {
           activePanelIdx = idx;
-          activateBadges(idx);
+          activateAnnotations(idx);
+          updateVignette(entry.target);
+          positionPins(); /* ensure pins are placed for this panel */
 
           contentEls.forEach(function (el, i) {
             el.classList.toggle('is-visible', i === idx);
           });
 
           var pose = getPose(entry.target);
-          tgt.rotX = pose.rotX; tgt.rotY = pose.rotY; tgt.rotZ = pose.rotZ;
-          tgt.posX = pose.posX; tgt.posY = pose.posY;
-          tgt.lX = pose.lX; tgt.lY = pose.lY; tgt.lZ = pose.lZ; tgt.lI = pose.lI;
+          tgt.rotX=pose.rotX; tgt.rotY=pose.rotY; tgt.rotZ=pose.rotZ;
+          tgt.posX=pose.posX; tgt.posY=pose.posY;
+          tgt.lX=pose.lX; tgt.lY=pose.lY; tgt.lZ=pose.lZ; tgt.lI=pose.lI;
         } else {
           if (activePanelIdx === idx) {
             activePanelIdx = -1;
-            activateBadges(-1);
+            activateAnnotations(-1);
+            updateVignette(null);
             contentEls.forEach(function (el) { el.classList.remove('is-visible'); });
           }
         }
       });
-    }, { rootMargin: '-30% 0px -30% 0px', threshold: 0 }).observe.bind(
-      /* observe each panel */
-      (function () {
-        var io = new IntersectionObserver(function (entries) {
-          entries.forEach(function (entry) {
-            var idx = parseInt(entry.target.dataset.panelIndex, 10);
-            if (entry.isIntersecting) {
-              activePanelIdx = idx;
-              activateBadges(idx);
-              contentEls.forEach(function (el, i) { el.classList.toggle('is-visible', i === idx); });
-              var pose = getPose(entry.target);
-              tgt.rotX=pose.rotX; tgt.rotY=pose.rotY; tgt.rotZ=pose.rotZ;
-              tgt.posX=pose.posX; tgt.posY=pose.posY;
-              tgt.lX=pose.lX; tgt.lY=pose.lY; tgt.lZ=pose.lZ; tgt.lI=pose.lI;
-            } else {
-              if (activePanelIdx === idx) {
-                activePanelIdx = -1;
-                activateBadges(-1);
-                contentEls.forEach(function (el) { el.classList.remove('is-visible'); });
-              }
-            }
-          });
-        }, { rootMargin: '-30% 0px -30% 0px', threshold: 0 });
-        panelEls.forEach(function (el) { io.observe(el); });
-        return io;
-      })()
-    );
+    }, { rootMargin: '-30% 0px -30% 0px', threshold: 0 });
+
+    panelEls.forEach(function (el) { panelIO.observe(el); });
 
     /* ── Render loop ── */
     function startLoop() {
@@ -765,7 +943,7 @@
         function (g) {
           shoe = g.scene;
           var box = new THREE.Box3().setFromObject(shoe);
-          var sz = new THREE.Vector3(), ct = new THREE.Vector3();
+          var sz  = new THREE.Vector3(), ct = new THREE.Vector3();
           box.getSize(sz); box.getCenter(ct);
           shoe.position.sub(ct);
           shoe.scale.setScalar(3.6 / Math.max(sz.x, sz.y, sz.z));
@@ -783,11 +961,13 @@
           }
           scene.add(shoe);
           if (loaderEl) loaderEl.classList.add('is-hidden');
+          /* Position pins once the model has loaded and canvas is sized */
+          positionPins();
         },
         function (xhr) {
           if (loaderEl && xhr.total) {
             var t = loaderEl.querySelector('.shoe3d-loader__text');
-            if (t) t.textContent = 'Loading\u2026 ' + Math.round(xhr.loaded/xhr.total*100) + '%';
+            if (t) t.textContent = 'Loading\u2026 ' + Math.round(xhr.loaded / xhr.total * 100) + '%';
           }
         },
         function (err) {
@@ -805,10 +985,12 @@
     if (typeof MeshoptDecoder !== 'undefined' && MeshoptDecoder && gltf.setMeshoptDecoder) {
       var rdy = MeshoptDecoder.ready instanceof Promise ? MeshoptDecoder.ready : Promise.resolve();
       rdy.then(function () { gltf.setMeshoptDecoder(MeshoptDecoder); doLoad(); });
-    } else { doLoad(); }
+    } else {
+      doLoad();
+    }
 
     document.addEventListener('visibilitychange', function () {
-      if (document.hidden && raf) { cancelAnimationFrame(raf); raf = null; }
+      if (document.hidden && raf)         { cancelAnimationFrame(raf); raf = null; }
       else if (!document.hidden && isVis && !raf) startLoop();
     });
   }
@@ -829,66 +1011,150 @@
       "label": "GLB Model URL",
       "info": "Upload your .glb to Content → Files and paste the CDN URL here."
     },
+
     { "type": "header", "content": "Hero Section" },
     { "type": "text",  "id": "hero_badge",    "label": "Badge text",   "default": "Best Seller" },
     { "type": "text",  "id": "hero_headline", "label": "Hero headline","default": "The Jillian" },
     { "type": "text",  "id": "hero_subtext",  "label": "Hero subtext", "default": "Scroll to explore" },
-    { "type": "header", "content": "Colors" },
-    { "type": "color", "id": "background_color", "label": "Background", "default": "#080808" },
-    { "type": "color", "id": "text_color",        "label": "Text",       "default": "#ffffff" },
-    { "type": "color", "id": "accent_color",      "label": "Accent",     "default": "#c8956c" },
+
+    { "type": "header", "content": "Hero Background" },
+    {
+      "type": "color",
+      "id": "hero_background_color",
+      "label": "Hero background (solid)",
+      "default": "#080808"
+    },
+    {
+      "type": "color_background",
+      "id": "hero_background_gradient",
+      "label": "Hero background (gradient — overrides solid)",
+      "info": "Leave blank to use the solid colour above."
+    },
+
+    { "type": "header", "content": "Global Colours" },
+    { "type": "color", "id": "text_color",   "label": "Default text",  "default": "#ffffff" },
+    { "type": "color", "id": "accent_color", "label": "Accent colour", "default": "#c8956c" },
+
     { "type": "header", "content": "Accessibility" },
-    { "type": "text",  "id": "aria_label", "label": "Section ARIA label", "default": "3D Product Showcase — Scroll to explore" }
+    {
+      "type": "text",
+      "id": "aria_label",
+      "label": "Section ARIA label",
+      "default": "3D Product Showcase — Scroll to explore"
+    }
   ],
+
   "blocks": [
     {
       "type": "panel",
       "name": "Scroll Panel",
       "settings": [
-        { "type": "header",   "content": "Content" },
+        { "type": "header", "content": "Panel Background" },
+        {
+          "type": "color",
+          "id": "panel_background_color",
+          "label": "Background (solid)",
+          "default": "#0d0d0d",
+          "info": "Used when the gradient field below is empty."
+        },
+        {
+          "type": "color_background",
+          "id": "panel_background_gradient",
+          "label": "Background (gradient — overrides solid)",
+          "info": "Use Shopify's native gradient picker. Leave blank for solid colour."
+        },
+        {
+          "type": "color",
+          "id": "panel_text_color",
+          "label": "Panel text colour",
+          "default": "#ffffff",
+          "info": "Headings and eyebrow text in this panel."
+        },
+
+        { "type": "header", "content": "Content" },
         { "type": "text",     "id": "eyebrow",   "label": "Eyebrow label", "default": "Feature 01" },
         { "type": "text",     "id": "heading",   "label": "Heading",       "default": "Crafted for Every Step" },
         { "type": "textarea", "id": "body",      "label": "Body text",     "default": "Precision-engineered for all-day comfort." },
-        { "type": "text", "id": "feature_1", "label": "Feature 1" },
-        { "type": "text", "id": "feature_2", "label": "Feature 2" },
-        { "type": "text", "id": "feature_3", "label": "Feature 3" },
-        { "type": "text",         "id": "cta_label",   "label": "Button label" },
-        { "type": "url",          "id": "cta_url",     "label": "Button URL" },
-        { "type": "checkbox",     "id": "cta_new_tab", "label": "Open in new tab", "default": false },
-        { "type": "image_picker", "id": "image",       "label": "Mobile fallback image" },
-
-        { "type": "header",    "content": "Feature Badge 1" },
-        { "type": "paragraph", "content": "Floating label shown on the shoe. Leave blank to hide." },
-        { "type": "text",     "id": "badge_1_label", "label": "Label" },
-        { "type": "text",     "id": "badge_1_sub",   "label": "Sub-label (optional, desktop only)" },
+        { "type": "text",     "id": "feature_1", "label": "Feature 1" },
+        { "type": "text",     "id": "feature_2", "label": "Feature 2" },
+        { "type": "text",     "id": "feature_3", "label": "Feature 3" },
+        { "type": "text",     "id": "cta_label",   "label": "Button label" },
+        { "type": "url",      "id": "cta_url",     "label": "Button URL" },
         {
-          "type": "range", "id": "badge_1_x",
-          "label": "Horizontal position",
-          "min": 5, "max": 95, "step": 1, "default": 62, "unit": "%",
-          "info": "% from left edge of screen"
+          "type": "checkbox",
+          "id": "cta_new_tab",
+          "label": "Open in new tab",
+          "default": false
         },
         {
-          "type": "range", "id": "badge_1_y",
-          "label": "Vertical position",
-          "min": 5, "max": 95, "step": 1, "default": 32, "unit": "%",
-          "info": "% from top of screen"
+          "type": "image_picker",
+          "id": "image",
+          "label": "Supporting image",
+          "info": "Shown alongside the text on desktop and mobile."
         },
 
-        { "type": "header",    "content": "Feature Badge 2" },
-        { "type": "paragraph", "content": "Second optional badge. Leave blank to hide." },
-        { "type": "text",     "id": "badge_2_label", "label": "Label" },
-        { "type": "text",     "id": "badge_2_sub",   "label": "Sub-label (optional, desktop only)" },
+        { "type": "header", "content": "Annotation Pin 1" },
         {
-          "type": "range", "id": "badge_2_x",
-          "label": "Horizontal position",
-          "min": 5, "max": 95, "step": 1, "default": 38, "unit": "%",
-          "info": "% from left edge of screen"
+          "type": "paragraph",
+          "content": "Floating annotation shown on the 3D model. Positions are % of the canvas (0 = top/left, 100 = bottom/right)."
+        },
+        { "type": "text", "id": "ann_1_label", "label": "Label"              },
+        { "type": "text", "id": "ann_1_desc",  "label": "Description (optional)" },
+        {
+          "type": "select",
+          "id": "ann_1_side",
+          "label": "Card side",
+          "options": [
+            { "value": "right", "label": "Right of dot" },
+            { "value": "left",  "label": "Left of dot"  }
+          ],
+          "default": "right"
         },
         {
-          "type": "range", "id": "badge_2_y",
-          "label": "Vertical position",
-          "min": 5, "max": 95, "step": 1, "default": 68, "unit": "%",
-          "info": "% from top of screen"
+          "type": "range",
+          "id": "ann_1_x",
+          "label": "Horizontal position (% of canvas)",
+          "min": 5, "max": 95, "step": 1, "default": 52,
+          "unit": "%"
+        },
+        {
+          "type": "range",
+          "id": "ann_1_y",
+          "label": "Vertical position (% of canvas)",
+          "min": 5, "max": 95, "step": 1, "default": 38,
+          "unit": "%"
+        },
+
+        { "type": "header", "content": "Annotation Pin 2" },
+        {
+          "type": "paragraph",
+          "content": "Second annotation pin. Leave label blank to hide."
+        },
+        { "type": "text", "id": "ann_2_label", "label": "Label"              },
+        { "type": "text", "id": "ann_2_desc",  "label": "Description (optional)" },
+        {
+          "type": "select",
+          "id": "ann_2_side",
+          "label": "Card side",
+          "options": [
+            { "value": "right", "label": "Right of dot" },
+            { "value": "left",  "label": "Left of dot"  }
+          ],
+          "default": "left"
+        },
+        {
+          "type": "range",
+          "id": "ann_2_x",
+          "label": "Horizontal position (% of canvas)",
+          "min": 5, "max": 95, "step": 1, "default": 46,
+          "unit": "%"
+        },
+        {
+          "type": "range",
+          "id": "ann_2_y",
+          "label": "Vertical position (% of canvas)",
+          "min": 5, "max": 95, "step": 1, "default": 65,
+          "unit": "%"
         },
 
         { "type": "header", "content": "Shoe Rotation" },
@@ -906,6 +1172,7 @@
       ]
     }
   ],
+
   "presets": [
     {
       "name": "3D Shoe Scroll",
@@ -913,6 +1180,8 @@
         {
           "type": "panel",
           "settings": {
+            "panel_background_color": "#0a0806",
+            "panel_text_color": "#ffffff",
             "eyebrow": "All-Day Comfort",
             "heading": "Feels Like Walking on Air",
             "body": "Memory foam cushioning and an ultra-light cork midsole work together to reduce fatigue — so you can go further, longer.",
@@ -923,17 +1192,19 @@
             "rot_x": 10, "rot_y": 90, "rot_z": 5,
             "pos_x": 6, "pos_y": 0,
             "light_intensity": 12, "light_x": 8, "light_y": 6, "light_z": 5,
-            "badge_1_label": "Memory Foam",
-            "badge_1_sub": "Conforms to your foot",
-            "badge_1_x": 50, "badge_1_y": 42,
-            "badge_2_label": "Cork Midsole",
-            "badge_2_sub": "Ultra-light & shock-absorbing",
-            "badge_2_x": 52, "badge_2_y": 66
+            "ann_1_label": "Memory Foam",
+            "ann_1_desc": "Conforms to your foot, distributes weight evenly",
+            "ann_1_x": 52, "ann_1_y": 42, "ann_1_side": "right",
+            "ann_2_label": "Cork Midsole",
+            "ann_2_desc": "Ultra-light & shock-absorbing for all-day wear",
+            "ann_2_x": 46, "ann_2_y": 65, "ann_2_side": "left"
           }
         },
         {
           "type": "panel",
           "settings": {
+            "panel_background_color": "#080c0a",
+            "panel_text_color": "#ffffff",
             "eyebrow": "Premium Materials",
             "heading": "Genuine Leather. Built to Last.",
             "body": "Crafted from real leather uppers with a soft microfiber footbed treated with antimicrobial technology — fresh all day, every day.",
@@ -943,53 +1214,57 @@
             "rot_x": -75, "rot_y": 10, "rot_z": 0,
             "pos_x": -6, "pos_y": 0,
             "light_intensity": 14, "light_x": -5, "light_y": 8, "light_z": 3,
-            "badge_1_label": "Leather Upper",
-            "badge_1_sub": "Full-grain & breathable",
-            "badge_1_x": 48, "badge_1_y": 34,
-            "badge_2_label": "Microfiber Footbed",
-            "badge_2_sub": "Antimicrobial lining",
-            "badge_2_x": 52, "badge_2_y": 56
+            "ann_1_label": "Leather Upper",
+            "ann_1_desc": "Full-grain & breathable — built to last",
+            "ann_1_x": 50, "ann_1_y": 34, "ann_1_side": "right",
+            "ann_2_label": "Antimicrobial Lining",
+            "ann_2_desc": "Fights everyday odors all day long",
+            "ann_2_x": 52, "ann_2_y": 58, "ann_2_side": "left"
           }
         },
         {
           "type": "panel",
           "settings": {
+            "panel_background_color": "#08080c",
+            "panel_text_color": "#ffffff",
             "eyebrow": "Signature Arch Support",
             "heading": "Aligned From the Ground Up",
             "body": "Aetrex Signature Arch Support is strategically placed to align your entire body — relieving pressure from your feet all the way to your back.",
             "feature_1": "Aetrex Signature Arch Support",
-            "feature_2": "Strategically placed straps",
-            "feature_3": "Bunion-friendly strap design",
+            "feature_2": "Bunion-relief strap placement",
+            "feature_3": "Helps with Plantar Fasciitis & heel pain",
             "rot_x": 95, "rot_y": 0, "rot_z": 5,
             "pos_x": 6, "pos_y": 0,
             "light_intensity": 13, "light_x": 3, "light_y": -5, "light_z": 8,
-            "badge_1_label": "Signature Arch Support",
-            "badge_1_sub": "Aetrex — full-body alignment",
-            "badge_1_x": 50, "badge_1_y": 54,
-            "badge_2_label": "Braided Straps",
-            "badge_2_sub": "Strategically placed",
-            "badge_2_x": 46, "badge_2_y": 30
+            "ann_1_label": "Arch Support",
+            "ann_1_desc": "Aetrex contoured support — full-body alignment",
+            "ann_1_x": 50, "ann_1_y": 54, "ann_1_side": "right",
+            "ann_2_label": "Bunion Relief",
+            "ann_2_desc": "Strap void eliminates pressure on bunions",
+            "ann_2_x": 46, "ann_2_y": 30, "ann_2_side": "left"
           }
         },
         {
           "type": "panel",
           "settings": {
+            "panel_background_color": "#0c0a08",
+            "panel_text_color": "#ffffff",
             "eyebrow": "Style Meets Function",
             "heading": "Comfort You Can See.",
             "body": "The signature braided detailing makes the Jillian the sandal you'll reach for every morning — whether running errands or spending a full day on your feet.",
-            "feature_1": "Fully adjustable hook & loop closure",
+            "feature_1": "Hook & loop closure — fully adjustable",
             "feature_2": "1.1\" heel height",
             "feature_3": "Our #1 best-selling sandal",
             "cta_label": "Shop the Jillian",
             "rot_x": 0, "rot_y": 0, "rot_z": 0,
             "pos_x": -4, "pos_y": -2,
             "light_intensity": 15, "light_x": 0, "light_y": 5, "light_z": 10,
-            "badge_1_label": "Braided Leather Strap",
-            "badge_1_sub": "Signature design detail",
-            "badge_1_x": 44, "badge_1_y": 30,
-            "badge_2_label": "Hook & Loop Closure",
-            "badge_2_sub": "Fully adjustable fit",
-            "badge_2_x": 54, "badge_2_y": 54
+            "ann_1_label": "Braided Strap",
+            "ann_1_desc": "Signature design — adjustable for wide feet",
+            "ann_1_x": 44, "ann_1_y": 30, "ann_1_side": "right",
+            "ann_2_label": "Hook & Loop Closure",
+            "ann_2_desc": "Accommodates narrow to wide widths",
+            "ann_2_x": 54, "ann_2_y": 56, "ann_2_side": "left"
           }
         }
       ]
