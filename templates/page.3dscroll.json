@@ -173,7 +173,7 @@
         "hero_headline": "The Jillian",
         "hero_subtext": "Scroll to explore",
         "background_color": "#353535",
-        "background_gradient": "linear-gradient(136deg, rgba(49, 49, 49, 1), rgba(197, 163, 112, 1) 100%)",
+        "background_gradient": "linear-gradient(136deg, rgba(49, 49, 49, 1), rgba(142, 90, 59, 1) 100%)",
         "text_color": "#ffffff",
         "accent_color": "#ffddbf",
         "aria_label": "3D Product Showcase — Scroll to explore"
@@ -185,8 +185,8 @@
       "settings": {
         "desktop_height": 200,
         "mobile_height": 200,
-        "color_background": "#353535",
-        "gradient_background": ""
+        "color_background": "#8e5a3bff",
+        "gradient_background": "linear-gradient(46deg, rgba(118, 80, 57, 1) 13%, rgba(142, 90, 59, 1) 86%)"
       }
     }
   },
