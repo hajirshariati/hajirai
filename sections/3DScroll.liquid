@@ -79,10 +79,17 @@
       {%- assign idx = forloop.index0 -%}
 
       {%- comment -%} Resolve annotation content from block settings OR product defaults {%- endcomment -%}
-      {%- assign default_a1_labels  = "Memory Foam Cushioning,Genuine Leather Upper,Aetrex Arch Support,Braided Leather Strap" | split: "," -%}
-      {%- assign default_a1_descs   = "Conforms to your foot, distributes weight evenly,Full-grain leather — breathable & durable,Strategically placed for full-body alignment,Signature style detail — comfort meets fashion" | split: "," -%}
-      {%- assign default_a2_labels  = "Ultra-Light Cork Midsole,Antimicrobial Footbed,Met Bar Pod,Hook & Loop Closure" | split: "," -%}
-      {%- assign default_a2_descs   = "Reduces fatigue for all-day wear,Fights everyday odors all day,Relieves ball-of-foot discomfort,Fully adjustable for multiple widths" | split: "," -%}
+      {%- comment -%}
+        Annotation defaults — content matches each panel's feature focus.
+        Panel 0 Comfort:      Memory Foam + Met Bar Pod
+        Panel 1 Materials:    Genuine Leather + Antimicrobial Microfiber
+        Panel 2 Arch Support: Aetrex Arch Support + Bunion Relief
+        Panel 3 Style:        Braided Leather Strap + Hook & Loop Closure
+      {%- endcomment -%}
+      {%- assign default_a1_labels = "Memory Foam,Genuine Leather Upper,Aetrex Arch Support,Braided Leather Strap" | split: "," -%}
+      {%- assign default_a1_descs  = "Conforms to your foot & distributes weight evenly,Full-grain leather — breathable & built to last,Strategically placed for full-body alignment,Signature braided detail — style meets comfort" | split: "," -%}
+      {%- assign default_a2_labels = "Met Bar Pod,Antimicrobial Microfiber,Bunion Relief Design,Hook & Loop Closure" | split: "," -%}
+      {%- assign default_a2_descs  = "Relieves ball-of-foot & metatarsalgia discomfort,Fights everyday odors all day long,Strap void removes pressure on bunions,Fully adjustable — fits narrow to wide feet" | split: "," -%}
 
       {%- assign a1_label = default_a1_labels[idx] -%}
       {%- assign a1_desc  = default_a1_descs[idx] -%}
@@ -763,25 +770,70 @@
        Because left/top are in px (not %) they do NOT shift
        when anything on the page reflows.
     ──────────────────────────────────────────────────────── */
+    /* Shoe bounding box in local space — set once after GLB loads */
+    var shoeBBoxMin = null, shoeBBoxMax = null;
+
+    function setShoeBBox() {
+      if (!shoe) return;
+      var box = new THREE.Box3().setFromObject(shoe);
+      shoeBBoxMin = box.min.clone();
+      shoeBBoxMax = box.max.clone();
+    }
+
+    /* Project a THREE.Vector3 world position to canvas pixel coords */
+    function worldToScreen(worldVec, W, H) {
+      var v = worldVec.clone().project(camera);
+      return {
+        x: ( v.x * 0.5 + 0.5) * W,
+        y: (-v.y * 0.5 + 0.5) * H
+      };
+    }
+
     function positionPins() {
+      if (!shoe || !shoeBBoxMin) return;
       var canvasWrap = canvas.parentElement;
       var W = canvasWrap.offsetWidth;
       var H = canvasWrap.offsetHeight;
       if (!W || !H) return;
 
-      /* The 3D shoe does not fill the full canvas — it occupies a
-         centred region. We map pin % coords into that region so
-         0% = left edge of shoe area, 100% = right edge of shoe area.
-         Shoe region defaults: x 20–80% of canvas, y 10–90% of canvas.
-         These match the Three.js camera FOV and default model scale. */
-      var shoeX0 = W * 0.20, shoeX1 = W * 0.80;
-      var shoeY0 = H * 0.10, shoeY1 = H * 0.90;
+      /* Get the shoe's current world-space bounding box by
+         re-computing it from the live scene (accounts for rotation,
+         scale and posX/posY translation set in the render loop) */
+      var worldBox = new THREE.Box3().setFromObject(shoe);
+      var wMin = worldBox.min, wMax = worldBox.max;
+
+      /* Project all 8 corners to find the actual screen bbox */
+      var corners = [
+        new THREE.Vector3(wMin.x, wMin.y, wMin.z),
+        new THREE.Vector3(wMax.x, wMin.y, wMin.z),
+        new THREE.Vector3(wMin.x, wMax.y, wMin.z),
+        new THREE.Vector3(wMax.x, wMax.y, wMin.z),
+        new THREE.Vector3(wMin.x, wMin.y, wMax.z),
+        new THREE.Vector3(wMax.x, wMin.y, wMax.z),
+        new THREE.Vector3(wMin.x, wMax.y, wMax.z),
+        new THREE.Vector3(wMax.x, wMax.y, wMax.z)
+      ];
+
+      var sxMin=Infinity,sxMax=-Infinity,syMin=Infinity,syMax=-Infinity;
+      corners.forEach(function(c) {
+        var s = worldToScreen(c, W, H);
+        if (s.x < sxMin) sxMin = s.x;
+        if (s.x > sxMax) sxMax = s.x;
+        if (s.y < syMin) syMin = s.y;
+        if (s.y > syMax) syMax = s.y;
+      });
+
+      /* Clamp to canvas bounds */
+      sxMin = Math.max(0, sxMin);
+      sxMax = Math.min(W, sxMax);
+      syMin = Math.max(0, syMin);
+      syMax = Math.min(H, syMax);
 
       [].slice.call(section.querySelectorAll('.shoe3d-pin')).forEach(function (pin) {
         var ax = parseFloat(pin.dataset.ax || 50) / 100;
         var ay = parseFloat(pin.dataset.ay || 50) / 100;
-        pin.style.left = (shoeX0 + ax * (shoeX1 - shoeX0)) + 'px';
-        pin.style.top  = (shoeY0 + ay * (shoeY1 - shoeY0)) + 'px';
+        pin.style.left = (sxMin + ax * (sxMax - sxMin)) + 'px';
+        pin.style.top  = (syMin + ay * (syMax - syMin)) + 'px';
       });
     }
 
@@ -929,6 +981,7 @@
         key.position.set(cur.lX, cur.lY, cur.lZ);
         key.intensity = cur.lI;
         renderer.render(scene, camera);
+        positionPins(); /* track shoe every frame */
       })();
     }
 
@@ -960,6 +1013,7 @@
             tgt.lX=p0.lX; tgt.lY=p0.lY; tgt.lZ=p0.lZ; tgt.lI=p0.lI;
           }
           scene.add(shoe);
+          setShoeBBox();
           if (loaderEl) loaderEl.classList.add('is-hidden');
           /* Position pins once the model has loaded and canvas is sized */
           positionPins();
@@ -1169,11 +1223,11 @@
             "pos_x": 6, "pos_y": 0,
             "light_intensity": 12, "light_x": 8, "light_y": 6, "light_z": 5,
             "ann_1_label": "Memory Foam",
-            "ann_1_desc": "Conforms to your foot, distributes weight evenly",
-            "ann_1_x": 52, "ann_1_y": 42, "ann_1_side": "right",
-            "ann_2_label": "Cork Midsole",
-            "ann_2_desc": "Ultra-light & shock-absorbing for all-day wear",
-            "ann_2_x": 46, "ann_2_y": 65, "ann_2_side": "left"
+            "ann_1_desc": "Conforms to your foot & distributes weight evenly",
+            "ann_1_x": 55, "ann_1_y": 40, "ann_1_side": "right",
+            "ann_2_label": "Met Bar Pod",
+            "ann_2_desc": "Relieves ball-of-foot & metatarsalgia discomfort",
+            "ann_2_x": 40, "ann_2_y": 72, "ann_2_side": "right"
           }
         },
         {
@@ -1188,12 +1242,12 @@
             "rot_x": -75, "rot_y": 10, "rot_z": 0,
             "pos_x": -6, "pos_y": 0,
             "light_intensity": 14, "light_x": -5, "light_y": 8, "light_z": 3,
-            "ann_1_label": "Leather Upper",
-            "ann_1_desc": "Full-grain & breathable — built to last",
-            "ann_1_x": 50, "ann_1_y": 34, "ann_1_side": "right",
-            "ann_2_label": "Antimicrobial Lining",
-            "ann_2_desc": "Fights everyday odors all day long",
-            "ann_2_x": 52, "ann_2_y": 58, "ann_2_side": "left"
+            "ann_1_label": "Genuine Leather Upper",
+            "ann_1_desc": "Full-grain leather — breathable & built to last",
+            "ann_1_x": 55, "ann_1_y": 30, "ann_1_side": "right",
+            "ann_2_label": "Antimicrobial Microfiber",
+            "ann_2_desc": "Footbed treated to fight everyday odors all day",
+            "ann_2_x": 48, "ann_2_y": 62, "ann_2_side": "right"
           }
         },
         {
@@ -1208,12 +1262,12 @@
             "rot_x": 95, "rot_y": 0, "rot_z": 5,
             "pos_x": 6, "pos_y": 0,
             "light_intensity": 13, "light_x": 3, "light_y": -5, "light_z": 8,
-            "ann_1_label": "Arch Support",
-            "ann_1_desc": "Aetrex contoured support — full-body alignment",
-            "ann_1_x": 50, "ann_1_y": 54, "ann_1_side": "right",
+            "ann_1_label": "Aetrex Arch Support",
+            "ann_1_desc": "Contoured height aligns body from ground up",
+            "ann_1_x": 52, "ann_1_y": 58, "ann_1_side": "right",
             "ann_2_label": "Bunion Relief",
-            "ann_2_desc": "Strap void eliminates pressure on bunions",
-            "ann_2_x": 46, "ann_2_y": 30, "ann_2_side": "left"
+            "ann_2_desc": "Strap void removes pressure on bunions entirely",
+            "ann_2_x": 38, "ann_2_y": 32, "ann_2_side": "right"
           }
         },
         {
@@ -1229,12 +1283,12 @@
             "rot_x": 0, "rot_y": 0, "rot_z": 0,
             "pos_x": -4, "pos_y": -2,
             "light_intensity": 15, "light_x": 0, "light_y": 5, "light_z": 10,
-            "ann_1_label": "Braided Strap",
-            "ann_1_desc": "Signature design — adjustable for wide feet",
-            "ann_1_x": 44, "ann_1_y": 30, "ann_1_side": "right",
+            "ann_1_label": "Braided Leather Strap",
+            "ann_1_desc": "Signature quarter-strap — style meets comfort",
+            "ann_1_x": 42, "ann_1_y": 28, "ann_1_side": "right",
             "ann_2_label": "Hook & Loop Closure",
-            "ann_2_desc": "Accommodates narrow to wide widths",
-            "ann_2_x": 54, "ann_2_y": 56, "ann_2_side": "left"
+            "ann_2_desc": "Fully adjustable — fits narrow to wide feet",
+            "ann_2_x": 55, "ann_2_y": 60, "ann_2_side": "left"
           }
         }
       ]
