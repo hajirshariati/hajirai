@@ -39,6 +39,7 @@
             "cta_label": "Shop the Jillian",
             "cta_url": "",
             "cta_new_tab": false,
+            "image": "shopify://shop_images/Ash_banner_M.jpg",
             "ann_1_label": "",
             "ann_1_desc": "",
             "ann_1_side": "right",
@@ -171,7 +172,7 @@
         "model_url": "https://cdn.jsdelivr.net/gh/aetrexinc/Jillian3D@main/Jillian-v2.glb",
         "hero_badge": "Best Seller",
         "hero_headline": "The Jillian",
-        "hero_subtext": "Scroll to explore",
+        "hero_subtext": "Designed to help relieve discomfort with superior arch support",
         "background_color": "#353535",
         "background_gradient": "linear-gradient(136deg, rgba(49, 49, 49, 1), rgba(142, 90, 59, 1) 100%)",
         "text_color": "#ffffff",
@@ -185,7 +186,7 @@
       "settings": {
         "desktop_height": 200,
         "mobile_height": 200,
-        "color_background": "#8e5a3bff",
+        "color_background": "#8e5a3b",
         "gradient_background": "linear-gradient(46deg, rgba(118, 80, 57, 1) 13%, rgba(142, 90, 59, 1) 86%)"
       }
     }
