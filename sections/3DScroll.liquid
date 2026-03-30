@@ -277,14 +277,13 @@
   background: var(--bg); /* single global background — set from section settings */
 }
 
-/* The inner scroll container sits above the sticky canvas.
-   Gets the same bg as the section so hero + panels are
-   uniformly coloured — no tone mismatch. */
+/* The inner scroll container — MUST be transparent so the
+   sticky canvas is visible during the hero section. */
 .shoe3d-section__inner {
   max-width: var(--max-w);
   margin: -100vh auto 0;
   position: relative;
-  background: var(--bg);
+  background: transparent;
 }
 
 /* ── Sticky canvas ── */
@@ -488,15 +487,7 @@
   pointer-events: none;
   background: transparent; /* NEVER cover the canvas */
 }
-/* Soft bottom fade so the hero blends into the first panel */
-.shoe3d-hero::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 30%;
-  background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.35));
-  pointer-events: none;
-}
+
 .shoe3d-hero__badge {
   display: inline-flex;
   align-items: center;
@@ -547,7 +538,11 @@
 }
 
 /* ── Panels ── */
-.shoe3d-panels { position: relative; z-index: 2; }
+.shoe3d-panels {
+  position: relative;
+  z-index: 2;
+  background: var(--bg); /* bg lives HERE — below hero, above canvas */
+}
 
 .shoe3d-panel {
   position: relative;
@@ -766,20 +761,24 @@
        when anything on the page reflows.
     ──────────────────────────────────────────────────────── */
     function positionPins() {
-      /* Use the canvas-wrap's layout size — this is the same
-         element that .shoe3d-annotations is positioned inside
-         (inset:0). offsetWidth/Height are unaffected by scroll
-         position, viewport offset, or sticky behaviour. */
       var canvasWrap = canvas.parentElement;
       var W = canvasWrap.offsetWidth;
       var H = canvasWrap.offsetHeight;
       if (!W || !H) return;
 
+      /* The 3D shoe does not fill the full canvas — it occupies a
+         centred region. We map pin % coords into that region so
+         0% = left edge of shoe area, 100% = right edge of shoe area.
+         Shoe region defaults: x 20–80% of canvas, y 10–90% of canvas.
+         These match the Three.js camera FOV and default model scale. */
+      var shoeX0 = W * 0.20, shoeX1 = W * 0.80;
+      var shoeY0 = H * 0.10, shoeY1 = H * 0.90;
+
       [].slice.call(section.querySelectorAll('.shoe3d-pin')).forEach(function (pin) {
         var ax = parseFloat(pin.dataset.ax || 50) / 100;
         var ay = parseFloat(pin.dataset.ay || 50) / 100;
-        pin.style.left = (ax * W) + 'px';
-        pin.style.top  = (ay * H) + 'px';
+        pin.style.left = (shoeX0 + ax * (shoeX1 - shoeX0)) + 'px';
+        pin.style.top  = (shoeY0 + ay * (shoeY1 - shoeY0)) + 'px';
       });
     }
 
@@ -871,14 +870,23 @@
        panel at all times with no gap between them.
     ── */
     function updateActivePanel() {
-      var midY = window.innerHeight / 2;
-      var best = -1, bestDist = Infinity;
+      /* A panel is "eligible" only when its top has scrolled past
+         25% of the viewport — prevents early activation while the
+         panel is still mostly below the fold. */
+      var triggerY  = window.innerHeight * 0.25;
+      var midY      = window.innerHeight * 0.5;
+      var best      = -1, bestDist = Infinity;
+
       panelEls.forEach(function (el, i) {
         var r = el.getBoundingClientRect();
+        /* Skip panels not on screen at all */
         if (r.bottom < 0 || r.top > window.innerHeight) return;
+        /* Skip panels whose top hasn't reached the trigger line yet */
+        if (r.top > triggerY) return;
         var dist = Math.abs((r.top + r.height / 2) - midY);
         if (dist < bestDist) { bestDist = dist; best = i; }
       });
+
       if (best === activePanelIdx) return;
       activePanelIdx = best;
       activateAnnotations(best);
