@@ -277,11 +277,14 @@
   background: var(--bg); /* single global background — set from section settings */
 }
 
-/* The inner scroll container sits above the sticky canvas */
+/* The inner scroll container sits above the sticky canvas.
+   Gets the same bg as the section so hero + panels are
+   uniformly coloured — no tone mismatch. */
 .shoe3d-section__inner {
   max-width: var(--max-w);
   margin: -100vh auto 0;
   position: relative;
+  background: var(--bg);
 }
 
 /* ── Sticky canvas ── */
@@ -763,19 +766,18 @@
        when anything on the page reflows.
     ──────────────────────────────────────────────────────── */
     function positionPins() {
-      var rect = canvas.getBoundingClientRect();
-      /* rect is relative to viewport; because the canvas-wrap
-         is sticky top:0 and we're inside it, offsetTop of the
-         canvas-wrap is 0 while it's visible.  We only need the
-         width/height to convert %. */
-      var W = rect.width;
-      var H = rect.height;
+      /* Use the canvas-wrap's layout size — this is the same
+         element that .shoe3d-annotations is positioned inside
+         (inset:0). offsetWidth/Height are unaffected by scroll
+         position, viewport offset, or sticky behaviour. */
+      var canvasWrap = canvas.parentElement;
+      var W = canvasWrap.offsetWidth;
+      var H = canvasWrap.offsetHeight;
+      if (!W || !H) return;
 
       [].slice.call(section.querySelectorAll('.shoe3d-pin')).forEach(function (pin) {
         var ax = parseFloat(pin.dataset.ax || 50) / 100;
         var ay = parseFloat(pin.dataset.ay || 50) / 100;
-        /* left/top set relative to the .shoe3d-annotations div
-           which has inset:0 (same size as the canvas-wrap) */
         pin.style.left = (ax * W) + 'px';
         pin.style.top  = (ay * H) + 'px';
       });
@@ -863,34 +865,74 @@
       if (!isVis && raf) { cancelAnimationFrame(raf); raf = null; }
     }, { threshold: 0 }).observe(section);
 
-    /* ── Panel observer ── */
-    var panelIO = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        var idx = parseInt(entry.target.dataset.panelIndex, 10);
-        if (entry.isIntersecting) {
-          activePanelIdx = idx;
-          activateAnnotations(idx);
-          positionPins(); /* ensure pins are placed for this panel */
+    /* ── Panel activation via scroll ──
+       On every scroll (and on load) we find which panel's
+       vertical centre is closest to the viewport centre.
+       This guarantees EXACTLY ONE panel is active at all
+       times — no gap between panels where annotations vanish.
+       We also keep an IntersectionObserver just to know
+       whether ANY panel is on screen at all (for the idle
+       rotation fallback). ── */
 
-          contentEls.forEach(function (el, i) {
-            el.classList.toggle('is-visible', i === idx);
-          });
-
-          var pose = getPose(entry.target);
-          tgt.rotX=pose.rotX; tgt.rotY=pose.rotY; tgt.rotZ=pose.rotZ;
-          tgt.posX=pose.posX; tgt.posY=pose.posY;
-          tgt.lX=pose.lX; tgt.lY=pose.lY; tgt.lZ=pose.lZ; tgt.lI=pose.lI;
-        } else {
-          if (activePanelIdx === idx) {
-            activePanelIdx = -1;
-            activateAnnotations(-1);
-            contentEls.forEach(function (el) { el.classList.remove('is-visible'); });
-          }
-        }
+    var anyPanelVisible = false;
+    new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) anyPanelVisible = true;
       });
-    }, { rootMargin: '-30% 0px -30% 0px', threshold: 0 });
+      anyPanelVisible = panelEls.some(function (el) {
+        var r = el.getBoundingClientRect();
+        return r.bottom > 0 && r.top < window.innerHeight;
+      });
+    }, { threshold: 0 }).observe.apply(
+      (function(){
+        var io2 = new IntersectionObserver(function(){
+          anyPanelVisible = panelEls.some(function(el){
+            var r=el.getBoundingClientRect();
+            return r.bottom>0 && r.top<window.innerHeight;
+          });
+        },{threshold:0});
+        panelEls.forEach(function(el){io2.observe(el);});
+        return io2;
+      })(), []
+    );
 
-    panelEls.forEach(function (el) { panelIO.observe(el); });
+    function updateActivePanel() {
+      var midY = window.innerHeight / 2;
+      var best = -1, bestDist = Infinity;
+
+      panelEls.forEach(function (el, i) {
+        var r = el.getBoundingClientRect();
+        /* Only consider panels that are actually on screen */
+        if (r.bottom < 0 || r.top > window.innerHeight) return;
+        var centre = r.top + r.height / 2;
+        var dist   = Math.abs(centre - midY);
+        if (dist < bestDist) { bestDist = dist; best = i; }
+      });
+
+      if (best === activePanelIdx) return; /* nothing changed */
+
+      activePanelIdx = best;
+      activateAnnotations(best);
+      positionPins();
+
+      contentEls.forEach(function (el, i) {
+        el.classList.toggle('is-visible', i === best);
+      });
+
+      if (best >= 0) {
+        var pose = getPose(panelEls[best]);
+        tgt.rotX=pose.rotX; tgt.rotY=pose.rotY; tgt.rotZ=pose.rotZ;
+        tgt.posX=pose.posX; tgt.posY=pose.posY;
+        tgt.lX=pose.lX; tgt.lY=pose.lY; tgt.lZ=pose.lZ; tgt.lI=pose.lI;
+      } else {
+        /* Between panels / above first / below last — idle */
+        activateAnnotations(-1);
+        contentEls.forEach(function(el){ el.classList.remove('is-visible'); });
+      }
+    }
+
+    window.addEventListener('scroll', updateActivePanel, { passive: true });
+    updateActivePanel(); /* run once on load */
 
     /* ── Render loop ── */
     function startLoop() {
