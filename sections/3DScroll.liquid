@@ -282,7 +282,8 @@
 .shoe3d-section {
   position: relative;
   color: var(--text);
-  contain: layout style;
+  /* contain:layout/style removed — it breaks CSS custom property inheritance */
+  background: #0e0c09; /* dark fallback so page white never shows */
 }
 
 /* The inner scroll container sits above the sticky canvas */
@@ -560,13 +561,17 @@
   display: flex;
   align-items: stretch;
   padding: 0;
+  /* Belt-and-suspenders: also set bg directly so it never falls back to white */
+  background: var(--panel-bg, #0e0c09);
 }
 
-/* Per-panel background layer fills the full panel height */
+/* Per-panel background — applied directly on the panel element.
+   --panel-bg is set as an inline style on the same element so
+   no inheritance chain can break it. */
 .shoe3d-panel__bg {
   position: absolute;
   inset: 0;
-  background: var(--panel-bg, transparent);
+  background: var(--panel-bg, #0e0c09);
   z-index: 0;
   pointer-events: none;
 }
@@ -673,7 +678,7 @@
 .shoe3d-panel__cta svg { flex-shrink: 0; transition: transform .2s ease; }
 .shoe3d-panel__cta:hover svg { transform: translateX(4px); }
 
-.shoe3d-end-spacer { height: 20vh; }
+.shoe3d-end-spacer { height: 20vh; background: #0e0c09; }
 
 /* ── Mobile layout ── */
 @media (max-width: 767px) {
