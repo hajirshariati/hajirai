@@ -676,26 +676,11 @@
 
 /* ── Mobile layout ── */
 @media (max-width: 767px) {
-  .shoe3d-panel__inner {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 3rem 1.5rem 3rem;
-    gap: 1.5rem;
-    min-height: auto;
-  }
-  .shoe3d-panel--left  .shoe3d-panel__inner,
-  .shoe3d-panel--right .shoe3d-panel__inner {
-    justify-content: flex-start;
-  }
-  /* Image always on top on mobile */
-  .shoe3d-panel__image-wrap {
-    order: -1 !important;
-    width: 100%;
-    max-width: 280px;
-    aspect-ratio: 1;
-    align-self: center;
-  }
-  .shoe3d-panel__content { width: 100%; }
+  /* Hide all panel text, images and annotation pins on mobile.
+     The full-screen 3D shoe is the only thing shown. */
+  .shoe3d-panels,
+  .shoe3d-annotations { display: none !important; }
+
   .shoe3d-hero__headline { font-size: clamp(2rem, 10vw, 4rem); }
 }
 
