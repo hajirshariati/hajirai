@@ -44,6 +44,10 @@
   class="shoe3d-section"
   aria-label="{{ section.settings.aria_label | default: '3D Product Showcase' }}"
   data-model="{{ model_url | escape }}"
+  data-hero-li="{{ section.settings.hero_light_intensity | default: 12 }}"
+  data-hero-lx="{{ section.settings.hero_light_x | default: 5 }}"
+  data-hero-ly="{{ section.settings.hero_light_y | default: 5 }}"
+  data-hero-lz="{{ section.settings.hero_light_z | default: 5 }}"
   data-section-id="{{ section.id }}"
   itemscope
   itemtype="https://schema.org/Product"
@@ -751,6 +755,14 @@
     var MODEL_URL = section.dataset.model;
     if (!MODEL_URL) { console.warn('[Shoe3D] No model URL.'); return; }
 
+    /* Hero lighting — used when no scroll panel is active */
+    var heroLight = {
+      lI: parseFloat(section.dataset.heroLi || 12) / 10,
+      lX: parseFloat(section.dataset.heroLx || 5),
+      lY: parseFloat(section.dataset.heroLy || 5),
+      lZ: parseFloat(section.dataset.heroLz || 5)
+    };
+
     var canvas     = document.getElementById(SECTION_ID + '-canvas');
     var vignette   = document.getElementById(SECTION_ID + '-vignette');
     var loaderEl   = document.getElementById(SECTION_ID + '-loader');
@@ -924,7 +936,7 @@
         if (activePanelIdx === -1) {
           tgt.posX = 0;
           tgt.posY = reduced ? 0 : Math.sin(idle * .5) * .1;
-          tgt.lX=5; tgt.lY=5; tgt.lZ=5; tgt.lI=1.2;
+          tgt.lX=heroLight.lX; tgt.lY=heroLight.lY; tgt.lZ=heroLight.lZ; tgt.lI=heroLight.lI;
           if (!reduced) idle += .004;
           tgt.rotX=0; tgt.rotY=reduced ? .3 : idle; tgt.rotZ=.15;
         }
@@ -1039,6 +1051,12 @@
     { "type": "header", "content": "Text & Accent" },
     { "type": "color", "id": "text_color",   "label": "Default text",  "default": "#f0ebe3" },
     { "type": "color", "id": "accent_color", "label": "Accent colour", "default": "#d4a86a" },
+
+    { "type": "header", "content": "Hero Lighting" },
+    { "type": "range", "id": "hero_light_intensity", "label": "Key light intensity", "min": 0, "max": 30, "step": 1, "default": 12 },
+    { "type": "range", "id": "hero_light_x", "label": "Light X position", "min": -10, "max": 10, "step": 0.5, "default": 5 },
+    { "type": "range", "id": "hero_light_y", "label": "Light Y position", "min": -10, "max": 10, "step": 0.5, "default": 5 },
+    { "type": "range", "id": "hero_light_z", "label": "Light Z position", "min": -10, "max": 10, "step": 0.5, "default": 5 },
 
     { "type": "header", "content": "Accessibility" },
     {
