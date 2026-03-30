@@ -176,6 +176,10 @@
         "background_gradient": "linear-gradient(136deg, rgba(49, 49, 49, 1), rgba(142, 90, 59, 1) 100%)",
         "text_color": "#ffffff",
         "accent_color": "#ffddbf",
+        "hero_light_intensity": 20,
+        "hero_light_x": 5,
+        "hero_light_y": 5,
+        "hero_light_z": 5,
         "aria_label": "3D Product Showcase — Scroll to explore"
       }
     },
