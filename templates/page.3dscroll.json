@@ -185,6 +185,7 @@
     },
     "empty_space_L66qFY": {
       "type": "empty-space",
+      "disabled": true,
       "name": "t:sections.empty-space.name",
       "settings": {
         "desktop_height": 200,
