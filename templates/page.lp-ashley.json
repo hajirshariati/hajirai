@@ -38,15 +38,24 @@
         "heading_ChxeEC": {
           "type": "heading",
           "settings": {
-            "heading": "<p>A Style That Feels as Good as it Looks</p>",
+            "heading": "<p>Best Sandal for Bunions</p>",
             "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         },
+        "subheading_MbEAmi": {
+          "type": "subheading",
+          "settings": {
+            "subheading": "Honored by Oprah Daily",
+            "subheading_size": "subtitle-lg",
+            "secondary_color": false
+          }
+        },
         "text_cQCMec": {
           "type": "text",
+          "disabled": true,
           "settings": {
             "text": "<p>Genuine leather construction, built-in arch support and a memory foam footbed. Designed using insights from over 50 million foot scans, made to make you move better. </p>",
             "text_font": "body",
@@ -76,6 +85,7 @@
       "block_order": [
         "subheading_ijjb78",
         "heading_ChxeEC",
+        "subheading_MbEAmi",
         "text_cQCMec",
         "button_fnaDLP"
       ],
@@ -107,54 +117,6 @@
         "rounded": false,
         "enable_parallax": false,
         "parallax_direction": "vertical",
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "scrolling_text_r9arYW": {
-      "type": "scrolling-text",
-      "blocks": {
-        "image_Nj4fnz": {
-          "type": "image",
-          "settings": {
-            "image": "shopify://shop_images/footwear-logo-67eae71e5b26b.avif",
-            "height": 120,
-            "link": "",
-            "accessibility_info": "",
-            "external": false
-          }
-        },
-        "text_pJyAJw": {
-          "type": "text",
-          "settings": {
-            "text": "\"Best Sandal for Bunions\" - Oprah Daily",
-            "text_size": 40,
-            "text_font": "subtitle",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "image_Nj4fnz",
-        "text_pJyAJw"
-      ],
-      "name": "t:sections.scrolling-text.name",
-      "settings": {
-        "direction": "left",
-        "speed": 20,
-        "grid_horizontal": 70,
-        "enable_twin": false,
-        "enable_parallax": true,
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "padding_top": 36,
-        "padding_bottom": 36,
-        "divider": false,
-        "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
@@ -229,8 +191,24 @@
         },
         "text_HnQg7Q": {
           "type": "text",
+          "disabled": true,
           "settings": {
             "text": "<p>Engineered using data from over 50 million global foot scans, every curve and contour of the Ashley is designed to support your body from the ground up.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 0.8,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_KiXc8F": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Genuine leather construction, built-in arch support and a memory foam footbed. Designed using insights from over 50 million foot scans, made to make you move better.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -270,6 +248,7 @@
         "feature_point_6fhNb6",
         "heading_Q7f3Ca",
         "text_HnQg7Q",
+        "text_KiXc8F",
         "spacing_h83m86",
         "button_Vd4x9h"
       ],
@@ -1134,7 +1113,6 @@
   "order": [
     "main-page",
     "image_with_text_overlay_Hnzn9F",
-    "scrolling_text_r9arYW",
     "dynamic_feature_combo_8NW3dN",
     "image_with_text_K47tcA",
     "featured_product_wtCJrb",
