@@ -193,11 +193,66 @@
         "color_background": "#8e5a3b",
         "gradient_background": "linear-gradient(46deg, rgba(118, 80, 57, 1) 13%, rgba(142, 90, 59, 1) 86%)"
       }
+    },
+    "featured_collection_ikEcGe": {
+      "type": "featured-collection",
+      "name": "t:sections.featured-collection.name",
+      "settings": {
+        "collection": "",
+        "products": [
+          "jillian-antique-rose-sc443w",
+          "jillian-brushed-silver-sc367w",
+          "jillian-butter-sc445w",
+          "jillian-champagne-sc440w",
+          "jillian-cognac-sc363w",
+          "jillian-cork-sc364w",
+          "jillian-denim-sc493w",
+          "jillian-gunmetal-sc465w",
+          "jillian-ivory-sc362w",
+          "jillian-leopard-sc498w",
+          "jillian-navy-sc461w",
+          "jillian-red-sc368w",
+          "jillian-sage-sc446w",
+          "jillian-snake-sc497w",
+          "jillian-walnut-sc441w",
+          "jillian-white-sc453w"
+        ],
+        "product_limit": 6,
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": false,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "#8a583a",
+        "gradient_background": "linear-gradient(54deg, rgba(118, 79, 56, 1) 14%, rgba(142, 90, 59, 1) 85%)",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 120,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
     }
   },
   "order": [
     "main-page",
     "3_d_scroll_3aR6wn",
-    "empty_space_L66qFY"
+    "empty_space_L66qFY",
+    "featured_collection_ikEcGe"
   ]
 }
