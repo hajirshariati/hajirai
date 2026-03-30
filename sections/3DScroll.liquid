@@ -145,11 +145,16 @@
   {%- comment -%} ── Scrollable content ── {%- endcomment -%}
   <div class="shoe3d-section__inner">
 
-    {%- comment -%} HERO PANEL — own background {%- endcomment -%}
+    {%- comment -%}
+      HERO PANEL — transparent so the sticky 3D canvas is fully
+      visible behind it. The hero_bg is only applied as a very
+      subtle gradient overlay at the bottom edge (via a
+      pseudo-element in CSS), not as a full block background.
+      This way the shoe is never covered.
+    {%- endcomment -%}
     <div
       class="shoe3d-hero"
       aria-hidden="true"
-      style="background: {{ hero_bg }};"
     >
       {%- if section.settings.hero_badge != blank -%}
         <div class="shoe3d-hero__badge"><span>{{ section.settings.hero_badge }}</span></div>
@@ -468,10 +473,16 @@
   .shoe3d-pin__card  { padding: 7px 10px; border-radius: 8px; }
 }
 
-/* ── Hero ── */
+/* ── Hero ──
+   Transparent — the sticky 3D canvas is the background.
+   We sit at z-index 2 (above the canvas z-index:1) but with
+   background:transparent so the shoe is always fully visible.
+   A subtle radial fade at the bottom helps the first panel
+   blend in as the user starts scrolling.
+── */
 .shoe3d-hero {
   position: relative;
-  z-index: 3;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -480,7 +491,16 @@
   padding: 2rem;
   text-align: center;
   pointer-events: none;
-  /* background set via inline style from Liquid */
+  background: transparent; /* NEVER cover the canvas */
+}
+/* Soft bottom fade so the hero blends into the first panel */
+.shoe3d-hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 30%;
+  background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.35));
+  pointer-events: none;
 }
 .shoe3d-hero__badge {
   display: inline-flex;
@@ -1022,7 +1042,7 @@
       "type": "color",
       "id": "hero_background_color",
       "label": "Hero background (solid)",
-      "default": "#080808"
+      "default": "#0e0c09"
     },
     {
       "type": "color_background",
@@ -1032,8 +1052,8 @@
     },
 
     { "type": "header", "content": "Global Colours" },
-    { "type": "color", "id": "text_color",   "label": "Default text",  "default": "#ffffff" },
-    { "type": "color", "id": "accent_color", "label": "Accent colour", "default": "#c8956c" },
+    { "type": "color", "id": "text_color",   "label": "Default text",  "default": "#f0ebe3" },
+    { "type": "color", "id": "accent_color", "label": "Accent colour", "default": "#d4a86a" },
 
     { "type": "header", "content": "Accessibility" },
     {
@@ -1054,7 +1074,7 @@
           "type": "color",
           "id": "panel_background_color",
           "label": "Background (solid)",
-          "default": "#0d0d0d",
+          "default": "#0e0c09",
           "info": "Used when the gradient field below is empty."
         },
         {
@@ -1067,7 +1087,7 @@
           "type": "color",
           "id": "panel_text_color",
           "label": "Panel text colour",
-          "default": "#ffffff",
+          "default": "#f0ebe3",
           "info": "Headings and eyebrow text in this panel."
         },
 
@@ -1180,8 +1200,8 @@
         {
           "type": "panel",
           "settings": {
-            "panel_background_color": "#0a0806",
-            "panel_text_color": "#ffffff",
+            "panel_background_color": "#0e0c09",
+            "panel_text_color": "#f0ebe3",
             "eyebrow": "All-Day Comfort",
             "heading": "Feels Like Walking on Air",
             "body": "Memory foam cushioning and an ultra-light cork midsole work together to reduce fatigue — so you can go further, longer.",
@@ -1203,8 +1223,8 @@
         {
           "type": "panel",
           "settings": {
-            "panel_background_color": "#080c0a",
-            "panel_text_color": "#ffffff",
+            "panel_background_color": "#13100c",
+            "panel_text_color": "#f0ebe3",
             "eyebrow": "Premium Materials",
             "heading": "Genuine Leather. Built to Last.",
             "body": "Crafted from real leather uppers with a soft microfiber footbed treated with antimicrobial technology — fresh all day, every day.",
@@ -1225,8 +1245,8 @@
         {
           "type": "panel",
           "settings": {
-            "panel_background_color": "#08080c",
-            "panel_text_color": "#ffffff",
+            "panel_background_color": "#0c0e13",
+            "panel_text_color": "#f0ebe3",
             "eyebrow": "Signature Arch Support",
             "heading": "Aligned From the Ground Up",
             "body": "Aetrex Signature Arch Support is strategically placed to align your entire body — relieving pressure from your feet all the way to your back.",
@@ -1247,8 +1267,8 @@
         {
           "type": "panel",
           "settings": {
-            "panel_background_color": "#0c0a08",
-            "panel_text_color": "#ffffff",
+            "panel_background_color": "#120f0a",
+            "panel_text_color": "#f0ebe3",
             "eyebrow": "Style Meets Function",
             "heading": "Comfort You Can See.",
             "body": "The signature braided detailing makes the Jillian the sandal you'll reach for every morning — whether running errands or spending a full day on your feet.",
