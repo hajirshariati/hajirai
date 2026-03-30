@@ -110,7 +110,7 @@
           class="shoe3d-pin shoe3d-pin--1"
           data-ax="{{ block.settings.ann_1_x | default: 52 }}"
           data-ay="{{ block.settings.ann_1_y | default: 38 }}"
-          data-side="{{ block.settings.ann_1_side | default: 'right' }}"
+          style="--ax: {{ block.settings.ann_1_x | default: 52 }}%; --ay: {{ block.settings.ann_1_y | default: 38 }}%;"
         >
           <div class="shoe3d-pin__dot" aria-hidden="true">
             <span class="shoe3d-pin__pulse"></span>
@@ -128,7 +128,7 @@
           class="shoe3d-pin shoe3d-pin--2"
           data-ax="{{ block.settings.ann_2_x | default: 48 }}"
           data-ay="{{ block.settings.ann_2_y | default: 65 }}"
-          data-side="{{ block.settings.ann_2_side | default: 'left' }}"
+          style="--ax: {{ block.settings.ann_2_x | default: 48 }}%; --ay: {{ block.settings.ann_2_y | default: 65 }}%;"
         >
           <div class="shoe3d-pin__dot" aria-hidden="true">
             <span class="shoe3d-pin__pulse"></span>
@@ -365,13 +365,15 @@
   visibility: visible;
 }
 
-/* Individual pin — JS sets left/top via style attribute */
+/* Individual pin — positioned purely by CSS custom properties.
+   --ax and --ay are set as % values directly in the Liquid template.
+   No JS involvement = never drifts on scroll. */
 .shoe3d-pin {
   position: absolute;
-  /* transform centres the dot on the exact coordinate */
+  left: var(--ax, 50%);
+  top:  var(--ay, 50%);
   transform: translate(-50%, -50%);
   pointer-events: none;
-  /* Entry animation */
   opacity: 0;
   transition: opacity .45s var(--ease-spring);
 }
@@ -770,20 +772,10 @@
        Because left/top are in px (not %) they do NOT shift
        when anything on the page reflows.
     ──────────────────────────────────────────────────────── */
-    /* positionPins — slider value (0-100) maps directly to
-       % of canvas width/height. Simple, reliable, customiser-driven. */
-    function positionPins() {
-      var canvasWrap = canvas.parentElement;
-      var W = canvasWrap.offsetWidth;
-      var H = canvasWrap.offsetHeight;
-      if (!W || !H) return;
-      [].slice.call(section.querySelectorAll('.shoe3d-pin')).forEach(function (pin) {
-        var ax = parseFloat(pin.dataset.ax || 50) / 100;
-        var ay = parseFloat(pin.dataset.ay || 50) / 100;
-        pin.style.left = (ax * W) + 'px';
-        pin.style.top  = (ay * H) + 'px';
-      });
-    }
+    /* positionPins — no-op. Pins are positioned by CSS custom
+       properties --ax/--ay set in Liquid. Kept as a stub so
+       existing call-sites don't throw. */
+    function positionPins() {}
 
     /* ── Activate / deactivate annotation groups ── */
     function activateAnnotations(idx) {
