@@ -64,7 +64,7 @@
           "type": "button",
           "settings": {
             "button_label": "Shop Ashley Wedge",
-            "button_link": "",
+            "button_link": "shopify://products/ashley-hazy-blue-multi-ew794w",
             "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
@@ -253,7 +253,7 @@
           "type": "button",
           "settings": {
             "button_label": "Shop Now",
-            "button_link": "shopify://products/ashley-off-white-ew793w",
+            "button_link": "shopify://products/ashley-coffee-multi-ew796w",
             "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
@@ -350,7 +350,7 @@
           "type": "button",
           "settings": {
             "button_label": "Shop Now",
-            "button_link": "shopify://products/ashley-black-ew790w",
+            "button_link": "shopify://products/ashley-off-white-ew793w",
             "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
