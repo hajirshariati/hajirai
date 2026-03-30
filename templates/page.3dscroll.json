@@ -115,13 +115,13 @@
             "ann_2_side": "left",
             "ann_2_x": 28,
             "ann_2_y": 49,
-            "rot_x": 0,
-            "rot_y": -155,
+            "rot_x": 30,
+            "rot_y": 180,
             "rot_z": -15,
-            "pos_x": 7,
+            "pos_x": 5,
             "pos_y": 0,
             "light_intensity": 24,
-            "light_x": -1.5,
+            "light_x": 1,
             "light_y": 0.5,
             "light_z": 4
           }
