@@ -173,7 +173,7 @@
         "hero_headline": "The Jillian",
         "hero_subtext": "Scroll to explore",
         "background_color": "#353535",
-        "background_gradient": "linear-gradient(136deg, rgba(23, 23, 23, 1) 11%, rgba(197, 163, 112, 1) 84%)",
+        "background_gradient": "linear-gradient(136deg, rgba(49, 49, 49, 1), rgba(197, 163, 112, 1) 100%)",
         "text_color": "#ffffff",
         "accent_color": "#ffddbf",
         "aria_label": "3D Product Showcase — Scroll to explore"
