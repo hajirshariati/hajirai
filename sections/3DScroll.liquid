@@ -110,7 +110,7 @@
           class="shoe3d-pin shoe3d-pin--1"
           data-ax="{{ block.settings.ann_1_x | default: 52 }}"
           data-ay="{{ block.settings.ann_1_y | default: 38 }}"
-          style="--ax: {{ block.settings.ann_1_x | default: 52 }}%; --ay: {{ block.settings.ann_1_y | default: 38 }}%;"
+
         >
           <div class="shoe3d-pin__dot" aria-hidden="true">
             <span class="shoe3d-pin__pulse"></span>
@@ -128,7 +128,7 @@
           class="shoe3d-pin shoe3d-pin--2"
           data-ax="{{ block.settings.ann_2_x | default: 48 }}"
           data-ay="{{ block.settings.ann_2_y | default: 65 }}"
-          style="--ax: {{ block.settings.ann_2_x | default: 48 }}%; --ay: {{ block.settings.ann_2_y | default: 65 }}%;"
+
         >
           <div class="shoe3d-pin__dot" aria-hidden="true">
             <span class="shoe3d-pin__pulse"></span>
@@ -370,8 +370,7 @@
    No JS involvement = never drifts on scroll. */
 .shoe3d-pin {
   position: absolute;
-  left: var(--ax, 50%);
-  top:  var(--ay, 50%);
+  /* left/top set by JS via positionPins() — see script */
   transform: translate(-50%, -50%);
   pointer-events: none;
   opacity: 0;
@@ -772,10 +771,22 @@
        Because left/top are in px (not %) they do NOT shift
        when anything on the page reflows.
     ──────────────────────────────────────────────────────── */
-    /* positionPins — no-op. Pins are positioned by CSS custom
-       properties --ax/--ay set in Liquid. Kept as a stub so
-       existing call-sites don't throw. */
-    function positionPins() {}
+    /* positionPins — converts each pin's data-ax/data-ay (0-100)
+       into absolute px left/top within the .shoe3d-annotations div.
+       Uses canvas.offsetWidth/Height which are stable layout dimensions
+       unaffected by scroll position, sticky offsets, or viewport state.
+       Called on: load, resize, panel activation, scroll. */
+    function positionPins() {
+      var W = canvas.offsetWidth;
+      var H = canvas.offsetHeight;
+      if (!W || !H) return;
+      [].slice.call(section.querySelectorAll('.shoe3d-pin')).forEach(function(pin) {
+        var ax = parseFloat(pin.dataset.ax || 50) / 100;
+        var ay = parseFloat(pin.dataset.ay || 50) / 100;
+        pin.style.left = (ax * W) + 'px';
+        pin.style.top  = (ay * H) + 'px';
+      });
+    }
 
     /* ── Activate / deactivate annotation groups ── */
     function activateAnnotations(idx) {
@@ -901,6 +912,8 @@
     }
     window.addEventListener('scroll', updateActivePanel, { passive: true });
     updateActivePanel();
+    /* Re-position pins once the page is fully laid out */
+    window.addEventListener('load', function() { positionPins(); updateActivePanel(); });
 
     /* ── Render loop ── */
     function startLoop() {
