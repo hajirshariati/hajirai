@@ -770,70 +770,18 @@
        Because left/top are in px (not %) they do NOT shift
        when anything on the page reflows.
     ──────────────────────────────────────────────────────── */
-    /* Shoe bounding box in local space — set once after GLB loads */
-    var shoeBBoxMin = null, shoeBBoxMax = null;
-
-    function setShoeBBox() {
-      if (!shoe) return;
-      var box = new THREE.Box3().setFromObject(shoe);
-      shoeBBoxMin = box.min.clone();
-      shoeBBoxMax = box.max.clone();
-    }
-
-    /* Project a THREE.Vector3 world position to canvas pixel coords */
-    function worldToScreen(worldVec, W, H) {
-      var v = worldVec.clone().project(camera);
-      return {
-        x: ( v.x * 0.5 + 0.5) * W,
-        y: (-v.y * 0.5 + 0.5) * H
-      };
-    }
-
+    /* positionPins — slider value (0-100) maps directly to
+       % of canvas width/height. Simple, reliable, customiser-driven. */
     function positionPins() {
-      if (!shoe || !shoeBBoxMin) return;
       var canvasWrap = canvas.parentElement;
       var W = canvasWrap.offsetWidth;
       var H = canvasWrap.offsetHeight;
       if (!W || !H) return;
-
-      /* Get the shoe's current world-space bounding box by
-         re-computing it from the live scene (accounts for rotation,
-         scale and posX/posY translation set in the render loop) */
-      var worldBox = new THREE.Box3().setFromObject(shoe);
-      var wMin = worldBox.min, wMax = worldBox.max;
-
-      /* Project all 8 corners to find the actual screen bbox */
-      var corners = [
-        new THREE.Vector3(wMin.x, wMin.y, wMin.z),
-        new THREE.Vector3(wMax.x, wMin.y, wMin.z),
-        new THREE.Vector3(wMin.x, wMax.y, wMin.z),
-        new THREE.Vector3(wMax.x, wMax.y, wMin.z),
-        new THREE.Vector3(wMin.x, wMin.y, wMax.z),
-        new THREE.Vector3(wMax.x, wMin.y, wMax.z),
-        new THREE.Vector3(wMin.x, wMax.y, wMax.z),
-        new THREE.Vector3(wMax.x, wMax.y, wMax.z)
-      ];
-
-      var sxMin=Infinity,sxMax=-Infinity,syMin=Infinity,syMax=-Infinity;
-      corners.forEach(function(c) {
-        var s = worldToScreen(c, W, H);
-        if (s.x < sxMin) sxMin = s.x;
-        if (s.x > sxMax) sxMax = s.x;
-        if (s.y < syMin) syMin = s.y;
-        if (s.y > syMax) syMax = s.y;
-      });
-
-      /* Clamp to canvas bounds */
-      sxMin = Math.max(0, sxMin);
-      sxMax = Math.min(W, sxMax);
-      syMin = Math.max(0, syMin);
-      syMax = Math.min(H, syMax);
-
       [].slice.call(section.querySelectorAll('.shoe3d-pin')).forEach(function (pin) {
         var ax = parseFloat(pin.dataset.ax || 50) / 100;
         var ay = parseFloat(pin.dataset.ay || 50) / 100;
-        pin.style.left = (sxMin + ax * (sxMax - sxMin)) + 'px';
-        pin.style.top  = (syMin + ay * (syMax - syMin)) + 'px';
+        pin.style.left = (ax * W) + 'px';
+        pin.style.top  = (ay * H) + 'px';
       });
     }
 
@@ -981,7 +929,6 @@
         key.position.set(cur.lX, cur.lY, cur.lZ);
         key.intensity = cur.lI;
         renderer.render(scene, camera);
-        positionPins(); /* track shoe every frame */
       })();
     }
 
@@ -1013,7 +960,6 @@
             tgt.lX=p0.lX; tgt.lY=p0.lY; tgt.lZ=p0.lZ; tgt.lI=p0.lI;
           }
           scene.add(shoe);
-          setShoeBBox();
           if (loaderEl) loaderEl.classList.add('is-hidden');
           /* Position pins once the model has loaded and canvas is sized */
           positionPins();
