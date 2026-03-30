@@ -202,7 +202,7 @@
           data-shoe-rot-z="{{ block.settings.rot_z | default: 0 }}"
           data-shoe-pos-x="{{ block.settings.pos_x | default: 0 }}"
           data-shoe-pos-y="{{ block.settings.pos_y | default: 0 }}"
-          data-shoe-light-intensity="{{ block.settings.light_intensity | default: 1.0 }}"
+          data-shoe-light-intensity="{{ block.settings.light_intensity | default: 12 }}"
           data-shoe-light-x="{{ block.settings.light_x | default: 5 }}"
           data-shoe-light-y="{{ block.settings.light_y | default: 5 }}"
           data-shoe-light-z="{{ block.settings.light_z | default: 5 }}"
@@ -799,7 +799,7 @@
         rotZ: parseFloat(el.dataset.shoeRotZ  || 0) * Math.PI / 180,
         posX: parseFloat(el.dataset.shoePosX  || 0) / 10,
         posY: parseFloat(el.dataset.shoePosY  || 0) / 10,
-        lI:   parseFloat(el.dataset.shoeLightIntensity || 10) / 10,
+        lI:   parseFloat(el.dataset.shoeLightIntensity || 12) / 10,
         lX:   parseFloat(el.dataset.shoeLightX || 5),
         lY:   parseFloat(el.dataset.shoeLightY || 5),
         lZ:   parseFloat(el.dataset.shoeLightZ || 5),
@@ -808,8 +808,8 @@
 
     var shoe = null, raf = null, isVis = false;
     var idle = 0, activePanelIdx = -1;
-    var cur = { rotX:0, rotY:0, rotZ:.2, posX:0, posY:0, lI:1, lX:5, lY:5, lZ:5 };
-    var tgt = { rotX:0, rotY:0, rotZ:.2, posX:0, posY:0, lI:1, lX:5, lY:5, lZ:5 };
+    var cur = { rotX:0, rotY:0, rotZ:.2, posX:0, posY:0, lI:1.2, lX:5, lY:5, lZ:5 };
+    var tgt = { rotX:0, rotY:0, rotZ:.2, posX:0, posY:0, lI:1.2, lX:5, lY:5, lZ:5 };
 
     /* ── Renderer ── */
     var renderer = new THREE.WebGLRenderer({
@@ -911,7 +911,7 @@
         if (activePanelIdx === -1) {
           tgt.posX = 0;
           tgt.posY = reduced ? 0 : Math.sin(idle * .5) * .1;
-          tgt.lX=5; tgt.lY=5; tgt.lZ=5; tgt.lI=1.0;
+          tgt.lX=5; tgt.lY=5; tgt.lZ=5; tgt.lI=1.2;
           if (!reduced) idle += .004;
           tgt.rotX=0; tgt.rotY=reduced ? .3 : idle; tgt.rotZ=.15;
         }
