@@ -114,16 +114,16 @@
             "ann_2_desc": "",
             "ann_2_side": "left",
             "ann_2_x": 24,
-            "ann_2_y": 51,
-            "rot_x": 0,
+            "ann_2_y": 69,
+            "rot_x": 40,
             "rot_y": -155,
             "rot_z": -15,
             "pos_x": 5,
             "pos_y": 0,
-            "light_intensity": 27,
-            "light_x": -4,
-            "light_y": 2,
-            "light_z": 8
+            "light_intensity": 4,
+            "light_x": -5.5,
+            "light_y": -4.5,
+            "light_z": 9.5
           }
         },
         "panel_CifDLU": {
