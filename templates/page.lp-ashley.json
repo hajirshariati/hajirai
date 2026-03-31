@@ -124,6 +124,17 @@
     "dynamic_feature_combo_8NW3dN": {
       "type": "dynamic-feature-combo",
       "blocks": {
+        "feature_point_4y67Aw": {
+          "type": "feature_point",
+          "settings": {
+            "heading": "Adjustable Straps",
+            "text": "for Extra Comfort",
+            "horizontal": 54,
+            "vertical": 64,
+            "text_horizontal": 3,
+            "text_vertical": 76
+          }
+        },
         "feature_point_wG8TzX": {
           "type": "feature_point",
           "settings": {
@@ -155,17 +166,6 @@
             "vertical": 21,
             "text_horizontal": 55,
             "text_vertical": 4
-          }
-        },
-        "feature_point_4y67Aw": {
-          "type": "feature_point",
-          "settings": {
-            "heading": "Adjustable Straps",
-            "text": "for Extra Comfort",
-            "horizontal": 40,
-            "vertical": 34,
-            "text_horizontal": 0,
-            "text_vertical": 74
           }
         },
         "feature_point_6fhNb6": {
@@ -241,10 +241,10 @@
         }
       },
       "block_order": [
+        "feature_point_4y67Aw",
         "feature_point_wG8TzX",
         "feature_point_gn8GxX",
         "feature_point_FXjfXC",
-        "feature_point_4y67Aw",
         "feature_point_6fhNb6",
         "heading_Q7f3Ca",
         "text_HnQg7Q",
