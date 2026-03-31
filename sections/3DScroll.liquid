@@ -2,30 +2,6 @@
   ============================================================
   3D Shoe Scroll Section — Syntilay-Style (Enhanced)
   ============================================================
-  CHANGES FROM ORIGINAL:
-  1. Per-panel background color/gradient (hero has its own too)
-     — Uses Shopify native color + gradient pickers
-  2. Supporting image always visible on desktop AND mobile
-  3. Two annotation pins per panel — bullet-proof positioning
-     via a CSS custom property approach: the pin anchor is set
-     as a percentage of the *canvas element* size (measured
-     at runtime), then converted to absolute px so pins stay
-     locked to the model on every screen size / orientation.
-  4. Annotation content pre-filled from Jillian product data
-  ============================================================
-
-  SETUP:
-  1. Upload your .glb to Shopify Admin → Content → Files
-  2. Paste the CDN URL in section settings
-  3. Add to homepage via theme editor
-
-  ANNOTATION PIN POSITIONING:
-  - Use the range sliders (0–100) in each panel block.
-  - 0,0 = top-left of the 3D canvas; 100,100 = bottom-right.
-  - Pins are positioned in JS against the canvas bounding rect
-    so they are immune to page layout shifts, scrollbars, and
-    responsive reflowing.
-  ============================================================
 {% endcomment %}
 
 {%- liquid
@@ -53,12 +29,10 @@
   itemtype="https://schema.org/Product"
 >
 
-  {%- comment -%}
-    ── STICKY CANVAS WRAP ──
-    Contains the Three.js canvas, vignette, loader and
-    annotation pins. Pins are repositioned by JS on every
-    resize so they always track the model correctly.
-  {%- endcomment -%}
+  <div class="shoe3d-page-block" id="{{ section_id }}-block">
+    <div class="shoe3d-progress-bar" id="{{ section_id }}-progress"></div>
+  </div>
+
   <div class="shoe3d-canvas-wrap" aria-hidden="true">
     <canvas
       id="{{ section_id }}-canvas"
@@ -72,24 +46,8 @@
       <span class="shoe3d-loader__text">Loading model…</span>
     </div>
 
-    {%- comment -%}
-      ANNOTATION PINS
-      One group per panel. Each group holds two pins.
-      JS places them via inline `style="left:Xpx; top:Ypx"`
-      computed from the canvas bounding rect + the % sliders.
-      The data-ax / data-ay attributes carry the raw % values.
-    {%- endcomment -%}
     {%- for block in section.blocks -%}
       {%- assign idx = forloop.index0 -%}
-
-      {%- comment -%} Resolve annotation content from block settings OR product defaults {%- endcomment -%}
-      {%- comment -%}
-        Annotation defaults — content matches each panel's feature focus.
-        Panel 0 Comfort:      Memory Foam + Met Bar Pod
-        Panel 1 Materials:    Genuine Leather + Antimicrobial Microfiber
-        Panel 2 Arch Support: Aetrex Arch Support + Bunion Relief
-        Panel 3 Style:        Braided Leather Strap + Hook & Loop Closure
-      {%- endcomment -%}
       {%- assign default_a1_labels = "Memory Foam,Genuine Leather Upper,Aetrex Arch Support,Braided Leather Strap" | split: "," -%}
       {%- assign default_a1_descs  = "Conforms to your foot & distributes weight evenly,Full-grain leather — breathable & built to last,Strategically placed for full-body alignment,Signature braided detail — style meets comfort" | split: "," -%}
       {%- assign default_a2_labels = "Met Bar Pod,Antimicrobial Microfiber,Bunion Relief Design,Hook & Loop Closure" | split: "," -%}
@@ -109,12 +67,10 @@
         data-ann-panel="{{ idx }}"
         aria-hidden="true"
       >
-        {%- comment -%} Pin 1 {%- endcomment -%}
         <div
           class="shoe3d-pin shoe3d-pin--1"
           data-ax="{{ block.settings.ann_1_x | default: 52 }}"
           data-ay="{{ block.settings.ann_1_y | default: 38 }}"
-
         >
           <div class="shoe3d-pin__dot" aria-hidden="true">
             <span class="shoe3d-pin__pulse"></span>
@@ -127,12 +83,10 @@
           </div>
         </div>
 
-        {%- comment -%} Pin 2 {%- endcomment -%}
         <div
           class="shoe3d-pin shoe3d-pin--2"
           data-ax="{{ block.settings.ann_2_x | default: 48 }}"
           data-ay="{{ block.settings.ann_2_y | default: 65 }}"
-
         >
           <div class="shoe3d-pin__dot" aria-hidden="true">
             <span class="shoe3d-pin__pulse"></span>
@@ -149,20 +103,9 @@
 
   </div>
 
-  {%- comment -%} ── Scrollable content ── {%- endcomment -%}
   <div class="shoe3d-section__inner">
 
-    {%- comment -%}
-      HERO PANEL — transparent so the sticky 3D canvas is fully
-      visible behind it. The hero_bg is only applied as a very
-      subtle gradient overlay at the bottom edge (via a
-      pseudo-element in CSS), not as a full block background.
-      This way the shoe is never covered.
-    {%- endcomment -%}
-    <div
-      class="shoe3d-hero"
-      aria-hidden="true"
-    >
+    <div class="shoe3d-hero" aria-hidden="true">
       {%- if section.settings.hero_badge != blank -%}
         <div class="shoe3d-hero__badge"><span>{{ section.settings.hero_badge }}</span></div>
       {%- endif -%}
@@ -195,7 +138,6 @@
         {%- assign body_text = jillian_bodies[idx] -%}
         {%- if block.settings.body != blank -%}{%- assign body_text = block.settings.body -%}{%- endif -%}
 
-        {%- comment -%} Resolve panel text color {%- endcomment -%}
         {%- assign panel_text = block.settings.panel_text_color | default: text_color -%}
 
         <div
@@ -213,12 +155,10 @@
           style="--panel-text: {{ panel_text }};"
           {{ block.shopify_attributes }}
         >
-          {%- comment -%} Background layer so gradient/color fills only this panel's scroll height {%- endcomment -%}
           <div class="shoe3d-panel__bg" aria-hidden="true"></div>
 
           <div class="shoe3d-panel__inner shoe3d-panel__inner--{{ panel_side }}">
 
-            {%- comment -%} ── Supporting image — shown on BOTH desktop and mobile ── {%- endcomment -%}
             {%- if block.settings.image != blank -%}
               <div class="shoe3d-panel__image-wrap shoe3d-panel__image-wrap--{{ panel_side }}">
                 {{- block.settings.image | image_url: width: 800 | image_tag:
@@ -266,9 +206,6 @@
 </section>
 
 <style>
-/* ────────────────────────────────────────────────────────────
-   DESIGN TOKENS  (section-scoped)
-──────────────────────────────────────────────────────────── */
 #{{ section_id }} {
   --bg:           {{ bg_value }};
   --text:         {{ text_color }};
@@ -281,20 +218,46 @@
   --pin-card-w:   180px;
 }
 
-/* ── Section shell ── */
 .shoe3d-section {
   position: relative;
   color: var(--text);
-  background: var(--bg); /* single global background — set from section settings */
+  background: var(--bg);
 }
 
-/* The inner scroll container — MUST be transparent so the
-   sticky canvas is visible during the hero section. */
 .shoe3d-section__inner {
   max-width: var(--max-w);
   margin: -100vh auto 0;
   position: relative;
   background: transparent;
+}
+
+/* ── Page block overlay ── */
+.shoe3d-page-block {
+  position: absolute;
+  inset: 0;
+  z-index: 9999;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(0, 0, 0, 0.4);
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+  pointer-events: all;
+}
+.shoe3d-page-block.is-done {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Progress bar */
+.shoe3d-progress-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  background: var(--accent, #d4a86a);
+  transition: width 0.25s ease;
+  border-radius: 0 2px 2px 0;
 }
 
 /* ── Sticky canvas ── */
@@ -317,10 +280,7 @@
 .shoe3d-vignette {
   position: absolute;
   inset: 0;
-  /* Strong vignette — edges are solid bg colour, centre is clear
-     so the shoe is always visible against the branded background */
-  background:
-    radial-gradient(ellipse 50% 60% at 50% 50%, transparent 20%, var(--bg) 75%);
+  background: radial-gradient(ellipse 50% 60% at 50% 50%, transparent 20%, var(--bg) 75%);
   pointer-events: none;
 }
 
@@ -349,32 +309,17 @@
   text-transform: uppercase; color: rgba(255,255,255,.4);
 }
 
-/* ════════════════════════════════════════════════════════════
-   ANNOTATION PINS
-   ─────────────────────────────────────────────────────────
-   Each .shoe3d-annotations group is positioned absolute
-   inside .shoe3d-canvas-wrap (inset:0).
-   Each .shoe3d-pin is positioned absolute with left/top set
-   by JS in pixels (derived from canvas bounding rect + %).
-   This makes them 100% immune to layout reflow.
-   The card flips left/right based on data-side attribute.
-════════════════════════════════════════════════════════════ */
+/* ── Annotation pins ── */
 .shoe3d-annotations {
   position: absolute;
   inset: 0;
   pointer-events: none;
   visibility: hidden;
 }
-.shoe3d-annotations.is-active {
-  visibility: visible;
-}
+.shoe3d-annotations.is-active { visibility: visible; }
 
-/* Individual pin — positioned purely by CSS custom properties.
-   --ax and --ay are set as % values directly in the Liquid template.
-   No JS involvement = never drifts on scroll. */
 .shoe3d-pin {
   position: absolute;
-  /* left/top set by JS via positionPins() — see script */
   transform: translate(-50%, -50%);
   pointer-events: none;
   opacity: 0;
@@ -383,7 +328,6 @@
 .shoe3d-pin--2 { transition-delay: .12s; }
 .shoe3d-annotations.is-active .shoe3d-pin { opacity: 1; }
 
-/* Pulsing dot */
 .shoe3d-pin__dot {
   position: relative;
   width: var(--pin-dot-size);
@@ -403,10 +347,8 @@
 }
 .shoe3d-pin--2 .shoe3d-pin__pulse { animation-delay: .6s; }
 
-/* Card — positioned absolutely relative to the pin dot */
 .shoe3d-pin__card {
   position: absolute;
-  /* Vertical centre on the dot */
   top: 50%;
   transform: translateY(-50%);
   width: var(--pin-card-w);
@@ -419,19 +361,9 @@
   white-space: normal;
   pointer-events: none;
 }
+.shoe3d-pin__card--right { left: calc(var(--pin-dot-size) + 10px); }
+.shoe3d-pin__card--left  { right: calc(var(--pin-dot-size) + 10px); left: auto; text-align: right; }
 
-/* Card to the right of the dot */
-.shoe3d-pin__card--right {
-  left: calc(var(--pin-dot-size) + 10px);
-}
-/* Card to the left of the dot */
-.shoe3d-pin__card--left {
-  right: calc(var(--pin-dot-size) + 10px);
-  left: auto;
-  text-align: right;
-}
-
-/* Connector line between dot and card */
 .shoe3d-pin__card::before {
   content: '';
   position: absolute;
@@ -441,50 +373,23 @@
   background: rgba(255,255,255,.3);
   transform: translateY(-50%);
 }
-.shoe3d-pin__card--right::before {
-  right: 100%;
-}
-.shoe3d-pin__card--left::before {
-  left: 100%;
-}
+.shoe3d-pin__card--right::before { right: 100%; }
+.shoe3d-pin__card--left::before  { left: 100%; }
 
 .shoe3d-pin__label {
   display: block;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  color: #fff;
-  line-height: 1.2;
-  margin-bottom: 3px;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase;
+  color: #fff; line-height: 1.2; margin-bottom: 3px;
 }
 .shoe3d-pin__desc {
-    display: block;
-    font-size: 11px;
-    font-weight: 400;
-    color: rgb(255 255 255 / 81%);
-    letter-spacing: .05em;
-    line-height: 1.45;
+  display: block;
+  font-size: 11px; font-weight: 400;
+  color: rgb(255 255 255 / 81%);
+  letter-spacing: .05em; line-height: 1.45;
 }
 
-/* Mobile: slightly smaller cards */
-@media (max-width: 767px) {
-  #{{ section_id }} {
-    --pin-dot-size: 12px;
-    --pin-card-w: 140px;
-  }
-  .shoe3d-pin__label { font-size: 10px; }
-  .shoe3d-pin__desc  { font-size: 9px; }
-  .shoe3d-pin__card  { padding: 7px 10px; border-radius: 8px; }
-}
-
-/* ── Hero ──
-   Transparent — the sticky 3D canvas is the background.
-   We sit at z-index 2 (above the canvas z-index:1) but with
-   background:transparent so the shoe is always fully visible.
-   A subtle radial fade at the bottom helps the first panel
-   blend in as the user starts scrolling.
-── */
+/* ── Hero ── */
 .shoe3d-hero {
   position: relative;
   z-index: 2;
@@ -496,9 +401,8 @@
   padding: 2rem;
   text-align: center;
   pointer-events: none;
-  background: transparent; /* NEVER cover the canvas */
+  background: transparent;
 }
-
 .shoe3d-hero__badge {
   display: inline-flex;
   align-items: center;
@@ -514,7 +418,7 @@
 }
 .shoe3d-hero__badge:empty { display: none; }
 .shoe3d-hero__headline {
-  ont-family: var(--font-heading-family, 'Georgia', serif);
+  font-family: var(--font-heading-family, 'Georgia', serif);
   font-size: clamp(2.5rem, 8vw, 7rem);
   font-weight: 300;
   letter-spacing: -.04em;
@@ -552,9 +456,8 @@
 .shoe3d-panels {
   position: relative;
   z-index: 2;
-  background: transparent; /* transparent — shoe canvas shows through */
+  background: transparent;
 }
-
 .shoe3d-panel {
   position: relative;
   min-height: var(--panel-h);
@@ -562,11 +465,8 @@
   align-items: stretch;
   padding: 0;
 }
-
-/* Panel background div is now unused — section bg covers everything */
 .shoe3d-panel__bg { display: none; }
 
-/* Inner flex row — content + image side by side */
 .shoe3d-panel__inner {
   position: relative;
   z-index: 1;
@@ -576,12 +476,9 @@
   gap: 2.5rem;
   padding: 4rem 5vw;
 }
-
-/* Content side */
 .shoe3d-panel--left  .shoe3d-panel__inner { justify-content: flex-end; }
 .shoe3d-panel--right .shoe3d-panel__inner { justify-content: flex-start; }
 
-/* ── Supporting image — always visible ── */
 .shoe3d-panel__image-wrap {
   flex-shrink: 0;
   width: clamp(160px, 22vw, 320px);
@@ -589,22 +486,16 @@
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 24px 64px rgba(0,0,0,.55);
-  order: 0; /* will be overridden per side below */
+  order: 0;
 }
-
-/* On left-aligned panels, image goes to the left of the text */
 .shoe3d-panel--left  .shoe3d-panel__image-wrap { order: -1; }
-/* On right-aligned panels, image goes to the right */
 .shoe3d-panel--right .shoe3d-panel__image-wrap { order: 1; }
 
 .shoe3d-panel__image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
 }
 
-/* ── Panel text content ── */
 .shoe3d-panel__content {
   pointer-events: all;
   width: var(--content-w);
@@ -615,7 +506,6 @@
   transform: translateY(40px);
   transition: opacity .7s var(--ease-spring), transform .7s var(--ease-spring);
   color: var(--panel-text, var(--text));
-  /* Subtle backdrop so text is legible without covering the shoe */
   background: #00000096;
   padding: 2rem;
   border-radius: 16px;
@@ -630,7 +520,7 @@
   border-radius: 50px; padding: .3em .9em; width: fit-content;
 }
 .shoe3d-panel__heading {
-  ont-family: var(--font-heading-family, 'Georgia', serif);
+  font-family: var(--font-heading-family, 'Georgia', serif);
   font-size: clamp(1.6rem, 3.5vw, 3rem);
   font-weight: 300; letter-spacing: -.04em;
   line-height: 1.05;
@@ -674,15 +564,21 @@
 
 .shoe3d-end-spacer { height: 20vh; }
 
-/* ── Mobile layout ── */
+/* ── Mobile ── */
 @media (max-width: 767px) {
-  /* Hide ONLY annotation pins on mobile — panels and content stay visible */
+  #{{ section_id }} {
+    --pin-dot-size: 12px;
+    --pin-card-w: 140px;
+  }
+  .shoe3d-pin__label { font-size: 10px; }
+  .shoe3d-pin__desc  { font-size: 9px; }
+  .shoe3d-pin__card  { padding: 7px 10px; border-radius: 8px; }
+
   .shoe3d-annotations { display: none !important; }
 
   .shoe3d-panel {
     min-height: auto;
   }
-
   .shoe3d-panel__inner {
     flex-direction: column;
     align-items: flex-start;
@@ -701,7 +597,12 @@
     aspect-ratio: 1;
     align-self: center;
   }
-  .shoe3d-panel__content { width: 100%; opacity: 1 !important; transform: none !important; transition: none !important; }
+  .shoe3d-panel__content {
+    width: 100%;
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
   .shoe3d-hero__headline { font-size: clamp(2rem, 10vw, 4rem); }
 }
 
@@ -761,7 +662,6 @@
     var MODEL_URL = section.dataset.model;
     if (!MODEL_URL) { console.warn('[Shoe3D] No model URL.'); return; }
 
-    /* Hero lighting — used when no scroll panel is active */
     var heroLight = {
       lI: parseFloat(section.dataset.heroLi || 12) / 10,
       lX: parseFloat(section.dataset.heroLx || 5),
@@ -769,31 +669,19 @@
       lZ: parseFloat(section.dataset.heroLz || 5)
     };
 
-    var canvas     = document.getElementById(SECTION_ID + '-canvas');
-    var vignette   = document.getElementById(SECTION_ID + '-vignette');
-    var loaderEl   = document.getElementById(SECTION_ID + '-loader');
-    var panelEls   = [].slice.call(section.querySelectorAll('.shoe3d-panel'));
-    var contentEls = [].slice.call(section.querySelectorAll('.shoe3d-panel__content'));
+    var canvas      = document.getElementById(SECTION_ID + '-canvas');
+    var vignette    = document.getElementById(SECTION_ID + '-vignette');
+    var loaderEl    = document.getElementById(SECTION_ID + '-loader');
+    var pageBlock   = document.getElementById(SECTION_ID + '-block');
+    var progressBar = document.getElementById(SECTION_ID + '-progress');
+    var panelEls    = [].slice.call(section.querySelectorAll('.shoe3d-panel'));
+    var contentEls  = [].slice.call(section.querySelectorAll('.shoe3d-panel__content'));
 
-    /* ── Annotation pin groups ── */
     var annGroups = {};
     [].slice.call(section.querySelectorAll('.shoe3d-annotations')).forEach(function (el) {
       annGroups[el.dataset.annPanel] = el;
     });
 
-    /* ────────────────────────────────────────────────────────
-       PIN POSITIONING
-       Called on load, on panel change, and on window resize.
-       Reads the canvas bounding rect + the % data attrs on
-       each .shoe3d-pin, then sets absolute left/top in px.
-       Because left/top are in px (not %) they do NOT shift
-       when anything on the page reflows.
-    ──────────────────────────────────────────────────────── */
-    /* positionPins — converts each pin's data-ax/data-ay (0-100)
-       into absolute px left/top within the .shoe3d-annotations div.
-       Uses canvas.offsetWidth/Height which are stable layout dimensions
-       unaffected by scroll position, sticky offsets, or viewport state.
-       Called on: load, resize, panel activation, scroll. */
     function positionPins() {
       var W = canvas.offsetWidth;
       var H = canvas.offsetHeight;
@@ -806,7 +694,6 @@
       });
     }
 
-    /* ── Activate / deactivate annotation groups ── */
     function activateAnnotations(idx) {
       Object.keys(annGroups).forEach(function (k) {
         annGroups[k].classList.remove('is-active');
@@ -816,7 +703,6 @@
       }
     }
 
-    /* ── Interpolation helpers ── */
     var lerp = function (a, b, t) { return a + (b - a) * t; };
     var LERP_SPEED = 0.08;
     var reduced    = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -840,7 +726,6 @@
     var cur = { rotX:0, rotY:0, rotZ:.2, posX:0, posY:0, lI:1.2, lX:5, lY:5, lZ:5 };
     var tgt = { rotX:0, rotY:0, rotZ:.2, posX:0, posY:0, lI:1.2, lX:5, lY:5, lZ:5 };
 
-    /* ── Renderer ── */
     var renderer = new THREE.WebGLRenderer({
       canvas: canvas, antialias: true, alpha: true,
       powerPreference: 'high-performance'
@@ -865,7 +750,6 @@
     rim.position.set(-5, 2, -5); scene.add(rim);
     scene.add(new THREE.HemisphereLight(0xffffff, 0x333333, 0.2));
 
-    /* Resize */
     var rzTimer;
     function onResize() {
       var W = canvas.clientWidth  || window.innerWidth;
@@ -873,7 +757,7 @@
       renderer.setSize(W, H, false);
       camera.aspect = W / H;
       camera.updateProjectionMatrix();
-      positionPins(); /* re-anchor all pins after resize */
+      positionPins();
     }
     new ResizeObserver(function () {
       clearTimeout(rzTimer);
@@ -881,31 +765,20 @@
     }).observe(canvas);
     onResize();
 
-    /* Visibility gate */
     new IntersectionObserver(function (e) {
       isVis = e[0].isIntersecting;
       if (isVis && !raf) startLoop();
       if (!isVis && raf) { cancelAnimationFrame(raf); raf = null; }
     }, { threshold: 0 }).observe(section);
 
-    /* ── Panel activation via scroll ──
-       On every scroll we find which panel centre is closest
-       to the viewport centre — guarantees exactly one active
-       panel at all times with no gap between them.
-    ── */
     function updateActivePanel() {
-      /* A panel is "eligible" only when its top has scrolled past
-         25% of the viewport — prevents early activation while the
-         panel is still mostly below the fold. */
       var triggerY  = window.innerHeight * 0.25;
       var midY      = window.innerHeight * 0.5;
       var best      = -1, bestDist = Infinity;
 
       panelEls.forEach(function (el, i) {
         var r = el.getBoundingClientRect();
-        /* Skip panels not on screen at all */
         if (r.bottom < 0 || r.top > window.innerHeight) return;
-        /* Skip panels whose top hasn't reached the trigger line yet */
         if (r.top > triggerY) return;
         var dist = Math.abs((r.top + r.height / 2) - midY);
         if (dist < bestDist) { bestDist = dist; best = i; }
@@ -930,10 +803,8 @@
     }
     window.addEventListener('scroll', updateActivePanel, { passive: true });
     updateActivePanel();
-    /* Re-position pins once the page is fully laid out */
     window.addEventListener('load', function() { positionPins(); updateActivePanel(); });
 
-    /* ── Render loop ── */
     function startLoop() {
       (function frame() {
         raf = requestAnimationFrame(frame);
@@ -955,7 +826,6 @@
       })();
     }
 
-    /* ── Load GLB ── */
     var draco = new DRACOLoader();
     draco.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.4.1/');
     var gltf = new GLTFLoader();
@@ -984,7 +854,10 @@
           }
           scene.add(shoe);
           if (loaderEl) loaderEl.classList.add('is-hidden');
-          /* Position pins once the model has loaded and canvas is sized */
+          if (progressBar) progressBar.style.width = '100%';
+          setTimeout(function () {
+            if (pageBlock) pageBlock.classList.add('is-done');
+          }, 400);
           positionPins();
         },
         function (xhr) {
@@ -992,9 +865,13 @@
             var t = loaderEl.querySelector('.shoe3d-loader__text');
             if (t) t.textContent = 'Loading\u2026 ' + Math.round(xhr.loaded / xhr.total * 100) + '%';
           }
+          if (progressBar && xhr.total) {
+            progressBar.style.width = Math.round(xhr.loaded / xhr.total * 100) + '%';
+          }
         },
         function (err) {
           console.error('[Shoe3D] Load error:', err);
+          if (pageBlock) pageBlock.classList.add('is-done');
           if (loaderEl) {
             var t = loaderEl.querySelector('.shoe3d-loader__text');
             var r = loaderEl.querySelector('.shoe3d-loader__ring');
@@ -1034,45 +911,24 @@
       "label": "GLB Model URL",
       "info": "Upload your .glb to Content → Files and paste the CDN URL here."
     },
-
     { "type": "header", "content": "Hero Section" },
-    { "type": "text",  "id": "hero_badge",    "label": "Badge text",   "default": "Best Seller" },
-    { "type": "text",  "id": "hero_headline", "label": "Hero headline","default": "The Jillian" },
-    { "type": "text",  "id": "hero_subtext",  "label": "Hero subtext", "default": "Scroll to explore" },
-
+    { "type": "text",  "id": "hero_badge",    "label": "Badge text",    "default": "Best Seller" },
+    { "type": "text",  "id": "hero_headline", "label": "Hero headline", "default": "The Jillian" },
+    { "type": "text",  "id": "hero_subtext",  "label": "Hero subtext",  "default": "Scroll to explore" },
     { "type": "header", "content": "Background" },
-    {
-      "type": "color",
-      "id": "background_color",
-      "label": "Background colour",
-      "default": "#0e0c09"
-    },
-    {
-      "type": "color_background",
-      "id": "background_gradient",
-      "label": "Background gradient (overrides solid)",
-      "info": "Uses Shopify's native gradient picker. Leave blank for solid colour."
-    },
-
+    { "type": "color",            "id": "background_color",    "label": "Background colour",                    "default": "#0e0c09" },
+    { "type": "color_background", "id": "background_gradient", "label": "Background gradient (overrides solid)", "info": "Leave blank for solid colour." },
     { "type": "header", "content": "Text & Accent" },
     { "type": "color", "id": "text_color",   "label": "Default text",  "default": "#f0ebe3" },
     { "type": "color", "id": "accent_color", "label": "Accent colour", "default": "#d4a86a" },
-
     { "type": "header", "content": "Hero Lighting" },
-    { "type": "range", "id": "hero_light_intensity", "label": "Key light intensity", "min": 0, "max": 30, "step": 1, "default": 12 },
-    { "type": "range", "id": "hero_light_x", "label": "Light X position", "min": -10, "max": 10, "step": 0.5, "default": 5 },
-    { "type": "range", "id": "hero_light_y", "label": "Light Y position", "min": -10, "max": 10, "step": 0.5, "default": 5 },
-    { "type": "range", "id": "hero_light_z", "label": "Light Z position", "min": -10, "max": 10, "step": 0.5, "default": 5 },
-
+    { "type": "range", "id": "hero_light_intensity", "label": "Key light intensity", "min": 0, "max": 30, "step": 1,   "default": 12 },
+    { "type": "range", "id": "hero_light_x",         "label": "Light X position",   "min": -10, "max": 10, "step": 0.5, "default": 5 },
+    { "type": "range", "id": "hero_light_y",         "label": "Light Y position",   "min": -10, "max": 10, "step": 0.5, "default": 5 },
+    { "type": "range", "id": "hero_light_z",         "label": "Light Z position",   "min": -10, "max": 10, "step": 0.5, "default": 5 },
     { "type": "header", "content": "Accessibility" },
-    {
-      "type": "text",
-      "id": "aria_label",
-      "label": "Section ARIA label",
-      "default": "3D Product Showcase — Scroll to explore"
-    }
+    { "type": "text", "id": "aria_label", "label": "Section ARIA label", "default": "3D Product Showcase — Scroll to explore" }
   ],
-
   "blocks": [
     {
       "type": "panel",
@@ -1085,89 +941,28 @@
         { "type": "text",     "id": "feature_1", "label": "Feature 1" },
         { "type": "text",     "id": "feature_2", "label": "Feature 2" },
         { "type": "text",     "id": "feature_3", "label": "Feature 3" },
-        { "type": "text",     "id": "cta_label",   "label": "Button label" },
-        { "type": "url",      "id": "cta_url",     "label": "Button URL" },
-        {
-          "type": "checkbox",
-          "id": "cta_new_tab",
-          "label": "Open in new tab",
-          "default": false
-        },
-        {
-          "type": "image_picker",
-          "id": "image",
-          "label": "Supporting image",
-          "info": "Shown alongside the text on desktop and mobile."
-        },
-
+        { "type": "text",     "id": "cta_label", "label": "Button label" },
+        { "type": "url",      "id": "cta_url",   "label": "Button URL" },
+        { "type": "checkbox", "id": "cta_new_tab", "label": "Open in new tab", "default": false },
+        { "type": "image_picker", "id": "image", "label": "Supporting image", "info": "Shown alongside the text on desktop and mobile." },
         { "type": "header", "content": "Annotation Pin 1" },
-        {
-          "type": "paragraph",
-          "content": "Floating annotation shown on the 3D model. Positions are % of the canvas (0 = top/left, 100 = bottom/right)."
-        },
-        { "type": "text", "id": "ann_1_label", "label": "Label"              },
-        { "type": "text", "id": "ann_1_desc",  "label": "Description (optional)" },
-        {
-          "type": "select",
-          "id": "ann_1_side",
-          "label": "Card side",
-          "options": [
-            { "value": "right", "label": "Right of dot" },
-            { "value": "left",  "label": "Left of dot"  }
-          ],
-          "default": "right"
-        },
-        {
-          "type": "range",
-          "id": "ann_1_x",
-          "label": "Horizontal position (% of canvas)",
-          "min": 5, "max": 95, "step": 1, "default": 52,
-          "unit": "%"
-        },
-        {
-          "type": "range",
-          "id": "ann_1_y",
-          "label": "Vertical position (% of canvas)",
-          "min": 5, "max": 95, "step": 1, "default": 38,
-          "unit": "%"
-        },
-
+        { "type": "paragraph", "content": "Floating annotation shown on the 3D model. Positions are % of the canvas (0 = top/left, 100 = bottom/right)." },
+        { "type": "text",   "id": "ann_1_label", "label": "Label" },
+        { "type": "text",   "id": "ann_1_desc",  "label": "Description (optional)" },
+        { "type": "select", "id": "ann_1_side",  "label": "Card side", "options": [{ "value": "right", "label": "Right of dot" }, { "value": "left", "label": "Left of dot" }], "default": "right" },
+        { "type": "range",  "id": "ann_1_x", "label": "Horizontal position (% of canvas)", "min": 5, "max": 95, "step": 1, "default": 52, "unit": "%" },
+        { "type": "range",  "id": "ann_1_y", "label": "Vertical position (% of canvas)",   "min": 5, "max": 95, "step": 1, "default": 38, "unit": "%" },
         { "type": "header", "content": "Annotation Pin 2" },
-        {
-          "type": "paragraph",
-          "content": "Second annotation pin. Leave label blank to hide."
-        },
-        { "type": "text", "id": "ann_2_label", "label": "Label"              },
-        { "type": "text", "id": "ann_2_desc",  "label": "Description (optional)" },
-        {
-          "type": "select",
-          "id": "ann_2_side",
-          "label": "Card side",
-          "options": [
-            { "value": "right", "label": "Right of dot" },
-            { "value": "left",  "label": "Left of dot"  }
-          ],
-          "default": "left"
-        },
-        {
-          "type": "range",
-          "id": "ann_2_x",
-          "label": "Horizontal position (% of canvas)",
-          "min": 5, "max": 95, "step": 1, "default": 46,
-          "unit": "%"
-        },
-        {
-          "type": "range",
-          "id": "ann_2_y",
-          "label": "Vertical position (% of canvas)",
-          "min": 5, "max": 95, "step": 1, "default": 65,
-          "unit": "%"
-        },
-
+        { "type": "paragraph", "content": "Second annotation pin. Leave label blank to hide." },
+        { "type": "text",   "id": "ann_2_label", "label": "Label" },
+        { "type": "text",   "id": "ann_2_desc",  "label": "Description (optional)" },
+        { "type": "select", "id": "ann_2_side",  "label": "Card side", "options": [{ "value": "right", "label": "Right of dot" }, { "value": "left", "label": "Left of dot" }], "default": "left" },
+        { "type": "range",  "id": "ann_2_x", "label": "Horizontal position (% of canvas)", "min": 5, "max": 95, "step": 1, "default": 46, "unit": "%" },
+        { "type": "range",  "id": "ann_2_y", "label": "Vertical position (% of canvas)",   "min": 5, "max": 95, "step": 1, "default": 65, "unit": "%" },
         { "type": "header", "content": "Shoe Rotation" },
-        { "type": "range", "id": "rot_x", "label": "Rotation X (tilt forward/back)", "min": -180, "max": 180, "step": 5, "default": 0,  "unit": "°" },
-        { "type": "range", "id": "rot_y", "label": "Rotation Y (spin left/right)",   "min": -180, "max": 180, "step": 5, "default": 0,  "unit": "°" },
-        { "type": "range", "id": "rot_z", "label": "Rotation Z (roll)",              "min": -180, "max": 180, "step": 5, "default": 0,  "unit": "°" },
+        { "type": "range", "id": "rot_x", "label": "Rotation X (tilt forward/back)", "min": -180, "max": 180, "step": 5, "default": 0, "unit": "°" },
+        { "type": "range", "id": "rot_y", "label": "Rotation Y (spin left/right)",   "min": -180, "max": 180, "step": 5, "default": 0, "unit": "°" },
+        { "type": "range", "id": "rot_z", "label": "Rotation Z (roll)",              "min": -180, "max": 180, "step": 5, "default": 0, "unit": "°" },
         { "type": "header", "content": "Shoe Position" },
         { "type": "range", "id": "pos_x", "label": "Position X", "min": -10, "max": 10, "step": 1, "default": 5 },
         { "type": "range", "id": "pos_y", "label": "Position Y", "min": -10, "max": 10, "step": 1, "default": 0 },
@@ -1179,7 +974,6 @@
       ]
     }
   ],
-
   "presets": [
     {
       "name": "3D Shoe Scroll",
@@ -1197,12 +991,8 @@
             "rot_x": 10, "rot_y": 90, "rot_z": 5,
             "pos_x": 6, "pos_y": 0,
             "light_intensity": 12, "light_x": 8, "light_y": 6, "light_z": 5,
-            "ann_1_label": "Memory Foam",
-            "ann_1_desc": "Conforms to your foot & distributes weight evenly",
-            "ann_1_x": 55, "ann_1_y": 40, "ann_1_side": "right",
-            "ann_2_label": "Met Bar Pod",
-            "ann_2_desc": "Relieves ball-of-foot & metatarsalgia discomfort",
-            "ann_2_x": 40, "ann_2_y": 72, "ann_2_side": "right"
+            "ann_1_label": "Memory Foam", "ann_1_desc": "Conforms to your foot & distributes weight evenly", "ann_1_x": 55, "ann_1_y": 40, "ann_1_side": "right",
+            "ann_2_label": "Met Bar Pod", "ann_2_desc": "Relieves ball-of-foot & metatarsalgia discomfort",  "ann_2_x": 40, "ann_2_y": 72, "ann_2_side": "right"
           }
         },
         {
@@ -1217,12 +1007,8 @@
             "rot_x": -75, "rot_y": 10, "rot_z": 0,
             "pos_x": -6, "pos_y": 0,
             "light_intensity": 14, "light_x": -5, "light_y": 8, "light_z": 3,
-            "ann_1_label": "Genuine Leather Upper",
-            "ann_1_desc": "Full-grain leather — breathable & built to last",
-            "ann_1_x": 55, "ann_1_y": 30, "ann_1_side": "right",
-            "ann_2_label": "Antimicrobial Microfiber",
-            "ann_2_desc": "Footbed treated to fight everyday odors all day",
-            "ann_2_x": 48, "ann_2_y": 62, "ann_2_side": "right"
+            "ann_1_label": "Genuine Leather Upper",   "ann_1_desc": "Full-grain leather — breathable & built to last",  "ann_1_x": 55, "ann_1_y": 30, "ann_1_side": "right",
+            "ann_2_label": "Antimicrobial Microfiber", "ann_2_desc": "Footbed treated to fight everyday odors all day", "ann_2_x": 48, "ann_2_y": 62, "ann_2_side": "right"
           }
         },
         {
@@ -1237,12 +1023,8 @@
             "rot_x": 95, "rot_y": 0, "rot_z": 5,
             "pos_x": 6, "pos_y": 0,
             "light_intensity": 13, "light_x": 3, "light_y": -5, "light_z": 8,
-            "ann_1_label": "Aetrex Arch Support",
-            "ann_1_desc": "Contoured height aligns body from ground up",
-            "ann_1_x": 52, "ann_1_y": 58, "ann_1_side": "right",
-            "ann_2_label": "Bunion Relief",
-            "ann_2_desc": "Strap void removes pressure on bunions entirely",
-            "ann_2_x": 38, "ann_2_y": 32, "ann_2_side": "right"
+            "ann_1_label": "Aetrex Arch Support", "ann_1_desc": "Contoured height aligns body from ground up",       "ann_1_x": 52, "ann_1_y": 58, "ann_1_side": "right",
+            "ann_2_label": "Bunion Relief",        "ann_2_desc": "Strap void removes pressure on bunions entirely",   "ann_2_x": 38, "ann_2_y": 32, "ann_2_side": "right"
           }
         },
         {
@@ -1258,12 +1040,8 @@
             "rot_x": 0, "rot_y": 0, "rot_z": 0,
             "pos_x": -4, "pos_y": -2,
             "light_intensity": 15, "light_x": 0, "light_y": 5, "light_z": 10,
-            "ann_1_label": "Braided Leather Strap",
-            "ann_1_desc": "Signature quarter-strap — style meets comfort",
-            "ann_1_x": 42, "ann_1_y": 28, "ann_1_side": "right",
-            "ann_2_label": "Hook & Loop Closure",
-            "ann_2_desc": "Fully adjustable — fits narrow to wide feet",
-            "ann_2_x": 55, "ann_2_y": 60, "ann_2_side": "left"
+            "ann_1_label": "Braided Leather Strap", "ann_1_desc": "Signature quarter-strap — style meets comfort",  "ann_1_x": 42, "ann_1_y": 28, "ann_1_side": "right",
+            "ann_2_label": "Hook & Loop Closure",   "ann_2_desc": "Fully adjustable — fits narrow to wide feet",    "ann_2_x": 55, "ann_2_y": 60, "ann_2_side": "left"
           }
         }
       ]
