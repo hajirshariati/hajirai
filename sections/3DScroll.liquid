@@ -255,15 +255,16 @@
 
 /* Progress bar */
 .shoe3d-progress-bar-wrap {
-  position: absolute;
-  top: 50%;
+  position: fixed;
+  top: 30vh;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
   width: 200px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 12px;
+  z-index: 10000;
 }
 .shoe3d-progress-bar-track {
   width: 100%;
@@ -605,13 +606,13 @@
   .shoe3d-panel {
     min-height: auto;
   }
-  .shoe3d-panel__inner {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 1.5rem 1.5rem;
-    gap: 1rem;
-    min-height: auto;
-  }
+.shoe3d-panel__inner {
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 6rem 1.5rem;
+  gap: 1rem;
+  min-height: auto;
+}
   .shoe3d-panel--left  .shoe3d-panel__inner,
   .shoe3d-panel--right .shoe3d-panel__inner {
     justify-content: flex-start;
