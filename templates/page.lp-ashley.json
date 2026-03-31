@@ -129,10 +129,10 @@
           "settings": {
             "heading": "Memory Foam Footbed",
             "text": "for Cushioning & Comfort",
-            "horizontal": 70,
+            "horizontal": 81,
             "vertical": 63,
-            "text_horizontal": 17,
-            "text_vertical": 79
+            "text_horizontal": 28,
+            "text_vertical": 87
           }
         },
         "feature_point_gn8GxX": {
@@ -146,17 +146,6 @@
             "text_vertical": 29
           }
         },
-        "feature_point_K3DUcM": {
-          "type": "feature_point",
-          "settings": {
-            "heading": "Adjustable Straps",
-            "text": "for the Perfect Fit Each Wear",
-            "horizontal": 32,
-            "vertical": 43,
-            "text_horizontal": 3,
-            "text_vertical": 70
-          }
-        },
         "feature_point_FXjfXC": {
           "type": "feature_point",
           "settings": {
@@ -168,6 +157,17 @@
             "text_vertical": 4
           }
         },
+        "feature_point_4y67Aw": {
+          "type": "feature_point",
+          "settings": {
+            "heading": "Adjustable Straps",
+            "text": "for Extra Comfort",
+            "horizontal": 40,
+            "vertical": 34,
+            "text_horizontal": 0,
+            "text_vertical": 74
+          }
+        },
         "feature_point_6fhNb6": {
           "type": "feature_point",
           "settings": {
@@ -175,7 +175,7 @@
             "text": "",
             "horizontal": 49,
             "vertical": 25,
-            "text_horizontal": 69,
+            "text_horizontal": 67,
             "text_vertical": 14
           }
         },
@@ -243,8 +243,8 @@
       "block_order": [
         "feature_point_wG8TzX",
         "feature_point_gn8GxX",
-        "feature_point_K3DUcM",
         "feature_point_FXjfXC",
+        "feature_point_4y67Aw",
         "feature_point_6fhNb6",
         "heading_Q7f3Ca",
         "text_HnQg7Q",
