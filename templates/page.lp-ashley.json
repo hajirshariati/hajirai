@@ -24,6 +24,72 @@
         "rounded": false
       }
     },
+    "slideshow_aM3pX6": {
+      "type": "slideshow",
+      "blocks": {
+        "image_EXgffj": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Ash_banner_D2.jpg",
+            "image_mobile": "shopify://shop_images/Ash_banner_M3.jpg",
+            "content_position": "md:items-center md:justify-start",
+            "content_position_mobile": "items-end justify-center",
+            "heading": "Best Sandal for Bunions",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "text": "<p>Honored by Oprah Daily</p>",
+            "text_font": "subtitle",
+            "text_size": "subtext-lg",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color_text": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle",
+            "button_label": "Shop Ashley Wedge",
+            "button_link": "shopify://products/ashley-hazy-blue-multi-ew794w",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "image_EXgffj"
+      ],
+      "name": "t:sections.slideshow.name",
+      "settings": {
+        "autoplay": false,
+        "autoplay_speed": 5,
+        "show_navigation": true,
+        "image_height": "adapt",
+        "content_width": "small",
+        "text_alignment": "left",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "left",
+        "mobile_content_space": 168,
+        "mobile_content_space_color": "#e9eae5",
+        "accessibility_info": "",
+        "color_text": "#171717",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
     "image_with_text_overlay_Hnzn9F": {
       "type": "image-with-text-overlay",
       "blocks": {
@@ -97,7 +163,7 @@
         "content_width": "small",
         "content_position": "md:items-center md:justify-start",
         "text_alignment": "left",
-        "image_mobile": "shopify://shop_images/Ash_banner_M3.jpg",
+        "image_mobile": "shopify://shop_images/Ash_banner_M4.jpg",
         "image_height_mobile": "adapt",
         "content_position_mobile": "items-end justify-center",
         "text_alignment_mobile": "left",
@@ -1097,6 +1163,7 @@
   },
   "order": [
     "main-page",
+    "slideshow_aM3pX6",
     "image_with_text_overlay_Hnzn9F",
     "dynamic_feature_combo_8NW3dN",
     "image_with_text_K47tcA",
