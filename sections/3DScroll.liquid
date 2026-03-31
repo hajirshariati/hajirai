@@ -29,9 +29,14 @@
   itemtype="https://schema.org/Product"
 >
 
-  <div class="shoe3d-page-block" id="{{ section_id }}-block">
-    <div class="shoe3d-progress-bar" id="{{ section_id }}-progress"></div>
+<div class="shoe3d-page-block" id="{{ section_id }}-block">
+  <div class="shoe3d-progress-bar-wrap">
+    <div class="shoe3d-progress-bar-track">
+      <div class="shoe3d-progress-bar" id="{{ section_id }}-progress"></div>
+    </div>
+    <span class="shoe3d-progress-label" id="{{ section_id }}-progress-label">Loading… 0%</span>
   </div>
+</div>
 
   <div class="shoe3d-canvas-wrap" aria-hidden="true">
     <canvas
@@ -249,15 +254,36 @@
 }
 
 /* Progress bar */
-.shoe3d-progress-bar {
+.shoe3d-progress-bar-wrap {
   position: absolute;
-  top: 0;
-  left: 0;
-  height: 3px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.shoe3d-progress-bar-track {
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.shoe3d-progress-bar {
+  height: 100%;
   width: 0%;
-  background: var(--accent, #d4a86a);
+  background: #ffffff;
+  border-radius: 2px;
   transition: width 0.25s ease;
-  border-radius: 0 2px 2px 0;
+}
+.shoe3d-progress-label {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 /* ── Sticky canvas ── */
@@ -673,7 +699,8 @@
     var vignette    = document.getElementById(SECTION_ID + '-vignette');
     var loaderEl    = document.getElementById(SECTION_ID + '-loader');
     var pageBlock   = document.getElementById(SECTION_ID + '-block');
-    var progressBar = document.getElementById(SECTION_ID + '-progress');
+var progressBar   = document.getElementById(SECTION_ID + '-progress');
+var progressLabel = document.getElementById(SECTION_ID + '-progress-label');
     var panelEls    = [].slice.call(section.querySelectorAll('.shoe3d-panel'));
     var contentEls  = [].slice.call(section.querySelectorAll('.shoe3d-panel__content'));
 
@@ -865,9 +892,11 @@
             var t = loaderEl.querySelector('.shoe3d-loader__text');
             if (t) t.textContent = 'Loading\u2026 ' + Math.round(xhr.loaded / xhr.total * 100) + '%';
           }
-          if (progressBar && xhr.total) {
-            progressBar.style.width = Math.round(xhr.loaded / xhr.total * 100) + '%';
-          }
+if (progressBar && xhr.total) {
+  var pct = Math.round(xhr.loaded / xhr.total * 100);
+  progressBar.style.width = pct + '%';
+  if (progressLabel) progressLabel.textContent = 'Loading… ' + pct + '%';
+}
         },
         function (err) {
           console.error('[Shoe3D] Load error:', err);
