@@ -296,6 +296,12 @@
       "block_order": [
         "feed_JpVDVt"
       ],
+      "custom_css": [
+        ".product-card__media .badges {display: none;}",
+        ".shop-the-feed .horizontal-product {display: none;}",
+        ".social-feed.x-modal:not(.is-visible) {pointer-events: none !important;}",
+        ".media-card__button {display: none !important;}"
+      ],
       "name": "t:sections.shop-the-feed.name",
       "settings": {
         "columns": 4,
