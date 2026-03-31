@@ -232,10 +232,10 @@
         {%- for block in question_blocks -%}
           {
             "@type": "Question",
-            "name": {{ block.settings.title | json }},
+            "name": {{ block.settings.title | strip_html | json }},
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": {{ block.settings.text | json }}
+              "text": {{ block.settings.text | strip_html | json }}
             }
           }{% unless forloop.last %},{% endunless %}
         {% endfor -%}

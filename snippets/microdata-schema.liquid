@@ -16,11 +16,11 @@
   "@context": "https://schema.org",
   "@type": "Organization",
   "name": {{ org_name | json }},
-  "url": {{ org_url | json }},
+  "url": "{{ org_url }}",
   {%- if org_logo -%}
   "logo": {
     "@type": "ImageObject",
-    "url": {{ org_logo | image_url: width: 600 | prepend: 'https:' | json }},
+    "url": "{{ org_logo | image_url: width: 600 | prepend: 'https:' }}",
     "width": "600",
     "height": "600"
   },
@@ -33,24 +33,29 @@
   },
   {%- endif -%}
   "sameAs": [
-    {%- if settings.social_facebook_link != blank -%}
-    {{ settings.social_facebook_link | json }}{% unless settings.social_instagram_link == blank or settings.social_twitter_link == blank or settings.social_youtube_link == blank or settings.social_pinterest_link == blank or settings.social_linkedin_link == blank %},{% endunless %}
-    {%- endif -%}
-    {%- if settings.social_instagram_link != blank -%}
-    {{ settings.social_instagram_link | json }}{% unless settings.social_twitter_link == blank or settings.social_youtube_link == blank or settings.social_pinterest_link == blank or settings.social_linkedin_link == blank %},{% endunless %}
-    {%- endif -%}
-    {%- if settings.social_twitter_link != blank -%}
-    {{ settings.social_twitter_link | json }}{% unless settings.social_youtube_link == blank or settings.social_pinterest_link == blank or settings.social_linkedin_link == blank %},{% endunless %}
-    {%- endif -%}
-    {%- if settings.social_youtube_link != blank -%}
-    {{ settings.social_youtube_link | json }}{% unless settings.social_pinterest_link == blank or settings.social_linkedin_link == blank %},{% endunless %}
-    {%- endif -%}
-    {%- if settings.social_pinterest_link != blank -%}
-    {{ settings.social_pinterest_link | json }}{% unless settings.social_linkedin_link == blank %},{% endunless %}
-    {%- endif -%}
-    {%- if settings.social_linkedin_link != blank -%}
-    {{ settings.social_linkedin_link | json }}
-    {%- endif -%}
+{%- if settings.social_facebook_link != blank -%}
+    "{{ settings.social_facebook_link }}"
+{%- endif -%}
+{%- if settings.social_instagram_link != blank -%}
+{%- if settings.social_facebook_link != blank -%},{%- endif -%}
+    "{{ settings.social_instagram_link }}"
+{%- endif -%}
+{%- if settings.social_twitter_link != blank -%}
+{%- if settings.social_facebook_link != blank or settings.social_instagram_link != blank -%},{%- endif -%}
+    "{{ settings.social_twitter_link }}"
+{%- endif -%}
+{%- if settings.social_youtube_link != blank -%}
+{%- if settings.social_facebook_link != blank or settings.social_instagram_link != blank or settings.social_twitter_link != blank -%},{%- endif -%}
+    "{{ settings.social_youtube_link }}"
+{%- endif -%}
+{%- if settings.social_pinterest_link != blank -%}
+{%- if settings.social_facebook_link != blank or settings.social_instagram_link != blank or settings.social_twitter_link != blank or settings.social_youtube_link != blank -%},{%- endif -%}
+    "{{ settings.social_pinterest_link }}"
+{%- endif -%}
+{%- if settings.social_linkedin_link != blank -%}
+{%- if settings.social_facebook_link != blank or settings.social_instagram_link != blank or settings.social_twitter_link != blank or settings.social_youtube_link != blank or settings.social_pinterest_link != blank -%},{%- endif -%}
+    "{{ settings.social_linkedin_link }}"
+{%- endif -%}
   ]
 }
 </script>
@@ -66,32 +71,66 @@
       "@type": "ListItem",
       "position": 1,
       "name": "Home",
-      "item": {{ shop.url | json }}
+      "item": "{{ shop.url }}"
     }
-    {%- if collection -%}
+    {%- if product -%}
+      {%- assign primary_category = product.metafields.custom.primary_category -%}
+      {%- if primary_category != blank -%}
     ,
     {
       "@type": "ListItem",
       "position": 2,
-      "name": {{ collection.title | json }},
-      "item": {{ collection.url | prepend: shop.url | json }}
+      "name": {{ primary_category.value.title | json }},
+      "item": "{{ primary_category.value.url | prepend: shop.url }}"
     }
-    {%- endif -%}
-    {%- if product and collection -%}
     ,
     {
       "@type": "ListItem",
       "position": 3,
       "name": {{ product.title | json }},
-      "item": {{ product.url | within: collection | prepend: shop.url | json }}
+      "item": "{{ product.url | prepend: shop.url }}"
     }
-    {%- elsif product -%}
+      {%- elsif collection -%}
     ,
     {
       "@type": "ListItem",
       "position": 2,
+      "name": {{ collection.title | json }},
+      "item": "{{ collection.url | prepend: shop.url }}"
+    }
+    ,
+    {
+      "@type": "ListItem",
+      "position": 3,
       "name": {{ product.title | json }},
-      "item": {{ product.url | prepend: shop.url | json }}
+      "item": "{{ product.url | within: collection | prepend: shop.url }}"
+    }
+      {%- else -%}
+        {%- assign fallback_collection = product.collections | first -%}
+        {%- if fallback_collection -%}
+    ,
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": {{ fallback_collection.title | json }},
+      "item": "{{ fallback_collection.url | prepend: shop.url }}"
+    }
+        {%- endif -%}
+    ,
+    {
+      "@type": "ListItem",
+      "position": {% if fallback_collection %}3{% else %}2{% endif %},
+      "name": {{ product.title | json }},
+      "item": "{{ product.url | prepend: shop.url }}"
+    }
+      {%- endif -%}
+    {%- elsif collection -%}
+    ,
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": {{ collection.title | json }},
+      "item": "{{ collection.url | prepend: shop.url }}"
     }
     {%- elsif article -%}
     ,
@@ -99,14 +138,14 @@
       "@type": "ListItem",
       "position": 2,
       "name": {{ blog.title | json }},
-      "item": {{ blog.url | prepend: shop.url | json }}
+      "item": "{{ blog.url | prepend: shop.url }}"
     }
     ,
     {
       "@type": "ListItem",
       "position": 3,
       "name": {{ article.title | json }},
-      "item": {{ article.url | prepend: shop.url | json }}
+      "item": "{{ article.url | prepend: shop.url }}"
     }
     {%- elsif blog -%}
     ,
@@ -114,7 +153,7 @@
       "@type": "ListItem",
       "position": 2,
       "name": {{ blog.title | json }},
-      "item": {{ blog.url | prepend: shop.url | json }}
+      "item": "{{ blog.url | prepend: shop.url }}"
     }
     {%- elsif page -%}
     ,
@@ -122,7 +161,7 @@
       "@type": "ListItem",
       "position": 2,
       "name": {{ page.title | json }},
-      "item": {{ page.url | prepend: shop.url | json }}
+      "item": "{{ page.url | prepend: shop.url }}"
     }
     {%- endif -%}
   ]
@@ -143,7 +182,7 @@
   endif
 
   assign rating_value = product.metafields.reviews.rating.value | default: product.metafields.spr.reviews.rating
-  assign review_count = product.metafields.reviews.rating_count | default: product.metafields.spr.reviews.count
+  assign review_count = product.metafields.reviews.rating_count.value | default: product.metafields.spr.reviews.count
 -%}
 
 <script type="application/ld+json">
@@ -152,8 +191,13 @@
   "@type": "Product",
   "name": {{ product.title | json }},
   "description": {{ product.description | strip_html | truncate: 5000 | json }},
-  "url": {{ product_url | json }},
+  "url": "{{ product_url }}",
   "sku": {{ current_variant.sku | default: current_variant.id | json }},
+  {%- if current_variant.barcode != blank -%}
+  "gtin": {{ current_variant.barcode | json }},
+  {%- endif -%}
+  "productID": {{ product.id | json }},
+  "itemGroupID": {{ product.id | json }},
   "brand": {
     "@type": "Brand",
     "name": {{ shop.name | json }}
@@ -161,13 +205,13 @@
   {%- if product.featured_image -%}
   "image": [
     {%- for image in product.images limit: 5 -%}
-    {{ image | image_url: width: 1200 | prepend: 'https:' | json }}{% unless forloop.last %},{% endunless %}
+    "{{ image | image_url: width: 1200 | prepend: 'https:' }}"{% unless forloop.last %},{% endunless %}
     {%- endfor -%}
   ],
   {%- endif -%}
   "offers": {
     "@type": "Offer",
-    "url": {{ product_url | json }},
+    "url": "{{ product_url }}",
     "priceCurrency": {{ cart.currency.iso_code | json }},
     "price": {{ current_variant.price | divided_by: 100.0 | json }},
     {%- if current_variant.compare_at_price and current_variant.compare_at_price > current_variant.price -%}
@@ -177,7 +221,7 @@
       "priceCurrency": {{ cart.currency.iso_code | json }}
     },
     {%- endif -%}
-    "availability": {{ availability | json }},
+    "availability": "{{ availability }}",
     "seller": {
       "@type": "Organization",
       "name": {{ shop.name | json }}
@@ -185,6 +229,40 @@
     {%- if current_variant.compare_at_price and current_variant.compare_at_price > current_variant.price -%}
     ,
     "priceValidUntil": {{ 'now' | date: '%s' | plus: 2592000 | date: '%Y-%m-%d' | json }}
+    {%- endif -%}
+    {%- if settings.schema_shipping_rate != blank or settings.schema_shipping_destination != blank -%}
+    ,
+    "shippingDetails": {
+      "@type": "OfferShippingDetails",
+      "shippingRate": {
+        "@type": "MonetaryAmount",
+        "value": {{ settings.schema_shipping_rate | default: 0 | json }},
+        "currency": {{ cart.currency.iso_code | json }}
+      }
+      {%- if settings.schema_shipping_destination != blank -%}
+      ,
+      "shippingDestination": {
+        "@type": "DefinedRegion",
+        "addressCountry": {{ settings.schema_shipping_destination | json }}
+      }
+      {%- endif -%}
+    }
+    {%- endif -%}
+    {%- if settings.schema_return_policy_url != blank or settings.schema_return_days != blank -%}
+    ,
+    "hasMerchantReturnPolicy": {
+      "@type": "MerchantReturnPolicy",
+      {%- if settings.schema_return_days != blank -%}
+      "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+      "merchantReturnDays": {{ settings.schema_return_days | json }},
+      {%- else -%}
+      "returnPolicyCategory": "https://schema.org/MerchantReturnUnlimitedWindow",
+      {%- endif -%}
+      {%- if settings.schema_return_policy_url != blank -%}
+      "returnPolicyUrl": "{{ settings.schema_return_policy_url }}",
+      {%- endif -%}
+      "applicableCountry": {{ settings.schema_shipping_destination | default: 'US' | json }}
+    }
     {%- endif -%}
   }
   {%- if rating_value and review_count and review_count > 0 -%}
@@ -199,6 +277,82 @@
   {%- endif -%}
 }
 </script>
+
+{%- comment -%} Yotpo Review Data Injection (Fallback when metafields not synced) {%- endcomment -%}
+{%- if rating_value == blank or review_count == blank or review_count == 0 -%}
+<script>
+(function() {
+  function extractYotpoReviews() {
+    // Method 1: Try to get from Yotpo widget DOM
+    const yotpoWidget = document.querySelector('.yotpo-bottomline, .yotpo-sr-bottom-line-summary');
+    if (yotpoWidget) {
+      const stars = yotpoWidget.querySelectorAll('.yotpo-sr-star-full, .yotpo-icon-star.rating-star, [class*="star-full"]');
+      const reviewText = yotpoWidget.querySelector('.yotpo-sr-bottom-line-text, .text-m, [class*="review"]');
+      
+      if (stars.length > 0 && reviewText) {
+        const ratingValue = stars.length;
+        const reviewMatch = reviewText.textContent.match(/(\d+)\s*Review/i);
+        const reviewCount = reviewMatch ? parseInt(reviewMatch[1]) : 0;
+        
+        if (ratingValue > 0 && reviewCount > 0) {
+          updateSchema(ratingValue, reviewCount);
+          return true;
+        }
+      }
+    }
+    
+    // Method 2: Try Yotpo API if available
+    if (window.yotpo && window.yotpo.api) {
+      const productId = {{ product.id | json }};
+      window.yotpo.api.request('bottomline', { pid: productId }).then(function(response) {
+        if (response && response.response && response.response.bottomline) {
+          const data = response.response.bottomline;
+          if (data.average_score && data.total_reviews > 0) {
+            updateSchema(data.average_score, data.total_reviews);
+          }
+        }
+      });
+    }
+    
+    return false;
+  }
+  
+  function updateSchema(ratingValue, reviewCount) {
+    const scripts = document.querySelectorAll('script[type="application/ld+json"]');
+    scripts.forEach(script => {
+      try {
+        const schema = JSON.parse(script.textContent);
+        if (schema['@type'] === 'Product' && schema.name === {{ product.title | json }}) {
+          if (!schema.aggregateRating) {
+            schema.aggregateRating = {
+              "@type": "AggregateRating",
+              "ratingValue": ratingValue.toString(),
+              "reviewCount": reviewCount.toString(),
+              "bestRating": "5",
+              "worstRating": "1"
+            };
+            script.textContent = JSON.stringify(schema, null, 2);
+            console.log('Yotpo reviews injected into schema:', ratingValue, 'stars,', reviewCount, 'reviews');
+          }
+        }
+      } catch(e) {
+        console.error('Error updating schema:', e);
+      }
+    });
+  }
+  
+  // Try multiple times as Yotpo loads asynchronously
+  let attempts = 0;
+  const maxAttempts = 10;
+  const interval = setInterval(function() {
+    attempts++;
+    if (extractYotpoReviews() || attempts >= maxAttempts) {
+      clearInterval(interval);
+    }
+  }, 500);
+})();
+</script>
+{%- endif -%}
 {%- endif -%}
 
 {%- comment -%} ========== COLLECTION SCHEMA ========== {%- endcomment -%}
@@ -212,12 +366,12 @@
   "@context": "https://schema.org",
   "@type": "CollectionPage",
   "name": {{ collection.title | json }},
-  "url": {{ collection_url | json }},
+  "url": "{{ collection_url }}",
   {%- if collection.description != blank -%}
   "description": {{ collection.description | strip_html | json }},
   {%- endif -%}
   {%- if collection.image -%}
-  "image": {{ collection.image | image_url: width: 1200 | prepend: 'https:' | json }},
+  "image": "{{ collection.image | image_url: width: 1200 | prepend: 'https:' }}",
   {%- endif -%}
   "mainEntity": {
     "@type": "ItemList",
@@ -227,7 +381,7 @@
       {
         "@type": "ListItem",
         "position": {{ forloop.index | json }},
-        "url": {{ product.url | within: collection | prepend: shop.url | json }},
+        "url": "{{ product.url | within: collection | prepend: shop.url }}",
         "name": {{ product.title | json }}
       }{% unless forloop.last %},{% endunless %}
       {%- endfor -%}
@@ -249,7 +403,7 @@
   "@context": "https://schema.org",
   "@type": "BlogPosting",
   "headline": {{ article.title | json }},
-  "url": {{ article_url | json }},
+  "url": "{{ article_url }}",
   {%- if article.excerpt != blank -%}
   "description": {{ article.excerpt | strip_html | json }},
   {%- elsif article.content != blank -%}
@@ -258,7 +412,7 @@
   {%- if article.image -%}
   "image": {
     "@type": "ImageObject",
-    "url": {{ article.image | image_url: width: 1200 | prepend: 'https:' | json }},
+    "url": "{{ article.image | image_url: width: 1200 | prepend: 'https:' }}",
     "width": "1200",
     "height": "630"
   },
@@ -279,19 +433,66 @@
     {%- if settings.logo -%}
     "logo": {
       "@type": "ImageObject",
-      "url": {{ settings.logo | image_url: width: 600 | prepend: 'https:' | json }},
+      "url": "{{ settings.logo | image_url: width: 600 | prepend: 'https:' }}",
       "width": "600",
       "height": "600"
     },
     {%- endif -%}
-    "url": {{ shop.url | json }}
+    "url": "{{ shop.url }}"
   },
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": {{ article_url | json }}
+    "@id": "{{ article_url }}"
   }
 }
 </script>
+{%- endif -%}
+
+{%- comment -%} ========== MEDICAL WEB PAGE SCHEMA ========== {%- endcomment -%}
+{%- if page -%}
+{%- liquid
+  assign is_medical_page = false
+  assign medical_condition = ''
+  
+  # Check if page should have medical schema via metafield or handle
+  if page.metafields.custom.medical_page == true or page.metafields.custom.medical_condition != blank
+    assign is_medical_page = true
+    assign medical_condition = page.metafields.custom.medical_condition
+  elsif page.handle contains 'explore-relief' or page.handle contains 'clinical' or page.handle contains 'case-' or page.handle contains 'ER-' or page.handle contains 'plantar' or page.handle contains 'bunions' or page.handle contains 'metatarsalgia' or page.handle contains 'diabetes' or page.handle contains 'athletic'
+    assign is_medical_page = true
+  endif
+-%}
+
+{%- if is_medical_page -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "MedicalWebPage",
+  "name": {{ page.title | json }},
+  "url": "{{ page.url | prepend: shop.url }}",
+  {%- if page.content != blank -%}
+  "description": {{ page.content | strip_html | truncate: 300 | json }},
+  {%- endif -%}
+  "lastReviewed": "{{ page.updated_at | default: page.published_at | date: '%Y-%m-%d' }}",
+  "reviewedBy": {
+    "@type": "Organization",
+    "name": {{ shop.name | json }}
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": {{ shop.name | json }},
+    "url": "{{ shop.url }}"
+  }
+  {%- if medical_condition != blank -%}
+  ,
+  "about": {
+    "@type": "MedicalCondition",
+    "name": {{ medical_condition | json }}
+  }
+  {%- endif -%}
+}
+</script>
+{%- endif -%}
 {%- endif -%}
 
 {%- comment -%} ========== FAQ SCHEMA ========== {%- endcomment -%}

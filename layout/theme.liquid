@@ -72,7 +72,12 @@ function OptanonWrapper() { }
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="theme-color" content="{{ settings.color_button_background }}">
-    <link rel="canonical" href="{{ canonical_url }}">
+    {%- if product and product.selected_or_first_available_variant -%}
+      {%- comment -%} Point all color variants to main product URL for SEO consolidation {%- endcomment -%}
+      <link rel="canonical" href="{{ shop.url }}{{ product.url }}">
+    {%- else -%}
+      <link rel="canonical" href="{{ canonical_url }}">
+    {%- endif -%}
     <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
     <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
     {% # theme-check-disable RemoteAsset %}
