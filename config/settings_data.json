@@ -212,11 +212,6 @@
           "clear_after_logout": false
         }
       },
-      "11945366711752539959": {
-        "type": "shopify://apps/zendesk/blocks/zendesk_web_widget/c0b417b1-b90b-4754-baaf-f55627e6acd4",
-        "disabled": false,
-        "settings": {}
-      },
       "2786716548061469553": {
         "type": "shopify://apps/axon/blocks/app-embed/baa0f014-62ea-462f-a8aa-a94befb1cbad",
         "disabled": true,
@@ -259,6 +254,11 @@
       },
       "10533623496951086041": {
         "type": "shopify://apps/criteo-sales-growth-ads/blocks/theme-extension/b74e0e19-7ecc-4a61-b469-888ea2cdf8f5",
+        "disabled": true,
+        "settings": {}
+      },
+      "11945366711752539959": {
+        "type": "shopify://apps/zendesk/blocks/zendesk_web_widget/c0b417b1-b90b-4754-baaf-f55627e6acd4",
         "disabled": true,
         "settings": {}
       }
