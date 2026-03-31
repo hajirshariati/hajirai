@@ -251,12 +251,96 @@
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
+    },
+    "shop_the_feed_Rwrh3z": {
+      "type": "shop-the-feed",
+      "blocks": {
+        "feed_JpVDVt": {
+          "type": "feed",
+          "settings": {
+            "enable_video_autoplay": true,
+            "enable_video_looping": true,
+            "video_on_hover": true,
+            "button_label": "",
+            "button_link": "",
+            "button_external": false,
+            "button_icon": false,
+            "account_name": "@Concept",
+            "account_description": "We cultivate sonic excellence",
+            "account_button": "Follow",
+            "account_link": "",
+            "account_link_external": false,
+            "color_text": "#ffffff",
+            "color_button_text": "#000000",
+            "color_button_background": "#ffffff",
+            "color_button_gradient": "",
+            "hotspot_color_text_1": "#ffffff",
+            "hotspot_vertical_1": 45,
+            "hotspot_horizontal_1": 25,
+            "hotspot_product_1": "",
+            "hotspot_color_text_2": "#ffffff",
+            "hotspot_vertical_2": 30,
+            "hotspot_horizontal_2": 65,
+            "hotspot_product_2": "",
+            "hotspot_color_text_3": "#ffffff",
+            "hotspot_vertical_3": 60,
+            "hotspot_horizontal_3": 75,
+            "hotspot_product_3": "",
+            "hotspot_color_text_4": "#ffffff",
+            "hotspot_vertical_4": 50,
+            "hotspot_horizontal_4": 50,
+            "hotspot_product_4": ""
+          }
+        }
+      },
+      "block_order": [
+        "feed_JpVDVt"
+      ],
+      "name": "t:sections.shop-the-feed.name",
+      "settings": {
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "image_ratio": "portrait",
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "account_name": "",
+        "show_vendor": false,
+        "show_price": true,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": false,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 80,
+        "padding_bottom": 100,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
     }
   },
   "order": [
     "main-page",
     "3_d_scroll_3aR6wn",
     "empty_space_L66qFY",
-    "featured_collection_ikEcGe"
+    "featured_collection_ikEcGe",
+    "shop_the_feed_Rwrh3z"
   ]
 }
