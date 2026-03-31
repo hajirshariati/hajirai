@@ -164,16 +164,23 @@
 
           <div class="shoe3d-panel__inner shoe3d-panel__inner--{{ panel_side }}">
 
-            {%- if block.settings.image != blank -%}
-              <div class="shoe3d-panel__image-wrap shoe3d-panel__image-wrap--{{ panel_side }}">
-                {{- block.settings.image | image_url: width: 800 | image_tag:
-                    loading: 'lazy',
-                    class: 'shoe3d-panel__image',
-                    widths: '300,400,600,800',
-                    sizes: '(max-width:767px) 90vw, (max-width:1024px) 40vw, 360px'
-                -}}
-              </div>
-            {%- endif -%}
+{%- if block.settings.image != blank -%}
+  <div class="shoe3d-panel__image-wrap shoe3d-panel__image-wrap--{{ panel_side }}">
+    {%- if block.settings.cta_url != blank -%}
+      <a href="{{ block.settings.cta_url }}"
+        {%- if block.settings.cta_new_tab %} target="_blank" rel="noopener noreferrer"{%- endif -%}>
+    {%- endif -%}
+    {{- block.settings.image | image_url: width: 800 | image_tag:
+        loading: 'lazy',
+        class: 'shoe3d-panel__image',
+        widths: '300,400,600,800',
+        sizes: '(max-width:767px) 90vw, (max-width:1024px) 40vw, 360px'
+    -}}
+    {%- if block.settings.cta_url != blank -%}
+      </a>
+    {%- endif -%}
+  </div>
+{%- endif -%}
 
             <div class="shoe3d-panel__content shoe3d-panel__content--{{ panel_side }}">
               <span class="shoe3d-panel__eyebrow">{{ eyebrow_text }}</span>
