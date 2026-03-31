@@ -481,19 +481,6 @@
             "highlighted_scribble": "circle"
           }
         },
-        "testimonial_iaNxmK": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "quote",
-            "text": "<p>My favorite dressy shoe! I have these sandals are so comfortable. They add height when I need it. I also feel like I have a study walk. I am on my feet most of the day.</p>",
-            "author": "Amy S.",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
         "testimonial_WptKCX": {
           "type": "testimonial",
           "settings": {
@@ -533,19 +520,6 @@
             "highlighted_scribble": "circle"
           }
         },
-        "testimonial_UfMJFq": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "quote",
-            "text": "<p>Divine! These are the most comfortable and soft supportive shoes ever!</p>",
-            "author": "Tash",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
         "testimonial_KMjBFE": {
           "type": "testimonial",
           "settings": {
@@ -575,11 +549,9 @@
       },
       "block_order": [
         "testimonial_i8hpLw",
-        "testimonial_iaNxmK",
         "testimonial_WptKCX",
         "testimonial_cMqe8h",
         "testimonial_DUKJrG",
-        "testimonial_UfMJFq",
         "testimonial_KMjBFE",
         "testimonial_J6K3XV"
       ],
