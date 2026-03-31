@@ -1,0 +1,1091 @@
+{% comment %}
+  ============================================================
+  3D Shoe Scroll Section — Syntilay-Style (Enhanced)
+  ============================================================
+{% endcomment %}
+
+{%- liquid
+  assign section_id   = 'shoe3d-' | append: section.id
+  assign model_url    = section.settings.model_url
+  assign text_color   = section.settings.text_color
+  assign accent_color = section.settings.accent_color
+  assign bg_value     = section.settings.background_color
+  if section.settings.background_gradient != blank
+    assign bg_value = section.settings.background_gradient
+  endif
+-%}
+
+<section
+  id="{{ section_id }}"
+  class="shoe3d-section"
+  aria-label="{{ section.settings.aria_label | default: '3D Product Showcase' }}"
+  data-model="{{ model_url | escape }}"
+  data-hero-li="{{ section.settings.hero_light_intensity | default: 12 }}"
+  data-hero-lx="{{ section.settings.hero_light_x | default: 5 }}"
+  data-hero-ly="{{ section.settings.hero_light_y | default: 5 }}"
+  data-hero-lz="{{ section.settings.hero_light_z | default: 5 }}"
+  data-section-id="{{ section.id }}"
+  itemscope
+  itemtype="https://schema.org/Product"
+>
+
+<div class="shoe3d-page-block" id="{{ section_id }}-block">
+  <div class="shoe3d-progress-bar-wrap">
+    <div class="shoe3d-progress-bar-track">
+      <div class="shoe3d-progress-bar" id="{{ section_id }}-progress"></div>
+    </div>
+<span class="shoe3d-progress-label" id="{{ section_id }}-progress-label">Preparing Your Experience</span>
+  </div>
+</div>
+
+  <div class="shoe3d-canvas-wrap" aria-hidden="true">
+    <canvas
+      id="{{ section_id }}-canvas"
+      class="shoe3d-canvas"
+      role="img"
+      aria-label="{{ section.settings.aria_label | default: '3D rotating shoe model' }}"
+    ></canvas>
+    <div class="shoe3d-vignette" id="{{ section_id }}-vignette"></div>
+    <div class="shoe3d-loader" id="{{ section_id }}-loader" aria-live="polite" aria-atomic="true">
+      <div class="shoe3d-loader__ring" aria-hidden="true"></div>
+      <span class="shoe3d-loader__text">Loading model…</span>
+    </div>
+
+    {%- for block in section.blocks -%}
+      {%- assign idx = forloop.index0 -%}
+      {%- assign default_a1_labels = "Memory Foam,Genuine Leather Upper,Aetrex Arch Support,Braided Leather Strap" | split: "," -%}
+      {%- assign default_a1_descs  = "Conforms to your foot & distributes weight evenly,Full-grain leather — breathable & built to last,Strategically placed for full-body alignment,Signature braided detail — style meets comfort" | split: "," -%}
+      {%- assign default_a2_labels = "Met Bar Pod,Antimicrobial Microfiber,Bunion Relief Design,Hook & Loop Closure" | split: "," -%}
+      {%- assign default_a2_descs  = "Relieves ball-of-foot & metatarsalgia discomfort,Fights everyday odors all day long,Strap void removes pressure on bunions,Fully adjustable — fits narrow to wide feet" | split: "," -%}
+
+      {%- assign a1_label = default_a1_labels[idx] -%}
+      {%- assign a1_desc  = default_a1_descs[idx] -%}
+      {%- assign a2_label = default_a2_labels[idx] -%}
+      {%- assign a2_desc  = default_a2_descs[idx] -%}
+      {%- if block.settings.ann_1_label != blank -%}{%- assign a1_label = block.settings.ann_1_label -%}{%- endif -%}
+      {%- if block.settings.ann_1_desc  != blank -%}{%- assign a1_desc  = block.settings.ann_1_desc  -%}{%- endif -%}
+      {%- if block.settings.ann_2_label != blank -%}{%- assign a2_label = block.settings.ann_2_label -%}{%- endif -%}
+      {%- if block.settings.ann_2_desc  != blank -%}{%- assign a2_desc  = block.settings.ann_2_desc  -%}{%- endif -%}
+
+      <div
+        class="shoe3d-annotations"
+        data-ann-panel="{{ idx }}"
+        aria-hidden="true"
+      >
+        <div
+          class="shoe3d-pin shoe3d-pin--1"
+          data-ax="{{ block.settings.ann_1_x | default: 52 }}"
+          data-ay="{{ block.settings.ann_1_y | default: 38 }}"
+        >
+          <div class="shoe3d-pin__dot" aria-hidden="true">
+            <span class="shoe3d-pin__pulse"></span>
+          </div>
+          <div class="shoe3d-pin__card shoe3d-pin__card--{{ block.settings.ann_1_side | default: 'right' }}">
+            <span class="shoe3d-pin__label">{{ a1_label }}</span>
+            {%- if a1_desc != blank -%}
+              <span class="shoe3d-pin__desc">{{ a1_desc }}</span>
+            {%- endif -%}
+          </div>
+        </div>
+
+        <div
+          class="shoe3d-pin shoe3d-pin--2"
+          data-ax="{{ block.settings.ann_2_x | default: 48 }}"
+          data-ay="{{ block.settings.ann_2_y | default: 65 }}"
+        >
+          <div class="shoe3d-pin__dot" aria-hidden="true">
+            <span class="shoe3d-pin__pulse"></span>
+          </div>
+          <div class="shoe3d-pin__card shoe3d-pin__card--{{ block.settings.ann_2_side | default: 'left' }}">
+            <span class="shoe3d-pin__label">{{ a2_label }}</span>
+            {%- if a2_desc != blank -%}
+              <span class="shoe3d-pin__desc">{{ a2_desc }}</span>
+            {%- endif -%}
+          </div>
+        </div>
+      </div>
+    {%- endfor -%}
+
+  </div>
+
+  <div class="shoe3d-section__inner">
+
+    <div class="shoe3d-hero" aria-hidden="true">
+      {%- if section.settings.hero_badge != blank -%}
+        <div class="shoe3d-hero__badge"><span>{{ section.settings.hero_badge }}</span></div>
+      {%- endif -%}
+      <h2 class="shoe3d-hero__headline" itemprop="name">{{ section.settings.hero_headline | default: 'The Jillian' }}</h2>
+      <p class="shoe3d-hero__sub">{{ section.settings.hero_subtext | default: 'Scroll to explore' }}</p>
+      <div class="shoe3d-hero__scroll-hint" aria-hidden="true">
+        <span class="shoe3d-hero__scroll-line"></span>
+        <span class="shoe3d-hero__scroll-label">Scroll</span>
+      </div>
+    </div>
+
+    <div class="shoe3d-panels" id="{{ section_id }}-panels">
+
+      {%- liquid
+        assign jillian_eyebrows = "All-Day Comfort,Premium Materials,Signature Arch Support,Style Meets Function" | split: ","
+        assign jillian_headings = "Feels Like Walking on Air,Genuine Leather. Built to Last.,Aligned From the Ground Up,Comfort You Can See." | split: ","
+        assign jillian_bodies   = "Memory foam cushioning and an ultra-light cork midsole work together to reduce fatigue — so you can go further, longer.,Crafted from real leather uppers with a soft microfiber footbed treated with antimicrobial technology — fresh all day every day.,Aetrex Signature Arch Support is strategically placed to align your entire body — relieving pressure from your feet all the way to your back.,The signature braided detailing makes the Jillian the sandal you'll reach for every morning — whether running errands or spending a full day on your feet." | split: ","
+      -%}
+
+      {%- for block in section.blocks -%}
+        {%- assign is_right   = forloop.index | modulo: 2 -%}
+        {%- assign panel_side = 'left' -%}
+        {%- if is_right == 0 -%}{%- assign panel_side = 'right' -%}{%- endif -%}
+        {%- assign idx = forloop.index0 -%}
+
+        {%- assign eyebrow_text = jillian_eyebrows[idx] -%}
+        {%- if block.settings.eyebrow != blank -%}{%- assign eyebrow_text = block.settings.eyebrow -%}{%- endif -%}
+        {%- assign heading_text = jillian_headings[idx] -%}
+        {%- if block.settings.heading != blank -%}{%- assign heading_text = block.settings.heading -%}{%- endif -%}
+        {%- assign body_text = jillian_bodies[idx] -%}
+        {%- if block.settings.body != blank -%}{%- assign body_text = block.settings.body -%}{%- endif -%}
+
+        {%- assign panel_text = block.settings.panel_text_color | default: text_color -%}
+
+        <div
+          class="shoe3d-panel shoe3d-panel--{{ panel_side }}"
+          data-panel-index="{{ idx }}"
+          data-shoe-rot-x="{{ block.settings.rot_x | default: 0 }}"
+          data-shoe-rot-y="{{ block.settings.rot_y | default: 0 }}"
+          data-shoe-rot-z="{{ block.settings.rot_z | default: 0 }}"
+          data-shoe-pos-x="{{ block.settings.pos_x | default: 0 }}"
+          data-shoe-pos-y="{{ block.settings.pos_y | default: 0 }}"
+          data-shoe-light-intensity="{{ block.settings.light_intensity | default: 12 }}"
+          data-shoe-light-x="{{ block.settings.light_x | default: 5 }}"
+          data-shoe-light-y="{{ block.settings.light_y | default: 5 }}"
+          data-shoe-light-z="{{ block.settings.light_z | default: 5 }}"
+          style="--panel-text: {{ panel_text }};"
+          {{ block.shopify_attributes }}
+        >
+          <div class="shoe3d-panel__bg" aria-hidden="true"></div>
+
+          <div class="shoe3d-panel__inner shoe3d-panel__inner--{{ panel_side }}">
+
+{%- if block.settings.image != blank -%}
+  <div class="shoe3d-panel__image-wrap shoe3d-panel__image-wrap--{{ panel_side }}">
+    {%- if block.settings.cta_url != blank -%}
+      <a href="{{ block.settings.cta_url }}"
+        {%- if block.settings.cta_new_tab %} target="_blank" rel="noopener noreferrer"{%- endif -%}>
+    {%- endif -%}
+    {{- block.settings.image | image_url: width: 800 | image_tag:
+        loading: 'lazy',
+        class: 'shoe3d-panel__image',
+        widths: '300,400,600,800',
+        sizes: '(max-width:767px) 90vw, (max-width:1024px) 40vw, 360px'
+    -}}
+    {%- if block.settings.cta_url != blank -%}
+      </a>
+    {%- endif -%}
+  </div>
+{%- endif -%}
+
+            <div class="shoe3d-panel__content shoe3d-panel__content--{{ panel_side }}">
+              <span class="shoe3d-panel__eyebrow">{{ eyebrow_text }}</span>
+              <h3 class="shoe3d-panel__heading">{{ heading_text }}</h3>
+              <p class="shoe3d-panel__body">{{ body_text }}</p>
+
+              {%- if block.settings.feature_1 != blank or block.settings.feature_2 != blank or block.settings.feature_3 != blank -%}
+                <ul class="shoe3d-panel__features" aria-label="Features">
+                  {%- if block.settings.feature_1 != blank -%}<li class="shoe3d-panel__feature">{{ block.settings.feature_1 }}</li>{%- endif -%}
+                  {%- if block.settings.feature_2 != blank -%}<li class="shoe3d-panel__feature">{{ block.settings.feature_2 }}</li>{%- endif -%}
+                  {%- if block.settings.feature_3 != blank -%}<li class="shoe3d-panel__feature">{{ block.settings.feature_3 }}</li>{%- endif -%}
+                </ul>
+              {%- endif -%}
+
+              {%- if block.settings.cta_label != blank and block.settings.cta_url != blank -%}
+                <a class="shoe3d-panel__cta" href="{{ block.settings.cta_url }}"
+                  {%- if block.settings.cta_new_tab %} target="_blank" rel="noopener noreferrer"{%- endif -%}>
+                  <span>{{ block.settings.cta_label }}</span>
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+                    <path d="M3.75 9h10.5M9.75 4.5 14.25 9l-4.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </a>
+              {%- endif -%}
+            </div>
+
+          </div>
+        </div>
+      {%- endfor -%}
+
+      <div class="shoe3d-end-spacer" aria-hidden="true"></div>
+    </div>
+
+  </div>
+
+</section>
+
+<style>
+#{{ section_id }} {
+  --bg:           {{ bg_value }};
+  --text:         {{ text_color }};
+  --accent:       {{ accent_color }};
+  --panel-h:      50vh;
+  --content-w:    min(380px, 40vw);
+  --ease-spring:  cubic-bezier(0.22, 1, 0.36, 1);
+  --max-w:        1520px;
+  --pin-dot-size: 14px;
+  --pin-card-w:   180px;
+}
+
+.shoe3d-section {
+  position: relative;
+  color: var(--text);
+  background: var(--bg);
+}
+
+.shoe3d-section__inner {
+  max-width: var(--max-w);
+  margin: -100vh auto 0;
+  position: relative;
+  background: transparent;
+}
+
+/* ── Page block overlay ── */
+.shoe3d-page-block {
+  position: absolute;
+  inset: 0;
+  z-index: 9999;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(0, 0, 0, 0.4);
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+  pointer-events: all;
+}
+.shoe3d-page-block.is-done {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Progress bar */
+.shoe3d-progress-bar-wrap {
+  position: fixed;
+  top: 30vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  z-index: 10000;
+}
+.shoe3d-progress-bar-track {
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.shoe3d-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: #ffffff;
+  border-radius: 2px;
+  transition: width 0.25s ease;
+}
+.shoe3d-progress-label {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ── Sticky canvas ── */
+.shoe3d-canvas-wrap {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+.shoe3d-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  will-change: contents;
+}
+.shoe3d-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 50% 60% at 50% 50%, transparent 20%, var(--bg) 75%);
+  pointer-events: none;
+}
+
+/* ── Loader ── */
+.shoe3d-loader {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  transition: opacity .4s ease, visibility .4s ease;
+  pointer-events: none;
+}
+.shoe3d-loader.is-hidden { opacity: 0; visibility: hidden; }
+.shoe3d-loader__ring {
+  width: 36px; height: 36px;
+  border: 2px solid rgba(255,255,255,.15);
+  border-top-color: rgba(255,255,255,.7);
+  border-radius: 50%;
+  animation: shoe3d-spin .8s linear infinite;
+}
+.shoe3d-loader__text {
+  font-size: .7rem; letter-spacing: .12em;
+  text-transform: uppercase; color: rgba(255,255,255,.4);
+}
+
+/* ── Annotation pins ── */
+.shoe3d-annotations {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+.shoe3d-annotations.is-active { visibility: visible; }
+
+.shoe3d-pin {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .45s var(--ease-spring);
+}
+.shoe3d-pin--2 { transition-delay: .12s; }
+.shoe3d-annotations.is-active .shoe3d-pin { opacity: 1; }
+
+.shoe3d-pin__dot {
+  position: relative;
+  width: var(--pin-dot-size);
+  height: var(--pin-dot-size);
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 2px rgba(255,255,255,.35);
+  flex-shrink: 0;
+}
+.shoe3d-pin__pulse {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  opacity: 0;
+  animation: shoe3d-pulse 2.2s ease-out infinite;
+}
+.shoe3d-pin--2 .shoe3d-pin__pulse { animation-delay: .6s; }
+
+.shoe3d-pin__card {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: var(--pin-card-w);
+  background: rgba(10, 10, 12, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 10px;
+  padding: 9px 13px;
+  white-space: normal;
+  pointer-events: none;
+}
+.shoe3d-pin__card--right { left: calc(var(--pin-dot-size) + 10px); }
+.shoe3d-pin__card--left  { right: calc(var(--pin-dot-size) + 10px); left: auto; text-align: right; }
+
+.shoe3d-pin__card::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 10px;
+  height: 1px;
+  background: rgba(255,255,255,.3);
+  transform: translateY(-50%);
+}
+.shoe3d-pin__card--right::before { right: 100%; }
+.shoe3d-pin__card--left::before  { left: 100%; }
+
+.shoe3d-pin__label {
+  display: block;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase;
+  color: #fff; line-height: 1.2; margin-bottom: 3px;
+}
+.shoe3d-pin__desc {
+  display: block;
+  font-size: 11px; font-weight: 400;
+  color: rgb(255 255 255 / 81%);
+  letter-spacing: .05em; line-height: 1.45;
+}
+
+/* ── Hero ── */
+.shoe3d-hero {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  text-align: center;
+  pointer-events: none;
+  background: transparent;
+}
+.shoe3d-hero__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  border: 1px solid rgba(255,255,255,.25);
+  border-radius: 50px;
+  padding: .35em 1.1em;
+  font-size: .7rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.75);
+  margin-bottom: 1.5rem;
+}
+.shoe3d-hero__badge:empty { display: none; }
+.shoe3d-hero__headline {
+  font-family: var(--font-heading-family, 'Georgia', serif);
+  font-size: clamp(2.5rem, 8vw, 7rem);
+  font-weight: 300;
+  letter-spacing: -.04em;
+  line-height: .95;
+  color: var(--text);
+  margin-bottom: 1rem;
+}
+.shoe3d-hero__sub {
+  font-size: clamp(1rem, 1.3vw, 1.1rem);
+  color: rgba(255,255,255,.5);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  margin-bottom: 3rem;
+}
+.shoe3d-hero__scroll-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .6rem;
+  animation: shoe3d-bounce 2s ease-in-out infinite;
+}
+.shoe3d-hero__scroll-line {
+  display: block;
+  width: 1px; height: 48px;
+  background: linear-gradient(to bottom, transparent, rgba(255,255,255,.6));
+}
+.shoe3d-hero__scroll-label {
+  font-size: .65rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.4);
+}
+
+/* ── Panels ── */
+.shoe3d-panels {
+  
+  position: relative;
+  z-index: 2;
+  background: transparent;
+}
+.shoe3d-panel {
+  position: relative;
+  min-height: var(--panel-h);
+  display: flex;
+  align-items: stretch;
+  padding: 0;
+}
+.shoe3d-panel__bg { display: none; }
+
+.shoe3d-panel__inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  padding: 4rem 5vw;
+}
+.shoe3d-panel--left  .shoe3d-panel__inner { justify-content: flex-end; }
+.shoe3d-panel--right .shoe3d-panel__inner { justify-content: flex-start; }
+
+.shoe3d-panel__image-wrap {
+  display: none;
+  flex-shrink: 0;
+  width: clamp(160px, 22vw, 320px);
+  aspect-ratio: 1 / 1;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 24px 64px rgba(0,0,0,.55);
+  order: 0;
+}
+.shoe3d-panel--left  .shoe3d-panel__image-wrap { order: -1; }
+.shoe3d-panel--right .shoe3d-panel__image-wrap { order: 1; }
+
+.shoe3d-panel__image {
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+}
+
+.shoe3d-panel__content {
+  pointer-events: all;
+  width: var(--content-w);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity .7s var(--ease-spring), transform .7s var(--ease-spring);
+  color: var(--panel-text, var(--text));
+  background: #00000096;
+  padding: 2rem;
+  border-radius: 16px;
+}
+.shoe3d-panel__content.is-visible { opacity: 1; transform: translateY(0); }
+
+.shoe3d-panel__eyebrow {
+  display: inline-block;
+  font-size: .65rem; font-weight: 600;
+  letter-spacing: .2em; text-transform: uppercase;
+  color: var(--accent); border: 1px solid var(--accent);
+  border-radius: 50px; padding: .3em .9em; width: fit-content;
+}
+.shoe3d-panel__heading {
+  font-family: var(--font-heading-family, 'Georgia', serif);
+  font-size: clamp(1.6rem, 3.5vw, 3rem);
+  font-weight: 300; letter-spacing: -.04em;
+  line-height: 1.05;
+  color: var(--panel-text, var(--text));
+  margin: 0;
+}
+.shoe3d-panel__body {
+  font-size: clamp(.85rem, 1.1vw, 1rem);
+  line-height: 1.75;
+  color: rgba(255,255,255,.6);
+  margin: 0; max-width: 38ch;
+}
+.shoe3d-panel__features {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; flex-direction: column; gap: .5rem;
+}
+.shoe3d-panel__feature {
+  font-size: .85rem; color: rgba(255,255,255,.7);
+  padding-left: 1.2em; position: relative; letter-spacing: .02em;
+}
+.shoe3d-panel__feature::before {
+  content: ''; position: absolute;
+  left: 0; top: .5em;
+  width: 5px; height: 5px;
+  background: var(--accent); border-radius: 50%;
+}
+.shoe3d-panel__cta {
+  display: inline-flex; align-items: center; gap: .6rem;
+  font-size: .75rem; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase;
+  text-decoration: none;
+  color: var(--panel-bg, #080808);
+  background: var(--panel-text, var(--text));
+  padding: .8em 1.7em; border-radius: 50px; width: fit-content;
+  transition: background .2s ease, color .2s ease, transform .2s ease;
+}
+.shoe3d-panel__cta:hover { background: var(--accent); color: #000; transform: translateX(4px); }
+.shoe3d-panel__cta:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.shoe3d-panel__cta svg { flex-shrink: 0; transition: transform .2s ease; }
+.shoe3d-panel__cta:hover svg { transform: translateX(4px); }
+
+.shoe3d-end-spacer { height: 20vh; }
+
+/* ── Mobile ── */
+@media (max-width: 767px) {
+  #{{ section_id }} {
+    --pin-dot-size: 12px;
+    --pin-card-w: 140px;
+  }
+  .shoe3d-pin__label { font-size: 10px; }
+  .shoe3d-pin__desc  { font-size: 9px; }
+  .shoe3d-pin__card  { padding: 7px 10px; border-radius: 8px; }
+
+  .shoe3d-annotations { display: none !important; }
+
+  .shoe3d-panel {
+    min-height: auto;
+  }
+.shoe3d-panel__inner {
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 6rem 1.5rem;
+  gap: 1rem;
+  min-height: auto;
+}
+  .shoe3d-panel--left  .shoe3d-panel__inner,
+  .shoe3d-panel--right .shoe3d-panel__inner {
+    justify-content: flex-start;
+  }
+  .shoe3d-panel__image-wrap {
+    display: block;
+    order: -1 !important;
+    width: 100%;
+    max-width: 100%;
+    aspect-ratio: 1;
+    align-self: center;
+  }
+  .shoe3d-panel__content {
+    width: 100%;
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .shoe3d-hero__headline { font-size: clamp(4rem, 10vw, 4rem); }
+}
+
+/* ── Keyframes ── */
+@keyframes shoe3d-spin   { to { transform: rotate(360deg); } }
+@keyframes shoe3d-bounce {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(8px); }
+}
+@keyframes shoe3d-pulse {
+  0%   { opacity: .7; transform: scale(1); }
+  100% { opacity: 0;  transform: scale(2.4); }
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .shoe3d-hero__scroll-hint { animation: none; }
+  .shoe3d-loader__ring { animation: none; border-top-color: rgba(255,255,255,.5); }
+  .shoe3d-panel__content { opacity: 1; transform: none; transition: none; }
+  .shoe3d-pin { opacity: 1; transition: none; }
+  .shoe3d-pin__pulse { animation: none; opacity: 0; }
+}
+</style>
+
+<script>
+(function () {
+  'use strict';
+
+  function loadScript(src, cb) {
+    var s = document.createElement('script');
+    s.src = src; s.async = false; s.onload = cb;
+    s.onerror = function () { console.error('[Shoe3D] Failed:', src); };
+    document.head.appendChild(s);
+  }
+
+  loadScript('https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js', function () {
+    loadScript('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js', function () {
+      loadScript('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js', function () {
+        loadScript('https://cdn.jsdelivr.net/npm/meshoptimizer@0.18.1/meshopt_decoder.js', function () {
+          var T  = window.THREE,
+              GL = T && T.GLTFLoader,
+              DL = T && T.DRACOLoader,
+              MOD= window.MeshoptDecoder;
+          if (!T || !GL || !DL) { console.error('[Shoe3D] THREE not ready'); return; }
+          if (MOD && GL.setMeshoptDecoder) GL.setMeshoptDecoder(MOD);
+          initShoe3D(T, GL, DL, MOD);
+        });
+      });
+    });
+  });
+
+  function initShoe3D(THREE, GLTFLoader, DRACOLoader, MeshoptDecoder) {
+    var SECTION_ID = '{{ section_id }}';
+    var section    = document.getElementById(SECTION_ID);
+    if (!section) return;
+
+    var MODEL_URL = section.dataset.model;
+    if (!MODEL_URL) { console.warn('[Shoe3D] No model URL.'); return; }
+
+    var heroLight = {
+      lI: parseFloat(section.dataset.heroLi || 12) / 10,
+      lX: parseFloat(section.dataset.heroLx || 5),
+      lY: parseFloat(section.dataset.heroLy || 5),
+      lZ: parseFloat(section.dataset.heroLz || 5)
+    };
+
+    var canvas      = document.getElementById(SECTION_ID + '-canvas');
+    var vignette    = document.getElementById(SECTION_ID + '-vignette');
+    var loaderEl    = document.getElementById(SECTION_ID + '-loader');
+    var pageBlock   = document.getElementById(SECTION_ID + '-block');
+var progressBar   = document.getElementById(SECTION_ID + '-progress');
+var progressLabel = document.getElementById(SECTION_ID + '-progress-label');
+    var panelEls    = [].slice.call(section.querySelectorAll('.shoe3d-panel'));
+    var contentEls  = [].slice.call(section.querySelectorAll('.shoe3d-panel__content'));
+
+    var annGroups = {};
+    [].slice.call(section.querySelectorAll('.shoe3d-annotations')).forEach(function (el) {
+      annGroups[el.dataset.annPanel] = el;
+    });
+
+    function positionPins() {
+      var W = canvas.offsetWidth;
+      var H = canvas.offsetHeight;
+      if (!W || !H) return;
+      [].slice.call(section.querySelectorAll('.shoe3d-pin')).forEach(function(pin) {
+        var ax = parseFloat(pin.dataset.ax || 50) / 100;
+        var ay = parseFloat(pin.dataset.ay || 50) / 100;
+        pin.style.left = (ax * W) + 'px';
+        pin.style.top  = (ay * H) + 'px';
+      });
+    }
+
+    function activateAnnotations(idx) {
+      Object.keys(annGroups).forEach(function (k) {
+        annGroups[k].classList.remove('is-active');
+      });
+      if (idx >= 0 && annGroups[idx]) {
+        annGroups[idx].classList.add('is-active');
+      }
+    }
+
+    var lerp = function (a, b, t) { return a + (b - a) * t; };
+    var LERP_SPEED = 0.08;
+    var reduced    = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function getPose(el) {
+      return {
+        rotX: parseFloat(el.dataset.shoeRotX  || 0) * Math.PI / 180,
+        rotY: parseFloat(el.dataset.shoeRotY  || 0) * Math.PI / 180,
+        rotZ: parseFloat(el.dataset.shoeRotZ  || 0) * Math.PI / 180,
+        posX: parseFloat(el.dataset.shoePosX  || 0) / 10,
+        posY: parseFloat(el.dataset.shoePosY  || 0) / 10,
+        lI:   parseFloat(el.dataset.shoeLightIntensity || 12) / 10,
+        lX:   parseFloat(el.dataset.shoeLightX || 5),
+        lY:   parseFloat(el.dataset.shoeLightY || 5),
+        lZ:   parseFloat(el.dataset.shoeLightZ || 5),
+      };
+    }
+
+    var shoe = null, raf = null, isVis = false;
+    var idle = 0, activePanelIdx = -1;
+    var cur = { rotX:0, rotY:0, rotZ:.2, posX:0, posY:0, lI:1.2, lX:5, lY:5, lZ:5 };
+    var tgt = { rotX:0, rotY:0, rotZ:.2, posX:0, posY:0, lI:1.2, lX:5, lY:5, lZ:5 };
+
+    var renderer = new THREE.WebGLRenderer({
+      canvas: canvas, antialias: true, alpha: true,
+      powerPreference: 'high-performance'
+    });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.outputEncoding      = THREE.sRGBEncoding;
+    renderer.shadowMap.enabled   = true;
+    renderer.shadowMap.type      = THREE.PCFSoftShadowMap;
+    renderer.toneMapping         = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.2;
+
+    var scene  = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+    camera.position.set(0, 0, 5);
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+    var key = new THREE.DirectionalLight(0xffffff, 1.0);
+    key.position.set(5,5,5); key.castShadow = true;
+    key.shadow.mapSize.set(1024, 1024);
+    scene.add(key);
+    var rim = new THREE.DirectionalLight(0x8899ff, 0.3);
+    rim.position.set(-5, 2, -5); scene.add(rim);
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x333333, 0.2));
+
+    var rzTimer;
+    function onResize() {
+      var W = canvas.clientWidth  || window.innerWidth;
+      var H = canvas.clientHeight || window.innerHeight;
+      renderer.setSize(W, H, false);
+      camera.aspect = W / H;
+      camera.updateProjectionMatrix();
+      positionPins();
+    }
+    new ResizeObserver(function () {
+      clearTimeout(rzTimer);
+      rzTimer = setTimeout(onResize, 80);
+    }).observe(canvas);
+    onResize();
+
+    new IntersectionObserver(function (e) {
+      isVis = e[0].isIntersecting;
+      if (isVis && !raf) startLoop();
+      if (!isVis && raf) { cancelAnimationFrame(raf); raf = null; }
+    }, { threshold: 0 }).observe(section);
+
+    function updateActivePanel() {
+      var triggerY  = window.innerHeight * 0.25;
+      var midY      = window.innerHeight * 0.5;
+      var best      = -1, bestDist = Infinity;
+
+      panelEls.forEach(function (el, i) {
+        var r = el.getBoundingClientRect();
+        if (r.bottom < 0 || r.top > window.innerHeight) return;
+        if (r.top > triggerY) return;
+        var dist = Math.abs((r.top + r.height / 2) - midY);
+        if (dist < bestDist) { bestDist = dist; best = i; }
+      });
+
+      if (best === activePanelIdx) return;
+      activePanelIdx = best;
+      activateAnnotations(best);
+      positionPins();
+      contentEls.forEach(function (el, i) {
+        el.classList.toggle('is-visible', i === best);
+      });
+      if (best >= 0) {
+        var pose = getPose(panelEls[best]);
+        tgt.rotX=pose.rotX; tgt.rotY=pose.rotY; tgt.rotZ=pose.rotZ;
+        tgt.posX=pose.posX; tgt.posY=pose.posY;
+        tgt.lX=pose.lX; tgt.lY=pose.lY; tgt.lZ=pose.lZ; tgt.lI=pose.lI;
+      } else {
+        activateAnnotations(-1);
+        contentEls.forEach(function(el){ el.classList.remove('is-visible'); });
+      }
+    }
+    window.addEventListener('scroll', updateActivePanel, { passive: true });
+    updateActivePanel();
+    window.addEventListener('load', function() { positionPins(); updateActivePanel(); });
+
+    function startLoop() {
+      (function frame() {
+        raf = requestAnimationFrame(frame);
+        if (!shoe) return;
+        var speed = reduced ? 1 : LERP_SPEED;
+        if (activePanelIdx === -1) {
+          tgt.posX = 0;
+          tgt.posY = reduced ? 0 : Math.sin(idle * .5) * .1;
+          tgt.lX=heroLight.lX; tgt.lY=heroLight.lY; tgt.lZ=heroLight.lZ; tgt.lI=heroLight.lI;
+          if (!reduced) idle += .004;
+          tgt.rotX=0; tgt.rotY=reduced ? .3 : idle; tgt.rotZ=.15;
+        }
+        for (var k in cur) cur[k] = lerp(cur[k], tgt[k], speed);
+        shoe.rotation.set(cur.rotX, cur.rotY, cur.rotZ);
+        shoe.position.set(-cur.posX * (camera.aspect * 1.6), cur.posY, 0);
+        key.position.set(cur.lX, cur.lY, cur.lZ);
+        key.intensity = cur.lI;
+        renderer.render(scene, camera);
+      })();
+    }
+
+    var draco = new DRACOLoader();
+    draco.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.4.1/');
+    var gltf = new GLTFLoader();
+    gltf.setDRACOLoader(draco);
+
+    function doLoad() {
+      gltf.load(MODEL_URL,
+        function (g) {
+          shoe = g.scene;
+          var box = new THREE.Box3().setFromObject(shoe);
+          var sz  = new THREE.Vector3(), ct = new THREE.Vector3();
+          box.getSize(sz); box.getCenter(ct);
+          shoe.position.sub(ct);
+          shoe.scale.setScalar(3.6 / Math.max(sz.x, sz.y, sz.z));
+          shoe.traverse(function (c) {
+            if (c.isMesh) {
+              c.castShadow = c.receiveShadow = true;
+              if (c.material) c.material.envMapIntensity = .6;
+            }
+          });
+          cur.rotX=0; cur.rotY=.3; cur.rotZ=.15; idle=.3;
+          if (panelEls[0]) {
+            var p0 = getPose(panelEls[0]);
+            cur.posX=tgt.posX=p0.posX; cur.posY=tgt.posY=p0.posY;
+            tgt.lX=p0.lX; tgt.lY=p0.lY; tgt.lZ=p0.lZ; tgt.lI=p0.lI;
+          }
+          scene.add(shoe);
+          if (loaderEl) loaderEl.classList.add('is-hidden');
+          if (progressBar) progressBar.style.width = '100%';
+          setTimeout(function () {
+            if (pageBlock) pageBlock.classList.add('is-done');
+          }, 400);
+          positionPins();
+        },
+        function (xhr) {
+          if (loaderEl && xhr.total) {
+            var t = loaderEl.querySelector('.shoe3d-loader__text');
+            if (t) t.textContent = 'Loading\u2026 ' + Math.round(xhr.loaded / xhr.total * 100) + '%';
+          }
+if (progressBar && xhr.total) {
+  var pct = Math.round(xhr.loaded / xhr.total * 100);
+  progressBar.style.width = pct + '%';
+  if (progressLabel) progressLabel.textContent = 'Loading… ' + pct + '%';
+}
+        },
+        function (err) {
+          console.error('[Shoe3D] Load error:', err);
+          if (pageBlock) pageBlock.classList.add('is-done');
+          if (loaderEl) {
+            var t = loaderEl.querySelector('.shoe3d-loader__text');
+            var r = loaderEl.querySelector('.shoe3d-loader__ring');
+            if (t) t.textContent = 'Could not load 3D model.';
+            if (r) r.parentNode.removeChild(r);
+          }
+        }
+      );
+    }
+
+    if (typeof MeshoptDecoder !== 'undefined' && MeshoptDecoder && gltf.setMeshoptDecoder) {
+      var rdy = MeshoptDecoder.ready instanceof Promise ? MeshoptDecoder.ready : Promise.resolve();
+      rdy.then(function () { gltf.setMeshoptDecoder(MeshoptDecoder); doLoad(); });
+    } else {
+      doLoad();
+    }
+
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden && raf)         { cancelAnimationFrame(raf); raf = null; }
+      else if (!document.hidden && isVis && !raf) startLoop();
+    });
+  }
+
+})();
+</script>
+
+{% schema %}
+{
+  "name": "3D Shoe Scroll",
+  "tag": "section",
+  "class": "shoe3d-section-wrapper",
+  "settings": [
+    { "type": "header", "content": "3D Model" },
+    {
+      "type": "url",
+      "id": "model_url",
+      "label": "GLB Model URL",
+      "info": "Upload your .glb to Content → Files and paste the CDN URL here."
+    },
+    { "type": "header", "content": "Hero Section" },
+    { "type": "text",  "id": "hero_badge",    "label": "Badge text",    "default": "Best Seller" },
+    { "type": "text",  "id": "hero_headline", "label": "Hero headline", "default": "The Jillian" },
+    { "type": "text",  "id": "hero_subtext",  "label": "Hero subtext",  "default": "Scroll to explore" },
+    { "type": "header", "content": "Background" },
+    { "type": "color",            "id": "background_color",    "label": "Background colour",                    "default": "#0e0c09" },
+    { "type": "color_background", "id": "background_gradient", "label": "Background gradient (overrides solid)", "info": "Leave blank for solid colour." },
+    { "type": "header", "content": "Text & Accent" },
+    { "type": "color", "id": "text_color",   "label": "Default text",  "default": "#f0ebe3" },
+    { "type": "color", "id": "accent_color", "label": "Accent colour", "default": "#d4a86a" },
+    { "type": "header", "content": "Hero Lighting" },
+    { "type": "range", "id": "hero_light_intensity", "label": "Key light intensity", "min": 0, "max": 30, "step": 1,   "default": 12 },
+    { "type": "range", "id": "hero_light_x",         "label": "Light X position",   "min": -10, "max": 10, "step": 0.5, "default": 5 },
+    { "type": "range", "id": "hero_light_y",         "label": "Light Y position",   "min": -10, "max": 10, "step": 0.5, "default": 5 },
+    { "type": "range", "id": "hero_light_z",         "label": "Light Z position",   "min": -10, "max": 10, "step": 0.5, "default": 5 },
+    { "type": "header", "content": "Accessibility" },
+    { "type": "text", "id": "aria_label", "label": "Section ARIA label", "default": "3D Product Showcase — Scroll to explore" }
+  ],
+  "blocks": [
+    {
+      "type": "panel",
+      "name": "Scroll Panel",
+      "settings": [
+        { "type": "header", "content": "Content" },
+        { "type": "text",     "id": "eyebrow",   "label": "Eyebrow label", "default": "Feature 01" },
+        { "type": "text",     "id": "heading",   "label": "Heading",       "default": "Crafted for Every Step" },
+        { "type": "textarea", "id": "body",      "label": "Body text",     "default": "Precision-engineered for all-day comfort." },
+        { "type": "text",     "id": "feature_1", "label": "Feature 1" },
+        { "type": "text",     "id": "feature_2", "label": "Feature 2" },
+        { "type": "text",     "id": "feature_3", "label": "Feature 3" },
+        { "type": "text",     "id": "cta_label", "label": "Button label" },
+        { "type": "url",      "id": "cta_url",   "label": "Button URL" },
+        { "type": "checkbox", "id": "cta_new_tab", "label": "Open in new tab", "default": false },
+        { "type": "image_picker", "id": "image", "label": "Supporting image", "info": "Shown alongside the text on desktop and mobile." },
+        { "type": "header", "content": "Annotation Pin 1" },
+        { "type": "paragraph", "content": "Floating annotation shown on the 3D model. Positions are % of the canvas (0 = top/left, 100 = bottom/right)." },
+        { "type": "text",   "id": "ann_1_label", "label": "Label" },
+        { "type": "text",   "id": "ann_1_desc",  "label": "Description (optional)" },
+        { "type": "select", "id": "ann_1_side",  "label": "Card side", "options": [{ "value": "right", "label": "Right of dot" }, { "value": "left", "label": "Left of dot" }], "default": "right" },
+        { "type": "range",  "id": "ann_1_x", "label": "Horizontal position (% of canvas)", "min": 5, "max": 95, "step": 1, "default": 52, "unit": "%" },
+        { "type": "range",  "id": "ann_1_y", "label": "Vertical position (% of canvas)",   "min": 5, "max": 95, "step": 1, "default": 38, "unit": "%" },
+        { "type": "header", "content": "Annotation Pin 2" },
+        { "type": "paragraph", "content": "Second annotation pin. Leave label blank to hide." },
+        { "type": "text",   "id": "ann_2_label", "label": "Label" },
+        { "type": "text",   "id": "ann_2_desc",  "label": "Description (optional)" },
+        { "type": "select", "id": "ann_2_side",  "label": "Card side", "options": [{ "value": "right", "label": "Right of dot" }, { "value": "left", "label": "Left of dot" }], "default": "left" },
+        { "type": "range",  "id": "ann_2_x", "label": "Horizontal position (% of canvas)", "min": 5, "max": 95, "step": 1, "default": 46, "unit": "%" },
+        { "type": "range",  "id": "ann_2_y", "label": "Vertical position (% of canvas)",   "min": 5, "max": 95, "step": 1, "default": 65, "unit": "%" },
+        { "type": "header", "content": "Shoe Rotation" },
+        { "type": "range", "id": "rot_x", "label": "Rotation X (tilt forward/back)", "min": -180, "max": 180, "step": 5, "default": 0, "unit": "°" },
+        { "type": "range", "id": "rot_y", "label": "Rotation Y (spin left/right)",   "min": -180, "max": 180, "step": 5, "default": 0, "unit": "°" },
+        { "type": "range", "id": "rot_z", "label": "Rotation Z (roll)",              "min": -180, "max": 180, "step": 5, "default": 0, "unit": "°" },
+        { "type": "header", "content": "Shoe Position" },
+        { "type": "range", "id": "pos_x", "label": "Position X", "min": -10, "max": 10, "step": 1, "default": 5 },
+        { "type": "range", "id": "pos_y", "label": "Position Y", "min": -10, "max": 10, "step": 1, "default": 0 },
+        { "type": "header", "content": "Lighting" },
+        { "type": "range", "id": "light_intensity", "label": "Key light intensity", "min": 0,   "max": 30,  "step": 1,   "default": 12 },
+        { "type": "range", "id": "light_x",         "label": "Light X position",   "min": -10, "max": 10,  "step": 0.5, "default": 5  },
+        { "type": "range", "id": "light_y",         "label": "Light Y position",   "min": -10, "max": 10,  "step": 0.5, "default": 5  },
+        { "type": "range", "id": "light_z",         "label": "Light Z position",   "min": -10, "max": 10,  "step": 0.5, "default": 5  }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "3D Shoe Scroll",
+      "blocks": [
+        {
+          "type": "panel",
+          "settings": {
+            "eyebrow": "All-Day Comfort",
+            "heading": "Feels Like Walking on Air",
+            "body": "Memory foam cushioning and an ultra-light cork midsole work together to reduce fatigue — so you can go further, longer.",
+            "feature_1": "Memory foam + cork midsole",
+            "feature_2": "Padded collar & heel",
+            "feature_3": "Met bar pod for ball-of-foot relief",
+            "cta_label": "Shop the Jillian",
+            "rot_x": 10, "rot_y": 90, "rot_z": 5,
+            "pos_x": 6, "pos_y": 0,
+            "light_intensity": 12, "light_x": 8, "light_y": 6, "light_z": 5,
+            "ann_1_label": "Memory Foam", "ann_1_desc": "Conforms to your foot & distributes weight evenly", "ann_1_x": 55, "ann_1_y": 40, "ann_1_side": "right",
+            "ann_2_label": "Met Bar Pod", "ann_2_desc": "Relieves ball-of-foot & metatarsalgia discomfort",  "ann_2_x": 40, "ann_2_y": 72, "ann_2_side": "right"
+          }
+        },
+        {
+          "type": "panel",
+          "settings": {
+            "eyebrow": "Premium Materials",
+            "heading": "Genuine Leather. Built to Last.",
+            "body": "Crafted from real leather uppers with a soft microfiber footbed treated with antimicrobial technology — fresh all day, every day.",
+            "feature_1": "Genuine leather upper",
+            "feature_2": "Antimicrobial microfiber footbed",
+            "feature_3": "Blown rubber outsole for grip",
+            "rot_x": -75, "rot_y": 10, "rot_z": 0,
+            "pos_x": -6, "pos_y": 0,
+            "light_intensity": 14, "light_x": -5, "light_y": 8, "light_z": 3,
+            "ann_1_label": "Genuine Leather Upper",   "ann_1_desc": "Full-grain leather — breathable & built to last",  "ann_1_x": 55, "ann_1_y": 30, "ann_1_side": "right",
+            "ann_2_label": "Antimicrobial Microfiber", "ann_2_desc": "Footbed treated to fight everyday odors all day", "ann_2_x": 48, "ann_2_y": 62, "ann_2_side": "right"
+          }
+        },
+        {
+          "type": "panel",
+          "settings": {
+            "eyebrow": "Signature Arch Support",
+            "heading": "Aligned From the Ground Up",
+            "body": "Aetrex Signature Arch Support is strategically placed to align your entire body — relieving pressure from your feet all the way to your back.",
+            "feature_1": "Aetrex Signature Arch Support",
+            "feature_2": "Bunion-relief strap placement",
+            "feature_3": "Helps with Plantar Fasciitis & heel pain",
+            "rot_x": 95, "rot_y": 0, "rot_z": 5,
+            "pos_x": 6, "pos_y": 0,
+            "light_intensity": 13, "light_x": 3, "light_y": -5, "light_z": 8,
+            "ann_1_label": "Aetrex Arch Support", "ann_1_desc": "Contoured height aligns body from ground up",       "ann_1_x": 52, "ann_1_y": 58, "ann_1_side": "right",
+            "ann_2_label": "Bunion Relief",        "ann_2_desc": "Strap void removes pressure on bunions entirely",   "ann_2_x": 38, "ann_2_y": 32, "ann_2_side": "right"
+          }
+        },
+        {
+          "type": "panel",
+          "settings": {
+            "eyebrow": "Style Meets Function",
+            "heading": "Comfort You Can See.",
+            "body": "The signature braided detailing makes the Jillian the sandal you'll reach for every morning — whether running errands or spending a full day on your feet.",
+            "feature_1": "Hook & loop closure — fully adjustable",
+            "feature_2": "1.1\" heel height",
+            "feature_3": "Our #1 best-selling sandal",
+            "cta_label": "Shop the Jillian",
+            "rot_x": 0, "rot_y": 0, "rot_z": 0,
+            "pos_x": -4, "pos_y": -2,
+            "light_intensity": 15, "light_x": 0, "light_y": 5, "light_z": 10,
+            "ann_1_label": "Braided Leather Strap", "ann_1_desc": "Signature quarter-strap — style meets comfort",  "ann_1_x": 42, "ann_1_y": 28, "ann_1_side": "right",
+            "ann_2_label": "Hook & Loop Closure",   "ann_2_desc": "Fully adjustable — fits narrow to wide feet",    "ann_2_x": 55, "ann_2_y": 60, "ann_2_side": "left"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

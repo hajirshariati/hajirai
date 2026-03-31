@@ -775,8 +775,8 @@
                           assign show_free_shipping_bar = true
                         endif
                         
-                        if show_free_shipping_bar
-                          render 'free-shipping-bar', minimum_amount: minimum_amount
+if show_free_shipping_bar
+                          render 'free-shipping-bar', minimum_amount: minimum_amount, second_threshold_amount: block.settings.second_threshold_amount, second_threshold_message: block.settings.second_threshold_message
                         endif
                       endif
                     -%}
@@ -1119,24 +1119,41 @@
         }
       ]
     },
+{
+  "type": "free_shipping",
+  "name": "t:sections.main-cart.blocks.free_shipping.name",
+  "limit": 1,
+  "settings": [
     {
-      "type": "free_shipping",
-      "name": "t:sections.main-cart.blocks.free_shipping.name",
-      "limit": 1,
-      "settings": [
-        {
-          "type": "paragraph",
-          "content": "t:sections.main-cart.blocks.free_shipping.settings.paragraph.content"
-        },
-        {
-          "type": "text",
-          "id": "minimum_amount",
-          "default": "100",
-          "label": "t:sections.main-cart.blocks.free_shipping.settings.minimum_amount.label",
-          "info": "t:sections.main-cart.blocks.free_shipping.settings.minimum_amount.info"
-        }
-      ]
+      "type": "paragraph",
+      "content": "t:sections.main-cart.blocks.free_shipping.settings.paragraph.content"
     },
+    {
+      "type": "text",
+      "id": "minimum_amount",
+      "default": "100",
+      "label": "t:sections.main-cart.blocks.free_shipping.settings.minimum_amount.label",
+      "info": "t:sections.main-cart.blocks.free_shipping.settings.minimum_amount.info"
+    },
+    {
+      "type": "number",
+      "id": "second_threshold_amount",
+      "label": "Second threshold amount",
+      "info": "Optional. Must be higher than the first threshold. Leave blank to disable."
+    },
+    {
+      "type": "richtext",
+      "id": "second_threshold_message",
+      "label": "Second threshold message",
+      "info": "Shown when the cart reaches the second threshold. E.g. 'You unlocked a free gift! 🎁'"
+    }
+  ]
+},
+
+
+
+
+    
     {
       "type": "custom_field",
       "name": "t:sections.main-cart.blocks.custom_field.name",

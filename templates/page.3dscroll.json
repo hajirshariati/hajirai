@@ -1,0 +1,265 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-sm",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "3_d_scroll_3aR6wn": {
+      "type": "3DScroll",
+      "blocks": {
+        "panel_f9UmPU": {
+          "type": "panel",
+          "settings": {
+            "eyebrow": "All-Day Comfort",
+            "heading": "Feels Like Walking on Air",
+            "body": "Memory foam cushioning and an ultra-light cork midsole work together to reduce fatigue — so you can go further, longer.",
+            "feature_1": "Memory foam + cork midsole",
+            "feature_2": "Padded collar & heel",
+            "feature_3": "Met bar pod for ball-of-foot relief",
+            "cta_label": "Shop Now",
+            "cta_url": "https://www.aetrex.com/products/jillian-black-sc450w",
+            "cta_new_tab": false,
+            "image": "shopify://shop_images/93646-SC440W_lifestyle.jpg",
+            "ann_1_label": "",
+            "ann_1_desc": "",
+            "ann_1_side": "right",
+            "ann_1_x": 33,
+            "ann_1_y": 56,
+            "ann_2_label": "",
+            "ann_2_desc": "",
+            "ann_2_side": "left",
+            "ann_2_x": 39,
+            "ann_2_y": 45,
+            "rot_x": 10,
+            "rot_y": 90,
+            "rot_z": 5,
+            "pos_x": 3,
+            "pos_y": -2,
+            "light_intensity": 12,
+            "light_x": 8,
+            "light_y": 6,
+            "light_z": 5
+          }
+        },
+        "panel_VaHB98": {
+          "type": "panel",
+          "settings": {
+            "eyebrow": "Premium Materials",
+            "heading": "Genuine Leather. Built to Last.",
+            "body": "Crafted from real leather uppers with a soft microfiber footbed treated with antimicrobial technology — fresh all day, every day.",
+            "feature_1": "Genuine leather upper",
+            "feature_2": "Antimicrobial microfiber footbed",
+            "feature_3": "Blown rubber outsole for grip",
+            "cta_label": "Shop Now",
+            "cta_url": "https://www.aetrex.com/products/jillian-black-sc450w",
+            "cta_new_tab": false,
+            "image": "shopify://shop_images/39771-SC450W_top_fd2e1985-9f65-4b1f-9180-fe5cdc244cf8.jpg",
+            "ann_1_label": "",
+            "ann_1_desc": "",
+            "ann_1_side": "right",
+            "ann_1_x": 70,
+            "ann_1_y": 40,
+            "ann_2_label": "",
+            "ann_2_desc": "",
+            "ann_2_side": "left",
+            "ann_2_x": 56,
+            "ann_2_y": 43,
+            "rot_x": 50,
+            "rot_y": 10,
+            "rot_z": -5,
+            "pos_x": -4,
+            "pos_y": -2,
+            "light_intensity": 27,
+            "light_x": -2.5,
+            "light_y": 1.5,
+            "light_z": 8
+          }
+        },
+        "panel_PaMDGt": {
+          "type": "panel",
+          "settings": {
+            "eyebrow": "Signature Arch Support",
+            "heading": "Aligned From the Ground Up",
+            "body": "Aetrex Signature Arch Support is strategically placed to align your entire body — relieving pressure from your feet all the way to your back.",
+            "feature_1": "Aetrex Signature Arch Support",
+            "feature_2": "Strategically placed straps",
+            "feature_3": "Bunion-friendly strap design",
+            "cta_label": "Shop Now",
+            "cta_url": "https://www.aetrex.com/products/jillian-black-sc450w",
+            "cta_new_tab": false,
+            "image": "shopify://shop_images/93648-SC493W_lifestyle.jpg",
+            "ann_1_label": "",
+            "ann_1_desc": "",
+            "ann_1_side": "right",
+            "ann_1_x": 46,
+            "ann_1_y": 43,
+            "ann_2_label": "",
+            "ann_2_desc": "",
+            "ann_2_side": "left",
+            "ann_2_x": 24,
+            "ann_2_y": 52,
+            "rot_x": 30,
+            "rot_y": 180,
+            "rot_z": -15,
+            "pos_x": 3,
+            "pos_y": 0,
+            "light_intensity": 24,
+            "light_x": 1,
+            "light_y": 0.5,
+            "light_z": 4
+          }
+        },
+        "panel_CifDLU": {
+          "type": "panel",
+          "settings": {
+            "eyebrow": "Style Meets Function",
+            "heading": "Comfort You Can See.",
+            "body": "The signature braided detailing makes the Jillian the sandal you'll reach for every morning — whether you're running errands or spending a full day on your feet.",
+            "feature_1": "Fully adjustable hook & loop closure",
+            "feature_2": "1.1\" heel height",
+            "feature_3": "Our #1 best-selling sandal",
+            "cta_label": "Shop Now",
+            "cta_url": "https://www.aetrex.com/products/jillian-black-sc450w",
+            "cta_new_tab": false,
+            "image": "shopify://shop_images/93647-SC493W_lifestyle2.jpg",
+            "ann_1_label": "",
+            "ann_1_desc": "",
+            "ann_1_side": "right",
+            "ann_1_x": 78,
+            "ann_1_y": 62,
+            "ann_2_label": "",
+            "ann_2_desc": "",
+            "ann_2_side": "left",
+            "ann_2_x": 61,
+            "ann_2_y": 49,
+            "rot_x": 0,
+            "rot_y": 0,
+            "rot_z": 0,
+            "pos_x": -4,
+            "pos_y": -10,
+            "light_intensity": 15,
+            "light_x": 0,
+            "light_y": 5,
+            "light_z": 10
+          }
+        }
+      },
+      "block_order": [
+        "panel_f9UmPU",
+        "panel_VaHB98",
+        "panel_PaMDGt",
+        "panel_CifDLU"
+      ],
+      "name": "3D Shoe Scroll",
+      "settings": {
+        "model_url": "https://cdn.jsdelivr.net/gh/aetrexinc/Jillian3D@main/Jillian-v2.glb",
+        "hero_badge": "Best Seller",
+        "hero_headline": "The Jillian",
+        "hero_subtext": "Designed to help relieve discomfort with superior arch support",
+        "background_color": "#454545",
+        "background_gradient": "linear-gradient(136deg, rgba(118, 118, 118, 1), rgba(142, 90, 59, 1) 100%)",
+        "text_color": "#ffffff",
+        "accent_color": "#ffddbf",
+        "hero_light_intensity": 20,
+        "hero_light_x": 5,
+        "hero_light_y": 5,
+        "hero_light_z": 5,
+        "aria_label": "3D Product Showcase — Scroll to explore"
+      }
+    },
+    "empty_space_L66qFY": {
+      "type": "empty-space",
+      "disabled": true,
+      "name": "t:sections.empty-space.name",
+      "settings": {
+        "desktop_height": 200,
+        "mobile_height": 200,
+        "color_background": "#8e5a3b",
+        "gradient_background": "linear-gradient(46deg, rgba(118, 80, 57, 1) 13%, rgba(142, 90, 59, 1) 86%)"
+      }
+    },
+    "featured_collection_ikEcGe": {
+      "type": "featured-collection",
+      "custom_css": [
+        ".product-card__content {display: none;}"
+      ],
+      "name": "t:sections.featured-collection.name",
+      "settings": {
+        "collection": "",
+        "products": [
+          "jillian-antique-rose-sc443w",
+          "jillian-brushed-silver-sc367w",
+          "jillian-butter-sc445w",
+          "jillian-champagne-sc440w",
+          "jillian-cognac-sc363w",
+          "jillian-cork-sc364w",
+          "jillian-denim-sc493w",
+          "jillian-gunmetal-sc465w",
+          "jillian-ivory-sc362w",
+          "jillian-leopard-sc498w",
+          "jillian-navy-sc461w",
+          "jillian-red-sc368w",
+          "jillian-sage-sc446w",
+          "jillian-snake-sc497w",
+          "jillian-walnut-sc441w",
+          "jillian-white-sc453w"
+        ],
+        "product_limit": 12,
+        "columns": 5,
+        "carousel_on_desktop": true,
+        "show_view_all": false,
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "heading": "More Colors, Same Comfort",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#ffffff",
+        "color_background": "#8a583a",
+        "gradient_background": "linear-gradient(54deg, rgba(136, 97, 75, 1) 14%, rgba(142, 90, 59, 1) 85%)",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 120,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "3_d_scroll_3aR6wn",
+    "empty_space_L66qFY",
+    "featured_collection_ikEcGe"
+  ]
+}

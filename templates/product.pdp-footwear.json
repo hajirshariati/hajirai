@@ -466,6 +466,7 @@
         "content-3",
         "content-4"
       ],
+      "disabled": true,
       "settings": {
         "heading": "Need help?",
         "description": "<p>If you have any questions, you are always welcome to contact us. We'll get back to you as soon as possible, within 24 hours on weekdays.</p>"
@@ -767,7 +768,6 @@
     },
     "custom_liquid_T9rexX": {
       "type": "custom-liquid",
-      "disabled": true,
       "name": "t:sections.custom-liquid.name",
       "settings": {
         "liquid": "{%render 'fr-testimonials'%}",
