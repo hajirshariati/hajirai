@@ -106,7 +106,7 @@
     data-media-id="{{ media.id }}"
     {%- if gang_exist == true %} data-gang-option="{{ gang_option_name }}" data-gang-connect="{{ gang_connect }}"{% if gang_media_active == false %} hidden{% endif %}{% else %} data-gang-default{% endif -%}
   >
-    {%- render 'media', section_id: section_id, product_id: product_id, media: media, media_alt: media_alt, sizes: sizes, preload: preload, autoplay: autoplay, loop: loop -%}
+    {%- render 'media', index: index, section_id: section_id, product_id: product_id, media: media, media_alt: media_alt, sizes: sizes, preload: preload, autoplay: autoplay, loop: loop -%}
 
     {%- if image_zoom != 'none' and media.media_type == 'image' -%}
       <button type="button" class="absolute top-0 left-0 w-full h-full flex items-center justify-center" is="media-{{ image_zoom }}-button" aria-label="{{ 'products.media.open_media' | t: index: media.position | escape }}" tabindex="-1">

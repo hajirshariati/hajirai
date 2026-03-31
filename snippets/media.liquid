@@ -12,14 +12,15 @@
   @param {boolean} [loop] - Enable continuous video playback
   @param {string} [video_class] - Additional CSS classes for video elements
   @param {string} [media_alt] - Override alt text for accessibility
-
+  @param {number} [index] - Index of the media in the gallery
   @example
   {% render 'media',
      media: product.featured_media,
      sizes: '(max-width: 740px) 100vw, 50vw',
      product_id: product.id,
      section_id: section.id,
-     preload: true
+     preload: true,
+     index: forloop.index
   %}
 {%- enddoc -%}
 
@@ -33,18 +34,39 @@
     assign fetchpriority = 'auto'
     assign lazyimage = 'lazy-image'
   endif
+
+  assign should_defer = false
+  if index > 1 and preload == false
+    assign should_defer = true
+  endif
+
+  assign media_class = 'w-full media-index-' | append: index
 -%}
 
 {%- case media.media_type -%}
   {%- when 'image' -%}
-    {{- media | image_url: width: media.preview_image.width | image_tag: loading: loading, fetchpriority: fetchpriority, sizes: sizes, widths: '400,600,800,1000,1200,1600,2000', width: media.preview_image.width, height: media.preview_image.height, class: 'w-full', alt: media_alt, is: lazyimage -}}
+    {%- if should_defer -%}
+      {%- capture img_tag -%}
+        {{- media | image_url: width: media.preview_image.width | image_tag: loading: loading, fetchpriority: fetchpriority, sizes: sizes, widths: '400,600,800,1000,1200,1600,2000', width: media.preview_image.width, height: media.preview_image.height, class: media_class, alt: media_alt -}}
+      {%- endcapture -%}
+      {{ img_tag | replace: ' src="', ' data-lazy-src="' | replace: ' srcset="', ' data-lazy-srcset="' }}
+    {%- else -%}
+      {{- media | image_url: width: media.preview_image.width | image_tag: loading: loading, fetchpriority: fetchpriority, sizes: sizes, widths: '400,600,800,1000,1200,1600,2000', width: media.preview_image.width, height: media.preview_image.height, class: media_class, alt: media_alt, is: lazyimage -}}
+    {%- endif -%}
 
   {%- when 'video', 'external_video' -%}
     <video-media class="deferred-media block relative w-full" style="--aspect-ratio: {{ media.aspect_ratio }};" data-aspect-ratio="{{ media.aspect_ratio }}" aria-controls="SliderGallery-{{ section_id }}-{{ product_id }}"
       {%- if media.host %} host="{{ media.host }}"{% endif -%}
       {%- if autoplay %} autoplay{% endif -%}
     >
-      {{- media | image_url: width: media.preview_image.width | image_tag: loading: loading, fetchpriority: fetchpriority, sizes: sizes, widths: '400,600,800,1000,1200,1600,2000', width: media.preview_image.width, height: media.preview_image.height, class: 'w-full', alt: media_alt, is: lazyimage -}}
+      {%- if should_defer -%}
+        {%- capture img_tag -%}
+          {{- media | image_url: width: media.preview_image.width | image_tag: loading: loading, fetchpriority: fetchpriority, sizes: sizes, widths: '400,600,800,1000,1200,1600,2000', width: media.preview_image.width, height: media.preview_image.height, class: media_class, alt: media_alt -}}
+        {%- endcapture -%}
+        {{ img_tag | replace: ' src="', ' data-lazy-src="' | replace: ' srcset="', ' data-lazy-srcset="' }}
+      {%- else -%}
+        {{- media | image_url: width: media.preview_image.width | image_tag: loading: loading, fetchpriority: fetchpriority, sizes: sizes, widths: '400,600,800,1000,1200,1600,2000', width: media.preview_image.width, height: media.preview_image.height, class: media_class, alt: media_alt, is: lazyimage -}}
+      {%- endif -%}
 
       <template>
         {%- liquid
@@ -69,7 +91,14 @@
 
   {%- when 'model' -%}
     <model-media class="deferred-media block relative w-full" style="--aspect-ratio: {{ media.preview_image.aspect_ratio }};" data-aspect-ratio="{{ media.preview_image.aspect_ratio }}" aria-controls="SliderGallery-{{ section_id }}-{{ product_id }}">
-      {{- media | image_url: width: media.preview_image.width | image_tag: loading: loading, fetchpriority: fetchpriority, sizes: sizes, widths: '400,600,800,1000,1200,1600,2000', width: media.preview_image.width, height: media.preview_image.height, class: 'w-full', alt: media_alt, is: lazyimage -}}
+      {%- if should_defer -%}
+        {%- capture img_tag -%}
+          {{- media | image_url: width: media.preview_image.width | image_tag: loading: loading, fetchpriority: fetchpriority, sizes: sizes, widths: '400,600,800,1000,1200,1600,2000', width: media.preview_image.width, height: media.preview_image.height, class: media_class, alt: media_alt -}}
+        {%- endcapture -%}
+        {{ img_tag | replace: ' src="', ' data-lazy-src="' | replace: ' srcset="', ' data-lazy-srcset="' }}
+      {%- else -%}
+        {{- media | image_url: width: media.preview_image.width | image_tag: loading: loading, fetchpriority: fetchpriority, sizes: sizes, widths: '400,600,800,1000,1200,1600,2000', width: media.preview_image.width, height: media.preview_image.height, class: media_class, alt: media_alt, is: lazyimage -}}
+      {%- endif -%}
       {{- media | model_viewer_tag: image_size: '2048x', reveal: 'interaction', toggleable: true -}}
 
       <template>

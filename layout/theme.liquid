@@ -6,9 +6,7 @@
   dir="{{ direction }}"
 >
   <head>
-<!-- Start of Shoplift scripts -->
-{% render 'shoplift' %}
-<!-- End of Shoplift scripts -->
+ 
 
  <!-- OneTrust Cookies Consent Notice start for aetrex.com -->
 <script src="https://cdn.cookielaw.org/scripttemplates/otSDKStub.js" type="text/javascript" charset="UTF-8" data-domain-script="018e0a40-1844-7f60-845d-6b0849ecced9" async></script>
@@ -70,8 +68,7 @@ function OptanonWrapper() { }
 
 
     
-    <script src="https://rapid-cdn.yottaa.com/rapid/lib/HucOtCTdvSMtxQ.js" defer></script>
-    <meta charset="utf-8">
+     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="theme-color" content="{{ settings.color_button_background }}">
@@ -80,8 +77,7 @@ function OptanonWrapper() { }
     <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
     {% # theme-check-disable RemoteAsset %}
     <link rel="preconnect" href="https://cdn.cookielaw.org">
-    <link rel="preconnect" href="https://rapid-cdn.yottaa.com">
-    <link rel="dns-prefetch" href="https://embed.typeform.com">
+     <link rel="dns-prefetch" href="https://embed.typeform.com">
     <link rel="dns-prefetch" href="https://ds-dev.truefitcorp.com">
     <link rel="dns-prefetch" href="https://cdn.truefitcorp.com">
     <link rel="dns-prefetch" href="https://ajax.googleapis.com">
@@ -145,23 +141,20 @@ function OptanonWrapper() { }
       onload="this.media='all'"
     >
 
-      {% if template contains 'product' %}
-          {%- capture __content_for_header -%}
-              {{ content_for_header }}
-          {%- endcapture -%}
-
-          {%- assign __content_for_header = __content_for_header
-                  | replace: 'checkouts/internal/preloads.js', ''
-                  | replace: 'https://shop.app', ''
-                  | replace: "window.addEventListener('load', asyncLoad, false);", "['scroll','click','touchstart','mousemove'].forEach(function(e){window.addEventListener(e,function handler(){asyncLoad();['scroll','click','touchstart','mousemove'].forEach(function(e){window.removeEventListener(e,handler);});},{once:true,passive:true});});"
-                  | replace: "window.attachEvent('onload', asyncLoad);", ""
-          -%}
-
-          {{ __content_for_header }}
-
-      {% else %}
-          {{ content_for_header }}
-      {% endif %}
+      {%- capture __content_for_header -%}
+        {{ content_for_header }}
+    {%- endcapture -%}
+    
+    {%- assign __content_for_header = __content_for_header
+            | replace: 'checkouts/internal/preloads.js', ''
+            | replace: 'https://shop.app', ''
+            | replace: "window.addEventListener('load', asyncLoad, false);", "['scroll','click','touchstart','mousemove'].forEach(function(e){window.addEventListener(e,function handler(){asyncLoad();['scroll','click','touchstart','mousemove'].forEach(function(e){window.removeEventListener(e,handler);});},{once:true,passive:true});});"
+            | replace: "window.attachEvent('onload', asyncLoad);", ""
+            | replace: "https://cdn.shopify.com/shopifycloud/preview-bar/preview-bar-modules.js", ""
+            | replace: 'shopify-accelerated-checkout-styles', ""
+    -%}
+    
+    {{ __content_for_header }}
 
 
       <script src="{{ 'vendor.js' | asset_url }}" defer="defer"></script>
@@ -323,6 +316,69 @@ document.addEventListener('DOMContentLoaded', function() {
   observer.observe(document.body, { attributes: true, subtree: true, attributeFilter: ['hidden'] });
 });
 </script>
+
+ <script>
+  (function () {
+    var BREAKPOINT = 992;
+  
+    var observer = new IntersectionObserver(
+      function (entries, obs) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          swapAttributes(entry.target);
+          obs.unobserve(entry.target);
+        });
+      },
+      {
+        rootMargin: '20px 0px',
+        threshold: 0,
+      }
+    );
+  
+    function swapAttributes(el) {
+      var src = el.getAttribute('data-lazy-src');
+      var srcset = el.getAttribute('data-lazy-srcset');
+      if (src) el.setAttribute('src', src);
+      if (srcset) el.setAttribute('srcset', srcset);
+      el.removeAttribute('data-lazy-src');
+      el.removeAttribute('data-lazy-srcset');
+  
+      var bg = el.getAttribute('data-lazy-bg');
+      var swatchBg = el.getAttribute('data-lazy-swatch-bg');
+      if (bg) {
+        el.style.backgroundImage = 'url(' + bg + ')';
+        el.removeAttribute('data-lazy-bg');
+      }
+      if (swatchBg) {
+        el.style.setProperty('--swatch-background-image', 'url(' + swatchBg + ')');
+        el.removeAttribute('data-lazy-swatch-bg');
+      }
+    }
+  
+    function observeElements() {
+      var isDesktop = window.innerWidth > BREAKPOINT;
+  
+      document
+        .querySelectorAll('img[data-lazy-src], [data-lazy-bg]')
+        .forEach(function (el) {
+          // Media snippet images (media-index-*): only lazy load on mobile
+          // If desktop, swap immediately
+          if (isDesktop && el.className.match(/media-index-/)) {
+            swapAttributes(el);
+          } else {
+            observer.observe(el);
+          }
+        });
+    }
+  
+    observeElements();
+  
+    new MutationObserver(observeElements).observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+  })();
+ </script>
 
 <style>
 /* Force Zendesk launcher behind drawer when cart is open */

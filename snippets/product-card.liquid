@@ -189,16 +189,19 @@
                         class="swiper-slide"
                         data-index="{{ unique_index }}"
                       >
-                        {{
-                          product.featured_image
-                          | image_url: width: featured_media.width
-                          | image_tag:
-                            data-img-id: img_id,
-                            class: 'inner-variant-image',
-                            loading: 'lazy',
-                            widths: '180,360,540,720,900,1080',
-                            is: 'lazy-image'
-                        -}}
+                        {%- capture img_tag -%}
+                          {{
+                            product.featured_image
+                            | image_url: width: featured_media.width
+                            | image_tag:
+                              data-img-id: img_id,
+                              class: 'inner-variant-image',
+                              loading: 'lazy',
+                              widths: '180,360,540,720,900,1080'
+                              
+                          }}
+                        {%- endcapture -%}
+                        {{ img_tag | replace: ' src="', ' data-lazy-src="' | replace: ' srcset="', ' data-lazy-srcset="' }}
                       </div>
                     {% else %}
                       <div
@@ -207,16 +210,19 @@
                         class="swiper-slide"
                         data-index="{{ unique_index }}"
                       >
-                        {{
-                          metaProductscard.featured_image
-                          | image_url: width: media.width
-                          | image_tag:
-                            data-img-id: img_id,
-                            class: 'inner-variant-image',
-                            loading: 'lazy',
-                            widths: '180,360,540,720,900,1080',
-                            is: 'lazy-image'
-                        -}}
+                        {%- capture img_tag -%}
+                          {{
+                            metaProductscard.featured_image
+                            | image_url: width: media.width
+                            | image_tag:
+                              data-img-id: img_id,
+                              class: 'inner-variant-image',
+                              loading: 'lazy',
+                              widths: '180,360,540,720,900,1080'
+                          
+                          }}
+                        {%- endcapture -%}
+                        {{ img_tag | replace: ' src="', ' data-lazy-src="' | replace: ' srcset="', ' data-lazy-srcset="' }}
                       </div>
                       {%- assign shown_image_ids = shown_image_ids | append: img_id | append: ',' -%}
                     {% endif %}
@@ -409,7 +415,7 @@
                   " 
                   data-img-id="{{ metaproduct.featured_image.id }}" 
                   class="custom-color-swatch-link color-swatch{% if swatch_image != blank %} with-image{% endif %} block relative{% if class != blank %} {{ class }}{% endif %}" 
-                  title="{{ title | escape }}" aria-label="{{ title | escape }}" style="background-image: url({{ metaproduct.featured_image | image_url }});{% if swatch_fallback_override == false and swatch_image != blank %} --swatch-background-image: url({{ swatch_image }});{% endif %}"{% if no_instant %} data-no-instant{% endif %}>
+                  title="{{ title | escape }}" aria-label="{{ title | escape }}" data-lazy-bg="{{ metaproduct.featured_image | image_url }}" {% if swatch_fallback_override == false and swatch_image != blank %} data-lazy-swatch-bg="{{ swatch_image }}"{% endif %} {% if no_instant %} data-no-instant{% endif %}>
                   {%- if tooltip != blank -%}
                     <span class="tooltip opacity-0 pointer-events-none text-xs rounded-full z-10">{{ tooltip | escape }}</span>
                   {%- else -%}
@@ -441,7 +447,7 @@
                   " 
                   data-img-id="{{ metaproduct.featured_image.id }}" 
                   class="custom-color-swatch-link color-swatch{% if swatch_image != blank %} with-image{% endif %} block relative{% if class != blank %} {{ class }}{% endif %}" 
-                  title="{{ title | escape }}" aria-label="{{ title | escape }}" style="background-image: url({{ metaproduct.featured_image | image_url }});{% if swatch_fallback_override == false and swatch_image != blank %} --swatch-background-image: url({{ swatch_image }});{% endif %}"{% if no_instant %} data-no-instant{% endif %}>
+                  title="{{ title | escape }}" aria-label="{{ title | escape }}" data-lazy-bg="{{ metaproduct.featured_image | image_url }}" {% if swatch_fallback_override == false and swatch_image != blank %} data-lazy-swatch-bg="{{ swatch_image }}"{% endif %} {% if no_instant %} data-no-instant{% endif %}>
                   {%- if tooltip != blank -%}
                     <span class="tooltip opacity-0 pointer-events-none text-xs rounded-full z-10">{{ tooltip | escape }}</span>
                   {%- else -%}
