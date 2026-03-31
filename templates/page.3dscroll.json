@@ -228,7 +228,7 @@
         "columns": 5,
         "carousel_on_desktop": true,
         "show_view_all": false,
-        "columns_mobile": "1",
+        "columns_mobile": "2",
         "swipe_on_mobile": true,
         "heading": "More Colors, Same Comfort",
         "heading_size": "title-md",
