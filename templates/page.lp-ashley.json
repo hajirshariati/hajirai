@@ -67,7 +67,7 @@
         "content_width": "small",
         "text_alignment": "left",
         "image_height_mobile": "adapt",
-        "text_alignment_mobile": "left",
+        "text_alignment_mobile": "center",
         "mobile_content_space": 168,
         "mobile_content_space_color": "#e9eae5",
         "accessibility_info": "",
@@ -155,6 +155,7 @@
         "text_cQCMec",
         "button_fnaDLP"
       ],
+      "disabled": true,
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
