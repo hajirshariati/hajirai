@@ -545,6 +545,19 @@
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
+        },
+        "testimonial_AQFrnV": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>These shoes are great! They give me arch support and a soft footbed, as well as adjustable straps. And they are pretty!!</p>",
+            "author": "Kristin L.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
         }
       },
       "block_order": [
@@ -553,7 +566,8 @@
         "testimonial_cMqe8h",
         "testimonial_DUKJrG",
         "testimonial_KMjBFE",
-        "testimonial_J6K3XV"
+        "testimonial_J6K3XV",
+        "testimonial_AQFrnV"
       ],
       "name": "t:sections.testimonials.name",
       "settings": {
