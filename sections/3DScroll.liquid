@@ -507,6 +507,7 @@
 .shoe3d-panel--right .shoe3d-panel__inner { justify-content: flex-start; }
 
 .shoe3d-panel__image-wrap {
+  display: none;
   flex-shrink: 0;
   width: clamp(160px, 22vw, 320px);
   aspect-ratio: 1 / 1;
@@ -618,9 +619,10 @@
     justify-content: flex-start;
   }
   .shoe3d-panel__image-wrap {
+    display: block;
     order: -1 !important;
     width: 100%;
-    max-width: 280px;
+    max-width: 100%;
     aspect-ratio: 1;
     align-self: center;
   }
