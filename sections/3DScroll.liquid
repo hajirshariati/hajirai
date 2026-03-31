@@ -514,19 +514,15 @@
 .shoe3d-panel--left  .shoe3d-panel__inner { justify-content: flex-end; }
 .shoe3d-panel--right .shoe3d-panel__inner { justify-content: flex-start; }
 
-.shoe3d-panel__inner {
-  flex-direction: column;  /* stack vertically */
-  align-items: flex-start;
-}
-
 .shoe3d-panel__image-wrap {
-  display: block;
-  order: 1;  /* always after content */
+  display: none;
+  flex-shrink: 0;
   width: clamp(160px, 22vw, 320px);
   aspect-ratio: 1 / 1;
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 24px 64px rgba(0,0,0,.55);
+  order: 0;
 }
 .shoe3d-panel--left  .shoe3d-panel__image-wrap { order: -1; }
 .shoe3d-panel--right .shoe3d-panel__image-wrap { order: 1; }
@@ -630,7 +626,14 @@
   .shoe3d-panel--right .shoe3d-panel__inner {
     justify-content: flex-start;
   }
- 
+  .shoe3d-panel__image-wrap {
+    display: block;
+    order: -1 !important;
+    width: 100%;
+    max-width: 100%;
+    aspect-ratio: 1;
+    align-self: center;
+  }
   .shoe3d-panel__content {
     width: 100%;
     opacity: 1 !important;
