@@ -184,7 +184,7 @@
         "padding_top": 52,
         "padding_bottom": 32,
         "divider": false,
-        "full_width": false,
+        "full_width": true,
         "rounded": true,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": "",
