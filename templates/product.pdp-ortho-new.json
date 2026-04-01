@@ -200,7 +200,7 @@
       ],
       "settings": {
         "enable_sticky_info": true,
-        "media_size": 65,
+        "media_size": 50,
         "gallery_layout": "thumbnail",
         "thumbnail_position": "beside",
         "image_ratio": "adapt_first",
