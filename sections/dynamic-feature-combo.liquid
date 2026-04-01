@@ -262,7 +262,7 @@
 }
 
 #shopify-section-{{ section.id }} .dynamic-feature__callout {
-    background:{{ section.settings.callout_background }};
+    background:{{ section.settings.callout_background | color_modify: 'alpha', section.settings.callout_background_opacity }};
     padding: 6px 12px;
     border-radius: 8px;
     box-shadow: none;
