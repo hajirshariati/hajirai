@@ -448,7 +448,7 @@ label.active-swatch.custom-meta-label:before {
 }
 
 .custom-product-card .product-card__content {
-    padding: 0;
+    padding: 0px 0px 15px 0px ;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
