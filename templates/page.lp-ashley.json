@@ -349,6 +349,7 @@
         "line_color": "#171717",
         "line_width": 0.4,
         "callout_background": "#e7e7e7",
+        "callout_background_opacity": 1,
         "callout_radius": 8,
         "callout_max_width": 220,
         "callout_title_color": "#171717",
@@ -667,6 +668,9 @@
     },
     "featured_collection_ytWEYw": {
       "type": "featured-collection",
+      "custom_css": [
+        ".product-card__media .badges {display: none;}"
+      ],
       "name": "t:sections.featured-collection.name",
       "settings": {
         "collection": "",
