@@ -18,16 +18,6 @@
             "show_collections_link": false
           }
         },
-        "text_hTxre4": {
-          "type": "text",
-          "settings": {
-            "icon": "none",
-            "iwidth": "custom",
-            "icon_width": 24,
-            "text": "test",
-            "text_size": "text-base"
-          }
-        },
         "title": {
           "type": "title",
           "settings": {
@@ -170,34 +160,6 @@
             "already_a_member": "You’re already a member! 💙 Just <a href=\"https://www.aetrex.com/account/login\" target=\"_blank\" title=\"Login\"><strong>log in</strong></a> to enjoy your perks."
           }
         },
-        "aetrex_fitai_pdp_size_recommendation_gUEcCb": {
-          "type": "shopify://apps/aetrex-fitai/blocks/PDPSizeRecommendation/6c991f1a-1e7d-4325-983c-2984a2e41236",
-          "disabled": true,
-          "settings": {
-            "ProductPage": true,
-            "size_recommendation_font_family": "OpenSans, sans-serif",
-            "size_recommendation_vertical_spacing": 5,
-            "expansion_panel_background": "#d06263",
-            "expansion_panel_foreground": "#ffffff",
-            "tab_background": "#f2f2f2",
-            "tab_foreground": "#5c6271",
-            "active_tab_background": "#5c6271",
-            "acitve_tab_foreground": "#ffffff",
-            "button_background": "#f2f2f2",
-            "button_foreground": "#5c6271",
-            "acive_button_background": "#5c6271",
-            "acive_button_foreground": "#ffffff",
-            "size_color": "#d60000",
-            "result_header_background": "#d06263",
-            "result_header_foreground": "#ffffff",
-            "result_content_background": "#f1f1f1",
-            "result_content_foreground": "#707070",
-            "result_footer_background": "#c8c8c8",
-            "result_footer_foreground": "#363636",
-            "popup_title_background": "#c8c8c8",
-            "popup_title_foreground": "#363636"
-          }
-        },
         "sticky_buy_button": {
           "type": "sticky_buy_button",
           "settings": {}
@@ -205,7 +167,6 @@
       },
       "block_order": [
         "breadcrumb_UzHCRY",
-        "text_hTxre4",
         "title",
         "price_TirYdK",
         "yotpo_product_reviews_star_rating_8XQiyE",
@@ -222,7 +183,6 @@
         "text-2",
         "text_RzDJHr",
         "sign_up_DcnXLa",
-        "aetrex_fitai_pdp_size_recommendation_gUEcCb",
         "sticky_buy_button"
       ],
       "settings": {
