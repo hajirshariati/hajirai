@@ -861,36 +861,6 @@
       ],
       "name": "Searchspring Recommendations",
       "settings": {}
-    },
-    "ss_recs_target_WcRdgj": {
-      "type": "ss-recs-target",
-      "blocks": {
-        "ss_profile_block_hUMykr": {
-          "type": "ss_profile_block",
-          "settings": {
-            "ss_profile_id": "cross-sell"
-          }
-        },
-        "ss_profile_block_BYUhAA": {
-          "type": "ss_profile_block",
-          "settings": {
-            "ss_profile_id": "similar"
-          }
-        },
-        "ss_profile_block_AXb8Di": {
-          "type": "ss_profile_block",
-          "settings": {
-            "ss_profile_id": "recently-viewed"
-          }
-        }
-      },
-      "block_order": [
-        "ss_profile_block_hUMykr",
-        "ss_profile_block_BYUhAA",
-        "ss_profile_block_AXb8Di"
-      ],
-      "name": "Searchspring Recommendations Target",
-      "settings": {}
     }
   },
   "order": [
@@ -904,7 +874,6 @@
     "ugc_gallery_9emGbm",
     "17477533508981334f",
     "product-recommendations",
-    "ss_recs_script_FKLgRC",
-    "ss_recs_target_WcRdgj"
+    "ss_recs_script_FKLgRC"
   ]
 }
