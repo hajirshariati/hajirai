@@ -18,16 +18,6 @@
             "show_collections_link": false
           }
         },
-        "text_hTxre4": {
-          "type": "text",
-          "settings": {
-            "icon": "none",
-            "iwidth": "custom",
-            "icon_width": 24,
-            "text": "test",
-            "text_size": "text-base"
-          }
-        },
         "title": {
           "type": "title",
           "settings": {
@@ -177,7 +167,6 @@
       },
       "block_order": [
         "breadcrumb_UzHCRY",
-        "text_hTxre4",
         "title",
         "price_TirYdK",
         "yotpo_product_reviews_star_rating_8XQiyE",
