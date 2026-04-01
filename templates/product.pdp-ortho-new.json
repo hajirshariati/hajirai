@@ -201,7 +201,7 @@
       "settings": {
         "enable_sticky_info": true,
         "media_size": 65,
-        "gallery_layout": "scroll",
+        "gallery_layout": "columns",
         "thumbnail_position": "below",
         "image_ratio": "adapt_first",
         "image_zoom": "lightbox",
