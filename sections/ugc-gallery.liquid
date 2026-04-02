@@ -1,5 +1,18 @@
 {{ 'ugc-gallery.min.css' | asset_url | stylesheet_tag }}
 
+<style>
+  .ugc-gallery-wrapper {
+    width: 100%;
+    max-width: var(--page-width, 1200px);
+    margin: 0 auto;
+    padding: 0 var(--page-margin, 20px);
+    box-sizing: border-box;
+  }
+
+  .ugc-gallery-wrapper .yotpo-pictures-widget {
+    width: 100%;
+  }
+</style>
 
 {% liquid 
   assign _s = section.settings
@@ -14,39 +27,38 @@
   endif
 %}
 
-{%- if template contains 'product' -%}
-  {% if _s.custom_gallery != blank %}
-    <div 
-    class="yotpo yotpo-pictures-widget"
-    data-gallery-id="{{ gallery_id }}"
-  >
-  </div>
+<div class="ugc-gallery-wrapper">
+  {%- if template contains 'product' -%}
+    {% if _s.custom_gallery != blank %}
+      <div 
+        class="yotpo yotpo-pictures-widget"
+        data-gallery-id="{{ gallery_id }}"
+      ></div>
     {% else %}
-  <div 
-    class="yotpo yotpo-pictures-widget"
-    data-gallery-id="{{ gallery_id }}"
-    {% if _s.global_pdp_sourced_gallery != blank %}
-      data-product-id="{{ product.id }}"
+      <div 
+        class="yotpo yotpo-pictures-widget"
+        data-gallery-id="{{ gallery_id }}"
+        {% if _s.global_pdp_sourced_gallery != blank %}
+          data-product-id="{{ product.id }}"
+        {% endif %}
+      ></div>
     {% endif %}
-  >
-  </div>
-  {% endif %}
-  
-{%- elsif template contains 'collection' and collection.metafields.custom.ugc_gallery_id -%}
-  {%- assign gallery_id = collection.metafields.custom.ugc_gallery_id | default: _s.global_fallback_sourced_gallery -%}
-  <div 
-    class="yotpo yotpo-pictures-widget"
-    data-gallery-id="{{ gallery_id  }}"
-  >
-  </div>
-{%- elsif template contains 'page' and page.metafields.custom.ugc_gallery_id -%}
-  {%- assign gallery_id = page.metafields.custom.ugc_gallery_id | default: _s.global_fallback_sourced_gallery -%}
-  <div 
-    class="yotpo yotpo-pictures-widget"
-    data-gallery-id="{{ gallery_id }}"
-  >
-  </div>
-{%- endif -%}
+    
+  {%- elsif template contains 'collection' and collection.metafields.custom.ugc_gallery_id -%}
+    {%- assign gallery_id = collection.metafields.custom.ugc_gallery_id | default: _s.global_fallback_sourced_gallery -%}
+    <div 
+      class="yotpo yotpo-pictures-widget"
+      data-gallery-id="{{ gallery_id }}"
+    ></div>
+
+  {%- elsif template contains 'page' and page.metafields.custom.ugc_gallery_id -%}
+    {%- assign gallery_id = page.metafields.custom.ugc_gallery_id | default: _s.global_fallback_sourced_gallery -%}
+    <div 
+      class="yotpo yotpo-pictures-widget"
+      data-gallery-id="{{ gallery_id }}"
+    ></div>
+  {%- endif -%}
+</div>
 
 {% schema %} 
 {
@@ -56,7 +68,7 @@
       "type":"text",
       "id":"custom_gallery",
       "label": "Custom Gallery",
-      "info": "This sourced gallery will take priority over the Global PDP and Global Fallback Galleries",
+      "info": "This sourced gallery will take priority over the Global PDP and Global Fallback Galleries"
     },
     {
       "type":"text",
