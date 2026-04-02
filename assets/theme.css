@@ -18309,38 +18309,33 @@ cart-count.count::before {
     border-radius: 1em !important;
 }
 
-.yotpo-vugc-carousel-container {
+.yotpo-carousel {
   position: relative;
   overflow: hidden;
 }
 
-.yotpo-vugc-carousel-container::before,
-.yotpo-vugc-carousel-container::after {
+.yotpo-carousel::before,
+.yotpo-carousel::after {
   content: '';
   position: absolute;
   top: 0;
-  height: 100%;
+  height: calc(100% - 40px); /* stops the fade before the arrows row */
   width: 150px;
-  z-index: 99;
+  z-index: 2;
   pointer-events: none;
 }
 
-.yotpo-vugc-carousel-container::before {
+.yotpo-carousel::before {
   left: 0;
   background: linear-gradient(to right, #ffffff 0%, transparent 100%);
 }
 
-.yotpo-vugc-carousel-container::after {
+.yotpo-carousel::after {
   right: 0;
   background: linear-gradient(to left, #ffffff 0%, transparent 100%);
 }
 
-.yotpo-vugc-carousel-container .glide__arrows {
+.yotpo-carousel .glide__arrows {
   position: relative;
-  z-index: 100;
-}
-
-.yotpo-vugc-carousel-container .yotpo-carousel-arrow {
-  position: relative;
-  z-index: 100;
+  z-index: 3;
 }
