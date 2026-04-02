@@ -797,7 +797,9 @@
     },
     "ugc_gallery_9emGbm": {
       "type": "ugc-gallery",
-      "custom_css": [],
+      "custom_css": [
+        ".yotpo-vugc-carousel-2926 {-webkit-mask-image: linear-gradient( to right, transparent 0%, black 12%, black 88%, transparent 100% ); mask-image: linear-gradient( to right, transparent 0%, black 12%, black 88%, transparent 100% );}"
+      ],
       "name": "UGC Gallery",
       "settings": {
         "custom_gallery": "{{ product.metafields.product.yotpo_gallery_id.value }}",
