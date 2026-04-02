@@ -707,33 +707,12 @@
         "full_width": true,
         "rounded": false
       }
-    },
-    "custom_liquid_KTncyx": {
-      "type": "custom-liquid",
-      "name": "t:sections.custom-liquid.name",
-      "settings": {
-        "liquid": "<script>\n(function () {\n  \"use strict\";\n\n  const loadedScripts = new Set();\n\n  function isValidJSResponse(text) {\n    // crude check: HTML responses usually start with <!DOCTYPE or <html>\n    return !/^\\s*</.test(text);\n  }\n\n  function loadScriptWithRetry({\n    name,\n    src,\n    retries = 2,\n    timeout = 5000,\n    fallback = null,\n    globalCheck = null\n  }) {\n    if (loadedScripts.has(name)) {\n      console.warn(`[Loader] ${name} already loaded`);\n      return Promise.resolve();\n    }\n\n    function attempt(tryCount) {\n      return new Promise((resolve, reject) => {\n        console.warn(`[Loader] Loading ${name}, attempt ${tryCount + 1}`);\n\n        const timer = setTimeout(() => {\n          console.warn(`[Loader] Timeout: ${name}`);\n          reject(\"timeout\");\n        }, timeout);\n\n        fetch(src, { cache: \"no-store\" })\n          .then(res => res.text())\n          .then(text => {\n            clearTimeout(timer);\n\n            if (!isValidJSResponse(text)) {\n              throw new Error(\"Invalid JS (likely HTML response)\");\n            }\n\n            const script = document.createElement(\"script\");\n            script.textContent = text;\n            document.head.appendChild(script);\n\n            // Optional global check (ex: window.ZE)\n            if (globalCheck && !globalCheck()) {\n              throw new Error(\"Global check failed\");\n            }\n\n            loadedScripts.add(name);\n            console.warn(`[Loader] Loaded: ${name}`);\n            resolve();\n          })\n          .catch(err => {\n            clearTimeout(timer);\n\n            if (tryCount < retries) {\n              console.warn(`[Loader] Retry ${name}...`);\n              resolve(attempt(tryCount + 1));\n            } else {\n              console.warn(`[Loader] Failed: ${name}`, err);\n\n              if (fallback) {\n                try {\n                  fallback();\n                  console.warn(`[Loader] Fallback executed: ${name}`);\n                } catch (e) {\n                  console.warn(`[Loader] Fallback failed: ${name}`, e);\n                }\n              }\n\n              resolve(); // don't break page\n            }\n          });\n      });\n    }\n\n    return attempt(0);\n  }\n\n  /* =========================\n     EXAMPLES (customize below)\n  ========================== */\n\n  // Zendesk fallback (fix ZE undefined)\n  loadScriptWithRetry({\n    name: \"zendesk\",\n    src: \"https://static.zdassets.com/ekr/snippet.js?key=YOUR_KEY\",\n    retries: 2,\n    globalCheck: () => typeof window.zE !== \"undefined\",\n    fallback: function () {\n      window.zE = function () {\n        console.warn(\"Zendesk fallback called\");\n      };\n    }\n  });\n\n  // Example problematic script (replace with yours)\n  loadScriptWithRetry({\n    name: \"aetrex-script\",\n    src: \"https://www.aetrex.com/?locale=en-US\",\n    retries: 2,\n    fallback: function () {\n      console.warn(\"Aetrex script failed — safely ignored\");\n    }\n  });\n\n  // Delay loading until page is stable\n  window.addEventListener(\"load\", function () {\n    console.warn(\"[Loader] Page fully loaded\");\n  });\n\n})();\n</script>",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 0,
-        "padding_bottom": 0,
-        "divider": false,
-        "narrow": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
     }
   },
   "order": [
     "announcement-bar",
     "announcement_bar_iKW798",
     "header",
-    "countdown_condensed_4b8jxE",
-    "custom_liquid_KTncyx"
+    "countdown_condensed_4b8jxE"
   ]
 }
