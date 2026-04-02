@@ -18298,3 +18298,26 @@ cart-count.count::before {
 
 
 
+  .ss__results .product-card {
+    gap: 0rem !important;
+}
+
+
+
+
+.yotpo-vugc-carousel-2926 {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 12%,
+    black 88%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 12%,
+    black 88%,
+    transparent 100%
+  );
+}
