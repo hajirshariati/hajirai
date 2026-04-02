@@ -169,34 +169,6 @@
             "already_a_member": "You’re already a member! 💙 Just <a href=\"https://www.aetrex.com/account/login\" target=\"_blank\" title=\"Login\"><strong>log in</strong></a> to enjoy your perks."
           }
         },
-        "aetrex_fitai_pdp_size_recommendation_gUEcCb": {
-          "type": "shopify://apps/aetrex-fitai/blocks/PDPSizeRecommendation/6c991f1a-1e7d-4325-983c-2984a2e41236",
-          "disabled": true,
-          "settings": {
-            "ProductPage": true,
-            "size_recommendation_font_family": "OpenSans, sans-serif",
-            "size_recommendation_vertical_spacing": 5,
-            "expansion_panel_background": "#d06263",
-            "expansion_panel_foreground": "#ffffff",
-            "tab_background": "#f2f2f2",
-            "tab_foreground": "#5c6271",
-            "active_tab_background": "#5c6271",
-            "acitve_tab_foreground": "#ffffff",
-            "button_background": "#f2f2f2",
-            "button_foreground": "#5c6271",
-            "acive_button_background": "#5c6271",
-            "acive_button_foreground": "#ffffff",
-            "size_color": "#d60000",
-            "result_header_background": "#d06263",
-            "result_header_foreground": "#ffffff",
-            "result_content_background": "#f1f1f1",
-            "result_content_foreground": "#707070",
-            "result_footer_background": "#c8c8c8",
-            "result_footer_foreground": "#363636",
-            "popup_title_background": "#c8c8c8",
-            "popup_title_foreground": "#363636"
-          }
-        },
         "sticky_buy_button": {
           "type": "sticky_buy_button",
           "settings": {}
@@ -221,7 +193,6 @@
         "text-2",
         "text_RzDJHr",
         "sign_up_DcnXLa",
-        "aetrex_fitai_pdp_size_recommendation_gUEcCb",
         "sticky_buy_button"
       ],
       "settings": {
@@ -460,6 +431,8 @@
             "content_metafield": "",
             "columns": "Size,Chest",
             "rows": "S,36\nM,38\nL,40",
+            "columns2": "",
+            "rows2": "",
             "metafields": ""
           }
         },
@@ -474,6 +447,8 @@
             "content_metafield": "metafield",
             "columns": "Size,Chest",
             "rows": "S,36\nM,38\nL,40",
+            "columns2": "",
+            "rows2": "",
             "metafields": "Comfort:custom.comfort_details\nMaterials:custom.materials_details\nMeasurements:custom.measurements_details"
           }
         },
@@ -488,6 +463,8 @@
             "content_metafield": "custom.care_instructions",
             "columns": "Size,Chest",
             "rows": "S,36\nM,38\nL,40",
+            "columns2": "",
+            "rows2": "",
             "metafields": ""
           }
         },
@@ -502,6 +479,8 @@
             "content_metafield": "",
             "columns": "HEEL-TOE MEASUREMENT,7.2\" - 7.5\",7.9\",8.2\",8.5\",8.7\",8.8\",8.9\",9.0\",9.2\",9.3\",9.5\",9.7\",9.8\",10.0\",10.2\",10.4\",10.5\",10.7\",10.8\",11.0\",11.2\",11.3\",11.5\",11.7\",11.9\",12.0\"",
             "rows": "WOMEN'S - US,--,--,--,--,5,5.5,--,6,6.5,7,7.5,8,8.5,9,9.5,10,10.5,11,11.5,12,--,--,--,--,--,--\nWOMEN'S - EU,--,--,--,--,35,35,--,36,36,37,38,38,39,40,40,41,42,42,43,43,--,--,--,--,--,--\nMEN'S - US,--,--,--,--,--,--,--,--,--,--,--,7,7.5,8,8.5,9,9.5,10,10.5,11,11.5,12,12.5,13,13.5,14\nMEN'S - EU,--,--,--,--,--,--,--,--,--,--,--,39,40,41,42,42,43,43,44,45,45,46,47,47,48,48\nKIDS - US,C12/13,Y1,Y2,Y3,--,--,Y4,--,Y5,--,Y6,--,Y7,--,--,--,--,--,--,--,--,--,--,--,--,--",
+            "columns2": "",
+            "rows2": "",
             "metafields": ""
           }
         },
@@ -516,6 +495,8 @@
             "content_metafield": "",
             "columns": "Size,Chest",
             "rows": "S,36\nM,38\nL,40",
+            "columns2": "",
+            "rows2": "",
             "metafields": ""
           }
         },
@@ -796,7 +777,7 @@
         "image_height_mobile": "auto",
         "text_alignment_mobile": "center",
         "color_text": "#171717",
-        "color_background": "#fafafa",
+        "color_background": "#ffffff",
         "gradient_background": "",
         "color_background_2": "",
         "gradient_background_2": "",
@@ -806,7 +787,7 @@
         "color_button_background": "",
         "color_button_gradient": "",
         "padding_top": 72,
-        "padding_bottom": 0,
+        "padding_bottom": 28,
         "divider": false,
         "full_width": false,
         "rounded": true,
