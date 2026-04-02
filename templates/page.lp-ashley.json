@@ -30,7 +30,7 @@
         "image_EXgffj": {
           "type": "image",
           "settings": {
-            "image": "shopify://shop_images/Ash_banner_D2.jpg",
+            "image": "shopify://shop_images/Ash_banner_D3.jpg",
             "image_mobile": "shopify://shop_images/Ash_banner_M6.jpg",
             "content_position": "md:items-center md:justify-start",
             "content_position_mobile": "items-end justify-center",
