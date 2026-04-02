@@ -785,7 +785,7 @@
         "color_button_background": "",
         "color_button_gradient": "",
         "padding_top": 72,
-        "padding_bottom": 20,
+        "padding_bottom": 28,
         "divider": false,
         "full_width": false,
         "rounded": true,
