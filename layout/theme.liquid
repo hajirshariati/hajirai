@@ -6,28 +6,6 @@
   dir="{{ direction }}"
 >
   <head>
- <!-- Noibu temporary disable -->    
-<script>
-  window.__NOIBU_DISABLED__ = true;
-  (function() {
-    var _ws = window.WebSocket;
-    window.WebSocket = function(url, p) {
-      if (url && url.indexOf('noibu.com') > -1) return { send:function(){}, close:function(){}, addEventListener:function(){} };
-      return new _ws(url, p);
-    };
-    var _fetch = window.fetch;
-    window.fetch = function(url, opts) {
-      if (typeof url === 'string' && url.indexOf('noibu.com') > -1) return Promise.resolve(new Response('', {status:200}));
-      return _fetch.apply(this, arguments);
-    };
-    var _xhr = XMLHttpRequest.prototype.open;
-    XMLHttpRequest.prototype.open = function(m, url) {
-      if (typeof url === 'string' && url.indexOf('noibu.com') > -1) url = 'about:blank';
-      return _xhr.apply(this, arguments);
-    };
-  })();
-</script> 
- <!-- Noibu temporary disable -->
 
 
  <!-- OneTrust Cookies Consent Notice start for aetrex.com -->
