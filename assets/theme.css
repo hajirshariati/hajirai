@@ -18334,3 +18334,13 @@ cart-count.count::before {
   right: 0;
   background: linear-gradient(to left, #ffffff 0%, transparent 100%);
 }
+
+.yotpo-vugc-carousel-container .glide__arrows {
+  position: relative;
+  z-index: 100;
+}
+
+.yotpo-vugc-carousel-container .yotpo-carousel-arrow {
+  position: relative;
+  z-index: 100;
+}
