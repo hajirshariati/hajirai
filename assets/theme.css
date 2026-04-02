@@ -18305,3 +18305,6 @@ cart-count.count::before {
 
 
 
+.vugc-media-image {
+    border-radius: 1em !important;
+}
