@@ -23,24 +23,11 @@
           "settings": {
             "title_size": "title-md"
           }
-        },
-        "description_jGMf6q": {
-          "type": "description",
-          "settings": {
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false
-          }
         }
       },
       "block_order": [
         "breadcrumb",
-        "title",
-        "description_jGMf6q"
+        "title"
       ],
       "custom_css": [],
       "settings": {
