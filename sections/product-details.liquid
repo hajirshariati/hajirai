@@ -408,6 +408,11 @@
     {%- assign columns2 = block.settings.columns2 | split: ',' -%}
     {%- assign rows2_raw = block.settings.rows2 | newline_to_br | split: '<br />' -%}
     {%- if block.settings.columns2 != blank and block.settings.rows2 != blank and columns2.size > 0 and rows2_raw.size > 0 -%}
+      
+      <div style="text-align: center; font-size: 11px; color: #c00000; margin: 4px 0 16px 0;">
+      ← Scroll horizontally to see all sizes →
+    </div>
+      
       <div style="
         max-width: 40em;
         min-width: -webkit-fill-available;
@@ -484,7 +489,9 @@
           </table>
         </div>
       </div>
-
+      <div style="text-align: center; font-size: 11px; color: #c00000; margin: 4px 0 16px 0;">
+        ← Scroll horizontally to see all sizes →
+      </div>
     {%- endif -%}
                   {%- endif -%}
                 {%- endif -%}
