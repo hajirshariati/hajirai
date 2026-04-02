@@ -27,8 +27,8 @@
         "description_yNYCxN": {
           "type": "description",
           "settings": {
-            "text_font": "body",
-            "text_size": "subtext-md",
+            "text_font": "subtitle",
+            "text_size": "subtext-sm",
             "text_max_size": 32,
             "text_line_height": 1.6,
             "text_letter_spacing": 0,
