@@ -29,7 +29,6 @@
         "breadcrumb",
         "title"
       ],
-      "disabled": true,
       "custom_css": [],
       "settings": {
         "transparent_header": false,
