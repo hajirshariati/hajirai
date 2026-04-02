@@ -23,11 +23,24 @@
           "settings": {
             "title_size": "title-md"
           }
+        },
+        "description_jGMf6q": {
+          "type": "description",
+          "settings": {
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false
+          }
         }
       },
       "block_order": [
         "breadcrumb",
-        "title"
+        "title",
+        "description_jGMf6q"
       ],
       "custom_css": [],
       "settings": {
@@ -112,27 +125,6 @@
     },
     "17715083590c9e8395": {
       "type": "apps",
-      "blocks": {
-        "aetrex_fitai_plp_shoe_fit_rating_JJe3tM": {
-          "type": "shopify://apps/aetrex-fitai/blocks/PLPShoeFitRating/6c991f1a-1e7d-4325-983c-2984a2e41236",
-          "settings": {
-            "CategoryPage": true,
-            "rating_background": "#ebebeb",
-            "rating_foreground": "#d06263",
-            "rating_font_size": 14,
-            "rating_font_family": "'Open Sans', sans-serif",
-            "rating_vertical_spacing": 20,
-            "rating_overlay": true,
-            "rating_justify_content": "flex-start",
-            "info_popup_title_background": "#cf6262",
-            "info_popup_title_foreground": "#ffffff",
-            "class_selector": "product-card__content"
-          }
-        }
-      },
-      "block_order": [
-        "aetrex_fitai_plp_shoe_fit_rating_JJe3tM"
-      ],
       "custom_css": [
         ".fg-score .score-label {border-radius: 0px 26px 25px 0px;}"
       ],
