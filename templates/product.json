@@ -144,32 +144,6 @@
             "already_a_member": "You’re already a member! 💙 Just <a href=\"https://www.aetrex.com/account/login\" target=\"_blank\" title=\"Login\"><strong>log in</strong></a> to enjoy your perks."
           }
         },
-        "aetrex_fitai_pdp_size_recommendation_gUEcCb": {
-          "type": "shopify://apps/aetrex-fitai/blocks/PDPSizeRecommendation/6c991f1a-1e7d-4325-983c-2984a2e41236",
-          "disabled": true,
-          "settings": {
-            "ProductPage": true,
-            "size_recommendation_font_family": "OpenSans, sans-serif",
-            "size_recommendation_vertical_spacing": 5,
-            "tab_background": "#f2f2f2",
-            "tab_foreground": "#5c6271",
-            "active_tab_background": "#5c6271",
-            "acitve_tab_foreground": "#ffffff",
-            "button_background": "#f2f2f2",
-            "button_foreground": "#5c6271",
-            "acive_button_background": "#5c6271",
-            "acive_button_foreground": "#ffffff",
-            "size_color": "#d60000",
-            "result_header_background": "#d06263",
-            "result_header_foreground": "#ffffff",
-            "result_content_background": "#f1f1f1",
-            "result_content_foreground": "#707070",
-            "result_footer_background": "#c8c8c8",
-            "result_footer_foreground": "#363636",
-            "popup_title_background": "#c8c8c8",
-            "popup_title_foreground": "#363636"
-          }
-        },
         "sticky_buy_button": {
           "type": "sticky_buy_button",
           "settings": {}
@@ -191,7 +165,6 @@
         "text-2",
         "text_94cLLh",
         "sign_up_DcnXLa",
-        "aetrex_fitai_pdp_size_recommendation_gUEcCb",
         "sticky_buy_button"
       ],
       "settings": {
@@ -900,6 +873,21 @@
       ],
       "name": "Searchspring Recommendations Target",
       "settings": {}
+    },
+    "2a39382cc7e260140e90": {
+      "type": "apps",
+      "blocks": {
+        "8792f536-1273-4a99-b3a0-2f634242dcf1": {
+          "type": "shopify://apps/yotpo-product-reviews/blocks/reviews/eb7dfd7d-db44-4334-bc49-c893b51b36cf",
+          "settings": {
+            "product": "{{product}}"
+          }
+        }
+      },
+      "block_order": [
+        "8792f536-1273-4a99-b3a0-2f634242dcf1"
+      ],
+      "settings": {}
     }
   },
   "order": [
@@ -914,6 +902,7 @@
     "17477533508981334f",
     "product-recommendations",
     "ss_recs_script_FKLgRC",
-    "ss_recs_target_WcRdgj"
+    "ss_recs_target_WcRdgj",
+    "2a39382cc7e260140e90"
   ]
 }
