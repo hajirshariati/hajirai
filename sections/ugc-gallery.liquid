@@ -16,13 +16,13 @@
 
 {%- if template contains 'product' -%}
   {% if _s.custom_gallery != blank %}
-    <div style="background:#fafafa"
+    <div 
     class="yotpo yotpo-pictures-widget"
     data-gallery-id="{{ gallery_id }}"
   >
   </div>
     {% else %}
-  <div style="background:#fafafa"
+  <div 
     class="yotpo yotpo-pictures-widget"
     data-gallery-id="{{ gallery_id }}"
     {% if _s.global_pdp_sourced_gallery != blank %}
@@ -34,14 +34,14 @@
   
 {%- elsif template contains 'collection' and collection.metafields.custom.ugc_gallery_id -%}
   {%- assign gallery_id = collection.metafields.custom.ugc_gallery_id | default: _s.global_fallback_sourced_gallery -%}
-  <div style="background:#fafafa"
+  <div 
     class="yotpo yotpo-pictures-widget"
     data-gallery-id="{{ gallery_id  }}"
   >
   </div>
 {%- elsif template contains 'page' and page.metafields.custom.ugc_gallery_id -%}
   {%- assign gallery_id = page.metafields.custom.ugc_gallery_id | default: _s.global_fallback_sourced_gallery -%}
-  <div style="background:#fafafa"
+  <div 
     class="yotpo yotpo-pictures-widget"
     data-gallery-id="{{ gallery_id }}"
   >
