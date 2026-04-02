@@ -18308,3 +18308,29 @@ cart-count.count::before {
 .vugc-media-image {
     border-radius: 1em !important;
 }
+
+.yotpo-vugc-carousel-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.yotpo-vugc-carousel-container::before,
+.yotpo-vugc-carousel-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 150px;
+  z-index: 99;
+  pointer-events: none;
+}
+
+.yotpo-vugc-carousel-container::before {
+  left: 0;
+  background: linear-gradient(to right, #ffffff 0%, transparent 100%);
+}
+
+.yotpo-vugc-carousel-container::after {
+  right: 0;
+  background: linear-gradient(to left, #ffffff 0%, transparent 100%);
+}
