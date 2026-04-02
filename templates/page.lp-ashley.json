@@ -668,9 +668,7 @@
     },
     "featured_collection_ytWEYw": {
       "type": "featured-collection",
-      "custom_css": [
-        ".product-card__media .badges {display: none;}"
-      ],
+      "custom_css": [],
       "name": "t:sections.featured-collection.name",
       "settings": {
         "collection": "",
