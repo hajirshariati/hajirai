@@ -4,119 +4,13 @@
     --section-padding-bottom: {{ section.settings.padding_bottom }}px;
     {%- render 'section-variables', section: section -%}
   }
-
-  #shopify-section-{{ section.id }} .yotpo-reviews-accordion__trigger {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    padding: 20px 0;
-    background: transparent;
-    border: none;
-    border-top: 1px solid rgba(var(--color-border), 0.15);
-    border-bottom: 1px solid rgba(var(--color-border), 0.15);
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: 600;
-    color: rgb(var(--color-foreground));
-    text-align: left;
-  }
-
-  #shopify-section-{{ section.id }} .yotpo-reviews-accordion__chevron {
-    flex-shrink: 0;
-    transition: transform 0.25s ease;
-  }
-
-  #shopify-section-{{ section.id }} .yotpo-reviews-accordion__trigger[aria-expanded="true"] .yotpo-reviews-accordion__chevron {
-    transform: rotate(180deg);
-  }
-
-  #shopify-section-{{ section.id }} .yotpo-reviews-accordion__panel {
-    overflow: hidden;
-    max-height: 0;
-    transition: max-height 0.35s ease;
-  }
-
-  #shopify-section-{{ section.id }} .yotpo-reviews-accordion__panel.is-open {
-    max-height: 9999px;
-  }
 </style>
 
 <div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}">
   <div class="page-width{% if section.settings.full_width %} page-width--full{% endif %} relative">
-
-{%- if section.id == '17477533508981334f' -%}
-
-  <div id="yotpo-app">
-    <button
-      class="yotpo-reviews-accordion__trigger"
-      id="yotpo-reviews-trigger"
-      aria-expanded="false"
-      type="button"
-    >
-      <span>Customer Reviews</span>
-      <svg class="yotpo-reviews-accordion__chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <polyline points="6 9 12 15 18 9"/>
-      </svg>
-    </button>
-
-    <div class="yotpo-reviews-accordion__panel" id="yotpo-reviews-panel">
-      {%- comment -%} Store the block HTML as a template — not rendered yet {%- endcomment -%}
-      <template id="yotpo-widget-template">
-        {%- for block in section.blocks -%}
-          {% render block %}
-        {%- endfor -%}
-      </template>
-    </div>
-  </div>
-
-  <script>
-    (function() {
-      var loaded = false;
-      var trigger = document.getElementById('yotpo-reviews-trigger');
-      var panel = document.getElementById('yotpo-reviews-panel');
-      var template = document.getElementById('yotpo-widget-template');
-
-      if (!trigger || !panel || !template) return;
-
-      trigger.addEventListener('click', function() {
-        var isOpen = this.getAttribute('aria-expanded') === 'true';
-
-        if (!isOpen) {
-          this.setAttribute('aria-expanded', 'true');
-          panel.classList.add('is-open');
-
-          if (!loaded) {
-            loaded = true;
-            // Move template content into DOM — this is when Yotpo sees it
-            panel.appendChild(template.content.cloneNode(true));
-
-            // Give Yotpo a moment to detect the new element
-            setTimeout(function() {
-              if (window.yotpo) {
-                try {
-                  var api = new Yotpo.API(yotpo);
-                  api.refreshWidgets();
-                } catch(e) {
-                  console.warn('Yotpo refresh:', e);
-                }
-              }
-            }, 100);
-          }
-        } else {
-          this.setAttribute('aria-expanded', 'false');
-          panel.classList.remove('is-open');
-        }
-      });
-    })();
-  </script>
-
-{%- else -%}
-  {%- for block in section.blocks -%}
-    {% render block %}
-  {%- endfor -%}
-{%- endif -%}
-
+    {%- for block in section.blocks -%}
+      {% render block %}
+    {%- endfor -%}
   </div>
 </div>
 
