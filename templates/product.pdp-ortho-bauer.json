@@ -715,7 +715,7 @@
         "heading_ePLUpg": {
           "type": "heading",
           "settings": {
-            "heading": "Why Customers Love <em> </em><em>{{ product.title }}</em>",
+            "heading": "Why Customers Love <em>BAUER // Aetrex Skate Orthotics</em>",
             "heading_size": "title-sm",
             "heading_tag": "h2",
             "highlighted_text": "text",
@@ -771,7 +771,7 @@
       "name": "UGC Gallery",
       "settings": {
         "custom_gallery": "{{ product.metafields.product.yotpo_gallery_id.value }}",
-        "global_pdp_sourced_gallery": "",
+        "global_pdp_sourced_gallery": "680b83c6b3803b9f59ed3f41",
         "global_fallback_sourced_gallery": "67c9dfd952921dee2bb9fc5c"
       }
     },
