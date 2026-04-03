@@ -28,7 +28,7 @@
 
     {% comment %}  No / Unsure and Yes  code {% endcomment %}
 
-  {% if product.template_suffix == 'pdp-ortho-v2' %}
+  {% if product.template_suffix == 'pdp-ortho-v2'  or product.template_suffix == 'pdp-ortho-bauer' %}
     {% if product.metafields.custom.custom_product_reference_code.value %}
       {% assign variant_code = product.metafields.custom.custom_product_reference_code.value %}
     {% else %}
