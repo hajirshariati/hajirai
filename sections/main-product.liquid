@@ -253,22 +253,8 @@
         <div class="product-info__blocks">
           {%- for block in section.blocks -%}
             {%- case block.type -%}
-{%- when '@app' -%}
-  {%- if block.app_name contains 'Yotpo' or block.type contains 'yotpo' -%}
-    <details class="product__accordion details with-border" is="accordion-details" {{ block.shopify_attributes }}>
-      <summary class="details__summary flex items-center justify-between gap-2 cursor-pointer">
-        <div class="flex items-center gap-2d5">
-          <span class="text-sm-base font-medium leading-none">Customer Reviews</span>
-        </div>
-        {%- render 'icon', icon: 'plus-2', size: 'xs', class: 'shrink-0' -%}
-      </summary>
-      <div class="details__content" id="yotpo-app">
-        {%- render block -%}
-      </div>
-    </details>
-  {%- else -%}
-    {%- render block -%}
-  {%- endif -%}
+              {%- when '@app' -%}
+                {%- render block -%}
 
               {%- when 'breadcrumb' -%}
                 {%- render 'product-breadcrumb', product: product, block: block -%}
@@ -1204,33 +1190,6 @@
     }, 300);
   });
   </script>
-
-
-
-
-
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  var reviewsAccordion = document.querySelector('details:has(#yotpo-app)');
-  if (!reviewsAccordion) return;
-
-  var initialized = false;
-
-  reviewsAccordion.addEventListener('toggle', function() {
-    if (this.open && !initialized) {
-      initialized = true;
-      if (window.yotpo) {
-        var api = new Yotpo.API(yotpo);
-        api.refreshWidgets();
-      }
-    }
-  });
-});
-</script>
-
-
-
 {% endif %}
 
 
