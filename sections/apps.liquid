@@ -45,72 +45,77 @@
 <div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}">
   <div class="page-width{% if section.settings.full_width %} page-width--full{% endif %} relative">
 
-    {%- if section.id == '17477533508981334f' -%}
+{%- if section.id == '17477533508981334f' -%}
 
-      <div id="yotpo-app">
-        <button
-          class="yotpo-reviews-accordion__trigger"
-          id="yotpo-reviews-trigger"
-          aria-expanded="false"
-          aria-controls="yotpo-reviews-panel"
-          type="button"
-        >
-          <span>Customer Reviews</span>
-          <svg class="yotpo-reviews-accordion__chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <polyline points="6 9 12 15 18 9"/>
-          </svg>
-        </button>
+  <div id="yotpo-app">
+    <button
+      class="yotpo-reviews-accordion__trigger"
+      id="yotpo-reviews-trigger"
+      aria-expanded="false"
+      type="button"
+    >
+      <span>Customer Reviews</span>
+      <svg class="yotpo-reviews-accordion__chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
+    </button>
 
-        <div
-          class="yotpo-reviews-accordion__panel"
-          id="yotpo-reviews-panel"
-          role="region"
-          aria-labelledby="yotpo-reviews-trigger"
-        >
-          {%- for block in section.blocks -%}
-            {% render block %}
-          {%- endfor -%}
-        </div>
-      </div>
+    <div class="yotpo-reviews-accordion__panel" id="yotpo-reviews-panel">
+      {%- comment -%} Store the block HTML as a template — not rendered yet {%- endcomment -%}
+      <template id="yotpo-widget-template">
+        {%- for block in section.blocks -%}
+          {% render block %}
+        {%- endfor -%}
+      </template>
+    </div>
+  </div>
 
-      <script>
-        (function() {
-          var initialized = false;
-          var trigger = document.getElementById('yotpo-reviews-trigger');
-          var panel = document.getElementById('yotpo-reviews-panel');
-          if (!trigger || !panel) return;
+  <script>
+    (function() {
+      var loaded = false;
+      var trigger = document.getElementById('yotpo-reviews-trigger');
+      var panel = document.getElementById('yotpo-reviews-panel');
+      var template = document.getElementById('yotpo-widget-template');
 
-          trigger.addEventListener('click', function() {
-            var isOpen = this.getAttribute('aria-expanded') === 'true';
-            if (!isOpen) {
-              this.setAttribute('aria-expanded', 'true');
-              panel.classList.add('is-open');
-              if (!initialized) {
-                initialized = true;
-                if (window.yotpo) {
-                  try {
-                    var api = new Yotpo.API(yotpo);
-                    api.refreshWidgets();
-                  } catch(e) {
-                    console.warn('Yotpo refresh failed:', e);
-                  }
+      if (!trigger || !panel || !template) return;
+
+      trigger.addEventListener('click', function() {
+        var isOpen = this.getAttribute('aria-expanded') === 'true';
+
+        if (!isOpen) {
+          this.setAttribute('aria-expanded', 'true');
+          panel.classList.add('is-open');
+
+          if (!loaded) {
+            loaded = true;
+            // Move template content into DOM — this is when Yotpo sees it
+            panel.appendChild(template.content.cloneNode(true));
+
+            // Give Yotpo a moment to detect the new element
+            setTimeout(function() {
+              if (window.yotpo) {
+                try {
+                  var api = new Yotpo.API(yotpo);
+                  api.refreshWidgets();
+                } catch(e) {
+                  console.warn('Yotpo refresh:', e);
                 }
               }
-            } else {
-              this.setAttribute('aria-expanded', 'false');
-              panel.classList.remove('is-open');
-            }
-          });
-        })();
-      </script>
+            }, 100);
+          }
+        } else {
+          this.setAttribute('aria-expanded', 'false');
+          panel.classList.remove('is-open');
+        }
+      });
+    })();
+  </script>
 
-    {%- else -%}
-
-      {%- for block in section.blocks -%}
-        {% render block %}
-      {%- endfor -%}
-
-    {%- endif -%}
+{%- else -%}
+  {%- for block in section.blocks -%}
+    {% render block %}
+  {%- endfor -%}
+{%- endif -%}
 
   </div>
 </div>
