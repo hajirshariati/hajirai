@@ -4,13 +4,140 @@
     --section-padding-bottom: {{ section.settings.padding_bottom }}px;
     {%- render 'section-variables', section: section -%}
   }
+
+  #shopify-section-{{ section.id }} .yotpo-reviews-accordion {
+    border-top: 1px solid rgba(var(--color-border), 0.15);
+    border-bottom: 1px solid rgba(var(--color-border), 0.15);
+  }
+
+  #shopify-section-{{ section.id }} .yotpo-reviews-accordion__trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 20px 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    color: rgb(var(--color-foreground));
+    text-align: left;
+  }
+
+  #shopify-section-{{ section.id }} .yotpo-reviews-accordion__trigger:hover {
+    opacity: 0.8;
+  }
+
+  #shopify-section-{{ section.id }} .yotpo-reviews-accordion__chevron {
+    flex-shrink: 0;
+    transition: transform 0.25s ease;
+  }
+
+  #shopify-section-{{ section.id }} .yotpo-reviews-accordion__trigger[aria-expanded="true"] .yotpo-reviews-accordion__chevron {
+    transform: rotate(180deg);
+  }
+
+  #shopify-section-{{ section.id }} .yotpo-reviews-accordion__panel {
+    overflow: hidden;
+    transition: max-height 0.35s ease;
+    max-height: 0;
+  }
+
+  #shopify-section-{{ section.id }} .yotpo-reviews-accordion__panel.is-open {
+    max-height: 9999px;
+  }
+
+  #shopify-section-{{ section.id }} .yotpo-reviews-accordion__inner {
+    padding-bottom: 24px;
+  }
 </style>
 
 <div class="section section--padding{% if section.settings.divider %} section--divider{% endif %}{% if section.settings.rounded %} section--rounded relative{% endif %}">
   <div class="page-width{% if section.settings.full_width %} page-width--full{% endif %} relative">
+
+    {%- comment -%} Check if this apps section contains only Yotpo reviews blocks {%- endcomment -%}
+    {%- assign has_yotpo_reviews = false -%}
+    {%- assign has_other_blocks = false -%}
     {%- for block in section.blocks -%}
-      {% render block %}
+      {%- if block.type contains 'yotpo' and block.type contains 'review' -%}
+        {%- assign has_yotpo_reviews = true -%}
+      {%- else -%}
+        {%- assign has_other_blocks = true -%}
+      {%- endif -%}
     {%- endfor -%}
+
+    {%- if has_yotpo_reviews and has_other_blocks == false -%}
+      {% comment %} Pure Yotpo reviews section — wrap in lazy accordion{% endcomment %}
+      <div class="yotpo-reviews-accordion" id="yotpo-app">
+        <button
+          class="yotpo-reviews-accordion__trigger"
+          id="yotpo-reviews-trigger"
+          aria-expanded="false"
+          aria-controls="yotpo-reviews-panel"
+          type="button"
+        >
+          <span>Customer Reviews</span>
+          <svg class="yotpo-reviews-accordion__chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
+
+        <div
+          class="yotpo-reviews-accordion__panel"
+          id="yotpo-reviews-panel"
+          role="region"
+          aria-labelledby="yotpo-reviews-trigger"
+        >
+          <div class="yotpo-reviews-accordion__inner">
+            {%- for block in section.blocks -%}
+              {% render block %}
+            {%- endfor -%}
+          </div>
+        </div>
+      </div>
+
+      <script>
+        (function() {
+          var initialized = false;
+          var trigger = document.getElementById('yotpo-reviews-trigger');
+          var panel = document.getElementById('yotpo-reviews-panel');
+
+          if (!trigger || !panel) return;
+
+          trigger.addEventListener('click', function() {
+            var isOpen = this.getAttribute('aria-expanded') === 'true';
+
+            if (!isOpen) {
+              this.setAttribute('aria-expanded', 'true');
+              panel.classList.add('is-open');
+
+              if (!initialized) {
+                initialized = true;
+                if (window.yotpo) {
+                  try {
+                    var api = new Yotpo.API(yotpo);
+                    api.refreshWidgets();
+                  } catch(e) {
+                    console.warn('Yotpo refresh failed:', e);
+                  }
+                }
+              }
+            } else {
+              this.setAttribute('aria-expanded', 'false');
+              panel.classList.remove('is-open');
+            }
+          });
+        })();
+      </script>
+
+    {%- else -%}
+      {% comment %} Mixed or non-Yotpo section — render normally{% endcomment %}
+      {%- for block in section.blocks -%}
+        {% render block %}
+      {%- endfor -%}
+    {%- endif -%}
+
   </div>
 </div>
 
