@@ -271,6 +271,96 @@ function OptanonWrapper() { }
 
  
  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script>
+(function() {
+  // Only run on product pages
+  if (!window.location.pathname.includes('/products/')) return;
+
+  // Find the Yotpo reviews widget container and hide it until click
+  function wrapYotpoReviews() {
+    // Target the shopify section that wraps the full reviews widget
+    // We identify it by looking for the reviews widget instance (not star ratings)
+    var sections = document.querySelectorAll('.shopify-section');
+    
+    sections.forEach(function(section) {
+      // Look for the full reviews widget (has yotpo-reviews-main-widget inside)
+      // but NOT the star rating widget (which is in main-product section)
+      var reviewsWidget = section.querySelector('.yotpo-widget-instance[data-yotpo-instance-id]');
+      var isStarRating = section.id.includes('main-product');
+      
+      if (reviewsWidget && !isStarRating && !section.dataset.yotpoWrapped) {
+        section.dataset.yotpoWrapped = 'true';
+
+        // Insert accordion trigger before the section content
+        var trigger = document.createElement('button');
+        trigger.className = 'yotpo-lazy-trigger';
+        trigger.setAttribute('aria-expanded', 'false');
+        trigger.innerHTML = '<span>Customer Reviews</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>';
+
+        // Hide the section content
+        var inner = section.querySelector('.page-width');
+        if (!inner) return;
+        
+        inner.style.display = 'none';
+        section.insertBefore(trigger, section.firstChild);
+
+        // Add styles
+        var style = document.createElement('style');
+        style.textContent = [
+          '.yotpo-lazy-trigger{display:flex;align-items:center;justify-content:space-between;width:100%;padding:20px;background:transparent;border:none;border-top:1px solid rgba(0,0,0,0.1);border-bottom:1px solid rgba(0,0,0,0.1);cursor:pointer;font-size:1rem;font-weight:600;text-align:left;}',
+          '.yotpo-lazy-trigger svg{transition:transform 0.25s;}',
+          '.yotpo-lazy-trigger[aria-expanded="true"] svg{transform:rotate(180deg);}'
+        ].join('');
+        document.head.appendChild(style);
+
+        trigger.addEventListener('click', function() {
+          var isOpen = this.getAttribute('aria-expanded') === 'true';
+          if (!isOpen) {
+            this.setAttribute('aria-expanded', 'true');
+            inner.style.display = '';
+            // Refresh Yotpo if needed
+            if (window.yotpo) {
+              try { new Yotpo.API(yotpo).refreshWidgets(); } catch(e) {}
+            }
+          } else {
+            this.setAttribute('aria-expanded', 'false');
+            inner.style.display = 'none';
+          }
+        });
+      }
+    });
+  }
+
+  // Run after page load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', wrapYotpoReviews);
+  } else {
+    wrapYotpoReviews();
+  }
+})();
+</script>
   </body>
 </html>
 
