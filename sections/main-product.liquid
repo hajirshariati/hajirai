@@ -1114,7 +1114,7 @@
 </div>
 
 
-{% if product.template_suffix == 'pdp-ortho-v2'%}
+{% if product.template_suffix == 'pdp-ortho-v2' or product.template_suffix == 'pdp-ortho-bauer' %}
   <script>
 
   {% assign products_list = product.metafields.custom.product_reference.value %}
