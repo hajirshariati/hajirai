@@ -8177,6 +8177,15 @@ class ProductColorSwatchHandler {
 
         swatch.classList.add('color-links--already-loaded');
         
+        // Apply active-swatch class immediately for instant visual feedback
+        const allSwatches = document.querySelectorAll('.custom-meta-label.color-swatch');
+        allSwatches.forEach(s => s.classList.remove('active-swatch'));
+        
+        const clickedLabel = swatch.querySelector('.custom-meta-label.color-swatch');
+        if (clickedLabel) {
+            clickedLabel.classList.add('active-swatch');
+        }
+        
         // Set flag to indicate we're switching products
         this.isProductSwitching = true;
 
