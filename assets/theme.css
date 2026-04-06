@@ -16151,7 +16151,7 @@ video-media
 
 @media screen and (min-width: 1536px) {
     .specifications-section :is(.title-wrapper, .specifications) {
-        padding-inline: calc(var(--grid-gap) * 2);
+        padding-inline: calc(var(--grid-gap) * 0.1);
     }
 }
 
