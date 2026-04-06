@@ -16140,7 +16140,7 @@ video-media
 
 @media screen and (min-width: 1024px) {
     .specs__sidebar {
-        width: clamp(340px, 30vw, 480px);
+        width: clamp(340px, 29vw, 620px);
         padding-inline: var(--sp-12);
     }
 
@@ -16151,7 +16151,7 @@ video-media
 
 @media screen and (min-width: 1536px) {
     .specifications-section :is(.title-wrapper, .specifications) {
-        padding-inline: calc(var(--grid-gap) * 0.1);
+        padding-inline: calc(var(--grid-gap) * 0);
     }
 }
 
