@@ -415,6 +415,16 @@
         "description": "<p>If you have any questions, you are always welcome to contact us. We'll get back to you as soon as possible, within 24 hours on weekdays.</p>"
       }
     },
+    "ugc_gallery_9emGbm": {
+      "type": "ugc-gallery",
+      "custom_css": [],
+      "name": "UGC Gallery",
+      "settings": {
+        "custom_gallery": "{{ product.metafields.product.yotpo_gallery_id.value }}",
+        "global_pdp_sourced_gallery": "",
+        "global_fallback_sourced_gallery": "67c9dfd952921dee2bb9fc5c"
+      }
+    },
     "product-details": {
       "type": "product-details",
       "blocks": {
@@ -739,133 +749,6 @@
         "abra_promo_code_hide": ""
       }
     },
-    "video_with_text_xf4VTt": {
-      "type": "video-with-text",
-      "blocks": {
-        "heading_ePLUpg": {
-          "type": "heading",
-          "settings": {
-            "heading": "Why Customers Love <em> </em><em>{{ product.title }}</em>",
-            "heading_size": "title-md",
-            "heading_tag": "h2",
-            "highlighted_text": "text",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "heading_ePLUpg"
-      ],
-      "name": "Video with text",
-      "settings": {
-        "video": "{{ product.metafields.product.details_media_content.value.video.value }}",
-        "hosted_cover_image": "{{ product.featured_image }}",
-        "video_url": "",
-        "description": "",
-        "enable_video_autoplay": false,
-        "enable_video_looping": false,
-        "default_video": "shopify://files/videos/the_aetrex_advantage_-_arch_support (2160p)_b1e093e3-090a-4412-a365-9ffadc8a32e5.mp4",
-        "default_cover_image": "{{ product.featured_image }}",
-        "image_height": "500px",
-        "video_width": "medium",
-        "layout": "text_first",
-        "text_alignment": "center",
-        "content_position": "align-self-center",
-        "video_url_mobile": "",
-        "image_height_mobile": "auto",
-        "text_alignment_mobile": "center",
-        "color_text": "#171717",
-        "color_background": "#ffffff",
-        "gradient_background": "",
-        "color_background_2": "",
-        "gradient_background_2": "",
-        "color_highlight": "#c5a370",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 28,
-        "divider": false,
-        "full_width": false,
-        "rounded": true,
-        "enable_parallax": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": "",
-        "parallax_direction": "vertical"
-      }
-    },
-    "ugc_gallery_9emGbm": {
-      "type": "ugc-gallery",
-      "custom_css": [],
-      "name": "UGC Gallery",
-      "settings": {
-        "custom_gallery": "{{ product.metafields.product.yotpo_gallery_id.value }}",
-        "global_pdp_sourced_gallery": "",
-        "global_fallback_sourced_gallery": "67c9dfd952921dee2bb9fc5c"
-      }
-    },
-    "17477533508981334f": {
-      "type": "apps",
-      "blocks": {
-        "yotpo_product_reviews_reviews_RzHEBX": {
-          "type": "shopify://apps/yotpo-product-reviews/blocks/reviews/eb7dfd7d-db44-4334-bc49-c893b51b36cf",
-          "settings": {
-            "product": "{{product}}"
-          }
-        }
-      },
-      "block_order": [
-        "yotpo_product_reviews_reviews_RzHEBX"
-      ],
-      "settings": {
-        "color_text": "",
-        "color_background": "#ffffff",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 0,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": true
-      }
-    },
-    "product-recommendations": {
-      "type": "product-recommendations",
-      "disabled": true,
-      "settings": {
-        "product_limit": 6,
-        "columns": 4,
-        "carousel_on_desktop": true,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "You may also like",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": true
-      }
-    },
     "ss_recs_script_FKLgRC": {
       "type": "ss-recs-script",
       "blocks": {
@@ -933,21 +816,138 @@
       ],
       "name": "Searchspring Recommendations Target",
       "settings": {}
+    },
+    "video_with_text_xf4VTt": {
+      "type": "video-with-text",
+      "blocks": {
+        "heading_ePLUpg": {
+          "type": "heading",
+          "settings": {
+            "heading": "Why Customers Love <em> </em><em>{{ product.title }}</em>",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "text",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "heading_ePLUpg"
+      ],
+      "name": "Video with text",
+      "settings": {
+        "video": "{{ product.metafields.product.details_media_content.value.video.value }}",
+        "hosted_cover_image": "{{ product.featured_image }}",
+        "video_url": "",
+        "description": "",
+        "enable_video_autoplay": false,
+        "enable_video_looping": false,
+        "default_video": "shopify://files/videos/the_aetrex_advantage_-_arch_support (2160p)_b1e093e3-090a-4412-a365-9ffadc8a32e5.mp4",
+        "default_cover_image": "{{ product.featured_image }}",
+        "image_height": "500px",
+        "video_width": "medium",
+        "layout": "text_first",
+        "text_alignment": "center",
+        "content_position": "align-self-center",
+        "video_url_mobile": "",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "center",
+        "color_text": "#171717",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "#c5a370",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 28,
+        "divider": false,
+        "full_width": false,
+        "rounded": true,
+        "enable_parallax": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": "",
+        "parallax_direction": "vertical"
+      }
+    },
+    "17477533508981334f": {
+      "type": "apps",
+      "blocks": {
+        "yotpo_product_reviews_reviews_RzHEBX": {
+          "type": "shopify://apps/yotpo-product-reviews/blocks/reviews/eb7dfd7d-db44-4334-bc49-c893b51b36cf",
+          "settings": {
+            "product": "{{product}}"
+          }
+        }
+      },
+      "block_order": [
+        "yotpo_product_reviews_reviews_RzHEBX"
+      ],
+      "settings": {
+        "color_text": "",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 0,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": true
+      }
+    },
+    "product-recommendations": {
+      "type": "product-recommendations",
+      "disabled": true,
+      "settings": {
+        "product_limit": 6,
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "You may also like",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": true
+      }
     }
   },
   "order": [
     "main-product",
     "scrolling_text_4DH9VU",
     "help-drawer",
+    "ugc_gallery_9emGbm",
     "product-details",
     "multicolumn_KyfUdW",
     "multicolumn_CEQ6Uh",
     "custom_liquid_T9rexX",
-    "video_with_text_xf4VTt",
-    "ugc_gallery_9emGbm",
-    "17477533508981334f",
-    "product-recommendations",
     "ss_recs_script_FKLgRC",
-    "ss_recs_target_WcRdgj"
+    "ss_recs_target_WcRdgj",
+    "video_with_text_xf4VTt",
+    "17477533508981334f",
+    "product-recommendations"
   ]
 }
