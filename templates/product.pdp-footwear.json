@@ -415,16 +415,6 @@
         "description": "<p>If you have any questions, you are always welcome to contact us. We'll get back to you as soon as possible, within 24 hours on weekdays.</p>"
       }
     },
-    "ugc_gallery_9emGbm": {
-      "type": "ugc-gallery",
-      "custom_css": [],
-      "name": "UGC Gallery",
-      "settings": {
-        "custom_gallery": "{{ product.metafields.product.yotpo_gallery_id.value }}",
-        "global_pdp_sourced_gallery": "",
-        "global_fallback_sourced_gallery": "67c9dfd952921dee2bb9fc5c"
-      }
-    },
     "product-details": {
       "type": "product-details",
       "blocks": {
@@ -554,6 +544,16 @@
         "divider": false,
         "full_width": true,
         "rounded": true
+      }
+    },
+    "ugc_gallery_9emGbm": {
+      "type": "ugc-gallery",
+      "custom_css": [],
+      "name": "UGC Gallery",
+      "settings": {
+        "custom_gallery": "{{ product.metafields.product.yotpo_gallery_id.value }}",
+        "global_pdp_sourced_gallery": "",
+        "global_fallback_sourced_gallery": "67c9dfd952921dee2bb9fc5c"
       }
     },
     "multicolumn_KyfUdW": {
@@ -939,8 +939,8 @@
     "main-product",
     "scrolling_text_4DH9VU",
     "help-drawer",
-    "ugc_gallery_9emGbm",
     "product-details",
+    "ugc_gallery_9emGbm",
     "multicolumn_KyfUdW",
     "multicolumn_CEQ6Uh",
     "custom_liquid_T9rexX",
