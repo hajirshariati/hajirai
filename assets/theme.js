@@ -8005,6 +8005,7 @@ class ProductColorSwatchHandler {
         
         this.observer = null;
         this.isProductSwitching = false;
+        this.currentAbortController = null;
         this.init();
     }
 
@@ -8175,7 +8176,25 @@ class ProductColorSwatchHandler {
             return;
         }
 
+        // Cancel any pending request
+        if (this.currentAbortController) {
+            this.currentAbortController.abort();
+        }
+        
+        // Create new AbortController for this request
+        this.currentAbortController = new AbortController();
+        const signal = this.currentAbortController.signal;
+
         swatch.classList.add('color-links--already-loaded');
+        
+        // Apply active-swatch class immediately for instant visual feedback
+        const allSwatches = document.querySelectorAll('.custom-meta-label.color-swatch');
+        allSwatches.forEach(s => s.classList.remove('active-swatch'));
+        
+        const clickedLabel = swatch.querySelector('.custom-meta-label.color-swatch');
+        if (clickedLabel) {
+            clickedLabel.classList.add('active-swatch');
+        }
         
         // Set flag to indicate we're switching products
         this.isProductSwitching = true;
@@ -8198,7 +8217,7 @@ class ProductColorSwatchHandler {
             }
         });
 
-        fetch(url)
+        fetch(url, { signal })
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -8413,6 +8432,10 @@ class ProductColorSwatchHandler {
                 window.loadFrontrow();
             })
             .catch(error => {
+                // Don't log or handle aborted requests
+                if (error.name === 'AbortError') {
+                    return;
+                }
                 console.error('Error fetching product page:', error);
                 swatch.classList.remove('color-links--already-loaded');
                 this.isProductSwitching = false; // Reset flag on error
