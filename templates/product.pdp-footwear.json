@@ -735,7 +735,7 @@
       "settings": {
         "liquid": "{%render 'fr-testimonials'%}",
         "color_text": "",
-        "color_background": "#fafafa",
+        "color_background": "#ffffff",
         "gradient_background": "",
         "color_button_text": "",
         "color_button_background": "",
@@ -862,7 +862,7 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 72,
+        "padding_top": 28,
         "padding_bottom": 28,
         "divider": false,
         "full_width": false,
