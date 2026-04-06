@@ -528,7 +528,7 @@
 
       {%- if show_sidebar -%}
         <div class="grow-0">
-          <sticky-element class="specs__sidebar flex flex-col gap-7d5 md:gap-10 sticky top-0 text-center"
+          <sticky-element style=" border-radius: 2em;" class="specs__sidebar flex flex-col gap-7d5 md:gap-10 sticky top-0 text-center"
             id="dynamic-specs-sidebar"
             {%- if template.suffix == 'pdp-ortho-new' -%}
               {%- capture metafield_no_no_json -%}[{%- for item in product.metafields.custom.details_icons_no_no.value -%}{"icon":"{{ item.icon.value | image_url: width: 192 }}","label":"{{ item.label.value | escape }}"}{%- unless forloop.last -%},{%- endunless -%}{%- endfor -%}]{%- endcapture -%}
