@@ -788,7 +788,7 @@
             "text": "<p>Aetrex Performance<br/>Comfort Orthotics</p>",
             "custom_html": "",
             "button_label": "LEARN MORE",
-            "button_link": "shopify://pages/aetrex-premium-casual",
+            "button_link": "shopify://pages/aetrex-performance-comfort-orthotics-collection",
             "button_style": "primary",
             "button_external": false,
             "button_icon": false,
@@ -1198,7 +1198,8 @@
         "padding_top": 12,
         "padding_bottom": 12,
         "divider": false,
-        "rounded": false
+        "rounded": false,
+        "limit_section_width": false
       }
     },
     "empty_space_fB7tE3": {
@@ -1270,7 +1271,8 @@
         "padding_top": 40,
         "padding_bottom": 40,
         "divider": false,
-        "rounded": false
+        "rounded": false,
+        "limit_section_width": false
       }
     },
     "featured_collection_iDAyKn": {
