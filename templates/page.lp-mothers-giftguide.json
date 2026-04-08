@@ -739,6 +739,115 @@
         "abra_promo_code_hide": ""
       }
     },
+    "collection_list_KtUmXQ": {
+      "type": "collection-list",
+      "blocks": {
+        "collection_x8RVwH": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "",
+            "custom_url": "",
+            "title": "Flat Feet",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_mnCRUc": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "",
+            "custom_url": "",
+            "title": "Plantar Fasciitis",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_xaHzXD": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "",
+            "custom_url": "",
+            "title": "Bunions",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        },
+        "collection_L9eHdd": {
+          "type": "collection",
+          "settings": {
+            "link_type": "collection",
+            "collection": "",
+            "custom_url": "",
+            "title": "Metatarsalgia",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
+          }
+        }
+      },
+      "block_order": [
+        "collection_x8RVwH",
+        "collection_mnCRUc",
+        "collection_xaHzXD",
+        "collection_L9eHdd"
+      ],
+      "name": "t:sections.collection-list.name",
+      "settings": {
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "image_type": "collection",
+        "image_ratio": "square",
+        "show_products_count": true,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "Find Relief for Her",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "<p>The most thoughtful gift is one that helps to relieve pain she's been living with </p>",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
     "testimonials_rmN7kx": {
       "type": "testimonials",
       "blocks": {
@@ -891,6 +1000,7 @@
     "shop_the_look_8wViVf",
     "dynamic_feature_combo_8NW3dN",
     "image_with_text_K47tcA",
+    "collection_list_KtUmXQ",
     "testimonials_rmN7kx",
     "ugc_gallery_bWECXN"
   ]
