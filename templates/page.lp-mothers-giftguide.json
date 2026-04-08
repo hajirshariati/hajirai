@@ -451,7 +451,7 @@
       ],
       "name": "t:sections.shop-the-look.name",
       "settings": {
-        "heading": "Because She Deserves the Best",
+        "heading": "Because <em>She</em> Deserves the Best",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
