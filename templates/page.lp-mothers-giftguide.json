@@ -286,103 +286,6 @@
         "abra_promo_code_hide": ""
       }
     },
-    "multicolumn_with_icons_TjwHpG": {
-      "type": "multicolumn-with-icons",
-      "blocks": {
-        "column_EJn6hE": {
-          "type": "column",
-          "settings": {
-            "icon": "shield",
-            "custom_icon": "",
-            "heading": "<strong>Try It Risk-Free for 30 Days</strong>",
-            "text": "",
-            "highlighted_text": "none",
-            "custom_html": "",
-            "us_only": false,
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_zrrTMM": {
-          "type": "column",
-          "settings": {
-            "icon": "award",
-            "custom_icon": "",
-            "heading": "<strong>Science-Backed Comfort</strong>",
-            "text": "",
-            "highlighted_text": "none",
-            "custom_html": "",
-            "us_only": false,
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_wAdPGb": {
-          "type": "column",
-          "settings": {
-            "icon": "check_mark",
-            "custom_icon": "",
-            "heading": "<strong>Recommended by Doctors & Podiatrists</strong>",
-            "text": "",
-            "highlighted_text": "none",
-            "custom_html": "",
-            "us_only": false,
-            "highlighted_scribble": "circle"
-          }
-        },
-        "column_86cTPY": {
-          "type": "column",
-          "settings": {
-            "icon": "heart",
-            "custom_icon": "",
-            "heading": "<strong>Loved by Millions</strong>",
-            "text": "",
-            "highlighted_text": "none",
-            "custom_html": "",
-            "us_only": false,
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "column_EJn6hE",
-        "column_zrrTMM",
-        "column_wAdPGb",
-        "column_86cTPY"
-      ],
-      "name": "t:sections.multicolumn-with-icons.name",
-      "settings": {
-        "style": "with-border",
-        "columns": 4,
-        "text_alignment": "center",
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "#f0f5f6",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 24,
-        "padding_bottom": 12,
-        "divider": false,
-        "full_width": true,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": "",
-        "limit_section_width": false
-      }
-    },
     "shop_the_look_8wViVf": {
       "type": "shop-the-look",
       "blocks": {
@@ -658,6 +561,103 @@
         "divider": false,
         "full_width": false,
         "rounded": false
+      }
+    },
+    "multicolumn_with_icons_TjwHpG": {
+      "type": "multicolumn-with-icons",
+      "blocks": {
+        "column_EJn6hE": {
+          "type": "column",
+          "settings": {
+            "icon": "shield",
+            "custom_icon": "",
+            "heading": "<strong>Try It Risk-Free for 30 Days</strong>",
+            "text": "",
+            "highlighted_text": "none",
+            "custom_html": "",
+            "us_only": false,
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_zrrTMM": {
+          "type": "column",
+          "settings": {
+            "icon": "award",
+            "custom_icon": "",
+            "heading": "<strong>Science-Backed Comfort</strong>",
+            "text": "",
+            "highlighted_text": "none",
+            "custom_html": "",
+            "us_only": false,
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_wAdPGb": {
+          "type": "column",
+          "settings": {
+            "icon": "check_mark",
+            "custom_icon": "",
+            "heading": "<strong>Recommended by Doctors & Podiatrists</strong>",
+            "text": "",
+            "highlighted_text": "none",
+            "custom_html": "",
+            "us_only": false,
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_86cTPY": {
+          "type": "column",
+          "settings": {
+            "icon": "heart",
+            "custom_icon": "",
+            "heading": "<strong>Loved by Millions</strong>",
+            "text": "",
+            "highlighted_text": "none",
+            "custom_html": "",
+            "us_only": false,
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_EJn6hE",
+        "column_zrrTMM",
+        "column_wAdPGb",
+        "column_86cTPY"
+      ],
+      "name": "t:sections.multicolumn-with-icons.name",
+      "settings": {
+        "style": "with-border",
+        "columns": 4,
+        "text_alignment": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "#f0f5f6",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 12,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": "",
+        "limit_section_width": false
       }
     },
     "image_with_text_K47tcA": {
@@ -1061,9 +1061,9 @@
     "slideshow_aM3pX6",
     "rich_text_E7k9yj",
     "collection_list_q9MCBN",
-    "multicolumn_with_icons_TjwHpG",
     "shop_the_look_8wViVf",
     "dynamic_feature_combo_8NW3dN",
+    "multicolumn_with_icons_TjwHpG",
     "image_with_text_K47tcA",
     "collection_list_KtUmXQ",
     "testimonials_rmN7kx",
