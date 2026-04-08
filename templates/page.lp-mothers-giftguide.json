@@ -851,19 +851,6 @@
     "testimonials_rmN7kx": {
       "type": "testimonials",
       "blocks": {
-        "testimonial_i8hpLw": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "quote",
-            "text": "<p>Beautifully Comfortable. I could walk in these all day. They are perfect for work.</p>",
-            "author": "Marjolyn M.",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
         "testimonial_WptKCX": {
           "type": "testimonial",
           "settings": {
@@ -944,7 +931,6 @@
         }
       },
       "block_order": [
-        "testimonial_i8hpLw",
         "testimonial_WptKCX",
         "testimonial_cMqe8h",
         "testimonial_DUKJrG",
@@ -954,7 +940,7 @@
       ],
       "name": "t:sections.testimonials.name",
       "settings": {
-        "heading": "Customer Reviews",
+        "heading": "Real Moms, Real Relief",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
         "heading_tag": "h2",
