@@ -88,6 +88,94 @@
         "abra_promo_code_hide": ""
       }
     },
+    "rich_text_E7k9yj": {
+      "type": "rich-text",
+      "blocks": {
+        "button_W7wmbU": {
+          "type": "button",
+          "settings": {
+            "button_label": "Under $75",
+            "button_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_Nm9MVV": {
+          "type": "button",
+          "settings": {
+            "button_label": "Under $100",
+            "button_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_LyYQCN": {
+          "type": "button",
+          "settings": {
+            "button_label": "Under $150",
+            "button_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        },
+        "button_EQXYBm": {
+          "type": "button",
+          "settings": {
+            "button_label": "$150+",
+            "button_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "button_W7wmbU",
+        "button_Nm9MVV",
+        "button_LyYQCN",
+        "button_EQXYBm"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_width": "small",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 20,
+        "padding_bottom": 20,
+        "divider": false,
+        "narrow": true,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
     "collection_list_q9MCBN": {
       "type": "collection-list",
       "blocks": {
@@ -796,6 +884,7 @@
   "order": [
     "main-page",
     "slideshow_aM3pX6",
+    "rich_text_E7k9yj",
     "collection_list_q9MCBN",
     "multicolumn_with_icons_TjwHpG",
     "shop_the_look_8wViVf",
