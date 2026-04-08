@@ -524,6 +524,7 @@
         "spacing_h83m86",
         "button_Vd4x9h"
       ],
+      "disabled": true,
       "custom_css": [],
       "name": "Dynamic Feature Combo",
       "settings": {
@@ -576,7 +577,7 @@
         "heading_T98yTk": {
           "type": "heading",
           "settings": {
-            "heading": "What <em>Oprah Daily</em> Is Saying",
+            "heading": "Introducing BioRocker TM",
             "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "none",
@@ -586,7 +587,7 @@
         "text_HtYPP9": {
           "type": "text",
           "settings": {
-            "text": "<p>\"We love that these wedge sandals have an adjustable front strap with a hook and loop closure to accommodate the bunion area with an extra comfortable fit. And there’s another strap at your ankle as well to keep you securely in the shoe. There’s also memory foam in the foot bed and arch support which is helpful for other conditions like plantar fasciitis.\"</p>",
+            "text": "<p>Technology that promotes a smooth, natural heel-to-toe motion designed to help reduce pressure on the ball-of-foot and keep her moving comfortably all day.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -601,8 +602,8 @@
         "button_AVPJUf": {
           "type": "button",
           "settings": {
-            "button_label": "Shop Now",
-            "button_link": "shopify://products/ashley-off-white-ew793w",
+            "button_label": "Shop BioRocker Styles",
+            "button_link": "shopify://collections/biorocker™-collection",
             "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
@@ -647,95 +648,6 @@
         "parallax_direction": "vertical",
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
-      }
-    },
-    "featured_product_wtCJrb": {
-      "type": "featured-product",
-      "blocks": {
-        "title_kFqqXf": {
-          "type": "title",
-          "settings": {
-            "title_size": "product-title-md",
-            "title_size_mobile": "product-title-md",
-            "title_tag": "h2",
-            "show_price": true,
-            "show_rating": true
-          }
-        },
-        "variant_picker_7r6hdp": {
-          "type": "variant_picker",
-          "settings": {
-            "enable_dynamic_variants": true,
-            "show_variant_labels": true,
-            "picker_type": "button",
-            "enable_color_swatches": true,
-            "color_swatch_type": "variant",
-            "size_chart": ""
-          }
-        },
-        "complementary_myAUcB": {
-          "type": "complementary",
-          "settings": {
-            "heading": "Additional Colors",
-            "product_limit": 10,
-            "show_vendor": false,
-            "show_price": true
-          }
-        },
-        "quantity_selector_479EwC": {
-          "type": "quantity_selector",
-          "disabled": true,
-          "settings": {}
-        },
-        "buy_buttons_4dEzXk": {
-          "type": "buy_buttons",
-          "settings": {
-            "show_quantity_selector": false,
-            "show_price": false,
-            "show_dynamic_checkout": true,
-            "show_gift_card_recipient": false,
-            "enable_back_in_stock": false,
-            "show_back_in_stock_name": false,
-            "show_back_in_stock_phone": false
-          }
-        },
-        "read_more_nGzagb": {
-          "type": "read_more",
-          "settings": {}
-        }
-      },
-      "block_order": [
-        "title_kFqqXf",
-        "variant_picker_7r6hdp",
-        "complementary_myAUcB",
-        "quantity_selector_479EwC",
-        "buy_buttons_4dEzXk",
-        "read_more_nGzagb"
-      ],
-      "custom_css": [
-        ".installment {display: none !important;}",
-        "ul.swatches.swatches--round-slight.swatches--color.swatches--variant {display: none !important;}"
-      ],
-      "name": "t:sections.featured-product.name",
-      "settings": {
-        "product": "ashley-black-ew790w",
-        "enable_sticky_info": true,
-        "media_size": 50,
-        "gallery_layout": "thumbnail",
-        "thumbnail_position": "beside",
-        "image_ratio": "adapt_first",
-        "image_zoom": "lightbox",
-        "hide_variants": false,
-        "enable_video_autoplay": false,
-        "enable_video_looping": false,
-        "mobile_layout": "partial",
-        "image_ratio_mobile": "adapt_first",
-        "mobile_thumbnail": false,
-        "padding_top": 52,
-        "padding_bottom": 0,
-        "divider": false,
-        "full_width": false,
-        "rounded": false
       }
     },
     "testimonials_rmN7kx": {
@@ -889,7 +801,6 @@
     "shop_the_look_8wViVf",
     "dynamic_feature_combo_8NW3dN",
     "image_with_text_K47tcA",
-    "featured_product_wtCJrb",
     "testimonials_rmN7kx",
     "ugc_gallery_bWECXN"
   ]
