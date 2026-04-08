@@ -30,15 +30,13 @@
         "image_EXgffj": {
           "type": "image",
           "settings": {
-            "image": "shopify://shop_images/Ash_banner_D3.jpg",
-            "image_mobile": "shopify://shop_images/Ash_banner_M6.jpg",
             "content_position": "md:items-center md:justify-start",
             "content_position_mobile": "items-end justify-center",
-            "heading": "Best Sandal for Bunions",
+            "heading": "The Gift She'll Love Every Day",
             "heading_size": "title-md",
             "heading_tag": "h2",
-            "text": "<p>Honored by Oprah Daily</p>",
-            "text_font": "subtitle",
+            "text": "<p>Engineered from 50M+ foot scans. Doctor recommended. The comfort she deserves, in the styles she'll actually reach for.</p>",
+            "text_font": "body",
             "text_size": "subtext-lg",
             "text_max_size": 32,
             "text_line_height": 1.6,
@@ -47,7 +45,7 @@
             "secondary_color_text": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle",
-            "button_label": "Shop Ashley Wedge",
+            "button_label": "Shop All Women's Gifts",
             "button_link": "shopify://products/ashley-hazy-blue-multi-ew794w",
             "button_style": "primary",
             "button_external": false,
@@ -90,100 +88,111 @@
         "abra_promo_code_hide": ""
       }
     },
-    "image_with_text_overlay_Hnzn9F": {
-      "type": "image-with-text-overlay",
+    "collection_list_q9MCBN": {
+      "type": "collection-list",
       "blocks": {
-        "subheading_ijjb78": {
-          "type": "subheading",
+        "collection_mnGN4D": {
+          "type": "collection",
           "settings": {
-            "subheading": "Ashley Arch Support Wedge",
-            "subheading_size": "subtitle-lg",
-            "secondary_color": true
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "",
+            "title": "Under $75",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
           }
         },
-        "heading_ChxeEC": {
-          "type": "heading",
+        "collection_bjWfVU": {
+          "type": "collection",
           "settings": {
-            "heading": "<p>Best Sandal for Bunions</p>",
-            "heading_size": "title-md",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "",
+            "title": "Under $100",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
           }
         },
-        "subheading_MbEAmi": {
-          "type": "subheading",
+        "collection_ryjD9n": {
+          "type": "collection",
           "settings": {
-            "subheading": "Honored by Oprah Daily",
-            "subheading_size": "subtitle-lg",
-            "secondary_color": false
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "",
+            "title": "Under $150",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
           }
         },
-        "text_cQCMec": {
-          "type": "text",
-          "disabled": true,
+        "collection_7gGD8r": {
+          "type": "collection",
           "settings": {
-            "text": "<p>Genuine leather construction, built-in arch support and a memory foam footbed. Designed using insights from over 50 million foot scans, made to make you move better. </p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_fnaDLP": {
-          "type": "button",
-          "settings": {
-            "button_label": "Shop Ashley Wedge",
-            "button_link": "shopify://products/ashley-hazy-blue-multi-ew794w",
-            "button_video_link": "",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": false
+            "link_type": "url",
+            "collection": "",
+            "custom_url": "",
+            "title": "$150+",
+            "description": "",
+            "overlay_content": false,
+            "color_text": "#ffffff",
+            "color_overlay": "#000000",
+            "overlay_opacity": 30,
+            "submenu_title_position": "bottom",
+            "enable_title_drop_shadow": false
           }
         }
       },
       "block_order": [
-        "subheading_ijjb78",
-        "heading_ChxeEC",
-        "subheading_MbEAmi",
-        "text_cQCMec",
-        "button_fnaDLP"
+        "collection_mnGN4D",
+        "collection_bjWfVU",
+        "collection_ryjD9n",
+        "collection_7gGD8r"
       ],
-      "disabled": true,
-      "name": "t:sections.image-with-text-overlay.name",
+      "name": "t:sections.collection-list.name",
       "settings": {
-        "transparent_header": false,
-        "image": "shopify://shop_images/Ash_banner_D2.jpg",
-        "image_height": "adapt",
-        "content_width": "small",
-        "content_position": "md:items-center md:justify-start",
-        "text_alignment": "left",
-        "image_mobile": "shopify://shop_images/Ash_banner_M4.jpg",
-        "image_height_mobile": "adapt",
-        "content_position_mobile": "items-end justify-center",
-        "text_alignment_mobile": "left",
-        "color_text": "#171717",
-        "color_highlight": "#869cae",
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "image_type": "collection",
+        "image_ratio": "square",
+        "show_products_count": true,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "Collections",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
         "gradient_highlight": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
+        "color_button_text": "",
+        "color_button_background": "",
         "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "divider_color": "#111111",
-        "overlay_opacity": 0,
-        "padding_top": 0,
-        "padding_bottom": 0,
+        "padding_top": 72,
+        "padding_bottom": 72,
         "divider": false,
         "full_width": false,
         "rounded": false,
-        "enable_parallax": false,
-        "parallax_direction": "vertical",
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
@@ -1167,7 +1176,7 @@
   "order": [
     "main-page",
     "slideshow_aM3pX6",
-    "image_with_text_overlay_Hnzn9F",
+    "collection_list_q9MCBN",
     "dynamic_feature_combo_8NW3dN",
     "image_with_text_K47tcA",
     "featured_product_wtCJrb",
