@@ -713,15 +713,6 @@
         "abra_promo_code_hide": ""
       }
     },
-    "ugc_gallery_bWECXN": {
-      "type": "ugc-gallery",
-      "name": "UGC Gallery",
-      "settings": {
-        "custom_gallery": "",
-        "global_pdp_sourced_gallery": "67807363501d9d972ff9bf48",
-        "global_fallback_sourced_gallery": "67806b650c1215001c37bb7e"
-      }
-    },
     "shop_the_feed_ThdnXC": {
       "type": "shop-the-feed",
       "blocks": {
@@ -1173,7 +1164,6 @@
     "featured_product_wtCJrb",
     "testimonials_rmN7kx",
     "featured_collection_ytWEYw",
-    "ugc_gallery_bWECXN",
     "shop_the_feed_ThdnXC"
   ]
 }
