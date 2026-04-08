@@ -973,7 +973,7 @@
         "heading_MWkRge": {
           "type": "heading",
           "settings": {
-            "heading": "Rich text",
+            "heading": "Make Her Next Step <em>Her Best One</em>",
             "heading_size": "title-lg tracking-heading",
             "heading_tag": "h2",
             "highlighted_text": "none",
@@ -983,7 +983,7 @@
         "text_d7kJmn": {
           "type": "text",
           "settings": {
-            "text": "<p>Use this text to share information about your brand with your customers. Describe a product, share announcements, or welcome customers to your store.</p>",
+            "text": "<p>Free shipping · 30-day wear test · Easy returns</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -998,12 +998,12 @@
         "button_YHXKUR": {
           "type": "button",
           "settings": {
-            "button_label": "Button label",
+            "button_label": "Shop All Women's Gifts",
             "button_link": "",
             "button_style": "primary",
             "button_size": "md",
             "button_external": false,
-            "button_icon": true
+            "button_icon": false
           }
         }
       },
@@ -1014,8 +1014,8 @@
       ],
       "name": "t:sections.rich-text.name",
       "settings": {
-        "text_alignment": "left",
-        "text_alignment_mobile": "left",
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
         "heading": "",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
