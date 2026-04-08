@@ -1,0 +1,1179 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main-page": {
+      "type": "main-page",
+      "disabled": true,
+      "settings": {
+        "heading_size": "title-sm",
+        "heading_alignment": "text-left",
+        "heading_tag": "h1",
+        "text_size": "text-base",
+        "padding_top": 72,
+        "padding_bottom": 120,
+        "divider": false,
+        "narrow": true,
+        "rounded": false
+      }
+    },
+    "slideshow_aM3pX6": {
+      "type": "slideshow",
+      "blocks": {
+        "image_EXgffj": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/Ash_banner_D3.jpg",
+            "image_mobile": "shopify://shop_images/Ash_banner_M6.jpg",
+            "content_position": "md:items-center md:justify-start",
+            "content_position_mobile": "items-end justify-center",
+            "heading": "Best Sandal for Bunions",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "text": "<p>Honored by Oprah Daily</p>",
+            "text_font": "subtitle",
+            "text_size": "subtext-lg",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color_text": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle",
+            "button_label": "Shop Ashley Wedge",
+            "button_link": "shopify://products/ashley-hazy-blue-multi-ew794w",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "image_EXgffj"
+      ],
+      "name": "t:sections.slideshow.name",
+      "settings": {
+        "autoplay": false,
+        "autoplay_speed": 5,
+        "show_navigation": true,
+        "image_height": "adapt",
+        "content_width": "small",
+        "text_alignment": "left",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "center",
+        "mobile_content_space": 168,
+        "mobile_content_space_color": "#e9eae5",
+        "accessibility_info": "",
+        "color_text": "#171717",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "image_with_text_overlay_Hnzn9F": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "subheading_ijjb78": {
+          "type": "subheading",
+          "settings": {
+            "subheading": "Ashley Arch Support Wedge",
+            "subheading_size": "subtitle-lg",
+            "secondary_color": true
+          }
+        },
+        "heading_ChxeEC": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>Best Sandal for Bunions</p>",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "subheading_MbEAmi": {
+          "type": "subheading",
+          "settings": {
+            "subheading": "Honored by Oprah Daily",
+            "subheading_size": "subtitle-lg",
+            "secondary_color": false
+          }
+        },
+        "text_cQCMec": {
+          "type": "text",
+          "disabled": true,
+          "settings": {
+            "text": "<p>Genuine leather construction, built-in arch support and a memory foam footbed. Designed using insights from over 50 million foot scans, made to make you move better. </p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_fnaDLP": {
+          "type": "button",
+          "settings": {
+            "button_label": "Shop Ashley Wedge",
+            "button_link": "shopify://products/ashley-hazy-blue-multi-ew794w",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "subheading_ijjb78",
+        "heading_ChxeEC",
+        "subheading_MbEAmi",
+        "text_cQCMec",
+        "button_fnaDLP"
+      ],
+      "disabled": true,
+      "name": "t:sections.image-with-text-overlay.name",
+      "settings": {
+        "transparent_header": false,
+        "image": "shopify://shop_images/Ash_banner_D2.jpg",
+        "image_height": "adapt",
+        "content_width": "small",
+        "content_position": "md:items-center md:justify-start",
+        "text_alignment": "left",
+        "image_mobile": "shopify://shop_images/Ash_banner_M4.jpg",
+        "image_height_mobile": "adapt",
+        "content_position_mobile": "items-end justify-center",
+        "text_alignment_mobile": "left",
+        "color_text": "#171717",
+        "color_highlight": "#869cae",
+        "gradient_highlight": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "divider_color": "#111111",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "dynamic_feature_combo_8NW3dN": {
+      "type": "dynamic-feature-combo",
+      "blocks": {
+        "feature_point_4y67Aw": {
+          "type": "feature_point",
+          "settings": {
+            "heading": "Adjustable Straps",
+            "text": "for Extra Comfort",
+            "horizontal": 54,
+            "vertical": 64,
+            "text_horizontal": 3,
+            "text_vertical": 76
+          }
+        },
+        "feature_point_wG8TzX": {
+          "type": "feature_point",
+          "settings": {
+            "heading": "Memory Foam Footbed",
+            "text": "for Cushioning & Comfort",
+            "horizontal": 81,
+            "vertical": 63,
+            "text_horizontal": 28,
+            "text_vertical": 87
+          }
+        },
+        "feature_point_gn8GxX": {
+          "type": "feature_point",
+          "settings": {
+            "heading": "Aetrex Signature Arch Support",
+            "text": "to Help Relieve Heel/Arch Pain",
+            "horizontal": 55,
+            "vertical": 46,
+            "text_horizontal": 70,
+            "text_vertical": 29
+          }
+        },
+        "feature_point_FXjfXC": {
+          "type": "feature_point",
+          "settings": {
+            "heading": "Stretchy Gore",
+            "text": "for Extra Comfort",
+            "horizontal": 37,
+            "vertical": 21,
+            "text_horizontal": 55,
+            "text_vertical": 4
+          }
+        },
+        "feature_point_6fhNb6": {
+          "type": "feature_point",
+          "settings": {
+            "heading": "Genuine Leather",
+            "text": "",
+            "horizontal": 49,
+            "vertical": 25,
+            "text_horizontal": 67,
+            "text_vertical": 14
+          }
+        },
+        "heading_Q7f3Ca": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>Where <em>Science</em> </p><p>Meets <em>Style</em></p>",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_HnQg7Q": {
+          "type": "text",
+          "disabled": true,
+          "settings": {
+            "text": "<p>Engineered using data from over 50 million global foot scans, every curve and contour of the Ashley is designed to support your body from the ground up.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 0.8,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_KiXc8F": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Genuine leather construction, built-in arch support and a memory foam footbed. Designed using insights from over 50 million foot scans, made to make you move better.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 0.8,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "spacing_h83m86": {
+          "type": "spacing",
+          "settings": {
+            "height": 40,
+            "height_mobile": 28
+          }
+        },
+        "button_Vd4x9h": {
+          "type": "button",
+          "settings": {
+            "button_label": "Shop Now",
+            "button_link": "shopify://products/ashley-coffee-multi-ew796w",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "feature_point_4y67Aw",
+        "feature_point_wG8TzX",
+        "feature_point_gn8GxX",
+        "feature_point_FXjfXC",
+        "feature_point_6fhNb6",
+        "heading_Q7f3Ca",
+        "text_HnQg7Q",
+        "text_KiXc8F",
+        "spacing_h83m86",
+        "button_Vd4x9h"
+      ],
+      "custom_css": [],
+      "name": "Dynamic Feature Combo",
+      "settings": {
+        "tile1_width": 5,
+        "tile2_width": 2,
+        "tile3_width": 5,
+        "gap": 16,
+        "gap_mobile": 16,
+        "feature_image": "shopify://shop_images/93104-EW796W_catalog.jpg",
+        "feature_image_mobile": "shopify://shop_images/93104-EW796W_catalog.jpg",
+        "feature_image_link": "shopify://products/ashley-coffee-multi-ew796w",
+        "feature_image_link_external": false,
+        "feature_image_link_target": "desktop",
+        "lifestyle_image": "shopify://shop_images/science_53e95fe1-1ba1-4c6c-9de2-6b57552a93a7.jpg",
+        "lifestyle_image_mobile": "shopify://shop_images/science_53e95fe1-1ba1-4c6c-9de2-6b57552a93a7.jpg",
+        "text_background": "#f5f5f5",
+        "text_padding": 40,
+        "text_vertical_align": "center",
+        "text_horizontal_align": "center",
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "text_max_width": 500,
+        "dot_size": 16,
+        "dot_size_mobile": 20,
+        "dot_color": "#ffffff",
+        "dot_border_color": "#171717",
+        "dot_border_width": 2,
+        "line_color": "#171717",
+        "line_width": 0.4,
+        "callout_background": "#e7e7e7",
+        "callout_background_opacity": 1,
+        "callout_radius": 8,
+        "callout_max_width": 220,
+        "callout_title_color": "#171717",
+        "callout_text_color": "#484848",
+        "color_text": "#000000",
+        "color_highlight": "#e0a580",
+        "gradient_highlight": "",
+        "divider_color": "#111111",
+        "padding_top": 40,
+        "padding_bottom": 40,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "image_with_text_K47tcA": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_T98yTk": {
+          "type": "heading",
+          "settings": {
+            "heading": "What <em>Oprah Daily</em> Is Saying",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_HtYPP9": {
+          "type": "text",
+          "settings": {
+            "text": "<p>\"We love that these wedge sandals have an adjustable front strap with a hook and loop closure to accommodate the bunion area with an extra comfortable fit. And there’s another strap at your ankle as well to keep you securely in the shoe. There’s also memory foam in the foot bed and arch support which is helpful for other conditions like plantar fasciitis.\"</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_AVPJUf": {
+          "type": "button",
+          "settings": {
+            "button_label": "Shop Now",
+            "button_link": "shopify://products/ashley-off-white-ew793w",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_T98yTk",
+        "text_HtYPP9",
+        "button_AVPJUf"
+      ],
+      "name": "t:sections.image-with-text.name",
+      "settings": {
+        "image": "shopify://shop_images/oprah.jpg",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "medium",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_mobile": "shopify://shop_images/oprah.jpg",
+        "image_height_mobile": "adapt",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": false,
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "featured_product_wtCJrb": {
+      "type": "featured-product",
+      "blocks": {
+        "title_kFqqXf": {
+          "type": "title",
+          "settings": {
+            "title_size": "product-title-md",
+            "title_size_mobile": "product-title-md",
+            "title_tag": "h2",
+            "show_price": true,
+            "show_rating": true
+          }
+        },
+        "variant_picker_7r6hdp": {
+          "type": "variant_picker",
+          "settings": {
+            "enable_dynamic_variants": true,
+            "show_variant_labels": true,
+            "picker_type": "button",
+            "enable_color_swatches": true,
+            "color_swatch_type": "variant",
+            "size_chart": ""
+          }
+        },
+        "complementary_myAUcB": {
+          "type": "complementary",
+          "settings": {
+            "heading": "Additional Colors",
+            "product_limit": 10,
+            "show_vendor": false,
+            "show_price": true
+          }
+        },
+        "quantity_selector_479EwC": {
+          "type": "quantity_selector",
+          "disabled": true,
+          "settings": {}
+        },
+        "buy_buttons_4dEzXk": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_quantity_selector": false,
+            "show_price": false,
+            "show_dynamic_checkout": true,
+            "show_gift_card_recipient": false,
+            "enable_back_in_stock": false,
+            "show_back_in_stock_name": false,
+            "show_back_in_stock_phone": false
+          }
+        },
+        "read_more_nGzagb": {
+          "type": "read_more",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "title_kFqqXf",
+        "variant_picker_7r6hdp",
+        "complementary_myAUcB",
+        "quantity_selector_479EwC",
+        "buy_buttons_4dEzXk",
+        "read_more_nGzagb"
+      ],
+      "custom_css": [
+        ".installment {display: none !important;}",
+        "ul.swatches.swatches--round-slight.swatches--color.swatches--variant {display: none !important;}"
+      ],
+      "name": "t:sections.featured-product.name",
+      "settings": {
+        "product": "ashley-black-ew790w",
+        "enable_sticky_info": true,
+        "media_size": 50,
+        "gallery_layout": "thumbnail",
+        "thumbnail_position": "beside",
+        "image_ratio": "adapt_first",
+        "image_zoom": "lightbox",
+        "hide_variants": false,
+        "enable_video_autoplay": false,
+        "enable_video_looping": false,
+        "mobile_layout": "partial",
+        "image_ratio_mobile": "adapt_first",
+        "mobile_thumbnail": false,
+        "padding_top": 52,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": false,
+        "rounded": false
+      }
+    },
+    "testimonials_rmN7kx": {
+      "type": "testimonials",
+      "blocks": {
+        "testimonial_i8hpLw": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Beautifully Comfortable. I could walk in these all day. They are perfect for work.</p>",
+            "author": "Marjolyn M.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_WptKCX": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Love this style! I’ve never been able to wear a shoe with any heel. These are so COMFORTABLE and attractive. Thank you Aetrex!</p>",
+            "author": "Gina S.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_cMqe8h": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Holy grail of wedges! They are the most comfortable wedges ever! I wear them all day with no issues. The arch support is fantastic.</p>",
+            "author": "Sherri J.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_DUKJrG": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>Highly recommend! Love these shoes! The Ashley Arch Support Wedge is not only fashionable but also comfortable to wear from the get-go.</p>",
+            "author": "Julie S.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_KMjBFE": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>These are wonderful shoes. I have high arches and very bad knee arthritis. I never wear heels, but these are a real exception. I can wear them all day without exacerbating my knee pain, and they look great!</p>",
+            "author": "Joan S.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_J6K3XV": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>What a great shoe! This is the most comfortable shoe I own. The arch support is perfect and the adjustable straps are terrific. All of this and stylish too!</p>",
+            "author": "Kathy C.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "testimonial_AQFrnV": {
+          "type": "testimonial",
+          "settings": {
+            "icon": "quote",
+            "text": "<p>These shoes are great! They give me arch support and a soft footbed, as well as adjustable straps. And they are pretty!!</p>",
+            "author": "Kristin L.",
+            "author_info": "",
+            "author_url": "",
+            "image_ratio": "rounded",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "testimonial_i8hpLw",
+        "testimonial_WptKCX",
+        "testimonial_cMqe8h",
+        "testimonial_DUKJrG",
+        "testimonial_KMjBFE",
+        "testimonial_J6K3XV",
+        "testimonial_AQFrnV"
+      ],
+      "name": "t:sections.testimonials.name",
+      "settings": {
+        "heading": "Customer Reviews",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "rounded": false,
+        "limit_section_width": false
+      }
+    },
+    "featured_collection_ytWEYw": {
+      "type": "featured-collection",
+      "custom_css": [],
+      "name": "t:sections.featured-collection.name",
+      "settings": {
+        "collection": "",
+        "products": [
+          "ashley-champagne-ew795w",
+          "ashley-coffee-multi-ew796w",
+          "ashley-off-white-ew793w",
+          "ashley-navy-ew791w",
+          "ashley-hazy-blue-multi-ew794w",
+          "ashley-rose-ew797w",
+          "ashley-scotch-ew798w",
+          "ashley-taupe-ew792w"
+        ],
+        "product_limit": 12,
+        "columns": 5,
+        "carousel_on_desktop": true,
+        "show_view_all": false,
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "heading": "More Colors, Same Comfort",
+        "heading_size": "title-md",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "ugc_gallery_bWECXN": {
+      "type": "ugc-gallery",
+      "name": "UGC Gallery",
+      "settings": {
+        "custom_gallery": "",
+        "global_pdp_sourced_gallery": "67807363501d9d972ff9bf48",
+        "global_fallback_sourced_gallery": "67806b650c1215001c37bb7e"
+      }
+    },
+    "shop_the_feed_ThdnXC": {
+      "type": "shop-the-feed",
+      "blocks": {
+        "feed_ahjgWH": {
+          "type": "feed",
+          "settings": {
+            "image": "shopify://shop_images/Ashley_karenlien.co_1.jpg",
+            "enable_video_autoplay": false,
+            "enable_video_looping": false,
+            "video_on_hover": false,
+            "button_label": "",
+            "button_link": "",
+            "button_external": false,
+            "button_icon": false,
+            "account_name": "",
+            "account_description": "",
+            "account_button": "Follow",
+            "account_link": "",
+            "account_link_external": false,
+            "color_text": "#ffffff",
+            "color_button_text": "#000000",
+            "color_button_background": "#ffffff",
+            "color_button_gradient": "",
+            "hotspot_color_text_1": "#ffffff",
+            "hotspot_vertical_1": 45,
+            "hotspot_horizontal_1": 25,
+            "hotspot_product_1": "",
+            "hotspot_color_text_2": "#ffffff",
+            "hotspot_vertical_2": 30,
+            "hotspot_horizontal_2": 65,
+            "hotspot_product_2": "",
+            "hotspot_color_text_3": "#ffffff",
+            "hotspot_vertical_3": 60,
+            "hotspot_horizontal_3": 75,
+            "hotspot_product_3": "",
+            "hotspot_color_text_4": "#ffffff",
+            "hotspot_vertical_4": 50,
+            "hotspot_horizontal_4": 50,
+            "hotspot_product_4": ""
+          }
+        },
+        "feed_YgeLci": {
+          "type": "feed",
+          "settings": {
+            "image": "shopify://shop_images/Ashley_sweetstylingsue_3.jpg",
+            "enable_video_autoplay": false,
+            "enable_video_looping": false,
+            "video_on_hover": false,
+            "button_label": "",
+            "button_link": "",
+            "button_external": false,
+            "button_icon": false,
+            "account_name": "",
+            "account_description": "",
+            "account_button": "",
+            "account_link": "",
+            "account_link_external": false,
+            "color_text": "#ffffff",
+            "color_button_text": "#000000",
+            "color_button_background": "#ffffff",
+            "color_button_gradient": "",
+            "hotspot_color_text_1": "#ffffff",
+            "hotspot_vertical_1": 45,
+            "hotspot_horizontal_1": 25,
+            "hotspot_product_1": "",
+            "hotspot_color_text_2": "#ffffff",
+            "hotspot_vertical_2": 30,
+            "hotspot_horizontal_2": 65,
+            "hotspot_product_2": "",
+            "hotspot_color_text_3": "#ffffff",
+            "hotspot_vertical_3": 60,
+            "hotspot_horizontal_3": 75,
+            "hotspot_product_3": "",
+            "hotspot_color_text_4": "#ffffff",
+            "hotspot_vertical_4": 50,
+            "hotspot_horizontal_4": 50,
+            "hotspot_product_4": ""
+          }
+        },
+        "feed_yMczED": {
+          "type": "feed",
+          "settings": {
+            "image": "shopify://shop_images/Ashley_reemakakria9_1_POSTED.jpg",
+            "enable_video_autoplay": false,
+            "enable_video_looping": false,
+            "video_on_hover": false,
+            "button_label": "",
+            "button_link": "",
+            "button_external": false,
+            "button_icon": false,
+            "account_name": "",
+            "account_description": "",
+            "account_button": "",
+            "account_link": "",
+            "account_link_external": false,
+            "color_text": "#ffffff",
+            "color_button_text": "#000000",
+            "color_button_background": "#ffffff",
+            "color_button_gradient": "",
+            "hotspot_color_text_1": "#ffffff",
+            "hotspot_vertical_1": 45,
+            "hotspot_horizontal_1": 25,
+            "hotspot_product_1": "",
+            "hotspot_color_text_2": "#ffffff",
+            "hotspot_vertical_2": 30,
+            "hotspot_horizontal_2": 65,
+            "hotspot_product_2": "",
+            "hotspot_color_text_3": "#ffffff",
+            "hotspot_vertical_3": 60,
+            "hotspot_horizontal_3": 75,
+            "hotspot_product_3": "",
+            "hotspot_color_text_4": "#ffffff",
+            "hotspot_vertical_4": 50,
+            "hotspot_horizontal_4": 50,
+            "hotspot_product_4": ""
+          }
+        },
+        "feed_9crYFb": {
+          "type": "feed",
+          "settings": {
+            "image": "shopify://shop_images/Ashley_totallyglamstyle_1_POSTED.jpg",
+            "enable_video_autoplay": false,
+            "enable_video_looping": false,
+            "video_on_hover": false,
+            "button_label": "",
+            "button_link": "",
+            "button_external": false,
+            "button_icon": false,
+            "account_name": "",
+            "account_description": "",
+            "account_button": "",
+            "account_link": "",
+            "account_link_external": false,
+            "color_text": "#ffffff",
+            "color_button_text": "#000000",
+            "color_button_background": "#ffffff",
+            "color_button_gradient": "",
+            "hotspot_color_text_1": "#ffffff",
+            "hotspot_vertical_1": 45,
+            "hotspot_horizontal_1": 25,
+            "hotspot_product_1": "",
+            "hotspot_color_text_2": "#ffffff",
+            "hotspot_vertical_2": 30,
+            "hotspot_horizontal_2": 65,
+            "hotspot_product_2": "",
+            "hotspot_color_text_3": "#ffffff",
+            "hotspot_vertical_3": 60,
+            "hotspot_horizontal_3": 75,
+            "hotspot_product_3": "",
+            "hotspot_color_text_4": "#ffffff",
+            "hotspot_vertical_4": 50,
+            "hotspot_horizontal_4": 50,
+            "hotspot_product_4": ""
+          }
+        },
+        "feed_fQgetX": {
+          "type": "feed",
+          "settings": {
+            "image": "shopify://shop_images/Ashley_lbambrick_1.jpg",
+            "enable_video_autoplay": false,
+            "enable_video_looping": false,
+            "video_on_hover": false,
+            "button_label": "",
+            "button_link": "",
+            "button_external": false,
+            "button_icon": false,
+            "account_name": "",
+            "account_description": "",
+            "account_button": "",
+            "account_link": "",
+            "account_link_external": false,
+            "color_text": "#ffffff",
+            "color_button_text": "#000000",
+            "color_button_background": "#ffffff",
+            "color_button_gradient": "",
+            "hotspot_color_text_1": "#ffffff",
+            "hotspot_vertical_1": 45,
+            "hotspot_horizontal_1": 25,
+            "hotspot_product_1": "",
+            "hotspot_color_text_2": "#ffffff",
+            "hotspot_vertical_2": 30,
+            "hotspot_horizontal_2": 65,
+            "hotspot_product_2": "",
+            "hotspot_color_text_3": "#ffffff",
+            "hotspot_vertical_3": 60,
+            "hotspot_horizontal_3": 75,
+            "hotspot_product_3": "",
+            "hotspot_color_text_4": "#ffffff",
+            "hotspot_vertical_4": 50,
+            "hotspot_horizontal_4": 50,
+            "hotspot_product_4": ""
+          }
+        },
+        "feed_Gzex6j": {
+          "type": "feed",
+          "settings": {
+            "image": "shopify://shop_images/Ashley_jennyonthespot_1_POSTED.jpg",
+            "enable_video_autoplay": false,
+            "enable_video_looping": false,
+            "video_on_hover": false,
+            "button_label": "",
+            "button_link": "",
+            "button_external": false,
+            "button_icon": false,
+            "account_name": "",
+            "account_description": "",
+            "account_button": "",
+            "account_link": "",
+            "account_link_external": false,
+            "color_text": "#ffffff",
+            "color_button_text": "#000000",
+            "color_button_background": "#ffffff",
+            "color_button_gradient": "",
+            "hotspot_color_text_1": "#ffffff",
+            "hotspot_vertical_1": 45,
+            "hotspot_horizontal_1": 25,
+            "hotspot_product_1": "",
+            "hotspot_color_text_2": "#ffffff",
+            "hotspot_vertical_2": 30,
+            "hotspot_horizontal_2": 65,
+            "hotspot_product_2": "",
+            "hotspot_color_text_3": "#ffffff",
+            "hotspot_vertical_3": 60,
+            "hotspot_horizontal_3": 75,
+            "hotspot_product_3": "",
+            "hotspot_color_text_4": "#ffffff",
+            "hotspot_vertical_4": 50,
+            "hotspot_horizontal_4": 50,
+            "hotspot_product_4": ""
+          }
+        },
+        "feed_Cnwgqn": {
+          "type": "feed",
+          "settings": {
+            "image": "shopify://shop_images/Ashley_dzaninatahirovic_1.jpg",
+            "enable_video_autoplay": false,
+            "enable_video_looping": false,
+            "video_on_hover": false,
+            "button_label": "",
+            "button_link": "",
+            "button_external": false,
+            "button_icon": false,
+            "account_name": "",
+            "account_description": "",
+            "account_button": "",
+            "account_link": "",
+            "account_link_external": false,
+            "color_text": "#ffffff",
+            "color_button_text": "#000000",
+            "color_button_background": "#ffffff",
+            "color_button_gradient": "",
+            "hotspot_color_text_1": "#ffffff",
+            "hotspot_vertical_1": 45,
+            "hotspot_horizontal_1": 25,
+            "hotspot_product_1": "",
+            "hotspot_color_text_2": "#ffffff",
+            "hotspot_vertical_2": 30,
+            "hotspot_horizontal_2": 65,
+            "hotspot_product_2": "",
+            "hotspot_color_text_3": "#ffffff",
+            "hotspot_vertical_3": 60,
+            "hotspot_horizontal_3": 75,
+            "hotspot_product_3": "",
+            "hotspot_color_text_4": "#ffffff",
+            "hotspot_vertical_4": 50,
+            "hotspot_horizontal_4": 50,
+            "hotspot_product_4": ""
+          }
+        },
+        "feed_YBxD6E": {
+          "type": "feed",
+          "settings": {
+            "image": "shopify://shop_images/Ashley_mysweetsavings_4.png",
+            "enable_video_autoplay": false,
+            "enable_video_looping": false,
+            "video_on_hover": false,
+            "button_label": "",
+            "button_link": "",
+            "button_external": false,
+            "button_icon": false,
+            "account_name": "",
+            "account_description": "",
+            "account_button": "",
+            "account_link": "",
+            "account_link_external": false,
+            "color_text": "#ffffff",
+            "color_button_text": "#000000",
+            "color_button_background": "#ffffff",
+            "color_button_gradient": "",
+            "hotspot_color_text_1": "#ffffff",
+            "hotspot_vertical_1": 45,
+            "hotspot_horizontal_1": 25,
+            "hotspot_product_1": "",
+            "hotspot_color_text_2": "#ffffff",
+            "hotspot_vertical_2": 30,
+            "hotspot_horizontal_2": 65,
+            "hotspot_product_2": "",
+            "hotspot_color_text_3": "#ffffff",
+            "hotspot_vertical_3": 60,
+            "hotspot_horizontal_3": 75,
+            "hotspot_product_3": "",
+            "hotspot_color_text_4": "#ffffff",
+            "hotspot_vertical_4": 50,
+            "hotspot_horizontal_4": 50,
+            "hotspot_product_4": ""
+          }
+        },
+        "feed_egfATL": {
+          "type": "feed",
+          "settings": {
+            "image": "shopify://shop_images/Ashley_stephanie_loftin_1.jpg",
+            "enable_video_autoplay": false,
+            "enable_video_looping": false,
+            "video_on_hover": false,
+            "button_label": "",
+            "button_link": "",
+            "button_external": false,
+            "button_icon": false,
+            "account_name": "",
+            "account_description": "",
+            "account_button": "",
+            "account_link": "",
+            "account_link_external": false,
+            "color_text": "#ffffff",
+            "color_button_text": "#000000",
+            "color_button_background": "#ffffff",
+            "color_button_gradient": "",
+            "hotspot_color_text_1": "#ffffff",
+            "hotspot_vertical_1": 45,
+            "hotspot_horizontal_1": 25,
+            "hotspot_product_1": "",
+            "hotspot_color_text_2": "#ffffff",
+            "hotspot_vertical_2": 30,
+            "hotspot_horizontal_2": 65,
+            "hotspot_product_2": "",
+            "hotspot_color_text_3": "#ffffff",
+            "hotspot_vertical_3": 60,
+            "hotspot_horizontal_3": 75,
+            "hotspot_product_3": "",
+            "hotspot_color_text_4": "#ffffff",
+            "hotspot_vertical_4": 50,
+            "hotspot_horizontal_4": 50,
+            "hotspot_product_4": ""
+          }
+        },
+        "feed_f9TVzp": {
+          "type": "feed",
+          "settings": {
+            "image": "shopify://shop_images/Ashley_grace.grit.glamour_4.jpg",
+            "enable_video_autoplay": false,
+            "enable_video_looping": false,
+            "video_on_hover": false,
+            "button_label": "",
+            "button_link": "",
+            "button_external": false,
+            "button_icon": false,
+            "account_name": "",
+            "account_description": "",
+            "account_button": "",
+            "account_link": "",
+            "account_link_external": false,
+            "color_text": "#ffffff",
+            "color_button_text": "#000000",
+            "color_button_background": "#ffffff",
+            "color_button_gradient": "",
+            "hotspot_color_text_1": "#ffffff",
+            "hotspot_vertical_1": 45,
+            "hotspot_horizontal_1": 25,
+            "hotspot_product_1": "",
+            "hotspot_color_text_2": "#ffffff",
+            "hotspot_vertical_2": 30,
+            "hotspot_horizontal_2": 65,
+            "hotspot_product_2": "",
+            "hotspot_color_text_3": "#ffffff",
+            "hotspot_vertical_3": 60,
+            "hotspot_horizontal_3": 75,
+            "hotspot_product_3": "",
+            "hotspot_color_text_4": "#ffffff",
+            "hotspot_vertical_4": 50,
+            "hotspot_horizontal_4": 50,
+            "hotspot_product_4": ""
+          }
+        }
+      },
+      "block_order": [
+        "feed_ahjgWH",
+        "feed_YgeLci",
+        "feed_yMczED",
+        "feed_9crYFb",
+        "feed_fQgetX",
+        "feed_Gzex6j",
+        "feed_Cnwgqn",
+        "feed_YBxD6E",
+        "feed_egfATL",
+        "feed_f9TVzp"
+      ],
+      "custom_css": [
+        ".product-card__media .badges {display: none;}",
+        ".shop-the-feed .horizontal-product {display: none;}",
+        ".social-feed.x-modal:not(.is-visible) {pointer-events: none !important;}",
+        ".media-card__button {display: none !important;}"
+      ],
+      "name": "t:sections.shop-the-feed.name",
+      "settings": {
+        "columns": 5,
+        "carousel_on_desktop": true,
+        "image_ratio": "portrait",
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "account_name": "",
+        "show_vendor": false,
+        "show_price": false,
+        "heading": "",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": false,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 80,
+        "padding_bottom": 100,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    }
+  },
+  "order": [
+    "main-page",
+    "slideshow_aM3pX6",
+    "image_with_text_overlay_Hnzn9F",
+    "dynamic_feature_combo_8NW3dN",
+    "image_with_text_K47tcA",
+    "featured_product_wtCJrb",
+    "testimonials_rmN7kx",
+    "featured_collection_ytWEYw",
+    "ugc_gallery_bWECXN",
+    "shop_the_feed_ThdnXC"
+  ]
+}
