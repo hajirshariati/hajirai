@@ -290,7 +290,7 @@
         {%- if show_variant_labels -%}
           <div class="flex gap-2 items-center">
             {{- option.name -}}
-            {%- if product.template_suffix == 'pdp-ortho-new' -%}
+            {%- if product.template_suffix == 'pdp-ortho-new' or product.template_suffix == 'pdp-ortho-bauer' -%}
                 {%- if option.name == 'Size' -%}
                     :<span class="font-medium"
                            id="{{ section_id }}-{{ product_id }}-option{{ option.position }}">{{ option.selected_value }}</span>
