@@ -24,6 +24,93 @@
         "rounded": false
       }
     },
+    "shop_the_look_8wViVf": {
+      "type": "shop-the-look",
+      "blocks": {
+        "product_mWCyK3": {
+          "type": "product",
+          "settings": {
+            "product": "jillian-sage-sc446w",
+            "color_text": "#ffffff",
+            "vertical": 50,
+            "horizontal": 50,
+            "vertical_mobile": 50,
+            "horizontal_mobile": 50
+          }
+        },
+        "product_Be6ffn": {
+          "type": "product",
+          "settings": {
+            "product": "flora-antique-rose-mw139w",
+            "color_text": "#ffffff",
+            "vertical": 50,
+            "horizontal": 50,
+            "vertical_mobile": 50,
+            "horizontal_mobile": 50
+          }
+        },
+        "product_8kJHf8": {
+          "type": "product",
+          "settings": {
+            "product": "l2300w-m",
+            "color_text": "#ffffff",
+            "vertical": 25,
+            "horizontal": 25,
+            "vertical_mobile": 25,
+            "horizontal_mobile": 25
+          }
+        },
+        "product_BqrwaL": {
+          "type": "product",
+          "settings": {
+            "product": "charlotte-butter-ca716w",
+            "color_text": "#ffffff",
+            "vertical": 75,
+            "horizontal": 65,
+            "vertical_mobile": 75,
+            "horizontal_mobile": 65
+          }
+        }
+      },
+      "block_order": [
+        "product_mWCyK3",
+        "product_Be6ffn",
+        "product_8kJHf8",
+        "product_BqrwaL"
+      ],
+      "name": "t:sections.shop-the-look.name",
+      "settings": {
+        "heading": "Because <em>She</em> Deserves the Best",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "Our Top Picks",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 30,
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
     "slideshow_aM3pX6": {
       "type": "slideshow",
       "blocks": {
@@ -389,105 +476,6 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "shop_the_look_8wViVf": {
-      "type": "shop-the-look",
-      "blocks": {
-        "product_mWCyK3": {
-          "type": "product",
-          "settings": {
-            "product": "jillian-sage-sc446w",
-            "color_text": "#ffffff",
-            "vertical": 50,
-            "horizontal": 50,
-            "vertical_mobile": 50,
-            "horizontal_mobile": 50
-          }
-        },
-        "product_Be6ffn": {
-          "type": "product",
-          "settings": {
-            "product": "flora-antique-rose-mw139w",
-            "color_text": "#ffffff",
-            "vertical": 50,
-            "horizontal": 50,
-            "vertical_mobile": 50,
-            "horizontal_mobile": 50
-          }
-        },
-        "product_8kJHf8": {
-          "type": "product",
-          "settings": {
-            "product": "l2300w-m",
-            "color_text": "#ffffff",
-            "vertical": 25,
-            "horizontal": 25,
-            "vertical_mobile": 25,
-            "horizontal_mobile": 25
-          }
-        },
-        "product_BqrwaL": {
-          "type": "product",
-          "settings": {
-            "product": "charlotte-butter-ca716w",
-            "color_text": "#ffffff",
-            "vertical": 75,
-            "horizontal": 65,
-            "vertical_mobile": 75,
-            "horizontal_mobile": 65
-          }
-        },
-        "product_9xE63H": {
-          "type": "product",
-          "settings": {
-            "product": "sydney-denim-ew710w",
-            "color_text": "#ffffff",
-            "vertical": 50,
-            "horizontal": 50,
-            "vertical_mobile": 50,
-            "horizontal_mobile": 50
-          }
-        }
-      },
-      "block_order": [
-        "product_mWCyK3",
-        "product_Be6ffn",
-        "product_8kJHf8",
-        "product_BqrwaL",
-        "product_9xE63H"
-      ],
-      "name": "t:sections.shop-the-look.name",
-      "settings": {
-        "heading": "Because <em>She</em> Deserves the Best",
-        "heading_size": "title-md",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "Our Top Picks",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "overlay_opacity": 30,
         "padding_top": 72,
         "padding_bottom": 72,
         "divider": false,
@@ -1170,11 +1158,11 @@
   },
   "order": [
     "main-page",
+    "shop_the_look_8wViVf",
+    "logo_list_YCPjeJ",
     "slideshow_aM3pX6",
     "rich_text_E7k9yj",
-    "logo_list_YCPjeJ",
     "collection_list_q9MCBN",
-    "shop_the_look_8wViVf",
     "dynamic_feature_combo_8NW3dN",
     "multicolumn_with_icons_TjwHpG",
     "image_with_text_K47tcA",
