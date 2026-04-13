@@ -229,7 +229,7 @@
       },
       "2296928500563504527": {
         "type": "shopify://apps/abra-promotions/blocks/abra/daa1493a-23b5-48bb-8cb5-7ab1267b4642",
-        "disabled": false,
+        "disabled": true,
         "settings": {
           "popup_preview": false,
           "popup_background_color": "#119d52",
