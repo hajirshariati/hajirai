@@ -21,6 +21,7 @@ function OptanonWrapper() { }
 {% comment %} True Fit Script {% endcomment %} 
  {% if template contains 'pdp' %}  
 <script>
+setTimeout(function() {
   ;(function (r, e, o) {
     var w = window, d = document, t, s, x;
     w.tfcapi = t =
@@ -39,6 +40,7 @@ function OptanonWrapper() { }
     s.src = 'https://' + subDomain + '.truefitcorp.com/fitrec/global/js/tf-integration.js?storeKey=' + r;
     x.parentNode.insertBefore(s, x);
   })('aet', 'prod');
+}, 5000);
 
   function observeCartChanges() {
     const cartObserver = new PerformanceObserver((list) => {
