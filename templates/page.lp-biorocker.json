@@ -11,8 +11,9 @@
   "sections": {
     "main-page": {
       "type": "main-page",
+      "disabled": true,
       "settings": {
-        "heading_size": "title-sm",
+        "heading_size": "title-xl tracking-heading",
         "heading_alignment": "text-left",
         "heading_tag": "h1",
         "text_size": "text-base",
@@ -23,164 +24,339 @@
         "rounded": false
       }
     },
-    "slideshow_rcT8py": {
-      "type": "slideshow",
+    "rich_text_qhigBb": {
+      "type": "rich-text",
       "blocks": {
-        "image_gPRPDR": {
-          "type": "image",
+        "text_3N3TpP": {
+          "type": "text",
           "settings": {
-            "content_position": "md:items-end md:justify-start",
-            "content_position_mobile": "items-end justify-start",
-            "heading": "Foot Pain is not normal.",
-            "heading_size": "title-lg tracking-heading",
-            "heading_tag": "h2",
-            "text": "<p><em>Move with stability. Live with confidence.</em></p><p></p>",
+            "text": "<p>BioRocker™ Collection</p>",
+            "text_font": "body",
+            "text_size": "subtext-custom",
+            "text_max_size": 50,
+            "text_line_height": 1.2,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_CKVNhf": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Engineered to promote a smooth, natural heel-to-toe motion and designed to help reduce pressure where you need it most.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
-            "text_line_height": 1.6,
+            "text_line_height": 1.2,
             "text_letter_spacing": 0,
             "text_capitalize": false,
-            "secondary_color_text": false,
+            "secondary_color": false,
             "highlighted_text": "none",
-            "highlighted_scribble": "circle",
-            "button_label": "Discover Your Support",
-            "button_link": "",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_3N3TpP",
+        "text_CKVNhf"
+      ],
+      "name": "Rich text",
+      "settings": {
+        "text_alignment": "center",
+        "text_alignment_mobile": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_width": "small",
+        "heading_tag": "h1",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "#171717",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 12,
+        "padding_bottom": 12,
+        "divider": false,
+        "narrow": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "multicolumn_R8kcbF": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_aAJcWw": {
+          "type": "column",
+          "settings": {
+            "show_border": true,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/93905-EN2004W_catalog.jpg",
+            "image_ratio": "square",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "custom_html": "",
+            "button_label": "Shop Savannah",
+            "button_link": "shopify://products/savannah-taupe-en2004w",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_pNXkfL": {
+          "type": "column",
+          "settings": {
+            "show_border": true,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/93027-EN3004W_catalog.jpg",
+            "image_ratio": "square",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "custom_html": "",
+            "button_label": "Shop Donna",
+            "button_link": "shopify://products/donna-cognac-en3004w",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_hR6VPT": {
+          "type": "column",
+          "settings": {
+            "show_border": true,
+            "text_alignment": "center",
+            "text_alignment_mobile": "center",
+            "image": "shopify://shop_images/93003-EN2504W_catalog.jpg",
+            "image_ratio": "square",
+            "heading": "",
+            "heading_size": "text-lg-2xl",
+            "text": "",
+            "custom_html": "",
+            "button_label": "Shop Jenny",
+            "button_link": "shopify://products/jenny-taupe-en2504w",
+            "button_style": "secondary",
+            "button_external": false,
+            "button_icon": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_aAJcWw",
+        "column_pNXkfL",
+        "column_hR6VPT"
+      ],
+      "name": "Multicolumn",
+      "settings": {
+        "gap": "large",
+        "columns": 3,
+        "columns_mobile": "1",
+        "carousel_on_desktop": false,
+        "swipe_on_mobile": true,
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h3",
+        "subheading": "",
+        "description": "",
+        "button_label": "Shop BioRocker™ Collection",
+        "button_link": "shopify://collections/biorocker™-collection",
+        "button_external": false,
+        "button_icon": false,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "full_width": true,
+        "divider": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
+    "dynamic_feature_combo_RDPrtk": {
+      "type": "dynamic-feature-combo",
+      "blocks": {
+        "feature_point_TGJEik": {
+          "type": "feature_point",
+          "settings": {
+            "heading": "Lightweight UltraSky™ EVA Midsole",
+            "text": "for balance & alignment helps absorb shock",
+            "horizontal": 36,
+            "vertical": 62,
+            "text_horizontal": 0,
+            "text_vertical": 84
+          }
+        },
+        "feature_point_jaE6at": {
+          "type": "feature_point",
+          "settings": {
+            "heading": "Aetrex Signature Arch Support",
+            "text": "for balance & alignment",
+            "horizontal": 42,
+            "vertical": 47,
+            "text_horizontal": 60,
+            "text_vertical": 4
+          }
+        },
+        "feature_point_MC4DTP": {
+          "type": "feature_point",
+          "settings": {
+            "heading": "Dual BioRocker™ Design",
+            "text": "guides each heel-to-toe step for effortless motion",
+            "horizontal": 81,
+            "vertical": 62,
+            "text_horizontal": 55,
+            "text_vertical": 79
+          }
+        },
+        "heading_J3D4zG": {
+          "type": "heading",
+          "settings": {
+            "heading": "<p>The <em>Science</em> </p><p>Behind Every Step</p>",
+            "heading_size": "title-sm",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_7pBeji": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Genuine leather construction, built-in arch support and a memory foam footbed. Designed using insights from over 50 million foot scans, made to make you move better.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 0.8,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "spacing_fkWaLi": {
+          "type": "spacing",
+          "settings": {
+            "height": 40,
+            "height_mobile": 28
+          }
+        },
+        "button_rK7CEX": {
+          "type": "button",
+          "settings": {
+            "button_label": "Shop Now",
+            "button_link": "shopify://products/ashley-coffee-multi-ew796w",
+            "button_video_link": "",
             "button_style": "primary",
+            "button_size": "md",
             "button_external": false,
             "button_icon": false
           }
         }
       },
       "block_order": [
-        "image_gPRPDR"
+        "feature_point_TGJEik",
+        "feature_point_jaE6at",
+        "feature_point_MC4DTP",
+        "heading_J3D4zG",
+        "text_7pBeji",
+        "spacing_fkWaLi",
+        "button_rK7CEX"
       ],
-      "disabled": true,
-      "name": "t:sections.slideshow.name",
+      "custom_css": [],
+      "name": "Dynamic Feature Combo",
       "settings": {
-        "autoplay": false,
-        "autoplay_speed": 5,
-        "show_navigation": true,
-        "image_height": "100vh",
-        "content_width": "small",
+        "tile1_width": 6,
+        "tile2_width": 4,
+        "tile3_width": 4,
+        "gap": 16,
+        "gap_mobile": 16,
+        "feature_image": "shopify://shop_images/92983-EN2009W_right.jpg",
+        "feature_image_mobile": "shopify://shop_images/92983-EN2009W_right.jpg",
+        "feature_image_link": "shopify://products/savannah-taupe-en2004w",
+        "feature_image_link_external": false,
+        "feature_image_link_target": "desktop",
+        "lifestyle_image": "shopify://shop_images/Biorocker_8.5x11.jpg",
+        "lifestyle_image_mobile": "shopify://shop_images/Biorocker_8.5x11.jpg",
+        "text_background": "#f5f5f5",
+        "text_padding": 40,
+        "text_vertical_align": "center",
+        "text_horizontal_align": "center",
         "text_alignment": "left",
-        "image_height_mobile": "auto",
         "text_alignment_mobile": "left",
-        "accessibility_info": "Slideshow about our brand",
-        "color_text": "#ffffff",
-        "color_background": "#ffffff",
-        "gradient_background": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
-        "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "overlay_opacity": 20,
-        "padding_top": 0,
-        "padding_bottom": 0,
-        "divider": false,
-        "full_width": true,
-        "rounded": false,
-        "enable_parallax": false,
-        "parallax_direction": "vertical",
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "image_with_text_7FkUzY": {
-      "type": "image-with-text",
-      "blocks": {
-        "heading_mYJBhg": {
-          "type": "heading",
-          "settings": {
-            "heading": "It’s not just age.",
-            "heading_size": "title-md",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_dAb3eB": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Long days. Travel. Standing at work.<br/><br/>Pain has been normalized. It shouldn’t be.</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_Byr8RP": {
-          "type": "button",
-          "settings": {
-            "button_label": "Button label",
-            "button_link": "",
-            "button_video_link": "",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": true
-          }
-        }
-      },
-      "block_order": [
-        "heading_mYJBhg",
-        "text_dAb3eB",
-        "button_Byr8RP"
-      ],
-      "disabled": true,
-      "name": "t:sections.image-with-text.name",
-      "settings": {
-        "img_url": "",
-        "image_height": "650px",
-        "image_width": "medium",
-        "layout": "image_first",
-        "text_alignment": "left",
-        "custom_content_position": "items-center",
-        "image_height_mobile": "auto",
-        "text_alignment_mobile": "left",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_background_2": "",
-        "gradient_background_2": "",
-        "color_highlight": "",
+        "text_max_width": 500,
+        "dot_size": 16,
+        "dot_size_mobile": 20,
+        "dot_color": "#ffffff",
+        "dot_border_color": "#171717",
+        "dot_border_width": 2,
+        "line_color": "#171717",
+        "line_width": 0.4,
+        "callout_background": "#e7e7e7",
+        "callout_background_opacity": 1,
+        "callout_radius": 8,
+        "callout_max_width": 220,
+        "callout_title_color": "#171717",
+        "callout_text_color": "#484848",
+        "color_text": "#000000",
+        "color_highlight": "#e0a580",
         "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
+        "divider_color": "#111111",
+        "padding_top": 40,
+        "padding_bottom": 40,
         "divider": false,
         "full_width": false,
-        "rounded": false,
-        "enable_parallax": true,
-        "parallax_direction": "vertical",
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
+        "rounded": false
       }
     },
-    "image_with_text_hKzaWF": {
+    "image_with_text_rg7Gg3": {
       "type": "image-with-text",
       "blocks": {
-        "heading_VB6Gen": {
+        "heading_hgMJaH": {
           "type": "heading",
           "settings": {
-            "heading": "Real comfort is structure.",
+            "heading": "Motion Made Easy",
             "heading_size": "title-md",
             "heading_tag": "h2",
             "highlighted_text": "none",
             "highlighted_scribble": "circle"
           }
         },
-        "text_VfxCP8": {
+        "text_4BtNAj": {
           "type": "text",
           "settings": {
-            "text": "<p>Softness fades. Support lasts.<br/><br/>We build from structure first — not cushioning alone.</p>",
+            "text": "<p>Engineered to promote a smooth, natural heel-to-toe motion and designed to help reduce pressure where you need it most.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -192,27 +368,27 @@
             "highlighted_scribble": "circle"
           }
         },
-        "button_jmwimp": {
+        "button_3xCjCM": {
           "type": "button",
           "settings": {
-            "button_label": "Button label",
-            "button_link": "",
+            "button_label": "Shop BioRocker™ Collection",
+            "button_link": "shopify://collections/biorocker™-collection",
             "button_video_link": "",
-            "button_style": "primary",
+            "button_style": "secondary",
             "button_size": "md",
             "button_external": false,
-            "button_icon": true
+            "button_icon": false
           }
         }
       },
       "block_order": [
-        "heading_VB6Gen",
-        "text_VfxCP8",
-        "button_jmwimp"
+        "heading_hgMJaH",
+        "text_4BtNAj",
+        "button_3xCjCM"
       ],
-      "disabled": true,
       "name": "t:sections.image-with-text.name",
       "settings": {
+        "image": "shopify://shop_images/94845-EN2508W_catalog2.gif",
         "img_url": "",
         "image_height": "650px",
         "image_width": "medium",
@@ -242,63 +418,24 @@
         "abra_promo_code_hide": ""
       }
     },
-    "featured_collections_FLxc7H": {
-      "type": "featured-collections",
-      "blocks": {
-        "collection_34eK49": {
-          "type": "collection",
-          "settings": {
-            "collection": "",
-            "products": [],
-            "title": "All-day stability"
-          }
-        },
-        "collection_QHpTMj": {
-          "type": "collection",
-          "settings": {
-            "collection": "",
-            "products": [],
-            "title": "Travel"
-          }
-        },
-        "collection_4APaY8": {
-          "type": "collection",
-          "settings": {
-            "collection": "",
-            "products": [],
-            "title": "Structured support"
-          }
-        },
-        "collection_nw4kBW": {
-          "type": "collection",
-          "settings": {
-            "collection": "",
-            "products": [],
-            "title": "Flat Feet"
-          }
-        }
-      },
-      "block_order": [
-        "collection_34eK49",
-        "collection_QHpTMj",
-        "collection_4APaY8",
-        "collection_nw4kBW"
-      ],
-      "disabled": true,
-      "name": "t:sections.featured-collections.name",
+    "featured_collection_UyTjdn": {
+      "type": "featured-collection",
+      "name": "t:sections.featured-collection.name",
       "settings": {
+        "collection": "biorocker™-collection",
+        "products": [],
         "product_limit": 6,
         "columns": 4,
         "carousel_on_desktop": true,
         "show_view_all": false,
         "columns_mobile": "1",
         "swipe_on_mobile": true,
-        "heading": "<strong>Support, thoughtfully designed</strong>",
+        "heading": "Shop BioRocker™ Collection",
         "heading_size": "title-md",
         "heading_alignment": "text-left md:items-end md:flex-row",
         "heading_tag": "h2",
         "subheading": "",
-        "description": "<p>Each style is built with structured support and refined materials — so you never have to choose between elegance and stability.</p><p></p>",
+        "description": "",
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "",
@@ -317,330 +454,14 @@
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
       }
-    },
-    "images_with_text_overlay_dtnRUF": {
-      "type": "images-with-text-overlay",
-      "blocks": {
-        "heading_8dPhTc": {
-          "type": "heading",
-          "settings": {
-            "heading": "<p>Designed from real foot intelligence</p>",
-            "heading_size": "title-lg tracking-heading",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_pa49k3": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Decades of foot data.<br/>Structural arch systems.<br/>Built for the way women’s feet change.</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_yUALRG": {
-          "type": "button",
-          "settings": {
-            "button_label": "Learn About Our Support",
-            "button_link": "",
-            "button_video_link": "",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": true
-          }
-        }
-      },
-      "block_order": [
-        "heading_8dPhTc",
-        "text_pa49k3",
-        "button_yUALRG"
-      ],
-      "disabled": true,
-      "name": "t:sections.images-with-text-overlay.name",
-      "settings": {
-        "transparent_header": false,
-        "image_height": "650px",
-        "content_width": "small",
-        "content_position": "md:items-end md:justify-start",
-        "text_alignment": "left",
-        "image_height_mobile": "auto",
-        "content_position_mobile": "items-end justify-start",
-        "text_alignment_mobile": "left",
-        "color_text": "#ffffff",
-        "color_highlight": "#e0a580",
-        "gradient_highlight": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
-        "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "divider_color": "#111111",
-        "overlay_opacity": 100,
-        "padding_top": 0,
-        "padding_bottom": 0,
-        "divider": false,
-        "full_width": true,
-        "rounded": false,
-        "enable_parallax": true
-      }
-    },
-    "reveal_testimonials_EU8z7L": {
-      "type": "reveal-testimonials",
-      "blocks": {
-        "testimonial_TeakBY": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "testimonial_fd8RXY": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "testimonial_FptCJy": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "testimonial_3GipyW": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "testimonial_rkJDdN": {
-          "type": "testimonial",
-          "settings": {
-            "icon": "quote",
-            "text": "<p>Add customer reviews and testimonials to showcase your store’s happy customers.</p>",
-            "author": "Author's name",
-            "author_info": "",
-            "author_url": "",
-            "image_ratio": "rounded",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        }
-      },
-      "block_order": [
-        "testimonial_TeakBY",
-        "testimonial_fd8RXY",
-        "testimonial_FptCJy",
-        "testimonial_3GipyW",
-        "testimonial_rkJDdN"
-      ],
-      "disabled": true,
-      "name": "t:sections.reveal-testimonials.name",
-      "settings": {
-        "heading": "REAL PEOPLE. REAL STORIES.",
-        "heading_size": "title-md",
-        "heading_tag": "h2",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "image_with_text_overlay_kgdapg": {
-      "type": "image-with-text-overlay",
-      "blocks": {
-        "heading_gneyk3": {
-          "type": "heading",
-          "settings": {
-            "heading": "<p>Move with confidence</p>",
-            "heading_size": "title-lg tracking-heading",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_VLXVGm": {
-          "type": "text",
-          "settings": {
-            "text": "<p>For every day you don’t want to think about your feet.</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_cdCdK8": {
-          "type": "button",
-          "settings": {
-            "button_label": "Shop Support That Lasts",
-            "button_link": "",
-            "button_video_link": "",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": true
-          }
-        }
-      },
-      "block_order": [
-        "heading_gneyk3",
-        "text_VLXVGm",
-        "button_cdCdK8"
-      ],
-      "disabled": true,
-      "name": "t:sections.image-with-text-overlay.name",
-      "settings": {
-        "transparent_header": false,
-        "image_height": "650px",
-        "content_width": "small",
-        "content_position": "md:items-end md:justify-start",
-        "text_alignment": "left",
-        "image_height_mobile": "auto",
-        "content_position_mobile": "items-end justify-start",
-        "text_alignment_mobile": "left",
-        "color_text": "#ffffff",
-        "color_highlight": "#e0a580",
-        "gradient_highlight": "",
-        "color_button_text": "#171717",
-        "color_button_background": "#ffffff",
-        "color_button_gradient": "",
-        "color_overlay": "#171717",
-        "divider_color": "#111111",
-        "overlay_opacity": 70,
-        "padding_top": 0,
-        "padding_bottom": 0,
-        "divider": false,
-        "full_width": true,
-        "rounded": false,
-        "enable_parallax": true,
-        "parallax_direction": "vertical",
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "rich_text_Ep8Mfk": {
-      "type": "rich-text",
-      "blocks": {
-        "heading_RGW4XY": {
-          "type": "heading",
-          "settings": {
-            "heading": "You deserve better support.",
-            "heading_size": "title-lg tracking-heading",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_KwLG46": {
-          "type": "button",
-          "settings": {
-            "button_label": "Find Your Fit",
-            "button_link": "",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": true
-          }
-        }
-      },
-      "block_order": [
-        "heading_RGW4XY",
-        "button_KwLG46"
-      ],
-      "disabled": true,
-      "name": "t:sections.rich-text.name",
-      "settings": {
-        "text_alignment": "center",
-        "text_alignment_mobile": "center",
-        "heading": "",
-        "heading_size": "title-md",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_width": "small",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 100,
-        "divider": false,
-        "narrow": true,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
     }
   },
   "order": [
     "main-page",
-    "slideshow_rcT8py",
-    "image_with_text_7FkUzY",
-    "image_with_text_hKzaWF",
-    "featured_collections_FLxc7H",
-    "images_with_text_overlay_dtnRUF",
-    "reveal_testimonials_EU8z7L",
-    "image_with_text_overlay_kgdapg",
-    "rich_text_Ep8Mfk"
+    "rich_text_qhigBb",
+    "multicolumn_R8kcbF",
+    "dynamic_feature_combo_RDPrtk",
+    "image_with_text_rg7Gg3",
+    "featured_collection_UyTjdn"
   ]
 }
