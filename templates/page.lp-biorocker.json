@@ -308,10 +308,10 @@
           "settings": {
             "heading": "Lightweight UltraSky™ EVA Midsole",
             "text": "for balance & alignment helps absorb shock",
-            "horizontal": 36,
-            "vertical": 62,
-            "text_horizontal": 0,
-            "text_vertical": 84
+            "horizontal": 20,
+            "vertical": 60,
+            "text_horizontal": 11,
+            "text_vertical": 80
           }
         },
         "feature_point_jaE6at": {
@@ -319,10 +319,10 @@
           "settings": {
             "heading": "Aetrex Signature Arch Support",
             "text": "for balance & alignment",
-            "horizontal": 42,
+            "horizontal": 37,
             "vertical": 47,
-            "text_horizontal": 60,
-            "text_vertical": 4
+            "text_horizontal": 43,
+            "text_vertical": 2
           }
         },
         "feature_point_MC4DTP": {
