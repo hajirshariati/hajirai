@@ -330,7 +330,7 @@
           "settings": {
             "heading": "Dual BioRocker™ Design",
             "text": "guides each heel-to-toe step for effortless motion",
-            "horizontal": 86,
+            "horizontal": 81,
             "vertical": 62,
             "text_horizontal": 65,
             "text_vertical": 18
@@ -434,6 +434,84 @@
         "divider": false,
         "full_width": false,
         "rounded": false
+      }
+    },
+    "image_with_text_X7WB6L": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading_8MDgaK": {
+          "type": "heading",
+          "settings": {
+            "heading": "How it Works",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_HBQCrB": {
+          "type": "text",
+          "settings": {
+            "text": "<p>BioRocker Technology promotes a smooth natural heel-to-toe motion. Designed to help reduce pressure on the ball-of-foot, keeping you moving comfortably all day.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "button_rPikU4": {
+          "type": "button",
+          "settings": {
+            "button_label": "Shop BioRocker Collection",
+            "button_link": "shopify://collections/biorocker™-collection",
+            "button_video_link": "",
+            "button_style": "primary",
+            "button_size": "md",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_8MDgaK",
+        "text_HBQCrB",
+        "button_rPikU4"
+      ],
+      "name": "t:sections.image-with-text.name",
+      "settings": {
+        "image": "shopify://shop_images/94845-EN2508W_catalog2.gif",
+        "img_url": "",
+        "image_height": "adapt",
+        "image_width": "medium",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "custom_content_position": "items-center",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_background_2": "",
+        "gradient_background_2": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": true,
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "featured_collection_UyTjdn": {
@@ -559,6 +637,7 @@
     "multicolumn_R8kcbF",
     "multicolumn_with_icons_Wb3Wrk",
     "dynamic_feature_combo_RDPrtk",
+    "image_with_text_X7WB6L",
     "featured_collection_UyTjdn",
     "rich_text_ELxcbY"
   ]
