@@ -353,6 +353,89 @@
         "rounded": false
       }
     },
+    "multicolumn_with_icons_Wb3Wrk": {
+      "type": "multicolumn-with-icons",
+      "blocks": {
+        "column_gkLAGr": {
+          "type": "column",
+          "settings": {
+            "icon": "shield",
+            "custom_icon": "",
+            "heading": "<strong>Try It Risk-Free for 30 Days</strong>",
+            "text": "",
+            "highlighted_text": "none",
+            "custom_html": "",
+            "us_only": false,
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_RQMbpf": {
+          "type": "column",
+          "settings": {
+            "icon": "award",
+            "custom_icon": "",
+            "heading": "<strong>Built with 50M+ Foot Scans</strong>",
+            "text": "",
+            "highlighted_text": "none",
+            "custom_html": "",
+            "us_only": false,
+            "highlighted_scribble": "circle"
+          }
+        },
+        "column_EtTypD": {
+          "type": "column",
+          "settings": {
+            "icon": "check_mark",
+            "custom_icon": "",
+            "heading": "<strong>Recommended by Doctors & Podiatrists</strong>",
+            "text": "",
+            "highlighted_text": "none",
+            "custom_html": "",
+            "us_only": false,
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "column_gkLAGr",
+        "column_RQMbpf",
+        "column_EtTypD"
+      ],
+      "name": "t:sections.multicolumn-with-icons.name",
+      "settings": {
+        "style": "with-border",
+        "columns": 3,
+        "text_alignment": "center",
+        "heading": "",
+        "heading_size": "title-md",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "#f0f5f6",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 12,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": "",
+        "limit_section_width": false
+      }
+    },
     "featured_collection_UyTjdn": {
       "type": "featured-collection",
       "name": "t:sections.featured-collection.name",
@@ -396,6 +479,7 @@
     "image_with_text_overlay_P4xxxr",
     "multicolumn_R8kcbF",
     "dynamic_feature_combo_RDPrtk",
+    "multicolumn_with_icons_Wb3Wrk",
     "featured_collection_UyTjdn"
   ]
 }
