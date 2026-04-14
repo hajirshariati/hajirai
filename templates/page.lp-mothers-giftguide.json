@@ -70,25 +70,13 @@
             "vertical_mobile": 50,
             "horizontal_mobile": 50
           }
-        },
-        "product_nreBXe": {
-          "type": "product",
-          "settings": {
-            "product": "l400w-m",
-            "color_text": "#ffffff",
-            "vertical": 50,
-            "horizontal": 50,
-            "vertical_mobile": 50,
-            "horizontal_mobile": 50
-          }
         }
       },
       "block_order": [
         "product_GczgLJ",
         "product_qmeimk",
         "product_BqrwaL",
-        "product_DNaVGb",
-        "product_nreBXe"
+        "product_DNaVGb"
       ],
       "custom_css": [
         ".product-variant-slider-wrapper {padding-bottom: 15px;}",
