@@ -1,6 +1,5 @@
-div:has(> div[data-testid="POPUP"]) {
-  z-index: 999999999 !important;
-}
+.needsclick .kl-private-reset-css-Xuajs1{z-index: 999999999 !important;}
+
 
 :root {
     --color-background: var(--color-base-background);
