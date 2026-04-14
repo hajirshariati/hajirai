@@ -1,5 +1,6 @@
-[data-testid="POPUP"] {
+form.klaviyo-form {
   z-index: 999999999 !important;
+  position: relative !important;
 }
 
 :root {
