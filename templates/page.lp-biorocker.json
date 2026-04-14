@@ -64,7 +64,7 @@
           "type": "button",
           "settings": {
             "button_label": "Shop Collection",
-            "button_link": "shopify://collections/biorocker™-collection",
+            "button_link": "shopify://collections/biorocker-collection",
             "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
@@ -468,7 +468,7 @@
           "type": "button",
           "settings": {
             "button_label": "Shop Collection",
-            "button_link": "shopify://collections/biorocker™-collection",
+            "button_link": "shopify://collections/biorocker-collection",
             "button_video_link": "",
             "button_style": "primary",
             "button_size": "md",
@@ -518,7 +518,7 @@
       "type": "featured-collection",
       "name": "t:sections.featured-collection.name",
       "settings": {
-        "collection": "biorocker™-collection",
+        "collection": "biorocker-collection",
         "products": [],
         "product_limit": 6,
         "columns": 4,
@@ -583,7 +583,7 @@
           "type": "button",
           "settings": {
             "button_label": "Shop Now",
-            "button_link": "shopify://collections/biorocker™-collection",
+            "button_link": "shopify://collections/biorocker-collection",
             "button_style": "primary",
             "button_size": "md",
             "button_external": false,
