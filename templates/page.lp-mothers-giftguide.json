@@ -27,28 +27,6 @@
     "shop_the_look_8wViVf": {
       "type": "shop-the-look",
       "blocks": {
-        "product_aPiTqY": {
-          "type": "product",
-          "settings": {
-            "product": "",
-            "color_text": "#ffffff",
-            "vertical": 50,
-            "horizontal": 50,
-            "vertical_mobile": 50,
-            "horizontal_mobile": 50
-          }
-        },
-        "product_xE8Aee": {
-          "type": "product",
-          "settings": {
-            "product": "",
-            "color_text": "#ffffff",
-            "vertical": 50,
-            "horizontal": 50,
-            "vertical_mobile": 50,
-            "horizontal_mobile": 50
-          }
-        },
         "product_qmeimk": {
           "type": "product",
           "settings": {
@@ -73,15 +51,13 @@
         }
       },
       "block_order": [
-        "product_aPiTqY",
-        "product_xE8Aee",
         "product_qmeimk",
         "product_BqrwaL"
       ],
       "custom_css": [],
       "name": "t:sections.shop-the-look.name",
       "settings": {
-        "image": "shopify://shop_images/free_visor_M.jpg",
+        "image": "shopify://shop_images/free_visor_nav_D.jpg",
         "heading": "Because <em>She</em> Deserves the Best",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
