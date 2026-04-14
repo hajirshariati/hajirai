@@ -1162,7 +1162,7 @@
         "feed_R9LzAn": {
           "type": "feed",
           "settings": {
-            "image": "shopify://shop_images/Ashley_totallyglamstyle_1_POSTED.jpg",
+            "image": "shopify://shop_images/Summer_Dr_Janine_1.jpg",
             "enable_video_autoplay": false,
             "enable_video_looping": false,
             "video_on_hover": false,
@@ -1200,7 +1200,7 @@
         "feed_PUVAUF": {
           "type": "feed",
           "settings": {
-            "image": "shopify://shop_images/Ashley_lbambrick_1.jpg",
+            "image": "shopify://shop_images/Jillian_Sport_kiersten.linnea_1_POSTED_850cf2dc-ba35-4001-8b5e-de6fdd9b6de9.jpg",
             "enable_video_autoplay": false,
             "enable_video_looping": false,
             "video_on_hover": false,
@@ -1238,7 +1238,7 @@
         "feed_pkh8je": {
           "type": "feed",
           "settings": {
-            "image": "shopify://shop_images/Ashley_jennyonthespot_1_POSTED.jpg",
+            "image": "shopify://shop_images/Jillian_Sport_alyssasholander_2.jpg",
             "enable_video_autoplay": false,
             "enable_video_looping": false,
             "video_on_hover": false,
@@ -1276,7 +1276,7 @@
         "feed_bhecgc": {
           "type": "feed",
           "settings": {
-            "image": "shopify://shop_images/Ashley_dzaninatahirovic_1.jpg",
+            "image": "shopify://shop_images/Blake_chefwhitneymiller_1_POSTED.jpg",
             "enable_video_autoplay": false,
             "enable_video_looping": false,
             "video_on_hover": false,
@@ -1314,7 +1314,7 @@
         "feed_qnfeY7": {
           "type": "feed",
           "settings": {
-            "image": "shopify://shop_images/Ashley_mysweetsavings_4.png",
+            "image": "shopify://shop_images/Jillian_thejavamama_1_POSTED.jpg",
             "enable_video_autoplay": false,
             "enable_video_looping": false,
             "video_on_hover": false,
@@ -1352,7 +1352,7 @@
         "feed_dGKzRy": {
           "type": "feed",
           "settings": {
-            "image": "shopify://shop_images/Ashley_stephanie_loftin_1.jpg",
+            "image": "shopify://shop_images/Libby_blakeleysblondelife_6.jpg",
             "enable_video_autoplay": false,
             "enable_video_looping": false,
             "video_on_hover": false,
@@ -1390,7 +1390,121 @@
         "feed_HK6kxM": {
           "type": "feed",
           "settings": {
-            "image": "shopify://shop_images/Ashley_grace.grit.glamour_4.jpg",
+            "image": "shopify://shop_images/Danika_blakeleysblondelife_3_ca2b0c92-eab1-4e51-bbff-bf0ab5eb1d33.jpg",
+            "enable_video_autoplay": false,
+            "enable_video_looping": false,
+            "video_on_hover": false,
+            "button_label": "",
+            "button_link": "",
+            "button_external": false,
+            "button_icon": false,
+            "account_name": "",
+            "account_description": "",
+            "account_button": "",
+            "account_link": "",
+            "account_link_external": false,
+            "color_text": "#ffffff",
+            "color_button_text": "#000000",
+            "color_button_background": "#ffffff",
+            "color_button_gradient": "",
+            "hotspot_color_text_1": "#ffffff",
+            "hotspot_vertical_1": 45,
+            "hotspot_horizontal_1": 25,
+            "hotspot_product_1": "",
+            "hotspot_color_text_2": "#ffffff",
+            "hotspot_vertical_2": 30,
+            "hotspot_horizontal_2": 65,
+            "hotspot_product_2": "",
+            "hotspot_color_text_3": "#ffffff",
+            "hotspot_vertical_3": 60,
+            "hotspot_horizontal_3": 75,
+            "hotspot_product_3": "",
+            "hotspot_color_text_4": "#ffffff",
+            "hotspot_vertical_4": 50,
+            "hotspot_horizontal_4": 50,
+            "hotspot_product_4": ""
+          }
+        },
+        "feed_fT9XzV": {
+          "type": "feed",
+          "settings": {
+            "image": "shopify://shop_images/Emery_fortheloveofmya_1_POSTED.jpg",
+            "enable_video_autoplay": false,
+            "enable_video_looping": false,
+            "video_on_hover": false,
+            "button_label": "",
+            "button_link": "",
+            "button_external": false,
+            "button_icon": false,
+            "account_name": "",
+            "account_description": "",
+            "account_button": "",
+            "account_link": "",
+            "account_link_external": false,
+            "color_text": "#ffffff",
+            "color_button_text": "#000000",
+            "color_button_background": "#ffffff",
+            "color_button_gradient": "",
+            "hotspot_color_text_1": "#ffffff",
+            "hotspot_vertical_1": 45,
+            "hotspot_horizontal_1": 25,
+            "hotspot_product_1": "",
+            "hotspot_color_text_2": "#ffffff",
+            "hotspot_vertical_2": 30,
+            "hotspot_horizontal_2": 65,
+            "hotspot_product_2": "",
+            "hotspot_color_text_3": "#ffffff",
+            "hotspot_vertical_3": 60,
+            "hotspot_horizontal_3": 75,
+            "hotspot_product_3": "",
+            "hotspot_color_text_4": "#ffffff",
+            "hotspot_vertical_4": 50,
+            "hotspot_horizontal_4": 50,
+            "hotspot_product_4": ""
+          }
+        },
+        "feed_NVwpDa": {
+          "type": "feed",
+          "settings": {
+            "image": "shopify://shop_images/Tamara_theallaroundmama_1_POSTED_17ae3cf2-0c3a-417e-833d-56392f045fc3.jpg",
+            "enable_video_autoplay": false,
+            "enable_video_looping": false,
+            "video_on_hover": false,
+            "button_label": "",
+            "button_link": "",
+            "button_external": false,
+            "button_icon": false,
+            "account_name": "",
+            "account_description": "",
+            "account_button": "",
+            "account_link": "",
+            "account_link_external": false,
+            "color_text": "#ffffff",
+            "color_button_text": "#000000",
+            "color_button_background": "#ffffff",
+            "color_button_gradient": "",
+            "hotspot_color_text_1": "#ffffff",
+            "hotspot_vertical_1": 45,
+            "hotspot_horizontal_1": 25,
+            "hotspot_product_1": "",
+            "hotspot_color_text_2": "#ffffff",
+            "hotspot_vertical_2": 30,
+            "hotspot_horizontal_2": 65,
+            "hotspot_product_2": "",
+            "hotspot_color_text_3": "#ffffff",
+            "hotspot_vertical_3": 60,
+            "hotspot_horizontal_3": 75,
+            "hotspot_product_3": "",
+            "hotspot_color_text_4": "#ffffff",
+            "hotspot_vertical_4": 50,
+            "hotspot_horizontal_4": 50,
+            "hotspot_product_4": ""
+          }
+        },
+        "feed_d6rLWP": {
+          "type": "feed",
+          "settings": {
+            "image": "shopify://shop_images/Maui_blakeleysblondelife_3.jpg",
             "enable_video_autoplay": false,
             "enable_video_looping": false,
             "video_on_hover": false,
@@ -1436,7 +1550,10 @@
         "feed_bhecgc",
         "feed_qnfeY7",
         "feed_dGKzRy",
-        "feed_HK6kxM"
+        "feed_HK6kxM",
+        "feed_fT9XzV",
+        "feed_NVwpDa",
+        "feed_d6rLWP"
       ],
       "custom_css": [
         ".product-card__media .badges {display: none;}",
