@@ -31,10 +31,10 @@
           "settings": {
             "content_position": "md:items-end md:justify-start",
             "content_position_mobile": "items-end justify-start",
-            "heading": "Foot Pain is not normal.",
+            "heading": "Recovery doesn't stop when you leave the office",
             "heading_size": "title-lg tracking-heading",
             "heading_tag": "h2",
-            "text": "<p><em>Move with stability. Live with confidence.</em></p><p></p>",
+            "text": "<p>[PT Office Name] recommended Aetrex to keep your progress going — 15% off, exclusively for their patients.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -55,7 +55,6 @@
       "block_order": [
         "image_gPRPDR"
       ],
-      "disabled": true,
       "name": "t:sections.slideshow.name",
       "settings": {
         "autoplay": false,
@@ -66,6 +65,8 @@
         "text_alignment": "left",
         "image_height_mobile": "auto",
         "text_alignment_mobile": "left",
+        "mobile_content_space": 0,
+        "mobile_content_space_color": "#ffffff",
         "accessibility_info": "Slideshow about our brand",
         "color_text": "#ffffff",
         "color_background": "#ffffff",
