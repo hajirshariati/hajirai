@@ -184,7 +184,7 @@
         {%- endif -%}
       </lookbook-element>
 
-<slider-element id="Slider-{{ section.id }}" class="grid slider slider--tablet overflow-hidden min-w-0" selector=".stl-card-grid>.card" tabindex="0">
+<div id="Slider-{{ section.id }}" class="stl-slider-wrapper overflow-hidden w-full">
 <motion-list class="stl-card-grid product-grid card-grid card-grid--2 mobile:card-grid--1 grid">
     {%- for block in section.blocks -%}
       {%- render 'product-card',
@@ -209,7 +209,7 @@
       -%}
     {%- endfor -%}
   </motion-list>
-</slider-element>
+</div>
     </shop-the-look>
   </div>
 </div>
