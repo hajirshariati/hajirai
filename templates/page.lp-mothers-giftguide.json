@@ -1072,6 +1072,136 @@
         "limit_section_width": false
       }
     },
+    "featured_collections_TBzwpA": {
+      "type": "featured-collections",
+      "blocks": {
+        "collection_VgiJrf": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "products": [
+              "danika-ivory-ap111w",
+              "chase-mens-black-ap900m",
+              "l1900m-m",
+              "l1900w-m",
+              "carly-grey-as106w",
+              "megan-pewter-ct406w",
+              "ivy-champagne-ct306w",
+              "elise-navy-af155w",
+              "xspress-runner2-white-xs103w",
+              "emily-chalk-af101w"
+            ],
+            "title": "For the Always-In-Motion"
+          }
+        },
+        "collection_wHJEKe": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "products": [
+              "reagan-red-ah609w",
+              "kaylee-dark-brown-lb659w",
+              "l100m-m",
+              "l100w-m",
+              "charlotte-white-ca711w",
+              "gianna-taupe-cx200w",
+              "dahlia-navy-dm352w",
+              "cammie-charcoal-dm726w",
+              "mila-dark-brown-lb304w"
+            ],
+            "title": "For the Style Seeker"
+          }
+        },
+        "collection_tFbJYc": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "products": [
+              "dash-women-blue-ap955w",
+              "dash-mens-black-ap950m",
+              "morgan-oatmeal-ca733w",
+              "teagan-navy-nc105w",
+              "helena-black-dm570w",
+              "karina-brown-dm502w",
+              "zoey-dark-taupe-bw702w"
+            ],
+            "title": "For the Frequent Flyer"
+          }
+        },
+        "collection_L7iHdh": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "products": [
+              "mandy-wine-fe208w",
+              "mandy-grey-fe206w",
+              "millie-charcoal-fe704w",
+              "malina-black-fe900w",
+              "malina-charcoal-fe904w",
+              "misty-pink-fe269w",
+              "misty-ivory-fe262w"
+            ],
+            "title": "For the Comfort Enthusiast"
+          }
+        },
+        "collection_CUGhqG": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "products": [
+              "l2300m-m",
+              "l2300w-m",
+              "l400m-m",
+              "l400w-m",
+              "l700m-m",
+              "l700w-m",
+              "l800m-m",
+              "l800w-m"
+            ],
+            "title": "For the Wellness Lover"
+          }
+        }
+      },
+      "block_order": [
+        "collection_VgiJrf",
+        "collection_wHJEKe",
+        "collection_tFbJYc",
+        "collection_L7iHdh",
+        "collection_CUGhqG"
+      ],
+      "name": "Multiple featured collections",
+      "settings": {
+        "product_limit": 6,
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "Comfort, Curated for Them",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
     "rich_text_krdgad": {
       "type": "rich-text",
       "blocks": {
@@ -1173,6 +1303,7 @@
     "image_with_text_K47tcA",
     "collection_list_KtUmXQ",
     "testimonials_rmN7kx",
+    "featured_collections_TBzwpA",
     "rich_text_krdgad",
     "ugc_gallery_bWECXN"
   ]
