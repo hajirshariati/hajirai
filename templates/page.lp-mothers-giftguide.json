@@ -956,41 +956,16 @@
     "featured_collections_TBzwpA": {
       "type": "featured-collections",
       "blocks": {
-        "collection_VgiJrf": {
-          "type": "collection",
-          "settings": {
-            "collection": "",
-            "products": [
-              "danika-ivory-ap111w",
-              "chase-mens-black-ap900m",
-              "l1900m-m",
-              "l1900w-m",
-              "carly-grey-as106w",
-              "megan-pewter-ct406w",
-              "ivy-champagne-ct306w",
-              "elise-navy-af155w",
-              "xspress-runner2-white-xs103w",
-              "emily-chalk-af101w"
-            ],
-            "title": "For the Always-In-Motion"
-          }
-        },
         "collection_wHJEKe": {
           "type": "collection",
           "settings": {
             "collection": "",
             "products": [
-              "reagan-red-ah609w",
-              "kaylee-dark-brown-lb659w",
-              "l100m-m",
-              "l100w-m",
-              "charlotte-white-ca711w",
-              "gianna-taupe-cx200w",
-              "dahlia-navy-dm352w",
-              "cammie-charcoal-dm726w",
-              "mila-dark-brown-lb304w"
+              "collette-cognac-ll102w",
+              "charlotte-terracotta-ca715w",
+              "l2300w-m"
             ],
-            "title": "For the Style Seeker"
+            "title": "For Everyday Comfort"
           }
         },
         "collection_tFbJYc": {
@@ -998,15 +973,10 @@
           "settings": {
             "collection": "",
             "products": [
-              "dash-women-blue-ap955w",
-              "dash-mens-black-ap950m",
-              "morgan-oatmeal-ca733w",
-              "teagan-navy-nc105w",
-              "helena-black-dm570w",
-              "karina-brown-dm502w",
-              "zoey-dark-taupe-bw702w"
+              "jillian-sage-sc446w",
+              "savannah-champagne-en2005w"
             ],
-            "title": "For the Frequent Flyer"
+            "title": "For Vacation Ready"
           }
         },
         "collection_L7iHdh": {
@@ -1014,15 +984,11 @@
           "settings": {
             "collection": "",
             "products": [
-              "mandy-wine-fe208w",
-              "mandy-grey-fe206w",
-              "millie-charcoal-fe704w",
-              "malina-black-fe900w",
-              "malina-charcoal-fe904w",
-              "misty-pink-fe269w",
-              "misty-ivory-fe262w"
+              "ivy-hazy-blue-ct308w",
+              "danika-black-ap100w",
+              "l400w-m"
             ],
-            "title": "For the Comfort Enthusiast"
+            "title": "For Active Days"
           }
         },
         "collection_CUGhqG": {
@@ -1044,7 +1010,6 @@
         }
       },
       "block_order": [
-        "collection_VgiJrf",
         "collection_wHJEKe",
         "collection_tFbJYc",
         "collection_L7iHdh",
