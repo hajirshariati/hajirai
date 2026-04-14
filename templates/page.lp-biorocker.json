@@ -185,7 +185,7 @@
       "settings": {
         "gap": "small",
         "columns": 3,
-        "columns_mobile": "2",
+        "columns_mobile": "1",
         "carousel_on_desktop": false,
         "swipe_on_mobile": true,
         "heading": "",
