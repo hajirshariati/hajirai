@@ -1,3 +1,15 @@
+.needsclick .kl-private-reset-css-Xuajs1 {
+  z-index: 999999999 !important;
+}
+
+/* Restore the close button */
+button.klaviyo-close-form.kl-private-reset-css-Xuajs1 {
+  z-index: 1000000000 !important;
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
 .go2726514625.kl-private-reset-css-Xuajs1 {
   z-index: 1000000000 !important;
   display: flex !important;
