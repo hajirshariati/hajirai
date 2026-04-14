@@ -78,6 +78,10 @@
         "product_qmeimk",
         "product_BqrwaL"
       ],
+      "custom_css": [
+        ".stl-card-grid .card {min-width: 0; max-width: 100%; overflow: hidden;}",
+        ".stl-card-grid .card .swiper-wrapper,.stl-card-grid .card .main-media-custom-slider {max-width: 100%; overflow: hidden;}"
+      ],
       "name": "t:sections.shop-the-look.name",
       "settings": {
         "heading": "Because <em>She</em> Deserves the Best",
