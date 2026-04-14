@@ -27,6 +27,28 @@
     "shop_the_look_8wViVf": {
       "type": "shop-the-look",
       "blocks": {
+        "product_KkVQfJ": {
+          "type": "product",
+          "settings": {
+            "product": "ashley-taupe-ew792w",
+            "color_text": "#ffffff",
+            "vertical": 31,
+            "horizontal": 30,
+            "vertical_mobile": 50,
+            "horizontal_mobile": 50
+          }
+        },
+        "product_wDJVW4": {
+          "type": "product",
+          "settings": {
+            "product": "anna-rose-ew789w",
+            "color_text": "#ffffff",
+            "vertical": 60,
+            "horizontal": 66,
+            "vertical_mobile": 50,
+            "horizontal_mobile": 50
+          }
+        },
         "product_qmeimk": {
           "type": "product",
           "settings": {
@@ -51,6 +73,8 @@
         }
       },
       "block_order": [
+        "product_KkVQfJ",
+        "product_wDJVW4",
         "product_qmeimk",
         "product_BqrwaL"
       ],
