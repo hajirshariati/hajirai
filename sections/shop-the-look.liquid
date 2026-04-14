@@ -117,7 +117,7 @@
       </lookbook-element>
 
 <slider-element id="Slider-{{ section.id }}" class="grid slider slider--tablet" selector=".stl-card-grid>.card" tabindex="0">
-  <motion-list class="stl-card-grid product-grid card-grid card-grid--{{ section.blocks.size }} mobile:card-grid--2 grid">
+ <motion-list class="stl-card-grid product-grid card-grid card-grid--4 mobile:card-grid--2 grid">
     {%- for block in section.blocks -%}
       {%- render 'product-card',
         product: block.settings.product,
