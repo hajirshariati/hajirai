@@ -1446,20 +1446,10 @@
     "rich_text_krdgad": {
       "type": "rich-text",
       "blocks": {
-        "heading_MWkRge": {
-          "type": "heading",
-          "settings": {
-            "heading": "Make Her Next Step <em>Her Best One</em>",
-            "heading_size": "title-lg tracking-heading",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
         "text_d7kJmn": {
           "type": "text",
           "settings": {
-            "text": "<p>30-Day Wear Test · Easy Returns</p>",
+            "text": "<h1>Make Her Next Step <em>Her Best One</em></h1><p>30-Day Wear Test · Easy Returns</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -1484,7 +1474,6 @@
         }
       },
       "block_order": [
-        "heading_MWkRge",
         "text_d7kJmn",
         "button_YHXKUR"
       ],
