@@ -701,7 +701,7 @@
           "settings": {
             "icon": "check_mark",
             "custom_icon": "",
-            "heading": "<strong>Recommended by Doctors & Podiatrists</strong>",
+            "heading": "<strong>Recommended by Doctors</strong>",
             "text": "",
             "highlighted_text": "none",
             "custom_html": "",
