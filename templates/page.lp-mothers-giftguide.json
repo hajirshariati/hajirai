@@ -27,24 +27,13 @@
     "shop_the_look_8wViVf": {
       "type": "shop-the-look",
       "blocks": {
-        "product_KkVQfJ": {
+        "product_GczgLJ": {
           "type": "product",
           "settings": {
-            "product": "ashley-taupe-ew792w",
+            "product": "l2300w-m",
             "color_text": "#ffffff",
-            "vertical": 31,
-            "horizontal": 30,
-            "vertical_mobile": 50,
-            "horizontal_mobile": 50
-          }
-        },
-        "product_wDJVW4": {
-          "type": "product",
-          "settings": {
-            "product": "anna-rose-ew789w",
-            "color_text": "#ffffff",
-            "vertical": 60,
-            "horizontal": 66,
+            "vertical": 25,
+            "horizontal": 83,
             "vertical_mobile": 50,
             "horizontal_mobile": 50
           }
@@ -52,10 +41,10 @@
         "product_qmeimk": {
           "type": "product",
           "settings": {
-            "product": "addie-navy-nc505w",
+            "product": "savannah-taupe-en2004w",
             "color_text": "#ffffff",
             "vertical": 50,
-            "horizontal": 50,
+            "horizontal": 19,
             "vertical_mobile": 50,
             "horizontal_mobile": 50
           }
@@ -63,20 +52,31 @@
         "product_BqrwaL": {
           "type": "product",
           "settings": {
-            "product": "charlotte-butter-ca716w",
+            "product": "jillian-sage-sc446w",
             "color_text": "#ffffff",
             "vertical": 75,
             "horizontal": 65,
             "vertical_mobile": 75,
             "horizontal_mobile": 65
           }
+        },
+        "product_DNaVGb": {
+          "type": "product",
+          "settings": {
+            "product": "claire-leopard-fc178w",
+            "color_text": "#ffffff",
+            "vertical": 50,
+            "horizontal": 50,
+            "vertical_mobile": 50,
+            "horizontal_mobile": 50
+          }
         }
       },
       "block_order": [
-        "product_KkVQfJ",
-        "product_wDJVW4",
+        "product_GczgLJ",
         "product_qmeimk",
-        "product_BqrwaL"
+        "product_BqrwaL",
+        "product_DNaVGb"
       ],
       "custom_css": [
         ".product-variant-slider-wrapper {padding-bottom: 15px;}",
@@ -84,7 +84,6 @@
       ],
       "name": "t:sections.shop-the-look.name",
       "settings": {
-        "image": "shopify://shop_images/free_visor_nav_D.jpg",
         "heading": "Because <em>She</em> Deserves the Best",
         "heading_size": "title-md",
         "heading_alignment": "text-center md:items-center",
