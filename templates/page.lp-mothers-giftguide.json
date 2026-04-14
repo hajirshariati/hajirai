@@ -873,175 +873,6 @@
         "abra_promo_code_hide": ""
       }
     },
-    "image_with_text_K47tcA": {
-      "type": "image-with-text",
-      "blocks": {
-        "heading_T98yTk": {
-          "type": "heading",
-          "settings": {
-            "heading": "Introducing BioRocker™ Technology",
-            "heading_size": "title-md",
-            "heading_tag": "h2",
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "text_HtYPP9": {
-          "type": "text",
-          "settings": {
-            "text": "<p>Technology that promotes a smooth, natural heel-to-toe motion designed to help reduce pressure on the ball-of-foot and keep her moving comfortably all day.</p>",
-            "text_font": "body",
-            "text_size": "subtext-md",
-            "text_max_size": 32,
-            "text_line_height": 1.6,
-            "text_letter_spacing": 0,
-            "text_capitalize": false,
-            "secondary_color": false,
-            "highlighted_text": "none",
-            "highlighted_scribble": "circle"
-          }
-        },
-        "button_AVPJUf": {
-          "type": "button",
-          "settings": {
-            "button_label": "Shop BioRocker™ Styles",
-            "button_link": "shopify://collections/biorocker™-collection",
-            "button_video_link": "",
-            "button_style": "primary",
-            "button_size": "md",
-            "button_external": false,
-            "button_icon": false
-          }
-        }
-      },
-      "block_order": [
-        "heading_T98yTk",
-        "text_HtYPP9",
-        "button_AVPJUf"
-      ],
-      "name": "t:sections.image-with-text.name",
-      "settings": {
-        "image": "shopify://shop_images/oprah.jpg",
-        "img_url": "",
-        "image_height": "adapt",
-        "image_width": "medium",
-        "layout": "text_first",
-        "text_alignment": "left",
-        "custom_content_position": "items-center",
-        "image_mobile": "shopify://shop_images/oprah.jpg",
-        "image_height_mobile": "adapt",
-        "text_alignment_mobile": "left",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_background_2": "",
-        "gradient_background_2": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "enable_parallax": false,
-        "parallax_direction": "vertical",
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
-    "featured_collections_TBzwpA": {
-      "type": "featured-collections",
-      "blocks": {
-        "collection_wHJEKe": {
-          "type": "collection",
-          "settings": {
-            "collection": "",
-            "products": [
-              "collette-cognac-ll102w",
-              "charlotte-terracotta-ca715w",
-              "l2300w-m"
-            ],
-            "title": "For Everyday Comfort"
-          }
-        },
-        "collection_tFbJYc": {
-          "type": "collection",
-          "settings": {
-            "collection": "",
-            "products": [
-              "jillian-sage-sc446w",
-              "savannah-champagne-en2005w"
-            ],
-            "title": "For Vacation Ready"
-          }
-        },
-        "collection_L7iHdh": {
-          "type": "collection",
-          "settings": {
-            "collection": "",
-            "products": [
-              "ivy-hazy-blue-ct308w",
-              "danika-black-ap100w",
-              "l400w-m"
-            ],
-            "title": "For Active Days"
-          }
-        },
-        "collection_CUGhqG": {
-          "type": "collection",
-          "settings": {
-            "collection": "",
-            "products": [
-              "sydney-cognac-ew718w",
-              "vania-hazy-blue-cp111w",
-              "l100w-m"
-            ],
-            "title": "For Special Occasions"
-          }
-        }
-      },
-      "block_order": [
-        "collection_wHJEKe",
-        "collection_tFbJYc",
-        "collection_L7iHdh",
-        "collection_CUGhqG"
-      ],
-      "name": "Multiple featured collections",
-      "settings": {
-        "product_limit": 6,
-        "columns": 4,
-        "carousel_on_desktop": true,
-        "show_view_all": false,
-        "columns_mobile": "1",
-        "swipe_on_mobile": true,
-        "heading": "Comfort, Curated for <em>Her</em>",
-        "heading_size": "title-sm",
-        "heading_alignment": "text-left md:items-end md:flex-row",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "",
-        "gradient_background": "",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 72,
-        "padding_bottom": 72,
-        "divider": false,
-        "full_width": false,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": ""
-      }
-    },
     "shop_the_feed_BkfqTx": {
       "type": "shop-the-feed",
       "blocks": {
@@ -1522,6 +1353,96 @@
         "abra_promo_code_hide": ""
       }
     },
+    "featured_collections_TBzwpA": {
+      "type": "featured-collections",
+      "blocks": {
+        "collection_wHJEKe": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "products": [
+              "collette-cognac-ll102w",
+              "charlotte-terracotta-ca715w",
+              "l2300w-m"
+            ],
+            "title": "For Everyday Comfort"
+          }
+        },
+        "collection_tFbJYc": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "products": [
+              "jillian-sage-sc446w",
+              "savannah-champagne-en2005w"
+            ],
+            "title": "For Vacation Ready"
+          }
+        },
+        "collection_L7iHdh": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "products": [
+              "ivy-hazy-blue-ct308w",
+              "danika-black-ap100w",
+              "l400w-m"
+            ],
+            "title": "For Active Days"
+          }
+        },
+        "collection_CUGhqG": {
+          "type": "collection",
+          "settings": {
+            "collection": "",
+            "products": [
+              "sydney-cognac-ew718w",
+              "vania-hazy-blue-cp111w",
+              "l100w-m"
+            ],
+            "title": "For Special Occasions"
+          }
+        }
+      },
+      "block_order": [
+        "collection_wHJEKe",
+        "collection_tFbJYc",
+        "collection_L7iHdh",
+        "collection_CUGhqG"
+      ],
+      "name": "Multiple featured collections",
+      "settings": {
+        "product_limit": 6,
+        "columns": 4,
+        "carousel_on_desktop": true,
+        "show_view_all": false,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "heading": "Comfort, Curated for <em>Her</em>",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-left md:items-end md:flex-row",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 72,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
     "rich_text_krdgad": {
       "type": "rich-text",
       "blocks": {
@@ -1612,9 +1533,8 @@
     "dynamic_feature_combo_8NW3dN",
     "multicolumn_with_icons_TjwHpG",
     "collection_list_KtUmXQ",
-    "image_with_text_K47tcA",
-    "featured_collections_TBzwpA",
     "shop_the_feed_BkfqTx",
+    "featured_collections_TBzwpA",
     "rich_text_krdgad"
   ]
 }
