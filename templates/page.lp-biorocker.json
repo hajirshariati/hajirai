@@ -467,7 +467,7 @@
         "button_rPikU4": {
           "type": "button",
           "settings": {
-            "button_label": "Shop BioRocker™ Collection",
+            "button_label": "Shop Collection",
             "button_link": "shopify://collections/biorocker™-collection",
             "button_video_link": "",
             "button_style": "primary",
