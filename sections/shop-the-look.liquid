@@ -1,4 +1,14 @@
 <style>
+
+@media (min-width: 768px) {
+  #shopify-section-{{ section.id }} .stl-card-grid .price del,
+  #shopify-section-{{ section.id }} .stl-card-grid .price s,
+  #shopify-section-{{ section.id }} .stl-card-grid .price__compare,
+  #shopify-section-{{ section.id }} .stl-card-grid .price-item--regular:not(:only-child) {
+    display: none !important;
+  }
+}
+  
  .shop-the-look .banner .banner__media, .shop-the-look .banner .banner__overlay
 {border-radius: 1em !important;}
 
