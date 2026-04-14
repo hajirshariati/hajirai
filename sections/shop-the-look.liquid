@@ -1,4 +1,20 @@
 <style>
+  /* Sticky lookbook image */
+@media(min-width:768px){
+  .shop-the-look lookbook-element{
+    position:sticky;
+    top:20px;
+    align-self:start;
+  }
+  .shop-the-look slider-element{
+    overflow-y:auto;
+    max-height:80vh;
+    scrollbar-width:none;
+  }
+  .shop-the-look slider-element::-webkit-scrollbar{
+    display:none;
+  }
+}
 
 .stl-card-grid .card {
   min-width: 0;
@@ -59,7 +75,7 @@
   {% endif %}
 >
   <div class="page-width{% if section.settings.full_width %} page-width--full{% endif %} relative">
-    <shop-the-look class="shop-the-look grid gap-6">
+<shop-the-look class="shop-the-look grid gap-6 items-start">
       {%- render 'section-heading', section: section -%}
 
       <lookbook-element class="banner block media--adapt mobile:media--adapt{% if section.settings.image == blank %} media--placeholder{% endif %} relative overflow-hidden">
