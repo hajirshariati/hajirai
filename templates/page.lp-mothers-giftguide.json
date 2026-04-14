@@ -54,7 +54,10 @@
         "product_qmeimk",
         "product_BqrwaL"
       ],
-      "custom_css": [],
+      "custom_css": [
+        ".product-variant-slider-wrapper {display:none;}",
+        " .price__regular {display:none;}"
+      ],
       "name": "t:sections.shop-the-look.name",
       "settings": {
         "image": "shopify://shop_images/free_visor_nav_D.jpg",
