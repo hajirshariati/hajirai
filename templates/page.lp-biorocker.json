@@ -484,7 +484,7 @@
       ],
       "name": "t:sections.image-with-text.name",
       "settings": {
-        "image": "shopify://shop_images/94845-EN2508W_catalog2.gif",
+        "image": "shopify://shop_images/jenny_landing.gif",
         "img_url": "",
         "image_height": "adapt",
         "image_width": "medium",
@@ -508,7 +508,7 @@
         "divider": false,
         "full_width": false,
         "rounded": false,
-        "enable_parallax": true,
+        "enable_parallax": false,
         "parallax_direction": "vertical",
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
