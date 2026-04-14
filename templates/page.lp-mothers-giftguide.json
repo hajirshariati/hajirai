@@ -27,15 +27,37 @@
     "shop_the_look_8wViVf": {
       "type": "shop-the-look",
       "blocks": {
-        "product_8kJHf8": {
+        "product_VVRBWJ": {
           "type": "product",
           "settings": {
-            "product": "l2300w-m",
+            "product": "",
             "color_text": "#ffffff",
-            "vertical": 25,
-            "horizontal": 25,
-            "vertical_mobile": 25,
-            "horizontal_mobile": 25
+            "vertical": 50,
+            "horizontal": 50,
+            "vertical_mobile": 50,
+            "horizontal_mobile": 50
+          }
+        },
+        "product_Dbmhej": {
+          "type": "product",
+          "settings": {
+            "product": "addie-navy-nc505w",
+            "color_text": "#ffffff",
+            "vertical": 50,
+            "horizontal": 50,
+            "vertical_mobile": 50,
+            "horizontal_mobile": 50
+          }
+        },
+        "product_qmeimk": {
+          "type": "product",
+          "settings": {
+            "product": "addie-navy-nc505w",
+            "color_text": "#ffffff",
+            "vertical": 50,
+            "horizontal": 50,
+            "vertical_mobile": 50,
+            "horizontal_mobile": 50
           }
         },
         "product_BqrwaL": {
@@ -51,7 +73,9 @@
         }
       },
       "block_order": [
-        "product_8kJHf8",
+        "product_VVRBWJ",
+        "product_Dbmhej",
+        "product_qmeimk",
         "product_BqrwaL"
       ],
       "name": "t:sections.shop-the-look.name",

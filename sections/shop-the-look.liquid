@@ -116,8 +116,8 @@
         {%- endif -%}
       </lookbook-element>
 
-<slider-element id="Slider-{{ section.id }}" class="grid slider slider--tablet overflow-hidden" selector=".stl-card-grid>.card" tabindex="0">
- <motion-list class="stl-card-grid product-grid card-grid card-grid--2 mobile:card-grid--2 grid">
+<slider-element id="Slider-{{ section.id }}" class="grid slider slider--tablet overflow-hidden min-w-0" selector=".stl-card-grid>.card" tabindex="0">
+<motion-list class="stl-card-grid product-grid card-grid card-grid--2 mobile:card-grid--1 grid">
     {%- for block in section.blocks -%}
       {%- render 'product-card',
         product: block.settings.product,
