@@ -1643,7 +1643,7 @@
         "padding_bottom": 20,
         "divider": false,
         "rounded": false,
-        "limit_section_width": true
+        "limit_section_width": false
       }
     },
     "faq_f3crHM": {
