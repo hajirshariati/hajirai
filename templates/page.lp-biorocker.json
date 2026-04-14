@@ -582,7 +582,7 @@
         "button_cU8dUT": {
           "type": "button",
           "settings": {
-            "button_label": "Shop Collection",
+            "button_label": "Shop Now",
             "button_link": "shopify://collections/biorocker™-collection",
             "button_style": "primary",
             "button_size": "md",
