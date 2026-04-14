@@ -20,35 +20,13 @@
         "padding_top": 72,
         "padding_bottom": 120,
         "divider": false,
-        "narrow": true,
+        "narrow": false,
         "rounded": false
       }
     },
     "shop_the_look_8wViVf": {
       "type": "shop-the-look",
       "blocks": {
-        "product_mWCyK3": {
-          "type": "product",
-          "settings": {
-            "product": "jillian-sage-sc446w",
-            "color_text": "#ffffff",
-            "vertical": 50,
-            "horizontal": 50,
-            "vertical_mobile": 50,
-            "horizontal_mobile": 50
-          }
-        },
-        "product_Be6ffn": {
-          "type": "product",
-          "settings": {
-            "product": "flora-antique-rose-mw139w",
-            "color_text": "#ffffff",
-            "vertical": 50,
-            "horizontal": 50,
-            "vertical_mobile": 50,
-            "horizontal_mobile": 50
-          }
-        },
         "product_8kJHf8": {
           "type": "product",
           "settings": {
@@ -73,8 +51,6 @@
         }
       },
       "block_order": [
-        "product_mWCyK3",
-        "product_Be6ffn",
         "product_8kJHf8",
         "product_BqrwaL"
       ],
@@ -109,6 +85,118 @@
         "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
+      }
+    },
+    "logo_list_YCPjeJ": {
+      "type": "logo-list",
+      "blocks": {
+        "logo_36CHeL": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/image_80.png",
+            "height": 52,
+            "link": "",
+            "title": "",
+            "title_size": "text-sm"
+          }
+        },
+        "logo_F4tMHF": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/image_81.png",
+            "height": 52,
+            "link": "",
+            "title": "",
+            "title_size": "text-sm"
+          }
+        },
+        "logo_WKnd6B": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/image_82.png",
+            "height": 52,
+            "link": "",
+            "title": "",
+            "title_size": "text-sm"
+          }
+        },
+        "logo_McmYcz": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/image_83.png",
+            "height": 52,
+            "link": "",
+            "title": "",
+            "title_size": "text-sm"
+          }
+        },
+        "logo_ihXJhh": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/image_84.png",
+            "height": 52,
+            "link": "",
+            "title": "",
+            "title_size": "text-sm"
+          }
+        },
+        "logo_rJ4yxb": {
+          "type": "logo",
+          "settings": {
+            "image": "shopify://shop_images/image_89.png",
+            "height": 52,
+            "link": "",
+            "title": "",
+            "title_size": "text-sm"
+          }
+        }
+      },
+      "block_order": [
+        "logo_36CHeL",
+        "logo_F4tMHF",
+        "logo_WKnd6B",
+        "logo_McmYcz",
+        "logo_ihXJhh",
+        "logo_rJ4yxb"
+      ],
+      "custom_css": [
+        ".flickity-slider {mix-blend-mode: multiply;}"
+      ],
+      "name": "Logo list",
+      "settings": {
+        "visibility": "all",
+        "layout": "marquee",
+        "grid_horizontal": 120,
+        "direction": "left",
+        "speed": 1,
+        "heading": "As Seen On",
+        "heading_size": "title-sm",
+        "heading_alignment": "text-center md:items-center",
+        "heading_tag": "h2",
+        "subheading": "",
+        "description": "",
+        "button_label": "",
+        "button_link": "",
+        "button_external": false,
+        "button_icon": true,
+        "highlighted_text": "none",
+        "highlighted_scribble": "circle",
+        "color_text": "",
+        "color_background": "#fafafa",
+        "gradient_background": "linear-gradient(358deg, rgba(216, 131, 140, 1) 13%, rgba(170, 248, 219, 0) 86%)",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 24,
+        "padding_bottom": 24,
+        "divider": false,
+        "full_width": true,
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": "",
+        "limit_section_width": false
       }
     },
     "slideshow_aM3pX6": {
@@ -261,118 +349,6 @@
         "rounded": false,
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
-      }
-    },
-    "logo_list_YCPjeJ": {
-      "type": "logo-list",
-      "blocks": {
-        "logo_36CHeL": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/image_80.png",
-            "height": 52,
-            "link": "",
-            "title": "",
-            "title_size": "text-sm"
-          }
-        },
-        "logo_F4tMHF": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/image_81.png",
-            "height": 52,
-            "link": "",
-            "title": "",
-            "title_size": "text-sm"
-          }
-        },
-        "logo_WKnd6B": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/image_82.png",
-            "height": 52,
-            "link": "",
-            "title": "",
-            "title_size": "text-sm"
-          }
-        },
-        "logo_McmYcz": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/image_83.png",
-            "height": 52,
-            "link": "",
-            "title": "",
-            "title_size": "text-sm"
-          }
-        },
-        "logo_ihXJhh": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/image_84.png",
-            "height": 52,
-            "link": "",
-            "title": "",
-            "title_size": "text-sm"
-          }
-        },
-        "logo_rJ4yxb": {
-          "type": "logo",
-          "settings": {
-            "image": "shopify://shop_images/image_89.png",
-            "height": 52,
-            "link": "",
-            "title": "",
-            "title_size": "text-sm"
-          }
-        }
-      },
-      "block_order": [
-        "logo_36CHeL",
-        "logo_F4tMHF",
-        "logo_WKnd6B",
-        "logo_McmYcz",
-        "logo_ihXJhh",
-        "logo_rJ4yxb"
-      ],
-      "custom_css": [
-        ".flickity-slider {mix-blend-mode: multiply;}"
-      ],
-      "name": "Logo list",
-      "settings": {
-        "visibility": "all",
-        "layout": "marquee",
-        "grid_horizontal": 120,
-        "direction": "left",
-        "speed": 1,
-        "heading": "As Seen On",
-        "heading_size": "title-sm",
-        "heading_alignment": "text-center md:items-center",
-        "heading_tag": "h2",
-        "subheading": "",
-        "description": "",
-        "button_label": "",
-        "button_link": "",
-        "button_external": false,
-        "button_icon": true,
-        "highlighted_text": "none",
-        "highlighted_scribble": "circle",
-        "color_text": "",
-        "color_background": "#fafafa",
-        "gradient_background": "linear-gradient(358deg, rgba(216, 131, 140, 1) 13%, rgba(170, 248, 219, 0) 86%)",
-        "color_highlight": "",
-        "gradient_highlight": "",
-        "color_button_text": "",
-        "color_button_background": "",
-        "color_button_gradient": "",
-        "padding_top": 24,
-        "padding_bottom": 24,
-        "divider": false,
-        "full_width": true,
-        "rounded": false,
-        "abra_promo_code_show": "",
-        "abra_promo_code_hide": "",
-        "limit_section_width": false
       }
     },
     "collection_list_q9MCBN": {
