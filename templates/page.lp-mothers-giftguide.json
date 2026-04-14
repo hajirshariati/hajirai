@@ -55,8 +55,8 @@
         "product_BqrwaL"
       ],
       "custom_css": [
-        ".product-variant-slider-wrapper {display:none;}",
-        " .price__regular {display:none;}"
+        ".product-variant-slider-wrapper {padding-bottom:15px;}",
+        ".price__regular {display: none;}"
       ],
       "name": "t:sections.shop-the-look.name",
       "settings": {
