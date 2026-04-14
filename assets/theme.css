@@ -1,6 +1,5 @@
-form.klaviyo-form {
+div:has(> div[data-testid="POPUP"]) {
   z-index: 999999999 !important;
-  position: relative !important;
 }
 
 :root {
