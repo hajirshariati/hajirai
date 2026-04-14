@@ -44,7 +44,7 @@
             "secondary_color_text": false,
             "highlighted_text": "none",
             "highlighted_scribble": "circle",
-            "button_label": "Discover Your Support",
+            "button_label": "",
             "button_link": "",
             "button_style": "primary",
             "button_external": false,
