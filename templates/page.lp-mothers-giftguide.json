@@ -234,7 +234,6 @@
         "image_EXgffj": {
           "type": "image",
           "settings": {
-            "image": "shopify://shop_images/free_visor_D.jpg",
             "content_position": "md:items-center md:justify-start",
             "content_position_mobile": "items-end justify-center",
             "heading": "The Gift She'll Love Every Day",
@@ -251,7 +250,7 @@
             "highlighted_text": "none",
             "highlighted_scribble": "circle",
             "button_label": "Shop All Women's Gifts",
-            "button_link": "shopify://products/ashley-hazy-blue-multi-ew794w",
+            "button_link": "",
             "button_style": "primary",
             "button_external": false,
             "button_icon": false
