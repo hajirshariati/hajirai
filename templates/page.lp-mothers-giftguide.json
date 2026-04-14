@@ -54,12 +54,7 @@
         "product_qmeimk",
         "product_BqrwaL"
       ],
-      "custom_css": [
-        ".stl-card-grid .card {min-width: 0; max-width: 100%; overflow: hidden;}",
-        ".stl-card-grid .card .swiper-wrapper,.stl-card-grid .card .main-media-custom-slider {max-width: 100%; overflow: hidden;}",
-        ".shop-the-look {align-items: start;}",
-        ".shop-the-look .stl-card-grid {align-content: start;}"
-      ],
+      "custom_css": [],
       "name": "t:sections.shop-the-look.name",
       "settings": {
         "image": "shopify://shop_images/free_visor_M.jpg",
