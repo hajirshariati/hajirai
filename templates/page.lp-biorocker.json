@@ -183,9 +183,9 @@
       ],
       "name": "Multicolumn",
       "settings": {
-        "gap": "large",
+        "gap": "small",
         "columns": 3,
-        "columns_mobile": "1",
+        "columns_mobile": "2",
         "carousel_on_desktop": false,
         "swipe_on_mobile": true,
         "heading": "",
