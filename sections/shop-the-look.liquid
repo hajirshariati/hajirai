@@ -116,30 +116,32 @@
         {%- endif -%}
       </lookbook-element>
 
-      <carousel-element class="block">
-        {%- for block in section.blocks -%}
-          {%- render 'product-card',
-            product: block.settings.product,
-            product_id: block.settings.product.id,
-            section_id: section.id,
-            block_id: block.id,
-            lazy_load: false,
-            image_ratio: settings.product_image_ratio,
-            image_fill: settings.product_image_fill,
-            show_secondary_image: settings.product_secondary_image,
-            show_vendor: settings.product_vendor,
-            show_rating: settings.product_rating,
-            show_color_swatches: settings.product_color_swatches,
-            show_countdown: settings.product_countdown,
-            show_quick_add: settings.product_quick_add,
-            show_quick_view: settings.product_quick_view,
-            show_save_amount: settings.product_save_amount,
-            save_type: settings.product_save_type,
-            show_icon_list: false,
-            mobile_quick_add: true
-          -%}
-        {%- endfor -%}
-      </carousel-element>
+<slider-element id="Slider-{{ section.id }}" class="grid slider slider--tablet" selector=".stl-card-grid>.card" tabindex="0">
+  <motion-list class="stl-card-grid product-grid card-grid card-grid--{{ section.blocks.size }} mobile:card-grid--2 grid">
+    {%- for block in section.blocks -%}
+      {%- render 'product-card',
+        product: block.settings.product,
+        product_id: block.settings.product.id,
+        section_id: section.id,
+        block_id: block.id,
+        lazy_load: false,
+        image_ratio: settings.product_image_ratio,
+        image_fill: settings.product_image_fill,
+        show_secondary_image: settings.product_secondary_image,
+        show_vendor: settings.product_vendor,
+        show_rating: settings.product_rating,
+        show_color_swatches: settings.product_color_swatches,
+        show_countdown: settings.product_countdown,
+        show_quick_add: settings.product_quick_add,
+        show_quick_view: settings.product_quick_view,
+        show_save_amount: settings.product_save_amount,
+        save_type: settings.product_save_type,
+        show_icon_list: false,
+        mobile_quick_add: true
+      -%}
+    {%- endfor -%}
+  </motion-list>
+</slider-element>
     </shop-the-look>
   </div>
 </div>
