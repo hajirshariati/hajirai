@@ -38,7 +38,7 @@
         "heading_bby7qK": {
           "type": "heading",
           "settings": {
-            "heading": "<p>BioRocker™ Collection</p>",
+            "heading": "<p>BioRocker™ Technology Collection</p>",
             "heading_size": "title-lg tracking-heading",
             "heading_tag": "h2",
             "highlighted_text": "none",
@@ -48,7 +48,7 @@
         "text_n3KDXU": {
           "type": "text",
           "settings": {
-            "text": "<p>With a curved, rocker-style sole, BioRocker™ technology helps move you forward naturally while easing pressure on the front of your foot.</p>",
+            "text": "<p>With a curved, rocker-style sole, BioRocker™ technology helps move you forward naturally while easing pressure on the heel and ball-of-foot.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
