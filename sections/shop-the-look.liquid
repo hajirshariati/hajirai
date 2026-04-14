@@ -1,16 +1,19 @@
 <style>
-  @media(max-width:767px){
-  .shop-the-look slider-element{
+@media(max-width:767px){
+  .stl-slider-wrapper{
     overflow:hidden!important;
     width:100%!important;
   }
   .stl-card-grid{
-    overflow:hidden!important;
+    display:flex!important;
+    flex-direction:column!important;
     width:100%!important;
+    gap:16px!important;
   }
   .stl-card-grid .card{
     width:100%!important;
     max-width:100%!important;
+    min-width:0!important;
   }
   .stl-card-grid .main-media-custom-slider,
   .stl-card-grid .main-media-custom-slider .swiper-wrapper,
@@ -19,17 +22,11 @@
     max-width:100%!important;
   }
   .stl-card-grid .product-card__content{
-    justify-content:center;
     text-align:center;
-    padding:8px!important;
+    padding:8px 12px!important;
   }
   .stl-card-grid .product-card__details{
     align-items:center;
-  }
-  .stl-card-grid .card-grid--2,
-  .stl-card-grid{
-    gap:12px!important;
-    padding:0!important;
   }
 }
 
