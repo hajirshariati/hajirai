@@ -308,7 +308,7 @@
           "settings": {
             "heading": "Lightweight UltraSky™ EVA Midsole",
             "text": "for balance & alignment helps absorb shock",
-            "horizontal": 20,
+            "horizontal": 81,
             "vertical": 60,
             "text_horizontal": 24,
             "text_vertical": 80
@@ -319,9 +319,9 @@
           "settings": {
             "heading": "Aetrex Signature Arch Support",
             "text": "for balance & alignment",
-            "horizontal": 37,
-            "vertical": 47,
-            "text_horizontal": 43,
+            "horizontal": 67,
+            "vertical": 52,
+            "text_horizontal": 71,
             "text_vertical": 2
           }
         },
@@ -332,7 +332,7 @@
             "text": "guides each heel-to-toe step for effortless motion",
             "horizontal": 81,
             "vertical": 62,
-            "text_horizontal": 65,
+            "text_horizontal": 17,
             "text_vertical": 18
           }
         },
@@ -398,8 +398,8 @@
         "tile3_width": 4,
         "gap": 16,
         "gap_mobile": 16,
-        "feature_image": "shopify://shop_images/92983-EN2009W_right.jpg",
-        "feature_image_mobile": "shopify://shop_images/92983-EN2009W_right.jpg",
+        "feature_image": "shopify://shop_images/92985-EN2009W_left.jpg",
+        "feature_image_mobile": "shopify://shop_images/92985-EN2009W_left.jpg",
         "feature_image_link": "shopify://products/savannah-taupe-en2004w",
         "feature_image_link_external": false,
         "feature_image_link_target": "desktop",
