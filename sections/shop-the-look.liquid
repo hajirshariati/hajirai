@@ -40,13 +40,14 @@
   #shopify-section-{{ section.id }} .stl-card-grid .product-card__media { overflow: hidden !important; }
   #shopify-section-{{ section.id }} .stl-card-grid .card .main-media-custom-slider { max-width: 100%; overflow: hidden; }
 
-  @media (min-width: 768px) {
+@media (min-width: 768px) {
     #shopify-section-{{ section.id }} .shop-the-look lookbook-element {
       position: sticky;
       top: 20px;
       align-self: start;
     }
     #shopify-section-{{ section.id }} .stl-slider-wrapper {
+      overflow-x: visible !important;
       overflow-y: auto;
       max-height: 80vh;
       scrollbar-width: none;
@@ -213,7 +214,7 @@
         {%- endif -%}
       </lookbook-element>
 
-<div id="Slider-{{ section.id }}" class="stl-slider-wrapper overflow-hidden w-full">
+<div id="Slider-{{ section.id }}" class="stl-slider-wrapper w-full">
 <motion-list class="stl-card-grid product-grid card-grid card-grid--2 mobile:card-grid--1 grid">
     {%- for block in section.blocks -%}
       {%- render 'product-card',
