@@ -1,4 +1,8 @@
- 
+.go2726514625.kl-private-reset-css-Xuajs1 {
+  z-index: 1000000000 !important;
+  display: flex !important;
+  visibility: visible !important;
+}
 
 :root {
     --color-background: var(--color-base-background);
