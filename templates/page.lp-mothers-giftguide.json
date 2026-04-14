@@ -841,10 +841,10 @@
       "name": "t:sections.collection-list.name",
       "settings": {
         "columns": 4,
-        "carousel_on_desktop": true,
+        "carousel_on_desktop": false,
         "image_type": "collection",
         "image_ratio": "square",
-        "show_products_count": true,
+        "show_products_count": false,
         "show_view_all": false,
         "columns_mobile": "1",
         "swipe_on_mobile": true,
