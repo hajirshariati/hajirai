@@ -58,7 +58,7 @@
         "heading"
       ],
       "settings": {
-        "transparent_header": true,
+        "transparent_header": false,
         "image": "shopify://shop_images/2015-Aetrex-Building_53741168-fcaa-4721-9a8e-ffad58d9c13a.jpg",
         "image_height": "750px",
         "content_width": "medium",
@@ -82,7 +82,9 @@
         "full_width": true,
         "rounded": false,
         "enable_parallax": false,
-        "parallax_direction": "vertical"
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     },
     "rich_text_GVNdq4": {
@@ -136,7 +138,9 @@
         "padding_bottom": 100,
         "divider": false,
         "narrow": false,
-        "rounded": false
+        "rounded": false,
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
       }
     }
   },
