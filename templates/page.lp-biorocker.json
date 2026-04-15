@@ -463,9 +463,7 @@
         "spacing_fkWaLi",
         "button_rK7CEX"
       ],
-      "custom_css": [
-        ".dynamic-feature__media::after {position: absolute; inset: 0; background: #ecebe442; mix-blend-mode: darken; pointer-events: none; z-index: 1;}"
-      ],
+      "custom_css": [],
       "name": "Dynamic Feature Combo",
       "settings": {
         "tile1_width": 6,
