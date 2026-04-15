@@ -463,7 +463,9 @@
         "spacing_fkWaLi",
         "button_rK7CEX"
       ],
-      "custom_css": [],
+      "custom_css": [
+        ".dynamic-feature__media {mix-blend-mode: darken; background: #ecebe442;}"
+      ],
       "name": "Dynamic Feature Combo",
       "settings": {
         "tile1_width": 6,
