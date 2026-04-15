@@ -16,6 +16,47 @@ button.klaviyo-close-form.kl-private-reset-css-Xuajs1 {
   visibility: visible !important;
 }
 
+
+
+
+
+
+
+/* Force form to fit container */
+.klaviyo-form {
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* Stack fields instead of side-by-side */
+.klaviyo-form form {
+  flex-direction: column !important;
+}
+
+/* Make each row full width */
+.klaviyo-form [data-testid="form-row"] {
+  flex-direction: column !important;
+}
+
+/* Fix spacing between inputs */
+.klaviyo-form [data-testid="form-component"] {
+  padding: 6px 0 !important;
+  width: 100% !important;
+}
+
+/* Ensure inputs don’t overflow */
+.klaviyo-form input,
+.klaviyo-form button {
+  width: 100% !important;
+}
+
+
+
+
+
+
+
+
 :root {
     --color-background: var(--color-base-background);
     --color-background-2: var(--color-base-background);
