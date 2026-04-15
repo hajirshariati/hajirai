@@ -60,7 +60,7 @@
       "settings": {
         "transparent_header": true,
         "image": "shopify://shop_images/2015-Aetrex-Building_53741168-fcaa-4721-9a8e-ffad58d9c13a.jpg",
-        "image_height": "750px",
+        "image_height": "600px",
         "content_width": "medium",
         "content_position": "md:items-center md:justify-center",
         "text_alignment": "center",
