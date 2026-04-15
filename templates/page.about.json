@@ -122,7 +122,6 @@
         },
         "text_FL4L6R": {
           "type": "text",
-          "disabled": true,
           "settings": {
             "text": "<p>Aetrex is distributed globally and is headquartered just outside New York City, in Teaneck, New Jersey. Additional offices are located in Israel and China. Aetrex employs over 200 people, including leading hardware and software engineers and programmers, top footwear designers, and developers. You can find Aetrex in fine footwear retailers around the world. View the<a href=\"https://aetrex.com/pages/store-locator\" target=\"_blank\"> store locator </a>for more information.</p>",
             "text_font": "body",
@@ -225,6 +224,7 @@
         "text_MJL4Rw",
         "text_hhnt8n"
       ],
+      "disabled": true,
       "name": "t:sections.rich-text.name",
       "settings": {
         "text_alignment": "left",
