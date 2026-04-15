@@ -31,7 +31,7 @@
           "type": "image",
           "settings": {
             "image": "shopify://shop_images/bio_banner_D.jpg",
-            "image_mobile": "shopify://shop_images/bio_banner_M.jpg",
+            "image_mobile": "shopify://shop_images/bio_banner_M2.jpg",
             "content_position": "md:items-end md:justify-start",
             "content_position_mobile": "items-end justify-start",
             "heading": "BioRocker™ Technology Collection",
@@ -72,7 +72,7 @@
         "image_height_mobile": "auto",
         "text_alignment_mobile": "center",
         "mobile_content_space": 312,
-        "mobile_content_space_color": "#f6ebe3",
+        "mobile_content_space_color": "#e5ddd2",
         "accessibility_info": "Slideshow about our brand",
         "color_text": "#171717",
         "color_background": "#ffffff",
