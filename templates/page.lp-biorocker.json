@@ -341,6 +341,9 @@
         "column_RQMbpf",
         "column_EtTypD"
       ],
+      "custom_css": [
+        ".flickity-page-dots {margin-block-start: 1px;}"
+      ],
       "name": "t:sections.multicolumn-with-icons.name",
       "settings": {
         "style": "with-border",
