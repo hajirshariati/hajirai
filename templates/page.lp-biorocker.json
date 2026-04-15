@@ -469,9 +469,9 @@
       ],
       "name": "Dynamic Feature Combo",
       "settings": {
-        "tile1_width": 6,
-        "tile2_width": 3,
-        "tile3_width": 4,
+        "tile1_width": 3,
+        "tile2_width": 2,
+        "tile3_width": 2,
         "gap": 16,
         "gap_mobile": 16,
         "feature_image": "shopify://shop_images/92985-EN2009W_left.jpg",
