@@ -59,7 +59,7 @@
         "image_8RLr6T"
       ],
       "custom_css": [
-        ".slideshow-content-positioned {max-width: 49em !important; }"
+        ".slideshow-content-positioned {max-width: 49em !important;}"
       ],
       "name": "t:sections.slideshow.name",
       "settings": {
@@ -314,7 +314,7 @@
           "settings": {
             "icon": "award",
             "custom_icon": "",
-            "heading": "Designed with Insights from 50M+ Foot Scans",
+            "heading": "Designed from 50M+ foot scans",
             "text": "",
             "highlighted_text": "none",
             "custom_html": "",
@@ -367,7 +367,7 @@
         "color_button_background": "",
         "color_button_gradient": "",
         "padding_top": 24,
-        "padding_bottom": 12,
+        "padding_bottom": 8,
         "divider": false,
         "full_width": true,
         "rounded": false,
