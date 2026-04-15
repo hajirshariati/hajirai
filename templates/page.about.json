@@ -87,11 +87,94 @@
         "abra_promo_code_hide": ""
       }
     },
+    "images_with_text_etUwLq": {
+      "type": "images-with-text",
+      "blocks": {
+        "text_zLiTt9": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Aetrex, Inc. is widely recognized as a global leader in foot scanning technology, orthotics and comfort and wellness footwear. The company’s state-of-the-art foot scanning devices, including Albert, Albert 2 Pro and Albert 3DFit (2022 and 2023 CES Innovation Award Honorees) and Albert Pressure are engineered to accurately measure feet and determine foot type and pressure points.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_gwwYet": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Since 2002, Aetrex has placed over 12,000 scanners worldwide that have performed more than 50 million unique customer foot scans. With all of this global foot data, it’s no surprise Aetrex really knows feet. Their unique, premium footwear and orthotic designs are based on learnings from their foot scans to ensure maximum comfort, support, and a better overall fit. Each shoe and orthotic features Aetrex’s Signature Arch Support to provide alignment, minimize over-pronation and help prevent common conditions such as Plantar Fasciitis, Arch Pain and Metatarsalgia.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        },
+        "text_FL4L6R": {
+          "type": "text",
+          "disabled": true,
+          "settings": {
+            "text": "<p>Aetrex is distributed globally and is headquartered just outside New York City, in Teaneck, New Jersey. Additional offices are located in Israel and China. Aetrex employs over 200 people, including leading hardware and software engineers and programmers, top footwear designers, and developers. You can find Aetrex in fine footwear retailers around the world. View the<a href=\"https://aetrex.com/pages/store-locator\" target=\"_blank\"> store locator </a>for more information.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle"
+          }
+        }
+      },
+      "block_order": [
+        "text_zLiTt9",
+        "text_gwwYet",
+        "text_FL4L6R"
+      ],
+      "name": "t:sections.images-with-text.name",
+      "settings": {
+        "image": "shopify://shop_images/Savannah_red_LS.jpg",
+        "image_url": "",
+        "image_2": "shopify://shop_images/albert2pro_clear.png",
+        "image2_url": "",
+        "image_ratio": "adapt",
+        "image_width": "small",
+        "layout": "text_first",
+        "text_alignment": "left",
+        "text_alignment_mobile": "left",
+        "color_text": "",
+        "color_background": "",
+        "gradient_background": "",
+        "color_highlight": "",
+        "gradient_highlight": "",
+        "color_button_text": "",
+        "color_button_background": "",
+        "color_button_gradient": "",
+        "padding_top": 72,
+        "padding_bottom": 40,
+        "divider": false,
+        "full_width": false,
+        "rounded": false,
+        "enable_parallax": true
+      }
+    },
     "rich_text_GVNdq4": {
       "type": "rich-text",
       "blocks": {
         "text_VayDbb": {
           "type": "text",
+          "disabled": true,
           "settings": {
             "text": "<p>Aetrex, Inc. is widely recognized as a global leader in foot scanning technology, orthotics and comfort and wellness footwear. The company’s state-of-the-art foot scanning devices, including Albert, Albert 2 Pro and Albert 3DFit (2022 and 2023 CES Innovation Award Honorees) and Albert Pressure are engineered to accurately measure feet and determine foot type and pressure points.</p>",
             "text_font": "body",
@@ -107,6 +190,7 @@
         },
         "text_MJL4Rw": {
           "type": "text",
+          "disabled": true,
           "settings": {
             "text": "<p>Since 2002, Aetrex has placed over 12,000 scanners worldwide that have performed more than 50 million unique customer foot scans. With all of this global foot data, it’s no surprise Aetrex really knows feet. Their unique, premium footwear and orthotic designs are based on learnings from their foot scans to ensure maximum comfort, support, and a better overall fit. Each shoe and orthotic features Aetrex’s Signature Arch Support to provide alignment, minimize over-pronation and help prevent common conditions such as Plantar Fasciitis, Arch Pain and Metatarsalgia.</p>",
             "text_font": "body",
@@ -166,7 +250,7 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 72,
+        "padding_top": 0,
         "padding_bottom": 100,
         "divider": false,
         "narrow": false,
@@ -179,6 +263,7 @@
   "order": [
     "main",
     "image-with-text-overlay",
+    "images_with_text_etUwLq",
     "rich_text_GVNdq4"
   ]
 }
