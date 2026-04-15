@@ -145,10 +145,10 @@
       "settings": {
         "image": "shopify://shop_images/Savannah_red_LS.jpg",
         "image_url": "",
-        "image_2": "shopify://shop_images/Albert2Pro_isolated.png",
+        "image_2": "shopify://shop_images/9a56530c-0517-453e-a68a-e2726e473f55_33b0d110-5333-4f93-9ef9-b121c4b89da5.jpg",
         "image2_url": "",
-        "image_ratio": "adapt",
-        "image_width": "small",
+        "image_ratio": "rounded",
+        "image_width": "medium",
         "layout": "text_first",
         "text_alignment": "left",
         "text_alignment_mobile": "left",
