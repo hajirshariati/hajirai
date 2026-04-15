@@ -383,8 +383,8 @@
             "text": "helps absorb shock",
             "horizontal": 81,
             "vertical": 58,
-            "text_horizontal": 24,
-            "text_vertical": 80
+            "text_horizontal": 4,
+            "text_vertical": 76
           }
         },
         "feature_point_jaE6at": {
@@ -392,8 +392,8 @@
           "settings": {
             "heading": "Aetrex Signature Arch Support",
             "text": "for balance & alignment",
-            "horizontal": 67,
-            "vertical": 52,
+            "horizontal": 62,
+            "vertical": 54,
             "text_horizontal": 71,
             "text_vertical": 2
           }
@@ -403,9 +403,9 @@
           "settings": {
             "heading": "Dual BioRocker™ Design",
             "text": "guides each heel-to-toe step for effortless motion",
-            "horizontal": 14,
-            "vertical": 62,
-            "text_horizontal": 18,
+            "horizontal": 60,
+            "vertical": 64,
+            "text_horizontal": 3,
             "text_vertical": 12
           }
         },
@@ -488,11 +488,11 @@
         "dot_size": 16,
         "dot_size_mobile": 20,
         "dot_color": "#ffffff",
-        "dot_border_color": "#171717",
+        "dot_border_color": "#73b5be",
         "dot_border_width": 2,
-        "line_color": "#171717",
+        "line_color": "#d0edf1",
         "line_width": 0.4,
-        "callout_background": "#e7e7e7",
+        "callout_background": "#ecebe4",
         "callout_background_opacity": 1,
         "callout_radius": 8,
         "callout_max_width": 220,
