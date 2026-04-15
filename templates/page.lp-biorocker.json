@@ -250,6 +250,10 @@
         "column_pNXkfL",
         "column_hR6VPT"
       ],
+      "custom_css": [
+        ".slider .card {border-radius: 2em; background: #d9d7c87d !important;}",
+        ".multicolumn .media {mix-blend-mode: darken;}"
+      ],
       "name": "Multicolumn",
       "settings": {
         "gap": "small",
