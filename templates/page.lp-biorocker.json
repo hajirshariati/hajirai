@@ -58,6 +58,9 @@
       "block_order": [
         "image_8RLr6T"
       ],
+      "custom_css": [
+        ".slideshow-content-positioned {max-width: 49em !important; }"
+      ],
       "name": "t:sections.slideshow.name",
       "settings": {
         "autoplay": false,
