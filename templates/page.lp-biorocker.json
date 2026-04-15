@@ -24,6 +24,72 @@
         "rounded": false
       }
     },
+    "slideshow_xAxqFy": {
+      "type": "slideshow",
+      "blocks": {
+        "image_8RLr6T": {
+          "type": "image",
+          "settings": {
+            "image": "shopify://shop_images/bio_banner_D.jpg",
+            "image_mobile": "shopify://shop_images/bio_banner_M.jpg",
+            "content_position": "md:items-end md:justify-start",
+            "content_position_mobile": "items-end justify-start",
+            "heading": "BioRocker™ <br>Technology Collection",
+            "heading_size": "title-md",
+            "heading_tag": "h2",
+            "text": "<p>With a curved, rocker-style sole, BioRocker™ technology <br/>helps move you forward naturally while easing pressure <br/>on the heel and ball-of-foot.</p>",
+            "text_font": "body",
+            "text_size": "subtext-md",
+            "text_max_size": 32,
+            "text_line_height": 1.6,
+            "text_letter_spacing": 0,
+            "text_capitalize": false,
+            "secondary_color_text": false,
+            "highlighted_text": "none",
+            "highlighted_scribble": "circle",
+            "button_label": "Shop Collection",
+            "button_link": "shopify://collections/biorocker-collection",
+            "button_style": "primary",
+            "button_external": false,
+            "button_icon": false
+          }
+        }
+      },
+      "block_order": [
+        "image_8RLr6T"
+      ],
+      "name": "t:sections.slideshow.name",
+      "settings": {
+        "autoplay": false,
+        "autoplay_speed": 5,
+        "show_navigation": true,
+        "image_height": "650px",
+        "content_width": "small",
+        "text_alignment": "left",
+        "image_height_mobile": "auto",
+        "text_alignment_mobile": "center",
+        "mobile_content_space": 336,
+        "mobile_content_space_color": "#f6ebe3",
+        "accessibility_info": "Slideshow about our brand",
+        "color_text": "#171717",
+        "color_background": "#ffffff",
+        "gradient_background": "",
+        "color_button_text": "#171717",
+        "color_button_background": "#ffffff",
+        "color_button_gradient": "",
+        "color_overlay": "#171717",
+        "overlay_opacity": 0,
+        "padding_top": 0,
+        "padding_bottom": 0,
+        "divider": false,
+        "full_width": false,
+        "rounded": true,
+        "enable_parallax": false,
+        "parallax_direction": "vertical",
+        "abra_promo_code_show": "",
+        "abra_promo_code_hide": ""
+      }
+    },
     "image_with_text_overlay_P4xxxr": {
       "type": "image-with-text-overlay",
       "blocks": {
@@ -79,6 +145,7 @@
         "text_n3KDXU",
         "button_tyKkBW"
       ],
+      "disabled": true,
       "name": "t:sections.image-with-text-overlay.name",
       "settings": {
         "transparent_header": false,
@@ -105,7 +172,7 @@
         "divider": false,
         "full_width": false,
         "rounded": true,
-        "enable_parallax": true,
+        "enable_parallax": false,
         "parallax_direction": "vertical",
         "abra_promo_code_show": "",
         "abra_promo_code_hide": ""
@@ -117,7 +184,7 @@
         "column_aAJcWw": {
           "type": "column",
           "settings": {
-            "show_border": true,
+            "show_border": false,
             "text_alignment": "center",
             "text_alignment_mobile": "center",
             "image": "shopify://shop_images/93905-EN2004W_catalog.jpg",
@@ -138,7 +205,7 @@
         "column_pNXkfL": {
           "type": "column",
           "settings": {
-            "show_border": true,
+            "show_border": false,
             "text_alignment": "center",
             "text_alignment_mobile": "center",
             "image": "shopify://shop_images/93027-EN3004W_catalog.jpg",
@@ -159,7 +226,7 @@
         "column_hR6VPT": {
           "type": "column",
           "settings": {
-            "show_border": true,
+            "show_border": false,
             "text_alignment": "center",
             "text_alignment_mobile": "center",
             "image": "shopify://shop_images/93003-EN2504W_catalog.jpg",
@@ -203,7 +270,7 @@
         "highlighted_text": "none",
         "highlighted_scribble": "circle",
         "color_text": "",
-        "color_background": "",
+        "color_background": "#ffffff",
         "gradient_background": "",
         "color_highlight": "",
         "gradient_highlight": "",
@@ -212,7 +279,7 @@
         "color_button_gradient": "",
         "padding_top": 24,
         "padding_bottom": 24,
-        "full_width": true,
+        "full_width": false,
         "divider": false,
         "rounded": false,
         "abra_promo_code_show": "",
@@ -635,6 +702,7 @@
   },
   "order": [
     "main-page",
+    "slideshow_xAxqFy",
     "image_with_text_overlay_P4xxxr",
     "multicolumn_R8kcbF",
     "multicolumn_with_icons_Wb3Wrk",
