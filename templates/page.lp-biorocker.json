@@ -422,7 +422,7 @@
         "text_7pBeji": {
           "type": "text",
           "settings": {
-            "text": "<p>Leather construction, built-in arch support and an EVA footbed. Designed using insights from over 50M foot scans to ensure you're properly supported from the ground up.</p>",
+            "text": "<p>Designed using insights from over 50M foot scans to ensure you’re properly supported from the ground up, Flora features a leather construction with built-in arch support and an EVA footbed.</p>",
             "text_font": "body",
             "text_size": "subtext-md",
             "text_max_size": 32,
@@ -560,7 +560,7 @@
       ],
       "name": "t:sections.image-with-text.name",
       "settings": {
-        "image": "shopify://shop_images/jenny_landing.gif",
+        "image": "shopify://shop_images/rocker_small2.gif",
         "img_url": "",
         "image_height": "adapt",
         "image_width": "medium",
@@ -579,8 +579,8 @@
         "color_button_text": "",
         "color_button_background": "",
         "color_button_gradient": "",
-        "padding_top": 32,
-        "padding_bottom": 32,
+        "padding_top": 52,
+        "padding_bottom": 52,
         "divider": false,
         "full_width": false,
         "rounded": true,
