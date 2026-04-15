@@ -490,7 +490,7 @@
         "dot_color": "#ffffff",
         "dot_border_color": "#73b5be",
         "dot_border_width": 2,
-        "line_color": "#d0edf1",
+        "line_color": "#3f9999",
         "line_width": 0.4,
         "callout_background": "#ecebe4",
         "callout_background_opacity": 1,
