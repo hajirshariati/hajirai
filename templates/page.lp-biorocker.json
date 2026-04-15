@@ -68,7 +68,7 @@
         "text_alignment": "left",
         "image_height_mobile": "auto",
         "text_alignment_mobile": "center",
-        "mobile_content_space": 336,
+        "mobile_content_space": 312,
         "mobile_content_space_color": "#f6ebe3",
         "accessibility_info": "Slideshow about our brand",
         "color_text": "#171717",
