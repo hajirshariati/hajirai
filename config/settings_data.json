@@ -604,6 +604,8 @@
     }
   },
   "platform_customizations": {
-    "custom_css": []
+    "custom_css": [
+      "#launcher{display:none}"
+    ]
   }
 }
