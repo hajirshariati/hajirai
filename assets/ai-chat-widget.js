@@ -245,6 +245,13 @@ if(p.type==='link'&&p.url){
   if(b)b.insertAdjacentHTML('beforeend','<a style="display:block;margin-top:10px;padding:12px 16px;background:var(--ai-chat-primary,#2d6b4f);color:#fff;border-radius:10px;text-decoration:none;text-align:center;font-size:14px;font-weight:600" href="'+esc(p.url)+'">'+esc(p.label||'Browse Collection')+' &rarr;</a>');
   scrollBottom();
 }
+if(p.type==='choices'&&p.options&&p.options.length){
+  typingEl.classList.remove('visible');
+  if(!msgDiv)msgDiv=appendMsg('assistant',full||'');
+  var b=$('.ai-chat-msg-bubble',msgDiv);
+  if(b){var ch='<div class="ai-chat-choices">';for(var ci=0;ci<p.options.length;ci++){ch+='<button class="ai-chat-choice-btn" data-message="'+esc(p.options[ci])+'">'+esc(p.options[ci])+'</button>'}ch+='</div>';b.insertAdjacentHTML('beforeend',ch)}
+  scrollBottom();
+}
 if(p.type==='action'&&p.action==='open_zendesk'){
   setTimeout(function(){toggle(false);if(typeof window.zE==='function'){window.zE('webWidget','show');window.zE('webWidget','open')}},1500);
 }
