@@ -1555,8 +1555,9 @@
         "visible_if": "{{ settings.ai_chat_enabled == true }}",
         "type": "text",
         "id": "ai_chat_cta3_label",
-        "label": "CTA 3 Label",
-        "default": "Orthotics"
+        "label": "CTA 3 Label (Optional)",
+        "default": "Orthotics",
+        "info": "Leave blank to hide."
       },
       {
         "visible_if": "{{ settings.ai_chat_enabled == true }}",
@@ -1570,8 +1571,9 @@
         "visible_if": "{{ settings.ai_chat_enabled == true }}",
         "type": "text",
         "id": "ai_chat_cta4_label",
-        "label": "CTA 4 Label",
-        "default": "Foot Pain Relief"
+        "label": "CTA 4 Label (Optional)",
+        "default": "Foot Pain Relief",
+        "info": "Leave blank to hide."
       },
       {
         "visible_if": "{{ settings.ai_chat_enabled == true }}",
