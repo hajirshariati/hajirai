@@ -243,6 +243,17 @@ if(p.type==='link'&&p.url){
 if(p.type==='action'&&p.action==='open_zendesk'){
   setTimeout(function(){toggle(false);if(typeof window.zE==='function'){window.zE('webWidget','show');window.zE('webWidget','open')}},1500);
 }
+if(p.type==='action'&&p.action==='show_dead_end'){
+  typingEl.classList.remove('visible');
+  if(!msgDiv)msgDiv=appendMsg('assistant','It looks like I\'m having trouble finding what you need.');
+  var bubble=$('.ai-chat-msg-bubble',msgDiv);
+  if(bubble){
+    bubble.insertAdjacentHTML('beforeend','<div class="ai-chat-dead-end"><button class="ai-chat-dead-end__btn ai-chat-dead-end__btn--support" data-dead-end="support">Talk to Support Team</button><button class="ai-chat-dead-end__btn ai-chat-dead-end__btn--new" data-dead-end="new-chat">Start a New Chat</button></div>');
+  }
+  /* Disable input */
+  inputEl.disabled=true;inputEl.placeholder='Choose an option above';sendBtn.disabled=true;
+  scrollBottom();
+}
 if(p.type==='error'){full=p.message||'An error occurred.';finish(full,[]);return true}
 }catch(e){full+=data;typingEl.classList.remove('visible');if(!msgDiv)msgDiv=appendMsg('assistant',full);else{var bb=$('.ai-chat-msg-bubble',msgDiv);if(bb)bb.innerHTML='<p>'+md(esc(full))+'</p>'}}
 }return false}
@@ -288,8 +299,15 @@ document.addEventListener('click',function(){menu.style.display='none'});
 msgsEl.addEventListener('click',function(e){
 var btn=e.target.closest('[data-add-to-cart]');
 if(btn){e.preventDefault();var vid=btn.getAttribute('data-add-to-cart');btn.disabled=true;btn.textContent='Adding...';addToCart(vid,1).then(function(){btn.textContent='Added!';setTimeout(function(){btn.textContent='Add to Cart';btn.disabled=false},2000)}).catch(function(){btn.textContent='Error';btn.disabled=false});return}
+var deadEnd=e.target.closest('[data-dead-end]');
+if(deadEnd){
+  var action=deadEnd.getAttribute('data-dead-end');
+  if(action==='support'){toggle(false);if(typeof window.zE==='function'){window.zE('webWidget','show');window.zE('webWidget','open')}}
+  if(action==='new-chat'){clearChat();inputEl.disabled=false;inputEl.placeholder=IPLACE;sendBtn.disabled=false}
+  return;
+}
 var cta=e.target.closest('[data-message]');
-if(cta){var t=cta.getAttribute('data-message');if(t){inputEl.value=t;sendMessage()}}
+if(cta){var t=cta.getAttribute('data-message');if(t){inputEl.disabled=false;inputEl.placeholder=IPLACE;sendBtn.disabled=false;inputEl.value=t;sendMessage()}}
 });
 
 /* Init */
