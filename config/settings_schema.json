@@ -1588,8 +1588,8 @@
         "type": "text",
         "id": "ai_chat_cta_hint",
         "label": "CTA Hint Text",
-        "default": "",
-        "info": "Shown below quick picks. Leave blank to hide."
+        "default": "Or type your question below",
+        "info": "Shown below CTAs. Leave blank to hide."
       },
       {
         "visible_if": "{{ settings.ai_chat_enabled == true }}",
