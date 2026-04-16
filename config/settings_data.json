@@ -151,6 +151,8 @@
     "ai_chat_disclaimer": "Powered by Aetrex Technology • Not medical advice",
     "ai_chat_position": "bottom-center",
     "ai_chat_launcher_width": 600,
+    "ai_chat_launcher_placeholder": "How can I help your feet today?",
+    "ai_chat_input_placeholder": "How can I help your feet today?",
     "ai_chat_banner": "shopify://shop_images/AI-banner.png",
     "ai_chat_avatar": "shopify://shop_images/Create_a_professional_202604160903.jpg",
     "ai_chat_cta3_label": "Orthotic Finder",
