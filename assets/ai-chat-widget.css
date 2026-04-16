@@ -453,7 +453,7 @@
 
 .ai-chat-welcome__cta-btn:hover {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  background: #d6eee0;
+  background: var(--ai-chat-cta-hover, #d6eee0);
 }
 
 .ai-chat-welcome__cta-btn .cta-plus {

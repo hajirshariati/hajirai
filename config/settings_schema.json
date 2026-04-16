@@ -1609,6 +1609,14 @@
         "label": "CTA Button Text",
         "default": "#2d6b4f",
         "info": "Text color of the welcome screen CTA buttons."
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "color",
+        "id": "ai_chat_color_cta_hover",
+        "label": "CTA Button Hover",
+        "default": "#d6eee0",
+        "info": "Background color when hovering over CTA buttons."
       }
     ]
   },

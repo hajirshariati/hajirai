@@ -47,6 +47,8 @@ launcher.innerHTML='<div class="ai-chat-launcher__icon">'+avatarImg+'</div><span
 
 /* Build panel */
 var panel=el('div','ai-chat-panel ai-chat-panel--'+POS);
+panel.style.width=LWIDTH+'px';
+panel.style.maxWidth='calc(100vw - 16px)';
 panel.setAttribute('role','dialog');
 panel.setAttribute('aria-label','AI Shopping Assistant');
 
