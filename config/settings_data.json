@@ -147,6 +147,7 @@
     "ai_chat_api_url": "https://shopify-ai-chat-production-c344.up.railway.app",
     "ai_chat_assistant_name": "Archie by Aetrex",
     "ai_chat_tagline": "Your Personal Fit & Comfort Expert",
+    "ai_chat_greeting": "I'm the Aetrex AI Assistant, here to help you find the perfect fit.",
     "ai_chat_disclaimer": "Powered by Aetrex fit technology • Not medical advice",
     "ai_chat_launcher_width": 590,
     "ai_chat_banner": "shopify://shop_images/AI-banner.png",
