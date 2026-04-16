@@ -145,6 +145,8 @@
     "ss_branch_name": "",
     "ai_chat_enabled": true,
     "ai_chat_api_url": "https://shopify-ai-chat-production-c344.up.railway.app",
+    "ai_chat_launcher_width": 590,
+    "ai_chat_banner": "shopify://shop_images/bio_banner_D.jpg",
     "checkout_logo_position": "left",
     "checkout_logo_size": "small",
     "checkout_body_background_color": "#ffffff",
