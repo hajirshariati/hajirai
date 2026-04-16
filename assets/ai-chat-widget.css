@@ -334,7 +334,7 @@
 
 .ai-chat-welcome__banner {
   width: 100%;
-  height: 160px;
+  aspect-ratio: 5 / 2;
   overflow: hidden;
   border-radius: 0;
   position: relative;
@@ -465,7 +465,8 @@
   font-size: 14px;
   font-weight: 600;
   color: var(--ai-chat-text);
-  margin-top: 12px;
+  margin-top: 16px;
+  margin-bottom: 14px;
 }
 
 .ai-chat-welcome__hint {
@@ -932,7 +933,7 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
   }
 
   .ai-chat-welcome__banner {
-    height: 120px;
+    aspect-ratio: 3 / 1;
   }
 
   .ai-chat-welcome__avatar {
