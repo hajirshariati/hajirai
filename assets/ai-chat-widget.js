@@ -3,18 +3,24 @@
 var C=window.__AI_CHAT_CONFIG||{};
 var API=C.apiUrl||'';
 var SHOP=C.shopDomain||'';
-var GREET=C.greeting||'How can I help you today?';
+var GREET=C.greeting||'Hi, I\'m Archie — your personal fit and comfort expert.';
+var GREETCTA=C.greetingCta||'What can I help you find today?';
 var AVATAR=C.avatarUrl||'';
 var BANNER=C.bannerUrl||'';
-var NAME=C.assistantName||'Aetrex AI';
-var TAG=C.assistantTagline||'Shop with AI';
-var LPLACE=C.launcherPlaceholder||'How can I help your feet today?';
-var IPLACE=C.inputPlaceholder||'How can I help your feet today?';
+var NAME=C.assistantName||'Archie by Aetrex';
+var TAG=C.assistantTagline||'Smart Support for Every Step';
+var LPLACE=C.launcherPlaceholder||'How can Archie help your feet today?';
+var IPLACE=C.inputPlaceholder||'How can Archie help your feet today?';
 var POS=C.widgetPosition||'bottom-center';
 var CTA1L=C.cta1Label||'';var CTA1M=C.cta1Message||'';
 var CTA2L=C.cta2Label||'';var CTA2M=C.cta2Message||'';
 var CTA3L=C.cta3Label||'';var CTA3M=C.cta3Message||'';
-var HINT=C.ctaHint||'Or type your question below';
+var CTA4L=C.cta4Label||'';var CTA4M=C.cta4Message||'';
+var HINT=C.ctaHint||'';
+var QP1L=C.quickPick1Label||'';var QP1M=C.quickPick1Message||'';
+var QP2L=C.quickPick2Label||'';var QP2M=C.quickPick2Message||'';
+var QP3L=C.quickPick3Label||'';var QP3M=C.quickPick3Message||'';
+var QP4L=C.quickPick4Label||'';var QP4M=C.quickPick4Message||'';
 var SHOWBAN=C.showBanner!==false;
 var DISCL=C.disclaimerText||'';
 var PRIVURL=C.privacyUrl||'/pages/privacy-policy';
@@ -94,17 +100,31 @@ if(SHOWBAN){
 }
 h+='<div class="ai-chat-welcome__avatar">'+avatarImg+'</div>';
 h+='<div class="ai-chat-welcome__name">'+esc(NAME)+'</div>';
-h+='<div class="ai-chat-welcome__tagline">'+esc(TAG)+' <span class="ai-chat-welcome__tagline-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span></div>';
+h+='<div class="ai-chat-welcome__tagline">'+esc(TAG)+'</div>';
 h+='<div class="ai-chat-welcome__greeting">'+esc(GREET)+'</div>';
+if(GREETCTA)h+='<div class="ai-chat-welcome__greeting-cta">'+esc(GREETCTA)+'</div>';
 var ctas=[];
-if(CTA1L&&CTA1M)ctas.push({l:CTA1L,m:CTA1M});
-if(CTA2L&&CTA2M)ctas.push({l:CTA2L,m:CTA2M});
-if(CTA3L&&CTA3M)ctas.push({l:CTA3L,m:CTA3M});
+if(CTA1L&&CTA1M)ctas.push({l:CTA1L,m:CTA1M,icon:'shoe'});
+if(CTA2L&&CTA2M)ctas.push({l:CTA2L,m:CTA2M,icon:'shoe'});
+if(CTA3L&&CTA3M)ctas.push({l:CTA3L,m:CTA3M,icon:'orthotic'});
+if(CTA4L&&CTA4M)ctas.push({l:CTA4L,m:CTA4M,icon:'heart'});
 if(ctas.length){
-  h+='<div class="ai-chat-welcome__cta-label">Find your perfect shoes:</div>';
   h+='<div class="ai-chat-welcome__ctas">';
   for(var i=0;i<ctas.length;i++){
     h+='<button class="ai-chat-welcome__cta-btn" data-message="'+esc(ctas[i].m)+'"><span class="cta-plus">+</span> '+esc(ctas[i].l)+'</button>';
+  }
+  h+='</div>';
+}
+/* Quick picks */
+var qps=[];
+if(QP1L&&QP1M)qps.push({l:QP1L,m:QP1M});
+if(QP2L&&QP2M)qps.push({l:QP2L,m:QP2M});
+if(QP3L&&QP3M)qps.push({l:QP3L,m:QP3M});
+if(QP4L&&QP4M)qps.push({l:QP4L,m:QP4M});
+if(qps.length){
+  h+='<div class="ai-chat-welcome__quickpicks"><span class="ai-chat-welcome__qp-label">Quick picks:</span>';
+  for(var j=0;j<qps.length;j++){
+    h+='<button class="ai-chat-welcome__qp-btn" data-message="'+esc(qps[j].m)+'">'+esc(qps[j].l)+'</button>';
   }
   h+='</div>';
 }

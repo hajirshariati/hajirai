@@ -1407,7 +1407,7 @@
         "type": "text",
         "id": "ai_chat_assistant_name",
         "label": "Assistant Name",
-        "default": "Aetrex AI",
+        "default": "Archie by Aetrex",
         "info": "Shown in the header and welcome screen."
       },
       {
@@ -1415,7 +1415,7 @@
         "type": "text",
         "id": "ai_chat_tagline",
         "label": "Tagline",
-        "default": "Shop with AI",
+        "default": "Smart Support for Every Step",
         "info": "Shown below the assistant name on the welcome screen."
       },
       {
@@ -1423,7 +1423,7 @@
         "type": "textarea",
         "id": "ai_chat_greeting",
         "label": "Welcome Message",
-        "default": "I'm the Aetrex AI Assistant — here to help you find the perfect fit. How can I help?",
+        "default": "Hi, I'm Archie — your personal fit and comfort expert. I'll help you find the right shoes, sandals, or orthotics based on your foot type, support needs, and daily lifestyle.",
         "info": "Greeting shown when a customer first opens the chat."
       },
       {
@@ -1431,7 +1431,7 @@
         "type": "text",
         "id": "ai_chat_disclaimer",
         "label": "Disclaimer Text",
-        "default": "AI-powered assistant. Not medical advice.",
+        "default": "Powered by Aetrex fit technology · Not medical advice",
         "info": "Shown at the bottom of the chat panel. Leave blank to hide."
       },
       {
@@ -1479,7 +1479,7 @@
         "type": "text",
         "id": "ai_chat_launcher_placeholder",
         "label": "Launcher Placeholder",
-        "default": "How can I help your feet today?",
+        "default": "How can Archie help your feet today?",
         "info": "Text shown in the search-bar launcher."
       },
       {
@@ -1487,7 +1487,7 @@
         "type": "text",
         "id": "ai_chat_input_placeholder",
         "label": "Input Placeholder",
-        "default": "How can I help your feet today?",
+        "default": "How can Archie help your feet today?",
         "info": "Placeholder text in the chat input field."
       },
       {
@@ -1555,23 +1555,105 @@
         "visible_if": "{{ settings.ai_chat_enabled == true }}",
         "type": "text",
         "id": "ai_chat_cta3_label",
-        "label": "CTA 3 Label (Optional)",
-        "info": "Leave blank to hide."
+        "label": "CTA 3 Label",
+        "default": "Orthotics"
       },
       {
         "visible_if": "{{ settings.ai_chat_enabled == true }}",
         "type": "text",
         "id": "ai_chat_cta3_message",
         "label": "CTA 3 Message",
+        "default": "Help me find the right orthotic",
         "info": "Message sent when customer clicks CTA 3."
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "text",
+        "id": "ai_chat_cta4_label",
+        "label": "CTA 4 Label",
+        "default": "Foot Pain Relief"
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "text",
+        "id": "ai_chat_cta4_message",
+        "label": "CTA 4 Message",
+        "default": "I have foot pain and need help",
+        "info": "Message sent when customer clicks CTA 4."
       },
       {
         "visible_if": "{{ settings.ai_chat_enabled == true }}",
         "type": "text",
         "id": "ai_chat_cta_hint",
         "label": "CTA Hint Text",
-        "default": "Or type your question below",
-        "info": "Shown below CTAs. Leave blank to hide."
+        "default": "",
+        "info": "Shown below quick picks. Leave blank to hide."
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "header",
+        "content": "Quick Picks"
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "paragraph",
+        "content": "Small pill-style buttons shown below the CTAs for common topics."
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "text",
+        "id": "ai_chat_qp1_label",
+        "label": "Quick Pick 1",
+        "default": "Arch Support"
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "text",
+        "id": "ai_chat_qp1_message",
+        "label": "Quick Pick 1 Message",
+        "default": "Show me shoes with the best arch support"
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "text",
+        "id": "ai_chat_qp2_label",
+        "label": "Quick Pick 2",
+        "default": "Flat Feet"
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "text",
+        "id": "ai_chat_qp2_message",
+        "label": "Quick Pick 2 Message",
+        "default": "I have flat feet, what do you recommend?"
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "text",
+        "id": "ai_chat_qp3_label",
+        "label": "Quick Pick 3",
+        "default": "Walking Shoes"
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "text",
+        "id": "ai_chat_qp3_message",
+        "label": "Quick Pick 3 Message",
+        "default": "Show me the best walking shoes"
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "text",
+        "id": "ai_chat_qp4_label",
+        "label": "Quick Pick 4",
+        "default": "Plantar Fasciitis"
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "text",
+        "id": "ai_chat_qp4_message",
+        "label": "Quick Pick 4 Message",
+        "default": "I have plantar fasciitis, what shoes help?"
       },
       {
         "visible_if": "{{ settings.ai_chat_enabled == true }}",
