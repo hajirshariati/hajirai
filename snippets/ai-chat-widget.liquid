@@ -1,0 +1,55 @@
+{%- comment -%}
+  AI Chat Widget – Aetrex Store (Redesigned)
+  Renders a search-bar style launcher + modal chat widget powered by Claude AI + Shopify MCP.
+  Controlled via Theme Settings > AI Chat Assistant.
+{%- endcomment -%}
+
+{%- if settings.ai_chat_enabled -%}
+  {%- comment -%} Pass configuration to JavaScript {%- endcomment -%}
+  <script>
+    window.__AI_CHAT_CONFIG = {
+      apiUrl: {{ settings.ai_chat_api_url | json }},
+      shopDomain: {{ shop.permanent_domain | json }},
+      greeting: {{ settings.ai_chat_greeting | default: "I'm the Aetrex AI Assistant — here to help you find the perfect fit. How can I help?" | json }},
+      avatarUrl: {% if settings.ai_chat_avatar != blank %}{{ settings.ai_chat_avatar | image_url: width: 200 | json }}{% else %}""{% endif %},
+      bannerUrl: {% if settings.ai_chat_banner != blank %}{{ settings.ai_chat_banner | image_url: width: 800 | json }}{% else %}""{% endif %},
+      assistantName: {{ settings.ai_chat_assistant_name | default: "Aetrex AI" | json }},
+      assistantTagline: {{ settings.ai_chat_tagline | default: "Shop with AI" | json }},
+      launcherPlaceholder: {{ settings.ai_chat_launcher_placeholder | default: "How can I help your feet today?" | json }},
+      inputPlaceholder: {{ settings.ai_chat_input_placeholder | default: "How can I help your feet today?" | json }},
+      widgetPosition: {{ settings.ai_chat_position | default: "bottom-center" | json }},
+      cta1Label: {{ settings.ai_chat_cta1_label | default: "Women's Shoes" | json }},
+      cta1Message: {{ settings.ai_chat_cta1_message | default: "Show me women's shoes" | json }},
+      cta2Label: {{ settings.ai_chat_cta2_label | default: "Men's Shoes" | json }},
+      cta2Message: {{ settings.ai_chat_cta2_message | default: "Show me men's shoes" | json }},
+      cta3Label: {{ settings.ai_chat_cta3_label | default: "" | json }},
+      cta3Message: {{ settings.ai_chat_cta3_message | default: "" | json }},
+      ctaHint: {{ settings.ai_chat_cta_hint | default: "Or type your question below" | json }},
+      showBanner: {{ settings.ai_chat_show_banner | default: true | json }},
+      launcherWidth: {{ settings.ai_chat_launcher_width | default: "500" | json }},
+      disclaimerText: {{ settings.ai_chat_disclaimer | default: "AI-powered assistant. Not medical advice." | json }},
+      privacyUrl: {{ settings.ai_chat_privacy_url | default: "/pages/privacy-policy" | json }}
+    };
+  </script>
+
+  {%- comment -%} Inject custom colour properties if set {%- endcomment -%}
+  <style>
+    :root {
+      {%- if settings.ai_chat_color_primary != blank -%}
+        --ai-chat-color-primary: {{ settings.ai_chat_color_primary }};
+      {%- endif -%}
+      {%- if settings.ai_chat_color_accent != blank -%}
+        --ai-chat-color-accent: {{ settings.ai_chat_color_accent }};
+      {%- endif -%}
+      {%- if settings.ai_chat_color_cta_bg != blank -%}
+        --ai-chat-cta-bg: {{ settings.ai_chat_color_cta_bg }};
+      {%- endif -%}
+      {%- if settings.ai_chat_color_cta_text != blank -%}
+        --ai-chat-cta-text: {{ settings.ai_chat_color_cta_text }};
+      {%- endif -%}
+    }
+  </style>
+
+  {{ 'ai-chat-widget.css' | asset_url | stylesheet_tag }}
+  <script src="{{ 'ai-chat-widget.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}

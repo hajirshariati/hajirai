@@ -1,0 +1,277 @@
+(function(){
+'use strict';
+var C=window.__AI_CHAT_CONFIG||{};
+var API=C.apiUrl||'';
+var SHOP=C.shopDomain||'';
+var GREET=C.greeting||'How can I help you today?';
+var AVATAR=C.avatarUrl||'';
+var BANNER=C.bannerUrl||'';
+var NAME=C.assistantName||'Aetrex AI';
+var TAG=C.assistantTagline||'Shop with AI';
+var LPLACE=C.launcherPlaceholder||'How can I help your feet today?';
+var IPLACE=C.inputPlaceholder||'How can I help your feet today?';
+var POS=C.widgetPosition||'bottom-center';
+var CTA1L=C.cta1Label||'';var CTA1M=C.cta1Message||'';
+var CTA2L=C.cta2Label||'';var CTA2M=C.cta2Message||'';
+var CTA3L=C.cta3Label||'';var CTA3M=C.cta3Message||'';
+var HINT=C.ctaHint||'Or type your question below';
+var SHOWBAN=C.showBanner!==false;
+var DISCL=C.disclaimerText||'';
+var PRIVURL=C.privacyUrl||'/pages/privacy-policy';
+var LWIDTH=C.launcherWidth||'500';
+var SK='aetrex_ai_chat_session';
+var HK='aetrex_ai_chat_history';
+
+function $(s,c){return(c||document).querySelector(s)}
+function el(t,cl,h){var e=document.createElement(t);if(cl)e.className=cl;if(h)e.innerHTML=h;return e}
+function esc(s){var d=document.createElement('div');d.appendChild(document.createTextNode(s));return d.innerHTML}
+function fmt(c){return'$'+(c/100).toFixed(2)}
+function md(t){if(!t)return'';return t.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>').replace(/^[-*] (.+)$/gm,'<li>$1</li>').replace(/(<li>.*<\/li>)/gs,'<ul>$1</ul>').replace(/\n{2,}/g,'</p><p>').replace(/\n/g,'<br>')}
+
+function getSess(){var id=localStorage.getItem(SK);if(!id){id='sess_'+Date.now()+'_'+Math.random().toString(36).slice(2,10);localStorage.setItem(SK,id)}return id}
+function saveH(m){try{localStorage.setItem(HK,JSON.stringify(m.slice(-50)))}catch(e){}}
+function loadH(){try{return JSON.parse(localStorage.getItem(HK))||[]}catch(e){return[]}}
+
+function addToCart(vid,qty){
+return fetch('/cart/add.js',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items:[{id:parseInt(vid,10),quantity:qty||1}]})}).then(function(r){return r.json()}).then(function(d){document.dispatchEvent(new CustomEvent('cart:refresh'));return fetch('/cart.js').then(function(r){return r.json()}).then(function(cart){document.querySelectorAll('[data-cart-count],.cart-count,.header__cart-count').forEach(function(e){e.textContent=cart.item_count});return d})})
+}
+
+var avatarImg=AVATAR?'<img src="'+AVATAR+'" alt="'+esc(NAME)+'">':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+var assistantBubbleAvatar=AVATAR?'<img src="'+AVATAR+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+
+/* Build launcher */
+var launcher=el('div','ai-chat-launcher ai-chat-launcher--'+POS);
+launcher.style.width=LWIDTH+'px';
+launcher.style.maxWidth='calc(100vw - 32px)';
+launcher.innerHTML='<div class="ai-chat-launcher__icon">'+avatarImg+'</div><span class="ai-chat-launcher__text">'+esc(LPLACE)+'</span><button class="ai-chat-launcher__send" aria-label="Open chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button><button class="ai-chat-launcher__close" aria-label="Dismiss"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>';
+
+/* Build panel */
+var panel=el('div','ai-chat-panel ai-chat-panel--'+POS);
+panel.setAttribute('role','dialog');
+panel.setAttribute('aria-label','AI Shopping Assistant');
+
+var headerAv=AVATAR?'<div class="ai-chat-header__avatar"><img src="'+AVATAR+'" alt="'+esc(NAME)+'"></div>':'<div class="ai-chat-header__avatar ai-chat-header__avatar--placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>';
+
+panel.innerHTML=
+'<div class="ai-chat-header">'+headerAv+'<div class="ai-chat-header__info"><div class="ai-chat-header__name">'+esc(NAME)+'</div></div><div class="ai-chat-header__actions"><button class="ai-chat-header__btn ai-chat-menu-btn" aria-label="Menu" title="Options"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button><button class="ai-chat-header__btn ai-chat-close-btn" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div></div>'+
+'<div class="ai-chat-messages" role="log" aria-live="polite"></div>'+
+'<div class="ai-chat-typing"><div class="ai-chat-msg-avatar">'+assistantBubbleAvatar+'</div><div class="ai-chat-typing-dots"><span class="ai-chat-typing-dot"></span><span class="ai-chat-typing-dot"></span><span class="ai-chat-typing-dot"></span></div></div>'+
+'<div class="ai-chat-input-area"><div class="ai-chat-input-wrap"><div class="ai-chat-input-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><textarea class="ai-chat-input" rows="1" placeholder="'+esc(IPLACE)+'" aria-label="Type your message"></textarea></div><button class="ai-chat-send" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></div>'+
+(DISCL?'<div class="ai-chat-footer">'+esc(DISCL)+' <a href="'+esc(PRIVURL)+'">Privacy Policy</a></div>':'');
+
+/* Build overlay */
+var overlay=el('div','ai-chat-overlay');
+
+/* Menu dropdown */
+var menu=el('div','ai-chat-menu');
+menu.style.cssText='position:absolute;top:52px;right:12px;background:#fff;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.15);z-index:10;display:none;min-width:140px;overflow:hidden';
+menu.innerHTML='<button class="ai-chat-menu-item" data-action="clear" style="display:block;width:100%;padding:10px 16px;border:none;background:none;text-align:left;font-size:13px;cursor:pointer;color:#1a1a1a;font-family:inherit">Clear Chat</button>';
+panel.style.position='fixed';
+panel.appendChild(menu);
+
+document.body.appendChild(overlay);
+document.body.appendChild(panel);
+document.body.appendChild(launcher);
+
+/* Cache refs */
+var msgsEl=$('.ai-chat-messages',panel);
+var typingEl=$('.ai-chat-typing',panel);
+var inputEl=$('.ai-chat-input',panel);
+var sendBtn=$('.ai-chat-send',panel);
+var closeBtn=$('.ai-chat-close-btn',panel);
+var menuBtn=$('.ai-chat-menu-btn',panel);
+
+var isOpen=false,isStreaming=false,messages=loadH(),abortCtrl=null;
+
+function buildWelcome(){
+var h='<div class="ai-chat-welcome">';
+if(SHOWBAN){
+  h+='<div class="ai-chat-welcome__banner">';
+  if(BANNER)h+='<img src="'+BANNER+'" alt="">';
+  h+='</div>';
+}
+h+='<div class="ai-chat-welcome__avatar">'+avatarImg+'</div>';
+h+='<div class="ai-chat-welcome__name">'+esc(NAME)+'</div>';
+h+='<div class="ai-chat-welcome__tagline">'+esc(TAG)+' <span class="ai-chat-welcome__tagline-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span></div>';
+h+='<div class="ai-chat-welcome__greeting">'+esc(GREET)+'</div>';
+var ctas=[];
+if(CTA1L&&CTA1M)ctas.push({l:CTA1L,m:CTA1M});
+if(CTA2L&&CTA2M)ctas.push({l:CTA2L,m:CTA2M});
+if(CTA3L&&CTA3M)ctas.push({l:CTA3L,m:CTA3M});
+if(ctas.length){
+  h+='<div class="ai-chat-welcome__cta-label">Find your perfect shoes:</div>';
+  h+='<div class="ai-chat-welcome__ctas">';
+  for(var i=0;i<ctas.length;i++){
+    h+='<button class="ai-chat-welcome__cta-btn" data-message="'+esc(ctas[i].m)+'"><span class="cta-plus">+</span> '+esc(ctas[i].l)+'</button>';
+  }
+  h+='</div>';
+}
+if(HINT)h+='<div class="ai-chat-welcome__hint">'+esc(HINT)+'</div>';
+h+='</div>';
+msgsEl.innerHTML=h;
+}
+
+function toggle(force){
+isOpen=typeof force==='boolean'?force:!isOpen;
+if(isOpen){
+  launcher.classList.add('hidden');
+  panel.classList.add('open');
+  overlay.classList.add('visible');
+  setTimeout(function(){inputEl.focus()},300);
+}else{
+  panel.classList.remove('open');
+  overlay.classList.remove('visible');
+  launcher.classList.remove('hidden');
+  menu.style.display='none';
+}
+}
+
+function scrollBottom(){requestAnimationFrame(function(){msgsEl.scrollTop=msgsEl.scrollHeight})}
+
+function appendMsg(role,content,products){
+var isU=role==='user';
+var d=el('div','ai-chat-msg ai-chat-msg--'+role);
+var av=isU?'<span>You</span>':assistantBubbleAvatar;
+d.innerHTML='<div class="ai-chat-msg-avatar">'+av+'</div><div class="ai-chat-msg-bubble"><p>'+md(esc(content))+'</p></div>';
+if(products&&products.length){
+  var b=$('.ai-chat-msg-bubble',d);
+  var ph='<div class="ai-chat-products">';
+  for(var i=0;i<products.length;i++)ph+=prodCard(products[i]);
+  ph+='</div>';
+  b.insertAdjacentHTML('beforeend',ph);
+}
+msgsEl.appendChild(d);
+scrollBottom();
+return d;
+}
+
+function prodCard(p){
+var img=p.image||p.featured_image||'';
+var t=esc(p.title||'');
+var u=p.url||p.handle?('/products/'+p.handle):'#';
+var pr=p.price_formatted||(p.price?fmt(p.price):'');
+var cp=p.compare_at_price?fmt(p.compare_at_price):'';
+return '<a class="ai-chat-product-card" href="'+esc(u)+'" style="text-decoration:none;color:inherit">'+(img?'<div class="ai-chat-product-img"><img src="'+esc(img)+'" alt="'+t+'" loading="lazy"></div>':'')+'<div class="ai-chat-product-info"><span class="ai-chat-product-title">'+t+'</span><div class="ai-chat-product-price">'+pr+(cp?'<span class="compare-at">'+cp+'</span>':'')+'</div></div></a>';
+}
+
+function sendMessage(){
+var text=inputEl.value.trim();
+if(!text||isStreaming)return;
+var w=$('.ai-chat-welcome',msgsEl);
+if(w)w.remove();
+messages.push({role:'user',content:text});
+appendMsg('user',text);
+saveH(messages);
+inputEl.value='';inputEl.style.height='auto';
+sendBtn.disabled=true;isStreaming=true;
+typingEl.classList.add('visible');
+scrollBottom();
+streamResponse(text);
+}
+
+function streamResponse(msg){
+if(abortCtrl)abortCtrl.abort();
+abortCtrl=new AbortController();
+var body={message:msg,session_id:getSess(),shop_domain:SHOP,history:messages.slice(-20)};
+fetch(API+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json','Accept':'text/event-stream'},body:JSON.stringify(body),signal:abortCtrl.signal}).then(function(r){
+if(!r.ok)throw new Error('Failed: '+r.status);
+var ct=r.headers.get('content-type')||'';
+if(ct.includes('text/event-stream')||ct.includes('text/plain'))return handleSSE(r);
+return r.json().then(function(d){handleJSON(d)});
+}).catch(function(e){
+if(e.name==='AbortError')return;
+typingEl.classList.remove('visible');isStreaming=false;sendBtn.disabled=false;
+var em='Sorry, I\'m having trouble connecting. Please try again.';
+messages.push({role:'assistant',content:em});appendMsg('assistant',em);saveH(messages);
+});
+}
+
+function handleSSE(response){
+var reader=response.body.getReader();
+var decoder=new TextDecoder();
+var buf='',full='',prods=[],msgDiv=null;
+function proc(chunk){
+buf+=chunk;var lines=buf.split('\n');buf=lines.pop()||'';
+for(var i=0;i<lines.length;i++){
+var line=lines[i].trim();
+if(!line.startsWith('data: '))continue;
+var data=line.slice(6);
+if(data==='[DONE]'){finish(full,prods);return true}
+try{
+var p=JSON.parse(data);
+if(p.type==='text'||p.type==='content_block_delta'){
+  var tc=p.text||(p.delta&&p.delta.text)||'';
+  full+=tc;typingEl.classList.remove('visible');
+  if(!msgDiv)msgDiv=appendMsg('assistant',full);
+  else{var b=$('.ai-chat-msg-bubble',msgDiv);if(b)b.innerHTML='<p>'+md(esc(full))+'</p>'}
+  scrollBottom();
+}
+if(p.type==='products'&&p.products){
+  prods=prods.concat(p.products);typingEl.classList.remove('visible');
+  if(!msgDiv){full=full||'Here are some options for you!';msgDiv=appendMsg('assistant',full)}
+  if(msgDiv){var b=$('.ai-chat-msg-bubble',msgDiv);var ep=$('.ai-chat-products',b);if(ep)ep.remove();var ph='<div class="ai-chat-products">';for(var j=0;j<prods.length;j++)ph+=prodCard(prods[j]);ph+='</div>';b.insertAdjacentHTML('beforeend',ph)}
+}
+if(p.type==='link'&&p.url){
+  typingEl.classList.remove('visible');
+  if(!msgDiv)msgDiv=appendMsg('assistant',full||'Here are some options!');
+  var b=$('.ai-chat-msg-bubble',msgDiv);
+  if(b)b.insertAdjacentHTML('beforeend','<a style="display:block;margin-top:10px;padding:12px 16px;background:var(--ai-chat-primary,#2d6b4f);color:#fff;border-radius:10px;text-decoration:none;text-align:center;font-size:14px;font-weight:600" href="'+esc(p.url)+'">'+esc(p.label||'Browse Collection')+' &rarr;</a>');
+  scrollBottom();
+}
+if(p.type==='action'&&p.action==='open_zendesk'){
+  setTimeout(function(){toggle(false);if(typeof window.zE==='function'){window.zE('webWidget','show');window.zE('webWidget','open')}},1500);
+}
+if(p.type==='error'){full=p.message||'An error occurred.';finish(full,[]);return true}
+}catch(e){full+=data;typingEl.classList.remove('visible');if(!msgDiv)msgDiv=appendMsg('assistant',full);else{var bb=$('.ai-chat-msg-bubble',msgDiv);if(bb)bb.innerHTML='<p>'+md(esc(full))+'</p>'}}
+}return false}
+function read(){reader.read().then(function(r){if(r.done){if(full)finish(full,prods);return}var done=proc(decoder.decode(r.value,{stream:true}));if(!done)read()}).catch(function(e){if(e.name!=='AbortError')finish(full||'Connection lost.',prods)})}
+read();
+}
+
+function handleJSON(d){
+typingEl.classList.remove('visible');
+var c=d.message||d.response||d.text||'Sorry, no response. Try again.';
+var p=d.products||[];
+messages.push({role:'assistant',content:c,products:p});
+appendMsg('assistant',c,p);saveH(messages);
+isStreaming=false;sendBtn.disabled=false;
+}
+
+function finish(text,prods){
+typingEl.classList.remove('visible');isStreaming=false;sendBtn.disabled=false;
+if(text){messages.push({role:'assistant',content:text,products:prods||[]});saveH(messages)}
+}
+
+function clearChat(){
+messages=[];localStorage.removeItem(HK);localStorage.removeItem(SK);
+msgsEl.innerHTML='';buildWelcome();
+if(abortCtrl){abortCtrl.abort();abortCtrl=null}
+isStreaming=false;sendBtn.disabled=false;typingEl.classList.remove('visible');
+}
+
+/* Events */
+launcher.addEventListener('click',function(e){
+if(e.target.closest('.ai-chat-launcher__close')){launcher.classList.add('hidden');return}
+toggle(true);
+});
+closeBtn.addEventListener('click',function(){toggle(false)});
+overlay.addEventListener('click',function(){toggle(false)});
+sendBtn.addEventListener('click',sendMessage);
+inputEl.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}});
+inputEl.addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&isOpen)toggle(false)});
+menuBtn.addEventListener('click',function(e){e.stopPropagation();menu.style.display=menu.style.display==='none'?'block':'none'});
+menu.addEventListener('click',function(e){var item=e.target.closest('[data-action]');if(!item)return;if(item.dataset.action==='clear')clearChat();menu.style.display='none'});
+document.addEventListener('click',function(){menu.style.display='none'});
+msgsEl.addEventListener('click',function(e){
+var btn=e.target.closest('[data-add-to-cart]');
+if(btn){e.preventDefault();var vid=btn.getAttribute('data-add-to-cart');btn.disabled=true;btn.textContent='Adding...';addToCart(vid,1).then(function(){btn.textContent='Added!';setTimeout(function(){btn.textContent='Add to Cart';btn.disabled=false},2000)}).catch(function(){btn.textContent='Error';btn.disabled=false});return}
+var cta=e.target.closest('[data-message]');
+if(cta){var t=cta.getAttribute('data-message');if(t){inputEl.value=t;sendMessage()}}
+});
+
+/* Init */
+if(messages.length===0)buildWelcome();
+else for(var i=0;i<messages.length;i++)appendMsg(messages[i].role,messages[i].content,messages[i].products);
+
+})();

@@ -1378,6 +1378,241 @@
     ]
   },
   {
+    "name": "AI Chat Assistant",
+    "settings": [
+      {
+        "type": "header",
+        "content": "General"
+      },
+      {
+        "type": "paragraph",
+        "content": "A floating AI chat widget powered by Claude AI. Helps shoppers find products, get sizing help, and check orders."
+      },
+      {
+        "type": "checkbox",
+        "id": "ai_chat_enabled",
+        "label": "Enable AI Chat Widget",
+        "default": false
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "text",
+        "id": "ai_chat_api_url",
+        "label": "Chat Server URL",
+        "info": "Your deployed chat-server backend URL (e.g. https://your-app.railway.app).",
+        "placeholder": "https://your-chat-server.example.com"
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "text",
+        "id": "ai_chat_assistant_name",
+        "label": "Assistant Name",
+        "default": "Aetrex AI",
+        "info": "Shown in the header and welcome screen."
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "text",
+        "id": "ai_chat_tagline",
+        "label": "Tagline",
+        "default": "Shop with AI",
+        "info": "Shown below the assistant name on the welcome screen."
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "textarea",
+        "id": "ai_chat_greeting",
+        "label": "Welcome Message",
+        "default": "I'm the Aetrex AI Assistant — here to help you find the perfect fit. How can I help?",
+        "info": "Greeting shown when a customer first opens the chat."
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "text",
+        "id": "ai_chat_disclaimer",
+        "label": "Disclaimer Text",
+        "default": "AI-powered assistant. Not medical advice.",
+        "info": "Shown at the bottom of the chat panel. Leave blank to hide."
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "url",
+        "id": "ai_chat_privacy_url",
+        "label": "Privacy Policy URL",
+        "info": "Linked in the footer disclaimer."
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "header",
+        "content": "Widget Position & Size"
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "select",
+        "id": "ai_chat_position",
+        "label": "Widget Position",
+        "default": "bottom-center",
+        "options": [
+          { "value": "bottom-center", "label": "Bottom Center" },
+          { "value": "bottom-left", "label": "Bottom Left" },
+          { "value": "bottom-right", "label": "Bottom Right" }
+        ]
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "range",
+        "id": "ai_chat_launcher_width",
+        "label": "Launcher Bar Width (px)",
+        "min": 300,
+        "max": 700,
+        "step": 10,
+        "default": 500,
+        "info": "Width of the search-bar style launcher."
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "header",
+        "content": "Launcher Text"
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "text",
+        "id": "ai_chat_launcher_placeholder",
+        "label": "Launcher Placeholder",
+        "default": "How can I help your feet today?",
+        "info": "Text shown in the search-bar launcher."
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "text",
+        "id": "ai_chat_input_placeholder",
+        "label": "Input Placeholder",
+        "default": "How can I help your feet today?",
+        "info": "Placeholder text in the chat input field."
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "header",
+        "content": "Welcome Screen"
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "checkbox",
+        "id": "ai_chat_show_banner",
+        "label": "Show Banner Image",
+        "default": true
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "image_picker",
+        "id": "ai_chat_banner",
+        "label": "Banner Image",
+        "info": "Hero/cover image at the top of the welcome screen. Recommended: 800x320px."
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "image_picker",
+        "id": "ai_chat_avatar",
+        "label": "Assistant Avatar",
+        "info": "Avatar shown in the launcher, header, and welcome screen. Recommended: square, 200x200px."
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "header",
+        "content": "Welcome CTAs"
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "text",
+        "id": "ai_chat_cta1_label",
+        "label": "CTA 1 Label",
+        "default": "Women's Shoes"
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "text",
+        "id": "ai_chat_cta1_message",
+        "label": "CTA 1 Message",
+        "default": "Show me women's shoes",
+        "info": "Message sent when customer clicks this CTA."
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "text",
+        "id": "ai_chat_cta2_label",
+        "label": "CTA 2 Label",
+        "default": "Men's Shoes"
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "text",
+        "id": "ai_chat_cta2_message",
+        "label": "CTA 2 Message",
+        "default": "Show me men's shoes",
+        "info": "Message sent when customer clicks this CTA."
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "text",
+        "id": "ai_chat_cta3_label",
+        "label": "CTA 3 Label (Optional)",
+        "info": "Leave blank to hide."
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "text",
+        "id": "ai_chat_cta3_message",
+        "label": "CTA 3 Message",
+        "info": "Message sent when customer clicks CTA 3."
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "text",
+        "id": "ai_chat_cta_hint",
+        "label": "CTA Hint Text",
+        "default": "Or type your question below",
+        "info": "Shown below CTAs. Leave blank to hide."
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "header",
+        "content": "Colors"
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "color",
+        "id": "ai_chat_color_primary",
+        "label": "Primary Color",
+        "default": "#2d6b4f",
+        "info": "Launcher icon, header, send button, user bubbles."
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "color",
+        "id": "ai_chat_color_accent",
+        "label": "Accent Color",
+        "default": "#3a7d5c",
+        "info": "Used for gradients (banner fallback)."
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "color",
+        "id": "ai_chat_color_cta_bg",
+        "label": "CTA Button Background",
+        "default": "#e8f5ee",
+        "info": "Background color of the welcome screen CTA buttons."
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "color",
+        "id": "ai_chat_color_cta_text",
+        "label": "CTA Button Text",
+        "default": "#2d6b4f",
+        "info": "Text color of the welcome screen CTA buttons."
+      }
+    ]
+  },
+  {
     "name": "Schema Markup",
     "settings": [
       {
