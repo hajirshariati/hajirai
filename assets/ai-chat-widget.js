@@ -194,7 +194,7 @@ streamResponse(text);
 function streamResponse(msg){
 if(abortCtrl)abortCtrl.abort();
 abortCtrl=new AbortController();
-var body={message:msg,session_id:getSess(),shop_domain:SHOP,history:messages.slice(-20)};
+var body={message:msg,session_id:getSess(),shop_domain:SHOP,assistant_name:NAME,history:messages.slice(-20)};
 fetch(API+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json','Accept':'text/event-stream'},body:JSON.stringify(body),signal:abortCtrl.signal}).then(function(r){
 if(!r.ok)throw new Error('Failed: '+r.status);
 var ct=r.headers.get('content-type')||'';
