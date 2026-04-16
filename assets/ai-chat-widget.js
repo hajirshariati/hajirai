@@ -203,8 +203,13 @@ return r.json().then(function(d){handleJSON(d)});
 }).catch(function(e){
 if(e.name==='AbortError')return;
 typingEl.classList.remove('visible');isStreaming=false;sendBtn.disabled=false;
-var em='Sorry, I\'m having trouble connecting. Please try again.';
-messages.push({role:'assistant',content:em});appendMsg('assistant',em);saveH(messages);
+var em='I\'m experiencing high demand right now. Let me connect you with help!';
+messages.push({role:'assistant',content:em});
+var md=appendMsg('assistant',em);
+var bb=$('.ai-chat-msg-bubble',md);
+if(bb)bb.insertAdjacentHTML('beforeend','<div class="ai-chat-dead-end"><button class="ai-chat-dead-end__btn ai-chat-dead-end__btn--support" data-dead-end="support">Talk to Support Team</button><button class="ai-chat-dead-end__btn ai-chat-dead-end__btn--new" data-dead-end="new-chat">Start a New Chat</button></div>');
+inputEl.disabled=true;inputEl.placeholder='Choose an option above';sendBtn.disabled=true;
+saveH(messages);
 });
 }
 
