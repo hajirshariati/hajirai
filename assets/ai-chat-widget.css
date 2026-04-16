@@ -769,6 +769,7 @@
   align-self: flex-start;
   gap: 8px;
   max-width: 85%;
+  margin-bottom: 16px;
 }
 
 .ai-chat-typing.visible {
