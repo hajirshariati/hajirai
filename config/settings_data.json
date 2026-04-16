@@ -151,6 +151,7 @@
     "ai_chat_color_accent": "#805c28",
     "ai_chat_color_cta_bg": "#f7e8d0",
     "ai_chat_color_cta_text": "#805c28",
+    "ai_chat_color_cta_hover": "#fff9ef",
     "checkout_logo_position": "left",
     "checkout_logo_size": "small",
     "checkout_body_background_color": "#ffffff",
