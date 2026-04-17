@@ -5,6 +5,11 @@
 {%- endcomment -%}
 
 {%- if settings.ai_chat_enabled -%}
+  {%- comment -%} Hide on technology pages if toggle is on {%- endcomment -%}
+  {%- assign current_path = request.path | downcase -%}
+  {%- if settings.ai_chat_hide_tech_pages and current_path contains '/pages/tech' -%}
+    {%- comment -%} Tech page — bot hidden {%- endcomment -%}
+  {%- else -%}
   {%- comment -%} Pass configuration to JavaScript {%- endcomment -%}
   <script>
     window.__AI_CHAT_CONFIG = {
@@ -66,4 +71,5 @@
 
   {{ 'ai-chat-widget.css' | asset_url | stylesheet_tag }}
   <script src="{{ 'ai-chat-widget.js' | asset_url }}" defer="defer"></script>
+  {%- endif -%}
 {%- endif -%}

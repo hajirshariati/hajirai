@@ -1396,6 +1396,14 @@
       },
       {
         "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "checkbox",
+        "id": "ai_chat_hide_tech_pages",
+        "label": "Hide on Technology Pages",
+        "default": true,
+        "info": "Hide the chat widget on /pages/technology and all /pages/tech-* pages."
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
         "type": "text",
         "id": "ai_chat_api_url",
         "label": "Chat Server URL",
