@@ -137,10 +137,14 @@ isOpen=typeof force==='boolean'?force:!isOpen;
 if(isOpen){
   launcher.classList.add('hidden');
   panel.classList.add('open');
-  panel.classList.remove('ai-chat-glow');
-  void panel.offsetWidth;
-  panel.classList.add('ai-chat-glow');
-  setTimeout(function(){panel.classList.remove('ai-chat-glow')},3000);
+  if(C.glowEnabled!==false){
+    var glowDur=parseFloat(C.glowDuration)||3;
+    panel.classList.remove('ai-chat-glow','ai-chat-glow-fade');
+    void panel.offsetWidth;
+    panel.classList.add('ai-chat-glow');
+    setTimeout(function(){panel.classList.add('ai-chat-glow-fade')},glowDur*1000);
+    setTimeout(function(){panel.classList.remove('ai-chat-glow','ai-chat-glow-fade')},(glowDur+1)*1000);
+  }
   overlay.classList.add('visible');
   document.body.classList.add('ai-chat-blurred');
   setTimeout(function(){inputEl.focus()},300);

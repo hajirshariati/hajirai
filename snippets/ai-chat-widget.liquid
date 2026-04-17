@@ -44,7 +44,9 @@
       showBanner: {{ settings.ai_chat_show_banner | default: true | json }},
       launcherWidth: {{ settings.ai_chat_launcher_width | default: "500" | json }},
       disclaimerText: {{ settings.ai_chat_disclaimer | default: "Powered by Aetrex fit technology · Not medical advice" | json }},
-      privacyUrl: {{ settings.ai_chat_privacy_url | default: "/pages/privacy-policy" | json }}
+      privacyUrl: {{ settings.ai_chat_privacy_url | default: "/pages/privacy-policy" | json }},
+      glowEnabled: {{ settings.ai_chat_glow_enabled | default: true | json }},
+      glowDuration: {{ settings.ai_chat_glow_duration | default: "3" | json }}
     };
   </script>
 
@@ -66,6 +68,12 @@
       {%- if settings.ai_chat_color_cta_hover != blank -%}
         --ai-chat-cta-hover: {{ settings.ai_chat_color_cta_hover }};
       {%- endif -%}
+      {%- if settings.ai_chat_glow_color_1 != blank -%}
+        --ai-chat-glow-1: {{ settings.ai_chat_glow_color_1 }};
+      {%- endif -%}
+      {%- if settings.ai_chat_glow_color_2 != blank -%}
+        --ai-chat-glow-2: {{ settings.ai_chat_glow_color_2 }};
+      {%- endif -%}
     }
     .ai-chat-overlay.visible {
       background: rgba(0, 0, 0, 0.4) !important;
@@ -81,19 +89,25 @@
     .ai-chat-panel.ai-chat-glow {
       animation: ai-glow-border 12s ease-in-out forwards;
     }
+    .ai-chat-panel.ai-chat-glow-fade {
+      transition: box-shadow 1s ease-out !important;
+      box-shadow: var(--ai-chat-shadow) !important;
+      animation: none !important;
+    }
     .ai-chat-panel.ai-chat-glow .ai-chat-header,
     .ai-chat-panel.ai-chat-glow .ai-chat-input-area,
     .ai-chat-panel.ai-chat-glow .ai-chat-footer {
       background: transparent !important;
+      transition: background 1s ease-out;
     }
     @keyframes ai-glow-border {
-      0%   { box-shadow: inset 0 4px 25px -5px rgba(45,107,79,0.5); }
-      12%  { box-shadow: inset -6px 0 25px -5px rgba(58,157,106,0.5); }
-      25%  { box-shadow: inset 0 -4px 25px -5px rgba(184,149,106,0.5); }
-      37%  { box-shadow: inset 6px 0 25px -5px rgba(212,196,160,0.5); }
-      50%  { box-shadow: inset 0 4px 20px -5px rgba(45,107,79,0.35); }
-      65%  { box-shadow: inset 0 2px 15px -5px rgba(58,157,106,0.2); }
-      80%  { box-shadow: inset 0 0 8px -5px rgba(184,149,106,0.1); }
+      0%   { box-shadow: inset 0 4px 25px -5px var(--ai-chat-glow-1, rgba(45,107,79,0.5)); }
+      12%  { box-shadow: inset -6px 0 25px -5px var(--ai-chat-glow-2, rgba(184,149,106,0.5)); }
+      25%  { box-shadow: inset 0 -4px 25px -5px var(--ai-chat-glow-1, rgba(45,107,79,0.5)); }
+      37%  { box-shadow: inset 6px 0 25px -5px var(--ai-chat-glow-2, rgba(184,149,106,0.5)); }
+      50%  { box-shadow: inset 0 4px 20px -5px var(--ai-chat-glow-1, rgba(45,107,79,0.35)); }
+      65%  { box-shadow: inset 0 2px 15px -5px var(--ai-chat-glow-2, rgba(184,149,106,0.2)); }
+      80%  { box-shadow: inset 0 0 8px -5px var(--ai-chat-glow-1, rgba(45,107,79,0.1)); }
       100% { box-shadow: var(--ai-chat-shadow); }
     }
   </style>

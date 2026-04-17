@@ -1404,6 +1404,46 @@
       },
       {
         "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "header",
+        "content": "Glow Animation"
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "checkbox",
+        "id": "ai_chat_glow_enabled",
+        "label": "Enable Glow on Open",
+        "default": true,
+        "info": "Show a glowing border animation when the chat opens."
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "color",
+        "id": "ai_chat_glow_color_1",
+        "label": "Glow Color 1",
+        "default": "#2d6b4f",
+        "info": "Primary glow color (green)."
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "color",
+        "id": "ai_chat_glow_color_2",
+        "label": "Glow Color 2",
+        "default": "#b8956a",
+        "info": "Secondary glow color (gold/cream)."
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
+        "type": "range",
+        "id": "ai_chat_glow_duration",
+        "label": "Glow Duration (seconds)",
+        "min": 1,
+        "max": 10,
+        "step": 0.5,
+        "default": 3,
+        "info": "How long the glow animation lasts before fading out."
+      },
+      {
+        "visible_if": "{{ settings.ai_chat_enabled == true }}",
         "type": "text",
         "id": "ai_chat_api_url",
         "label": "Chat Server URL",
