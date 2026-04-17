@@ -16,7 +16,7 @@
   --ai-chat-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   --ai-chat-radius: 16px;
   --ai-chat-panel-w: 480px;
-  --ai-chat-panel-h: 640px;
+  --ai-chat-panel-h: 720px;
   --ai-chat-z: 999990;
   --ai-chat-cta-bg-val: var(--ai-chat-cta-bg, #e8f5ee);
   --ai-chat-cta-text-val: var(--ai-chat-cta-text, #2d6b4f);
