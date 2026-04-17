@@ -285,6 +285,21 @@ isStreaming=false;sendBtn.disabled=false;
 function finish(text,prods){
 typingEl.classList.remove('visible');isStreaming=false;sendBtn.disabled=false;
 if(text){messages.push({role:'assistant',content:text,products:prods||[]});saveH(messages)}
+if(prods&&prods.length&&msgDiv){
+  var b=$('.ai-chat-msg-bubble',msgDiv);
+  if(b&&!$('.ai-chat-feedback',b)){
+    var fbId='fb_'+Date.now();
+    b.insertAdjacentHTML('beforeend','<div class="ai-chat-feedback" data-fbid="'+fbId+'"><span class="ai-chat-feedback__label">Was this helpful?</span><button class="ai-chat-feedback__btn" data-vote="up" title="Helpful"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg></button><button class="ai-chat-feedback__btn" data-vote="down" title="Not helpful"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/></svg></button></div>');
+    b.querySelectorAll('.ai-chat-feedback__btn').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        var vote=this.getAttribute('data-vote');
+        var wrap=this.closest('.ai-chat-feedback');
+        wrap.innerHTML='<span class="ai-chat-feedback__thanks">'+(vote==='up'?'Thanks for the feedback!':'Sorry about that — we\'ll improve!')+'</span>';
+        try{fetch(API+'/api/feedback?vote='+vote+'&session='+encodeURIComponent(getSess())+'&query='+encodeURIComponent(text||'').slice(0,200))}catch(e){}
+      });
+    });
+  }
+}
 }
 
 function clearChat(){
