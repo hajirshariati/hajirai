@@ -958,9 +958,7 @@
 .ai-chat-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.3);
   z-index: var(--ai-chat-z);
   opacity: 0;
   visibility: hidden;
@@ -970,10 +968,6 @@
 .ai-chat-overlay.visible {
   opacity: 1;
   visibility: visible;
-}
-
-body.ai-chat-open {
-  overflow: hidden;
 }
 
 /* ---------- Cart drawer z-index management ---------- */

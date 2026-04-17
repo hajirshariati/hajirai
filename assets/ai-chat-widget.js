@@ -138,13 +138,11 @@ if(isOpen){
   launcher.classList.add('hidden');
   panel.classList.add('open');
   overlay.classList.add('visible');
-  document.body.classList.add('ai-chat-open');
   setTimeout(function(){inputEl.focus()},300);
 }else{
   panel.classList.remove('open');
   overlay.classList.remove('visible');
   launcher.classList.remove('hidden');
-  document.body.classList.remove('ai-chat-open');
   menu.style.display='none';
 }
 }
