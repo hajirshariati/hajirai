@@ -100,8 +100,7 @@ if(SHOWBAN){
 }
 h+='<div class="ai-chat-welcome__avatar">'+avatarImg+'</div>';
 h+='<div class="ai-chat-welcome__name">'+esc(NAME)+'</div>';
-h+='<div class="ai-chat-welcome__tagline">'+esc(TAG)+'</div>';
-h+='<div class="ai-chat-welcome__greeting">'+esc(GREET)+'</div>';
+h+='<div class="ai-chat-welcome__tagline">'+esc(GREET)+'</div>';
 if(GREETCTA)h+='<div class="ai-chat-welcome__greeting-cta">'+esc(GREETCTA)+'</div>';
 var ctas=[];
 if(CTA1L&&CTA1M)ctas.push({l:CTA1L,m:CTA1M,icon:'shoe'});
