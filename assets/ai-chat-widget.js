@@ -138,15 +138,13 @@ if(isOpen){
   launcher.classList.add('hidden');
   panel.classList.add('open');
   overlay.classList.add('visible');
-  document.body.style.overflow='hidden';
-  document.documentElement.style.overflow='hidden';
+  document.body.classList.add('ai-chat-blurred');
   setTimeout(function(){inputEl.focus()},300);
 }else{
   panel.classList.remove('open');
   overlay.classList.remove('visible');
   launcher.classList.remove('hidden');
-  document.body.style.overflow='';
-  document.documentElement.style.overflow='';
+  document.body.classList.remove('ai-chat-blurred');
   menu.style.display='none';
 }
 }

@@ -67,10 +67,16 @@
         --ai-chat-cta-hover: {{ settings.ai_chat_color_cta_hover }};
       {%- endif -%}
     }
-    .ai-chat-overlay {
-      -webkit-backdrop-filter: blur(8px) !important;
-      backdrop-filter: blur(8px) !important;
-      background: rgba(0, 0, 0, 0.35) !important;
+    .ai-chat-overlay.visible {
+      background: rgba(0, 0, 0, 0.4) !important;
+    }
+    body.ai-chat-blurred > *:not(.ai-chat-overlay):not(.ai-chat-panel):not(.ai-chat-launcher) {
+      filter: blur(6px) !important;
+      pointer-events: none !important;
+      user-select: none !important;
+    }
+    body.ai-chat-blurred {
+      overflow: hidden !important;
     }
   </style>
 
