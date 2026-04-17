@@ -1472,7 +1472,7 @@
         "id": "ai_chat_launcher_width",
         "label": "Launcher Bar Width (px)",
         "min": 300,
-        "max": 700,
+        "max": 1200,
         "step": 10,
         "default": 500,
         "info": "Width of the search-bar style launcher."
