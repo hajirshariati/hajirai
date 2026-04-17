@@ -170,9 +170,9 @@ return d;
 function prodCard(p){
 var img=p.image||p.featured_image||'';
 var t=esc(p.title||'');
-var u=p.url||p.handle?('/products/'+p.handle):'#';
-var pr=p.price_formatted||(p.price?fmt(p.price):'');
-var cp=p.compare_at_price?fmt(p.compare_at_price):'';
+var u=p.url||(p.handle?('/products/'+p.handle):'#');
+var pr=esc(p.price_formatted||(p.price?fmt(p.price):''));
+var cp=p.compare_at_price?esc(fmt(p.compare_at_price)):'';
 return '<a class="ai-chat-product-card" href="'+esc(u)+'" style="text-decoration:none;color:inherit">'+(img?'<div class="ai-chat-product-img"><img src="'+esc(img)+'" alt="'+t+'" loading="lazy"></div>':'')+'<div class="ai-chat-product-info"><span class="ai-chat-product-title">'+t+'</span><div class="ai-chat-product-price">'+pr+(cp?'<span class="compare-at">'+cp+'</span>':'')+'</div></div></a>';
 }
 
@@ -194,7 +194,7 @@ streamResponse(text);
 function streamResponse(msg){
 if(abortCtrl)abortCtrl.abort();
 abortCtrl=new AbortController();
-var body={message:msg,session_id:getSess(),shop_domain:SHOP,assistant_name:NAME,history:messages.slice(-20)};
+var body={message:msg,session_id:getSess(),shop_domain:SHOP,assistant_name:NAME,history:messages.slice(-20).map(function(m){return{role:m.role,content:m.content}})};
 fetch(API+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json','Accept':'text/event-stream'},body:JSON.stringify(body),signal:abortCtrl.signal}).then(function(r){
 if(!r.ok)throw new Error('Failed: '+r.status);
 var ct=r.headers.get('content-type')||'';
