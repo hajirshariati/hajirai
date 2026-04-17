@@ -78,26 +78,53 @@
     body.ai-chat-blurred {
       overflow: hidden !important;
     }
+    .ai-chat-panel.ai-chat-glow { overflow: hidden; }
     .ai-chat-panel.ai-chat-glow::before {
       content: '';
       position: absolute;
-      inset: -2px;
-      border-radius: inherit;
+      top: 50%; left: 50%;
+      width: 150%; height: 150%;
+      margin-top: -75%; margin-left: -75%;
+      border-radius: 0;
+      z-index: 9999;
+      pointer-events: none;
+      background: conic-gradient(
+        from 0deg at 50% 50%,
+        transparent 0deg,
+        transparent 260deg,
+        #2d6b4f 290deg,
+        #3a9d6a 310deg,
+        #b8956a 330deg,
+        #d4c4a0 345deg,
+        #b8956a 355deg,
+        transparent 360deg
+      );
+      filter: blur(18px);
+      opacity: 0;
+      animation: ai-glow-spin 3s ease-in-out forwards;
+    }
+    .ai-chat-panel.ai-chat-glow::after {
+      content: '';
+      position: absolute;
+      inset: 4px;
+      background: #fff;
+      border-radius: 12px;
       z-index: 9999;
       pointer-events: none;
       opacity: 0;
-      animation: ai-glow-travel 2s ease-in-out forwards;
+      animation: ai-glow-mask 3s ease-in-out forwards;
     }
-    @keyframes ai-glow-travel {
-      0%   { opacity: 1; box-shadow: inset 0 -30px 40px -20px #2d6b4f, inset 0 0 0 0 transparent; }
-      10%  { opacity: 1; box-shadow: inset -30px -20px 40px -20px #3a9d6a, inset 0 0 0 0 transparent; }
-      25%  { opacity: 1; box-shadow: inset -30px 0 40px -20px #b8956a, inset 0 0 0 0 transparent; }
-      40%  { opacity: 1; box-shadow: inset -20px 30px 40px -20px #d4c4a0, inset 0 0 0 0 transparent; }
-      55%  { opacity: 1; box-shadow: inset 0 30px 40px -20px #2d6b4f, inset 0 0 0 0 transparent; }
-      70%  { opacity: 1; box-shadow: inset 30px 20px 40px -20px #3a9d6a, inset 0 0 0 0 transparent; }
-      85%  { opacity: 0.7; box-shadow: inset 30px 0 40px -20px #b8956a, inset 0 0 0 0 transparent; }
-      95%  { opacity: 0.3; box-shadow: inset 20px -30px 40px -20px #2d6b4f, inset 0 0 0 0 transparent; }
-      100% { opacity: 0; box-shadow: inset 0 -30px 40px -20px transparent, inset 0 0 0 0 transparent; }
+    @keyframes ai-glow-spin {
+      0%   { opacity: 0; transform: rotate(0deg); }
+      8%   { opacity: 0.9; }
+      85%  { opacity: 0.9; transform: rotate(360deg); }
+      100% { opacity: 0; transform: rotate(400deg); }
+    }
+    @keyframes ai-glow-mask {
+      0%   { opacity: 0; }
+      8%   { opacity: 1; }
+      85%  { opacity: 1; }
+      100% { opacity: 0; }
     }
   </style>
 

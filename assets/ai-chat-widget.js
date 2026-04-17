@@ -140,7 +140,7 @@ if(isOpen){
   panel.classList.remove('ai-chat-glow');
   void panel.offsetWidth;
   panel.classList.add('ai-chat-glow');
-  setTimeout(function(){panel.classList.remove('ai-chat-glow')},2000);
+  setTimeout(function(){panel.classList.remove('ai-chat-glow')},3500);
   overlay.classList.add('visible');
   document.body.classList.add('ai-chat-blurred');
   setTimeout(function(){inputEl.focus()},300);
