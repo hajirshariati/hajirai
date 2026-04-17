@@ -139,7 +139,8 @@ if(isOpen){
   panel.classList.add('open');
   overlay.classList.add('visible');
   document.body.classList.add('ai-chat-blurred');
-  setTimeout(function(){inputEl.focus()},300);
+  setTimeout(function(){inputEl.focus()},400);
+  setTimeout(function(){inputEl.focus()},800);
 }else{
   panel.classList.remove('open');
   overlay.classList.remove('visible');
