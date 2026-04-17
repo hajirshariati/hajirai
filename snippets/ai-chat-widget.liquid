@@ -78,6 +78,37 @@
     body.ai-chat-blurred {
       overflow: hidden !important;
     }
+    .ai-chat-panel.ai-chat-glow::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 3px;
+      background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        #2d6b4f 0deg,
+        #3a9d6a 40deg,
+        #b8956a 80deg,
+        #d4c4a0 120deg,
+        #2d6b4f 160deg,
+        transparent 160deg,
+        transparent 360deg
+      );
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      z-index: 9999;
+      pointer-events: none;
+      animation: ai-glow-spin 1.5s ease-out forwards;
+      opacity: 0;
+    }
+    @keyframes ai-glow-spin {
+      0% { opacity: 1; transform: rotate(0deg); }
+      80% { opacity: 1; transform: rotate(360deg); }
+      100% { opacity: 0; transform: rotate(360deg); }
+    }
   </style>
 
   {{ 'ai-chat-widget.css' | asset_url | stylesheet_tag }}
