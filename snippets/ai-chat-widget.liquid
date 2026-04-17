@@ -78,53 +78,39 @@
     body.ai-chat-blurred {
       overflow: hidden !important;
     }
-    .ai-chat-panel.ai-chat-glow { overflow: hidden; }
     .ai-chat-panel.ai-chat-glow::before {
       content: '';
       position: absolute;
       top: 50%; left: 50%;
-      width: 150%; height: 150%;
-      margin-top: -75%; margin-left: -75%;
-      border-radius: 0;
-      z-index: 9999;
+      width: 140%; height: 140%;
+      margin-top: -70%; margin-left: -70%;
+      z-index: 0;
       pointer-events: none;
       background: conic-gradient(
         from 0deg at 50% 50%,
         transparent 0deg,
-        transparent 260deg,
-        #2d6b4f 290deg,
-        #3a9d6a 310deg,
-        #b8956a 330deg,
-        #d4c4a0 345deg,
-        #b8956a 355deg,
+        transparent 270deg,
+        rgba(45,107,79,0.6) 300deg,
+        rgba(58,157,106,0.5) 320deg,
+        rgba(184,149,106,0.5) 340deg,
+        rgba(212,196,160,0.4) 350deg,
         transparent 360deg
       );
-      filter: blur(18px);
+      filter: blur(28px);
+      border-radius: inherit;
+      padding: 8px;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
       opacity: 0;
-      animation: ai-glow-spin 3s ease-in-out forwards;
-    }
-    .ai-chat-panel.ai-chat-glow::after {
-      content: '';
-      position: absolute;
-      inset: 4px;
-      background: #fff;
-      border-radius: 12px;
-      z-index: 9999;
-      pointer-events: none;
-      opacity: 0;
-      animation: ai-glow-mask 3s ease-in-out forwards;
+      animation: ai-glow-spin 5s ease-in-out forwards;
     }
     @keyframes ai-glow-spin {
       0%   { opacity: 0; transform: rotate(0deg); }
-      8%   { opacity: 0.9; }
-      85%  { opacity: 0.9; transform: rotate(360deg); }
+      5%   { opacity: 1; }
+      85%  { opacity: 1; transform: rotate(360deg); }
       100% { opacity: 0; transform: rotate(400deg); }
-    }
-    @keyframes ai-glow-mask {
-      0%   { opacity: 0; }
-      8%   { opacity: 1; }
-      85%  { opacity: 1; }
-      100% { opacity: 0; }
     }
   </style>
 
