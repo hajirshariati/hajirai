@@ -295,7 +295,9 @@ if(prods&&prods.length>0&&lastMsg){
         var vote=this.getAttribute('data-vote');
         var wrap=this.closest('.ai-chat-feedback');
         wrap.innerHTML='<span class="ai-chat-fb-thanks">'+(vote==='up'?'Thanks for the feedback!':'Sorry about that, we\'ll improve!')+'</span>';
-        try{fetch(API+'/api/feedback?vote='+vote+'&session='+encodeURIComponent(getSess())+'&query='+encodeURIComponent((text||'').slice(0,200)))}catch(e){}
+        var payload={vote:vote,session:getSess(),botResponse:(text||'').slice(0,500),products:(prods||[]).map(function(p){return p.title||''}).slice(0,5)};
+        if(vote==='down'){payload.conversation=messages.slice(-10).map(function(m){return{role:m.role,content:(m.content||'').slice(0,300)}})}
+        try{fetch(API+'/api/feedback',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})}catch(e){}
       });
     });
   }
