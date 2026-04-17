@@ -86,6 +86,36 @@
     body.ai-chat-blurred {
       overflow: hidden !important;
     }
+    .ai-chat-suggestions {
+      display: flex !important;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid #eee;
+    }
+    .ai-chat-suggest-btn {
+      display: flex !important;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1.5px solid var(--ai-chat-cta-bg, #e8f5ee);
+      background: var(--ai-chat-cta-bg, #e8f5ee);
+      cursor: pointer;
+      color: var(--ai-chat-cta-text, #2d6b4f);
+      font-size: 13px;
+      font-family: inherit;
+      font-weight: 500;
+      line-height: 1.4;
+      text-align: left;
+    }
+    .suggest-plus {
+      color: var(--ai-chat-color-primary, #2d6b4f);
+      font-weight: 700;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
   </style>
 
   {{ 'ai-chat-widget.css' | asset_url | stylesheet_tag }}
