@@ -254,6 +254,13 @@ if(p.type==='choices'&&p.options&&p.options.length){
   if(b){var ch='<div class="ai-chat-choices">';for(var ci=0;ci<p.options.length;ci++){ch+='<button class="ai-chat-choice-btn" data-message="'+esc(p.options[ci])+'">'+esc(p.options[ci])+'</button>'}ch+='</div>';b.insertAdjacentHTML('beforeend',ch)}
   scrollBottom();
 }
+if(p.type==='suggestions'&&p.questions&&p.questions.length){
+  typingEl.classList.remove('visible');
+  if(!msgDiv)msgDiv=appendMsg('assistant',full||'');
+  var b=$('.ai-chat-msg-bubble',msgDiv);
+  if(b){var sg='<div class="ai-chat-suggestions">';for(var si=0;si<p.questions.length;si++){sg+='<button class="ai-chat-suggest-btn" data-message="'+esc(p.questions[si])+'"><span class="suggest-plus">+</span> '+esc(p.questions[si])+'</button>'}sg+='</div>';b.insertAdjacentHTML('beforeend',sg)}
+  scrollBottom();
+}
 if(p.type==='action'&&p.action==='open_zendesk'){
   setTimeout(function(){toggle(false);if(typeof window.zE==='function'){window.zE('webWidget','show');window.zE('webWidget','open')}},1500);
 }

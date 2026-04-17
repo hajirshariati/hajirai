@@ -542,6 +542,47 @@
   color: #fff;
 }
 
+/* ---------- Suggested follow-up questions ---------- */
+.ai-chat-suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+}
+
+.ai-chat-suggest-btn {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1.5px solid var(--ai-chat-cta-bg-val, #e8f5ee);
+  background: var(--ai-chat-cta-bg-val, #e8f5ee);
+  cursor: pointer;
+  color: var(--ai-chat-cta-text-val, #2d6b4f);
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 500;
+  line-height: 1.4;
+  text-align: left;
+  transition: all 0.15s;
+}
+
+.ai-chat-suggest-btn:hover {
+  border-color: var(--ai-chat-primary, #2d6b4f);
+  background: rgba(45, 107, 79, 0.08);
+}
+
+.suggest-plus {
+  color: var(--ai-chat-primary, #2d6b4f);
+  font-weight: 700;
+  font-size: 15px;
+  flex-shrink: 0;
+  line-height: 1.2;
+}
+
 /* ---------- Feedback thumbs up/down ---------- */
 .ai-chat-feedback {
   display: flex;
