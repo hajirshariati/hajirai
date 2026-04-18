@@ -21,6 +21,15 @@ try {
 } catch (e) { /* keep theme defaults */ }
 
 var C=window.__AI_CHAT_CONFIG||{};
+
+/* Apply merchant colors as CSS variables (overrides theme block defaults). */
+var _rootStyle=document.documentElement.style;
+if(C.colorPrimary) _rootStyle.setProperty('--ai-chat-color-primary', C.colorPrimary);
+if(C.colorAccent)  _rootStyle.setProperty('--ai-chat-color-accent',  C.colorAccent);
+if(C.colorCtaBg)   _rootStyle.setProperty('--ai-chat-cta-bg',        C.colorCtaBg);
+if(C.colorCtaText) _rootStyle.setProperty('--ai-chat-cta-text',      C.colorCtaText);
+if(C.colorCtaHover)_rootStyle.setProperty('--ai-chat-cta-hover',     C.colorCtaHover);
+
 var API=C.apiUrl||'';
 var SHOP=C.shopDomain||'';
 var GREET=C.greeting||'Hi, I\'m Archie — your personal fit and comfort expert.';
