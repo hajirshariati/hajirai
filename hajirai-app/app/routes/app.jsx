@@ -1,7 +1,9 @@
 import { Link, Outlet, useLoaderData, useRouteError } from "react-router";
 import { boundary } from "@shopify/shopify-app-react-router/server";
-import { AppProvider } from "@shopify/shopify-app-react-router/react";
+import { AppProvider as ShopifyAppProvider } from "@shopify/shopify-app-react-router/react";
+import { AppProvider as PolarisAppProvider } from "@shopify/polaris";
 import { NavMenu } from "@shopify/app-bridge-react";
+import enTranslations from "@shopify/polaris/locales/en.json";
 import polarisStyles from "@shopify/polaris/build/esm/styles.css?url";
 import { authenticate } from "../shopify.server";
 
@@ -15,16 +17,18 @@ export const loader = async ({ request }) => {
 export default function App() {
   const { apiKey } = useLoaderData();
   return (
-    <AppProvider isEmbeddedApp apiKey={apiKey}>
-      <NavMenu>
-        <Link to="/app" rel="home">Dashboard</Link>
-        <Link to="/app/branding">Branding</Link>
-        <Link to="/app/greetings">Greetings & CTAs</Link>
-        <Link to="/app/knowledge">Knowledge Base</Link>
-        <Link to="/app/api-keys">API Keys</Link>
-      </NavMenu>
-      <Outlet />
-    </AppProvider>
+    <ShopifyAppProvider isEmbeddedApp apiKey={apiKey}>
+      <PolarisAppProvider i18n={enTranslations}>
+        <NavMenu>
+          <Link to="/app" rel="home">Dashboard</Link>
+          <Link to="/app/branding">Branding</Link>
+          <Link to="/app/greetings">Greetings & CTAs</Link>
+          <Link to="/app/knowledge">Knowledge Base</Link>
+          <Link to="/app/api-keys">API Keys</Link>
+        </NavMenu>
+        <Outlet />
+      </PolarisAppProvider>
+    </ShopifyAppProvider>
   );
 }
 
