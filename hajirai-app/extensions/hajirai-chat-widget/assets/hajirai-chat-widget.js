@@ -105,7 +105,7 @@ var menuBtn=$('.ai-chat-menu-btn',panel);
 
 var isOpen=false,isStreaming=false,messages=loadH(),abortCtrl=null;
 var IDLE_TIMEOUT=5*60*1000;
-var LMK='aetrex_ai_chat_last_msg';
+var LMK='hajirai_chat_last_msg';
 var idleTimedOut=false;
 function stampLastMsg(){try{localStorage.setItem(LMK,''+Date.now())}catch(e){}}
 function getLastMsg(){try{return parseInt(localStorage.getItem(LMK),10)||0}catch(e){return 0}}
