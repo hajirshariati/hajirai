@@ -3,7 +3,7 @@ import { useLoaderData, useActionData, useNavigation, useSubmit } from "react-ro
 import { Page, Layout, Card, BlockStack, Text, Button, Banner, Box, DataTable, DropZone, InlineStack, Modal, Select, Thumbnail } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
-import { getShopConfig, getKnowledgeFiles, saveKnowledgeFile, deleteKnowledgeFile } from "../models/ShopConfig.server";
+import { getKnowledgeFiles, saveKnowledgeFile, deleteKnowledgeFile } from "../models/ShopConfig.server";
 
 export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);

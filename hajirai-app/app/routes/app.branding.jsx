@@ -1,5 +1,5 @@
 import { useLoaderData, useActionData, useNavigation, Form } from "react-router";
-import { Page, Layout, Card, BlockStack, TextField, Select, Checkbox, Button, Banner, Text, InlineGrid } from "@shopify/polaris";
+import { Page, Layout, Card, BlockStack, TextField, Select, Checkbox, Button, Banner, Text, Box, InlineGrid } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import { getShopConfig, updateShopConfig } from "../models/ShopConfig.server";
