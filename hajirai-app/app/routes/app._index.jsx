@@ -12,16 +12,7 @@ import {
   Badge,
   Divider,
 } from "@shopify/polaris";
-import {
-  CheckCircleIcon,
-  CircleDotIcon,
-  ChatIcon,
-  KeyIcon,
-  DatabaseIcon,
-  PaintBrushFlatIcon,
-  ChartVerticalIcon,
-  BookIcon,
-} from "@shopify/polaris-icons";
+import { CheckCircleIcon } from "@shopify/polaris-icons";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import { getShopConfig, getKnowledgeFiles } from "../models/ShopConfig.server";
@@ -39,7 +30,34 @@ export const loader = async ({ request }) => {
   };
 };
 
-function ChecklistItem({ done, title, description, actionLabel, actionUrl, external }) {
+function StepCircle({ done, number }) {
+  if (done) {
+    return (
+      <Box>
+        <Icon source={CheckCircleIcon} tone="success" />
+      </Box>
+    );
+  }
+  return (
+    <Box
+      background="bg-surface-secondary"
+      borderWidth="025"
+      borderColor="border"
+      borderRadius="full"
+      padding="100"
+      minWidth="32px"
+      minHeight="32px"
+    >
+      <InlineStack align="center" blockAlign="center">
+        <Text as="span" variant="bodySm" fontWeight="semibold" tone="subdued">
+          {number}
+        </Text>
+      </InlineStack>
+    </Box>
+  );
+}
+
+function ChecklistItem({ done, number, title, description, actionLabel, actionUrl, external }) {
   return (
     <Box
       background={done ? "bg-surface-success-subdued" : "bg-surface"}
@@ -49,12 +67,7 @@ function ChecklistItem({ done, title, description, actionLabel, actionUrl, exter
       padding="400"
     >
       <InlineStack gap="400" blockAlign="center" wrap={false}>
-        <Box>
-          <Icon
-            source={done ? CheckCircleIcon : CircleDotIcon}
-            tone={done ? "success" : "subdued"}
-          />
-        </Box>
+        <StepCircle done={done} number={number} />
         <Box minWidth="0" width="100%">
           <BlockStack gap="100">
             <InlineStack gap="200" blockAlign="center">
@@ -74,17 +87,17 @@ function ChecklistItem({ done, title, description, actionLabel, actionUrl, exter
   );
 }
 
-function QuickActionCard({ icon, title, description, actionLabel, actionUrl, external }) {
+function QuickActionCard({ emoji, title, description, actionLabel, actionUrl, external }) {
   return (
     <Card>
       <BlockStack gap="300">
         <Box
           background="bg-surface-brand-subdued"
           borderRadius="200"
-          padding="200"
+          padding="300"
           width="fit-content"
         >
-          <Icon source={icon} tone="base" />
+          <Text as="span" variant="headingLg">{emoji}</Text>
         </Box>
         <BlockStack gap="100">
           <Text as="h3" variant="headingSm">{title}</Text>
@@ -110,17 +123,10 @@ export default function Home() {
       <TitleBar title="Home" />
       <BlockStack gap="600">
         <Card padding="0">
-          <Box
-            background="bg-surface-brand"
-            padding="800"
-            borderStartStartRadius="300"
-            borderStartEndRadius="300"
-            borderEndStartRadius="300"
-            borderEndEndRadius="300"
-          >
+          <Box background="bg-surface-brand" padding="800" borderRadius="300">
             <InlineStack gap="400" blockAlign="center" wrap={false}>
-              <Box background="bg-surface" borderRadius="full" padding="300">
-                <Icon source={ChatIcon} tone="base" />
+              <Box background="bg-surface" borderRadius="full" padding="400">
+                <Text as="span" variant="heading2xl">💬</Text>
               </Box>
               <BlockStack gap="100">
                 <Text as="h1" variant="headingLg">Welcome to Hajirai</Text>
@@ -145,6 +151,7 @@ export default function Home() {
           <BlockStack gap="300">
             <ChecklistItem
               done={hasApiKey}
+              number="1"
               title="Add your Anthropic API key"
               description="Required. Powers the AI assistant that answers customer questions."
               actionLabel={hasApiKey ? "Manage" : "Add key"}
@@ -152,6 +159,7 @@ export default function Home() {
             />
             <ChecklistItem
               done={false}
+              number="2"
               title="Enable the chat widget in your theme"
               description="Turn on the Hajirai AI Chat app embed in your active theme so customers can see it."
               actionLabel="Open theme editor"
@@ -160,6 +168,7 @@ export default function Home() {
             />
             <ChecklistItem
               done={fileCount > 0}
+              number="3"
               title="Upload extra knowledge (optional)"
               description="FAQs, brand voice, sizing guides — anything beyond what's in Shopify already."
               actionLabel={fileCount > 0 ? "Manage files" : "Upload"}
@@ -174,21 +183,21 @@ export default function Home() {
           <Text as="h2" variant="headingMd">Quick actions</Text>
           <InlineGrid columns={{ xs: 1, sm: 2, md: 4 }} gap="400">
             <QuickActionCard
-              icon={KeyIcon}
+              emoji="🔑"
               title="API Keys"
               description="Anthropic, Yotpo, Aftership."
               actionLabel="Configure"
               actionUrl="/app/api-keys"
             />
             <QuickActionCard
-              icon={DatabaseIcon}
+              emoji="📚"
               title="Knowledge Base"
               description="Train the AI with extra context."
               actionLabel="Upload files"
               actionUrl="/app/knowledge"
             />
             <QuickActionCard
-              icon={PaintBrushFlatIcon}
+              emoji="🎨"
               title="Customize widget"
               description="Colors, greetings, CTAs."
               actionLabel="Theme editor"
@@ -196,7 +205,7 @@ export default function Home() {
               external
             />
             <QuickActionCard
-              icon={ChartVerticalIcon}
+              emoji="📊"
               title="Analytics"
               description="Conversations & usage."
               actionLabel="View stats"
@@ -207,10 +216,7 @@ export default function Home() {
 
         <Card>
           <BlockStack gap="400">
-            <InlineStack gap="200" blockAlign="center">
-              <Icon source={BookIcon} tone="base" />
-              <Text as="h2" variant="headingMd">Getting started</Text>
-            </InlineStack>
+            <Text as="h2" variant="headingMd">Getting started</Text>
             <InlineGrid columns={{ xs: 1, md: 3 }} gap="400">
               <BlockStack gap="100">
                 <Text as="h3" variant="headingSm">1. Connect AI</Text>

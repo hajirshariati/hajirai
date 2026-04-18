@@ -7,14 +7,7 @@ import {
   Text,
   InlineGrid,
   Badge,
-  Icon,
 } from "@shopify/polaris";
-import {
-  ChatIcon,
-  PersonIcon,
-  ClockIcon,
-  ProductIcon,
-} from "@shopify/polaris-icons";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import { getShopConfig } from "../models/ShopConfig.server";
@@ -25,12 +18,12 @@ export const loader = async ({ request }) => {
   return { hasApiKey: config.anthropicApiKey !== "" };
 };
 
-function StatCard({ icon, label, value, sublabel }) {
+function StatCard({ emoji, label, value, sublabel }) {
   return (
     <Card>
       <BlockStack gap="200">
         <InlineStack gap="200" blockAlign="center">
-          <Icon source={icon} tone="subdued" />
+          <Text as="span" variant="bodyLg">{emoji}</Text>
           <Text as="p" tone="subdued" variant="bodySm">{label}</Text>
         </InlineStack>
         <Text as="p" variant="heading2xl">{value}</Text>
@@ -59,10 +52,10 @@ export default function Analytics() {
         )}
 
         <InlineGrid columns={{ xs: 1, sm: 2, md: 4 }} gap="400">
-          <StatCard icon={ChatIcon} label="Conversations" value="—" sublabel="Last 30 days" />
-          <StatCard icon={PersonIcon} label="Messages" value="—" sublabel="Last 30 days" />
-          <StatCard icon={ClockIcon} label="Avg. response time" value="—" sublabel="Seconds" />
-          <StatCard icon={ProductIcon} label="Product mentions" value="—" sublabel="Click-throughs to PDP" />
+          <StatCard emoji="💬" label="Conversations" value="—" sublabel="Last 30 days" />
+          <StatCard emoji="✉️" label="Messages" value="—" sublabel="Last 30 days" />
+          <StatCard emoji="⏱" label="Avg. response time" value="—" sublabel="Seconds" />
+          <StatCard emoji="🛍" label="Product mentions" value="—" sublabel="Click-throughs to PDP" />
         </InlineGrid>
 
         <Card>

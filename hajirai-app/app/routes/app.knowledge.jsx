@@ -13,17 +13,11 @@ import {
   DataTable,
   DropZone,
   Select,
-  Icon,
   Badge,
   Divider,
   EmptyState,
 } from "@shopify/polaris";
-import {
-  ConnectIcon,
-  FileIcon,
-  InfoIcon,
-  DeleteIcon,
-} from "@shopify/polaris-icons";
+import { DeleteIcon } from "@shopify/polaris-icons";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import { getKnowledgeFiles, saveKnowledgeFile, deleteKnowledgeFile } from "../models/ShopConfig.server";
@@ -115,10 +109,7 @@ export default function Knowledge() {
   }
 
   const rows = files.map((f) => [
-    <InlineStack gap="200" blockAlign="center">
-      <Icon source={FileIcon} tone="subdued" />
-      <Text as="span" variant="bodyMd">{f.fileName}</Text>
-    </InlineStack>,
+    <Text as="span" variant="bodyMd" fontWeight="medium">{f.fileName}</Text>,
     <Badge>{FILE_TYPES.find((t) => t.value === f.fileType)?.label || f.fileType}</Badge>,
     formatSize(f.fileSize),
     new Date(f.updatedAt).toLocaleDateString(),
@@ -137,7 +128,7 @@ export default function Knowledge() {
     <Page title="Knowledge Base" backAction={{ url: "/app" }}>
       <TitleBar title="Knowledge Base" />
       <BlockStack gap="500">
-        <Banner title="Your Shopify store is already connected" tone="info" icon={ConnectIcon}>
+        <Banner title="Your Shopify store is already connected" tone="info">
           <Text as="p">
             The assistant has live access to your products, collections, pages, and policies via
             the Shopify API. Use this page only to upload <strong>extra</strong> context beyond
@@ -174,13 +165,10 @@ export default function Knowledge() {
                 >
                   {uploadFile ? (
                     <Box padding="400">
-                      <InlineStack gap="300" blockAlign="center">
-                        <Icon source={FileIcon} tone="base" />
-                        <BlockStack gap="050">
-                          <Text as="p" variant="bodyMd" fontWeight="semibold">{uploadFile.name}</Text>
-                          <Text as="p" tone="subdued" variant="bodySm">{formatSize(uploadFile.size)}</Text>
-                        </BlockStack>
-                      </InlineStack>
+                      <BlockStack gap="050">
+                        <Text as="p" variant="bodyMd" fontWeight="semibold">{uploadFile.name}</Text>
+                        <Text as="p" tone="subdued" variant="bodySm">{formatSize(uploadFile.size)}</Text>
+                      </BlockStack>
                     </Box>
                   ) : (
                     <DropZone.FileUpload actionHint="Accepts .csv and .txt files" />
@@ -225,10 +213,7 @@ export default function Knowledge() {
 
         <Card>
           <BlockStack gap="400">
-            <InlineStack gap="200" blockAlign="center">
-              <Icon source={InfoIcon} tone="base" />
-              <Text as="h2" variant="headingMd">What to upload</Text>
-            </InlineStack>
+            <Text as="h2" variant="headingMd">What to upload</Text>
             <BlockStack gap="300">
               {FILE_TYPES.map((t) => (
                 <BlockStack key={t.value} gap="100">

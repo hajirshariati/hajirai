@@ -16,7 +16,7 @@ import {
   Badge,
   Divider,
 } from "@shopify/polaris";
-import { KeyIcon, CheckCircleIcon, AlertTriangleIcon } from "@shopify/polaris-icons";
+import { CheckCircleIcon } from "@shopify/polaris-icons";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import { getShopConfig, updateShopConfig } from "../models/ShopConfig.server";
@@ -70,10 +70,7 @@ function ConnectionStatus({ connected }) {
       <Text as="span" variant="bodySm" tone="success">Connected</Text>
     </InlineStack>
   ) : (
-    <InlineStack gap="150" blockAlign="center">
-      <Icon source={AlertTriangleIcon} tone="caution" />
-      <Text as="span" variant="bodySm" tone="caution">Not configured</Text>
-    </InlineStack>
+    <Badge tone="attention">Not configured</Badge>
   );
 }
 
@@ -118,10 +115,7 @@ export default function ApiKeys() {
               <Card>
                 <BlockStack gap="400">
                   <InlineStack align="space-between" blockAlign="center">
-                    <InlineStack gap="200" blockAlign="center">
-                      <Icon source={KeyIcon} tone="base" />
-                      <Text as="h3" variant="headingSm">Anthropic API Key</Text>
-                    </InlineStack>
+                    <Text as="h3" variant="headingSm">Anthropic API Key</Text>
                     <ConnectionStatus connected={hasAnthropicKey} />
                   </InlineStack>
 
