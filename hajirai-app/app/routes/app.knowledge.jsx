@@ -21,11 +21,24 @@ import { DeleteIcon } from "@shopify/polaris-icons";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import { getKnowledgeFiles, saveKnowledgeFile, deleteKnowledgeFile } from "../models/ShopConfig.server";
+import {
+  upsertEnrichmentsFromCsv,
+  deleteEnrichmentsBySourceFile,
+  countEnrichmentsBySourceFile,
+} from "../models/ProductEnrichment.server";
+
+function isCsv(fileName) {
+  return typeof fileName === "string" && fileName.toLowerCase().endsWith(".csv");
+}
 
 export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
   const files = await getKnowledgeFiles(session.shop);
-  return { files, shop: session.shop };
+  const enriched = await Promise.all(
+    files.map((f) => countEnrichmentsBySourceFile(f.id))
+  );
+  const filesWithCounts = files.map((f, i) => ({ ...f, enrichedSkus: enriched[i] }));
+  return { files: filesWithCounts, shop: session.shop };
 };
 
 export const action = async ({ request }) => {
@@ -43,12 +56,36 @@ export const action = async ({ request }) => {
       return { error: "File and type are required" };
     }
 
-    await saveKnowledgeFile(session.shop, { fileName, fileType, fileSize, content });
-    return { success: true, message: `${fileName} uploaded successfully` };
+    const saved = await saveKnowledgeFile(session.shop, {
+      fileName,
+      fileType,
+      fileSize,
+      content,
+    });
+
+    // Wipe any enrichment rows from a prior upload at this file id. If the new
+    // file is a CSV with a SKU column, the upsert below will re-populate it.
+    await deleteEnrichmentsBySourceFile(saved.id);
+
+    let enrichmentMessage = "";
+    if (isCsv(fileName)) {
+      const result = await upsertEnrichmentsFromCsv(session.shop, saved, content);
+      if (result.noSkuColumn) {
+        enrichmentMessage = " No SKU column detected — stored as raw context.";
+      } else if (result.total > 0) {
+        enrichmentMessage = ` Linked ${result.total} SKUs (${result.matched} matched your catalog).`;
+      }
+    }
+
+    return {
+      success: true,
+      message: `${fileName} uploaded successfully.${enrichmentMessage}`,
+    };
   }
 
   if (intent === "delete") {
     const fileId = formData.get("fileId");
+    await deleteEnrichmentsBySourceFile(fileId);
     await deleteKnowledgeFile(fileId);
     return { success: true, message: "File deleted" };
   }
@@ -112,6 +149,11 @@ export default function Knowledge() {
     <Text as="span" variant="bodyMd" fontWeight="medium">{f.fileName}</Text>,
     <Badge>{FILE_TYPES.find((t) => t.value === f.fileType)?.label || f.fileType}</Badge>,
     formatSize(f.fileSize),
+    f.enrichedSkus > 0 ? (
+      <Badge tone="success">{`${f.enrichedSkus} SKUs`}</Badge>
+    ) : (
+      <Text as="span" tone="subdued" variant="bodySm">—</Text>
+    ),
     new Date(f.updatedAt).toLocaleDateString(),
     <Button
       icon={DeleteIcon}
@@ -200,8 +242,8 @@ export default function Knowledge() {
                 </EmptyState>
               ) : (
                 <DataTable
-                  columnContentTypes={["text", "text", "text", "text", "text"]}
-                  headings={["File", "Category", "Size", "Updated", ""]}
+                  columnContentTypes={["text", "text", "text", "text", "text", "text"]}
+                  headings={["File", "Category", "Size", "SKUs linked", "Updated", ""]}
                   rows={rows}
                 />
               )}
@@ -224,8 +266,9 @@ export default function Knowledge() {
               <Divider />
               <Text as="p" variant="bodySm" tone="subdued">
                 <strong>Format tip:</strong> For CSVs, include headers like{" "}
-                <code>question, answer</code> for FAQs or{" "}
-                <code>product_title, details</code> for product data. Plain text works for any category.
+                <code>question, answer</code> for FAQs. For product data, include a{" "}
+                <code>sku</code> column — rows will be automatically linked to matching
+                products in your catalog. Plain text works for any category.
               </Text>
             </BlockStack>
           </BlockStack>

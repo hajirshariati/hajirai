@@ -141,3 +141,18 @@ model CatalogSyncState {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
+
+model ProductEnrichment {
+  id             String   @id @default(cuid())
+  shop           String
+  sku            String
+  data           Json
+  sourceFileId   String?
+  sourceFileType String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([shop, sku])
+  @@index([shop])
+  @@index([sourceFileId])
+}
