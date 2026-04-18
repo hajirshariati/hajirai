@@ -1,5 +1,25 @@
-(function(){
+(async function(){
 'use strict';
+
+/* Fetch merchant config from App Proxy and merge over theme defaults.
+   Falls back silently to theme block settings on any failure. */
+try {
+  var res = await fetch('/apps/hajirai/config', {
+    credentials: 'same-origin',
+    headers: { 'Accept': 'application/json' }
+  });
+  if (res.ok) {
+    var merchant = await res.json();
+    var base = window.__AI_CHAT_CONFIG || {};
+    var merged = Object.assign({}, base);
+    for (var k in merchant) {
+      var v = merchant[k];
+      if (v !== null && v !== undefined && v !== '') merged[k] = v;
+    }
+    window.__AI_CHAT_CONFIG = merged;
+  }
+} catch (e) { /* keep theme defaults */ }
+
 var C=window.__AI_CHAT_CONFIG||{};
 var API=C.apiUrl||'';
 var SHOP=C.shopDomain||'';
