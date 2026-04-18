@@ -54,6 +54,14 @@ export async function getKnowledgeFiles(shop) {
   });
 }
 
+export async function getKnowledgeFilesWithContent(shop) {
+  return prisma.knowledgeFile.findMany({
+    where: { shop },
+    orderBy: { updatedAt: "desc" },
+    select: { fileType: true, content: true },
+  });
+}
+
 export async function saveKnowledgeFile(shop, { fileName, fileType, fileSize, content }) {
   const existing = await prisma.knowledgeFile.findFirst({
     where: { shop, fileType },
