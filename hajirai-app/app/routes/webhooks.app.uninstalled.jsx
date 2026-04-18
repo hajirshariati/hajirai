@@ -12,6 +12,8 @@ export const action = async ({ request }) => {
 
   await db.knowledgeFile.deleteMany({ where: { shop } });
   await db.shopConfig.deleteMany({ where: { shop } });
+  await db.product.deleteMany({ where: { shop } });
+  await db.catalogSyncState.deleteMany({ where: { shop } });
 
   return new Response();
 };

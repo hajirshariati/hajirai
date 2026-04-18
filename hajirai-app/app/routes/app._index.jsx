@@ -16,11 +16,17 @@ import { CheckCircleIcon } from "@shopify/polaris-icons";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import { getShopConfig, getKnowledgeFiles } from "../models/ShopConfig.server";
+import { getCatalogSyncState, syncCatalogAsync } from "../models/Product.server";
 
 export const loader = async ({ request }) => {
-  const { session } = await authenticate.admin(request);
+  const { admin, session } = await authenticate.admin(request);
   const config = await getShopConfig(session.shop);
   const files = await getKnowledgeFiles(session.shop);
+
+  const syncState = await getCatalogSyncState(session.shop);
+  if (!syncState.lastSyncedAt && syncState.status !== "running") {
+    syncCatalogAsync(admin, session.shop);
+  }
 
   return {
     hasApiKey: config.anthropicApiKey !== "",

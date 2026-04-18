@@ -92,3 +92,52 @@ model KnowledgeFile {
 
   @@index([shop])
 }
+
+model Product {
+  id          String           @id @default(cuid())
+  shop        String
+  shopifyId   String
+  handle      String
+  title       String
+  vendor      String?
+  productType String?
+  tags        String[]
+  description String?
+  status      String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  variants    ProductVariant[]
+
+  @@unique([shop, shopifyId])
+  @@index([shop])
+  @@index([shop, handle])
+}
+
+model ProductVariant {
+  id               String   @id @default(cuid())
+  productId        String
+  product          Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  shopifyId        String
+  sku              String?
+  title            String?
+  price            String?
+  compareAtPrice   String?
+  inventoryQty     Int?
+  optionsJson      String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([productId, shopifyId])
+  @@index([sku])
+}
+
+model CatalogSyncState {
+  id            String    @id @default(cuid())
+  shop          String    @unique
+  status        String    @default("idle")
+  lastSyncedAt  DateTime?
+  lastError     String?
+  productsCount Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
