@@ -1,0 +1,261 @@
+{% comment %}
+  Hajirai AI Chat — app embed block.
+  Mirrors the original Aetrex widget configuration shape (window.__AI_CHAT_CONFIG).
+  Merchants configure these in the theme editor OR in the Hajirai app admin.
+  Phase 3 will override these fallbacks by fetching admin config via App Proxy.
+{% endcomment %}
+
+<script>
+  window.__AI_CHAT_CONFIG = {
+    apiUrl: {{ block.settings.chat_api_url | json }},
+    shopDomain: {{ shop.permanent_domain | json }},
+    greeting: {{ block.settings.greeting | json }},
+    greetingCta: {{ block.settings.greeting_cta | json }},
+    avatarUrl: {% if block.settings.avatar != blank %}{{ block.settings.avatar | image_url: width: 200 | json }}{% else %}""{% endif %},
+    bannerUrl: {% if block.settings.banner != blank %}{{ block.settings.banner | image_url: width: 800 | json }}{% else %}""{% endif %},
+    assistantName: {{ block.settings.assistant_name | json }},
+    assistantTagline: {{ block.settings.assistant_tagline | json }},
+    launcherPlaceholder: {{ block.settings.launcher_placeholder | json }},
+    inputPlaceholder: {{ block.settings.input_placeholder | json }},
+    widgetPosition: {{ block.settings.position | json }},
+    cta1Label: {{ block.settings.cta1_label | json }},
+    cta1Message: {{ block.settings.cta1_message | json }},
+    cta2Label: {{ block.settings.cta2_label | json }},
+    cta2Message: {{ block.settings.cta2_message | json }},
+    cta3Label: {{ block.settings.cta3_label | json }},
+    cta3Message: {{ block.settings.cta3_message | json }},
+    cta4Label: {{ block.settings.cta4_label | json }},
+    cta4Message: {{ block.settings.cta4_message | json }},
+    ctaHint: {{ block.settings.cta_hint | json }},
+    quickPick1Label: {{ block.settings.qp1_label | json }},
+    quickPick1Message: {{ block.settings.qp1_message | json }},
+    quickPick2Label: {{ block.settings.qp2_label | json }},
+    quickPick2Message: {{ block.settings.qp2_message | json }},
+    quickPick3Label: {{ block.settings.qp3_label | json }},
+    quickPick3Message: {{ block.settings.qp3_message | json }},
+    quickPick4Label: {{ block.settings.qp4_label | json }},
+    quickPick4Message: {{ block.settings.qp4_message | json }},
+    showBanner: {{ block.settings.show_banner | json }},
+    launcherWidth: {{ block.settings.launcher_width | json }},
+    disclaimerText: {{ block.settings.disclaimer | json }},
+    privacyUrl: {{ block.settings.privacy_url | json }}
+  };
+</script>
+
+<style>
+  :root {
+    {%- if block.settings.color_primary != blank -%}
+      --ai-chat-color-primary: {{ block.settings.color_primary }};
+    {%- endif -%}
+    {%- if block.settings.color_accent != blank -%}
+      --ai-chat-color-accent: {{ block.settings.color_accent }};
+    {%- endif -%}
+    {%- if block.settings.color_cta_bg != blank -%}
+      --ai-chat-cta-bg: {{ block.settings.color_cta_bg }};
+    {%- endif -%}
+    {%- if block.settings.color_cta_text != blank -%}
+      --ai-chat-cta-text: {{ block.settings.color_cta_text }};
+    {%- endif -%}
+    {%- if block.settings.color_cta_hover != blank -%}
+      --ai-chat-cta-hover: {{ block.settings.color_cta_hover }};
+    {%- endif -%}
+  }
+  .ai-chat-overlay.visible { background: rgba(0, 0, 0, 0.4) !important; }
+  .ai-chat-panel { --ai-chat-panel-w: 560px !important; }
+  @media (min-width: 700px) {
+    .ai-chat-welcome__ctas { grid-template-columns: repeat(4, 1fr) !important; }
+  }
+  body.ai-chat-blurred > *:not(.ai-chat-overlay):not(.ai-chat-panel):not(.ai-chat-launcher) {
+    filter: blur(6px) !important;
+    pointer-events: none !important;
+    user-select: none !important;
+  }
+  body.ai-chat-blurred { overflow: hidden !important; }
+  .ai-chat-suggestions {
+    display: flex !important;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid #eee;
+  }
+  .ai-chat-suggest-btn {
+    display: flex !important;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1.5px solid var(--ai-chat-cta-bg, #e8f5ee);
+    background: var(--ai-chat-cta-bg, #e8f5ee);
+    cursor: pointer;
+    color: var(--ai-chat-cta-text, #2d6b4f);
+    font-size: 13px;
+    font-family: inherit;
+    font-weight: 500;
+    line-height: 1.4;
+    text-align: left;
+  }
+  .suggest-plus {
+    color: var(--ai-chat-color-primary, #2d6b4f);
+    font-weight: 700;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+</style>
+
+<link rel="stylesheet" href="{{ 'hajirai-chat-widget.css' | asset_url }}">
+<script src="{{ 'hajirai-chat-widget.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Hajirai AI Chat",
+  "target": "body",
+  "settings": [
+    {
+      "type": "text",
+      "id": "chat_api_url",
+      "label": "Chat Server URL",
+      "info": "Your deployed chat server (e.g. https://hajirai-server.up.railway.app). Leave blank until the server is ready."
+    },
+
+    { "type": "header", "content": "Assistant Identity" },
+    {
+      "type": "text",
+      "id": "assistant_name",
+      "label": "Assistant Name",
+      "default": "AI Shopping Assistant"
+    },
+    {
+      "type": "text",
+      "id": "assistant_tagline",
+      "label": "Tagline",
+      "default": "Smart Support for Every Step"
+    },
+    {
+      "type": "image_picker",
+      "id": "avatar",
+      "label": "Avatar Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "banner",
+      "label": "Welcome Banner"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_banner",
+      "label": "Show banner on welcome screen",
+      "default": true
+    },
+
+    { "type": "header", "content": "Messages" },
+    {
+      "type": "textarea",
+      "id": "greeting",
+      "label": "Greeting",
+      "default": "Hi! I'm your personal shopping assistant."
+    },
+    {
+      "type": "text",
+      "id": "greeting_cta",
+      "label": "Greeting CTA",
+      "default": "What can I help you find today?"
+    },
+    {
+      "type": "text",
+      "id": "launcher_placeholder",
+      "label": "Launcher Placeholder",
+      "default": "How can I help you today?"
+    },
+    {
+      "type": "text",
+      "id": "input_placeholder",
+      "label": "Chat Input Placeholder",
+      "default": "How can I help you today?"
+    },
+
+    { "type": "header", "content": "Layout & Colors" },
+    {
+      "type": "select",
+      "id": "position",
+      "label": "Launcher Position",
+      "options": [
+        { "value": "bottom-center", "label": "Bottom Center" },
+        { "value": "bottom-left", "label": "Bottom Left" },
+        { "value": "bottom-right", "label": "Bottom Right" }
+      ],
+      "default": "bottom-center"
+    },
+    {
+      "type": "text",
+      "id": "launcher_width",
+      "label": "Launcher Width (px)",
+      "default": "500"
+    },
+    {
+      "type": "color",
+      "id": "color_primary",
+      "label": "Primary Color",
+      "default": "#2d6b4f"
+    },
+    {
+      "type": "color",
+      "id": "color_accent",
+      "label": "Accent Color",
+      "default": "#3a7d5c"
+    },
+    {
+      "type": "color",
+      "id": "color_cta_bg",
+      "label": "CTA Background",
+      "default": "#e8f5ee"
+    },
+    {
+      "type": "color",
+      "id": "color_cta_text",
+      "label": "CTA Text",
+      "default": "#2d6b4f"
+    },
+    {
+      "type": "color",
+      "id": "color_cta_hover",
+      "label": "CTA Hover",
+      "default": "#d4ebdb"
+    },
+
+    { "type": "header", "content": "Welcome CTAs" },
+    { "type": "text", "id": "cta1_label", "label": "CTA 1 Label", "default": "Women's Shoes" },
+    { "type": "text", "id": "cta1_message", "label": "CTA 1 Message", "default": "Show me women's shoes" },
+    { "type": "text", "id": "cta2_label", "label": "CTA 2 Label", "default": "Men's Shoes" },
+    { "type": "text", "id": "cta2_message", "label": "CTA 2 Message", "default": "Show me men's shoes" },
+    { "type": "text", "id": "cta3_label", "label": "CTA 3 Label", "default": "Orthotics" },
+    { "type": "text", "id": "cta3_message", "label": "CTA 3 Message", "default": "Help me find the right orthotic" },
+    { "type": "text", "id": "cta4_label", "label": "CTA 4 Label", "default": "Foot Pain Relief" },
+    { "type": "text", "id": "cta4_message", "label": "CTA 4 Message", "default": "I have foot pain and need help" },
+    { "type": "text", "id": "cta_hint", "label": "CTA Hint Text" },
+
+    { "type": "header", "content": "Quick Picks" },
+    { "type": "text", "id": "qp1_label", "label": "Quick Pick 1 Label", "default": "Arch Support" },
+    { "type": "text", "id": "qp1_message", "label": "Quick Pick 1 Message", "default": "Show me shoes with the best arch support" },
+    { "type": "text", "id": "qp2_label", "label": "Quick Pick 2 Label", "default": "Flat Feet" },
+    { "type": "text", "id": "qp2_message", "label": "Quick Pick 2 Message", "default": "I have flat feet, what do you recommend?" },
+    { "type": "text", "id": "qp3_label", "label": "Quick Pick 3 Label", "default": "Walking Shoes" },
+    { "type": "text", "id": "qp3_message", "label": "Quick Pick 3 Message", "default": "Show me the best walking shoes" },
+    { "type": "text", "id": "qp4_label", "label": "Quick Pick 4 Label", "default": "Plantar Fasciitis" },
+    { "type": "text", "id": "qp4_message", "label": "Quick Pick 4 Message", "default": "I have plantar fasciitis, what shoes help?" },
+
+    { "type": "header", "content": "Footer" },
+    {
+      "type": "text",
+      "id": "disclaimer",
+      "label": "Disclaimer Text",
+      "default": "Powered by AI · Not medical advice"
+    },
+    {
+      "type": "url",
+      "id": "privacy_url",
+      "label": "Privacy Policy URL"
+    }
+  ]
+}
+{% endschema %}
