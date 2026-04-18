@@ -46,14 +46,13 @@ export default function Knowledge() {
   const submit = useSubmit();
   const saving = nav.state === "submitting";
 
-  const [selectedType, setSelectedType] = useState("products");
+  const [selectedType, setSelectedType] = useState("faqs");
   const [uploadFile, setUploadFile] = useState(null);
 
   const fileTypes = [
-    { label: "Product Catalog", value: "products" },
-    { label: "Orthotics / Insoles", value: "orthotics" },
-    { label: "Fit & Sizing Data", value: "fit_data" },
-    { label: "Technology Info", value: "technology" },
+    { label: "FAQs & Policies", value: "faqs" },
+    { label: "Brand / About", value: "brand" },
+    { label: "Product Details", value: "products" },
     { label: "Custom Knowledge", value: "custom" },
   ];
 
@@ -104,6 +103,15 @@ export default function Knowledge() {
     <Page title="Knowledge Base" backAction={{ url: "/app" }}>
       <TitleBar title="Knowledge Base" />
       <BlockStack gap="500">
+        <Banner title="Your store is already connected" tone="info">
+          <Text as="p">
+            The assistant has live access to your Shopify store — products, collections, pages,
+            and policies are automatically available via the Shopify API. Use this page only to
+            add <strong>extra</strong> knowledge the AI should know beyond what's in your store
+            (FAQs, brand voice, detailed product guides, etc.).
+          </Text>
+        </Banner>
+
         {actionData?.success && (
           <Banner title={actionData.message} tone="success" onDismiss={() => {}} />
         )}
@@ -113,8 +121,8 @@ export default function Knowledge() {
 
         <Layout>
           <Layout.AnnotatedSection
-            title="Upload Knowledge Files"
-            description="Upload CSV files to train your AI assistant. Each file type can have one active file — uploading a new one replaces the previous."
+            title="Upload Extra Knowledge"
+            description="Upload CSV or plain text files with additional context for the AI. Each category keeps one active file — uploading a new one replaces the previous."
           >
             <Card>
               <BlockStack gap="400">
@@ -175,15 +183,18 @@ export default function Knowledge() {
 
         <Card>
           <BlockStack gap="300">
-            <Text as="h2" variant="headingMd">CSV Format Guide</Text>
+            <Text as="h2" variant="headingMd">What to upload</Text>
             <Text as="p" variant="bodySm" tone="subdued">
-              Product Catalog CSV should include columns: title, handle, description, price, compare_at_price, product_type, tags, gender, image_url, url
+              <strong>FAQs & Policies</strong> — shipping, returns, warranty, common questions. Plain text (.txt) or CSV with columns: question, answer.
             </Text>
             <Text as="p" variant="bodySm" tone="subdued">
-              Fit Data CSV should include columns: product_title, sizing_notes, return_reason, size_recommendation
+              <strong>Brand / About</strong> — your story, values, voice, and tone. Plain text (.txt).
             </Text>
             <Text as="p" variant="bodySm" tone="subdued">
-              Technology and Custom files can be plain text (.txt) with free-form knowledge the AI should know.
+              <strong>Product Details</strong> — extra product info beyond what's in Shopify (materials, care, sizing charts). CSV with columns: product_title, details.
+            </Text>
+            <Text as="p" variant="bodySm" tone="subdued">
+              <strong>Custom Knowledge</strong> — free-form text for anything else the AI should know.
             </Text>
           </BlockStack>
         </Card>

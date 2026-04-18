@@ -75,7 +75,6 @@ model ShopConfig {
   anthropicModel      String   @default("claude-sonnet-4-20250514")
   yotpoApiKey         String   @default("")
   aftershipApiKey     String   @default("")
-  chatServerUrl       String   @default("")
 
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt

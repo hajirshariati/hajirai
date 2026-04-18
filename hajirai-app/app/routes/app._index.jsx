@@ -24,7 +24,6 @@ export const loader = async ({ request }) => {
 
   return {
     hasApiKey: config.anthropicApiKey !== "",
-    hasChatServer: config.chatServerUrl !== "",
     anthropicModel: config.anthropicModel,
     fileCount: files.length,
     shop: session.shop,
@@ -45,23 +44,19 @@ function StatCard({ label, value, sublabel }) {
 }
 
 export default function Dashboard() {
-  const { hasApiKey, hasChatServer, anthropicModel, fileCount, shop, themeEditorUrl } = useLoaderData();
-  const ready = hasApiKey && hasChatServer;
+  const { hasApiKey, anthropicModel, fileCount, shop, themeEditorUrl } = useLoaderData();
 
   return (
     <Page title="Analytics">
       <TitleBar title="Analytics" />
       <BlockStack gap="500">
-        {!ready && (
+        {!hasApiKey && (
           <Banner title="Finish setup to activate the chat assistant" tone="warning">
-            <BlockStack gap="200">
-              {!hasApiKey && <p>— Add your Anthropic API key in <PolarisLink url="/app/api-keys">API Keys</PolarisLink></p>}
-              {!hasChatServer && <p>— Set your Chat Server URL in <PolarisLink url="/app/api-keys">API Keys</PolarisLink></p>}
-            </BlockStack>
+            <p>Add your Anthropic API key in <PolarisLink url="/app/api-keys">API Keys</PolarisLink> to activate the chat assistant.</p>
           </Banner>
         )}
 
-        {ready && (
+        {hasApiKey && (
           <Banner title="Chat assistant is live" tone="success">
             <p>Customers on your storefront can now chat with the AI. Customize appearance and messaging in the theme editor.</p>
           </Banner>

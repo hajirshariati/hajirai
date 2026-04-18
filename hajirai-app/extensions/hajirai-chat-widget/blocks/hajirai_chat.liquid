@@ -1,13 +1,11 @@
 {% comment %}
   Hajirai AI Chat — app embed block.
-  Mirrors the original Aetrex widget configuration shape (window.__AI_CHAT_CONFIG).
-  Merchants configure these in the theme editor OR in the Hajirai app admin.
-  Phase 3 will override these fallbacks by fetching admin config via App Proxy.
+  Merchants configure appearance and content here in the theme editor.
+  Chat routing goes through the app proxy at /apps/hajirai/chat.
 {% endcomment %}
 
 <script>
   window.__AI_CHAT_CONFIG = {
-    apiUrl: {{ block.settings.chat_api_url | json }},
     shopDomain: {{ shop.permanent_domain | json }},
     greeting: {{ block.settings.greeting | json }},
     greetingCta: {{ block.settings.greeting_cta | json }},
@@ -111,13 +109,6 @@
   "name": "Hajirai AI Chat",
   "target": "body",
   "settings": [
-    {
-      "type": "text",
-      "id": "chat_api_url",
-      "label": "Chat Server URL",
-      "info": "Your deployed chat server (e.g. https://hajirai-server.up.railway.app). Leave blank until the server is ready."
-    },
-
     { "type": "header", "content": "Assistant Identity" },
     {
       "type": "text",
@@ -129,7 +120,7 @@
       "type": "text",
       "id": "assistant_tagline",
       "label": "Tagline",
-      "default": "Smart Support for Every Step"
+      "default": ""
     },
     {
       "type": "image_picker",
@@ -223,33 +214,33 @@
       "default": "#d4ebdb"
     },
 
-    { "type": "header", "content": "Welcome CTAs" },
-    { "type": "text", "id": "cta1_label", "label": "CTA 1 Label", "default": "Women's Shoes" },
-    { "type": "text", "id": "cta1_message", "label": "CTA 1 Message", "default": "Show me women's shoes" },
-    { "type": "text", "id": "cta2_label", "label": "CTA 2 Label", "default": "Men's Shoes" },
-    { "type": "text", "id": "cta2_message", "label": "CTA 2 Message", "default": "Show me men's shoes" },
-    { "type": "text", "id": "cta3_label", "label": "CTA 3 Label", "default": "Orthotics" },
-    { "type": "text", "id": "cta3_message", "label": "CTA 3 Message", "default": "Help me find the right orthotic" },
-    { "type": "text", "id": "cta4_label", "label": "CTA 4 Label", "default": "Foot Pain Relief" },
-    { "type": "text", "id": "cta4_message", "label": "CTA 4 Message", "default": "I have foot pain and need help" },
+    { "type": "header", "content": "Welcome CTAs", "info": "Up to 4 suggested starting questions shown under the greeting." },
+    { "type": "text", "id": "cta1_label", "label": "CTA 1 Label", "default": "Find a product" },
+    { "type": "text", "id": "cta1_message", "label": "CTA 1 Message", "default": "Help me find a product" },
+    { "type": "text", "id": "cta2_label", "label": "CTA 2 Label", "default": "Track my order" },
+    { "type": "text", "id": "cta2_message", "label": "CTA 2 Message", "default": "I want to check the status of my order" },
+    { "type": "text", "id": "cta3_label", "label": "CTA 3 Label", "default": "Sizing help" },
+    { "type": "text", "id": "cta3_message", "label": "CTA 3 Message", "default": "I need help choosing the right size" },
+    { "type": "text", "id": "cta4_label", "label": "CTA 4 Label", "default": "Browse deals" },
+    { "type": "text", "id": "cta4_message", "label": "CTA 4 Message", "default": "Show me current sales and promotions" },
     { "type": "text", "id": "cta_hint", "label": "CTA Hint Text" },
 
-    { "type": "header", "content": "Quick Picks" },
-    { "type": "text", "id": "qp1_label", "label": "Quick Pick 1 Label", "default": "Arch Support" },
-    { "type": "text", "id": "qp1_message", "label": "Quick Pick 1 Message", "default": "Show me shoes with the best arch support" },
-    { "type": "text", "id": "qp2_label", "label": "Quick Pick 2 Label", "default": "Flat Feet" },
-    { "type": "text", "id": "qp2_message", "label": "Quick Pick 2 Message", "default": "I have flat feet, what do you recommend?" },
-    { "type": "text", "id": "qp3_label", "label": "Quick Pick 3 Label", "default": "Walking Shoes" },
-    { "type": "text", "id": "qp3_message", "label": "Quick Pick 3 Message", "default": "Show me the best walking shoes" },
-    { "type": "text", "id": "qp4_label", "label": "Quick Pick 4 Label", "default": "Plantar Fasciitis" },
-    { "type": "text", "id": "qp4_message", "label": "Quick Pick 4 Message", "default": "I have plantar fasciitis, what shoes help?" },
+    { "type": "header", "content": "Quick Picks", "info": "Shorter prompts shown as pills below the main CTAs." },
+    { "type": "text", "id": "qp1_label", "label": "Quick Pick 1 Label", "default": "Best sellers" },
+    { "type": "text", "id": "qp1_message", "label": "Quick Pick 1 Message", "default": "What are your best-selling products?" },
+    { "type": "text", "id": "qp2_label", "label": "Quick Pick 2 Label", "default": "New arrivals" },
+    { "type": "text", "id": "qp2_message", "label": "Quick Pick 2 Message", "default": "Show me what's new" },
+    { "type": "text", "id": "qp3_label", "label": "Quick Pick 3 Label", "default": "On sale" },
+    { "type": "text", "id": "qp3_message", "label": "Quick Pick 3 Message", "default": "What's currently on sale?" },
+    { "type": "text", "id": "qp4_label", "label": "Quick Pick 4 Label", "default": "Return policy" },
+    { "type": "text", "id": "qp4_message", "label": "Quick Pick 4 Message", "default": "What is your return and refund policy?" },
 
     { "type": "header", "content": "Footer" },
     {
       "type": "text",
       "id": "disclaimer",
       "label": "Disclaimer Text",
-      "default": "Powered by AI · Not medical advice"
+      "default": "Powered by AI"
     },
     {
       "type": "url",

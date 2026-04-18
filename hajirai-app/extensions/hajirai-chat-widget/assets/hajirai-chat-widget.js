@@ -1,25 +1,8 @@
-(async function(){
+(function(){
 'use strict';
 
-/* Fetch merchant config from App Proxy and merge over theme defaults.
-   Falls back silently to theme block settings on any failure. */
-try {
-  var res = await fetch('/apps/hajirai/config', {
-    credentials: 'same-origin',
-    headers: { 'Accept': 'application/json' }
-  });
-  if (res.ok) {
-    var merchant = await res.json();
-    var base = window.__AI_CHAT_CONFIG || {};
-    var merged = Object.assign({}, base);
-    for (var k in merchant) {
-      var v = merchant[k];
-      if (v !== null && v !== undefined && v !== '') merged[k] = v;
-    }
-    window.__AI_CHAT_CONFIG = merged;
-  }
-} catch (e) { /* keep theme defaults */ }
-
+/* Visual config comes from theme editor (liquid-injected as window.__AI_CHAT_CONFIG).
+   Chat server URL is handled internally via app proxy at /apps/hajirai/chat. */
 var C=window.__AI_CHAT_CONFIG||{};
 
 /* Apply merchant colors as CSS variables (overrides theme block defaults). */
@@ -30,16 +13,17 @@ if(C.colorCtaBg)   _rootStyle.setProperty('--ai-chat-cta-bg',        C.colorCtaB
 if(C.colorCtaText) _rootStyle.setProperty('--ai-chat-cta-text',      C.colorCtaText);
 if(C.colorCtaHover)_rootStyle.setProperty('--ai-chat-cta-hover',     C.colorCtaHover);
 
-var API=C.apiUrl||'';
+var CHAT_URL='/apps/hajirai/chat';
+var FEEDBACK_URL='/apps/hajirai/feedback';
 var SHOP=C.shopDomain||'';
-var GREET=C.greeting||'Hi, I\'m Archie — your personal fit and comfort expert.';
+var GREET=C.greeting||'Hi! I\'m your personal shopping assistant.';
 var GREETCTA=C.greetingCta||'What can I help you find today?';
 var AVATAR=C.avatarUrl||'';
 var BANNER=C.bannerUrl||'';
-var NAME=C.assistantName||'Archie by Aetrex';
-var TAG=C.assistantTagline||'Smart Support for Every Step';
-var LPLACE=C.launcherPlaceholder||'How can Archie help your feet today?';
-var IPLACE=C.inputPlaceholder||'How can Archie help your feet today?';
+var NAME=C.assistantName||'AI Shopping Assistant';
+var TAG=C.assistantTagline||'';
+var LPLACE=C.launcherPlaceholder||'How can I help you today?';
+var IPLACE=C.inputPlaceholder||'How can I help you today?';
 var POS=C.widgetPosition||'bottom-center';
 var CTA1L=C.cta1Label||'';var CTA1M=C.cta1Message||'';
 var CTA2L=C.cta2Label||'';var CTA2M=C.cta2Message||'';
@@ -54,8 +38,8 @@ var SHOWBAN=C.showBanner!==false;
 var DISCL=C.disclaimerText||'';
 var PRIVURL=C.privacyUrl||'/pages/privacy-policy';
 var LWIDTH=C.launcherWidth||'500';
-var SK='aetrex_ai_chat_session';
-var HK='aetrex_ai_chat_history';
+var SK='hajirai_chat_session';
+var HK='hajirai_chat_history';
 
 function $(s,c){return(c||document).querySelector(s)}
 function el(t,cl,h){var e=document.createElement(t);if(cl)e.className=cl;if(h)e.innerHTML=h;return e}
@@ -157,10 +141,10 @@ h+='<div class="ai-chat-welcome__name">'+esc(NAME)+'</div>';
 h+='<div class="ai-chat-welcome__tagline">'+esc(GREET)+'</div>';
 if(GREETCTA)h+='<div class="ai-chat-welcome__greeting-cta">'+esc(GREETCTA)+'</div>';
 var ctas=[];
-if(CTA1L&&CTA1M)ctas.push({l:CTA1L,m:CTA1M,icon:'shoe'});
-if(CTA2L&&CTA2M)ctas.push({l:CTA2L,m:CTA2M,icon:'shoe'});
-if(CTA3L&&CTA3M)ctas.push({l:CTA3L,m:CTA3M,icon:'orthotic'});
-if(CTA4L&&CTA4M)ctas.push({l:CTA4L,m:CTA4M,icon:'heart'});
+if(CTA1L&&CTA1M)ctas.push({l:CTA1L,m:CTA1M});
+if(CTA2L&&CTA2M)ctas.push({l:CTA2L,m:CTA2M});
+if(CTA3L&&CTA3M)ctas.push({l:CTA3L,m:CTA3M});
+if(CTA4L&&CTA4M)ctas.push({l:CTA4L,m:CTA4M});
 if(ctas.length){
   h+='<div class="ai-chat-welcome__ctas">';
   for(var i=0;i<ctas.length;i++){
@@ -253,7 +237,7 @@ function streamResponse(msg){
 if(abortCtrl)abortCtrl.abort();
 abortCtrl=new AbortController();
 var body={message:msg,session_id:getSess(),shop_domain:SHOP,assistant_name:NAME,history:messages.slice(-20).map(function(m){return{role:m.role,content:m.content}})};
-fetch(API+'/api/chat',{method:'POST',headers:{'Content-Type':'application/json','Accept':'text/event-stream'},body:JSON.stringify(body),signal:abortCtrl.signal}).then(function(r){
+fetch(CHAT_URL,{method:'POST',headers:{'Content-Type':'application/json','Accept':'text/event-stream'},body:JSON.stringify(body),signal:abortCtrl.signal}).then(function(r){
 if(!r.ok)throw new Error('Failed: '+r.status);
 var ct=r.headers.get('content-type')||'';
 if(ct.includes('text/event-stream')||ct.includes('text/plain'))return handleSSE(r);
@@ -362,7 +346,7 @@ if(prods&&prods.length>0&&lastMsg){
         wrap.innerHTML='<span class="ai-chat-fb-thanks">'+(vote==='up'?'Thanks for the feedback!':'Sorry about that, we\'ll improve!')+'</span>';
         var payload={vote:vote,session:getSess(),botResponse:(text||'').slice(0,500),products:(prods||[]).map(function(p){return p.title||''}).slice(0,5)};
         if(vote==='down'){payload.conversation=messages.slice(-10).map(function(m){return{role:m.role,content:(m.content||'').slice(0,300)}})}
-        try{fetch(API+'/api/feedback',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})}catch(e){}
+        try{fetch(FEEDBACK_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})}catch(e){}
       });
     });
   }

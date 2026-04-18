@@ -13,7 +13,6 @@ export const loader = async ({ request }) => {
     anthropicModel: config.anthropicModel,
     hasYotpoKey: config.yotpoApiKey !== "",
     hasAftershipKey: config.aftershipApiKey !== "",
-    chatServerUrl: config.chatServerUrl,
   };
 };
 
@@ -41,11 +40,6 @@ export const action = async ({ request }) => {
     data.aftershipApiKey = aftershipKey;
   }
 
-  const chatUrl = formData.get("chatServerUrl");
-  if (chatUrl !== null) {
-    data.chatServerUrl = chatUrl;
-  }
-
   if (Object.keys(data).length > 0) {
     await updateShopConfig(session.shop, data);
   }
@@ -54,14 +48,13 @@ export const action = async ({ request }) => {
 };
 
 export default function ApiKeys() {
-  const { hasAnthropicKey, anthropicModel, hasYotpoKey, hasAftershipKey, chatServerUrl } = useLoaderData();
+  const { hasAnthropicKey, anthropicModel, hasYotpoKey, hasAftershipKey } = useLoaderData();
   const actionData = useActionData();
   const nav = useNavigation();
   const saving = nav.state === "submitting";
 
   const [anthropicKey, setAnthropicKey] = useState("");
   const [model, setModel] = useState(anthropicModel || "claude-sonnet-4-20250514");
-  const [chatUrl, setChatUrl] = useState(chatServerUrl || "");
   const [yotpoKey, setYotpoKey] = useState("");
   const [aftershipKey, setAftershipKey] = useState("");
 
@@ -108,24 +101,6 @@ export default function ApiKeys() {
             </Layout.AnnotatedSection>
 
             <Layout.AnnotatedSection
-              title="Chat Server URL"
-              description="The URL of your deployed chat server. This handles AI conversations."
-            >
-              <Card>
-                <BlockStack gap="400">
-                  <TextField
-                    label="Chat Server URL"
-                    value={chatUrl}
-                    onChange={setChatUrl}
-                    autoComplete="off"
-                    placeholder="https://your-server.railway.app"
-                    helpText="Your Express.js chat server URL (deployed on Railway, Fly.io, etc.)"
-                  />
-                </BlockStack>
-              </Card>
-            </Layout.AnnotatedSection>
-
-            <Layout.AnnotatedSection
               title="Integrations (Optional)"
               description="Connect third-party services for enhanced features like product reviews and return data."
             >
@@ -156,7 +131,6 @@ export default function ApiKeys() {
 
           <input type="hidden" name="anthropicApiKey" value={anthropicKey} />
           <input type="hidden" name="anthropicModel" value={model} />
-          <input type="hidden" name="chatServerUrl" value={chatUrl} />
           <input type="hidden" name="yotpoApiKey" value={yotpoKey} />
           <input type="hidden" name="aftershipApiKey" value={aftershipKey} />
 
