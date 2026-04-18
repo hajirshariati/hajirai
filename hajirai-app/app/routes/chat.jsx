@@ -1,13 +1,12 @@
+import Anthropic from "@anthropic-ai/sdk";
 import { authenticate } from "../shopify.server";
 import { getShopConfig, getKnowledgeFilesWithContent } from "../models/ShopConfig.server";
+import { buildSystemPrompt } from "../lib/chat-prompt.server";
+import { TOOLS, executeTool } from "../lib/chat-tools.server";
 
-const CONFIG_FIELDS_FOR_AI = [
-  "assistantName",
-  "assistantTagline",
-  "greeting",
-  "greetingCta",
-  "disclaimerText",
-];
+const DEFAULT_MODEL = process.env.DEFAULT_MODEL || "claude-sonnet-4-20250514";
+const MAX_TOKENS = parseInt(process.env.CHAT_MAX_TOKENS, 10) || 1024;
+const MAX_TOOL_HOPS = parseInt(process.env.CHAT_MAX_TOOL_HOPS, 10) || 5;
 
 const RATE_LIMIT_PER_IP_SHOP = parseInt(process.env.RATE_LIMIT_PER_IP_SHOP, 10) || 20;
 const RATE_LIMIT_WINDOW_MS = parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 60_000;
@@ -47,14 +46,76 @@ if (!globalThis.__hajiraiRateSweeper) {
   globalThis.__hajiraiRateSweeper.unref?.();
 }
 
-function pickConfigForAI(config) {
-  const out = {};
-  for (const k of CONFIG_FIELDS_FOR_AI) {
-    if (config[k] !== undefined && config[k] !== null && config[k] !== "") {
-      out[k] = config[k];
-    }
+function sanitizeHistory(history) {
+  const out = [];
+  for (const turn of history || []) {
+    if (!turn?.role || !turn?.content) continue;
+    if (turn.role !== "user" && turn.role !== "assistant") continue;
+    out.push({ role: turn.role, content: String(turn.content) });
   }
   return out;
+}
+
+function sseChunk(obj) {
+  return `data: ${JSON.stringify(obj)}\n\n`;
+}
+
+async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, controller, encoder }) {
+  for (let hop = 0; hop < MAX_TOOL_HOPS; hop++) {
+    const stream = anthropic.messages.stream({
+      model,
+      max_tokens: MAX_TOKENS,
+      system: systemPrompt,
+      tools: TOOLS,
+      messages,
+    });
+
+    for await (const event of stream) {
+      if (
+        event.type === "content_block_delta" &&
+        event.delta?.type === "text_delta"
+      ) {
+        controller.enqueue(encoder.encode(sseChunk({ type: "text", text: event.delta.text })));
+      }
+    }
+
+    const final = await stream.finalMessage();
+
+    if (final.stop_reason !== "tool_use") {
+      return;
+    }
+
+    const toolUses = final.content.filter((b) => b.type === "tool_use");
+    if (toolUses.length === 0) return;
+
+    const results = await Promise.all(
+      toolUses.map((u) => executeTool(u.name, u.input, ctx)),
+    );
+
+    messages.push({ role: "assistant", content: final.content });
+    messages.push({
+      role: "user",
+      content: toolUses.map((u, i) => ({
+        type: "tool_result",
+        tool_use_id: u.id,
+        content: JSON.stringify(results[i] ?? {}),
+      })),
+    });
+  }
+  // Ran out of hops. Nudge the model to wrap up with a final text response.
+  const wrap = await anthropic.messages.create({
+    model,
+    max_tokens: MAX_TOKENS,
+    system: systemPrompt,
+    tools: TOOLS,
+    tool_choice: { type: "none" },
+    messages,
+  });
+  for (const block of wrap.content) {
+    if (block.type === "text" && block.text) {
+      controller.enqueue(encoder.encode(sseChunk({ type: "text", text: block.text })));
+    }
+  }
 }
 
 export const loader = async () => {
@@ -82,38 +143,47 @@ export const action = async ({ request }) => {
       );
     }
 
-    const chatUrl = process.env.CHAT_SERVER_URL;
-    const secret = process.env.CHAT_SERVER_INTERNAL_SECRET;
-    if (!chatUrl || !secret) {
-      return Response.json({ error: "chat server not configured" }, { status: 500 });
+    const body = await request.json();
+    if (!body?.message) {
+      return Response.json({ error: "message is required" }, { status: 400 });
     }
 
     const knowledge = await getKnowledgeFilesWithContent(session.shop);
-    const body = await request.json();
+    const systemPrompt = buildSystemPrompt({ config, knowledge, shop: session.shop });
 
-    const upstream = await fetch(`${chatUrl}/chat`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-internal-secret": secret,
-        "x-anthropic-api-key": config.anthropicApiKey,
-        "x-anthropic-model": config.anthropicModel,
+    const messages = sanitizeHistory(body.history);
+    messages.push({ role: "user", content: String(body.message) });
+
+    const anthropic = new Anthropic({ apiKey: config.anthropicApiKey });
+    const model = config.anthropicModel || DEFAULT_MODEL;
+    const ctx = { shop: session.shop };
+    const encoder = new TextEncoder();
+
+    const stream = new ReadableStream({
+      async start(controller) {
+        try {
+          await runAgenticLoop({
+            anthropic,
+            model,
+            systemPrompt,
+            messages,
+            ctx,
+            controller,
+            encoder,
+          });
+          controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
+        } catch (err) {
+          console.error("[chat.jsx] stream error:", err?.message || err);
+          controller.enqueue(
+            encoder.encode(sseChunk({ type: "error", message: err?.message || "upstream error" })),
+          );
+        } finally {
+          controller.close();
+        }
       },
-      body: JSON.stringify({
-        shop: session.shop,
-        message: body.message,
-        history: body.history || [],
-        config: pickConfigForAI(config),
-        knowledge,
-      }),
     });
 
-    if (!upstream.ok) {
-      const text = await upstream.text().catch(() => "");
-      return Response.json({ error: `upstream ${upstream.status}`, detail: text }, { status: 502 });
-    }
-
-    return new Response(upstream.body, {
+    return new Response(stream, {
       headers: {
         "Content-Type": "text/event-stream",
         "Cache-Control": "no-cache",
