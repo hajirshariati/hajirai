@@ -1,112 +1,134 @@
 import { useLoaderData } from "react-router";
-import { Page, Layout, Card, BlockStack, Text, InlineGrid, Box, Icon, Banner, Button } from "@shopify/polaris";
+import {
+  Page,
+  Card,
+  BlockStack,
+  InlineStack,
+  Text,
+  InlineGrid,
+  Box,
+  Banner,
+  Button,
+  Link as PolarisLink,
+  Badge,
+  Divider,
+} from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import { getShopConfig, getKnowledgeFiles } from "../models/ShopConfig.server";
-import { ChatIcon, PersonIcon, DataTableIcon, KeyIcon } from "@shopify/polaris-icons";
 
 export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
   const config = await getShopConfig(session.shop);
   const files = await getKnowledgeFiles(session.shop);
 
-  const steps = [
-    { label: "Set up branding", done: config.assistantName !== "AI Shopping Assistant", link: "/app/branding" },
-    { label: "Configure greetings & CTAs", done: config.cta1Label !== "", link: "/app/greetings" },
-    { label: "Upload product knowledge", done: files.length > 0, link: "/app/knowledge" },
-    { label: "Add API key", done: config.anthropicApiKey !== "", link: "/app/api-keys" },
-  ];
-  const completed = steps.filter((s) => s.done).length;
-
-  return { config, files, steps, completed, shop: session.shop };
+  return {
+    hasApiKey: config.anthropicApiKey !== "",
+    hasChatServer: config.chatServerUrl !== "",
+    anthropicModel: config.anthropicModel,
+    fileCount: files.length,
+    shop: session.shop,
+    themeEditorUrl: `https://${session.shop}/admin/themes/current/editor?context=apps`,
+  };
 };
 
+function StatCard({ label, value, sublabel }) {
+  return (
+    <Card>
+      <BlockStack gap="100">
+        <Text as="p" tone="subdued" variant="bodySm">{label}</Text>
+        <Text as="p" variant="heading2xl">{value}</Text>
+        {sublabel && <Text as="p" tone="subdued" variant="bodySm">{sublabel}</Text>}
+      </BlockStack>
+    </Card>
+  );
+}
+
 export default function Dashboard() {
-  const { config, files, steps, completed, shop } = useLoaderData();
+  const { hasApiKey, hasChatServer, anthropicModel, fileCount, shop, themeEditorUrl } = useLoaderData();
+  const ready = hasApiKey && hasChatServer;
 
   return (
-    <Page>
-      <TitleBar title="Dashboard" />
+    <Page title="Analytics">
+      <TitleBar title="Analytics" />
       <BlockStack gap="500">
-        {completed < 4 && (
-          <Banner title="Complete your setup" tone="info">
-            <p>You've completed {completed} of 4 setup steps. Finish all steps to activate your AI chat assistant.</p>
+        {!ready && (
+          <Banner title="Finish setup to activate the chat assistant" tone="warning">
+            <BlockStack gap="200">
+              {!hasApiKey && <p>— Add your Anthropic API key in <PolarisLink url="/app/api-keys">API Keys</PolarisLink></p>}
+              {!hasChatServer && <p>— Set your Chat Server URL in <PolarisLink url="/app/api-keys">API Keys</PolarisLink></p>}
+            </BlockStack>
           </Banner>
         )}
 
-        {completed === 4 && (
-          <Banner title="Your AI assistant is ready!" tone="success">
-            <p>All setup steps are complete. The chat widget is active on your storefront.</p>
+        {ready && (
+          <Banner title="Chat assistant is live" tone="success">
+            <p>Customers on your storefront can now chat with the AI. Customize appearance and messaging in the theme editor.</p>
           </Banner>
         )}
 
-        <InlineGrid columns={{ xs: 1, md: 2 }} gap="500">
-          <Card>
-            <BlockStack gap="300">
-              <Text as="h2" variant="headingMd">Setup Progress</Text>
-              {steps.map((step, i) => (
-                <Box key={i} paddingBlockStart="100">
-                  <InlineGrid columns="auto 1fr auto" gap="200" alignItems="center">
-                    <Box width="24px">
-                      <Text as="span" tone={step.done ? "success" : "subdued"}>
-                        {step.done ? "\u2713" : "\u25CB"}
-                      </Text>
-                    </Box>
-                    <Text as="span" tone={step.done ? "success" : undefined}>
-                      {step.label}
-                    </Text>
-                    {!step.done && (
-                      <Button url={step.link} size="slim">Set up</Button>
-                    )}
-                  </InlineGrid>
-                </Box>
-              ))}
-            </BlockStack>
-          </Card>
-
-          <Card>
-            <BlockStack gap="300">
-              <Text as="h2" variant="headingMd">Assistant Preview</Text>
-              <Box padding="400" background="bg-surface-secondary" borderRadius="200">
-                <BlockStack gap="200">
-                  <Text as="p" variant="headingSm">{config.assistantName}</Text>
-                  <Text as="p" tone="subdued">{config.assistantTagline}</Text>
-                  <Text as="p" variant="bodySm">{config.greeting}</Text>
-                </BlockStack>
-              </Box>
-            </BlockStack>
-          </Card>
+        <InlineGrid columns={{ xs: 1, sm: 2, md: 4 }} gap="400">
+          <StatCard label="Conversations" value="—" sublabel="Last 30 days" />
+          <StatCard label="Messages" value="—" sublabel="Last 30 days" />
+          <StatCard label="Avg. response time" value="—" sublabel="Seconds" />
+          <StatCard label="Product mentions" value="—" sublabel="Click-throughs to PDP" />
         </InlineGrid>
 
-        <InlineGrid columns={{ xs: 1, md: 3 }} gap="500">
+        <Card>
+          <BlockStack gap="400">
+            <InlineStack align="space-between" blockAlign="center">
+              <Text as="h2" variant="headingMd">Top customer questions</Text>
+              <Badge tone="info">Coming soon</Badge>
+            </InlineStack>
+            <Text as="p" tone="subdued">
+              A ranked list of what customers ask most will appear here once the chat server starts logging conversations.
+            </Text>
+          </BlockStack>
+        </Card>
+
+        <Divider />
+
+        <InlineGrid columns={{ xs: 1, md: 3 }} gap="400">
           <Card>
             <BlockStack gap="200">
-              <Text as="h2" variant="headingMd">Knowledge Files</Text>
-              <Text as="p" variant="headingXl">{files.length}</Text>
-              <Text as="p" tone="subdued">CSV files uploaded</Text>
-              <Button url="/app/knowledge" size="slim">Manage</Button>
+              <Text as="h3" variant="headingSm">AI Model</Text>
+              <InlineStack gap="200" blockAlign="center">
+                <Badge tone={hasApiKey ? "success" : "critical"}>
+                  {hasApiKey ? "Connected" : "Not set"}
+                </Badge>
+              </InlineStack>
+              <Text as="p" tone="subdued" variant="bodySm">{anthropicModel}</Text>
+              <Button url="/app/api-keys" variant="plain">Configure</Button>
             </BlockStack>
           </Card>
 
           <Card>
             <BlockStack gap="200">
-              <Text as="h2" variant="headingMd">AI Model</Text>
-              <Text as="p" variant="headingXl">
-                {config.anthropicApiKey ? "Connected" : "Not set"}
+              <Text as="h3" variant="headingSm">Knowledge Base</Text>
+              <Text as="p" variant="headingLg">{fileCount}</Text>
+              <Text as="p" tone="subdued" variant="bodySm">CSV files uploaded</Text>
+              <Button url="/app/knowledge" variant="plain">Manage</Button>
+            </BlockStack>
+          </Card>
+
+          <Card>
+            <BlockStack gap="200">
+              <Text as="h3" variant="headingSm">Appearance & Content</Text>
+              <Text as="p" tone="subdued" variant="bodySm">
+                Branding, colors, greetings, and CTAs live in the theme editor.
               </Text>
-              <Text as="p" tone="subdued">{config.anthropicModel}</Text>
-              <Button url="/app/api-keys" size="slim">Configure</Button>
-            </BlockStack>
-          </Card>
-
-          <Card>
-            <BlockStack gap="200">
-              <Text as="h2" variant="headingMd">Store</Text>
-              <Text as="p" variant="bodyMd">{shop}</Text>
-              <Text as="p" tone="subdued">Widget position: {config.widgetPosition}</Text>
+              <Button url={themeEditorUrl} external variant="plain">
+                Open theme editor
+              </Button>
             </BlockStack>
           </Card>
         </InlineGrid>
+
+        <Box paddingBlockStart="300">
+          <Text as="p" tone="subdued" variant="bodySm" alignment="center">
+            Installed on {shop}
+          </Text>
+        </Box>
       </BlockStack>
     </Page>
   );
