@@ -26,6 +26,9 @@ const MAX_TOKENS = parseInt(process.env.MAX_TOKENS, 10) || 512;
 const DEFAULT_MODEL =
   process.env.DEFAULT_MODEL || "claude-sonnet-4-20250514";
 
+const RATE_LIMIT_PER_SHOP = parseInt(process.env.RATE_LIMIT_PER_SHOP, 10) || 120;
+const RATE_LIMIT_WINDOW_MS = parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 60_000;
+
 if (process.env.NODE_ENV === "production" && !INTERNAL_SECRET) {
   console.error("INTERNAL_SECRET is required in production.");
   process.exit(1);
@@ -61,6 +64,33 @@ app.use((req, res, next) => {
   }
   return res.status(401).json({ error: "unauthorized" });
 });
+
+/* -------------------- Rate limiting (per shop) -------------------- */
+
+const shopBuckets = new Map();
+
+function checkShopRate(shop) {
+  const now = Date.now();
+  const cutoff = now - RATE_LIMIT_WINDOW_MS;
+  const bucket = (shopBuckets.get(shop) || []).filter((t) => t > cutoff);
+  if (bucket.length >= RATE_LIMIT_PER_SHOP) {
+    const retryAfter = Math.max(1, Math.ceil((bucket[0] + RATE_LIMIT_WINDOW_MS - now) / 1000));
+    shopBuckets.set(shop, bucket);
+    return { ok: false, retryAfter };
+  }
+  bucket.push(now);
+  shopBuckets.set(shop, bucket);
+  return { ok: true };
+}
+
+setInterval(() => {
+  const cutoff = Date.now() - RATE_LIMIT_WINDOW_MS;
+  for (const [shop, bucket] of shopBuckets) {
+    const filtered = bucket.filter((t) => t > cutoff);
+    if (filtered.length === 0) shopBuckets.delete(shop);
+    else shopBuckets.set(shop, filtered);
+  }
+}, RATE_LIMIT_WINDOW_MS).unref();
 
 /* -------------------- System prompt builder -------------------- */
 
@@ -126,6 +156,12 @@ app.post("/chat", async (req, res) => {
   const { shop, message, history = [], config = {}, knowledge = [] } = req.body || {};
   if (!shop || !message) {
     return res.status(400).json({ error: "shop and message are required" });
+  }
+
+  const rate = checkShopRate(shop);
+  if (!rate.ok) {
+    res.setHeader("Retry-After", String(rate.retryAfter));
+    return res.status(429).json({ error: "rate_limited", retryAfter: rate.retryAfter });
   }
 
   const systemPrompt = buildSystemPrompt({ config, knowledge, shop });
