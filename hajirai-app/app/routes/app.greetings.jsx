@@ -1,8 +1,18 @@
 import { useLoaderData, useActionData, useNavigation, Form } from "react-router";
+import { useState } from "react";
 import { Page, Layout, Card, BlockStack, TextField, Button, Banner, Text, Box, InlineGrid } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import { getShopConfig, updateShopConfig } from "../models/ShopConfig.server";
+
+const FIELD_KEYS = [
+  "greeting", "greetingCta", "launcherPlaceholder", "inputPlaceholder",
+  "disclaimerText", "privacyUrl", "ctaHint",
+  "cta1Label", "cta1Message", "cta2Label", "cta2Message",
+  "cta3Label", "cta3Message", "cta4Label", "cta4Message",
+  "qp1Label", "qp1Message", "qp2Label", "qp2Message",
+  "qp3Label", "qp3Message", "qp4Label", "qp4Message",
+];
 
 export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
@@ -13,33 +23,8 @@ export const loader = async ({ request }) => {
 export const action = async ({ request }) => {
   const { session } = await authenticate.admin(request);
   const formData = await request.formData();
-
-  const data = {
-    greeting: formData.get("greeting"),
-    greetingCta: formData.get("greetingCta"),
-    launcherPlaceholder: formData.get("launcherPlaceholder"),
-    inputPlaceholder: formData.get("inputPlaceholder"),
-    disclaimerText: formData.get("disclaimerText"),
-    privacyUrl: formData.get("privacyUrl"),
-    ctaHint: formData.get("ctaHint"),
-    cta1Label: formData.get("cta1Label"),
-    cta1Message: formData.get("cta1Message"),
-    cta2Label: formData.get("cta2Label"),
-    cta2Message: formData.get("cta2Message"),
-    cta3Label: formData.get("cta3Label"),
-    cta3Message: formData.get("cta3Message"),
-    cta4Label: formData.get("cta4Label"),
-    cta4Message: formData.get("cta4Message"),
-    qp1Label: formData.get("qp1Label"),
-    qp1Message: formData.get("qp1Message"),
-    qp2Label: formData.get("qp2Label"),
-    qp2Message: formData.get("qp2Message"),
-    qp3Label: formData.get("qp3Label"),
-    qp3Message: formData.get("qp3Message"),
-    qp4Label: formData.get("qp4Label"),
-    qp4Message: formData.get("qp4Message"),
-  };
-
+  const data = {};
+  for (const key of FIELD_KEYS) data[key] = formData.get(key) ?? "";
   await updateShopConfig(session.shop, data);
   return { success: true };
 };
@@ -49,6 +34,13 @@ export default function Greetings() {
   const actionData = useActionData();
   const nav = useNavigation();
   const saving = nav.state === "submitting";
+
+  const [values, setValues] = useState(() => {
+    const v = {};
+    for (const k of FIELD_KEYS) v[k] = config[k] ?? "";
+    return v;
+  });
+  const setField = (k) => (val) => setValues((prev) => ({ ...prev, [k]: val }));
 
   return (
     <Page title="Greetings & CTAs" backAction={{ url: "/app" }}>
@@ -68,15 +60,15 @@ export default function Greetings() {
                 <BlockStack gap="400">
                   <TextField
                     label="Greeting Message"
-                    name="greeting"
-                    defaultValue={config.greeting}
+                    value={values.greeting}
+                    onChange={setField("greeting")}
                     autoComplete="off"
                     multiline={3}
                   />
                   <TextField
                     label="Greeting Call-to-Action"
-                    name="greetingCta"
-                    defaultValue={config.greetingCta}
+                    value={values.greetingCta}
+                    onChange={setField("greetingCta")}
                     autoComplete="off"
                     helpText="Prompt shown below the greeting"
                   />
@@ -92,15 +84,15 @@ export default function Greetings() {
                 <BlockStack gap="400">
                   <TextField
                     label="Launcher Placeholder"
-                    name="launcherPlaceholder"
-                    defaultValue={config.launcherPlaceholder}
+                    value={values.launcherPlaceholder}
+                    onChange={setField("launcherPlaceholder")}
                     autoComplete="off"
                     helpText="Text shown in the search-bar launcher"
                   />
                   <TextField
                     label="Chat Input Placeholder"
-                    name="inputPlaceholder"
-                    defaultValue={config.inputPlaceholder}
+                    value={values.inputPlaceholder}
+                    onChange={setField("inputPlaceholder")}
                     autoComplete="off"
                     helpText="Text shown in the message input field"
                   />
@@ -117,18 +109,18 @@ export default function Greetings() {
                   {[1, 2, 3, 4].map((n) => (
                     <BlockStack gap="200" key={n}>
                       <Text as="h3" variant="headingSm">CTA {n}</Text>
-                      <InlineGrid columns={2} gap="400">
+                      <InlineGrid columns={{ xs: 1, sm: 2 }} gap="400">
                         <TextField
                           label="Button Label"
-                          name={`cta${n}Label`}
-                          defaultValue={config[`cta${n}Label`]}
+                          value={values[`cta${n}Label`]}
+                          onChange={setField(`cta${n}Label`)}
                           autoComplete="off"
                           placeholder="e.g. Women's Shoes"
                         />
                         <TextField
                           label="Message Sent"
-                          name={`cta${n}Message`}
-                          defaultValue={config[`cta${n}Message`]}
+                          value={values[`cta${n}Message`]}
+                          onChange={setField(`cta${n}Message`)}
                           autoComplete="off"
                           placeholder="e.g. Show me women's shoes"
                         />
@@ -146,17 +138,17 @@ export default function Greetings() {
               <Card>
                 <BlockStack gap="500">
                   {[1, 2, 3, 4].map((n) => (
-                    <InlineGrid columns={2} gap="400" key={n}>
+                    <InlineGrid columns={{ xs: 1, sm: 2 }} gap="400" key={n}>
                       <TextField
                         label={`Quick Pick ${n} Label`}
-                        name={`qp${n}Label`}
-                        defaultValue={config[`qp${n}Label`]}
+                        value={values[`qp${n}Label`]}
+                        onChange={setField(`qp${n}Label`)}
                         autoComplete="off"
                       />
                       <TextField
                         label={`Quick Pick ${n} Message`}
-                        name={`qp${n}Message`}
-                        defaultValue={config[`qp${n}Message`]}
+                        value={values[`qp${n}Message`]}
+                        onChange={setField(`qp${n}Message`)}
                         autoComplete="off"
                       />
                     </InlineGrid>
@@ -173,27 +165,31 @@ export default function Greetings() {
                 <BlockStack gap="400">
                   <TextField
                     label="CTA Hint Text"
-                    name="ctaHint"
-                    defaultValue={config.ctaHint}
+                    value={values.ctaHint}
+                    onChange={setField("ctaHint")}
                     autoComplete="off"
                     helpText="Optional hint shown below CTAs"
                   />
                   <TextField
                     label="Disclaimer Text"
-                    name="disclaimerText"
-                    defaultValue={config.disclaimerText}
+                    value={values.disclaimerText}
+                    onChange={setField("disclaimerText")}
                     autoComplete="off"
                   />
                   <TextField
                     label="Privacy Policy URL"
-                    name="privacyUrl"
-                    defaultValue={config.privacyUrl}
+                    value={values.privacyUrl}
+                    onChange={setField("privacyUrl")}
                     autoComplete="off"
                   />
                 </BlockStack>
               </Card>
             </Layout.AnnotatedSection>
           </Layout>
+
+          {FIELD_KEYS.map((k) => (
+            <input key={k} type="hidden" name={k} value={values[k]} />
+          ))}
 
           <Box paddingBlockEnd="800">
             <Button variant="primary" submit loading={saving}>

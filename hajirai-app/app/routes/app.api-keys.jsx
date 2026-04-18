@@ -1,5 +1,6 @@
 import { useLoaderData, useActionData, useNavigation, Form } from "react-router";
-import { Page, Layout, Card, BlockStack, TextField, Select, Button, Banner, Text, Box, Link } from "@shopify/polaris";
+import { useState } from "react";
+import { Page, Layout, Card, BlockStack, TextField, Select, Button, Banner, Box } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import { getShopConfig, updateShopConfig } from "../models/ShopConfig.server";
@@ -58,6 +59,12 @@ export default function ApiKeys() {
   const nav = useNavigation();
   const saving = nav.state === "submitting";
 
+  const [anthropicKey, setAnthropicKey] = useState("");
+  const [model, setModel] = useState(anthropicModel || "claude-sonnet-4-20250514");
+  const [chatUrl, setChatUrl] = useState(chatServerUrl || "");
+  const [yotpoKey, setYotpoKey] = useState("");
+  const [aftershipKey, setAftershipKey] = useState("");
+
   return (
     <Page title="API Keys" backAction={{ url: "/app" }}>
       <TitleBar title="API Keys" />
@@ -79,21 +86,22 @@ export default function ApiKeys() {
                   </Banner>
                   <TextField
                     label="Anthropic API Key"
-                    name="anthropicApiKey"
                     type="password"
+                    value={anthropicKey}
+                    onChange={setAnthropicKey}
                     placeholder={hasAnthropicKey ? "••••••••••••••••" : "sk-ant-api03-..."}
                     autoComplete="off"
                     helpText="Your key is encrypted and stored securely. Leave blank to keep the existing key."
                   />
                   <Select
                     label="Claude Model"
-                    name="anthropicModel"
                     options={[
                       { label: "Claude Sonnet 4 (recommended)", value: "claude-sonnet-4-20250514" },
                       { label: "Claude Haiku 4.5 (faster, cheaper)", value: "claude-haiku-4-5-20251001" },
                       { label: "Claude Opus 4 (most capable)", value: "claude-opus-4-20250514" },
                     ]}
-                    value={anthropicModel}
+                    value={model}
+                    onChange={setModel}
                   />
                 </BlockStack>
               </Card>
@@ -107,8 +115,8 @@ export default function ApiKeys() {
                 <BlockStack gap="400">
                   <TextField
                     label="Chat Server URL"
-                    name="chatServerUrl"
-                    defaultValue={chatServerUrl}
+                    value={chatUrl}
+                    onChange={setChatUrl}
                     autoComplete="off"
                     placeholder="https://your-server.railway.app"
                     helpText="Your Express.js chat server URL (deployed on Railway, Fly.io, etc.)"
@@ -125,16 +133,18 @@ export default function ApiKeys() {
                 <BlockStack gap="400">
                   <TextField
                     label="Yotpo API Key"
-                    name="yotpoApiKey"
                     type="password"
+                    value={yotpoKey}
+                    onChange={setYotpoKey}
                     placeholder={hasYotpoKey ? "••••••••••••••••" : "Optional — for product reviews"}
                     autoComplete="off"
                     helpText="Enables the AI to reference product reviews and sizing feedback"
                   />
                   <TextField
                     label="Aftership API Key"
-                    name="aftershipApiKey"
                     type="password"
+                    value={aftershipKey}
+                    onChange={setAftershipKey}
                     placeholder={hasAftershipKey ? "••••••••••••••••" : "Optional — for return/fit data"}
                     autoComplete="off"
                     helpText="Enables fit intelligence from return reason data"
@@ -143,6 +153,12 @@ export default function ApiKeys() {
               </Card>
             </Layout.AnnotatedSection>
           </Layout>
+
+          <input type="hidden" name="anthropicApiKey" value={anthropicKey} />
+          <input type="hidden" name="anthropicModel" value={model} />
+          <input type="hidden" name="chatServerUrl" value={chatUrl} />
+          <input type="hidden" name="yotpoApiKey" value={yotpoKey} />
+          <input type="hidden" name="aftershipApiKey" value={aftershipKey} />
 
           <Box paddingBlockEnd="800">
             <Button variant="primary" submit loading={saving}>

@@ -1,5 +1,21 @@
-import { useLoaderData, useActionData, useNavigation, Form } from "react-router";
-import { Page, Layout, Card, BlockStack, TextField, Select, Checkbox, Button, Banner, Text, Box, InlineGrid } from "@shopify/polaris";
+import { useLoaderData, useActionData, useNavigation, Form, useFetcher } from "react-router";
+import { useEffect, useRef, useState } from "react";
+import {
+  Page,
+  Layout,
+  Card,
+  BlockStack,
+  InlineStack,
+  TextField,
+  Select,
+  Checkbox,
+  Button,
+  Banner,
+  Text,
+  Box,
+  InlineGrid,
+  Thumbnail,
+} from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import { getShopConfig, updateShopConfig } from "../models/ShopConfig.server";
@@ -33,11 +49,145 @@ export const action = async ({ request }) => {
   return { success: true };
 };
 
+function ColorField({ label, value, onChange, helpText }) {
+  const safe = /^#[0-9a-fA-F]{6}$/.test(value) ? value : "#000000";
+  return (
+    <BlockStack gap="100">
+      <Text as="span" variant="bodyMd">{label}</Text>
+      <InlineStack gap="200" blockAlign="center" wrap={false}>
+        <input
+          type="color"
+          value={safe}
+          onChange={(e) => onChange(e.target.value)}
+          aria-label={`${label} swatch`}
+          style={{
+            width: 40,
+            height: 36,
+            padding: 2,
+            border: "1px solid var(--p-color-border)",
+            borderRadius: 8,
+            background: "transparent",
+            cursor: "pointer",
+            flex: "0 0 auto",
+          }}
+        />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <TextField
+            label={label}
+            labelHidden
+            value={value}
+            onChange={onChange}
+            autoComplete="off"
+            helpText={helpText}
+          />
+        </div>
+      </InlineStack>
+    </BlockStack>
+  );
+}
+
+function ImageField({ label, helpText, value, onChange }) {
+  const fetcher = useFetcher();
+  const fileRef = useRef(null);
+  const uploading = fetcher.state !== "idle";
+
+  useEffect(() => {
+    if (fetcher.data?.url) onChange(fetcher.data.url);
+  }, [fetcher.data]);
+
+  const handleFile = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const fd = new FormData();
+    fd.append("file", file);
+    fetcher.submit(fd, {
+      method: "post",
+      action: "/app/upload-image",
+      encType: "multipart/form-data",
+    });
+    e.target.value = "";
+  };
+
+  return (
+    <BlockStack gap="200">
+      <Text as="span" variant="bodyMd" fontWeight="medium">{label}</Text>
+      <InlineStack gap="400" blockAlign="center" wrap={false}>
+        {value ? (
+          <Thumbnail source={value} alt={label} size="large" />
+        ) : (
+          <div
+            style={{
+              width: 60,
+              height: 60,
+              border: "1px dashed var(--p-color-border)",
+              borderRadius: 8,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "var(--p-color-text-subdued)",
+              fontSize: 12,
+              background: "var(--p-color-bg-surface-secondary)",
+            }}
+          >
+            No image
+          </div>
+        )}
+        <BlockStack gap="100">
+          <InlineStack gap="200">
+            <Button onClick={() => fileRef.current?.click()} loading={uploading}>
+              {value ? "Change image" : "Upload image"}
+            </Button>
+            {value && (
+              <Button variant="tertiary" tone="critical" onClick={() => onChange("")}>
+                Remove
+              </Button>
+            )}
+          </InlineStack>
+          {fetcher.data?.error && (
+            <Text as="span" tone="critical" variant="bodySm">
+              {fetcher.data.error}
+            </Text>
+          )}
+        </BlockStack>
+      </InlineStack>
+      <TextField
+        label="Image URL"
+        labelHidden
+        value={value}
+        onChange={onChange}
+        autoComplete="off"
+        placeholder="Or paste an image URL"
+        helpText={helpText}
+      />
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        style={{ display: "none" }}
+        onChange={handleFile}
+      />
+    </BlockStack>
+  );
+}
+
 export default function Branding() {
   const { config } = useLoaderData();
   const actionData = useActionData();
   const nav = useNavigation();
-  const saving = nav.state === "submitting";
+  const saving = nav.state === "submitting" && nav.formMethod?.toUpperCase() === "POST";
+
+  const [assistantName, setAssistantName] = useState(config.assistantName || "");
+  const [assistantTagline, setAssistantTagline] = useState(config.assistantTagline || "");
+  const [avatarUrl, setAvatarUrl] = useState(config.avatarUrl || "");
+  const [bannerUrl, setBannerUrl] = useState(config.bannerUrl || "");
+  const [showBanner, setShowBanner] = useState(Boolean(config.showBanner));
+  const [colorPrimary, setColorPrimary] = useState(config.colorPrimary || "#2d6b4f");
+  const [colorAccent, setColorAccent] = useState(config.colorAccent || "#3a7d5c");
+  const [colorCtaBg, setColorCtaBg] = useState(config.colorCtaBg || "#e8f5ee");
+  const [colorCtaText, setColorCtaText] = useState(config.colorCtaText || "#2d6b4f");
+  const [colorCtaHover, setColorCtaHover] = useState(config.colorCtaHover || "#d4ebdb");
+  const [widgetPosition, setWidgetPosition] = useState(config.widgetPosition || "bottom-center");
+  const [launcherWidth, setLauncherWidth] = useState(config.launcherWidth || "500");
 
   return (
     <Page title="Branding" backAction={{ url: "/app" }}>
@@ -57,14 +207,14 @@ export default function Branding() {
                 <BlockStack gap="400">
                   <TextField
                     label="Assistant Name"
-                    name="assistantName"
-                    defaultValue={config.assistantName}
+                    value={assistantName}
+                    onChange={setAssistantName}
                     autoComplete="off"
                   />
                   <TextField
                     label="Tagline"
-                    name="assistantTagline"
-                    defaultValue={config.assistantTagline}
+                    value={assistantTagline}
+                    onChange={setAssistantTagline}
                     autoComplete="off"
                     helpText="Appears below the name in the chat header"
                   />
@@ -77,26 +227,23 @@ export default function Branding() {
               description="Avatar and banner images for the chat widget."
             >
               <Card>
-                <BlockStack gap="400">
-                  <TextField
-                    label="Avatar Image URL"
-                    name="avatarUrl"
-                    defaultValue={config.avatarUrl}
-                    autoComplete="off"
-                    helpText="Square image, at least 200x200px. Use a CDN URL."
+                <BlockStack gap="500">
+                  <ImageField
+                    label="Avatar Image"
+                    value={avatarUrl}
+                    onChange={setAvatarUrl}
+                    helpText="Square image, at least 200×200px. Upload or paste a CDN URL."
                   />
-                  <TextField
-                    label="Banner Image URL"
-                    name="bannerUrl"
-                    defaultValue={config.bannerUrl}
-                    autoComplete="off"
+                  <ImageField
+                    label="Banner Image"
+                    value={bannerUrl}
+                    onChange={setBannerUrl}
                     helpText="Wide image shown at the top of the welcome screen."
                   />
                   <Checkbox
                     label="Show banner on welcome screen"
-                    name="showBanner"
-                    value="true"
-                    defaultChecked={config.showBanner}
+                    checked={showBanner}
+                    onChange={setShowBanner}
                   />
                 </BlockStack>
               </Card>
@@ -108,40 +255,35 @@ export default function Branding() {
             >
               <Card>
                 <BlockStack gap="400">
-                  <InlineGrid columns={2} gap="400">
-                    <TextField
+                  <InlineGrid columns={{ xs: 1, sm: 2 }} gap="400">
+                    <ColorField
                       label="Primary Color"
-                      name="colorPrimary"
-                      defaultValue={config.colorPrimary}
-                      autoComplete="off"
-                      helpText="Main brand color (hex)"
+                      value={colorPrimary}
+                      onChange={setColorPrimary}
+                      helpText="Main brand color"
                     />
-                    <TextField
+                    <ColorField
                       label="Accent Color"
-                      name="colorAccent"
-                      defaultValue={config.colorAccent}
-                      autoComplete="off"
-                      helpText="Secondary color (hex)"
+                      value={colorAccent}
+                      onChange={setColorAccent}
+                      helpText="Secondary color"
                     />
                   </InlineGrid>
-                  <InlineGrid columns={3} gap="400">
-                    <TextField
+                  <InlineGrid columns={{ xs: 1, sm: 3 }} gap="400">
+                    <ColorField
                       label="CTA Background"
-                      name="colorCtaBg"
-                      defaultValue={config.colorCtaBg}
-                      autoComplete="off"
+                      value={colorCtaBg}
+                      onChange={setColorCtaBg}
                     />
-                    <TextField
+                    <ColorField
                       label="CTA Text"
-                      name="colorCtaText"
-                      defaultValue={config.colorCtaText}
-                      autoComplete="off"
+                      value={colorCtaText}
+                      onChange={setColorCtaText}
                     />
-                    <TextField
+                    <ColorField
                       label="CTA Hover"
-                      name="colorCtaHover"
-                      defaultValue={config.colorCtaHover}
-                      autoComplete="off"
+                      value={colorCtaHover}
+                      onChange={setColorCtaHover}
                     />
                   </InlineGrid>
                 </BlockStack>
@@ -156,18 +298,18 @@ export default function Branding() {
                 <BlockStack gap="400">
                   <Select
                     label="Widget Position"
-                    name="widgetPosition"
                     options={[
                       { label: "Bottom Center", value: "bottom-center" },
                       { label: "Bottom Left", value: "bottom-left" },
                       { label: "Bottom Right", value: "bottom-right" },
                     ]}
-                    defaultValue={config.widgetPosition}
+                    value={widgetPosition}
+                    onChange={setWidgetPosition}
                   />
                   <TextField
                     label="Launcher Width (px)"
-                    name="launcherWidth"
-                    defaultValue={config.launcherWidth}
+                    value={launcherWidth}
+                    onChange={setLauncherWidth}
                     autoComplete="off"
                     type="number"
                   />
@@ -175,6 +317,19 @@ export default function Branding() {
               </Card>
             </Layout.AnnotatedSection>
           </Layout>
+
+          <input type="hidden" name="assistantName" value={assistantName} />
+          <input type="hidden" name="assistantTagline" value={assistantTagline} />
+          <input type="hidden" name="avatarUrl" value={avatarUrl} />
+          <input type="hidden" name="bannerUrl" value={bannerUrl} />
+          <input type="hidden" name="showBanner" value={showBanner ? "true" : "false"} />
+          <input type="hidden" name="colorPrimary" value={colorPrimary} />
+          <input type="hidden" name="colorAccent" value={colorAccent} />
+          <input type="hidden" name="colorCtaBg" value={colorCtaBg} />
+          <input type="hidden" name="colorCtaText" value={colorCtaText} />
+          <input type="hidden" name="colorCtaHover" value={colorCtaHover} />
+          <input type="hidden" name="widgetPosition" value={widgetPosition} />
+          <input type="hidden" name="launcherWidth" value={launcherWidth} />
 
           <Box paddingBlockEnd="800">
             <Button variant="primary" submit loading={saving}>
