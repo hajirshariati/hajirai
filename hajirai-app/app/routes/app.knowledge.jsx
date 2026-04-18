@@ -1,6 +1,29 @@
 import { useState } from "react";
 import { useLoaderData, useActionData, useNavigation, useSubmit } from "react-router";
-import { Page, Layout, Card, BlockStack, Text, Button, Banner, Box, DataTable, DropZone, InlineStack, Modal, Select, Thumbnail } from "@shopify/polaris";
+import {
+  Page,
+  Layout,
+  Card,
+  BlockStack,
+  InlineStack,
+  Text,
+  Button,
+  Banner,
+  Box,
+  DataTable,
+  DropZone,
+  Select,
+  Icon,
+  Badge,
+  Divider,
+  EmptyState,
+} from "@shopify/polaris";
+import {
+  ConnectIcon,
+  FileIcon,
+  InfoIcon,
+  DeleteIcon,
+} from "@shopify/polaris-icons";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import { getKnowledgeFiles, saveKnowledgeFile, deleteKnowledgeFile } from "../models/ShopConfig.server";
@@ -39,6 +62,13 @@ export const action = async ({ request }) => {
   return { error: "Unknown action" };
 };
 
+const FILE_TYPES = [
+  { label: "FAQs & Policies", value: "faqs", description: "Shipping, returns, warranty, common customer questions." },
+  { label: "Brand / About", value: "brand", description: "Your story, values, voice, and tone." },
+  { label: "Product Details", value: "products", description: "Extra product info — materials, care, sizing charts." },
+  { label: "Custom Knowledge", value: "custom", description: "Anything else the AI should know." },
+];
+
 export default function Knowledge() {
   const { files } = useLoaderData();
   const actionData = useActionData();
@@ -48,13 +78,6 @@ export default function Knowledge() {
 
   const [selectedType, setSelectedType] = useState("faqs");
   const [uploadFile, setUploadFile] = useState(null);
-
-  const fileTypes = [
-    { label: "FAQs & Policies", value: "faqs" },
-    { label: "Brand / About", value: "brand" },
-    { label: "Product Details", value: "products" },
-    { label: "Custom Knowledge", value: "custom" },
-  ];
 
   function handleDropAccepted(droppedFiles) {
     const file = droppedFiles[0];
@@ -92,23 +115,33 @@ export default function Knowledge() {
   }
 
   const rows = files.map((f) => [
-    f.fileName,
-    fileTypes.find((t) => t.value === f.fileType)?.label || f.fileType,
+    <InlineStack gap="200" blockAlign="center">
+      <Icon source={FileIcon} tone="subdued" />
+      <Text as="span" variant="bodyMd">{f.fileName}</Text>
+    </InlineStack>,
+    <Badge>{FILE_TYPES.find((t) => t.value === f.fileType)?.label || f.fileType}</Badge>,
     formatSize(f.fileSize),
     new Date(f.updatedAt).toLocaleDateString(),
-    <Button tone="critical" variant="plain" onClick={() => handleDelete(f.id)}>Delete</Button>,
+    <Button
+      icon={DeleteIcon}
+      tone="critical"
+      variant="plain"
+      onClick={() => handleDelete(f.id)}
+      accessibilityLabel="Delete file"
+    />,
   ]);
+
+  const currentType = FILE_TYPES.find((t) => t.value === selectedType);
 
   return (
     <Page title="Knowledge Base" backAction={{ url: "/app" }}>
       <TitleBar title="Knowledge Base" />
       <BlockStack gap="500">
-        <Banner title="Your store is already connected" tone="info">
+        <Banner title="Your Shopify store is already connected" tone="info" icon={ConnectIcon}>
           <Text as="p">
-            The assistant has live access to your Shopify store — products, collections, pages,
-            and policies are automatically available via the Shopify API. Use this page only to
-            add <strong>extra</strong> knowledge the AI should know beyond what's in your store
-            (FAQs, brand voice, detailed product guides, etc.).
+            The assistant has live access to your products, collections, pages, and policies via
+            the Shopify API. Use this page only to upload <strong>extra</strong> context beyond
+            what's already in your store — FAQs, brand voice, sizing guides, and more.
           </Text>
         </Banner>
 
@@ -121,16 +154,17 @@ export default function Knowledge() {
 
         <Layout>
           <Layout.AnnotatedSection
-            title="Upload Extra Knowledge"
-            description="Upload CSV or plain text files with additional context for the AI. Each category keeps one active file — uploading a new one replaces the previous."
+            title="Upload extra knowledge"
+            description="Upload CSV or plain-text files with additional context for the AI. Each category keeps one active file — uploading a new file replaces the previous."
           >
             <Card>
               <BlockStack gap="400">
                 <Select
-                  label="File Type"
-                  options={fileTypes}
+                  label="Category"
+                  options={FILE_TYPES.map((t) => ({ label: t.label, value: t.value }))}
                   value={selectedType}
                   onChange={setSelectedType}
+                  helpText={currentType?.description}
                 />
                 <DropZone
                   accept=".csv,.txt"
@@ -140,10 +174,13 @@ export default function Knowledge() {
                 >
                   {uploadFile ? (
                     <Box padding="400">
-                      <BlockStack gap="200">
-                        <Text as="p" variant="bodyMd">{uploadFile.name}</Text>
-                        <Text as="p" tone="subdued">{formatSize(uploadFile.size)}</Text>
-                      </BlockStack>
+                      <InlineStack gap="300" blockAlign="center">
+                        <Icon source={FileIcon} tone="base" />
+                        <BlockStack gap="050">
+                          <Text as="p" variant="bodyMd" fontWeight="semibold">{uploadFile.name}</Text>
+                          <Text as="p" tone="subdued" variant="bodySm">{formatSize(uploadFile.size)}</Text>
+                        </BlockStack>
+                      </InlineStack>
                     </Box>
                   ) : (
                     <DropZone.FileUpload actionHint="Accepts .csv and .txt files" />
@@ -152,7 +189,7 @@ export default function Knowledge() {
                 {uploadFile && (
                   <InlineStack gap="300">
                     <Button variant="primary" onClick={handleUpload} loading={saving}>
-                      Upload {fileTypes.find((t) => t.value === selectedType)?.label}
+                      Upload as {currentType?.label}
                     </Button>
                     <Button onClick={() => setUploadFile(null)}>Cancel</Button>
                   </InlineStack>
@@ -162,18 +199,21 @@ export default function Knowledge() {
           </Layout.AnnotatedSection>
 
           <Layout.AnnotatedSection
-            title="Uploaded Files"
-            description="These files are used by the AI to answer customer questions about your products."
+            title="Uploaded files"
+            description="These files are sent to the AI alongside Shopify store data when answering customer questions."
           >
-            <Card>
+            <Card padding="0">
               {files.length === 0 ? (
-                <Box padding="400">
-                  <Text as="p" tone="subdued">No files uploaded yet. Upload a CSV to get started.</Text>
-                </Box>
+                <EmptyState heading="No extra knowledge yet" image="">
+                  <Text as="p" tone="subdued">
+                    Upload a CSV or text file on the left to enrich the AI with your
+                    unique store content.
+                  </Text>
+                </EmptyState>
               ) : (
                 <DataTable
                   columnContentTypes={["text", "text", "text", "text", "text"]}
-                  headings={["File Name", "Type", "Size", "Updated", ""]}
+                  headings={["File", "Category", "Size", "Updated", ""]}
                   rows={rows}
                 />
               )}
@@ -181,21 +221,28 @@ export default function Knowledge() {
           </Layout.AnnotatedSection>
         </Layout>
 
+        <Divider />
+
         <Card>
-          <BlockStack gap="300">
-            <Text as="h2" variant="headingMd">What to upload</Text>
-            <Text as="p" variant="bodySm" tone="subdued">
-              <strong>FAQs & Policies</strong> — shipping, returns, warranty, common questions. Plain text (.txt) or CSV with columns: question, answer.
-            </Text>
-            <Text as="p" variant="bodySm" tone="subdued">
-              <strong>Brand / About</strong> — your story, values, voice, and tone. Plain text (.txt).
-            </Text>
-            <Text as="p" variant="bodySm" tone="subdued">
-              <strong>Product Details</strong> — extra product info beyond what's in Shopify (materials, care, sizing charts). CSV with columns: product_title, details.
-            </Text>
-            <Text as="p" variant="bodySm" tone="subdued">
-              <strong>Custom Knowledge</strong> — free-form text for anything else the AI should know.
-            </Text>
+          <BlockStack gap="400">
+            <InlineStack gap="200" blockAlign="center">
+              <Icon source={InfoIcon} tone="base" />
+              <Text as="h2" variant="headingMd">What to upload</Text>
+            </InlineStack>
+            <BlockStack gap="300">
+              {FILE_TYPES.map((t) => (
+                <BlockStack key={t.value} gap="100">
+                  <Text as="h3" variant="headingSm">{t.label}</Text>
+                  <Text as="p" variant="bodySm" tone="subdued">{t.description}</Text>
+                </BlockStack>
+              ))}
+              <Divider />
+              <Text as="p" variant="bodySm" tone="subdued">
+                <strong>Format tip:</strong> For CSVs, include headers like{" "}
+                <code>question, answer</code> for FAQs or{" "}
+                <code>product_title, details</code> for product data. Plain text works for any category.
+              </Text>
+            </BlockStack>
           </BlockStack>
         </Card>
       </BlockStack>

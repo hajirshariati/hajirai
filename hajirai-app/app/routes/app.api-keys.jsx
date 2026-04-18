@@ -1,6 +1,22 @@
 import { useLoaderData, useActionData, useNavigation, Form } from "react-router";
 import { useState } from "react";
-import { Page, Layout, Card, BlockStack, TextField, Select, Button, Banner, Box } from "@shopify/polaris";
+import {
+  Page,
+  Layout,
+  Card,
+  BlockStack,
+  InlineStack,
+  TextField,
+  Select,
+  Button,
+  Banner,
+  Box,
+  Text,
+  Icon,
+  Badge,
+  Divider,
+} from "@shopify/polaris";
+import { KeyIcon, CheckCircleIcon, AlertTriangleIcon } from "@shopify/polaris-icons";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import { getShopConfig, updateShopConfig } from "../models/ShopConfig.server";
@@ -47,6 +63,20 @@ export const action = async ({ request }) => {
   return { success: true };
 };
 
+function ConnectionStatus({ connected }) {
+  return connected ? (
+    <InlineStack gap="150" blockAlign="center">
+      <Icon source={CheckCircleIcon} tone="success" />
+      <Text as="span" variant="bodySm" tone="success">Connected</Text>
+    </InlineStack>
+  ) : (
+    <InlineStack gap="150" blockAlign="center">
+      <Icon source={AlertTriangleIcon} tone="caution" />
+      <Text as="span" variant="bodySm" tone="caution">Not configured</Text>
+    </InlineStack>
+  );
+}
+
 export default function ApiKeys() {
   const { hasAnthropicKey, anthropicModel, hasYotpoKey, hasAftershipKey } = useLoaderData();
   const actionData = useActionData();
@@ -69,61 +99,104 @@ export default function ApiKeys() {
 
           <Layout>
             <Layout.AnnotatedSection
-              title="Anthropic API Key"
-              description="Required. Powers the AI chat assistant. Get your key from console.anthropic.com"
+              title="Anthropic (required)"
+              description={
+                <BlockStack gap="200">
+                  <Text as="p" tone="subdued" variant="bodySm">
+                    Powers the AI chat assistant. Without this key, the widget won't respond to customers.
+                  </Text>
+                  <Text as="p" tone="subdued" variant="bodySm">
+                    Get your key from{" "}
+                    <a href="https://console.anthropic.com" target="_blank" rel="noreferrer">
+                      console.anthropic.com
+                    </a>
+                    .
+                  </Text>
+                </BlockStack>
+              }
             >
               <Card>
                 <BlockStack gap="400">
-                  <Banner tone={hasAnthropicKey ? "success" : "warning"}>
-                    <p>{hasAnthropicKey ? "API key is configured" : "No API key set — the chat assistant won't work until you add one"}</p>
-                  </Banner>
+                  <InlineStack align="space-between" blockAlign="center">
+                    <InlineStack gap="200" blockAlign="center">
+                      <Icon source={KeyIcon} tone="base" />
+                      <Text as="h3" variant="headingSm">Anthropic API Key</Text>
+                    </InlineStack>
+                    <ConnectionStatus connected={hasAnthropicKey} />
+                  </InlineStack>
+
                   <TextField
-                    label="Anthropic API Key"
+                    label="API key"
                     type="password"
                     value={anthropicKey}
                     onChange={setAnthropicKey}
                     placeholder={hasAnthropicKey ? "••••••••••••••••" : "sk-ant-api03-..."}
                     autoComplete="off"
-                    helpText="Your key is encrypted and stored securely. Leave blank to keep the existing key."
+                    helpText="Encrypted at rest. Leave blank to keep your existing key."
                   />
+
+                  <Divider />
+
                   <Select
-                    label="Claude Model"
+                    label="Claude model"
                     options={[
-                      { label: "Claude Sonnet 4 (recommended)", value: "claude-sonnet-4-20250514" },
-                      { label: "Claude Haiku 4.5 (faster, cheaper)", value: "claude-haiku-4-5-20251001" },
-                      { label: "Claude Opus 4 (most capable)", value: "claude-opus-4-20250514" },
+                      { label: "Claude Sonnet 4 — recommended", value: "claude-sonnet-4-20250514" },
+                      { label: "Claude Haiku 4.5 — faster, cheaper", value: "claude-haiku-4-5-20251001" },
+                      { label: "Claude Opus 4 — most capable", value: "claude-opus-4-20250514" },
                     ]}
                     value={model}
                     onChange={setModel}
+                    helpText="Sonnet is the sweet spot of quality, speed, and cost."
                   />
                 </BlockStack>
               </Card>
             </Layout.AnnotatedSection>
 
             <Layout.AnnotatedSection
-              title="Integrations (Optional)"
-              description="Connect third-party services for enhanced features like product reviews and return data."
+              title="Integrations (optional)"
+              description="Connect third-party services to unlock richer context — product reviews, sizing feedback, and return-reason data."
             >
               <Card>
-                <BlockStack gap="400">
-                  <TextField
-                    label="Yotpo API Key"
-                    type="password"
-                    value={yotpoKey}
-                    onChange={setYotpoKey}
-                    placeholder={hasYotpoKey ? "••••••••••••••••" : "Optional — for product reviews"}
-                    autoComplete="off"
-                    helpText="Enables the AI to reference product reviews and sizing feedback"
-                  />
-                  <TextField
-                    label="Aftership API Key"
-                    type="password"
-                    value={aftershipKey}
-                    onChange={setAftershipKey}
-                    placeholder={hasAftershipKey ? "••••••••••••••••" : "Optional — for return/fit data"}
-                    autoComplete="off"
-                    helpText="Enables fit intelligence from return reason data"
-                  />
+                <BlockStack gap="500">
+                  <BlockStack gap="300">
+                    <InlineStack align="space-between" blockAlign="center">
+                      <Text as="h3" variant="headingSm">Yotpo</Text>
+                      <Badge tone={hasYotpoKey ? "success" : undefined}>
+                        {hasYotpoKey ? "Connected" : "Not set"}
+                      </Badge>
+                    </InlineStack>
+                    <TextField
+                      label="Yotpo API key"
+                      labelHidden
+                      type="password"
+                      value={yotpoKey}
+                      onChange={setYotpoKey}
+                      placeholder={hasYotpoKey ? "••••••••••••••••" : "Paste key to enable"}
+                      autoComplete="off"
+                      helpText="Lets the AI reference product reviews and customer sizing feedback."
+                    />
+                  </BlockStack>
+
+                  <Divider />
+
+                  <BlockStack gap="300">
+                    <InlineStack align="space-between" blockAlign="center">
+                      <Text as="h3" variant="headingSm">Aftership</Text>
+                      <Badge tone={hasAftershipKey ? "success" : undefined}>
+                        {hasAftershipKey ? "Connected" : "Not set"}
+                      </Badge>
+                    </InlineStack>
+                    <TextField
+                      label="Aftership API key"
+                      labelHidden
+                      type="password"
+                      value={aftershipKey}
+                      onChange={setAftershipKey}
+                      placeholder={hasAftershipKey ? "••••••••••••••••" : "Paste key to enable"}
+                      autoComplete="off"
+                      helpText="Enables fit intelligence and sizing guidance from return-reason data."
+                    />
+                  </BlockStack>
                 </BlockStack>
               </Card>
             </Layout.AnnotatedSection>
@@ -135,9 +208,11 @@ export default function ApiKeys() {
           <input type="hidden" name="aftershipApiKey" value={aftershipKey} />
 
           <Box paddingBlockEnd="800">
-            <Button variant="primary" submit loading={saving}>
-              Save API Keys
-            </Button>
+            <InlineStack align="end">
+              <Button variant="primary" submit loading={saving}>
+                Save changes
+              </Button>
+            </InlineStack>
           </Box>
         </BlockStack>
       </Form>
