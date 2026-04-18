@@ -91,6 +91,24 @@ var closeBtn=$('.ai-chat-close-btn',panel);
 var menuBtn=$('.ai-chat-menu-btn',panel);
 
 var isOpen=false,isStreaming=false,messages=loadH(),abortCtrl=null;
+var IDLE_TIMEOUT=5*60*1000;
+var idleTimer=null;
+function resetIdleTimer(){
+  if(idleTimer)clearTimeout(idleTimer);
+  if(!isOpen||messages.length===0)return;
+  idleTimer=setTimeout(showIdleTimeout,IDLE_TIMEOUT);
+}
+function clearIdleTimer(){if(idleTimer){clearTimeout(idleTimer);idleTimer=null}}
+function showIdleTimeout(){
+  if(!isOpen||isStreaming||messages.length===0)return;
+  var txt="It looks like you've been away for a bit. Would you like to continue or start fresh?";
+  messages.push({role:'assistant',content:txt});
+  var md=appendMsg('assistant',txt);
+  var bb=$('.ai-chat-msg-bubble',md);
+  if(bb)bb.insertAdjacentHTML('beforeend','<div class="ai-chat-dead-end"><button class="ai-chat-dead-end__btn ai-chat-dead-end__btn--support" data-dead-end="support">Contact Support Team</button><button class="ai-chat-dead-end__btn ai-chat-dead-end__btn--new" data-dead-end="new-chat">Start a New Chat</button></div>');
+  inputEl.disabled=true;inputEl.placeholder='Choose an option above';sendBtn.disabled=true;
+  saveH(messages);scrollBottom();
+}
 
 function buildWelcome(){
 var h='<div class="ai-chat-welcome">';
@@ -142,12 +160,14 @@ if(isOpen){
   document.body.classList.add('ai-chat-blurred');
   setTimeout(function(){inputEl.focus()},400);
   setTimeout(function(){inputEl.focus()},800);
+  resetIdleTimer();
 }else{
   panel.classList.remove('open');
   overlay.classList.remove('visible');
   launcher.classList.remove('hidden');
   document.body.classList.remove('ai-chat-blurred');
   menu.style.display='none';
+  clearIdleTimer();
 }
 }
 
@@ -191,6 +211,7 @@ inputEl.value='';inputEl.style.height='auto';
 sendBtn.disabled=true;isStreaming=true;
 typingEl.classList.add('visible');
 scrollBottom();
+resetIdleTimer();
 streamResponse(text);
 }
 
@@ -294,6 +315,7 @@ isStreaming=false;sendBtn.disabled=false;
 
 function finish(text,prods){
 typingEl.classList.remove('visible');isStreaming=false;sendBtn.disabled=false;
+resetIdleTimer();
 if(text){messages.push({role:'assistant',content:text,products:prods||[]});saveH(messages)}
 var lastMsg=msgsEl.querySelector('.ai-chat-msg--assistant:last-child');
 if(prods&&prods.length>0&&lastMsg){
@@ -319,6 +341,7 @@ messages=[];localStorage.removeItem(HK);localStorage.removeItem(SK);
 msgsEl.innerHTML='';buildWelcome();
 if(abortCtrl){abortCtrl.abort();abortCtrl=null}
 isStreaming=false;sendBtn.disabled=false;typingEl.classList.remove('visible');
+clearIdleTimer();
 }
 
 /* Events */
