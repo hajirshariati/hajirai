@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:dev.sqlite"
+}
+
+model Session {
+  id            String    @id
+  shop          String
+  state         String
+  isOnline      Boolean   @default(false)
+  scope         String?
+  expires       DateTime?
+  accessToken   String
+  userId        BigInt?
+  firstName     String?
+  lastName      String?
+  email         String?
+  accountOwner  Boolean   @default(false)
+  locale        String?
+  collaborator  Boolean?  @default(false)
+  emailVerified Boolean?  @default(false)
+}
+
+model ShopConfig {
+  id                  String   @id @default(cuid())
+  shop                String   @unique
+
+  assistantName       String   @default("AI Shopping Assistant")
+  assistantTagline    String   @default("Smart Support for Every Step")
+  greeting            String   @default("Hi! I'm your personal shopping assistant.")
+  greetingCta         String   @default("What can I help you find today?")
+  avatarUrl           String   @default("")
+  bannerUrl           String   @default("")
+  colorPrimary        String   @default("#2d6b4f")
+  colorAccent         String   @default("#e8f5ee")
+  colorCtaBg          String   @default("#e8f5ee")
+  colorCtaText        String   @default("#2d6b4f")
+  colorCtaHover       String   @default("#d6eee0")
+
+  launcherPlaceholder String   @default("How can I help you today?")
+  inputPlaceholder    String   @default("How can I help you today?")
+  launcherWidth       String   @default("500")
+  widgetPosition      String   @default("bottom-center")
+  showBanner          Boolean  @default(true)
+
+  cta1Label           String   @default("")
+  cta1Message         String   @default("")
+  cta2Label           String   @default("")
+  cta2Message         String   @default("")
+  cta3Label           String   @default("")
+  cta3Message         String   @default("")
+  cta4Label           String   @default("")
+  cta4Message         String   @default("")
+
+  qp1Label            String   @default("")
+  qp1Message          String   @default("")
+  qp2Label            String   @default("")
+  qp2Message          String   @default("")
+  qp3Label            String   @default("")
+  qp3Message          String   @default("")
+  qp4Label            String   @default("")
+  qp4Message          String   @default("")
+
+  ctaHint             String   @default("")
+  disclaimerText      String   @default("Powered by AI")
+  privacyUrl          String   @default("/pages/privacy-policy")
+
+  anthropicApiKey     String   @default("")
+  anthropicModel      String   @default("claude-sonnet-4-20250514")
+  yotpoApiKey         String   @default("")
+  aftershipApiKey     String   @default("")
+  chatServerUrl       String   @default("")
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model KnowledgeFile {
+  id        String   @id @default(cuid())
+  shop      String
+  fileName  String
+  fileType  String
+  fileSize  Int
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([shop])
+}
