@@ -92,15 +92,21 @@ var menuBtn=$('.ai-chat-menu-btn',panel);
 
 var isOpen=false,isStreaming=false,messages=loadH(),abortCtrl=null;
 var IDLE_TIMEOUT=5*60*1000;
-var idleTimer=null;
-function resetIdleTimer(){
-  if(idleTimer)clearTimeout(idleTimer);
-  if(!isOpen||messages.length===0)return;
-  idleTimer=setTimeout(showIdleTimeout,IDLE_TIMEOUT);
+var LMK='aetrex_ai_chat_last_msg';
+var idleTimedOut=false;
+function stampLastMsg(){try{localStorage.setItem(LMK,''+Date.now())}catch(e){}}
+function getLastMsg(){try{return parseInt(localStorage.getItem(LMK),10)||0}catch(e){return 0}}
+function clearLastMsg(){try{localStorage.removeItem(LMK)}catch(e){}}
+function checkIdleOnOpen(){
+  if(messages.length===0||idleTimedOut)return;
+  var last=getLastMsg();
+  if(last&&(Date.now()-last)>=IDLE_TIMEOUT){
+    showIdleTimeout();
+  }
 }
-function clearIdleTimer(){if(idleTimer){clearTimeout(idleTimer);idleTimer=null}}
 function showIdleTimeout(){
-  if(!isOpen||isStreaming||messages.length===0)return;
+  if(idleTimedOut||isStreaming||messages.length===0)return;
+  idleTimedOut=true;
   var txt="It looks like you've been away for a bit. Would you like to continue or start fresh?";
   messages.push({role:'assistant',content:txt});
   var md=appendMsg('assistant',txt);
@@ -160,14 +166,13 @@ if(isOpen){
   document.body.classList.add('ai-chat-blurred');
   setTimeout(function(){inputEl.focus()},400);
   setTimeout(function(){inputEl.focus()},800);
-  resetIdleTimer();
+  checkIdleOnOpen();
 }else{
   panel.classList.remove('open');
   overlay.classList.remove('visible');
   launcher.classList.remove('hidden');
   document.body.classList.remove('ai-chat-blurred');
   menu.style.display='none';
-  clearIdleTimer();
 }
 }
 
@@ -211,7 +216,7 @@ inputEl.value='';inputEl.style.height='auto';
 sendBtn.disabled=true;isStreaming=true;
 typingEl.classList.add('visible');
 scrollBottom();
-resetIdleTimer();
+stampLastMsg();
 streamResponse(text);
 }
 
@@ -315,7 +320,6 @@ isStreaming=false;sendBtn.disabled=false;
 
 function finish(text,prods){
 typingEl.classList.remove('visible');isStreaming=false;sendBtn.disabled=false;
-resetIdleTimer();
 if(text){messages.push({role:'assistant',content:text,products:prods||[]});saveH(messages)}
 var lastMsg=msgsEl.querySelector('.ai-chat-msg--assistant:last-child');
 if(prods&&prods.length>0&&lastMsg){
@@ -341,7 +345,7 @@ messages=[];localStorage.removeItem(HK);localStorage.removeItem(SK);
 msgsEl.innerHTML='';buildWelcome();
 if(abortCtrl){abortCtrl.abort();abortCtrl=null}
 isStreaming=false;sendBtn.disabled=false;typingEl.classList.remove('visible');
-clearIdleTimer();
+idleTimedOut=false;clearLastMsg();
 }
 
 /* Events */
