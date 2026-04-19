@@ -1,37 +1,29 @@
-(async function(){
+(function(){
 'use strict';
 
-/* Fetch merchant config from App Proxy and merge over theme defaults.
-   Falls back silently to theme block settings on any failure. */
-try {
-  var res = await fetch('/apps/hajirai/config', {
-    credentials: 'same-origin',
-    headers: { 'Accept': 'application/json' }
-  });
-  if (res.ok) {
-    var merchant = await res.json();
-    var base = window.__AI_CHAT_CONFIG || {};
-    var merged = Object.assign({}, base);
-    for (var k in merchant) {
-      var v = merchant[k];
-      if (v !== null && v !== undefined && v !== '') merged[k] = v;
-    }
-    window.__AI_CHAT_CONFIG = merged;
-  }
-} catch (e) { /* keep theme defaults */ }
-
+/* Visual config comes from theme editor (liquid-injected as window.__AI_CHAT_CONFIG).
+   Chat server URL is handled internally via app proxy at /apps/hajirai/chat. */
 var C=window.__AI_CHAT_CONFIG||{};
 
-var API=C.apiUrl||'';
+/* Apply merchant colors as CSS variables (overrides theme block defaults). */
+var _rootStyle=document.documentElement.style;
+if(C.colorPrimary) _rootStyle.setProperty('--ai-chat-color-primary', C.colorPrimary);
+if(C.colorAccent)  _rootStyle.setProperty('--ai-chat-color-accent',  C.colorAccent);
+if(C.colorCtaBg)   _rootStyle.setProperty('--ai-chat-cta-bg',        C.colorCtaBg);
+if(C.colorCtaText) _rootStyle.setProperty('--ai-chat-cta-text',      C.colorCtaText);
+if(C.colorCtaHover)_rootStyle.setProperty('--ai-chat-cta-hover',     C.colorCtaHover);
+
+var CHAT_URL='/apps/hajirai/chat';
+var FEEDBACK_URL='/apps/hajirai/feedback';
 var SHOP=C.shopDomain||'';
-var GREET=C.greeting||'Hi, I\'m Archie — your personal fit and comfort expert.';
+var GREET=C.greeting||'Hi! I\'m your personal shopping assistant.';
 var GREETCTA=C.greetingCta||'What can I help you find today?';
 var AVATAR=C.avatarUrl||'';
 var BANNER=C.bannerUrl||'';
-var NAME=C.assistantName||'Archie by Aetrex';
-var TAG=C.assistantTagline||'Smart Support for Every Step';
-var LPLACE=C.launcherPlaceholder||'How can Archie help your feet today?';
-var IPLACE=C.inputPlaceholder||'How can Archie help your feet today?';
+var NAME=C.assistantName||'AI Shopping Assistant';
+var TAG=C.assistantTagline||'';
+var LPLACE=C.launcherPlaceholder||'How can I help you today?';
+var IPLACE=C.inputPlaceholder||'How can I help you today?';
 var POS=C.widgetPosition||'bottom-center';
 var CTA1L=C.cta1Label||'';var CTA1M=C.cta1Message||'';
 var CTA2L=C.cta2Label||'';var CTA2M=C.cta2Message||'';
@@ -46,14 +38,17 @@ var SHOWBAN=C.showBanner!==false;
 var DISCL=C.disclaimerText||'';
 var PRIVURL=C.privacyUrl||'/pages/privacy-policy';
 var LWIDTH=C.launcherWidth||'500';
-var SK='aetrex_ai_chat_session';
-var HK='aetrex_ai_chat_history';
+var SUPPORT_URL=C.supportUrl||'';
+var SUPPORT_LABEL=C.supportLabel||'Contact customer service';
+var SK='hajirai_chat_session';
+var HK='hajirai_chat_history';
 
 function $(s,c){return(c||document).querySelector(s)}
 function el(t,cl,h){var e=document.createElement(t);if(cl)e.className=cl;if(h)e.innerHTML=h;return e}
 function esc(s){var d=document.createElement('div');d.appendChild(document.createTextNode(s));return d.innerHTML}
 function fmt(c){return'$'+(c/100).toFixed(2)}
-function md(t){if(!t)return'';return t.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/\[([^\]]+)\]\(([^)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>').replace(/^[-*] (.+)$/gm,'<li>$1</li>').replace(/(<li>.*<\/li>)/gs,'<ul>$1</ul>').replace(/\n{2,}/g,'</p><p>').replace(/\n/g,'<br>')}
+function safeUrl(u){var s=String(u||'').trim();return /^(https?:\/\/|\/)/i.test(s)?s.replace(/"/g,'&quot;'):''}
+function md(t){if(!t)return'';return t.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\*(.+?)\*/g,'<em>$1</em>').replace(/\[([^\]]+)\]\(([^)]+)\)/g,function(_,txt,url){var u=safeUrl(url);return u?'<a href="'+u+'" target="_blank" rel="noopener">'+txt+'</a>':txt}).replace(/^[-*] (.+)$/gm,'<li>$1</li>').replace(/(<li>.*<\/li>)/gs,'<ul>$1</ul>').replace(/\n{2,}/g,'</p><p>').replace(/\n/g,'<br>')}
 
 function getSess(){var id=localStorage.getItem(SK);if(!id){id='sess_'+Date.now()+'_'+Math.random().toString(36).slice(2,10);localStorage.setItem(SK,id)}return id}
 function saveH(m){try{localStorage.setItem(HK,JSON.stringify(m.slice(-50)))}catch(e){}}
@@ -113,7 +108,7 @@ var menuBtn=$('.ai-chat-menu-btn',panel);
 
 var isOpen=false,isStreaming=false,messages=loadH(),abortCtrl=null;
 var IDLE_TIMEOUT=5*60*1000;
-var LMK='aetrex_ai_chat_last_msg';
+var LMK='hajirai_chat_last_msg';
 var idleTimedOut=false;
 function stampLastMsg(){try{localStorage.setItem(LMK,''+Date.now())}catch(e){}}
 function getLastMsg(){try{return parseInt(localStorage.getItem(LMK),10)||0}catch(e){return 0}}
@@ -132,7 +127,7 @@ function showIdleTimeout(){
   messages.push({role:'assistant',content:txt});
   var md=appendMsg('assistant',txt);
   var bb=$('.ai-chat-msg-bubble',md);
-  if(bb)bb.insertAdjacentHTML('beforeend','<div class="ai-chat-dead-end"><button class="ai-chat-dead-end__btn ai-chat-dead-end__btn--support" data-dead-end="support">Contact Support Team</button><button class="ai-chat-dead-end__btn ai-chat-dead-end__btn--new" data-dead-end="new-chat">Start a New Chat</button></div>');
+  if(bb)bb.insertAdjacentHTML('beforeend',deadEndHtml());
   inputEl.disabled=true;inputEl.placeholder='Choose an option above';sendBtn.disabled=true;
   saveH(messages);scrollBottom();
 }
@@ -149,10 +144,10 @@ h+='<div class="ai-chat-welcome__name">'+esc(NAME)+'</div>';
 h+='<div class="ai-chat-welcome__tagline">'+esc(GREET)+'</div>';
 if(GREETCTA)h+='<div class="ai-chat-welcome__greeting-cta">'+esc(GREETCTA)+'</div>';
 var ctas=[];
-if(CTA1L&&CTA1M)ctas.push({l:CTA1L,m:CTA1M,icon:'shoe'});
-if(CTA2L&&CTA2M)ctas.push({l:CTA2L,m:CTA2M,icon:'shoe'});
-if(CTA3L&&CTA3M)ctas.push({l:CTA3L,m:CTA3M,icon:'orthotic'});
-if(CTA4L&&CTA4M)ctas.push({l:CTA4L,m:CTA4M,icon:'heart'});
+if(CTA1L&&CTA1M)ctas.push({l:CTA1L,m:CTA1M});
+if(CTA2L&&CTA2M)ctas.push({l:CTA2L,m:CTA2M});
+if(CTA3L&&CTA3M)ctas.push({l:CTA3L,m:CTA3M});
+if(CTA4L&&CTA4M)ctas.push({l:CTA4L,m:CTA4M});
 if(ctas.length){
   h+='<div class="ai-chat-welcome__ctas">';
   for(var i=0;i<ctas.length;i++){
@@ -241,11 +236,29 @@ stampLastMsg();
 streamResponse(text);
 }
 
+function deadEndHtml(){
+var s='<div class="ai-chat-dead-end">';
+s+='<button class="ai-chat-dead-end__btn ai-chat-dead-end__btn--support" data-dead-end="support">'+esc(SUPPORT_LABEL)+'</button>';
+s+='<button class="ai-chat-dead-end__btn ai-chat-dead-end__btn--new" data-dead-end="new-chat">Start a new chat</button>';
+s+='</div>';
+return s;
+}
+
+function showHighTraffic(){
+var em='I\'m experiencing high traffic right now. Please try again in a moment.';
+messages.push({role:'assistant',content:em});
+var md=appendMsg('assistant',em);
+var bb=$('.ai-chat-msg-bubble',md);
+if(bb)bb.insertAdjacentHTML('beforeend',deadEndHtml());
+inputEl.disabled=true;inputEl.placeholder='Choose an option above';sendBtn.disabled=true;
+saveH(messages);
+}
+
 function streamResponse(msg){
 if(abortCtrl)abortCtrl.abort();
 abortCtrl=new AbortController();
 var body={message:msg,session_id:getSess(),shop_domain:SHOP,assistant_name:NAME,history:messages.slice(-20).map(function(m){return{role:m.role,content:m.content}})};
-fetch('/apps/hajirai/chat',{method:'POST',headers:{'Content-Type':'application/json','Accept':'text/event-stream'},body:JSON.stringify(body),signal:abortCtrl.signal}).then(function(r){
+fetch(CHAT_URL,{method:'POST',headers:{'Content-Type':'application/json','Accept':'text/event-stream'},body:JSON.stringify(body),signal:abortCtrl.signal}).then(function(r){
 if(!r.ok)throw new Error('Failed: '+r.status);
 var ct=r.headers.get('content-type')||'';
 if(ct.includes('text/event-stream')||ct.includes('text/plain'))return handleSSE(r);
@@ -253,13 +266,7 @@ return r.json().then(function(d){handleJSON(d)});
 }).catch(function(e){
 if(e.name==='AbortError')return;
 typingEl.classList.remove('visible');isStreaming=false;sendBtn.disabled=false;
-var em='I\'m experiencing high demand right now. Let me connect you with help!';
-messages.push({role:'assistant',content:em});
-var md=appendMsg('assistant',em);
-var bb=$('.ai-chat-msg-bubble',md);
-if(bb)bb.insertAdjacentHTML('beforeend','<div class="ai-chat-dead-end"><button class="ai-chat-dead-end__btn ai-chat-dead-end__btn--support" data-dead-end="support">Talk to Support Team</button><button class="ai-chat-dead-end__btn ai-chat-dead-end__btn--new" data-dead-end="new-chat">Start a New Chat</button></div>');
-inputEl.disabled=true;inputEl.placeholder='Choose an option above';sendBtn.disabled=true;
-saveH(messages);
+showHighTraffic();
 });
 }
 
@@ -317,7 +324,7 @@ if(p.type==='action'&&p.action==='show_dead_end'){
   if(!msgDiv)msgDiv=appendMsg('assistant','It looks like I\'m having trouble finding what you need.');
   var bubble=$('.ai-chat-msg-bubble',msgDiv);
   if(bubble){
-    bubble.insertAdjacentHTML('beforeend','<div class="ai-chat-dead-end"><button class="ai-chat-dead-end__btn ai-chat-dead-end__btn--support" data-dead-end="support">Talk to Support Team</button><button class="ai-chat-dead-end__btn ai-chat-dead-end__btn--new" data-dead-end="new-chat">Start a New Chat</button></div>');
+    bubble.insertAdjacentHTML('beforeend',deadEndHtml());
   }
   /* Disable input */
   inputEl.disabled=true;inputEl.placeholder='Choose an option above';sendBtn.disabled=true;
@@ -354,7 +361,7 @@ if(prods&&prods.length>0&&lastMsg){
         wrap.innerHTML='<span class="ai-chat-fb-thanks">'+(vote==='up'?'Thanks for the feedback!':'Sorry about that, we\'ll improve!')+'</span>';
         var payload={vote:vote,session:getSess(),botResponse:(text||'').slice(0,500),products:(prods||[]).map(function(p){return p.title||''}).slice(0,5)};
         if(vote==='down'){payload.conversation=messages.slice(-10).map(function(m){return{role:m.role,content:(m.content||'').slice(0,300)}})}
-        try{fetch(API+'/api/feedback',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})}catch(e){}
+        try{fetch(FEEDBACK_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})}catch(e){}
       });
     });
   }
@@ -389,7 +396,12 @@ if(btn){e.preventDefault();var vid=btn.getAttribute('data-add-to-cart');btn.disa
 var deadEnd=e.target.closest('[data-dead-end]');
 if(deadEnd){
   var action=deadEnd.getAttribute('data-dead-end');
-  if(action==='support'){toggle(false);if(typeof window.zE==='function'){window.zE('webWidget','show');window.zE('webWidget','open')}}
+  if(action==='support'){
+    if(SUPPORT_URL){window.open(SUPPORT_URL,'_blank','noopener');}
+    else if(typeof window.zE==='function'){toggle(false);window.zE('webWidget','show');window.zE('webWidget','open');}
+    else if(typeof window.Intercom==='function'){window.Intercom('show');}
+    else if(typeof window.GorgiasChat!=='undefined'&&window.GorgiasChat.open){window.GorgiasChat.open();}
+  }
   if(action==='new-chat'){clearChat();inputEl.disabled=false;inputEl.placeholder=IPLACE;sendBtn.disabled=false}
   return;
 }
