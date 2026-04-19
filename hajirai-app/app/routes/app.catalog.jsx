@@ -86,7 +86,9 @@ export default function Catalog() {
                 <BlockStack gap="100">
                   <Text as="h2" variant="headingMd">Catalog sync</Text>
                   <Text as="p" tone="subdued">
-                    Keeps your Shopify products indexed so the AI assistant can reference them.
+                    ShopAgent indexes your Shopify products, variants, prices, and inventory into a
+                    searchable database. The AI uses this to search your catalog, look up product
+                    details, and check SKUs in real time — instead of guessing.
                   </Text>
                 </BlockStack>
                 {statusBadge(data.status)}

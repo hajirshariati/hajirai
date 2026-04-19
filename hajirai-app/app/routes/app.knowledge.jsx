@@ -170,12 +170,19 @@ export default function Knowledge() {
     <Page title="Knowledge Base" backAction={{ url: "/app" }}>
       <TitleBar title="Knowledge Base" />
       <BlockStack gap="500">
-        <Banner title="Your Shopify store is already connected" tone="info">
+        <Banner title="Your Shopify catalog is already synced" tone="info">
           <Text as="p">
-            The assistant has live access to your products, collections, pages, and policies via
-            the Shopify API. Use this page only to upload <strong>extra</strong> context beyond
-            what's already in your store — FAQs, brand voice, sizing guides, and more.
+            ShopAgent automatically indexes your products, variants, and prices via Catalog Sync.
+            Use this page to upload <strong>extra</strong> context the AI can't get from Shopify —
+            FAQs, brand voice, sizing guides, product specs, and more.
           </Text>
+          <Box paddingBlockStart="200">
+            <Text as="p" variant="bodySm">
+              <strong>SKU Matching:</strong> Upload a CSV with a <code>sku</code> column and each row
+              is automatically linked to the matching product variant. The AI can then reference
+              materials, care instructions, fit notes, and any other data you include — per product.
+            </Text>
+          </Box>
         </Banner>
 
         {actionData?.success && (

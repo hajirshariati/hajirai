@@ -73,6 +73,7 @@ model ShopConfig {
 
   anthropicApiKey     String   @default("")
   anthropicModel      String   @default("claude-sonnet-4-20250514")
+  modelStrategy       String   @default("smart")
   yotpoApiKey         String   @default("")
   aftershipApiKey     String   @default("")
 
@@ -155,4 +156,20 @@ model ProductEnrichment {
   @@unique([shop, sku])
   @@index([shop])
   @@index([sourceFileId])
+}
+
+model ChatUsage {
+  id                       String   @id @default(cuid())
+  shop                     String
+  model                    String
+  inputTokens              Int      @default(0)
+  outputTokens             Int      @default(0)
+  cacheCreationInputTokens Int      @default(0)
+  cacheReadInputTokens     Int      @default(0)
+  costUsd                  Float    @default(0)
+  toolCalls                Int      @default(0)
+  createdAt                DateTime @default(now())
+
+  @@index([shop])
+  @@index([shop, createdAt])
 }

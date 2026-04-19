@@ -3,8 +3,11 @@ import { authenticate } from "../shopify.server";
 import { getShopConfig, getKnowledgeFilesWithContent } from "../models/ShopConfig.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
 import { TOOLS, executeTool } from "../lib/chat-tools.server";
+import { recordChatUsage } from "../models/ChatUsage.server";
 
 const DEFAULT_MODEL = process.env.DEFAULT_MODEL || "claude-sonnet-4-20250514";
+const HAIKU_MODEL = "claude-haiku-4-5-20251001";
+const OPUS_MODEL = "claude-opus-4-20250514";
 const MAX_TOKENS = parseInt(process.env.CHAT_MAX_TOKENS, 10) || 1024;
 const MAX_TOOL_HOPS = parseInt(process.env.CHAT_MAX_TOOL_HOPS, 10) || 5;
 
@@ -34,8 +37,8 @@ function checkIpShopRate(shop, ip) {
   return { ok: true };
 }
 
-if (!globalThis.__hajiraiRateSweeper) {
-  globalThis.__hajiraiRateSweeper = setInterval(() => {
+if (!globalThis.__shopagentRateSweeper) {
+  globalThis.__shopagentRateSweeper = setInterval(() => {
     const cutoff = Date.now() - RATE_LIMIT_WINDOW_MS;
     for (const [key, bucket] of ipShopBuckets) {
       const filtered = bucket.filter((t) => t > cutoff);
@@ -43,7 +46,7 @@ if (!globalThis.__hajiraiRateSweeper) {
       else ipShopBuckets.set(key, filtered);
     }
   }, RATE_LIMIT_WINDOW_MS);
-  globalThis.__hajiraiRateSweeper.unref?.();
+  globalThis.__shopagentRateSweeper.unref?.();
 }
 
 function sanitizeHistory(history) {
@@ -60,7 +63,33 @@ function sseChunk(obj) {
   return `data: ${JSON.stringify(obj)}\n\n`;
 }
 
+const SIMPLE_PATTERN = /^(hi|hey|hello|thanks|thank you|ok|okay|yes|no|bye|goodbye|cool|great|got it|perfect|sure|nice|awesome|alright|yep|nope|sounds good|that helps|appreciate it)\s*[.!?]*$/i;
+
+function chooseModel(config, message, history) {
+  const strategy = config.modelStrategy || "smart";
+  const sonnet = config.anthropicModel || DEFAULT_MODEL;
+
+  if (strategy === "always-haiku") return HAIKU_MODEL;
+  if (strategy === "always-opus") return OPUS_MODEL;
+  if (strategy !== "smart") return sonnet;
+
+  if (history.length > 0 && message.length < 80 && SIMPLE_PATTERN.test(message.trim())) {
+    return HAIKU_MODEL;
+  }
+  return sonnet;
+}
+
+function addUsage(acc, usage) {
+  acc.input_tokens += usage.input_tokens || 0;
+  acc.output_tokens += usage.output_tokens || 0;
+  acc.cache_creation_input_tokens += usage.cache_creation_input_tokens || 0;
+  acc.cache_read_input_tokens += usage.cache_read_input_tokens || 0;
+}
+
 async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, controller, encoder }) {
+  const totalUsage = { input_tokens: 0, output_tokens: 0, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 };
+  let toolCallCount = 0;
+
   for (let hop = 0; hop < MAX_TOOL_HOPS; hop++) {
     const stream = anthropic.messages.stream({
       model,
@@ -71,22 +100,22 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     });
 
     for await (const event of stream) {
-      if (
-        event.type === "content_block_delta" &&
-        event.delta?.type === "text_delta"
-      ) {
+      if (event.type === "content_block_delta" && event.delta?.type === "text_delta") {
         controller.enqueue(encoder.encode(sseChunk({ type: "text", text: event.delta.text })));
       }
     }
 
     const final = await stream.finalMessage();
+    addUsage(totalUsage, final.usage || {});
 
     if (final.stop_reason !== "tool_use") {
-      return;
+      return { totalUsage, toolCallCount, model };
     }
 
     const toolUses = final.content.filter((b) => b.type === "tool_use");
-    if (toolUses.length === 0) return;
+    if (toolUses.length === 0) return { totalUsage, toolCallCount, model };
+
+    toolCallCount += toolUses.length;
 
     const results = await Promise.all(
       toolUses.map((u) => executeTool(u.name, u.input, ctx)),
@@ -102,7 +131,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       })),
     });
   }
-  // Ran out of hops. Nudge the model to wrap up with a final text response.
+
   const wrap = await anthropic.messages.create({
     model,
     max_tokens: MAX_TOKENS,
@@ -111,11 +140,15 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     tool_choice: { type: "none" },
     messages,
   });
+  addUsage(totalUsage, wrap.usage || {});
+
   for (const block of wrap.content) {
     if (block.type === "text" && block.text) {
       controller.enqueue(encoder.encode(sseChunk({ type: "text", text: block.text })));
     }
   }
+
+  return { totalUsage, toolCallCount, model };
 }
 
 export const loader = async () => {
@@ -151,18 +184,20 @@ export const action = async ({ request }) => {
     const knowledge = await getKnowledgeFilesWithContent(session.shop);
     const systemPrompt = buildSystemPrompt({ config, knowledge, shop: session.shop });
 
-    const messages = sanitizeHistory(body.history);
+    const history = sanitizeHistory(body.history);
+    const model = chooseModel(config, String(body.message), history);
+
+    const messages = [...history];
     messages.push({ role: "user", content: String(body.message) });
 
     const anthropic = new Anthropic({ apiKey: config.anthropicApiKey });
-    const model = config.anthropicModel || DEFAULT_MODEL;
     const ctx = { shop: session.shop };
     const encoder = new TextEncoder();
 
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          await runAgenticLoop({
+          const result = await runAgenticLoop({
             anthropic,
             model,
             systemPrompt,
@@ -172,8 +207,15 @@ export const action = async ({ request }) => {
             encoder,
           });
           controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
+
+          recordChatUsage({
+            shop: session.shop,
+            model: result.model,
+            usage: result.totalUsage,
+            toolCalls: result.toolCallCount,
+          }).catch((err) => console.error("[chat] usage log error:", err?.message));
         } catch (err) {
-          console.error("[chat.jsx] stream error:", err?.message || err);
+          console.error("[chat] stream error:", err?.message || err);
           controller.enqueue(
             encoder.encode(sseChunk({ type: "error", message: err?.message || "upstream error" })),
           );
@@ -191,7 +233,7 @@ export const action = async ({ request }) => {
       },
     });
   } catch (e) {
-    console.error("[chat.jsx] error:", e);
+    console.error("[chat] error:", e);
     return Response.json({ error: "action failed", message: e.message }, { status: 500 });
   }
 };
