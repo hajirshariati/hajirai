@@ -36,6 +36,9 @@ if (host === "localhost") {
 }
 
 export default defineConfig({
+  ssr: {
+    external: ["@anthropic-ai/sdk"],
+  },
   server: {
     allowedHosts: [host],
     cors: {
@@ -54,5 +57,6 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: ["@shopify/app-bridge-react"],
+    exclude: ["@anthropic-ai/sdk"],
   },
 });
