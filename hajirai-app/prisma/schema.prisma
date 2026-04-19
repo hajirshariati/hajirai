@@ -80,6 +80,10 @@ model ShopConfig {
   showFollowUps       Boolean  @default(true)
   showFeedback        Boolean  @default(true)
 
+  plan                    String    @default("free")
+  subscriptionId          String?
+  subscriptionActivatedAt DateTime?
+
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 }

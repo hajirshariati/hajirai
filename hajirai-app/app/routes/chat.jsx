@@ -4,6 +4,7 @@ import { getShopConfig, getKnowledgeFilesWithContent } from "../models/ShopConfi
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
 import { TOOLS, executeTool } from "../lib/chat-tools.server";
 import { recordChatUsage } from "../models/ChatUsage.server";
+import { canSendMessage } from "../lib/billing.server";
 
 const DEFAULT_MODEL = process.env.DEFAULT_MODEL || "claude-sonnet-4-20250514";
 const HAIKU_MODEL = "claude-haiku-4-5-20251001";
@@ -184,6 +185,20 @@ export const action = async ({ request }) => {
       return Response.json(
         { error: "AI engine API key not configured. Set it in the app admin under Settings." },
         { status: 503 },
+      );
+    }
+
+    const quota = await canSendMessage(session.shop);
+    if (!quota.ok) {
+      return Response.json(
+        {
+          error: "plan_limit_reached",
+          message: `This store reached its ${quota.limit.toLocaleString()} conversations for the month. Upgrade the plan in the ShopAgent admin to keep helping customers.`,
+          plan: quota.plan.id,
+          used: quota.used,
+          limit: quota.limit,
+        },
+        { status: 402 },
       );
     }
 
