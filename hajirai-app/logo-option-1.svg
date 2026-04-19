@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" width="1200" height="1200">
+  <!-- Option 1: Chat bubble + shopping bag hybrid -->
+  <rect width="1200" height="1200" rx="220" fill="#2D6B4F"/>
+  <!-- Chat bubble -->
+  <path d="M600 280c-190 0-340 120-340 280 0 95 55 178 140 232l-40 120 130-75c35 10 72 15 110 15 190 0 340-120 340-280S790 280 600 280z" fill="#fff"/>
+  <!-- Shopping bag inside bubble -->
+  <rect x="520" y="460" width="160" height="130" rx="12" fill="#2D6B4F" opacity="0.85"/>
+  <path d="M560 460v-35c0-22 18-40 40-40s40 18 40 40v35" fill="none" stroke="#2D6B4F" stroke-width="14" stroke-linecap="round" opacity="0.85"/>
+</svg>
