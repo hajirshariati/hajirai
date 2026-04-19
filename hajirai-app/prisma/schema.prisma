@@ -80,6 +80,9 @@ model ShopConfig {
   showFollowUps       Boolean  @default(true)
   showFeedback        Boolean  @default(true)
 
+  supportUrl          String   @default("")
+  supportLabel        String   @default("Contact customer service")
+
   plan                    String    @default("free")
   subscriptionId          String?
   subscriptionActivatedAt DateTime?

@@ -38,6 +38,8 @@ var SHOWBAN=C.showBanner!==false;
 var DISCL=C.disclaimerText||'';
 var PRIVURL=C.privacyUrl||'/pages/privacy-policy';
 var LWIDTH=C.launcherWidth||'500';
+var SUPPORT_URL=C.supportUrl||'';
+var SUPPORT_LABEL=C.supportLabel||'Contact customer service';
 var SK='hajirai_chat_session';
 var HK='hajirai_chat_history';
 
@@ -125,7 +127,7 @@ function showIdleTimeout(){
   messages.push({role:'assistant',content:txt});
   var md=appendMsg('assistant',txt);
   var bb=$('.ai-chat-msg-bubble',md);
-  if(bb)bb.insertAdjacentHTML('beforeend','<div class="ai-chat-dead-end"><button class="ai-chat-dead-end__btn ai-chat-dead-end__btn--support" data-dead-end="support">Contact Support Team</button><button class="ai-chat-dead-end__btn ai-chat-dead-end__btn--new" data-dead-end="new-chat">Start a New Chat</button></div>');
+  if(bb)bb.insertAdjacentHTML('beforeend',deadEndHtml());
   inputEl.disabled=true;inputEl.placeholder='Choose an option above';sendBtn.disabled=true;
   saveH(messages);scrollBottom();
 }
@@ -234,6 +236,24 @@ stampLastMsg();
 streamResponse(text);
 }
 
+function deadEndHtml(){
+var s='<div class="ai-chat-dead-end">';
+s+='<button class="ai-chat-dead-end__btn ai-chat-dead-end__btn--support" data-dead-end="support">'+esc(SUPPORT_LABEL)+'</button>';
+s+='<button class="ai-chat-dead-end__btn ai-chat-dead-end__btn--new" data-dead-end="new-chat">Start a new chat</button>';
+s+='</div>';
+return s;
+}
+
+function showHighTraffic(){
+var em='I\'m experiencing high traffic right now. Please try again in a moment.';
+messages.push({role:'assistant',content:em});
+var md=appendMsg('assistant',em);
+var bb=$('.ai-chat-msg-bubble',md);
+if(bb)bb.insertAdjacentHTML('beforeend',deadEndHtml());
+inputEl.disabled=true;inputEl.placeholder='Choose an option above';sendBtn.disabled=true;
+saveH(messages);
+}
+
 function streamResponse(msg){
 if(abortCtrl)abortCtrl.abort();
 abortCtrl=new AbortController();
@@ -246,13 +266,7 @@ return r.json().then(function(d){handleJSON(d)});
 }).catch(function(e){
 if(e.name==='AbortError')return;
 typingEl.classList.remove('visible');isStreaming=false;sendBtn.disabled=false;
-var em='I\'m experiencing high demand right now. Let me connect you with help!';
-messages.push({role:'assistant',content:em});
-var md=appendMsg('assistant',em);
-var bb=$('.ai-chat-msg-bubble',md);
-if(bb)bb.insertAdjacentHTML('beforeend','<div class="ai-chat-dead-end"><button class="ai-chat-dead-end__btn ai-chat-dead-end__btn--support" data-dead-end="support">Talk to Support Team</button><button class="ai-chat-dead-end__btn ai-chat-dead-end__btn--new" data-dead-end="new-chat">Start a New Chat</button></div>');
-inputEl.disabled=true;inputEl.placeholder='Choose an option above';sendBtn.disabled=true;
-saveH(messages);
+showHighTraffic();
 });
 }
 
@@ -310,7 +324,7 @@ if(p.type==='action'&&p.action==='show_dead_end'){
   if(!msgDiv)msgDiv=appendMsg('assistant','It looks like I\'m having trouble finding what you need.');
   var bubble=$('.ai-chat-msg-bubble',msgDiv);
   if(bubble){
-    bubble.insertAdjacentHTML('beforeend','<div class="ai-chat-dead-end"><button class="ai-chat-dead-end__btn ai-chat-dead-end__btn--support" data-dead-end="support">Talk to Support Team</button><button class="ai-chat-dead-end__btn ai-chat-dead-end__btn--new" data-dead-end="new-chat">Start a New Chat</button></div>');
+    bubble.insertAdjacentHTML('beforeend',deadEndHtml());
   }
   /* Disable input */
   inputEl.disabled=true;inputEl.placeholder='Choose an option above';sendBtn.disabled=true;
@@ -382,7 +396,12 @@ if(btn){e.preventDefault();var vid=btn.getAttribute('data-add-to-cart');btn.disa
 var deadEnd=e.target.closest('[data-dead-end]');
 if(deadEnd){
   var action=deadEnd.getAttribute('data-dead-end');
-  if(action==='support'){toggle(false);if(typeof window.zE==='function'){window.zE('webWidget','show');window.zE('webWidget','open')}}
+  if(action==='support'){
+    if(SUPPORT_URL){window.open(SUPPORT_URL,'_blank','noopener');}
+    else if(typeof window.zE==='function'){toggle(false);window.zE('webWidget','show');window.zE('webWidget','open');}
+    else if(typeof window.Intercom==='function'){window.Intercom('show');}
+    else if(typeof window.GorgiasChat!=='undefined'&&window.GorgiasChat.open){window.GorgiasChat.open();}
+  }
   if(action==='new-chat'){clearChat();inputEl.disabled=false;inputEl.placeholder=IPLACE;sendBtn.disabled=false}
   return;
 }
