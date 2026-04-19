@@ -59,7 +59,7 @@ export const TOOLS = [
 ];
 
 function productUrl(shop, handle) {
-  return `https://${shop}/products/${handle}`;
+  return `https://${shop}/products/${handle}?utm_source=shopagent&utm_medium=chat&utm_campaign=ai_recommendation`;
 }
 
 function safeParseJson(s) {

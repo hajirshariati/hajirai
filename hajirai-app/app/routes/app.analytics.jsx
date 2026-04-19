@@ -10,16 +10,31 @@ import {
   Box,
   Divider,
   DataTable,
+  Banner,
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import { getUsageSummary } from "../models/ChatUsage.server";
-import { getModelLabel } from "../lib/pricing.server";
+import { getFeedbackSummary, cleanupOldFeedback } from "../models/ChatFeedback.server";
+
+const MODEL_LABELS = {
+  "claude-sonnet-4-20250514": "Claude Sonnet 4",
+  "claude-haiku-4-5-20251001": "Claude Haiku 4.5",
+  "claude-opus-4-20250514": "Claude Opus 4",
+};
+
+function modelLabel(model) {
+  return MODEL_LABELS[model] || model;
+}
 
 export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
-  const usage = await getUsageSummary(session.shop, 30);
-  return { usage };
+  const [usage, feedback] = await Promise.all([
+    getUsageSummary(session.shop, 30),
+    getFeedbackSummary(session.shop, 30),
+  ]);
+  cleanupOldFeedback().catch(() => {});
+  return { usage, feedback };
 };
 
 function StatCard({ label, value, sublabel, tone }) {
@@ -28,9 +43,7 @@ function StatCard({ label, value, sublabel, tone }) {
       <BlockStack gap="200">
         <Text as="p" tone="subdued" variant="bodySm">{label}</Text>
         <Text as="p" variant="heading2xl">{value}</Text>
-        {sublabel && (
-          <Badge tone={tone || "info"}>{sublabel}</Badge>
-        )}
+        {sublabel && <Badge tone={tone || "info"}>{sublabel}</Badge>}
       </BlockStack>
     </Card>
   );
@@ -50,11 +63,11 @@ function formatTokens(n) {
 }
 
 export default function Analytics() {
-  const { usage } = useLoaderData();
+  const { usage, feedback } = useLoaderData();
   const hasData = usage.totalMessages > 0;
 
   const modelRows = Object.entries(usage.byModel).map(([model, data]) => [
-    getModelLabel(model),
+    modelLabel(model),
     String(data.messages),
     formatCost(data.cost),
     data.messages > 0 ? formatCost(data.cost / data.messages) : "—",
@@ -63,11 +76,14 @@ export default function Analytics() {
   const dailyRows = Object.entries(usage.dailyCosts)
     .sort(([a], [b]) => b.localeCompare(a))
     .slice(0, 14)
-    .map(([day, data]) => [
-      day,
-      String(data.messages),
-      formatCost(data.cost),
-    ]);
+    .map(([day, data]) => [day, String(data.messages), formatCost(data.cost)]);
+
+  const negativeRows = feedback.negativeFeedback.map((f) => [
+    new Date(f.createdAt).toLocaleDateString(),
+    f.userHash || "—",
+    f.botResponse.slice(0, 80) + (f.botResponse.length > 80 ? "..." : ""),
+    f.products.length > 0 ? f.products.join(", ").slice(0, 60) : "—",
+  ]);
 
   return (
     <Page title="Analytics" backAction={{ url: "/app" }}>
@@ -75,58 +91,95 @@ export default function Analytics() {
       <BlockStack gap="500">
         <InlineStack gap="200" blockAlign="center">
           <Text as="h2" variant="headingMd">Last 30 days</Text>
-          {hasData ? (
-            <Badge tone="success">Live</Badge>
-          ) : (
-            <Badge>No data yet</Badge>
-          )}
+          {hasData ? <Badge tone="success">Live</Badge> : <Badge>No data yet</Badge>}
         </InlineStack>
 
+        {/* ─── Engagement Metrics ─── */}
+        <Text as="h2" variant="headingMd">Engagement</Text>
         <InlineGrid columns={{ xs: 2, md: 4 }} gap="400">
-          <StatCard
-            label="API Cost"
-            value={formatCost(usage.totalCost)}
-            sublabel="Billed to your Anthropic account"
-          />
           <StatCard
             label="Conversations"
             value={String(usage.totalMessages)}
-            sublabel="Customer messages handled"
+            sublabel="Messages handled"
           />
           <StatCard
-            label="Avg. Cost / Message"
-            value={formatCost(usage.avgCostPerMessage)}
-            sublabel={usage.totalMessages > 0 ? "Across all models" : "No data"}
+            label="Satisfaction"
+            value={feedback.total > 0 ? `${feedback.satisfactionRate}%` : "—"}
+            sublabel={feedback.total > 0 ? `${feedback.up} helpful · ${feedback.down} not` : "No feedback yet"}
+            tone={feedback.satisfactionRate >= 80 ? "success" : feedback.satisfactionRate >= 50 ? "warning" : "critical"}
           />
           <StatCard
             label="Tool Calls"
             value={String(usage.totalToolCalls)}
-            sublabel="Product searches, lookups"
+            sublabel="Product searches & lookups"
+          />
+          <StatCard
+            label="Total Feedback"
+            value={String(feedback.total)}
+            sublabel={`${feedback.up} positive · ${feedback.down} negative`}
           />
         </InlineGrid>
 
-        <InlineGrid columns={{ xs: 1, md: 2 }} gap="400">
+        {/* ─── Negative Feedback Review ─── */}
+        {negativeRows.length > 0 && (
+          <>
+            <Divider />
+            <Card>
+              <BlockStack gap="400">
+                <InlineStack gap="200" blockAlign="center">
+                  <Text as="h2" variant="headingMd">Negative feedback</Text>
+                  <Badge tone="critical">{feedback.down} reports</Badge>
+                </InlineStack>
+                <Text as="p" tone="subdued" variant="bodySm">
+                  User data is hashed for privacy. Records auto-delete after 90 days.
+                </Text>
+                <DataTable
+                  columnContentTypes={["text", "text", "text", "text"]}
+                  headings={["Date", "User (hashed)", "AI Response", "Products"]}
+                  rows={negativeRows}
+                />
+              </BlockStack>
+            </Card>
+          </>
+        )}
+
+        {feedback.total > 0 && feedback.down === 0 && (
+          <Banner tone="success" title="No negative feedback in the last 30 days" />
+        )}
+
+        <Divider />
+
+        {/* ─── API Cost ─── */}
+        <Text as="h2" variant="headingMd">API Cost</Text>
+        <InlineGrid columns={{ xs: 2, md: 4 }} gap="400">
+          <StatCard
+            label="Total Cost"
+            value={formatCost(usage.totalCost)}
+            sublabel="Billed to your Anthropic account"
+          />
+          <StatCard
+            label="Avg / Message"
+            value={formatCost(usage.avgCostPerMessage)}
+            sublabel={usage.totalMessages > 0 ? "Across all models" : "No data"}
+          />
           <StatCard
             label="Input Tokens"
             value={formatTokens(usage.totalInputTokens)}
-            sublabel="Prompts + context sent to AI"
+            sublabel="Prompts sent to AI"
           />
           <StatCard
             label="Output Tokens"
             value={formatTokens(usage.totalOutputTokens)}
-            sublabel="AI responses generated"
+            sublabel="Responses generated"
           />
         </InlineGrid>
-
-        <Divider />
 
         {modelRows.length > 0 && (
           <Card>
             <BlockStack gap="400">
               <Text as="h2" variant="headingMd">Cost by model</Text>
               <Text as="p" tone="subdued" variant="bodySm">
-                Smart routing automatically uses Haiku for simple follow-ups and Sonnet for product questions,
-                reducing your costs without sacrificing quality.
+                Smart routing uses Haiku for simple follow-ups and Sonnet for product questions.
               </Text>
               <DataTable
                 columnContentTypes={["text", "numeric", "numeric", "numeric"]}
@@ -155,11 +208,7 @@ export default function Analytics() {
             <BlockStack gap="300">
               <Text as="h3" variant="headingSm">Waiting for first conversation</Text>
               <Text as="p" tone="subdued">
-                Once customers start chatting with your ShopAgent, you'll see real-time cost and usage
-                data here. Every API call is tracked with exact token counts and cost per model.
-              </Text>
-              <Text as="p" tone="subdued" variant="bodySm">
-                Costs are billed directly to your Anthropic account — ShopAgent doesn't add any markup.
+                Once customers start chatting, you'll see engagement and cost data here.
               </Text>
             </BlockStack>
           </Card>
@@ -167,7 +216,7 @@ export default function Analytics() {
 
         <Box paddingBlockStart="100">
           <Text as="p" tone="subdued" variant="bodySm" alignment="center">
-            Cost estimates based on published Anthropic pricing. Actual billing may vary slightly.
+            Cost estimates based on Anthropic pricing. User data hashed for privacy. Feedback auto-deleted after 90 days.
           </Text>
         </Box>
       </BlockStack>

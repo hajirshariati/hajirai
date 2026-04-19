@@ -292,11 +292,23 @@ export default function Home() {
           </InlineGrid>
         </BlockStack>
 
-        <Box paddingBlockStart="300">
-          <Text as="p" tone="subdued" variant="bodySm" alignment="center">
-            ShopAgent by HajirAi | Installed on {shop}
-          </Text>
-        </Box>
+        <Card>
+          <BlockStack gap="300">
+            <Text as="h2" variant="headingMd">About ShopAgent</Text>
+            <InlineGrid columns={{ xs: 1, sm: 2 }} gap="400">
+              <BlockStack gap="200">
+                <Text as="p" variant="bodySm"><strong>Version:</strong> 1.0.0</Text>
+                <Text as="p" variant="bodySm"><strong>Built by:</strong> HajirAi</Text>
+                <Text as="p" variant="bodySm"><strong>AI Engine:</strong> Claude by Anthropic</Text>
+              </BlockStack>
+              <BlockStack gap="200">
+                <Text as="p" variant="bodySm"><strong>UTM Tracking:</strong> All product links include utm_source=shopagent</Text>
+                <Text as="p" variant="bodySm"><strong>Privacy:</strong> Feedback data hashed, auto-deleted after 90 days</Text>
+                <Text as="p" variant="bodySm"><strong>Billing:</strong> Pay Anthropic directly — no markup</Text>
+              </BlockStack>
+            </InlineGrid>
+          </BlockStack>
+        </Card>
       </BlockStack>
     </Page>
   );

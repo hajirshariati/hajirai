@@ -15,6 +15,7 @@ import {
   Icon,
   Badge,
   Divider,
+  Checkbox,
 } from "@shopify/polaris";
 import { CheckCircleIcon } from "@shopify/polaris-icons";
 import { TitleBar } from "@shopify/app-bridge-react";
@@ -28,6 +29,8 @@ export const loader = async ({ request }) => {
     hasAnthropicKey: config.anthropicApiKey !== "",
     anthropicModel: config.anthropicModel,
     modelStrategy: config.modelStrategy || "smart",
+    showFollowUps: config.showFollowUps !== false,
+    showFeedback: config.showFeedback !== false,
     hasYotpoKey: config.yotpoApiKey !== "",
     hasAftershipKey: config.aftershipApiKey !== "",
   };
@@ -59,6 +62,12 @@ export const action = async ({ request }) => {
   if (aftershipKey !== null && aftershipKey !== "") {
     data.aftershipApiKey = aftershipKey;
   }
+
+  const followUps = formData.get("showFollowUps");
+  if (followUps !== null) data.showFollowUps = followUps === "true";
+
+  const feedbackToggle = formData.get("showFeedback");
+  if (feedbackToggle !== null) data.showFeedback = feedbackToggle === "true";
 
   if (Object.keys(data).length > 0) {
     await updateShopConfig(session.shop, data);
@@ -99,7 +108,7 @@ const STRATEGY_HELP = {
 };
 
 export default function ApiKeys() {
-  const { hasAnthropicKey, anthropicModel, modelStrategy, hasYotpoKey, hasAftershipKey } = useLoaderData();
+  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey } = useLoaderData();
   const actionData = useActionData();
   const nav = useNavigation();
   const saving = nav.state === "submitting";
@@ -107,6 +116,8 @@ export default function ApiKeys() {
   const [anthropicKey, setAnthropicKey] = useState("");
   const [model, setModel] = useState(anthropicModel || "claude-sonnet-4-20250514");
   const [strategy, setStrategy] = useState(modelStrategy);
+  const [followUps, setFollowUps] = useState(initFollowUps);
+  const [feedbackOn, setFeedbackOn] = useState(initFeedback);
   const [yotpoKey, setYotpoKey] = useState("");
   const [aftershipKey, setAftershipKey] = useState("");
 
@@ -202,6 +213,29 @@ export default function ApiKeys() {
             </Layout.AnnotatedSection>
 
             <Layout.AnnotatedSection
+              title="Chat features"
+              description="Toggle AI behaviors for the storefront chat widget."
+            >
+              <Card>
+                <BlockStack gap="400">
+                  <Checkbox
+                    label="Follow-up questions"
+                    checked={followUps}
+                    onChange={setFollowUps}
+                    helpText="AI suggests 2-3 clickable follow-up questions after each response. Only suggests questions it can answer."
+                  />
+                  <Divider />
+                  <Checkbox
+                    label="Helpful / Not helpful feedback"
+                    checked={feedbackOn}
+                    onChange={setFeedbackOn}
+                    helpText="Shows thumbs up/down on product responses. Negative feedback appears in Analytics with hashed user data."
+                  />
+                </BlockStack>
+              </Card>
+            </Layout.AnnotatedSection>
+
+            <Layout.AnnotatedSection
               title="Integrations (optional)"
               description="Connect third-party services for richer AI context — product reviews, sizing data, and return insights."
             >
@@ -254,6 +288,8 @@ export default function ApiKeys() {
           <input type="hidden" name="anthropicApiKey" value={anthropicKey} />
           <input type="hidden" name="anthropicModel" value={model} />
           <input type="hidden" name="modelStrategy" value={strategy} />
+          <input type="hidden" name="showFollowUps" value={String(followUps)} />
+          <input type="hidden" name="showFeedback" value={String(feedbackOn)} />
           <input type="hidden" name="yotpoApiKey" value={yotpoKey} />
           <input type="hidden" name="aftershipApiKey" value={aftershipKey} />
 

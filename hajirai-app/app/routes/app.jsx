@@ -2,6 +2,7 @@ import { Link, Outlet, useLoaderData, useRouteError } from "react-router";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { AppProvider as ShopifyAppProvider } from "@shopify/shopify-app-react-router/react";
 import { AppProvider as PolarisAppProvider } from "@shopify/polaris";
+import { Box, Text } from "@shopify/polaris";
 import { NavMenu } from "@shopify/app-bridge-react";
 import enTranslations from "@shopify/polaris/locales/en.json";
 import polarisStyles from "@shopify/polaris/build/esm/styles.css?url";
@@ -27,6 +28,11 @@ export default function App() {
           <Link to="/app/api-keys">API Keys</Link>
         </NavMenu>
         <Outlet />
+        <Box paddingBlockStart="800" paddingBlockEnd="600" paddingInline="400">
+          <Text as="p" tone="subdued" variant="bodySm" alignment="center">
+            ShopAgent v1.0 by HajirAi. All rights reserved.
+          </Text>
+        </Box>
       </PolarisAppProvider>
     </ShopifyAppProvider>
   );

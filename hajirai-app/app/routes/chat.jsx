@@ -206,6 +206,39 @@ export const action = async ({ request }) => {
             controller,
             encoder,
           });
+
+          if (config.showFollowUps !== false) {
+            try {
+              const lastAssistant = messages.filter((m) => m.role === "assistant").pop();
+              const lastText = typeof lastAssistant?.content === "string"
+                ? lastAssistant.content
+                : Array.isArray(lastAssistant?.content)
+                  ? lastAssistant.content.filter((b) => b.type === "text").map((b) => b.text).join("")
+                  : "";
+              const fuRes = await anthropic.messages.create({
+                model: HAIKU_MODEL,
+                max_tokens: 150,
+                messages: [
+                  {
+                    role: "user",
+                    content: `Customer asked: "${String(body.message).slice(0, 200)}"\nAssistant replied: "${lastText.slice(0, 300)}"\n\nSuggest 2-3 brief follow-up questions the customer might ask next. Only suggest questions that can be answered from a product catalog or store knowledge base. Return ONLY a JSON array of strings, nothing else.`,
+                  },
+                ],
+              });
+              const raw = fuRes.content?.[0]?.text || "";
+              const match = raw.match(/\[[\s\S]*\]/);
+              if (match) {
+                const questions = JSON.parse(match[0]).filter((q) => typeof q === "string").slice(0, 3);
+                if (questions.length > 0) {
+                  controller.enqueue(encoder.encode(sseChunk({ type: "suggestions", questions })));
+                }
+              }
+              addUsage(result.totalUsage, fuRes.usage || {});
+            } catch (fuErr) {
+              console.error("[chat] follow-up error:", fuErr?.message);
+            }
+          }
+
           controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
 
           recordChatUsage({

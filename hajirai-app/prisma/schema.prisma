@@ -77,6 +77,9 @@ model ShopConfig {
   yotpoApiKey         String   @default("")
   aftershipApiKey     String   @default("")
 
+  showFollowUps       Boolean  @default(true)
+  showFeedback        Boolean  @default(true)
+
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 }
@@ -172,4 +175,20 @@ model ChatUsage {
 
   @@index([shop])
   @@index([shop, createdAt])
+}
+
+model ChatFeedback {
+  id           String   @id @default(cuid())
+  shop         String
+  sessionId    String
+  vote         String
+  botResponse  String
+  products     String[]
+  conversation String?
+  userHash     String?
+  createdAt    DateTime @default(now())
+
+  @@index([shop])
+  @@index([shop, createdAt])
+  @@index([createdAt])
 }
