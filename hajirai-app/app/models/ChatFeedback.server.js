@@ -49,6 +49,33 @@ export async function getFeedbackSummary(shop, days = 30) {
   };
 }
 
+export async function getRecentQuestions(shop, days = 30, limit = 15) {
+  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+  const records = await prisma.chatFeedback.findMany({
+    where: { shop, createdAt: { gte: since }, conversation: { not: null } },
+    orderBy: { createdAt: "desc" },
+    select: { conversation: true, vote: true, products: true, createdAt: true },
+    take: limit * 2,
+  });
+  const questions = [];
+  for (const r of records) {
+    try {
+      const conv = JSON.parse(r.conversation);
+      const firstUser = (Array.isArray(conv) ? conv : []).find((m) => m.role === "user");
+      if (firstUser?.content) {
+        questions.push({
+          question: String(firstUser.content).slice(0, 150),
+          vote: r.vote,
+          products: r.products || [],
+          date: r.createdAt,
+        });
+      }
+    } catch {}
+    if (questions.length >= limit) break;
+  }
+  return questions;
+}
+
 export async function cleanupOldFeedback() {
   const cutoff = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
   const { count } = await prisma.chatFeedback.deleteMany({

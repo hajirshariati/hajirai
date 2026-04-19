@@ -15,8 +15,13 @@ import {
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import { getUsageSummary } from "../models/ChatUsage.server";
-import { getFeedbackSummary, cleanupOldFeedback } from "../models/ChatFeedback.server";
-import { getTopProducts, cleanupOldMentions } from "../models/ChatProductMention.server";
+import { getFeedbackSummary, cleanupOldFeedback, getRecentQuestions } from "../models/ChatFeedback.server";
+import {
+  getTopProducts,
+  getProductsByTool,
+  getInterestBreakdown,
+  cleanupOldMentions,
+} from "../models/ChatProductMention.server";
 
 const MODEL_LABELS = {
   "claude-sonnet-4-20250514": "Standard",
@@ -30,14 +35,17 @@ function modelLabel(model) {
 
 export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
-  const [usage, feedback, topProducts] = await Promise.all([
+  const [usage, feedback, topProducts, productsByTool, interest, recentQuestions] = await Promise.all([
     getUsageSummary(session.shop, 30),
     getFeedbackSummary(session.shop, 30),
     getTopProducts(session.shop, 30, 10),
+    getProductsByTool(session.shop, 30, 10),
+    getInterestBreakdown(session.shop, 30),
+    getRecentQuestions(session.shop, 30, 15),
   ]);
   cleanupOldFeedback().catch(() => {});
   cleanupOldMentions().catch(() => {});
-  return { usage, feedback, topProducts };
+  return { usage, feedback, topProducts, productsByTool, interest, recentQuestions };
 };
 
 function StatCard({ label, value, sublabel, tone }) {
@@ -81,7 +89,7 @@ function computeInsights(usage) {
 }
 
 export default function Analytics() {
-  const { usage, feedback, topProducts } = useLoaderData();
+  const { usage, feedback, topProducts, productsByTool, interest, recentQuestions } = useLoaderData();
   const hasData = usage.totalMessages > 0;
   const { activeDays, peakDay, peakMessages, avgPerDay } = computeInsights(usage);
 
@@ -111,6 +119,25 @@ export default function Analytics() {
     String(p.mentions),
   ]);
 
+  const searchedRows = (productsByTool?.searched || []).map((p, i) => [
+    String(i + 1),
+    p.title,
+    String(p.count),
+  ]);
+
+  const viewedRows = (productsByTool?.viewed || []).map((p, i) => [
+    String(i + 1),
+    p.title,
+    String(p.count),
+  ]);
+
+  const questionRows = (recentQuestions || []).map((q) => [
+    new Date(q.date).toLocaleDateString(),
+    q.question + (q.question.length >= 150 ? "..." : ""),
+    q.vote === "up" ? "Helpful" : q.vote === "down" ? "Not helpful" : "—",
+    q.products.length > 0 ? q.products.slice(0, 2).join(", ") : "—",
+  ]);
+
   return (
     <Page title="Analytics" backAction={{ url: "/app" }}>
       <TitleBar title="Analytics" />
@@ -135,12 +162,12 @@ export default function Analytics() {
             tone={feedback.satisfactionRate >= 80 ? "success" : feedback.satisfactionRate >= 50 ? "warning" : "critical"}
           />
           <StatCard
-            label="Tool Calls"
+            label="AI Actions"
             value={String(usage.totalToolCalls)}
             sublabel="Product searches & lookups"
           />
           <StatCard
-            label="Total Feedback"
+            label="Customer Feedback"
             value={String(feedback.total)}
             sublabel={`${feedback.up} positive · ${feedback.down} negative`}
           />
@@ -166,38 +193,132 @@ export default function Analytics() {
           <StatCard
             label="Products Shown"
             value={String(topProductRows.length)}
-            sublabel={topProductRows.length > 0 ? "Unique products in chat" : "No products yet"}
+            sublabel={topProductRows.length > 0 ? "Unique products surfaced" : "No products yet"}
           />
         </InlineGrid>
+
+        {interest.total > 0 && (
+          <>
+            <Divider />
+            <Text as="h2" variant="headingMd">How the AI helps customers</Text>
+            <Text as="p" tone="subdued" variant="bodySm">
+              Breakdown of what the AI does when customers ask questions.
+            </Text>
+            <InlineGrid columns={{ xs: 2, md: 4 }} gap="400">
+              <StatCard
+                label="Product Searches"
+                value={String(interest.searches)}
+                sublabel="Customers looking for products"
+                tone="info"
+              />
+              <StatCard
+                label="Product Views"
+                value={String(interest.views)}
+                sublabel="Detailed info requested"
+                tone="success"
+              />
+              <StatCard
+                label="SKU Lookups"
+                value={String(interest.skuLookups)}
+                sublabel="Matched to your uploaded data"
+              />
+              <StatCard
+                label="Total AI Actions"
+                value={String(interest.total)}
+                sublabel="Across all product interactions"
+              />
+            </InlineGrid>
+          </>
+        )}
+
+        {searchedRows.length > 0 && (
+          <Card>
+            <BlockStack gap="400">
+              <InlineStack gap="200" blockAlign="center">
+                <Text as="h2" variant="headingMd">What customers are searching for</Text>
+                <Badge tone="info">Last 30 days</Badge>
+              </InlineStack>
+              <Text as="p" tone="subdued" variant="bodySm">
+                Products customers asked the AI to find. High-demand items you may want to promote or keep in stock.
+              </Text>
+              <DataTable
+                columnContentTypes={["text", "text", "numeric"]}
+                headings={["#", "Product", "Searches"]}
+                rows={searchedRows}
+              />
+            </BlockStack>
+          </Card>
+        )}
+
+        {viewedRows.length > 0 && (
+          <Card>
+            <BlockStack gap="400">
+              <InlineStack gap="200" blockAlign="center">
+                <Text as="h2" variant="headingMd">Products customers wanted details on</Text>
+                <Badge tone="success">Purchase intent</Badge>
+              </InlineStack>
+              <Text as="p" tone="subdued" variant="bodySm">
+                Customers asked for pricing, sizes, or availability on these products. These are your strongest purchase signals.
+              </Text>
+              <DataTable
+                columnContentTypes={["text", "text", "numeric"]}
+                headings={["#", "Product", "Detail views"]}
+                rows={viewedRows}
+              />
+            </BlockStack>
+          </Card>
+        )}
 
         {topProductRows.length > 0 && (
           <Card>
             <BlockStack gap="400">
               <InlineStack gap="200" blockAlign="center">
-                <Text as="h2" variant="headingMd">Top recommended products</Text>
-                <Badge tone="info">Last 30 days</Badge>
+                <Text as="h2" variant="headingMd">Most popular products overall</Text>
+                <Badge>Combined activity</Badge>
               </InlineStack>
               <Text as="p" tone="subdued" variant="bodySm">
-                Products the AI surfaced most often in chat. Use this to spot catalog winners and gaps.
+                All product interactions combined — searches, detail views, and SKU lookups.
               </Text>
               <DataTable
                 columnContentTypes={["text", "text", "text", "numeric"]}
-                headings={["#", "Product", "Handle", "Mentions"]}
+                headings={["#", "Product", "Handle", "Total mentions"]}
                 rows={topProductRows}
               />
             </BlockStack>
           </Card>
         )}
 
+        {questionRows.length > 0 && (
+          <>
+            <Divider />
+            <Card>
+              <BlockStack gap="400">
+                <InlineStack gap="200" blockAlign="center">
+                  <Text as="h2" variant="headingMd">What customers are asking</Text>
+                  <Badge tone="info">{questionRows.length} recent questions</Badge>
+                </InlineStack>
+                <Text as="p" tone="subdued" variant="bodySm">
+                  Real questions from your customers. Use these to improve your product descriptions, FAQs, or knowledge base.
+                </Text>
+                <DataTable
+                  columnContentTypes={["text", "text", "text", "text"]}
+                  headings={["Date", "Customer question", "Rating", "Products mentioned"]}
+                  rows={questionRows}
+                />
+              </BlockStack>
+            </Card>
+          </>
+        )}
+
         {negativeRows.length > 0 && (
           <Card>
             <BlockStack gap="400">
               <InlineStack gap="200" blockAlign="center">
-                <Text as="h2" variant="headingMd">Negative feedback</Text>
+                <Text as="h2" variant="headingMd">Responses that need improvement</Text>
                 <Badge tone="critical">{feedback.down} reports</Badge>
               </InlineStack>
               <Text as="p" tone="subdued" variant="bodySm">
-                User data is hashed for privacy. Records auto-delete after 90 days.
+                Customers marked these responses as unhelpful. Review them to see if your knowledge base or product info needs updating.
               </Text>
               <DataTable
                 columnContentTypes={["text", "text", "text", "text"]}
@@ -272,7 +393,7 @@ export default function Analytics() {
             <BlockStack gap="300">
               <Text as="h3" variant="headingSm">Waiting for first conversation</Text>
               <Text as="p" tone="subdued">
-                Once customers start chatting, you'll see engagement and cost data here.
+                Once customers start chatting, you'll see engagement and product data here.
               </Text>
             </BlockStack>
           </Card>
