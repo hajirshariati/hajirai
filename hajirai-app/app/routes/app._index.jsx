@@ -186,7 +186,7 @@ export default function Home() {
             <BlockStack gap="200">
               <Text as="h1" variant="headingXl">ShopAgent</Text>
               <Text as="p" variant="bodyMd" tone="subdued">
-                AI-powered shopping assistant for your Shopify store. Built by HajirAi.
+                AI-powered shopping assistant for your Shopify store.
               </Text>
               {totalMessages > 0 && (
                 <Box paddingBlockStart="200">
@@ -315,7 +315,6 @@ export default function Home() {
             <InlineGrid columns={{ xs: 1, sm: 2 }} gap="400">
               <BlockStack gap="200">
                 <Text as="p" variant="bodySm"><strong>Version:</strong> 1.0.0</Text>
-                <Text as="p" variant="bodySm"><strong>Built by:</strong> HajirAi</Text>
                 <Text as="p" variant="bodySm"><strong>AI Engine:</strong> Claude by Anthropic</Text>
               </BlockStack>
               <BlockStack gap="200">

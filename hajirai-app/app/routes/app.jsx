@@ -30,7 +30,7 @@ export default function App() {
         <Outlet />
         <Box paddingBlockStart="800" paddingBlockEnd="600" paddingInline="400">
           <Text as="p" tone="subdued" variant="bodySm" alignment="center">
-            ShopAgent v1.0 by HajirAi. All rights reserved.
+            ShopAgent v1.0. All rights reserved.
           </Text>
         </Box>
       </PolarisAppProvider>
