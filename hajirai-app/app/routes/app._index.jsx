@@ -50,27 +50,22 @@ export const loader = async ({ request }) => {
 function StepCircle({ done, number }) {
   if (done) {
     return (
-      <Box>
+      <div style={{ width: "28px", height: "28px", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
         <Icon source={CheckCircleIcon} tone="success" />
-      </Box>
+      </div>
     );
   }
   return (
-    <Box
-      background="bg-surface-secondary"
-      borderWidth="025"
-      borderColor="border"
-      borderRadius="full"
-      padding="100"
-      minWidth="32px"
-      minHeight="32px"
-    >
-      <InlineStack align="center" blockAlign="center">
-        <Text as="span" variant="bodySm" fontWeight="semibold" tone="subdued">
-          {number}
-        </Text>
-      </InlineStack>
-    </Box>
+    <div style={{
+      width: "28px", height: "28px", flexShrink: 0,
+      display: "flex", alignItems: "center", justifyContent: "center",
+      borderRadius: "50%", background: "var(--p-color-bg-surface-secondary)",
+      border: "1px solid var(--p-color-border)",
+    }}>
+      <Text as="span" variant="bodySm" fontWeight="semibold" tone="subdued">
+        {number}
+      </Text>
+    </div>
   );
 }
 
@@ -83,9 +78,9 @@ function ChecklistItem({ done, number, title, description, actionLabel, actionUr
       borderColor={done ? "border-success-subdued" : "border"}
       padding="400"
     >
-      <InlineStack gap="400" blockAlign="center" wrap={false}>
+      <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
         <StepCircle done={done} number={number} />
-        <Box minWidth="0" width="100%">
+        <div style={{ flex: 1, minWidth: 0 }}>
           <BlockStack gap="100">
             <InlineStack gap="200" blockAlign="center">
               <Text as="h3" variant="headingSm">{title}</Text>
@@ -93,13 +88,13 @@ function ChecklistItem({ done, number, title, description, actionLabel, actionUr
             </InlineStack>
             <Text as="p" tone="subdued" variant="bodySm">{description}</Text>
           </BlockStack>
-        </Box>
-        <Box>
+        </div>
+        <div style={{ flexShrink: 0 }}>
           <Button url={actionUrl} external={external} variant={done ? "plain" : "primary"}>
             {actionLabel}
           </Button>
-        </Box>
-      </InlineStack>
+        </div>
+      </div>
     </Box>
   );
 }
