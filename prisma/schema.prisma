@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:dev.sqlite"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Session {
@@ -73,9 +73,16 @@ model ShopConfig {
 
   anthropicApiKey     String   @default("")
   anthropicModel      String   @default("claude-sonnet-4-20250514")
+  modelStrategy       String   @default("smart")
   yotpoApiKey         String   @default("")
   aftershipApiKey     String   @default("")
-  chatServerUrl       String   @default("")
+
+  showFollowUps       Boolean  @default(true)
+  showFeedback        Boolean  @default(true)
+
+  plan                    String    @default("free")
+  subscriptionId          String?
+  subscriptionActivatedAt DateTime?
 
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
@@ -92,4 +99,114 @@ model KnowledgeFile {
   updatedAt DateTime @updatedAt
 
   @@index([shop])
+}
+
+model Product {
+  id          String           @id @default(cuid())
+  shop        String
+  shopifyId   String
+  handle      String
+  title       String
+  vendor      String?
+  productType String?
+  tags        String[]
+  description String?
+  status      String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  variants    ProductVariant[]
+
+  @@unique([shop, shopifyId])
+  @@index([shop])
+  @@index([shop, handle])
+}
+
+model ProductVariant {
+  id               String   @id @default(cuid())
+  productId        String
+  product          Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  shopifyId        String
+  sku              String?
+  title            String?
+  price            String?
+  compareAtPrice   String?
+  inventoryQty     Int?
+  optionsJson      String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([productId, shopifyId])
+  @@index([sku])
+}
+
+model CatalogSyncState {
+  id            String    @id @default(cuid())
+  shop          String    @unique
+  status        String    @default("idle")
+  lastSyncedAt  DateTime?
+  lastError     String?
+  productsCount Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model ProductEnrichment {
+  id             String   @id @default(cuid())
+  shop           String
+  sku            String
+  data           Json
+  sourceFileId   String?
+  sourceFileType String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([shop, sku])
+  @@index([shop])
+  @@index([sourceFileId])
+}
+
+model ChatUsage {
+  id                       String   @id @default(cuid())
+  shop                     String
+  model                    String
+  inputTokens              Int      @default(0)
+  outputTokens             Int      @default(0)
+  cacheCreationInputTokens Int      @default(0)
+  cacheReadInputTokens     Int      @default(0)
+  costUsd                  Float    @default(0)
+  toolCalls                Int      @default(0)
+  createdAt                DateTime @default(now())
+
+  @@index([shop])
+  @@index([shop, createdAt])
+}
+
+model ChatFeedback {
+  id           String   @id @default(cuid())
+  shop         String
+  sessionId    String
+  vote         String
+  botResponse  String
+  products     String[]
+  conversation String?
+  userHash     String?
+  createdAt    DateTime @default(now())
+
+  @@index([shop])
+  @@index([shop, createdAt])
+  @@index([createdAt])
+}
+
+model ChatProductMention {
+  id        String   @id @default(cuid())
+  shop      String
+  handle    String
+  title     String
+  tool      String
+  createdAt DateTime @default(now())
+
+  @@index([shop])
+  @@index([shop, createdAt])
+  @@index([shop, handle])
+  @@index([createdAt])
 }
