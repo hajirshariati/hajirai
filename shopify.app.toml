@@ -1,8 +1,6 @@
-# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
-
 client_id = "0448b3c2fd7ca4393b467d01ced74cd4"
-name = "hajirai"
-application_url = "https://example.com"
+name = "ShopAgent"
+application_url = "https://hajirai-app-production.up.railway.app"
 embedded = true
 
 [build]
@@ -19,12 +17,37 @@ api_version = "2026-07"
   topics = [ "app/scopes_update" ]
   uri = "/webhooks/app/scopes_update"
 
+  [[webhooks.subscriptions]]
+  topics = [ "products/create" ]
+  uri = "/webhooks/products/create"
+
+  [[webhooks.subscriptions]]
+  topics = [ "products/update" ]
+  uri = "/webhooks/products/update"
+
+  [[webhooks.subscriptions]]
+  topics = [ "products/delete" ]
+  uri = "/webhooks/products/delete"
+
+  [webhooks.privacy_compliance]
+  customer_deletion_url = "/webhooks/customers/redact"
+  customer_data_request_url = "/webhooks/customers/data_request"
+  shop_deletion_url = "/webhooks/shop/redact"
+
 [access_scopes]
-# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
 scopes = "write_files,write_metaobject_definitions,write_metaobjects,write_products"
 
 [auth]
-redirect_urls = [ "https://example.com/api/auth" ]
+redirect_urls = [
+  "https://hajirai-app-production.up.railway.app/auth/callback",
+  "https://hajirai-app-production.up.railway.app/auth/shopify/callback",
+  "https://hajirai-app-production.up.railway.app/api/auth/callback"
+]
+
+[app_proxy]
+url = "https://hajirai-app-production.up.railway.app"
+subpath = "hajirai"
+prefix = "apps"
 
 [product.metafields.app.demo_info]
 type = "single_line_text_field"
@@ -49,7 +72,3 @@ required = true
 [metaobjects.app.example.fields.description]
 name = "Description"
 type = "multi_line_text_field"
-[app_proxy]
-url = "https://example.com"
-subpath = "hajirai"
-prefix = "apps"

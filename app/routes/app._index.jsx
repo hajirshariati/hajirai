@@ -7,128 +7,298 @@ import {
   Text,
   InlineGrid,
   Box,
-  Banner,
   Button,
-  Link as PolarisLink,
+  Icon,
   Badge,
   Divider,
 } from "@shopify/polaris";
+import { CheckCircleIcon } from "@shopify/polaris-icons";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import { getShopConfig, getKnowledgeFiles } from "../models/ShopConfig.server";
+import { getCatalogSyncState, syncCatalogAsync } from "../models/Product.server";
+import { countEnrichmentsByShop } from "../models/ProductEnrichment.server";
+import { getUsageSummary } from "../models/ChatUsage.server";
 
 export const loader = async ({ request }) => {
-  const { session } = await authenticate.admin(request);
-  const config = await getShopConfig(session.shop);
-  const files = await getKnowledgeFiles(session.shop);
+  const { admin, session } = await authenticate.admin(request);
+  const [config, files, syncState, enrichmentCount, usage] = await Promise.all([
+    getShopConfig(session.shop),
+    getKnowledgeFiles(session.shop),
+    getCatalogSyncState(session.shop),
+    countEnrichmentsByShop(session.shop),
+    getUsageSummary(session.shop, 30),
+  ]);
+
+  if (!syncState.lastSyncedAt && syncState.status !== "running") {
+    syncCatalogAsync(admin, session.shop);
+  }
 
   return {
     hasApiKey: config.anthropicApiKey !== "",
-    hasChatServer: config.chatServerUrl !== "",
-    anthropicModel: config.anthropicModel,
     fileCount: files.length,
     shop: session.shop,
     themeEditorUrl: `https://${session.shop}/admin/themes/current/editor?context=apps`,
+    productsCount: syncState.productsCount || 0,
+    enrichmentCount,
+    totalCost: usage.totalCost,
+    totalMessages: usage.totalMessages,
+    modelStrategy: config.modelStrategy || "smart",
   };
 };
 
-function StatCard({ label, value, sublabel }) {
+function StepCircle({ done, number }) {
+  if (done) {
+    return (
+      <div style={{ width: "28px", height: "28px", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", color: "#2D6B4F" }}>
+        <Icon source={CheckCircleIcon} tone="success" />
+      </div>
+    );
+  }
+  return (
+    <div style={{
+      width: "28px", height: "28px", flexShrink: 0,
+      display: "flex", alignItems: "center", justifyContent: "center",
+      borderRadius: "50%", background: "var(--p-color-bg-surface-secondary)",
+      border: "1px solid var(--p-color-border)",
+    }}>
+      <Text as="span" variant="bodySm" fontWeight="semibold" tone="subdued">
+        {number}
+      </Text>
+    </div>
+  );
+}
+
+function ChecklistItem({ done, number, title, description, actionLabel, actionUrl, external }) {
+  return (
+    <Box
+      background={done ? "bg-surface-success-subdued" : "bg-surface"}
+      borderRadius="300"
+      borderWidth="025"
+      borderColor={done ? "border-success-subdued" : "border"}
+      padding="400"
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+        <StepCircle done={done} number={number} />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <BlockStack gap="100">
+            <InlineStack gap="200" blockAlign="center">
+              <Text as="h3" variant="headingSm">{title}</Text>
+              {done && <Badge tone="success">Done</Badge>}
+            </InlineStack>
+            <Text as="p" tone="subdued" variant="bodySm">{description}</Text>
+          </BlockStack>
+        </div>
+        <div style={{ flexShrink: 0 }}>
+          <Button url={actionUrl} external={external} variant={done ? "plain" : "primary"}>
+            {actionLabel}
+          </Button>
+        </div>
+      </div>
+    </Box>
+  );
+}
+
+function FeatureCard({ icon, title, description, stat }) {
   return (
     <Card>
-      <BlockStack gap="100">
-        <Text as="p" tone="subdued" variant="bodySm">{label}</Text>
-        <Text as="p" variant="heading2xl">{value}</Text>
-        {sublabel && <Text as="p" tone="subdued" variant="bodySm">{sublabel}</Text>}
+      <BlockStack gap="300">
+        <InlineStack gap="300" blockAlign="center">
+          <div style={{
+            width: "36px", height: "36px", flexShrink: 0,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            borderRadius: "10px", background: "rgba(45,107,79,0.1)",
+            fontSize: "18px",
+          }}>
+            {icon}
+          </div>
+          <Text as="h3" variant="headingSm">{title}</Text>
+        </InlineStack>
+        <Text as="p" tone="subdued" variant="bodySm">{description}</Text>
+        {stat && (
+          <Box paddingBlockStart="100">
+            <Badge tone="info">{stat}</Badge>
+          </Box>
+        )}
       </BlockStack>
     </Card>
   );
 }
 
-export default function Dashboard() {
-  const { hasApiKey, hasChatServer, anthropicModel, fileCount, shop, themeEditorUrl } = useLoaderData();
-  const ready = hasApiKey && hasChatServer;
+function QuickActionCard({ title, description, actionLabel, actionUrl, external }) {
+  return (
+    <Card>
+      <BlockStack gap="200">
+        <Text as="h3" variant="headingSm">{title}</Text>
+        <Text as="p" tone="subdued" variant="bodySm">{description}</Text>
+        <Box paddingBlockStart="100">
+          <Button url={actionUrl} external={external} variant="plain">
+            {actionLabel}
+          </Button>
+        </Box>
+      </BlockStack>
+    </Card>
+  );
+}
+
+export default function Home() {
+  const {
+    hasApiKey, fileCount, shop, themeEditorUrl,
+    productsCount, enrichmentCount, totalCost, totalMessages, modelStrategy,
+  } = useLoaderData();
+
+  const strategyLabel = modelStrategy === "smart"
+    ? "Smart routing"
+    : modelStrategy === "always-haiku"
+      ? "Always Fast"
+      : modelStrategy === "always-opus"
+        ? "Always Advanced"
+        : "Always Standard";
 
   return (
-    <Page title="Analytics">
-      <TitleBar title="Analytics" />
-      <BlockStack gap="500">
-        {!ready && (
-          <Banner title="Finish setup to activate the chat assistant" tone="warning">
-            <BlockStack gap="200">
-              {!hasApiKey && <p>— Add your Anthropic API key in <PolarisLink url="/app/api-keys">API Keys</PolarisLink></p>}
-              {!hasChatServer && <p>— Set your Chat Server URL in <PolarisLink url="/app/api-keys">API Keys</PolarisLink></p>}
-            </BlockStack>
-          </Banner>
-        )}
-
-        {ready && (
-          <Banner title="Chat assistant is live" tone="success">
-            <p>Customers on your storefront can now chat with the AI. Customize appearance and messaging in the theme editor.</p>
-          </Banner>
-        )}
-
-        <InlineGrid columns={{ xs: 1, sm: 2, md: 4 }} gap="400">
-          <StatCard label="Conversations" value="—" sublabel="Last 30 days" />
-          <StatCard label="Messages" value="—" sublabel="Last 30 days" />
-          <StatCard label="Avg. response time" value="—" sublabel="Seconds" />
-          <StatCard label="Product mentions" value="—" sublabel="Click-throughs to PDP" />
-        </InlineGrid>
-
-        <Card>
-          <BlockStack gap="400">
-            <InlineStack align="space-between" blockAlign="center">
-              <Text as="h2" variant="headingMd">Top customer questions</Text>
-              <Badge tone="info">Coming soon</Badge>
-            </InlineStack>
-            <Text as="p" tone="subdued">
-              A ranked list of what customers ask most will appear here once the chat server starts logging conversations.
+    <Page>
+      <TitleBar title="ShopAgent" />
+      <BlockStack gap="600">
+        <div style={{
+          background: "linear-gradient(135deg, #2D6B4F 0%, #3a8a66 100%)",
+          borderRadius: "12px", padding: "32px", marginTop: "-8px",
+        }}>
+          <BlockStack gap="200">
+            <Text as="h1" variant="headingXl">
+              <span style={{ color: "#fff" }}>ShopAgent</span>
             </Text>
+            <Text as="p" variant="bodyMd">
+              <span style={{ color: "rgba(255,255,255,0.85)" }}>AI-powered shopping assistant for your Shopify store.</span>
+            </Text>
+            {totalMessages > 0 && (
+              <Box paddingBlockStart="200">
+                <Badge tone="info">{totalMessages} conversations this month</Badge>
+              </Box>
+            )}
           </BlockStack>
-        </Card>
+        </div>
+
+        <BlockStack gap="300">
+          <Text as="h2" variant="headingMd">What ShopAgent does for you</Text>
+          <Text as="p" tone="subdued" variant="bodySm">
+            Everything runs automatically — just connect your account and let the AI handle customer questions.
+          </Text>
+          <InlineGrid columns={{ xs: 1, sm: 2 }} gap="400">
+            <FeatureCard
+              icon={"📦"}
+              title="Knows your products"
+              description="Your entire catalog — products, prices, sizes, and availability — is always up to date. Any changes you make in Shopify are reflected instantly."
+              stat={productsCount > 0 ? `${productsCount} products synced` : null}
+            />
+            <FeatureCard
+              icon={"📋"}
+              title="Learns your extra info"
+              description="Upload files with FAQs, sizing guides, care instructions, or brand info. The AI uses this to give more detailed, personalized answers."
+              stat={enrichmentCount > 0 ? `${enrichmentCount} products enriched` : null}
+            />
+            <FeatureCard
+              icon={"🔍"}
+              title="Finds the right products"
+              description="When a customer asks about a product, the AI searches your catalog in real time — by name, category, price, or any detail you\'ve uploaded."
+            />
+            <FeatureCard
+              icon={"⚡"}
+              title="Keeps costs low"
+              description="Quick replies like \'thanks\' or \'okay\' use a faster, cheaper model. Detailed product questions use the full-powered model. You save without lifting a finger."
+              stat={strategyLabel}
+            />
+          </InlineGrid>
+        </BlockStack>
 
         <Divider />
 
-        <InlineGrid columns={{ xs: 1, md: 3 }} gap="400">
-          <Card>
-            <BlockStack gap="200">
-              <Text as="h3" variant="headingSm">AI Model</Text>
-              <InlineStack gap="200" blockAlign="center">
-                <Badge tone={hasApiKey ? "success" : "critical"}>
-                  {hasApiKey ? "Connected" : "Not set"}
-                </Badge>
-              </InlineStack>
-              <Text as="p" tone="subdued" variant="bodySm">{anthropicModel}</Text>
-              <Button url="/app/api-keys" variant="plain">Configure</Button>
-            </BlockStack>
-          </Card>
+        <BlockStack gap="300">
+          <InlineStack gap="300" blockAlign="center">
+            <Text as="h2" variant="headingMd">Setup checklist</Text>
+            {hasApiKey ? (
+              <Badge tone="success">Ready</Badge>
+            ) : (
+              <Badge tone="attention">Action needed</Badge>
+            )}
+          </InlineStack>
 
-          <Card>
-            <BlockStack gap="200">
-              <Text as="h3" variant="headingSm">Knowledge Base</Text>
-              <Text as="p" variant="headingLg">{fileCount}</Text>
-              <Text as="p" tone="subdued" variant="bodySm">CSV files uploaded</Text>
-              <Button url="/app/knowledge" variant="plain">Manage</Button>
-            </BlockStack>
-          </Card>
+          <BlockStack gap="300">
+            <ChecklistItem
+              done={hasApiKey}
+              number="1"
+              title="Connect the AI engine"
+              description="Paste your API key to power the AI assistant. Pay-as-you-go — you only pay for what you use."
+              actionLabel={hasApiKey ? "Manage" : "Add key"}
+              actionUrl="/app/api-keys"
+            />
+            <ChecklistItem
+              done={false}
+              number="2"
+              title="Enable the chat widget"
+              description="Turn on the ShopAgent chat block in your active Shopify theme so customers see it on your storefront."
+              actionLabel="Open theme editor"
+              actionUrl={themeEditorUrl}
+              external
+            />
+            <ChecklistItem
+              done={fileCount > 0}
+              number="3"
+              title="Upload extra knowledge (optional)"
+              description="FAQs, brand voice, sizing guides, product specs — CSV files with a SKU column are automatically linked to your catalog."
+              actionLabel={fileCount > 0 ? "Manage files" : "Upload"}
+              actionUrl="/app/knowledge"
+            />
+          </BlockStack>
+        </BlockStack>
 
-          <Card>
-            <BlockStack gap="200">
-              <Text as="h3" variant="headingSm">Appearance & Content</Text>
-              <Text as="p" tone="subdued" variant="bodySm">
-                Branding, colors, greetings, and CTAs live in the theme editor.
-              </Text>
-              <Button url={themeEditorUrl} external variant="plain">
-                Open theme editor
-              </Button>
-            </BlockStack>
-          </Card>
-        </InlineGrid>
+        <Divider />
 
-        <Box paddingBlockStart="300">
-          <Text as="p" tone="subdued" variant="bodySm" alignment="center">
-            Installed on {shop}
-          </Text>
-        </Box>
+        <BlockStack gap="300">
+          <Text as="h2" variant="headingMd">Quick actions</Text>
+          <InlineGrid columns={{ xs: 1, sm: 2, md: 4 }} gap="400">
+            <QuickActionCard
+              title="Settings"
+              description="AI engine and model routing strategy."
+              actionLabel="Configure"
+              actionUrl="/app/api-keys"
+            />
+            <QuickActionCard
+              title="Knowledge Base"
+              description="Upload CSVs and text files with extra context."
+              actionLabel="Upload files"
+              actionUrl="/app/knowledge"
+            />
+            <QuickActionCard
+              title="Catalog"
+              description="View synced products and trigger a resync."
+              actionLabel="View catalog"
+              actionUrl="/app/catalog"
+            />
+            <QuickActionCard
+              title="Analytics"
+              description="API usage, cost breakdown, and conversations."
+              actionLabel="View stats"
+              actionUrl="/app/analytics"
+            />
+          </InlineGrid>
+        </BlockStack>
+
+        <Card>
+          <BlockStack gap="300">
+            <Text as="h2" variant="headingMd">About ShopAgent</Text>
+            <InlineGrid columns={{ xs: 1, sm: 2 }} gap="400">
+              <BlockStack gap="200">
+                <Text as="p" variant="bodySm"><strong>Version:</strong> 1.0.0</Text>
+                <Text as="p" variant="bodySm"><strong>AI Engine:</strong> ShopAgent AI</Text>
+              </BlockStack>
+              <BlockStack gap="200">
+                <Text as="p" variant="bodySm"><strong>UTM Tracking:</strong> All product links include utm_source=shopagent</Text>
+                <Text as="p" variant="bodySm"><strong>Privacy:</strong> Feedback data hashed, auto-deleted after 90 days</Text>
+                <Text as="p" variant="bodySm"><strong>Billing:</strong> Pay-as-you-go AI usage — no markup</Text>
+              </BlockStack>
+            </InlineGrid>
+          </BlockStack>
+        </Card>
       </BlockStack>
     </Page>
   );
