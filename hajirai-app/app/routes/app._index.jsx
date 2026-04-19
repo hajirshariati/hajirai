@@ -99,39 +99,22 @@ function ChecklistItem({ done, number, title, description, actionLabel, actionUr
   );
 }
 
-function FeatureCard({ number, title, description, stat, items }) {
+function FeatureCard({ icon, title, description, stat }) {
   return (
     <Card>
       <BlockStack gap="300">
-        <InlineStack gap="200" blockAlign="center">
-          <Box
-            background="bg-surface-brand-subdued"
-            borderRadius="full"
-            padding="200"
-            minWidth="28px"
-            minHeight="28px"
-          >
-            <InlineStack align="center" blockAlign="center">
-              <Text as="span" variant="bodySm" fontWeight="bold">{number}</Text>
-            </InlineStack>
-          </Box>
+        <InlineStack gap="300" blockAlign="center">
+          <div style={{
+            width: "36px", height: "36px", flexShrink: 0,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            borderRadius: "10px", background: "var(--p-color-bg-surface-brand-subdued)",
+            fontSize: "18px",
+          }}>
+            {icon}
+          </div>
           <Text as="h3" variant="headingSm">{title}</Text>
         </InlineStack>
         <Text as="p" tone="subdued" variant="bodySm">{description}</Text>
-        {items && (
-          <BlockStack gap="150">
-            {items.map((item) => (
-              <InlineStack key={item.name} gap="200" blockAlign="start" wrap={false}>
-                <Box minWidth="6px">
-                  <Text as="span" tone="subdued" variant="bodySm">•</Text>
-                </Box>
-                <Text as="p" variant="bodySm">
-                  <strong>{item.name}</strong> — {item.desc}
-                </Text>
-              </InlineStack>
-            ))}
-          </BlockStack>
-        )}
         {stat && (
           <Box paddingBlockStart="100">
             <Badge tone="info">{stat}</Badge>
@@ -195,37 +178,32 @@ export default function Home() {
         </Card>
 
         <BlockStack gap="300">
-          <Text as="h2" variant="headingMd">How ShopAgent works</Text>
+          <Text as="h2" variant="headingMd">What ShopAgent does for you</Text>
           <Text as="p" tone="subdued" variant="bodySm">
-            Four systems work together to give your customers accurate, real-time answers.
+            Everything runs automatically — just connect your account and let the AI handle customer questions.
           </Text>
           <InlineGrid columns={{ xs: 1, sm: 2 }} gap="400">
             <FeatureCard
-              number="1"
-              title="Catalog Sync"
-              description="Your Shopify products, variants, prices, and inventory are automatically indexed into a searchable database. Stays in sync via webhooks."
-              stat={productsCount > 0 ? `${productsCount} products indexed` : null}
+              icon={"\uD83D\uDCE6"}
+              title="Knows your products"
+              description="Your entire catalog — products, prices, sizes, and availability — is always up to date. Any changes you make in Shopify are reflected instantly."
+              stat={productsCount > 0 ? `${productsCount} products synced` : null}
             />
             <FeatureCard
-              number="2"
-              title="SKU Matching Engine"
-              description="When you upload a CSV with a SKU column, each row is automatically linked to the matching product variant. Materials, sizing, care instructions — all connected."
-              stat={enrichmentCount > 0 ? `${enrichmentCount} SKUs enriched` : null}
+              icon={"\uD83D\uDCCB"}
+              title="Learns your extra info"
+              description="Upload files with FAQs, sizing guides, care instructions, or brand info. The AI uses this to give more detailed, personalized answers."
+              stat={enrichmentCount > 0 ? `${enrichmentCount} products enriched` : null}
             />
             <FeatureCard
-              number="3"
-              title="AI Tool Use"
-              description="The AI doesn't see all your data at once. It calls these tools on demand — accurate, efficient, auto-activated on every chat."
-              items={[
-                { name: "search_products", desc: "Finds products by keyword, tag, or category." },
-                { name: "get_product_details", desc: "Pulls variants, pricing, stock, and specs." },
-                { name: "lookup_sku", desc: "Matches a SKU to uploaded CSV knowledge." },
-              ]}
+              icon={"\uD83D\uDD0D"}
+              title="Finds the right products"
+              description="When a customer asks about a product, the AI searches your catalog in real time — by name, category, price, or any detail you've uploaded."
             />
             <FeatureCard
-              number="4"
-              title="Smart Model Routing"
-              description="Simple follow-ups (thanks, ok, bye) use the faster, cheaper model. Product questions and complex queries use the more capable model. Saves you money automatically."
+              icon={"\u26A1"}
+              title="Keeps costs low"
+              description="Quick replies like 'thanks' or 'okay' use a faster, cheaper model. Detailed product questions use the full-powered model. You save without lifting a finger."
               stat={strategyLabel}
             />
           </InlineGrid>
