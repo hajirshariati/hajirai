@@ -2,6 +2,7 @@ import { Link, Outlet, useLoaderData, useRouteError } from "react-router";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { AppProvider as ShopifyAppProvider } from "@shopify/shopify-app-react-router/react";
 import { AppProvider as PolarisAppProvider } from "@shopify/polaris";
+import { Box, Text } from "@shopify/polaris";
 import { NavMenu } from "@shopify/app-bridge-react";
 import enTranslations from "@shopify/polaris/locales/en.json";
 import polarisStyles from "@shopify/polaris/build/esm/styles.css?url";
@@ -20,11 +21,19 @@ export default function App() {
     <ShopifyAppProvider isEmbeddedApp apiKey={apiKey}>
       <PolarisAppProvider i18n={enTranslations}>
         <NavMenu>
-          <Link to="/app" rel="home">Analytics</Link>
+          <Link to="/app" rel="home">ShopAgent</Link>
+          <Link to="/app/catalog">Catalog</Link>
           <Link to="/app/knowledge">Knowledge Base</Link>
-          <Link to="/app/api-keys">API Keys</Link>
+          <Link to="/app/analytics">Analytics</Link>
+          <Link to="/app/plans">Plans</Link>
+          <Link to="/app/api-keys">Settings</Link>
         </NavMenu>
         <Outlet />
+        <div style={{ marginTop: "40px", padding: "16px", textAlign: "center", borderTop: "2px solid #2D6B4F" }}>
+          <Text as="p" tone="subdued" variant="bodySm" alignment="center">
+            ShopAgent v1.0. All rights reserved.
+          </Text>
+        </div>
       </PolarisAppProvider>
     </ShopifyAppProvider>
   );
