@@ -1006,16 +1006,18 @@
 .ai-chat-input {
   flex: 1;
   padding: 10px 0;
-  border: none;
+  border: none !important;
   font-size: 14px;
   font-family: inherit;
   resize: none;
-  outline: none;
+  outline: none !important;
   line-height: 1.4;
   max-height: 100px;
   overflow-y: auto;
   background: transparent;
   color: var(--ai-chat-text);
+  box-shadow: none !important;
+  -webkit-appearance: none !important;
   box-sizing: border-box;
 }
 
