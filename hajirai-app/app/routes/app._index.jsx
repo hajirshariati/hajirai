@@ -283,7 +283,7 @@ export default function Home() {
           <Text as="h2" variant="headingMd">Quick actions</Text>
           <InlineGrid columns={{ xs: 1, sm: 2, md: 4 }} gap="400">
             <QuickActionCard
-              title="API Keys"
+              title="Settings"
               description="Anthropic account and model routing strategy."
               actionLabel="Configure"
               actionUrl="/app/api-keys"

@@ -25,7 +25,7 @@ export default function App() {
           <Link to="/app/catalog">Catalog</Link>
           <Link to="/app/knowledge">Knowledge Base</Link>
           <Link to="/app/analytics">Analytics</Link>
-          <Link to="/app/api-keys">API Keys</Link>
+          <Link to="/app/api-keys">Settings</Link>
         </NavMenu>
         <Outlet />
         <Box paddingBlockStart="800" paddingBlockEnd="600" paddingInline="400">

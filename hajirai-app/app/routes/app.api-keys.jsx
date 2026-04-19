@@ -122,8 +122,8 @@ export default function ApiKeys() {
   const [aftershipKey, setAftershipKey] = useState("");
 
   return (
-    <Page title="API Keys & Model Settings" backAction={{ url: "/app" }}>
-      <TitleBar title="API Keys" />
+    <Page title="Settings" backAction={{ url: "/app" }}>
+      <TitleBar title="Settings" />
       <Form method="post">
         <BlockStack gap="500">
           {actionData?.success && (
