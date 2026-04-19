@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useLoaderData, useActionData, useNavigation, useSubmit } from "react-router";
 import {
   Page,
@@ -99,10 +99,70 @@ export const action = async ({ request }) => {
 };
 
 const FILE_TYPES = [
-  { label: "FAQs & Policies", value: "faqs", description: "Shipping, returns, warranty, common customer questions." },
-  { label: "Brand / About", value: "brand", description: "Your story, values, voice, and tone." },
-  { label: "Product Details", value: "products", description: "Extra product info — materials, care, sizing charts." },
-  { label: "Custom Knowledge", value: "custom", description: "Anything else the AI should know." },
+  {
+    label: "FAQs & Policies",
+    value: "faqs",
+    description: "Shipping, returns, warranty, common customer questions.",
+    format: "csv",
+    templateName: "faqs-template.csv",
+    columns: "question, answer",
+    template: `question,answer
+"What is your return policy?","We accept returns within 30 days of purchase. Items must be unworn with original tags attached."
+"How long does shipping take?","Standard shipping takes 5-7 business days. Express shipping takes 2-3 business days."
+"Do you offer free shipping?","Yes, free standard shipping on all orders over $50."
+"How do I track my order?","Once your order ships, you'll receive a tracking email. You can also check order status in your account."
+"What payment methods do you accept?","We accept Visa, Mastercard, American Express, PayPal, and Apple Pay."`,
+  },
+  {
+    label: "Brand / About",
+    value: "brand",
+    description: "Your story, values, voice, and tone.",
+    format: "txt",
+    templateName: "brand-voice-template.txt",
+    template: `Brand Name: [Your Brand Name]
+
+Our Story:
+[Write 2-3 sentences about how your brand started and what drives you.]
+
+Brand Voice:
+- Tone: [e.g., friendly and approachable / premium and sophisticated / casual and fun]
+- We always say: [e.g., "sustainable materials", "handcrafted quality"]
+- We never say: [e.g., "cheap", "discount"]
+
+Values:
+- [e.g., Sustainability — we use recycled packaging and ethically sourced materials]
+- [e.g., Quality — every product is inspected before shipping]
+- [e.g., Community — 1% of sales go to local charities]
+
+Key Differentiators:
+- [What makes you different from competitors?]
+- [Why should customers choose you?]`,
+  },
+  {
+    label: "Product Details",
+    value: "products",
+    description: "Extra product info — materials, care, sizing. Include a SKU column to auto-link to your catalog.",
+    format: "csv",
+    templateName: "product-details-template.csv",
+    columns: "sku, material, care_instructions, fit_notes, weight, made_in",
+    template: `sku,material,care_instructions,fit_notes,weight,made_in
+"SKU-001","100% organic cotton","Machine wash cold, tumble dry low","Runs true to size","200g","Portugal"
+"SKU-002","Premium full-grain leather","Wipe clean with damp cloth","Order half size up","450g","Italy"
+"SKU-003","Recycled polyester blend","Machine wash warm, hang dry","Relaxed fit — size down if between sizes","180g","Vietnam"`,
+  },
+  {
+    label: "Custom Knowledge",
+    value: "custom",
+    description: "Anything else the AI should know — promotions, seasonal info, store policies.",
+    format: "csv",
+    templateName: "custom-knowledge-template.csv",
+    columns: "topic, details",
+    template: `topic,details
+"Current promotion","Buy 2 get 1 free on all t-shirts until end of month."
+"Holiday hours","We're closed Dec 25-26 and Jan 1. Orders placed during this time ship on Jan 2."
+"Loyalty program","Customers earn 1 point per dollar spent. 100 points = $10 off next order."
+"Gift wrapping","We offer free gift wrapping on all orders. Just add a note at checkout."`,
+  },
 ];
 
 export default function Knowledge() {
@@ -114,6 +174,20 @@ export default function Knowledge() {
 
   const [selectedType, setSelectedType] = useState("faqs");
   const [uploadFile, setUploadFile] = useState(null);
+
+  const downloadTemplate = useCallback(() => {
+    const type = FILE_TYPES.find((t) => t.value === selectedType);
+    if (!type?.template) return;
+    const blob = new Blob([type.template], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = type.templateName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, [selectedType]);
 
   function handleDropAccepted(droppedFiles) {
     const file = droppedFiles[0];
@@ -212,6 +286,28 @@ export default function Knowledge() {
                   onChange={setSelectedType}
                   helpText={currentType?.description}
                 />
+                <Box padding="300" background="bg-surface-secondary" borderRadius="200">
+                  <BlockStack gap="200">
+                    <InlineStack align="space-between" blockAlign="center">
+                      <Text as="p" variant="bodySm" fontWeight="semibold">
+                        Template: {currentType?.templateName}
+                      </Text>
+                      <Button size="slim" onClick={downloadTemplate}>
+                        Download template
+                      </Button>
+                    </InlineStack>
+                    {currentType?.columns && (
+                      <Text as="p" tone="subdued" variant="bodySm">
+                        Columns: <code>{currentType.columns}</code>
+                      </Text>
+                    )}
+                    {currentType?.value === "products" && (
+                      <Text as="p" tone="subdued" variant="bodySm">
+                        The <code>sku</code> column is required — rows are automatically matched to your Shopify products.
+                      </Text>
+                    )}
+                  </BlockStack>
+                </Box>
                 <DropZone
                   accept=".csv,.txt"
                   type="file"
@@ -268,20 +364,36 @@ export default function Knowledge() {
 
         <Card>
           <BlockStack gap="400">
-            <Text as="h2" variant="headingMd">What to upload</Text>
+            <Text as="h2" variant="headingMd">How it works</Text>
             <BlockStack gap="300">
-              {FILE_TYPES.map((t) => (
-                <BlockStack key={t.value} gap="100">
-                  <Text as="h3" variant="headingSm">{t.label}</Text>
-                  <Text as="p" variant="bodySm" tone="subdued">{t.description}</Text>
+              <Box padding="300" background="bg-surface-secondary" borderRadius="200">
+                <BlockStack gap="200">
+                  <Text as="h3" variant="headingSm">1. Download a template</Text>
+                  <Text as="p" variant="bodySm" tone="subdued">
+                    Select a category above and click "Download template" to get a pre-formatted file with example data.
+                  </Text>
                 </BlockStack>
-              ))}
+              </Box>
+              <Box padding="300" background="bg-surface-secondary" borderRadius="200">
+                <BlockStack gap="200">
+                  <Text as="h3" variant="headingSm">2. Fill in your data</Text>
+                  <Text as="p" variant="bodySm" tone="subdued">
+                    Open the template in Excel or Google Sheets, replace the sample data with your own, and save as CSV.
+                  </Text>
+                </BlockStack>
+              </Box>
+              <Box padding="300" background="bg-surface-secondary" borderRadius="200">
+                <BlockStack gap="200">
+                  <Text as="h3" variant="headingSm">3. Upload it</Text>
+                  <Text as="p" variant="bodySm" tone="subdued">
+                    Drag your file into the upload area above. If your CSV has a <code>sku</code> column, each row is automatically linked to the matching product in your Shopify catalog.
+                  </Text>
+                </BlockStack>
+              </Box>
               <Divider />
               <Text as="p" variant="bodySm" tone="subdued">
-                <strong>Format tip:</strong> For CSVs, include headers like{" "}
-                <code>question, answer</code> for FAQs. For product data, include a{" "}
-                <code>sku</code> column — rows will be automatically linked to matching
-                products in your catalog. Plain text works for any category.
+                Each category keeps one active file — uploading a new file replaces the previous one.
+                The AI reads these files alongside your Shopify catalog when answering customer questions.
               </Text>
             </BlockStack>
           </BlockStack>
