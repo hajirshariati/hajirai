@@ -17,6 +17,7 @@ export const action = async ({ request }) => {
   await db.productEnrichment.deleteMany({ where: { shop } });
   await db.chatUsage.deleteMany({ where: { shop } });
   await db.chatFeedback.deleteMany({ where: { shop } });
+  await db.chatProductMention.deleteMany({ where: { shop } });
 
   return new Response();
 };

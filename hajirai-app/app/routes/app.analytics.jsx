@@ -16,6 +16,7 @@ import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import { getUsageSummary } from "../models/ChatUsage.server";
 import { getFeedbackSummary, cleanupOldFeedback } from "../models/ChatFeedback.server";
+import { getTopProducts, cleanupOldMentions } from "../models/ChatProductMention.server";
 
 const MODEL_LABELS = {
   "claude-sonnet-4-20250514": "Claude Sonnet 4",
@@ -29,12 +30,14 @@ function modelLabel(model) {
 
 export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
-  const [usage, feedback] = await Promise.all([
+  const [usage, feedback, topProducts] = await Promise.all([
     getUsageSummary(session.shop, 30),
     getFeedbackSummary(session.shop, 30),
+    getTopProducts(session.shop, 30, 10),
   ]);
   cleanupOldFeedback().catch(() => {});
-  return { usage, feedback };
+  cleanupOldMentions().catch(() => {});
+  return { usage, feedback, topProducts };
 };
 
 function StatCard({ label, value, sublabel, tone }) {
@@ -62,9 +65,25 @@ function formatTokens(n) {
   return `${(n / 1_000_000).toFixed(2)}M`;
 }
 
+function computeInsights(usage) {
+  const entries = Object.entries(usage.dailyCosts || {});
+  const activeDays = entries.length;
+  let peakDay = null;
+  let peakMessages = 0;
+  for (const [day, data] of entries) {
+    if ((data.messages || 0) > peakMessages) {
+      peakMessages = data.messages;
+      peakDay = day;
+    }
+  }
+  const avgPerDay = activeDays > 0 ? Math.round(usage.totalMessages / activeDays) : 0;
+  return { activeDays, peakDay, peakMessages, avgPerDay };
+}
+
 export default function Analytics() {
-  const { usage, feedback } = useLoaderData();
+  const { usage, feedback, topProducts } = useLoaderData();
   const hasData = usage.totalMessages > 0;
+  const { activeDays, peakDay, peakMessages, avgPerDay } = computeInsights(usage);
 
   const modelRows = Object.entries(usage.byModel).map(([model, data]) => [
     modelLabel(model),
@@ -85,6 +104,13 @@ export default function Analytics() {
     f.products.length > 0 ? f.products.join(", ").slice(0, 60) : "—",
   ]);
 
+  const topProductRows = (topProducts || []).map((p, i) => [
+    String(i + 1),
+    p.title,
+    p.handle,
+    String(p.mentions),
+  ]);
+
   return (
     <Page title="Analytics" backAction={{ url: "/app" }}>
       <TitleBar title="Analytics" />
@@ -94,7 +120,6 @@ export default function Analytics() {
           {hasData ? <Badge tone="success">Live</Badge> : <Badge>No data yet</Badge>}
         </InlineStack>
 
-        {/* ─── Engagement Metrics ─── */}
         <Text as="h2" variant="headingMd">Engagement</Text>
         <InlineGrid columns={{ xs: 2, md: 4 }} gap="400">
           <StatCard
@@ -120,27 +145,66 @@ export default function Analytics() {
           />
         </InlineGrid>
 
-        {/* ─── Negative Feedback Review ─── */}
+        <Text as="h2" variant="headingMd">Activity</Text>
+        <InlineGrid columns={{ xs: 2, md: 4 }} gap="400">
+          <StatCard
+            label="Active Days"
+            value={`${activeDays}/30`}
+            sublabel={activeDays > 0 ? `${Math.round((activeDays / 30) * 100)}% of the month` : "No activity yet"}
+          />
+          <StatCard
+            label="Peak Day"
+            value={peakDay || "—"}
+            sublabel={peakMessages > 0 ? `${peakMessages} messages` : "No data"}
+          />
+          <StatCard
+            label="Avg / Active Day"
+            value={String(avgPerDay)}
+            sublabel="Messages per day"
+          />
+          <StatCard
+            label="Products Shown"
+            value={String(topProductRows.length)}
+            sublabel={topProductRows.length > 0 ? "Unique products in chat" : "No products yet"}
+          />
+        </InlineGrid>
+
+        {topProductRows.length > 0 && (
+          <Card>
+            <BlockStack gap="400">
+              <InlineStack gap="200" blockAlign="center">
+                <Text as="h2" variant="headingMd">Top recommended products</Text>
+                <Badge tone="info">Last 30 days</Badge>
+              </InlineStack>
+              <Text as="p" tone="subdued" variant="bodySm">
+                Products the AI surfaced most often in chat. Use this to spot catalog winners and gaps.
+              </Text>
+              <DataTable
+                columnContentTypes={["text", "text", "text", "numeric"]}
+                headings={["#", "Product", "Handle", "Mentions"]}
+                rows={topProductRows}
+              />
+            </BlockStack>
+          </Card>
+        )}
+
         {negativeRows.length > 0 && (
-          <>
-            <Divider />
-            <Card>
-              <BlockStack gap="400">
-                <InlineStack gap="200" blockAlign="center">
-                  <Text as="h2" variant="headingMd">Negative feedback</Text>
-                  <Badge tone="critical">{feedback.down} reports</Badge>
-                </InlineStack>
-                <Text as="p" tone="subdued" variant="bodySm">
-                  User data is hashed for privacy. Records auto-delete after 90 days.
-                </Text>
-                <DataTable
-                  columnContentTypes={["text", "text", "text", "text"]}
-                  headings={["Date", "User (hashed)", "AI Response", "Products"]}
-                  rows={negativeRows}
-                />
-              </BlockStack>
-            </Card>
-          </>
+          <Card>
+            <BlockStack gap="400">
+              <InlineStack gap="200" blockAlign="center">
+                <Text as="h2" variant="headingMd">Negative feedback</Text>
+                <Badge tone="critical">{feedback.down} reports</Badge>
+              </InlineStack>
+              <Text as="p" tone="subdued" variant="bodySm">
+                User data is hashed for privacy. Records auto-delete after 90 days.
+              </Text>
+              <DataTable
+                columnContentTypes={["text", "text", "text", "text"]}
+                headings={["Date", "User (hashed)", "AI Response", "Products"]}
+                rows={negativeRows}
+              />
+            </BlockStack>
+          </Card>
         )}
 
         {feedback.total > 0 && feedback.down === 0 && (
@@ -149,7 +213,6 @@ export default function Analytics() {
 
         <Divider />
 
-        {/* ─── API Cost ─── */}
         <Text as="h2" variant="headingMd">API Cost</Text>
         <InlineGrid columns={{ xs: 2, md: 4 }} gap="400">
           <StatCard

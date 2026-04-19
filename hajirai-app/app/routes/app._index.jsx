@@ -104,7 +104,7 @@ function ChecklistItem({ done, number, title, description, actionLabel, actionUr
   );
 }
 
-function FeatureCard({ number, title, description, stat }) {
+function FeatureCard({ number, title, description, stat, items }) {
   return (
     <Card>
       <BlockStack gap="300">
@@ -123,6 +123,20 @@ function FeatureCard({ number, title, description, stat }) {
           <Text as="h3" variant="headingSm">{title}</Text>
         </InlineStack>
         <Text as="p" tone="subdued" variant="bodySm">{description}</Text>
+        {items && (
+          <BlockStack gap="150">
+            {items.map((item) => (
+              <InlineStack key={item.name} gap="200" blockAlign="start" wrap={false}>
+                <Box minWidth="6px">
+                  <Text as="span" tone="subdued" variant="bodySm">•</Text>
+                </Box>
+                <Text as="p" variant="bodySm">
+                  <strong>{item.name}</strong> — {item.desc}
+                </Text>
+              </InlineStack>
+            ))}
+          </BlockStack>
+        )}
         {stat && (
           <Box paddingBlockStart="100">
             <Badge tone="info">{stat}</Badge>
@@ -178,7 +192,6 @@ export default function Home() {
                 <Box paddingBlockStart="200">
                   <InlineStack gap="300">
                     <Badge>{totalMessages} conversations this month</Badge>
-                    <Badge tone="info">${totalCost.toFixed(2)} API cost</Badge>
                   </InlineStack>
                 </Box>
               )}
@@ -207,8 +220,12 @@ export default function Home() {
             <FeatureCard
               number="3"
               title="AI Tool Use"
-              description="Instead of dumping all your data into a prompt, the AI searches your catalog, looks up product details, and checks SKUs on demand. Accurate and cost-efficient."
-              stat="3 tools available"
+              description="The AI doesn't see all your data at once. It calls these tools on demand — accurate, efficient, auto-activated on every chat."
+              items={[
+                { name: "search_products", desc: "Finds products by keyword, tag, or category." },
+                { name: "get_product_details", desc: "Pulls variants, pricing, stock, and specs." },
+                { name: "lookup_sku", desc: "Matches a SKU to uploaded CSV knowledge." },
+              ]}
             />
             <FeatureCard
               number="4"

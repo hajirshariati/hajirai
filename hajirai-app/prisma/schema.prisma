@@ -192,3 +192,17 @@ model ChatFeedback {
   @@index([shop, createdAt])
   @@index([createdAt])
 }
+
+model ChatProductMention {
+  id        String   @id @default(cuid())
+  shop      String
+  handle    String
+  title     String
+  tool      String
+  createdAt DateTime @default(now())
+
+  @@index([shop])
+  @@index([shop, createdAt])
+  @@index([shop, handle])
+  @@index([createdAt])
+}

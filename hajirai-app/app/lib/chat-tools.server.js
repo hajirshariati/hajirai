@@ -1,4 +1,5 @@
 import prisma from "../db.server";
+import { logMentions } from "../models/ChatProductMention.server";
 
 // Tool definitions sent to Anthropic. Keep descriptions action-oriented so the
 // model knows when to call each one.
@@ -212,11 +213,29 @@ const HANDLERS = {
   lookup_sku: lookupSku,
 };
 
+function mentionsFromResult(name, result) {
+  if (!result || result.error) return [];
+  if (name === "search_products" && Array.isArray(result.products)) {
+    return result.products.map((p) => ({ handle: p.handle, title: p.title, tool: name }));
+  }
+  if (name === "get_product_details" && result.handle && result.title) {
+    return [{ handle: result.handle, title: result.title, tool: name }];
+  }
+  if (name === "lookup_sku" && Array.isArray(result.found)) {
+    return result.found.map((f) => ({ handle: f.productHandle, title: f.productTitle, tool: name }));
+  }
+  return [];
+}
+
 export async function executeTool(name, input, ctx) {
   const handler = HANDLERS[name];
   if (!handler) return { error: `Unknown tool '${name}'.` };
   try {
-    return await handler(input || {}, ctx);
+    const result = await handler(input || {}, ctx);
+    if (ctx?.shop) {
+      logMentions(ctx.shop, mentionsFromResult(name, result)).catch(() => {});
+    }
+    return result;
   } catch (err) {
     console.error(`[tool ${name}] error:`, err?.message || err);
     return { error: `Tool '${name}' failed: ${err?.message || "unknown error"}` };

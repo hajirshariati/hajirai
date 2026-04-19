@@ -13,6 +13,7 @@ const MAX_TOOL_HOPS = parseInt(process.env.CHAT_MAX_TOOL_HOPS, 10) || 5;
 
 const RATE_LIMIT_PER_IP_SHOP = parseInt(process.env.RATE_LIMIT_PER_IP_SHOP, 10) || 20;
 const RATE_LIMIT_WINDOW_MS = parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 60_000;
+const RATE_LIMIT_MAX_KEYS = parseInt(process.env.RATE_LIMIT_MAX_KEYS, 10) || 10_000;
 
 const ipShopBuckets = new Map();
 
@@ -34,6 +35,16 @@ function checkIpShopRate(shop, ip) {
   }
   bucket.push(now);
   ipShopBuckets.set(key, bucket);
+  if (ipShopBuckets.size > RATE_LIMIT_MAX_KEYS) {
+    const evictCount = ipShopBuckets.size - RATE_LIMIT_MAX_KEYS;
+    let evicted = 0;
+    for (const k of ipShopBuckets.keys()) {
+      if (evicted >= evictCount) break;
+      if (k === key) continue;
+      ipShopBuckets.delete(k);
+      evicted++;
+    }
+  }
   return { ok: true };
 }
 

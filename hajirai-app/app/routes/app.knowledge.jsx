@@ -56,6 +56,11 @@ export const action = async ({ request }) => {
       return { error: "File and type are required" };
     }
 
+    const MAX_FILE_BYTES = 10 * 1024 * 1024;
+    if (content.length > MAX_FILE_BYTES) {
+      return { error: `File too large. Max ${MAX_FILE_BYTES / 1024 / 1024}MB.` };
+    }
+
     const saved = await saveKnowledgeFile(session.shop, {
       fileName,
       fileType,
