@@ -19,9 +19,9 @@ import { getFeedbackSummary, cleanupOldFeedback } from "../models/ChatFeedback.s
 import { getTopProducts, cleanupOldMentions } from "../models/ChatProductMention.server";
 
 const MODEL_LABELS = {
-  "claude-sonnet-4-20250514": "Claude Sonnet 4",
-  "claude-haiku-4-5-20251001": "Claude Haiku 4.5",
-  "claude-opus-4-20250514": "Claude Opus 4",
+  "claude-sonnet-4-20250514": "Standard",
+  "claude-haiku-4-5-20251001": "Fast",
+  "claude-opus-4-20250514": "Advanced",
 };
 
 function modelLabel(model) {
@@ -218,7 +218,7 @@ export default function Analytics() {
           <StatCard
             label="Total Cost"
             value={formatCost(usage.totalCost)}
-            sublabel="Billed to your Anthropic account"
+            sublabel="AI engine usage cost"
           />
           <StatCard
             label="Avg / Message"
@@ -242,7 +242,7 @@ export default function Analytics() {
             <BlockStack gap="400">
               <Text as="h2" variant="headingMd">Cost by model</Text>
               <Text as="p" tone="subdued" variant="bodySm">
-                Smart routing uses Haiku for simple follow-ups and Sonnet for product questions.
+                Smart routing uses the Fast model for simple follow-ups and the Standard model for product questions.
               </Text>
               <DataTable
                 columnContentTypes={["text", "numeric", "numeric", "numeric"]}
@@ -279,7 +279,7 @@ export default function Analytics() {
 
         <Box paddingBlockStart="100">
           <Text as="p" tone="subdued" variant="bodySm" alignment="center">
-            Cost estimates based on Anthropic pricing. User data hashed for privacy. Feedback auto-deleted after 90 days.
+            Cost estimates based on AI engine pricing. User data hashed for privacy. Feedback auto-deleted after 90 days.
           </Text>
         </Box>
       </BlockStack>

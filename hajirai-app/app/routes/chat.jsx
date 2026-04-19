@@ -182,7 +182,7 @@ export const action = async ({ request }) => {
     const config = await getShopConfig(session.shop);
     if (!config.anthropicApiKey) {
       return Response.json(
-        { error: "Anthropic API key not configured. Set it in the app admin under API Keys." },
+        { error: "AI engine API key not configured. Set it in the app admin under Settings." },
         { status: 503 },
       );
     }

@@ -172,10 +172,10 @@ export default function Home() {
   const strategyLabel = modelStrategy === "smart"
     ? "Smart routing"
     : modelStrategy === "always-haiku"
-      ? "Always Haiku"
+      ? "Always Fast"
       : modelStrategy === "always-opus"
-        ? "Always Opus"
-        : "Always Sonnet";
+        ? "Always Advanced"
+        : "Always Standard";
 
   return (
     <Page title="Home">
@@ -230,7 +230,7 @@ export default function Home() {
             <FeatureCard
               number="4"
               title="Smart Model Routing"
-              description="Simple follow-ups (thanks, ok, bye) use the cheaper Haiku model. Product questions and complex queries use the more capable Sonnet model. Saves you money automatically."
+              description="Simple follow-ups (thanks, ok, bye) use the faster, cheaper model. Product questions and complex queries use the more capable model. Saves you money automatically."
               stat={strategyLabel}
             />
           </InlineGrid>
@@ -252,8 +252,8 @@ export default function Home() {
             <ChecklistItem
               done={hasApiKey}
               number="1"
-              title="Connect your Anthropic account"
-              description="Paste your API key from console.anthropic.com. This is the AI engine that powers customer conversations. You only pay for what you use."
+              title="Connect the AI engine"
+              description="Paste your API key to power the AI assistant. Pay-as-you-go — you only pay for what you use."
               actionLabel={hasApiKey ? "Manage" : "Add key"}
               actionUrl="/app/api-keys"
             />
@@ -284,7 +284,7 @@ export default function Home() {
           <InlineGrid columns={{ xs: 1, sm: 2, md: 4 }} gap="400">
             <QuickActionCard
               title="Settings"
-              description="Anthropic account and model routing strategy."
+              description="AI engine and model routing strategy."
               actionLabel="Configure"
               actionUrl="/app/api-keys"
             />
@@ -315,12 +315,12 @@ export default function Home() {
             <InlineGrid columns={{ xs: 1, sm: 2 }} gap="400">
               <BlockStack gap="200">
                 <Text as="p" variant="bodySm"><strong>Version:</strong> 1.0.0</Text>
-                <Text as="p" variant="bodySm"><strong>AI Engine:</strong> Claude by Anthropic</Text>
+                <Text as="p" variant="bodySm"><strong>AI Engine:</strong> ShopAgent AI</Text>
               </BlockStack>
               <BlockStack gap="200">
                 <Text as="p" variant="bodySm"><strong>UTM Tracking:</strong> All product links include utm_source=shopagent</Text>
                 <Text as="p" variant="bodySm"><strong>Privacy:</strong> Feedback data hashed, auto-deleted after 90 days</Text>
-                <Text as="p" variant="bodySm"><strong>Billing:</strong> Pay Anthropic directly — no markup</Text>
+                <Text as="p" variant="bodySm"><strong>Billing:</strong> Pay-as-you-go AI usage — no markup</Text>
               </BlockStack>
             </InlineGrid>
           </BlockStack>

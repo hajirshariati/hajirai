@@ -88,23 +88,23 @@ function ConnectionStatus({ connected }) {
 }
 
 const MODEL_OPTIONS = [
-  { label: "Claude Sonnet 4 — recommended", value: "claude-sonnet-4-20250514" },
-  { label: "Claude Haiku 4.5 — faster, cheaper", value: "claude-haiku-4-5-20251001" },
-  { label: "Claude Opus 4 — most capable", value: "claude-opus-4-20250514" },
+  { label: "Standard — recommended", value: "claude-sonnet-4-20250514" },
+  { label: "Fast — lower cost", value: "claude-haiku-4-5-20251001" },
+  { label: "Advanced — most capable", value: "claude-opus-4-20250514" },
 ];
 
 const STRATEGY_OPTIONS = [
   { label: "Smart routing (recommended)", value: "smart" },
-  { label: "Always use Sonnet 4", value: "always-sonnet" },
-  { label: "Always use Haiku 4.5", value: "always-haiku" },
-  { label: "Always use Opus 4", value: "always-opus" },
+  { label: "Always use Standard", value: "always-sonnet" },
+  { label: "Always use Fast", value: "always-haiku" },
+  { label: "Always use Advanced", value: "always-opus" },
 ];
 
 const STRATEGY_HELP = {
-  smart: "Uses Haiku ($1/M tokens) for simple follow-ups like \"thanks\" or \"ok\", and Sonnet ($3/M) for product questions and complex queries. Best balance of cost and quality.",
-  "always-sonnet": "Every message uses Sonnet 4 ($3/M input, $15/M output). Consistent quality for all conversations.",
-  "always-haiku": "Every message uses Haiku 4.5 ($1/M input, $5/M output). Lowest cost, good for high-volume stores with simple products.",
-  "always-opus": "Every message uses Opus 4 ($15/M input, $75/M output). Maximum capability for complex product catalogs.",
+  smart: "Uses the Fast model for simple follow-ups like \"thanks\" or \"ok\", and the Standard model for product questions and complex queries. Best balance of cost and quality.",
+  "always-sonnet": "Every message uses the Standard model. Consistent quality for all conversations.",
+  "always-haiku": "Every message uses the Fast model. Lowest cost, good for high-volume stores with simple products.",
+  "always-opus": "Every message uses the Advanced model. Maximum capability for complex product catalogs.",
 };
 
 export default function ApiKeys() {
@@ -132,16 +132,15 @@ export default function ApiKeys() {
 
           <Layout>
             <Layout.AnnotatedSection
-              title="Anthropic (required)"
+              title="AI Engine (required)"
               description={
                 <BlockStack gap="200">
                   <Text as="p" tone="subdued" variant="bodySm">
-                    Powers the AI assistant. You pay Anthropic directly for usage — ShopAgent adds no markup.
+                    Powers the AI assistant. Pay-as-you-go usage — ShopAgent adds no markup.
                   </Text>
                   <Text as="p" tone="subdued" variant="bodySm">
-                    Get your key from{" "}
                     <a href="https://console.anthropic.com" target="_blank" rel="noreferrer">
-                      console.anthropic.com
+                      Get your API key here
                     </a>
                     .
                   </Text>
@@ -160,7 +159,7 @@ export default function ApiKeys() {
                     type="password"
                     value={anthropicKey}
                     onChange={setAnthropicKey}
-                    placeholder={hasAnthropicKey ? "••••••••••••••••" : "sk-ant-api03-..."}
+                    placeholder={hasAnthropicKey ? "••••••••••••••••" : "Paste API key"}
                     autoComplete="off"
                     helpText="Encrypted at rest. Leave blank to keep your existing key."
                   />
@@ -173,7 +172,7 @@ export default function ApiKeys() {
               description={
                 <BlockStack gap="200">
                   <Text as="p" tone="subdued" variant="bodySm">
-                    Control which Claude model handles customer messages. Smart routing saves money by using
+                    Control which AI model handles customer messages. Smart routing saves money by using
                     a cheaper model for simple interactions.
                   </Text>
                 </BlockStack>
@@ -203,7 +202,7 @@ export default function ApiKeys() {
                     <Banner tone="info">
                       <Text as="p" variant="bodySm">
                         <strong>How smart routing works:</strong> When a customer sends a simple follow-up
-                        like "thanks", "ok", or "bye", ShopAgent uses Haiku 4.5 (up to 3x cheaper).
+                        like "thanks", "ok", or "bye", ShopAgent uses the Fast model (up to 3x cheaper).
                         Product questions, first messages, and detailed queries always use your primary model.
                       </Text>
                     </Banner>
