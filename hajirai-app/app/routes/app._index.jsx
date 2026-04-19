@@ -50,7 +50,7 @@ export const loader = async ({ request }) => {
 function StepCircle({ done, number }) {
   if (done) {
     return (
-      <div style={{ width: "28px", height: "28px", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ width: "28px", height: "28px", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", color: "#2D6B4F" }}>
         <Icon source={CheckCircleIcon} tone="success" />
       </div>
     );
@@ -107,7 +107,7 @@ function FeatureCard({ icon, title, description, stat }) {
           <div style={{
             width: "36px", height: "36px", flexShrink: 0,
             display: "flex", alignItems: "center", justifyContent: "center",
-            borderRadius: "10px", background: "var(--p-color-bg-surface-brand-subdued)",
+            borderRadius: "10px", background: "rgba(45,107,79,0.1)",
             fontSize: "18px",
           }}>
             {icon}
@@ -156,26 +156,27 @@ export default function Home() {
         : "Always Standard";
 
   return (
-    <Page title="Home">
+    <Page>
       <TitleBar title="ShopAgent" />
       <BlockStack gap="600">
-        <Card padding="0">
-          <Box background="bg-surface-brand" padding="800" borderRadius="300">
-            <BlockStack gap="200">
-              <Text as="h1" variant="headingXl">ShopAgent</Text>
-              <Text as="p" variant="bodyMd" tone="subdued">
-                AI-powered shopping assistant for your Shopify store.
-              </Text>
-              {totalMessages > 0 && (
-                <Box paddingBlockStart="200">
-                  <InlineStack gap="300">
-                    <Badge>{totalMessages} conversations this month</Badge>
-                  </InlineStack>
-                </Box>
-              )}
-            </BlockStack>
-          </Box>
-        </Card>
+        <div style={{
+          background: "linear-gradient(135deg, #2D6B4F 0%, #3a8a66 100%)",
+          borderRadius: "12px", padding: "32px", marginTop: "-8px",
+        }}>
+          <BlockStack gap="200">
+            <Text as="h1" variant="headingXl">
+              <span style={{ color: "#fff" }}>ShopAgent</span>
+            </Text>
+            <Text as="p" variant="bodyMd">
+              <span style={{ color: "rgba(255,255,255,0.85)" }}>AI-powered shopping assistant for your Shopify store.</span>
+            </Text>
+            {totalMessages > 0 && (
+              <Box paddingBlockStart="200">
+                <Badge tone="info">{totalMessages} conversations this month</Badge>
+              </Box>
+            )}
+          </BlockStack>
+        </div>
 
         <BlockStack gap="300">
           <Text as="h2" variant="headingMd">What ShopAgent does for you</Text>

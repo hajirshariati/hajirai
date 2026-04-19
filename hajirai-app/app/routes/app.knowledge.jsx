@@ -175,6 +175,7 @@ export default function Knowledge() {
     <Page title="Knowledge Base" backAction={{ url: "/app" }}>
       <TitleBar title="Knowledge Base" />
       <BlockStack gap="500">
+        <div style={{ height: "4px", borderRadius: "2px", background: "linear-gradient(90deg, #2D6B4F, #3a8a66, transparent)" }} />
         <Banner title="Your Shopify catalog is already synced" tone="info">
           <Text as="p">
             ShopAgent automatically indexes your products, variants, and prices via Catalog Sync.

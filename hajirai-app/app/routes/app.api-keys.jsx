@@ -126,6 +126,7 @@ export default function ApiKeys() {
       <TitleBar title="Settings" />
       <Form method="post">
         <BlockStack gap="500">
+          <div style={{ height: "4px", borderRadius: "2px", background: "linear-gradient(90deg, #2D6B4F, #3a8a66, transparent)" }} />
           {actionData?.success && (
             <Banner title="Settings saved" tone="success" onDismiss={() => {}} />
           )}

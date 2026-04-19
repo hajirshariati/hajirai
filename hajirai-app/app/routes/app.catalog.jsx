@@ -76,8 +76,9 @@ export default function Catalog() {
   };
 
   return (
-    <Page>
+    <Page backAction={{ url: "/app" }}>
       <TitleBar title="Catalog" />
+      <div style={{ height: "4px", borderRadius: "2px", background: "linear-gradient(90deg, #2D6B4F, #3a8a66, transparent)", marginBottom: "20px" }} />
       <Layout>
         <Layout.Section>
           <Card>

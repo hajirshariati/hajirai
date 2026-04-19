@@ -115,6 +115,7 @@ export default function Analytics() {
     <Page title="Analytics" backAction={{ url: "/app" }}>
       <TitleBar title="Analytics" />
       <BlockStack gap="500">
+        <div style={{ height: "4px", borderRadius: "2px", background: "linear-gradient(90deg, #2D6B4F, #3a8a66, transparent)" }} />
         <InlineStack gap="200" blockAlign="center">
           <Text as="h2" variant="headingMd">Last 30 days</Text>
           {hasData ? <Badge tone="success">Live</Badge> : <Badge>No data yet</Badge>}

@@ -28,11 +28,11 @@ export default function App() {
           <Link to="/app/api-keys">Settings</Link>
         </NavMenu>
         <Outlet />
-        <Box paddingBlockStart="800" paddingBlockEnd="600" paddingInline="400">
+        <div style={{ marginTop: "40px", padding: "16px", textAlign: "center", borderTop: "2px solid #2D6B4F" }}>
           <Text as="p" tone="subdued" variant="bodySm" alignment="center">
             ShopAgent v1.0. All rights reserved.
           </Text>
-        </Box>
+        </div>
       </PolarisAppProvider>
     </ShopifyAppProvider>
   );
