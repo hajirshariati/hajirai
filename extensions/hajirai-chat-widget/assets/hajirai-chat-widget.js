@@ -287,7 +287,7 @@ if(p.type==='text'||p.type==='content_block_delta'){
   var tc=p.text||(p.delta&&p.delta.text)||'';
   full+=tc;typingEl.classList.remove('visible');
   if(!msgDiv)msgDiv=appendMsg('assistant',full);
-  else{var b=$('.ai-chat-msg-bubble',msgDiv);if(b)b.innerHTML='<p>'+md(esc(full))+'</p>'}
+  else{var b=$('.ai-chat-msg-bubble',msgDiv);if(b){var savedProds=$('.ai-chat-products',b);b.innerHTML='<p>'+md(esc(full))+'</p>';if(savedProds)b.appendChild(savedProds)}}
   scrollBottom();
 }
 if(p.type==='products'&&p.products){

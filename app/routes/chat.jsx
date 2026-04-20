@@ -3,7 +3,7 @@ import { authenticate } from "../shopify.server";
 import { getShopConfig, getKnowledgeFilesWithContent } from "../models/ShopConfig.server";
 import { getAttributeMappings } from "../models/AttributeMapping.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
-import { TOOLS, executeTool } from "../lib/chat-tools.server";
+import { TOOLS, executeTool, extractProductCards } from "../lib/chat-tools.server";
 import { recordChatUsage } from "../models/ChatUsage.server";
 import { canSendMessage } from "../lib/billing.server";
 
@@ -134,6 +134,15 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       toolUses.map((u) => executeTool(u.name, u.input, ctx)),
     );
 
+    const allCards = [];
+    for (let i = 0; i < toolUses.length; i++) {
+      const cards = extractProductCards(toolUses[i].name, results[i]);
+      allCards.push(...cards);
+    }
+    if (allCards.length > 0) {
+      controller.enqueue(encoder.encode(sseChunk({ type: "products", products: allCards })));
+    }
+
     messages.push({ role: "assistant", content: final.content });
     messages.push({
       role: "user",
@@ -222,7 +231,7 @@ export const action = async ({ request }) => {
     messages.push({ role: "user", content: String(body.message) });
 
     const anthropic = new Anthropic({ apiKey: config.anthropicApiKey });
-    const ctx = { shop: session.shop };
+    const ctx = { shop: session.shop, deduplicateColors: config.deduplicateColors };
     const encoder = new TextEncoder();
 
     const stream = new ReadableStream({
