@@ -149,12 +149,15 @@ function deduplicateByColor(products) {
 
 const STOP_WORDS = new Set(["the", "a", "an", "for", "and", "or", "in", "on", "to", "of", "with", "is", "are", "i", "my", "me", "some", "any", "can", "do", "show", "find", "get", "want", "need", "looking", "search"]);
 
+const POSSESSIVE_STRIP = { mens: "men", womens: "women", childrens: "children", kids: "kid" };
+
 function extractKeywords(q) {
   return q
     .toLowerCase()
     .replace(/['']/g, "")
     .split(/\s+/)
-    .filter((w) => w.length > 1 && !STOP_WORDS.has(w));
+    .filter((w) => w.length > 1 && !STOP_WORDS.has(w))
+    .map((w) => POSSESSIVE_STRIP[w] || w);
 }
 
 const SYNONYMS = {
