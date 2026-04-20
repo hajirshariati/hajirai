@@ -201,6 +201,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
 
   if (pool.length > 0 && fullResponseText) {
     const textLower = fullResponseText.toLowerCase();
+    const saysNoMatch = /\b(don't (?:have|see|carry)|not (?:see|carry|have)|don't appear|we don't|no .{0,20} available)\b/i.test(fullResponseText);
 
     const scored = pool.map((card) => ({
       card,
@@ -210,9 +211,23 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
 
     const matched = scored.filter((s) => s.score >= 0.4);
 
+    let cards;
     if (matched.length > 0) {
-      const cards = matched.slice(0, 3).map((s) => s.card);
-      controller.enqueue(encoder.encode(sseChunk({ type: "products", products: cards })));
+      cards = matched.slice(0, 3).map((s) => s.card);
+    } else if (!saysNoMatch) {
+      cards = scored.slice(0, 3).map((s) => s.card);
+    }
+
+    if (cards && cards.length > 0) {
+      const seen = new Set();
+      const deduped = [];
+      for (const c of cards) {
+        const key = c.handle || c.title;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        deduped.push(c);
+      }
+      controller.enqueue(encoder.encode(sseChunk({ type: "products", products: deduped })));
     }
   }
 
