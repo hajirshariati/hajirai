@@ -4,9 +4,22 @@ import { PLANS, getPlan } from "./plans";
 const IS_TEST_CHARGE = process.env.SHOPIFY_BILLING_TEST !== "false";
 const APP_URL = process.env.SHOPIFY_APP_URL || process.env.APP_URL || "";
 
+const COMP_PRO_SHOPS = new Set(
+  (process.env.COMP_PRO_SHOPS || "")
+    .split(",")
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean),
+);
+
+export function isCompedShop(shop) {
+  return COMP_PRO_SHOPS.has(String(shop || "").toLowerCase());
+}
+
 export async function getShopPlan(shop) {
+  if (isCompedShop(shop)) return getPlan("pro");
   const config = await prisma.shopConfig.findUnique({ where: { shop } });
-  return getPlan(config?.plan || "free");
+  const planId = config?.plan || "free";
+  return getPlan(planId);
 }
 
 function monthStart(date = new Date()) {
@@ -14,43 +27,92 @@ function monthStart(date = new Date()) {
 }
 
 export async function getConversationsThisMonth(shop) {
-  return prisma.chatUsage.count({ where: { shop, createdAt: { gte: monthStart() } } });
+  const since = monthStart();
+  return prisma.chatUsage.count({
+    where: { shop, createdAt: { gte: since } },
+  });
 }
 
 export async function canSendMessage(shop) {
   const plan = await getShopPlan(shop);
-  if (plan.conversationsPerMonth === Infinity) return { ok: true, plan, used: null, limit: Infinity };
+  if (plan.conversationsPerMonth === Infinity) {
+    return { ok: true, plan, used: null, limit: Infinity };
+  }
   const used = await getConversationsThisMonth(shop);
   if (used >= plan.conversationsPerMonth) {
-    return { ok: false, reason: "conversation_limit_reached", plan, used, limit: plan.conversationsPerMonth };
+    return {
+      ok: false,
+      reason: "conversation_limit_reached",
+      plan,
+      used,
+      limit: plan.conversationsPerMonth,
+    };
   }
   return { ok: true, plan, used, limit: plan.conversationsPerMonth };
 }
 
 export async function createSubscription({ admin, shop, planId, host }) {
   const plan = getPlan(planId);
-  if (!plan || plan.price === 0) throw new Error("Cannot create subscription for free plan");
+  if (!plan || plan.price === 0) {
+    throw new Error("Cannot create subscription for free plan");
+  }
+
   const returnUrl = buildReturnUrl({ shop, planId, host });
+
   const response = await admin.graphql(
     `#graphql
-    mutation appSubscriptionCreate($name: String!, $returnUrl: URL!, $test: Boolean, $lineItems: [AppSubscriptionLineItemInput!]!) {
-      appSubscriptionCreate(name: $name, returnUrl: $returnUrl, test: $test, lineItems: $lineItems) {
+    mutation appSubscriptionCreate(
+      $name: String!
+      $returnUrl: URL!
+      $test: Boolean
+      $lineItems: [AppSubscriptionLineItemInput!]!
+    ) {
+      appSubscriptionCreate(
+        name: $name
+        returnUrl: $returnUrl
+        test: $test
+        lineItems: $lineItems
+      ) {
         userErrors { field message }
         confirmationUrl
         appSubscription { id status }
       }
     }`,
-    { variables: {
-        name: `ShopAgent ${plan.name}`, returnUrl, test: IS_TEST_CHARGE,
-        lineItems: [{ plan: { appRecurringPricingDetails: {
-          price: { amount: plan.price, currencyCode: "USD" }, interval: "EVERY_30_DAYS" } } }],
-      } },
+    {
+      variables: {
+        name: `ShopAgent ${plan.name}`,
+        returnUrl,
+        test: IS_TEST_CHARGE,
+        lineItems: [
+          {
+            plan: {
+              appRecurringPricingDetails: {
+                price: { amount: plan.price, currencyCode: "USD" },
+                interval: "EVERY_30_DAYS",
+              },
+            },
+          },
+        ],
+      },
+    },
   );
+
   const json = await response.json();
   const payload = json?.data?.appSubscriptionCreate;
-  if (payload?.userErrors?.length) throw new Error(`Shopify billing error: ${payload.userErrors.map((e) => e.message).join("; ")}`);
-  if (!payload?.confirmationUrl) throw new Error("Shopify billing: no confirmation URL returned");
-  return { confirmationUrl: payload.confirmationUrl, subscriptionId: payload.appSubscription?.id || null };
+
+  if (payload?.userErrors?.length) {
+    const msg = payload.userErrors.map((e) => e.message).join("; ");
+    throw new Error(`Shopify billing error: ${msg}`);
+  }
+
+  if (!payload?.confirmationUrl) {
+    throw new Error("Shopify billing: no confirmation URL returned");
+  }
+
+  return {
+    confirmationUrl: payload.confirmationUrl,
+    subscriptionId: payload.appSubscription?.id || null,
+  };
 }
 
 export async function cancelSubscription({ admin, subscriptionId }) {
@@ -76,8 +138,17 @@ export async function getActiveSubscription({ admin }) {
       currentAppInstallation {
         activeSubscriptions {
           id name status currentPeriodEnd
-          lineItems { plan { pricingDetails { __typename
-            ... on AppRecurringPricing { price { amount currencyCode } interval } } } }
+          lineItems {
+            plan {
+              pricingDetails {
+                __typename
+                ... on AppRecurringPricing {
+                  price { amount currencyCode }
+                  interval
+                }
+              }
+            }
+          }
         }
       }
     }`,
@@ -89,10 +160,17 @@ export async function getActiveSubscription({ admin }) {
 export async function setShopPlan({ shop, planId, subscriptionId }) {
   await prisma.shopConfig.upsert({
     where: { shop },
-    create: { shop, plan: planId, subscriptionId: subscriptionId || null,
-      subscriptionActivatedAt: planId === "free" ? null : new Date() },
-    update: { plan: planId, subscriptionId: subscriptionId || null,
-      subscriptionActivatedAt: planId === "free" ? null : new Date() },
+    create: {
+      shop,
+      plan: planId,
+      subscriptionId: subscriptionId || null,
+      subscriptionActivatedAt: planId === "free" ? null : new Date(),
+    },
+    update: {
+      plan: planId,
+      subscriptionId: subscriptionId || null,
+      subscriptionActivatedAt: planId === "free" ? null : new Date(),
+    },
   });
 }
 

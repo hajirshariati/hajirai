@@ -62,6 +62,36 @@ export const TOOLS = [
       required: ["skus"],
     },
   },
+  {
+    name: "get_product_reviews",
+    description:
+      "Fetch customer reviews from Yotpo for a specific product, including an aggregated fit/sizing summary. Use this whenever the customer asks about fit, sizing (true to size, runs small, runs large), comfort, quality, or wants to know what other buyers think. Returns review count, average rating, fit breakdown, and a sample of the most recent review snippets.",
+    input_schema: {
+      type: "object",
+      properties: {
+        handle: {
+          type: "string",
+          description: "The product handle (slug), e.g. 'jillian-sandal'.",
+        },
+      },
+      required: ["handle"],
+    },
+  },
+  {
+    name: "get_return_insights",
+    description:
+      "Fetch return/exchange insights from Aftership for a specific product, including how often it gets returned for sizing reasons (too small, too big) and common return reasons. Use this when the customer asks about sizing, fit, whether to size up or down, or return/exchange policy for a specific product.",
+    input_schema: {
+      type: "object",
+      properties: {
+        handle: {
+          type: "string",
+          description: "The product handle (slug), e.g. 'jillian-sandal'.",
+        },
+      },
+      required: ["handle"],
+    },
+  },
 ];
 
 function productUrl(shop, handle) {
@@ -320,10 +350,183 @@ async function lookupSku({ skus }, { shop }) {
   };
 }
 
+function numericShopifyId(gid) {
+  if (!gid) return null;
+  const match = String(gid).match(/(\d+)$/);
+  return match ? match[1] : null;
+}
+
+const FIT_PATTERNS = [
+  { key: "runs_small", regex: /\b(runs? small|too small|tight|size up|order.{0,6}size up|half size up|one size up)\b/i },
+  { key: "runs_large", regex: /\b(runs? (?:big|large)|too (?:big|large)|loose|size down|order.{0,6}size down|half size down|one size down)\b/i },
+  { key: "true_to_size", regex: /\b(true to size|fits (?:well|perfectly|great)|perfect fit|right size|accurate sizing)\b/i },
+  { key: "narrow", regex: /\b(too narrow|narrow fit|feels? narrow)\b/i },
+  { key: "wide", regex: /\b(too wide|wide fit|feels? wide|roomy)\b/i },
+];
+
+function classifyFit(text) {
+  const hits = [];
+  for (const { key, regex } of FIT_PATTERNS) {
+    if (regex.test(text)) hits.push(key);
+  }
+  return hits;
+}
+
+async function getProductReviews({ handle }, { shop, yotpoApiKey }) {
+  if (!yotpoApiKey) {
+    return { error: "Yotpo reviews are not configured for this store." };
+  }
+  const h = String(handle || "").trim();
+  if (!h) return { error: "handle is required" };
+
+  const product = await prisma.product.findFirst({
+    where: { shop, handle: h },
+    select: { shopifyId: true, title: true },
+  });
+  if (!product) return { error: `No product found with handle '${h}'.` };
+
+  const productId = numericShopifyId(product.shopifyId);
+  if (!productId) return { error: "Could not resolve Shopify product id." };
+
+  const url = `https://api.yotpo.com/v1/widget/${encodeURIComponent(yotpoApiKey)}/products/${encodeURIComponent(productId)}/reviews.json?per_page=30&page=1&sort=date&direction=desc`;
+  let data;
+  try {
+    const res = await fetch(url, { headers: { accept: "application/json" } });
+    if (!res.ok) return { error: `Yotpo request failed (${res.status}).` };
+    data = await res.json();
+  } catch (err) {
+    return { error: `Yotpo fetch error: ${err?.message || "unknown"}` };
+  }
+
+  const reviews = data?.response?.reviews || [];
+  const bottomline = data?.response?.bottomline || {};
+
+  const fitCounts = { runs_small: 0, runs_large: 0, true_to_size: 0, narrow: 0, wide: 0 };
+  const snippets = [];
+  for (const r of reviews) {
+    const content = `${r.title || ""} ${r.content || ""}`.trim();
+    const hits = classifyFit(content);
+    for (const k of hits) fitCounts[k] = (fitCounts[k] || 0) + 1;
+    if (snippets.length < 8 && content.length > 20) {
+      snippets.push({
+        rating: r.score,
+        text: truncate(content.replace(/\s+/g, " "), 220),
+      });
+    }
+  }
+
+  let fitSummary = "Not enough reviews mention fit.";
+  const totalFit = fitCounts.runs_small + fitCounts.runs_large + fitCounts.true_to_size;
+  if (totalFit >= 3) {
+    if (fitCounts.runs_small > fitCounts.runs_large && fitCounts.runs_small >= fitCounts.true_to_size) {
+      fitSummary = `Tends to run small — most reviewers suggest sizing up (${fitCounts.runs_small} of ${totalFit} fit mentions).`;
+    } else if (fitCounts.runs_large > fitCounts.runs_small && fitCounts.runs_large >= fitCounts.true_to_size) {
+      fitSummary = `Tends to run large — most reviewers suggest sizing down (${fitCounts.runs_large} of ${totalFit} fit mentions).`;
+    } else {
+      fitSummary = `Most reviewers say it fits true to size (${fitCounts.true_to_size} of ${totalFit} fit mentions).`;
+    }
+  }
+
+  return {
+    handle: h,
+    title: product.title,
+    totalReviews: bottomline.total_review ?? reviews.length,
+    averageScore: bottomline.average_score ?? undefined,
+    fitSummary,
+    fitCounts,
+    sampleReviews: snippets,
+  };
+}
+
+async function getReturnInsights({ handle }, { shop, aftershipApiKey }) {
+  if (!aftershipApiKey) {
+    return { error: "Aftership returns are not configured for this store." };
+  }
+  const h = String(handle || "").trim();
+  if (!h) return { error: "handle is required" };
+
+  const product = await prisma.product.findFirst({
+    where: { shop, handle: h },
+    select: { title: true },
+  });
+  if (!product) return { error: `No product found with handle '${h}'.` };
+
+  const url = `https://api.aftership.com/returns-center/v1/returns?search=${encodeURIComponent(product.title)}&limit=50`;
+  let data;
+  try {
+    const res = await fetch(url, {
+      headers: {
+        accept: "application/json",
+        "aftership-api-key": aftershipApiKey,
+      },
+    });
+    if (!res.ok) return { error: `Aftership request failed (${res.status}).` };
+    data = await res.json();
+  } catch (err) {
+    return { error: `Aftership fetch error: ${err?.message || "unknown"}` };
+  }
+
+  const returns = data?.data?.returns || data?.returns || [];
+  if (!Array.isArray(returns) || returns.length === 0) {
+    return {
+      handle: h,
+      title: product.title,
+      totalReturns: 0,
+      note: "No return data available for this product.",
+    };
+  }
+
+  const reasonCounts = {};
+  const sizingReasons = { too_small: 0, too_big: 0, other_fit: 0 };
+  for (const r of returns) {
+    const items = r?.items || r?.return_items || [];
+    const matches = items.filter((it) => {
+      const name = (it?.product_name || it?.name || "").toLowerCase();
+      return name && name.includes(product.title.toLowerCase().slice(0, 20));
+    });
+    if (matches.length === 0 && items.length > 0) continue;
+    for (const it of (matches.length ? matches : items)) {
+      const reason = String(it?.return_reason || it?.reason || r?.reason || "unspecified").toLowerCase();
+      reasonCounts[reason] = (reasonCounts[reason] || 0) + 1;
+      if (/too small|size up|smaller/i.test(reason)) sizingReasons.too_small++;
+      else if (/too (?:big|large)|size down|larger/i.test(reason)) sizingReasons.too_big++;
+      else if (/fit|size/i.test(reason)) sizingReasons.other_fit++;
+    }
+  }
+
+  const topReasons = Object.entries(reasonCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([reason, count]) => ({ reason, count }));
+
+  let sizingAdvice = null;
+  const totalSizing = sizingReasons.too_small + sizingReasons.too_big;
+  if (totalSizing >= 2) {
+    if (sizingReasons.too_small > sizingReasons.too_big * 1.5) {
+      sizingAdvice = "Returns skew toward 'too small' — recommend sizing up.";
+    } else if (sizingReasons.too_big > sizingReasons.too_small * 1.5) {
+      sizingAdvice = "Returns skew toward 'too big' — recommend sizing down.";
+    } else {
+      sizingAdvice = "Return data is mixed on sizing — likely true to size.";
+    }
+  }
+
+  return {
+    handle: h,
+    title: product.title,
+    totalReturns: returns.length,
+    sizingReasons,
+    topReasons,
+    sizingAdvice,
+  };
+}
+
 const HANDLERS = {
   search_products: searchProducts,
   get_product_details: getProductDetails,
   lookup_sku: lookupSku,
+  get_product_reviews: getProductReviews,
+  get_return_insights: getReturnInsights,
 };
 
 function mentionsFromResult(name, result) {
