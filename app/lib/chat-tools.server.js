@@ -109,7 +109,7 @@ async function enrichmentMap(shop, skus) {
 function deduplicateByColor(products) {
   const seen = new Map();
   for (const p of products) {
-    const base = p.handle.replace(/-[a-z]+$/, "");
+    const base = p.title.replace(/\s*-\s*[^-]+$/, "").toLowerCase();
     if (!seen.has(base)) {
       seen.set(base, p);
     }
@@ -307,24 +307,21 @@ function mentionsFromResult(name, result) {
 export function extractProductCards(name, result) {
   if (!result || result.error) return [];
   if (name === "search_products" && Array.isArray(result.products)) {
-    return result.products
-      .filter((p) => p.image)
-      .map((p) => ({
-        title: p.title,
-        url: p.url,
-        handle: p.handle,
-        image: p.image,
-        price_formatted: p.priceRange || (p.price ? `$${parseFloat(p.price).toFixed(2)}` : ""),
-        compare_at_price: p.compareAtPrice ? Math.round(parseFloat(p.compareAtPrice) * 100) : undefined,
-      }));
+    return result.products.map((p) => ({
+      title: p.title,
+      url: p.url,
+      handle: p.handle,
+      image: p.image || "",
+      price_formatted: p.priceRange || (p.price ? `$${parseFloat(p.price).toFixed(2)}` : ""),
+      compare_at_price: p.compareAtPrice ? Math.round(parseFloat(p.compareAtPrice) * 100) : undefined,
+    }));
   }
   if (name === "get_product_details" && result.handle) {
-    if (!result.image) return [];
     return [{
       title: result.title,
       url: result.url,
       handle: result.handle,
-      image: result.image,
+      image: result.image || "",
       price_formatted: result.priceRange || (result.price ? `$${parseFloat(result.price).toFixed(2)}` : ""),
       compare_at_price: result.compareAtPrice ? Math.round(parseFloat(result.compareAtPrice) * 100) : undefined,
     }];
@@ -332,12 +329,12 @@ export function extractProductCards(name, result) {
   if (name === "lookup_sku" && Array.isArray(result.found)) {
     const seen = new Set();
     return result.found
-      .filter((f) => f.image && !seen.has(f.productHandle) && seen.add(f.productHandle))
+      .filter((f) => !seen.has(f.productHandle) && seen.add(f.productHandle))
       .map((f) => ({
         title: f.productTitle,
         url: f.url,
         handle: f.productHandle,
-        image: f.image,
+        image: f.image || "",
         price_formatted: f.price ? `$${parseFloat(f.price).toFixed(2)}` : "",
         compare_at_price: f.compareAtPrice ? Math.round(parseFloat(f.compareAtPrice) * 100) : undefined,
       }));
