@@ -143,7 +143,7 @@
     "tab_attention_message_delay": 3,
     "ss_enable": true,
     "ss_branch_name": "",
-    "ai_chat_enabled": true,
+    "ai_chat_enabled": false,
     "ai_chat_api_url": "https://shopify-ai-chat-production-c344.up.railway.app",
     "ai_chat_assistant_name": "The Fit Concierge",
     "ai_chat_tagline": "Your Personal Fit & Comfort Expert",
