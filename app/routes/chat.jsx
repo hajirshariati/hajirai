@@ -7,7 +7,7 @@ import { TOOLS, executeTool, extractProductCards } from "../lib/chat-tools.serve
 import { recordChatUsage } from "../models/ChatUsage.server";
 import { canSendMessage } from "../lib/billing.server";
 
-const DEFAULT_MODEL = process.env.DEFAULT_MODEL || "claude-sonnet-4-6-20250514";
+const DEFAULT_MODEL = process.env.DEFAULT_MODEL || "claude-sonnet-4-6";
 const HAIKU_MODEL = "claude-haiku-4-5-20251001";
 const OPUS_MODEL = "claude-opus-4-20250514";
 const MAX_TOKENS = parseInt(process.env.CHAT_MAX_TOKENS, 10) || 1024;
@@ -312,7 +312,7 @@ export const action = async ({ request }) => {
                 messages: [
                   {
                     role: "user",
-                    content: `Customer asked: "${String(body.message).slice(0, 200)}"\nAssistant replied: "${lastText.slice(0, 300)}"\n\nSuggest 2-3 brief follow-up questions the CUSTOMER would naturally ask next. Write them from the customer's perspective (e.g. "What sizes are available?" not "What size do you wear?", "Do you have these in black?" not "What color are you looking for?").\n\nIMPORTANT RULES:\n- The follow-ups MUST align with what the assistant actually said. If the assistant said the store doesn't carry hiking boots and recommended sneakers instead, do NOT suggest questions about hiking boots — ask about the sneakers that were recommended.\n- Only suggest questions about products the assistant actually mentioned or recommended.\n- Never suggest questions about products the assistant said the store doesn't carry.\n- Only suggest questions that can be answered from a product catalog or store knowledge base.\n\nReturn ONLY a JSON array of strings, nothing else.`,
+                    content: `Customer asked: "${String(body.message).slice(0, 200)}"\nAssistant replied: "${lastText.slice(0, 300)}"\n\nSuggest 2-3 brief follow-up questions the CUSTOMER would naturally ask next. These should be questions a shopper would ask about PRODUCTS (shoes, sizing, colors, availability, prices, styles, materials, etc.).\n\nIMPORTANT RULES:\n- Questions MUST be about products, shopping, or store policies. NEVER about the bot itself, its availability, technical issues, or whether it's online.\n- The follow-ups MUST align with what the assistant actually said. If the assistant recommended sneakers, ask about those sneakers.\n- Only suggest questions about products the assistant actually mentioned or recommended.\n- Never suggest questions about products the assistant said the store doesn't carry.\n- Write from the customer's perspective (e.g. "What sizes are available?" not "What size do you wear?").\n- Examples of GOOD follow-ups: "What colors does this come in?", "Do you have this in a size 9?", "What's the return policy?"\n- Examples of BAD follow-ups (NEVER use): "Are you back online?", "Should I try again?", "Is there a different way to reach support?"\n\nReturn ONLY a JSON array of strings, nothing else.`,
                   },
                 ],
               });
