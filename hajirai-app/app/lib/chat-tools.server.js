@@ -246,7 +246,8 @@ function detectAndStripGender(query) {
 
 function genderFilterClause(gender) {
   const want = gender.toLowerCase();
-  return {
+  const opposite = want === "men" ? "women" : want === "women" ? "men" : null;
+  const clause = {
     OR: [
       { attributesJson: { path: ["gender"], equals: want } },
       { attributesJson: { path: ["gender"], array_contains: [want] } },
@@ -256,6 +257,15 @@ function genderFilterClause(gender) {
       { attributesJson: { path: ["gender_fallback"], equals: `${want}'s` } },
     ],
   };
+  if (opposite) {
+    clause.OR.push({
+      AND: [
+        { title: { contains: want, mode: "insensitive" } },
+        { NOT: { title: { contains: opposite, mode: "insensitive" } } },
+      ],
+    });
+  }
+  return clause;
 }
 
 async function searchProducts({ query, limit, filters }, { shop, deduplicateColors }) {
