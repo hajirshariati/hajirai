@@ -105,19 +105,20 @@ model KnowledgeFile {
 }
 
 model Product {
-  id          String           @id @default(cuid())
-  shop        String
-  shopifyId   String
-  handle      String
-  title       String
-  vendor      String?
-  productType String?
-  tags        String[]
-  description String?
-  status      String?
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  variants    ProductVariant[]
+  id             String           @id @default(cuid())
+  shop           String
+  shopifyId      String
+  handle         String
+  title          String
+  vendor         String?
+  productType    String?
+  tags           String[]
+  description    String?
+  status         String?
+  attributesJson Json?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  variants       ProductVariant[]
 
   @@unique([shop, shopifyId])
   @@index([shop])
@@ -135,11 +136,28 @@ model ProductVariant {
   compareAtPrice   String?
   inventoryQty     Int?
   optionsJson      String?
+  attributesJson   Json?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
   @@unique([productId, shopifyId])
   @@index([sku])
+}
+
+model AttributeMapping {
+  id         String   @id @default(cuid())
+  shop       String
+  attribute  String
+  sourceType String
+  target     String   @default("product")
+  namespace  String?
+  key        String?
+  prefix     String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([shop, attribute])
+  @@index([shop])
 }
 
 model CatalogSyncState {

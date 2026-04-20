@@ -1,8 +1,15 @@
 import prisma from "../db.server";
+import {
+  getAttributeMappings,
+  buildMetafieldFragment,
+  resolveProductAttributes,
+  resolveVariantAttributes,
+} from "./AttributeMapping.server";
 
 const PRODUCTS_PAGE = 50;
 
-const PRODUCTS_QUERY = `#graphql
+function productsQuery(productMfFragment = "", variantMfFragment = "") {
+  return `#graphql
   query SyncProducts($cursor: String) {
     products(first: ${PRODUCTS_PAGE}, after: $cursor) {
       pageInfo { hasNextPage endCursor }
@@ -15,6 +22,7 @@ const PRODUCTS_QUERY = `#graphql
         tags
         descriptionHtml
         status
+        ${productMfFragment}
         variants(first: 100) {
           nodes {
             id
@@ -24,14 +32,17 @@ const PRODUCTS_QUERY = `#graphql
             compareAtPrice
             inventoryQuantity
             selectedOptions { name value }
+            ${variantMfFragment}
           }
         }
       }
     }
   }
 `;
+}
 
-const PRODUCT_BY_ID_QUERY = `#graphql
+function productByIdQuery(productMfFragment = "", variantMfFragment = "") {
+  return `#graphql
   query GetProduct($id: ID!) {
     product(id: $id) {
       id
@@ -42,6 +53,7 @@ const PRODUCT_BY_ID_QUERY = `#graphql
       tags
       descriptionHtml
       status
+      ${productMfFragment}
       variants(first: 100) {
         nodes {
           id
@@ -51,19 +63,21 @@ const PRODUCT_BY_ID_QUERY = `#graphql
           compareAtPrice
           inventoryQuantity
           selectedOptions { name value }
+          ${variantMfFragment}
         }
       }
     }
   }
 `;
+}
 
 function stripHtml(html) {
   if (!html) return "";
   return String(html).replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 }
 
-function mapProductFields(node) {
-  return {
+function mapProductFields(node, mappings) {
+  const fields = {
     shopifyId: node.id,
     handle: node.handle,
     title: node.title,
@@ -73,10 +87,14 @@ function mapProductFields(node) {
     description: stripHtml(node.descriptionHtml),
     status: node.status || null,
   };
+  if (mappings && mappings.length > 0) {
+    fields.attributesJson = resolveProductAttributes(node, mappings) || undefined;
+  }
+  return fields;
 }
 
-function mapVariantFields(v) {
-  return {
+function mapVariantFields(v, mappings) {
+  const fields = {
     shopifyId: v.id,
     sku: v.sku || null,
     title: v.title || null,
@@ -85,17 +103,21 @@ function mapVariantFields(v) {
     inventoryQty: typeof v.inventoryQuantity === "number" ? v.inventoryQuantity : null,
     optionsJson: v.selectedOptions ? JSON.stringify(v.selectedOptions) : null,
   };
+  if (mappings && mappings.length > 0) {
+    fields.attributesJson = resolveVariantAttributes(v, mappings) || undefined;
+  }
+  return fields;
 }
 
-async function upsertProduct(shop, node) {
-  const fields = mapProductFields(node);
+async function upsertProduct(shop, node, mappings = null) {
+  const fields = mapProductFields(node, mappings);
   const product = await prisma.product.upsert({
     where: { shop_shopifyId: { shop, shopifyId: fields.shopifyId } },
     update: { ...fields, updatedAt: new Date() },
     create: { shop, ...fields },
   });
 
-  const variants = (node.variants?.nodes || []).map(mapVariantFields);
+  const variants = (node.variants?.nodes || []).map((v) => mapVariantFields(v, mappings));
   const incomingIds = new Set(variants.map((v) => v.shopifyId));
 
   await prisma.productVariant.deleteMany({
@@ -151,11 +173,15 @@ export async function upsertProductFromWebhook(shop, webhookPayload) {
 }
 
 export async function fetchAndUpsertProduct(admin, shop, shopifyGid) {
-  const resp = await admin.graphql(PRODUCT_BY_ID_QUERY, { variables: { id: shopifyGid } });
+  const mappings = await getAttributeMappings(shop);
+  const productMf = buildMetafieldFragment(mappings, "product");
+  const variantMf = buildMetafieldFragment(mappings, "variant");
+  const query = productByIdQuery(productMf, variantMf);
+  const resp = await admin.graphql(query, { variables: { id: shopifyGid } });
   const json = await resp.json();
   const node = json?.data?.product;
   if (!node) return null;
-  return upsertProduct(shop, node);
+  return upsertProduct(shop, node, mappings);
 }
 
 export async function deleteProductByShopifyId(shop, shopifyId) {
@@ -184,16 +210,28 @@ async function setSyncState(shop, patch) {
 export async function syncCatalog(admin, shop) {
   await setSyncState(shop, { status: "running", lastError: null });
   try {
+    const mappings = await getAttributeMappings(shop);
+    const productMf = buildMetafieldFragment(mappings, "product");
+    const variantMf = buildMetafieldFragment(mappings, "variant");
+    const query = productsQuery(productMf, variantMf);
+    if (mappings.length > 0) {
+      const prodCount = mappings.filter((m) => (m.target || "product") === "product").length;
+      const varCount = mappings.filter((m) => m.target === "variant").length;
+      console.log(
+        `[syncCatalog] ${shop}: syncing with ${mappings.length} mappings (${prodCount} product, ${varCount} variant)`,
+      );
+    }
+
     let cursor = null;
     let totalSeen = 0;
     while (true) {
-      const resp = await admin.graphql(PRODUCTS_QUERY, { variables: { cursor } });
+      const resp = await admin.graphql(query, { variables: { cursor } });
       const json = await resp.json();
       const page = json?.data?.products;
       if (!page) throw new Error("No products data in GraphQL response");
 
       for (const node of page.nodes) {
-        await upsertProduct(shop, node);
+        await upsertProduct(shop, node, mappings);
         totalSeen += 1;
       }
 

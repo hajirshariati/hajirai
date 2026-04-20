@@ -4,7 +4,7 @@ export const TOOLS = [
   {
     name: "search_products",
     description:
-      "Search the merchant's product catalog by keyword. Returns a list of products matching the query across title, vendor, product type, tags, and description. Use this when the customer is looking for something but hasn't named a specific product, or to surface options.",
+      "Search the merchant's product catalog by keyword. Returns a list of products matching the query across title, vendor, product type, tags, and description. Use filters to narrow by attributes the merchant has configured (e.g. gender, color, material).",
     input_schema: {
       type: "object",
       properties: {
@@ -17,6 +17,11 @@ export const TOOLS = [
           description: "Maximum number of products to return (default 6, max 10).",
           minimum: 1,
           maximum: 10,
+        },
+        filters: {
+          type: "object",
+          description: "Optional attribute filters. Keys are attribute names (e.g. 'gender', 'color', 'material'), values are the desired value. Only attributes the merchant has mapped will be usable.",
+          additionalProperties: { type: "string" },
         },
       },
       required: ["query"],
@@ -92,34 +97,71 @@ async function enrichmentMap(shop, skus) {
   return map;
 }
 
-async function searchProducts({ query, limit }, { shop }) {
+async function searchProducts({ query, limit, filters }, { shop }) {
   const q = String(query || "").trim();
   if (!q) return { products: [] };
   const max = Math.min(Math.max(parseInt(limit, 10) || 6, 1), 10);
+  const attrFilters = filters && typeof filters === "object" ? filters : {};
+
+  const where = {
+    shop,
+    OR: [
+      { title: { contains: q, mode: "insensitive" } },
+      { vendor: { contains: q, mode: "insensitive" } },
+      { productType: { contains: q, mode: "insensitive" } },
+      { description: { contains: q, mode: "insensitive" } },
+      { tags: { has: q } },
+    ],
+  };
+
+  const attrKeys = Object.keys(attrFilters);
+  if (attrKeys.length > 0) {
+    where.AND = attrKeys.map((key) => {
+      const want = attrFilters[key].toLowerCase();
+      return {
+        OR: [
+          { attributesJson: { path: [key], string_contains: want } },
+          { variants: { some: { attributesJson: { path: [key], string_contains: want } } } },
+        ],
+      };
+    });
+  }
+
   const products = await prisma.product.findMany({
-    where: {
-      shop,
-      OR: [
-        { title: { contains: q, mode: "insensitive" } },
-        { vendor: { contains: q, mode: "insensitive" } },
-        { productType: { contains: q, mode: "insensitive" } },
-        { description: { contains: q, mode: "insensitive" } },
-        { tags: { has: q } },
-      ],
+    where,
+    include: {
+      variants: { select: { sku: true, price: true, attributesJson: true } },
     },
-    include: { variants: { select: { sku: true, price: true } } },
-    take: max,
+    take: attrKeys.length > 0 ? max * 3 : max,
     orderBy: { updatedAt: "desc" },
   });
+
+  const matchesAttr = (val, want) => {
+    if (Array.isArray(val)) return val.some((v) => typeof v === "string" && v.includes(want));
+    return typeof val === "string" && val.includes(want);
+  };
+  const filtered = attrKeys.length > 0
+    ? products.filter((p) => {
+        const productAttrs = p.attributesJson || {};
+        return attrKeys.every((key) => {
+          const want = attrFilters[key].toLowerCase();
+          if (matchesAttr(productAttrs[key], want)) return true;
+          return p.variants.some((v) => matchesAttr((v.attributesJson || {})[key], want));
+        });
+      }).slice(0, max)
+    : products.slice(0, max);
+
   return {
     query: q,
-    count: products.length,
-    products: products.map((p) => ({
+    count: filtered.length,
+    filters: attrKeys.length > 0 ? attrFilters : undefined,
+    products: filtered.map((p) => ({
       handle: p.handle,
       title: p.title,
       vendor: p.vendor || undefined,
       productType: p.productType || undefined,
       tags: p.tags?.length ? p.tags : undefined,
+      attributes: p.attributesJson || undefined,
       priceRange: priceRange(p.variants),
       variantCount: p.variants.length,
       url: productUrl(shop, p.handle),
@@ -147,6 +189,7 @@ async function getProductDetails({ handle }, { shop }) {
     description: truncate(product.description || "", 600),
     priceRange: priceRange(product.variants),
     url: productUrl(shop, product.handle),
+    attributes: product.attributesJson || undefined,
     variants: product.variants.map((v) => ({
       sku: v.sku || undefined,
       title: v.title || undefined,
@@ -154,6 +197,7 @@ async function getProductDetails({ handle }, { shop }) {
       compareAtPrice: v.compareAtPrice || undefined,
       inventoryQty: v.inventoryQty ?? undefined,
       options: safeParseJson(v.optionsJson) || undefined,
+      attributes: v.attributesJson || undefined,
       enrichment: v.sku ? enrich.get(v.sku) || undefined : undefined,
     })),
   };
@@ -181,6 +225,8 @@ async function lookupSku({ skus }, { shop }) {
       compareAtPrice: v.compareAtPrice || undefined,
       inventoryQty: v.inventoryQty ?? undefined,
       options: safeParseJson(v.optionsJson) || undefined,
+      attributes: v.attributesJson || undefined,
+      productAttributes: v.product.attributesJson || undefined,
       url: productUrl(shop, v.product.handle),
       enrichment: enrich.get(v.sku) || undefined,
     })),

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLoaderData, useFetcher, useRevalidator } from "react-router";
 import {
   Page,
@@ -12,6 +12,10 @@ import {
   Banner,
   Box,
   Divider,
+  FormLayout,
+  TextField,
+  Select,
+  Tag,
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
@@ -20,12 +24,18 @@ import {
   getProductCount,
   syncCatalogAsync,
 } from "../models/Product.server";
+import {
+  getAttributeMappings,
+  upsertAttributeMapping,
+  deleteAttributeMapping,
+} from "../models/AttributeMapping.server";
 
 export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
-  const [state, count] = await Promise.all([
+  const [state, count, mappings] = await Promise.all([
     getCatalogSyncState(session.shop),
     getProductCount(session.shop),
+    getAttributeMappings(session.shop),
   ]);
   return {
     shop: session.shop,
@@ -33,16 +43,56 @@ export const loader = async ({ request }) => {
     lastSyncedAt: state.lastSyncedAt,
     lastError: state.lastError,
     productsCount: count,
+    mappings,
   };
 };
 
 export const action = async ({ request }) => {
   const { admin, session } = await authenticate.admin(request);
   const formData = await request.formData();
-  if (formData.get("intent") === "resync") {
+  const intent = formData.get("intent");
+
+  if (intent === "resync") {
     syncCatalogAsync(admin, session.shop);
     return { started: true };
   }
+
+  if (intent === "save_mapping") {
+    const attribute = String(formData.get("attribute") || "").trim().toLowerCase();
+    const sourceType = String(formData.get("sourceType") || "metafield");
+    const target = String(formData.get("target") || "product");
+    const namespace = String(formData.get("namespace") || "").trim();
+    const key = String(formData.get("key") || "").trim();
+    const prefix = String(formData.get("prefix") || "").trim();
+
+    if (!attribute) return { error: "Attribute name is required." };
+    if (sourceType === "metafield") {
+      if (!namespace || !key) {
+        return { error: "Namespace and key are required for metafield mappings." };
+      }
+    } else if (sourceType === "tag_prefix") {
+      if (!prefix) return { error: "Prefix is required for tag prefix mappings." };
+    } else {
+      return { error: "Unknown source type." };
+    }
+
+    await upsertAttributeMapping(session.shop, {
+      attribute,
+      sourceType,
+      target,
+      namespace: sourceType === "metafield" ? namespace : null,
+      key: sourceType === "metafield" ? key : null,
+      prefix: sourceType === "tag_prefix" ? prefix : null,
+    });
+    return { saved: true };
+  }
+
+  if (intent === "delete_mapping") {
+    const attribute = String(formData.get("attribute") || "").trim();
+    if (attribute) await deleteAttributeMapping(session.shop, attribute);
+    return { deleted: true };
+  }
+
   return { error: "unknown intent" };
 };
 
@@ -58,12 +108,179 @@ function statusBadge(status) {
   return <Badge tone="success">Idle</Badge>;
 }
 
+function MappingsPanel({ mappings }) {
+  const fetcher = useFetcher();
+  const saving = fetcher.state !== "idle" && fetcher.formData?.get("intent") === "save_mapping";
+  const lastError = fetcher.data?.error;
+  const lastSaved = fetcher.data?.saved;
+
+  const [attribute, setAttribute] = useState("");
+  const [sourceType, setSourceType] = useState("metafield");
+  const [target, setTarget] = useState("product");
+  const [namespace, setNamespace] = useState("");
+  const [key, setKey] = useState("");
+  const [prefix, setPrefix] = useState("");
+
+  useEffect(() => {
+    if (lastSaved) {
+      setAttribute("");
+      setNamespace("");
+      setKey("");
+      setPrefix("");
+    }
+  }, [lastSaved]);
+
+  const handleSave = () => {
+    const fd = new FormData();
+    fd.set("intent", "save_mapping");
+    fd.set("attribute", attribute);
+    fd.set("sourceType", sourceType);
+    fd.set("target", target);
+    fd.set("namespace", namespace);
+    fd.set("key", key);
+    fd.set("prefix", prefix);
+    fetcher.submit(fd, { method: "post" });
+  };
+
+  const handleDelete = (attr) => {
+    const fd = new FormData();
+    fd.set("intent", "delete_mapping");
+    fd.set("attribute", attr);
+    fetcher.submit(fd, { method: "post" });
+  };
+
+  const canSave =
+    attribute.trim().length > 0 &&
+    ((sourceType === "metafield" && namespace.trim() && key.trim()) ||
+      (sourceType === "tag_prefix" && prefix.trim()));
+
+  return (
+    <Card>
+      <BlockStack gap="400">
+        <BlockStack gap="100">
+          <Text as="h2" variant="headingMd">Product attributes</Text>
+          <Text as="p" tone="subdued">
+            Map your Shopify metafields or tag prefixes to shared attribute names so the AI can
+            filter results ("show me men's running shoes" → <code>gender: men</code>). Supports
+            both product-level and variant-level metafields, including Metaobject references.
+          </Text>
+        </BlockStack>
+
+        {mappings.length > 0 && (
+          <>
+            <Divider />
+            <BlockStack gap="200">
+              {mappings.map((m) => (
+                <InlineStack key={m.id} align="space-between" blockAlign="center">
+                  <InlineStack gap="200" blockAlign="center">
+                    <Text as="span" variant="bodyMd" fontWeight="semibold">{m.attribute}</Text>
+                    <Badge tone={m.target === "variant" ? "attention" : "info"}>
+                      {m.target === "variant" ? "Variant" : "Product"}
+                    </Badge>
+                    {m.sourceType === "metafield" ? (
+                      <Tag>{`metafield: ${m.namespace}.${m.key}`}</Tag>
+                    ) : (
+                      <Tag>{`tag prefix: ${m.prefix}`}</Tag>
+                    )}
+                  </InlineStack>
+                  <Button
+                    variant="tertiary"
+                    tone="critical"
+                    onClick={() => handleDelete(m.attribute)}
+                  >
+                    Remove
+                  </Button>
+                </InlineStack>
+              ))}
+            </BlockStack>
+          </>
+        )}
+
+        <Divider />
+
+        <BlockStack gap="200">
+          <Text as="h3" variant="headingSm">Add mapping</Text>
+          {lastError && <Banner tone="critical"><p>{lastError}</p></Banner>}
+          <FormLayout>
+            <FormLayout.Group>
+              <TextField
+                label="Attribute name"
+                value={attribute}
+                onChange={setAttribute}
+                helpText="Shared name the AI will use (e.g. gender, color, material, size)."
+                autoComplete="off"
+              />
+              <Select
+                label="Source"
+                options={[
+                  { label: "Metafield", value: "metafield" },
+                  { label: "Tag prefix", value: "tag_prefix" },
+                ]}
+                value={sourceType}
+                onChange={setSourceType}
+              />
+              <Select
+                label="Target"
+                options={[
+                  { label: "Product", value: "product" },
+                  { label: "Variant", value: "variant" },
+                ]}
+                value={target}
+                onChange={setTarget}
+                disabled={sourceType === "tag_prefix"}
+                helpText={sourceType === "tag_prefix" ? "Tags live on products only" : undefined}
+              />
+            </FormLayout.Group>
+
+            {sourceType === "metafield" ? (
+              <FormLayout.Group>
+                <TextField
+                  label="Namespace"
+                  value={namespace}
+                  onChange={setNamespace}
+                  placeholder="custom"
+                  autoComplete="off"
+                />
+                <TextField
+                  label="Key"
+                  value={key}
+                  onChange={setKey}
+                  placeholder="gender"
+                  autoComplete="off"
+                />
+              </FormLayout.Group>
+            ) : (
+              <TextField
+                label="Tag prefix"
+                value={prefix}
+                onChange={setPrefix}
+                placeholder="gender:"
+                helpText="Tags starting with this prefix become the attribute value (e.g. tag 'gender:men' → gender=men)."
+                autoComplete="off"
+              />
+            )}
+
+            <Button variant="primary" loading={saving} disabled={!canSave} onClick={handleSave}>
+              Save mapping
+            </Button>
+          </FormLayout>
+        </BlockStack>
+
+        <Banner tone="info">
+          <p>After adding or changing mappings, click <strong>Resync now</strong> above so the new attributes get pulled into every product.</p>
+        </Banner>
+      </BlockStack>
+    </Card>
+  );
+}
+
 export default function Catalog() {
   const data = useLoaderData();
   const fetcher = useFetcher();
   const revalidator = useRevalidator();
 
-  const isRunning = data.status === "running" || fetcher.state !== "idle";
+  const isRunning = data.status === "running" ||
+    (fetcher.state !== "idle" && fetcher.formData?.get("intent") === "resync");
 
   useEffect(() => {
     if (!isRunning) return;
@@ -121,6 +338,10 @@ export default function Catalog() {
               </InlineStack>
             </BlockStack>
           </Card>
+        </Layout.Section>
+
+        <Layout.Section>
+          <MappingsPanel mappings={data.mappings} />
         </Layout.Section>
       </Layout>
     </Page>

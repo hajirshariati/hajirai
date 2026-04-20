@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { authenticate } from "../shopify.server";
 import { getShopConfig, getKnowledgeFilesWithContent } from "../models/ShopConfig.server";
+import { getAttributeMappings } from "../models/AttributeMapping.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
 import { TOOLS, executeTool } from "../lib/chat-tools.server";
 import { recordChatUsage } from "../models/ChatUsage.server";
@@ -207,8 +208,12 @@ export const action = async ({ request }) => {
       return Response.json({ error: "message is required" }, { status: 400 });
     }
 
-    const knowledge = await getKnowledgeFilesWithContent(session.shop);
-    const systemPrompt = buildSystemPrompt({ config, knowledge, shop: session.shop });
+    const [knowledge, attrMappings] = await Promise.all([
+      getKnowledgeFilesWithContent(session.shop),
+      getAttributeMappings(session.shop),
+    ]);
+    const attributeNames = attrMappings.map((m) => m.attribute);
+    const systemPrompt = buildSystemPrompt({ config, knowledge, shop: session.shop, attributeNames });
 
     const history = sanitizeHistory(body.history);
     const model = chooseModel(config, String(body.message), history);
