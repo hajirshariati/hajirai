@@ -186,6 +186,8 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
 
   if (lastHopProducts.length > 0 && fullResponseText) {
     const textLower = fullResponseText.toLowerCase();
+    const saysNoMatch = /\b(don't (?:have|see|carry)|no (?:hiking|running|dress|actual|dedicated)|not (?:see|carry|have)|don't appear|we don't)\b/i.test(fullResponseText);
+
     const scored = lastHopProducts.map((card) => {
       const words = card.title.toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter((w) => w.length > 2);
       const matches = words.filter((w) => textLower.includes(w)).length;
@@ -193,17 +195,22 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     });
     scored.sort((a, b) => b.score - a.score);
     const matched = scored.filter((s) => s.score >= 0.6).map((s) => s.card);
-    const picked = matched.length > 0 ? matched : lastHopProducts;
-    const seen = new Set();
-    const cards = [];
-    for (const c of picked) {
-      const key = c.handle || c.title;
-      if (seen.has(key)) continue;
-      seen.add(key);
-      cards.push(c);
-      if (cards.length >= 3) break;
+
+    if (matched.length === 0 && saysNoMatch) {
+      // AI explicitly said it can't help — don't show mismatched cards.
+    } else {
+      const picked = matched.length > 0 ? matched : lastHopProducts;
+      const seen = new Set();
+      const cards = [];
+      for (const c of picked) {
+        const key = c.handle || c.title;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        cards.push(c);
+        if (cards.length >= 3) break;
+      }
+      controller.enqueue(encoder.encode(sseChunk({ type: "products", products: cards })));
     }
-    controller.enqueue(encoder.encode(sseChunk({ type: "products", products: cards })));
   }
 
   return { totalUsage, toolCallCount, model };
