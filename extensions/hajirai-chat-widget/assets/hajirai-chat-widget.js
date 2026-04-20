@@ -292,7 +292,7 @@ if(p.type==='text'||p.type==='content_block_delta'){
 }
 if(p.type==='products'&&p.products){
   prods=prods.concat(p.products);typingEl.classList.remove('visible');
-  if(!msgDiv){full=full||'Here are some options for you!';msgDiv=appendMsg('assistant',full)}
+  if(!msgDiv){msgDiv=appendMsg('assistant',full||'')}
   if(msgDiv){var b=$('.ai-chat-msg-bubble',msgDiv);var ep=$('.ai-chat-products',b);if(ep)ep.remove();var ph='<div class="ai-chat-products">';for(var j=0;j<prods.length;j++)ph+=prodCard(prods[j]);ph+='</div>';b.insertAdjacentHTML('beforeend',ph)}
 }
 if(p.type==='link'&&p.url){
