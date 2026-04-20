@@ -330,8 +330,15 @@ export const action = async ({ request }) => {
           }).catch((err) => console.error("[chat] usage log error:", err?.message));
         } catch (err) {
           console.error("[chat] stream error:", err?.message || err);
+          let userMsg = "I'm sorry, I'm having trouble right now. Please try again in a moment.";
+          const raw = String(err?.message || "");
+          if (raw.includes("credit balance") || raw.includes("billing") || raw.includes("insufficient")) {
+            userMsg = "I'm temporarily unavailable. Please try again later or reach out to our customer service team for help.";
+          } else if (raw.includes("rate limit") || raw.includes("429")) {
+            userMsg = "I'm getting a lot of questions right now! Please try again in a moment.";
+          }
           controller.enqueue(
-            encoder.encode(sseChunk({ type: "error", message: err?.message || "upstream error" })),
+            encoder.encode(sseChunk({ type: "error", message: userMsg })),
           );
         } finally {
           controller.close();

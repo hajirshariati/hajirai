@@ -259,7 +259,12 @@ if(abortCtrl)abortCtrl.abort();
 abortCtrl=new AbortController();
 var body={message:msg,session_id:getSess(),shop_domain:SHOP,assistant_name:NAME,history:messages.slice(-20).map(function(m){return{role:m.role,content:m.content}})};
 fetch(CHAT_URL,{method:'POST',headers:{'Content-Type':'application/json','Accept':'text/event-stream'},body:JSON.stringify(body),signal:abortCtrl.signal}).then(function(r){
-if(!r.ok)throw new Error('Failed: '+r.status);
+if(!r.ok){
+  if(r.headers.get('content-type')&&r.headers.get('content-type').includes('text/event-stream'))return handleSSE(r);
+  return r.json().catch(function(){return{}}).then(function(d){
+    throw new Error(d.message||'Something went wrong. Please try again.');
+  });
+}
 var ct=r.headers.get('content-type')||'';
 if(ct.includes('text/event-stream')||ct.includes('text/plain'))return handleSSE(r);
 return r.json().then(function(d){handleJSON(d)});
@@ -321,7 +326,17 @@ if(p.type==='action'&&p.action==='show_dead_end'){
   scrollBottom();
 }
 if(p.type==='done'){finish(full,prods,msgDiv,buffSugg);return true}
-if(p.type==='error'){full=p.message||'An error occurred.';finish(full,[],msgDiv,[]);return true}
+if(p.type==='error'){
+  typingEl.classList.remove('visible');isStreaming=false;sendBtn.disabled=false;
+  var errText=p.message||'I\'m sorry, I\'m having trouble right now. Please try again in a moment.';
+  var errDiv=appendMsg('assistant',errText);
+  messages.push({role:'assistant',content:errText});saveH(messages);
+  var errBub=$('.ai-chat-msg-bubble',errDiv);
+  if(errBub)errBub.insertAdjacentHTML('beforeend',deadEndHtml());
+  inputEl.disabled=true;inputEl.placeholder='Choose an option above';sendBtn.disabled=true;
+  scrollBottom();
+  return true;
+}
 }catch(e){full+=data}
 }return false}
 function read(){reader.read().then(function(r){if(r.done){if(full)finish(full,prods,msgDiv,buffSugg);return}var done=proc(decoder.decode(r.value,{stream:true}));if(!done)read()}).catch(function(e){if(e.name!=='AbortError')finish(full||'Connection lost.',prods,msgDiv,[])})}
