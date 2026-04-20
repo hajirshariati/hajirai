@@ -68,6 +68,8 @@ export const action = async ({ request }) => {
       content,
     });
 
+    // Wipe any enrichment rows from a prior upload at this file id. If the new
+    // file is a CSV with a SKU column, the upsert below will re-populate it.
     await deleteEnrichmentsBySourceFile(saved.id);
 
     let enrichmentMessage = "";
@@ -147,6 +149,32 @@ Key Differentiators:
 "SKU-001","100% organic cotton","Machine wash cold, tumble dry low","Runs true to size","200g","Portugal"
 "SKU-002","Premium full-grain leather","Wipe clean with damp cloth","Order half size up","450g","Italy"
 "SKU-003","Recycled polyester blend","Machine wash warm, hang dry","Relaxed fit — size down if between sizes","180g","Vietnam"`,
+  },
+  {
+    label: "Rules & Guardrails",
+    value: "rules",
+    description: "Hard rules the AI must always follow — redirects, restrictions, required responses. These override all other knowledge.",
+    format: "txt",
+    templateName: "rules-template.txt",
+    template: `# Rules & Guardrails
+# The AI will follow these rules strictly — even if a customer asks it to ignore them.
+# Use this file to control how the AI responds in specific situations.
+
+# REDIRECT RULES — send customers to a specific page for certain topics:
+When a customer asks about finding a physical store or retail location, always respond with:
+"You can find our stores and authorized retailers on our store locator page: https://yourstore.com/pages/store-locator"
+
+When a customer asks about custom orders or bulk pricing, always respond with:
+"For custom and bulk orders, please reach out to our team directly: https://yourstore.com/pages/contact"
+
+# RESTRICTION RULES — things the AI should never do:
+Never mention, compare to, or recommend competitor brands or products.
+Never discuss or speculate on upcoming product releases unless listed in the knowledge base.
+Never offer discounts, coupon codes, or price adjustments — direct the customer to current promotions on the website.
+
+# REQUIRED BEHAVIOR:
+Always recommend consulting a healthcare professional before using products for medical purposes.
+If a customer seems frustrated, offer to connect them with a human support agent.`,
   },
   {
     label: "Custom Knowledge",
@@ -394,6 +422,115 @@ export default function Knowledge() {
                 The AI reads these files alongside your Shopify catalog when answering customer questions.
               </Text>
             </BlockStack>
+          </BlockStack>
+        </Card>
+
+        <Card>
+          <BlockStack gap="400">
+            <Text as="h2" variant="headingMd">Data priority — what the AI trusts most</Text>
+            <Text as="p" variant="bodySm" tone="subdued">
+              When the AI answers a question, it checks multiple data sources. If two sources
+              conflict, the higher-priority source wins. Use this to fix wrong answers — upload
+              the correction to the highest applicable source.
+            </Text>
+            <BlockStack gap="200">
+              <Box padding="300" background="bg-surface-critical-subdued" borderRadius="200">
+                <InlineStack gap="300" blockAlign="center">
+                  <Badge tone="critical">1 — Highest</Badge>
+                  <BlockStack gap="050">
+                    <Text as="p" variant="bodySm" fontWeight="semibold">Rules & Guardrails</Text>
+                    <Text as="p" variant="bodySm" tone="subdued">
+                      Hard rules the AI must always follow. Cannot be overridden by anything, not even the customer.
+                      Use this for redirects, restrictions, and required behaviors.
+                    </Text>
+                  </BlockStack>
+                </InlineStack>
+              </Box>
+              <Box padding="300" background="bg-surface-secondary" borderRadius="200">
+                <InlineStack gap="300" blockAlign="center">
+                  <Badge tone="info">2</Badge>
+                  <BlockStack gap="050">
+                    <Text as="p" variant="bodySm" fontWeight="semibold">Live catalog data (tool results)</Text>
+                    <Text as="p" variant="bodySm" tone="subdued">
+                      Real-time product search, variant details, prices, and inventory from your Shopify catalog.
+                      Automatically synced — no action needed.
+                    </Text>
+                  </BlockStack>
+                </InlineStack>
+              </Box>
+              <Box padding="300" background="bg-surface-secondary" borderRadius="200">
+                <InlineStack gap="300" blockAlign="center">
+                  <Badge tone="info">3</Badge>
+                  <BlockStack gap="050">
+                    <Text as="p" variant="bodySm" fontWeight="semibold">Knowledge files (FAQs, Brand, Products, Custom)</Text>
+                    <Text as="p" variant="bodySm" tone="subdued">
+                      The files you upload on this page. Great for policies, sizing guides, brand voice, and extra product details not in Shopify.
+                    </Text>
+                  </BlockStack>
+                </InlineStack>
+              </Box>
+              <Box padding="300" background="bg-surface-secondary" borderRadius="200">
+                <InlineStack gap="300" blockAlign="center">
+                  <Badge>4</Badge>
+                  <BlockStack gap="050">
+                    <Text as="p" variant="bodySm" fontWeight="semibold">Conversation context</Text>
+                    <Text as="p" variant="bodySm" tone="subdued">
+                      What the customer said earlier in the current chat session.
+                    </Text>
+                  </BlockStack>
+                </InlineStack>
+              </Box>
+              <Box padding="300" background="bg-surface-secondary" borderRadius="200">
+                <InlineStack gap="300" blockAlign="center">
+                  <Badge>5 — Lowest</Badge>
+                  <BlockStack gap="050">
+                    <Text as="p" variant="bodySm" fontWeight="semibold">AI general knowledge</Text>
+                    <Text as="p" variant="bodySm" tone="subdued">
+                      The AI's training data. Used only when nothing above answers the question.
+                      The AI is instructed to never invent policies, product details, or availability — it will
+                      offer to connect the customer with your support team instead.
+                    </Text>
+                  </BlockStack>
+                </InlineStack>
+              </Box>
+            </BlockStack>
+            <Banner tone="info">
+              <Text as="p" variant="bodySm">
+                <strong>Fixing a wrong answer?</strong> Upload the correction to the highest applicable source.
+                For example, if the AI gives wrong return policy info, update your FAQs file.
+                If it should always redirect a certain question to a specific page, add that as a Rules & Guardrails file.
+              </Text>
+            </Banner>
+          </BlockStack>
+        </Card>
+
+        <Card>
+          <BlockStack gap="400">
+            <Text as="h2" variant="headingMd">Tip: redirect customers to specific pages</Text>
+            <Text as="p" variant="bodySm" tone="subdued">
+              Want the AI to always send customers to a specific URL when they ask about a topic?
+              Upload a <strong>Rules & Guardrails</strong> file with redirect instructions. For example:
+            </Text>
+            <Box padding="300" background="bg-surface-secondary" borderRadius="200">
+              <Text as="p" variant="bodySm">
+                <code>
+                  When a customer asks about finding a store or retail location, always respond with:
+                  "You can find our stores at https://yourstore.com/pages/store-locator"
+                </code>
+              </Text>
+            </Box>
+            <Box padding="300" background="bg-surface-secondary" borderRadius="200">
+              <Text as="p" variant="bodySm">
+                <code>
+                  When a customer asks about custom orders, always respond with:
+                  "For custom orders, please contact our team at https://yourstore.com/pages/contact"
+                </code>
+              </Text>
+            </Box>
+            <Text as="p" variant="bodySm" tone="subdued">
+              Rules are the highest priority — the AI will follow them strictly, even if other
+              knowledge says something different. Download the Rules template above to see more examples.
+            </Text>
           </BlockStack>
         </Card>
       </BlockStack>
