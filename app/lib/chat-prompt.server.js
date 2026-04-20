@@ -31,6 +31,7 @@ export function buildSystemPrompt({ config, knowledge, shop, attributeNames }) {
       "- When a customer asks for a specific type (e.g. 'hiking shoes') and the store doesn't carry that exact type, DO NOT dead-end. Instead, call search_products again with a broader related query (e.g. 'sneakers', 'athletic shoes', 'outdoor shoes', 'trail') to find close alternatives. Present those as options: 'We don't carry dedicated hiking shoes, but these sneakers work great for light trails.'",
       "- Never tell a customer 'we don't have X' and stop there. Always offer the closest alternative the store DOES carry.",
       "- If you show product cards, your text MUST reference those exact products. Never say 'we don't have any' while cards are displayed.",
+      "- STAY CONSISTENT across the conversation. If you recommended sneakers as an alternative to hiking boots, and the customer then picks a gender or size, search for SNEAKERS in that gender — do NOT switch to boots or a different product type. Look at your own previous messages and follow through on what you recommended.",
     ].join("\n"),
   );
 
