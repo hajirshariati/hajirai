@@ -3,11 +3,12 @@ import {
   getAttributeMappings,
   buildMetafieldFragment,
   resolveProductAttributes,
+  resolveVariantAttributes,
 } from "./AttributeMapping.server";
 
 const PRODUCTS_PAGE = 50;
 
-function productsQuery(metafieldFragment = "") {
+function productsQuery(productMfFragment = "", variantMfFragment = "") {
   return `#graphql
   query SyncProducts($cursor: String) {
     products(first: ${PRODUCTS_PAGE}, after: $cursor) {
@@ -21,7 +22,7 @@ function productsQuery(metafieldFragment = "") {
         tags
         descriptionHtml
         status
-        ${metafieldFragment}
+        ${productMfFragment}
         variants(first: 100) {
           nodes {
             id
@@ -31,6 +32,7 @@ function productsQuery(metafieldFragment = "") {
             compareAtPrice
             inventoryQuantity
             selectedOptions { name value }
+            ${variantMfFragment}
           }
         }
       }
@@ -39,7 +41,7 @@ function productsQuery(metafieldFragment = "") {
 `;
 }
 
-function productByIdQuery(metafieldFragment = "") {
+function productByIdQuery(productMfFragment = "", variantMfFragment = "") {
   return `#graphql
   query GetProduct($id: ID!) {
     product(id: $id) {
@@ -51,7 +53,7 @@ function productByIdQuery(metafieldFragment = "") {
       tags
       descriptionHtml
       status
-      ${metafieldFragment}
+      ${productMfFragment}
       variants(first: 100) {
         nodes {
           id
@@ -61,6 +63,7 @@ function productByIdQuery(metafieldFragment = "") {
           compareAtPrice
           inventoryQuantity
           selectedOptions { name value }
+          ${variantMfFragment}
         }
       }
     }
@@ -90,8 +93,8 @@ function mapProductFields(node, mappings) {
   return fields;
 }
 
-function mapVariantFields(v) {
-  return {
+function mapVariantFields(v, mappings) {
+  const fields = {
     shopifyId: v.id,
     sku: v.sku || null,
     title: v.title || null,
@@ -100,6 +103,10 @@ function mapVariantFields(v) {
     inventoryQty: typeof v.inventoryQuantity === "number" ? v.inventoryQuantity : null,
     optionsJson: v.selectedOptions ? JSON.stringify(v.selectedOptions) : null,
   };
+  if (mappings && mappings.length > 0) {
+    fields.attributesJson = resolveVariantAttributes(v, mappings) || undefined;
+  }
+  return fields;
 }
 
 async function upsertProduct(shop, node, mappings = null) {
@@ -110,7 +117,7 @@ async function upsertProduct(shop, node, mappings = null) {
     create: { shop, ...fields },
   });
 
-  const variants = (node.variants?.nodes || []).map(mapVariantFields);
+  const variants = (node.variants?.nodes || []).map((v) => mapVariantFields(v, mappings));
   const incomingIds = new Set(variants.map((v) => v.shopifyId));
 
   await prisma.productVariant.deleteMany({
@@ -167,8 +174,9 @@ export async function upsertProductFromWebhook(shop, webhookPayload) {
 
 export async function fetchAndUpsertProduct(admin, shop, shopifyGid) {
   const mappings = await getAttributeMappings(shop);
-  const mfFragment = buildMetafieldFragment(mappings);
-  const query = productByIdQuery(mfFragment);
+  const productMf = buildMetafieldFragment(mappings, "product");
+  const variantMf = buildMetafieldFragment(mappings, "variant");
+  const query = productByIdQuery(productMf, variantMf);
   const resp = await admin.graphql(query, { variables: { id: shopifyGid } });
   const json = await resp.json();
   const node = json?.data?.product;
@@ -203,10 +211,15 @@ export async function syncCatalog(admin, shop) {
   await setSyncState(shop, { status: "running", lastError: null });
   try {
     const mappings = await getAttributeMappings(shop);
-    const mfFragment = buildMetafieldFragment(mappings);
-    const query = productsQuery(mfFragment);
+    const productMf = buildMetafieldFragment(mappings, "product");
+    const variantMf = buildMetafieldFragment(mappings, "variant");
+    const query = productsQuery(productMf, variantMf);
     if (mappings.length > 0) {
-      console.log(`[syncCatalog] ${shop}: syncing with ${mappings.length} attribute mappings`);
+      const prodCount = mappings.filter((m) => (m.target || "product") === "product").length;
+      const varCount = mappings.filter((m) => m.target === "variant").length;
+      console.log(
+        `[syncCatalog] ${shop}: syncing with ${mappings.length} mappings (${prodCount} product, ${varCount} variant)`,
+      );
     }
 
     let cursor = null;

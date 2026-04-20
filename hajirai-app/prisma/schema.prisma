@@ -136,6 +136,7 @@ model ProductVariant {
   compareAtPrice   String?
   inventoryQty     Int?
   optionsJson      String?
+  attributesJson   Json?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
@@ -148,6 +149,7 @@ model AttributeMapping {
   shop       String
   attribute  String
   sourceType String
+  target     String   @default("product")
   namespace  String?
   key        String?
   prefix     String?

@@ -125,15 +125,21 @@ async function searchProducts({ query, limit, filters }, { shop }) {
 
   const attrKeys = Object.keys(attrFilters);
   if (attrKeys.length > 0) {
-    where.AND = attrKeys.map((key) => ({
-      attributesJson: { path: [key], string_contains: attrFilters[key].toLowerCase() },
-    }));
+    where.AND = attrKeys.map((key) => {
+      const want = attrFilters[key].toLowerCase();
+      return {
+        OR: [
+          { attributesJson: { path: [key], string_contains: want } },
+          { variants: { some: { attributesJson: { path: [key], string_contains: want } } } },
+        ],
+      };
+    });
   }
 
   const products = await prisma.product.findMany({
     where,
     include: {
-      variants: { select: { sku: true, price: true } },
+      variants: { select: { sku: true, price: true, attributesJson: true } },
     },
     take: attrKeys.length > 0 ? max * 3 : max,
     orderBy: { updatedAt: "desc" },
@@ -141,14 +147,17 @@ async function searchProducts({ query, limit, filters }, { shop }) {
 
   /* Post-filter for array-valued attributes (Prisma string_contains on
      JSON arrays may over-match). Then trim to requested limit. */
+  const matchesAttr = (val, want) => {
+    if (Array.isArray(val)) return val.some((v) => typeof v === "string" && v.includes(want));
+    return typeof val === "string" && val.includes(want);
+  };
   const filtered = attrKeys.length > 0
     ? products.filter((p) => {
-        const attrs = p.attributesJson || {};
+        const productAttrs = p.attributesJson || {};
         return attrKeys.every((key) => {
-          const val = attrs[key];
           const want = attrFilters[key].toLowerCase();
-          if (Array.isArray(val)) return val.some((v) => v.includes(want));
-          return typeof val === "string" && val.includes(want);
+          if (matchesAttr(productAttrs[key], want)) return true;
+          return p.variants.some((v) => matchesAttr((v.attributesJson || {})[key], want));
         });
       }).slice(0, max)
     : products.slice(0, max);
@@ -201,6 +210,7 @@ async function getProductDetails({ handle }, { shop }) {
       compareAtPrice: v.compareAtPrice || undefined,
       inventoryQty: v.inventoryQty ?? undefined,
       options: safeParseJson(v.optionsJson) || undefined,
+      attributes: v.attributesJson || undefined,
       enrichment: v.sku ? enrich.get(v.sku) || undefined : undefined,
     })),
   };
@@ -231,6 +241,8 @@ async function lookupSku({ skus }, { shop }) {
       compareAtPrice: v.compareAtPrice || undefined,
       inventoryQty: v.inventoryQty ?? undefined,
       options: safeParseJson(v.optionsJson) || undefined,
+      attributes: v.attributesJson || undefined,
+      productAttributes: v.product.attributesJson || undefined,
       url: productUrl(shop, v.product.handle),
       enrichment: enrich.get(v.sku) || undefined,
     })),
