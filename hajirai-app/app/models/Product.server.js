@@ -22,6 +22,7 @@ function productsQuery(productMfFragment = "", variantMfFragment = "") {
         tags
         descriptionHtml
         status
+        featuredImage { url }
         ${productMfFragment}
         variants(first: 100) {
           nodes {
@@ -53,6 +54,7 @@ function productByIdQuery(productMfFragment = "", variantMfFragment = "") {
       tags
       descriptionHtml
       status
+      featuredImage { url }
       ${productMfFragment}
       variants(first: 100) {
         nodes {
@@ -86,6 +88,7 @@ function mapProductFields(node, mappings) {
     tags: node.tags || [],
     description: stripHtml(node.descriptionHtml),
     status: node.status || null,
+    featuredImageUrl: node.featuredImage?.url || null,
   };
   if (mappings && mappings.length > 0) {
     fields.attributesJson = resolveProductAttributes(node, mappings) || undefined;
@@ -166,6 +169,7 @@ export async function upsertProductFromWebhook(shop, webhookPayload) {
       : (webhookPayload.tags || []),
     descriptionHtml: webhookPayload.body_html,
     status: webhookPayload.status,
+    featuredImage: webhookPayload.image ? { url: webhookPayload.image.src } : null,
     variants: { nodes: variants },
   };
 

@@ -16,6 +16,7 @@ import {
   TextField,
   Select,
   Tag,
+  Checkbox,
 } from "@shopify/polaris";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
@@ -29,13 +30,15 @@ import {
   upsertAttributeMapping,
   deleteAttributeMapping,
 } from "../models/AttributeMapping.server";
+import { getShopConfig, updateShopConfig } from "../models/ShopConfig.server";
 
 export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
-  const [state, count, mappings] = await Promise.all([
+  const [state, count, mappings, config] = await Promise.all([
     getCatalogSyncState(session.shop),
     getProductCount(session.shop),
     getAttributeMappings(session.shop),
+    getShopConfig(session.shop),
   ]);
   return {
     shop: session.shop,
@@ -44,6 +47,7 @@ export const loader = async ({ request }) => {
     lastError: state.lastError,
     productsCount: count,
     mappings,
+    deduplicateColors: config.deduplicateColors,
   };
 };
 
@@ -91,6 +95,12 @@ export const action = async ({ request }) => {
     const attribute = String(formData.get("attribute") || "").trim();
     if (attribute) await deleteAttributeMapping(session.shop, attribute);
     return { deleted: true };
+  }
+
+  if (intent === "toggle_dedup") {
+    const value = formData.get("deduplicateColors") === "true";
+    await updateShopConfig(session.shop, { deduplicateColors: value });
+    return { saved: true };
   }
 
   return { error: "unknown intent" };
@@ -277,10 +287,18 @@ function MappingsPanel({ mappings }) {
 export default function Catalog() {
   const data = useLoaderData();
   const fetcher = useFetcher();
+  const dedupFetcher = useFetcher();
   const revalidator = useRevalidator();
 
   const isRunning = data.status === "running" ||
     (fetcher.state !== "idle" && fetcher.formData?.get("intent") === "resync");
+
+  const handleDedup = (checked) => {
+    const fd = new FormData();
+    fd.set("intent", "toggle_dedup");
+    fd.set("deduplicateColors", String(checked));
+    dedupFetcher.submit(fd, { method: "post" });
+  };
 
   useEffect(() => {
     if (!isRunning) return;
@@ -336,6 +354,20 @@ export default function Catalog() {
                   {isRunning ? "Syncing..." : "Resync now"}
                 </Button>
               </InlineStack>
+            </BlockStack>
+          </Card>
+        </Layout.Section>
+
+        <Layout.Section>
+          <Card>
+            <BlockStack gap="300">
+              <Text as="h2" variant="headingMd">Chat display</Text>
+              <Checkbox
+                label="Deduplicate colors in search results"
+                helpText="When enabled, products that differ only by color show a single card instead of one per color variant. Useful when each color is a separate Shopify product."
+                checked={data.deduplicateColors}
+                onChange={handleDedup}
+              />
             </BlockStack>
           </Card>
         </Layout.Section>

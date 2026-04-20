@@ -106,7 +106,18 @@ async function enrichmentMap(shop, skus) {
   return map;
 }
 
-async function searchProducts({ query, limit, filters }, { shop }) {
+function deduplicateByColor(products) {
+  const seen = new Map();
+  for (const p of products) {
+    const base = p.handle.replace(/-[a-z]+$/, "");
+    if (!seen.has(base)) {
+      seen.set(base, p);
+    }
+  }
+  return Array.from(seen.values());
+}
+
+async function searchProducts({ query, limit, filters }, { shop, deduplicateColors }) {
   const q = String(query || "").trim();
   if (!q) return { products: [] };
   const max = Math.min(Math.max(parseInt(limit, 10) || 6, 1), 10);
@@ -136,22 +147,22 @@ async function searchProducts({ query, limit, filters }, { shop }) {
     });
   }
 
+  const fetchLimit = deduplicateColors ? max * 5 : (attrKeys.length > 0 ? max * 3 : max);
+
   const products = await prisma.product.findMany({
     where,
     include: {
-      variants: { select: { sku: true, price: true, attributesJson: true } },
+      variants: { select: { sku: true, price: true, compareAtPrice: true, attributesJson: true } },
     },
-    take: attrKeys.length > 0 ? max * 3 : max,
+    take: fetchLimit,
     orderBy: { updatedAt: "desc" },
   });
 
-  /* Post-filter for array-valued attributes (Prisma string_contains on
-     JSON arrays may over-match). Then trim to requested limit. */
   const matchesAttr = (val, want) => {
     if (Array.isArray(val)) return val.some((v) => typeof v === "string" && v.includes(want));
     return typeof val === "string" && val.includes(want);
   };
-  const filtered = attrKeys.length > 0
+  let filtered = attrKeys.length > 0
     ? products.filter((p) => {
         const productAttrs = p.attributesJson || {};
         return attrKeys.every((key) => {
@@ -159,8 +170,24 @@ async function searchProducts({ query, limit, filters }, { shop }) {
           if (matchesAttr(productAttrs[key], want)) return true;
           return p.variants.some((v) => matchesAttr((v.attributesJson || {})[key], want));
         });
-      }).slice(0, max)
-    : products.slice(0, max);
+      })
+    : products;
+
+  if (deduplicateColors) {
+    filtered = deduplicateByColor(filtered);
+  }
+
+  filtered = filtered.slice(0, max);
+
+  const firstPrice = (variants) => {
+    const v = variants.find((v) => v.price);
+    return v ? v.price : null;
+  };
+
+  const firstCompareAt = (variants) => {
+    const v = variants.find((v) => v.compareAtPrice);
+    return v ? v.compareAtPrice : null;
+  };
 
   return {
     query: q,
@@ -176,6 +203,9 @@ async function searchProducts({ query, limit, filters }, { shop }) {
       priceRange: priceRange(p.variants),
       variantCount: p.variants.length,
       url: productUrl(shop, p.handle),
+      image: p.featuredImageUrl || undefined,
+      price: firstPrice(p.variants) || undefined,
+      compareAtPrice: firstCompareAt(p.variants) || undefined,
     })),
   };
 }
@@ -203,6 +233,9 @@ async function getProductDetails({ handle }, { shop }) {
     description: truncate(product.description || "", 600),
     priceRange: priceRange(product.variants),
     url: productUrl(shop, product.handle),
+    image: product.featuredImageUrl || undefined,
+    price: product.variants[0]?.price || undefined,
+    compareAtPrice: product.variants[0]?.compareAtPrice || undefined,
     variants: product.variants.map((v) => ({
       sku: v.sku || undefined,
       title: v.title || undefined,
@@ -244,6 +277,7 @@ async function lookupSku({ skus }, { shop }) {
       attributes: v.attributesJson || undefined,
       productAttributes: v.product.attributesJson || undefined,
       url: productUrl(shop, v.product.handle),
+      image: v.product.featuredImageUrl || undefined,
       enrichment: enrich.get(v.sku) || undefined,
     })),
     missing,
@@ -266,6 +300,47 @@ function mentionsFromResult(name, result) {
   }
   if (name === "lookup_sku" && Array.isArray(result.found)) {
     return result.found.map((f) => ({ handle: f.productHandle, title: f.productTitle, tool: name }));
+  }
+  return [];
+}
+
+export function extractProductCards(name, result) {
+  if (!result || result.error) return [];
+  if (name === "search_products" && Array.isArray(result.products)) {
+    return result.products
+      .filter((p) => p.image)
+      .map((p) => ({
+        title: p.title,
+        url: p.url,
+        handle: p.handle,
+        image: p.image,
+        price_formatted: p.priceRange || (p.price ? `$${parseFloat(p.price).toFixed(2)}` : ""),
+        compare_at_price: p.compareAtPrice ? Math.round(parseFloat(p.compareAtPrice) * 100) : undefined,
+      }));
+  }
+  if (name === "get_product_details" && result.handle) {
+    if (!result.image) return [];
+    return [{
+      title: result.title,
+      url: result.url,
+      handle: result.handle,
+      image: result.image,
+      price_formatted: result.priceRange || (result.price ? `$${parseFloat(result.price).toFixed(2)}` : ""),
+      compare_at_price: result.compareAtPrice ? Math.round(parseFloat(result.compareAtPrice) * 100) : undefined,
+    }];
+  }
+  if (name === "lookup_sku" && Array.isArray(result.found)) {
+    const seen = new Set();
+    return result.found
+      .filter((f) => f.image && !seen.has(f.productHandle) && seen.add(f.productHandle))
+      .map((f) => ({
+        title: f.productTitle,
+        url: f.url,
+        handle: f.productHandle,
+        image: f.image,
+        price_formatted: f.price ? `$${parseFloat(f.price).toFixed(2)}` : "",
+        compare_at_price: f.compareAtPrice ? Math.round(parseFloat(f.compareAtPrice) * 100) : undefined,
+      }));
   }
   return [];
 }
