@@ -216,7 +216,7 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
 
   const where = {
     shop,
-    status: { in: ["ACTIVE", "active"] },
+    NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } },
     AND: keywords.map(keywordMatchClause),
   };
 
@@ -253,7 +253,7 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
   if (products.length === 0 && keywords.length > 1) {
     const fallbackWhere = {
       shop,
-      status: { in: ["ACTIVE", "active"] },
+      NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } },
       OR: keywords.map(keywordMatchClause),
     };
     if (wantsShoes) {
@@ -326,7 +326,7 @@ async function getProductDetails({ handle }, { shop }) {
   if (!h) return { error: "handle is required" };
 
   const product = await prisma.product.findFirst({
-    where: { shop, handle: h, status: { in: ["ACTIVE", "active"] } },
+    where: { shop, handle: h, NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } } },
     include: { variants: true },
   });
   if (!product) return { error: `No product found with handle '${h}'.` };
@@ -367,7 +367,7 @@ async function lookupSku({ skus }, { shop }) {
   if (list.length === 0) return { found: [], missing: [] };
 
   const variants = await prisma.productVariant.findMany({
-    where: { sku: { in: list }, product: { shop, status: { in: ["ACTIVE", "active"] } } },
+    where: { sku: { in: list }, product: { shop, NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } } } },
     include: { product: true },
   });
   const enrich = await enrichmentMap(shop, list);
