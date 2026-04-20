@@ -5,7 +5,7 @@ const LABELS = {
   custom: "Custom Knowledge",
 };
 
-export function buildSystemPrompt({ config, knowledge, shop }) {
+export function buildSystemPrompt({ config, knowledge, shop, attributeNames }) {
   const name = config?.assistantName || "AI Shopping Assistant";
   const tagline = config?.assistantTagline || "";
   const parts = [];
@@ -37,6 +37,14 @@ export function buildSystemPrompt({ config, knowledge, shop }) {
   for (const [type, contents] of Object.entries(knowledgeByType)) {
     const label = LABELS[type] || type;
     parts.push(`\n=== ${label} ===\n${contents.join("\n\n")}`);
+  }
+
+  if (attributeNames && attributeNames.length > 0) {
+    parts.push(
+      `\n=== Product Attributes ===\nThe merchant has mapped these product attributes: ${attributeNames.join(", ")}. ` +
+        `When searching for products, use the "filters" parameter in search_products to narrow results by these attributes ` +
+        `(e.g. if a customer says "men's running shoes", call search_products with query "running shoes" and filters { "gender": "men" }).`,
+    );
   }
 
   if (config?.disclaimerText) {
