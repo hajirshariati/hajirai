@@ -7,7 +7,7 @@ import { TOOLS, executeTool, extractProductCards } from "../lib/chat-tools.serve
 import { recordChatUsage } from "../models/ChatUsage.server";
 import { canSendMessage } from "../lib/billing.server";
 
-const DEFAULT_MODEL = process.env.DEFAULT_MODEL || "claude-sonnet-4-6-20250514";
+const DEFAULT_MODEL = process.env.DEFAULT_MODEL || "claude-sonnet-4-6";
 const HAIKU_MODEL = "claude-haiku-4-5-20251001";
 const OPUS_MODEL = "claude-opus-4-20250514";
 const MAX_TOKENS = parseInt(process.env.CHAT_MAX_TOKENS, 10) || 1024;
