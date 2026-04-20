@@ -157,16 +157,29 @@ function extractKeywords(q) {
     .filter((w) => w.length > 1 && !STOP_WORDS.has(w));
 }
 
+const SYNONYMS = {
+  shoe: ["sneaker", "sandal", "boot", "slipper", "loafer", "flat", "heel", "clog", "mule", "oxford", "moccasin"],
+  shoes: ["sneaker", "sneakers", "sandal", "sandals", "boot", "boots", "slipper", "slippers", "loafer", "loafers", "flat", "flats", "heel", "heels", "clog", "clogs", "mule", "mules", "oxford", "moccasin"],
+  footwear: ["sneaker", "sneakers", "sandal", "sandals", "boot", "boots", "slipper", "slippers", "shoe", "shoes"],
+  sneakers: ["sneaker", "shoe", "shoes"],
+  sneaker: ["sneakers", "shoe", "shoes"],
+  sandals: ["sandal", "shoe", "shoes"],
+  boots: ["boot", "shoe", "shoes"],
+};
+
 function keywordMatchClause(kw) {
-  return {
-    OR: [
-      { title: { contains: kw, mode: "insensitive" } },
-      { vendor: { contains: kw, mode: "insensitive" } },
-      { productType: { contains: kw, mode: "insensitive" } },
-      { description: { contains: kw, mode: "insensitive" } },
-      { tags: { hasSome: [kw] } },
-    ],
-  };
+  const terms = [kw, ...(SYNONYMS[kw] || [])];
+  const clauses = [];
+  for (const t of terms) {
+    clauses.push(
+      { title: { contains: t, mode: "insensitive" } },
+      { vendor: { contains: t, mode: "insensitive" } },
+      { productType: { contains: t, mode: "insensitive" } },
+      { description: { contains: t, mode: "insensitive" } },
+    );
+  }
+  clauses.push({ tags: { hasSome: terms } });
+  return { OR: clauses };
 }
 
 const ORTHOTIC_TERMS = /\b(orthotic|orthotics|insole|insoles|inserts?|arch support|arch-support)\b/i;
