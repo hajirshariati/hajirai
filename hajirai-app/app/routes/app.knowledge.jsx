@@ -73,17 +73,20 @@ export const action = async ({ request }) => {
     await deleteEnrichmentsBySourceFile(saved.id);
 
     let enrichmentMessage = "";
+    let skuWarning = false;
     if (isCsv(fileName)) {
       const result = await upsertEnrichmentsFromCsv(session.shop, saved, content);
       if (result.noSkuColumn) {
         enrichmentMessage = " No SKU column detected — stored as raw context.";
       } else if (result.total > 0) {
         enrichmentMessage = ` Linked ${result.total} SKUs (${result.matched} matched your catalog).`;
+        if (result.matched === 0) skuWarning = true;
       }
     }
 
     return {
       success: true,
+      skuWarning,
       message: `${fileName} uploaded successfully.${enrichmentMessage}`,
     };
   }
@@ -174,6 +177,7 @@ export default function Knowledge() {
 
   const [selectedType, setSelectedType] = useState("faqs");
   const [uploadFile, setUploadFile] = useState(null);
+  const [dismissedBanner, setDismissedBanner] = useState(null);
 
   const downloadTemplate = useCallback(() => {
     const type = FILE_TYPES.find((t) => t.value === selectedType);
@@ -265,11 +269,19 @@ export default function Knowledge() {
           </Box>
         </Banner>
 
-        {actionData?.success && (
-          <Banner title={actionData.message} tone="success" onDismiss={() => {}} />
+        {actionData?.success && dismissedBanner !== actionData.message && (
+          <Banner
+            title={actionData.message}
+            tone={actionData.skuWarning ? "warning" : "success"}
+            onDismiss={() => setDismissedBanner(actionData.message)}
+          />
         )}
-        {actionData?.error && (
-          <Banner title={actionData.error} tone="critical" onDismiss={() => {}} />
+        {actionData?.error && dismissedBanner !== actionData.error && (
+          <Banner
+            title={actionData.error}
+            tone="critical"
+            onDismiss={() => setDismissedBanner(actionData.error)}
+          />
         )}
 
         <Layout>
