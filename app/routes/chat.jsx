@@ -7,11 +7,13 @@ import { TOOLS, executeTool, extractProductCards } from "../lib/chat-tools.serve
 import { recordChatUsage } from "../models/ChatUsage.server";
 import { canSendMessage } from "../lib/billing.server";
 
-const DEFAULT_MODEL = process.env.DEFAULT_MODEL || "claude-sonnet-4-20250514";
+const DEFAULT_MODEL = process.env.DEFAULT_MODEL || "claude-sonnet-4-6-20250514";
 const HAIKU_MODEL = "claude-haiku-4-5-20251001";
 const OPUS_MODEL = "claude-opus-4-20250514";
 const MAX_TOKENS = parseInt(process.env.CHAT_MAX_TOKENS, 10) || 1024;
 const MAX_TOOL_HOPS = parseInt(process.env.CHAT_MAX_TOOL_HOPS, 10) || 5;
+
+const DEPRECATED_MODELS = new Set(["claude-sonnet-4-20250514", "claude-3-5-sonnet-20241022", "claude-3-5-sonnet-20240620"]);
 
 const RATE_LIMIT_PER_IP_SHOP = parseInt(process.env.RATE_LIMIT_PER_IP_SHOP, 10) || 20;
 const RATE_LIMIT_WINDOW_MS = parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 60_000;
@@ -80,7 +82,8 @@ const SIMPLE_PATTERN = /^(hi|hey|hello|thanks|thank you|ok|okay|yes|no|bye|goodb
 
 function chooseModel(config, message, history) {
   const strategy = config.modelStrategy || "smart";
-  const sonnet = config.anthropicModel || DEFAULT_MODEL;
+  const stored = config.anthropicModel || DEFAULT_MODEL;
+  const sonnet = DEPRECATED_MODELS.has(stored) ? DEFAULT_MODEL : stored;
 
   if (strategy === "always-haiku") return HAIKU_MODEL;
   if (strategy === "always-opus") return OPUS_MODEL;
