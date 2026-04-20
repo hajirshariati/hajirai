@@ -367,7 +367,7 @@ if(p.type==='error'){
   scrollBottom();
   return true;
 }
-}catch(e){full+=data}
+}catch(e){}
 }return false}
 function read(){reader.read().then(function(r){if(r.done){if(full)finish(full,prods,msgDiv,buffSugg);return}var done=proc(decoder.decode(r.value,{stream:true}));if(!done)read()}).catch(function(e){if(e.name!=='AbortError')finish(full||'Connection lost.',prods,msgDiv,[])})}
 read();
