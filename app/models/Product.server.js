@@ -22,6 +22,7 @@ function productsQuery(productMfFragment = "", variantMfFragment = "") {
         tags
         descriptionHtml
         status
+        featuredImage { url }
         ${productMfFragment}
         variants(first: 100) {
           nodes {
@@ -53,6 +54,7 @@ function productByIdQuery(productMfFragment = "", variantMfFragment = "") {
       tags
       descriptionHtml
       status
+      featuredImage { url }
       ${productMfFragment}
       variants(first: 100) {
         nodes {
@@ -86,6 +88,7 @@ function mapProductFields(node, mappings) {
     tags: node.tags || [],
     description: stripHtml(node.descriptionHtml),
     status: node.status || null,
+    featuredImageUrl: node.featuredImage?.url || null,
   };
   if (mappings && mappings.length > 0) {
     fields.attributesJson = resolveProductAttributes(node, mappings) || undefined;
@@ -140,16 +143,16 @@ export async function upsertProductFromWebhook(shop, webhookPayload) {
   if (!numericId) return null;
   const gid = typeof numericId === "string" && numericId.startsWith("gid://")
     ? numericId
-    : "gid://shopify/Product/" + numericId;
+    : `gid://shopify/Product/${numericId}`;
   const variants = (webhookPayload.variants || []).map((v) => ({
-    id: v.admin_graphql_api_id || "gid://shopify/ProductVariant/" + v.id,
+    id: v.admin_graphql_api_id || `gid://shopify/ProductVariant/${v.id}`,
     sku: v.sku,
     title: v.title,
     price: v.price,
     compareAtPrice: v.compare_at_price,
     inventoryQuantity: v.inventory_quantity,
     selectedOptions: [
-      v.option1 ? { name: "Option1", value: v.option1 } : null,
+      webhookPayload.option1 || v.option1 ? { name: "Option1", value: v.option1 } : null,
       v.option2 ? { name: "Option2", value: v.option2 } : null,
       v.option3 ? { name: "Option3", value: v.option3 } : null,
     ].filter(Boolean),
@@ -166,6 +169,7 @@ export async function upsertProductFromWebhook(shop, webhookPayload) {
       : (webhookPayload.tags || []),
     descriptionHtml: webhookPayload.body_html,
     status: webhookPayload.status,
+    featuredImage: webhookPayload.image ? { url: webhookPayload.image.src } : null,
     variants: { nodes: variants },
   };
 
@@ -187,7 +191,7 @@ export async function fetchAndUpsertProduct(admin, shop, shopifyGid) {
 export async function deleteProductByShopifyId(shop, shopifyId) {
   const gid = typeof shopifyId === "string" && shopifyId.startsWith("gid://")
     ? shopifyId
-    : "gid://shopify/Product/" + shopifyId;
+    : `gid://shopify/Product/${shopifyId}`;
   await prisma.product.deleteMany({ where: { shop, shopifyId: gid } });
 }
 
@@ -247,7 +251,7 @@ export async function syncCatalog(admin, shop) {
     return { ok: true, count: totalSeen };
   } catch (err) {
     const message = err?.message || String(err);
-    console.error("[syncCatalog] " + shop + ":", message);
+    console.error(`[syncCatalog] ${shop}:`, message);
     await setSyncState(shop, { status: "error", lastError: message });
     return { ok: false, error: message };
   }
@@ -255,7 +259,7 @@ export async function syncCatalog(admin, shop) {
 
 export function syncCatalogAsync(admin, shop) {
   syncCatalog(admin, shop).catch((err) => {
-    console.error("[syncCatalogAsync] " + shop + " unhandled:", err);
+    console.error(`[syncCatalogAsync] ${shop} unhandled:`, err);
   });
 }
 
