@@ -169,6 +169,20 @@ function keywordMatchClause(kw) {
   };
 }
 
+const ORTHOTIC_TERMS = /\b(orthotic|orthotics|insole|insoles|inserts?|arch support|arch-support)\b/i;
+const SHOE_TERMS = /\b(shoe|shoes|sneaker|sneakers|sandal|sandals|boot|boots|slipper|slippers|heel|heels|flat|flats|loafer|loafers|footwear)\b/i;
+
+function excludeOrthoticsClause() {
+  return {
+    AND: [
+      { NOT: { productType: { contains: "orthotic", mode: "insensitive" } } },
+      { NOT: { productType: { contains: "insole", mode: "insensitive" } } },
+      { NOT: { title: { contains: "orthotic", mode: "insensitive" } } },
+      { NOT: { title: { contains: "insole", mode: "insensitive" } } },
+    ],
+  };
+}
+
 async function searchProducts({ query, limit, filters }, { shop, deduplicateColors }) {
   const q = String(query || "").trim();
   if (!q) return { products: [] };
@@ -178,10 +192,16 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
   const keywords = extractKeywords(q);
   if (keywords.length === 0) return { products: [] };
 
+  const wantsShoes = SHOE_TERMS.test(q) && !ORTHOTIC_TERMS.test(q);
+
   const where = {
     shop,
     AND: keywords.map(keywordMatchClause),
   };
+
+  if (wantsShoes) {
+    where.AND.push(excludeOrthoticsClause());
+  }
 
   const attrKeys = Object.keys(attrFilters);
   if (attrKeys.length > 0) {
@@ -214,6 +234,9 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
       shop,
       OR: keywords.map(keywordMatchClause),
     };
+    if (wantsShoes) {
+      fallbackWhere.AND = [excludeOrthoticsClause()];
+    }
     products = await prisma.product.findMany({
       where: fallbackWhere,
       include: {
