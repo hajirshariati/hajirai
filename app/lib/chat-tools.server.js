@@ -149,7 +149,7 @@ function deduplicateByColor(products) {
 
 const STOP_WORDS = new Set(["the", "a", "an", "for", "and", "or", "in", "on", "to", "of", "with", "is", "are", "i", "my", "me", "some", "any", "can", "do", "show", "find", "get", "want", "need", "looking", "search"]);
 
-const POSSESSIVE_STRIP = { mens: "men", womens: "women", childrens: "children", kids: "kid" };
+const POSSESSIVE_STRIP = { mens: "men", womens: "women", childrens: "children", kids: "kid", girls: "girl", boys: "boy" };
 
 function extractKeywords(q) {
   return q
@@ -167,11 +167,21 @@ const SYNONYMS = {
   sneakers: ["sneaker", "shoe", "shoes"],
   sneaker: ["sneakers", "shoe", "shoes"],
   sandals: ["sandal", "shoe", "shoes"],
+  sandal: ["sandals", "shoe", "shoes"],
   boots: ["boot", "shoe", "shoes"],
+  boot: ["boots", "shoe", "shoes"],
+  slippers: ["slipper", "shoe", "shoes"],
+  slipper: ["slippers", "shoe", "shoes"],
+  loafers: ["loafer", "shoe", "shoes"],
+  loafer: ["loafers", "shoe", "shoes"],
   wedges: ["wedge", "sandal", "sandals"],
   wedge: ["wedges", "sandal", "sandals"],
   slides: ["slide", "sandal", "sandals"],
   slide: ["slides", "sandal", "sandals"],
+  heels: ["heel", "shoe", "shoes"],
+  heel: ["heels", "shoe", "shoes"],
+  flats: ["flat", "shoe", "shoes"],
+  flat: ["flats", "shoe", "shoes"],
 };
 
 function keywordMatchClause(kw) {
@@ -270,8 +280,8 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
   }
 
   const matchesAttr = (val, want) => {
-    if (Array.isArray(val)) return val.some((v) => typeof v === "string" && v.includes(want));
-    return typeof val === "string" && val.includes(want);
+    if (Array.isArray(val)) return val.some((v) => typeof v === "string" && v.toLowerCase().includes(want));
+    return typeof val === "string" && val.toLowerCase().includes(want);
   };
   let filtered = attrKeys.length > 0
     ? products.filter((p) => {
@@ -436,7 +446,7 @@ async function getProductReviews({ handle }, { shop, yotpoApiKey }) {
   const url = `https://api.yotpo.com/v1/widget/${encodeURIComponent(yotpoApiKey)}/products/${encodeURIComponent(productId)}/reviews.json?per_page=30&page=1&sort=date&direction=desc`;
   let data;
   try {
-    const res = await fetch(url, { headers: { accept: "application/json" } });
+    const res = await fetch(url, { headers: { accept: "application/json" }, signal: AbortSignal.timeout(8000) });
     if (!res.ok) return { error: `Yotpo request failed (${res.status}).` };
     data = await res.json();
   } catch (err) {
@@ -463,12 +473,14 @@ async function getProductReviews({ handle }, { shop, yotpoApiKey }) {
   let fitSummary = "Not enough reviews mention fit.";
   const totalFit = fitCounts.runs_small + fitCounts.runs_large + fitCounts.true_to_size;
   if (totalFit >= 3) {
-    if (fitCounts.runs_small > fitCounts.runs_large && fitCounts.runs_small >= fitCounts.true_to_size) {
-      fitSummary = `Tends to run small — most reviewers suggest sizing up (${fitCounts.runs_small} of ${totalFit} fit mentions).`;
-    } else if (fitCounts.runs_large > fitCounts.runs_small && fitCounts.runs_large >= fitCounts.true_to_size) {
-      fitSummary = `Tends to run large — most reviewers suggest sizing down (${fitCounts.runs_large} of ${totalFit} fit mentions).`;
-    } else {
+    if (fitCounts.true_to_size >= fitCounts.runs_small && fitCounts.true_to_size >= fitCounts.runs_large) {
       fitSummary = `Most reviewers say it fits true to size (${fitCounts.true_to_size} of ${totalFit} fit mentions).`;
+    } else if (fitCounts.runs_small > fitCounts.runs_large && fitCounts.runs_small > fitCounts.true_to_size) {
+      fitSummary = `Tends to run small — reviewers suggest sizing up (${fitCounts.runs_small} of ${totalFit} fit mentions).`;
+    } else if (fitCounts.runs_large > fitCounts.runs_small && fitCounts.runs_large > fitCounts.true_to_size) {
+      fitSummary = `Tends to run large — reviewers suggest sizing down (${fitCounts.runs_large} of ${totalFit} fit mentions).`;
+    } else {
+      fitSummary = `Fit reviews are mixed — consider trying your usual size (${totalFit} fit mentions).`;
     }
   }
 
@@ -504,6 +516,7 @@ async function getReturnInsights({ handle }, { shop, aftershipApiKey }) {
         accept: "application/json",
         "aftership-api-key": aftershipApiKey,
       },
+      signal: AbortSignal.timeout(8000),
     });
     if (!res.ok) return { error: `Aftership request failed (${res.status}).` };
     data = await res.json();

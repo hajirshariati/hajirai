@@ -101,7 +101,7 @@ function ConnectionStatus({ connected }) {
 }
 
 const MODEL_OPTIONS = [
-  { label: "Standard — recommended", value: "claude-sonnet-4-20250514" },
+  { label: "Standard — recommended", value: "claude-sonnet-4-6" },
   { label: "Fast — lower cost", value: "claude-haiku-4-5-20251001" },
   { label: "Advanced — most capable", value: "claude-opus-4-20250514" },
 ];
@@ -202,7 +202,7 @@ export default function ApiKeys() {
   const saving = nav.state === "submitting";
 
   const [anthropicKey, setAnthropicKey] = useState("");
-  const [model, setModel] = useState(anthropicModel || "claude-sonnet-4-20250514");
+  const [model, setModel] = useState(anthropicModel || "claude-sonnet-4-6");
   const [strategy, setStrategy] = useState(modelStrategy);
   const [followUps, setFollowUps] = useState(initFollowUps);
   const [feedbackOn, setFeedbackOn] = useState(initFeedback);

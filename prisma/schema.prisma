@@ -72,7 +72,7 @@ model ShopConfig {
   privacyUrl          String   @default("/pages/privacy-policy")
 
   anthropicApiKey     String   @default("")
-  anthropicModel      String   @default("claude-sonnet-4-20250514")
+  anthropicModel      String   @default("claude-sonnet-4-6")
   modelStrategy       String   @default("smart")
   yotpoApiKey         String   @default("")
   aftershipApiKey     String   @default("")

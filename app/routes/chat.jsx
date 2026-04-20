@@ -231,7 +231,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }
   }
 
-  return { totalUsage, toolCallCount, model };
+  return { totalUsage, toolCallCount, model, fullResponseText };
 }
 
 export const loader = async () => {
@@ -315,12 +315,7 @@ export const action = async ({ request }) => {
 
           if (config.showFollowUps !== false) {
             try {
-              const lastAssistant = messages.filter((m) => m.role === "assistant").pop();
-              const lastText = typeof lastAssistant?.content === "string"
-                ? lastAssistant.content
-                : Array.isArray(lastAssistant?.content)
-                  ? lastAssistant.content.filter((b) => b.type === "text").map((b) => b.text).join("")
-                  : "";
+              const lastText = result.fullResponseText || "";
               const fuRes = await anthropic.messages.create({
                 model: HAIKU_MODEL,
                 max_tokens: 150,
