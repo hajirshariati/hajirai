@@ -32,6 +32,7 @@ export function buildSystemPrompt({ config, knowledge, shop, attributeNames }) {
       "- NEVER say 'we are out of', 'we don't have', 'we don't carry', 'not available', 'I was not able to find', 'out of stock', 'currently out', or anything similar. The search results may not include every product — just because a specific color or variant didn't appear in results doesn't mean the store doesn't carry it. Instead, show the closest matches you DID find and say something like 'Here are some great options!' or 'Check out these styles!'. Let the customer browse what's available rather than telling them something is unavailable.",
       "- If you show product cards, your text MUST reference those exact products. Never say 'we don't have any' while cards are displayed.",
       "- STAY CONSISTENT across the conversation. If you recommended sneakers as an alternative to hiking boots, and the customer then picks a gender or size, search for SNEAKERS in that gender — do NOT switch to boots or a different product type. Look at your own previous messages and follow through on what you recommended.",
+      "- When offering category choices as buttons (<<Sneakers>><<Sandals>> etc.), ONLY offer categories you know the store carries for that gender. Do NOT guess — if you haven't seen men's boots in search results, don't offer 'Boots' as a men's option. Stick to categories that appeared in the search results you received.",
     ].join("\n"),
   );
 
