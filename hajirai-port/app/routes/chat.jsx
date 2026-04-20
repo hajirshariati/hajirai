@@ -267,7 +267,7 @@ export const action = async ({ request }) => {
                 messages: [
                   {
                     role: "user",
-                    content: `Customer asked: "${String(body.message).slice(0, 200)}"\nAssistant replied: "${lastText.slice(0, 300)}"\n\nSuggest 2-3 brief follow-up questions the customer might ask next. Only suggest questions that can be answered from a product catalog or store knowledge base. Return ONLY a JSON array of strings, nothing else.`,
+                    content: `Customer asked: "${String(body.message).slice(0, 200)}"\nAssistant replied: "${lastText.slice(0, 300)}"\n\nSuggest 2-3 brief follow-up questions the CUSTOMER would naturally ask next. Write them from the customer's perspective (e.g. "What sizes are available?" not "What size do you wear?", "Do you have these in black?" not "What color are you looking for?"). Only suggest questions that can be answered from a product catalog or store knowledge base. Return ONLY a JSON array of strings, nothing else.`,
                   },
                 ],
               });
