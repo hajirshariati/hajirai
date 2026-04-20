@@ -81,6 +81,8 @@ model ShopConfig {
   showFeedback        Boolean  @default(true)
   deduplicateColors   Boolean  @default(false)
 
+  hideOnUrls          String   @default("[]")
+
   supportUrl          String   @default("")
   supportLabel        String   @default("Contact customer service")
 
