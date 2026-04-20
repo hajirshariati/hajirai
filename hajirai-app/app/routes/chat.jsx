@@ -102,8 +102,8 @@ function addUsage(acc, usage) {
 async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, controller, encoder }) {
   const totalUsage = { input_tokens: 0, output_tokens: 0, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 };
   let toolCallCount = 0;
-  let allToolProducts = [];
-  let finalText = "";
+  let lastHopProducts = [];
+  let fullResponseText = "";
 
   for (let hop = 0; hop < MAX_TOOL_HOPS; hop++) {
     const stream = anthropic.messages.stream({
@@ -114,14 +114,12 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       messages,
     });
 
-    let hopText = "";
     for await (const event of stream) {
       if (event.type === "content_block_delta" && event.delta?.type === "text_delta") {
-        hopText += event.delta.text;
+        fullResponseText += event.delta.text;
         controller.enqueue(encoder.encode(sseChunk({ type: "text", text: event.delta.text })));
       }
     }
-    finalText = hopText;
 
     const final = await stream.finalMessage();
     addUsage(totalUsage, final.usage || {});
@@ -139,9 +137,15 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       toolUses.map((u) => executeTool(u.name, u.input, ctx)),
     );
 
+    lastHopProducts = [];
+    const seenHandles = new Set();
     for (let i = 0; i < toolUses.length; i++) {
       const cards = extractProductCards(toolUses[i].name, results[i]);
-      allToolProducts.push(...cards);
+      for (const c of cards) {
+        if (c.handle && seenHandles.has(c.handle)) continue;
+        if (c.handle) seenHandles.add(c.handle);
+        lastHopProducts.push(c);
+      }
     }
 
     messages.push({ role: "assistant", content: final.content });
@@ -149,7 +153,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       role: "user",
       content: toolUses.map((u, i) => {
         const payload = results[i] ?? {};
-        if (allToolProducts.length > 0 && (u.name === "search_products" || u.name === "get_product_details" || u.name === "lookup_sku")) {
+        if (lastHopProducts.length > 0 && (u.name === "search_products" || u.name === "get_product_details" || u.name === "lookup_sku")) {
           payload._display = "Product cards are shown automatically. Do NOT list products with links. Write a brief summary only.";
         }
         return {
@@ -161,7 +165,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     });
   }
 
-  if (!finalText && allToolProducts.length > 0) {
+  if (!fullResponseText && lastHopProducts.length > 0) {
     const wrap = await anthropic.messages.create({
       model,
       max_tokens: MAX_TOKENS,
@@ -174,22 +178,31 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
 
     for (const block of wrap.content) {
       if (block.type === "text" && block.text) {
-        finalText += block.text;
+        fullResponseText += block.text;
         controller.enqueue(encoder.encode(sseChunk({ type: "text", text: block.text })));
       }
     }
   }
 
-  if (allToolProducts.length > 0 && finalText) {
-    const textLower = finalText.toLowerCase();
-    const scored = allToolProducts.map((card) => {
+  if (lastHopProducts.length > 0 && fullResponseText) {
+    const textLower = fullResponseText.toLowerCase();
+    const scored = lastHopProducts.map((card) => {
       const words = card.title.toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter((w) => w.length > 2);
       const matches = words.filter((w) => textLower.includes(w)).length;
       return { card, score: words.length > 0 ? matches / words.length : 0 };
     });
     scored.sort((a, b) => b.score - a.score);
-    const matched = scored.filter((s) => s.score >= 0.5).map((s) => s.card);
-    const cards = (matched.length > 0 ? matched : allToolProducts).slice(0, 3);
+    const matched = scored.filter((s) => s.score >= 0.6).map((s) => s.card);
+    const picked = matched.length > 0 ? matched : lastHopProducts;
+    const seen = new Set();
+    const cards = [];
+    for (const c of picked) {
+      const key = c.handle || c.title;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      cards.push(c);
+      if (cards.length >= 3) break;
+    }
     controller.enqueue(encoder.encode(sseChunk({ type: "products", products: cards })));
   }
 
