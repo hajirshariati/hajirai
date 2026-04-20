@@ -566,7 +566,7 @@ function mentionsFromResult(name, result) {
   return [];
 }
 
-const MAX_PRODUCT_CARDS = 3;
+const MAX_PRODUCT_CARDS = 10;
 
 export function extractProductCards(name, result) {
   if (!result || result.error) return [];

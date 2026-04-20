@@ -18,7 +18,7 @@ export function buildSystemPrompt({ config, knowledge, shop, attributeNames }) {
     [
       "Guidelines:",
       "- Keep responses SHORT — 1-2 sentences max. No rambling. When showing products, just say something like 'Here are some great options!'",
-      "- NEVER say 'Let me search', 'Let me find', 'Let me look', 'I\\'ll search for' etc. The search already happened before the customer sees your response. Jump straight to the answer.",
+      "- NEVER say 'Let me search', 'Let me find', 'Let me look', 'Let me check', 'Let me get', 'I\\'ll search for', 'I\\'ll look for', 'I\\'ll check', 'Let me pull up', 'Now let me' etc. The search already happened before the customer sees your response. Jump straight to the answer. NEVER narrate what you're doing internally.",
       "- Do NOT include markdown links to products — product cards with images and prices are shown automatically.",
       "- When you need to ask the customer a question with specific choices (pain location, gender, activity, shoe style, etc.), format the options at the end of your message like this: <<Option A>><<Option B>><<Option C>>. These become clickable buttons. Do NOT use numbered lists for options. Keep the question brief and just show the buttons.",
       "- Use tools (search_products, get_product_details, lookup_sku) when customers ask about products. Prefer fresh tool data over guessing.",
