@@ -1,4 +1,4 @@
-import { useLoaderData, useActionData, useNavigation, Form } from "react-router";
+import { useLoaderData, useActionData, useNavigation, Form, useFetcher } from "react-router";
 import { useState } from "react";
 import {
   Page,
@@ -16,6 +16,7 @@ import {
   Badge,
   Divider,
   Checkbox,
+  Tag,
 } from "@shopify/polaris";
 import { CheckCircleIcon } from "@shopify/polaris-icons";
 import { TitleBar } from "@shopify/app-bridge-react";
@@ -25,6 +26,9 @@ import { getShopConfig, updateShopConfig } from "../models/ShopConfig.server";
 export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
   const config = await getShopConfig(session.shop);
+  let hideOnUrls = [];
+  try { hideOnUrls = JSON.parse(config.hideOnUrls || "[]"); } catch { hideOnUrls = []; }
+
   return {
     hasAnthropicKey: config.anthropicApiKey !== "",
     anthropicModel: config.anthropicModel,
@@ -33,6 +37,7 @@ export const loader = async ({ request }) => {
     showFeedback: config.showFeedback !== false,
     hasYotpoKey: config.yotpoApiKey !== "",
     hasAftershipKey: config.aftershipApiKey !== "",
+    hideOnUrls,
   };
 };
 
@@ -61,6 +66,14 @@ export const action = async ({ request }) => {
   const aftershipKey = formData.get("aftershipApiKey");
   if (aftershipKey !== null && aftershipKey !== "") {
     data.aftershipApiKey = aftershipKey;
+  }
+
+  const hideUrlsRaw = formData.get("hideOnUrls");
+  if (hideUrlsRaw !== null) {
+    try {
+      const parsed = JSON.parse(hideUrlsRaw);
+      if (Array.isArray(parsed)) data.hideOnUrls = JSON.stringify(parsed);
+    } catch { /* ignore invalid JSON */ }
   }
 
   const followUps = formData.get("showFollowUps");
@@ -107,8 +120,83 @@ const STRATEGY_HELP = {
   "always-opus": "Every message uses the Advanced model. Maximum capability for complex product catalogs.",
 };
 
+function HideUrlsPanel({ initial }) {
+  const [rules, setRules] = useState(initial || []);
+  const [matchType, setMatchType] = useState("equals");
+  const [pattern, setPattern] = useState("");
+
+  const addRule = () => {
+    const p = pattern.trim();
+    if (!p) return;
+    const exists = rules.some((r) => r.matchType === matchType && r.pattern === p);
+    if (exists) return;
+    setRules([...rules, { matchType, pattern: p }]);
+    setPattern("");
+  };
+
+  const removeRule = (idx) => {
+    setRules(rules.filter((_, i) => i !== idx));
+  };
+
+  return (
+    <Card>
+      <BlockStack gap="400">
+        <BlockStack gap="100">
+          <Text as="h2" variant="headingMd">Hide widget on specific pages</Text>
+          <Text as="p" tone="subdued" variant="bodySm">
+            The chat widget will be hidden on pages matching any of these rules. Use "equals" for exact path matches or "contains" for substring matches (e.g. all pages starting with a prefix).
+          </Text>
+        </BlockStack>
+
+        {rules.length > 0 && (
+          <BlockStack gap="200">
+            {rules.map((r, i) => (
+              <InlineStack key={i} gap="200" blockAlign="center">
+                <Badge tone={r.matchType === "contains" ? "attention" : "info"}>
+                  {r.matchType === "contains" ? "Contains" : "Equals"}
+                </Badge>
+                <Text as="span" variant="bodyMd"><code>{r.pattern}</code></Text>
+                <Button variant="plain" tone="critical" onClick={() => removeRule(i)}>Remove</Button>
+              </InlineStack>
+            ))}
+          </BlockStack>
+        )}
+
+        <Divider />
+
+        <InlineStack gap="200" blockAlign="end" wrap={false}>
+          <div style={{ minWidth: 130 }}>
+            <Select
+              label="Match type"
+              options={[
+                { label: "URL equals", value: "equals" },
+                { label: "URL contains", value: "contains" },
+              ]}
+              value={matchType}
+              onChange={setMatchType}
+            />
+          </div>
+          <div style={{ flex: 1 }}>
+            <TextField
+              label="URL pattern"
+              value={pattern}
+              onChange={setPattern}
+              placeholder="/pages/technology"
+              autoComplete="off"
+              onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addRule(); } }}
+            />
+          </div>
+          <Button onClick={addRule} disabled={!pattern.trim()}>Add</Button>
+        </InlineStack>
+
+        <input type="hidden" name="hideOnUrls" value={JSON.stringify(rules)} />
+      </BlockStack>
+    </Card>
+  );
+}
+
 export default function ApiKeys() {
-  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey } = useLoaderData();
+  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls } = useLoaderData();
   const actionData = useActionData();
   const nav = useNavigation();
   const saving = nav.state === "submitting";
@@ -282,6 +370,13 @@ export default function ApiKeys() {
                   </BlockStack>
                 </BlockStack>
               </Card>
+            </Layout.AnnotatedSection>
+
+            <Layout.AnnotatedSection
+              title="Widget visibility"
+              description="Control which pages the chat widget appears on. Add URL rules to hide the widget on specific pages."
+            >
+              <HideUrlsPanel initial={hideOnUrls} />
             </Layout.AnnotatedSection>
           </Layout>
 

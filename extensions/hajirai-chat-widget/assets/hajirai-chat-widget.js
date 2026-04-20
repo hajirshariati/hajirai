@@ -15,6 +15,36 @@ if(C.colorCtaHover)_rootStyle.setProperty('--ai-chat-cta-hover',     C.colorCtaH
 
 var CHAT_URL='/apps/hajirai/chat';
 var FEEDBACK_URL='/apps/hajirai/feedback';
+var CONFIG_URL='/apps/hajirai/widget-config';
+var HRK='hajirai_hide_rules';
+
+function matchesHideRule(rules){
+  if(!rules||!rules.length)return false;
+  var path=window.location.pathname;
+  for(var i=0;i<rules.length;i++){
+    var r=rules[i];
+    if(r.matchType==='equals'&&path===r.pattern)return true;
+    if(r.matchType==='contains'&&path.indexOf(r.pattern)!==-1)return true;
+  }
+  return false;
+}
+
+var _cachedRules=null;
+try{_cachedRules=JSON.parse(sessionStorage.getItem(HRK))}catch(e){}
+if(_cachedRules&&matchesHideRule(_cachedRules))return;
+
+fetch(CONFIG_URL).then(function(r){return r.json()}).then(function(d){
+  var rules=d.hideOnUrls||[];
+  try{sessionStorage.setItem(HRK,JSON.stringify(rules))}catch(e){}
+  if(matchesHideRule(rules)){
+    var l=document.querySelector('.ai-chat-launcher');
+    var p=document.querySelector('.ai-chat-panel');
+    var o=document.querySelector('.ai-chat-overlay');
+    if(l)l.style.display='none';
+    if(p)p.style.display='none';
+    if(o)o.style.display='none';
+  }
+}).catch(function(){});
 var SHOP=C.shopDomain||'';
 var GREET=C.greeting||'Hi! I\'m your personal shopping assistant.';
 var GREETCTA=C.greetingCta||'What can I help you find today?';
