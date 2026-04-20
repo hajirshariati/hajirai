@@ -331,7 +331,7 @@ if(p.type==='action'&&p.action==='show_dead_end'){
   scrollBottom();
 }
 if(p.type==='error'){full=p.message||'An error occurred.';finish(full,[]);return true}
-}catch(e){full+=data;typingEl.classList.remove('visible');if(!msgDiv)msgDiv=appendMsg('assistant',full);else{var bb=$('.ai-chat-msg-bubble',msgDiv);if(bb)bb.innerHTML='<p>'+md(esc(full))+'</p>'}}
+}catch(e){full+=data;typingEl.classList.remove('visible');if(!msgDiv)msgDiv=appendMsg('assistant',full);else{var bb=$('.ai-chat-msg-bubble',msgDiv);if(bb){var sp=$('.ai-chat-products',bb);bb.innerHTML='<p>'+md(esc(full))+'</p>';if(sp)bb.appendChild(sp)}}}
 }return false}
 function read(){reader.read().then(function(r){if(r.done){if(full)finish(full,prods);return}var done=proc(decoder.decode(r.value,{stream:true}));if(!done)read()}).catch(function(e){if(e.name!=='AbortError')finish(full||'Connection lost.',prods)})}
 read();
