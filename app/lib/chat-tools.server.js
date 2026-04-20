@@ -304,10 +304,12 @@ function mentionsFromResult(name, result) {
   return [];
 }
 
+const MAX_PRODUCT_CARDS = 3;
+
 export function extractProductCards(name, result) {
   if (!result || result.error) return [];
   if (name === "search_products" && Array.isArray(result.products)) {
-    return result.products.map((p) => ({
+    return result.products.slice(0, MAX_PRODUCT_CARDS).map((p) => ({
       title: p.title,
       url: p.url,
       handle: p.handle,
