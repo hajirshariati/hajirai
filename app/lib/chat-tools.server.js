@@ -151,6 +151,15 @@ const STOP_WORDS = new Set(["the", "a", "an", "for", "and", "or", "in", "on", "t
 
 const POSSESSIVE_STRIP = { mens: "men", womens: "women", childrens: "children", kids: "kid", girls: "girl", boys: "boy" };
 
+const GENDERED_SEARCH = {
+  men: ["men's", "mens"],
+  women: ["women's", "womens"],
+  boy: ["boy's", "boys"],
+  girl: ["girl's", "girls"],
+  children: ["children's", "childrens", "kids"],
+  kid: ["kid's", "kids"],
+};
+
 function extractKeywords(q) {
   return q
     .toLowerCase()
@@ -185,9 +194,13 @@ const SYNONYMS = {
 };
 
 function keywordMatchClause(kw) {
-  const terms = [kw, ...(SYNONYMS[kw] || [])];
+  const gendered = GENDERED_SEARCH[kw];
+  const searchTerms = gendered || [kw];
+  const synonymTerms = SYNONYMS[kw] || [];
+  const allTerms = [...searchTerms, ...synonymTerms];
+
   const clauses = [];
-  for (const t of terms) {
+  for (const t of allTerms) {
     clauses.push(
       { title: { contains: t, mode: "insensitive" } },
       { vendor: { contains: t, mode: "insensitive" } },
@@ -195,7 +208,7 @@ function keywordMatchClause(kw) {
       { description: { contains: t, mode: "insensitive" } },
     );
   }
-  clauses.push({ tags: { hasSome: terms } });
+  clauses.push({ tags: { hasSome: allTerms } });
   return { OR: clauses };
 }
 
