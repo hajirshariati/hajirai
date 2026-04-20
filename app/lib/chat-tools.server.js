@@ -248,10 +248,12 @@ function genderFilterClause(gender) {
   const want = gender.toLowerCase();
   return {
     OR: [
-      { attributesJson: { path: ["gender"], string_contains: want } },
-      { attributesJson: { path: ["gender_fallback"], string_contains: want } },
-      { title: { contains: `${gender}'s`, mode: "insensitive" } },
-      { title: { contains: `${gender}s`, mode: "insensitive" } },
+      { attributesJson: { path: ["gender"], equals: want } },
+      { attributesJson: { path: ["gender"], array_contains: [want] } },
+      { attributesJson: { path: ["gender_fallback"], equals: want } },
+      { attributesJson: { path: ["gender_fallback"], array_contains: [want] } },
+      { attributesJson: { path: ["gender"], equals: `${want}'s` } },
+      { attributesJson: { path: ["gender_fallback"], equals: `${want}'s` } },
     ],
   };
 }
@@ -291,7 +293,11 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
         const want = attrFilters[key].toLowerCase();
         return {
           OR: [
+            { attributesJson: { path: [key], equals: want } },
+            { attributesJson: { path: [key], array_contains: [want] } },
             { attributesJson: { path: [key], string_contains: want } },
+            { variants: { some: { attributesJson: { path: [key], equals: want } } } },
+            { variants: { some: { attributesJson: { path: [key], array_contains: [want] } } } },
             { variants: { some: { attributesJson: { path: [key], string_contains: want } } } },
           ],
         };
