@@ -102,6 +102,8 @@ function addUsage(acc, usage) {
 async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, controller, encoder }) {
   const totalUsage = { input_tokens: 0, output_tokens: 0, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 };
   let toolCallCount = 0;
+  let allToolProducts = [];
+  let finalText = "";
 
   for (let hop = 0; hop < MAX_TOOL_HOPS; hop++) {
     const stream = anthropic.messages.stream({
@@ -112,21 +114,24 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       messages,
     });
 
+    let hopText = "";
     for await (const event of stream) {
       if (event.type === "content_block_delta" && event.delta?.type === "text_delta") {
+        hopText += event.delta.text;
         controller.enqueue(encoder.encode(sseChunk({ type: "text", text: event.delta.text })));
       }
     }
+    finalText = hopText;
 
     const final = await stream.finalMessage();
     addUsage(totalUsage, final.usage || {});
 
     if (final.stop_reason !== "tool_use") {
-      return { totalUsage, toolCallCount, model };
+      break;
     }
 
     const toolUses = final.content.filter((b) => b.type === "tool_use");
-    if (toolUses.length === 0) return { totalUsage, toolCallCount, model };
+    if (toolUses.length === 0) break;
 
     toolCallCount += toolUses.length;
 
@@ -134,13 +139,9 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       toolUses.map((u) => executeTool(u.name, u.input, ctx)),
     );
 
-    const allCards = [];
     for (let i = 0; i < toolUses.length; i++) {
       const cards = extractProductCards(toolUses[i].name, results[i]);
-      allCards.push(...cards);
-    }
-    if (allCards.length > 0) {
-      controller.enqueue(encoder.encode(sseChunk({ type: "products", products: allCards })));
+      allToolProducts.push(...cards);
     }
 
     messages.push({ role: "assistant", content: final.content });
@@ -148,8 +149,8 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       role: "user",
       content: toolUses.map((u, i) => {
         const payload = results[i] ?? {};
-        if (allCards.length > 0 && (u.name === "search_products" || u.name === "get_product_details" || u.name === "lookup_sku")) {
-          payload._display = "Product cards with images and prices are already shown to the customer in the UI. Do NOT list products with markdown links or bullet points. Write a brief friendly summary instead (e.g. 'Here are some great options for you!'). The customer can see the product cards directly.";
+        if (allToolProducts.length > 0 && (u.name === "search_products" || u.name === "get_product_details" || u.name === "lookup_sku")) {
+          payload._display = "Product cards are shown automatically. Do NOT list products with links. Write a brief summary only.";
         }
         return {
           type: "tool_result",
@@ -160,20 +161,36 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     });
   }
 
-  const wrap = await anthropic.messages.create({
-    model,
-    max_tokens: MAX_TOKENS,
-    system: systemPrompt,
-    tools: TOOLS,
-    tool_choice: { type: "none" },
-    messages,
-  });
-  addUsage(totalUsage, wrap.usage || {});
+  if (!finalText && allToolProducts.length > 0) {
+    const wrap = await anthropic.messages.create({
+      model,
+      max_tokens: MAX_TOKENS,
+      system: systemPrompt,
+      tools: TOOLS,
+      tool_choice: { type: "none" },
+      messages,
+    });
+    addUsage(totalUsage, wrap.usage || {});
 
-  for (const block of wrap.content) {
-    if (block.type === "text" && block.text) {
-      controller.enqueue(encoder.encode(sseChunk({ type: "text", text: block.text })));
+    for (const block of wrap.content) {
+      if (block.type === "text" && block.text) {
+        finalText += block.text;
+        controller.enqueue(encoder.encode(sseChunk({ type: "text", text: block.text })));
+      }
     }
+  }
+
+  if (allToolProducts.length > 0 && finalText) {
+    const textLower = finalText.toLowerCase();
+    const scored = allToolProducts.map((card) => {
+      const words = card.title.toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter((w) => w.length > 2);
+      const matches = words.filter((w) => textLower.includes(w)).length;
+      return { card, score: words.length > 0 ? matches / words.length : 0 };
+    });
+    scored.sort((a, b) => b.score - a.score);
+    const matched = scored.filter((s) => s.score >= 0.5).map((s) => s.card);
+    const cards = (matched.length > 0 ? matched : allToolProducts).slice(0, 3);
+    controller.enqueue(encoder.encode(sseChunk({ type: "products", products: cards })));
   }
 
   return { totalUsage, toolCallCount, model };
