@@ -117,39 +117,60 @@ function deduplicateByColor(products) {
   return Array.from(seen.values());
 }
 
+const STOP_WORDS = new Set(["the", "a", "an", "for", "and", "or", "in", "on", "to", "of", "with", "is", "are", "i", "my", "me", "some", "any", "can", "do", "show", "find", "get", "want", "need", "looking", "search"]);
+
+function extractKeywords(q) {
+  return q
+    .toLowerCase()
+    .replace(/['']/g, "")
+    .split(/\s+/)
+    .filter((w) => w.length > 1 && !STOP_WORDS.has(w));
+}
+
+function keywordMatchClause(kw) {
+  return {
+    OR: [
+      { title: { contains: kw, mode: "insensitive" } },
+      { vendor: { contains: kw, mode: "insensitive" } },
+      { productType: { contains: kw, mode: "insensitive" } },
+      { description: { contains: kw, mode: "insensitive" } },
+      { tags: { hasSome: [kw] } },
+    ],
+  };
+}
+
 async function searchProducts({ query, limit, filters }, { shop, deduplicateColors }) {
   const q = String(query || "").trim();
   if (!q) return { products: [] };
   const max = Math.min(Math.max(parseInt(limit, 10) || 6, 1), 10);
   const attrFilters = filters && typeof filters === "object" ? filters : {};
 
+  const keywords = extractKeywords(q);
+  if (keywords.length === 0) return { products: [] };
+
   const where = {
     shop,
-    OR: [
-      { title: { contains: q, mode: "insensitive" } },
-      { vendor: { contains: q, mode: "insensitive" } },
-      { productType: { contains: q, mode: "insensitive" } },
-      { description: { contains: q, mode: "insensitive" } },
-      { tags: { has: q } },
-    ],
+    AND: keywords.map(keywordMatchClause),
   };
 
   const attrKeys = Object.keys(attrFilters);
   if (attrKeys.length > 0) {
-    where.AND = attrKeys.map((key) => {
-      const want = attrFilters[key].toLowerCase();
-      return {
-        OR: [
-          { attributesJson: { path: [key], string_contains: want } },
-          { variants: { some: { attributesJson: { path: [key], string_contains: want } } } },
-        ],
-      };
-    });
+    where.AND.push(
+      ...attrKeys.map((key) => {
+        const want = attrFilters[key].toLowerCase();
+        return {
+          OR: [
+            { attributesJson: { path: [key], string_contains: want } },
+            { variants: { some: { attributesJson: { path: [key], string_contains: want } } } },
+          ],
+        };
+      }),
+    );
   }
 
-  const fetchLimit = deduplicateColors ? max * 5 : (attrKeys.length > 0 ? max * 3 : max);
+  const fetchLimit = deduplicateColors ? max * 5 : max * 3;
 
-  const products = await prisma.product.findMany({
+  let products = await prisma.product.findMany({
     where,
     include: {
       variants: { select: { sku: true, price: true, compareAtPrice: true, attributesJson: true } },
@@ -157,6 +178,21 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
     take: fetchLimit,
     orderBy: { updatedAt: "desc" },
   });
+
+  if (products.length === 0 && keywords.length > 1) {
+    const fallbackWhere = {
+      shop,
+      OR: keywords.map(keywordMatchClause),
+    };
+    products = await prisma.product.findMany({
+      where: fallbackWhere,
+      include: {
+        variants: { select: { sku: true, price: true, compareAtPrice: true, attributesJson: true } },
+      },
+      take: fetchLimit,
+      orderBy: { updatedAt: "desc" },
+    });
+  }
 
   const matchesAttr = (val, want) => {
     if (Array.isArray(val)) return val.some((v) => typeof v === "string" && v.includes(want));
