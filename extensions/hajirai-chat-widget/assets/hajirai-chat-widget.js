@@ -273,27 +273,22 @@ showHighTraffic();
 function handleSSE(response){
 var reader=response.body.getReader();
 var decoder=new TextDecoder();
-var buf='',full='',prods=[],msgDiv=null;
+var buf='',full='',prods=[],msgDiv=null,buffSugg=[];
 function proc(chunk){
 buf+=chunk;var lines=buf.split('\n');buf=lines.pop()||'';
 for(var i=0;i<lines.length;i++){
 var line=lines[i].trim();
 if(!line.startsWith('data: '))continue;
 var data=line.slice(6);
-if(data==='[DONE]'){finish(full,prods);return true}
+if(data==='[DONE]'){finish(full,prods,msgDiv,buffSugg);return true}
 try{
 var p=JSON.parse(data);
 if(p.type==='text'||p.type==='content_block_delta'){
   var tc=p.text||(p.delta&&p.delta.text)||'';
-  full+=tc;typingEl.classList.remove('visible');
-  if(!msgDiv)msgDiv=appendMsg('assistant',full);
-  else{var b=$('.ai-chat-msg-bubble',msgDiv);if(b){var savedProds=$('.ai-chat-products',b);b.innerHTML='<p>'+md(esc(full))+'</p>';if(savedProds)b.appendChild(savedProds)}}
-  scrollBottom();
+  full+=tc;
 }
 if(p.type==='products'&&p.products){
-  prods=prods.concat(p.products);typingEl.classList.remove('visible');
-  if(!msgDiv){msgDiv=appendMsg('assistant',full||'')}
-  if(msgDiv){var b=$('.ai-chat-msg-bubble',msgDiv);var ep=$('.ai-chat-products',b);if(ep)ep.remove();var ph='<div class="ai-chat-products">';for(var j=0;j<prods.length;j++)ph+=prodCard(prods[j]);ph+='</div>';b.insertAdjacentHTML('beforeend',ph)}
+  prods=prods.concat(p.products);
 }
 if(p.type==='link'&&p.url){
   typingEl.classList.remove('visible');
@@ -310,11 +305,7 @@ if(p.type==='choices'&&p.options&&p.options.length){
   scrollBottom();
 }
 if(p.type==='suggestions'&&p.questions&&p.questions.length){
-  typingEl.classList.remove('visible');
-  if(!msgDiv)msgDiv=appendMsg('assistant',full||'');
-  var b=$('.ai-chat-msg-bubble',msgDiv);
-  if(b){var sg='<div class="ai-chat-suggestions">';for(var si=0;si<p.questions.length;si++){sg+='<button class="ai-chat-suggest-btn" data-message="'+esc(p.questions[si])+'"><span class="suggest-plus">+</span> '+esc(p.questions[si])+'</button>'}sg+='</div>';b.insertAdjacentHTML('beforeend',sg)}
-  scrollBottom();
+  buffSugg=p.questions;
 }
 if(p.type==='action'&&p.action==='open_zendesk'){
   setTimeout(function(){toggle(false);if(typeof window.zE==='function'){window.zE('webWidget','show');window.zE('webWidget','open')}},1500);
@@ -326,14 +317,14 @@ if(p.type==='action'&&p.action==='show_dead_end'){
   if(bubble){
     bubble.insertAdjacentHTML('beforeend',deadEndHtml());
   }
-  /* Disable input */
   inputEl.disabled=true;inputEl.placeholder='Choose an option above';sendBtn.disabled=true;
   scrollBottom();
 }
-if(p.type==='error'){full=p.message||'An error occurred.';finish(full,[]);return true}
-}catch(e){full+=data;typingEl.classList.remove('visible');if(!msgDiv)msgDiv=appendMsg('assistant',full);else{var bb=$('.ai-chat-msg-bubble',msgDiv);if(bb){var sp=$('.ai-chat-products',bb);bb.innerHTML='<p>'+md(esc(full))+'</p>';if(sp)bb.appendChild(sp)}}}
+if(p.type==='done'){finish(full,prods,msgDiv,buffSugg);return true}
+if(p.type==='error'){full=p.message||'An error occurred.';finish(full,[],msgDiv,[]);return true}
+}catch(e){full+=data}
 }return false}
-function read(){reader.read().then(function(r){if(r.done){if(full)finish(full,prods);return}var done=proc(decoder.decode(r.value,{stream:true}));if(!done)read()}).catch(function(e){if(e.name!=='AbortError')finish(full||'Connection lost.',prods)})}
+function read(){reader.read().then(function(r){if(r.done){if(full)finish(full,prods,msgDiv,buffSugg);return}var done=proc(decoder.decode(r.value,{stream:true}));if(!done)read()}).catch(function(e){if(e.name!=='AbortError')finish(full||'Connection lost.',prods,msgDiv,[])})}
 read();
 }
 
@@ -346,15 +337,23 @@ appendMsg('assistant',c,p);saveH(messages);
 isStreaming=false;sendBtn.disabled=false;
 }
 
-function finish(text,prods){
+function finish(text,prods,md2,sugg){
 typingEl.classList.remove('visible');isStreaming=false;sendBtn.disabled=false;
-if(text){messages.push({role:'assistant',content:text,products:prods||[]});saveH(messages)}
-var lastMsg=msgsEl.querySelector('.ai-chat-msg--assistant:last-child');
-if(prods&&prods.length>0&&lastMsg){
-  var b=$('.ai-chat-msg-bubble',lastMsg);
-  if(b&&!$('.ai-chat-feedback',b)){
-    b.insertAdjacentHTML('beforeend','<div class="ai-chat-feedback"><button class="ai-chat-fb-btn" data-vote="up"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg> Helpful</button><button class="ai-chat-fb-btn" data-vote="down"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/></svg> Not helpful</button></div>');
-    b.querySelectorAll('.ai-chat-fb-btn').forEach(function(btn){
+var mDiv=md2;
+if(text){
+  if(!mDiv)mDiv=appendMsg('assistant',text,prods);
+  else{var b=$('.ai-chat-msg-bubble',mDiv);if(b){b.innerHTML='<p>'+md(esc(text))+'</p>';if(prods&&prods.length){var ph='<div class="ai-chat-products">';for(var pi=0;pi<prods.length;pi++)ph+=prodCard(prods[pi]);ph+='</div>';b.insertAdjacentHTML('beforeend',ph)}}}
+  messages.push({role:'assistant',content:text,products:prods||[]});saveH(messages)
+}
+if(sugg&&sugg.length>0&&mDiv){
+  var sb=$('.ai-chat-msg-bubble',mDiv);
+  if(sb){var sg='<div class="ai-chat-suggestions">';for(var si=0;si<sugg.length;si++){sg+='<button class="ai-chat-suggest-btn" data-message="'+esc(sugg[si])+'"><span class="suggest-plus">+</span> '+esc(sugg[si])+'</button>'}sg+='</div>';sb.insertAdjacentHTML('beforeend',sg)}
+}
+if(prods&&prods.length>0&&mDiv){
+  var fb=$('.ai-chat-msg-bubble',mDiv);
+  if(fb&&!$('.ai-chat-feedback',fb)){
+    fb.insertAdjacentHTML('beforeend','<div class="ai-chat-feedback"><button class="ai-chat-fb-btn" data-vote="up"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg> Helpful</button><button class="ai-chat-fb-btn" data-vote="down"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/></svg> Not helpful</button></div>');
+    fb.querySelectorAll('.ai-chat-fb-btn').forEach(function(btn){
       btn.addEventListener('click',function(){
         var vote=this.getAttribute('data-vote');
         var wrap=this.closest('.ai-chat-feedback');
@@ -366,6 +365,7 @@ if(prods&&prods.length>0&&lastMsg){
     });
   }
 }
+scrollBottom();
 }
 
 function clearChat(){
