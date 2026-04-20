@@ -340,10 +340,19 @@ isStreaming=false;sendBtn.disabled=false;
 function finish(text,prods,md2,sugg){
 typingEl.classList.remove('visible');isStreaming=false;sendBtn.disabled=false;
 var mDiv=md2;
-if(text){
-  if(!mDiv)mDiv=appendMsg('assistant',text,prods);
-  else{var b=$('.ai-chat-msg-bubble',mDiv);if(b){b.innerHTML='<p>'+md(esc(text))+'</p>';if(prods&&prods.length){var ph='<div class="ai-chat-products">';for(var pi=0;pi<prods.length;pi++)ph+=prodCard(prods[pi]);ph+='</div>';b.insertAdjacentHTML('beforeend',ph)}}}
-  messages.push({role:'assistant',content:text,products:prods||[]});saveH(messages)
+var choices=[];
+var cleanText=text||'';
+var choiceRe=/<<([^<>]+)>>/g;
+var cm;while((cm=choiceRe.exec(cleanText))!==null){choices.push(cm[1])}
+if(choices.length>0)cleanText=cleanText.replace(/\s*<<[^<>]+>>/g,'').trim();
+if(cleanText){
+  if(!mDiv)mDiv=appendMsg('assistant',cleanText,prods);
+  else{var b=$('.ai-chat-msg-bubble',mDiv);if(b){b.innerHTML='<p>'+md(esc(cleanText))+'</p>';if(prods&&prods.length){var ph='<div class="ai-chat-products">';for(var pi=0;pi<prods.length;pi++)ph+=prodCard(prods[pi]);ph+='</div>';b.insertAdjacentHTML('beforeend',ph)}}}
+  messages.push({role:'assistant',content:cleanText,products:prods||[]});saveH(messages)
+}
+if(choices.length>0&&mDiv){
+  var cb=$('.ai-chat-msg-bubble',mDiv);
+  if(cb){var ch='<div class="ai-chat-choices">';for(var ci=0;ci<choices.length;ci++){ch+='<button class="ai-chat-choice-btn" data-message="'+esc(choices[ci])+'">'+esc(choices[ci])+'</button>'}ch+='</div>';cb.insertAdjacentHTML('beforeend',ch)}
 }
 if(sugg&&sugg.length>0&&mDiv){
   var sb=$('.ai-chat-msg-bubble',mDiv);
