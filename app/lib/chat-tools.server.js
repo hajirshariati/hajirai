@@ -212,6 +212,7 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
 
   const where = {
     shop,
+    status: { in: ["ACTIVE", "active"] },
     AND: keywords.map(keywordMatchClause),
   };
 
@@ -248,6 +249,7 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
   if (products.length === 0 && keywords.length > 1) {
     const fallbackWhere = {
       shop,
+      status: { in: ["ACTIVE", "active"] },
       OR: keywords.map(keywordMatchClause),
     };
     if (wantsShoes) {
@@ -320,7 +322,7 @@ async function getProductDetails({ handle }, { shop }) {
   if (!h) return { error: "handle is required" };
 
   const product = await prisma.product.findFirst({
-    where: { shop, handle: h },
+    where: { shop, handle: h, status: { in: ["ACTIVE", "active"] } },
     include: { variants: true },
   });
   if (!product) return { error: `No product found with handle '${h}'.` };
@@ -361,7 +363,7 @@ async function lookupSku({ skus }, { shop }) {
   if (list.length === 0) return { found: [], missing: [] };
 
   const variants = await prisma.productVariant.findMany({
-    where: { sku: { in: list }, product: { shop } },
+    where: { sku: { in: list }, product: { shop, status: { in: ["ACTIVE", "active"] } } },
     include: { product: true },
   });
   const enrich = await enrichmentMap(shop, list);
