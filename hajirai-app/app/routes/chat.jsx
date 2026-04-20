@@ -146,11 +146,17 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     messages.push({ role: "assistant", content: final.content });
     messages.push({
       role: "user",
-      content: toolUses.map((u, i) => ({
-        type: "tool_result",
-        tool_use_id: u.id,
-        content: JSON.stringify(results[i] ?? {}),
-      })),
+      content: toolUses.map((u, i) => {
+        const payload = results[i] ?? {};
+        if (allCards.length > 0 && (u.name === "search_products" || u.name === "get_product_details" || u.name === "lookup_sku")) {
+          payload._display = "Product cards with images and prices are already shown to the customer in the UI. Do NOT list products with markdown links or bullet points. Write a brief friendly summary instead (e.g. 'Here are some great options for you!'). The customer can see the product cards directly.";
+        }
+        return {
+          type: "tool_result",
+          tool_use_id: u.id,
+          content: JSON.stringify(payload),
+        };
+      }),
     });
   }
 
