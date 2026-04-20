@@ -161,13 +161,17 @@ function extractKeywords(q) {
 }
 
 const SYNONYMS = {
-  shoe: ["sneaker", "sandal", "boot", "slipper", "loafer", "flat", "heel", "clog", "mule", "oxford", "moccasin"],
-  shoes: ["sneaker", "sneakers", "sandal", "sandals", "boot", "boots", "slipper", "slippers", "loafer", "loafers", "flat", "flats", "heel", "heels", "clog", "clogs", "mule", "mules", "oxford", "moccasin"],
-  footwear: ["sneaker", "sneakers", "sandal", "sandals", "boot", "boots", "slipper", "slippers", "shoe", "shoes"],
+  shoe: ["sneaker", "sandal", "boot", "slipper", "loafer", "flat", "heel", "clog", "mule", "wedge", "slide", "oxford", "moccasin"],
+  shoes: ["sneaker", "sneakers", "sandal", "sandals", "boot", "boots", "slipper", "slippers", "loafer", "loafers", "flat", "flats", "heel", "heels", "clog", "clogs", "mule", "mules", "wedge", "wedges", "slide", "slides", "oxford", "moccasin"],
+  footwear: ["sneaker", "sneakers", "sandal", "sandals", "boot", "boots", "slipper", "slippers", "shoe", "shoes", "wedge", "wedges", "slide", "slides"],
   sneakers: ["sneaker", "shoe", "shoes"],
   sneaker: ["sneakers", "shoe", "shoes"],
   sandals: ["sandal", "shoe", "shoes"],
   boots: ["boot", "shoe", "shoes"],
+  wedges: ["wedge", "sandal", "sandals"],
+  wedge: ["wedges", "sandal", "sandals"],
+  slides: ["slide", "sandal", "sandals"],
+  slide: ["slides", "sandal", "sandals"],
 };
 
 function keywordMatchClause(kw) {
@@ -186,7 +190,7 @@ function keywordMatchClause(kw) {
 }
 
 const ORTHOTIC_TERMS = /\b(orthotic|orthotics|insole|insoles|inserts?|arch support|arch-support)\b/i;
-const SHOE_TERMS = /\b(shoe|shoes|sneaker|sneakers|sandal|sandals|boot|boots|slipper|slippers|heel|heels|flat|flats|loafer|loafers|footwear)\b/i;
+const SHOE_TERMS = /\b(shoe|shoes|sneaker|sneakers|sandal|sandals|boot|boots|slipper|slippers|heel|heels|flat|flats|loafer|loafers|footwear|wedge|wedges|mule|mules|clog|clogs|slide|slides)\b/i;
 
 function excludeOrthoticsClause() {
   return {
