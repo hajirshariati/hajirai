@@ -99,10 +99,19 @@ function addUsage(acc, usage) {
   acc.cache_read_input_tokens += usage.cache_read_input_tokens || 0;
 }
 
+function scoreCardAgainstText(card, textLower) {
+  const raw = card.title.toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter((w) => w.length > 1);
+  const generic = new Set(["the", "a", "an", "for", "and", "or", "in", "on", "with", "men", "mens", "women", "womens", "black", "white", "tan", "brown", "red", "blue", "grey", "gray", "pink", "dark", "light"]);
+  const nameWords = raw.filter((w) => !generic.has(w));
+  if (nameWords.length === 0) return 0;
+  const hits = nameWords.filter((w) => textLower.includes(w)).length;
+  return hits / nameWords.length;
+}
+
 async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, controller, encoder }) {
   const totalUsage = { input_tokens: 0, output_tokens: 0, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 };
   let toolCallCount = 0;
-  let lastHopProducts = [];
+  const allProductPool = new Map();
   let fullResponseText = "";
 
   for (let hop = 0; hop < MAX_TOOL_HOPS; hop++) {
@@ -137,14 +146,15 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       toolUses.map((u) => executeTool(u.name, u.input, ctx)),
     );
 
-    lastHopProducts = [];
-    const seenHandles = new Set();
+    let hopHasProducts = false;
     for (let i = 0; i < toolUses.length; i++) {
       const cards = extractProductCards(toolUses[i].name, results[i]);
       for (const c of cards) {
-        if (c.handle && seenHandles.has(c.handle)) continue;
-        if (c.handle) seenHandles.add(c.handle);
-        lastHopProducts.push(c);
+        const key = c.handle || c.title;
+        if (!allProductPool.has(key)) {
+          allProductPool.set(key, c);
+          hopHasProducts = true;
+        }
       }
     }
 
@@ -153,7 +163,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       role: "user",
       content: toolUses.map((u, i) => {
         const payload = results[i] ?? {};
-        if (lastHopProducts.length > 0 && (u.name === "search_products" || u.name === "get_product_details" || u.name === "lookup_sku")) {
+        if (hopHasProducts && (u.name === "search_products" || u.name === "get_product_details" || u.name === "lookup_sku")) {
           payload._display = "Product cards are shown automatically. Do NOT list products with links. Write a brief summary only.";
         }
         return {
@@ -165,7 +175,9 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     });
   }
 
-  if (!fullResponseText && lastHopProducts.length > 0) {
+  const pool = Array.from(allProductPool.values());
+
+  if (!fullResponseText && pool.length > 0) {
     const wrap = await anthropic.messages.create({
       model,
       max_tokens: MAX_TOKENS,
@@ -184,31 +196,19 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }
   }
 
-  if (lastHopProducts.length > 0 && fullResponseText) {
+  if (pool.length > 0 && fullResponseText) {
     const textLower = fullResponseText.toLowerCase();
-    const saysNoMatch = /\b(don't (?:have|see|carry)|no (?:hiking|running|dress|actual|dedicated)|not (?:see|carry|have)|don't appear|we don't)\b/i.test(fullResponseText);
 
-    const scored = lastHopProducts.map((card) => {
-      const words = card.title.toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter((w) => w.length > 2);
-      const matches = words.filter((w) => textLower.includes(w)).length;
-      return { card, score: words.length > 0 ? matches / words.length : 0 };
-    });
+    const scored = pool.map((card) => ({
+      card,
+      score: scoreCardAgainstText(card, textLower),
+    }));
     scored.sort((a, b) => b.score - a.score);
-    const matched = scored.filter((s) => s.score >= 0.6).map((s) => s.card);
 
-    if (matched.length === 0 && saysNoMatch) {
-      // AI explicitly said it can't help — don't show mismatched cards.
-    } else {
-      const picked = matched.length > 0 ? matched : lastHopProducts;
-      const seen = new Set();
-      const cards = [];
-      for (const c of picked) {
-        const key = c.handle || c.title;
-        if (seen.has(key)) continue;
-        seen.add(key);
-        cards.push(c);
-        if (cards.length >= 3) break;
-      }
+    const matched = scored.filter((s) => s.score >= 0.4);
+
+    if (matched.length > 0) {
+      const cards = matched.slice(0, 3).map((s) => s.card);
       controller.enqueue(encoder.encode(sseChunk({ type: "products", products: cards })));
     }
   }
