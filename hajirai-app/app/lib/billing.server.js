@@ -4,7 +4,19 @@ import { PLANS, getPlan } from "./plans";
 const IS_TEST_CHARGE = process.env.SHOPIFY_BILLING_TEST !== "false";
 const APP_URL = process.env.SHOPIFY_APP_URL || process.env.APP_URL || "";
 
+const COMP_PRO_SHOPS = new Set(
+  (process.env.COMP_PRO_SHOPS || "")
+    .split(",")
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean),
+);
+
+export function isCompedShop(shop) {
+  return COMP_PRO_SHOPS.has(String(shop || "").toLowerCase());
+}
+
 export async function getShopPlan(shop) {
+  if (isCompedShop(shop)) return getPlan("pro");
   const config = await prisma.shopConfig.findUnique({ where: { shop } });
   const planId = config?.plan || "free";
   return getPlan(planId);
