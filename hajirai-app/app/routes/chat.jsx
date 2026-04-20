@@ -267,7 +267,12 @@ export const action = async ({ request }) => {
     messages.push({ role: "user", content: String(body.message) });
 
     const anthropic = new Anthropic({ apiKey: config.anthropicApiKey });
-    const ctx = { shop: session.shop, deduplicateColors: config.deduplicateColors };
+    const ctx = {
+      shop: session.shop,
+      deduplicateColors: config.deduplicateColors,
+      yotpoApiKey: config.yotpoApiKey || "",
+      aftershipApiKey: config.aftershipApiKey || "",
+    };
     const encoder = new TextEncoder();
 
     const stream = new ReadableStream({
