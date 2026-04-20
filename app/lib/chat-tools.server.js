@@ -226,22 +226,59 @@ function excludeOrthoticsClause() {
   };
 }
 
+const GENDER_DETECT = [
+  { pattern: /\b(men'?s|male)\b/i, gender: "men", strip: /\b(men'?s|mens|male)\b/gi },
+  { pattern: /\b(women'?s|female|ladies)\b/i, gender: "women", strip: /\b(women'?s|womens|female|ladies)\b/gi },
+  { pattern: /\b(boy'?s|boys)\b/i, gender: "boy", strip: /\b(boy'?s|boys)\b/gi },
+  { pattern: /\b(girl'?s|girls)\b/i, gender: "girl", strip: /\b(girl'?s|girls)\b/gi },
+  { pattern: /\b(kid'?s|kids|children'?s)\b/i, gender: "kid", strip: /\b(kid'?s|kids|children'?s|childrens)\b/gi },
+];
+
+function detectAndStripGender(query) {
+  for (const g of GENDER_DETECT) {
+    if (g.pattern.test(query)) {
+      const stripped = query.replace(g.strip, "").replace(/\s+/g, " ").trim();
+      return { gender: g.gender, query: stripped || query };
+    }
+  }
+  return { gender: null, query };
+}
+
+function genderFilterClause(gender) {
+  const want = gender.toLowerCase();
+  return {
+    OR: [
+      { attributesJson: { path: ["gender"], string_contains: want } },
+      { attributesJson: { path: ["gender_fallback"], string_contains: want } },
+      { title: { contains: `${gender}'s`, mode: "insensitive" } },
+      { title: { contains: `${gender}s`, mode: "insensitive" } },
+    ],
+  };
+}
+
 async function searchProducts({ query, limit, filters }, { shop, deduplicateColors }) {
   const q = String(query || "").trim();
   if (!q) return { products: [] };
   const max = Math.min(Math.max(parseInt(limit, 10) || 6, 1), 10);
   const attrFilters = filters && typeof filters === "object" ? filters : {};
 
-  const keywords = extractKeywords(q);
-  if (keywords.length === 0) return { products: [] };
+  const detected = detectAndStripGender(q);
+  const searchQuery = detected.gender ? detected.query : q;
+
+  const keywords = extractKeywords(searchQuery);
+  if (keywords.length === 0 && !detected.gender) return { products: [] };
 
   const wantsShoes = SHOE_TERMS.test(q) && !ORTHOTIC_TERMS.test(q);
 
   const where = {
     shop,
     NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } },
-    AND: keywords.map(keywordMatchClause),
+    AND: keywords.length > 0 ? keywords.map(keywordMatchClause) : [],
   };
+
+  if (detected.gender) {
+    where.AND.push(genderFilterClause(detected.gender));
+  }
 
   if (wantsShoes) {
     where.AND.push(excludeOrthoticsClause());
@@ -279,9 +316,10 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
       NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } },
       OR: keywords.map(keywordMatchClause),
     };
-    if (wantsShoes) {
-      fallbackWhere.AND = [excludeOrthoticsClause()];
-    }
+    const fallbackAnd = [];
+    if (detected.gender) fallbackAnd.push(genderFilterClause(detected.gender));
+    if (wantsShoes) fallbackAnd.push(excludeOrthoticsClause());
+    if (fallbackAnd.length > 0) fallbackWhere.AND = fallbackAnd;
     products = await prisma.product.findMany({
       where: fallbackWhere,
       include: {
