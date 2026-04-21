@@ -7,7 +7,6 @@ import { NavMenu } from "@shopify/app-bridge-react";
 import enTranslations from "@shopify/polaris/locales/en.json";
 import polarisStyles from "@shopify/polaris/build/esm/styles.css?url";
 import { authenticate } from "../shopify.server";
-import { AppLink } from "../lib/link-component";
 
 export const links = () => [{ rel: "stylesheet", href: polarisStyles }];
 
@@ -20,11 +19,10 @@ export default function App() {
   const { apiKey } = useLoaderData();
   return (
     <ShopifyAppProvider isEmbeddedApp apiKey={apiKey}>
-      <PolarisAppProvider i18n={enTranslations} linkComponent={AppLink}>
+      <PolarisAppProvider i18n={enTranslations}>
         <NavMenu>
           <Link to="/app" rel="home">ShopAgent</Link>
-          <Link to="/app/catalog">Catalog</Link>
-          <Link to="/app/knowledge">Knowledge Base</Link>
+          <Link to="/app/rules-knowledge">Rules & Knowledge</Link>
           <Link to="/app/analytics">Analytics</Link>
           <Link to="/app/plans">Plans</Link>
           <Link to="/app/api-keys">Settings</Link>

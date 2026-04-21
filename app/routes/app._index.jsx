@@ -185,26 +185,26 @@ export default function Home() {
           </Text>
           <InlineGrid columns={{ xs: 1, sm: 2 }} gap="400">
             <FeatureCard
-              icon={"📦"}
+              icon={"\uD83D\uDCE6"}
               title="Knows your products"
               description="Your entire catalog — products, prices, sizes, and availability — is always up to date. Any changes you make in Shopify are reflected instantly."
               stat={productsCount > 0 ? `${productsCount} products synced` : null}
             />
             <FeatureCard
-              icon={"📋"}
+              icon={"\uD83D\uDCCB"}
               title="Learns your extra info"
               description="Upload files with FAQs, sizing guides, care instructions, or brand info. The AI uses this to give more detailed, personalized answers."
               stat={enrichmentCount > 0 ? `${enrichmentCount} products enriched` : null}
             />
             <FeatureCard
-              icon={"🔍"}
+              icon={"\uD83D\uDD0D"}
               title="Finds the right products"
-              description="When a customer asks about a product, the AI searches your catalog in real time — by name, category, price, or any detail you\'ve uploaded."
+              description="When a customer asks about a product, the AI searches your catalog in real time — by name, category, price, or any detail you've uploaded."
             />
             <FeatureCard
-              icon={"⚡"}
+              icon={"\u26A1"}
               title="Keeps costs low"
-              description="Quick replies like \'thanks\' or \'okay\' use a faster, cheaper model. Detailed product questions use the full-powered model. You save without lifting a finger."
+              description="Quick replies like 'thanks' or 'okay' use a faster, cheaper model. Detailed product questions use the full-powered model. You save without lifting a finger."
               stat={strategyLabel}
             />
           </InlineGrid>
@@ -246,7 +246,7 @@ export default function Home() {
               title="Upload extra knowledge (optional)"
               description="FAQs, brand voice, sizing guides, product specs — CSV files with a SKU column are automatically linked to your catalog."
               actionLabel={fileCount > 0 ? "Manage files" : "Upload"}
-              actionUrl="/app/knowledge"
+              actionUrl="/app/rules-knowledge"
             />
           </BlockStack>
         </BlockStack>
@@ -255,7 +255,7 @@ export default function Home() {
 
         <BlockStack gap="300">
           <Text as="h2" variant="headingMd">Quick actions</Text>
-          <InlineGrid columns={{ xs: 1, sm: 2, md: 4 }} gap="400">
+          <InlineGrid columns={{ xs: 1, sm: 2, md: 3 }} gap="400">
             <QuickActionCard
               title="Settings"
               description="AI engine and model routing strategy."
@@ -263,16 +263,10 @@ export default function Home() {
               actionUrl="/app/api-keys"
             />
             <QuickActionCard
-              title="Knowledge Base"
-              description="Upload CSVs and text files with extra context."
-              actionLabel="Upload files"
-              actionUrl="/app/knowledge"
-            />
-            <QuickActionCard
-              title="Catalog"
-              description="View synced products and trigger a resync."
-              actionLabel="View catalog"
-              actionUrl="/app/catalog"
+              title="Rules & Knowledge"
+              description="Search rules, synonyms, attributes, files, and catalog sync — all in one place."
+              actionLabel="Open"
+              actionUrl="/app/rules-knowledge"
             />
             <QuickActionCard
               title="Analytics"
