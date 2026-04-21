@@ -227,8 +227,8 @@ function excludeOrthoticsClause() {
 }
 
 const GENDER_DETECT = [
-  { pattern: /\b(men[''']?s|male)\b/i, gender: "men", strip: /\b(men[''']?s|mens|male)\b/gi },
-  { pattern: /\b(women[''']?s|female|ladies)\b/i, gender: "women", strip: /\b(women[''']?s|womens|female|ladies)\b/gi },
+  { pattern: /\b(men[''']?s|male|guy|dude|dad|father|husband|boyfriend|brother|son|grandpa|grandfather|uncle|nephew|him|his)\b/i, gender: "men", strip: /\b(men[''']?s|mens|male|guy|dude|dad|father|husband|boyfriend|brother|son|grandpa|grandfather|uncle|nephew)\b/gi },
+  { pattern: /\b(women[''']?s|female|lady|ladies|mom|mother|wife|girlfriend|sister|daughter|grandma|grandmother|aunt|niece|her|hers)\b/i, gender: "women", strip: /\b(women[''']?s|womens|female|lady|ladies|mom|mother|wife|girlfriend|sister|daughter|grandma|grandmother|aunt|niece)\b/gi },
   { pattern: /\b(boy[''']?s|boys)\b/i, gender: "boy", strip: /\b(boy[''']?s|boys)\b/gi },
   { pattern: /\b(girl[''']?s|girls)\b/i, gender: "girl", strip: /\b(girl[''']?s|girls)\b/gi },
   { pattern: /\b(kid[''']?s|kids|children[''']?s)\b/i, gender: "kid", strip: /\b(kid[''']?s|kids|children[''']?s|childrens)\b/gi },
@@ -268,17 +268,18 @@ function genderFilterClause(gender) {
   return clause;
 }
 
-async function searchProducts({ query, limit, filters }, { shop, deduplicateColors }) {
+async function searchProducts({ query, limit, filters }, { shop, deduplicateColors, sessionGender }) {
   const q = String(query || "").trim();
   if (!q) return { products: [] };
   const max = Math.min(Math.max(parseInt(limit, 10) || 6, 1), 10);
   const attrFilters = filters && typeof filters === "object" ? filters : {};
 
   const detected = detectAndStripGender(q);
+  const effectiveGender = detected.gender || sessionGender || null;
   const searchQuery = detected.gender ? detected.query : q;
 
   const keywords = extractKeywords(searchQuery);
-  if (keywords.length === 0 && !detected.gender) return { products: [] };
+  if (keywords.length === 0 && !effectiveGender) return { products: [] };
 
   const wantsShoes = SHOE_TERMS.test(q) && !ORTHOTIC_TERMS.test(q);
 
@@ -288,8 +289,8 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
     AND: keywords.length > 0 ? keywords.map(keywordMatchClause) : [],
   };
 
-  if (detected.gender) {
-    where.AND.push(genderFilterClause(detected.gender));
+  if (effectiveGender) {
+    where.AND.push(genderFilterClause(effectiveGender));
   }
 
   if (wantsShoes) {
@@ -333,7 +334,7 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
       OR: keywords.map(keywordMatchClause),
     };
     const fallbackAnd = [];
-    if (detected.gender) fallbackAnd.push(genderFilterClause(detected.gender));
+    if (effectiveGender) fallbackAnd.push(genderFilterClause(effectiveGender));
     if (wantsShoes) fallbackAnd.push(excludeOrthoticsClause());
     if (fallbackAnd.length > 0) fallbackWhere.AND = fallbackAnd;
     products = await prisma.product.findMany({
@@ -361,8 +362,8 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
       })
     : products;
 
-  if (detected.gender) {
-    const want = detected.gender.toLowerCase();
+  if (effectiveGender) {
+    const want = effectiveGender.toLowerCase();
     const opposite = want === "men" ? "women" : want === "women" ? "men" : null;
     filtered = filtered.filter((p) => {
       const attrs = p.attributesJson || {};
