@@ -125,22 +125,6 @@ function FeatureCard({ icon, title, description, stat }) {
   );
 }
 
-function QuickActionCard({ title, description, actionLabel, actionUrl, external }) {
-  return (
-    <Card>
-      <BlockStack gap="200">
-        <Text as="h3" variant="headingSm">{title}</Text>
-        <Text as="p" tone="subdued" variant="bodySm">{description}</Text>
-        <Box paddingBlockStart="100">
-          <Button url={actionUrl} external={external} variant="plain">
-            {actionLabel}
-          </Button>
-        </Box>
-      </BlockStack>
-    </Card>
-  );
-}
-
 export default function Home() {
   const {
     hasApiKey, fileCount, shop, themeEditorUrl,
@@ -249,32 +233,6 @@ export default function Home() {
               actionUrl="/app/rules-knowledge"
             />
           </BlockStack>
-        </BlockStack>
-
-        <Divider />
-
-        <BlockStack gap="300">
-          <Text as="h2" variant="headingMd">Quick actions</Text>
-          <InlineGrid columns={{ xs: 1, sm: 2, md: 3 }} gap="400">
-            <QuickActionCard
-              title="Settings"
-              description="AI engine and model routing strategy."
-              actionLabel="Configure"
-              actionUrl="/app/api-keys"
-            />
-            <QuickActionCard
-              title="Rules & Knowledge"
-              description="Search rules, synonyms, attributes, files, and catalog sync — all in one place."
-              actionLabel="Open"
-              actionUrl="/app/rules-knowledge"
-            />
-            <QuickActionCard
-              title="Analytics"
-              description="API usage, cost breakdown, and conversations."
-              actionLabel="View stats"
-              actionUrl="/app/analytics"
-            />
-          </InlineGrid>
         </BlockStack>
 
         <Card>
