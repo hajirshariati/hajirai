@@ -83,6 +83,8 @@ const SIMPLE_PATTERN = /^(hi|hey|hello|thanks|thank you|ok|okay|yes|no|bye|goodb
 const MALE_PATTERN = /\b(men[''']?s|mens|male|guy|dude|dad|father|husband|boyfriend|brother|son|grandpa|grandfather|uncle|nephew|man)\b/i;
 const FEMALE_PATTERN = /\b(women[''']?s|womens|female|lady|ladies|mom|mother|wife|girlfriend|sister|daughter|grandma|grandmother|aunt|niece|woman)\b/i;
 
+const ORTHOTIC_HISTORY_PATTERN = /\b(orthotic|orthotics|insole|insoles|inserts?|arch support|plantar fasciitis|foot pain|ball of foot|heel pain|metatarsal)\b/i;
+
 function detectGenderFromHistory(messages) {
   for (let i = messages.length - 1; i >= 0; i--) {
     const text = typeof messages[i].content === "string" ? messages[i].content : "";
@@ -96,6 +98,14 @@ function detectGenderFromHistory(messages) {
     }
   }
   return null;
+}
+
+function detectOrthoticIntent(messages) {
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const text = typeof messages[i].content === "string" ? messages[i].content : "";
+    if (ORTHOTIC_HISTORY_PATTERN.test(text)) return true;
+  }
+  return false;
 }
 
 function chooseModel(config, message, history) {
@@ -310,12 +320,14 @@ export const action = async ({ request }) => {
     messages.push({ role: "user", content: String(body.message) });
 
     const sessionGender = detectGenderFromHistory(messages);
+    const sessionOrthoticIntent = detectOrthoticIntent(messages);
 
     const anthropic = new Anthropic({ apiKey: config.anthropicApiKey });
     const ctx = {
       shop: session.shop,
       deduplicateColors: config.deduplicateColors,
       sessionGender,
+      sessionOrthoticIntent,
       yotpoApiKey: config.yotpoApiKey || "",
       aftershipApiKey: config.aftershipApiKey || "",
     };
