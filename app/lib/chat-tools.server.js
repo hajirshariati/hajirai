@@ -124,6 +124,29 @@ function truncate(s, n) {
   return s.slice(0, n).trimEnd() + "…";
 }
 
+// Returns a short description excerpt. If the query term appears in the description,
+// returns a window around the first match (so the AI sees why it matched). Otherwise
+// returns the leading snippet. Keeps tool-result payloads small while giving the AI
+// enough context to answer terminology/ingredient questions.
+function descriptionSnippet(desc, query, maxLen) {
+  if (!desc) return undefined;
+  const text = String(desc).replace(/\s+/g, " ").trim();
+  if (!text) return undefined;
+  const n = maxLen || 240;
+  const q = String(query || "").trim().toLowerCase();
+  if (q) {
+    const idx = text.toLowerCase().indexOf(q);
+    if (idx >= 0) {
+      const start = Math.max(0, idx - 60);
+      const end = Math.min(text.length, start + n);
+      const prefix = start > 0 ? "…" : "";
+      const suffix = end < text.length ? "…" : "";
+      return prefix + text.slice(start, end) + suffix;
+    }
+  }
+  return truncate(text, n);
+}
+
 async function enrichmentMap(shop, skus) {
   const rows = skus.length
     ? await prisma.productEnrichment.findMany({
@@ -499,6 +522,7 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
       productType: p.productType || undefined,
       tags: p.tags?.length ? p.tags : undefined,
       attributes: p.attributesJson || undefined,
+      descriptionSnippet: descriptionSnippet(p.description, q, 280),
       priceRange: priceRange(p.variants),
       variantCount: p.variants.length,
       url: productUrl(shop, p.handle),
