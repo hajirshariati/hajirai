@@ -226,6 +226,21 @@ function excludeOrthoticsClause() {
   };
 }
 
+function excludeShoesClause() {
+  return {
+    AND: [
+      { NOT: { productType: { contains: "shoe", mode: "insensitive" } } },
+      { NOT: { productType: { contains: "sneaker", mode: "insensitive" } } },
+      { NOT: { productType: { contains: "sandal", mode: "insensitive" } } },
+      { NOT: { productType: { contains: "boot", mode: "insensitive" } } },
+      { NOT: { title: { contains: "sneaker", mode: "insensitive" } } },
+      { NOT: { title: { contains: "sandal", mode: "insensitive" } } },
+      { NOT: { title: { contains: "boot", mode: "insensitive" } } },
+      { NOT: { title: { contains: "slipper", mode: "insensitive" } } },
+    ],
+  };
+}
+
 const GENDER_DETECT = [
   { pattern: /\b(men[''']?s|male|guy|dude|dad|father|husband|boyfriend|brother|son|grandpa|grandfather|uncle|nephew|him|his)\b/i, gender: "men", strip: /\b(men[''']?s|mens|male|guy|dude|dad|father|husband|boyfriend|brother|son|grandpa|grandfather|uncle|nephew)\b/gi },
   { pattern: /\b(women[''']?s|female|lady|ladies|mom|mother|wife|girlfriend|sister|daughter|grandma|grandmother|aunt|niece|her|hers)\b/i, gender: "women", strip: /\b(women[''']?s|womens|female|lady|ladies|mom|mother|wife|girlfriend|sister|daughter|grandma|grandmother|aunt|niece)\b/gi },
@@ -282,6 +297,7 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
   if (keywords.length === 0 && !effectiveGender) return { products: [] };
 
   const wantsShoes = SHOE_TERMS.test(q) && !ORTHOTIC_TERMS.test(q);
+  const wantsOrthotics = ORTHOTIC_TERMS.test(q);
 
   const where = {
     shop,
@@ -295,6 +311,9 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
 
   if (wantsShoes) {
     where.AND.push(excludeOrthoticsClause());
+  }
+  if (wantsOrthotics) {
+    where.AND.push(excludeShoesClause());
   }
 
   const attrKeys = Object.keys(attrFilters);
