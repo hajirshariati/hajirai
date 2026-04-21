@@ -110,7 +110,7 @@ var headerAv=AVATAR?'<div class="ai-chat-header__avatar"><img src="'+AVATAR+'" a
 panel.innerHTML=
 '<div class="ai-chat-header">'+headerAv+'<div class="ai-chat-header__info"><div class="ai-chat-header__name">'+esc(NAME)+'</div></div><div class="ai-chat-header__actions"><button class="ai-chat-header__btn ai-chat-menu-btn" aria-label="Menu" title="Options"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button><button class="ai-chat-header__btn ai-chat-close-btn" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div></div>'+
 '<div class="ai-chat-messages" role="log" aria-live="polite"></div>'+
-'<div class="ai-chat-typing"><div class="ai-chat-msg-avatar">'+assistantBubbleAvatar+'</div><div class="ai-chat-typing-dots"><span class="ai-chat-typing-dot"></span><span class="ai-chat-typing-dot"></span><span class="ai-chat-typing-dot"></span></div></div>'+
+'<div class="ai-chat-typing"><div class="ai-chat-msg-avatar">'+assistantBubbleAvatar+'</div><div class="ai-chat-typing-dots"><span class="ai-chat-typing-dot"></span><span class="ai-chat-typing-dot"></span><span class="ai-chat-typing-dot"></span></div><span class="ai-chat-typing-text" aria-live="polite"></span></div>'+
 '<div class="ai-chat-input-area"><div class="ai-chat-input-wrap"><div class="ai-chat-input-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><textarea class="ai-chat-input" rows="1" placeholder="'+esc(IPLACE)+'" aria-label="Type your message"></textarea></div><button class="ai-chat-send" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></div>'+
 (DISCL?'<div class="ai-chat-footer">'+esc(DISCL)+' <a href="'+esc(PRIVURL)+'">Privacy Policy</a></div>':'');
 
@@ -131,10 +131,38 @@ document.body.appendChild(launcher);
 /* Cache refs */
 var msgsEl=$('.ai-chat-messages',panel);
 var typingEl=$('.ai-chat-typing',panel);
+var typingTextEl=$('.ai-chat-typing-text',panel);
 var inputEl=$('.ai-chat-input',panel);
 var sendBtn=$('.ai-chat-send',panel);
 var closeBtn=$('.ai-chat-close-btn',panel);
 var menuBtn=$('.ai-chat-menu-btn',panel);
+
+/* Typing hint rotator — shows reassuring text after 4s, rotates every 4s */
+var TYPING_HINTS=['Still looking…','Almost there…','Just a moment…','Thanks for your patience…'];
+var typingHintTimer=null,typingHintIdx=0;
+function clearTypingHints(){
+  if(typingHintTimer){clearTimeout(typingHintTimer);typingHintTimer=null}
+  typingHintIdx=0;
+  if(typingTextEl){typingTextEl.textContent='';typingTextEl.classList.remove('visible')}
+}
+function scheduleTypingHint(delay){
+  typingHintTimer=setTimeout(function tick(){
+    if(!typingEl.classList.contains('visible')){clearTypingHints();return}
+    if(typingTextEl){
+      typingTextEl.textContent=TYPING_HINTS[typingHintIdx%TYPING_HINTS.length];
+      typingTextEl.classList.add('visible');
+    }
+    typingHintIdx++;
+    typingHintTimer=setTimeout(tick,4000);
+  },delay);
+}
+try{
+  var typingObserver=new MutationObserver(function(){
+    if(typingEl.classList.contains('visible')){clearTypingHints();scheduleTypingHint(4000)}
+    else{clearTypingHints()}
+  });
+  typingObserver.observe(typingEl,{attributes:true,attributeFilter:['class']});
+}catch(e){}
 
 var isOpen=false,isStreaming=false,messages=loadH(),abortCtrl=null;
 var IDLE_TIMEOUT=5*60*1000;

@@ -946,6 +946,20 @@
   animation-delay: 0.32s;
 }
 
+.ai-chat-typing-text {
+  align-self: center;
+  font-size: 12px;
+  font-style: italic;
+  color: #9ca3af;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  white-space: nowrap;
+}
+
+.ai-chat-typing-text.visible {
+  opacity: 1;
+}
+
 @keyframes ai-chat-bounce {
   0%, 80%, 100% {
     transform: scale(0.6);
