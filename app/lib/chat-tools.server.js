@@ -309,7 +309,12 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
   const userIntentText = `${q} ${userText || ""}`;
   const merchantExclude = matchesCategoryRule(userIntentText, categoryExclusions, userText);
   const exclusionClause = merchantExclude ? buildExclusionClause(merchantExclude) : null;
-  console.log(`[search] query="${q}" gender=${effectiveGender || "-"} rule=${merchantExclude || "-"}`);
+  const GENDER_KEYS_FOR_LOG = new Set(["gender", "gender_fallback", "genders"]);
+  const extraFilterKeys = Object.keys(attrFilters).filter((k) => !GENDER_KEYS_FOR_LOG.has(k.toLowerCase()));
+  const extraFiltersLog = extraFilterKeys.length > 0
+    ? extraFilterKeys.map((k) => `${k}=${attrFilters[k]}`).join(",")
+    : "-";
+  console.log(`[search] query="${q}" gender=${effectiveGender || "-"} filters=${extraFiltersLog} rule=${merchantExclude || "-"}`);
 
   const where = {
     shop,
@@ -330,16 +335,19 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
   if (attrKeys.length > 0) {
     where.AND.push(
       ...attrKeys.map((key) => {
-        const want = attrFilters[key].toLowerCase();
+        const raw = String(attrFilters[key] || "").trim();
+        const lower = raw.toLowerCase();
+        const title = lower.charAt(0).toUpperCase() + lower.slice(1);
+        const cases = Array.from(new Set([raw, lower, title, lower.toUpperCase()].filter(Boolean)));
         return {
-          OR: [
-            { attributesJson: { path: [key], equals: want } },
-            { attributesJson: { path: [key], array_contains: [want] } },
-            { attributesJson: { path: [key], string_contains: want } },
-            { variants: { some: { attributesJson: { path: [key], equals: want } } } },
-            { variants: { some: { attributesJson: { path: [key], array_contains: [want] } } } },
-            { variants: { some: { attributesJson: { path: [key], string_contains: want } } } },
-          ],
+          OR: cases.flatMap((v) => [
+            { attributesJson: { path: [key], equals: v } },
+            { attributesJson: { path: [key], array_contains: [v] } },
+            { attributesJson: { path: [key], string_contains: v } },
+            { variants: { some: { attributesJson: { path: [key], equals: v } } } },
+            { variants: { some: { attributesJson: { path: [key], array_contains: [v] } } } },
+            { variants: { some: { attributesJson: { path: [key], string_contains: v } } } },
+          ]),
         };
       }),
     );
@@ -430,6 +438,8 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
   }
 
   filtered = filtered.slice(0, max);
+
+  console.log(`[search]   → db=${products.length} filtered=${filtered.length}`);
 
   const firstPrice = (variants) => {
     const v = variants.find((v) => v.price);
