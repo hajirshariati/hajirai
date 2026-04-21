@@ -40,6 +40,9 @@ export const loader = async ({ request }) => {
     getAttributeMappings(session.shop),
     getShopConfig(session.shop),
   ]);
+  let categoryExclusions = [];
+  try { categoryExclusions = JSON.parse(config.categoryExclusions || "[]"); } catch { /* */ }
+
   return {
     shop: session.shop,
     status: state.status,
@@ -47,6 +50,7 @@ export const loader = async ({ request }) => {
     lastError: state.lastError,
     productsCount: count,
     mappings,
+    categoryExclusions,
     deduplicateColors: config.deduplicateColors,
   };
 };
@@ -101,6 +105,20 @@ export const action = async ({ request }) => {
     const value = formData.get("deduplicateColors") === "true";
     await updateShopConfig(session.shop, { deduplicateColors: value });
     return { saved: true };
+  }
+
+  if (intent === "save_exclusions") {
+    const raw = formData.get("categoryExclusions");
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          await updateShopConfig(session.shop, { categoryExclusions: JSON.stringify(parsed) });
+          return { saved: true };
+        }
+      } catch { /* */ }
+    }
+    return { error: "Invalid exclusion rules." };
   }
 
   return { error: "unknown intent" };
@@ -284,6 +302,86 @@ function MappingsPanel({ mappings }) {
   );
 }
 
+function CategoryExclusionsPanel({ initial }) {
+  const fetcher = useFetcher();
+  const [rules, setRules] = useState(initial || []);
+  const [whenQuery, setWhenQuery] = useState("");
+  const [excludeTerms, setExcludeTerms] = useState("");
+
+  const addRule = () => {
+    const w = whenQuery.trim();
+    const e = excludeTerms.trim();
+    if (!w || !e) return;
+    const updated = [...rules, { whenQuery: w, excludeTerms: e }];
+    setRules(updated);
+    setWhenQuery("");
+    setExcludeTerms("");
+    saveRules(updated);
+  };
+
+  const removeRule = (idx) => {
+    const updated = rules.filter((_, i) => i !== idx);
+    setRules(updated);
+    saveRules(updated);
+  };
+
+  const saveRules = (r) => {
+    const fd = new FormData();
+    fd.set("intent", "save_exclusions");
+    fd.set("categoryExclusions", JSON.stringify(r));
+    fetcher.submit(fd, { method: "post" });
+  };
+
+  return (
+    <BlockStack gap="300">
+      <BlockStack gap="100">
+        <Text as="h3" variant="headingSm">Category exclusion rules</Text>
+        <Text as="p" tone="subdued" variant="bodySm">
+          Prevent product categories from mixing. When a keyword from the "trigger" column appears in the conversation, products matching the "exclude" column are hidden. Uses substring matching — shorter triggers match more broadly (e.g. "ortho" matches "orthotic", "orthotics", "orthopedic").
+        </Text>
+      </BlockStack>
+
+      {rules.length > 0 && (
+        <BlockStack gap="200">
+          {rules.map((r, i) => (
+            <InlineStack key={i} gap="200" blockAlign="center" wrap={false}>
+              <Badge tone="info">When</Badge>
+              <Text as="span" variant="bodySm"><code>{r.whenQuery}</code></Text>
+              <Badge tone="critical">Exclude</Badge>
+              <Text as="span" variant="bodySm"><code>{r.excludeTerms}</code></Text>
+              <Button variant="plain" tone="critical" onClick={() => removeRule(i)}>Remove</Button>
+            </InlineStack>
+          ))}
+        </BlockStack>
+      )}
+
+      <InlineStack gap="200" blockAlign="end" wrap={false}>
+        <div style={{ flex: 1 }}>
+          <TextField
+            label="When conversation mentions"
+            value={whenQuery}
+            onChange={setWhenQuery}
+            placeholder="ortho, insole, arch support"
+            autoComplete="off"
+            helpText="Comma-separated trigger keywords"
+          />
+        </div>
+        <div style={{ flex: 1 }}>
+          <TextField
+            label="Exclude products containing"
+            value={excludeTerms}
+            onChange={setExcludeTerms}
+            placeholder="sneaker, sandal, boot, shoe"
+            autoComplete="off"
+            helpText="Comma-separated — matching products are hidden"
+          />
+        </div>
+        <Button onClick={addRule} disabled={!whenQuery.trim() || !excludeTerms.trim()}>Add</Button>
+      </InlineStack>
+    </BlockStack>
+  );
+}
+
 export default function Catalog() {
   const data = useLoaderData();
   const fetcher = useFetcher();
@@ -360,14 +458,16 @@ export default function Catalog() {
 
         <Layout.Section>
           <Card>
-            <BlockStack gap="300">
-              <Text as="h2" variant="headingMd">Chat display</Text>
+            <BlockStack gap="400">
+              <Text as="h2" variant="headingMd">Search & display</Text>
               <Checkbox
                 label="Deduplicate colors in search results"
                 helpText="When enabled, products that differ only by color show a single card instead of one per color variant. Useful when each color is a separate Shopify product."
                 checked={data.deduplicateColors}
                 onChange={handleDedup}
               />
+              <Divider />
+              <CategoryExclusionsPanel initial={data.categoryExclusions} />
             </BlockStack>
           </Card>
         </Layout.Section>
