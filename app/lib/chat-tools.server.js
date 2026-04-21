@@ -223,6 +223,19 @@ function keywordMatchClause(kw, synonymMap) {
       { productType: { contains: t, mode: "insensitive" } },
       { description: { contains: t, mode: "insensitive" } },
     );
+    // Also check category-like metafield attributes. Merchants often tag products
+    // by category in metafields (e.g. Category="Sandals") rather than in the title.
+    const lower = t.toLowerCase();
+    const titleCase = lower.charAt(0).toUpperCase() + lower.slice(1);
+    const termCases = Array.from(new Set([t, lower, titleCase]));
+    const attrKeys = ["category", "Category", "category_for_filter", "Category For Filter", "product_type", "productType"];
+    for (const key of attrKeys) {
+      for (const v of termCases) {
+        clauses.push({ attributesJson: { path: [key], equals: v } });
+        clauses.push({ attributesJson: { path: [key], array_contains: [v] } });
+        clauses.push({ attributesJson: { path: [key], string_contains: v } });
+      }
+    }
   }
   clauses.push({ tags: { hasSome: allTerms } });
   return { OR: clauses };
