@@ -338,7 +338,7 @@ submitBtn.addEventListener('click',function(){
     body:JSON.stringify({data:{type:'subscription',attributes:{custom_source:'ShopAgent Chat',profile:{data:{type:'profile',attributes:profileAttrs}}},relationships:{list:{data:{type:'list',id:KLAVIYO_LIST_ID}}}}})
   }).then(function(r){
     if(r.ok||r.status===202){
-      form.innerHTML='<div style="text-align:center;padding:12px;color:#2d6b4f;font-weight:600;font-size:14px">You\'re subscribed! Check your inbox for a confirmation.</div>';
+      form.innerHTML='<div style="text-align:center;padding:12px;color:#2d6b4f;font-weight:600;font-size:14px">You\'re subscribed!</div>';
     } else {
       r.text().then(function(t){console.error('[klaviyo] status='+r.status,t)});
       statusEl.style.display='block';statusEl.style.color='#c00';statusEl.textContent='Something went wrong ('+r.status+'). Please try again.';
