@@ -39,6 +39,7 @@ export const loader = async ({ request }) => {
     hideOnUrls,
     supportUrl: config.supportUrl || "",
     supportLabel: config.supportLabel || "",
+    promptCaching: config.promptCaching === true,
   };
 };
 
@@ -88,6 +89,9 @@ export const action = async ({ request }) => {
 
   const feedbackToggle = formData.get("showFeedback");
   if (feedbackToggle !== null) data.showFeedback = feedbackToggle === "true";
+
+  const cachingToggle = formData.get("promptCaching");
+  if (cachingToggle !== null) data.promptCaching = cachingToggle === "true";
 
   if (Object.keys(data).length > 0) {
     await updateShopConfig(session.shop, data);
@@ -203,7 +207,7 @@ function HideUrlsPanel({ initial }) {
 }
 
 export default function ApiKeys() {
-  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel } = useLoaderData();
+  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, promptCaching: initCaching } = useLoaderData();
   const actionData = useActionData();
   const nav = useNavigation();
   const saving = nav.state === "submitting";
@@ -217,6 +221,7 @@ export default function ApiKeys() {
   const [aftershipKey, setAftershipKey] = useState("");
   const [supportUrl, setSupportUrl] = useState(initSupportUrl);
   const [supportLabel, setSupportLabel] = useState(initSupportLabel);
+  const [caching, setCaching] = useState(initCaching);
 
   return (
     <Page title="Settings" backAction={{ url: "/app" }}>
@@ -328,6 +333,13 @@ export default function ApiKeys() {
                     onChange={setFeedbackOn}
                     helpText="Shows thumbs up/down on product responses. Negative feedback appears in Analytics with hashed user data."
                   />
+                  <Divider />
+                  <Checkbox
+                    label="Prompt caching"
+                    checked={caching}
+                    onChange={setCaching}
+                    helpText="Caches the system prompt across requests so repeat messages cost up to 90% less on input tokens. Recommended for stores with 1,000+ monthly conversations."
+                  />
                 </BlockStack>
               </Card>
             </Layout.AnnotatedSection>
@@ -424,6 +436,7 @@ export default function ApiKeys() {
           <input type="hidden" name="aftershipApiKey" value={aftershipKey} />
           <input type="hidden" name="supportUrl" value={supportUrl} />
           <input type="hidden" name="supportLabel" value={supportLabel} />
+          <input type="hidden" name="promptCaching" value={String(caching)} />
 
           <Box paddingBlockEnd="800">
             <InlineStack align="end">
