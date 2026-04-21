@@ -173,23 +173,53 @@ function stripMissingSkus(text, missing) {
   return cleaned;
 }
 
+const SUPPORT_ANCHOR_RE = /\b(contact|customer\s+(service|care|support)|support\s+(hub|team|center)|support|care\s+team|help\s+team|reach\s+(out|us)|our\s+team|speak.*(human|agent|rep|person))\b/i;
+
+function normalizeUrl(u) {
+  return String(u || "").trim().toLowerCase().replace(/^https?:\/\//, "").replace(/^www\./, "").replace(/\/+$/, "");
+}
+
 function extractSupportCTA(text, supportUrl, supportLabel) {
-  if (!text || !supportUrl) return { text, cta: null };
-  const safeUrl = supportUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const mdLink = new RegExp(`\\[([^\\]]+)\\]\\(\\s*${safeUrl}\\s*\\)`, "gi");
-  const bareUrl = new RegExp(`(?<![\\w(])${safeUrl}(?![\\w)])`, "gi");
+  if (!text) return { text, cta: null };
+
+  const defaultOldLabel = "Contact customer service";
+  const label = supportLabel && supportLabel.trim() && supportLabel.trim() !== defaultOldLabel
+    ? supportLabel.trim()
+    : "Visit Support Hub";
+
+  const normSupport = supportUrl ? normalizeUrl(supportUrl) : "";
+  const mdLinkAny = /\[([^\]]+)\]\(\s*([^)\s]+)\s*\)/g;
+
+  const removals = [];
+  let cta = null;
+  let m;
+  while ((m = mdLinkAny.exec(text)) !== null) {
+    const anchor = m[1];
+    const linkUrl = m[2];
+    const normLink = normalizeUrl(linkUrl);
+    const anchorMatch = SUPPORT_ANCHOR_RE.test(anchor);
+    const urlMatch = normSupport && (normLink === normSupport || normLink.includes(normSupport) || normSupport.includes(normLink));
+    if (anchorMatch || urlMatch) {
+      removals.push({ start: m.index, end: m.index + m[0].length });
+      if (!cta) cta = { url: supportUrl || linkUrl, label };
+    }
+  }
 
   let cleaned = text;
-  let found = false;
-  if (mdLink.test(cleaned)) {
-    cleaned = cleaned.replace(mdLink, "");
-    found = true;
+  for (let i = removals.length - 1; i >= 0; i--) {
+    cleaned = cleaned.slice(0, removals[i].start) + cleaned.slice(removals[i].end);
   }
-  if (bareUrl.test(cleaned)) {
-    cleaned = cleaned.replace(bareUrl, "");
-    found = true;
+
+  if (supportUrl) {
+    const safeUrl = supportUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const bareUrl = new RegExp(`(?<![\\w(\\[])${safeUrl}/?(?![\\w)])`, "gi");
+    if (bareUrl.test(cleaned)) {
+      cleaned = cleaned.replace(bareUrl, "");
+      if (!cta) cta = { url: supportUrl, label };
+    }
   }
-  if (!found) return { text, cta: null };
+
+  if (!cta) return { text, cta: null };
 
   cleaned = cleaned
     .replace(/:\s*$/gm, ".")
@@ -201,12 +231,7 @@ function extractSupportCTA(text, supportUrl, supportLabel) {
     .replace(/\n{3,}/g, "\n\n")
     .trim();
 
-  const defaultOldLabel = "Contact customer service";
-  const label = supportLabel && supportLabel.trim() && supportLabel.trim() !== defaultOldLabel
-    ? supportLabel.trim()
-    : "Visit Support Hub";
-
-  return { text: cleaned, cta: { url: supportUrl, label } };
+  return { text: cleaned, cta };
 }
 
 async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, controller, encoder }) {
@@ -332,6 +357,21 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     const result = extractSupportCTA(fullResponseText, ctx.supportUrl, ctx.supportLabel);
     fullResponseText = result.text;
     supportCTA = result.cta;
+
+    if (!supportCTA) {
+      const userText = ctx.conversationText || "";
+      const aiText = fullResponseText || "";
+      const userAskedSupport = /\b(contact|reach|talk to|speak (to|with)|get (a )?hold of|how do i .{0,20}(contact|reach))\b.{0,40}\b(customer|support|service|care|team|human|agent|representative|rep|person|someone)\b/i.test(userText)
+        || /\b(customer (service|care|support)|support (hub|team)|return policy|refund|exchange|my order|order status|shipping issue|problem with my)\b/i.test(userText);
+      const aiMentionsSupport = /\b(our (team|support|customer service|customer care)|support team|customer service|customer care|reach out|contact us|get in touch|happy to help)\b/i.test(aiText);
+      if (userAskedSupport || aiMentionsSupport) {
+        const defaultOldLabel = "Contact customer service";
+        const label = ctx.supportLabel && ctx.supportLabel.trim() && ctx.supportLabel.trim() !== defaultOldLabel
+          ? ctx.supportLabel.trim()
+          : "Visit Support Hub";
+        supportCTA = { url: ctx.supportUrl, label };
+      }
+    }
   }
 
   const pool = Array.from(allProductPool.values());
