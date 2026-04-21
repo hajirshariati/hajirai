@@ -41,6 +41,8 @@ export const loader = async ({ request }) => {
     supportLabel: config.supportLabel || "",
     promptCaching: config.promptCaching === true,
     klaviyoFormId: config.klaviyoFormId || "",
+    klaviyoCompanyId: config.klaviyoCompanyId || "",
+    klaviyoListId: config.klaviyoListId || "",
   };
 };
 
@@ -79,6 +81,10 @@ export const action = async ({ request }) => {
 
   const klaviyoFormId = formData.get("klaviyoFormId");
   if (klaviyoFormId !== null) data.klaviyoFormId = klaviyoFormId.trim();
+  const klaviyoCompanyId = formData.get("klaviyoCompanyId");
+  if (klaviyoCompanyId !== null) data.klaviyoCompanyId = klaviyoCompanyId.trim();
+  const klaviyoListId = formData.get("klaviyoListId");
+  if (klaviyoListId !== null) data.klaviyoListId = klaviyoListId.trim();
 
   const hideUrlsRaw = formData.get("hideOnUrls");
   if (hideUrlsRaw !== null) {
@@ -211,7 +217,7 @@ function HideUrlsPanel({ initial }) {
 }
 
 export default function ApiKeys() {
-  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, promptCaching: initCaching, klaviyoFormId: initKlaviyoFormId } = useLoaderData();
+  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, promptCaching: initCaching, klaviyoFormId: initKlaviyoFormId, klaviyoCompanyId: initKlaviyoCompanyId, klaviyoListId: initKlaviyoListId } = useLoaderData();
   const actionData = useActionData();
   const nav = useNavigation();
   const saving = nav.state === "submitting";
@@ -227,6 +233,8 @@ export default function ApiKeys() {
   const [supportLabel, setSupportLabel] = useState(initSupportLabel);
   const [caching, setCaching] = useState(initCaching);
   const [klaviyoFormId, setKlaviyoFormId] = useState(initKlaviyoFormId);
+  const [klaviyoCompanyId, setKlaviyoCompanyId] = useState(initKlaviyoCompanyId);
+  const [klaviyoListId, setKlaviyoListId] = useState(initKlaviyoListId);
 
   return (
     <Page title="Settings" backAction={{ url: "/app" }}>
@@ -426,13 +434,20 @@ export default function ApiKeys() {
                   <BlockStack gap="300">
                     <Text as="h3" variant="headingSm">Klaviyo</Text>
                     <TextField
-                      label="Signup form ID"
-                      labelHidden
-                      value={klaviyoFormId}
-                      onChange={setKlaviyoFormId}
-                      placeholder="TAKnwd"
+                      label="Company ID (public API key)"
+                      value={klaviyoCompanyId}
+                      onChange={setKlaviyoCompanyId}
+                      placeholder="AbC123"
                       autoComplete="off"
-                      helpText="The Klaviyo form ID (e.g. TAKnwd from the embed code). Shows an email/SMS signup form in the chat when customers ask to subscribe, and after dead-end responses."
+                      helpText="Found in Klaviyo → Settings → API Keys → Public API Key."
+                    />
+                    <TextField
+                      label="List ID"
+                      value={klaviyoListId}
+                      onChange={setKlaviyoListId}
+                      placeholder="XyZ789"
+                      autoComplete="off"
+                      helpText="The list to subscribe to. Found in Klaviyo → Audience → Lists → click your list → ID in the URL."
                     />
                   </BlockStack>
                 </BlockStack>
@@ -458,6 +473,8 @@ export default function ApiKeys() {
           <input type="hidden" name="supportLabel" value={supportLabel} />
           <input type="hidden" name="promptCaching" value={String(caching)} />
           <input type="hidden" name="klaviyoFormId" value={klaviyoFormId} />
+          <input type="hidden" name="klaviyoCompanyId" value={klaviyoCompanyId} />
+          <input type="hidden" name="klaviyoListId" value={klaviyoListId} />
 
           <Box paddingBlockEnd="800">
             <InlineStack align="end">

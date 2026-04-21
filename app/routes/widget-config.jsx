@@ -13,6 +13,8 @@ export const loader = async ({ request }) => {
     return Response.json({
       hideOnUrls,
       klaviyoFormId: config.klaviyoFormId || "",
+      klaviyoCompanyId: config.klaviyoCompanyId || "",
+      klaviyoListId: config.klaviyoListId || "",
     }, {
       headers: { "Cache-Control": "public, max-age=300" },
     });
