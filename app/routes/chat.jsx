@@ -234,18 +234,22 @@ function extractSupportCTA(text, supportUrl, supportLabel) {
   return { text: cleaned, cta };
 }
 
-async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, controller, encoder }) {
+async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, controller, encoder, promptCaching }) {
   const totalUsage = { input_tokens: 0, output_tokens: 0, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 };
   let toolCallCount = 0;
   const allProductPool = new Map();
   let fullResponseText = "";
+
+  const system = promptCaching
+    ? [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }]
+    : systemPrompt;
 
   for (let hop = 0; hop < MAX_TOOL_HOPS; hop++) {
     const hopStart = Date.now();
     const stream = anthropic.messages.stream({
       model,
       max_tokens: MAX_TOKENS,
-      system: systemPrompt,
+      system,
       tools: TOOLS,
       messages,
     });
@@ -308,7 +312,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     const wrap = await anthropic.messages.create({
       model,
       max_tokens: MAX_TOKENS,
-      system: systemPrompt,
+      system,
       tools: TOOLS,
       tool_choice: { type: "none" },
       messages,
@@ -524,6 +528,7 @@ export const action = async ({ request }) => {
             ctx,
             controller,
             encoder,
+            promptCaching: config.promptCaching === true,
           });
 
           const lastText = result.fullResponseText || "";
@@ -556,6 +561,11 @@ export const action = async ({ request }) => {
           }
 
           controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
+
+          const u = result.totalUsage;
+          if (u.cache_creation_input_tokens || u.cache_read_input_tokens) {
+            console.log(`[cache] created=${u.cache_creation_input_tokens} read=${u.cache_read_input_tokens} input=${u.input_tokens}`);
+          }
 
           recordChatUsage({
             shop: session.shop,

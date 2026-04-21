@@ -1,0 +1,1 @@
+ALTER TABLE "ShopConfig" ADD COLUMN "promptCaching" BOOLEAN NOT NULL DEFAULT false;
