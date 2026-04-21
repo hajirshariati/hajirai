@@ -512,8 +512,8 @@ export const action = async ({ request }) => {
       userText,
       yotpoApiKey: config.yotpoApiKey || "",
       aftershipApiKey: config.aftershipApiKey || "",
-      supportUrl: config.supportUrl || "",
-      supportLabel: config.supportLabel || "",
+      supportUrl: body.support_url || config.supportUrl || "",
+      supportLabel: body.support_label || config.supportLabel || "",
     };
     const encoder = new TextEncoder();
 
