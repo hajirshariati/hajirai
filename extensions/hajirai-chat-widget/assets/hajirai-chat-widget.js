@@ -321,11 +321,6 @@ var p=JSON.parse(data);
 if(p.type==='text'||p.type==='content_block_delta'){
   var tc=p.text||(p.delta&&p.delta.text)||'';
   full+=tc;
-  typingEl.classList.remove('visible');
-  if(!msgDiv){msgDiv=appendMsg('assistant','');};
-  var b=$('.ai-chat-msg-bubble',msgDiv);
-  if(b)b.innerHTML='<p>'+md(esc(full))+'</p>';
-  scrollBottom();
 }
 if(p.type==='products'&&p.products){
   prods=prods.concat(p.products);
