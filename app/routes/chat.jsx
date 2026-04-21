@@ -11,7 +11,7 @@ const DEFAULT_MODEL = process.env.DEFAULT_MODEL || "claude-sonnet-4-6";
 const HAIKU_MODEL = "claude-haiku-4-5-20251001";
 const OPUS_MODEL = "claude-opus-4-20250514";
 const MAX_TOKENS = parseInt(process.env.CHAT_MAX_TOKENS, 10) || 1024;
-const MAX_TOOL_HOPS = parseInt(process.env.CHAT_MAX_TOOL_HOPS, 10) || 5;
+const MAX_TOOL_HOPS = parseInt(process.env.CHAT_MAX_TOOL_HOPS, 10) || 3;
 
 const DEPRECATED_MODELS = new Set(["claude-sonnet-4-20250514", "claude-3-5-sonnet-20241022", "claude-3-5-sonnet-20240620"]);
 
