@@ -37,6 +37,8 @@ export const loader = async ({ request }) => {
     hasYotpoKey: config.yotpoApiKey !== "",
     hasAftershipKey: config.aftershipApiKey !== "",
     hideOnUrls,
+    supportUrl: config.supportUrl || "",
+    supportLabel: config.supportLabel || "",
   };
 };
 
@@ -66,6 +68,12 @@ export const action = async ({ request }) => {
   if (aftershipKey !== null && aftershipKey !== "") {
     data.aftershipApiKey = aftershipKey;
   }
+
+  const supportUrl = formData.get("supportUrl");
+  if (supportUrl !== null) data.supportUrl = supportUrl.trim();
+
+  const supportLabel = formData.get("supportLabel");
+  if (supportLabel !== null) data.supportLabel = supportLabel.trim();
 
   const hideUrlsRaw = formData.get("hideOnUrls");
   if (hideUrlsRaw !== null) {
@@ -195,7 +203,7 @@ function HideUrlsPanel({ initial }) {
 }
 
 export default function ApiKeys() {
-  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls } = useLoaderData();
+  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel } = useLoaderData();
   const actionData = useActionData();
   const nav = useNavigation();
   const saving = nav.state === "submitting";
@@ -207,6 +215,8 @@ export default function ApiKeys() {
   const [feedbackOn, setFeedbackOn] = useState(initFeedback);
   const [yotpoKey, setYotpoKey] = useState("");
   const [aftershipKey, setAftershipKey] = useState("");
+  const [supportUrl, setSupportUrl] = useState(initSupportUrl);
+  const [supportLabel, setSupportLabel] = useState(initSupportLabel);
 
   return (
     <Page title="Settings" backAction={{ url: "/app" }}>
@@ -323,6 +333,32 @@ export default function ApiKeys() {
             </Layout.AnnotatedSection>
 
             <Layout.AnnotatedSection
+              title="Support link"
+              description="When a customer asks for help or customer service, the AI shows a 'Visit Support Hub' button linking to this URL."
+            >
+              <Card>
+                <BlockStack gap="400">
+                  <TextField
+                    label="Support page URL"
+                    value={supportUrl}
+                    onChange={setSupportUrl}
+                    placeholder="https://yourstore.com/pages/contact"
+                    autoComplete="off"
+                    helpText="Leave blank to disable the support button."
+                  />
+                  <TextField
+                    label="Button label (optional)"
+                    value={supportLabel}
+                    onChange={setSupportLabel}
+                    placeholder="Visit Support Hub"
+                    autoComplete="off"
+                    helpText="Defaults to 'Visit Support Hub' if left blank."
+                  />
+                </BlockStack>
+              </Card>
+            </Layout.AnnotatedSection>
+
+            <Layout.AnnotatedSection
               title="Integrations (optional)"
               description="Connect third-party services for richer AI context — product reviews, sizing data, and return insights."
             >
@@ -386,6 +422,8 @@ export default function ApiKeys() {
           <input type="hidden" name="showFeedback" value={String(feedbackOn)} />
           <input type="hidden" name="yotpoApiKey" value={yotpoKey} />
           <input type="hidden" name="aftershipApiKey" value={aftershipKey} />
+          <input type="hidden" name="supportUrl" value={supportUrl} />
+          <input type="hidden" name="supportLabel" value={supportLabel} />
 
           <Box paddingBlockEnd="800">
             <InlineStack align="end">
