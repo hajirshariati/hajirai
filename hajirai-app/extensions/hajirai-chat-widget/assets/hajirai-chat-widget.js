@@ -308,14 +308,14 @@ showHighTraffic();
 function handleSSE(response){
 var reader=response.body.getReader();
 var decoder=new TextDecoder();
-var buf='',full='',prods=[],msgDiv=null,buffSugg=[];
+var buf='',full='',prods=[],msgDiv=null,buffSugg=[],linkCTA=null;
 function proc(chunk){
 buf+=chunk;var lines=buf.split('\n');buf=lines.pop()||'';
 for(var i=0;i<lines.length;i++){
 var line=lines[i].trim();
 if(!line.startsWith('data: '))continue;
 var data=line.slice(6);
-if(data==='[DONE]'){finish(full,prods,msgDiv,buffSugg);return true}
+if(data==='[DONE]'){finish(full,prods,msgDiv,buffSugg,linkCTA);return true}
 try{
 var p=JSON.parse(data);
 if(p.type==='text'||p.type==='content_block_delta'){
@@ -326,11 +326,7 @@ if(p.type==='products'&&p.products){
   prods=prods.concat(p.products);
 }
 if(p.type==='link'&&p.url){
-  typingEl.classList.remove('visible');
-  if(!msgDiv)msgDiv=appendMsg('assistant',full||'Here are some options!');
-  var b=$('.ai-chat-msg-bubble',msgDiv);
-  if(b)b.insertAdjacentHTML('beforeend','<a style="display:block;margin-top:10px;padding:12px 16px;background:var(--ai-chat-primary,#2d6b4f);color:#fff;border-radius:10px;text-decoration:none;text-align:center;font-size:14px;font-weight:600" href="'+esc(p.url)+'">'+esc(p.label||'Browse Collection')+' &rarr;</a>');
-  scrollBottom();
+  linkCTA={url:p.url,label:p.label||'Visit Support Hub'};
 }
 if(p.type==='choices'&&p.options&&p.options.length){
   typingEl.classList.remove('visible');
@@ -355,7 +351,7 @@ if(p.type==='action'&&p.action==='show_dead_end'){
   inputEl.disabled=true;inputEl.placeholder='Choose an option above';sendBtn.disabled=true;
   scrollBottom();
 }
-if(p.type==='done'){finish(full,prods,msgDiv,buffSugg);return true}
+if(p.type==='done'){finish(full,prods,msgDiv,buffSugg,linkCTA);return true}
 if(p.type==='error'){
   typingEl.classList.remove('visible');isStreaming=false;sendBtn.disabled=false;
   var errText=p.message||'I\'m sorry, I\'m having trouble right now. Please try again in a moment.';
@@ -382,7 +378,7 @@ appendMsg('assistant',c,p);saveH(messages);
 isStreaming=false;sendBtn.disabled=false;
 }
 
-function finish(text,prods,md2,sugg){
+function finish(text,prods,md2,sugg,linkCTA){
 typingEl.classList.remove('visible');isStreaming=false;sendBtn.disabled=false;
 var mDiv=md2;
 var choices=[];
@@ -398,6 +394,10 @@ if(cleanText){
 if(choices.length>0&&mDiv){
   var cb=$('.ai-chat-msg-bubble',mDiv);
   if(cb){var ch='<div class="ai-chat-choices">';for(var ci=0;ci<choices.length;ci++){ch+='<button class="ai-chat-choice-btn" data-message="'+esc(choices[ci])+'">'+esc(choices[ci])+'</button>'}ch+='</div>';cb.insertAdjacentHTML('beforeend',ch)}
+}
+if(linkCTA&&linkCTA.url&&mDiv){
+  var lb=$('.ai-chat-msg-bubble',mDiv);
+  if(lb)lb.insertAdjacentHTML('beforeend','<a class="ai-chat-cta-btn" style="display:block;margin-top:12px;padding:14px 16px;background:var(--ai-chat-primary,#2d6b4f);color:#fff;border-radius:10px;text-decoration:none;text-align:center;font-size:14px;font-weight:600;line-height:1.3" href="'+esc(linkCTA.url)+'" target="_blank" rel="noopener">'+esc(linkCTA.label||'Visit Support Hub')+' &rarr;</a>');
 }
 if(sugg&&sugg.length>0&&mDiv){
   var sb=$('.ai-chat-msg-bubble',mDiv);

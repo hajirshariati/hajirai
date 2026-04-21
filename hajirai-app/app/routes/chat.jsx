@@ -173,6 +173,42 @@ function stripMissingSkus(text, missing) {
   return cleaned;
 }
 
+function extractSupportCTA(text, supportUrl, supportLabel) {
+  if (!text || !supportUrl) return { text, cta: null };
+  const safeUrl = supportUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const mdLink = new RegExp(`\\[([^\\]]+)\\]\\(\\s*${safeUrl}\\s*\\)`, "gi");
+  const bareUrl = new RegExp(`(?<![\\w(])${safeUrl}(?![\\w)])`, "gi");
+
+  let cleaned = text;
+  let found = false;
+  if (mdLink.test(cleaned)) {
+    cleaned = cleaned.replace(mdLink, "");
+    found = true;
+  }
+  if (bareUrl.test(cleaned)) {
+    cleaned = cleaned.replace(bareUrl, "");
+    found = true;
+  }
+  if (!found) return { text, cta: null };
+
+  cleaned = cleaned
+    .replace(/:\s*$/gm, ".")
+    .replace(/\s+here\s*[.:!]?\s*$/gim, ".")
+    .replace(/\s*\(\s*\)/g, "")
+    .replace(/\s+([.,!?;:])/g, "$1")
+    .replace(/\.{2,}/g, ".")
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+
+  const defaultOldLabel = "Contact customer service";
+  const label = supportLabel && supportLabel.trim() && supportLabel.trim() !== defaultOldLabel
+    ? supportLabel.trim()
+    : "Visit Support Hub";
+
+  return { text: cleaned, cta: { url: supportUrl, label } };
+}
+
 async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, controller, encoder }) {
   const totalUsage = { input_tokens: 0, output_tokens: 0, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 };
   let toolCallCount = 0;
@@ -289,8 +325,19 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }
   }
 
+  let supportCTA = null;
+  if (fullResponseText && ctx.supportUrl) {
+    const result = extractSupportCTA(fullResponseText, ctx.supportUrl, ctx.supportLabel);
+    fullResponseText = result.text;
+    supportCTA = result.cta;
+  }
+
   if (fullResponseText) {
     controller.enqueue(encoder.encode(sseChunk({ type: "text", text: fullResponseText })));
+  }
+
+  if (supportCTA) {
+    controller.enqueue(encoder.encode(sseChunk({ type: "link", url: supportCTA.url, label: supportCTA.label })));
   }
 
   const pool = Array.from(allProductPool.values());
@@ -401,6 +448,8 @@ export const action = async ({ request }) => {
       conversationText,
       yotpoApiKey: config.yotpoApiKey || "",
       aftershipApiKey: config.aftershipApiKey || "",
+      supportUrl: config.supportUrl || "",
+      supportLabel: config.supportLabel || "",
     };
     const encoder = new TextEncoder();
 
