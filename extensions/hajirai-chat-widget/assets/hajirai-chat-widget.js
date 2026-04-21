@@ -35,6 +35,8 @@ if(_cachedRules&&matchesHideRule(_cachedRules))return;
 
 fetch(CONFIG_URL).then(function(r){return r.json()}).then(function(d){
   if(d.klaviyoFormId)KLAVIYO_FORM_ID=d.klaviyoFormId;
+  if(d.klaviyoCompanyId)KLAVIYO_COMPANY_ID=d.klaviyoCompanyId;
+  if(d.klaviyoListId)KLAVIYO_LIST_ID=d.klaviyoListId;
   var rules=d.hideOnUrls||[];
   try{sessionStorage.setItem(HRK,JSON.stringify(rules))}catch(e){}
   if(matchesHideRule(rules)){
@@ -72,6 +74,8 @@ var LWIDTH=C.launcherWidth||'500';
 var SUPPORT_URL=C.supportUrl||'';
 var SUPPORT_LABEL=C.supportLabel||'Contact customer service';
 var KLAVIYO_FORM_ID='';
+var KLAVIYO_COMPANY_ID='';
+var KLAVIYO_LIST_ID='';
 var SK='hajirai_chat_session';
 var HK='hajirai_chat_history';
 
@@ -305,35 +309,46 @@ return s;
 }
 
 function showKlaviyoForm(label){
-if(!KLAVIYO_FORM_ID)return;
+if(!KLAVIYO_COMPANY_ID||!KLAVIYO_LIST_ID)return;
 var d=appendMsg('assistant',label||'Stay Connected');
 var b=$('.ai-chat-msg-bubble',d);
 if(!b)return;
-var slot=document.createElement('div');
-slot.style.marginTop='12px';
-slot.style.minHeight='60px';
-b.appendChild(slot);
-var formEl=document.createElement('div');
-formEl.className='klaviyo-form-'+KLAVIYO_FORM_ID;
-formEl.style.cssText='position:absolute;left:-9999px;opacity:0';
-document.body.appendChild(formEl);
-var moved=false;
-var obs=new MutationObserver(function(){
-  if(!moved&&formEl.children.length>0){
-    moved=true;obs.disconnect();
-    formEl.style.cssText='';
-    slot.appendChild(formEl);
-    scrollBottom();
-  }
+var formHtml='<div class="ai-chat-klaviyo-form" style="margin-top:12px;padding:16px;background:#f8f8f8;border-radius:10px">'
++'<div style="font-size:13px;font-weight:600;margin-bottom:10px;color:#1a1a1a">Get the latest updates and exclusive offers</div>'
++'<input type="email" class="ai-kl-email" placeholder="Email address" style="display:block;width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit;margin-bottom:8px;box-sizing:border-box" />'
++'<input type="tel" class="ai-kl-phone" placeholder="Phone number (optional)" style="display:block;width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit;margin-bottom:10px;box-sizing:border-box" />'
++'<button class="ai-kl-submit" style="display:block;width:100%;padding:12px;background:var(--ai-chat-primary,#2d6b4f);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">Subscribe</button>'
++'<div class="ai-kl-status" style="font-size:12px;margin-top:8px;text-align:center;display:none"></div>'
++'</div>';
+b.insertAdjacentHTML('beforeend',formHtml);
+var form=$('.ai-chat-klaviyo-form',b);
+var emailIn=$('.ai-kl-email',form);
+var phoneIn=$('.ai-kl-phone',form);
+var submitBtn=$('.ai-kl-submit',form);
+var statusEl=$('.ai-kl-status',form);
+submitBtn.addEventListener('click',function(){
+  var email=(emailIn.value||'').trim();
+  if(!email||email.indexOf('@')===-1){statusEl.style.display='block';statusEl.style.color='#c00';statusEl.textContent='Please enter a valid email.';return}
+  submitBtn.disabled=true;submitBtn.textContent='Subscribing...';
+  var phone=(phoneIn.value||'').trim();
+  var attrs={email:email,subscriptions:{email:{marketing:{consent:'SUBSCRIBED'}}}};
+  if(phone){attrs.phone_number=phone;attrs.subscriptions.sms={marketing:{consent:'SUBSCRIBED'}}}
+  fetch('https://a.klaviyo.com/client/subscriptions/?company_id='+encodeURIComponent(KLAVIYO_COMPANY_ID),{
+    method:'POST',
+    headers:{'Content-Type':'application/json','revision':'2024-10-15'},
+    body:JSON.stringify({data:{type:'subscription',attributes:{custom_source:'ShopAgent Chat',profile:{data:{type:'profile',attributes:attrs}}},relationships:{list:{data:{type:'list',id:KLAVIYO_LIST_ID}}}}})
+  }).then(function(r){
+    if(r.ok||r.status===202){
+      form.innerHTML='<div style="text-align:center;padding:12px;color:#2d6b4f;font-weight:600;font-size:14px">You\'re subscribed! Check your inbox for a confirmation.</div>';
+    } else {
+      statusEl.style.display='block';statusEl.style.color='#c00';statusEl.textContent='Something went wrong. Please try again.';
+      submitBtn.disabled=false;submitBtn.textContent='Subscribe';
+    }
+  }).catch(function(){
+    statusEl.style.display='block';statusEl.style.color='#c00';statusEl.textContent='Connection error. Please try again.';
+    submitBtn.disabled=false;submitBtn.textContent='Subscribe';
+  });
 });
-obs.observe(formEl,{childList:true,subtree:true});
-setTimeout(function(){
-  if(!moved){obs.disconnect();formEl.remove();
-    slot.innerHTML='<button class="ai-chat-klaviyo-btn" style="display:block;width:100%;padding:14px 16px;background:var(--ai-chat-primary,#2d6b4f);color:#fff;border:none;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;font-family:inherit;text-align:center;line-height:1.3">Sign up for Email &amp; SMS</button>';
-    var btn=$('.ai-chat-klaviyo-btn',slot);
-    if(btn)btn.addEventListener('click',function(){try{if(window._klOnsite)window._klOnsite.push(['openForm',KLAVIYO_FORM_ID])}catch(e){}});
-  }
-},5000);
 scrollBottom();
 }
 
