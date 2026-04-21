@@ -129,6 +129,86 @@ function scoreCardAgainstText(card, textLower) {
   return hits / nameWords.length;
 }
 
+const SKU_PATTERN = /\b[A-Z]{1,2}\d{3,5}[A-Z]?\b/g;
+
+function skusFromCardText(value) {
+  if (!value) return [];
+  const matches = String(value).toUpperCase().match(SKU_PATTERN) || [];
+  return matches;
+}
+
+function extractOrphanSkus(text, pool) {
+  const mentioned = text.match(SKU_PATTERN) || [];
+  if (mentioned.length === 0) return [];
+  const poolSkuSet = new Set();
+  for (const card of pool) {
+    for (const s of skusFromCardText(card.title)) poolSkuSet.add(s);
+    for (const s of skusFromCardText(card.handle)) poolSkuSet.add(s);
+  }
+  const seen = new Set();
+  const orphans = [];
+  for (const raw of mentioned) {
+    const sku = raw.toUpperCase();
+    if (seen.has(sku)) continue;
+    seen.add(sku);
+    if (!poolSkuSet.has(sku)) orphans.push(sku);
+  }
+  return orphans;
+}
+
+function stripMissingSkus(text, missing) {
+  if (!text || missing.length === 0) return text;
+  let cleaned = text;
+  for (const sku of missing) {
+    const safe = sku.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    cleaned = cleaned.replace(new RegExp(`\\s*\\(\\s*${safe}\\s*\\)`, "gi"), "");
+    cleaned = cleaned.replace(new RegExp(`\\b${safe}\\b`, "gi"), "");
+  }
+  cleaned = cleaned
+    .replace(/\(\s*\)/g, "")
+    .replace(/\s+([.,!?;:])/g, "$1")
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+  return cleaned;
+}
+
+function extractSupportCTA(text, supportUrl, supportLabel) {
+  if (!text || !supportUrl) return { text, cta: null };
+  const safeUrl = supportUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const mdLink = new RegExp(`\\[([^\\]]+)\\]\\(\\s*${safeUrl}\\s*\\)`, "gi");
+  const bareUrl = new RegExp(`(?<![\\w(])${safeUrl}(?![\\w)])`, "gi");
+
+  let cleaned = text;
+  let found = false;
+  if (mdLink.test(cleaned)) {
+    cleaned = cleaned.replace(mdLink, "");
+    found = true;
+  }
+  if (bareUrl.test(cleaned)) {
+    cleaned = cleaned.replace(bareUrl, "");
+    found = true;
+  }
+  if (!found) return { text, cta: null };
+
+  cleaned = cleaned
+    .replace(/:\s*$/gm, ".")
+    .replace(/\s+here\s*[.:!]?\s*$/gim, ".")
+    .replace(/\s*\(\s*\)/g, "")
+    .replace(/\s+([.,!?;:])/g, "$1")
+    .replace(/\.{2,}/g, ".")
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+
+  const defaultOldLabel = "Contact customer service";
+  const label = supportLabel && supportLabel.trim() && supportLabel.trim() !== defaultOldLabel
+    ? supportLabel.trim()
+    : "Visit Support Hub";
+
+  return { text: cleaned, cta: { url: supportUrl, label } };
+}
+
 async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, controller, encoder }) {
   const totalUsage = { input_tokens: 0, output_tokens: 0, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 };
   let toolCallCount = 0;
@@ -136,6 +216,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   let fullResponseText = "";
 
   for (let hop = 0; hop < MAX_TOOL_HOPS; hop++) {
+    const hopStart = Date.now();
     const stream = anthropic.messages.stream({
       model,
       max_tokens: MAX_TOKENS,
@@ -147,12 +228,12 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     for await (const event of stream) {
       if (event.type === "content_block_delta" && event.delta?.type === "text_delta") {
         fullResponseText += event.delta.text;
-        controller.enqueue(encoder.encode(sseChunk({ type: "text", text: event.delta.text })));
       }
     }
 
     const final = await stream.finalMessage();
     addUsage(totalUsage, final.usage || {});
+    console.log(`[chat] hop=${hop} stop=${final.stop_reason} ms=${Date.now() - hopStart} textLen=${fullResponseText.length}`);
 
     if (final.stop_reason !== "tool_use") {
       break;
@@ -196,9 +277,9 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     });
   }
 
-  const pool = Array.from(allProductPool.values());
+  let initialPool = Array.from(allProductPool.values());
 
-  if (!fullResponseText && pool.length > 0) {
+  if (!fullResponseText && initialPool.length > 0) {
     const wrap = await anthropic.messages.create({
       model,
       max_tokens: MAX_TOKENS,
@@ -212,9 +293,59 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     for (const block of wrap.content) {
       if (block.type === "text" && block.text) {
         fullResponseText += block.text;
-        controller.enqueue(encoder.encode(sseChunk({ type: "text", text: block.text })));
       }
     }
+  }
+
+  if (fullResponseText) {
+    const poolForCheck = Array.from(allProductPool.values());
+    const orphanSkus = extractOrphanSkus(fullResponseText, poolForCheck);
+    if (orphanSkus.length > 0) {
+      const recoveredSkus = new Set();
+      try {
+        const recovery = await executeTool("lookup_sku", { skus: orphanSkus.slice(0, 10) }, ctx);
+        toolCallCount += 1;
+        const newCards = extractProductCards("lookup_sku", recovery);
+        for (const card of newCards) {
+          const key = card.handle || card.title;
+          if (!allProductPool.has(key)) allProductPool.set(key, card);
+          for (const s of skusFromCardText(card.title)) recoveredSkus.add(s);
+          for (const s of skusFromCardText(card.handle)) recoveredSkus.add(s);
+        }
+        if (recovery && Array.isArray(recovery.found)) {
+          for (const f of recovery.found) {
+            if (f?.sku) recoveredSkus.add(String(f.sku).toUpperCase());
+          }
+        }
+      } catch (err) {
+        console.error("[chat] SKU recovery failed:", err?.message || err);
+      }
+      const stillMissing = orphanSkus.filter((s) => !recoveredSkus.has(s));
+      if (stillMissing.length > 0) {
+        fullResponseText = stripMissingSkus(fullResponseText, stillMissing);
+      }
+    }
+  }
+
+  let supportCTA = null;
+  if (fullResponseText && ctx.supportUrl) {
+    const result = extractSupportCTA(fullResponseText, ctx.supportUrl, ctx.supportLabel);
+    fullResponseText = result.text;
+    supportCTA = result.cta;
+  }
+
+  const pool = Array.from(allProductPool.values());
+
+  if (!fullResponseText && pool.length === 0) {
+    fullResponseText = "I'm not finding a great match for that right now. Want to try a different style, or I can connect you with our support team?";
+  }
+
+  if (fullResponseText) {
+    controller.enqueue(encoder.encode(sseChunk({ type: "text", text: fullResponseText })));
+  }
+
+  if (supportCTA) {
+    controller.enqueue(encoder.encode(sseChunk({ type: "link", url: supportCTA.url, label: supportCTA.label })));
   }
 
   if (pool.length > 0 && fullResponseText) {
@@ -323,6 +454,8 @@ export const action = async ({ request }) => {
       conversationText,
       yotpoApiKey: config.yotpoApiKey || "",
       aftershipApiKey: config.aftershipApiKey || "",
+      supportUrl: config.supportUrl || "",
+      supportLabel: config.supportLabel || "",
     };
     const encoder = new TextEncoder();
 
