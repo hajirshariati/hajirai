@@ -334,16 +334,18 @@ export const action = async ({ request }) => {
             encoder,
           });
 
-          if (config.showFollowUps !== false) {
+          const lastText = result.fullResponseText || "";
+          const hasChoiceButtons = /<<[^<>]+>>/.test(lastText);
+
+          if (config.showFollowUps !== false && !hasChoiceButtons) {
             try {
-              const lastText = result.fullResponseText || "";
               const fuRes = await anthropic.messages.create({
                 model: HAIKU_MODEL,
                 max_tokens: 150,
                 messages: [
                   {
                     role: "user",
-                    content: `Customer asked: "${String(body.message).slice(0, 200)}"\nAssistant replied: "${lastText.slice(0, 300)}"\n\nSuggest 2-3 brief follow-up questions the CUSTOMER would naturally ask next.\n\nRULES:\n- Questions MUST be about specific products or styles the assistant ACTUALLY mentioned or showed. If the assistant showed sneakers, ask about those sneakers — NOT about boots, loafers, or other categories that weren't mentioned.\n- NEVER suggest questions about product categories, brands, or items that were NOT in the assistant's response.\n- Write from the customer's perspective (e.g. "What colors does this come in?", "Do you have this in a size 9?").\n- Keep questions specific to what was shown, not generic browsing questions.\n\nReturn ONLY a JSON array of strings, nothing else.`,
+                    content: `Customer asked: "${String(body.message).slice(0, 200)}"\nAssistant replied: "${lastText.slice(0, 300)}"\n\nSuggest 2-3 brief follow-up questions the CUSTOMER would naturally ask next.\n\nRULES:\n- Questions MUST be directly relevant to the assistant's response. If the assistant asked the customer a question, suggest answers the customer might give — not unrelated questions.\n- Only reference products, styles, or details the assistant ACTUALLY mentioned. Never ask about things not yet discussed.\n- NEVER mention "brands" — this is a single-brand store.\n- NEVER ask about shoe size, availability, or pricing if no specific product has been shown yet.\n- Write from the customer's perspective.\n- Keep questions short and specific.\n\nReturn ONLY a JSON array of strings, nothing else.`,
                   },
                 ],
               });
