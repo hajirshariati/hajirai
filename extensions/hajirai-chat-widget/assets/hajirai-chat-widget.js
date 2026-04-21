@@ -314,7 +314,6 @@ var d=appendMsg('assistant',label||'Stay Connected');
 var b=$('.ai-chat-msg-bubble',d);
 if(!b)return;
 var formHtml='<div class="ai-chat-klaviyo-form" style="margin-top:12px;padding:16px;background:#f8f8f8;border-radius:10px">'
-+'<div style="font-size:13px;font-weight:600;margin-bottom:10px;color:#1a1a1a">Get the latest updates and exclusive offers</div>'
 +'<input type="email" class="ai-kl-email" placeholder="Email address" style="display:block;width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit;margin-bottom:8px;box-sizing:border-box" />'
 +'<input type="tel" class="ai-kl-phone" placeholder="Phone number (optional)" style="display:block;width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit;margin-bottom:10px;box-sizing:border-box" />'
 +'<button class="ai-kl-submit" style="display:block;width:100%;padding:12px;background:var(--ai-chat-primary,#2d6b4f);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">Subscribe</button>'
