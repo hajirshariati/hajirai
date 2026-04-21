@@ -35,6 +35,7 @@ import {
   getCatalogSyncState,
   getProductCount,
   syncCatalogAsync,
+  stopCatalogSync,
 } from "../models/Product.server";
 import {
   getAttributeMappings,
@@ -85,6 +86,7 @@ export const loader = async ({ request }) => {
     lastSyncedAt: state.lastSyncedAt,
     lastError: state.lastError,
     productsCount: count,
+    syncedSoFar: state.syncedSoFar || 0,
     mappings,
     categoryExclusions: safeParse(config.categoryExclusions, []),
     querySynonyms: safeParse(config.querySynonyms, []),
@@ -101,6 +103,11 @@ export const action = async ({ request }) => {
   if (intent === "resync") {
     syncCatalogAsync(admin, session.shop);
     return { started: true };
+  }
+
+  if (intent === "stop_sync") {
+    await stopCatalogSync(session.shop);
+    return { stopped: true };
   }
 
   if (intent === "save_mapping") {
@@ -761,18 +768,27 @@ function AttributeMappingsCard({ mappings }) {
 function CatalogSyncCard({ data }) {
   const fetcher = useFetcher();
   const revalidator = useRevalidator();
-  const isRunning = data.status === "running" ||
-    (fetcher.state !== "idle" && fetcher.formData?.get("intent") === "resync");
+  const isStopping = data.status === "stopping" ||
+    (fetcher.state !== "idle" && fetcher.formData?.get("intent") === "stop_sync");
+  const isRunning = (data.status === "running" || data.status === "stopping" ||
+    (fetcher.state !== "idle" && fetcher.formData?.get("intent") === "resync")) && !isStopping;
 
   useEffect(() => {
-    if (!isRunning) return;
+    if (data.status !== "running" && data.status !== "stopping") return;
     const t = setInterval(() => revalidator.revalidate(), 3000);
     return () => clearInterval(t);
-  }, [isRunning, revalidator]);
+  }, [data.status, revalidator]);
 
   const handleResync = () => {
     fetcher.submit({ intent: "resync" }, { method: "post" });
   };
+  const handleStop = () => {
+    fetcher.submit({ intent: "stop_sync" }, { method: "post" });
+  };
+
+  const syncedSoFar = data.syncedSoFar || 0;
+  const estimate = data.productsCount || 0;
+  const pct = estimate > 0 && syncedSoFar > 0 ? Math.min(100, Math.round((syncedSoFar / estimate) * 100)) : null;
 
   return (
     <Card>
@@ -784,7 +800,7 @@ function CatalogSyncCard({ data }) {
               Indexes your Shopify products, variants, prices, and inventory. The AI searches this database in real time instead of guessing.
             </Text>
           </BlockStack>
-          {statusBadge(data.status)}
+          {statusBadge(data.status === "stopping" ? "running" : data.status)}
         </InlineStack>
         <Divider />
         <InlineStack gap="800">
@@ -797,13 +813,34 @@ function CatalogSyncCard({ data }) {
             <Text as="p" variant="bodyMd">{formatTime(data.lastSyncedAt)}</Text>
           </Box>
         </InlineStack>
+        {(data.status === "running" || data.status === "stopping") && syncedSoFar > 0 && (
+          <BlockStack gap="200">
+            <InlineStack align="space-between">
+              <Text as="p" variant="bodySm" tone="subdued">
+                {isStopping ? "Stopping..." : `${syncedSoFar} products synced${pct !== null ? ` (${pct}%)` : ""}...`}
+              </Text>
+            </InlineStack>
+            {pct !== null && (
+              <div style={{ height: "6px", borderRadius: "3px", background: "#e4e5e7", overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${pct}%`, borderRadius: "3px", background: "#2D6B4F", transition: "width 0.5s ease" }} />
+              </div>
+            )}
+          </BlockStack>
+        )}
         {data.lastError && (
           <Banner tone="critical" title="Last sync failed"><p>{data.lastError}</p></Banner>
         )}
-        <InlineStack>
-          <Button variant="primary" loading={isRunning} onClick={handleResync}>
-            {isRunning ? "Syncing..." : "Resync now"}
-          </Button>
+        <InlineStack gap="200">
+          {data.status !== "running" && data.status !== "stopping" && (
+            <Button variant="primary" loading={isRunning} onClick={handleResync}>
+              Resync now
+            </Button>
+          )}
+          {(data.status === "running" || data.status === "stopping") && (
+            <Button variant="plain" tone="critical" loading={isStopping} onClick={handleStop}>
+              {isStopping ? "Stopping..." : "Stop sync"}
+            </Button>
+          )}
         </InlineStack>
       </BlockStack>
     </Card>

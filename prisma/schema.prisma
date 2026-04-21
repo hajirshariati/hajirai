@@ -93,6 +93,9 @@ model ShopConfig {
   subscriptionId          String?
   subscriptionActivatedAt DateTime?
 
+  rateLimitHits      Int      @default(0)
+  rateLimitHitsMonth String   @default("")
+
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 }
@@ -174,6 +177,7 @@ model CatalogSyncState {
   lastSyncedAt  DateTime?
   lastError     String?
   productsCount Int       @default(0)
+  syncedSoFar   Int       @default(0)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
