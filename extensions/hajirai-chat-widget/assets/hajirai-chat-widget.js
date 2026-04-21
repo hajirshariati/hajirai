@@ -308,10 +308,32 @@ function showKlaviyoForm(label){
 if(!KLAVIYO_FORM_ID)return;
 var d=appendMsg('assistant',label||'Stay Connected');
 var b=$('.ai-chat-msg-bubble',d);
-if(b){
-  b.insertAdjacentHTML('beforeend','<div class="klaviyo-form-'+esc(KLAVIYO_FORM_ID)+'" style="margin-top:12px"></div>');
-  try{if(window._klOnsite)window._klOnsite.push(['openForm',KLAVIYO_FORM_ID])}catch(e){}
-}
+if(!b)return;
+var slot=document.createElement('div');
+slot.style.marginTop='12px';
+slot.style.minHeight='60px';
+b.appendChild(slot);
+var formEl=document.createElement('div');
+formEl.className='klaviyo-form-'+KLAVIYO_FORM_ID;
+formEl.style.cssText='position:absolute;left:-9999px;opacity:0';
+document.body.appendChild(formEl);
+var moved=false;
+var obs=new MutationObserver(function(){
+  if(!moved&&formEl.children.length>0){
+    moved=true;obs.disconnect();
+    formEl.style.cssText='';
+    slot.appendChild(formEl);
+    scrollBottom();
+  }
+});
+obs.observe(formEl,{childList:true,subtree:true});
+setTimeout(function(){
+  if(!moved){obs.disconnect();formEl.remove();
+    slot.innerHTML='<button class="ai-chat-klaviyo-btn" style="display:block;width:100%;padding:14px 16px;background:var(--ai-chat-primary,#2d6b4f);color:#fff;border:none;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;font-family:inherit;text-align:center;line-height:1.3">Sign up for Email &amp; SMS</button>';
+    var btn=$('.ai-chat-klaviyo-btn',slot);
+    if(btn)btn.addEventListener('click',function(){try{if(window._klOnsite)window._klOnsite.push(['openForm',KLAVIYO_FORM_ID])}catch(e){}});
+  }
+},5000);
 scrollBottom();
 }
 
