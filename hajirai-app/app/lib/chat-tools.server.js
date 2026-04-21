@@ -212,33 +212,27 @@ function keywordMatchClause(kw) {
   return { OR: clauses };
 }
 
-const ORTHOTIC_TERMS = /\b(orthotic|orthotics|insole|insoles|inserts?|arch support|arch-support)\b/i;
-const SHOE_TERMS = /\b(shoe|shoes|sneaker|sneakers|sandal|sandals|boot|boots|slipper|slippers|heel|heels|flat|flats|loafer|loafers|footwear|wedge|wedges|mule|mules|clog|clogs|slide|slides)\b/i;
-
-function excludeOrthoticsClause() {
+function buildExclusionClause(excludeTerms) {
+  const terms = excludeTerms.split(",").map((t) => t.trim().toLowerCase()).filter(Boolean);
+  if (terms.length === 0) return null;
   return {
-    AND: [
-      { NOT: { productType: { contains: "orthotic", mode: "insensitive" } } },
-      { NOT: { productType: { contains: "insole", mode: "insensitive" } } },
-      { NOT: { title: { contains: "orthotic", mode: "insensitive" } } },
-      { NOT: { title: { contains: "insole", mode: "insensitive" } } },
-    ],
+    AND: terms.flatMap((t) => [
+      { NOT: { title: { contains: t, mode: "insensitive" } } },
+      { NOT: { productType: { contains: t, mode: "insensitive" } } },
+    ]),
   };
 }
 
-function excludeShoesClause() {
-  return {
-    AND: [
-      { NOT: { productType: { contains: "shoe", mode: "insensitive" } } },
-      { NOT: { productType: { contains: "sneaker", mode: "insensitive" } } },
-      { NOT: { productType: { contains: "sandal", mode: "insensitive" } } },
-      { NOT: { productType: { contains: "boot", mode: "insensitive" } } },
-      { NOT: { title: { contains: "sneaker", mode: "insensitive" } } },
-      { NOT: { title: { contains: "sandal", mode: "insensitive" } } },
-      { NOT: { title: { contains: "boot", mode: "insensitive" } } },
-      { NOT: { title: { contains: "slipper", mode: "insensitive" } } },
-    ],
-  };
+function matchesCategoryRule(text, rules) {
+  if (!rules || !Array.isArray(rules)) return null;
+  const lower = text.toLowerCase();
+  for (const rule of rules) {
+    const triggers = (rule.whenQuery || "").split(",").map((t) => t.trim().toLowerCase()).filter(Boolean);
+    if (triggers.some((t) => lower.includes(t))) {
+      return rule.excludeTerms;
+    }
+  }
+  return null;
 }
 
 const GENDER_DETECT = [
@@ -283,7 +277,7 @@ function genderFilterClause(gender) {
   return clause;
 }
 
-async function searchProducts({ query, limit, filters }, { shop, deduplicateColors, sessionGender, sessionOrthoticIntent }) {
+async function searchProducts({ query, limit, filters }, { shop, deduplicateColors, sessionGender, categoryExclusions, conversationText }) {
   const q = String(query || "").trim();
   if (!q) return { products: [] };
   const max = Math.min(Math.max(parseInt(limit, 10) || 6, 1), 10);
@@ -296,8 +290,9 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
   const keywords = extractKeywords(searchQuery);
   if (keywords.length === 0 && !effectiveGender) return { products: [] };
 
-  const wantsShoes = SHOE_TERMS.test(q) && !ORTHOTIC_TERMS.test(q);
-  const wantsOrthotics = ORTHOTIC_TERMS.test(q) || sessionOrthoticIntent;
+  const fullContext = `${q} ${conversationText || ""}`;
+  const excludeTerms = matchesCategoryRule(fullContext, categoryExclusions);
+  const exclusionClause = excludeTerms ? buildExclusionClause(excludeTerms) : null;
 
   const where = {
     shop,
@@ -309,11 +304,8 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
     where.AND.push(genderFilterClause(effectiveGender));
   }
 
-  if (wantsShoes) {
-    where.AND.push(excludeOrthoticsClause());
-  }
-  if (wantsOrthotics) {
-    where.AND.push(excludeShoesClause());
+  if (exclusionClause) {
+    where.AND.push(exclusionClause);
   }
 
   const attrKeys = Object.keys(attrFilters);
@@ -354,7 +346,7 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
     };
     const fallbackAnd = [];
     if (effectiveGender) fallbackAnd.push(genderFilterClause(effectiveGender));
-    if (wantsShoes) fallbackAnd.push(excludeOrthoticsClause());
+    if (exclusionClause) fallbackAnd.push(exclusionClause);
     if (fallbackAnd.length > 0) fallbackWhere.AND = fallbackAnd;
     products = await prisma.product.findMany({
       where: fallbackWhere,
