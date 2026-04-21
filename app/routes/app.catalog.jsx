@@ -459,7 +459,13 @@ export default function Catalog() {
         <Layout.Section>
           <Card>
             <BlockStack gap="400">
-              <Text as="h2" variant="headingMd">Search & display</Text>
+              <InlineStack gap="200" blockAlign="center">
+                <Text as="h2" variant="headingMd">Search & display</Text>
+                <Badge tone="success">Hard rule</Badge>
+              </InlineStack>
+              <Banner tone="info">
+                Rules here are enforced at the database level before results reach the AI. They take priority over anything written in Knowledge Base files.
+              </Banner>
               <Checkbox
                 label="Deduplicate colors in search results"
                 helpText="When enabled, products that differ only by color show a single card instead of one per color variant. Useful when each color is a separate Shopify product."
