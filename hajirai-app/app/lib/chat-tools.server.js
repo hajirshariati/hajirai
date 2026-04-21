@@ -286,7 +286,13 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
   const attrFilters = filters && typeof filters === "object" ? filters : {};
 
   const detected = detectAndStripGender(q);
-  const effectiveGender = detected.gender || sessionGender || null;
+  const filterGenderRaw = (attrFilters.gender || attrFilters.Gender || attrFilters.gender_fallback || "").toString().toLowerCase().trim();
+  const filterGender = filterGenderRaw === "men" || filterGenderRaw === "mens" || filterGenderRaw === "men's" || filterGenderRaw === "male"
+    ? "men"
+    : filterGenderRaw === "women" || filterGenderRaw === "womens" || filterGenderRaw === "women's" || filterGenderRaw === "female"
+    ? "women"
+    : null;
+  const effectiveGender = detected.gender || sessionGender || filterGender || null;
   const searchQuery = detected.gender ? detected.query : q;
 
   const keywords = extractKeywords(searchQuery);
@@ -310,7 +316,8 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
     where.AND.push(exclusionClause);
   }
 
-  const attrKeys = Object.keys(attrFilters);
+  const GENDER_KEYS = new Set(["gender", "gender_fallback", "genders"]);
+  const attrKeys = Object.keys(attrFilters).filter((k) => !GENDER_KEYS.has(k.toLowerCase()));
   if (attrKeys.length > 0) {
     where.AND.push(
       ...attrKeys.map((key) => {
@@ -378,22 +385,35 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
   if (effectiveGender) {
     const want = effectiveGender.toLowerCase();
     const opposite = want === "men" ? "women" : want === "women" ? "men" : null;
+    const wantRe = new RegExp(`(^|[^a-z])${want}('?s)?([^a-z]|$)`, "i");
+    const oppositeRe = opposite ? new RegExp(`(^|[^a-z])${opposite}('?s)?([^a-z]|$)`, "i") : null;
+    const unisexRe = /(^|[^a-z])unisex([^a-z]|$)/i;
+
+    const before = filtered.length;
     filtered = filtered.filter((p) => {
       const attrs = p.attributesJson || {};
       const gVal = attrs.gender || attrs.gender_fallback || "";
-      const gStr = Array.isArray(gVal) ? gVal.join(" ").toLowerCase() : String(gVal).toLowerCase();
-      const titleLow = (p.title || "").toLowerCase();
+      const gStr = Array.isArray(gVal) ? gVal.join(" ") : String(gVal);
+      const titleStr = p.title || "";
 
-      if (gStr.includes("unisex")) return true;
+      if (unisexRe.test(gStr)) return true;
 
-      if (opposite && gStr && gStr.includes(opposite) && !gStr.includes(want)) return false;
-      if (gStr.includes(want)) return true;
+      const gHasOpposite = oppositeRe && oppositeRe.test(gStr);
+      const gHasWant = wantRe.test(gStr);
+      if (gHasOpposite && !gHasWant) return false;
+      if (gHasWant) return true;
 
-      if (opposite && titleLow.includes(`${opposite}'s`)) return false;
-      if (titleLow.includes(`${want}'s`)) return true;
+      const tHasOpposite = oppositeRe && oppositeRe.test(titleStr);
+      const tHasWant = wantRe.test(titleStr);
+      if (tHasOpposite && !tHasWant) return false;
+      if (tHasWant) return true;
 
+      console.warn(`[gender-filter] dropped product=${p.handle} want=${want} gender=${JSON.stringify(gVal)} title="${titleStr}"`);
       return false;
     });
+    if (before !== filtered.length) {
+      console.log(`[gender-filter] want=${want} ${before} -> ${filtered.length} products`);
+    }
   }
 
   if (deduplicateColors) {
