@@ -392,6 +392,12 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     controller.enqueue(encoder.encode(sseChunk({ type: "link", url: supportCTA.url, label: supportCTA.label })));
   }
 
+  const userAskedSignup = /\b(sign ?up|subscribe|newsletter|email list|mailing list|sms|text (me|updates|alerts)|join.{0,15}(list|email|sms)|opt.?in|stay.{0,10}(connected|touch|updated))\b/i.test(ctx.userText || "");
+  const aiMentionsSignup = /\b(sign ?up|subscribe|newsletter|email|sms|mailing list|stay.{0,10}(connected|touch|updated))\b/i.test(fullResponseText || "");
+  if (userAskedSignup || aiMentionsSignup) {
+    controller.enqueue(encoder.encode(sseChunk({ type: "klaviyo_form" })));
+  }
+
   if (pool.length > 0 && fullResponseText) {
     const textLower = fullResponseText.toLowerCase();
     const saysNoMatch = /\b(don't (?:have|see|carry)|not (?:see|carry|have)|don't appear|we don't|no .{0,20} available)\b/i.test(fullResponseText);

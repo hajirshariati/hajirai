@@ -40,6 +40,7 @@ export const loader = async ({ request }) => {
     supportUrl: config.supportUrl || "",
     supportLabel: config.supportLabel || "",
     promptCaching: config.promptCaching === true,
+    klaviyoFormId: config.klaviyoFormId || "",
   };
 };
 
@@ -75,6 +76,9 @@ export const action = async ({ request }) => {
 
   const supportLabel = formData.get("supportLabel");
   if (supportLabel !== null) data.supportLabel = supportLabel.trim();
+
+  const klaviyoFormId = formData.get("klaviyoFormId");
+  if (klaviyoFormId !== null) data.klaviyoFormId = klaviyoFormId.trim();
 
   const hideUrlsRaw = formData.get("hideOnUrls");
   if (hideUrlsRaw !== null) {
@@ -207,7 +211,7 @@ function HideUrlsPanel({ initial }) {
 }
 
 export default function ApiKeys() {
-  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, promptCaching: initCaching } = useLoaderData();
+  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, promptCaching: initCaching, klaviyoFormId: initKlaviyoFormId } = useLoaderData();
   const actionData = useActionData();
   const nav = useNavigation();
   const saving = nav.state === "submitting";
@@ -222,6 +226,7 @@ export default function ApiKeys() {
   const [supportUrl, setSupportUrl] = useState(initSupportUrl);
   const [supportLabel, setSupportLabel] = useState(initSupportLabel);
   const [caching, setCaching] = useState(initCaching);
+  const [klaviyoFormId, setKlaviyoFormId] = useState(initKlaviyoFormId);
 
   return (
     <Page title="Settings" backAction={{ url: "/app" }}>
@@ -415,6 +420,21 @@ export default function ApiKeys() {
                       helpText="Enables fit intelligence and sizing guidance from return-reason data."
                     />
                   </BlockStack>
+
+                  <Divider />
+
+                  <BlockStack gap="300">
+                    <Text as="h3" variant="headingSm">Klaviyo</Text>
+                    <TextField
+                      label="Signup form ID"
+                      labelHidden
+                      value={klaviyoFormId}
+                      onChange={setKlaviyoFormId}
+                      placeholder="TAKnwd"
+                      autoComplete="off"
+                      helpText="The Klaviyo form ID (e.g. TAKnwd from the embed code). Shows an email/SMS signup form in the chat when customers ask to subscribe, and after dead-end responses."
+                    />
+                  </BlockStack>
                 </BlockStack>
               </Card>
             </Layout.AnnotatedSection>
@@ -437,6 +457,7 @@ export default function ApiKeys() {
           <input type="hidden" name="supportUrl" value={supportUrl} />
           <input type="hidden" name="supportLabel" value={supportLabel} />
           <input type="hidden" name="promptCaching" value={String(caching)} />
+          <input type="hidden" name="klaviyoFormId" value={klaviyoFormId} />
 
           <Box paddingBlockEnd="800">
             <InlineStack align="end">
