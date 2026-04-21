@@ -264,15 +264,27 @@ function genderFilterClause(gender) {
       { attributesJson: { path: ["gender_fallback"], array_contains: [want] } },
       { attributesJson: { path: ["gender"], equals: `${want}'s` } },
       { attributesJson: { path: ["gender_fallback"], equals: `${want}'s` } },
+      { attributesJson: { path: ["gender"], equals: "unisex" } },
+      { attributesJson: { path: ["gender_fallback"], equals: "unisex" } },
     ],
   };
   if (opposite) {
-    clause.OR.push({
-      AND: [
-        { title: { contains: want, mode: "insensitive" } },
-        { NOT: { title: { contains: opposite, mode: "insensitive" } } },
-      ],
-    });
+    clause.OR.push(
+      {
+        AND: [
+          { title: { contains: want, mode: "insensitive" } },
+          { NOT: { title: { contains: opposite, mode: "insensitive" } } },
+        ],
+      },
+      {
+        AND: [
+          { NOT: { title: { contains: want, mode: "insensitive" } } },
+          { NOT: { title: { contains: opposite, mode: "insensitive" } } },
+          { NOT: { title: { contains: `${want}'s`, mode: "insensitive" } } },
+          { NOT: { title: { contains: `${opposite}'s`, mode: "insensitive" } } },
+        ],
+      },
+    );
   }
   return clause;
 }
