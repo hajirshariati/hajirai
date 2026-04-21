@@ -81,6 +81,7 @@ model ShopConfig {
   showFeedback        Boolean  @default(true)
   deduplicateColors   Boolean  @default(false)
   promptCaching       Boolean  @default(false)
+  klaviyoFormId       String   @default("")
 
   hideOnUrls          String   @default("[]")
   categoryExclusions  String   @default("[]")

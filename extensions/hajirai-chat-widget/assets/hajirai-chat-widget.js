@@ -34,6 +34,7 @@ try{_cachedRules=JSON.parse(sessionStorage.getItem(HRK))}catch(e){}
 if(_cachedRules&&matchesHideRule(_cachedRules))return;
 
 fetch(CONFIG_URL).then(function(r){return r.json()}).then(function(d){
+  if(d.klaviyoFormId)KLAVIYO_FORM_ID=d.klaviyoFormId;
   var rules=d.hideOnUrls||[];
   try{sessionStorage.setItem(HRK,JSON.stringify(rules))}catch(e){}
   if(matchesHideRule(rules)){
@@ -70,6 +71,7 @@ var PRIVURL=C.privacyUrl||'/pages/privacy-policy';
 var LWIDTH=C.launcherWidth||'500';
 var SUPPORT_URL=C.supportUrl||'';
 var SUPPORT_LABEL=C.supportLabel||'Contact customer service';
+var KLAVIYO_FORM_ID='';
 var SK='hajirai_chat_session';
 var HK='hajirai_chat_history';
 
@@ -302,6 +304,17 @@ s+='</div>';
 return s;
 }
 
+function showKlaviyoForm(label){
+if(!KLAVIYO_FORM_ID)return;
+var d=appendMsg('assistant',label||'Stay Connected');
+var b=$('.ai-chat-msg-bubble',d);
+if(b){
+  b.insertAdjacentHTML('beforeend','<div class="klaviyo-form-'+esc(KLAVIYO_FORM_ID)+'" style="margin-top:12px"></div>');
+  try{if(window._klOnsite)window._klOnsite.push(['openForm',KLAVIYO_FORM_ID])}catch(e){}
+}
+scrollBottom();
+}
+
 function showHighTraffic(){
 var em='I\'m experiencing high traffic right now. Please try again in a moment.';
 messages.push({role:'assistant',content:em});
@@ -310,6 +323,7 @@ var bb=$('.ai-chat-msg-bubble',md);
 if(bb)bb.insertAdjacentHTML('beforeend',deadEndHtml());
 inputEl.disabled=true;inputEl.placeholder='Choose an option above';sendBtn.disabled=true;
 saveH(messages);
+setTimeout(function(){showKlaviyoForm('Stay Connected')},500);
 }
 
 var streamWatchdog=null;
@@ -330,6 +344,8 @@ streamWatchdog=setTimeout(function(){
   }
 },90000);
 var body={message:msg,session_id:getSess(),shop_domain:SHOP,assistant_name:NAME,history:messages.slice(-20).map(function(m){return{role:m.role,content:m.content}})};
+if(SUPPORT_URL)body.support_url=SUPPORT_URL;
+if(SUPPORT_LABEL)body.support_label=SUPPORT_LABEL;
 fetch(CHAT_URL,{method:'POST',headers:{'Content-Type':'application/json','Accept':'text/event-stream'},body:JSON.stringify(body),signal:abortCtrl.signal}).then(function(r){
 if(!r.ok){
   if(r.headers.get('content-type')&&r.headers.get('content-type').includes('text/event-stream'))return handleSSE(r);
@@ -381,6 +397,9 @@ if(p.type==='choices'&&p.options&&p.options.length){
 if(p.type==='suggestions'&&p.questions&&p.questions.length){
   buffSugg=p.questions;
 }
+if(p.type==='klaviyo_form'){
+  setTimeout(function(){showKlaviyoForm('Stay Connected')},300);
+}
 if(p.type==='action'&&p.action==='open_zendesk'){
   setTimeout(function(){toggle(false);if(typeof window.zE==='function'){window.zE('webWidget','show');window.zE('webWidget','open')}},1500);
 }
@@ -392,6 +411,7 @@ if(p.type==='action'&&p.action==='show_dead_end'){
     bubble.insertAdjacentHTML('beforeend',deadEndHtml());
   }
   inputEl.disabled=true;inputEl.placeholder='Choose an option above';sendBtn.disabled=true;
+  setTimeout(function(){showKlaviyoForm('Stay Connected')},500);
   scrollBottom();
 }
 if(p.type==='done'){finish(full,prods,msgDiv,buffSugg,linkCTA);return true}

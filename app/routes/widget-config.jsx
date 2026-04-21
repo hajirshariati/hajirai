@@ -10,7 +10,10 @@ export const loader = async ({ request }) => {
     let hideOnUrls = [];
     try { hideOnUrls = JSON.parse(config.hideOnUrls || "[]"); } catch { /* */ }
 
-    return Response.json({ hideOnUrls }, {
+    return Response.json({
+      hideOnUrls,
+      klaviyoFormId: config.klaviyoFormId || "",
+    }, {
       headers: { "Cache-Control": "public, max-age=300" },
     });
   } catch {
