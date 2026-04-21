@@ -1,4 +1,4 @@
-import { useLoaderData } from "react-router";
+import { useLoaderData, useFetcher } from "react-router";
 import {
   Page,
   Card,
@@ -16,7 +16,7 @@ import {
 import { CheckCircleIcon } from "@shopify/polaris-icons";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
-import { getShopConfig, getKnowledgeFiles } from "../models/ShopConfig.server";
+import { getShopConfig, getKnowledgeFiles, updateShopConfig } from "../models/ShopConfig.server";
 import { getCatalogSyncState, syncCatalogAsync } from "../models/Product.server";
 import { countEnrichmentsByShop } from "../models/ProductEnrichment.server";
 import { getUsageSummary } from "../models/ChatUsage.server";
@@ -51,6 +51,16 @@ export const loader = async ({ request }) => {
     modelStrategy: config.modelStrategy || "smart",
     rateLimitHits,
   };
+};
+
+export const action = async ({ request }) => {
+  const { session } = await authenticate.admin(request);
+  const formData = await request.formData();
+  if (formData.get("intent") === "dismiss_rate_limit") {
+    await updateShopConfig(session.shop, { rateLimitHits: 0, rateLimitHitsMonth: "" });
+    return { dismissed: true };
+  }
+  return null;
 };
 
 function StepCircle({ done, number }) {
@@ -138,6 +148,10 @@ export default function Home() {
     rateLimitHits,
   } = useLoaderData();
 
+  const rateFetcher = useFetcher();
+  const rateDismissed = rateFetcher.state !== "idle" || rateFetcher.data?.dismissed;
+  const showRateLimit = rateLimitHits > 0 && !rateDismissed;
+
   const strategyLabel = modelStrategy === "smart"
     ? "Smart routing"
     : modelStrategy === "always-haiku"
@@ -161,13 +175,13 @@ export default function Home() {
             <Text as="p" variant="bodyMd">
               <span style={{ color: "rgba(255,255,255,0.85)" }}>AI-powered shopping assistant for your Shopify store.</span>
             </Text>
-            {(totalMessages > 0 || rateLimitHits > 0) && (
+            {(totalMessages > 0 || showRateLimit) && (
               <Box paddingBlockStart="200">
                 <InlineStack gap="200">
                   {totalMessages > 0 && (
                     <Badge tone="info">{totalMessages} conversations this month</Badge>
                   )}
-                  {rateLimitHits > 0 && (
+                  {showRateLimit && (
                     <Badge tone={rateLimitHits >= 10 ? "critical" : "attention"}>
                       {rateLimitHits} rate-limited {rateLimitHits === 1 ? "request" : "requests"}
                     </Badge>
@@ -178,11 +192,13 @@ export default function Home() {
           </BlockStack>
         </div>
 
-        {rateLimitHits > 0 && (
+        {showRateLimit && (
           <Banner
             title={rateLimitHits >= 10 ? "Customers are being turned away" : "Some customers hit the AI rate limit"}
             tone={rateLimitHits >= 10 ? "critical" : "warning"}
             action={{ content: "Increase limits", url: "https://console.anthropic.com/settings/limits", external: true }}
+            secondaryAction={{ content: "Dismiss", onAction: () => rateFetcher.submit({ intent: "dismiss_rate_limit" }, { method: "post" }) }}
+            onDismiss={() => rateFetcher.submit({ intent: "dismiss_rate_limit" }, { method: "post" })}
           >
             <Text as="p" variant="bodySm">
               {rateLimitHits} {rateLimitHits === 1 ? "request was" : "requests were"} rate-limited this month.
