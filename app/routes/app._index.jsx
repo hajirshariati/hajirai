@@ -10,6 +10,7 @@ import {
   Button,
   Icon,
   Badge,
+  Banner,
   Divider,
 } from "@shopify/polaris";
 import { CheckCircleIcon } from "@shopify/polaris-icons";
@@ -34,6 +35,10 @@ export const loader = async ({ request }) => {
     syncCatalogAsync(admin, session.shop);
   }
 
+  const now = new Date();
+  const currentMonth = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}`;
+  const rateLimitHits = config.rateLimitHitsMonth === currentMonth ? (config.rateLimitHits || 0) : 0;
+
   return {
     hasApiKey: config.anthropicApiKey !== "",
     fileCount: files.length,
@@ -44,6 +49,7 @@ export const loader = async ({ request }) => {
     totalCost: usage.totalCost,
     totalMessages: usage.totalMessages,
     modelStrategy: config.modelStrategy || "smart",
+    rateLimitHits,
   };
 };
 
@@ -129,6 +135,7 @@ export default function Home() {
   const {
     hasApiKey, fileCount, shop, themeEditorUrl,
     productsCount, enrichmentCount, totalCost, totalMessages, modelStrategy,
+    rateLimitHits,
   } = useLoaderData();
 
   const strategyLabel = modelStrategy === "smart"
@@ -154,13 +161,37 @@ export default function Home() {
             <Text as="p" variant="bodyMd">
               <span style={{ color: "rgba(255,255,255,0.85)" }}>AI-powered shopping assistant for your Shopify store.</span>
             </Text>
-            {totalMessages > 0 && (
+            {(totalMessages > 0 || rateLimitHits > 0) && (
               <Box paddingBlockStart="200">
-                <Badge tone="info">{totalMessages} conversations this month</Badge>
+                <InlineStack gap="200">
+                  {totalMessages > 0 && (
+                    <Badge tone="info">{totalMessages} conversations this month</Badge>
+                  )}
+                  {rateLimitHits > 0 && (
+                    <Badge tone={rateLimitHits >= 10 ? "critical" : "attention"}>
+                      {rateLimitHits} rate-limited {rateLimitHits === 1 ? "request" : "requests"}
+                    </Badge>
+                  )}
+                </InlineStack>
               </Box>
             )}
           </BlockStack>
         </div>
+
+        {rateLimitHits > 0 && (
+          <Banner
+            title={rateLimitHits >= 10 ? "Customers are being turned away" : "Some customers hit the AI rate limit"}
+            tone={rateLimitHits >= 10 ? "critical" : "warning"}
+            action={{ content: "Increase limits", url: "https://console.anthropic.com/settings/limits", external: true }}
+          >
+            <Text as="p" variant="bodySm">
+              {rateLimitHits} {rateLimitHits === 1 ? "request was" : "requests were"} rate-limited this month.
+              {rateLimitHits >= 10
+                ? " Your Anthropic API tier is too low for your traffic. Add credits at console.anthropic.com to auto-upgrade."
+                : " This happens when many customers chat simultaneously. If this keeps growing, consider upgrading your Anthropic API tier."}
+            </Text>
+          </Banner>
+        )}
 
         <BlockStack gap="300">
           <Text as="h2" variant="headingMd">What ShopAgent does for you</Text>

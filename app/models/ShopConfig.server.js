@@ -46,6 +46,17 @@ export async function updateShopConfig(shop, data) {
   return decryptConfig(saved);
 }
 
+export async function incrementRateLimitHits(shop) {
+  const now = new Date();
+  const month = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}`;
+  const config = await prisma.shopConfig.findUnique({ where: { shop }, select: { rateLimitHitsMonth: true } });
+  if (config?.rateLimitHitsMonth === month) {
+    await prisma.shopConfig.update({ where: { shop }, data: { rateLimitHits: { increment: 1 } } });
+  } else {
+    await prisma.shopConfig.update({ where: { shop }, data: { rateLimitHits: 1, rateLimitHitsMonth: month } });
+  }
+}
+
 export async function getKnowledgeFiles(shop) {
   return prisma.knowledgeFile.findMany({
     where: { shop },

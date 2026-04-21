@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { authenticate } from "../shopify.server";
-import { getShopConfig, getKnowledgeFilesWithContent } from "../models/ShopConfig.server";
+import { getShopConfig, getKnowledgeFilesWithContent, incrementRateLimitHits } from "../models/ShopConfig.server";
 import { getAttributeMappings } from "../models/AttributeMapping.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
 import { TOOLS, executeTool, extractProductCards } from "../lib/chat-tools.server";
@@ -581,6 +581,7 @@ export const action = async ({ request }) => {
             userMsg = "I'm temporarily unavailable. Please try again later or reach out to our customer service team for help.";
           } else if (raw.includes("rate limit") || raw.includes("429")) {
             userMsg = "I'm getting a lot of questions right now! Please try again in a moment.";
+            incrementRateLimitHits(session.shop).catch(() => {});
           }
           controller.enqueue(
             encoder.encode(sseChunk({ type: "error", message: userMsg })),

@@ -212,7 +212,7 @@ async function setSyncState(shop, patch) {
 }
 
 export async function syncCatalog(admin, shop) {
-  await setSyncState(shop, { status: "running", lastError: null });
+  await setSyncState(shop, { status: "running", lastError: null, syncedSoFar: 0 });
   try {
     const mappings = await getAttributeMappings(shop);
     const productMf = buildMetafieldFragment(mappings, "product");
@@ -229,6 +229,13 @@ export async function syncCatalog(admin, shop) {
     let cursor = null;
     let totalSeen = 0;
     while (true) {
+      const current = await prisma.catalogSyncState.findUnique({ where: { shop } });
+      if (current?.status === "stopping") {
+        console.log(`[syncCatalog] ${shop}: stopped by user at ${totalSeen} products`);
+        await setSyncState(shop, { status: "idle", syncedSoFar: totalSeen });
+        return { ok: true, count: totalSeen, stopped: true };
+      }
+
       const resp = await admin.graphql(query, { variables: { cursor } });
       const json = await resp.json();
       const page = json?.data?.products;
@@ -239,6 +246,8 @@ export async function syncCatalog(admin, shop) {
         totalSeen += 1;
       }
 
+      await setSyncState(shop, { syncedSoFar: totalSeen });
+
       if (!page.pageInfo.hasNextPage) break;
       cursor = page.pageInfo.endCursor;
     }
@@ -247,6 +256,7 @@ export async function syncCatalog(admin, shop) {
       status: "idle",
       lastSyncedAt: new Date(),
       productsCount: totalSeen,
+      syncedSoFar: totalSeen,
     });
     return { ok: true, count: totalSeen };
   } catch (err) {
@@ -255,6 +265,10 @@ export async function syncCatalog(admin, shop) {
     await setSyncState(shop, { status: "error", lastError: message });
     return { ok: false, error: message };
   }
+}
+
+export async function stopCatalogSync(shop) {
+  return setSyncState(shop, { status: "stopping" });
 }
 
 export function syncCatalogAsync(admin, shop) {
