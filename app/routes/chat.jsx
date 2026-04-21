@@ -482,6 +482,7 @@ export const action = async ({ request }) => {
 
     const sessionGender = detectGenderFromHistory(messages);
     const conversationText = messages.map((m) => typeof m.content === "string" ? m.content : "").join(" ");
+    const userText = messages.filter((m) => m.role === "user").map((m) => typeof m.content === "string" ? m.content : "").join(" ");
     let categoryExclusions = [];
     try { categoryExclusions = JSON.parse(config.categoryExclusions || "[]"); } catch { /* */ }
 
@@ -492,6 +493,7 @@ export const action = async ({ request }) => {
       sessionGender,
       categoryExclusions,
       conversationText,
+      userText,
       yotpoApiKey: config.yotpoApiKey || "",
       aftershipApiKey: config.aftershipApiKey || "",
       supportUrl: config.supportUrl || "",

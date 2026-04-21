@@ -239,9 +239,12 @@ const FOOTWEAR_TRIGGERS = /\b(shoe|shoes|footwear|sneaker|sneakers|sandal|sandal
 const ORTHOTIC_TRIGGERS = /\b(orthotic|orthotics|insole|insoles|insert|inserts|arch support|plantar|foot pain|heel pain|fasciitis|metatarsal)\b/i;
 const DEFAULT_FOOTWEAR_EXCLUDE = "orthotic,orthotics,insole,insoles,insert,inserts";
 
-function defaultFootwearExclusion(fullContext) {
-  if (!FOOTWEAR_TRIGGERS.test(fullContext)) return null;
-  if (ORTHOTIC_TRIGGERS.test(fullContext)) return null;
+function defaultFootwearExclusion(query, userText) {
+  const trigger = `${query} ${userText || ""}`;
+  if (!FOOTWEAR_TRIGGERS.test(trigger)) return null;
+  // Only suppress when the USER (not the AI's own earlier prompt) mentioned orthotics
+  if (ORTHOTIC_TRIGGERS.test(query)) return null;
+  if (ORTHOTIC_TRIGGERS.test(userText || "")) return null;
   return DEFAULT_FOOTWEAR_EXCLUDE;
 }
 
@@ -289,7 +292,7 @@ function genderFilterClause(gender) {
   return clause;
 }
 
-async function searchProducts({ query, limit, filters }, { shop, deduplicateColors, sessionGender, categoryExclusions, conversationText }) {
+async function searchProducts({ query, limit, filters }, { shop, deduplicateColors, sessionGender, categoryExclusions, conversationText, userText }) {
   const q = String(query || "").trim();
   if (!q) return { products: [] };
   const max = Math.min(Math.max(parseInt(limit, 10) || 6, 1), 10);
@@ -310,12 +313,10 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
 
   const fullContext = `${q} ${conversationText || ""}`;
   const merchantExclude = matchesCategoryRule(fullContext, categoryExclusions);
-  const defaultExclude = merchantExclude ? null : defaultFootwearExclusion(fullContext);
+  const defaultExclude = merchantExclude ? null : defaultFootwearExclusion(q, userText);
   const excludeTerms = merchantExclude || defaultExclude;
   const exclusionClause = excludeTerms ? buildExclusionClause(excludeTerms) : null;
-  if (defaultExclude) {
-    console.log(`[footwear-guard] query="${q}" excluding=${defaultExclude}`);
-  }
+  console.log(`[search] query="${q}" gender=${effectiveGender || "-"} footwearGuard=${defaultExclude ? "on" : "off"} merchantExclude=${merchantExclude || "-"}`);
 
   const where = {
     shop,
