@@ -28,6 +28,8 @@ export const loader = async ({ request }) => {
   const config = await getShopConfig(session.shop);
   let hideOnUrls = [];
   try { hideOnUrls = JSON.parse(config.hideOnUrls || "[]"); } catch { hideOnUrls = []; }
+  let categoryExclusions = [];
+  try { categoryExclusions = JSON.parse(config.categoryExclusions || "[]"); } catch { categoryExclusions = []; }
 
   return {
     hasAnthropicKey: config.anthropicApiKey !== "",
@@ -38,6 +40,7 @@ export const loader = async ({ request }) => {
     hasYotpoKey: config.yotpoApiKey !== "",
     hasAftershipKey: config.aftershipApiKey !== "",
     hideOnUrls,
+    categoryExclusions,
   };
 };
 
@@ -74,6 +77,14 @@ export const action = async ({ request }) => {
       const parsed = JSON.parse(hideUrlsRaw);
       if (Array.isArray(parsed)) data.hideOnUrls = JSON.stringify(parsed);
     } catch { /* ignore invalid JSON */ }
+  }
+
+  const catExRaw = formData.get("categoryExclusions");
+  if (catExRaw !== null) {
+    try {
+      const parsed = JSON.parse(catExRaw);
+      if (Array.isArray(parsed)) data.categoryExclusions = JSON.stringify(parsed);
+    } catch { /* ignore */ }
   }
 
   const followUps = formData.get("showFollowUps");
@@ -195,8 +206,80 @@ function HideUrlsPanel({ initial }) {
   );
 }
 
+function CategoryExclusionsPanel({ initial }) {
+  const [rules, setRules] = useState(initial || []);
+  const [whenQuery, setWhenQuery] = useState("");
+  const [excludeTerms, setExcludeTerms] = useState("");
+
+  const addRule = () => {
+    const w = whenQuery.trim();
+    const e = excludeTerms.trim();
+    if (!w || !e) return;
+    setRules([...rules, { whenQuery: w, excludeTerms: e }]);
+    setWhenQuery("");
+    setExcludeTerms("");
+  };
+
+  const removeRule = (idx) => setRules(rules.filter((_, i) => i !== idx));
+
+  return (
+    <Card>
+      <BlockStack gap="400">
+        <BlockStack gap="100">
+          <Text as="h2" variant="headingMd">Search category rules</Text>
+          <Text as="p" tone="subdued" variant="bodySm">
+            Prevent product categories from mixing in search results. When a customer searches for one category, products from the excluded category won't appear. Use comma-separated keywords.
+          </Text>
+        </BlockStack>
+
+        {rules.length > 0 && (
+          <BlockStack gap="200">
+            {rules.map((r, i) => (
+              <InlineStack key={i} gap="200" blockAlign="center" wrap={false}>
+                <Badge tone="info">When</Badge>
+                <Text as="span" variant="bodySm"><code>{r.whenQuery}</code></Text>
+                <Badge tone="critical">Exclude</Badge>
+                <Text as="span" variant="bodySm"><code>{r.excludeTerms}</code></Text>
+                <Button variant="plain" tone="critical" onClick={() => removeRule(i)}>Remove</Button>
+              </InlineStack>
+            ))}
+          </BlockStack>
+        )}
+
+        <Divider />
+
+        <InlineStack gap="200" blockAlign="end" wrap={false}>
+          <div style={{ flex: 1 }}>
+            <TextField
+              label="When query mentions"
+              value={whenQuery}
+              onChange={setWhenQuery}
+              placeholder="orthotic, insole, arch support"
+              autoComplete="off"
+              helpText="Comma-separated keywords that trigger this rule"
+            />
+          </div>
+          <div style={{ flex: 1 }}>
+            <TextField
+              label="Exclude products containing"
+              value={excludeTerms}
+              onChange={setExcludeTerms}
+              placeholder="sneaker, sandal, boot, shoe"
+              autoComplete="off"
+              helpText="Comma-separated keywords — matching products are hidden"
+            />
+          </div>
+          <Button onClick={addRule} disabled={!whenQuery.trim() || !excludeTerms.trim()}>Add</Button>
+        </InlineStack>
+
+        <input type="hidden" name="categoryExclusions" value={JSON.stringify(rules)} />
+      </BlockStack>
+    </Card>
+  );
+}
+
 export default function ApiKeys() {
-  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls } = useLoaderData();
+  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, categoryExclusions } = useLoaderData();
   const actionData = useActionData();
   const nav = useNavigation();
   const saving = nav.state === "submitting";
@@ -370,6 +453,13 @@ export default function ApiKeys() {
                   </BlockStack>
                 </BlockStack>
               </Card>
+            </Layout.AnnotatedSection>
+
+            <Layout.AnnotatedSection
+              title="Search category rules"
+              description="Prevent product categories from mixing in chat results. For example: when a customer asks about orthotics, exclude shoes from results (and vice versa)."
+            >
+              <CategoryExclusionsPanel initial={categoryExclusions} />
             </Layout.AnnotatedSection>
 
             <Layout.AnnotatedSection
