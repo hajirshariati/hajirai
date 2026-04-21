@@ -311,8 +311,8 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
   const keywords = extractKeywords(searchQuery);
   if (keywords.length === 0 && !effectiveGender) return { products: [] };
 
-  const fullContext = `${q} ${conversationText || ""}`;
-  const merchantExclude = matchesCategoryRule(fullContext, categoryExclusions);
+  const userIntentText = `${q} ${userText || ""}`;
+  const merchantExclude = matchesCategoryRule(userIntentText, categoryExclusions);
   const defaultExclude = merchantExclude ? null : defaultFootwearExclusion(q, userText);
   const excludeTerms = merchantExclude || defaultExclude;
   const exclusionClause = excludeTerms ? buildExclusionClause(excludeTerms) : null;
