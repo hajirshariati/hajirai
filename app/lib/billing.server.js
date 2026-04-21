@@ -16,7 +16,7 @@ export function isCompedShop(shop) {
 }
 
 export async function getShopPlan(shop) {
-  if (isCompedShop(shop)) return getPlan("pro");
+  if (isCompedShop(shop)) return getPlan("enterprise");
   const config = await prisma.shopConfig.findUnique({ where: { shop } });
   const planId = config?.plan || "free";
   return getPlan(planId);
