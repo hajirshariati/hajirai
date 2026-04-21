@@ -216,6 +216,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   let fullResponseText = "";
 
   for (let hop = 0; hop < MAX_TOOL_HOPS; hop++) {
+    const hopStart = Date.now();
     const stream = anthropic.messages.stream({
       model,
       max_tokens: MAX_TOKENS,
@@ -232,6 +233,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
 
     const final = await stream.finalMessage();
     addUsage(totalUsage, final.usage || {});
+    console.log(`[chat] hop=${hop} stop=${final.stop_reason} ms=${Date.now() - hopStart} textLen=${fullResponseText.length}`);
 
     if (final.stop_reason !== "tool_use") {
       break;
@@ -332,6 +334,12 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     supportCTA = result.cta;
   }
 
+  const pool = Array.from(allProductPool.values());
+
+  if (!fullResponseText && pool.length === 0) {
+    fullResponseText = "I'm not finding a great match for that right now. Want to try a different style, or I can connect you with our support team?";
+  }
+
   if (fullResponseText) {
     controller.enqueue(encoder.encode(sseChunk({ type: "text", text: fullResponseText })));
   }
@@ -339,8 +347,6 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   if (supportCTA) {
     controller.enqueue(encoder.encode(sseChunk({ type: "link", url: supportCTA.url, label: supportCTA.label })));
   }
-
-  const pool = Array.from(allProductPool.values());
 
   if (pool.length > 0 && fullResponseText) {
     const textLower = fullResponseText.toLowerCase();

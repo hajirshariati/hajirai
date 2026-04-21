@@ -284,9 +284,23 @@ inputEl.disabled=true;inputEl.placeholder='Choose an option above';sendBtn.disab
 saveH(messages);
 }
 
+var streamWatchdog=null;
+function clearWatchdog(){if(streamWatchdog){clearTimeout(streamWatchdog);streamWatchdog=null}}
 function streamResponse(msg){
 if(abortCtrl)abortCtrl.abort();
+clearWatchdog();
 abortCtrl=new AbortController();
+streamWatchdog=setTimeout(function(){
+  if(isStreaming&&abortCtrl){
+    try{abortCtrl.abort()}catch(e){}
+    typingEl.classList.remove('visible');isStreaming=false;sendBtn.disabled=false;
+    var em='This is taking longer than expected. Please try again.';
+    var md=appendMsg('assistant',em);
+    var bb=$('.ai-chat-msg-bubble',md);
+    if(bb)bb.insertAdjacentHTML('beforeend',deadEndHtml());
+    inputEl.disabled=true;inputEl.placeholder='Choose an option above';sendBtn.disabled=true;
+  }
+},90000);
 var body={message:msg,session_id:getSess(),shop_domain:SHOP,assistant_name:NAME,history:messages.slice(-20).map(function(m){return{role:m.role,content:m.content}})};
 fetch(CHAT_URL,{method:'POST',headers:{'Content-Type':'application/json','Accept':'text/event-stream'},body:JSON.stringify(body),signal:abortCtrl.signal}).then(function(r){
 if(!r.ok){
@@ -299,6 +313,7 @@ var ct=r.headers.get('content-type')||'';
 if(ct.includes('text/event-stream')||ct.includes('text/plain'))return handleSSE(r);
 return r.json().then(function(d){handleJSON(d)});
 }).catch(function(e){
+clearWatchdog();
 if(e.name==='AbortError')return;
 typingEl.classList.remove('visible');isStreaming=false;sendBtn.disabled=false;
 showHighTraffic();
@@ -365,7 +380,7 @@ if(p.type==='error'){
 }
 }catch(e){}
 }return false}
-function read(){reader.read().then(function(r){if(r.done){if(full)finish(full,prods,msgDiv,buffSugg);return}var done=proc(decoder.decode(r.value,{stream:true}));if(!done)read()}).catch(function(e){if(e.name!=='AbortError')finish(full||'Connection lost.',prods,msgDiv,[])})}
+function read(){reader.read().then(function(r){if(r.done){finish(full||'I\'m having trouble right now. Please try again.',prods,msgDiv,buffSugg,linkCTA);return}var done=proc(decoder.decode(r.value,{stream:true}));if(!done)read()}).catch(function(e){if(e.name!=='AbortError')finish(full||'Connection lost. Please try again.',prods,msgDiv,buffSugg,linkCTA)})}
 read();
 }
 
@@ -379,6 +394,7 @@ isStreaming=false;sendBtn.disabled=false;
 }
 
 function finish(text,prods,md2,sugg,linkCTA){
+clearWatchdog();
 typingEl.classList.remove('visible');isStreaming=false;sendBtn.disabled=false;
 var mDiv=md2;
 var choices=[];

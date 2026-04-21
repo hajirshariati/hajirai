@@ -269,6 +269,14 @@ export default function Knowledge() {
           </Box>
         </Banner>
 
+        <Banner title="AI guidance — soft rule" tone="warning">
+          <Text as="p">
+            The AI reads these files for context, but <strong>hard rules in Catalog → Search & display
+            take priority</strong>. For example, if a category is excluded there, the AI won't show
+            those products even if a knowledge file mentions them.
+          </Text>
+        </Banner>
+
         {actionData?.success && dismissedBanner !== actionData.message && (
           <Banner
             title={actionData.message}
