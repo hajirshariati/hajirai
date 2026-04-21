@@ -269,22 +269,12 @@ function genderFilterClause(gender) {
     ],
   };
   if (opposite) {
-    clause.OR.push(
-      {
-        AND: [
-          { title: { contains: want, mode: "insensitive" } },
-          { NOT: { title: { contains: opposite, mode: "insensitive" } } },
-        ],
-      },
-      {
-        AND: [
-          { NOT: { title: { contains: want, mode: "insensitive" } } },
-          { NOT: { title: { contains: opposite, mode: "insensitive" } } },
-          { NOT: { title: { contains: `${want}'s`, mode: "insensitive" } } },
-          { NOT: { title: { contains: `${opposite}'s`, mode: "insensitive" } } },
-        ],
-      },
-    );
+    clause.OR.push({
+      AND: [
+        { title: { contains: `${want}'s`, mode: "insensitive" } },
+        { NOT: { title: { contains: `${opposite}'s`, mode: "insensitive" } } },
+      ],
+    });
   }
   return clause;
 }
@@ -392,12 +382,17 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
       const attrs = p.attributesJson || {};
       const gVal = attrs.gender || attrs.gender_fallback || "";
       const gStr = Array.isArray(gVal) ? gVal.join(" ").toLowerCase() : String(gVal).toLowerCase();
-      if (gStr.includes(want)) return true;
-      if (opposite && gStr.includes(opposite)) return false;
       const titleLow = (p.title || "").toLowerCase();
-      if (opposite && titleLow.includes(opposite)) return false;
-      if (titleLow.includes(want)) return true;
-      return !opposite || !gStr;
+
+      if (gStr.includes("unisex")) return true;
+
+      if (opposite && gStr && gStr.includes(opposite) && !gStr.includes(want)) return false;
+      if (gStr.includes(want)) return true;
+
+      if (opposite && titleLow.includes(`${opposite}'s`)) return false;
+      if (titleLow.includes(`${want}'s`)) return true;
+
+      return false;
     });
   }
 
