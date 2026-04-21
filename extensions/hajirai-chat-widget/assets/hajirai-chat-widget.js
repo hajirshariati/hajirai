@@ -332,12 +332,10 @@ submitBtn.addEventListener('click',function(){
   var phone=(phoneIn.value||'').trim();
   var profileAttrs={email:email};
   if(phone)profileAttrs.phone_number=phone;
-  var subs={email:{marketing:{consent:'SUBSCRIBED'}}};
-  if(phone)subs.sms={marketing:{consent:'SUBSCRIBED'}};
   fetch('https://a.klaviyo.com/client/subscriptions/?company_id='+encodeURIComponent(KLAVIYO_COMPANY_ID),{
     method:'POST',
     headers:{'Content-Type':'application/json','revision':'2024-10-15'},
-    body:JSON.stringify({data:{type:'subscription',attributes:{custom_source:'ShopAgent Chat',profile:{data:{type:'profile',attributes:profileAttrs}},email:{marketing:{consent:'SUBSCRIBED'}},sms:phone?{marketing:{consent:'SUBSCRIBED'}}:undefined},relationships:{list:{data:{type:'list',id:KLAVIYO_LIST_ID}}}}})
+    body:JSON.stringify({data:{type:'subscription',attributes:{custom_source:'ShopAgent Chat',profile:{data:{type:'profile',attributes:profileAttrs}}},relationships:{list:{data:{type:'list',id:KLAVIYO_LIST_ID}}}}})
   }).then(function(r){
     if(r.ok||r.status===202){
       form.innerHTML='<div style="text-align:center;padding:12px;color:#2d6b4f;font-weight:600;font-size:14px">You\'re subscribed! Check your inbox for a confirmation.</div>';
