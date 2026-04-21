@@ -283,7 +283,7 @@ function genderFilterClause(gender) {
   return clause;
 }
 
-async function searchProducts({ query, limit, filters }, { shop, deduplicateColors, sessionGender }) {
+async function searchProducts({ query, limit, filters }, { shop, deduplicateColors, sessionGender, sessionOrthoticIntent }) {
   const q = String(query || "").trim();
   if (!q) return { products: [] };
   const max = Math.min(Math.max(parseInt(limit, 10) || 6, 1), 10);
@@ -297,7 +297,7 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
   if (keywords.length === 0 && !effectiveGender) return { products: [] };
 
   const wantsShoes = SHOE_TERMS.test(q) && !ORTHOTIC_TERMS.test(q);
-  const wantsOrthotics = ORTHOTIC_TERMS.test(q);
+  const wantsOrthotics = ORTHOTIC_TERMS.test(q) || sessionOrthoticIntent;
 
   const where = {
     shop,
