@@ -169,34 +169,26 @@ function extractKeywords(q) {
     .map((w) => POSSESSIVE_STRIP[w] || w);
 }
 
-const SYNONYMS = {
-  shoe: ["sneaker", "sandal", "boot", "slipper", "loafer", "flat", "heel", "clog", "mule", "wedge", "slide", "oxford", "moccasin"],
-  shoes: ["sneaker", "sneakers", "sandal", "sandals", "boot", "boots", "slipper", "slippers", "loafer", "loafers", "flat", "flats", "heel", "heels", "clog", "clogs", "mule", "mules", "wedge", "wedges", "slide", "slides", "oxford", "moccasin"],
-  footwear: ["sneaker", "sneakers", "sandal", "sandals", "boot", "boots", "slipper", "slippers", "shoe", "shoes", "wedge", "wedges", "slide", "slides"],
-  sneakers: ["sneaker"],
-  sneaker: ["sneakers"],
-  sandals: ["sandal"],
-  sandal: ["sandals"],
-  boots: ["boot"],
-  boot: ["boots"],
-  slippers: ["slipper"],
-  slipper: ["slippers"],
-  loafers: ["loafer"],
-  loafer: ["loafers"],
-  wedges: ["wedge"],
-  wedge: ["wedges"],
-  slides: ["slide"],
-  slide: ["slides"],
-  heels: ["heel"],
-  heel: ["heels"],
-  flats: ["flat"],
-  flat: ["flats"],
-};
+// Merchant-configured via Rules & Knowledge → Query Synonyms.
+// Shape: [{ term: "shoe", expandsTo: ["sneaker", "sandal"] }, ...]
+function buildSynonymMap(querySynonyms) {
+  const map = {};
+  if (!Array.isArray(querySynonyms)) return map;
+  for (const entry of querySynonyms) {
+    const term = String(entry?.term || "").trim().toLowerCase();
+    const expands = Array.isArray(entry?.expandsTo)
+      ? entry.expandsTo.map((s) => String(s).trim().toLowerCase()).filter(Boolean)
+      : [];
+    if (!term || expands.length === 0) continue;
+    map[term] = expands;
+  }
+  return map;
+}
 
-function keywordMatchClause(kw) {
+function keywordMatchClause(kw, synonymMap) {
   const gendered = GENDERED_SEARCH[kw];
   const searchTerms = gendered || [kw];
-  const synonymTerms = SYNONYMS[kw] || [];
+  const synonymTerms = synonymMap?.[kw] || [];
   const allTerms = [...searchTerms, ...synonymTerms];
 
   const clauses = [];
@@ -223,44 +215,31 @@ function buildExclusionClause(excludeTerms) {
   };
 }
 
-const SHOE_TYPE_RE = /\b(sneaker|sandal|boot|shoe|slipper|slide|wedge|loafer|heel|flat|clog|mule|oxford|moccasin)s?\b/i;
-
-function isShoeExclusion(excludeTerms) {
-  return SHOE_TYPE_RE.test(excludeTerms || "");
+function splitCsv(raw) {
+  return String(raw || "")
+    .split(",")
+    .map((t) => t.trim().toLowerCase())
+    .filter(Boolean);
 }
 
-function matchesCategoryRule(text, rules, { skipShoeExclusions = false } = {}) {
+// Merchant-configured via Rules & Knowledge → Search Rules.
+// Each rule: { whenQuery, excludeTerms, overrideTriggers? }
+// - whenQuery: comma-separated keywords; if any appears in the conversation, the rule fires
+// - excludeTerms: comma-separated terms; matching products are hidden from results
+// - overrideTriggers (optional): comma-separated keywords; if any appears in the user's
+//   latest message, the rule is skipped for this turn
+function matchesCategoryRule(text, rules, userText = "") {
   if (!rules || !Array.isArray(rules)) return null;
   const lower = text.toLowerCase();
+  const userLower = (userText || "").toLowerCase();
   for (const rule of rules) {
-    const triggers = (rule.whenQuery || "").split(",").map((t) => t.trim().toLowerCase()).filter(Boolean);
-    if (triggers.some((t) => lower.includes(t))) {
-      // Customer explicitly picked "New Footwear" — skip rules that would hide all shoes
-      if (skipShoeExclusions && isShoeExclusion(rule.excludeTerms)) continue;
-      return rule.excludeTerms;
-    }
+    const triggers = splitCsv(rule.whenQuery);
+    if (!triggers.some((t) => lower.includes(t))) continue;
+    const overrides = splitCsv(rule.overrideTriggers);
+    if (overrides.length > 0 && overrides.some((o) => userLower.includes(o))) continue;
+    return rule.excludeTerms;
   }
   return null;
-}
-
-const FOOTWEAR_TRIGGERS = /\b(shoe|shoes|footwear|sneaker|sneakers|sandal|sandals|boot|boots|loafer|loafers|slipper|slippers|heel|heels|flat|flats|clog|clogs|mule|mules|wedge|wedges|slide|slides|oxford|moccasin|new footwear)\b/i;
-const ORTHOTIC_TRIGGERS = /\b(orthotic|orthotics|insole|insoles|insert|inserts|arch support|plantar|foot pain|heel pain|fasciitis|metatarsal)\b/i;
-const EXPLICIT_FOOTWEAR_INTENT = /\bnew (footwear|shoes)\b/i;
-const DEFAULT_FOOTWEAR_EXCLUDE = "orthotic,orthotics,insole,insoles,insert,inserts";
-
-function hasExplicitFootwearIntent(userText) {
-  return Boolean(userText) && EXPLICIT_FOOTWEAR_INTENT.test(userText);
-}
-
-function defaultFootwearExclusion(query, userText) {
-  const trigger = `${query} ${userText || ""}`;
-  if (!FOOTWEAR_TRIGGERS.test(trigger)) return null;
-  // Explicit "New Footwear" button click overrides any orthotic/pain mentions
-  if (hasExplicitFootwearIntent(userText)) return DEFAULT_FOOTWEAR_EXCLUDE;
-  // Only suppress when the USER (not the AI's own earlier prompt) mentioned orthotics
-  if (ORTHOTIC_TRIGGERS.test(query)) return null;
-  if (ORTHOTIC_TRIGGERS.test(userText || "")) return null;
-  return DEFAULT_FOOTWEAR_EXCLUDE;
 }
 
 const GENDER_DETECT = [
@@ -307,7 +286,7 @@ function genderFilterClause(gender) {
   return clause;
 }
 
-async function searchProducts({ query, limit, filters }, { shop, deduplicateColors, sessionGender, categoryExclusions, conversationText, userText }) {
+async function searchProducts({ query, limit, filters }, { shop, deduplicateColors, sessionGender, categoryExclusions, querySynonyms, conversationText, userText }) {
   const q = String(query || "").trim();
   if (!q) return { products: [] };
   const max = Math.min(Math.max(parseInt(limit, 10) || 6, 1), 10);
@@ -326,18 +305,16 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
   const keywords = extractKeywords(searchQuery);
   if (keywords.length === 0 && !effectiveGender) return { products: [] };
 
+  const synonymMap = buildSynonymMap(querySynonyms);
   const userIntentText = `${q} ${userText || ""}`;
-  const explicitFootwear = hasExplicitFootwearIntent(userText);
-  const merchantExclude = matchesCategoryRule(userIntentText, categoryExclusions, { skipShoeExclusions: explicitFootwear });
-  const defaultExclude = merchantExclude ? null : defaultFootwearExclusion(q, userText);
-  const excludeTerms = merchantExclude || defaultExclude;
-  const exclusionClause = excludeTerms ? buildExclusionClause(excludeTerms) : null;
-  console.log(`[search] query="${q}" gender=${effectiveGender || "-"} explicitFootwear=${explicitFootwear} footwearGuard=${defaultExclude ? "on" : "off"} merchantExclude=${merchantExclude || "-"}`);
+  const merchantExclude = matchesCategoryRule(userIntentText, categoryExclusions, userText);
+  const exclusionClause = merchantExclude ? buildExclusionClause(merchantExclude) : null;
+  console.log(`[search] query="${q}" gender=${effectiveGender || "-"} rule=${merchantExclude || "-"}`);
 
   const where = {
     shop,
     NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } },
-    AND: keywords.length > 0 ? keywords.map(keywordMatchClause) : [],
+    AND: keywords.length > 0 ? keywords.map((kw) => keywordMatchClause(kw, synonymMap)) : [],
   };
 
   if (effectiveGender) {
@@ -383,7 +360,7 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
     const fallbackWhere = {
       shop,
       NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } },
-      OR: keywords.map(keywordMatchClause),
+      OR: keywords.map((kw) => keywordMatchClause(kw, synonymMap)),
     };
     const fallbackAnd = [];
     if (effectiveGender) fallbackAnd.push(genderFilterClause(effectiveGender));

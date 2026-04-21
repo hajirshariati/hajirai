@@ -246,7 +246,7 @@ export default function Home() {
               title="Upload extra knowledge (optional)"
               description="FAQs, brand voice, sizing guides, product specs — CSV files with a SKU column are automatically linked to your catalog."
               actionLabel={fileCount > 0 ? "Manage files" : "Upload"}
-              actionUrl="/app/knowledge"
+              actionUrl="/app/rules-knowledge"
             />
           </BlockStack>
         </BlockStack>
@@ -255,7 +255,7 @@ export default function Home() {
 
         <BlockStack gap="300">
           <Text as="h2" variant="headingMd">Quick actions</Text>
-          <InlineGrid columns={{ xs: 1, sm: 2, md: 4 }} gap="400">
+          <InlineGrid columns={{ xs: 1, sm: 2, md: 3 }} gap="400">
             <QuickActionCard
               title="Settings"
               description="AI engine and model routing strategy."
@@ -263,16 +263,10 @@ export default function Home() {
               actionUrl="/app/api-keys"
             />
             <QuickActionCard
-              title="Knowledge Base"
-              description="Upload CSVs and text files with extra context."
-              actionLabel="Upload files"
-              actionUrl="/app/knowledge"
-            />
-            <QuickActionCard
-              title="Catalog"
-              description="View synced products and trigger a resync."
-              actionLabel="View catalog"
-              actionUrl="/app/catalog"
+              title="Rules & Knowledge"
+              description="Search rules, synonyms, attributes, files, and catalog sync — all in one place."
+              actionLabel="Open"
+              actionUrl="/app/rules-knowledge"
             />
             <QuickActionCard
               title="Analytics"

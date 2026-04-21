@@ -472,7 +472,20 @@ export const action = async ({ request }) => {
       getAttributeMappings(session.shop),
     ]);
     const attributeNames = attrMappings.map((m) => m.attribute);
-    const systemPrompt = buildSystemPrompt({ config, knowledge, shop: session.shop, attributeNames });
+
+    let categoryExclusions = [];
+    try { categoryExclusions = JSON.parse(config.categoryExclusions || "[]"); } catch { /* */ }
+    let querySynonyms = [];
+    try { querySynonyms = JSON.parse(config.querySynonyms || "[]"); } catch { /* */ }
+
+    const systemPrompt = buildSystemPrompt({
+      config,
+      knowledge,
+      shop: session.shop,
+      attributeNames,
+      categoryExclusions,
+      querySynonyms,
+    });
 
     const history = sanitizeHistory(body.history);
     const model = chooseModel(config, String(body.message), history);
@@ -483,8 +496,6 @@ export const action = async ({ request }) => {
     const sessionGender = detectGenderFromHistory(messages);
     const conversationText = messages.map((m) => typeof m.content === "string" ? m.content : "").join(" ");
     const userText = messages.filter((m) => m.role === "user").map((m) => typeof m.content === "string" ? m.content : "").join(" ");
-    let categoryExclusions = [];
-    try { categoryExclusions = JSON.parse(config.categoryExclusions || "[]"); } catch { /* */ }
 
     const anthropic = new Anthropic({ apiKey: config.anthropicApiKey });
     const ctx = {
@@ -492,6 +503,7 @@ export const action = async ({ request }) => {
       deduplicateColors: config.deduplicateColors,
       sessionGender,
       categoryExclusions,
+      querySynonyms,
       conversationText,
       userText,
       yotpoApiKey: config.yotpoApiKey || "",
