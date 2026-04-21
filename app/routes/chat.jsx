@@ -120,13 +120,33 @@ function addUsage(acc, usage) {
   acc.cache_read_input_tokens += usage.cache_read_input_tokens || 0;
 }
 
-function scoreCardAgainstText(card, textLower) {
+function scoreCardAgainstText(card, textLower, userTextLower) {
   const raw = card.title.toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter((w) => w.length > 1);
   const generic = new Set(["the", "a", "an", "for", "and", "or", "in", "on", "with", "men", "mens", "women", "womens", "black", "white", "tan", "brown", "red", "blue", "grey", "gray", "pink", "dark", "light"]);
   const nameWords = raw.filter((w) => !generic.has(w));
-  if (nameWords.length === 0) return 0;
-  const hits = nameWords.filter((w) => textLower.includes(w)).length;
-  return hits / nameWords.length;
+  const titleScore = nameWords.length === 0 ? 0 : nameWords.filter((w) => textLower.includes(w)).length / nameWords.length;
+
+  // If the card came from a search whose query term appears in this card's
+  // description snippet, boost it — it's a direct textual match for what the
+  // user asked about (e.g. "UltraSKY" asked, description contains "UltraSKY").
+  let queryScore = 0;
+  const snippet = (card._descriptionSnippet || "").toLowerCase();
+  const searchQ = (card._searchQuery || "").toLowerCase().trim();
+  if (snippet && userTextLower) {
+    const distinctive = userTextLower
+      .replace(/[^a-z0-9\s]/g, " ")
+      .split(/\s+/)
+      .filter((w) => w.length >= 4 && !generic.has(w) && !["what", "does", "mean", "tell", "about", "show", "find"].includes(w));
+    if (distinctive.length > 0) {
+      const hits = distinctive.filter((w) => snippet.includes(w)).length;
+      queryScore = hits / distinctive.length;
+    }
+  }
+  if (snippet && searchQ && snippet.includes(searchQ)) {
+    queryScore = Math.max(queryScore, 1);
+  }
+
+  return Math.max(titleScore, queryScore);
 }
 
 const SKU_PATTERN = /\b[A-Z]{1,2}\d{3,5}[A-Z]?\b/g;
@@ -402,9 +422,10 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     const textLower = fullResponseText.toLowerCase();
     const saysNoMatch = /\b(don't (?:have|see|carry)|not (?:see|carry|have)|don't appear|we don't|no .{0,20} available)\b/i.test(fullResponseText);
 
+    const userTextLower = (ctx.userText || "").toLowerCase();
     const scored = pool.map((card) => ({
       card,
-      score: scoreCardAgainstText(card, textLower),
+      score: scoreCardAgainstText(card, textLower, userTextLower),
     }));
     scored.sort((a, b) => b.score - a.score);
 
@@ -424,7 +445,8 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         const key = c.handle || c.title;
         if (seen.has(key)) continue;
         seen.add(key);
-        deduped.push(c);
+        const { _descriptionSnippet, _searchQuery, ...publicCard } = c;
+        deduped.push(publicCard);
       }
       controller.enqueue(encoder.encode(sseChunk({ type: "products", products: deduped })));
     }

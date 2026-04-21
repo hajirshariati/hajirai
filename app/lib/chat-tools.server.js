@@ -808,6 +808,7 @@ const MAX_PRODUCT_CARDS = 10;
 export function extractProductCards(name, result) {
   if (!result || result.error) return [];
   if (name === "search_products" && Array.isArray(result.products)) {
+    const query = result.query || "";
     return result.products.slice(0, MAX_PRODUCT_CARDS).map((p) => ({
       title: p.title,
       url: p.url,
@@ -815,6 +816,8 @@ export function extractProductCards(name, result) {
       image: p.image || "",
       price_formatted: p.priceRange || (p.price ? `$${parseFloat(p.price).toFixed(2)}` : ""),
       compare_at_price: p.compareAtPrice ? Math.round(parseFloat(p.compareAtPrice) * 100) : undefined,
+      _descriptionSnippet: p.descriptionSnippet || "",
+      _searchQuery: query,
     }));
   }
   if (name === "get_product_details" && result.handle) {
