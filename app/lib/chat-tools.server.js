@@ -185,11 +185,35 @@ function buildSynonymMap(querySynonyms) {
   return map;
 }
 
+// Basic English plural/singular pair. Catalogs mix "Sandal" (singular title)
+// with "sandals" (plural category/tag), so every keyword is searched in both
+// forms to avoid 0-result queries on trivial inflection mismatches.
+function inflectVariants(term) {
+  const t = String(term || "").trim();
+  if (!t) return [];
+  const out = new Set([t]);
+  if (t.length > 3 && t.endsWith("s") && !t.endsWith("ss") && !t.endsWith("us")) {
+    out.add(t.slice(0, -1));
+  } else if (t.length > 2 && !t.endsWith("s")) {
+    out.add(t + "s");
+  }
+  return Array.from(out);
+}
+
 function keywordMatchClause(kw, synonymMap) {
   const gendered = GENDERED_SEARCH[kw];
-  const searchTerms = gendered || [kw];
+  const baseTerms = gendered || [kw];
   const synonymTerms = synonymMap?.[kw] || [];
-  const allTerms = [...searchTerms, ...synonymTerms];
+  const seen = new Set();
+  const allTerms = [];
+  for (const t of [...baseTerms, ...synonymTerms]) {
+    for (const v of inflectVariants(t)) {
+      const lower = v.toLowerCase();
+      if (seen.has(lower)) continue;
+      seen.add(lower);
+      allTerms.push(v);
+    }
+  }
 
   const clauses = [];
   for (const t of allTerms) {
