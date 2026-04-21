@@ -235,6 +235,16 @@ function matchesCategoryRule(text, rules) {
   return null;
 }
 
+const FOOTWEAR_TRIGGERS = /\b(shoe|shoes|footwear|sneaker|sneakers|sandal|sandals|boot|boots|loafer|loafers|slipper|slippers|heel|heels|flat|flats|clog|clogs|mule|mules|wedge|wedges|slide|slides|oxford|moccasin|new footwear)\b/i;
+const ORTHOTIC_TRIGGERS = /\b(orthotic|orthotics|insole|insoles|insert|inserts|arch support|plantar|foot pain|heel pain|fasciitis|metatarsal)\b/i;
+const DEFAULT_FOOTWEAR_EXCLUDE = "orthotic,orthotics,insole,insoles,insert,inserts";
+
+function defaultFootwearExclusion(fullContext) {
+  if (!FOOTWEAR_TRIGGERS.test(fullContext)) return null;
+  if (ORTHOTIC_TRIGGERS.test(fullContext)) return null;
+  return DEFAULT_FOOTWEAR_EXCLUDE;
+}
+
 const GENDER_DETECT = [
   { pattern: /\b(men[''']?s|male|guy|dude|dad|father|husband|boyfriend|brother|son|grandpa|grandfather|uncle|nephew|him|his)\b/i, gender: "men", strip: /\b(men[''']?s|mens|male|guy|dude|dad|father|husband|boyfriend|brother|son|grandpa|grandfather|uncle|nephew)\b/gi },
   { pattern: /\b(women[''']?s|female|lady|ladies|mom|mother|wife|girlfriend|sister|daughter|grandma|grandmother|aunt|niece|her|hers)\b/i, gender: "women", strip: /\b(women[''']?s|womens|female|lady|ladies|mom|mother|wife|girlfriend|sister|daughter|grandma|grandmother|aunt|niece)\b/gi },
@@ -299,8 +309,13 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
   if (keywords.length === 0 && !effectiveGender) return { products: [] };
 
   const fullContext = `${q} ${conversationText || ""}`;
-  const excludeTerms = matchesCategoryRule(fullContext, categoryExclusions);
+  const merchantExclude = matchesCategoryRule(fullContext, categoryExclusions);
+  const defaultExclude = merchantExclude ? null : defaultFootwearExclusion(fullContext);
+  const excludeTerms = merchantExclude || defaultExclude;
   const exclusionClause = excludeTerms ? buildExclusionClause(excludeTerms) : null;
+  if (defaultExclude) {
+    console.log(`[footwear-guard] query="${q}" excluding=${defaultExclude}`);
+  }
 
   const where = {
     shop,
