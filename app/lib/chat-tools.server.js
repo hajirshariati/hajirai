@@ -227,11 +227,11 @@ function excludeOrthoticsClause() {
 }
 
 const GENDER_DETECT = [
-  { pattern: /\b(men'?s|male)\b/i, gender: "men", strip: /\b(men'?s|mens|male)\b/gi },
-  { pattern: /\b(women'?s|female|ladies)\b/i, gender: "women", strip: /\b(women'?s|womens|female|ladies)\b/gi },
-  { pattern: /\b(boy'?s|boys)\b/i, gender: "boy", strip: /\b(boy'?s|boys)\b/gi },
-  { pattern: /\b(girl'?s|girls)\b/i, gender: "girl", strip: /\b(girl'?s|girls)\b/gi },
-  { pattern: /\b(kid'?s|kids|children'?s)\b/i, gender: "kid", strip: /\b(kid'?s|kids|children'?s|childrens)\b/gi },
+  { pattern: /\b(men[''']?s|male)\b/i, gender: "men", strip: /\b(men[''']?s|mens|male)\b/gi },
+  { pattern: /\b(women[''']?s|female|ladies)\b/i, gender: "women", strip: /\b(women[''']?s|womens|female|ladies)\b/gi },
+  { pattern: /\b(boy[''']?s|boys)\b/i, gender: "boy", strip: /\b(boy[''']?s|boys)\b/gi },
+  { pattern: /\b(girl[''']?s|girls)\b/i, gender: "girl", strip: /\b(girl[''']?s|girls)\b/gi },
+  { pattern: /\b(kid[''']?s|kids|children[''']?s)\b/i, gender: "kid", strip: /\b(kid[''']?s|kids|children[''']?s|childrens)\b/gi },
 ];
 
 function detectAndStripGender(query) {
@@ -360,6 +360,22 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
         });
       })
     : products;
+
+  if (detected.gender) {
+    const want = detected.gender.toLowerCase();
+    const opposite = want === "men" ? "women" : want === "women" ? "men" : null;
+    filtered = filtered.filter((p) => {
+      const attrs = p.attributesJson || {};
+      const gVal = attrs.gender || attrs.gender_fallback || "";
+      const gStr = Array.isArray(gVal) ? gVal.join(" ").toLowerCase() : String(gVal).toLowerCase();
+      if (gStr.includes(want)) return true;
+      if (opposite && gStr.includes(opposite)) return false;
+      const titleLow = (p.title || "").toLowerCase();
+      if (opposite && titleLow.includes(opposite)) return false;
+      if (titleLow.includes(want)) return true;
+      return !opposite || !gStr;
+    });
+  }
 
   if (deduplicateColors) {
     filtered = deduplicateByColor(filtered);
