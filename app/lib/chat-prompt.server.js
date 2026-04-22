@@ -1,5 +1,6 @@
 const LABELS = {
   faqs: "FAQs & Policies",
+  rules: "Rules & Guidelines",
   brand: "Brand & About",
   products: "Product Details",
   custom: "Custom Knowledge",
