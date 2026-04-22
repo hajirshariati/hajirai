@@ -24,7 +24,7 @@ function cacheSet(key, v) {
   CACHE.set(key, { v, t: Date.now() });
 }
 
-export async function fetchYotpoLoyalty({ apiKey, email }) {
+export async function fetchYotpoLoyalty({ apiKey, guid, email }) {
   if (!apiKey || !email) return null;
   const cacheKey = `${apiKey.slice(0, 8)}:${email}`;
   const cached = cacheGet(cacheKey);
@@ -32,12 +32,12 @@ export async function fetchYotpoLoyalty({ apiKey, email }) {
 
   try {
     const url = `${YOTPO_API}/customers?customer_email=${encodeURIComponent(email)}`;
-    const res = await fetch(url, {
-      headers: {
-        "x-api-key": apiKey,
-        accept: "application/json",
-      },
-    });
+    const headers = {
+      "x-api-key": apiKey,
+      accept: "application/json",
+    };
+    if (guid) headers["x-guid"] = guid;
+    const res = await fetch(url, { headers });
     if (!res.ok) {
       if (res.status === 404) {
         cacheSet(cacheKey, null);

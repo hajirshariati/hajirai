@@ -553,7 +553,7 @@ export const action = async ({ request }) => {
             ? fetchKlaviyoEnrichment({ privateKey: config.klaviyoPrivateKey, email: customerContext._email })
             : Promise.resolve(null),
           config.yotpoLoyaltyApiKey
-            ? fetchYotpoLoyalty({ apiKey: config.yotpoLoyaltyApiKey, email: customerContext._email })
+            ? fetchYotpoLoyalty({ apiKey: config.yotpoLoyaltyApiKey, guid: config.yotpoLoyaltyGuid, email: customerContext._email })
             : Promise.resolve(null),
         ]);
         if (klaviyo) customerContext.klaviyo = klaviyo;
