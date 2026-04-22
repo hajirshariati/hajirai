@@ -425,7 +425,7 @@ const keywords = rawKeywords.filter(
   const where = {
     shop,
     NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } },
-    AND: keywords.length > 0 ? keywords.map((kw) => keywordMatchClause(kw, synonymMap)) : [],
+    OR: keywords.length > 0 ? keywords.map((kw) => keywordMatchClause(kw)) : [],
   };
 
   if (effectiveGender) {
