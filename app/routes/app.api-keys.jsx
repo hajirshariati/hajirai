@@ -41,6 +41,7 @@ export const loader = async ({ request }) => {
     supportLabel: config.supportLabel || "",
     trackingPageUrl: config.trackingPageUrl || "",
     returnsPageUrl: config.returnsPageUrl || "",
+    referralPageUrl: config.referralPageUrl || "",
     promptCaching: config.promptCaching === true,
     klaviyoFormId: config.klaviyoFormId || "",
     klaviyoCompanyId: config.klaviyoCompanyId || "",
@@ -94,6 +95,9 @@ export const action = async ({ request }) => {
 
   const returnsPageUrl = formData.get("returnsPageUrl");
   if (returnsPageUrl !== null) data.returnsPageUrl = returnsPageUrl.trim();
+
+  const referralPageUrl = formData.get("referralPageUrl");
+  if (referralPageUrl !== null) data.referralPageUrl = referralPageUrl.trim();
 
   const klaviyoFormId = formData.get("klaviyoFormId");
   if (klaviyoFormId !== null) data.klaviyoFormId = klaviyoFormId.trim();
@@ -266,7 +270,7 @@ function HideUrlsPanel({ initial }) {
 }
 
 export default function ApiKeys() {
-  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, trackingPageUrl: initTrackingPageUrl, returnsPageUrl: initReturnsPageUrl, promptCaching: initCaching, klaviyoFormId: initKlaviyoFormId, klaviyoCompanyId: initKlaviyoCompanyId, klaviyoListId: initKlaviyoListId, vipModeEnabled: initVipMode, showLoginPill: initShowLoginPill, hasKlaviyoPrivateKey, hasYotpoLoyaltyKey, yotpoLoyaltyGuid: initYotpoLoyaltyGuid, loyaltyDisplay: initLoyaltyDisplay, loyaltyPointsPerDollar: initLoyaltyPointsPerDollar, loyaltyRounding: initLoyaltyRounding } = useLoaderData();
+  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, trackingPageUrl: initTrackingPageUrl, returnsPageUrl: initReturnsPageUrl, referralPageUrl: initReferralPageUrl, promptCaching: initCaching, klaviyoFormId: initKlaviyoFormId, klaviyoCompanyId: initKlaviyoCompanyId, klaviyoListId: initKlaviyoListId, vipModeEnabled: initVipMode, showLoginPill: initShowLoginPill, hasKlaviyoPrivateKey, hasYotpoLoyaltyKey, yotpoLoyaltyGuid: initYotpoLoyaltyGuid, loyaltyDisplay: initLoyaltyDisplay, loyaltyPointsPerDollar: initLoyaltyPointsPerDollar, loyaltyRounding: initLoyaltyRounding } = useLoaderData();
   const actionData = useActionData();
   const nav = useNavigation();
   const saving = nav.state === "submitting";
@@ -282,6 +286,7 @@ export default function ApiKeys() {
   const [supportLabel, setSupportLabel] = useState(initSupportLabel);
   const [trackingPageUrl, setTrackingPageUrl] = useState(initTrackingPageUrl);
   const [returnsPageUrl, setReturnsPageUrl] = useState(initReturnsPageUrl);
+  const [referralPageUrl, setReferralPageUrl] = useState(initReferralPageUrl);
   const [caching, setCaching] = useState(initCaching);
   const [klaviyoFormId, setKlaviyoFormId] = useState(initKlaviyoFormId);
   const [klaviyoCompanyId, setKlaviyoCompanyId] = useState(initKlaviyoCompanyId);
@@ -453,6 +458,14 @@ export default function ApiKeys() {
                     placeholder="https://returns.yourstore.com"
                     autoComplete="off"
                     helpText="AfterShip Returns or similar self-serve portal. When set, logged-in customers asking about returns or exchanges get a pre-filled link to this page (with their order number + email) instead of being routed to the support team."
+                  />
+                  <TextField
+                    label="Referral program page URL"
+                    value={referralPageUrl}
+                    onChange={setReferralPageUrl}
+                    placeholder="https://yourstore.com/pages/refer"
+                    autoComplete="off"
+                    helpText="Your Give-$X-Get-$X / referral landing page. When a customer asks how to refer friends, the AI links them here so they can get their personal referral link and share options. Used as a fallback when the customer's personal link isn't available from Yotpo."
                   />
                 </BlockStack>
               </Card>
@@ -641,6 +654,7 @@ export default function ApiKeys() {
           <input type="hidden" name="supportLabel" value={supportLabel} />
           <input type="hidden" name="trackingPageUrl" value={trackingPageUrl} />
           <input type="hidden" name="returnsPageUrl" value={returnsPageUrl} />
+          <input type="hidden" name="referralPageUrl" value={referralPageUrl} />
           <input type="hidden" name="promptCaching" value={String(caching)} />
           <input type="hidden" name="klaviyoFormId" value={klaviyoFormId} />
           <input type="hidden" name="klaviyoCompanyId" value={klaviyoCompanyId} />

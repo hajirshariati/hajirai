@@ -104,6 +104,7 @@ export function buildSystemPrompt({ config, knowledge, shop, attributeNames, cat
     if (customerContext.klaviyo?.segments && customerContext.klaviyo.segments.length > 0) {
       lines.push(`Klaviyo segments: ${customerContext.klaviyo.segments.join(", ")}. Use these to calibrate tone (e.g. VIP segment → extra warm; Winback segment → re-engage gently; Churn Risk → acknowledge they've been away).`);
     }
+    const referralPageUrl = config?.referralPageUrl || "";
     if (customerContext.loyalty) {
       const l = customerContext.loyalty;
       const displayMode = config?.loyaltyDisplay === "dollars" ? "dollars" : "points";
@@ -126,8 +127,8 @@ export function buildSystemPrompt({ config, knowledge, shop, attributeNames, cat
       }
       if (l.referralUrl) {
         const ref = l.referralUrl;
-        const shareText = "Get $20 off your first Aetrex order!";
-        const mailto = `mailto:?subject=${encodeURIComponent("Get $20 off Aetrex")}&body=${encodeURIComponent(`${shareText} ${ref}`)}`;
+        const shareText = "Check this out — great shoes + a discount on your first order!";
+        const mailto = `mailto:?subject=${encodeURIComponent("A recommendation for you")}&body=${encodeURIComponent(`${shareText} ${ref}`)}`;
         const sms = `sms:?&body=${encodeURIComponent(`${shareText} ${ref}`)}`;
         const whatsapp = `https://wa.me/?text=${encodeURIComponent(`${shareText} ${ref}`)}`;
         lines.push(`Personal referral link: ${ref}`);
@@ -135,6 +136,9 @@ export function buildSystemPrompt({ config, knowledge, shop, attributeNames, cat
         lines.push(`  - Email: ${mailto}`);
         lines.push(`  - Text: ${sms}`);
         lines.push(`  - WhatsApp: ${whatsapp}`);
+      }
+      if (referralPageUrl) {
+        lines.push(`Referral program page URL: ${referralPageUrl}`);
       }
       lines.push(
         displayMode === "dollars"
@@ -168,9 +172,10 @@ export function buildSystemPrompt({ config, knowledge, shop, attributeNames, cat
         "  - NEVER reveal the shipping street address. You may mention the destination city/state if the customer asks where their package is going.",
         "  - TRACKING LINKS: ALWAYS use the `url` value from `fulfillments[].tracking[]` as-is — NEVER build your own URL, never link to fedex.com / ups.com / usps.com / dhl.com directly, never fall back to a carrier homepage. The `url` field has already been pointed at the store's branded tracking page (AfterShip, etc.) when one is configured. Format as '[Track your package](URL)'. If no tracking URL is available on a fulfillment, use the order's top-level `trackingPageUrl` instead.",
         "- If they have loyalty points and ask about rewards, discounts, or how to save, mention their points balance and any redeemable rewards naturally. If they ask how to earn more, suggest their personal referral link.",
-        "- REFERRAL SHARING: when the customer asks about referrals, 'give $20 get $20', referring friends, earning more points, or asks 'how do I share', surface their personal referral link AND include share actions. Format exactly like this when the share URLs are in your context:",
-        "    'Share your link and earn 4,000 points per friend! [Email a friend](MAILTO_URL) • [Text](SMS_URL) • [WhatsApp](WHATSAPP_URL) — or copy this link: REFERRAL_URL'",
-        "  Use the Email/Text/WhatsApp URLs from the 'Share action URLs' block in the VIP Customer Context — they're pre-filled with the customer's own referral link. If the referral link is NOT in the VIP context (new customer, not yet set up), direct them to the referral page URL (merchant's Give $20, Get $20 page) instead.",
+        "- REFERRAL SHARING: when the customer asks about referrals, 'give $20 get $20', referring friends, earning more points, or 'how do I share', your response MUST include a clickable link — never just mention 'the page' without a URL.",
+        "  - IF 'Personal referral link' is in the VIP context: format like this: 'Share your link and earn 4,000 points per friend! [Email](MAILTO_URL) • [Text](SMS_URL) • [WhatsApp](WHATSAPP_URL) — or [open the referral page](REFERRAL_PAGE_URL)'. Use the Email/Text/WhatsApp URLs from the 'Share action URLs' block.",
+        "  - IF 'Personal referral link' is NOT available but 'Referral program page URL' is: link to the page — '[Go to your referral page](REFERRAL_PAGE_URL) to grab your link and share options.' NEVER say 'the page' without a clickable markdown link.",
+        "  - IF neither is available: briefly say our team can set that up for you (support button appears automatically).",
         "- Use Klaviyo segments to calibrate tone, but NEVER reveal segment names to the customer (e.g. don't say 'you're in our Churn Risk segment').",
         "- PRIVACY RULES (MUST follow):",
         "  - NEVER reveal the customer's email, full name, phone number, shipping or billing address, or payment details.",

@@ -99,6 +99,7 @@ model ShopConfig {
   supportLabel        String   @default("Contact customer service")
   trackingPageUrl     String   @default("")
   returnsPageUrl      String   @default("")
+  referralPageUrl     String   @default("")
 
   vipModeEnabled      Boolean  @default(false)
   showLoginPill       Boolean  @default(true)
