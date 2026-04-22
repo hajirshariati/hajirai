@@ -227,18 +227,7 @@ function inflectVariants(term) {
 function keywordMatchClause(kw, synonymMap) {
   const gendered = GENDERED_SEARCH[kw];
   const baseTerms = gendered || [kw];
-  // Look up synonyms under the keyword as-typed AND under each singular/plural
-  // variant — so a single "sandal → slide, flip" entry catches both "sandal"
-  // and "sandals" queries without the merchant having to add two rows.
-  let synonymTerms = [];
-  if (synonymMap) {
-    const seenSyn = new Set();
-    for (const variant of inflectVariants(kw)) {
-      for (const s of synonymMap[variant.toLowerCase()] || []) {
-        if (!seenSyn.has(s)) { seenSyn.add(s); synonymTerms.push(s); }
-      }
-    }
-  }
+  const synonymTerms = synonymMap?.[kw] || [];
   const seen = new Set();
   const allTerms = [];
   for (const t of [...baseTerms, ...synonymTerms]) {
@@ -279,28 +268,11 @@ function keywordMatchClause(kw, synonymMap) {
 function buildExclusionClause(excludeTerms) {
   const terms = excludeTerms.split(",").map((t) => t.trim().toLowerCase()).filter(Boolean);
   if (terms.length === 0) return null;
-  // Exclude based on the CATEGORY metafield, not free-text title matching.
-  // A product titled "Milos Orthotic Men's Slides" has category="sandals";
-  // title-based exclusion would wrongly hide it when the rule excludes
-  // "orthotic" during a sandal search. Shopify's native productType column
-  // is kept as a narrow fallback for products that lack a category metafield.
-  const categoryKeys = ["category", "Category", "category_for_filter", "Category For Filter", "subcategory", "Subcategory"];
   return {
-    AND: terms.flatMap((t) => {
-      const titleCase = t.charAt(0).toUpperCase() + t.slice(1);
-      const cases = Array.from(new Set([t, titleCase, t.toUpperCase()]));
-      const matchClauses = [];
-      for (const key of categoryKeys) {
-        for (const v of cases) {
-          matchClauses.push({ attributesJson: { path: [key], equals: v } });
-          matchClauses.push({ attributesJson: { path: [key], array_contains: [v] } });
-          matchClauses.push({ attributesJson: { path: [key], string_contains: v } });
-        }
-      }
-      matchClauses.push({ productType: { equals: t, mode: "insensitive" } });
-      matchClauses.push({ productType: { equals: titleCase, mode: "insensitive" } });
-      return [{ NOT: { OR: matchClauses } }];
-    }),
+    AND: terms.flatMap((t) => [
+      { NOT: { title: { contains: t, mode: "insensitive" } } },
+      { NOT: { productType: { contains: t, mode: "insensitive" } } },
+    ]),
   };
 }
 
@@ -311,24 +283,12 @@ function splitCsv(raw) {
     .filter(Boolean);
 }
 
-// Word-boundary + singular/plural match for a single override phrase.
-// "shoe" matches "shoe" and "shoes"; "shoes" matches "shoes" and "shoe".
-// "new shoes" matches "new shoes" / "new shoe" but not "newshoes".
-function overrideMatches(userLower, phrase) {
-  if (!phrase) return false;
-  const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const withS = /s$/.test(phrase)
-    ? `(?:${escaped}|${escaped.slice(0, -1)})`
-    : `${escaped}(?:s|es)?`;
-  return new RegExp(`\\b${withS}\\b`).test(userLower);
-}
-
 // Merchant-configured via Rules & Knowledge → Search Rules.
 // Each rule: { whenQuery, excludeTerms, overrideTriggers? }
 // - whenQuery: comma-separated keywords; if any appears in the conversation, the rule fires
 // - excludeTerms: comma-separated terms; matching products are hidden from results
 // - overrideTriggers (optional): comma-separated keywords; if any appears in the user's
-//   latest message (word-boundary, plural-aware), the rule is skipped for this turn
+//   latest message, the rule is skipped for this turn
 function matchesCategoryRule(text, rules, userText = "") {
   if (!rules || !Array.isArray(rules)) return null;
   const lower = text.toLowerCase();
@@ -337,7 +297,7 @@ function matchesCategoryRule(text, rules, userText = "") {
     const triggers = splitCsv(rule.whenQuery);
     if (!triggers.some((t) => lower.includes(t))) continue;
     const overrides = splitCsv(rule.overrideTriggers);
-    if (overrides.length > 0 && overrides.some((o) => overrideMatches(userLower, o))) continue;
+    if (overrides.length > 0 && overrides.some((o) => userLower.includes(o))) continue;
     return rule.excludeTerms;
   }
   return null;
