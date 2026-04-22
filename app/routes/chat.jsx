@@ -270,64 +270,67 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
 
   const activeTools = tools || TOOLS;
 
-let finalText = "";
-
-for (let hop = 0; hop < MAX_TOOL_HOPS; hop++) {
-  const res = await anthropic.messages.create({
-    model,
-    max_tokens: MAX_TOKENS,
-    tools,
-    messages,
-  });
-
-  const stop = res.stop_reason;
-  const text = res.content?.[0]?.text || "";
-
-  console.log(`[chat] hop=${hop} stop=${stop} textLen=${text.length}`);
-
-  // ✅ If model gives final answer → return it
-  if (stop === "end_turn") {
-    finalText = text;
-    break;
-  }
-
-  // ✅ If tool call → execute it
-  if (stop === "tool_use") {
-    const toolCall = res.content.find(c => c.type === "tool_use");
-    const result = await executeTool(toolCall.name, toolCall.input, ctx);
-
-    messages.push({
-      role: "assistant",
-      content: res.content,
+  for (let hop = 0; hop < MAX_TOOL_HOPS; hop++) {
+    const hopStart = Date.now();
+    const stream = anthropic.messages.stream({
+      model,
+      max_tokens: MAX_TOKENS,
+      system,
+      tools: activeTools,
+      messages,
     });
 
+    for await (const event of stream) {
+      if (event.type === "content_block_delta" && event.delta?.type === "text_delta") {
+        fullResponseText += event.delta.text;
+      }
+    }
+
+    const final = await stream.finalMessage();
+    addUsage(totalUsage, final.usage || {});
+    console.log(`[chat] hop=${hop} stop=${final.stop_reason} ms=${Date.now() - hopStart} textLen=${fullResponseText.length}`);
+
+    if (final.stop_reason !== "tool_use") {
+      break;
+    }
+
+    const toolUses = final.content.filter((b) => b.type === "tool_use");
+    if (toolUses.length === 0) break;
+
+    toolCallCount += toolUses.length;
+
+    const results = await Promise.all(
+      toolUses.map((u) => executeTool(u.name, u.input, ctx)),
+    );
+
+    let hopHasProducts = false;
+    for (let i = 0; i < toolUses.length; i++) {
+      const cards = extractProductCards(toolUses[i].name, results[i]);
+      for (const c of cards) {
+        const key = c.handle || c.title;
+        if (!allProductPool.has(key)) {
+          allProductPool.set(key, c);
+          hopHasProducts = true;
+        }
+      }
+    }
+
+    messages.push({ role: "assistant", content: final.content });
     messages.push({
       role: "user",
-      content: [{
-        type: "tool_result",
-        tool_name: toolCall.name,
-        content: JSON.stringify(result),
-      }],
+      content: toolUses.map((u, i) => {
+        const payload = results[i] ?? {};
+        if (hopHasProducts && (u.name === "search_products" || u.name === "get_product_details" || u.name === "lookup_sku")) {
+          payload._display = "Product cards are shown automatically. Do NOT list products with links. Write a brief summary only.";
+        }
+        return {
+          type: "tool_result",
+          tool_use_id: u.id,
+          content: JSON.stringify(payload),
+        };
+      }),
     });
-
-    continue;
   }
-
-  break;
-}
-
-// 🚨 CRITICAL FIX: force fallback if no answer
-if (!finalText) {
-  console.warn("[chat] forcing fallback response");
-
-  const res = await anthropic.messages.create({
-    model,
-    max_tokens: MAX_TOKENS,
-    messages,
-  });
-
-  finalText = res.content?.[0]?.text || "Sorry, I couldn't find the right products.";
-}
 
   let initialPool = Array.from(allProductPool.values());
 
