@@ -418,8 +418,8 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     controller.enqueue(encoder.encode(sseChunk({ type: "link", url: supportCTA.url, label: supportCTA.label })));
   }
 
-  const userAskedSignup = /\b(sign ?up|subscribe|newsletter|email list|mailing list|sms|text (me|updates|alerts)|join.{0,15}(list|email|sms)|opt.?in|stay.{0,10}(connected|touch|updated))\b/i.test(ctx.userText || "");
-  const aiMentionsSignup = /\b(sign ?up|subscribe|newsletter|email|sms|mailing list|stay.{0,10}(connected|touch|updated))\b/i.test(fullResponseText || "");
+  const userAskedSignup = /\b(sign ?up for (our|the|your|a).{0,25}(newsletter|list|email|sms|updates|deals|offers)|subscribe to (our|the|your).{0,20}(newsletter|list|email|sms|updates)|newsletter|mailing list|join our (list|newsletter|email|sms)|opt.?in|stay (connected|in touch|updated).{0,20}(email|offers|updates|news|deals))\b/i.test(ctx.userText || "");
+  const aiMentionsSignup = /\b(newsletter|mailing list|subscribe to (our|the|your).{0,20}(newsletter|list|sms|email)|sign ?up for (our|the|my|your).{0,25}(newsletter|list|email|sms|updates|deals|offers)|join our (newsletter|list|email|sms)|stay connected.{0,20}(email|offers|updates|deals))\b/i.test(fullResponseText || "");
   if (userAskedSignup || aiMentionsSignup) {
     controller.enqueue(encoder.encode(sseChunk({ type: "klaviyo_form" })));
   }
