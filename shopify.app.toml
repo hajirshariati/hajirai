@@ -35,7 +35,7 @@ api_version = "2026-07"
   shop_deletion_url = "/webhooks/shop/redact"
 
 [access_scopes]
-scopes = "write_files,write_metaobject_definitions,write_metaobjects,write_products"
+scopes = "write_files,write_metaobject_definitions,write_metaobjects,write_products,read_customers,read_orders"
 
 [auth]
 redirect_urls = [
