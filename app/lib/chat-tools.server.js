@@ -227,7 +227,18 @@ function inflectVariants(term) {
 function keywordMatchClause(kw, synonymMap) {
   const gendered = GENDERED_SEARCH[kw];
   const baseTerms = gendered || [kw];
-  const synonymTerms = synonymMap?.[kw] || [];
+  // Look up synonyms under the keyword as-typed AND under each singular/plural
+  // variant — so a single "sandal → slide, flip" entry catches both "sandal"
+  // and "sandals" queries without the merchant having to add two rows.
+  let synonymTerms = [];
+  if (synonymMap) {
+    const seenSyn = new Set();
+    for (const variant of inflectVariants(kw)) {
+      for (const s of synonymMap[variant.toLowerCase()] || []) {
+        if (!seenSyn.has(s)) { seenSyn.add(s); synonymTerms.push(s); }
+      }
+    }
+  }
   const seen = new Set();
   const allTerms = [];
   for (const t of [...baseTerms, ...synonymTerms]) {
