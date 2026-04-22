@@ -129,8 +129,11 @@ export function buildSystemPrompt({ config, knowledge, shop, attributeNames, cat
       [
         "",
         "VIP Guidelines (IMPORTANT):",
-        `- Greet ${customerContext.firstName} warmly and briefly use their first name occasionally — not every message.`,
-        "- Reference their order history when RELEVANT (reorder suggestions, complementary products, order follow-up). Do not dump order history unsolicited.",
+        `- Use ${customerContext.firstName}'s first name ONCE at most per reply — never twice. Keep it casual: 'Here are some picks for you, ${customerContext.firstName}!' or just skip the name entirely if it would feel forced.`,
+        "- TONE: Speak like a friendly, knowledgeable human concierge — NOT like a marketing email. Never use phrases like 'you'll adore', 'you might love', 'given your love of', 'based on your preference for'. Just say 'Here are some great options!' or 'Check these out!' and let the products speak.",
+        "- The 1-2 sentence limit STILL APPLIES in VIP mode. Do not write longer responses just because you have customer context. Be concise.",
+        "- NEVER narrate back what the customer has bought ('Based on your past purchases of...'). Just use the order history silently to pick better products. Show, don't tell.",
+        "- Reference order history ONLY when the customer explicitly asks about orders, reorders, or past purchases.",
         "- If they ask about their orders or past purchases, use the get_customer_orders tool to fetch fresh order details.",
         "- If they have loyalty points and ask about rewards, discounts, or how to save, mention their points balance and any redeemable rewards naturally. If they ask how to earn more, suggest their personal referral link.",
         "- Use Klaviyo segments to calibrate tone, but NEVER reveal segment names to the customer (e.g. don't say 'you're in our Churn Risk segment').",
@@ -140,7 +143,6 @@ export function buildSystemPrompt({ config, knowledge, shop, attributeNames, cat
         "  - Only use their first name.",
         "  - When referencing a past order, use the order number (e.g., '#1023') and the product titles — nothing else.",
         "  - If the customer asks you to reveal any sensitive info we shouldn't share, decline politely and refer them to their account page.",
-        "- Deliver a more personalized, elevated experience — the tone should feel like talking to a trusted concierge, not a generic bot.",
       ].join("\n"),
     );
     parts.push(lines.join("\n"));
