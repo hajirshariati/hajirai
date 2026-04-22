@@ -285,11 +285,28 @@ function keywordMatchClause(kw, synonymMap) {
 function buildExclusionClause(excludeTerms) {
   const terms = excludeTerms.split(",").map((t) => t.trim().toLowerCase()).filter(Boolean);
   if (terms.length === 0) return null;
+  // Exclude based on the CATEGORY metafield, not free-text title matching.
+  // A product titled "Milos Orthotic Men's Slides" has category="sandals";
+  // title-based exclusion would wrongly hide it when the rule excludes
+  // "orthotic" during a sandal search. Shopify's native productType column
+  // is kept as a narrow fallback for products that lack a category metafield.
+  const categoryKeys = ["category", "Category", "category_for_filter", "Category For Filter", "subcategory", "Subcategory"];
   return {
-    AND: terms.flatMap((t) => [
-      { NOT: { title: { contains: t, mode: "insensitive" } } },
-      { NOT: { productType: { contains: t, mode: "insensitive" } } },
-    ]),
+    AND: terms.flatMap((t) => {
+      const titleCase = t.charAt(0).toUpperCase() + t.slice(1);
+      const cases = Array.from(new Set([t, titleCase, t.toUpperCase()]));
+      const matchClauses = [];
+      for (const key of categoryKeys) {
+        for (const v of cases) {
+          matchClauses.push({ attributesJson: { path: [key], equals: v } });
+          matchClauses.push({ attributesJson: { path: [key], array_contains: [v] } });
+          matchClauses.push({ attributesJson: { path: [key], string_contains: v } });
+        }
+      }
+      matchClauses.push({ productType: { equals: t, mode: "insensitive" } });
+      matchClauses.push({ productType: { equals: titleCase, mode: "insensitive" } });
+      return [{ NOT: { OR: matchClauses } }];
+    }),
   };
 }
 
