@@ -227,6 +227,22 @@ const FILE_TYPES = [
 "How long does shipping take?","Standard shipping takes 5-7 business days."`,
   },
   {
+    label: "Rules & Guidelines",
+    value: "rules",
+    description: "Things the AI must always/never do — tone, routing rules, banned phrases, escalation paths.",
+    templateName: "rules-template.txt",
+    template: `ALWAYS:
+- Keep replies to 1-2 sentences.
+- Use the customer's first name sparingly when logged in.
+
+NEVER:
+- Invent product codes or make up details.
+- Claim items are out of stock.
+
+ROUTING:
+- Returns, refunds, billing, damaged items → support team.`,
+  },
+  {
     label: "Brand / About",
     value: "brand",
     description: "Your story, values, voice, and tone.",
