@@ -283,6 +283,40 @@
 .ai-chat-header__actions {
   display: flex;
   gap: 4px;
+  align-items: center;
+}
+
+.ai-chat-header__login-pill,
+.ai-chat-header__vip-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+  margin-right: 2px;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ai-chat-header__login-pill {
+  background: #f3f4f6;
+  color: #4b5563;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+@media (hover: hover) {
+  .ai-chat-header__login-pill:hover {
+    background: #e5e7eb;
+    color: #111827;
+  }
+}
+.ai-chat-header__vip-pill {
+  background: var(--ai-chat-cta-bg, #e8f5ee);
+  color: var(--ai-chat-cta-text, #2d6b4f);
 }
 
 .ai-chat-header__btn {

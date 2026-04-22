@@ -92,6 +92,9 @@ model ShopConfig {
   supportUrl          String   @default("")
   supportLabel        String   @default("Contact customer service")
 
+  vipModeEnabled      Boolean  @default(false)
+  showLoginPill       Boolean  @default(true)
+
   plan                    String    @default("free")
   subscriptionId          String?
   subscriptionActivatedAt DateTime?

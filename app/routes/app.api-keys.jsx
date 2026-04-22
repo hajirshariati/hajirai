@@ -43,6 +43,8 @@ export const loader = async ({ request }) => {
     klaviyoFormId: config.klaviyoFormId || "",
     klaviyoCompanyId: config.klaviyoCompanyId || "",
     klaviyoListId: config.klaviyoListId || "",
+    vipModeEnabled: config.vipModeEnabled === true,
+    showLoginPill: config.showLoginPill !== false,
   };
 };
 
@@ -102,6 +104,12 @@ export const action = async ({ request }) => {
 
   const cachingToggle = formData.get("promptCaching");
   if (cachingToggle !== null) data.promptCaching = cachingToggle === "true";
+
+  const vipToggle = formData.get("vipModeEnabled");
+  if (vipToggle !== null) data.vipModeEnabled = vipToggle === "true";
+
+  const loginPillToggle = formData.get("showLoginPill");
+  if (loginPillToggle !== null) data.showLoginPill = loginPillToggle === "true";
 
   if (Object.keys(data).length > 0) {
     await updateShopConfig(session.shop, data);
@@ -217,7 +225,7 @@ function HideUrlsPanel({ initial }) {
 }
 
 export default function ApiKeys() {
-  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, promptCaching: initCaching, klaviyoFormId: initKlaviyoFormId, klaviyoCompanyId: initKlaviyoCompanyId, klaviyoListId: initKlaviyoListId } = useLoaderData();
+  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, promptCaching: initCaching, klaviyoFormId: initKlaviyoFormId, klaviyoCompanyId: initKlaviyoCompanyId, klaviyoListId: initKlaviyoListId, vipModeEnabled: initVipMode, showLoginPill: initShowLoginPill } = useLoaderData();
   const actionData = useActionData();
   const nav = useNavigation();
   const saving = nav.state === "submitting";
@@ -235,6 +243,8 @@ export default function ApiKeys() {
   const [klaviyoFormId, setKlaviyoFormId] = useState(initKlaviyoFormId);
   const [klaviyoCompanyId, setKlaviyoCompanyId] = useState(initKlaviyoCompanyId);
   const [klaviyoListId, setKlaviyoListId] = useState(initKlaviyoListId);
+  const [vipMode, setVipMode] = useState(initVipMode);
+  const [showLoginPill, setShowLoginPill] = useState(initShowLoginPill);
 
   return (
     <Page title="Settings" backAction={{ url: "/app" }}>
@@ -455,6 +465,28 @@ export default function ApiKeys() {
             </Layout.AnnotatedSection>
 
             <Layout.AnnotatedSection
+              title="VIP customer experience"
+              description="Personalize the chat for logged-in customers using their order history and profile."
+            >
+              <Card>
+                <BlockStack gap="400">
+                  <Checkbox
+                    label="Show login pill in chat header"
+                    checked={showLoginPill}
+                    onChange={setShowLoginPill}
+                    helpText="Adds a 'Login' button next to the menu for anonymous visitors, and 'Hi [name]!' for logged-in customers."
+                  />
+                  <Checkbox
+                    label="Enable VIP mode for logged-in customers"
+                    checked={vipMode}
+                    onChange={setVipMode}
+                    helpText="Gives the AI access to the customer's order history, lifetime spend, and tags so it can deliver a more personalized experience. No PII (email, address, payment) is ever exposed in chat."
+                  />
+                </BlockStack>
+              </Card>
+            </Layout.AnnotatedSection>
+
+            <Layout.AnnotatedSection
               title="Widget visibility"
               description="Control which pages the chat widget appears on. Add URL rules to hide the widget on specific pages."
             >
@@ -475,6 +507,8 @@ export default function ApiKeys() {
           <input type="hidden" name="klaviyoFormId" value={klaviyoFormId} />
           <input type="hidden" name="klaviyoCompanyId" value={klaviyoCompanyId} />
           <input type="hidden" name="klaviyoListId" value={klaviyoListId} />
+          <input type="hidden" name="vipModeEnabled" value={String(vipMode)} />
+          <input type="hidden" name="showLoginPill" value={String(showLoginPill)} />
 
           <Box paddingBlockEnd="800">
             <InlineStack align="end">

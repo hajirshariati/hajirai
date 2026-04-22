@@ -15,6 +15,8 @@ export const loader = async ({ request }) => {
       klaviyoFormId: config.klaviyoFormId || "",
       klaviyoCompanyId: config.klaviyoCompanyId || "",
       klaviyoListId: config.klaviyoListId || "",
+      vipModeEnabled: config.vipModeEnabled === true,
+      showLoginPill: config.showLoginPill !== false,
     }, {
       headers: { "Cache-Control": "public, max-age=300" },
     });
