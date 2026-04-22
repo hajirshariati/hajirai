@@ -84,6 +84,8 @@ model ShopConfig {
   klaviyoFormId       String   @default("")
   klaviyoCompanyId    String   @default("")
   klaviyoListId       String   @default("")
+  klaviyoPrivateKey   String   @default("")
+  yotpoLoyaltyApiKey  String   @default("")
 
   hideOnUrls          String   @default("[]")
   categoryExclusions  String   @default("[]")

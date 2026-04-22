@@ -5,6 +5,8 @@ import { getAttributeMappings } from "../models/AttributeMapping.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
 import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL } from "../lib/chat-tools.server";
 import { fetchCustomerContext } from "../lib/customer-context.server";
+import { fetchKlaviyoEnrichment } from "../lib/klaviyo-enrichment.server";
+import { fetchYotpoLoyalty } from "../lib/yotpo-loyalty.server";
 import prisma from "../db.server";
 import { recordChatUsage } from "../models/ChatUsage.server";
 import { canSendMessage } from "../lib/billing.server";
@@ -540,6 +542,23 @@ export const action = async ({ request }) => {
         customerId: loggedInCustomerId,
         orderLimit: 5,
       });
+
+      // Enrich with Klaviyo segments + Yotpo loyalty in parallel. Both are
+      // opt-in (require a configured API key) and fail silently — enrichment
+      // must never block a chat response. Email is used only server-side for
+      // the lookup and is never placed in the system prompt.
+      if (customerContext?._email) {
+        const [klaviyo, loyalty] = await Promise.all([
+          config.klaviyoPrivateKey
+            ? fetchKlaviyoEnrichment({ privateKey: config.klaviyoPrivateKey, email: customerContext._email })
+            : Promise.resolve(null),
+          config.yotpoLoyaltyApiKey
+            ? fetchYotpoLoyalty({ apiKey: config.yotpoLoyaltyApiKey, email: customerContext._email })
+            : Promise.resolve(null),
+        ]);
+        if (klaviyo) customerContext.klaviyo = klaviyo;
+        if (loyalty) customerContext.loyalty = loyalty;
+      }
     }
 
     const systemPrompt = buildSystemPrompt({

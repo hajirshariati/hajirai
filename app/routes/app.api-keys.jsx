@@ -45,6 +45,8 @@ export const loader = async ({ request }) => {
     klaviyoListId: config.klaviyoListId || "",
     vipModeEnabled: config.vipModeEnabled === true,
     showLoginPill: config.showLoginPill !== false,
+    hasKlaviyoPrivateKey: config.klaviyoPrivateKey !== "",
+    hasYotpoLoyaltyKey: config.yotpoLoyaltyApiKey !== "",
   };
 };
 
@@ -110,6 +112,16 @@ export const action = async ({ request }) => {
 
   const loginPillToggle = formData.get("showLoginPill");
   if (loginPillToggle !== null) data.showLoginPill = loginPillToggle === "true";
+
+  const klaviyoPrivateKey = formData.get("klaviyoPrivateKey");
+  if (klaviyoPrivateKey !== null && klaviyoPrivateKey !== "") {
+    data.klaviyoPrivateKey = klaviyoPrivateKey;
+  }
+
+  const yotpoLoyaltyKey = formData.get("yotpoLoyaltyApiKey");
+  if (yotpoLoyaltyKey !== null && yotpoLoyaltyKey !== "") {
+    data.yotpoLoyaltyApiKey = yotpoLoyaltyKey;
+  }
 
   if (Object.keys(data).length > 0) {
     await updateShopConfig(session.shop, data);
@@ -225,7 +237,7 @@ function HideUrlsPanel({ initial }) {
 }
 
 export default function ApiKeys() {
-  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, promptCaching: initCaching, klaviyoFormId: initKlaviyoFormId, klaviyoCompanyId: initKlaviyoCompanyId, klaviyoListId: initKlaviyoListId, vipModeEnabled: initVipMode, showLoginPill: initShowLoginPill } = useLoaderData();
+  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, promptCaching: initCaching, klaviyoFormId: initKlaviyoFormId, klaviyoCompanyId: initKlaviyoCompanyId, klaviyoListId: initKlaviyoListId, vipModeEnabled: initVipMode, showLoginPill: initShowLoginPill, hasKlaviyoPrivateKey, hasYotpoLoyaltyKey } = useLoaderData();
   const actionData = useActionData();
   const nav = useNavigation();
   const saving = nav.state === "submitting";
@@ -245,6 +257,8 @@ export default function ApiKeys() {
   const [klaviyoListId, setKlaviyoListId] = useState(initKlaviyoListId);
   const [vipMode, setVipMode] = useState(initVipMode);
   const [showLoginPill, setShowLoginPill] = useState(initShowLoginPill);
+  const [klaviyoPrivateKey, setKlaviyoPrivateKey] = useState("");
+  const [yotpoLoyaltyKey, setYotpoLoyaltyKey] = useState("");
 
   return (
     <Page title="Settings" backAction={{ url: "/app" }}>
@@ -416,6 +430,22 @@ export default function ApiKeys() {
                       autoComplete="off"
                       helpText="Lets the AI reference product reviews and customer sizing feedback."
                     />
+                    <InlineStack align="space-between" blockAlign="center">
+                      <Text as="span" variant="bodySm">Yotpo Loyalty &amp; Referrals</Text>
+                      <Badge tone={hasYotpoLoyaltyKey ? "success" : undefined}>
+                        {hasYotpoLoyaltyKey ? "Connected" : "Not set"}
+                      </Badge>
+                    </InlineStack>
+                    <TextField
+                      label="Yotpo Loyalty API key"
+                      labelHidden
+                      type="password"
+                      value={yotpoLoyaltyKey}
+                      onChange={setYotpoLoyaltyKey}
+                      placeholder={hasYotpoLoyaltyKey ? "••••••••••••••••" : "Paste key to enable loyalty VIP perks"}
+                      autoComplete="off"
+                      helpText="Merchant API key from Yotpo Loyalty &amp; Referrals admin → Tools → Developer Tools. Different from the reviews key above. Lets the AI reference the customer's points balance, tier, and referral link when VIP mode is on."
+                    />
                   </BlockStack>
 
                   <Divider />
@@ -442,14 +472,19 @@ export default function ApiKeys() {
                   <Divider />
 
                   <BlockStack gap="300">
-                    <Text as="h3" variant="headingSm">Klaviyo</Text>
+                    <InlineStack align="space-between" blockAlign="center">
+                      <Text as="h3" variant="headingSm">Klaviyo</Text>
+                      <Badge tone={hasKlaviyoPrivateKey ? "success" : undefined}>
+                        {hasKlaviyoPrivateKey ? "Enrichment on" : "Signup only"}
+                      </Badge>
+                    </InlineStack>
                     <TextField
                       label="Company ID (public API key)"
                       value={klaviyoCompanyId}
                       onChange={setKlaviyoCompanyId}
                       placeholder="AbC123"
                       autoComplete="off"
-                      helpText="Found in Klaviyo → Settings → API Keys → Public API Key."
+                      helpText="Found in Klaviyo → Settings → API Keys → Public API Key. Used for the in-chat signup form."
                     />
                     <TextField
                       label="List ID"
@@ -458,6 +493,15 @@ export default function ApiKeys() {
                       placeholder="XyZ789"
                       autoComplete="off"
                       helpText="The list to subscribe to. Found in Klaviyo → Audience → Lists → click your list → ID in the URL."
+                    />
+                    <TextField
+                      label="Private API key"
+                      type="password"
+                      value={klaviyoPrivateKey}
+                      onChange={setKlaviyoPrivateKey}
+                      placeholder={hasKlaviyoPrivateKey ? "••••••••••••••••" : "pk_..."}
+                      autoComplete="off"
+                      helpText="Optional. Required for VIP mode enrichment — lets the AI see logged-in customers' Klaviyo segments (e.g. VIP, Winback). Klaviyo → Settings → API Keys → Create Private API Key (scopes: profiles:read, segments:read)."
                     />
                   </BlockStack>
                 </BlockStack>
@@ -509,6 +553,8 @@ export default function ApiKeys() {
           <input type="hidden" name="klaviyoListId" value={klaviyoListId} />
           <input type="hidden" name="vipModeEnabled" value={String(vipMode)} />
           <input type="hidden" name="showLoginPill" value={String(showLoginPill)} />
+          <input type="hidden" name="klaviyoPrivateKey" value={klaviyoPrivateKey} />
+          <input type="hidden" name="yotpoLoyaltyApiKey" value={yotpoLoyaltyKey} />
 
           <Box paddingBlockEnd="800">
             <InlineStack align="end">
