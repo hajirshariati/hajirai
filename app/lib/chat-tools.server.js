@@ -834,6 +834,28 @@ async function getCustomerOrders({ limit, orderNumber }, ctx) {
     orders = orders.filter((o) => normalizeOrderNumber(o.name) === needle || normalizeOrderNumber(o.name).endsWith(needle));
   }
 
+  // If the merchant configured a branded tracking page (AfterShip, Parcel Panel,
+  // etc.), generate tracking URLs using that base URL instead of carrier URLs.
+  const trackingBase = (ctx.trackingPageUrl || "").replace(/\/+$/, "");
+  const email = ctxData._email || "";
+  if (trackingBase) {
+    for (const order of orders) {
+      // Per-fulfillment: override tracking URL with the branded page.
+      for (const f of order.fulfillments || []) {
+        for (const t of f.tracking || []) {
+          if (t.number) {
+            t.url = `${trackingBase}/tracking/${encodeURIComponent(t.number)}`;
+          }
+        }
+      }
+      // Add a top-level order lookup URL (works even without a tracking number).
+      const orderNum = String(order.name || "").replace(/^#/, "");
+      if (orderNum && email) {
+        order.trackingPageUrl = `${trackingBase}?order-number=${encodeURIComponent(orderNum)}&email=${encodeURIComponent(email)}`;
+      }
+    }
+  }
+
   return {
     firstName: ctxData.firstName,
     numberOfOrders: ctxData.numberOfOrders,

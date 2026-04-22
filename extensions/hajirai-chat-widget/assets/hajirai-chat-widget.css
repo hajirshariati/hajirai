@@ -386,6 +386,7 @@
   border-radius: 1em;
   position: relative;
   background: linear-gradient(135deg, var(--ai-chat-primary), var(--ai-chat-accent));
+  flex-shrink: 0;
 }
 
 .ai-chat-welcome__banner:empty,
@@ -395,8 +396,21 @@
 
 .ai-chat-welcome__banner img {
   width: 100%;
-  height: auto;
+  /* Cap banner height so welcome content never overflows. clamp scales with
+     viewport height: 120px min, 30vh typical, 280px max on tall screens. */
+  height: clamp(120px, 30vh, 280px);
+  object-fit: cover;
   display: block;
+}
+
+/* Short viewports: shrink more. Very short: hide banner entirely so CTAs +
+   quick picks + input remain visible without an internal scroll. */
+@media (max-height: 720px) {
+  .ai-chat-welcome__banner img { height: clamp(100px, 20vh, 180px); }
+}
+@media (max-height: 520px) {
+  .ai-chat-welcome__banner { display: none; }
+  .ai-chat-welcome__avatar { margin-top: 8px; }
 }
 
 .ai-chat-welcome__avatar {
