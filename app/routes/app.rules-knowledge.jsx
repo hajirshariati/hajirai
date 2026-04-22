@@ -432,6 +432,19 @@ function DisplayCard({ deduplicateColors }) {
         <Checkbox label="Deduplicate colors in search results"
           helpText="When enabled, products that differ only by color show a single card instead of one per color variant. Useful when each color is a separate Shopify product."
           checked={deduplicateColors} onChange={handleDedup} />
+        <Box background="bg-surface-secondary" padding="300" borderRadius="200">
+          <BlockStack gap="150">
+            <Text as="p" variant="bodySm" tone="subdued">
+              <strong>How it works:</strong> the app groups products by everything before the last dash in the title. For this to work, your product titles must follow this format:
+            </Text>
+            <Text as="p" variant="bodySm">
+              <code>Product Name - Color</code>
+            </Text>
+            <Text as="p" variant="bodySm" tone="subdued">
+              Examples: <code>Chase Arch Support Sneaker - Black</code>, <code>Chase Arch Support Sneaker - White</code> → shown as one card. If your titles don't use this pattern, leave this off.
+            </Text>
+          </BlockStack>
+        </Box>
       </BlockStack>
     </Card>
   );
