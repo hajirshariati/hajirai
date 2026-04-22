@@ -429,9 +429,10 @@ const where = {
     where.AND.push(genderFilterClause(effectiveGender));
   }
 
-  if (exclusionClause) {
-    where.AND.push(exclusionClause);
-  }
+// TEMP TEST: disable exclusion rule
+// if (exclusionClause) {
+//   where.AND.push(exclusionClause);
+// }
 
   const GENDER_KEYS = new Set(["gender", "gender_fallback", "genders"]);
   const attrKeys = Object.keys(attrFilters).filter((k) => !GENDER_KEYS.has(k.toLowerCase()));
