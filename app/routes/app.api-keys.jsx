@@ -39,6 +39,7 @@ export const loader = async ({ request }) => {
     hideOnUrls,
     supportUrl: config.supportUrl || "",
     supportLabel: config.supportLabel || "",
+    trackingPageUrl: config.trackingPageUrl || "",
     promptCaching: config.promptCaching === true,
     klaviyoFormId: config.klaviyoFormId || "",
     klaviyoCompanyId: config.klaviyoCompanyId || "",
@@ -83,6 +84,9 @@ export const action = async ({ request }) => {
 
   const supportLabel = formData.get("supportLabel");
   if (supportLabel !== null) data.supportLabel = supportLabel.trim();
+
+  const trackingPageUrl = formData.get("trackingPageUrl");
+  if (trackingPageUrl !== null) data.trackingPageUrl = trackingPageUrl.trim();
 
   const klaviyoFormId = formData.get("klaviyoFormId");
   if (klaviyoFormId !== null) data.klaviyoFormId = klaviyoFormId.trim();
@@ -241,7 +245,7 @@ function HideUrlsPanel({ initial }) {
 }
 
 export default function ApiKeys() {
-  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, promptCaching: initCaching, klaviyoFormId: initKlaviyoFormId, klaviyoCompanyId: initKlaviyoCompanyId, klaviyoListId: initKlaviyoListId, vipModeEnabled: initVipMode, showLoginPill: initShowLoginPill, hasKlaviyoPrivateKey, hasYotpoLoyaltyKey, yotpoLoyaltyGuid: initYotpoLoyaltyGuid } = useLoaderData();
+  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, trackingPageUrl: initTrackingPageUrl, promptCaching: initCaching, klaviyoFormId: initKlaviyoFormId, klaviyoCompanyId: initKlaviyoCompanyId, klaviyoListId: initKlaviyoListId, vipModeEnabled: initVipMode, showLoginPill: initShowLoginPill, hasKlaviyoPrivateKey, hasYotpoLoyaltyKey, yotpoLoyaltyGuid: initYotpoLoyaltyGuid } = useLoaderData();
   const actionData = useActionData();
   const nav = useNavigation();
   const saving = nav.state === "submitting";
@@ -255,6 +259,7 @@ export default function ApiKeys() {
   const [aftershipKey, setAftershipKey] = useState("");
   const [supportUrl, setSupportUrl] = useState(initSupportUrl);
   const [supportLabel, setSupportLabel] = useState(initSupportLabel);
+  const [trackingPageUrl, setTrackingPageUrl] = useState(initTrackingPageUrl);
   const [caching, setCaching] = useState(initCaching);
   const [klaviyoFormId, setKlaviyoFormId] = useState(initKlaviyoFormId);
   const [klaviyoCompanyId, setKlaviyoCompanyId] = useState(initKlaviyoCompanyId);
@@ -408,6 +413,14 @@ export default function ApiKeys() {
                     autoComplete="off"
                     helpText="Defaults to 'Visit Support Hub' if left blank."
                   />
+                  <TextField
+                    label="Order tracking page URL"
+                    value={trackingPageUrl}
+                    onChange={setTrackingPageUrl}
+                    placeholder="https://orders.yourstore.com"
+                    autoComplete="off"
+                    helpText="AfterShip, Parcel Panel, or any branded tracking page. When set, logged-in customers get a tracking link to this page instead of the raw carrier URL. The AI appends the tracking number automatically."
+                  />
                 </BlockStack>
               </Card>
             </Layout.AnnotatedSection>
@@ -559,6 +572,7 @@ export default function ApiKeys() {
           <input type="hidden" name="aftershipApiKey" value={aftershipKey} />
           <input type="hidden" name="supportUrl" value={supportUrl} />
           <input type="hidden" name="supportLabel" value={supportLabel} />
+          <input type="hidden" name="trackingPageUrl" value={trackingPageUrl} />
           <input type="hidden" name="promptCaching" value={String(caching)} />
           <input type="hidden" name="klaviyoFormId" value={klaviyoFormId} />
           <input type="hidden" name="klaviyoCompanyId" value={klaviyoCompanyId} />

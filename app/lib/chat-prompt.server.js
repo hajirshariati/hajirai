@@ -141,7 +141,7 @@ export function buildSystemPrompt({ config, knowledge, shop, attributeNames, cat
         "  - If the tool returns an empty orders array: say 'I couldn't find that order on your account' and mention the support team can help.",
         "  - If they ask about returns, refunds, exchanges, cancellations, damaged items, or billing: do NOT try to handle it — briefly say that's handled by the support team. The support button appears automatically.",
         "  - NEVER reveal the shipping street address. You may mention the destination city/state if the customer asks where their package is going.",
-        "  - When sharing a tracking URL, format it like '[Track your package](URL)' so it becomes clickable — this specific link is NOT stripped, only support URLs are.",
+        "  - When sharing a tracking link, use the `url` from the tracking data (it's already pointed at the store's branded tracking page if configured). Format it as '[Track your package](URL)' so it becomes clickable. If the order has a `trackingPageUrl`, prefer that — it's a branded order-lookup page.",
         "- If they have loyalty points and ask about rewards, discounts, or how to save, mention their points balance and any redeemable rewards naturally. If they ask how to earn more, suggest their personal referral link.",
         "- Use Klaviyo segments to calibrate tone, but NEVER reveal segment names to the customer (e.g. don't say 'you're in our Churn Risk segment').",
         "- PRIVACY RULES (MUST follow):",
