@@ -40,6 +40,7 @@ export const loader = async ({ request }) => {
     supportUrl: config.supportUrl || "",
     supportLabel: config.supportLabel || "",
     trackingPageUrl: config.trackingPageUrl || "",
+    returnsPageUrl: config.returnsPageUrl || "",
     promptCaching: config.promptCaching === true,
     klaviyoFormId: config.klaviyoFormId || "",
     klaviyoCompanyId: config.klaviyoCompanyId || "",
@@ -87,6 +88,9 @@ export const action = async ({ request }) => {
 
   const trackingPageUrl = formData.get("trackingPageUrl");
   if (trackingPageUrl !== null) data.trackingPageUrl = trackingPageUrl.trim();
+
+  const returnsPageUrl = formData.get("returnsPageUrl");
+  if (returnsPageUrl !== null) data.returnsPageUrl = returnsPageUrl.trim();
 
   const klaviyoFormId = formData.get("klaviyoFormId");
   if (klaviyoFormId !== null) data.klaviyoFormId = klaviyoFormId.trim();
@@ -245,7 +249,7 @@ function HideUrlsPanel({ initial }) {
 }
 
 export default function ApiKeys() {
-  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, trackingPageUrl: initTrackingPageUrl, promptCaching: initCaching, klaviyoFormId: initKlaviyoFormId, klaviyoCompanyId: initKlaviyoCompanyId, klaviyoListId: initKlaviyoListId, vipModeEnabled: initVipMode, showLoginPill: initShowLoginPill, hasKlaviyoPrivateKey, hasYotpoLoyaltyKey, yotpoLoyaltyGuid: initYotpoLoyaltyGuid } = useLoaderData();
+  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, trackingPageUrl: initTrackingPageUrl, returnsPageUrl: initReturnsPageUrl, promptCaching: initCaching, klaviyoFormId: initKlaviyoFormId, klaviyoCompanyId: initKlaviyoCompanyId, klaviyoListId: initKlaviyoListId, vipModeEnabled: initVipMode, showLoginPill: initShowLoginPill, hasKlaviyoPrivateKey, hasYotpoLoyaltyKey, yotpoLoyaltyGuid: initYotpoLoyaltyGuid } = useLoaderData();
   const actionData = useActionData();
   const nav = useNavigation();
   const saving = nav.state === "submitting";
@@ -260,6 +264,7 @@ export default function ApiKeys() {
   const [supportUrl, setSupportUrl] = useState(initSupportUrl);
   const [supportLabel, setSupportLabel] = useState(initSupportLabel);
   const [trackingPageUrl, setTrackingPageUrl] = useState(initTrackingPageUrl);
+  const [returnsPageUrl, setReturnsPageUrl] = useState(initReturnsPageUrl);
   const [caching, setCaching] = useState(initCaching);
   const [klaviyoFormId, setKlaviyoFormId] = useState(initKlaviyoFormId);
   const [klaviyoCompanyId, setKlaviyoCompanyId] = useState(initKlaviyoCompanyId);
@@ -421,6 +426,14 @@ export default function ApiKeys() {
                     autoComplete="off"
                     helpText="AfterShip, Parcel Panel, or any branded tracking page. When set, logged-in customers get a tracking link to this page instead of the raw carrier URL. The AI appends the tracking number automatically."
                   />
+                  <TextField
+                    label="Returns page URL"
+                    value={returnsPageUrl}
+                    onChange={setReturnsPageUrl}
+                    placeholder="https://returns.yourstore.com"
+                    autoComplete="off"
+                    helpText="AfterShip Returns or similar self-serve portal. When set, logged-in customers asking about returns or exchanges get a pre-filled link to this page (with their order number + email) instead of being routed to the support team."
+                  />
                 </BlockStack>
               </Card>
             </Layout.AnnotatedSection>
@@ -573,6 +586,7 @@ export default function ApiKeys() {
           <input type="hidden" name="supportUrl" value={supportUrl} />
           <input type="hidden" name="supportLabel" value={supportLabel} />
           <input type="hidden" name="trackingPageUrl" value={trackingPageUrl} />
+          <input type="hidden" name="returnsPageUrl" value={returnsPageUrl} />
           <input type="hidden" name="promptCaching" value={String(caching)} />
           <input type="hidden" name="klaviyoFormId" value={klaviyoFormId} />
           <input type="hidden" name="klaviyoCompanyId" value={klaviyoCompanyId} />

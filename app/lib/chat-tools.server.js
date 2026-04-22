@@ -834,25 +834,26 @@ async function getCustomerOrders({ limit, orderNumber }, ctx) {
     orders = orders.filter((o) => normalizeOrderNumber(o.name) === needle || normalizeOrderNumber(o.name).endsWith(needle));
   }
 
-  // If the merchant configured a branded tracking page (AfterShip, Parcel Panel,
-  // etc.), generate tracking URLs using that base URL instead of carrier URLs.
+  // Branded tracking + returns page URLs (AfterShip, Parcel Panel, etc).
+  // When set, override carrier URLs and attach a returns link per order so
+  // the AI can guide self-serve returns instead of routing to support.
   const trackingBase = (ctx.trackingPageUrl || "").replace(/\/+$/, "");
+  const returnsBase = (ctx.returnsPageUrl || "").replace(/\/+$/, "");
   const email = ctxData._email || "";
-  if (trackingBase) {
-    for (const order of orders) {
-      // Per-fulfillment: override tracking URL with the branded page.
+  for (const order of orders) {
+    const orderNum = String(order.name || "").replace(/^#/, "");
+    if (trackingBase) {
       for (const f of order.fulfillments || []) {
         for (const t of f.tracking || []) {
-          if (t.number) {
-            t.url = `${trackingBase}/tracking/${encodeURIComponent(t.number)}`;
-          }
+          if (t.number) t.url = `${trackingBase}/tracking/${encodeURIComponent(t.number)}`;
         }
       }
-      // Add a top-level order lookup URL (works even without a tracking number).
-      const orderNum = String(order.name || "").replace(/^#/, "");
       if (orderNum && email) {
         order.trackingPageUrl = `${trackingBase}?order-number=${encodeURIComponent(orderNum)}&email=${encodeURIComponent(email)}`;
       }
+    }
+    if (returnsBase && orderNum && email) {
+      order.returnsPageUrl = `${returnsBase}?order-number=${encodeURIComponent(orderNum)}&email=${encodeURIComponent(email)}`;
     }
   }
 
