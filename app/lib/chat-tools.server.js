@@ -417,15 +417,21 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
     : "-";
   console.log(`[search] query="${q}" gender=${effectiveGender || "-"} filters=${extraFiltersLog} rule=${merchantExclude || "-"}`);
 
-  const where = {
-    shop,
-    NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } },
-    AND: keywords.length > 0 ? keywords.map((kw) => keywordMatchClause(kw, synonymMap)) : [],
-  };
+const where = {
+  shop,
+  NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } },
+  AND: keywords.length > 0
+    ? [{ OR: keywords.map((kw) => keywordMatchClause(kw, synonymMap)) }]
+    : [],
+};
 
-  if (effectiveGender) {
-    where.AND.push(genderFilterClause(effectiveGender));
-  }
+if (effectiveGender) {
+  where.AND.push(genderFilterClause(effectiveGender));
+}
+
+// Do not apply exclusionClause at DB level here.
+// We will apply exclusion only after fetching candidates,
+// and only if doing so would not leave us with zero results.
 
   if (exclusionClause) {
     where.AND.push(exclusionClause);
@@ -464,6 +470,40 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
     take: fetchLimit,
     orderBy: { updatedAt: "desc" },
   });
+
+  if (merchantExclude && products.length > 0) {
+  const excludedTerms = merchantExclude
+    .split(",")
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean);
+
+  const productText = (p) =>
+    [
+      p.title,
+      p.productType,
+      p.vendor,
+      p.handle,
+      typeof p.description === "string" ? p.description : "",
+      Array.isArray(p.tags) ? p.tags.join(" ") : "",
+      p.attributesJson ? JSON.stringify(p.attributesJson) : "",
+      Array.isArray(p.variants)
+        ? p.variants.map((v) => JSON.stringify(v.attributesJson || {})).join(" ")
+        : "",
+    ]
+      .join(" ")
+      .toLowerCase();
+
+  const preferred = products.filter((p) => {
+    const text = productText(p);
+    return !excludedTerms.some((term) => text.includes(term));
+  });
+
+  // Keep the rule when it still leaves usable results.
+  // But if it wipes everything out, fall back to original products.
+  if (preferred.length > 0) {
+    products = preferred;
+  }
+}
 
   if (products.length === 0 && keywords.length > 1) {
     const fallbackWhere = {
