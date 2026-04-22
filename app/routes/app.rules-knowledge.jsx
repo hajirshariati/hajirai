@@ -662,8 +662,8 @@ function SearchRulesCard({ initial }) {
               placeholder="sneaker, sandal, boot" autoComplete="off"
               helpText="Comma-separated. Matches product title or product type." />
             <TextField label="Unless customer also says (optional)" value={overrideTriggers} onChange={setOverrideTriggers}
-              placeholder="new footwear, new shoes, browse shoes" autoComplete="off"
-              helpText="Comma-separated. If any of these appears in the customer's latest message, the rule is skipped for this turn." />
+              placeholder="shoe, shoes, footwear, sneaker, sandal, boot" autoComplete="off"
+              helpText="Comma-separated. Word-boundary match with automatic singular/plural handling — entering 'shoe' also catches 'shoes', and vice versa. Multi-word phrases like 'new shoes' still work." />
             <Button onClick={addRule} disabled={!whenQuery.trim() || !excludeTerms.trim()}>Add rule</Button>
           </FormLayout>
         </BlockStack>
