@@ -417,21 +417,19 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
     : "-";
   console.log(`[search] query="${q}" gender=${effectiveGender || "-"} filters=${extraFiltersLog} rule=${merchantExclude || "-"}`);
 
-const where = {
-  shop,
-  NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } },
-  AND: keywords.length > 0
-    ? [{ OR: keywords.map((kw) => keywordMatchClause(kw, synonymMap)) }]
-    : [],
-};
+  const where = {
+    shop,
+    NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } },
+    AND: keywords.length > 0 ? keywords.map((kw) => keywordMatchClause(kw, synonymMap)) : [],
+  };
 
-if (effectiveGender) {
-  where.AND.push(genderFilterClause(effectiveGender));
-}
+  if (effectiveGender) {
+    where.AND.push(genderFilterClause(effectiveGender));
+  }
 
-// Exclusion rules are applied after retrieval as a soft filter.
-// This prevents valid results from disappearing entirely when a store's
-// product titles overlap with excluded terms.
+  if (exclusionClause) {
+    where.AND.push(exclusionClause);
+  }
 
   const GENDER_KEYS = new Set(["gender", "gender_fallback", "genders"]);
   const attrKeys = Object.keys(attrFilters).filter((k) => !GENDER_KEYS.has(k.toLowerCase()));
@@ -467,53 +465,16 @@ if (effectiveGender) {
     orderBy: { updatedAt: "desc" },
   });
 
-if (merchantExclude && products.length > 0) {
-  const excludedTerms = merchantExclude
-    .split(",")
-    .map((s) => s.trim().toLowerCase())
-    .filter(Boolean);
-
-  const toSearchableText = (value) => {
-    if (value == null) return "";
-    if (typeof value === "string") return value.toLowerCase();
-    if (Array.isArray(value)) return value.map(toSearchableText).join(" ");
-    if (typeof value === "object") return JSON.stringify(value).toLowerCase();
-    return String(value).toLowerCase();
-  };
-
-  const productText = (p) =>
-    [
-  p.title,
-  p.handle,
-  p.vendor,
-  p.productType,
-  p.description,
-  p.tags,
-  p.attributesJson,
-      ...(Array.isArray(p.variants) ? p.variants.map((v) => v.attributesJson) : []),
-    ]
-      .map(toSearchableText)
-      .join(" ");
-
-  const preferred = products.filter((p) => {
-    const text = productText(p);
-    return !excludedTerms.some((term) => text.includes(term));
-  });
-
-  if (preferred.length > 0) {
-    products = preferred;
-  }
-}
-
   if (products.length === 0 && keywords.length > 1) {
     const fallbackWhere = {
       shop,
       NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } },
       OR: keywords.map((kw) => keywordMatchClause(kw, synonymMap)),
     };
-const fallbackAnd = [];
-if (effectiveGender) fallbackAnd.push(genderFilterClause(effectiveGender));
-if (fallbackAnd.length > 0) fallbackWhere.AND = fallbackAnd;
+    const fallbackAnd = [];
+    if (effectiveGender) fallbackAnd.push(genderFilterClause(effectiveGender));
+    if (exclusionClause) fallbackAnd.push(exclusionClause);
+    if (fallbackAnd.length > 0) fallbackWhere.AND = fallbackAnd;
     products = await prisma.product.findMany({
       where: fallbackWhere,
       include: {
@@ -539,44 +500,39 @@ if (fallbackAnd.length > 0) fallbackWhere.AND = fallbackAnd;
       })
     : products;
 
-if (effectiveGender) {
-  const want = effectiveGender.toLowerCase();
-  const opposite = want === "men" ? "women" : want === "women" ? "men" : null;
-  const wantRe = new RegExp(`(^|[^a-z])${want}('?s)?([^a-z]|$)`, "i");
-  const oppositeRe = opposite ? new RegExp(`(^|[^a-z])${opposite}('?s)?([^a-z]|$)`, "i") : null;
-  const unisexRe = /(^|[^a-z])unisex([^a-z]|$)/i;
+  if (effectiveGender) {
+    const want = effectiveGender.toLowerCase();
+    const opposite = want === "men" ? "women" : want === "women" ? "men" : null;
+    const wantRe = new RegExp(`(^|[^a-z])${want}('?s)?([^a-z]|$)`, "i");
+    const oppositeRe = opposite ? new RegExp(`(^|[^a-z])${opposite}('?s)?([^a-z]|$)`, "i") : null;
+    const unisexRe = /(^|[^a-z])unisex([^a-z]|$)/i;
 
-  const before = filtered.length;
-  const kept = filtered.filter((p) => {
-    const attrs = p.attributesJson || {};
-    const gVal = attrs.gender || attrs.gender_fallback || "";
-    const gStr = Array.isArray(gVal) ? gVal.join(" ") : String(gVal);
-    const titleStr = p.title || "";
+    const before = filtered.length;
+    filtered = filtered.filter((p) => {
+      const attrs = p.attributesJson || {};
+      const gVal = attrs.gender || attrs.gender_fallback || "";
+      const gStr = Array.isArray(gVal) ? gVal.join(" ") : String(gVal);
+      const titleStr = p.title || "";
 
-    if (unisexRe.test(gStr)) return true;
+      if (unisexRe.test(gStr)) return true;
 
-    const gHasOpposite = oppositeRe && oppositeRe.test(gStr);
-    const gHasWant = wantRe.test(gStr);
-    if (gHasOpposite && !gHasWant) return false;
-    if (gHasWant) return true;
+      const gHasOpposite = oppositeRe && oppositeRe.test(gStr);
+      const gHasWant = wantRe.test(gStr);
+      if (gHasOpposite && !gHasWant) return false;
+      if (gHasWant) return true;
 
-    const tHasOpposite = oppositeRe && oppositeRe.test(titleStr);
-    const tHasWant = wantRe.test(titleStr);
-    if (tHasOpposite && !tHasWant) return false;
-    if (tHasWant) return true;
+      const tHasOpposite = oppositeRe && oppositeRe.test(titleStr);
+      const tHasWant = wantRe.test(titleStr);
+      if (tHasOpposite && !tHasWant) return false;
+      if (tHasWant) return true;
 
-    // Keep unknown gender products instead of dropping everything
-    return true;
-  });
-
-  if (kept.length > 0) {
-    filtered = kept;
+      console.warn(`[gender-filter] dropped product=${p.handle} want=${want} gender=${JSON.stringify(gVal)} title="${titleStr}"`);
+      return false;
+    });
+    if (before !== filtered.length) {
+      console.log(`[gender-filter] want=${want} ${before} -> ${filtered.length} products`);
+    }
   }
-
-  if (before !== filtered.length) {
-    console.log(`[gender-filter] want=${want} ${before} -> ${filtered.length} products`);
-  }
-}
 
   if (deduplicateColors) {
     filtered = deduplicateByColor(filtered);
@@ -584,20 +540,7 @@ if (effectiveGender) {
 
   filtered = filtered.slice(0, max);
 
-console.log("[search-debug-final]", {
-  query: q,
-  effectiveGender,
-  dbCount: products.length,
-  filteredCount: filtered.length,
-  handlesBeforeFilter: products.map((p) => ({
-    handle: p.handle,
-    title: p.title,
-    gender: p.attributesJson?.gender,
-    gender_fallback: p.attributesJson?.gender_fallback,
-  })),
-});
-
-console.log(`[search]   → db=${products.length} filtered=${filtered.length}`);
+  console.log(`[search]   → db=${products.length} filtered=${filtered.length}`);
 
   const firstPrice = (variants) => {
     const v = variants.find((v) => v.price);
