@@ -5,7 +5,7 @@ const LABELS = {
   custom: "Custom Knowledge",
 };
 
-export function buildSystemPrompt({ config, knowledge, shop, attributeNames, categoryExclusions, querySynonyms }) {
+export function buildSystemPrompt({ config, knowledge, shop, attributeNames, categoryExclusions, querySynonyms, customerContext }) {
   const name = config?.assistantName || "AI Shopping Assistant";
   const tagline = config?.assistantTagline || "";
   const parts = [];
@@ -92,11 +92,45 @@ export function buildSystemPrompt({ config, knowledge, shop, attributeNames, cat
     }
   }
 
+  if (customerContext && customerContext.firstName) {
+    const lines = [`\n=== VIP Customer Context ===`];
+    lines.push(`The customer chatting is logged in. Their first name is ${customerContext.firstName}.`);
+    if (customerContext.numberOfOrders) lines.push(`Total orders placed: ${customerContext.numberOfOrders}.`);
+    if (customerContext.amountSpent) lines.push(`Lifetime spend: ${customerContext.amountSpent}.`);
+    if (customerContext.tags && customerContext.tags.length > 0) {
+      lines.push(`Customer tags (from Shopify): ${customerContext.tags.join(", ")}.`);
+    }
+    if (customerContext.recentOrders && customerContext.recentOrders.length > 0) {
+      lines.push(`Recent orders (most recent first):`);
+      for (const o of customerContext.recentOrders) {
+        const itemsStr = (o.items || []).join(", ") || "items";
+        const status = [o.financialStatus, o.fulfillmentStatus].filter(Boolean).join("/") || "processed";
+        lines.push(`- ${o.name} on ${o.date} — ${status} — ${o.total} — ${itemsStr}`);
+      }
+    }
+    lines.push(
+      [
+        "",
+        "VIP Guidelines (IMPORTANT):",
+        `- Greet ${customerContext.firstName} warmly and briefly use their first name occasionally — not every message.`,
+        "- Reference their order history when RELEVANT (reorder suggestions, complementary products, order follow-up). Do not dump order history unsolicited.",
+        "- If they ask about their orders or past purchases, use the get_customer_orders tool to fetch fresh order details.",
+        "- PRIVACY RULES (MUST follow):",
+        "  - NEVER reveal the customer's email, full name, phone number, shipping or billing address, or payment details.",
+        "  - Only use their first name.",
+        "  - When referencing a past order, use the order number (e.g., '#1023') and the product titles — nothing else.",
+        "  - If the customer asks you to reveal any sensitive info we shouldn't share, decline politely and refer them to their account page.",
+        "- Deliver a more personalized, elevated experience — the tone should feel like talking to a trusted concierge, not a generic bot.",
+      ].join("\n"),
+    );
+    parts.push(lines.join("\n"));
+  }
+
   if (config?.disclaimerText) {
     parts.push(`\nDisclaimer shown to customers: ${config.disclaimerText}`);
   }
 
   const full = parts.join("\n\n");
-  console.log(`[prompt] chars=${full.length} knowledgeTypes=${Object.keys(knowledgeByType).length}`);
+  console.log(`[prompt] chars=${full.length} knowledgeTypes=${Object.keys(knowledgeByType).length} vip=${customerContext ? "yes" : "no"}`);
   return full;
 }

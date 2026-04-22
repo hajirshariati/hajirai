@@ -35,6 +35,12 @@
     quickPick4Message: {{ block.settings.qp4_message | json }},
     showBanner: {{ block.settings.show_banner | json }},
     launcherWidth: {{ block.settings.launcher_width | json }},
+    chatWidth: {{ block.settings.chat_width | json }},
+    hideOnMobile: {{ block.settings.hide_on_mobile | json }},
+    customerLoggedIn: {% if customer %}true{% else %}false{% endif %},
+    customerFirstName: {% if customer %}{{ customer.first_name | json }}{% else %}""{% endif %},
+    customerId: {% if customer %}{{ customer.id | json }}{% else %}null{% endif %},
+    customerLoginUrl: {{ routes.account_login_url | json }},
     disclaimerText: {{ block.settings.disclaimer | json }},
     privacyUrl: {{ block.settings.privacy_url | json }},
     supportUrl: {{ block.settings.support_url | json }},
@@ -183,6 +189,24 @@
       "default": "500"
     },
     {
+      "type": "text",
+      "id": "chat_width",
+      "label": "Chatbot Width (px)",
+      "info": "Width of the open chat panel. Defaults to the launcher width if left blank.",
+      "default": "560"
+    },
+    {
+      "type": "checkbox",
+      "id": "hide_on_mobile",
+      "label": "Hide chatbot on mobile",
+      "info": "Hides the launcher and chat panel on screens narrower than 768px.",
+      "default": false
+    },
+    {
+      "type": "paragraph",
+      "content": "Custom launcher: add the attribute data-open-ai-chat to any link, button, image, or text and clicking it will open the chatbot. Example: <a href=\"#\" data-open-ai-chat>Chat with us</a> — works even when the chatbot is hidden on mobile."
+    },
+    {
       "type": "color",
       "id": "color_primary",
       "label": "Primary Color",
@@ -213,7 +237,7 @@
       "default": "#d4ebdb"
     },
 
-    { "type": "header", "content": "Welcome CTAs", "info": "Up to 4 suggested starting questions shown under the greeting." },
+    { "type": "header", "content": "Welcome CTAs & Quick Picks", "info": "Up to 4 starting questions, plus shorter quick-pick prompts." },
     { "type": "text", "id": "cta1_label", "label": "CTA 1 Label", "default": "Find a product" },
     { "type": "text", "id": "cta1_message", "label": "CTA 1 Message", "default": "Help me find a product" },
     { "type": "text", "id": "cta2_label", "label": "CTA 2 Label", "default": "Track my order" },
@@ -224,7 +248,6 @@
     { "type": "text", "id": "cta4_message", "label": "CTA 4 Message", "default": "Show me current sales and promotions" },
     { "type": "text", "id": "cta_hint", "label": "CTA Hint Text" },
 
-    { "type": "header", "content": "Quick Picks", "info": "Shorter prompts shown as pills below the main CTAs." },
     { "type": "text", "id": "qp1_label", "label": "Quick Pick 1 Label", "default": "Best sellers" },
     { "type": "text", "id": "qp1_message", "label": "Quick Pick 1 Message", "default": "What are your best-selling products?" },
     { "type": "text", "id": "qp2_label", "label": "Quick Pick 2 Label", "default": "New arrivals" },
@@ -235,13 +258,23 @@
     { "type": "text", "id": "qp4_message", "label": "Quick Pick 4 Message", "default": "What is your return and refund policy?" },
 
     { "type": "header", "content": "Customer Service Handoff", "info": "Shown if the chat fails or the assistant can't answer." },
-    { "type": "text", "id": "support_label", "label": "Support Button Label", "default": "Contact customer service" },
-    { "type": "url", "id": "support_url", "label": "Support URL (help center, contact page, live chat link)", "info": "Leave blank to use your existing live chat (Zendesk / Gorgias / Intercom) if loaded on the page." },
+    {
+      "type": "text",
+      "id": "support_label",
+      "label": "Support Button Label",
+      "default": "Contact customer service"
+    },
+    {
+      "type": "url",
+      "id": "support_url",
+      "label": "Support URL (help center, contact page, live chat link)",
+      "info": "Leave blank to use your existing live chat (Zendesk / Gorgias / Intercom) if loaded on the page."
+    },
 
     {
       "type": "text",
       "id": "disclaimer",
-      "label": "Disclaimer Text",
+      "label": "Footer Disclaimer Text",
       "default": "Powered by AI"
     },
     {

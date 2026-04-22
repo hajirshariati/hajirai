@@ -3,7 +3,9 @@ import { authenticate } from "../shopify.server";
 import { getShopConfig, getKnowledgeFilesWithContent, incrementRateLimitHits } from "../models/ShopConfig.server";
 import { getAttributeMappings } from "../models/AttributeMapping.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
-import { TOOLS, executeTool, extractProductCards } from "../lib/chat-tools.server";
+import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL } from "../lib/chat-tools.server";
+import { fetchCustomerContext } from "../lib/customer-context.server";
+import prisma from "../db.server";
 import { recordChatUsage } from "../models/ChatUsage.server";
 import { canSendMessage } from "../lib/billing.server";
 
@@ -254,7 +256,7 @@ function extractSupportCTA(text, supportUrl, supportLabel) {
   return { text: cleaned, cta };
 }
 
-async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, controller, encoder, promptCaching }) {
+async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, controller, encoder, promptCaching, tools }) {
   const totalUsage = { input_tokens: 0, output_tokens: 0, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 };
   let toolCallCount = 0;
   const allProductPool = new Map();
@@ -264,13 +266,15 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     ? [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }]
     : systemPrompt;
 
+  const activeTools = tools || TOOLS;
+
   for (let hop = 0; hop < MAX_TOOL_HOPS; hop++) {
     const hopStart = Date.now();
     const stream = anthropic.messages.stream({
       model,
       max_tokens: MAX_TOKENS,
       system,
-      tools: TOOLS,
+      tools: activeTools,
       messages,
     });
 
@@ -510,6 +514,34 @@ export const action = async ({ request }) => {
     let querySynonyms = [];
     try { querySynonyms = JSON.parse(config.querySynonyms || "[]"); } catch { /* */ }
 
+    // Logged-in customer ID is HMAC-verified by Shopify on app proxy requests.
+    // This is the only trustworthy customer identifier — we NEVER use any
+    // customer_id sent in the POST body from the widget JS.
+    const url = new URL(request.url);
+    const loggedInCustomerId = url.searchParams.get("logged_in_customer_id") || null;
+
+    // session.accessToken from app proxy may be an online/proxy token; for
+    // Admin API calls we need the offline token. Fall back to the Session
+    // table if the proxy session's token is missing.
+    let accessToken = session.accessToken;
+    if (!accessToken) {
+      const offline = await prisma.session.findFirst({
+        where: { shop: session.shop, isOnline: false },
+        orderBy: { expires: "desc" },
+      });
+      accessToken = offline?.accessToken || null;
+    }
+
+    let customerContext = null;
+    if (loggedInCustomerId && config.vipModeEnabled === true && accessToken) {
+      customerContext = await fetchCustomerContext({
+        shop: session.shop,
+        accessToken,
+        customerId: loggedInCustomerId,
+        orderLimit: 5,
+      });
+    }
+
     const systemPrompt = buildSystemPrompt({
       config,
       knowledge,
@@ -517,6 +549,7 @@ export const action = async ({ request }) => {
       attributeNames,
       categoryExclusions,
       querySynonyms,
+      customerContext,
     });
 
     const history = sanitizeHistory(body.history);
@@ -542,12 +575,19 @@ export const action = async ({ request }) => {
       aftershipApiKey: config.aftershipApiKey || "",
       supportUrl: body.support_url || config.supportUrl || "",
       supportLabel: body.support_label || config.supportLabel || "",
+      accessToken,
+      loggedInCustomerId,
+      vipModeEnabled: config.vipModeEnabled === true,
     };
     const encoder = new TextEncoder();
 
     const stream = new ReadableStream({
       async start(controller) {
         try {
+          const activeTools = [...TOOLS];
+          if (loggedInCustomerId && config.vipModeEnabled === true && accessToken) {
+            activeTools.push(CUSTOMER_ORDERS_TOOL);
+          }
           const result = await runAgenticLoop({
             anthropic,
             model,
@@ -557,6 +597,7 @@ export const action = async ({ request }) => {
             controller,
             encoder,
             promptCaching: config.promptCaching === true,
+            tools: activeTools,
           });
 
           const lastText = result.fullResponseText || "";

@@ -37,6 +37,11 @@ fetch(CONFIG_URL).then(function(r){return r.json()}).then(function(d){
   if(d.klaviyoFormId)KLAVIYO_FORM_ID=d.klaviyoFormId;
   if(d.klaviyoCompanyId)KLAVIYO_COMPANY_ID=d.klaviyoCompanyId;
   if(d.klaviyoListId)KLAVIYO_LIST_ID=d.klaviyoListId;
+  if(d.showLoginPill===false){
+    SHOW_LOGIN_PILL=false;
+    var pill=document.querySelector('.ai-chat-header__login-pill,.ai-chat-header__vip-pill');
+    if(pill)pill.style.display='none';
+  }
   var rules=d.hideOnUrls||[];
   try{sessionStorage.setItem(HRK,JSON.stringify(rules))}catch(e){}
   if(matchesHideRule(rules)){
@@ -71,8 +76,15 @@ var SHOWBAN=C.showBanner!==false;
 var DISCL=C.disclaimerText||'';
 var PRIVURL=C.privacyUrl||'/pages/privacy-policy';
 var LWIDTH=C.launcherWidth||'500';
+var CWIDTH=C.chatWidth||LWIDTH;
+var HIDE_MOBILE=C.hideOnMobile===true;
 var SUPPORT_URL=C.supportUrl||'';
 var SUPPORT_LABEL=C.supportLabel||'Contact customer service';
+var CUST_LOGGED_IN=C.customerLoggedIn===true;
+var CUST_NAME=C.customerFirstName||'';
+var CUST_ID=C.customerId||null;
+var CUST_LOGIN_URL=C.customerLoginUrl||'/account/login';
+var SHOW_LOGIN_PILL=true;
 var KLAVIYO_FORM_ID='';
 var KLAVIYO_COMPANY_ID='';
 var KLAVIYO_LIST_ID='';
@@ -105,7 +117,7 @@ launcher.innerHTML='<div class="ai-chat-launcher__icon">'+avatarImg+'</div><span
 
 /* Build panel */
 var panel=el('div','ai-chat-panel ai-chat-panel--'+POS);
-var panelW=Math.max(parseInt(LWIDTH)||500,560);
+var panelW=Math.max(parseInt(CWIDTH)||parseInt(LWIDTH)||500,360);
 panel.style.width=panelW+'px';
 panel.style.maxWidth='calc(100vw - 16px)';
 panel.setAttribute('role','dialog');
@@ -113,8 +125,15 @@ panel.setAttribute('aria-label','AI Shopping Assistant');
 
 var headerAv=AVATAR?'<div class="ai-chat-header__avatar"><img src="'+AVATAR+'" alt="'+esc(NAME)+'"></div>':'<div class="ai-chat-header__avatar ai-chat-header__avatar--placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>';
 
+var loginPillHtml='';
+if(CUST_LOGGED_IN&&CUST_NAME){
+  loginPillHtml='<span class="ai-chat-header__vip-pill" title="Logged in">Hi '+esc(CUST_NAME)+'!</span>';
+}else if(!CUST_LOGGED_IN){
+  loginPillHtml='<a class="ai-chat-header__login-pill" href="'+esc(CUST_LOGIN_URL)+'">Login</a>';
+}
+
 panel.innerHTML=
-'<div class="ai-chat-header">'+headerAv+'<div class="ai-chat-header__info"><div class="ai-chat-header__name">'+esc(NAME)+'</div></div><div class="ai-chat-header__actions"><button class="ai-chat-header__btn ai-chat-menu-btn" aria-label="Menu" title="Options"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button><button class="ai-chat-header__btn ai-chat-close-btn" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div></div>'+
+'<div class="ai-chat-header">'+headerAv+'<div class="ai-chat-header__info"><div class="ai-chat-header__name">'+esc(NAME)+'</div></div><div class="ai-chat-header__actions">'+loginPillHtml+'<button class="ai-chat-header__btn ai-chat-menu-btn" aria-label="Menu" title="Options"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button><button class="ai-chat-header__btn ai-chat-close-btn" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div></div>'+
 '<div class="ai-chat-messages" role="log" aria-live="polite"></div>'+
 '<div class="ai-chat-typing"><div class="ai-chat-msg-avatar">'+assistantBubbleAvatar+'</div><div class="ai-chat-typing-dots"><span class="ai-chat-typing-dot"></span><span class="ai-chat-typing-dot"></span><span class="ai-chat-typing-dot"></span></div><span class="ai-chat-typing-text" aria-live="polite"></span></div>'+
 '<div class="ai-chat-input-area"><div class="ai-chat-input-wrap"><div class="ai-chat-input-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><textarea class="ai-chat-input" rows="1" placeholder="'+esc(IPLACE)+'" aria-label="Type your message"></textarea></div><button class="ai-chat-send" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></div>'+
@@ -133,6 +152,37 @@ panel.appendChild(menu);
 document.body.appendChild(overlay);
 document.body.appendChild(panel);
 document.body.appendChild(launcher);
+
+/* Hide on mobile if configured */
+var isMobileHidden=false;
+function checkMobileHide(){
+  if(!HIDE_MOBILE)return;
+  var mobile=window.innerWidth<768;
+  if(mobile&&!isMobileHidden){
+    launcher.style.display='none';
+    panel.style.display='none';
+    overlay.style.display='none';
+    isMobileHidden=true;
+  }else if(!mobile&&isMobileHidden){
+    launcher.style.display='';
+    panel.style.display='';
+    overlay.style.display='';
+    isMobileHidden=false;
+  }
+}
+checkMobileHide();
+window.addEventListener('resize',checkMobileHide);
+
+/* Custom launcher: any element with data-open-ai-chat opens the chatbot */
+document.addEventListener('click',function(e){
+  var trigger=e.target.closest('[data-open-ai-chat]');
+  if(!trigger)return;
+  e.preventDefault();
+  if(isMobileHidden){
+    launcher.style.display='';panel.style.display='';overlay.style.display='';isMobileHidden=false;
+  }
+  if(typeof toggle==='function')toggle(true);
+});
 
 /* Cache refs */
 var msgsEl=$('.ai-chat-messages',panel);

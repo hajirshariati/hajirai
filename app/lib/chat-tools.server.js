@@ -1,5 +1,6 @@
 import prisma from "../db.server";
 import { logMentions } from "../models/ChatProductMention.server";
+import { fetchCustomerContext } from "./customer-context.server";
 
 // Tool definitions sent to Anthropic. Keep descriptions action-oriented so the
 // model knows when to call each one.
@@ -781,12 +782,57 @@ async function getReturnInsights({ handle }, { shop, aftershipApiKey }) {
   };
 }
 
+// VIP-only tool. Only added to the tools list when the customer is logged in
+// and the shop has vipModeEnabled. Operates strictly on the HMAC-verified
+// loggedInCustomerId from the request context — never accepts a customer id
+// from the AI's arguments.
+export const CUSTOMER_ORDERS_TOOL = {
+  name: "get_customer_orders",
+  description:
+    "Fetch the logged-in customer's recent order history. Only call this when the customer asks about their orders, past purchases, order status, reorder, or anything referencing their history. Returns order number, date, status, line items, and total for each order. Never exposes email, addresses, or payment info.",
+  input_schema: {
+    type: "object",
+    properties: {
+      limit: {
+        type: "integer",
+        description: "Number of recent orders to fetch. Default 5, max 10.",
+        minimum: 1,
+        maximum: 10,
+      },
+    },
+  },
+};
+
+async function getCustomerOrders({ limit }, ctx) {
+  if (!ctx?.loggedInCustomerId || !ctx?.accessToken || !ctx?.shop) {
+    return { error: "Customer is not logged in." };
+  }
+  if (ctx.vipModeEnabled !== true) {
+    return { error: "VIP mode is not enabled for this store." };
+  }
+  const orderLimit = Math.max(1, Math.min(parseInt(limit, 10) || 5, 10));
+  const ctxData = await fetchCustomerContext({
+    shop: ctx.shop,
+    accessToken: ctx.accessToken,
+    customerId: ctx.loggedInCustomerId,
+    orderLimit,
+  });
+  if (!ctxData) return { error: "Could not fetch order history." };
+  return {
+    firstName: ctxData.firstName,
+    numberOfOrders: ctxData.numberOfOrders,
+    amountSpent: ctxData.amountSpent,
+    orders: ctxData.recentOrders,
+  };
+}
+
 const HANDLERS = {
   search_products: searchProducts,
   get_product_details: getProductDetails,
   lookup_sku: lookupSku,
   get_product_reviews: getProductReviews,
   get_return_insights: getReturnInsights,
+  get_customer_orders: getCustomerOrders,
 };
 
 function mentionsFromResult(name, result) {
