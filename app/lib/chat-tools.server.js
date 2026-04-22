@@ -184,6 +184,20 @@ const GENDERED_SEARCH = {
   kid: ["kid's", "kids"],
 };
 
+// Recognized footwear / accessory category words. When the search keyword is
+// one of these, we skip the description clause — sneakers frequently mention
+// "sandal" in prose ("great alternative to sandals"), which caused a men's
+// sandals query to surface sneakers. For category words, require a match in
+// title, productType, category attribute, or tags only.
+const CATEGORY_WORDS = new Set([
+  "shoe", "shoes", "sneaker", "sneakers", "sandal", "sandals",
+  "boot", "boots", "loafer", "loafers", "slipper", "slippers",
+  "heel", "heels", "flat", "flats", "clog", "clogs",
+  "mule", "mules", "wedge", "wedges", "slide", "slides",
+  "oxford", "oxfords", "moccasin", "moccasins",
+  "orthotic", "orthotics", "insole", "insoles", "insert", "inserts",
+]);
+
 function extractKeywords(q) {
   return q
     .toLowerCase()
@@ -239,14 +253,17 @@ function keywordMatchClause(kw, synonymMap) {
     }
   }
 
+  const isCategoryWord = CATEGORY_WORDS.has(kw.toLowerCase());
   const clauses = [];
   for (const t of allTerms) {
     clauses.push(
       { title: { contains: t, mode: "insensitive" } },
       { vendor: { contains: t, mode: "insensitive" } },
       { productType: { contains: t, mode: "insensitive" } },
-      { description: { contains: t, mode: "insensitive" } },
     );
+    if (!isCategoryWord) {
+      clauses.push({ description: { contains: t, mode: "insensitive" } });
+    }
     // Also check category-like metafield attributes. Merchants often tag products
     // by category in metafields (e.g. Category="Sandals") rather than in the title.
     const lower = t.toLowerCase();
