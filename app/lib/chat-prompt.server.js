@@ -100,6 +100,23 @@ export function buildSystemPrompt({ config, knowledge, shop, attributeNames, cat
     if (customerContext.tags && customerContext.tags.length > 0) {
       lines.push(`Customer tags (from Shopify): ${customerContext.tags.join(", ")}.`);
     }
+    if (customerContext.klaviyo?.segments && customerContext.klaviyo.segments.length > 0) {
+      lines.push(`Klaviyo segments: ${customerContext.klaviyo.segments.join(", ")}. Use these to calibrate tone (e.g. VIP segment → extra warm; Winback segment → re-engage gently; Churn Risk → acknowledge they've been away).`);
+    }
+    if (customerContext.loyalty) {
+      const l = customerContext.loyalty;
+      const bits = [];
+      if (l.pointsBalance != null) bits.push(`${l.pointsBalance} loyalty points`);
+      if (l.tier) bits.push(`tier: ${l.tier}`);
+      if (l.creditBalance != null && l.creditBalance > 0) bits.push(`$${l.creditBalance} store credit`);
+      if (bits.length > 0) lines.push(`Loyalty: ${bits.join(", ")}.`);
+      if (l.availableRewards && l.availableRewards.length > 0) {
+        lines.push(`Redeemable rewards: ${l.availableRewards.map((r) => `${r.name} (${r.cost})`).join(", ")}.`);
+      }
+      if (l.referralUrl) {
+        lines.push(`Personal referral link: ${l.referralUrl}`);
+      }
+    }
     if (customerContext.recentOrders && customerContext.recentOrders.length > 0) {
       lines.push(`Recent orders (most recent first):`);
       for (const o of customerContext.recentOrders) {
@@ -115,8 +132,11 @@ export function buildSystemPrompt({ config, knowledge, shop, attributeNames, cat
         `- Greet ${customerContext.firstName} warmly and briefly use their first name occasionally — not every message.`,
         "- Reference their order history when RELEVANT (reorder suggestions, complementary products, order follow-up). Do not dump order history unsolicited.",
         "- If they ask about their orders or past purchases, use the get_customer_orders tool to fetch fresh order details.",
+        "- If they have loyalty points and ask about rewards, discounts, or how to save, mention their points balance and any redeemable rewards naturally. If they ask how to earn more, suggest their personal referral link.",
+        "- Use Klaviyo segments to calibrate tone, but NEVER reveal segment names to the customer (e.g. don't say 'you're in our Churn Risk segment').",
         "- PRIVACY RULES (MUST follow):",
         "  - NEVER reveal the customer's email, full name, phone number, shipping or billing address, or payment details.",
+        "  - NEVER expose internal labels like Klaviyo segment names, customer tags, or system identifiers to the customer.",
         "  - Only use their first name.",
         "  - When referencing a past order, use the order number (e.g., '#1023') and the product titles — nothing else.",
         "  - If the customer asks you to reveal any sensitive info we shouldn't share, decline politely and refer them to their account page.",

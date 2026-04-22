@@ -8,6 +8,7 @@
   window.__AI_CHAT_CONFIG = {
     shopDomain: {{ shop.permanent_domain | json }},
     greeting: {{ block.settings.greeting | json }},
+    greetingLoggedIn: {{ block.settings.greeting_logged_in | json }},
     greetingCta: {{ block.settings.greeting_cta | json }},
     avatarUrl: {% if block.settings.avatar != blank %}{{ block.settings.avatar | image_url: width: 200 | json }}{% else %}""{% endif %},
     bannerUrl: {% if block.settings.banner != blank %}{{ block.settings.banner | image_url: width: 800 | json }}{% else %}""{% endif %},
@@ -150,6 +151,13 @@
       "id": "greeting",
       "label": "Greeting",
       "default": "Hi! I'm your personal shopping assistant."
+    },
+    {
+      "type": "textarea",
+      "id": "greeting_logged_in",
+      "label": "Greeting (logged in)",
+      "info": "Personalized greeting for logged-in customers. Use {name} for their first name. Leave blank to use the default greeting.",
+      "default": "Welcome back, {name}! How can I help you today?"
     },
     {
       "type": "text",

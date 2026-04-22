@@ -55,6 +55,7 @@ fetch(CONFIG_URL).then(function(r){return r.json()}).then(function(d){
 }).catch(function(){});
 var SHOP=C.shopDomain||'';
 var GREET=C.greeting||'Hi! I\'m your personal shopping assistant.';
+var GREET_LOGGED=C.greetingLoggedIn||'';
 var GREETCTA=C.greetingCta||'What can I help you find today?';
 var AVATAR=C.avatarUrl||'';
 var BANNER=C.bannerUrl||'';
@@ -255,7 +256,10 @@ if(SHOWBAN){
 }
 h+='<div class="ai-chat-welcome__avatar">'+avatarImg+'</div>';
 h+='<div class="ai-chat-welcome__name">'+esc(NAME)+'</div>';
-h+='<div class="ai-chat-welcome__tagline">'+esc(GREET)+'</div>';
+var welcomeGreeting=(CUST_LOGGED_IN&&CUST_NAME&&GREET_LOGGED&&GREET_LOGGED.trim())
+  ? GREET_LOGGED.replace(/\{name\}/gi,CUST_NAME)
+  : GREET;
+h+='<div class="ai-chat-welcome__tagline">'+esc(welcomeGreeting)+'</div>';
 if(GREETCTA)h+='<div class="ai-chat-welcome__greeting-cta">'+esc(GREETCTA)+'</div>';
 var ctas=[];
 if(CTA1L&&CTA1M)ctas.push({l:CTA1L,m:CTA1M});

@@ -13,6 +13,7 @@ const CUSTOMER_QUERY = `
   query GetCustomerContext($id: ID!, $orderLimit: Int!) {
     customer(id: $id) {
       firstName
+      email
       numberOfOrders
       amountSpent { amount currencyCode }
       tags
@@ -123,6 +124,10 @@ export async function fetchCustomerContext({ shop, accessToken, customerId, orde
     amountSpent: formatMoney(customer.amountSpent),
     tags: customer.tags || [],
     recentOrders,
+    // Internal-only: used by Klaviyo/Yotpo enrichment helpers for email-based
+    // lookups. Underscore prefix flags it as unsafe-for-prompt; the prompt
+    // builder explicitly strips underscore-prefixed keys before rendering.
+    _email: customer.email || "",
   };
   cacheSet(cacheKey, result);
   return result;
