@@ -598,6 +598,7 @@ export const action = async ({ request }) => {
       loggedInCustomerId,
       vipModeEnabled: config.vipModeEnabled === true,
       trackingPageUrl: config.trackingPageUrl || "",
+      returnsPageUrl: config.returnsPageUrl || "",
     };
     const encoder = new TextEncoder();
 
