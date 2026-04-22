@@ -393,7 +393,13 @@ function KnowledgeFilesCard({ files }) {
                   {currentType?.columns && <Text as="p" tone="subdued" variant="bodySm">Columns: <code>{currentType.columns}</code></Text>}
                 </BlockStack>
               </Box>
-              <DropZone accept=".csv,.txt" type="file" onDropAccepted={handleDropAccepted} allowMultiple={false}>
+              <DropZone
+                accept=".csv,.txt,text/plain,text/csv"
+                type="file"
+                onDropAccepted={handleDropAccepted}
+                allowMultiple={false}
+                customValidator={(file) => /\.(csv|txt)$/i.test(file.name)}
+              >
                 {uploadFile ? (
                   <Box padding="400">
                     <BlockStack gap="050">
