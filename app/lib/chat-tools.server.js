@@ -263,14 +263,7 @@ function keywordMatchClause(kw, synonymMap) {
     const lower = t.toLowerCase();
     const titleCase = lower.charAt(0).toUpperCase() + lower.slice(1);
     const termCases = Array.from(new Set([t, lower, titleCase]));
-    const attrKeys = ["category", "Category", "category_for_filter", "Category For Filter", "product_type", "productType"];
-    for (const key of attrKeys) {
-      for (const v of termCases) {
-        clauses.push({ attributesJson: { path: [key], equals: v } });
-        clauses.push({ attributesJson: { path: [key], array_contains: [v] } });
-        clauses.push({ attributesJson: { path: [key], string_contains: v } });
-      }
-    }
+
   }
   clauses.push({ tags: { hasSome: allTerms } });
   return { OR: clauses };
