@@ -429,13 +429,9 @@ if (effectiveGender) {
   where.AND.push(genderFilterClause(effectiveGender));
 }
 
-// Do not apply exclusionClause at DB level here.
-// We will apply exclusion only after fetching candidates,
-// and only if doing so would not leave us with zero results.
-
-  if (exclusionClause) {
-    where.AND.push(exclusionClause);
-  }
+// Exclusion rules are applied after retrieval as a soft filter.
+// This prevents valid results from disappearing entirely when a store's
+// product titles overlap with excluded terms.
 
   const GENDER_KEYS = new Set(["gender", "gender_fallback", "genders"]);
   const attrKeys = Object.keys(attrFilters).filter((k) => !GENDER_KEYS.has(k.toLowerCase()));
@@ -471,35 +467,39 @@ if (effectiveGender) {
     orderBy: { updatedAt: "desc" },
   });
 
-  if (merchantExclude && products.length > 0) {
+if (merchantExclude && products.length > 0) {
   const excludedTerms = merchantExclude
     .split(",")
     .map((s) => s.trim().toLowerCase())
     .filter(Boolean);
 
+  const toSearchableText = (value) => {
+    if (value == null) return "";
+    if (typeof value === "string") return value.toLowerCase();
+    if (Array.isArray(value)) return value.map(toSearchableText).join(" ");
+    if (typeof value === "object") return JSON.stringify(value).toLowerCase();
+    return String(value).toLowerCase();
+  };
+
   const productText = (p) =>
     [
-      p.title,
-      p.productType,
-      p.vendor,
-      p.handle,
-      typeof p.description === "string" ? p.description : "",
-      Array.isArray(p.tags) ? p.tags.join(" ") : "",
-      p.attributesJson ? JSON.stringify(p.attributesJson) : "",
-      Array.isArray(p.variants)
-        ? p.variants.map((v) => JSON.stringify(v.attributesJson || {})).join(" ")
-        : "",
+  p.title,
+  p.handle,
+  p.vendor,
+  p.productType,
+  p.description,
+  p.tags,
+  p.attributesJson,
+      ...(Array.isArray(p.variants) ? p.variants.map((v) => v.attributesJson) : []),
     ]
-      .join(" ")
-      .toLowerCase();
+      .map(toSearchableText)
+      .join(" ");
 
   const preferred = products.filter((p) => {
     const text = productText(p);
     return !excludedTerms.some((term) => text.includes(term));
   });
 
-  // Keep the rule when it still leaves usable results.
-  // But if it wipes everything out, fall back to original products.
   if (preferred.length > 0) {
     products = preferred;
   }
@@ -511,10 +511,9 @@ if (effectiveGender) {
       NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } },
       OR: keywords.map((kw) => keywordMatchClause(kw, synonymMap)),
     };
-    const fallbackAnd = [];
-    if (effectiveGender) fallbackAnd.push(genderFilterClause(effectiveGender));
-    if (exclusionClause) fallbackAnd.push(exclusionClause);
-    if (fallbackAnd.length > 0) fallbackWhere.AND = fallbackAnd;
+const fallbackAnd = [];
+if (effectiveGender) fallbackAnd.push(genderFilterClause(effectiveGender));
+if (fallbackAnd.length > 0) fallbackWhere.AND = fallbackAnd;
     products = await prisma.product.findMany({
       where: fallbackWhere,
       include: {
