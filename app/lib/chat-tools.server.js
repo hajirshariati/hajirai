@@ -403,7 +403,12 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
   const effectiveGender = detected.gender || sessionGender || filterGender || null;
   const searchQuery = detected.gender ? detected.query : q;
 
-  const keywords = extractKeywords(searchQuery);
+const rawKeywords = extractKeywords(searchQuery);
+
+// REMOVE gender words from keyword search
+const keywords = rawKeywords.filter(
+  (kw) => !["men", "women", "boy", "girl", "kid", "children"].includes(kw)
+);
   if (keywords.length === 0 && !effectiveGender) return { products: [] };
 
   const synonymMap = buildSynonymMap(querySynonyms);
