@@ -50,6 +50,9 @@ export const loader = async ({ request }) => {
     hasKlaviyoPrivateKey: config.klaviyoPrivateKey !== "",
     hasYotpoLoyaltyKey: config.yotpoLoyaltyApiKey !== "",
     yotpoLoyaltyGuid: config.yotpoLoyaltyGuid || "",
+    loyaltyDisplay: config.loyaltyDisplay || "points",
+    loyaltyPointsPerDollar: config.loyaltyPointsPerDollar ?? 100,
+    loyaltyRounding: config.loyaltyRounding || "exact",
   };
 };
 
@@ -134,6 +137,20 @@ export const action = async ({ request }) => {
 
   const yotpoLoyaltyGuid = formData.get("yotpoLoyaltyGuid");
   if (yotpoLoyaltyGuid !== null) data.yotpoLoyaltyGuid = yotpoLoyaltyGuid.trim();
+
+  const loyaltyDisplay = formData.get("loyaltyDisplay");
+  if (loyaltyDisplay !== null) data.loyaltyDisplay = loyaltyDisplay === "dollars" ? "dollars" : "points";
+
+  const loyaltyPointsPerDollar = formData.get("loyaltyPointsPerDollar");
+  if (loyaltyPointsPerDollar !== null) {
+    const n = parseInt(loyaltyPointsPerDollar, 10);
+    data.loyaltyPointsPerDollar = Number.isFinite(n) && n > 0 ? n : 100;
+  }
+
+  const loyaltyRounding = formData.get("loyaltyRounding");
+  if (loyaltyRounding !== null) {
+    data.loyaltyRounding = ["up", "down", "exact"].includes(loyaltyRounding) ? loyaltyRounding : "exact";
+  }
 
   if (Object.keys(data).length > 0) {
     await updateShopConfig(session.shop, data);
@@ -249,7 +266,7 @@ function HideUrlsPanel({ initial }) {
 }
 
 export default function ApiKeys() {
-  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, trackingPageUrl: initTrackingPageUrl, returnsPageUrl: initReturnsPageUrl, promptCaching: initCaching, klaviyoFormId: initKlaviyoFormId, klaviyoCompanyId: initKlaviyoCompanyId, klaviyoListId: initKlaviyoListId, vipModeEnabled: initVipMode, showLoginPill: initShowLoginPill, hasKlaviyoPrivateKey, hasYotpoLoyaltyKey, yotpoLoyaltyGuid: initYotpoLoyaltyGuid } = useLoaderData();
+  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, trackingPageUrl: initTrackingPageUrl, returnsPageUrl: initReturnsPageUrl, promptCaching: initCaching, klaviyoFormId: initKlaviyoFormId, klaviyoCompanyId: initKlaviyoCompanyId, klaviyoListId: initKlaviyoListId, vipModeEnabled: initVipMode, showLoginPill: initShowLoginPill, hasKlaviyoPrivateKey, hasYotpoLoyaltyKey, yotpoLoyaltyGuid: initYotpoLoyaltyGuid, loyaltyDisplay: initLoyaltyDisplay, loyaltyPointsPerDollar: initLoyaltyPointsPerDollar, loyaltyRounding: initLoyaltyRounding } = useLoaderData();
   const actionData = useActionData();
   const nav = useNavigation();
   const saving = nav.state === "submitting";
@@ -274,6 +291,9 @@ export default function ApiKeys() {
   const [klaviyoPrivateKey, setKlaviyoPrivateKey] = useState("");
   const [yotpoLoyaltyKey, setYotpoLoyaltyKey] = useState("");
   const [yotpoLoyaltyGuidState, setYotpoLoyaltyGuidState] = useState(initYotpoLoyaltyGuid);
+  const [loyaltyDisplay, setLoyaltyDisplay] = useState(initLoyaltyDisplay);
+  const [loyaltyPointsPerDollar, setLoyaltyPointsPerDollar] = useState(String(initLoyaltyPointsPerDollar));
+  const [loyaltyRounding, setLoyaltyRounding] = useState(initLoyaltyRounding);
 
   return (
     <Page title="Settings" backAction={{ url: "/app" }}>
@@ -484,6 +504,40 @@ export default function ApiKeys() {
                       autoComplete="off"
                       helpText="Optional. Some Yotpo accounts require the GUID alongside the API key. Leave blank if your API key works alone."
                     />
+                    <Select
+                      label="How should the chat display loyalty balances?"
+                      options={[
+                        { label: "Points (e.g. '250 points')", value: "points" },
+                        { label: "Dollar value (e.g. '$2.50 in rewards')", value: "dollars" },
+                      ]}
+                      value={loyaltyDisplay}
+                      onChange={setLoyaltyDisplay}
+                      helpText="Controls how the AI references loyalty balances to logged-in customers."
+                    />
+                    {loyaltyDisplay === "dollars" && (
+                      <BlockStack gap="300">
+                        <TextField
+                          label="Conversion rate (points per $1)"
+                          type="number"
+                          min={1}
+                          value={loyaltyPointsPerDollar}
+                          onChange={setLoyaltyPointsPerDollar}
+                          helpText="Example: 100 means 100 points = $1. 500 points → $5.00."
+                          autoComplete="off"
+                        />
+                        <Select
+                          label="Rounding"
+                          options={[
+                            { label: "Exact (e.g. $2.53)", value: "exact" },
+                            { label: "Round down (e.g. $2)", value: "down" },
+                            { label: "Round up (e.g. $3)", value: "up" },
+                          ]}
+                          value={loyaltyRounding}
+                          onChange={setLoyaltyRounding}
+                          helpText="How the converted dollar amount is displayed."
+                        />
+                      </BlockStack>
+                    )}
                   </BlockStack>
 
                   <Divider />
@@ -596,6 +650,9 @@ export default function ApiKeys() {
           <input type="hidden" name="klaviyoPrivateKey" value={klaviyoPrivateKey} />
           <input type="hidden" name="yotpoLoyaltyApiKey" value={yotpoLoyaltyKey} />
           <input type="hidden" name="yotpoLoyaltyGuid" value={yotpoLoyaltyGuidState} />
+          <input type="hidden" name="loyaltyDisplay" value={loyaltyDisplay} />
+          <input type="hidden" name="loyaltyPointsPerDollar" value={loyaltyPointsPerDollar} />
+          <input type="hidden" name="loyaltyRounding" value={loyaltyRounding} />
 
           <Box paddingBlockEnd="800">
             <InlineStack align="end">

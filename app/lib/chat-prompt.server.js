@@ -106,8 +106,18 @@ export function buildSystemPrompt({ config, knowledge, shop, attributeNames, cat
     }
     if (customerContext.loyalty) {
       const l = customerContext.loyalty;
+      const displayMode = config?.loyaltyDisplay === "dollars" ? "dollars" : "points";
+      const ratio = Math.max(1, parseInt(config?.loyaltyPointsPerDollar, 10) || 100);
+      const rounding = config?.loyaltyRounding || "exact";
+      const formatBalance = (points) => {
+        if (displayMode === "points") return `${points} points`;
+        const dollars = points / ratio;
+        if (rounding === "up") return `$${Math.ceil(dollars)} in rewards`;
+        if (rounding === "down") return `$${Math.floor(dollars)} in rewards`;
+        return `$${dollars.toFixed(2)} in rewards`;
+      };
       const bits = [];
-      if (l.pointsBalance != null) bits.push(`${l.pointsBalance} loyalty points`);
+      if (l.pointsBalance != null) bits.push(formatBalance(l.pointsBalance));
       if (l.tier) bits.push(`tier: ${l.tier}`);
       if (l.creditBalance != null && l.creditBalance > 0) bits.push(`$${l.creditBalance} store credit`);
       if (bits.length > 0) lines.push(`Loyalty: ${bits.join(", ")}.`);
@@ -117,6 +127,11 @@ export function buildSystemPrompt({ config, knowledge, shop, attributeNames, cat
       if (l.referralUrl) {
         lines.push(`Personal referral link: ${l.referralUrl}`);
       }
+      lines.push(
+        displayMode === "dollars"
+          ? `When telling the customer their loyalty balance, ALWAYS use the dollar value shown above — e.g. say 'you have $2.50 in rewards' — NEVER mention the raw points number. Only reference points if the customer explicitly asks about points.`
+          : `When telling the customer their loyalty balance, use the points figure shown above. Do not convert to dollars unless the customer asks.`,
+      );
     }
     if (customerContext.recentOrders && customerContext.recentOrders.length > 0) {
       lines.push(`Recent orders (most recent first):`);
