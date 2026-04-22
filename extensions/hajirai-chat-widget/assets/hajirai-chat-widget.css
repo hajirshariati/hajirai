@@ -549,6 +549,19 @@
   font-style: italic;
 }
 
+a.ai-chat-welcome__hint--link {
+  display: inline-block;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  color: var(--ai-chat-color-primary, #2d6b4f);
+  cursor: pointer;
+  font-style: normal;
+  font-weight: 500;
+}
+a.ai-chat-welcome__hint--link:hover {
+  color: var(--ai-chat-text, #1a1a1a);
+}
+
 /* Quick picks row */
 .ai-chat-welcome__quickpicks {
   display: flex;
