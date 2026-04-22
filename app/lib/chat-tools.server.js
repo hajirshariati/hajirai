@@ -417,22 +417,19 @@ async function searchProducts({ query, limit, filters }, { shop, deduplicateColo
     : "-";
   console.log(`[search] query="${q}" gender=${effectiveGender || "-"} filters=${extraFiltersLog} rule=${merchantExclude || "-"}`);
 
-const where = {
-  shop,
-  NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } },
-  AND: keywords.length > 0
-    ? [{ OR: keywords.map((kw) => keywordMatchClause(kw, synonymMap)) }]
-    : [],
-};
+  const where = {
+    shop,
+    NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } },
+    AND: keywords.length > 0 ? keywords.map((kw) => keywordMatchClause(kw, synonymMap)) : [],
+  };
 
   if (effectiveGender) {
     where.AND.push(genderFilterClause(effectiveGender));
   }
 
-// TEMP TEST: disable exclusion rule
-// if (exclusionClause) {
-//   where.AND.push(exclusionClause);
-// }
+  if (exclusionClause) {
+    where.AND.push(exclusionClause);
+  }
 
   const GENDER_KEYS = new Set(["gender", "gender_fallback", "genders"]);
   const attrKeys = Object.keys(attrFilters).filter((k) => !GENDER_KEYS.has(k.toLowerCase()));
