@@ -789,7 +789,7 @@ async function getReturnInsights({ handle }, { shop, aftershipApiKey }) {
 export const CUSTOMER_ORDERS_TOOL = {
   name: "get_customer_orders",
   description:
-    "Fetch the logged-in customer's recent order history. Only call this when the customer asks about their orders, past purchases, order status, reorder, or anything referencing their history. Returns order number, date, status, line items, and total for each order. Never exposes email, addresses, or payment info.",
+    "Fetch the logged-in customer's order history, including tracking info and delivery status. Call this when the customer asks about their orders, shipping, tracking, delivery, a specific order number, past purchases, or reorder. Returns order number, date, status, line items, total, tracking numbers with carrier and URL, and estimated/actual delivery date. Never exposes email, street addresses, or payment info. If the customer mentions a specific order number, pass it as orderNumber to filter.",
   input_schema: {
     type: "object",
     properties: {
@@ -799,18 +799,28 @@ export const CUSTOMER_ORDERS_TOOL = {
         minimum: 1,
         maximum: 10,
       },
+      orderNumber: {
+        type: "string",
+        description: "Optional. A specific order number the customer mentioned (e.g. '1023' or '#1023'). If provided, only matching orders are returned. If the match is empty, the tool returns an empty orders array (order may be too old or doesn't belong to this customer).",
+      },
     },
   },
 };
 
-async function getCustomerOrders({ limit }, ctx) {
+function normalizeOrderNumber(raw) {
+  return String(raw || "").replace(/[^0-9a-z]/gi, "").toLowerCase();
+}
+
+async function getCustomerOrders({ limit, orderNumber }, ctx) {
   if (!ctx?.loggedInCustomerId || !ctx?.accessToken || !ctx?.shop) {
     return { error: "Customer is not logged in." };
   }
   if (ctx.vipModeEnabled !== true) {
     return { error: "VIP mode is not enabled for this store." };
   }
-  const orderLimit = Math.max(1, Math.min(parseInt(limit, 10) || 5, 10));
+  // If filtering by order number, fetch the max so we can match older orders.
+  const needle = orderNumber ? normalizeOrderNumber(orderNumber) : "";
+  const orderLimit = needle ? 10 : Math.max(1, Math.min(parseInt(limit, 10) || 5, 10));
   const ctxData = await fetchCustomerContext({
     shop: ctx.shop,
     accessToken: ctx.accessToken,
@@ -818,11 +828,17 @@ async function getCustomerOrders({ limit }, ctx) {
     orderLimit,
   });
   if (!ctxData) return { error: "Could not fetch order history." };
+
+  let orders = ctxData.recentOrders || [];
+  if (needle) {
+    orders = orders.filter((o) => normalizeOrderNumber(o.name) === needle || normalizeOrderNumber(o.name).endsWith(needle));
+  }
+
   return {
     firstName: ctxData.firstName,
     numberOfOrders: ctxData.numberOfOrders,
     amountSpent: ctxData.amountSpent,
-    orders: ctxData.recentOrders,
+    orders,
   };
 }
 

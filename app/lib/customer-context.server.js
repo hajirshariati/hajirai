@@ -21,12 +21,21 @@ const CUSTOMER_QUERY = `
         nodes {
           name
           createdAt
+          cancelledAt
           displayFinancialStatus
           displayFulfillmentStatus
           totalPriceSet { shopMoney { amount currencyCode } }
           lineItems(first: 5) {
             nodes { title quantity }
           }
+          fulfillments(first: 3) {
+            createdAt
+            deliveredAt
+            estimatedDeliveryAt
+            status
+            trackingInfo { company number url }
+          }
+          shippingAddress { city province country }
         }
       }
     }
@@ -109,14 +118,33 @@ export async function fetchCustomerContext({ shop, accessToken, customerId, orde
   const customer = data?.customer;
   if (!customer) return null;
 
-  const recentOrders = (customer.orders?.nodes || []).map((o) => ({
-    name: o.name,
-    date: formatDate(o.createdAt),
-    financialStatus: o.displayFinancialStatus,
-    fulfillmentStatus: o.displayFulfillmentStatus,
-    total: formatMoney(o.totalPriceSet?.shopMoney),
-    items: (o.lineItems?.nodes || []).map((li) => `${li.title}${li.quantity > 1 ? ` ×${li.quantity}` : ""}`),
-  }));
+  const recentOrders = (customer.orders?.nodes || []).map((o) => {
+    const fulfillments = (o.fulfillments || []).map((f) => ({
+      status: f.status,
+      shippedAt: formatDate(f.createdAt),
+      deliveredAt: formatDate(f.deliveredAt),
+      estimatedDelivery: formatDate(f.estimatedDeliveryAt),
+      tracking: (f.trackingInfo || []).map((t) => ({
+        carrier: t.company || null,
+        number: t.number || null,
+        url: t.url || null,
+      })),
+    }));
+    const shipTo = o.shippingAddress
+      ? [o.shippingAddress.city, o.shippingAddress.province, o.shippingAddress.country].filter(Boolean).join(", ")
+      : "";
+    return {
+      name: o.name,
+      date: formatDate(o.createdAt),
+      cancelled: !!o.cancelledAt,
+      financialStatus: o.displayFinancialStatus,
+      fulfillmentStatus: o.displayFulfillmentStatus,
+      total: formatMoney(o.totalPriceSet?.shopMoney),
+      items: (o.lineItems?.nodes || []).map((li) => `${li.title}${li.quantity > 1 ? ` ×${li.quantity}` : ""}`),
+      fulfillments,
+      shipTo,
+    };
+  });
 
   const result = {
     firstName: customer.firstName || "",

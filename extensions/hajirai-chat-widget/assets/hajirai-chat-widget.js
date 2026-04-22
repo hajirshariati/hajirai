@@ -69,6 +69,7 @@ var CTA2L=C.cta2Label||'';var CTA2M=C.cta2Message||'';
 var CTA3L=C.cta3Label||'';var CTA3M=C.cta3Message||'';
 var CTA4L=C.cta4Label||'';var CTA4M=C.cta4Message||'';
 var HINT=C.ctaHint||'';
+var HINT_LOGGED=C.ctaHintLoggedIn||'';
 var QP1L=C.quickPick1Label||'';var QP1M=C.quickPick1Message||'';
 var QP2L=C.quickPick2Label||'';var QP2M=C.quickPick2Message||'';
 var QP3L=C.quickPick3Label||'';var QP3M=C.quickPick3Message||'';
@@ -286,7 +287,14 @@ if(qps.length){
   }
   h+='</div>';
 }
-if(HINT)h+='<div class="ai-chat-welcome__hint">'+esc(HINT)+'</div>';
+if(CUST_LOGGED_IN){
+  if(HINT_LOGGED&&HINT_LOGGED.trim()){
+    var loggedHint=HINT_LOGGED.replace(/\{name\}/gi,CUST_NAME||'');
+    h+='<div class="ai-chat-welcome__hint">'+esc(loggedHint)+'</div>';
+  }
+}else if(HINT){
+  h+='<a class="ai-chat-welcome__hint ai-chat-welcome__hint--link" href="'+esc(CUST_LOGIN_URL)+'">'+esc(HINT)+'</a>';
+}
 h+='</div>';
 msgsEl.innerHTML=h;
 }
