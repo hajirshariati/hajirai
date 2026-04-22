@@ -47,12 +47,20 @@ export async function fetchYotpoLoyalty({ apiKey, guid, email }) {
       throw new Error(`Yotpo Loyalty ${res.status}: ${body.slice(0, 200)}`);
     }
     const data = await res.json();
+    console.log(`[yotpo-loyalty] email=${email} points=${data?.points_balance ?? "?"} tier=${data?.vip_tier_name || data?.tier || "none"} referral=${data?.perkea_referral_link || data?.referral_url || data?.referralUrl || data?.referral_link || "none"}`);
     const result = {
       pointsBalance: data?.points_balance ?? null,
       creditBalance: data?.credit_balance ?? null,
       tier: data?.vip_tier_name || data?.tier || null,
       tierProgress: data?.vip_tier_progress_percentage ?? null,
-      referralUrl: data?.perkea_referral_link || data?.referral_url || null,
+      referralUrl:
+        data?.perkea_referral_link ||
+        data?.referral_url ||
+        data?.referralUrl ||
+        data?.referral_link ||
+        data?.share_link ||
+        data?.shareable_link ||
+        null,
       availableRewards: Array.isArray(data?.redemption_options)
         ? data.redemption_options
             .filter((r) => r?.is_redeemable)
