@@ -47,6 +47,7 @@ export const loader = async ({ request }) => {
     showLoginPill: config.showLoginPill !== false,
     hasKlaviyoPrivateKey: config.klaviyoPrivateKey !== "",
     hasYotpoLoyaltyKey: config.yotpoLoyaltyApiKey !== "",
+    yotpoLoyaltyGuid: config.yotpoLoyaltyGuid || "",
   };
 };
 
@@ -122,6 +123,9 @@ export const action = async ({ request }) => {
   if (yotpoLoyaltyKey !== null && yotpoLoyaltyKey !== "") {
     data.yotpoLoyaltyApiKey = yotpoLoyaltyKey;
   }
+
+  const yotpoLoyaltyGuid = formData.get("yotpoLoyaltyGuid");
+  if (yotpoLoyaltyGuid !== null) data.yotpoLoyaltyGuid = yotpoLoyaltyGuid.trim();
 
   if (Object.keys(data).length > 0) {
     await updateShopConfig(session.shop, data);
@@ -237,7 +241,7 @@ function HideUrlsPanel({ initial }) {
 }
 
 export default function ApiKeys() {
-  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, promptCaching: initCaching, klaviyoFormId: initKlaviyoFormId, klaviyoCompanyId: initKlaviyoCompanyId, klaviyoListId: initKlaviyoListId, vipModeEnabled: initVipMode, showLoginPill: initShowLoginPill, hasKlaviyoPrivateKey, hasYotpoLoyaltyKey } = useLoaderData();
+  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, promptCaching: initCaching, klaviyoFormId: initKlaviyoFormId, klaviyoCompanyId: initKlaviyoCompanyId, klaviyoListId: initKlaviyoListId, vipModeEnabled: initVipMode, showLoginPill: initShowLoginPill, hasKlaviyoPrivateKey, hasYotpoLoyaltyKey, yotpoLoyaltyGuid: initYotpoLoyaltyGuid } = useLoaderData();
   const actionData = useActionData();
   const nav = useNavigation();
   const saving = nav.state === "submitting";
@@ -259,6 +263,7 @@ export default function ApiKeys() {
   const [showLoginPill, setShowLoginPill] = useState(initShowLoginPill);
   const [klaviyoPrivateKey, setKlaviyoPrivateKey] = useState("");
   const [yotpoLoyaltyKey, setYotpoLoyaltyKey] = useState("");
+  const [yotpoLoyaltyGuidState, setYotpoLoyaltyGuidState] = useState(initYotpoLoyaltyGuid);
 
   return (
     <Page title="Settings" backAction={{ url: "/app" }}>
@@ -438,13 +443,20 @@ export default function ApiKeys() {
                     </InlineStack>
                     <TextField
                       label="Yotpo Loyalty API key"
-                      labelHidden
                       type="password"
                       value={yotpoLoyaltyKey}
                       onChange={setYotpoLoyaltyKey}
                       placeholder={hasYotpoLoyaltyKey ? "••••••••••••••••" : "Paste key to enable loyalty VIP perks"}
                       autoComplete="off"
-                      helpText="Merchant API key from Yotpo Loyalty &amp; Referrals admin → Tools → Developer Tools. Different from the reviews key above. Lets the AI reference the customer's points balance, tier, and referral link when VIP mode is on."
+                      helpText="From Yotpo Loyalty admin → Program Settings → API Key. Lets the AI reference the customer's points, tier, and referral link when VIP mode is on."
+                    />
+                    <TextField
+                      label="Yotpo Loyalty GUID"
+                      value={yotpoLoyaltyGuidState}
+                      onChange={setYotpoLoyaltyGuidState}
+                      placeholder="Optional — GUID from Program Settings"
+                      autoComplete="off"
+                      helpText="Optional. Some Yotpo accounts require the GUID alongside the API key. Leave blank if your API key works alone."
                     />
                   </BlockStack>
 
@@ -555,6 +567,7 @@ export default function ApiKeys() {
           <input type="hidden" name="showLoginPill" value={String(showLoginPill)} />
           <input type="hidden" name="klaviyoPrivateKey" value={klaviyoPrivateKey} />
           <input type="hidden" name="yotpoLoyaltyApiKey" value={yotpoLoyaltyKey} />
+          <input type="hidden" name="yotpoLoyaltyGuid" value={yotpoLoyaltyGuidState} />
 
           <Box paddingBlockEnd="800">
             <InlineStack align="end">
