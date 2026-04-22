@@ -283,12 +283,24 @@ function splitCsv(raw) {
     .filter(Boolean);
 }
 
+// Word-boundary + singular/plural match for a single override phrase.
+// "shoe" matches "shoe" and "shoes"; "shoes" matches "shoes" and "shoe".
+// "new shoes" matches "new shoes" / "new shoe" but not "newshoes".
+function overrideMatches(userLower, phrase) {
+  if (!phrase) return false;
+  const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const withS = /s$/.test(phrase)
+    ? `(?:${escaped}|${escaped.slice(0, -1)})`
+    : `${escaped}(?:s|es)?`;
+  return new RegExp(`\\b${withS}\\b`).test(userLower);
+}
+
 // Merchant-configured via Rules & Knowledge → Search Rules.
 // Each rule: { whenQuery, excludeTerms, overrideTriggers? }
 // - whenQuery: comma-separated keywords; if any appears in the conversation, the rule fires
 // - excludeTerms: comma-separated terms; matching products are hidden from results
 // - overrideTriggers (optional): comma-separated keywords; if any appears in the user's
-//   latest message, the rule is skipped for this turn
+//   latest message (word-boundary, plural-aware), the rule is skipped for this turn
 function matchesCategoryRule(text, rules, userText = "") {
   if (!rules || !Array.isArray(rules)) return null;
   const lower = text.toLowerCase();
@@ -297,7 +309,7 @@ function matchesCategoryRule(text, rules, userText = "") {
     const triggers = splitCsv(rule.whenQuery);
     if (!triggers.some((t) => lower.includes(t))) continue;
     const overrides = splitCsv(rule.overrideTriggers);
-    if (overrides.length > 0 && overrides.some((o) => userLower.includes(o))) continue;
+    if (overrides.length > 0 && overrides.some((o) => overrideMatches(userLower, o))) continue;
     return rule.excludeTerms;
   }
   return null;
