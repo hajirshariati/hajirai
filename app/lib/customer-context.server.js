@@ -26,7 +26,12 @@ const CUSTOMER_QUERY = `
           displayFulfillmentStatus
           totalPriceSet { shopMoney { amount currencyCode } }
           lineItems(first: 5) {
-            nodes { title quantity }
+            nodes {
+              title
+              quantity
+              variantTitle
+              variant { selectedOptions { name value } }
+            }
           }
           fulfillments(first: 3) {
             createdAt
@@ -140,7 +145,16 @@ export async function fetchCustomerContext({ shop, accessToken, customerId, orde
       financialStatus: o.displayFinancialStatus,
       fulfillmentStatus: o.displayFulfillmentStatus,
       total: formatMoney(o.totalPriceSet?.shopMoney),
-      items: (o.lineItems?.nodes || []).map((li) => `${li.title}${li.quantity > 1 ? ` ×${li.quantity}` : ""}`),
+      items: (o.lineItems?.nodes || []).map((li) => {
+        const parts = [li.title];
+        const vt = li.variantTitle && li.variantTitle !== "Default Title" ? li.variantTitle : "";
+        if (vt && !li.title.includes(vt)) parts.push(vt);
+        const opts = (li.variant?.selectedOptions || [])
+          .filter((o2) => o2 && o2.value && (!vt || !vt.includes(o2.value)))
+          .map((o2) => `${o2.name}: ${o2.value}`);
+        const base = opts.length ? `${parts.join(" — ")} (${opts.join(", ")})` : parts.join(" — ");
+        return li.quantity > 1 ? `${base} ×${li.quantity}` : base;
+      }),
       fulfillments,
       shipTo,
     };
