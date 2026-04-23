@@ -456,7 +456,12 @@ const keywords = rawKeywords.filter(
   const fetchLimit = deduplicateColors ? max * 5 : max * 3;
 
 let products = await prisma.product.findMany({
-  take: 5,
+  where,
+  include: {
+    variants: { select: { sku: true, price: true, compareAtPrice: true, attributesJson: true } },
+  },
+  take: fetchLimit,
+  orderBy: { updatedAt: "desc" },
 });
 
 console.log("TOTAL PRODUCTS FOUND:", products.length);
