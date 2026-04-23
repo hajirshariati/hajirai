@@ -946,6 +946,29 @@ async function findSimilarProducts({ handle, limit }, { shop, deduplicateColors,
   const refGender = readAttrLowerList(refAttrs, ["gender", "Gender", "gender_fallback"]);
   const max = Math.min(Math.max(parseInt(limit, 10) || 6, 1), 10);
 
+  // Style-family exclusion: catalogs frequently list multiple products under
+  // one style name (e.g. "Jillian Sport Sandal", "Jillian Braided Slide") with
+  // different handles. Handle-only exclusion leaves those variants in the
+  // results, which the customer reads as "you recommended the same thing back
+  // to me." Compute a style-family key from the first meaningful word of the
+  // reference's title, then filter out any candidate whose title starts with
+  // the same key. Pure title-token math — no product terminology in code.
+  const FAMILY_STOP = new Set(["the", "a", "an", "my", "our", "new"]);
+  const extractStyleFamily = (title) => {
+    if (!title) return "";
+    const beforeDash = String(title).split(/\s[-–—]\s/)[0];
+    const words = beforeDash
+      .toLowerCase()
+      .replace(/[^a-z0-9\s']/g, " ")
+      .split(/\s+/)
+      .filter(Boolean);
+    for (const w of words) {
+      if (w.length > 2 && !FAMILY_STOP.has(w)) return w;
+    }
+    return "";
+  };
+  const refFamily = extractStyleFamily(reference.title);
+
   const candidates = await prisma.product.findMany({
     where: {
       shop,
@@ -974,6 +997,11 @@ async function findSimilarProducts({ handle, limit }, { shop, deduplicateColors,
 
   const matched = candidates.filter((p) => {
     const a = p.attributesJson || {};
+
+    if (refFamily) {
+      const candFamily = extractStyleFamily(p.title);
+      if (candFamily === refFamily) return false;
+    }
 
     for (const { keys, values } of requiredMatches) {
       const candidateVals = readAttrLowerList(a, keys);
@@ -1012,7 +1040,7 @@ async function findSimilarProducts({ handle, limit }, { shop, deduplicateColors,
   };
 
   console.log(
-    `[similar] ref=${h} attrs=[${requiredMatches.map((r) => `${r.name}=${r.values.join("/")}`).join(", ")}] category=${refCategory.join("/") || "-"} gender=${refGender.join("/") || "-"} → ${final.length}`,
+    `[similar] ref=${h} family=${refFamily || "-"} attrs=[${requiredMatches.map((r) => `${r.name}=${r.values.join("/")}`).join(", ")}] category=${refCategory.join("/") || "-"} gender=${refGender.join("/") || "-"} → ${final.length}`,
   );
 
   return {
