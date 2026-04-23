@@ -550,22 +550,27 @@ const getProductHaystack = (p) => {
 
   const excludeTerms = merchantExclude ? splitCsv(merchantExclude) : [];
 
-  const isExcludedByRule = (p) => {
-    if (excludeTerms.length === 0) return false;
+const isExcludedByRule = (p) => {
+  if (excludeTerms.length === 0) return false;
 
-    const attrs = p.attributesJson || {};
-    const text = [
-      p.title || "",
-      p.productType || "",
-      attrs.category || "",
-      attrs.category_for_filter || "",
-      attrs.subcategory || "",
-    ]
-      .join(" ")
-      .toLowerCase();
+  const attrs = p.attributesJson || {};
+  const categoryText = [
+    attrs.category || "",
+    attrs.category_for_filter || "",
+    attrs.subcategory || "",
+  ]
+    .join(" ")
+    .toLowerCase();
 
-    return excludeTerms.some((term) => text.includes(term));
-  };
+  const productTypeText = (p.productType || "").toLowerCase();
+
+  // Only exclude by category/filter fields and productType.
+  // Do NOT exclude by title, because titles like
+  // "Milos Orthotic Men's Slides" would wrongly get removed.
+  return excludeTerms.some(
+    (term) => categoryText.includes(term) || productTypeText.includes(term)
+  );
+};
 
   const matchesAttr = (val, want) => {
     if (Array.isArray(val)) {
