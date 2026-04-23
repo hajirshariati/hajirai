@@ -343,7 +343,7 @@ var t=esc(p.title||'');
 var u=p.url||(p.handle?('/products/'+p.handle):'#');
 var pr=esc(p.price_formatted||(p.price?fmt(p.price):''));
 var cp=p.compare_at_price?esc(fmt(p.compare_at_price)):'';
-return '<a class="ai-chat-product-card" href="'+esc(u)+'" style="text-decoration:none;color:inherit">'+(img?'<div class="ai-chat-product-img"><img src="'+esc(img)+'" alt="'+t+'" loading="lazy"></div>':'')+'<div class="ai-chat-product-info"><span class="ai-chat-product-title">'+t+'</span><div class="ai-chat-product-price">'+pr+(cp?'<span class="compare-at">'+cp+'</span>':'')+'</div></div></a>';
+return '<a class="ai-chat-product-card" data-handle="'+esc(p.handle||'')+'" href="'+esc(u)+'" style="text-decoration:none;color:inherit">'+(img?'<div class="ai-chat-product-img"><img src="'+esc(img)+'" alt="'+t+'" loading="lazy"></div>':'')+'<div class="ai-chat-product-info"><span class="ai-chat-product-title">'+t+'</span><div class="ai-chat-product-price">'+pr+(cp?'<span class="compare-at">'+cp+'</span>':'')+'</div></div></a>';
 }
 
 function sendMessage(){
@@ -497,7 +497,8 @@ if(p.type==='suggestions'&&p.questions&&p.questions.length){
   buffSugg=p.questions;
 }
 if(p.type==='fit_report'&&p.recommendedSize){
-  fitReport={handle:p.handle||'',productTitle:p.productTitle||'',size:p.recommendedSize,confidence:Math.max(0,Math.min(100,parseInt(p.confidence,10)||0)),reasons:Array.isArray(p.reasons)?p.reasons:[],display:p.display==='percent'?'percent':'bar'};
+  var _d=p.display==='percent'?'percent':(p.display==='hide'?'hide':'bar');
+  fitReport={handle:p.handle||'',productTitle:p.productTitle||'',size:p.recommendedSize,confidence:Math.max(0,Math.min(100,parseInt(p.confidence,10)||0)),reasons:Array.isArray(p.reasons)?p.reasons:[],display:_d};
 }
 if(p.type==='klaviyo_form'){
   setTimeout(function(){showKlaviyoForm('Stay Connected')},300);
@@ -546,7 +547,11 @@ isStreaming=false;sendBtn.disabled=false;
 function fitReportHtml(fr){
 if(!fr||!fr.size)return '';
 var conf=fr.confidence||0;
-var bar=fr.display==='percent'?'<div class="ai-chat-fit-percent">'+conf+'%</div>':'<div class="ai-chat-fit-bar" role="progressbar" aria-valuenow="'+conf+'" aria-valuemin="0" aria-valuemax="100"><div class="ai-chat-fit-bar-fill" style="width:'+conf+'%"></div><span class="ai-chat-fit-bar-val">'+conf+'%</span></div>';
+var confBlock='';
+if(fr.display!=='hide'){
+  var bar=fr.display==='percent'?'<div class="ai-chat-fit-percent">'+conf+'%</div>':'<div class="ai-chat-fit-bar" role="progressbar" aria-valuenow="'+conf+'" aria-valuemin="0" aria-valuemax="100"><div class="ai-chat-fit-bar-fill" style="width:'+conf+'%"></div><span class="ai-chat-fit-bar-val">'+conf+'%</span></div>';
+  confBlock='<div class="ai-chat-fit-conf-label">Confidence</div>'+bar;
+}
 var reasonsHtml='';
 if(fr.reasons&&fr.reasons.length){
   reasonsHtml='<ul class="ai-chat-fit-reasons">';
@@ -556,8 +561,7 @@ if(fr.reasons&&fr.reasons.length){
 return '<div class="ai-chat-fit-card" role="region" aria-label="Size recommendation">'+
   '<div class="ai-chat-fit-head"><span class="ai-chat-fit-icon" aria-hidden="true">▸</span><span class="ai-chat-fit-title">Fit finder</span></div>'+
   '<div class="ai-chat-fit-size">Recommended size <strong>'+esc(fr.size)+'</strong></div>'+
-  '<div class="ai-chat-fit-conf-label">Confidence</div>'+
-  bar+
+  confBlock+
   reasonsHtml+
 '</div>';
 }
@@ -586,7 +590,22 @@ if(linkCTA&&linkCTA.url&&mDiv){
 }
 if(fitReport&&fitReport.size&&mDiv){
   var frb=$('.ai-chat-msg-bubble',mDiv);
-  if(frb)frb.insertAdjacentHTML('beforeend',fitReportHtml(fitReport));
+  if(frb){
+    var _h=(fitReport.handle||'').replace(/"/g,'');
+    var matchProd=_h?frb.querySelector('.ai-chat-product-card[data-handle="'+_h+'"]'):null;
+    var tmp=document.createElement('div');
+    tmp.innerHTML=fitReportHtml(fitReport);
+    var fitEl=tmp.firstChild;
+    if(matchProd&&fitEl){
+      var pair=document.createElement('div');
+      pair.className='ai-chat-fit-pair';
+      matchProd.parentNode.insertBefore(pair,matchProd);
+      pair.appendChild(matchProd);
+      pair.appendChild(fitEl);
+    }else if(fitEl){
+      frb.appendChild(fitEl);
+    }
+  }
 }
 if(sugg&&sugg.length>0&&mDiv){
   var sb=$('.ai-chat-msg-bubble',mDiv);

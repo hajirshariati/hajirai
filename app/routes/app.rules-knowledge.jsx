@@ -215,7 +215,7 @@ export const action = async ({ request }) => {
           historyWeight: Number.isFinite(parsed.historyWeight) ? Math.max(0, Math.min(1, parsed.historyWeight)) : 0.3,
           externalWeight: Number.isFinite(parsed.externalWeight) ? Math.max(0, Math.min(1, parsed.externalWeight)) : 0.1,
           minConfidence: Number.isFinite(parsed.minConfidence) ? Math.max(0, Math.min(100, parsed.minConfidence)) : 50,
-          display: parsed.display === "percent" || parsed.display === "bar" ? parsed.display : "bar",
+          display: parsed.display === "percent" || parsed.display === "bar" || parsed.display === "hide" ? parsed.display : "bar",
           externalUrl: typeof parsed.externalUrl === "string" ? parsed.externalUrl.trim() : "",
           externalAuthHeader: typeof parsed.externalAuthHeader === "string" ? parsed.externalAuthHeader.trim() : "",
         };
@@ -910,10 +910,11 @@ function FitPredictorCard({ enabled, config }) {
                     options={[
                       { label: "Progress bar", value: "bar" },
                       { label: "Percent only", value: "percent" },
+                      { label: "Hidden (size only)", value: "hide" },
                     ]}
                     value={display}
                     onChange={setDisplay}
-                    helpText="How confidence is rendered in the widget."
+                    helpText='How confidence is rendered. "Hidden" shows only the recommended size and reasons — no percentage or bar.'
                   />
                 </FormLayout.Group>
               </FormLayout>

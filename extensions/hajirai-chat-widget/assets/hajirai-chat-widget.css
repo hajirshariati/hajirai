@@ -1297,6 +1297,25 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
   }
 }
 
+/* Fit predictor pair — product + fit side-by-side on wide, stacked when narrow */
+.ai-chat-fit-pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 10px;
+  align-items: stretch;
+  margin-bottom: 10px;
+}
+.ai-chat-fit-pair .ai-chat-product-card {
+  margin: 0;
+  height: 100%;
+}
+.ai-chat-fit-pair .ai-chat-fit-card {
+  margin-top: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 /* Fit predictor card */
 .ai-chat-fit-card {
   margin-top: 12px;
