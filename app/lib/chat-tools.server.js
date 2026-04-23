@@ -498,31 +498,33 @@ async function searchProducts(
 
   const keywordGroups = keywords.map((kw) => expandKeywordTerms(kw));
 
-  const getProductHaystack = (p) => {
-    const attrs = p.attributesJson || {};
-    const variantAttrs = (p.variants || [])
-      .map((v) => {
-        const va = v.attributesJson || {};
-        return Object.values(va).flat().join(" ");
-      })
-      .join(" ");
+const flattenAttributeValues = (obj) => {
+  if (!obj || typeof obj !== "object") return "";
+  return Object.values(obj)
+    .flatMap((v) => (Array.isArray(v) ? v : [v]))
+    .filter((v) => v !== null && v !== undefined && v !== "")
+    .map((v) => String(v))
+    .join(" ");
+};
 
-    return [
-      p.title || "",
-      p.vendor || "",
-      p.productType || "",
-      p.description || "",
-      Array.isArray(p.tags) ? p.tags.join(" ") : "",
-      attrs.category || "",
-      attrs.category_for_filter || "",
-      attrs.subcategory || "",
-      attrs.gender || "",
-      attrs.gender_fallback || "",
-      variantAttrs,
-    ]
-      .join(" ")
-      .toLowerCase();
-  };
+const getProductHaystack = (p) => {
+  const attrs = flattenAttributeValues(p.attributesJson || {});
+  const variantAttrs = (p.variants || [])
+    .map((v) => flattenAttributeValues(v.attributesJson || {}))
+    .join(" ");
+
+  return [
+    p.title || "",
+    p.vendor || "",
+    p.productType || "",
+    p.description || "",
+    Array.isArray(p.tags) ? p.tags.join(" ") : "",
+    attrs,
+    variantAttrs,
+  ]
+    .join(" ")
+    .toLowerCase();
+};
 
   const excludeTerms = merchantExclude ? splitCsv(merchantExclude) : [];
 
