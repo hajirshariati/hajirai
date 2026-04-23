@@ -138,43 +138,16 @@ async function upsertProduct(shop, node, mappings = null) {
   return product;
 }
 
-export async function upsertProductFromWebhook(shop, webhookPayload) {
+export async function upsertProductFromWebhook(shop, webhookPayload, admin) {
   const numericId = webhookPayload.id || webhookPayload.admin_graphql_api_id;
-  if (!numericId) return null;
-  const gid = typeof numericId === "string" && numericId.startsWith("gid://")
-    ? numericId
-    : `gid://shopify/Product/${numericId}`;
-  const variants = (webhookPayload.variants || []).map((v) => ({
-    id: v.admin_graphql_api_id || `gid://shopify/ProductVariant/${v.id}`,
-    sku: v.sku,
-    title: v.title,
-    price: v.price,
-    compareAtPrice: v.compare_at_price,
-    inventoryQuantity: v.inventory_quantity,
-    selectedOptions: [
-      webhookPayload.option1 || v.option1 ? { name: "Option1", value: v.option1 } : null,
-      v.option2 ? { name: "Option2", value: v.option2 } : null,
-      v.option3 ? { name: "Option3", value: v.option3 } : null,
-    ].filter(Boolean),
-  }));
+  if (!numericId || !admin) return null;
 
-  const node = {
-    id: gid,
-    handle: webhookPayload.handle,
-    title: webhookPayload.title,
-    vendor: webhookPayload.vendor,
-    productType: webhookPayload.product_type,
-    tags: typeof webhookPayload.tags === "string"
-      ? webhookPayload.tags.split(",").map((t) => t.trim()).filter(Boolean)
-      : (webhookPayload.tags || []),
-    descriptionHtml: webhookPayload.body_html,
-    status: webhookPayload.status,
-    featuredImage: webhookPayload.image ? { url: webhookPayload.image.src } : null,
-    variants: { nodes: variants },
-  };
+  const gid =
+    typeof numericId === "string" && numericId.startsWith("gid://")
+      ? numericId
+      : `gid://shopify/Product/${numericId}`;
 
-const mappings = await getAttributeMappings(shop);
-return upsertProduct(shop, node, mappings);
+  return fetchAndUpsertProduct(admin, shop, gid);
 }
 
 export async function fetchAndUpsertProduct(admin, shop, shopifyGid) {

@@ -3,7 +3,7 @@ import { upsertProductFromWebhook } from "../models/Product.server";
 import prisma from "../db.server";
 
 export const action = async ({ request }) => {
-  const { shop, payload, topic } = await authenticate.webhook(request);
+  const { shop, payload, topic, admin } = await authenticate.webhook(request);
 
   const syncState = await prisma.catalogSyncState.findUnique({ where: { shop } });
   if (syncState?.status === "running") {
@@ -12,7 +12,7 @@ export const action = async ({ request }) => {
 
   console.log(`Received ${topic} webhook for ${shop}`);
   try {
-    await upsertProductFromWebhook(shop, payload);
+    await upsertProductFromWebhook(shop, payload, admin);
   } catch (err) {
     console.error(`[webhook ${topic}] upsert failed:`, err?.message || err);
   }
