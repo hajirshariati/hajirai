@@ -548,9 +548,18 @@ controller.enqueue(encoder.encode(sseChunk({
 })));
 
 
-  if (supportCTA) {
-    controller.enqueue(encoder.encode(sseChunk({ type: "link", url: supportCTA.url, label: supportCTA.label })));
-  }
+// ONLY show support CTA if user actually asked for support
+const userAskedSupportOnly =
+  /\b(contact|support|customer service|help|return|refund|exchange|order issue)\b/i
+  .test(ctx.userText || "");
+
+if (supportCTA && userAskedSupportOnly) {
+  controller.enqueue(encoder.encode(sseChunk({
+    type: "link",
+    url: supportCTA.url,
+    label: supportCTA.label
+  })));
+}
 
   if (!supportCTA && fullResponseText) {
   const generic = extractGenericCTA(fullResponseText);
