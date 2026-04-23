@@ -650,6 +650,7 @@ if (supportCTA && userAskedSupportOnly) {
       const seen = new Set();
       const deduped = [];
       const categoryCounts = new Map();
+      const genderCounts = new Map();
       for (const c of cards) {
         const key = c.handle || c.title;
         if (seen.has(key)) continue;
@@ -657,7 +658,10 @@ if (supportCTA && userAskedSupportOnly) {
         if (c._category) {
           categoryCounts.set(c._category, (categoryCounts.get(c._category) || 0) + 1);
         }
-        const { _descriptionSnippet, _searchQuery, _category, ...publicCard } = c;
+        if (c._gender) {
+          genderCounts.set(c._gender, (genderCounts.get(c._gender) || 0) + 1);
+        }
+        const { _descriptionSnippet, _searchQuery, _category, _gender, ...publicCard } = c;
         deduped.push(publicCard);
       }
       // show product cards
@@ -667,8 +671,10 @@ controller.enqueue(encoder.encode(sseChunk({
 })));
 
 // Collection CTA: AI-emitted <<Label|URL>> takes priority; otherwise look up
-// the dominant category across the shown cards in the merchant's configured
-// collectionLinks mapping. No mapping → no CTA (avoids 404s).
+// the dominant (category, gender) across the shown cards in the merchant's
+// configured collectionLinks mapping. Matching prefers an exact
+// category+gender rule, then falls back to a gender-agnostic rule for the
+// same category. No mapping → no CTA (avoids 404s).
 const collection = extractCollectionCTA(fullResponseText);
 if (collection.cta) {
   controller.enqueue(encoder.encode(sseChunk({
@@ -677,12 +683,29 @@ if (collection.cta) {
     label: collection.cta.label,
   })));
 } else if (Array.isArray(ctx.collectionLinks) && ctx.collectionLinks.length > 0 && categoryCounts.size > 0) {
-  const [dominantCat] = [...categoryCounts.entries()].sort((a, b) => b[1] - a[1])[0];
-  const match = ctx.collectionLinks.find((link) => {
+  const dominantCat = [...categoryCounts.entries()].sort((a, b) => b[1] - a[1])[0][0];
+  const dominantGender = genderCounts.size > 0
+    ? [...genderCounts.entries()].sort((a, b) => b[1] - a[1])[0][0]
+    : (ctx.sessionGender || "");
+  const normalizedGender = String(dominantGender || "").toLowerCase().trim();
+
+  const catMatches = (linkCat, cat) => {
+    if (!linkCat) return false;
+    return linkCat === cat || cat.includes(linkCat) || linkCat.includes(cat);
+  };
+  const exact = ctx.collectionLinks.find((link) => {
     const linkCat = String(link?.category || "").toLowerCase().trim();
-    if (!linkCat || !link?.url) return false;
-    return linkCat === dominantCat || dominantCat.includes(linkCat) || linkCat.includes(dominantCat);
+    const linkGender = String(link?.gender || "").toLowerCase().trim();
+    if (!linkCat || !link?.url || !linkGender) return false;
+    return catMatches(linkCat, dominantCat) && linkGender === normalizedGender;
   });
+  const fallback = !exact && ctx.collectionLinks.find((link) => {
+    const linkCat = String(link?.category || "").toLowerCase().trim();
+    const linkGender = String(link?.gender || "").toLowerCase().trim();
+    if (!linkCat || !link?.url || linkGender) return false;
+    return catMatches(linkCat, dominantCat);
+  });
+  const match = exact || fallback;
   if (match) {
     const label = `Shop all ${String(match.label || match.category).trim()}`;
     controller.enqueue(encoder.encode(sseChunk({
@@ -766,6 +789,7 @@ export const action = async ({ request }) => {
         ? raw
             .map((r) => ({
               category: String(r?.category || "").trim().toLowerCase(),
+              gender: String(r?.gender || "").trim().toLowerCase(),
               url: String(r?.url || "").trim(),
               label: String(r?.label || r?.category || "").trim(),
             }))
