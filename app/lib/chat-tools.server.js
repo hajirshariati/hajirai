@@ -337,11 +337,31 @@ function matchesCategoryRule(text, rules, userText = "") {
 }
 
 const GENDER_DETECT = [
-  { pattern: /\b(men[''']?s|male|guy|dude|dad|father|husband|boyfriend|brother|son|grandpa|grandfather|uncle|nephew|him|his)\b/i, gender: "men", strip: /\b(men[''']?s|mens|male|guy|dude|dad|father|husband|boyfriend|brother|son|grandpa|grandfather|uncle|nephew)\b/gi },
-  { pattern: /\b(women[''']?s|female|lady|ladies|mom|mother|wife|girlfriend|sister|daughter|grandma|grandmother|aunt|niece|her|hers)\b/i, gender: "women", strip: /\b(women[''']?s|womens|female|lady|ladies|mom|mother|wife|girlfriend|sister|daughter|grandma|grandmother|aunt|niece)\b/gi },
-  { pattern: /\b(boy[''']?s|boys)\b/i, gender: "boy", strip: /\b(boy[''']?s|boys)\b/gi },
-  { pattern: /\b(girl[''']?s|girls)\b/i, gender: "girl", strip: /\b(girl[''']?s|girls)\b/gi },
-  { pattern: /\b(kid[''']?s|kids|children[''']?s)\b/i, gender: "kid", strip: /\b(kid[''']?s|kids|children[''']?s|childrens)\b/gi },
+  {
+    pattern: /\b(men|mens|men['’]?s|male|guy|dude|dad|father|husband|boyfriend|brother|son|grandpa|grandfather|uncle|nephew|him|his)\b/i,
+    gender: "men",
+    strip: /\b(men|mens|men['’]?s|male|guy|dude|dad|father|husband|boyfriend|brother|son|grandpa|grandfather|uncle|nephew)\b/gi,
+  },
+  {
+    pattern: /\b(women|womens|women['’]?s|female|lady|ladies|mom|mother|wife|girlfriend|sister|daughter|grandma|grandmother|aunt|niece|her|hers)\b/i,
+    gender: "women",
+    strip: /\b(women|womens|women['’]?s|female|lady|ladies|mom|mother|wife|girlfriend|sister|daughter|grandma|grandmother|aunt|niece)\b/gi,
+  },
+  {
+    pattern: /\b(boy|boys|boy['’]?s)\b/i,
+    gender: "boy",
+    strip: /\b(boy|boys|boy['’]?s)\b/gi,
+  },
+  {
+    pattern: /\b(girl|girls|girl['’]?s)\b/i,
+    gender: "girl",
+    strip: /\b(girl|girls|girl['’]?s)\b/gi,
+  },
+  {
+    pattern: /\b(kid|kids|kid['’]?s|children|children['’]?s|childrens)\b/i,
+    gender: "kid",
+    strip: /\b(kid|kids|kid['’]?s|children|children['’]?s|childrens)\b/gi,
+  },
 ];
 
 function detectAndStripGender(query) {
@@ -469,10 +489,9 @@ let products = await prisma.product.findMany({
       NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } },
       OR: keywords.map((kw) => keywordMatchClause(kw, synonymMap)),
     };
-    const fallbackAnd = [];
-    if (effectiveGender) fallbackAnd.push(genderFilterClause(effectiveGender));
-    if (exclusionClause) fallbackAnd.push(exclusionClause);
-    if (fallbackAnd.length > 0) fallbackWhere.AND = fallbackAnd;
+const fallbackAnd = [];
+if (exclusionClause) fallbackAnd.push(exclusionClause);
+if (fallbackAnd.length > 0) fallbackWhere.AND = fallbackAnd;
     products = await prisma.product.findMany({
       where: fallbackWhere,
       include: {
