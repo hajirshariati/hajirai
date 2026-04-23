@@ -527,7 +527,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     scored.sort((a, b) => b.score - a.score);
 
     const matched = dropSiblingCards(
-      scored.filter((s) => s.score >= 0.4),
+      scored.filter((s) => s.score >= 0.6),
       textLower,
     );
 
