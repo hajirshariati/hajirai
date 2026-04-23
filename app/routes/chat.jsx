@@ -374,6 +374,11 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   const allProductPool = new Map();
   const excludedFamilies = new Set();
   const excludedHandles = new Set();
+  // Product handles the fit tool focused on. When present, the final card
+  // display filters to just these — a size question about "Miles" should
+  // only show the Miles card, not Elise/Dylan/etc. that happened to match
+  // the search query on generic words like "arch support sneaker".
+  const focusedHandles = new Set();
   let fullResponseText = "";
 
 
@@ -438,6 +443,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         if (fam) excludedFamilies.add(fam);
       }
       if (u.name === "get_fit_recommendation" && r && !r.error && r.recommendation?.shouldDisplay) {
+        if (r.handle) focusedHandles.add(String(r.handle).toLowerCase());
         const display = typeof ctx.fitPredictorConfig?.display === "string" ? ctx.fitPredictorConfig.display : "bar";
         controller.enqueue(encoder.encode(sseChunk({
           type: "fit_report",
@@ -629,7 +635,7 @@ if (supportCTA && userAskedSupportOnly) {
     // family matches the reference — otherwise Jillian from an earlier
     // search_products call wins the scoring pass because the AI text still
     // names "Jillian" as the comparison point.
-    const filteredPool = (excludedFamilies.size === 0 && excludedHandles.size === 0)
+    let filteredPool = (excludedFamilies.size === 0 && excludedHandles.size === 0)
       ? pool
       : pool.filter((card) => {
           const handle = String(card.handle || "").toLowerCase();
@@ -638,6 +644,17 @@ if (supportCTA && userAskedSupportOnly) {
           if (fam && excludedFamilies.has(fam)) return false;
           return true;
         });
+
+    // When get_fit_recommendation ran, the customer is asking about ONE
+    // specific product. Narrow the display to just the focused handle(s),
+    // so a search that over-matched on generic words ("arch support
+    // sneaker") doesn't show random sibling products alongside.
+    if (focusedHandles.size > 0) {
+      const focused = filteredPool.filter((card) =>
+        focusedHandles.has(String(card.handle || "").toLowerCase()),
+      );
+      if (focused.length > 0) filteredPool = focused;
+    }
 
     const userTextLower = (ctx.userText || "").toLowerCase();
     const scored = filteredPool.map((card) => ({
