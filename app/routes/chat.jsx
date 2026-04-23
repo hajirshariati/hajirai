@@ -398,7 +398,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     if (toolUses.length === 0) break;
 
     toolCallCount += toolUses.length;
-    if (toolUses.some((u) => u.name === "search_products" || u.name === "get_product_details" || u.name === "lookup_sku")) {
+    if (toolUses.some((u) => u.name === "search_products" || u.name === "get_product_details" || u.name === "lookup_sku" || u.name === "find_similar_products")) {
       productSearchAttempted = true;
     }
 
@@ -424,7 +424,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       role: "user",
       content: toolUses.map((u, i) => {
         const payload = results[i] ?? {};
-        if (hopHasProducts && (u.name === "search_products" || u.name === "get_product_details" || u.name === "lookup_sku")) {
+        if (hopHasProducts && (u.name === "search_products" || u.name === "get_product_details" || u.name === "lookup_sku" || u.name === "find_similar_products")) {
           payload._display = "Product cards are shown automatically. Do NOT list products with links. Write a brief summary only.";
         }
         return {
@@ -689,6 +689,13 @@ export const action = async ({ request }) => {
     try { categoryExclusions = JSON.parse(config.categoryExclusions || "[]"); } catch { /* */ }
     let querySynonyms = [];
     try { querySynonyms = JSON.parse(config.querySynonyms || "[]"); } catch { /* */ }
+    let similarMatchAttributes = [];
+    try {
+      const raw = JSON.parse(config.similarMatchAttributes || "[]");
+      similarMatchAttributes = Array.isArray(raw)
+        ? raw.map((s) => (typeof s === "string" ? s.trim() : "")).filter(Boolean)
+        : [];
+    } catch { /* */ }
 
     // Logged-in customer ID is HMAC-verified by Shopify on app proxy requests.
     // This is the only trustworthy customer identifier — we NEVER use any
@@ -762,6 +769,7 @@ export const action = async ({ request }) => {
       sessionGender,
       categoryExclusions,
       querySynonyms,
+      similarMatchAttributes,
       conversationText,
       userText,
       yotpoApiKey: config.yotpoApiKey || "",

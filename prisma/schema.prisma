@@ -91,9 +91,10 @@ model ShopConfig {
   loyaltyPointsPerDollar Int    @default(100)
   loyaltyRounding     String   @default("exact")
 
-  hideOnUrls          String   @default("[]")
-  categoryExclusions  String   @default("[]")
-  querySynonyms       String   @default("[]")
+  hideOnUrls             String   @default("[]")
+  categoryExclusions     String   @default("[]")
+  querySynonyms          String   @default("[]")
+  similarMatchAttributes String   @default("[]")
 
   supportUrl          String   @default("")
   supportLabel        String   @default("Contact customer service")
