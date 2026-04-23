@@ -544,6 +544,22 @@ appendMsg('assistant',c,p);saveH(messages);
 isStreaming=false;sendBtn.disabled=false;
 }
 
+function fitSnippetHtml(fr){
+if(!fr||!fr.size)return '';
+var conf=fr.confidence||0;
+var confBlock='';
+if(fr.display==='percent'){
+  confBlock='<div class="ai-chat-product-fit-pct">'+conf+'% sure</div>';
+}else if(fr.display!=='hide'){
+  confBlock='<div class="ai-chat-product-fit-bar" role="progressbar" aria-valuenow="'+conf+'" aria-valuemin="0" aria-valuemax="100"><div class="ai-chat-product-fit-bar-fill" style="width:'+conf+'%"></div></div><div class="ai-chat-product-fit-pct">'+conf+'% sure</div>';
+}
+return '<div class="ai-chat-product-fit" aria-label="Size recommendation">'+
+  '<span class="ai-chat-product-fit-label">▸ FIT FINDER</span>'+
+  '<div class="ai-chat-product-fit-size">Size <strong>'+esc(fr.size)+'</strong></div>'+
+  confBlock+
+'</div>';
+}
+
 function fitReportHtml(fr){
 if(!fr||!fr.size)return '';
 var conf=fr.confidence||0;
@@ -595,17 +611,14 @@ if(fitReport&&fitReport.size&&mDiv){
   if(frb){
     var _h=(fitReport.handle||'').replace(/"/g,'');
     var matchProd=_h?frb.querySelector('.ai-chat-product-card[data-handle="'+_h+'"]'):null;
-    var tmp=document.createElement('div');
-    tmp.innerHTML=fitReportHtml(fitReport);
-    var fitEl=tmp.firstChild;
-    if(matchProd&&fitEl){
-      var pair=document.createElement('div');
-      pair.className='ai-chat-fit-pair';
-      matchProd.parentNode.insertBefore(pair,matchProd);
-      pair.appendChild(matchProd);
-      pair.appendChild(fitEl);
-    }else if(fitEl){
-      frb.appendChild(fitEl);
+    if(matchProd){
+      matchProd.classList.add('has-fit');
+      matchProd.insertAdjacentHTML('beforeend',fitSnippetHtml(fitReport));
+    }else{
+      var tmp=document.createElement('div');
+      tmp.innerHTML=fitReportHtml(fitReport);
+      var fitEl=tmp.firstChild;
+      if(fitEl)frb.appendChild(fitEl);
     }
   }
 }
