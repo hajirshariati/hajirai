@@ -124,7 +124,58 @@ function addUsage(acc, usage) {
   acc.cache_read_input_tokens += usage.cache_read_input_tokens || 0;
 }
 
+const SIBLING_GENERIC_WORDS = new Set([
+  "the", "a", "an", "for", "and", "or", "in", "on", "with", "men", "mens",
+  "women", "womens", "black", "white", "tan", "brown", "red", "blue", "grey",
+  "gray", "pink", "dark", "light", "w", "s",
+]);
+
+function cardTitleTokens(title) {
+  return new Set(
+    (title || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, " ")
+      .split(/\s+/)
+      .filter((w) => w.length > 1 && !SIBLING_GENERIC_WORDS.has(w)),
+  );
+}
+
+// Drop "sibling" cards the AI didn't actually name. Example: the AI names
+// "Speed Orthotics W/ Metatarsal Support" but the near-duplicate "Speed
+// Posted Orthotics W/ Metatarsal Support" scores high purely from overlapping
+// title words, even though the AI never mentioned "Posted". For each
+// lower-scored card that shares >=80% of distinctive title words with a
+// higher-scored, already-kept card AND introduces at least one extra word
+// that does not appear in the AI text, drop it. Pure title-token math, no
+// product terminology.
+function dropSiblingCards(scored, textLower) {
+  const kept = [];
+  for (const candidate of scored) {
+    const candTokens = cardTitleTokens(candidate.card.title);
+    let drop = false;
+    for (const k of kept) {
+      const keptTokens = cardTitleTokens(k.card.title);
+      if (candTokens.size === 0 || keptTokens.size === 0) continue;
+      let shared = 0;
+      for (const w of candTokens) if (keptTokens.has(w)) shared++;
+      const sharedRatio = shared / Math.min(candTokens.size, keptTokens.size);
+      if (sharedRatio < 0.8) continue;
+      let extraUnmentioned = 0;
+      for (const w of candTokens) {
+        if (!keptTokens.has(w) && !textLower.includes(w)) extraUnmentioned++;
+      }
+      if (extraUnmentioned >= 1) {
+        drop = true;
+        break;
+      }
+    }
+    if (!drop) kept.push(candidate);
+  }
+  return kept;
+}
+
 function scoreCardAgainstText(card, textLower, userTextLower) {
+
   const raw = card.title.toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter((w) => w.length > 1);
   const generic = new Set(["the", "a", "an", "for", "and", "or", "in", "on", "with", "men", "mens", "women", "womens", "black", "white", "tan", "brown", "red", "blue", "grey", "gray", "pink", "dark", "light"]);
   const nameWords = raw.filter((w) => !generic.has(w));
@@ -271,8 +322,16 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   const activeTools = tools || TOOLS;
 
   for (let hop = 0; hop < MAX_TOOL_HOPS; hop++) {
+    // If the previous hop emitted text and this hop is about to emit more,
+    // insert a paragraph break so the two streamed chunks don't run together
+    // as "...you!Here are..." in the rendered message.
+    if (hop > 0 && fullResponseText && !/\s$/.test(fullResponseText)) {
+      fullResponseText += "\n\n";
+    }
+
     const hopStart = Date.now();
     const stream = anthropic.messages.stream({
+
       model,
       max_tokens: MAX_TOKENS,
       system,
@@ -435,14 +494,18 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }));
     scored.sort((a, b) => b.score - a.score);
 
-    const matched = scored.filter((s) => s.score >= 0.4);
+    const matched = dropSiblingCards(
+      scored.filter((s) => s.score >= 0.4),
+      textLower,
+    );
 
     let cards;
     if (matched.length > 0) {
       cards = matched.slice(0, 3).map((s) => s.card);
     } else if (!saysNoMatch) {
-      cards = scored.slice(0, 3).map((s) => s.card);
+      cards = dropSiblingCards(scored, textLower).slice(0, 3).map((s) => s.card);
     }
+
 
     if (cards && cards.length > 0) {
       const seen = new Set();

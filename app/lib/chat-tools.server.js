@@ -635,16 +635,69 @@ const isExcludedByRule = (p) => {
   let filtered = scored.map((x) => x.product);
 
   if (attrKeys.length > 0) {
+    const beforeAttrFilter = filtered;
+
+    // Category-style filters often come in as umbrella words ("footwear")
+    // that don't appear verbatim in the merchant's `category` value (which
+    // is usually narrower, like "sneaker"). Expand the filter value through
+    // the merchant's configured Query Synonyms and match against every
+    // field the merchant uses for category classification plus Shopify's
+    // productType. Keeps behavior data-driven — no product terminology in
+    // code. If the merchant configured no synonyms, this degrades to an
+    // exact match against those fields — same behavior as before.
+    const expandFilterValue = (want) => {
+      const out = new Set();
+      const base = String(want || "").toLowerCase().trim();
+      if (!base) return out;
+      out.add(base);
+      for (const s of synonymMap[base] || []) out.add(String(s).toLowerCase());
+      return out;
+    };
+
+    const matchesCategoryWant = (p, want) => {
+      const wants = expandFilterValue(want);
+      if (wants.size === 0) return true;
+      const attrs = p.attributesJson || {};
+      const parts = [
+        attrs.category,
+        attrs.category_for_filter,
+        attrs.subcategory,
+        p.productType,
+      ];
+      const haystack = parts
+        .flatMap((v) => (Array.isArray(v) ? v : [v]))
+        .filter(Boolean)
+        .map((v) => String(v).toLowerCase())
+        .join(" ");
+      for (const w of wants) {
+        if (haystack.includes(w)) return true;
+      }
+      return false;
+    };
+
     filtered = filtered.filter((p) => {
       const productAttrs = p.attributesJson || {};
       return attrKeys.every((key) => {
         const want = String(attrFilters[key] || "").toLowerCase();
         if (!want) return true;
+        if (key.toLowerCase() === "category") {
+          return matchesCategoryWant(p, want);
+        }
         if (matchesAttr(productAttrs[key], want)) return true;
         return (p.variants || []).some((v) => matchesAttr((v.attributesJson || {})[key], want));
       });
     });
+
+    // Safety net: if the attribute filters wiped out every keyword match,
+    // the LLM's filter value doesn't match this merchant's data. Returning
+    // zero dead-ends the customer, so drop the filter and keep the keyword
+    // matches. Gender filter and search-rule exclusions above are untouched.
+    if (filtered.length === 0 && beforeAttrFilter.length > 0) {
+      console.log(`[search]   filter-wipeout: dropping attrFilters=${JSON.stringify(attrFilters)}`);
+      filtered = beforeAttrFilter;
+    }
   }
+
 
   if (effectiveGender) {
     filtered = filtered.filter((p) => matchesGender(p, effectiveGender.toLowerCase()));
