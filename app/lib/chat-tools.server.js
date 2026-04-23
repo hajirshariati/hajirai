@@ -75,6 +75,27 @@ export const TOOLS = [
     },
   },
   {
+    name: "find_similar_products",
+    description:
+      "Find products similar to a specific reference product the customer named. Use this WHENEVER the customer asks for styles 'like', 'similar to', 'comparable to', 'supports like', 'feels like', or 'what else is like the <product name>' a specific product they named. Matches on the merchant's configured similarity attributes PLUS category PLUS gender of the reference product. Automatically excludes the reference product itself from results. Do NOT use search_products for this — search_products cannot exclude the reference and cannot guarantee the similarity-attribute match. If the customer names a product but you don't know its handle, call search_products first to get the handle, then call this tool.",
+    input_schema: {
+      type: "object",
+      properties: {
+        handle: {
+          type: "string",
+          description: "The reference product's handle (slug). This is the product the customer named and wants similar styles to.",
+        },
+        limit: {
+          type: "integer",
+          description: "Maximum number of similar products to return (default 6, max 10).",
+          minimum: 1,
+          maximum: 10,
+        },
+      },
+      required: ["handle"],
+    },
+  },
+  {
     name: "get_product_reviews",
     description:
       "Fetch customer reviews from Yotpo for a specific product, including an aggregated fit/sizing summary. Use this whenever the customer asks about fit, sizing (true to size, runs small, runs large), comfort, quality, or wants to know what other buyers think. Returns review count, average rating, fit breakdown, and a sample of the most recent review snippets.",
@@ -843,6 +864,183 @@ async function getProductDetails({ handle }, { shop }) {
   };
 }
 
+async function findSimilarProducts({ handle, limit }, { shop, deduplicateColors, similarMatchAttributes }) {
+  const h = String(handle || "").trim();
+  if (!h) return { error: "handle is required" };
+
+  const matchAttrs = Array.isArray(similarMatchAttributes)
+    ? similarMatchAttributes.map((s) => String(s || "").trim()).filter(Boolean)
+    : [];
+  if (matchAttrs.length === 0) {
+    return {
+      error:
+        "Similar-product matching is not configured for this store. The merchant needs to add at least one similarity attribute in the app admin under Rules & Knowledge → Similar-product matching.",
+      products: [],
+    };
+  }
+
+  const reference = await prisma.product.findFirst({
+    where: { shop, handle: h, NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } } },
+    include: {
+      variants: {
+        select: { sku: true, price: true, compareAtPrice: true, attributesJson: true },
+      },
+    },
+  });
+  if (!reference) return { error: `No product found with handle '${h}'.` };
+
+  const refAttrs = reference.attributesJson || {};
+
+  // Read a configured attribute case-insensitively — merchants spell metafield
+  // keys inconsistently. Returns all non-empty values as a lowercase string array.
+  const readAttrLowerList = (attrs, keyVariants) => {
+    const seen = new Set();
+    const out = [];
+    for (const k of keyVariants) {
+      const v = attrs?.[k];
+      if (v == null || v === "") continue;
+      const vals = Array.isArray(v) ? v : [v];
+      for (const x of vals) {
+        if (x == null || x === "") continue;
+        const s = String(x).toLowerCase().trim();
+        if (!s || seen.has(s)) continue;
+        seen.add(s);
+        out.push(s);
+      }
+    }
+    return out;
+  };
+
+  const variantKeys = (name) => {
+    const trimmed = String(name).trim();
+    const lower = trimmed.toLowerCase();
+    const upper = trimmed.toUpperCase();
+    const titleCase = lower.charAt(0).toUpperCase() + lower.slice(1);
+    return Array.from(new Set([trimmed, lower, upper, titleCase]));
+  };
+
+  // For each configured similarity attribute, collect the reference's values.
+  // If the reference is missing a value for every attribute the merchant set,
+  // we cannot find "similar" products meaningfully — surface it.
+  const requiredMatches = [];
+  const missingOnReference = [];
+  for (const attrName of matchAttrs) {
+    const keys = variantKeys(attrName);
+    const values = readAttrLowerList(refAttrs, keys);
+    if (values.length === 0) {
+      missingOnReference.push(attrName);
+    } else {
+      requiredMatches.push({ name: attrName, keys, values });
+    }
+  }
+
+  if (requiredMatches.length === 0) {
+    return {
+      error: `The reference product '${reference.title}' has no value for the configured similarity attribute(s): ${missingOnReference.join(", ")}. Cannot find similar products.`,
+      reference: { handle: reference.handle, title: reference.title },
+      products: [],
+    };
+  }
+
+  const refCategory = readAttrLowerList(refAttrs, ["category", "Category", "category_for_filter", "subcategory"]);
+  const refGender = readAttrLowerList(refAttrs, ["gender", "Gender", "gender_fallback"]);
+  const max = Math.min(Math.max(parseInt(limit, 10) || 6, 1), 10);
+
+  const candidates = await prisma.product.findMany({
+    where: {
+      shop,
+      handle: { not: h },
+      NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } },
+    },
+    include: {
+      variants: {
+        select: { sku: true, price: true, compareAtPrice: true, attributesJson: true },
+      },
+    },
+    orderBy: { updatedAt: "desc" },
+    take: 1200,
+  });
+
+  const valuesOverlap = (candidateVals, refVals) => {
+    if (candidateVals.length === 0) return false;
+    for (const c of candidateVals) {
+      for (const r of refVals) {
+        if (c === r) return true;
+        if (c.includes(r) || r.includes(c)) return true;
+      }
+    }
+    return false;
+  };
+
+  const matched = candidates.filter((p) => {
+    const a = p.attributesJson || {};
+
+    for (const { keys, values } of requiredMatches) {
+      const candidateVals = readAttrLowerList(a, keys);
+      if (!valuesOverlap(candidateVals, values)) return false;
+    }
+
+    if (refCategory.length > 0) {
+      const candCategory = readAttrLowerList(a, ["category", "Category", "category_for_filter", "subcategory"]);
+      const pt = (p.productType || "").toLowerCase().trim();
+      const candCategoryWithPt = pt ? [...candCategory, pt] : candCategory;
+      if (!valuesOverlap(candCategoryWithPt, refCategory)) return false;
+    }
+
+    if (refGender.length > 0) {
+      const candGender = readAttrLowerList(a, ["gender", "Gender", "gender_fallback"]);
+      if (candGender.length > 0) {
+        const eitherUnisex = candGender.includes("unisex") || refGender.includes("unisex");
+        if (!eitherUnisex && !valuesOverlap(candGender, refGender)) return false;
+      }
+    }
+
+    return true;
+  });
+
+  let final = matched;
+  if (deduplicateColors) final = deduplicateByColor(final);
+  final = final.slice(0, max);
+
+  const firstPrice = (variants) => {
+    const v = (variants || []).find((vv) => vv.price);
+    return v ? v.price : null;
+  };
+  const firstCompareAt = (variants) => {
+    const v = (variants || []).find((vv) => vv.compareAtPrice);
+    return v ? v.compareAtPrice : null;
+  };
+
+  console.log(
+    `[similar] ref=${h} attrs=[${requiredMatches.map((r) => `${r.name}=${r.values.join("/")}`).join(", ")}] category=${refCategory.join("/") || "-"} gender=${refGender.join("/") || "-"} → ${final.length}`,
+  );
+
+  return {
+    reference: {
+      handle: reference.handle,
+      title: reference.title,
+      matchedOn: requiredMatches.map((r) => ({ attribute: r.name, values: r.values })),
+      category: refCategory.length ? refCategory.join(", ") : undefined,
+      gender: refGender.length ? refGender.join(", ") : undefined,
+    },
+    count: final.length,
+    products: final.map((p) => ({
+      handle: p.handle,
+      title: p.title,
+      vendor: p.vendor || undefined,
+      productType: p.productType || undefined,
+      tags: p.tags?.length ? p.tags : undefined,
+      attributes: p.attributesJson || undefined,
+      priceRange: priceRange(p.variants || []),
+      variantCount: (p.variants || []).length,
+      url: productUrl(shop, p.handle),
+      image: p.featuredImageUrl || undefined,
+      price: firstPrice(p.variants || []) || undefined,
+      compareAtPrice: firstCompareAt(p.variants || []) || undefined,
+    })),
+  };
+}
+
 async function lookupSku({ skus }, { shop }) {
   const list = Array.from(
     new Set((Array.isArray(skus) ? skus : []).map((s) => String(s).trim()).filter(Boolean)),
@@ -1139,6 +1337,7 @@ const HANDLERS = {
   search_products: searchProducts,
   get_product_details: getProductDetails,
   lookup_sku: lookupSku,
+  find_similar_products: findSimilarProducts,
   get_product_reviews: getProductReviews,
   get_return_insights: getReturnInsights,
   get_customer_orders: getCustomerOrders,
@@ -1147,6 +1346,9 @@ const HANDLERS = {
 function mentionsFromResult(name, result) {
   if (!result || result.error) return [];
   if (name === "search_products" && Array.isArray(result.products)) {
+    return result.products.map((p) => ({ handle: p.handle, title: p.title, tool: name }));
+  }
+  if (name === "find_similar_products" && Array.isArray(result.products)) {
     return result.products.map((p) => ({ handle: p.handle, title: p.title, tool: name }));
   }
   if (name === "get_product_details" && result.handle && result.title) {
@@ -1173,6 +1375,19 @@ export function extractProductCards(name, result) {
       compare_at_price: p.compareAtPrice ? Math.round(parseFloat(p.compareAtPrice) * 100) : undefined,
       _descriptionSnippet: p.descriptionSnippet || "",
       _searchQuery: query,
+    }));
+  }
+  if (name === "find_similar_products" && Array.isArray(result.products)) {
+    const refTitle = result.reference?.title || "";
+    return result.products.slice(0, MAX_PRODUCT_CARDS).map((p) => ({
+      title: p.title,
+      url: p.url,
+      handle: p.handle,
+      image: p.image || "",
+      price_formatted: p.priceRange || (p.price ? `$${parseFloat(p.price).toFixed(2)}` : ""),
+      compare_at_price: p.compareAtPrice ? Math.round(parseFloat(p.compareAtPrice) * 100) : undefined,
+      _descriptionSnippet: "",
+      _searchQuery: refTitle,
     }));
   }
   if (name === "get_product_details" && result.handle) {

@@ -90,6 +90,7 @@ export const loader = async ({ request }) => {
     mappings,
     categoryExclusions: safeParse(config.categoryExclusions, []),
     querySynonyms: safeParse(config.querySynonyms, []),
+    similarMatchAttributes: safeParse(config.similarMatchAttributes, []),
     deduplicateColors: config.deduplicateColors,
     files: filesWithCounts,
   };
@@ -172,6 +173,21 @@ export const action = async ({ request }) => {
       }
     } catch { /* */ }
     return { error: "Invalid synonyms." };
+  }
+
+  if (intent === "save_similar_attrs") {
+    const raw = formData.get("similarMatchAttributes");
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        const clean = parsed
+          .map((s) => (typeof s === "string" ? s.trim() : ""))
+          .filter(Boolean);
+        await updateShopConfig(session.shop, { similarMatchAttributes: JSON.stringify(clean) });
+        return { saved: true };
+      }
+    } catch { /* */ }
+    return { error: "Invalid similarity attributes." };
   }
 
   if (intent === "upload") {
@@ -554,6 +570,82 @@ function QuerySynonymsCard({ initial }) {
   );
 }
 
+function SimilarMatchAttributesCard({ initial }) {
+  const fetcher = useFetcher();
+  const [attrs, setAttrs] = useState(initial || []);
+  const [input, setInput] = useState("");
+
+  const save = (list) => {
+    const fd = new FormData();
+    fd.set("intent", "save_similar_attrs");
+    fd.set("similarMatchAttributes", JSON.stringify(list));
+    fetcher.submit(fd, { method: "post" });
+  };
+
+  const add = () => {
+    const v = input.trim();
+    if (!v) return;
+    if (attrs.some((a) => a.toLowerCase() === v.toLowerCase())) {
+      setInput("");
+      return;
+    }
+    const updated = [...attrs, v];
+    setAttrs(updated);
+    setInput("");
+    save(updated);
+  };
+
+  const remove = (idx) => {
+    const updated = attrs.filter((_, i) => i !== idx);
+    setAttrs(updated);
+    save(updated);
+  };
+
+  return (
+    <Card>
+      <BlockStack gap="400">
+        <BlockStack gap="100">
+          <InlineStack gap="200" blockAlign="center">
+            <Text as="h2" variant="headingMd">Similar-product matching</Text>
+            <Badge tone="info">Powers "similar to X"</Badge>
+          </InlineStack>
+          <Text as="p" tone="subdued">
+            When a customer asks for styles "like" or "similar to" a specific product, the AI looks up that product and recommends other products that share the same value for each attribute listed here — plus the same category and gender. The reference product itself is always excluded from the results.
+          </Text>
+          <Text as="p" tone="subdued" variant="bodySm">
+            Enter the exact attribute name you mapped above in <strong>Product attributes</strong> (e.g. <code>footbed</code>, <code>fabric</code>, <code>material</code>, <code>heel_type</code>). Leave empty to disable the similar-products tool.
+          </Text>
+        </BlockStack>
+
+        {attrs.length > 0 && (
+          <InlineStack gap="200" wrap>
+            {attrs.map((a, i) => (
+              <Tag key={i} onRemove={() => remove(i)}>{a}</Tag>
+            ))}
+          </InlineStack>
+        )}
+
+        <Divider />
+
+        <BlockStack gap="200">
+          <Text as="h3" variant="headingSm">Add an attribute</Text>
+          <FormLayout>
+            <TextField
+              label="Attribute name"
+              value={input}
+              onChange={setInput}
+              placeholder="footbed"
+              autoComplete="off"
+              helpText="Single attribute key — exactly matching how it appears in Product attributes above."
+            />
+            <Button onClick={add} disabled={!input.trim()}>Add attribute</Button>
+          </FormLayout>
+        </BlockStack>
+      </BlockStack>
+    </Card>
+  );
+}
+
 function SearchRulesCard({ initial }) {
   const fetcher = useFetcher();
   const [rules, setRules] = useState(initial || []);
@@ -926,6 +1018,7 @@ export default function RulesKnowledge() {
         <AttributeMappingsCard mappings={data.mappings} />
         <SearchRulesCard initial={data.categoryExclusions} />
         <QuerySynonymsCard initial={data.querySynonyms} />
+        <SimilarMatchAttributesCard initial={data.similarMatchAttributes} />
         <KnowledgeFilesCard files={data.files} />
         <DisplayCard deduplicateColors={data.deduplicateColors} />
       </BlockStack>
