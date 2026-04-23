@@ -607,11 +607,15 @@ if (supportCTA && userAskedSupportOnly) {
     if (cards && cards.length > 0) {
       const seen = new Set();
       const deduped = [];
+      const categoryCounts = new Map();
       for (const c of cards) {
         const key = c.handle || c.title;
         if (seen.has(key)) continue;
         seen.add(key);
-        const { _descriptionSnippet, _searchQuery, ...publicCard } = c;
+        if (c._category) {
+          categoryCounts.set(c._category, (categoryCounts.get(c._category) || 0) + 1);
+        }
+        const { _descriptionSnippet, _searchQuery, _category, ...publicCard } = c;
         deduped.push(publicCard);
       }
       // show product cards
@@ -620,7 +624,9 @@ controller.enqueue(encoder.encode(sseChunk({
   products: deduped
 })));
 
-// show collection CTA below (if exists)
+// Collection CTA: AI-emitted <<Label|URL>> takes priority; otherwise look up
+// the dominant category across the shown cards in the merchant's configured
+// collectionLinks mapping. No mapping → no CTA (avoids 404s).
 const collection = extractCollectionCTA(fullResponseText);
 if (collection.cta) {
   controller.enqueue(encoder.encode(sseChunk({
@@ -628,6 +634,21 @@ if (collection.cta) {
     url: collection.cta.url,
     label: collection.cta.label,
   })));
+} else if (Array.isArray(ctx.collectionLinks) && ctx.collectionLinks.length > 0 && categoryCounts.size > 0) {
+  const [dominantCat] = [...categoryCounts.entries()].sort((a, b) => b[1] - a[1])[0];
+  const match = ctx.collectionLinks.find((link) => {
+    const linkCat = String(link?.category || "").toLowerCase().trim();
+    if (!linkCat || !link?.url) return false;
+    return linkCat === dominantCat || dominantCat.includes(linkCat) || linkCat.includes(dominantCat);
+  });
+  if (match) {
+    const label = `Shop all ${String(match.label || match.category).trim()}`;
+    controller.enqueue(encoder.encode(sseChunk({
+      type: "link",
+      url: match.url,
+      label,
+    })));
+  }
 }
     }
   }
@@ -694,6 +715,19 @@ export const action = async ({ request }) => {
       const raw = JSON.parse(config.similarMatchAttributes || "[]");
       similarMatchAttributes = Array.isArray(raw)
         ? raw.map((s) => (typeof s === "string" ? s.trim() : "")).filter(Boolean)
+        : [];
+    } catch { /* */ }
+    let collectionLinks = [];
+    try {
+      const raw = JSON.parse(config.collectionLinks || "[]");
+      collectionLinks = Array.isArray(raw)
+        ? raw
+            .map((r) => ({
+              category: String(r?.category || "").trim().toLowerCase(),
+              url: String(r?.url || "").trim(),
+              label: String(r?.label || r?.category || "").trim(),
+            }))
+            .filter((r) => r.category && r.url)
         : [];
     } catch { /* */ }
 
@@ -770,6 +804,7 @@ export const action = async ({ request }) => {
       categoryExclusions,
       querySynonyms,
       similarMatchAttributes,
+      collectionLinks,
       conversationText,
       userText,
       yotpoApiKey: config.yotpoApiKey || "",

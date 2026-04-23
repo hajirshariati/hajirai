@@ -95,6 +95,7 @@ model ShopConfig {
   categoryExclusions     String   @default("[]")
   querySynonyms          String   @default("[]")
   similarMatchAttributes String   @default("[]")
+  collectionLinks        String   @default("[]")
 
   supportUrl          String   @default("")
   supportLabel        String   @default("Contact customer service")
