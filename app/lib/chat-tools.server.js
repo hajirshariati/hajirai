@@ -1392,6 +1392,13 @@ const MAX_PRODUCT_CARDS = 10;
 
 export function extractProductCards(name, result) {
   if (!result || result.error) return [];
+  const categoryFromAttrs = (p) => {
+    const a = p.attributes || {};
+    const v = a.category || a.Category || a.category_for_filter || a.subcategory || p.productType || "";
+    if (Array.isArray(v)) return String(v[0] || "").toLowerCase().trim();
+    return String(v || "").toLowerCase().trim();
+  };
+
   if (name === "search_products" && Array.isArray(result.products)) {
     const query = result.query || "";
     return result.products.slice(0, MAX_PRODUCT_CARDS).map((p) => ({
@@ -1403,6 +1410,7 @@ export function extractProductCards(name, result) {
       compare_at_price: p.compareAtPrice ? Math.round(parseFloat(p.compareAtPrice) * 100) : undefined,
       _descriptionSnippet: p.descriptionSnippet || "",
       _searchQuery: query,
+      _category: categoryFromAttrs(p),
     }));
   }
   if (name === "find_similar_products" && Array.isArray(result.products)) {
@@ -1416,6 +1424,7 @@ export function extractProductCards(name, result) {
       compare_at_price: p.compareAtPrice ? Math.round(parseFloat(p.compareAtPrice) * 100) : undefined,
       _descriptionSnippet: "",
       _searchQuery: refTitle,
+      _category: categoryFromAttrs(p),
     }));
   }
   if (name === "get_product_details" && result.handle) {
