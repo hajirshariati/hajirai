@@ -214,11 +214,16 @@ export async function syncCatalog(admin, shop) {
       const json = await resp.json();
       const page = json?.data?.products;
       if (!page) throw new Error("No products data in GraphQL response");
+      console.log("[syncCatalog] page size:", page.nodes?.length || 0);
 
-      for (const node of page.nodes) {
-        await upsertProduct(shop, node, mappings);
-        totalSeen += 1;
-      }
+  for (const node of page.nodes) {
+  console.log("[syncCatalog] upserting:", node.handle);
+  await upsertProduct(shop, node, mappings);
+  totalSeen += 1;
+
+  const countNow = await prisma.product.count({ where: { shop } });
+  console.log("[syncCatalog] count now:", countNow);
+}
 
       await setSyncState(shop, { syncedSoFar: totalSeen });
 
