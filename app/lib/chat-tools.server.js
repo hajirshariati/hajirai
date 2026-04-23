@@ -415,21 +415,31 @@ async function searchProducts(
   const max = Math.min(Math.max(parseInt(limit, 10) || 6, 1), 10);
   const attrFilters = filters && typeof filters === "object" ? filters : {};
 
-  const detected = detectAndStripGender(q);
-  const filterGenderRaw = (attrFilters.gender || attrFilters.Gender || attrFilters.gender_fallback || "")
-    .toString()
-    .toLowerCase()
-    .trim();
+const detected = detectAndStripGender(q);
+const detectedFromUserText = detectAndStripGender(userText || "");
+const detectedFromConversation = detectAndStripGender(conversationText || "");
 
-  const filterGender =
-    filterGenderRaw === "men" || filterGenderRaw === "mens" || filterGenderRaw === "men's" || filterGenderRaw === "male"
-      ? "men"
-      : filterGenderRaw === "women" || filterGenderRaw === "womens" || filterGenderRaw === "women's" || filterGenderRaw === "female"
-      ? "women"
-      : null;
+const filterGenderRaw = (attrFilters.gender || attrFilters.Gender || attrFilters.gender_fallback || "")
+  .toString()
+  .toLowerCase()
+  .trim();
 
-  const effectiveGender = detected.gender || sessionGender || filterGender || null;
-  const searchQuery = detected.gender ? detected.query : q;
+const filterGender =
+  filterGenderRaw === "men" || filterGenderRaw === "mens" || filterGenderRaw === "men's" || filterGenderRaw === "male"
+    ? "men"
+    : filterGenderRaw === "women" || filterGenderRaw === "womens" || filterGenderRaw === "women's" || filterGenderRaw === "female"
+    ? "women"
+    : null;
+
+const effectiveGender =
+  detected.gender ||
+  detectedFromUserText.gender ||
+  detectedFromConversation.gender ||
+  sessionGender ||
+  filterGender ||
+  null;
+
+const searchQuery = detected.gender ? detected.query : q;
 
   const rawKeywords = extractKeywords(searchQuery);
   const keywords = rawKeywords.filter(
