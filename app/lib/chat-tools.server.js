@@ -675,6 +675,21 @@ const isExcludedByRule = (p) => {
       return false;
     };
 
+    // For non-category attribute filters (e.g. color_family=blue), expand
+    // the filter value through the merchant's Query Synonyms too. Lets a
+    // "blue" filter also match products whose color_family is "navy" or
+    // "denim" if the merchant configured "blue also searches navy, denim".
+    // No synonym? Degrades to the original exact-contains behavior.
+    const matchesAttrExpanded = (val, wants) => {
+      if (wants.size === 0) return true;
+      if (Array.isArray(val)) {
+        return val.some(
+          (v) => typeof v === "string" && [...wants].some((w) => v.toLowerCase().includes(w)),
+        );
+      }
+      return typeof val === "string" && [...wants].some((w) => val.toLowerCase().includes(w));
+    };
+
     filtered = filtered.filter((p) => {
       const productAttrs = p.attributesJson || {};
       return attrKeys.every((key) => {
@@ -683,10 +698,12 @@ const isExcludedByRule = (p) => {
         if (key.toLowerCase() === "category") {
           return matchesCategoryWant(p, want);
         }
-        if (matchesAttr(productAttrs[key], want)) return true;
-        return (p.variants || []).some((v) => matchesAttr((v.attributesJson || {})[key], want));
+        const wants = expandFilterValue(want);
+        if (matchesAttrExpanded(productAttrs[key], wants)) return true;
+        return (p.variants || []).some((v) => matchesAttrExpanded((v.attributesJson || {})[key], wants));
       });
     });
+
 
     // Safety net: if the attribute filters wiped out every keyword match,
     // the LLM's filter value doesn't match this merchant's data. Returning

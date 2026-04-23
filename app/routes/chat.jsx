@@ -312,8 +312,10 @@ function extractSupportCTA(text, supportUrl, supportLabel) {
 async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, controller, encoder, promptCaching, tools }) {
   const totalUsage = { input_tokens: 0, output_tokens: 0, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 };
   let toolCallCount = 0;
+  let productSearchAttempted = false;
   const allProductPool = new Map();
   let fullResponseText = "";
+
 
   const system = promptCaching
     ? [{ type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } }]
@@ -357,6 +359,10 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     if (toolUses.length === 0) break;
 
     toolCallCount += toolUses.length;
+    if (toolUses.some((u) => u.name === "search_products" || u.name === "get_product_details" || u.name === "lookup_sku")) {
+      productSearchAttempted = true;
+    }
+
 
     const results = await Promise.all(
       toolUses.map((u) => executeTool(u.name, u.input, ctx)),
@@ -465,9 +471,21 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
 
   const pool = Array.from(allProductPool.values());
 
+  // If the AI tried a product search, got nothing back, but still wrote a
+  // pitch-sounding response, clear the text so the fallback below kicks in.
+  // Prevents "Here are some options!" showing above an empty card area.
+  if (productSearchAttempted && pool.length === 0 && fullResponseText) {
+    const looksLikePitch = /\b(here are|check out|check these|some great|great options|top picks|picks for you|styles for you|perfect (for|match)|gorgeous)\b/i.test(fullResponseText);
+    if (looksLikePitch) {
+      console.log(`[chat] empty-pool repair: replacing positive pitch with fallback`);
+      fullResponseText = "";
+    }
+  }
+
   if (!fullResponseText && pool.length === 0) {
     fullResponseText = "I'm not finding a great match for that right now. Want to try a different style, or I can connect you with our support team?";
   }
+
 
   if (fullResponseText) {
     controller.enqueue(encoder.encode(sseChunk({ type: "text", text: fullResponseText })));
