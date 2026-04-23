@@ -348,11 +348,32 @@ function extractGenericCTA(text) {
 }
 
 
+// Mirror of the backend helper — extracts the first meaningful word of a
+// title as a style-family key. Used to drop the find_similar_products
+// reference (and its siblings) from the display pool so the customer never
+// sees the product they asked to compare against.
+const FAMILY_STOP_WORDS_UI = new Set(["the", "a", "an", "my", "our", "new"]);
+function titleStyleFamily(title) {
+  if (!title) return "";
+  const beforeDash = String(title).split(/\s[-–—]\s/)[0];
+  const words = beforeDash
+    .toLowerCase()
+    .replace(/[^a-z0-9\s']/g, " ")
+    .split(/\s+/)
+    .filter(Boolean);
+  for (const w of words) {
+    if (w.length > 2 && !FAMILY_STOP_WORDS_UI.has(w)) return w;
+  }
+  return "";
+}
+
 async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, controller, encoder, promptCaching, tools }) {
   const totalUsage = { input_tokens: 0, output_tokens: 0, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 };
   let toolCallCount = 0;
   let productSearchAttempted = false;
   const allProductPool = new Map();
+  const excludedFamilies = new Set();
+  const excludedHandles = new Set();
   let fullResponseText = "";
 
 
@@ -409,7 +430,14 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
 
     let hopHasProducts = false;
     for (let i = 0; i < toolUses.length; i++) {
-      const cards = extractProductCards(toolUses[i].name, results[i]);
+      const u = toolUses[i];
+      const r = results[i];
+      if (u.name === "find_similar_products" && r && !r.error && r.reference) {
+        if (r.reference.handle) excludedHandles.add(String(r.reference.handle).toLowerCase());
+        const fam = titleStyleFamily(r.reference.title || "");
+        if (fam) excludedFamilies.add(fam);
+      }
+      const cards = extractProductCards(u.name, r);
       for (const c of cards) {
         const key = c.handle || c.title;
         if (!allProductPool.has(key)) {
@@ -584,8 +612,22 @@ if (supportCTA && userAskedSupportOnly) {
     const textLower = fullResponseText.toLowerCase();
     const saysNoMatch = /\b(don't (?:have|see|carry)|not (?:see|carry|have)|don't appear|we don't|no .{0,20} available)\b/i.test(fullResponseText);
 
+    // When find_similar_products ran, drop every card whose handle or style
+    // family matches the reference — otherwise Jillian from an earlier
+    // search_products call wins the scoring pass because the AI text still
+    // names "Jillian" as the comparison point.
+    const filteredPool = (excludedFamilies.size === 0 && excludedHandles.size === 0)
+      ? pool
+      : pool.filter((card) => {
+          const handle = String(card.handle || "").toLowerCase();
+          if (excludedHandles.has(handle)) return false;
+          const fam = titleStyleFamily(card.title || "");
+          if (fam && excludedFamilies.has(fam)) return false;
+          return true;
+        });
+
     const userTextLower = (ctx.userText || "").toLowerCase();
-    const scored = pool.map((card) => ({
+    const scored = filteredPool.map((card) => ({
       card,
       score: scoreCardAgainstText(card, textLower, userTextLower),
     }));
