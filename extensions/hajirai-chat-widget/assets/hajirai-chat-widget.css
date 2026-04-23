@@ -1309,6 +1309,8 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
+  text-align: center;
   gap: 4px;
   align-self: stretch;
 }
