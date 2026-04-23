@@ -2,6 +2,17 @@ import prisma from "../db.server";
 import { logMentions } from "../models/ChatProductMention.server";
 import { fetchCustomerContext } from "./customer-context.server";
 
+
+const flattenValues = (obj) => {
+  if (!obj || typeof obj !== "object") return "";
+
+  return Object.values(obj)
+    .flatMap((v) => (Array.isArray(v) ? v : [v]))
+    .filter(Boolean)
+    .map((v) => String(v).toLowerCase())
+    .join(" ");
+};
+
 // Tool definitions sent to Anthropic. Keep descriptions action-oriented so the
 // model knows when to call each one.
 export const TOOLS = [
@@ -518,22 +529,23 @@ const flattenAttributeValues = (obj) => {
 };
 
 const getProductHaystack = (p) => {
-  const attrs = flattenAttributeValues(p.attributesJson || {});
-  const variantAttrs = (p.variants || [])
-    .map((v) => flattenAttributeValues(v.attributesJson || {}))
-    .join(" ");
-
-  return [
-    p.title || "",
-    p.vendor || "",
-    p.productType || "",
-    p.description || "",
+  const base = [
+    p.title,
+    p.vendor,
+    p.productType,
+    p.description,
     Array.isArray(p.tags) ? p.tags.join(" ") : "",
-    attrs,
-    variantAttrs,
   ]
+    .filter(Boolean)
     .join(" ")
     .toLowerCase();
+
+  const productAttrs = flattenValues(p.attributesJson);
+  const variantAttrs = (p.variants || [])
+    .map((v) => flattenValues(v.attributesJson))
+    .join(" ");
+
+  return `${base} ${productAttrs} ${variantAttrs}`;
 };
 
   const excludeTerms = merchantExclude ? splitCsv(merchantExclude) : [];
