@@ -486,16 +486,19 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     fullResponseText = "I'm not finding a great match for that right now. Want to try a different style, or I can connect you with our support team?";
   }
 
-  // Strip stray HTML the model sometimes emits (literal <br>, unexpected
-  // tags). The widget renders markdown / plain text, not HTML, so tags
-  // otherwise surface as raw characters to the customer.
+  // Strip stray HTML the model sometimes emits (literal <br>, <p>, etc.).
+  // The widget renders markdown / plain text, not HTML, so tags otherwise
+  // surface as raw characters. Whitelist real HTML tag names so the
+  // <<Option>> choice-button syntax used by the widget is never matched.
   if (fullResponseText) {
+    const HTML_TAG = /<\/?(?:br|p|div|span|b|i|u|strong|em|small|sup|sub|ul|ol|li|h[1-6]|hr|a|img|figure|figcaption|blockquote|code|pre|table|thead|tbody|tr|td|th)(?:\s[^>]*)?\/?>/gi;
     fullResponseText = fullResponseText
       .replace(/<br\s*\/?>/gi, "\n")
-      .replace(/<\/?[a-z][^>]*>/gi, "")
+      .replace(HTML_TAG, "")
       .replace(/\n{3,}/g, "\n\n")
       .trim();
   }
+
 
   if (fullResponseText) {
     controller.enqueue(encoder.encode(sseChunk({ type: "text", text: fullResponseText })));
