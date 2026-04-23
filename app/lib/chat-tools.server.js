@@ -251,20 +251,25 @@ function keywordMatchClause(kw, synonymMap) {
   }
 
   const clauses = [];
-  for (const t of allTerms) {
-    clauses.push(
-      { title: { contains: t, mode: "insensitive" } },
-      { vendor: { contains: t, mode: "insensitive" } },
-      { productType: { contains: t, mode: "insensitive" } },
-      { description: { contains: t, mode: "insensitive" } },
-    );
-    // Also check category-like metafield attributes. Merchants often tag products
-    // by category in metafields (e.g. Category="Sandals") rather than in the title.
-    const lower = t.toLowerCase();
-    const titleCase = lower.charAt(0).toUpperCase() + lower.slice(1);
-    const termCases = Array.from(new Set([t, lower, titleCase]));
+for (const t of allTerms) {
+  clauses.push(
+    { title: { contains: t, mode: "insensitive" } },
+    { vendor: { contains: t, mode: "insensitive" } },
+    { productType: { contains: t, mode: "insensitive" } },
+    { description: { contains: t, mode: "insensitive" } },
+  );
 
+  const lower = t.toLowerCase();
+  const titleCase = lower.charAt(0).toUpperCase() + lower.slice(1);
+  const termCases = Array.from(new Set([t, lower, titleCase]));
+
+  for (const v of termCases) {
+    clauses.push({ attributesJson: { path: ["category"], equals: v } });
+    clauses.push({ attributesJson: { path: ["category_for_filter"], equals: v } });
+    clauses.push({ attributesJson: { path: ["category"], string_contains: v } });
+    clauses.push({ attributesJson: { path: ["category_for_filter"], string_contains: v } });
   }
+}
   clauses.push({ tags: { hasSome: allTerms } });
   return { OR: clauses };
 }
