@@ -1348,6 +1348,16 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
 .ai-chat-fit-title {
   font-weight: 700;
 }
+.ai-chat-fit-for {
+  font-size: 12px;
+  color: #4b5563;
+  margin-bottom: 8px;
+  line-height: 1.35;
+}
+.ai-chat-fit-for strong {
+  color: #111827;
+  font-weight: 600;
+}
 .ai-chat-fit-size {
   font-size: 15px;
   font-weight: 500;
