@@ -309,6 +309,45 @@ function extractSupportCTA(text, supportUrl, supportLabel) {
   return { text: cleaned, cta };
 }
 
+
+function extractCollectionCTA(text) {
+  const match = text.match(/<<(.+?)\|(.+?)>>/);
+  if (!match) return { text, cta: null };
+
+  return {
+    text: text.replace(match[0], "").trim(),
+    cta: {
+      label: match[1],
+      url: match[2],
+    },
+  };
+}
+
+
+function extractGenericCTA(text) {
+  const mdLink = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/;
+  const rawLink = /(https?:\/\/[^\s]+)/;
+
+  let match = text.match(mdLink);
+  if (match) {
+    return {
+      text: text.replace(match[0], "").trim(),
+      cta: { url: match[2], label: match[1] },
+    };
+  }
+
+  match = text.match(rawLink);
+  if (match) {
+    return {
+      text: text.replace(match[0], "").trim(),
+      cta: { url: match[1], label: "Learn More" },
+    };
+  }
+
+  return { text, cta: null };
+}
+
+
 async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, controller, encoder, promptCaching, tools }) {
   const totalUsage = { input_tokens: 0, output_tokens: 0, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 };
   let toolCallCount = 0;
@@ -500,14 +539,31 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   }
 
 
-  if (fullResponseText) {
-    controller.enqueue(encoder.encode(sseChunk({ type: "text", text: fullResponseText })));
-  }
+const collection = extractCollectionCTA(fullResponseText);
+fullResponseText = collection.text;
+
+controller.enqueue(encoder.encode(sseChunk({
+  type: "text",
+  text: fullResponseText
+})));
 
 
   if (supportCTA) {
     controller.enqueue(encoder.encode(sseChunk({ type: "link", url: supportCTA.url, label: supportCTA.label })));
   }
+
+  if (!supportCTA && fullResponseText) {
+  const generic = extractGenericCTA(fullResponseText);
+  fullResponseText = generic.text;
+
+  if (generic.cta) {
+    controller.enqueue(encoder.encode(sseChunk({
+      type: "link",
+      url: generic.cta.url,
+      label: generic.cta.label,
+    })));
+  }
+}
 
   const userAskedSignup = /\b(sign ?up for (our|the|your|a).{0,25}(newsletter|list|email|sms|updates|deals|offers)|subscribe to (our|the|your).{0,20}(newsletter|list|email|sms|updates)|newsletter|mailing list|join our (list|newsletter|email|sms)|opt.?in|stay (connected|in touch|updated).{0,20}(email|offers|updates|news|deals))\b/i.test(ctx.userText || "");
   const aiMentionsSignup = /\b(newsletter|mailing list|subscribe to (our|the|your).{0,20}(newsletter|list|sms|email)|sign ?up for (our|the|my|your).{0,25}(newsletter|list|email|sms|updates|deals|offers)|join our (newsletter|list|email|sms)|stay connected.{0,20}(email|offers|updates|deals))\b/i.test(fullResponseText || "");
@@ -549,7 +605,21 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         const { _descriptionSnippet, _searchQuery, ...publicCard } = c;
         deduped.push(publicCard);
       }
-      controller.enqueue(encoder.encode(sseChunk({ type: "products", products: deduped })));
+      // show product cards
+controller.enqueue(encoder.encode(sseChunk({
+  type: "products",
+  products: deduped
+})));
+
+// show collection CTA below (if exists)
+const collection = extractCollectionCTA(fullResponseText);
+if (collection.cta) {
+  controller.enqueue(encoder.encode(sseChunk({
+    type: "link",
+    url: collection.cta.url,
+    label: collection.cta.label,
+  })));
+}
     }
   }
 
