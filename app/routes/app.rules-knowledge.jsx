@@ -199,6 +199,7 @@ export const action = async ({ request }) => {
         const clean = parsed
           .map((r) => ({
             category: String(r?.category || "").trim(),
+            gender: String(r?.gender || "").trim(),
             url: String(r?.url || "").trim(),
             label: String(r?.label || "").trim(),
           }))
@@ -666,10 +667,21 @@ function SimilarMatchAttributesCard({ initial }) {
   );
 }
 
+const GENDER_OPTIONS = [
+  { label: "— Any gender —", value: "" },
+  { label: "Men", value: "men" },
+  { label: "Women", value: "women" },
+  { label: "Boy", value: "boy" },
+  { label: "Girl", value: "girl" },
+  { label: "Kid", value: "kid" },
+  { label: "Unisex", value: "unisex" },
+];
+
 function CollectionLinksCard({ initial }) {
   const fetcher = useFetcher();
   const [links, setLinks] = useState(initial || []);
   const [category, setCategory] = useState("");
+  const [gender, setGender] = useState("");
   const [url, setUrl] = useState("");
   const [label, setLabel] = useState("");
 
@@ -682,12 +694,16 @@ function CollectionLinksCard({ initial }) {
 
   const add = () => {
     const c = category.trim().toLowerCase();
+    const g = gender.trim().toLowerCase();
     const u = url.trim();
     const l = label.trim() || category.trim();
     if (!c || !u) return;
-    const updated = [...links.filter((x) => x.category?.toLowerCase() !== c), { category: c, url: u, label: l }];
+    const keyFor = (x) => `${String(x.category || "").toLowerCase()}|${String(x.gender || "").toLowerCase()}`;
+    const newEntry = { category: c, gender: g, url: u, label: l };
+    const updated = [...links.filter((x) => keyFor(x) !== keyFor(newEntry)), newEntry];
     setLinks(updated);
     setCategory("");
+    setGender("");
     setUrl("");
     setLabel("");
     save(updated);
@@ -698,6 +714,8 @@ function CollectionLinksCard({ initial }) {
     setLinks(updated);
     save(updated);
   };
+
+  const genderLabel = (g) => (GENDER_OPTIONS.find((o) => o.value === (g || "").toLowerCase())?.label || "Any gender");
 
   return (
     <Card>
@@ -711,7 +729,7 @@ function CollectionLinksCard({ initial }) {
             When the assistant shows product cards and they share a dominant category, a "Shop all <em>&lt;label&gt;</em>" button appears below the cards linking to the collection page configured here.
           </Text>
           <Text as="p" tone="subdued" variant="bodySm">
-            Map each category value (as it appears in your <strong>Product attributes → category</strong> metafield) to the Shopify collection URL. Leave the list empty to disable the button.
+            Map each (category, gender) pair to its Shopify collection URL. Matching prefers an exact category+gender rule; if none exists, it falls back to a rule set to <em>Any gender</em> for that category.
           </Text>
         </BlockStack>
 
@@ -721,6 +739,7 @@ function CollectionLinksCard({ initial }) {
               <InlineStack key={i} align="space-between" blockAlign="center">
                 <InlineStack gap="200" blockAlign="center" wrap>
                   <Text as="span" variant="bodyMd" fontWeight="semibold"><code>{r.category}</code></Text>
+                  <Badge tone={r.gender ? "attention" : undefined}>{genderLabel(r.gender)}</Badge>
                   <Text as="span" tone="subdued" variant="bodySm">→</Text>
                   <Text as="span" variant="bodySm"><code>{r.url}</code></Text>
                   <Badge>{`Shop all ${r.label || r.category}`}</Badge>
@@ -738,15 +757,17 @@ function CollectionLinksCard({ initial }) {
           <FormLayout>
             <FormLayout.Group>
               <TextField label="Category value" value={category} onChange={setCategory}
-                placeholder="sandal" autoComplete="off"
+                placeholder="sneaker" autoComplete="off"
                 helpText="Exactly as it appears in the product's category metafield." />
+              <Select label="Gender" options={GENDER_OPTIONS} value={gender} onChange={setGender}
+                helpText="Leave as 'Any gender' for categories that don't split by gender." />
               <TextField label="Button label" value={label} onChange={setLabel}
-                placeholder="Sandals" autoComplete="off"
-                helpText='Shown as "Shop all <label>". Defaults to the category value.' />
+                placeholder="Women's Sneakers" autoComplete="off"
+                helpText='Shown as "Shop all <label>". Defaults to the category.' />
             </FormLayout.Group>
             <TextField label="Collection URL" value={url} onChange={setUrl}
-              placeholder="/collections/sandals" autoComplete="off"
-              helpText="Relative (/collections/sandals) or absolute (https://your-store.com/collections/sandals)." />
+              placeholder="/collections/womens-sneakers" autoComplete="off"
+              helpText="Relative (/collections/womens-sneakers) or absolute." />
             <Button onClick={add} disabled={!category.trim() || !url.trim()}>Add link</Button>
           </FormLayout>
         </BlockStack>

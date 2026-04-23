@@ -1399,6 +1399,13 @@ export function extractProductCards(name, result) {
     return String(v || "").toLowerCase().trim();
   };
 
+  const genderFromAttrs = (p) => {
+    const a = p.attributes || {};
+    const v = a.gender || a.Gender || a.gender_fallback || "";
+    if (Array.isArray(v)) return String(v[0] || "").toLowerCase().trim();
+    return String(v || "").toLowerCase().trim();
+  };
+
   if (name === "search_products" && Array.isArray(result.products)) {
     const query = result.query || "";
     return result.products.slice(0, MAX_PRODUCT_CARDS).map((p) => ({
@@ -1411,6 +1418,7 @@ export function extractProductCards(name, result) {
       _descriptionSnippet: p.descriptionSnippet || "",
       _searchQuery: query,
       _category: categoryFromAttrs(p),
+      _gender: genderFromAttrs(p),
     }));
   }
   if (name === "find_similar_products" && Array.isArray(result.products)) {
@@ -1425,6 +1433,7 @@ export function extractProductCards(name, result) {
       _descriptionSnippet: "",
       _searchQuery: refTitle,
       _category: categoryFromAttrs(p),
+      _gender: genderFromAttrs(p),
     }));
   }
   if (name === "get_product_details" && result.handle) {
