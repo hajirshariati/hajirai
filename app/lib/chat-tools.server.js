@@ -612,17 +612,60 @@ const isExcludedByRule = (p) => {
     return true;
   };
 
+  // Weighted scoring. A match in title / productType / category attributes
+  // is a much stronger signal than the same word mentioned somewhere in a
+  // description (e.g. a sandal that mentions "heel cushion" shouldn't tie a
+  // wedge whose productType is "Wedges" — on the old binary score ties were
+  // broken by updatedAt, which is volatile, so actual-category products got
+  // buried). Weights are generic — no product terminology baked in.
+  const FIELD_WEIGHTS = {
+    title: 3,
+    productType: 3,
+    categoryAttrs: 3,
+    tags: 2,
+    otherAttrs: 2,
+    vendor: 1,
+    description: 1,
+  };
+
+  const getScoredFields = (p) => {
+    const attrs = p.attributesJson || {};
+    const categoryAttrs = [attrs.category, attrs.category_for_filter, attrs.subcategory]
+      .flatMap((v) => (Array.isArray(v) ? v : [v]))
+      .filter(Boolean)
+      .map((v) => String(v).toLowerCase())
+      .join(" ");
+    const otherAttrValues = Object.entries(attrs)
+      .filter(([k]) => k !== "category" && k !== "category_for_filter" && k !== "subcategory")
+      .flatMap(([, v]) => (Array.isArray(v) ? v : [v]))
+      .filter((v) => v !== null && v !== undefined && v !== "")
+      .map((v) => String(v).toLowerCase())
+      .join(" ");
+    const variantAttrs = (p.variants || [])
+      .map((v) => flattenValues(v.attributesJson))
+      .join(" ");
+    return {
+      title: (p.title || "").toLowerCase(),
+      productType: (p.productType || "").toLowerCase(),
+      categoryAttrs,
+      tags: Array.isArray(p.tags) ? p.tags.join(" ").toLowerCase() : "",
+      otherAttrs: `${otherAttrValues} ${variantAttrs}`.trim(),
+      vendor: (p.vendor || "").toLowerCase(),
+      description: (p.description || "").toLowerCase(),
+    };
+  };
+
   const scored = products
     .map((p) => {
-      const haystack = getProductHaystack(p);
-
+      const fields = getScoredFields(p);
       let score = 0;
       for (const group of keywordGroups) {
-        if (group.some((term) => haystack.includes(term))) {
-          score += 1;
+        for (const [key, weight] of Object.entries(FIELD_WEIGHTS)) {
+          if (group.some((term) => fields[key].includes(term))) {
+            score += weight;
+          }
         }
       }
-
       return { product: p, score };
     })
     .filter(({ product, score }) => {
@@ -631,6 +674,7 @@ const isExcludedByRule = (p) => {
       return score > 0;
     })
     .sort((a, b) => b.score - a.score);
+
 
   let filtered = scored.map((x) => x.product);
 
