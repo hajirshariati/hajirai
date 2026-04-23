@@ -486,10 +486,21 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     fullResponseText = "I'm not finding a great match for that right now. Want to try a different style, or I can connect you with our support team?";
   }
 
+  // Strip stray HTML the model sometimes emits (literal <br>, unexpected
+  // tags). The widget renders markdown / plain text, not HTML, so tags
+  // otherwise surface as raw characters to the customer.
+  if (fullResponseText) {
+    fullResponseText = fullResponseText
+      .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/<\/?[a-z][^>]*>/gi, "")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
+  }
 
   if (fullResponseText) {
     controller.enqueue(encoder.encode(sseChunk({ type: "text", text: fullResponseText })));
   }
+
 
   if (supportCTA) {
     controller.enqueue(encoder.encode(sseChunk({ type: "link", url: supportCTA.url, label: supportCTA.label })));
