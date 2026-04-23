@@ -1435,6 +1435,17 @@ async function getFitRecommendation({ handle, customerSizeHint }, ctx) {
   let directionalNumerator = 0;
   let directionalDenominator = 0;
 
+  // Always surface where the base size came from, so the card has at least
+  // one explanatory line even when no review/return/external data exists.
+  if (hinted != null) {
+    signals.push({
+      source: "customer_hint",
+      weight: 0,
+      direction: "base",
+      summary: `Based on the size you mentioned (${formatSize(hinted)}).`,
+    });
+  }
+
   if (reviewRes && !reviewRes.error) {
     const fc = reviewRes.fitCounts || {};
     const total = (fc.runs_small || 0) + (fc.runs_large || 0) + (fc.true_to_size || 0);
