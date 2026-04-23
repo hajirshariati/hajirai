@@ -1278,6 +1278,296 @@ async function getReturnInsights({ handle }, { shop, aftershipApiKey }) {
   };
 }
 
+// Merchant-gated tool. Only added to the tools list when the shop has
+// fitPredictorEnabled=true. Aggregates review fit data, return sizing reasons,
+// customer order history, and an optional merchant-configured external fit
+// API into a single size recommendation with a confidence score.
+export const FIT_PREDICTOR_TOOL = {
+  name: "get_fit_recommendation",
+  description:
+    "Recommend a specific size with a confidence score for a single product, aggregating review fit signals, return sizing data, customer order history, and any merchant-configured external fit API. Use this INSTEAD of get_product_reviews + get_return_insights whenever the customer asks 'what size should I get', 'do these run small', 'should I size up/down', 'fit for [product]', or anything where the answer is a specific size. Returns a structured report that the widget renders as a visual fit-confidence card.",
+  input_schema: {
+    type: "object",
+    properties: {
+      handle: {
+        type: "string",
+        description: "The product handle to recommend a size for.",
+      },
+      customerSizeHint: {
+        type: "string",
+        description: "Optional. If the customer mentioned their usual size (e.g. '9', '8.5', 'W9', 'M10.5'), pass it so the predictor can anchor the recommendation.",
+      },
+    },
+    required: ["handle"],
+  },
+};
+
+function roundToHalf(n) {
+  if (!Number.isFinite(n)) return null;
+  return Math.round(n * 2) / 2;
+}
+
+function parseSize(raw) {
+  if (raw == null) return null;
+  const m = String(raw).match(/(\d+(?:\.\d+)?)/);
+  if (!m) return null;
+  const n = parseFloat(m[1]);
+  return Number.isFinite(n) ? n : null;
+}
+
+function formatSize(n) {
+  if (n == null) return "";
+  return Number.isInteger(n) ? String(n) : n.toFixed(1);
+}
+
+async function getFitRecommendation({ handle, customerSizeHint }, ctx) {
+  const h = String(handle || "").trim();
+  if (!h) return { error: "handle is required" };
+
+  const cfg = (ctx && typeof ctx.fitPredictorConfig === "object" && ctx.fitPredictorConfig) || {};
+  const weights = {
+    reviews: Number.isFinite(cfg.reviewsWeight) ? cfg.reviewsWeight : 0.4,
+    returns: Number.isFinite(cfg.returnsWeight) ? cfg.returnsWeight : 0.2,
+    history: Number.isFinite(cfg.historyWeight) ? cfg.historyWeight : 0.3,
+    external: Number.isFinite(cfg.externalWeight) ? cfg.externalWeight : 0.1,
+  };
+  const minConfidence = Number.isFinite(cfg.minConfidence) ? cfg.minConfidence : 50;
+  const externalUrl = typeof cfg.externalUrl === "string" ? cfg.externalUrl.trim() : "";
+  const externalAuthHeader = typeof cfg.externalAuthHeader === "string" ? cfg.externalAuthHeader.trim() : "";
+
+  const product = await prisma.product.findFirst({
+    where: { shop: ctx.shop, handle: h },
+    include: { variants: { select: { sku: true, title: true, optionsJson: true, attributesJson: true } } },
+  });
+  if (!product) return { error: `No product found with handle '${h}'.` };
+
+  const sizesAvailable = Array.from(
+    new Set(
+      (product.variants || [])
+        .flatMap((v) => {
+          const opts = safeParseJson(v.optionsJson);
+          if (opts && typeof opts === "object") {
+            return Object.values(opts).map(String);
+          }
+          return [v.title || ""];
+        })
+        .map((s) => String(s || "").trim())
+        .filter((s) => /\d/.test(s)),
+    ),
+  );
+
+  // Parallel-fetch every signal. Every call is guarded so a failure in one
+  // source never takes down the recommendation.
+  const [reviewRes, returnRes] = await Promise.all([
+    ctx.yotpoApiKey
+      ? getProductReviews({ handle: h }, { shop: ctx.shop, yotpoApiKey: ctx.yotpoApiKey }).catch(() => null)
+      : Promise.resolve(null),
+    ctx.aftershipApiKey
+      ? getReturnInsights({ handle: h }, { shop: ctx.shop, aftershipApiKey: ctx.aftershipApiKey }).catch(() => null)
+      : Promise.resolve(null),
+  ]);
+
+  // Optional external fit API.
+  let externalRes = null;
+  if (externalUrl) {
+    try {
+      const body = {
+        shop: ctx.shop,
+        productHandle: h,
+        customerId: ctx.loggedInCustomerId || null,
+      };
+      const headers = { "Content-Type": "application/json", accept: "application/json" };
+      if (externalAuthHeader) {
+        const idx = externalAuthHeader.indexOf(":");
+        if (idx > 0) {
+          headers[externalAuthHeader.slice(0, idx).trim()] = externalAuthHeader.slice(idx + 1).trim();
+        }
+      }
+      const r = await fetch(externalUrl, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(5000),
+      });
+      if (r.ok) externalRes = await r.json();
+    } catch {
+      externalRes = null;
+    }
+  }
+
+  // Customer history: if VIP + logged in, look at recent orders for sizes
+  // worn in the same category. Never expose PII.
+  let historyRes = null;
+  if (ctx.loggedInCustomerId && ctx.vipModeEnabled && ctx.accessToken) {
+    try {
+      const ctxData = await fetchCustomerContext({
+        shop: ctx.shop,
+        accessToken: ctx.accessToken,
+        customerId: ctx.loggedInCustomerId,
+        orderLimit: 10,
+      });
+      if (ctxData?.recentOrders?.length) {
+        const sizes = [];
+        for (const o of ctxData.recentOrders) {
+          for (const item of o.items || []) {
+            const s = parseSize(typeof item === "string" ? item : item?.title || item?.variantTitle || "");
+            if (s != null) sizes.push(s);
+          }
+        }
+        if (sizes.length > 0) {
+          const freq = new Map();
+          for (const s of sizes) freq.set(s, (freq.get(s) || 0) + 1);
+          const modal = [...freq.entries()].sort((a, b) => b[1] - a[1])[0];
+          historyRes = { modalSize: modal[0], orders: sizes.length };
+        }
+      }
+    } catch {
+      historyRes = null;
+    }
+  }
+
+  // Anchor size: customer hint > history > null.
+  const hinted = parseSize(customerSizeHint);
+  const baseSize = hinted != null ? hinted : (historyRes?.modalSize ?? null);
+
+  // Score directional fit signals. Positive = size up, negative = size down.
+  const signals = [];
+  let directionalNumerator = 0;
+  let directionalDenominator = 0;
+
+  if (reviewRes && !reviewRes.error) {
+    const fc = reviewRes.fitCounts || {};
+    const total = (fc.runs_small || 0) + (fc.runs_large || 0) + (fc.true_to_size || 0);
+    if (total >= 3) {
+      const raw = ((fc.runs_small || 0) - (fc.runs_large || 0)) / total;
+      directionalNumerator += raw * weights.reviews;
+      directionalDenominator += weights.reviews;
+      const direction = raw > 0.15 ? "up" : raw < -0.15 ? "down" : "base";
+      signals.push({
+        source: "reviews",
+        weight: weights.reviews,
+        direction,
+        summary:
+          direction === "up"
+            ? `Reviewers say it runs small (${fc.runs_small}/${total} fit mentions).`
+            : direction === "down"
+            ? `Reviewers say it runs large (${fc.runs_large}/${total} fit mentions).`
+            : `Reviewers say it's true to size (${fc.true_to_size}/${total} fit mentions).`,
+      });
+    }
+  }
+
+  if (returnRes && !returnRes.error && returnRes.sizingReasons) {
+    const sr = returnRes.sizingReasons;
+    const total = (sr.too_small || 0) + (sr.too_big || 0);
+    if (total >= 2) {
+      const raw = ((sr.too_small || 0) - (sr.too_big || 0)) / total;
+      directionalNumerator += raw * weights.returns;
+      directionalDenominator += weights.returns;
+      const direction = raw > 0.2 ? "up" : raw < -0.2 ? "down" : "base";
+      signals.push({
+        source: "returns",
+        weight: weights.returns,
+        direction,
+        summary:
+          direction === "up"
+            ? `Returns skew "too small" (${sr.too_small} vs ${sr.too_big}).`
+            : direction === "down"
+            ? `Returns skew "too big" (${sr.too_big} vs ${sr.too_small}).`
+            : `Return data is balanced on sizing.`,
+      });
+    }
+  }
+
+  if (historyRes?.modalSize != null) {
+    signals.push({
+      source: "history",
+      weight: weights.history,
+      direction: "base",
+      summary: `Your usual size across ${historyRes.orders} past item(s) is ${formatSize(historyRes.modalSize)}.`,
+    });
+  }
+
+  if (externalRes && externalRes.size != null) {
+    const sizeNum = parseSize(externalRes.size);
+    if (sizeNum != null) {
+      signals.push({
+        source: "external",
+        weight: weights.external,
+        direction: "base",
+        summary: String(externalRes.summary || `Scan/fit data suggests size ${formatSize(sizeNum)}.`),
+      });
+    }
+  }
+
+  // Aggregate.
+  const directional = directionalDenominator > 0 ? directionalNumerator / directionalDenominator : 0;
+  const adjustment = directional > 0.4 ? 0.5 : directional < -0.4 ? -0.5 : 0;
+
+  let recommendedSizeNum = null;
+  // Prefer external absolute recommendation if confident.
+  if (externalRes?.size != null && parseSize(externalRes.size) != null) {
+    recommendedSizeNum = parseSize(externalRes.size);
+  } else if (baseSize != null) {
+    recommendedSizeNum = roundToHalf(baseSize + adjustment);
+  }
+
+  // Confidence scoring.
+  let confidence = 30;
+  if (reviewRes && !reviewRes.error && reviewRes.fitCounts) {
+    const totalFit = (reviewRes.fitCounts.runs_small || 0) + (reviewRes.fitCounts.runs_large || 0) + (reviewRes.fitCounts.true_to_size || 0);
+    if (totalFit >= 10) confidence += 20;
+    else if (totalFit >= 3) confidence += 10;
+  }
+  if (returnRes && !returnRes.error && returnRes.sizingReasons) {
+    const totalRet = (returnRes.sizingReasons.too_small || 0) + (returnRes.sizingReasons.too_big || 0);
+    if (totalRet >= 5) confidence += 15;
+    else if (totalRet >= 2) confidence += 8;
+  }
+  if (historyRes?.orders >= 3) confidence += 20;
+  else if (historyRes?.orders >= 1) confidence += 10;
+  if (externalRes?.confidence != null && Number.isFinite(externalRes.confidence)) {
+    confidence = Math.max(confidence, Math.min(100, Math.round(externalRes.confidence)));
+  }
+  // Agreement bonus.
+  if (signals.length >= 2) {
+    const nonBase = signals.filter((s) => s.direction === "up" || s.direction === "down");
+    if (nonBase.length >= 2) {
+      const allSame = nonBase.every((s) => s.direction === nonBase[0].direction);
+      if (allSame) confidence += 10;
+    }
+  }
+  confidence = Math.max(0, Math.min(95, confidence));
+
+  const shouldDisplay = recommendedSizeNum != null && confidence >= minConfidence;
+
+  const reasons = signals.map((s) => s.summary);
+  if (adjustment !== 0 && baseSize != null) {
+    reasons.push(adjustment > 0
+      ? `Applied +0.5 adjustment from your usual size.`
+      : `Applied -0.5 adjustment from your usual size.`);
+  }
+
+  console.log(
+    `[fit] handle=${h} base=${baseSize ?? "-"} adj=${adjustment} rec=${recommendedSizeNum ?? "-"} conf=${confidence} signals=${signals.map((s) => s.source).join(",") || "-"}`,
+  );
+
+  return {
+    handle: h,
+    productTitle: product.title,
+    recommendation: {
+      recommendedSize: recommendedSizeNum != null ? formatSize(recommendedSizeNum) : null,
+      baseSize: baseSize != null ? formatSize(baseSize) : null,
+      adjustment,
+      confidence,
+      signals,
+      reasons,
+      sizesAvailable,
+      shouldDisplay,
+    },
+  };
+}
+
 // VIP-only tool. Only added to the tools list when the customer is logged in
 // and the shop has vipModeEnabled. Operates strictly on the HMAC-verified
 // loggedInCustomerId from the request context — never accepts a customer id
@@ -1369,6 +1659,7 @@ const HANDLERS = {
   get_product_reviews: getProductReviews,
   get_return_insights: getReturnInsights,
   get_customer_orders: getCustomerOrders,
+  get_fit_recommendation: getFitRecommendation,
 };
 
 function mentionsFromResult(name, result) {

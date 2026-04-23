@@ -3,7 +3,7 @@ import { authenticate } from "../shopify.server";
 import { getShopConfig, getKnowledgeFilesWithContent, incrementRateLimitHits } from "../models/ShopConfig.server";
 import { getAttributeMappings } from "../models/AttributeMapping.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
-import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL } from "../lib/chat-tools.server";
+import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL, FIT_PREDICTOR_TOOL } from "../lib/chat-tools.server";
 import { fetchCustomerContext } from "../lib/customer-context.server";
 import { fetchKlaviyoEnrichment } from "../lib/klaviyo-enrichment.server";
 import { fetchYotpoLoyalty } from "../lib/yotpo-loyalty.server";
@@ -437,6 +437,19 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         const fam = titleStyleFamily(r.reference.title || "");
         if (fam) excludedFamilies.add(fam);
       }
+      if (u.name === "get_fit_recommendation" && r && !r.error && r.recommendation?.shouldDisplay) {
+        const display = typeof ctx.fitPredictorConfig?.display === "string" ? ctx.fitPredictorConfig.display : "bar";
+        controller.enqueue(encoder.encode(sseChunk({
+          type: "fit_report",
+          handle: r.handle,
+          productTitle: r.productTitle,
+          recommendedSize: r.recommendation.recommendedSize,
+          confidence: r.recommendation.confidence,
+          reasons: r.recommendation.reasons || [],
+          sizesAvailable: r.recommendation.sizesAvailable || [],
+          display,
+        })));
+      }
       const cards = extractProductCards(u.name, r);
       for (const c of cards) {
         const key = c.handle || c.title;
@@ -796,6 +809,11 @@ export const action = async ({ request }) => {
             .filter((r) => r.category && r.url)
         : [];
     } catch { /* */ }
+    let fitPredictorConfig = {};
+    try {
+      const raw = JSON.parse(config.fitPredictorConfig || "{}");
+      if (raw && typeof raw === "object") fitPredictorConfig = raw;
+    } catch { /* */ }
 
     // Logged-in customer ID is HMAC-verified by Shopify on app proxy requests.
     // This is the only trustworthy customer identifier — we NEVER use any
@@ -850,6 +868,7 @@ export const action = async ({ request }) => {
       categoryExclusions,
       querySynonyms,
       customerContext,
+      fitPredictorEnabled: config.fitPredictorEnabled === true,
     });
 
     const history = sanitizeHistory(body.history);
@@ -871,6 +890,8 @@ export const action = async ({ request }) => {
       querySynonyms,
       similarMatchAttributes,
       collectionLinks,
+      fitPredictorConfig,
+      fitPredictorEnabled: config.fitPredictorEnabled === true,
       conversationText,
       userText,
       yotpoApiKey: config.yotpoApiKey || "",
@@ -891,6 +912,9 @@ export const action = async ({ request }) => {
           const activeTools = [...TOOLS];
           if (loggedInCustomerId && config.vipModeEnabled === true && accessToken) {
             activeTools.push(CUSTOMER_ORDERS_TOOL);
+          }
+          if (config.fitPredictorEnabled === true) {
+            activeTools.push(FIT_PREDICTOR_TOOL);
           }
           const result = await runAgenticLoop({
             anthropic,

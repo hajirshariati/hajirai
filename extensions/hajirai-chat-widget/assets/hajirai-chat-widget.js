@@ -466,14 +466,14 @@ showHighTraffic();
 function handleSSE(response){
 var reader=response.body.getReader();
 var decoder=new TextDecoder();
-var buf='',full='',prods=[],msgDiv=null,buffSugg=[],linkCTA=null;
+var buf='',full='',prods=[],msgDiv=null,buffSugg=[],linkCTA=null,fitReport=null;
 function proc(chunk){
 buf+=chunk;var lines=buf.split('\n');buf=lines.pop()||'';
 for(var i=0;i<lines.length;i++){
 var line=lines[i].trim();
 if(!line.startsWith('data: '))continue;
 var data=line.slice(6);
-if(data==='[DONE]'){finish(full,prods,msgDiv,buffSugg,linkCTA);return true}
+if(data==='[DONE]'){finish(full,prods,msgDiv,buffSugg,linkCTA,fitReport);return true}
 try{
 var p=JSON.parse(data);
 if(p.type==='text'||p.type==='content_block_delta'){
@@ -496,6 +496,9 @@ if(p.type==='choices'&&p.options&&p.options.length){
 if(p.type==='suggestions'&&p.questions&&p.questions.length){
   buffSugg=p.questions;
 }
+if(p.type==='fit_report'&&p.recommendedSize){
+  fitReport={handle:p.handle||'',productTitle:p.productTitle||'',size:p.recommendedSize,confidence:Math.max(0,Math.min(100,parseInt(p.confidence,10)||0)),reasons:Array.isArray(p.reasons)?p.reasons:[],display:p.display==='percent'?'percent':'bar'};
+}
 if(p.type==='klaviyo_form'){
   setTimeout(function(){showKlaviyoForm('Stay Connected')},300);
 }
@@ -513,7 +516,7 @@ if(p.type==='action'&&p.action==='show_dead_end'){
   setTimeout(function(){showKlaviyoForm('Stay Connected')},500);
   scrollBottom();
 }
-if(p.type==='done'){finish(full,prods,msgDiv,buffSugg,linkCTA);return true}
+if(p.type==='done'){finish(full,prods,msgDiv,buffSugg,linkCTA,fitReport);return true}
 if(p.type==='error'){
   typingEl.classList.remove('visible');isStreaming=false;sendBtn.disabled=false;
   var errText=p.message||'I\'m sorry, I\'m having trouble right now. Please try again in a moment.';
@@ -527,7 +530,7 @@ if(p.type==='error'){
 }
 }catch(e){}
 }return false}
-function read(){reader.read().then(function(r){if(r.done){finish(full||'I\'m having trouble right now. Please try again.',prods,msgDiv,buffSugg,linkCTA);return}var done=proc(decoder.decode(r.value,{stream:true}));if(!done)read()}).catch(function(e){if(e.name!=='AbortError')finish(full||'Connection lost. Please try again.',prods,msgDiv,buffSugg,linkCTA)})}
+function read(){reader.read().then(function(r){if(r.done){finish(full||'I\'m having trouble right now. Please try again.',prods,msgDiv,buffSugg,linkCTA,fitReport);return}var done=proc(decoder.decode(r.value,{stream:true}));if(!done)read()}).catch(function(e){if(e.name!=='AbortError')finish(full||'Connection lost. Please try again.',prods,msgDiv,buffSugg,linkCTA,fitReport)})}
 read();
 }
 
@@ -540,7 +543,26 @@ appendMsg('assistant',c,p);saveH(messages);
 isStreaming=false;sendBtn.disabled=false;
 }
 
-function finish(text,prods,md2,sugg,linkCTA){
+function fitReportHtml(fr){
+if(!fr||!fr.size)return '';
+var conf=fr.confidence||0;
+var bar=fr.display==='percent'?'<div class="ai-chat-fit-percent">'+conf+'%</div>':'<div class="ai-chat-fit-bar" role="progressbar" aria-valuenow="'+conf+'" aria-valuemin="0" aria-valuemax="100"><div class="ai-chat-fit-bar-fill" style="width:'+conf+'%"></div><span class="ai-chat-fit-bar-val">'+conf+'%</span></div>';
+var reasonsHtml='';
+if(fr.reasons&&fr.reasons.length){
+  reasonsHtml='<ul class="ai-chat-fit-reasons">';
+  for(var i=0;i<fr.reasons.length;i++){reasonsHtml+='<li>'+esc(fr.reasons[i])+'</li>'}
+  reasonsHtml+='</ul>';
+}
+return '<div class="ai-chat-fit-card" role="region" aria-label="Size recommendation">'+
+  '<div class="ai-chat-fit-head"><span class="ai-chat-fit-icon" aria-hidden="true">▸</span><span class="ai-chat-fit-title">Fit finder</span></div>'+
+  '<div class="ai-chat-fit-size">Recommended size <strong>'+esc(fr.size)+'</strong></div>'+
+  '<div class="ai-chat-fit-conf-label">Confidence</div>'+
+  bar+
+  reasonsHtml+
+'</div>';
+}
+
+function finish(text,prods,md2,sugg,linkCTA,fitReport){
 clearWatchdog();
 typingEl.classList.remove('visible');isStreaming=false;sendBtn.disabled=false;
 var mDiv=md2;
@@ -561,6 +583,10 @@ if(choices.length>0&&mDiv){
 if(linkCTA&&linkCTA.url&&mDiv){
   var lb=$('.ai-chat-msg-bubble',mDiv);
   if(lb)lb.insertAdjacentHTML('beforeend','<a class="ai-chat-cta-btn" style="display:block;margin-top:12px;padding:14px 16px;background:var(--ai-chat-primary,#2d6b4f);color:#fff;border-radius:10px;text-decoration:none;text-align:center;font-size:14px;font-weight:600;line-height:1.3" href="'+esc(linkCTA.url)+'" target="_blank" rel="noopener">'+esc(linkCTA.label||'Visit Support Hub')+' &rarr;</a>');
+}
+if(fitReport&&fitReport.size&&mDiv){
+  var frb=$('.ai-chat-msg-bubble',mDiv);
+  if(frb)frb.insertAdjacentHTML('beforeend',fitReportHtml(fitReport));
 }
 if(sugg&&sugg.length>0&&mDiv){
   var sb=$('.ai-chat-msg-bubble',mDiv);
