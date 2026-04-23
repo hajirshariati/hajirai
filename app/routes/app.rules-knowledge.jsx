@@ -91,6 +91,7 @@ export const loader = async ({ request }) => {
     categoryExclusions: safeParse(config.categoryExclusions, []),
     querySynonyms: safeParse(config.querySynonyms, []),
     similarMatchAttributes: safeParse(config.similarMatchAttributes, []),
+    collectionLinks: safeParse(config.collectionLinks, []),
     deduplicateColors: config.deduplicateColors,
     files: filesWithCounts,
   };
@@ -188,6 +189,25 @@ export const action = async ({ request }) => {
       }
     } catch { /* */ }
     return { error: "Invalid similarity attributes." };
+  }
+
+  if (intent === "save_collection_links") {
+    const raw = formData.get("collectionLinks");
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        const clean = parsed
+          .map((r) => ({
+            category: String(r?.category || "").trim(),
+            url: String(r?.url || "").trim(),
+            label: String(r?.label || "").trim(),
+          }))
+          .filter((r) => r.category && r.url);
+        await updateShopConfig(session.shop, { collectionLinks: JSON.stringify(clean) });
+        return { saved: true };
+      }
+    } catch { /* */ }
+    return { error: "Invalid collection links." };
   }
 
   if (intent === "upload") {
@@ -646,6 +666,95 @@ function SimilarMatchAttributesCard({ initial }) {
   );
 }
 
+function CollectionLinksCard({ initial }) {
+  const fetcher = useFetcher();
+  const [links, setLinks] = useState(initial || []);
+  const [category, setCategory] = useState("");
+  const [url, setUrl] = useState("");
+  const [label, setLabel] = useState("");
+
+  const save = (list) => {
+    const fd = new FormData();
+    fd.set("intent", "save_collection_links");
+    fd.set("collectionLinks", JSON.stringify(list));
+    fetcher.submit(fd, { method: "post" });
+  };
+
+  const add = () => {
+    const c = category.trim().toLowerCase();
+    const u = url.trim();
+    const l = label.trim() || category.trim();
+    if (!c || !u) return;
+    const updated = [...links.filter((x) => x.category?.toLowerCase() !== c), { category: c, url: u, label: l }];
+    setLinks(updated);
+    setCategory("");
+    setUrl("");
+    setLabel("");
+    save(updated);
+  };
+
+  const remove = (idx) => {
+    const updated = links.filter((_, i) => i !== idx);
+    setLinks(updated);
+    save(updated);
+  };
+
+  return (
+    <Card>
+      <BlockStack gap="400">
+        <BlockStack gap="100">
+          <InlineStack gap="200" blockAlign="center">
+            <Text as="h2" variant="headingMd">"Shop all" collection links</Text>
+            <Badge tone="info">Below product cards</Badge>
+          </InlineStack>
+          <Text as="p" tone="subdued">
+            When the assistant shows product cards and they share a dominant category, a "Shop all <em>&lt;label&gt;</em>" button appears below the cards linking to the collection page configured here.
+          </Text>
+          <Text as="p" tone="subdued" variant="bodySm">
+            Map each category value (as it appears in your <strong>Product attributes → category</strong> metafield) to the Shopify collection URL. Leave the list empty to disable the button.
+          </Text>
+        </BlockStack>
+
+        {links.length > 0 && (
+          <BlockStack gap="150">
+            {links.map((r, i) => (
+              <InlineStack key={i} align="space-between" blockAlign="center">
+                <InlineStack gap="200" blockAlign="center" wrap>
+                  <Text as="span" variant="bodyMd" fontWeight="semibold"><code>{r.category}</code></Text>
+                  <Text as="span" tone="subdued" variant="bodySm">→</Text>
+                  <Text as="span" variant="bodySm"><code>{r.url}</code></Text>
+                  <Badge>{`Shop all ${r.label || r.category}`}</Badge>
+                </InlineStack>
+                <Button variant="plain" tone="critical" onClick={() => remove(i)}>Remove</Button>
+              </InlineStack>
+            ))}
+          </BlockStack>
+        )}
+
+        <Divider />
+
+        <BlockStack gap="200">
+          <Text as="h3" variant="headingSm">Add a collection link</Text>
+          <FormLayout>
+            <FormLayout.Group>
+              <TextField label="Category value" value={category} onChange={setCategory}
+                placeholder="sandal" autoComplete="off"
+                helpText="Exactly as it appears in the product's category metafield." />
+              <TextField label="Button label" value={label} onChange={setLabel}
+                placeholder="Sandals" autoComplete="off"
+                helpText='Shown as "Shop all <label>". Defaults to the category value.' />
+            </FormLayout.Group>
+            <TextField label="Collection URL" value={url} onChange={setUrl}
+              placeholder="/collections/sandals" autoComplete="off"
+              helpText="Relative (/collections/sandals) or absolute (https://your-store.com/collections/sandals)." />
+            <Button onClick={add} disabled={!category.trim() || !url.trim()}>Add link</Button>
+          </FormLayout>
+        </BlockStack>
+      </BlockStack>
+    </Card>
+  );
+}
+
 function SearchRulesCard({ initial }) {
   const fetcher = useFetcher();
   const [rules, setRules] = useState(initial || []);
@@ -1019,6 +1128,7 @@ export default function RulesKnowledge() {
         <SearchRulesCard initial={data.categoryExclusions} />
         <QuerySynonymsCard initial={data.querySynonyms} />
         <SimilarMatchAttributesCard initial={data.similarMatchAttributes} />
+        <CollectionLinksCard initial={data.collectionLinks} />
         <KnowledgeFilesCard files={data.files} />
         <DisplayCard deduplicateColors={data.deduplicateColors} />
       </BlockStack>
