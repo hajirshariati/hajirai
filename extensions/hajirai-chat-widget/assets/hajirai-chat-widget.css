@@ -897,6 +897,7 @@ a.ai-chat-welcome__hint--link:hover {
 
 .ai-chat-product-card {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   padding: 10px;
   border: 1px solid var(--ai-chat-border);
@@ -1297,22 +1298,79 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
   }
 }
 
-/* Fit predictor pair — product + fit side-by-side on wide, stacked when narrow.
-   Each card keeps its natural height; grid only controls horizontal layout. */
-.ai-chat-fit-pair {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 10px;
-  align-items: start;
-  margin-bottom: 10px;
-}
-.ai-chat-fit-pair .ai-chat-product-card,
-.ai-chat-fit-pair .ai-chat-fit-card {
-  margin: 0;
+/* Inline fit block — lives INSIDE the matching product card on the right.
+   Drops to a full-width row below title/price when the card is too narrow
+   (thanks to flex-wrap on .ai-chat-product-card). */
+.ai-chat-product-fit {
+  flex: 0 0 140px;
   min-width: 0;
+  padding-left: 12px;
+  border-left: 1px dashed rgba(45, 107, 79, 0.28);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  align-self: stretch;
+}
+.ai-chat-product-fit-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ai-chat-primary, #2d6b4f);
+}
+.ai-chat-product-fit-size {
+  font-size: 13px;
+  color: #374151;
+  line-height: 1.2;
+}
+.ai-chat-product-fit-size strong {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--ai-chat-primary, #2d6b4f);
+  margin-left: 2px;
+}
+.ai-chat-product-fit-bar {
+  position: relative;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 2px;
+}
+.ai-chat-product-fit-bar-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: linear-gradient(90deg, var(--ai-chat-primary, #2d6b4f), #3a8a66);
+  border-radius: 999px;
+  transition: width 500ms ease;
+}
+.ai-chat-product-fit-pct {
+  font-size: 10px;
+  font-weight: 700;
+  color: #6b7280;
+  letter-spacing: 0.03em;
+}
+/* On narrow cards, fit block wraps below image+info and spans the full row. */
+@media (max-width: 480px) {
+  .ai-chat-product-fit {
+    flex: 1 0 100%;
+    padding: 8px 0 0;
+    margin-top: 4px;
+    border-left: none;
+    border-top: 1px dashed rgba(45, 107, 79, 0.28);
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .ai-chat-product-fit-bar { flex: 1; margin: 0 6px; max-width: 80px; }
 }
 
-/* Fit predictor card */
+/* Standalone fit card — fallback when the fit result's handle doesn't
+   match any rendered product card (rare). Unchanged from before. */
 .ai-chat-fit-card {
   margin-top: 12px;
   padding: 14px 14px 12px;
