@@ -173,7 +173,8 @@ export async function upsertProductFromWebhook(shop, webhookPayload) {
     variants: { nodes: variants },
   };
 
-  return upsertProduct(shop, node);
+const mappings = await getAttributeMappings(shop);
+return upsertProduct(shop, node, mappings);
 }
 
 export async function fetchAndUpsertProduct(admin, shop, shopifyGid) {
