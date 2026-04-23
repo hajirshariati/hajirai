@@ -422,9 +422,8 @@ const keywords = rawKeywords.filter(
     AND: [],
   };
 
-  if (effectiveGender) {
-    where.AND.push(genderFilterClause(effectiveGender));
-  }
+// Apply gender after retrieval instead of at the DB level.
+// This avoids zero-result queries when some products are missing synced attributes.
 
   if (exclusionClause) {
     where.AND.push(exclusionClause);
@@ -464,12 +463,6 @@ let products = await prisma.product.findMany({
   orderBy: { updatedAt: "desc" },
 });
 
-console.log("TOTAL PRODUCTS FOUND:", products.length);
-
-  if (products.length > 0) {
-  console.log("SAMPLE ATTRIBUTES:", products[0].attributesJson);
-}
-
   if (products.length === 0 && keywords.length > 1) {
     const fallbackWhere = {
       shop,
@@ -505,39 +498,36 @@ console.log("TOTAL PRODUCTS FOUND:", products.length);
       })
     : products;
 
-  if (effectiveGender) {
-    const want = effectiveGender.toLowerCase();
-    const opposite = want === "men" ? "women" : want === "women" ? "men" : null;
-    const wantRe = new RegExp(`(^|[^a-z])${want}('?s)?([^a-z]|$)`, "i");
-    const oppositeRe = opposite ? new RegExp(`(^|[^a-z])${opposite}('?s)?([^a-z]|$)`, "i") : null;
-    const unisexRe = /(^|[^a-z])unisex([^a-z]|$)/i;
+if (effectiveGender) {
+  const want = effectiveGender.toLowerCase();
+  const opposite = want === "men" ? "women" : want === "women" ? "men" : null;
+  const wantRe = new RegExp(`(^|[^a-z])${want}('?s)?([^a-z]|$)`, "i");
+  const oppositeRe = opposite ? new RegExp(`(^|[^a-z])${opposite}('?s)?([^a-z]|$)`, "i") : null;
+  const unisexRe = /(^|[^a-z])unisex([^a-z]|$)/i;
 
-    const before = filtered.length;
-    filtered = filtered.filter((p) => {
-      const attrs = p.attributesJson || {};
-      const gVal = attrs.gender || attrs.gender_fallback || "";
-      const gStr = Array.isArray(gVal) ? gVal.join(" ") : String(gVal);
-      const titleStr = p.title || "";
+  filtered = filtered.filter((p) => {
+    const attrs = p.attributesJson || {};
+    const gVal = attrs.gender || attrs.gender_fallback || "";
+    const gStr = Array.isArray(gVal) ? gVal.join(" ") : String(gVal);
+    const titleStr = p.title || "";
 
-      if (unisexRe.test(gStr)) return true;
+    if (unisexRe.test(gStr)) return true;
 
-      const gHasOpposite = oppositeRe && oppositeRe.test(gStr);
-      const gHasWant = wantRe.test(gStr);
-      if (gHasOpposite && !gHasWant) return false;
-      if (gHasWant) return true;
+    const gHasWant = wantRe.test(gStr);
+    const gHasOpposite = oppositeRe ? oppositeRe.test(gStr) : false;
+    if (gHasWant) return true;
+    if (gHasOpposite) return false;
 
-      const tHasOpposite = oppositeRe && oppositeRe.test(titleStr);
-      const tHasWant = wantRe.test(titleStr);
-      if (tHasOpposite && !tHasWant) return false;
-      if (tHasWant) return true;
+    const tHasWant = wantRe.test(titleStr);
+    const tHasOpposite = oppositeRe ? oppositeRe.test(titleStr) : false;
+    if (tHasWant) return true;
+    if (tHasOpposite) return false;
 
-      console.warn(`[gender-filter] dropped product=${p.handle} want=${want} gender=${JSON.stringify(gVal)} title="${titleStr}"`);
-      return false;
-    });
-    if (before !== filtered.length) {
-      console.log(`[gender-filter] want=${want} ${before} -> ${filtered.length} products`);
-    }
-  }
+    // If the product has no usable gender signal yet, keep it for now
+    // instead of zeroing out the whole result set.
+    return true;
+  });
+}
 
   if (deduplicateColors) {
     filtered = deduplicateByColor(filtered);
