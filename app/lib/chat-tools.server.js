@@ -1309,10 +1309,22 @@ function roundToHalf(n) {
 
 function parseSize(raw) {
   if (raw == null) return null;
-  const m = String(raw).match(/(\d+(?:\.\d+)?)/);
-  if (!m) return null;
-  const n = parseFloat(m[1]);
-  return Number.isFinite(n) ? n : null;
+  const str = String(raw);
+  // Prefer explicit "Size: 9.5" or "size 9" phrasings if present.
+  const labeled = str.match(/\bsize[^0-9]{0,6}(\d+(?:\.\d+)?)/i);
+  if (labeled) {
+    const n = parseFloat(labeled[1]);
+    if (Number.isFinite(n) && n >= 3 && n <= 18) return n;
+  }
+  // Otherwise scan all numbers and pick the first one that falls in the
+  // plausible US shoe-size range (3–18). Keeps SKUs like "L1305" from
+  // being read as size 1305.
+  const matches = str.match(/\d+(?:\.\d+)?/g) || [];
+  for (const m of matches) {
+    const n = parseFloat(m);
+    if (Number.isFinite(n) && n >= 3 && n <= 18) return n;
+  }
+  return null;
 }
 
 function formatSize(n) {
