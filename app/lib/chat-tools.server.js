@@ -405,135 +405,167 @@ function genderFilterClause(gender) {
   return clause;
 }
 
-async function searchProducts({ query, limit, filters }, { shop, deduplicateColors, sessionGender, categoryExclusions, querySynonyms, conversationText, userText }) {
+async function searchProducts(
+  { query, limit, filters },
+  { shop, deduplicateColors, sessionGender, categoryExclusions, querySynonyms, conversationText, userText }
+) {
   const q = String(query || "").trim();
   if (!q) return { products: [] };
+
   const max = Math.min(Math.max(parseInt(limit, 10) || 6, 1), 10);
   const attrFilters = filters && typeof filters === "object" ? filters : {};
 
   const detected = detectAndStripGender(q);
-  const filterGenderRaw = (attrFilters.gender || attrFilters.Gender || attrFilters.gender_fallback || "").toString().toLowerCase().trim();
-  const filterGender = filterGenderRaw === "men" || filterGenderRaw === "mens" || filterGenderRaw === "men's" || filterGenderRaw === "male"
-    ? "men"
-    : filterGenderRaw === "women" || filterGenderRaw === "womens" || filterGenderRaw === "women's" || filterGenderRaw === "female"
-    ? "women"
-    : null;
+  const filterGenderRaw = (attrFilters.gender || attrFilters.Gender || attrFilters.gender_fallback || "")
+    .toString()
+    .toLowerCase()
+    .trim();
+
+  const filterGender =
+    filterGenderRaw === "men" || filterGenderRaw === "mens" || filterGenderRaw === "men's" || filterGenderRaw === "male"
+      ? "men"
+      : filterGenderRaw === "women" || filterGenderRaw === "womens" || filterGenderRaw === "women's" || filterGenderRaw === "female"
+      ? "women"
+      : null;
+
   const effectiveGender = detected.gender || sessionGender || filterGender || null;
   const searchQuery = detected.gender ? detected.query : q;
 
-const rawKeywords = extractKeywords(searchQuery);
+  const rawKeywords = extractKeywords(searchQuery);
+  const keywords = rawKeywords.filter(
+    (kw) => !["men", "women", "boy", "girl", "kid", "children"].includes(kw)
+  );
 
-// REMOVE gender words from keyword search
-const keywords = rawKeywords.filter(
-  (kw) => !["men", "women", "boy", "girl", "kid", "children"].includes(kw)
-);
-  if (keywords.length === 0 && !effectiveGender) return { products: [] };
+  if (keywords.length === 0 && !effectiveGender) {
+    return { products: [] };
+  }
 
   const synonymMap = buildSynonymMap(querySynonyms);
   const userIntentText = `${q} ${userText || ""}`;
   const merchantExclude = matchesCategoryRule(userIntentText, categoryExclusions, userText);
-  const exclusionClause = merchantExclude ? buildExclusionClause(merchantExclude) : null;
+
   const GENDER_KEYS_FOR_LOG = new Set(["gender", "gender_fallback", "genders"]);
-  const extraFilterKeys = Object.keys(attrFilters).filter((k) => !GENDER_KEYS_FOR_LOG.has(k.toLowerCase()));
-  const extraFiltersLog = extraFilterKeys.length > 0
-    ? extraFilterKeys.map((k) => `${k}=${attrFilters[k]}`).join(",")
-    : "-";
-  console.log(`[search] query="${q}" gender=${effectiveGender || "-"} filters=${extraFiltersLog} rule=${merchantExclude || "-"}`);
+  const extraFilterKeys = Object.keys(attrFilters).filter(
+    (k) => !GENDER_KEYS_FOR_LOG.has(k.toLowerCase())
+  );
+  const extraFiltersLog =
+    extraFilterKeys.length > 0
+      ? extraFilterKeys.map((k) => `${k}=${attrFilters[k]}`).join(",")
+      : "-";
 
-  const where = {
-    shop,
-    NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } },
-    OR: keywords.length > 0 ? keywords.map((kw) => keywordMatchClause(kw)) : [],
-    AND: [],
-  };
+  console.log(
+    `[search] query="${q}" gender=${effectiveGender || "-"} filters=${extraFiltersLog} rule=${merchantExclude || "-"}`
+  );
 
-// Apply gender after retrieval instead of at the DB level.
-// This avoids zero-result queries when some products are missing synced attributes.
-
-  if (exclusionClause) {
-    where.AND.push(exclusionClause);
-  }
-
-  const GENDER_KEYS = new Set(["gender", "gender_fallback", "genders"]);
-  const attrKeys = Object.keys(attrFilters).filter((k) => !GENDER_KEYS.has(k.toLowerCase()));
-  if (attrKeys.length > 0) {
-    where.AND.push(
-      ...attrKeys.map((key) => {
-        const raw = String(attrFilters[key] || "").trim();
-        const lower = raw.toLowerCase();
-        const title = lower.charAt(0).toUpperCase() + lower.slice(1);
-        const cases = Array.from(new Set([raw, lower, title, lower.toUpperCase()].filter(Boolean)));
-        return {
-          OR: cases.flatMap((v) => [
-            { attributesJson: { path: [key], equals: v } },
-            { attributesJson: { path: [key], array_contains: [v] } },
-            { attributesJson: { path: [key], string_contains: v } },
-            { variants: { some: { attributesJson: { path: [key], equals: v } } } },
-            { variants: { some: { attributesJson: { path: [key], array_contains: [v] } } } },
-            { variants: { some: { attributesJson: { path: [key], string_contains: v } } } },
-          ]),
-        };
-      }),
-    );
-  }
-
-  const fetchLimit = deduplicateColors ? max * 5 : max * 3;
-
-let products = await prisma.product.findMany({
-  where,
-  include: {
-    variants: { select: { sku: true, price: true, compareAtPrice: true, attributesJson: true } },
-  },
-  take: fetchLimit,
-  orderBy: { updatedAt: "desc" },
-});
-
-  if (products.length === 0 && keywords.length > 1) {
-    const fallbackWhere = {
+  // Pull the synced catalog for this shop and do matching in memory.
+  // This avoids the brittle Prisma JSON search behavior that has been returning db=0.
+  let products = await prisma.product.findMany({
+    where: {
       shop,
       NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } },
-      OR: keywords.map((kw) => keywordMatchClause(kw, synonymMap)),
-    };
-const fallbackAnd = [];
-if (exclusionClause) fallbackAnd.push(exclusionClause);
-if (fallbackAnd.length > 0) fallbackWhere.AND = fallbackAnd;
-    products = await prisma.product.findMany({
-      where: fallbackWhere,
-      include: {
-        variants: { select: { sku: true, price: true, compareAtPrice: true, attributesJson: true } },
+    },
+    include: {
+      variants: {
+        select: {
+          sku: true,
+          price: true,
+          compareAtPrice: true,
+          attributesJson: true,
+        },
       },
-      take: fetchLimit,
-      orderBy: { updatedAt: "desc" },
-    });
-  }
+    },
+    orderBy: { updatedAt: "desc" },
+    take: 1200,
+  });
+
+  const expandKeywordTerms = (kw) => {
+    const out = new Set();
+
+    for (const v of inflectVariants(kw)) {
+      out.add(v.toLowerCase());
+    }
+
+    for (const v of inflectVariants(kw)) {
+      for (const s of synonymMap[v.toLowerCase()] || []) {
+        for (const sv of inflectVariants(s)) {
+          out.add(String(sv).toLowerCase());
+        }
+      }
+    }
+
+    return Array.from(out);
+  };
+
+  const keywordGroups = keywords.map((kw) => expandKeywordTerms(kw));
+
+  const getProductHaystack = (p) => {
+    const attrs = p.attributesJson || {};
+    const variantAttrs = (p.variants || [])
+      .map((v) => {
+        const va = v.attributesJson || {};
+        return Object.values(va).flat().join(" ");
+      })
+      .join(" ");
+
+    return [
+      p.title || "",
+      p.vendor || "",
+      p.productType || "",
+      p.description || "",
+      Array.isArray(p.tags) ? p.tags.join(" ") : "",
+      attrs.category || "",
+      attrs.category_for_filter || "",
+      attrs.subcategory || "",
+      attrs.gender || "",
+      attrs.gender_fallback || "",
+      variantAttrs,
+    ]
+      .join(" ")
+      .toLowerCase();
+  };
+
+  const excludeTerms = merchantExclude ? splitCsv(merchantExclude) : [];
+
+  const isExcludedByRule = (p) => {
+    if (excludeTerms.length === 0) return false;
+
+    const attrs = p.attributesJson || {};
+    const text = [
+      p.title || "",
+      p.productType || "",
+      attrs.category || "",
+      attrs.category_for_filter || "",
+      attrs.subcategory || "",
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    return excludeTerms.some((term) => text.includes(term));
+  };
 
   const matchesAttr = (val, want) => {
-    if (Array.isArray(val)) return val.some((v) => typeof v === "string" && v.toLowerCase().includes(want));
+    if (Array.isArray(val)) {
+      return val.some((v) => typeof v === "string" && v.toLowerCase().includes(want));
+    }
     return typeof val === "string" && val.toLowerCase().includes(want);
   };
-  let filtered = attrKeys.length > 0
-    ? products.filter((p) => {
-        const productAttrs = p.attributesJson || {};
-        return attrKeys.every((key) => {
-          const want = attrFilters[key].toLowerCase();
-          if (matchesAttr(productAttrs[key], want)) return true;
-          return p.variants.some((v) => matchesAttr((v.attributesJson || {})[key], want));
-        });
-      })
-    : products;
 
-if (effectiveGender) {
-  const want = effectiveGender.toLowerCase();
-  const opposite = want === "men" ? "women" : want === "women" ? "men" : null;
-  const wantRe = new RegExp(`(^|[^a-z])${want}('?s)?([^a-z]|$)`, "i");
-  const oppositeRe = opposite ? new RegExp(`(^|[^a-z])${opposite}('?s)?([^a-z]|$)`, "i") : null;
-  const unisexRe = /(^|[^a-z])unisex([^a-z]|$)/i;
+  const attrKeys = Object.keys(attrFilters).filter(
+    (k) => !new Set(["gender", "gender_fallback", "genders"]).has(k.toLowerCase())
+  );
 
-  filtered = filtered.filter((p) => {
+  const matchesGender = (p, want) => {
+    if (!want) return true;
+
     const attrs = p.attributesJson || {};
     const gVal = attrs.gender || attrs.gender_fallback || "";
     const gStr = Array.isArray(gVal) ? gVal.join(" ") : String(gVal);
     const titleStr = p.title || "";
+
+    const opposite = want === "men" ? "women" : want === "women" ? "men" : null;
+    const wantRe = new RegExp(`(^|[^a-z])${want}('?s)?([^a-z]|$)`, "i");
+    const oppositeRe = opposite ? new RegExp(`(^|[^a-z])${opposite}('?s)?([^a-z]|$)`, "i") : null;
+    const unisexRe = /(^|[^a-z])unisex([^a-z]|$)/i;
 
     if (unisexRe.test(gStr)) return true;
 
@@ -547,11 +579,47 @@ if (effectiveGender) {
     if (tHasWant) return true;
     if (tHasOpposite) return false;
 
-    // If the product has no usable gender signal yet, keep it for now
-    // instead of zeroing out the whole result set.
+    // Keep product if no strong gender signal is present.
     return true;
-  });
-}
+  };
+
+  const scored = products
+    .map((p) => {
+      const haystack = getProductHaystack(p);
+
+      let score = 0;
+      for (const group of keywordGroups) {
+        if (group.some((term) => haystack.includes(term))) {
+          score += 1;
+        }
+      }
+
+      return { product: p, score };
+    })
+    .filter(({ product, score }) => {
+      if (isExcludedByRule(product)) return false;
+      if (keywordGroups.length === 0) return true;
+      return score > 0;
+    })
+    .sort((a, b) => b.score - a.score);
+
+  let filtered = scored.map((x) => x.product);
+
+  if (attrKeys.length > 0) {
+    filtered = filtered.filter((p) => {
+      const productAttrs = p.attributesJson || {};
+      return attrKeys.every((key) => {
+        const want = String(attrFilters[key] || "").toLowerCase();
+        if (!want) return true;
+        if (matchesAttr(productAttrs[key], want)) return true;
+        return (p.variants || []).some((v) => matchesAttr((v.attributesJson || {})[key], want));
+      });
+    });
+  }
+
+  if (effectiveGender) {
+    filtered = filtered.filter((p) => matchesGender(p, effectiveGender.toLowerCase()));
+  }
 
   if (deduplicateColors) {
     filtered = deduplicateByColor(filtered);
@@ -562,12 +630,12 @@ if (effectiveGender) {
   console.log(`[search]   → db=${products.length} filtered=${filtered.length}`);
 
   const firstPrice = (variants) => {
-    const v = variants.find((v) => v.price);
+    const v = (variants || []).find((vv) => vv.price);
     return v ? v.price : null;
   };
 
   const firstCompareAt = (variants) => {
-    const v = variants.find((v) => v.compareAtPrice);
+    const v = (variants || []).find((vv) => vv.compareAtPrice);
     return v ? v.compareAtPrice : null;
   };
 
@@ -583,12 +651,12 @@ if (effectiveGender) {
       tags: p.tags?.length ? p.tags : undefined,
       attributes: p.attributesJson || undefined,
       descriptionSnippet: descriptionSnippet(p.description, q, 280),
-      priceRange: priceRange(p.variants),
-      variantCount: p.variants.length,
+      priceRange: priceRange(p.variants || []),
+      variantCount: (p.variants || []).length,
       url: productUrl(shop, p.handle),
       image: p.featuredImageUrl || undefined,
-      price: firstPrice(p.variants) || undefined,
-      compareAtPrice: firstCompareAt(p.variants) || undefined,
+      price: firstPrice(p.variants || []) || undefined,
+      compareAtPrice: firstCompareAt(p.variants || []) || undefined,
     })),
   };
 }
