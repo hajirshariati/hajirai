@@ -15,6 +15,7 @@ export const PLANS = {
       "7-day analytics",
       "Standard AI model",
       "Seos branding",
+      "Email support",
     ],
   },
   starter: {
@@ -33,6 +34,7 @@ export const PLANS = {
       "30-day analytics",
       "Smart model routing (saves up to 60% on AI costs)",
       "Search rules & query synonyms",
+      "Email support",
     ],
   },
   growth: {
@@ -51,7 +53,7 @@ export const PLANS = {
       "90-day analytics",
       "Remove Seos branding",
       "Product enrichment via CSV",
-      "Priority email support",
+      "Email support",
     ],
   },
   pro: {
@@ -70,7 +72,7 @@ export const PLANS = {
       "90-day analytics",
       "Advanced AI model for complex queries",
       "Prompt caching (reduce AI costs up to 90%)",
-      "Priority support",
+      "Email support",
     ],
   },
   enterprise: {
@@ -90,7 +92,7 @@ export const PLANS = {
       "Advanced AI model",
       "Prompt caching",
       "White-label branding",
-      "Dedicated support",
+      "Email support",
     ],
   },
 };
