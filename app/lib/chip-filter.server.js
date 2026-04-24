@@ -14,6 +14,17 @@ function normalize(s) {
   return String(s || "").trim().toLowerCase().replace(/s$/, "");
 }
 
+function chipTokens(inner) {
+  const whole = normalize(inner);
+  const tokens = new Set();
+  if (whole) tokens.add(whole);
+  for (const w of String(inner || "").toLowerCase().split(/[^a-z]+/).filter(Boolean)) {
+    const n = w.replace(/s$/, "");
+    if (n) tokens.add(n);
+  }
+  return tokens;
+}
+
 export function filterForbiddenCategoryChips(text, catalogCategories) {
   if (!text || typeof text !== "string") return { text: text || "", stripped: [] };
 
@@ -21,10 +32,24 @@ export function filterForbiddenCategoryChips(text, catalogCategories) {
   const stripped = [];
 
   const out = text.replace(/<<([^<>|]+)>>/g, (match, inner) => {
-    const n = normalize(inner);
-    if (!n) return match;
-    if (allow.has(n)) return match;
-    if (KNOWN_CATEGORY_SINGULARS.has(n)) {
+    const tokens = chipTokens(inner);
+    if (tokens.size === 0) return match;
+
+    let hasForbiddenCategory = false;
+    let allCategoryTokensAllowed = true;
+    let hasAnyCategoryToken = false;
+
+    for (const t of tokens) {
+      if (KNOWN_CATEGORY_SINGULARS.has(t)) {
+        hasAnyCategoryToken = true;
+        if (allow.has(t)) continue;
+        hasForbiddenCategory = true;
+        allCategoryTokensAllowed = false;
+      }
+    }
+
+    if (!hasAnyCategoryToken) return match;
+    if (hasForbiddenCategory && !allCategoryTokensAllowed) {
       stripped.push(inner.trim());
       return "";
     }

@@ -799,12 +799,16 @@ export const action = async ({ request }) => {
       return Response.json({ error: "message is required" }, { status: 400 });
     }
 
+    const history = sanitizeHistory(body.history);
+    const messages = [...history, { role: "user", content: String(body.message) }];
+    const sessionGender = detectGenderFromHistory(messages);
+
     const [knowledge, attrMappings, catalogProductTypes] = await Promise.all([
       getKnowledgeFilesWithContent(session.shop),
       getAttributeMappings(session.shop),
-      getCatalogCategories(session.shop),
+      getCatalogCategories(session.shop, { gender: sessionGender }),
     ]);
-    console.log(`[chat] ${session.shop} catalog categories (${catalogProductTypes.length}):`, catalogProductTypes);
+    console.log(`[chat] ${session.shop} gender=${sessionGender || "any"} catalog categories (${catalogProductTypes.length}):`, catalogProductTypes);
     const attributeNames = attrMappings.map((m) => m.attribute);
 
     let categoryExclusions = [];
@@ -893,15 +897,11 @@ export const action = async ({ request }) => {
       customerContext,
       fitPredictorEnabled: config.fitPredictorEnabled === true,
       catalogProductTypes,
+      scopedGender: sessionGender,
     });
 
-    const history = sanitizeHistory(body.history);
     const model = chooseModel(config, String(body.message), history);
 
-    const messages = [...history];
-    messages.push({ role: "user", content: String(body.message) });
-
-    const sessionGender = detectGenderFromHistory(messages);
     const conversationText = messages.map((m) => typeof m.content === "string" ? m.content : "").join(" ");
     const userText = messages.filter((m) => m.role === "user").map((m) => typeof m.content === "string" ? m.content : "").join(" ");
 

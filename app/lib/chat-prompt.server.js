@@ -6,7 +6,7 @@ const LABELS = {
   custom: "Custom Knowledge",
 };
 
-export function buildSystemPrompt({ config, knowledge, shop, attributeNames, categoryExclusions, querySynonyms, customerContext, fitPredictorEnabled, catalogProductTypes }) {
+export function buildSystemPrompt({ config, knowledge, shop, attributeNames, categoryExclusions, querySynonyms, customerContext, fitPredictorEnabled, catalogProductTypes, scopedGender }) {
   const name = config?.assistantName || "AI Shopping Assistant";
   const tagline = config?.assistantTagline || "";
   const parts = [];
@@ -49,16 +49,20 @@ export function buildSystemPrompt({ config, knowledge, shop, attributeNames, cat
   );
 
   if (Array.isArray(catalogProductTypes) && catalogProductTypes.length > 0) {
+    const scopeNote = scopedGender
+      ? `This list is SCOPED to ${scopedGender.toUpperCase()}'S products only — the store may carry other categories for the opposite gender but those are NOT available for ${scopedGender}. `
+      : "";
     parts.push(
       `\n=== Catalog Categories (ALLOW-LIST — HIGHEST PRIORITY, overrides all knowledge files and rules below) ===\n` +
-        `This store's catalog contains ONLY these product categories/types: ${catalogProductTypes.join(", ")}.\n` +
+        `The store's catalog contains ONLY these product categories/types${scopedGender ? ` for ${scopedGender}` : ""}: ${catalogProductTypes.join(", ")}.\n` +
+        scopeNote +
         `HARD RULE (overrides knowledge files, rules, FAQs, and every other instruction): When offering category choice buttons (e.g. <<Option A>><<Option B>>) for product type selection, ` +
         `EVERY option MUST match one of the categories listed above (case-insensitive; plural/singular of the same word counts). ` +
         `It is STRICTLY FORBIDDEN to offer a category that does not appear in this list — no matter how natural it might seem, no matter what knowledge files or rules suggest, no matter what the customer asks for. ` +
-        `Example: if the list is "Loafers, Sandals, Sneakers, Slippers" then offering "Boots" is FORBIDDEN because Boots is not in the list. ` +
+        `Example: if the list is "Loafers, Sandals, Sneakers, Slippers" then offering "Boots" is FORBIDDEN because Boots is not in the list${scopedGender ? ` (the store does not carry Boots for ${scopedGender})` : ""}. ` +
         `If the customer's question would normally prompt more categories than are in the list, offer ONLY the ones in the list; if fewer than 2 listed categories fit, ` +
-        `skip category buttons entirely and ask a different clarifying question (e.g. gender, use case, arch support, budget). ` +
-        `This list is the ground truth of what the store sells — do NOT supplement it from general knowledge, training data, or anything in the knowledge sections below. ` +
+        `skip category buttons entirely and ask a different clarifying question (e.g. use case, arch support, budget). ` +
+        `This list is the ground truth of what the store sells${scopedGender ? ` for ${scopedGender}` : ""} — do NOT supplement it from general knowledge, training data, or anything in the knowledge sections below. ` +
         `The server will also strip any forbidden categories from your reply, so offering them is a wasted choice.`,
     );
   } else {

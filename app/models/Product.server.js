@@ -272,7 +272,31 @@ export async function getDistinctProductTypes(shop) {
     .sort((a, b) => a.localeCompare(b));
 }
 
-export async function getCatalogCategories(shop) {
+function genderMatches(productGender, want) {
+  if (!want) return true;
+  const g = String(productGender || "").toLowerCase().trim();
+  if (!g) return true;
+  if (g === "unisex" || g === "all") return true;
+  const w = want.toLowerCase();
+  if (w === "men") return /^(m|male|men|mens|man|boys?|guys?)$/i.test(g) || g.startsWith("men") || g.startsWith("male") || g.startsWith("boy");
+  if (w === "women") return /^(f|female|women|womens|woman|girls?|ladies|ladys?)$/i.test(g) || g.startsWith("women") || g.startsWith("female") || g.startsWith("girl") || g.startsWith("lad");
+  return g === w;
+}
+
+function extractCategoryValues(attrs) {
+  if (!attrs || typeof attrs !== "object") return [];
+  const out = [];
+  const cat = attrs.category;
+  if (typeof cat === "string" && cat.trim()) out.push(cat.trim());
+  else if (Array.isArray(cat)) {
+    for (const v of cat) {
+      if (typeof v === "string" && v.trim()) out.push(v.trim());
+    }
+  }
+  return out;
+}
+
+export async function getCatalogCategories(shop, { gender } = {}) {
   const rows = await prisma.product.findMany({
     where: { shop },
     select: { productType: true, attributesJson: true },
@@ -280,19 +304,12 @@ export async function getCatalogCategories(shop) {
 
   const set = new Set();
   for (const r of rows) {
+    const attrs = r.attributesJson;
+    if (!genderMatches(attrs?.gender, gender)) continue;
+
     const pt = (r.productType || "").trim();
     if (pt) set.add(pt);
-
-    const attrs = r.attributesJson;
-    if (attrs && typeof attrs === "object") {
-      const cat = attrs.category;
-      if (typeof cat === "string" && cat.trim()) set.add(cat.trim());
-      else if (Array.isArray(cat)) {
-        for (const v of cat) {
-          if (typeof v === "string" && v.trim()) set.add(v.trim());
-        }
-      }
-    }
+    for (const v of extractCategoryValues(attrs)) set.add(v);
   }
 
   return Array.from(set).sort((a, b) => a.localeCompare(b));
