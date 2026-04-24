@@ -91,3 +91,10 @@ export async function saveKnowledgeFile(shop, { fileName, fileType, fileSize, co
 export async function deleteKnowledgeFile(id) {
   return prisma.knowledgeFile.delete({ where: { id } });
 }
+
+export async function getKnowledgeFileForDownload(shop, id) {
+  return prisma.knowledgeFile.findFirst({
+    where: { shop, id },
+    select: { fileName: true, fileType: true, content: true },
+  });
+}
