@@ -17,12 +17,36 @@ export async function recordChatUsage({ shop, model, usage, toolCalls }) {
   });
 }
 
-export async function getUsageSummary(shop, days = 30) {
-  const since = new Date();
-  since.setDate(since.getDate() - days);
+function resolveRange(arg) {
+  if (arg instanceof Date || typeof arg === "string") {
+    const start = arg instanceof Date ? arg : new Date(arg);
+    return { start, end: new Date() };
+  }
+  if (arg && typeof arg === "object") {
+    if (arg.startDate && arg.endDate) {
+      return { start: new Date(arg.startDate), end: new Date(arg.endDate) };
+    }
+    if (typeof arg.days === "number") {
+      const start = new Date();
+      start.setDate(start.getDate() - arg.days);
+      return { start, end: new Date() };
+    }
+  }
+  if (typeof arg === "number") {
+    const start = new Date();
+    start.setDate(start.getDate() - arg);
+    return { start, end: new Date() };
+  }
+  const start = new Date();
+  start.setDate(start.getDate() - 30);
+  return { start, end: new Date() };
+}
+
+export async function getUsageSummary(shop, range = 30) {
+  const { start, end } = resolveRange(range);
 
   const records = await prisma.chatUsage.findMany({
-    where: { shop, createdAt: { gte: since } },
+    where: { shop, createdAt: { gte: start, lte: end } },
     orderBy: { createdAt: "desc" },
   });
 
@@ -60,6 +84,45 @@ export async function getUsageSummary(shop, days = 30) {
     avgCostPerMessage: totalMessages > 0 ? totalCost / totalMessages : 0,
     byModel,
     dailyCosts,
-    days,
+    startDate: start.toISOString(),
+    endDate: end.toISOString(),
   };
+}
+
+export async function getDailySeries(shop, range = 30) {
+  const { start, end } = resolveRange(range);
+  const [usageRows, feedbackRows] = await Promise.all([
+    prisma.chatUsage.findMany({
+      where: { shop, createdAt: { gte: start, lte: end } },
+      select: { createdAt: true, costUsd: true, inputTokens: true, outputTokens: true, toolCalls: true },
+    }),
+    prisma.chatFeedback.findMany({
+      where: { shop, createdAt: { gte: start, lte: end } },
+      select: { createdAt: true, vote: true },
+    }),
+  ]);
+
+  const map = new Map();
+  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+    const key = d.toISOString().split("T")[0];
+    map.set(key, { date: key, messages: 0, cost: 0, tokens: 0, toolCalls: 0, up: 0, down: 0 });
+  }
+  for (const r of usageRows) {
+    const key = r.createdAt.toISOString().split("T")[0];
+    const row = map.get(key);
+    if (!row) continue;
+    row.messages += 1;
+    row.cost += r.costUsd || 0;
+    row.tokens += (r.inputTokens || 0) + (r.outputTokens || 0);
+    row.toolCalls += r.toolCalls || 0;
+  }
+  for (const r of feedbackRows) {
+    const key = r.createdAt.toISOString().split("T")[0];
+    const row = map.get(key);
+    if (!row) continue;
+    if (r.vote === "up") row.up += 1;
+    else if (r.vote === "down") row.down += 1;
+  }
+
+  return Array.from(map.values()).sort((a, b) => a.date.localeCompare(b.date));
 }
