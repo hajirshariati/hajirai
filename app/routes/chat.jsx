@@ -4,6 +4,7 @@ import { getShopConfig, getKnowledgeFilesWithContent, incrementRateLimitHits } f
 import { getAttributeMappings } from "../models/AttributeMapping.server";
 import { getCatalogCategories } from "../models/Product.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
+import { filterForbiddenCategoryChips } from "../lib/chip-filter.server";
 import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL, FIT_PREDICTOR_TOOL } from "../lib/chat-tools.server";
 import { fetchCustomerContext } from "../lib/customer-context.server";
 import { fetchKlaviyoEnrichment } from "../lib/klaviyo-enrichment.server";
@@ -584,6 +585,12 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       .replace(HTML_TAG, "")
       .replace(/\n{3,}/g, "\n\n")
       .trim();
+
+    const filtered = filterForbiddenCategoryChips(fullResponseText, ctx.catalogCategories);
+    if (filtered.stripped.length > 0) {
+      console.log(`[chat] ${ctx.shop} stripped off-catalog chips:`, filtered.stripped, "allowed:", ctx.catalogCategories);
+    }
+    fullResponseText = filtered.text;
   }
 
 
@@ -924,6 +931,7 @@ export const action = async ({ request }) => {
       vipModeEnabled: config.vipModeEnabled === true,
       trackingPageUrl: config.trackingPageUrl || "",
       returnsPageUrl: config.returnsPageUrl || "",
+      catalogCategories: catalogProductTypes,
     };
     const encoder = new TextEncoder();
 
