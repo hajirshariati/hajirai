@@ -172,10 +172,10 @@ export default function Home() {
             <div style={{ flex: "1 1 320px", minWidth: 0 }}>
               <BlockStack gap="200">
                 <Text as="h1" variant="headingXl">
-                  <span style={{ color: "#fff" }}>Seos</span>
+                  <span style={{ color: "#fff" }}>SEoS Assistant</span>
                 </Text>
                 <Text as="p" variant="bodyMd">
-                  <span style={{ color: "rgba(255,255,255,0.85)" }}>AI-powered shopping assistant for your Shopify store.</span>
+                  <span style={{ color: "rgba(255,255,255,0.85)" }}>Search Engine on Steroids</span>
                 </Text>
                 {(totalMessages > 0 || showRateLimit) && (
                   <Box paddingBlockStart="100">
