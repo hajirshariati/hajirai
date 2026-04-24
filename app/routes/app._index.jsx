@@ -20,6 +20,7 @@ import { getShopConfig, getKnowledgeFiles, updateShopConfig } from "../models/Sh
 import { getCatalogSyncState, syncCatalogAsync } from "../models/Product.server";
 import { countEnrichmentsByShop } from "../models/ProductEnrichment.server";
 import { getUsageSummary } from "../models/ChatUsage.server";
+import seosLogo from "../assets/SEoS.png";
 
 export const loader = async ({ request }) => {
   const { admin, session } = await authenticate.admin(request);
@@ -195,7 +196,7 @@ export default function Home() {
             </div>
             <div style={{ flex: "0 0 auto", marginLeft: "auto", display: "flex", alignItems: "center" }}>
               <img
-                src="/SEoS.png"
+                src={seosLogo}
                 alt="SEoS"
                 style={{ display: "block", maxWidth: "180px", maxHeight: "140px", width: "auto", height: "auto" }}
               />
