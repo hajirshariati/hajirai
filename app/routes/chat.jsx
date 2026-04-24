@@ -87,8 +87,8 @@ function sseChunk(obj) {
 
 const SIMPLE_PATTERN = /^(hi|hey|hello|thanks|thank you|ok|okay|yes|no|bye|goodbye|cool|great|got it|perfect|sure|nice|awesome|alright|yep|nope|sounds good|that helps|appreciate it)\s*[.!?]*$/i;
 
-const MALE_PATTERN = /\b(men[''']?s|mens|male|guy|dude|dad|father|husband|boyfriend|brother|son|grandpa|grandfather|uncle|nephew|man)\b/i;
-const FEMALE_PATTERN = /\b(women[''']?s|womens|female|lady|ladies|mom|mother|wife|girlfriend|sister|daughter|grandma|grandmother|aunt|niece|woman)\b/i;
+const MALE_PATTERN = /\b(men['‘’]?s|mens|male|guy|dude|dad|father|husband|boyfriend|brother|son|grandpa|grandfather|uncle|nephew|man)\b/i;
+const FEMALE_PATTERN = /\b(women['‘’]?s|womens|female|lady|ladies|mom|mother|wife|girlfriend|sister|daughter|grandma|grandmother|aunt|niece|woman)\b/i;
 
 function detectGenderFromHistory(messages) {
   for (let i = messages.length - 1; i >= 0; i--) {
@@ -98,8 +98,8 @@ function detectGenderFromHistory(messages) {
       if (FEMALE_PATTERN.test(text)) return "women";
     }
     if (messages[i].role === "assistant") {
-      if (/\bmen[''']?s\b/i.test(text) && !/\bwomen[''']?s\b/i.test(text)) return "men";
-      if (/\bwomen[''']?s\b/i.test(text) && !/\bmen[''']?s\b/i.test(text)) return "women";
+      if (/\bmen['‘’]?s\b/i.test(text) && !/\bwomen['‘’]?s\b/i.test(text)) return "men";
+      if (/\bwomen['‘’]?s\b/i.test(text) && !/\bmen['‘’]?s\b/i.test(text)) return "women";
     }
   }
   return null;
