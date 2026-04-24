@@ -5,6 +5,7 @@ import { getAttributeMappings } from "../models/AttributeMapping.server";
 import { getCatalogCategories } from "../models/Product.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
 import { filterForbiddenCategoryChips } from "../lib/chip-filter.server";
+import { sanitizeCtaLabel } from "../lib/cta-label.server";
 import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL, FIT_PREDICTOR_TOOL } from "../lib/chat-tools.server";
 import { fetchCustomerContext } from "../lib/customer-context.server";
 import { fetchKlaviyoEnrichment } from "../lib/klaviyo-enrichment.server";
@@ -319,7 +320,7 @@ function extractCollectionCTA(text) {
   return {
     text: text.replace(match[0], "").trim(),
     cta: {
-      label: match[1],
+      label: sanitizeCtaLabel(match[1], match[2]),
       url: match[2],
     },
   };
@@ -334,7 +335,7 @@ function extractGenericCTA(text) {
   if (match) {
     return {
       text: text.replace(match[0], "").trim(),
-      cta: { url: match[2], label: match[1] },
+      cta: { url: match[2], label: sanitizeCtaLabel(match[1], match[2]) },
     };
   }
 
@@ -342,7 +343,7 @@ function extractGenericCTA(text) {
   if (match) {
     return {
       text: text.replace(match[0], "").trim(),
-      cta: { url: match[1], label: "Learn More" },
+      cta: { url: match[1], label: sanitizeCtaLabel("", match[1]) },
     };
   }
 
