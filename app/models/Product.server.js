@@ -259,3 +259,15 @@ export function syncCatalogAsync(admin, shop) {
 export async function getProductCount(shop) {
   return prisma.product.count({ where: { shop } });
 }
+
+export async function getDistinctProductTypes(shop) {
+  const rows = await prisma.product.findMany({
+    where: { shop, productType: { not: null } },
+    select: { productType: true },
+    distinct: ["productType"],
+  });
+  return rows
+    .map((r) => (r.productType || "").trim())
+    .filter((t) => t.length > 0)
+    .sort((a, b) => a.localeCompare(b));
+}
