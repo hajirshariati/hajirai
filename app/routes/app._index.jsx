@@ -195,11 +195,9 @@ export default function Home() {
             </div>
             <div style={{ flex: "0 0 auto", marginLeft: "auto", display: "flex", alignItems: "center" }}>
               <img
-                src="/seos-hero.svg"
-                alt=""
-                width="180"
-                height="135"
-                style={{ display: "block", maxWidth: "100%", height: "auto" }}
+                src="/SEoS.png"
+                alt="SEoS"
+                style={{ display: "block", maxWidth: "180px", maxHeight: "140px", width: "auto", height: "auto" }}
               />
             </div>
           </InlineStack>
