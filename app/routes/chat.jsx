@@ -2,7 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { authenticate } from "../shopify.server";
 import { getShopConfig, getKnowledgeFilesWithContent, incrementRateLimitHits } from "../models/ShopConfig.server";
 import { getAttributeMappings } from "../models/AttributeMapping.server";
-import { getCatalogCategories } from "../models/Product.server";
+import { getCatalogCategories, getAllCatalogCategories } from "../models/Product.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
 import { filterForbiddenCategoryChips, enforceCategoryChipsForShoeQueries } from "../lib/chip-filter.server";
 import { sanitizeCtaLabel } from "../lib/cta-label.server";
@@ -587,7 +587,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       .replace(/\n{3,}/g, "\n\n")
       .trim();
 
-    const filtered = filterForbiddenCategoryChips(fullResponseText, ctx.catalogCategories);
+    const filtered = filterForbiddenCategoryChips(fullResponseText, ctx.catalogCategories, ctx.fullCatalogCategories);
     if (filtered.stripped.length > 0) {
       console.log(`[chat] ${ctx.shop} stripped off-catalog chips:`, filtered.stripped, "allowed:", ctx.catalogCategories);
     }
@@ -809,12 +809,13 @@ export const action = async ({ request }) => {
     const messages = [...history, { role: "user", content: String(body.message) }];
     const sessionGender = detectGenderFromHistory(messages);
 
-    const [knowledge, attrMappings, catalogProductTypes] = await Promise.all([
+    const [knowledge, attrMappings, catalogProductTypes, allCatalogCategories] = await Promise.all([
       getKnowledgeFilesWithContent(session.shop),
       getAttributeMappings(session.shop),
       getCatalogCategories(session.shop, { gender: sessionGender }),
+      getAllCatalogCategories(session.shop),
     ]);
-    console.log(`[chat] ${session.shop} gender=${sessionGender || "any"} catalog categories (${catalogProductTypes.length}):`, catalogProductTypes);
+    console.log(`[chat] ${session.shop} gender=${sessionGender || "any"} scoped-categories=${catalogProductTypes.length} full-catalog-categories=${allCatalogCategories.length}`);
     const attributeNames = attrMappings.map((m) => m.attribute);
 
     let categoryExclusions = [];
@@ -934,6 +935,7 @@ export const action = async ({ request }) => {
       trackingPageUrl: config.trackingPageUrl || "",
       returnsPageUrl: config.returnsPageUrl || "",
       catalogCategories: catalogProductTypes,
+      fullCatalogCategories: allCatalogCategories,
       latestUserMessage: String(body.message || ""),
     };
     const encoder = new TextEncoder();

@@ -275,6 +275,15 @@ export async function getDistinctProductTypes(shop) {
 const MEN_RE = /\b(m|male|men|mens|man|boys?|guys?)\b/i;
 const WOMEN_RE = /\b(f|female|women|womens|woman|girls?|ladies|ladys?)\b/i;
 
+function getAttrCaseInsensitive(attrs, name) {
+  if (!attrs || typeof attrs !== "object") return undefined;
+  const target = String(name).toLowerCase();
+  for (const key of Object.keys(attrs)) {
+    if (String(key).toLowerCase() === target) return attrs[key];
+  }
+  return undefined;
+}
+
 function hasExplicitGender(productGender) {
   if (productGender == null) return false;
   if (Array.isArray(productGender)) return productGender.some((v) => typeof v === "string" && v.trim().length > 0);
@@ -300,7 +309,7 @@ function genderMatches(productGender, want, { strict }) {
 function extractCategoryValues(attrs) {
   if (!attrs || typeof attrs !== "object") return [];
   const out = [];
-  const cat = attrs.category;
+  const cat = getAttrCaseInsensitive(attrs, "category");
   if (typeof cat === "string" && cat.trim()) out.push(cat.trim());
   else if (Array.isArray(cat)) {
     for (const v of cat) {
@@ -310,31 +319,53 @@ function extractCategoryValues(attrs) {
   return out;
 }
 
+export async function getAllCatalogCategories(shop) {
+  return getCatalogCategories(shop, {});
+}
+
 export async function getCatalogCategories(shop, { gender } = {}) {
   const rows = await prisma.product.findMany({
     where: { shop },
-    select: { productType: true, attributesJson: true },
+    select: { handle: true, productType: true, attributesJson: true },
   });
 
   let taggedCount = 0;
   for (const r of rows) {
-    if (hasExplicitGender(r.attributesJson?.gender)) taggedCount++;
+    const g = getAttrCaseInsensitive(r.attributesJson, "gender");
+    if (hasExplicitGender(g)) taggedCount++;
   }
-  const strict = gender && taggedCount > 0;
+  const strict = !!gender && taggedCount > 0;
 
   const set = new Set();
+  const sourceByCategory = new Map();
   let included = 0;
   for (const r of rows) {
     const attrs = r.attributesJson;
-    if (!genderMatches(attrs?.gender, gender, { strict })) continue;
+    const g = getAttrCaseInsensitive(attrs, "gender");
+    if (!genderMatches(g, gender, { strict })) continue;
     included++;
 
     const pt = (r.productType || "").trim();
-    if (pt) set.add(pt);
-    for (const v of extractCategoryValues(attrs)) set.add(v);
+    if (pt) {
+      set.add(pt);
+      if (!sourceByCategory.has(pt)) sourceByCategory.set(pt, []);
+      if (sourceByCategory.get(pt).length < 3) sourceByCategory.get(pt).push(`${r.handle}(productType, gender=${JSON.stringify(g)})`);
+    }
+    for (const v of extractCategoryValues(attrs)) {
+      set.add(v);
+      if (!sourceByCategory.has(v)) sourceByCategory.set(v, []);
+      if (sourceByCategory.get(v).length < 3) sourceByCategory.get(v).push(`${r.handle}(category, gender=${JSON.stringify(g)})`);
+    }
   }
 
-  console.log(`[catalog-categories] shop=${shop} gender=${gender || "any"} strict=${strict} taggedProducts=${taggedCount}/${rows.length} included=${included} categories=${set.size}`);
+  const categories = Array.from(set).sort((a, b) => a.localeCompare(b));
+  console.log(`[catalog-categories] shop=${shop} gender=${gender || "any"} strict=${strict} taggedProducts=${taggedCount}/${rows.length} included=${included} categories=${categories.join("|") || "(none)"}`);
+  if (!strict && gender) {
+    console.warn(`[catalog-categories] WARNING: strict=false means no products in shop "${shop}" have a "gender" attribute set. All categories will leak into every gendered query. Fix: map a "gender" attribute (metafield or tag_prefix) in the admin Rules & Knowledge page.`);
+  }
+  for (const [cat, sources] of sourceByCategory) {
+    console.log(`[catalog-categories]   "${cat}" <- ${sources.join(", ")}`);
+  }
 
-  return Array.from(set).sort((a, b) => a.localeCompare(b));
+  return categories;
 }
