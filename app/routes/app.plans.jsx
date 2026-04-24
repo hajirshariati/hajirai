@@ -45,24 +45,26 @@ export const action = async ({ request }) => {
 
 function PlanCard({ plan, isCurrent, isDowngrade, submitting, pendingPlan, onSubmit, highlight }) {
   return (
-    <div style={{ flex: "1 1 220px", minWidth: "220px", display: "flex" }}>
+    <div style={{ display: "flex", height: "100%" }}>
       <div style={{
         flex: 1,
         display: "flex",
         flexDirection: "column",
         border: highlight ? "2px solid #2D6B4F" : "1px solid var(--p-color-border)",
         borderRadius: "12px",
-        padding: "20px",
+        padding: highlight ? "28px 20px 20px" : "20px",
         background: "var(--p-color-bg-surface)",
         position: "relative",
       }}>
         {highlight ? (
           <div style={{
-            position: "absolute", top: "-10px", left: "50%", transform: "translateX(-50%)",
-            background: "#2D6B4F", color: "#fff", fontSize: "11px", fontWeight: 600,
-            padding: "2px 10px", borderRadius: "10px", letterSpacing: "0.04em",
+            position: "absolute", top: "-11px", left: "50%", transform: "translateX(-50%)",
+            background: "#2D6B4F", color: "#fff", fontSize: "10px", fontWeight: 700,
+            padding: "3px 12px", borderRadius: "999px", letterSpacing: "0.08em",
+            whiteSpace: "nowrap", textTransform: "uppercase", lineHeight: 1.4,
+            boxShadow: "0 1px 2px rgba(0,0,0,0.08)",
           }}>
-            MOST POPULAR
+            Most popular
           </div>
         ) : null}
         <BlockStack gap="300">
@@ -240,7 +242,7 @@ export default function PlansPage() {
                 Change plans any time. Charges are handled by Shopify and appear on your Shopify invoice.
               </Text>
             </BlockStack>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "16px" }}>
+            <div className="hj-plan-grid">
               {PLAN_ORDER.map((id) => {
                 const plan = PLANS[id];
                 const isCurrent = id === currentPlanId;
@@ -259,6 +261,27 @@ export default function PlansPage() {
                 );
               })}
             </div>
+            <style>{`
+              .hj-plan-grid {
+                display: grid;
+                grid-template-columns: repeat(6, minmax(0, 1fr));
+                gap: 20px;
+                align-items: stretch;
+              }
+              /* 5 plan cards → row 1: 3 cards each spanning 2 cols; row 2: 2 cards each spanning 2 cols, offset by 1 col to center under the top row */
+              .hj-plan-grid > :nth-child(1) { grid-column: 1 / span 2; grid-row: 1; }
+              .hj-plan-grid > :nth-child(2) { grid-column: 3 / span 2; grid-row: 1; }
+              .hj-plan-grid > :nth-child(3) { grid-column: 5 / span 2; grid-row: 1; }
+              .hj-plan-grid > :nth-child(4) { grid-column: 2 / span 2; grid-row: 2; }
+              .hj-plan-grid > :nth-child(5) { grid-column: 4 / span 2; grid-row: 2; }
+              @media (max-width: 900px) {
+                .hj-plan-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+                .hj-plan-grid > :nth-child(n) { grid-column: auto; grid-row: auto; }
+              }
+              @media (max-width: 479px) {
+                .hj-plan-grid { grid-template-columns: 1fr; }
+              }
+            `}</style>
           </BlockStack>
         </Layout.Section>
 
