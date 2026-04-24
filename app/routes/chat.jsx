@@ -4,7 +4,7 @@ import { getShopConfig, getKnowledgeFilesWithContent, incrementRateLimitHits } f
 import { getAttributeMappings } from "../models/AttributeMapping.server";
 import { getCatalogCategories } from "../models/Product.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
-import { filterForbiddenCategoryChips } from "../lib/chip-filter.server";
+import { filterForbiddenCategoryChips, enforceCategoryChipsForShoeQueries } from "../lib/chip-filter.server";
 import { sanitizeCtaLabel } from "../lib/cta-label.server";
 import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL, FIT_PREDICTOR_TOOL } from "../lib/chat-tools.server";
 import { fetchCustomerContext } from "../lib/customer-context.server";
@@ -592,6 +592,12 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       console.log(`[chat] ${ctx.shop} stripped off-catalog chips:`, filtered.stripped, "allowed:", ctx.catalogCategories);
     }
     fullResponseText = filtered.text;
+
+    const enforced = enforceCategoryChipsForShoeQueries(fullResponseText, ctx.catalogCategories, ctx.latestUserMessage);
+    if (enforced.replaced) {
+      console.log(`[chat] ${ctx.shop} replaced ${enforced.replacedCount} non-category chips with category chips for generic shoe query; new chips:`, enforced.newChips);
+      fullResponseText = enforced.text;
+    }
   }
 
 
@@ -928,6 +934,7 @@ export const action = async ({ request }) => {
       trackingPageUrl: config.trackingPageUrl || "",
       returnsPageUrl: config.returnsPageUrl || "",
       catalogCategories: catalogProductTypes,
+      latestUserMessage: String(body.message || ""),
     };
     const encoder = new TextEncoder();
 

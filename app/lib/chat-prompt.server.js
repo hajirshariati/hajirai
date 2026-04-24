@@ -63,7 +63,8 @@ export function buildSystemPrompt({ config, knowledge, shop, attributeNames, cat
         `If the customer's question would normally prompt more categories than are in the list, offer ONLY the ones in the list; if fewer than 2 listed categories fit, ` +
         `skip category buttons entirely and ask a different clarifying question (e.g. use case, arch support, budget). ` +
         `This list is the ground truth of what the store sells${scopedGender ? ` for ${scopedGender}` : ""} — do NOT supplement it from general knowledge, training data, or anything in the knowledge sections below. ` +
-        `The server will also strip any forbidden categories from your reply, so offering them is a wasted choice.`,
+        `The server will also strip any forbidden categories from your reply, so offering them is a wasted choice.\n` +
+        `GENERIC SHOE QUERIES RULE: When the customer's CURRENT message is a generic shoe/footwear request like "find shoes", "men's shoes", "women's shoes", "looking for shoes", or just "shoes" — WITHOUT naming a specific category word (sneaker, sandal, loafer, slipper, boot, heel, flat, clog, mule, oxford, moccasin, slide, orthotic, insole) — and you decide a clarifying question is needed, your ONLY valid follow-up is "What type of shoes are you looking for?" followed by 2–5 category chips from the ALLOW-LIST above. It is FORBIDDEN as the FIRST clarifying question to ask about pain, condition, foot problem, use case, activity, occasion, style, or "new footwear vs orthotic insert" when the customer said "shoes" generically — those can come LATER, only after a category is picked. The server will detect this case and replace any non-category chips with category chips, so offering pain/use-case chips here is a wasted choice.`,
     );
   } else {
     parts.push(
