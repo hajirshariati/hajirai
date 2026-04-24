@@ -6,7 +6,7 @@ const LABELS = {
   custom: "Custom Knowledge",
 };
 
-export function buildSystemPrompt({ config, knowledge, shop, attributeNames, categoryExclusions, querySynonyms, customerContext, fitPredictorEnabled }) {
+export function buildSystemPrompt({ config, knowledge, shop, attributeNames, categoryExclusions, querySynonyms, customerContext, fitPredictorEnabled, catalogProductTypes }) {
   const name = config?.assistantName || "AI Shopping Assistant";
   const tagline = config?.assistantTagline || "";
   const parts = [];
@@ -58,6 +58,18 @@ export function buildSystemPrompt({ config, knowledge, shop, attributeNames, cat
   for (const [type, contents] of Object.entries(knowledgeByType)) {
     const label = LABELS[type] || type;
     parts.push(`\n=== ${label} ===\n${contents.join("\n\n")}`);
+  }
+
+  if (Array.isArray(catalogProductTypes) && catalogProductTypes.length > 0) {
+    parts.push(
+      `\n=== Catalog Categories (ALLOW-LIST) ===\n` +
+        `This store's catalog contains ONLY these product categories/types: ${catalogProductTypes.join(", ")}.\n` +
+        `HARD RULE: When offering category choice buttons (e.g. <<Option A>><<Option B>>) for product type selection, ` +
+        `EVERY option MUST be one of the categories listed above. It is FORBIDDEN to offer a category that is not on this list ` +
+        `(e.g. do not offer "Boots" if Boots is not listed). If fewer than 2 listed categories are relevant to the customer's question, ` +
+        `ask a different clarifying question (e.g. gender, use case, size) instead of inventing categories. ` +
+        `This list is the ground truth of what the store sells — do not supplement it from general knowledge.`,
+    );
   }
 
   if (attributeNames && attributeNames.length > 0) {
