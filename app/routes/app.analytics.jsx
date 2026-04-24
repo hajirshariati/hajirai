@@ -310,7 +310,7 @@ export default function Analytics() {
   ]);
 
   return (
-    <Page title="Analytics" backAction={{ url: "/app" }}>
+    <Page>
       <TitleBar title="Analytics" />
       <BlockStack gap="500">
         <div style={{ height: "4px", borderRadius: "2px", background: "linear-gradient(90deg, #2D6B4F, #3a8a66, transparent)" }} />

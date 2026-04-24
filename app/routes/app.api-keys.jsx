@@ -301,7 +301,7 @@ export default function ApiKeys() {
   const [loyaltyRounding, setLoyaltyRounding] = useState(initLoyaltyRounding);
 
   return (
-    <Page title="Settings" backAction={{ url: "/app" }}>
+    <Page>
       <TitleBar title="Settings" />
       <Form method="post">
         <BlockStack gap="500">
