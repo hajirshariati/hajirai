@@ -3,9 +3,9 @@ import { redirect, data } from "react-router";
 import { useLoaderData, useActionData, Form, useNavigation } from "react-router";
 import {
   Page, Layout, Card, Text, Button, Badge, BlockStack, InlineStack, Banner,
-  ProgressBar, Box, Divider, Icon, TextField,
+  ProgressBar, Box, TextField, Icon,
 } from "@shopify/polaris";
-import { CheckCircleIcon, EmailIcon } from "@shopify/polaris-icons";
+import { CheckCircleIcon, EmailIcon, MinusIcon } from "@shopify/polaris-icons";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import {
@@ -43,72 +43,175 @@ export const action = async ({ request }) => {
   return data({ ok: false, message: "Unknown action" }, { status: 400 });
 };
 
-function PlanCard({ plan, isCurrent, isDowngrade, submitting, pendingPlan, onSubmit, highlight }) {
-  return (
-    <div style={{ display: "flex", height: "100%" }}>
-      <div style={{
-        flex: 1,
-        display: "flex",
-        flexDirection: "column",
-        border: highlight ? "2px solid #2D6B4F" : "1px solid var(--p-color-border)",
-        borderRadius: "12px",
-        padding: highlight ? "28px 20px 20px" : "20px",
-        background: "var(--p-color-bg-surface)",
-        position: "relative",
-      }}>
-        {highlight ? (
-          <div style={{
-            position: "absolute", top: "-11px", left: "50%", transform: "translateX(-50%)",
-            background: "#2D6B4F", color: "#fff", fontSize: "10px", fontWeight: 700,
-            padding: "3px 12px", borderRadius: "999px", letterSpacing: "0.08em",
-            whiteSpace: "nowrap", textTransform: "uppercase", lineHeight: 1.4,
-            boxShadow: "0 1px 2px rgba(0,0,0,0.08)",
-          }}>
-            Most popular
-          </div>
-        ) : null}
-        <BlockStack gap="300">
-          <InlineStack align="space-between" blockAlign="center">
-            <Text as="h3" variant="headingMd">{plan.name}</Text>
-            {isCurrent ? <Badge tone="success">Current</Badge> : null}
-          </InlineStack>
-          <Box>
-            <InlineStack gap="100" blockAlign="end">
-              <Text as="span" variant="heading2xl">{plan.price === 0 ? "Free" : `$${plan.price}`}</Text>
-              {plan.price > 0 ? <Text as="span" variant="bodyMd" tone="subdued">/ month</Text> : null}
-            </InlineStack>
-            <Text as="p" tone="subdued" variant="bodySm">
-              {formatLimit(plan.conversationsPerMonth)} conversations / month
-            </Text>
-          </Box>
-          <Divider />
-          <BlockStack gap="150">
-            {plan.features.map((f) => (
-              <InlineStack key={f} gap="150" blockAlign="start" wrap={false}>
-                <div style={{ flexShrink: 0, width: "16px", height: "16px", color: "#2D6B4F", marginTop: "2px" }}>
-                  <Icon source={CheckCircleIcon} tone="success" />
-                </div>
-                <Text as="span" variant="bodySm">{f}</Text>
-              </InlineStack>
-            ))}
-          </BlockStack>
-        </BlockStack>
-        <div style={{ marginTop: "auto", paddingTop: "20px" }}>
-          <Form method="post" onSubmit={onSubmit}>
-            <input type="hidden" name="intent" value="select" />
-            <input type="hidden" name="planId" value={plan.id} />
-            <Button
-              submit fullWidth
-              variant={isCurrent ? "secondary" : highlight ? "primary" : "secondary"}
-              disabled={isCurrent || submitting}
-              loading={submitting && pendingPlan === plan.id}
-            >
-              {isCurrent ? "Current plan" : isDowngrade ? `Downgrade to ${plan.name}` : plan.price === 0 ? "Switch to Free" : `Upgrade to ${plan.name}`}
-            </Button>
-          </Form>
-        </div>
+const FEATURE_ROWS = [
+  { label: "Conversations / month", get: (p) => formatLimit(p.conversationsPerMonth) },
+  { label: "Knowledge files", get: (p) => formatLimit(p.knowledgeFiles) },
+  { label: "Analytics retention", get: (p) => `${p.analyticsRetentionDays} days` },
+  { label: "Smart model routing", get: (p) => p.smartRouting },
+  { label: "Advanced AI model", get: (p) => p.advancedModel },
+  { label: "Prompt caching", get: (p) => p.advancedModel },
+  { label: "Remove Seos branding", get: (p) => p.allowBrandingRemoval },
+  { label: "Search rules & synonyms", get: (p) => p.id !== "free" },
+  { label: "Product enrichment (CSV)", get: (p) => p.id === "growth" || p.id === "pro" || p.id === "enterprise" },
+  { label: "White-label branding", get: (p) => p.id === "enterprise" },
+  { label: "Email support", get: () => true },
+];
+
+function Cell({ value }) {
+  if (value === true) {
+    return (
+      <div style={{ display: "flex", justifyContent: "center", color: "#2D6B4F" }}>
+        <div style={{ width: 18, height: 18 }}><Icon source={CheckCircleIcon} tone="success" /></div>
       </div>
-    </div>
+    );
+  }
+  if (value === false) {
+    return (
+      <div style={{ display: "flex", justifyContent: "center", color: "var(--p-color-text-disabled)" }}>
+        <div style={{ width: 18, height: 18, opacity: 0.5 }}><Icon source={MinusIcon} /></div>
+      </div>
+    );
+  }
+  return <Text as="span" variant="bodyMd" alignment="center">{value}</Text>;
+}
+
+function ComparisonTable({ currentPlanId, submitting, pendingPlan, onSubmit }) {
+  return (
+    <>
+      <div className="hj-cmp-scroll">
+        <table className="hj-cmp">
+          <thead>
+            <tr>
+              <th className="hj-cmp-rowlabel"></th>
+              {PLAN_ORDER.map((id) => {
+                const plan = PLANS[id];
+                const isCurrent = id === currentPlanId;
+                const isPopular = id === "growth";
+                return (
+                  <th key={id} className={`hj-cmp-colhead ${isPopular ? "hj-cmp-popular" : ""} ${isCurrent ? "hj-cmp-current" : ""}`}>
+                    <div className="hj-cmp-ribbons">
+                      {isPopular ? <span className="hj-cmp-ribbon hj-cmp-ribbon-popular">Most popular</span> : null}
+                      {isCurrent ? <span className="hj-cmp-ribbon hj-cmp-ribbon-current">Current plan</span> : null}
+                    </div>
+                    <BlockStack gap="100" align="center">
+                      <Text as="h3" variant="headingMd">{plan.name}</Text>
+                      <InlineStack gap="050" blockAlign="end" align="center">
+                        <Text as="span" variant="heading2xl">
+                          {plan.price === 0 ? "Free" : `$${plan.price}`}
+                        </Text>
+                        {plan.price > 0 ? <Text as="span" tone="subdued" variant="bodySm"> / mo</Text> : null}
+                      </InlineStack>
+                    </BlockStack>
+                  </th>
+                );
+              })}
+            </tr>
+          </thead>
+          <tbody>
+            {FEATURE_ROWS.map((row) => (
+              <tr key={row.label}>
+                <td className="hj-cmp-rowlabel">{row.label}</td>
+                {PLAN_ORDER.map((id) => (
+                  <td key={id} className={id === "growth" ? "hj-cmp-popular" : ""}>
+                    <Cell value={row.get(PLANS[id])} />
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td className="hj-cmp-rowlabel"></td>
+              {PLAN_ORDER.map((id) => {
+                const plan = PLANS[id];
+                const isCurrent = id === currentPlanId;
+                const isDowngrade = PLAN_ORDER.indexOf(id) < PLAN_ORDER.indexOf(currentPlanId);
+                return (
+                  <td key={id} className={id === "growth" ? "hj-cmp-popular" : ""}>
+                    <Form method="post" onSubmit={() => onSubmit(id)}>
+                      <input type="hidden" name="intent" value="select" />
+                      <input type="hidden" name="planId" value={id} />
+                      <Button
+                        submit fullWidth
+                        variant={isCurrent ? "secondary" : id === "growth" ? "primary" : "secondary"}
+                        disabled={isCurrent || submitting}
+                        loading={submitting && pendingPlan === id}
+                      >
+                        {isCurrent ? "Current plan" : isDowngrade ? "Downgrade" : plan.price === 0 ? "Switch to Free" : `Upgrade`}
+                      </Button>
+                    </Form>
+                  </td>
+                );
+              })}
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <style>{`
+        .hj-cmp-scroll { overflow-x: auto; margin: 0 -4px; padding: 0 4px 4px; }
+        .hj-cmp { border-collapse: separate; border-spacing: 0; width: 100%; min-width: 720px; }
+        .hj-cmp th, .hj-cmp td {
+          padding: 14px 12px;
+          border-bottom: 1px solid var(--p-color-border-subdued);
+          vertical-align: middle;
+          text-align: center;
+        }
+        .hj-cmp thead th {
+          position: sticky; top: 0; background: var(--p-color-bg-surface);
+          padding-top: 28px; padding-bottom: 16px;
+          border-bottom: 1px solid var(--p-color-border);
+        }
+        .hj-cmp-rowlabel {
+          text-align: left !important;
+          font-size: 13px;
+          color: var(--p-color-text);
+          font-weight: 500;
+          white-space: nowrap;
+          width: 1%;
+        }
+        .hj-cmp tbody tr:hover { background: var(--p-color-bg-surface-hover); }
+        .hj-cmp-popular {
+          background: rgba(45, 107, 79, 0.04);
+        }
+        .hj-cmp thead .hj-cmp-popular {
+          background: rgba(45, 107, 79, 0.08);
+          border-top: 2px solid #2D6B4F;
+          border-left: 2px solid #2D6B4F;
+          border-right: 2px solid #2D6B4F;
+          border-top-left-radius: 10px;
+          border-top-right-radius: 10px;
+        }
+        .hj-cmp tfoot .hj-cmp-popular {
+          border-left: 2px solid #2D6B4F;
+          border-right: 2px solid #2D6B4F;
+          border-bottom: 2px solid #2D6B4F;
+          border-bottom-left-radius: 10px;
+          border-bottom-right-radius: 10px;
+        }
+        .hj-cmp tbody .hj-cmp-popular:not(:last-child) {
+          border-left: 2px solid #2D6B4F;
+          border-right: 2px solid #2D6B4F;
+        }
+        .hj-cmp tbody tr td.hj-cmp-popular {
+          border-left: 2px solid #2D6B4F;
+          border-right: 2px solid #2D6B4F;
+        }
+        .hj-cmp-ribbons {
+          position: absolute; top: 6px; left: 0; right: 0;
+          display: flex; justify-content: center; gap: 6px;
+          pointer-events: none;
+        }
+        .hj-cmp-colhead { position: relative; }
+        .hj-cmp-ribbon {
+          display: inline-block; font-size: 10px; font-weight: 700;
+          padding: 2px 10px; border-radius: 999px;
+          letter-spacing: 0.04em; text-transform: uppercase;
+          white-space: nowrap;
+        }
+        .hj-cmp-ribbon-popular { background: #2D6B4F; color: #fff; }
+        .hj-cmp-ribbon-current { background: #e3f5eb; color: #0f5132; }
+      `}</style>
+    </>
   );
 }
 
@@ -118,25 +221,31 @@ function SupportBox({ shop }) {
 
   const mailtoHref = useMemo(() => {
     const s = subject.trim() || "Support request";
-    const bodyLines = [
-      `Shop: ${shop}`,
-      "",
-      message.trim(),
-    ].join("\n");
+    const bodyLines = [`Shop: ${shop}`, "", message.trim()].join("\n");
     return `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(`[Seos] ${s}`)}&body=${encodeURIComponent(bodyLines)}`;
   }, [subject, message, shop]);
 
   return (
     <Card>
       <BlockStack gap="400">
-        <InlineStack gap="200" blockAlign="center">
-          <Icon source={EmailIcon} />
-          <Text as="h2" variant="headingMd">Email support</Text>
-          <Badge tone="info">Replies within 1 business day</Badge>
+        <InlineStack gap="300" blockAlign="center" wrap={false}>
+          <div style={{
+            flexShrink: 0, width: 40, height: 40, borderRadius: 10,
+            background: "rgba(45,107,79,0.10)", display: "flex",
+            alignItems: "center", justifyContent: "center", color: "#2D6B4F",
+          }}>
+            <div style={{ width: 20, height: 20 }}><Icon source={EmailIcon} /></div>
+          </div>
+          <BlockStack gap="050">
+            <InlineStack gap="200" blockAlign="center">
+              <Text as="h2" variant="headingMd">Email support</Text>
+              <Badge tone="info">Replies within 1 business day</Badge>
+            </InlineStack>
+            <Text as="p" tone="subdued" variant="bodySm">
+              Question, bug, or feature request? We read every message.
+            </Text>
+          </BlockStack>
         </InlineStack>
-        <Text as="p" tone="subdued" variant="bodySm">
-          Question, bug, or feature request? Send it to our team — we read every message.
-        </Text>
         <TextField
           label="Subject"
           value={subject}
@@ -152,7 +261,7 @@ function SupportBox({ shop }) {
           placeholder="Tell us what's happening — include any error messages or screenshots if helpful."
           autoComplete="off"
         />
-        <InlineStack align="space-between" blockAlign="center" wrap>
+        <InlineStack align="space-between" blockAlign="center" wrap gap="200">
           <Text as="p" tone="subdued" variant="bodySm">
             Sends to <strong>{SUPPORT_EMAIL}</strong> from your default mail app.
           </Text>
@@ -194,29 +303,29 @@ export default function PlansPage() {
 
         <Layout.Section>
           <Card>
-            <BlockStack gap="400">
-              <InlineStack align="space-between" blockAlign="center" wrap>
-                <BlockStack gap="100">
-                  <InlineStack gap="200" blockAlign="center">
-                    <Text as="h2" variant="headingLg">Your plan</Text>
-                    <Badge tone={currentPlanId === "free" ? "attention" : "success"}>
-                      {current.price === 0 ? "Free" : `$${current.price}/mo`}
-                    </Badge>
-                  </InlineStack>
-                  <Text as="p" tone="subdued">
-                    {current.name} · {limit === Infinity ? "unlimited" : formatLimit(limit)} conversations / month
-                  </Text>
-                </BlockStack>
-                <BlockStack gap="050" align="end">
-                  <Text as="p" variant="headingMd">
-                    {limit === Infinity
-                      ? `${used.toLocaleString()} this month`
-                      : `${used.toLocaleString()} / ${limit.toLocaleString()}`}
-                  </Text>
-                  <Text as="p" tone="subdued" variant="bodySm">conversations used</Text>
-                </BlockStack>
-              </InlineStack>
-              {limit !== Infinity ? (
+            <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: "24px", alignItems: "center" }}>
+              <BlockStack gap="100">
+                <InlineStack gap="200" blockAlign="center" wrap>
+                  <Text as="h2" variant="headingLg">Your plan</Text>
+                  <Badge tone={currentPlanId === "free" ? "attention" : "success"}>
+                    {current.price === 0 ? "Free" : `$${current.price}/mo`}
+                  </Badge>
+                </InlineStack>
+                <Text as="p" tone="subdued">
+                  {current.name} · {limit === Infinity ? "unlimited" : formatLimit(limit)} conversations / month
+                </Text>
+              </BlockStack>
+              <div style={{ textAlign: "right" }}>
+                <Text as="p" variant="headingMd">
+                  {limit === Infinity
+                    ? `${used.toLocaleString()} this month`
+                    : `${used.toLocaleString()} / ${limit.toLocaleString()}`}
+                </Text>
+                <Text as="p" tone="subdued" variant="bodySm">conversations used</Text>
+              </div>
+            </div>
+            {limit !== Infinity ? (
+              <Box paddingBlockStart="400">
                 <BlockStack gap="100">
                   <ProgressBar progress={usagePct} tone={usageTone} />
                   {usagePct >= 90 ? (
@@ -229,60 +338,28 @@ export default function PlansPage() {
                     </Text>
                   ) : null}
                 </BlockStack>
-              ) : null}
-            </BlockStack>
+              </Box>
+            ) : null}
           </Card>
         </Layout.Section>
 
         <Layout.Section>
-          <BlockStack gap="300">
-            <BlockStack gap="100">
-              <Text as="h2" variant="headingLg">Compare plans</Text>
-              <Text as="p" tone="subdued" variant="bodySm">
-                Change plans any time. Charges are handled by Shopify and appear on your Shopify invoice.
-              </Text>
+          <Card>
+            <BlockStack gap="400">
+              <BlockStack gap="100">
+                <Text as="h2" variant="headingLg">Compare plans</Text>
+                <Text as="p" tone="subdued" variant="bodySm">
+                  Change plans any time. Charges are handled by Shopify and appear on your Shopify invoice.
+                </Text>
+              </BlockStack>
+              <ComparisonTable
+                currentPlanId={currentPlanId}
+                submitting={submitting}
+                pendingPlan={pendingPlan}
+                onSubmit={setPendingPlan}
+              />
             </BlockStack>
-            <div className="hj-plan-grid">
-              {PLAN_ORDER.map((id) => {
-                const plan = PLANS[id];
-                const isCurrent = id === currentPlanId;
-                const isDowngrade = PLAN_ORDER.indexOf(id) < PLAN_ORDER.indexOf(currentPlanId);
-                return (
-                  <PlanCard
-                    key={id}
-                    plan={plan}
-                    isCurrent={isCurrent}
-                    isDowngrade={isDowngrade}
-                    submitting={submitting}
-                    pendingPlan={pendingPlan}
-                    highlight={id === "growth"}
-                    onSubmit={() => setPendingPlan(id)}
-                  />
-                );
-              })}
-            </div>
-            <style>{`
-              .hj-plan-grid {
-                display: grid;
-                grid-template-columns: repeat(6, minmax(0, 1fr));
-                gap: 20px;
-                align-items: stretch;
-              }
-              /* 5 plan cards → row 1: 3 cards each spanning 2 cols; row 2: 2 cards each spanning 2 cols, offset by 1 col to center under the top row */
-              .hj-plan-grid > :nth-child(1) { grid-column: 1 / span 2; grid-row: 1; }
-              .hj-plan-grid > :nth-child(2) { grid-column: 3 / span 2; grid-row: 1; }
-              .hj-plan-grid > :nth-child(3) { grid-column: 5 / span 2; grid-row: 1; }
-              .hj-plan-grid > :nth-child(4) { grid-column: 2 / span 2; grid-row: 2; }
-              .hj-plan-grid > :nth-child(5) { grid-column: 4 / span 2; grid-row: 2; }
-              @media (max-width: 900px) {
-                .hj-plan-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-                .hj-plan-grid > :nth-child(n) { grid-column: auto; grid-row: auto; }
-              }
-              @media (max-width: 479px) {
-                .hj-plan-grid { grid-template-columns: 1fr; }
-              }
-            `}</style>
-          </BlockStack>
+          </Card>
         </Layout.Section>
 
         <Layout.Section>
