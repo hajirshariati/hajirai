@@ -93,15 +93,15 @@ function ComparisonTable({ currentPlanId, submitting, pendingPlan, onSubmit }) {
                       {isPopular ? <span className="hj-cmp-ribbon hj-cmp-ribbon-popular">Most popular</span> : null}
                       {isCurrent ? <span className="hj-cmp-ribbon hj-cmp-ribbon-current">Current plan</span> : null}
                     </div>
-                    <BlockStack gap="100" align="center">
-                      <Text as="h3" variant="headingMd">{plan.name}</Text>
-                      <InlineStack gap="050" blockAlign="end" align="center">
-                        <Text as="span" variant="heading2xl">
+                    <div className="hj-cmp-header">
+                      <div className="hj-cmp-plan-name">{plan.name}</div>
+                      <div className="hj-cmp-plan-price">
+                        <span className="hj-cmp-plan-price-amount">
                           {plan.price === 0 ? "Free" : `$${plan.price}`}
-                        </Text>
-                        {plan.price > 0 ? <Text as="span" tone="subdued" variant="bodySm"> / mo</Text> : null}
-                      </InlineStack>
-                    </BlockStack>
+                        </span>
+                        {plan.price > 0 ? <span className="hj-cmp-plan-price-unit"> / mo</span> : null}
+                      </div>
+                    </div>
                   </th>
                 );
               })}
@@ -158,8 +158,27 @@ function ComparisonTable({ currentPlanId, submitting, pendingPlan, onSubmit }) {
         }
         .hj-cmp thead th {
           position: sticky; top: 0; background: var(--p-color-bg-surface);
-          padding-top: 28px; padding-bottom: 16px;
+          padding-top: 52px; padding-bottom: 20px;
           border-bottom: 1px solid var(--p-color-border);
+        }
+        .hj-cmp-header {
+          display: flex; flex-direction: column; align-items: center;
+          gap: 6px;
+        }
+        .hj-cmp-plan-name {
+          font-size: 22px; font-weight: 600; line-height: 1.2;
+          letter-spacing: -0.01em;
+          color: var(--p-color-text);
+        }
+        .hj-cmp-plan-price {
+          display: inline-flex; align-items: baseline; gap: 2px;
+          color: var(--p-color-text);
+        }
+        .hj-cmp-plan-price-amount {
+          font-size: 18px; font-weight: 500;
+        }
+        .hj-cmp-plan-price-unit {
+          font-size: 12px; color: var(--p-color-text-secondary);
         }
         .hj-cmp-rowlabel {
           text-align: left !important;
@@ -197,16 +216,17 @@ function ComparisonTable({ currentPlanId, submitting, pendingPlan, onSubmit }) {
           border-right: 2px solid #2D6B4F;
         }
         .hj-cmp-ribbons {
-          position: absolute; top: 6px; left: 0; right: 0;
+          position: absolute; top: 14px; left: 0; right: 0;
           display: flex; justify-content: center; gap: 6px;
           pointer-events: none;
         }
         .hj-cmp-colhead { position: relative; }
         .hj-cmp-ribbon {
           display: inline-block; font-size: 10px; font-weight: 700;
-          padding: 2px 10px; border-radius: 999px;
-          letter-spacing: 0.04em; text-transform: uppercase;
+          padding: 3px 12px; border-radius: 999px;
+          letter-spacing: 0.06em; text-transform: uppercase;
           white-space: nowrap;
+          box-shadow: 0 1px 2px rgba(0,0,0,0.06);
         }
         .hj-cmp-ribbon-popular { background: #2D6B4F; color: #fff; }
         .hj-cmp-ribbon-current { background: #e3f5eb; color: #0f5132; }
