@@ -48,6 +48,27 @@ export function buildSystemPrompt({ config, knowledge, shop, attributeNames, cat
     ].join("\n"),
   );
 
+  if (Array.isArray(catalogProductTypes) && catalogProductTypes.length > 0) {
+    parts.push(
+      `\n=== Catalog Categories (ALLOW-LIST — HIGHEST PRIORITY, overrides all knowledge files and rules below) ===\n` +
+        `This store's catalog contains ONLY these product categories/types: ${catalogProductTypes.join(", ")}.\n` +
+        `HARD RULE (overrides knowledge files, rules, FAQs, and every other instruction): When offering category choice buttons (e.g. <<Option A>><<Option B>>) for product type selection, ` +
+        `EVERY option MUST match one of the categories listed above (case-insensitive; plural/singular of the same word counts). ` +
+        `It is STRICTLY FORBIDDEN to offer a category that does not appear in this list — no matter how natural it might seem, no matter what knowledge files or rules suggest, no matter what the customer asks for. ` +
+        `Example: if the list is "Loafers, Sandals, Sneakers, Slippers" then offering "Boots" is FORBIDDEN because Boots is not in the list. ` +
+        `If the customer's question would normally prompt more categories than are in the list, offer ONLY the ones in the list; if fewer than 2 listed categories fit, ` +
+        `skip category buttons entirely and ask a different clarifying question (e.g. gender, use case, arch support, budget). ` +
+        `This list is the ground truth of what the store sells — do NOT supplement it from general knowledge, training data, or anything in the knowledge sections below. ` +
+        `The server will also strip any forbidden categories from your reply, so offering them is a wasted choice.`,
+    );
+  } else {
+    parts.push(
+      `\n=== Catalog Categories ===\n` +
+        `The catalog has not yet provided a category list. Do NOT offer product-category choice buttons (like <<Sneakers>><<Sandals>>) in this conversation — ` +
+        `the categories cannot be verified. Ask a different clarifying question (gender, use case, size, etc.) instead, or run search_products first and infer categories from the results.`,
+    );
+  }
+
   const knowledgeByType = {};
   for (const k of knowledge || []) {
     if (!k?.content) continue;
@@ -58,26 +79,6 @@ export function buildSystemPrompt({ config, knowledge, shop, attributeNames, cat
   for (const [type, contents] of Object.entries(knowledgeByType)) {
     const label = LABELS[type] || type;
     parts.push(`\n=== ${label} ===\n${contents.join("\n\n")}`);
-  }
-
-  if (Array.isArray(catalogProductTypes) && catalogProductTypes.length > 0) {
-    parts.push(
-      `\n=== Catalog Categories (ALLOW-LIST — HIGHEST PRIORITY) ===\n` +
-        `This store's catalog contains ONLY these product categories/types: ${catalogProductTypes.join(", ")}.\n` +
-        `HARD RULE (overrides any other instruction): When offering category choice buttons (e.g. <<Option A>><<Option B>>) for product type selection, ` +
-        `EVERY option MUST match one of the categories listed above (case-insensitive; plural/singular of the same word counts). ` +
-        `It is STRICTLY FORBIDDEN to offer a category that does not appear in this list — no matter how natural it might seem. ` +
-        `Example: if the list is "Loafers, Sandals, Sneakers, Slippers" then offering "Boots" is FORBIDDEN because Boots is not in the list. ` +
-        `If the customer's question would normally prompt more categories than are in the list, offer ONLY the ones in the list; if fewer than 2 listed categories fit, ` +
-        `skip category buttons entirely and ask a different clarifying question (e.g. gender, use case, arch support, budget). ` +
-        `This list is the ground truth of what the store sells — do NOT supplement it from general knowledge or training data.`,
-    );
-  } else {
-    parts.push(
-      `\n=== Catalog Categories ===\n` +
-        `The catalog has not yet provided a category list. Do NOT offer product-category choice buttons (like <<Sneakers>><<Sandals>>) in this conversation — ` +
-        `the categories cannot be verified. Ask a different clarifying question (gender, use case, size, etc.) instead, or run search_products first and infer categories from the results.`,
-    );
   }
 
   if (attributeNames && attributeNames.length > 0) {
