@@ -1,0 +1,42 @@
+<svg viewBox="0 0 240 180" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img">
+  <defs>
+    <radialGradient id="seosGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.25)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Soft glow backdrop -->
+  <circle cx="140" cy="90" r="82" fill="url(#seosGlow)"/>
+
+  <!-- Outer dashed radar ring -->
+  <circle cx="140" cy="90" r="70" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="1.5" stroke-dasharray="3 5"/>
+
+  <!-- Middle ring -->
+  <circle cx="140" cy="90" r="48" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
+
+  <!-- Magnifier lens -->
+  <circle cx="140" cy="90" r="24" fill="rgba(255,255,255,0.95)"/>
+  <circle cx="140" cy="90" r="17" fill="#2D6B4F"/>
+  <!-- Lens highlight -->
+  <circle cx="133" cy="83" r="5.5" fill="rgba(255,255,255,0.45)"/>
+
+  <!-- Magnifier handle -->
+  <line x1="159" y1="109" x2="183" y2="133" stroke="rgba(255,255,255,0.95)" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- Scattered "data point" sparkles -->
+  <g fill="rgba(255,255,255,0.88)">
+    <circle cx="42" cy="56" r="2.6"/>
+    <circle cx="66" cy="28" r="2"/>
+    <circle cx="212" cy="38" r="3"/>
+    <circle cx="198" cy="156" r="2.5"/>
+    <circle cx="74" cy="150" r="2"/>
+    <circle cx="30" cy="112" r="1.8"/>
+  </g>
+
+  <!-- Lightning bolt (the "on steroids" hint) -->
+  <path d="M 212 88 L 222 88 L 216 100 L 225 100 L 210 122 L 216 106 L 208 106 Z"
+        fill="rgba(255,255,255,0.92)"
+        stroke="rgba(45,107,79,0.15)"
+        stroke-width="0.5"/>
+</svg>
