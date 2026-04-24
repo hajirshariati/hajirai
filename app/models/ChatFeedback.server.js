@@ -20,10 +20,19 @@ export async function recordFeedback({ shop, sessionId, vote, botResponse, produ
   });
 }
 
-export async function getFeedbackSummary(shop, days = 30) {
-  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+function resolveRange(arg) {
+  if (arg && typeof arg === "object" && arg.startDate && arg.endDate) {
+    return { start: new Date(arg.startDate), end: new Date(arg.endDate) };
+  }
+  const days = typeof arg === "number" ? arg : arg?.days || 30;
+  const start = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+  return { start, end: new Date() };
+}
+
+export async function getFeedbackSummary(shop, range = 30) {
+  const { start, end } = resolveRange(range);
   const all = await prisma.chatFeedback.findMany({
-    where: { shop, createdAt: { gte: since } },
+    where: { shop, createdAt: { gte: start, lte: end } },
     orderBy: { createdAt: "desc" },
     select: {
       id: true,
@@ -49,10 +58,10 @@ export async function getFeedbackSummary(shop, days = 30) {
   };
 }
 
-export async function getRecentQuestions(shop, days = 30, limit = 15) {
-  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+export async function getRecentQuestions(shop, range = 30, limit = 15) {
+  const { start, end } = resolveRange(range);
   const records = await prisma.chatFeedback.findMany({
-    where: { shop, createdAt: { gte: since }, conversation: { not: null } },
+    where: { shop, createdAt: { gte: start, lte: end }, conversation: { not: null } },
     orderBy: { createdAt: "desc" },
     select: { conversation: true, vote: true, products: true, createdAt: true },
     take: limit * 2,
