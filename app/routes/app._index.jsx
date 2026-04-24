@@ -166,9 +166,9 @@ export default function Home() {
       <BlockStack gap="600">
         <div style={{
           background: "linear-gradient(135deg, #2D6B4F 0%, #3a8a66 100%)",
-          borderRadius: "12px", padding: "32px", marginTop: "-8px",
+          borderRadius: "12px", padding: "24px 28px", marginTop: "-8px",
         }}>
-          <InlineStack align="space-between" blockAlign="center" wrap gap="600">
+          <InlineStack align="start" blockAlign="center" wrap gap="500">
             <div style={{ flex: "1 1 320px", minWidth: 0 }}>
               <BlockStack gap="200">
                 <Text as="h1" variant="headingXl">
@@ -178,8 +178,8 @@ export default function Home() {
                   <span style={{ color: "rgba(255,255,255,0.85)" }}>AI-powered shopping assistant for your Shopify store.</span>
                 </Text>
                 {(totalMessages > 0 || showRateLimit) && (
-                  <Box paddingBlockStart="200">
-                    <InlineStack gap="200">
+                  <Box paddingBlockStart="100">
+                    <InlineStack align="start" gap="200" wrap>
                       {totalMessages > 0 && (
                         <Badge tone="info">{totalMessages} conversations this month</Badge>
                       )}
@@ -193,12 +193,12 @@ export default function Home() {
                 )}
               </BlockStack>
             </div>
-            <div style={{ flex: "0 1 260px", display: "flex", justifyContent: "flex-end", minWidth: 0 }}>
+            <div style={{ flex: "0 0 auto", marginLeft: "auto", display: "flex", alignItems: "center" }}>
               <img
                 src="/seos-hero.svg"
                 alt=""
-                width="240"
-                height="180"
+                width="180"
+                height="135"
                 style={{ display: "block", maxWidth: "100%", height: "auto" }}
               />
             </div>
