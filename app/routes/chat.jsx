@@ -604,12 +604,7 @@ controller.enqueue(encoder.encode(sseChunk({
 })));
 
 
-// ONLY show support CTA if user actually asked for support
-const userAskedSupportOnly =
-  /\b(contact|support|customer service|help|return|refund|exchange|order issue)\b/i
-  .test(ctx.userText || "");
-
-if (supportCTA && userAskedSupportOnly) {
+if (supportCTA) {
   controller.enqueue(encoder.encode(sseChunk({
     type: "link",
     url: supportCTA.url,
