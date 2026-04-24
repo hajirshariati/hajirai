@@ -271,3 +271,29 @@ export async function getDistinctProductTypes(shop) {
     .filter((t) => t.length > 0)
     .sort((a, b) => a.localeCompare(b));
 }
+
+export async function getCatalogCategories(shop) {
+  const rows = await prisma.product.findMany({
+    where: { shop },
+    select: { productType: true, attributesJson: true },
+  });
+
+  const set = new Set();
+  for (const r of rows) {
+    const pt = (r.productType || "").trim();
+    if (pt) set.add(pt);
+
+    const attrs = r.attributesJson;
+    if (attrs && typeof attrs === "object") {
+      const cat = attrs.category;
+      if (typeof cat === "string" && cat.trim()) set.add(cat.trim());
+      else if (Array.isArray(cat)) {
+        for (const v of cat) {
+          if (typeof v === "string" && v.trim()) set.add(v.trim());
+        }
+      }
+    }
+  }
+
+  return Array.from(set).sort((a, b) => a.localeCompare(b));
+}

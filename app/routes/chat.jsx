@@ -2,7 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { authenticate } from "../shopify.server";
 import { getShopConfig, getKnowledgeFilesWithContent, incrementRateLimitHits } from "../models/ShopConfig.server";
 import { getAttributeMappings } from "../models/AttributeMapping.server";
-import { getDistinctProductTypes } from "../models/Product.server";
+import { getCatalogCategories } from "../models/Product.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
 import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL, FIT_PREDICTOR_TOOL } from "../lib/chat-tools.server";
 import { fetchCustomerContext } from "../lib/customer-context.server";
@@ -799,8 +799,9 @@ export const action = async ({ request }) => {
     const [knowledge, attrMappings, catalogProductTypes] = await Promise.all([
       getKnowledgeFilesWithContent(session.shop),
       getAttributeMappings(session.shop),
-      getDistinctProductTypes(session.shop),
+      getCatalogCategories(session.shop),
     ]);
+    console.log(`[chat] ${session.shop} catalog categories (${catalogProductTypes.length}):`, catalogProductTypes);
     const attributeNames = attrMappings.map((m) => m.attribute);
 
     let categoryExclusions = [];

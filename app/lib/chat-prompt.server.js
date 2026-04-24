@@ -62,13 +62,21 @@ export function buildSystemPrompt({ config, knowledge, shop, attributeNames, cat
 
   if (Array.isArray(catalogProductTypes) && catalogProductTypes.length > 0) {
     parts.push(
-      `\n=== Catalog Categories (ALLOW-LIST) ===\n` +
+      `\n=== Catalog Categories (ALLOW-LIST — HIGHEST PRIORITY) ===\n` +
         `This store's catalog contains ONLY these product categories/types: ${catalogProductTypes.join(", ")}.\n` +
-        `HARD RULE: When offering category choice buttons (e.g. <<Option A>><<Option B>>) for product type selection, ` +
-        `EVERY option MUST be one of the categories listed above. It is FORBIDDEN to offer a category that is not on this list ` +
-        `(e.g. do not offer "Boots" if Boots is not listed). If fewer than 2 listed categories are relevant to the customer's question, ` +
-        `ask a different clarifying question (e.g. gender, use case, size) instead of inventing categories. ` +
-        `This list is the ground truth of what the store sells — do not supplement it from general knowledge.`,
+        `HARD RULE (overrides any other instruction): When offering category choice buttons (e.g. <<Option A>><<Option B>>) for product type selection, ` +
+        `EVERY option MUST match one of the categories listed above (case-insensitive; plural/singular of the same word counts). ` +
+        `It is STRICTLY FORBIDDEN to offer a category that does not appear in this list — no matter how natural it might seem. ` +
+        `Example: if the list is "Loafers, Sandals, Sneakers, Slippers" then offering "Boots" is FORBIDDEN because Boots is not in the list. ` +
+        `If the customer's question would normally prompt more categories than are in the list, offer ONLY the ones in the list; if fewer than 2 listed categories fit, ` +
+        `skip category buttons entirely and ask a different clarifying question (e.g. gender, use case, arch support, budget). ` +
+        `This list is the ground truth of what the store sells — do NOT supplement it from general knowledge or training data.`,
+    );
+  } else {
+    parts.push(
+      `\n=== Catalog Categories ===\n` +
+        `The catalog has not yet provided a category list. Do NOT offer product-category choice buttons (like <<Sneakers>><<Sandals>>) in this conversation — ` +
+        `the categories cannot be verified. Ask a different clarifying question (gender, use case, size, etc.) instead, or run search_products first and infer categories from the results.`,
     );
   }
 
