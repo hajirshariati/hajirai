@@ -272,28 +272,69 @@ export async function getDistinctProductTypes(shop) {
     .sort((a, b) => a.localeCompare(b));
 }
 
-export async function getCatalogCategories(shop) {
+const MEN_RE = /\b(m|male|men|mens|man|boys?|guys?)\b/i;
+const WOMEN_RE = /\b(f|female|women|womens|woman|girls?|ladies|ladys?)\b/i;
+
+function hasExplicitGender(productGender) {
+  if (productGender == null) return false;
+  if (Array.isArray(productGender)) return productGender.some((v) => typeof v === "string" && v.trim().length > 0);
+  return typeof productGender === "string" && productGender.trim().length > 0;
+}
+
+function genderMatches(productGender, want, { strict }) {
+  if (!want) return true;
+  if (!hasExplicitGender(productGender)) return !strict;
+
+  const values = Array.isArray(productGender) ? productGender : [productGender];
+  for (const raw of values) {
+    const g = String(raw || "").toLowerCase().trim();
+    if (!g) continue;
+    if (g === "unisex" || g === "all" || g === "both") return true;
+    if (want === "men" && (MEN_RE.test(g) || g.startsWith("men") || g.startsWith("male") || g.startsWith("boy"))) return true;
+    if (want === "women" && (WOMEN_RE.test(g) || g.startsWith("women") || g.startsWith("female") || g.startsWith("girl") || g.startsWith("lad"))) return true;
+    if (g === want.toLowerCase()) return true;
+  }
+  return false;
+}
+
+function extractCategoryValues(attrs) {
+  if (!attrs || typeof attrs !== "object") return [];
+  const out = [];
+  const cat = attrs.category;
+  if (typeof cat === "string" && cat.trim()) out.push(cat.trim());
+  else if (Array.isArray(cat)) {
+    for (const v of cat) {
+      if (typeof v === "string" && v.trim()) out.push(v.trim());
+    }
+  }
+  return out;
+}
+
+export async function getCatalogCategories(shop, { gender } = {}) {
   const rows = await prisma.product.findMany({
     where: { shop },
     select: { productType: true, attributesJson: true },
   });
 
-  const set = new Set();
+  let taggedCount = 0;
   for (const r of rows) {
+    if (hasExplicitGender(r.attributesJson?.gender)) taggedCount++;
+  }
+  const strict = gender && taggedCount > 0;
+
+  const set = new Set();
+  let included = 0;
+  for (const r of rows) {
+    const attrs = r.attributesJson;
+    if (!genderMatches(attrs?.gender, gender, { strict })) continue;
+    included++;
+
     const pt = (r.productType || "").trim();
     if (pt) set.add(pt);
-
-    const attrs = r.attributesJson;
-    if (attrs && typeof attrs === "object") {
-      const cat = attrs.category;
-      if (typeof cat === "string" && cat.trim()) set.add(cat.trim());
-      else if (Array.isArray(cat)) {
-        for (const v of cat) {
-          if (typeof v === "string" && v.trim()) set.add(v.trim());
-        }
-      }
-    }
+    for (const v of extractCategoryValues(attrs)) set.add(v);
   }
+
+  console.log(`[catalog-categories] shop=${shop} gender=${gender || "any"} strict=${strict} taggedProducts=${taggedCount}/${rows.length} included=${included} categories=${set.size}`);
 
   return Array.from(set).sort((a, b) => a.localeCompare(b));
 }
