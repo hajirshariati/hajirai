@@ -18,11 +18,20 @@ export async function logMentions(shop, entries) {
   }
 }
 
-export async function getTopProducts(shop, days = 30, limit = 10) {
-  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+function resolveRange(arg) {
+  if (arg && typeof arg === "object" && arg.startDate && arg.endDate) {
+    return { start: new Date(arg.startDate), end: new Date(arg.endDate) };
+  }
+  const days = typeof arg === "number" ? arg : arg?.days || 30;
+  const start = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+  return { start, end: new Date() };
+}
+
+export async function getTopProducts(shop, range = 30, limit = 10) {
+  const { start, end } = resolveRange(range);
   const rows = await prisma.chatProductMention.groupBy({
     by: ["handle", "title"],
-    where: { shop, createdAt: { gte: since } },
+    where: { shop, createdAt: { gte: start, lte: end } },
     _count: { _all: true },
     orderBy: { _count: { handle: "desc" } },
     take: limit,
@@ -34,19 +43,19 @@ export async function getTopProducts(shop, days = 30, limit = 10) {
   }));
 }
 
-export async function getProductsByTool(shop, days = 30, limit = 10) {
-  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+export async function getProductsByTool(shop, range = 30, limit = 10) {
+  const { start, end } = resolveRange(range);
   const [searched, viewed] = await Promise.all([
     prisma.chatProductMention.groupBy({
       by: ["handle", "title"],
-      where: { shop, tool: "search_products", createdAt: { gte: since } },
+      where: { shop, tool: "search_products", createdAt: { gte: start, lte: end } },
       _count: { _all: true },
       orderBy: { _count: { handle: "desc" } },
       take: limit,
     }),
     prisma.chatProductMention.groupBy({
       by: ["handle", "title"],
-      where: { shop, tool: "get_product_details", createdAt: { gte: since } },
+      where: { shop, tool: "get_product_details", createdAt: { gte: start, lte: end } },
       _count: { _all: true },
       orderBy: { _count: { handle: "desc" } },
       take: limit,
@@ -58,11 +67,11 @@ export async function getProductsByTool(shop, days = 30, limit = 10) {
   };
 }
 
-export async function getInterestBreakdown(shop, days = 30) {
-  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+export async function getInterestBreakdown(shop, range = 30) {
+  const { start, end } = resolveRange(range);
   const rows = await prisma.chatProductMention.groupBy({
     by: ["tool"],
-    where: { shop, createdAt: { gte: since } },
+    where: { shop, createdAt: { gte: start, lte: end } },
     _count: { _all: true },
   });
   const result = { searches: 0, views: 0, skuLookups: 0, total: 0 };
