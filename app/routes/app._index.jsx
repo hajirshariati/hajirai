@@ -168,28 +168,41 @@ export default function Home() {
           background: "linear-gradient(135deg, #2D6B4F 0%, #3a8a66 100%)",
           borderRadius: "12px", padding: "32px", marginTop: "-8px",
         }}>
-          <BlockStack gap="200">
-            <Text as="h1" variant="headingXl">
-              <span style={{ color: "#fff" }}>Seos</span>
-            </Text>
-            <Text as="p" variant="bodyMd">
-              <span style={{ color: "rgba(255,255,255,0.85)" }}>AI-powered shopping assistant for your Shopify store.</span>
-            </Text>
-            {(totalMessages > 0 || showRateLimit) && (
-              <Box paddingBlockStart="200">
-                <InlineStack gap="200">
-                  {totalMessages > 0 && (
-                    <Badge tone="info">{totalMessages} conversations this month</Badge>
-                  )}
-                  {showRateLimit && (
-                    <Badge tone={rateLimitHits >= 10 ? "critical" : "attention"}>
-                      {rateLimitHits} rate-limited {rateLimitHits === 1 ? "request" : "requests"}
-                    </Badge>
-                  )}
-                </InlineStack>
-              </Box>
-            )}
-          </BlockStack>
+          <InlineStack align="space-between" blockAlign="center" wrap gap="600">
+            <div style={{ flex: "1 1 320px", minWidth: 0 }}>
+              <BlockStack gap="200">
+                <Text as="h1" variant="headingXl">
+                  <span style={{ color: "#fff" }}>Seos</span>
+                </Text>
+                <Text as="p" variant="bodyMd">
+                  <span style={{ color: "rgba(255,255,255,0.85)" }}>AI-powered shopping assistant for your Shopify store.</span>
+                </Text>
+                {(totalMessages > 0 || showRateLimit) && (
+                  <Box paddingBlockStart="200">
+                    <InlineStack gap="200">
+                      {totalMessages > 0 && (
+                        <Badge tone="info">{totalMessages} conversations this month</Badge>
+                      )}
+                      {showRateLimit && (
+                        <Badge tone={rateLimitHits >= 10 ? "critical" : "attention"}>
+                          {rateLimitHits} rate-limited {rateLimitHits === 1 ? "request" : "requests"}
+                        </Badge>
+                      )}
+                    </InlineStack>
+                  </Box>
+                )}
+              </BlockStack>
+            </div>
+            <div style={{ flex: "0 1 260px", display: "flex", justifyContent: "flex-end", minWidth: 0 }}>
+              <img
+                src="/seos-hero.svg"
+                alt=""
+                width="240"
+                height="180"
+                style={{ display: "block", maxWidth: "100%", height: "auto" }}
+              />
+            </div>
+          </InlineStack>
         </div>
 
         {showRateLimit && (
