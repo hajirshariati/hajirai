@@ -272,15 +272,29 @@ export async function getDistinctProductTypes(shop) {
     .sort((a, b) => a.localeCompare(b));
 }
 
-function genderMatches(productGender, want) {
+const MEN_RE = /\b(m|male|men|mens|man|boys?|guys?)\b/i;
+const WOMEN_RE = /\b(f|female|women|womens|woman|girls?|ladies|ladys?)\b/i;
+
+function hasExplicitGender(productGender) {
+  if (productGender == null) return false;
+  if (Array.isArray(productGender)) return productGender.some((v) => typeof v === "string" && v.trim().length > 0);
+  return typeof productGender === "string" && productGender.trim().length > 0;
+}
+
+function genderMatches(productGender, want, { strict }) {
   if (!want) return true;
-  const g = String(productGender || "").toLowerCase().trim();
-  if (!g) return true;
-  if (g === "unisex" || g === "all") return true;
-  const w = want.toLowerCase();
-  if (w === "men") return /^(m|male|men|mens|man|boys?|guys?)$/i.test(g) || g.startsWith("men") || g.startsWith("male") || g.startsWith("boy");
-  if (w === "women") return /^(f|female|women|womens|woman|girls?|ladies|ladys?)$/i.test(g) || g.startsWith("women") || g.startsWith("female") || g.startsWith("girl") || g.startsWith("lad");
-  return g === w;
+  if (!hasExplicitGender(productGender)) return !strict;
+
+  const values = Array.isArray(productGender) ? productGender : [productGender];
+  for (const raw of values) {
+    const g = String(raw || "").toLowerCase().trim();
+    if (!g) continue;
+    if (g === "unisex" || g === "all" || g === "both") return true;
+    if (want === "men" && (MEN_RE.test(g) || g.startsWith("men") || g.startsWith("male") || g.startsWith("boy"))) return true;
+    if (want === "women" && (WOMEN_RE.test(g) || g.startsWith("women") || g.startsWith("female") || g.startsWith("girl") || g.startsWith("lad"))) return true;
+    if (g === want.toLowerCase()) return true;
+  }
+  return false;
 }
 
 function extractCategoryValues(attrs) {
@@ -302,15 +316,25 @@ export async function getCatalogCategories(shop, { gender } = {}) {
     select: { productType: true, attributesJson: true },
   });
 
+  let taggedCount = 0;
+  for (const r of rows) {
+    if (hasExplicitGender(r.attributesJson?.gender)) taggedCount++;
+  }
+  const strict = gender && taggedCount > 0;
+
   const set = new Set();
+  let included = 0;
   for (const r of rows) {
     const attrs = r.attributesJson;
-    if (!genderMatches(attrs?.gender, gender)) continue;
+    if (!genderMatches(attrs?.gender, gender, { strict })) continue;
+    included++;
 
     const pt = (r.productType || "").trim();
     if (pt) set.add(pt);
     for (const v of extractCategoryValues(attrs)) set.add(v);
   }
+
+  console.log(`[catalog-categories] shop=${shop} gender=${gender || "any"} strict=${strict} taggedProducts=${taggedCount}/${rows.length} included=${included} categories=${set.size}`);
 
   return Array.from(set).sort((a, b) => a.localeCompare(b));
 }
