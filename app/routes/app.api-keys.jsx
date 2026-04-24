@@ -316,7 +316,7 @@ export default function ApiKeys() {
               description={
                 <BlockStack gap="200">
                   <Text as="p" tone="subdued" variant="bodySm">
-                    Powers the AI assistant. Pay-as-you-go usage — ShopAgent adds no markup.
+                    Powers the AI assistant. Pay-as-you-go usage — Seos adds no markup.
                   </Text>
                   <Text as="p" tone="subdued" variant="bodySm">
                     <a href="https://console.anthropic.com" target="_blank" rel="noreferrer">
@@ -382,7 +382,7 @@ export default function ApiKeys() {
                     <Banner tone="info">
                       <Text as="p" variant="bodySm">
                         <strong>How smart routing works:</strong> When a customer sends a simple follow-up
-                        like "thanks", "ok", or "bye", ShopAgent uses the Fast model (up to 3x cheaper).
+                        like "thanks", "ok", or "bye", Seos uses the Fast model (up to 3x cheaper).
                         Product questions, first messages, and detailed queries always use your primary model.
                       </Text>
                     </Banner>

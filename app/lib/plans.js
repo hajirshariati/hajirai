@@ -14,7 +14,7 @@ export const PLANS = {
       "1 knowledge file",
       "7-day analytics",
       "Standard AI model",
-      "ShopAgent branding",
+      "Seos branding",
     ],
   },
   starter: {
@@ -49,7 +49,7 @@ export const PLANS = {
       "3,000 conversations per month",
       "Unlimited knowledge files",
       "90-day analytics",
-      "Remove ShopAgent branding",
+      "Remove Seos branding",
       "Product enrichment via CSV",
       "Priority email support",
     ],
