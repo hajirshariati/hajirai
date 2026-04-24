@@ -4,7 +4,7 @@ import { getShopConfig, getKnowledgeFilesWithContent, incrementRateLimitHits } f
 import { getAttributeMappings } from "../models/AttributeMapping.server";
 import { getCatalogCategories } from "../models/Product.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
-import { filterForbiddenCategoryChips } from "../lib/chip-filter.server";
+import { filterForbiddenCategoryChips, enforceCategoryChipsForShoeQueries } from "../lib/chip-filter.server";
 import { sanitizeCtaLabel } from "../lib/cta-label.server";
 import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL, FIT_PREDICTOR_TOOL } from "../lib/chat-tools.server";
 import { fetchCustomerContext } from "../lib/customer-context.server";
@@ -592,6 +592,12 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       console.log(`[chat] ${ctx.shop} stripped off-catalog chips:`, filtered.stripped, "allowed:", ctx.catalogCategories);
     }
     fullResponseText = filtered.text;
+
+    const enforced = enforceCategoryChipsForShoeQueries(fullResponseText, ctx.catalogCategories, ctx.latestUserMessage);
+    if (enforced.replaced) {
+      console.log(`[chat] ${ctx.shop} replaced ${enforced.replacedCount} non-category chips with category chips for generic shoe query; new chips:`, enforced.newChips);
+      fullResponseText = enforced.text;
+    }
   }
 
 
@@ -799,12 +805,16 @@ export const action = async ({ request }) => {
       return Response.json({ error: "message is required" }, { status: 400 });
     }
 
+    const history = sanitizeHistory(body.history);
+    const messages = [...history, { role: "user", content: String(body.message) }];
+    const sessionGender = detectGenderFromHistory(messages);
+
     const [knowledge, attrMappings, catalogProductTypes] = await Promise.all([
       getKnowledgeFilesWithContent(session.shop),
       getAttributeMappings(session.shop),
-      getCatalogCategories(session.shop),
+      getCatalogCategories(session.shop, { gender: sessionGender }),
     ]);
-    console.log(`[chat] ${session.shop} catalog categories (${catalogProductTypes.length}):`, catalogProductTypes);
+    console.log(`[chat] ${session.shop} gender=${sessionGender || "any"} catalog categories (${catalogProductTypes.length}):`, catalogProductTypes);
     const attributeNames = attrMappings.map((m) => m.attribute);
 
     let categoryExclusions = [];
@@ -893,15 +903,11 @@ export const action = async ({ request }) => {
       customerContext,
       fitPredictorEnabled: config.fitPredictorEnabled === true,
       catalogProductTypes,
+      scopedGender: sessionGender,
     });
 
-    const history = sanitizeHistory(body.history);
     const model = chooseModel(config, String(body.message), history);
 
-    const messages = [...history];
-    messages.push({ role: "user", content: String(body.message) });
-
-    const sessionGender = detectGenderFromHistory(messages);
     const conversationText = messages.map((m) => typeof m.content === "string" ? m.content : "").join(" ");
     const userText = messages.filter((m) => m.role === "user").map((m) => typeof m.content === "string" ? m.content : "").join(" ");
 
@@ -928,6 +934,7 @@ export const action = async ({ request }) => {
       trackingPageUrl: config.trackingPageUrl || "",
       returnsPageUrl: config.returnsPageUrl || "",
       catalogCategories: catalogProductTypes,
+      latestUserMessage: String(body.message || ""),
     };
     const encoder = new TextEncoder();
 
