@@ -473,17 +473,22 @@ export default function ApiKeys() {
 
             <Layout.AnnotatedSection
               title="Integrations (optional)"
-              description="Connect third-party services for richer AI context — product reviews, sizing data, and return insights."
+              description="Connect third-party services for richer AI context — product reviews, sizing data, and return insights. Each service is independent; connect only what you use."
             >
-              <Card>
-                <BlockStack gap="500">
+              <BlockStack gap="400">
+                <Card>
                   <BlockStack gap="300">
                     <InlineStack align="space-between" blockAlign="center">
-                      <Text as="h3" variant="headingSm">Yotpo</Text>
+                      <InlineStack gap="200" blockAlign="center">
+                        <Text as="h3" variant="headingMd">Yotpo Reviews</Text>
+                      </InlineStack>
                       <Badge tone={hasYotpoKey ? "success" : undefined}>
                         {hasYotpoKey ? "Connected" : "Not set"}
                       </Badge>
                     </InlineStack>
+                    <Text as="p" tone="subdued" variant="bodySm">
+                      Product review data — fit summaries, star ratings, sample reviews. Powers sizing recommendations and "what do reviewers say" answers.
+                    </Text>
                     <TextField
                       label="Yotpo API key"
                       labelHidden
@@ -494,12 +499,20 @@ export default function ApiKeys() {
                       autoComplete="off"
                       helpText="Lets the AI reference product reviews and customer sizing feedback."
                     />
+                  </BlockStack>
+                </Card>
+
+                <Card>
+                  <BlockStack gap="300">
                     <InlineStack align="space-between" blockAlign="center">
-                      <Text as="span" variant="bodySm">Yotpo Loyalty &amp; Referrals</Text>
+                      <Text as="h3" variant="headingMd">Yotpo Loyalty &amp; Referrals</Text>
                       <Badge tone={hasYotpoLoyaltyKey ? "success" : undefined}>
                         {hasYotpoLoyaltyKey ? "Connected" : "Not set"}
                       </Badge>
                     </InlineStack>
+                    <Text as="p" tone="subdued" variant="bodySm">
+                      Points, VIP tier, and personal referral link for logged-in customers. Only used when VIP mode is enabled below.
+                    </Text>
                     <TextField
                       label="Yotpo Loyalty API key"
                       type="password"
@@ -507,7 +520,7 @@ export default function ApiKeys() {
                       onChange={setYotpoLoyaltyKey}
                       placeholder={hasYotpoLoyaltyKey ? "••••••••••••••••" : "Paste key to enable loyalty VIP perks"}
                       autoComplete="off"
-                      helpText="From Yotpo Loyalty admin → Program Settings → API Key. Lets the AI reference the customer's points, tier, and referral link when VIP mode is on."
+                      helpText="From Yotpo Loyalty admin → Program Settings → API Key."
                     />
                     <TextField
                       label="Yotpo Loyalty GUID"
@@ -552,16 +565,19 @@ export default function ApiKeys() {
                       </BlockStack>
                     )}
                   </BlockStack>
+                </Card>
 
-                  <Divider />
-
+                <Card>
                   <BlockStack gap="300">
                     <InlineStack align="space-between" blockAlign="center">
-                      <Text as="h3" variant="headingSm">Aftership</Text>
+                      <Text as="h3" variant="headingMd">Aftership</Text>
                       <Badge tone={hasAftershipKey ? "success" : undefined}>
                         {hasAftershipKey ? "Connected" : "Not set"}
                       </Badge>
                     </InlineStack>
+                    <Text as="p" tone="subdued" variant="bodySm">
+                      Return-reason data for sizing intelligence — if customers return products as "too small", the AI picks that up.
+                    </Text>
                     <TextField
                       label="Aftership API key"
                       labelHidden
@@ -573,16 +589,19 @@ export default function ApiKeys() {
                       helpText="Enables fit intelligence and sizing guidance from return-reason data."
                     />
                   </BlockStack>
+                </Card>
 
-                  <Divider />
-
+                <Card>
                   <BlockStack gap="300">
                     <InlineStack align="space-between" blockAlign="center">
-                      <Text as="h3" variant="headingSm">Klaviyo</Text>
+                      <Text as="h3" variant="headingMd">Klaviyo</Text>
                       <Badge tone={hasKlaviyoPrivateKey ? "success" : undefined}>
                         {hasKlaviyoPrivateKey ? "Enrichment on" : "Signup only"}
                       </Badge>
                     </InlineStack>
+                    <Text as="p" tone="subdued" variant="bodySm">
+                      Newsletter signup form in chat (with Company ID + List ID). Optional private key unlocks VIP segment enrichment.
+                    </Text>
                     <TextField
                       label="Company ID (public API key)"
                       value={klaviyoCompanyId}
@@ -609,8 +628,8 @@ export default function ApiKeys() {
                       helpText="Optional. Required for VIP mode enrichment — lets the AI see logged-in customers' Klaviyo segments (e.g. VIP, Winback). Klaviyo → Settings → API Keys → Create Private API Key (scopes: profiles:read, segments:read)."
                     />
                   </BlockStack>
-                </BlockStack>
-              </Card>
+                </Card>
+              </BlockStack>
             </Layout.AnnotatedSection>
 
             <Layout.AnnotatedSection

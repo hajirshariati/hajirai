@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import {
   useLoaderData,
   useActionData,
@@ -48,6 +48,7 @@ import {
   getKnowledgeFiles,
   saveKnowledgeFile,
   deleteKnowledgeFile,
+  getKnowledgeFileForDownload,
 } from "../models/ShopConfig.server";
 import {
   upsertEnrichmentsFromCsv,
@@ -284,6 +285,14 @@ export const action = async ({ request }) => {
     return { deleted: true };
   }
 
+  if (intent === "download_file") {
+    const fileId = String(formData.get("fileId") || "");
+    if (!fileId) return { error: "fileId required" };
+    const file = await getKnowledgeFileForDownload(session.shop, fileId);
+    if (!file) return { error: "File not found" };
+    return { download: { fileName: file.fileName, content: file.content, fileType: file.fileType } };
+  }
+
   return { error: "unknown intent" };
 };
 
@@ -371,6 +380,7 @@ function KnowledgeFilesCard({ files }) {
   const actionData = useActionData();
   const nav = useNavigation();
   const submit = useSubmit();
+  const downloadFetcher = useFetcher();
   const saving = nav.state === "submitting" &&
     (nav.formData?.get("intent") === "upload" || nav.formData?.get("intent") === "delete_file");
 
@@ -380,18 +390,34 @@ function KnowledgeFilesCard({ files }) {
 
   const currentType = FILE_TYPES.find((t) => t.value === selectedType);
 
-  const downloadTemplate = useCallback(() => {
-    if (!currentType?.template) return;
-    const blob = new Blob([currentType.template], { type: "text/plain;charset=utf-8" });
+  const triggerBrowserDownload = useCallback((fileName, content) => {
+    const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = currentType.templateName;
+    a.download = fileName;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-  }, [currentType]);
+  }, []);
+
+  const lastDownloadKey = useRef(null);
+  useEffect(() => {
+    const d = downloadFetcher.data?.download;
+    if (d && d.fileName && typeof d.content === "string") {
+      const key = `${d.fileName}:${d.content.length}`;
+      if (lastDownloadKey.current !== key) {
+        lastDownloadKey.current = key;
+        triggerBrowserDownload(d.fileName, d.content);
+      }
+    }
+  }, [downloadFetcher.data, triggerBrowserDownload]);
+
+  const downloadTemplate = useCallback(() => {
+    if (!currentType?.template) return;
+    triggerBrowserDownload(currentType.templateName, currentType.template);
+  }, [currentType, triggerBrowserDownload]);
 
   const handleDropAccepted = (droppedFiles) => {
     const file = droppedFiles[0];
@@ -422,14 +448,16 @@ function KnowledgeFilesCard({ files }) {
     submit(fd, { method: "post" });
   };
 
-  const rows = files.map((f) => [
-    <Text as="span" variant="bodyMd" fontWeight="medium">{f.fileName}</Text>,
-    <Badge>{FILE_TYPES.find((t) => t.value === f.fileType)?.label || f.fileType}</Badge>,
-    formatSize(f.fileSize),
-    f.enrichedSkus > 0 ? <Badge tone="success">{`${f.enrichedSkus} SKUs`}</Badge> : <Text as="span" tone="subdued" variant="bodySm">—</Text>,
-    new Date(f.updatedAt).toLocaleDateString(),
-    <Button icon={DeleteIcon} tone="critical" variant="plain" onClick={() => handleDelete(f.id)} accessibilityLabel="Delete file" />,
-  ]);
+  const handleDownload = (fileId) => {
+    const fd = new FormData();
+    fd.set("intent", "download_file");
+    fd.set("fileId", fileId);
+    downloadFetcher.submit(fd, { method: "post" });
+  };
+
+  const isDownloadingId = downloadFetcher.state !== "idle" && downloadFetcher.formData?.get("intent") === "download_file"
+    ? String(downloadFetcher.formData.get("fileId") || "")
+    : null;
 
   return (
     <Card>
@@ -498,11 +526,44 @@ function KnowledgeFilesCard({ files }) {
                 <Text as="p" tone="subdued">Upload a CSV or text file to enrich the AI with store-specific context.</Text>
               </EmptyState>
             ) : (
-              <DataTable
-                columnContentTypes={["text", "text", "text", "text", "text", "text"]}
-                headings={["File", "Category", "Size", "SKUs linked", "Updated", ""]}
-                rows={rows}
-              />
+              <BlockStack gap="200">
+                {files.map((f) => {
+                  const catLabel = FILE_TYPES.find((t) => t.value === f.fileType)?.label || f.fileType;
+                  return (
+                    <Box key={f.id} padding="300" background="bg-surface-secondary" borderRadius="200">
+                      <BlockStack gap="200">
+                        <InlineStack align="space-between" blockAlign="center" wrap gap="200">
+                          <BlockStack gap="050">
+                            <Text as="span" variant="bodyMd" fontWeight="semibold" breakWord>{f.fileName}</Text>
+                            <InlineStack gap="200" blockAlign="center" wrap>
+                              <Badge>{catLabel}</Badge>
+                              <Text as="span" tone="subdued" variant="bodySm">{formatSize(f.fileSize)}</Text>
+                              <Text as="span" tone="subdued" variant="bodySm">· Updated {new Date(f.updatedAt).toLocaleDateString()}</Text>
+                              {f.enrichedSkus > 0 && <Badge tone="success">{`${f.enrichedSkus} SKUs linked`}</Badge>}
+                            </InlineStack>
+                          </BlockStack>
+                          <InlineStack gap="200" blockAlign="center">
+                            <Button
+                              size="slim"
+                              onClick={() => handleDownload(f.id)}
+                              loading={isDownloadingId === f.id}
+                            >
+                              Download
+                            </Button>
+                            <Button
+                              icon={DeleteIcon}
+                              tone="critical"
+                              variant="plain"
+                              onClick={() => handleDelete(f.id)}
+                              accessibilityLabel="Delete file"
+                            />
+                          </InlineStack>
+                        </InlineStack>
+                      </BlockStack>
+                    </Box>
+                  );
+                })}
+              </BlockStack>
             )}
           </Layout.Section>
         </Layout>
@@ -1316,6 +1377,20 @@ function PriorityExplainer() {
   );
 }
 
+function SectionHeading({ eyebrow, title, description }) {
+  return (
+    <BlockStack gap="100">
+      {eyebrow && (
+        <Text as="p" variant="bodySm" tone="subdued" fontWeight="semibold">
+          {eyebrow.toUpperCase()}
+        </Text>
+      )}
+      <Text as="h2" variant="headingLg">{title}</Text>
+      {description && <Text as="p" tone="subdued">{description}</Text>}
+    </BlockStack>
+  );
+}
+
 export default function RulesKnowledge() {
   const data = useLoaderData();
 
@@ -1323,17 +1398,57 @@ export default function RulesKnowledge() {
     <Page>
       <TitleBar title="Rules & Knowledge" />
       <div style={{ height: "4px", borderRadius: "2px", background: "linear-gradient(90deg, #2D6B4F, #3a8a66, transparent)", marginBottom: "20px" }} />
-      <BlockStack gap="500">
+      <BlockStack gap="800">
         <PriorityExplainer />
-        <CatalogSyncCard data={data} />
-        <AttributeMappingsCard mappings={data.mappings} />
-        <SearchRulesCard initial={data.categoryExclusions} />
-        <QuerySynonymsCard initial={data.querySynonyms} />
-        <SimilarMatchAttributesCard initial={data.similarMatchAttributes} />
-        <CollectionLinksCard initial={data.collectionLinks} />
-        <FitPredictorCard enabled={data.fitPredictorEnabled} config={data.fitPredictorConfig} />
-        <KnowledgeFilesCard files={data.files} />
-        <DisplayCard deduplicateColors={data.deduplicateColors} />
+
+        <BlockStack gap="400">
+          <SectionHeading
+            eyebrow="1 · Data"
+            title="Catalog & attributes"
+            description="Where the AI's product data comes from — keep this in sync with your Shopify catalog and tell the AI which metafields to filter by."
+          />
+          <CatalogSyncCard data={data} />
+          <AttributeMappingsCard mappings={data.mappings} />
+        </BlockStack>
+
+        <BlockStack gap="400">
+          <SectionHeading
+            eyebrow="2 · Search behavior"
+            title="How the AI searches your catalog"
+            description="Hard filters, synonym expansions, and what counts as 'similar' for recommendations."
+          />
+          <SearchRulesCard initial={data.categoryExclusions} />
+          <QuerySynonymsCard initial={data.querySynonyms} />
+          <SimilarMatchAttributesCard initial={data.similarMatchAttributes} />
+        </BlockStack>
+
+        <BlockStack gap="400">
+          <SectionHeading
+            eyebrow="3 · Recommendations & CTAs"
+            title="What the customer sees below the chat"
+            description="Shop-all buttons beneath product cards, and the visual size-fit recommendation."
+          />
+          <CollectionLinksCard initial={data.collectionLinks} />
+          <FitPredictorCard enabled={data.fitPredictorEnabled} config={data.fitPredictorConfig} />
+        </BlockStack>
+
+        <BlockStack gap="400">
+          <SectionHeading
+            eyebrow="4 · Context"
+            title="Knowledge the AI can reference"
+            description="Soft context — FAQs, brand voice, sizing guides, product details."
+          />
+          <KnowledgeFilesCard files={data.files} />
+        </BlockStack>
+
+        <BlockStack gap="400">
+          <SectionHeading
+            eyebrow="5 · Display"
+            title="Product card presentation"
+            description="How product cards are deduplicated and shown in chat."
+          />
+          <DisplayCard deduplicateColors={data.deduplicateColors} />
+        </BlockStack>
       </BlockStack>
     </Page>
   );
