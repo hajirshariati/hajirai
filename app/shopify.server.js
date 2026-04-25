@@ -6,6 +6,17 @@ import {
 } from "@shopify/shopify-app-react-router/server";
 import { PrismaSessionStorage } from "@shopify/shopify-app-session-storage-prisma";
 import prisma from "./db.server";
+import { getKey as assertEncryptionKey } from "./utils/encryption.server";
+import { startRetentionScheduler } from "./lib/retention.server";
+
+// Fail fast at module load if encryption isn't configured. Without this the
+// app would happily accept writes (storing API keys plaintext) until the
+// first decrypt call surfaces the error.
+assertEncryptionKey();
+
+// Sweeps ChatFeedback/ChatProductMention rows older than 90 days. Boot-time
+// scheduler so retention is enforced regardless of admin traffic.
+startRetentionScheduler();
 
 const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY,
