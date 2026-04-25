@@ -20,17 +20,26 @@ const PolarisLink = forwardRef(function PolarisLink(
   { url, external, target, children, ...rest },
   ref,
 ) {
-  if (external || target === "_blank" || (typeof url === "string" && /^https?:\/\//.test(url))) {
+  const isInternalPath = typeof url === "string" && /^[/?#]/.test(url);
+  if (isInternalPath && !external) {
     return (
-      <a href={url} target={target || "_blank"} rel="noopener noreferrer" ref={ref} {...rest}>
+      <Link to={url} ref={ref} {...rest}>
         {children}
-      </a>
+      </Link>
     );
   }
+  const isCrossOrigin = typeof url === "string" && /^https?:\/\//i.test(url);
+  const finalTarget = target || (external || isCrossOrigin ? "_blank" : undefined);
   return (
-    <Link to={url} ref={ref} {...rest}>
+    <a
+      href={url}
+      target={finalTarget}
+      rel={finalTarget === "_blank" ? "noopener noreferrer" : undefined}
+      ref={ref}
+      {...rest}
+    >
       {children}
-    </Link>
+    </a>
   );
 });
 
