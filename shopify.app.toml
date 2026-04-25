@@ -1,6 +1,6 @@
 client_id = "4f1c387023378cd12943fd73d703d9d7"
 name = "SEoS Assistant"
-application_url = "https://hajirai-app-production.up.railway.app"
+application_url = "https://seos-production.up.railway.app"
 embedded = true
 
 [build]
@@ -39,13 +39,13 @@ scopes = "write_files,write_metaobject_definitions,write_metaobjects,write_produ
 
 [auth]
 redirect_urls = [
-  "https://hajirai-app-production.up.railway.app/auth/callback",
-  "https://hajirai-app-production.up.railway.app/auth/shopify/callback",
-  "https://hajirai-app-production.up.railway.app/api/auth/callback"
+  "https://seos-production.up.railway.app/auth/callback",
+  "https://seos-production.up.railway.app/auth/shopify/callback",
+  "https://seos-production.up.railway.app/api/auth/callback"
 ]
 
 [app_proxy]
-url = "https://hajirai-app-production.up.railway.app"
+url = "https://seos-production.up.railway.app"
 subpath = "hajirai"
 prefix = "apps"
 
