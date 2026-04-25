@@ -28,8 +28,10 @@ const PolarisLink = forwardRef(function PolarisLink(
       </Link>
     );
   }
-  const isCrossOrigin = typeof url === "string" && /^https?:\/\//i.test(url);
-  const finalTarget = target || (external || isCrossOrigin ? "_blank" : undefined);
+  const needsTopLevel =
+    typeof url === "string" &&
+    /^(https?:|mailto:|tel:|sms:)/i.test(url);
+  const finalTarget = target || (external || needsTopLevel ? "_blank" : undefined);
   return (
     <a
       href={url}
