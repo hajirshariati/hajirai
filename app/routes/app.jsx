@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import { Link, Outlet, useLoaderData, useRouteError } from "react-router";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { AppProvider as ShopifyAppProvider } from "@shopify/shopify-app-react-router/react";
@@ -15,11 +16,43 @@ export const loader = async ({ request }) => {
   return { apiKey: process.env.SHOPIFY_API_KEY || "" };
 };
 
+// Polaris components that take a `url` prop (Button, Banner action, ActionList,
+// …) render plain <a href>. Inside the embedded admin iframe a full-page
+// navigation drops the App Bridge session token, so the next request hits
+// authenticate.admin() with no session and bounces to the OAuth login page.
+// Routing in-app paths through react-router's Link keeps the navigation
+// client-side and preserves the session.
+const PolarisLink = forwardRef(function PolarisLink(
+  { children, url = "", external, target, download, ...rest },
+  ref,
+) {
+  const isProtocolUrl = /^([a-z][a-z0-9+.-]*:|\/\/)/i.test(url);
+  if (external || download || isProtocolUrl) {
+    return (
+      <a
+        ref={ref}
+        href={url}
+        target={external ? "_blank" : target}
+        rel={external ? "noopener noreferrer" : undefined}
+        download={download}
+        {...rest}
+      >
+        {children}
+      </a>
+    );
+  }
+  return (
+    <Link ref={ref} to={url} {...rest}>
+      {children}
+    </Link>
+  );
+});
+
 export default function App() {
   const { apiKey } = useLoaderData();
   return (
     <ShopifyAppProvider isEmbeddedApp apiKey={apiKey}>
-      <PolarisAppProvider i18n={enTranslations}>
+      <PolarisAppProvider i18n={enTranslations} linkComponent={PolarisLink}>
         <NavMenu>
           <Link to="/app" rel="home">Seos</Link>
           <Link to="/app/rules-knowledge">Rules & Knowledge</Link>
