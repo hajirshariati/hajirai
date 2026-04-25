@@ -343,7 +343,8 @@ var t=esc(p.title||'');
 var u=p.url||(p.handle?('/products/'+p.handle):'#');
 var pr=esc(p.price_formatted||(p.price?fmt(p.price):''));
 var cp=p.compare_at_price?esc(fmt(p.compare_at_price)):'';
-return '<a class="ai-chat-product-card" data-handle="'+esc(p.handle||'')+'" href="'+esc(u)+'" style="text-decoration:none;color:inherit">'+(img?'<div class="ai-chat-product-img"><img src="'+esc(img)+'" alt="'+t+'" loading="lazy"></div>':'')+'<div class="ai-chat-product-info"><span class="ai-chat-product-title">'+t+'</span><div class="ai-chat-product-price">'+pr+(cp?'<span class="compare-at">'+cp+'</span>':'')+'</div></div></a>';
+var ariaParts=[t];if(pr)ariaParts.push(pr);var ariaLabel=esc(ariaParts.join(' — '));
+return '<a class="ai-chat-product-card" data-handle="'+esc(p.handle||'')+'" href="'+esc(u)+'" aria-label="'+ariaLabel+'" style="text-decoration:none;color:inherit">'+(img?'<div class="ai-chat-product-img"><img src="'+esc(img)+'" alt="" loading="lazy"></div>':'')+'<div class="ai-chat-product-info"><span class="ai-chat-product-title">'+t+'</span><div class="ai-chat-product-price">'+pr+(cp?'<span class="compare-at">'+cp+'</span>':'')+'</div></div></a>';
 }
 
 function sendMessage(){
