@@ -27,13 +27,17 @@ const PolarisLink = forwardRef(function PolarisLink(
   ref,
 ) {
   const isProtocolUrl = /^([a-z][a-z0-9+.-]*:|\/\/)/i.test(url);
+  // mailto:/tel:/sms: must escape the iframe so the OS handler runs —
+  // top-level navigation to those schemes is blocked by Shopify's frame policy.
+  const isHandoffScheme = /^(mailto|tel|sms):/i.test(url);
   if (external || download || isProtocolUrl) {
+    const newTab = external || isHandoffScheme;
     return (
       <a
         ref={ref}
         href={url}
-        target={external ? "_blank" : target}
-        rel={external ? "noopener noreferrer" : undefined}
+        target={newTab ? "_blank" : target}
+        rel={newTab ? "noopener noreferrer" : undefined}
         download={download}
         {...rest}
       >
