@@ -47,7 +47,8 @@ export async function fetchYotpoLoyalty({ apiKey, guid, email }) {
       throw new Error(`Yotpo Loyalty ${res.status}: ${body.slice(0, 200)}`);
     }
     const data = await res.json();
-    console.log(`[yotpo-loyalty] email=${email} points=${data?.points_balance ?? "?"} tier=${data?.vip_tier_name || data?.tier || "none"} referral=${data?.perkea_referral_link || data?.referral_url || data?.referralUrl || data?.referral_link || "none"}`);
+    // Don't log raw email — Shopify reviewers inspect logs for PII.
+    console.log(`[yotpo-loyalty] points=${data?.points_balance ?? "?"} tier=${data?.vip_tier_name || data?.tier || "none"} hasReferral=${Boolean(data?.perkea_referral_link || data?.referral_url || data?.referralUrl || data?.referral_link)}`);
     const result = {
       pointsBalance: data?.points_balance ?? null,
       creditBalance: data?.credit_balance ?? null,

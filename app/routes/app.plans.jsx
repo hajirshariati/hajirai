@@ -50,7 +50,7 @@ const FEATURE_ROWS = [
   { label: "Smart model routing", get: (p) => p.smartRouting },
   { label: "Advanced AI model", get: (p) => p.advancedModel },
   { label: "Prompt caching", get: (p) => p.advancedModel },
-  { label: "Remove Seos branding", get: (p) => p.allowBrandingRemoval },
+  { label: "Remove SEoS Assistant branding", get: (p) => p.allowBrandingRemoval },
   { label: "Search rules & synonyms", get: (p) => p.id !== "free" },
   { label: "Product enrichment (CSV)", get: (p) => p.id === "growth" || p.id === "pro" || p.id === "enterprise" },
   { label: "White-label branding", get: (p) => p.id === "enterprise" },
@@ -242,7 +242,7 @@ function SupportBox({ shop }) {
   const mailtoHref = useMemo(() => {
     const s = subject.trim() || "Support request";
     const bodyLines = [`Shop: ${shop}`, "", message.trim()].join("\n");
-    return `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(`[Seos] ${s}`)}&body=${encodeURIComponent(bodyLines)}`;
+    return `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(`[SEoS Assistant] ${s}`)}&body=${encodeURIComponent(bodyLines)}`;
   }, [subject, message, shop]);
 
   return (

@@ -343,7 +343,8 @@ var t=esc(p.title||'');
 var u=p.url||(p.handle?('/products/'+p.handle):'#');
 var pr=esc(p.price_formatted||(p.price?fmt(p.price):''));
 var cp=p.compare_at_price?esc(fmt(p.compare_at_price)):'';
-return '<a class="ai-chat-product-card" data-handle="'+esc(p.handle||'')+'" href="'+esc(u)+'" style="text-decoration:none;color:inherit">'+(img?'<div class="ai-chat-product-img"><img src="'+esc(img)+'" alt="'+t+'" loading="lazy"></div>':'')+'<div class="ai-chat-product-info"><span class="ai-chat-product-title">'+t+'</span><div class="ai-chat-product-price">'+pr+(cp?'<span class="compare-at">'+cp+'</span>':'')+'</div></div></a>';
+var ariaParts=[t];if(pr)ariaParts.push(pr);var ariaLabel=esc(ariaParts.join(' — '));
+return '<a class="ai-chat-product-card" data-handle="'+esc(p.handle||'')+'" href="'+esc(u)+'" aria-label="'+ariaLabel+'" style="text-decoration:none;color:inherit">'+(img?'<div class="ai-chat-product-img"><img src="'+esc(img)+'" alt="" loading="lazy"></div>':'')+'<div class="ai-chat-product-info"><span class="ai-chat-product-title">'+t+'</span><div class="ai-chat-product-price">'+pr+(cp?'<span class="compare-at">'+cp+'</span>':'')+'</div></div></a>';
 }
 
 function sendMessage(){
@@ -397,7 +398,7 @@ submitBtn.addEventListener('click',function(){
   fetch('https://a.klaviyo.com/client/subscriptions/?company_id='+encodeURIComponent(KLAVIYO_COMPANY_ID),{
     method:'POST',
     headers:{'Content-Type':'application/json','revision':'2024-10-15'},
-    body:JSON.stringify({data:{type:'subscription',attributes:{custom_source:'Seos Chat',profile:{data:{type:'profile',attributes:profileAttrs}}},relationships:{list:{data:{type:'list',id:KLAVIYO_LIST_ID}}}}})
+    body:JSON.stringify({data:{type:'subscription',attributes:{custom_source:'SEoS Assistant Chat',profile:{data:{type:'profile',attributes:profileAttrs}}},relationships:{list:{data:{type:'list',id:KLAVIYO_LIST_ID}}}}})
   }).then(function(r){
     if(r.ok||r.status===202){
       form.innerHTML='<div style="text-align:center;padding:12px;color:#2d6b4f;font-weight:600;font-size:14px">You\'re subscribed!</div>';

@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "ShopConfig" ADD COLUMN "dailyCapEnabled" BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE "ShopConfig" ADD COLUMN "dailyCapMessages" INTEGER NOT NULL DEFAULT 200;

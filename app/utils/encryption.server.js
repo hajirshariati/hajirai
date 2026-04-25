@@ -5,7 +5,7 @@ const IV_BYTES = 12;
 const TAG_BYTES = 16;
 const PREFIX = "enc:v1:";
 
-function getKey() {
+export function getKey() {
   const raw = process.env.ENCRYPTION_KEY;
   if (!raw) {
     throw new Error(
