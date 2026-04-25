@@ -1034,7 +1034,16 @@ export const action = async ({ request }) => {
       },
     });
   } catch (e) {
+    // Server-side log keeps the detail; the storefront only ever sees the
+    // friendly message. Leaking e.message to the public widget can expose
+    // upstream API errors, internal paths, or library stack hints.
     console.error("[chat] error:", e);
-    return Response.json({ error: "action failed", message: e.message }, { status: 500 });
+    return Response.json(
+      {
+        error: "action_failed",
+        message: "I'm having trouble right now. Please try again in a moment.",
+      },
+      { status: 500 },
+    );
   }
 };
