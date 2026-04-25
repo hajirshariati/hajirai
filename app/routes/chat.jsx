@@ -791,7 +791,7 @@ export const action = async ({ request }) => {
       return Response.json(
         {
           error: "plan_limit_reached",
-          message: `This store reached its ${quota.limit.toLocaleString()} conversations for the month. Upgrade the plan in the Seos admin to keep helping customers.`,
+          message: `This store reached its ${quota.limit.toLocaleString()} conversations for the month. Upgrade the plan in the SEoS Assistant admin to keep helping customers.`,
           plan: quota.plan.id,
           used: quota.used,
           limit: quota.limit,

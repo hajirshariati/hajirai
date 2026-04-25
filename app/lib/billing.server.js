@@ -80,7 +80,7 @@ export async function createSubscription({ admin, shop, planId, host }) {
     }`,
     {
       variables: {
-        name: `Seos ${plan.name}`,
+        name: `SEoS Assistant ${plan.name}`,
         returnUrl,
         test: IS_TEST_CHARGE,
         lineItems: [
