@@ -1497,3 +1497,32 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
   .ai-chat-fit-size strong { font-size: 16px; }
   .ai-chat-fit-percent { font-size: 20px; }
 }
+
+/* Accessibility: visible focus rings for keyboard navigation. We intentionally
+   override the earlier `outline: none !important` for :focus-visible only —
+   pointer focus stays clean, keyboard focus is loud. */
+.ai-chat-launcher__send:focus-visible,
+.ai-chat-send:focus-visible,
+.ai-chat-welcome__cta-btn:focus-visible,
+.ai-chat-product-card:focus-visible,
+.ai-chat-quickpick:focus-visible,
+.ai-chat-followup:focus-visible,
+.ai-chat-launcher-text:focus-visible {
+  outline: 2px solid var(--ai-chat-primary, #2d6b4f) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 4px rgba(45, 107, 79, 0.18) !important;
+}
+
+/* Honor reduced-motion preference for the launcher / message animations. */
+@media (prefers-reduced-motion: reduce) {
+  .ai-chat-launcher,
+  .ai-chat-window,
+  .ai-chat-message,
+  .ai-chat-product-card,
+  .ai-chat-welcome__cta-btn,
+  .ai-chat-launcher__send,
+  .ai-chat-send {
+    transition: none !important;
+    animation: none !important;
+  }
+}

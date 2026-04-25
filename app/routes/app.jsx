@@ -58,7 +58,7 @@ export default function App() {
     <ShopifyAppProvider isEmbeddedApp apiKey={apiKey}>
       <PolarisAppProvider i18n={enTranslations} linkComponent={PolarisLink}>
         <NavMenu>
-          <Link to="/app" rel="home">Seos</Link>
+          <Link to="/app" rel="home">SEoS Assistant</Link>
           <Link to="/app/rules-knowledge">Rules & Knowledge</Link>
           <Link to="/app/analytics">Analytics</Link>
           <Link to="/app/plans">Plans</Link>
@@ -67,7 +67,7 @@ export default function App() {
         <Outlet />
         <div style={{ marginTop: "40px", padding: "16px", textAlign: "center", borderTop: "2px solid #2D6B4F" }}>
           <Text as="p" tone="subdued" variant="bodySm" alignment="center">
-            Seos v1.0. All rights reserved.
+            SEoS Assistant v1.0. All rights reserved.
           </Text>
         </div>
       </PolarisAppProvider>

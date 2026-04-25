@@ -11,7 +11,7 @@ import { fetchCustomerContext } from "../lib/customer-context.server";
 import { fetchKlaviyoEnrichment } from "../lib/klaviyo-enrichment.server";
 import { fetchYotpoLoyalty } from "../lib/yotpo-loyalty.server";
 import prisma from "../db.server";
-import { recordChatUsage } from "../models/ChatUsage.server";
+import { recordChatUsage, getTodayMessageCount } from "../models/ChatUsage.server";
 import { canSendMessage } from "../lib/billing.server";
 
 const DEFAULT_MODEL = process.env.DEFAULT_MODEL || "claude-sonnet-4-6";
@@ -791,13 +791,33 @@ export const action = async ({ request }) => {
       return Response.json(
         {
           error: "plan_limit_reached",
-          message: `This store reached its ${quota.limit.toLocaleString()} conversations for the month. Upgrade the plan in the Seos admin to keep helping customers.`,
+          message: `This store reached its ${quota.limit.toLocaleString()} conversations for the month. Upgrade the plan in the SEoS Assistant admin to keep helping customers.`,
           plan: quota.plan.id,
           used: quota.used,
           limit: quota.limit,
         },
         { status: 402 },
       );
+    }
+
+    // Optional merchant-defined daily spending guardrail. When enabled, the
+    // chat endpoint stops accepting new conversations once the configured
+    // count is reached for the UTC day. Counts come from ChatUsage so the
+    // limit is enforced consistently across multiple server instances.
+    if (config.dailyCapEnabled && config.dailyCapMessages > 0) {
+      const todayCount = await getTodayMessageCount(session.shop);
+      if (todayCount >= config.dailyCapMessages) {
+        return Response.json(
+          {
+            error: "daily_cap_reached",
+            message:
+              "The shop's daily AI assistant limit has been reached. The assistant will be available again tomorrow.",
+            limit: config.dailyCapMessages,
+            used: todayCount,
+          },
+          { status: 429 },
+        );
+      }
     }
 
     const body = await request.json();
@@ -1034,7 +1054,16 @@ export const action = async ({ request }) => {
       },
     });
   } catch (e) {
+    // Server-side log keeps the detail; the storefront only ever sees the
+    // friendly message. Leaking e.message to the public widget can expose
+    // upstream API errors, internal paths, or library stack hints.
     console.error("[chat] error:", e);
-    return Response.json({ error: "action failed", message: e.message }, { status: 500 });
+    return Response.json(
+      {
+        error: "action_failed",
+        message: "I'm having trouble right now. Please try again in a moment.",
+      },
+      { status: 500 },
+    );
   }
 };

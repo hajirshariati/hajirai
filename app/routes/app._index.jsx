@@ -163,7 +163,7 @@ export default function Home() {
 
   return (
     <Page>
-      <TitleBar title="Seos" />
+      <TitleBar title="SEoS Assistant" />
       <BlockStack gap="600">
         <div style={{
           background: "linear-gradient(135deg, #2D6B4F 0%, #3a8a66 100%)",
@@ -222,7 +222,7 @@ export default function Home() {
         )}
 
         <BlockStack gap="300">
-          <Text as="h2" variant="headingMd">What Seos does for you</Text>
+          <Text as="h2" variant="headingMd">What SEoS Assistant does for you</Text>
           <Text as="p" tone="subdued" variant="bodySm">
             Everything runs automatically — just connect your account and let the AI handle customer questions.
           </Text>
@@ -278,7 +278,7 @@ export default function Home() {
               done={false}
               number="2"
               title="Enable the chat widget"
-              description="Turn on the Seos chat block in your active Shopify theme so customers see it on your storefront."
+              description="Turn on the SEoS Assistant chat block in your active Shopify theme so customers see it on your storefront."
               actionLabel="Open theme editor"
               actionUrl={themeEditorUrl}
               external
@@ -296,11 +296,11 @@ export default function Home() {
 
         <Card>
           <BlockStack gap="300">
-            <Text as="h2" variant="headingMd">About Seos</Text>
+            <Text as="h2" variant="headingMd">About SEoS Assistant</Text>
             <InlineGrid columns={{ xs: 1, sm: 2 }} gap="400">
               <BlockStack gap="200">
                 <Text as="p" variant="bodySm"><strong>Version:</strong> 1.0.0</Text>
-                <Text as="p" variant="bodySm"><strong>AI Engine:</strong> Seos AI</Text>
+                <Text as="p" variant="bodySm"><strong>AI Engine:</strong> Anthropic Claude</Text>
               </BlockStack>
               <BlockStack gap="200">
                 <Text as="p" variant="bodySm"><strong>UTM Tracking:</strong> All product links include utm_source=shopagent</Text>
