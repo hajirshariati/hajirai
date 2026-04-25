@@ -1,4 +1,5 @@
 import { Link, Outlet, useLoaderData, useRouteError } from "react-router";
+import { forwardRef } from "react";
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { AppProvider as ShopifyAppProvider } from "@shopify/shopify-app-react-router/react";
 import { AppProvider as PolarisAppProvider } from "@shopify/polaris";
@@ -15,11 +16,29 @@ export const loader = async ({ request }) => {
   return { apiKey: process.env.SHOPIFY_API_KEY || "" };
 };
 
+const PolarisLink = forwardRef(function PolarisLink(
+  { url, external, target, children, ...rest },
+  ref,
+) {
+  if (external || target === "_blank" || (typeof url === "string" && /^https?:\/\//.test(url))) {
+    return (
+      <a href={url} target={target || "_blank"} rel="noopener noreferrer" ref={ref} {...rest}>
+        {children}
+      </a>
+    );
+  }
+  return (
+    <Link to={url} ref={ref} {...rest}>
+      {children}
+    </Link>
+  );
+});
+
 export default function App() {
   const { apiKey } = useLoaderData();
   return (
     <ShopifyAppProvider isEmbeddedApp apiKey={apiKey}>
-      <PolarisAppProvider i18n={enTranslations}>
+      <PolarisAppProvider i18n={enTranslations} linkComponent={PolarisLink}>
         <NavMenu>
           <Link to="/app" rel="home">Seos</Link>
           <Link to="/app/rules-knowledge">Rules & Knowledge</Link>
