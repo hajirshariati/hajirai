@@ -1,6 +1,19 @@
 import prisma from "../db.server";
 import { computeCost } from "../lib/pricing.server";
 
+// UTC midnight keeps the cap consistent across server instances and matches
+// how Shopify reports day boundaries in the admin.
+function startOfTodayUtc() {
+  const d = new Date();
+  return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+}
+
+export async function getTodayMessageCount(shop) {
+  return prisma.chatUsage.count({
+    where: { shop, createdAt: { gte: startOfTodayUtc() } },
+  });
+}
+
 export async function recordChatUsage({ shop, model, usage, toolCalls }) {
   const costUsd = computeCost(model, usage);
   return prisma.chatUsage.create({

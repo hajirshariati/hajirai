@@ -54,6 +54,8 @@ export const loader = async ({ request }) => {
     loyaltyDisplay: config.loyaltyDisplay || "points",
     loyaltyPointsPerDollar: config.loyaltyPointsPerDollar ?? 100,
     loyaltyRounding: config.loyaltyRounding || "exact",
+    dailyCapEnabled: config.dailyCapEnabled === true,
+    dailyCapMessages: config.dailyCapMessages ?? 200,
   };
 };
 
@@ -154,6 +156,17 @@ export const action = async ({ request }) => {
   const loyaltyRounding = formData.get("loyaltyRounding");
   if (loyaltyRounding !== null) {
     data.loyaltyRounding = ["up", "down", "exact"].includes(loyaltyRounding) ? loyaltyRounding : "exact";
+  }
+
+  const dailyCapToggle = formData.get("dailyCapEnabled");
+  if (dailyCapToggle !== null) data.dailyCapEnabled = dailyCapToggle === "true";
+
+  const dailyCapMessagesRaw = formData.get("dailyCapMessages");
+  if (dailyCapMessagesRaw !== null) {
+    const n = parseInt(dailyCapMessagesRaw, 10);
+    // Clamp to a sensible range so a typo can't soft-disable the assistant
+    // (0 messages) or set a useless absurdly-high cap.
+    data.dailyCapMessages = Number.isFinite(n) && n > 0 ? Math.min(n, 100000) : 200;
   }
 
   if (Object.keys(data).length > 0) {
@@ -270,7 +283,7 @@ function HideUrlsPanel({ initial }) {
 }
 
 export default function ApiKeys() {
-  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, trackingPageUrl: initTrackingPageUrl, returnsPageUrl: initReturnsPageUrl, referralPageUrl: initReferralPageUrl, promptCaching: initCaching, klaviyoFormId: initKlaviyoFormId, klaviyoCompanyId: initKlaviyoCompanyId, klaviyoListId: initKlaviyoListId, vipModeEnabled: initVipMode, showLoginPill: initShowLoginPill, hasKlaviyoPrivateKey, hasYotpoLoyaltyKey, yotpoLoyaltyGuid: initYotpoLoyaltyGuid, loyaltyDisplay: initLoyaltyDisplay, loyaltyPointsPerDollar: initLoyaltyPointsPerDollar, loyaltyRounding: initLoyaltyRounding } = useLoaderData();
+  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, trackingPageUrl: initTrackingPageUrl, returnsPageUrl: initReturnsPageUrl, referralPageUrl: initReferralPageUrl, promptCaching: initCaching, klaviyoFormId: initKlaviyoFormId, klaviyoCompanyId: initKlaviyoCompanyId, klaviyoListId: initKlaviyoListId, vipModeEnabled: initVipMode, showLoginPill: initShowLoginPill, hasKlaviyoPrivateKey, hasYotpoLoyaltyKey, yotpoLoyaltyGuid: initYotpoLoyaltyGuid, loyaltyDisplay: initLoyaltyDisplay, loyaltyPointsPerDollar: initLoyaltyPointsPerDollar, loyaltyRounding: initLoyaltyRounding, dailyCapEnabled: initDailyCapEnabled, dailyCapMessages: initDailyCapMessages } = useLoaderData();
   const actionData = useActionData();
   const nav = useNavigation();
   const saving = nav.state === "submitting";
@@ -293,6 +306,8 @@ export default function ApiKeys() {
   const [klaviyoListId, setKlaviyoListId] = useState(initKlaviyoListId);
   const [vipMode, setVipMode] = useState(initVipMode);
   const [showLoginPill, setShowLoginPill] = useState(initShowLoginPill);
+  const [dailyCapEnabled, setDailyCapEnabled] = useState(initDailyCapEnabled);
+  const [dailyCapMessages, setDailyCapMessages] = useState(String(initDailyCapMessages ?? 200));
   const [klaviyoPrivateKey, setKlaviyoPrivateKey] = useState("");
   const [yotpoLoyaltyKey, setYotpoLoyaltyKey] = useState("");
   const [yotpoLoyaltyGuidState, setYotpoLoyaltyGuidState] = useState(initYotpoLoyaltyGuid);
@@ -384,6 +399,49 @@ export default function ApiKeys() {
                         <strong>How smart routing works:</strong> When a customer sends a simple follow-up
                         like "thanks", "ok", or "bye", SEoS Assistant uses the Fast model (up to 3x cheaper).
                         Product questions, first messages, and detailed queries always use your primary model.
+                      </Text>
+                    </Banner>
+                  )}
+                </BlockStack>
+              </Card>
+            </Layout.AnnotatedSection>
+
+            <Layout.AnnotatedSection
+              title="Daily message cap"
+              description={
+                <BlockStack gap="200">
+                  <Text as="p" tone="subdued" variant="bodySm">
+                    Optional safety net to keep daily AI costs predictable.
+                  </Text>
+                  <Text as="p" tone="subdued" variant="bodySm">
+                    When enabled, the assistant pauses for the rest of the day once the cap is hit and resumes the next day at midnight UTC. Customers see a friendly &quot;back tomorrow&quot; message instead of an error. Counts every conversation across your storefront.
+                  </Text>
+                </BlockStack>
+              }
+            >
+              <Card>
+                <BlockStack gap="400">
+                  <Checkbox
+                    label="Enable daily cap"
+                    checked={dailyCapEnabled}
+                    onChange={setDailyCapEnabled}
+                    helpText="Off by default. Most stores leave this off and rely on monthly plan limits."
+                  />
+                  <TextField
+                    label="Maximum messages per day"
+                    type="number"
+                    min="1"
+                    max="100000"
+                    value={dailyCapMessages}
+                    onChange={setDailyCapMessages}
+                    disabled={!dailyCapEnabled}
+                    autoComplete="off"
+                    helpText="Conversations counted against the cap reset at midnight UTC."
+                  />
+                  {dailyCapEnabled && (
+                    <Banner tone="info">
+                      <Text as="p" variant="bodySm">
+                        <strong>Tip:</strong> a typical store costs roughly 1–3¢ per conversation depending on the AI model. Pick a cap based on how much you&apos;re willing to spend per day — for example, 200 messages at 2¢ each ≈ $4/day.
                       </Text>
                     </Banner>
                   )}
@@ -686,6 +744,8 @@ export default function ApiKeys() {
           <input type="hidden" name="loyaltyDisplay" value={loyaltyDisplay} />
           <input type="hidden" name="loyaltyPointsPerDollar" value={loyaltyPointsPerDollar} />
           <input type="hidden" name="loyaltyRounding" value={loyaltyRounding} />
+          <input type="hidden" name="dailyCapEnabled" value={String(dailyCapEnabled)} />
+          <input type="hidden" name="dailyCapMessages" value={dailyCapMessages} />
 
           <Box paddingBlockEnd="800">
             <InlineStack align="end">

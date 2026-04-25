@@ -11,7 +11,7 @@ import { fetchCustomerContext } from "../lib/customer-context.server";
 import { fetchKlaviyoEnrichment } from "../lib/klaviyo-enrichment.server";
 import { fetchYotpoLoyalty } from "../lib/yotpo-loyalty.server";
 import prisma from "../db.server";
-import { recordChatUsage } from "../models/ChatUsage.server";
+import { recordChatUsage, getTodayMessageCount } from "../models/ChatUsage.server";
 import { canSendMessage } from "../lib/billing.server";
 
 const DEFAULT_MODEL = process.env.DEFAULT_MODEL || "claude-sonnet-4-6";
@@ -798,6 +798,26 @@ export const action = async ({ request }) => {
         },
         { status: 402 },
       );
+    }
+
+    // Optional merchant-defined daily spending guardrail. When enabled, the
+    // chat endpoint stops accepting new conversations once the configured
+    // count is reached for the UTC day. Counts come from ChatUsage so the
+    // limit is enforced consistently across multiple server instances.
+    if (config.dailyCapEnabled && config.dailyCapMessages > 0) {
+      const todayCount = await getTodayMessageCount(session.shop);
+      if (todayCount >= config.dailyCapMessages) {
+        return Response.json(
+          {
+            error: "daily_cap_reached",
+            message:
+              "The shop's daily AI assistant limit has been reached. The assistant will be available again tomorrow.",
+            limit: config.dailyCapMessages,
+            used: todayCount,
+          },
+          { status: 429 },
+        );
+      }
     }
 
     const body = await request.json();
