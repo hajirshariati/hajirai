@@ -15,6 +15,13 @@ database.sqlite
 
 .env
 .env.*
+!.env.example
+
+# Database dumps must never be committed (they contain encrypted secrets,
+# customer data, and merchant config)
+*.dump
+*.sql.gz
+backup.*
 
 
 
