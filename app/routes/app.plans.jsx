@@ -329,6 +329,21 @@ function SupportBox({ shop }) {
         <Text as="p" tone="subdued" variant="bodySm">
           Send email opens your default mail app with the shop domain pre-filled.
         </Text>
+
+        <Box paddingBlockStart="200" borderBlockStartWidth="025" borderColor="border-subdued">
+          <Text as="p" tone="subdued" variant="bodySm">
+            Read our{" "}
+            <a
+              href="/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "inherit", textDecoration: "underline", textUnderlineOffset: "2px" }}
+            >
+              privacy policy
+            </a>{" "}
+            for details on what data SEoS Assistant collects and how it&apos;s handled.
+          </Text>
+        </Box>
       </BlockStack>
     </Card>
   );
