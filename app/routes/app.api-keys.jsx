@@ -1,5 +1,5 @@
 import { useLoaderData, useActionData, useNavigation, Form, useFetcher } from "react-router";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   Page,
   Layout,
@@ -19,13 +19,16 @@ import {
   Tag,
 } from "@shopify/polaris";
 import { CheckCircleIcon } from "@shopify/polaris-icons";
-import { TitleBar } from "@shopify/app-bridge-react";
+import { TitleBar, SaveBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import { getShopConfig, updateShopConfig } from "../models/ShopConfig.server";
+import { getShopPlan } from "../lib/billing.server";
+import { PlanGate } from "../components/PlanGate";
 
 export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
   const config = await getShopConfig(session.shop);
+  const plan = await getShopPlan(session.shop);
   let hideOnUrls = [];
   try { hideOnUrls = JSON.parse(config.hideOnUrls || "[]"); } catch { hideOnUrls = []; }
   return {
@@ -56,6 +59,7 @@ export const loader = async ({ request }) => {
     loyaltyRounding: config.loyaltyRounding || "exact",
     dailyCapEnabled: config.dailyCapEnabled === true,
     dailyCapMessages: config.dailyCapMessages ?? 200,
+    plan: { id: plan.id, name: plan.name, features: plan.features },
   };
 };
 
@@ -283,7 +287,7 @@ function HideUrlsPanel({ initial }) {
 }
 
 export default function ApiKeys() {
-  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, trackingPageUrl: initTrackingPageUrl, returnsPageUrl: initReturnsPageUrl, referralPageUrl: initReferralPageUrl, promptCaching: initCaching, klaviyoFormId: initKlaviyoFormId, klaviyoCompanyId: initKlaviyoCompanyId, klaviyoListId: initKlaviyoListId, vipModeEnabled: initVipMode, showLoginPill: initShowLoginPill, hasKlaviyoPrivateKey, hasYotpoLoyaltyKey, yotpoLoyaltyGuid: initYotpoLoyaltyGuid, loyaltyDisplay: initLoyaltyDisplay, loyaltyPointsPerDollar: initLoyaltyPointsPerDollar, loyaltyRounding: initLoyaltyRounding, dailyCapEnabled: initDailyCapEnabled, dailyCapMessages: initDailyCapMessages } = useLoaderData();
+  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, trackingPageUrl: initTrackingPageUrl, returnsPageUrl: initReturnsPageUrl, referralPageUrl: initReferralPageUrl, promptCaching: initCaching, klaviyoFormId: initKlaviyoFormId, klaviyoCompanyId: initKlaviyoCompanyId, klaviyoListId: initKlaviyoListId, vipModeEnabled: initVipMode, showLoginPill: initShowLoginPill, hasKlaviyoPrivateKey, hasYotpoLoyaltyKey, yotpoLoyaltyGuid: initYotpoLoyaltyGuid, loyaltyDisplay: initLoyaltyDisplay, loyaltyPointsPerDollar: initLoyaltyPointsPerDollar, loyaltyRounding: initLoyaltyRounding, dailyCapEnabled: initDailyCapEnabled, dailyCapMessages: initDailyCapMessages, plan } = useLoaderData();
   const actionData = useActionData();
   const nav = useNavigation();
   const saving = nav.state === "submitting";
@@ -315,10 +319,86 @@ export default function ApiKeys() {
   const [loyaltyPointsPerDollar, setLoyaltyPointsPerDollar] = useState(String(initLoyaltyPointsPerDollar));
   const [loyaltyRounding, setLoyaltyRounding] = useState(initLoyaltyRounding);
 
+  // Contextual Save Bar plumbing — BFS 4.1.5. Track dirty state via the
+  // form's onChange (Polaris components bubble change events to the parent
+  // form), reset on successful save, and let "Discard" restore the snapshot.
+  const formRef = useRef(null);
+  const [isDirty, setIsDirty] = useState(false);
+  const initialSnapshot = useRef({
+    model: anthropicModel || "claude-sonnet-4-6",
+    strategy: modelStrategy,
+    followUps: initFollowUps,
+    feedbackOn: initFeedback,
+    supportUrl: initSupportUrl,
+    supportLabel: initSupportLabel,
+    trackingPageUrl: initTrackingPageUrl,
+    returnsPageUrl: initReturnsPageUrl,
+    referralPageUrl: initReferralPageUrl,
+    caching: initCaching,
+    klaviyoFormId: initKlaviyoFormId,
+    klaviyoCompanyId: initKlaviyoCompanyId,
+    klaviyoListId: initKlaviyoListId,
+    vipMode: initVipMode,
+    showLoginPill: initShowLoginPill,
+    dailyCapEnabled: initDailyCapEnabled,
+    dailyCapMessages: String(initDailyCapMessages ?? 200),
+    yotpoLoyaltyGuid: initYotpoLoyaltyGuid,
+    loyaltyDisplay: initLoyaltyDisplay,
+    loyaltyPointsPerDollar: String(initLoyaltyPointsPerDollar),
+    loyaltyRounding: initLoyaltyRounding,
+  });
+
+  // Reset dirty + clear secret-input fields after a successful save.
+  useEffect(() => {
+    if (actionData?.success) {
+      setIsDirty(false);
+      setAnthropicKey("");
+      setYotpoKey("");
+      setAftershipKey("");
+      setKlaviyoPrivateKey("");
+      setYotpoLoyaltyKey("");
+    }
+  }, [actionData]);
+
+  const discardChanges = () => {
+    const s = initialSnapshot.current;
+    setAnthropicKey("");
+    setModel(s.model);
+    setStrategy(s.strategy);
+    setFollowUps(s.followUps);
+    setFeedbackOn(s.feedbackOn);
+    setYotpoKey("");
+    setAftershipKey("");
+    setSupportUrl(s.supportUrl);
+    setSupportLabel(s.supportLabel);
+    setTrackingPageUrl(s.trackingPageUrl);
+    setReturnsPageUrl(s.returnsPageUrl);
+    setReferralPageUrl(s.referralPageUrl);
+    setCaching(s.caching);
+    setKlaviyoFormId(s.klaviyoFormId);
+    setKlaviyoCompanyId(s.klaviyoCompanyId);
+    setKlaviyoListId(s.klaviyoListId);
+    setVipMode(s.vipMode);
+    setShowLoginPill(s.showLoginPill);
+    setKlaviyoPrivateKey("");
+    setYotpoLoyaltyKey("");
+    setYotpoLoyaltyGuidState(s.yotpoLoyaltyGuid);
+    setLoyaltyDisplay(s.loyaltyDisplay);
+    setLoyaltyPointsPerDollar(s.loyaltyPointsPerDollar);
+    setLoyaltyRounding(s.loyaltyRounding);
+    setDailyCapEnabled(s.dailyCapEnabled);
+    setDailyCapMessages(s.dailyCapMessages);
+    setIsDirty(false);
+  };
+
+  const submitForm = () => {
+    if (formRef.current) formRef.current.requestSubmit();
+  };
+
   return (
     <Page>
       <TitleBar title="Settings" />
-      <Form method="post">
+      <Form method="post" ref={formRef} onChange={() => setIsDirty(true)}>
         <BlockStack gap="500">
           <div style={{ height: "4px", borderRadius: "2px", background: "linear-gradient(90deg, #2D6B4F, #3a8a66, transparent)" }} />
           {actionData?.success && (
@@ -377,31 +457,45 @@ export default function ApiKeys() {
                 <BlockStack gap="400">
                   <Select
                     label="Primary model"
-                    options={MODEL_OPTIONS}
+                    options={MODEL_OPTIONS.filter(
+                      (o) => o.value !== "claude-opus-4-20250514" || plan.features?.advancedModel,
+                    )}
                     value={model}
                     onChange={setModel}
-                    helpText="Used for product questions, first messages, and complex queries."
+                    helpText={
+                      plan.features?.advancedModel
+                        ? "Used for product questions, first messages, and complex queries."
+                        : "Used for product questions, first messages, and complex queries. The Advanced model is available on the Enterprise plan."
+                    }
                   />
 
                   <Divider />
 
-                  <Select
-                    label="Routing strategy"
-                    options={STRATEGY_OPTIONS}
-                    value={strategy}
-                    onChange={setStrategy}
-                    helpText={STRATEGY_HELP[strategy]}
-                  />
+                  <PlanGate
+                    plan={plan}
+                    feature="smartRouting"
+                    summary="Smart routing automatically swaps in the Fast model for simple follow-ups like 'thanks' or 'ok' — typically 60% cheaper without quality loss."
+                  >
+                    <BlockStack gap="400">
+                      <Select
+                        label="Routing strategy"
+                        options={STRATEGY_OPTIONS}
+                        value={strategy}
+                        onChange={setStrategy}
+                        helpText={STRATEGY_HELP[strategy]}
+                      />
 
-                  {strategy === "smart" && (
-                    <Banner tone="info">
-                      <Text as="p" variant="bodySm">
-                        <strong>How smart routing works:</strong> When a customer sends a simple follow-up
-                        like "thanks", "ok", or "bye", SEoS Assistant uses the Fast model (up to 3x cheaper).
-                        Product questions, first messages, and detailed queries always use your primary model.
-                      </Text>
-                    </Banner>
-                  )}
+                      {strategy === "smart" && (
+                        <Banner tone="info">
+                          <Text as="p" variant="bodySm">
+                            <strong>How smart routing works:</strong> When a customer sends a simple follow-up
+                            like "thanks", "ok", or "bye", SEoS Assistant uses the Fast model (up to 3x cheaper).
+                            Product questions, first messages, and detailed queries always use your primary model.
+                          </Text>
+                        </Banner>
+                      )}
+                    </BlockStack>
+                  </PlanGate>
                 </BlockStack>
               </Card>
             </Layout.AnnotatedSection>
@@ -469,12 +563,18 @@ export default function ApiKeys() {
                     helpText="Shows thumbs up/down on product responses. Negative feedback appears in Analytics with hashed user data."
                   />
                   <Divider />
-                  <Checkbox
-                    label="Prompt caching"
-                    checked={caching}
-                    onChange={setCaching}
-                    helpText="Caches the system prompt across requests so repeat messages cost up to 90% less on input tokens. Recommended for stores with 1,000+ monthly conversations."
-                  />
+                  <PlanGate
+                    plan={plan}
+                    feature="promptCaching"
+                    summary="Prompt caching reduces input token cost by up to 90% on repeat messages. Recommended for stores with 1,000+ monthly conversations."
+                  >
+                    <Checkbox
+                      label="Prompt caching"
+                      checked={caching}
+                      onChange={setCaching}
+                      helpText="Caches the system prompt across requests so repeat messages cost up to 90% less on input tokens. Recommended for stores with 1,000+ monthly conversations."
+                    />
+                  </PlanGate>
                 </BlockStack>
               </Card>
             </Layout.AnnotatedSection>
@@ -534,32 +634,43 @@ export default function ApiKeys() {
               description="Connect third-party services for richer AI context — product reviews, sizing data, and return insights. Each service is independent; connect only what you use."
             >
               <BlockStack gap="400">
-                <Card>
-                  <BlockStack gap="300">
-                    <InlineStack align="space-between" blockAlign="center">
-                      <InlineStack gap="200" blockAlign="center">
-                        <Text as="h3" variant="headingMd">Yotpo Reviews</Text>
+                <PlanGate
+                  plan={plan}
+                  feature="yotpoIntegration"
+                  summary="Pull review data and customer sizing feedback into the chat — powers fit summaries, star ratings, and 'what do reviewers say' answers."
+                >
+                  <Card>
+                    <BlockStack gap="300">
+                      <InlineStack align="space-between" blockAlign="center">
+                        <InlineStack gap="200" blockAlign="center">
+                          <Text as="h3" variant="headingMd">Yotpo Reviews</Text>
+                        </InlineStack>
+                        <Badge tone={hasYotpoKey ? "success" : undefined}>
+                          {hasYotpoKey ? "Connected" : "Not set"}
+                        </Badge>
                       </InlineStack>
-                      <Badge tone={hasYotpoKey ? "success" : undefined}>
-                        {hasYotpoKey ? "Connected" : "Not set"}
-                      </Badge>
-                    </InlineStack>
-                    <Text as="p" tone="subdued" variant="bodySm">
-                      Product review data — fit summaries, star ratings, sample reviews. Powers sizing recommendations and "what do reviewers say" answers.
-                    </Text>
-                    <TextField
-                      label="Yotpo API key"
-                      labelHidden
-                      type="password"
-                      value={yotpoKey}
-                      onChange={setYotpoKey}
-                      placeholder={hasYotpoKey ? "••••••••••••••••" : "Paste key to enable"}
-                      autoComplete="off"
-                      helpText="Lets the AI reference product reviews and customer sizing feedback."
-                    />
-                  </BlockStack>
-                </Card>
+                      <Text as="p" tone="subdued" variant="bodySm">
+                        Product review data — fit summaries, star ratings, sample reviews. Powers sizing recommendations and "what do reviewers say" answers.
+                      </Text>
+                      <TextField
+                        label="Yotpo API key"
+                        labelHidden
+                        type="password"
+                        value={yotpoKey}
+                        onChange={setYotpoKey}
+                        placeholder={hasYotpoKey ? "••••••••••••••••" : "Paste key to enable"}
+                        autoComplete="off"
+                        helpText="Lets the AI reference product reviews and customer sizing feedback."
+                      />
+                    </BlockStack>
+                  </Card>
+                </PlanGate>
 
+                <PlanGate
+                  plan={plan}
+                  feature="yotpoIntegration"
+                  summary="Show points, VIP tier, and personal referral links to logged-in customers via the chat."
+                >
                 <Card>
                   <BlockStack gap="300">
                     <InlineStack align="space-between" blockAlign="center">
@@ -624,31 +735,43 @@ export default function ApiKeys() {
                     )}
                   </BlockStack>
                 </Card>
+                </PlanGate>
 
-                <Card>
-                  <BlockStack gap="300">
-                    <InlineStack align="space-between" blockAlign="center">
-                      <Text as="h3" variant="headingMd">Aftership</Text>
-                      <Badge tone={hasAftershipKey ? "success" : undefined}>
-                        {hasAftershipKey ? "Connected" : "Not set"}
-                      </Badge>
-                    </InlineStack>
-                    <Text as="p" tone="subdued" variant="bodySm">
-                      Return-reason data for sizing intelligence — if customers return products as "too small", the AI picks that up.
-                    </Text>
-                    <TextField
-                      label="Aftership API key"
-                      labelHidden
-                      type="password"
-                      value={aftershipKey}
-                      onChange={setAftershipKey}
-                      placeholder={hasAftershipKey ? "••••••••••••••••" : "Paste key to enable"}
-                      autoComplete="off"
-                      helpText="Enables fit intelligence and sizing guidance from return-reason data."
-                    />
-                  </BlockStack>
-                </Card>
+                <PlanGate
+                  plan={plan}
+                  feature="aftershipIntegration"
+                  summary="Lets the AI cite return-reason data so it can warn customers when a product runs small or large based on real return rates."
+                >
+                  <Card>
+                    <BlockStack gap="300">
+                      <InlineStack align="space-between" blockAlign="center">
+                        <Text as="h3" variant="headingMd">Aftership</Text>
+                        <Badge tone={hasAftershipKey ? "success" : undefined}>
+                          {hasAftershipKey ? "Connected" : "Not set"}
+                        </Badge>
+                      </InlineStack>
+                      <Text as="p" tone="subdued" variant="bodySm">
+                        Return-reason data for sizing intelligence — if customers return products as "too small", the AI picks that up.
+                      </Text>
+                      <TextField
+                        label="Aftership API key"
+                        labelHidden
+                        type="password"
+                        value={aftershipKey}
+                        onChange={setAftershipKey}
+                        placeholder={hasAftershipKey ? "••••••••••••••••" : "Paste key to enable"}
+                        autoComplete="off"
+                        helpText="Enables fit intelligence and sizing guidance from return-reason data."
+                      />
+                    </BlockStack>
+                  </Card>
+                </PlanGate>
 
+                <PlanGate
+                  plan={plan}
+                  feature="klaviyoIntegration"
+                  summary="Show a newsletter signup form in the chat and (optionally) enrich logged-in customers with Klaviyo segment data like VIP or Winback."
+                >
                 <Card>
                   <BlockStack gap="300">
                     <InlineStack align="space-between" blockAlign="center">
@@ -687,6 +810,7 @@ export default function ApiKeys() {
                     />
                   </BlockStack>
                 </Card>
+                </PlanGate>
               </BlockStack>
             </Layout.AnnotatedSection>
 
@@ -694,6 +818,11 @@ export default function ApiKeys() {
               title="VIP customer experience"
               description="Personalize the chat for logged-in customers using their order history and profile."
             >
+              <PlanGate
+                plan={plan}
+                feature="vipMode"
+                summary="VIP mode greets logged-in customers by name, references their past orders for size recommendations, and unlocks Yotpo/Klaviyo enrichment in the chat."
+              >
               <Card>
                 <BlockStack gap="400">
                   <Checkbox
@@ -710,6 +839,7 @@ export default function ApiKeys() {
                   />
                 </BlockStack>
               </Card>
+              </PlanGate>
             </Layout.AnnotatedSection>
 
             <Layout.AnnotatedSection
@@ -756,6 +886,21 @@ export default function ApiKeys() {
           </Box>
         </BlockStack>
       </Form>
+
+      {/* Contextual Save Bar — App Bridge ui-save-bar. Appears at the top of
+          the embedded admin whenever the form is dirty. The native <button>
+          children inside SaveBar use App Bridge custom attributes (variant,
+          loading) and are intentionally not Polaris components. */}
+      <SaveBar id="seos-settings-save-bar" open={isDirty}>
+        <button
+          variant="primary"
+          loading={saving ? "" : undefined}
+          onClick={submitForm}
+        >
+          Save changes
+        </button>
+        <button onClick={discardChanges}>Discard</button>
+      </SaveBar>
     </Page>
   );
 }

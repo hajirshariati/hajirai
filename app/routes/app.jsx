@@ -61,7 +61,7 @@ export default function App() {
           <Link to="/app" rel="home">SEoS Assistant</Link>
           <Link to="/app/rules-knowledge">Rules & Knowledge</Link>
           <Link to="/app/analytics">Analytics</Link>
-          <Link to="/app/plans">Plans</Link>
+          <Link to="/app/plans">Plans &amp; Support</Link>
           <Link to="/app/api-keys">Settings</Link>
         </NavMenu>
         <Outlet />
