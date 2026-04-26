@@ -1,18 +1,18 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { redirect, data } from "react-router";
 import { useLoaderData, useActionData, Form, useNavigation } from "react-router";
 import {
   Page, Layout, Card, Text, Button, Badge, BlockStack, InlineStack, Banner,
-  ProgressBar, Box, TextField, Icon,
+  ProgressBar, Box, Icon,
 } from "@shopify/polaris";
-import { CheckCircleIcon, EmailIcon, MinusIcon } from "@shopify/polaris-icons";
+import { CheckCircleIcon, EmailIcon, MinusIcon, ClipboardIcon } from "@shopify/polaris-icons";
 import { TitleBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import {
   getShopPlan, getConversationsThisMonth, createSubscription, setShopPlan,
   cancelSubscription, getActiveSubscription,
 } from "../lib/billing.server";
-import { PLANS, PLAN_ORDER, formatLimit } from "../lib/plans";
+import { PLANS, PLAN_ORDER, planAllows, formatLimit } from "../lib/plans";
 
 const SUPPORT_EMAIL = "hajiraiapp@gmail.com";
 
@@ -46,14 +46,18 @@ export const action = async ({ request }) => {
 const FEATURE_ROWS = [
   { label: "Conversations / month", get: (p) => formatLimit(p.conversationsPerMonth) },
   { label: "Knowledge files", get: (p) => formatLimit(p.knowledgeFiles) },
-  { label: "Analytics retention", get: (p) => `${p.analyticsRetentionDays} days` },
-  { label: "Smart model routing", get: (p) => p.smartRouting },
-  { label: "Advanced AI model", get: (p) => p.advancedModel },
-  { label: "Prompt caching", get: (p) => p.advancedModel },
-  { label: "Remove SEoS Assistant branding", get: (p) => p.allowBrandingRemoval },
-  { label: "Search rules & synonyms", get: (p) => p.id !== "free" },
-  { label: "Product enrichment (CSV)", get: (p) => p.id === "growth" || p.id === "pro" || p.id === "enterprise" },
-  { label: "White-label branding", get: (p) => p.id === "enterprise" },
+  { label: "Analytics history", get: (p) => `${p.analyticsRetentionDays} days` },
+  { label: "Smart model routing", get: (p) => planAllows(p, "smartRouting") },
+  { label: "Prompt caching", get: (p) => planAllows(p, "promptCaching") },
+  { label: "Advanced AI model", get: (p) => planAllows(p, "advancedModel") },
+  { label: "Search rules & synonyms", get: (p) => planAllows(p, "searchRules") },
+  { label: "Product enrichment (CSV)", get: (p) => planAllows(p, "productEnrichment") },
+  { label: "Fit predictor", get: (p) => planAllows(p, "fitPredictor") },
+  { label: "VIP mode (logged-in profiles)", get: (p) => planAllows(p, "vipMode") },
+  { label: "Klaviyo integration", get: (p) => planAllows(p, "klaviyoIntegration") },
+  { label: "Aftership integration", get: (p) => planAllows(p, "aftershipIntegration") },
+  { label: "Yotpo loyalty + reviews", get: (p) => planAllows(p, "yotpoIntegration") },
+  { label: "Remove SEoS Assistant branding", get: (p) => planAllows(p, "removeBranding") },
   { label: "Email support", get: () => true },
 ];
 
@@ -236,64 +240,95 @@ function ComparisonTable({ currentPlanId, submitting, pendingPlan, onSubmit }) {
 }
 
 function SupportBox({ shop }) {
-  const [subject, setSubject] = useState("");
-  const [message, setMessage] = useState("");
+  const [copied, setCopied] = useState(false);
 
-  const mailtoHref = useMemo(() => {
-    const s = subject.trim() || "Support request";
-    const bodyLines = [`Shop: ${shop}`, "", message.trim()].join("\n");
-    return `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(`[SEoS Assistant] ${s}`)}&body=${encodeURIComponent(bodyLines)}`;
-  }, [subject, message, shop]);
+  // mailto with a sensible default subject and the shop domain pre-filled in
+  // the body — when the merchant clicks "Send email" their default mail
+  // client (Outlook, Apple Mail, Gmail, etc.) opens with everything ready.
+  const mailtoHref =
+    `mailto:${SUPPORT_EMAIL}` +
+    `?subject=${encodeURIComponent("[SEoS Assistant] Support request")}` +
+    `&body=${encodeURIComponent(`Shop: ${shop}\n\n`)}`;
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(SUPPORT_EMAIL);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      /* clipboard blocked — silently ignore; the address is still on screen */
+    }
+  };
 
   return (
     <Card>
       <BlockStack gap="400">
-        <InlineStack gap="300" blockAlign="center" wrap={false}>
-          <div style={{
-            flexShrink: 0, width: 40, height: 40, borderRadius: 10,
-            background: "rgba(45,107,79,0.10)", display: "flex",
-            alignItems: "center", justifyContent: "center", color: "#2D6B4F",
-          }}>
-            <div style={{ width: 20, height: 20 }}><Icon source={EmailIcon} /></div>
+        <InlineStack gap="400" blockAlign="start" wrap={false}>
+          <div
+            style={{
+              flexShrink: 0,
+              width: 48,
+              height: 48,
+              borderRadius: 12,
+              background: "rgba(45,107,79,0.10)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#2D6B4F",
+            }}
+          >
+            <div style={{ width: 24, height: 24 }}>
+              <Icon source={EmailIcon} />
+            </div>
           </div>
-          <BlockStack gap="050">
-            <InlineStack gap="200" blockAlign="center">
-              <Text as="h2" variant="headingMd">Email support</Text>
+          <BlockStack gap="100">
+            <InlineStack gap="200" blockAlign="center" wrap>
+              <Text as="h2" variant="headingMd">
+                Need a hand?
+              </Text>
               <Badge tone="info">Replies within 1 business day</Badge>
             </InlineStack>
-            <Text as="p" tone="subdued" variant="bodySm">
-              Question, bug, or feature request? We read every message.
+            <Text as="p" tone="subdued" variant="bodyMd">
+              Email us with any questions, bugs, or feature requests. A real person reads every message.
             </Text>
           </BlockStack>
         </InlineStack>
-        <TextField
-          label="Subject"
-          value={subject}
-          onChange={setSubject}
-          placeholder="e.g. Billing question, product sync issue, feature request"
-          autoComplete="off"
-        />
-        <TextField
-          label="Message"
-          value={message}
-          onChange={setMessage}
-          multiline={6}
-          placeholder="Tell us what's happening — include any error messages or screenshots if helpful."
-          autoComplete="off"
-        />
-        <InlineStack align="space-between" blockAlign="center" wrap gap="200">
-          <Text as="p" tone="subdued" variant="bodySm">
-            Sends to <strong>{SUPPORT_EMAIL}</strong> from your default mail app.
-          </Text>
-          <Button
-            variant="primary"
-            icon={EmailIcon}
-            url={mailtoHref}
-            disabled={message.trim().length === 0}
-          >
-            Send email
-          </Button>
-        </InlineStack>
+
+        <Box
+          padding="400"
+          background="bg-surface-secondary"
+          borderRadius="200"
+          borderWidth="025"
+          borderColor="border"
+        >
+          <InlineStack align="space-between" blockAlign="center" gap="300" wrap>
+            <BlockStack gap="050">
+              <Text as="span" tone="subdued" variant="bodySm">
+                Support email
+              </Text>
+              <Text as="p" variant="headingMd" fontWeight="semibold">
+                {SUPPORT_EMAIL}
+              </Text>
+            </BlockStack>
+            <InlineStack gap="200" wrap={false}>
+              <Button icon={ClipboardIcon} onClick={handleCopy} accessibilityLabel="Copy support email">
+                {copied ? "Copied" : "Copy"}
+              </Button>
+              <Button
+                variant="primary"
+                icon={EmailIcon}
+                url={mailtoHref}
+                external
+              >
+                Send email
+              </Button>
+            </InlineStack>
+          </InlineStack>
+        </Box>
+
+        <Text as="p" tone="subdued" variant="bodySm">
+          Send email opens your default mail app with the shop domain pre-filled.
+        </Text>
       </BlockStack>
     </Card>
   );

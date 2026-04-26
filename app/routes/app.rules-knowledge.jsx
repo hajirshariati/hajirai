@@ -55,6 +55,8 @@ import {
   deleteEnrichmentsBySourceFile,
   countEnrichmentsBySourceFile,
 } from "../models/ProductEnrichment.server";
+import { getShopPlan } from "../lib/billing.server";
+import { PlanGate } from "../components/PlanGate";
 
 function isCsv(fileName) {
   return typeof fileName === "string" && fileName.toLowerCase().endsWith(".csv");
@@ -71,12 +73,13 @@ function safeParse(raw, fallback) {
 
 export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
-  const [state, count, mappings, config, files] = await Promise.all([
+  const [state, count, mappings, config, files, plan] = await Promise.all([
     getCatalogSyncState(session.shop),
     getProductCount(session.shop),
     getAttributeMappings(session.shop),
     getShopConfig(session.shop),
     getKnowledgeFiles(session.shop),
+    getShopPlan(session.shop),
   ]);
   const enrichedCounts = await Promise.all(files.map((f) => countEnrichmentsBySourceFile(f.id)));
   const filesWithCounts = files.map((f, i) => ({ ...f, enrichedSkus: enrichedCounts[i] }));
@@ -102,6 +105,7 @@ export const loader = async ({ request }) => {
     })(),
     deduplicateColors: config.deduplicateColors,
     files: filesWithCounts,
+    plan: { id: plan.id, name: plan.name, features: plan.features, knowledgeFiles: plan.knowledgeFiles },
   };
 };
 
@@ -1417,9 +1421,17 @@ export default function RulesKnowledge() {
             title="How the AI searches your catalog"
             description="Hard filters, synonym expansions, and what counts as 'similar' for recommendations."
           />
-          <SearchRulesCard initial={data.categoryExclusions} />
-          <QuerySynonymsCard initial={data.querySynonyms} />
-          <SimilarMatchAttributesCard initial={data.similarMatchAttributes} />
+          <PlanGate
+            plan={data.plan}
+            feature="searchRules"
+            summary="Custom search rules, query synonyms, and similar-match attributes let you tune how the AI matches customer questions to your catalog."
+          >
+            <BlockStack gap="400">
+              <SearchRulesCard initial={data.categoryExclusions} />
+              <QuerySynonymsCard initial={data.querySynonyms} />
+              <SimilarMatchAttributesCard initial={data.similarMatchAttributes} />
+            </BlockStack>
+          </PlanGate>
         </BlockStack>
 
         <BlockStack gap="400">
@@ -1428,8 +1440,20 @@ export default function RulesKnowledge() {
             title="What the customer sees below the chat"
             description="Shop-all buttons beneath product cards, and the visual size-fit recommendation."
           />
-          <CollectionLinksCard initial={data.collectionLinks} />
-          <FitPredictorCard enabled={data.fitPredictorEnabled} config={data.fitPredictorConfig} />
+          <PlanGate
+            plan={data.plan}
+            feature="searchRules"
+            summary="Add merchant-defined 'shop all' buttons (collection links) under product recommendations."
+          >
+            <CollectionLinksCard initial={data.collectionLinks} />
+          </PlanGate>
+          <PlanGate
+            plan={data.plan}
+            feature="fitPredictor"
+            summary="Visual fit-confidence card with size recommendation, aggregating reviews, return reasons, customer order history, and any merchant-configured external fit API."
+          >
+            <FitPredictorCard enabled={data.fitPredictorEnabled} config={data.fitPredictorConfig} />
+          </PlanGate>
         </BlockStack>
 
         <BlockStack gap="400">
