@@ -1,7 +1,12 @@
 import prisma from "../db.server";
 import { PLANS, getPlan } from "./plans";
 
-const IS_TEST_CHARGE = process.env.SHOPIFY_BILLING_TEST !== "false";
+// Production-safe default: real charges. Set SHOPIFY_BILLING_TEST=true on
+// dev / staging to opt into Shopify's test-mode subscriptions (no real money
+// changes hands, useful for partner test charges and reviewer test installs).
+// Until this commit the default was inverted (test mode on unless explicitly
+// disabled), which would have meant production merchants were never charged.
+const IS_TEST_CHARGE = process.env.SHOPIFY_BILLING_TEST === "true";
 const APP_URL = process.env.SHOPIFY_APP_URL || process.env.APP_URL || "";
 
 const COMP_PRO_SHOPS = new Set(
