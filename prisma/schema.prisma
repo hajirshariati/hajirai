@@ -118,6 +118,12 @@ model ShopConfig {
   dailyCapEnabled    Boolean  @default(false)
   dailyCapMessages   Int      @default(200)
 
+  // Updated on each /widget-config call from the storefront, throttled to
+  // once every 5 minutes. Used by the home-page setup checklist to detect
+  // whether the chat widget app embed is currently active in the merchant's
+  // theme. Null means the widget has never been seen.
+  lastWidgetSeenAt   DateTime?
+
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 }
