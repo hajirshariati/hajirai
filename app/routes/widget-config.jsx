@@ -1,5 +1,8 @@
 import { authenticate } from "../shopify.server";
 import { getShopConfig } from "../models/ShopConfig.server";
+import prisma from "../db.server";
+
+const FIVE_MIN_MS = 5 * 60 * 1000;
 
 // Storefront chat widget reads runtime config from this endpoint via the
 // Shopify app proxy. authenticate.public.appProxy verifies the proxy HMAC,
@@ -14,6 +17,25 @@ export const loader = async ({ request }) => {
     }
 
     const config = await getShopConfig(session.shop);
+
+    // Touch the lastWidgetSeenAt timestamp so the home page can mark the
+    // "Enable the chat widget" setup step as done. Throttled to once every
+    // five minutes so a high-traffic storefront doesn't write thousands of
+    // updates per day for the same shop. Errors are swallowed because the
+    // storefront should never fail to load just because a metric write
+    // missed.
+    const last = config.lastWidgetSeenAt
+      ? new Date(config.lastWidgetSeenAt).getTime()
+      : 0;
+    if (Date.now() - last > FIVE_MIN_MS) {
+      prisma.shopConfig
+        .update({
+          where: { shop: session.shop },
+          data: { lastWidgetSeenAt: new Date() },
+        })
+        .catch(() => {});
+    }
+
     let hideOnUrls = [];
     try {
       hideOnUrls = JSON.parse(config.hideOnUrls || "[]");
