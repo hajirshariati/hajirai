@@ -42,11 +42,22 @@ export const loader = async ({ request }) => {
   const currentMonth = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}`;
   const rateLimitHits = config.rateLimitHitsMonth === currentMonth ? (config.rateLimitHits || 0) : 0;
 
+  // The chat widget pings /widget-config on every storefront page load when
+  // the app embed is enabled. If we've heard from it in the last 7 days, the
+  // embed is currently active in the merchant's theme. 7 days tolerates a
+  // store with very low traffic without flipping back to "undone" the moment
+  // a quiet weekend passes.
+  const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
+  const widgetEnabled =
+    Boolean(config.lastWidgetSeenAt) &&
+    Date.now() - new Date(config.lastWidgetSeenAt).getTime() < SEVEN_DAYS;
+
   return {
     hasApiKey: config.anthropicApiKey !== "",
     fileCount: files.length,
     shop: session.shop,
     themeEditorUrl: `https://${session.shop}/admin/themes/current/editor?context=apps`,
+    widgetEnabled,
     productsCount: syncState.productsCount || 0,
     enrichmentCount,
     totalCost: usage.totalCost,
@@ -168,7 +179,7 @@ function MetricTile({ label, value, sublabel }) {
 
 export default function Home() {
   const {
-    hasApiKey, fileCount, shop, themeEditorUrl,
+    hasApiKey, fileCount, shop, themeEditorUrl, widgetEnabled,
     productsCount, enrichmentCount, totalCost, totalMessages, avgCostPerMessage,
     feedbackTotal, satisfactionRate, modelStrategy, rateLimitHits,
   } = useLoaderData();
@@ -330,11 +341,15 @@ export default function Home() {
               actionUrl="/app/api-keys"
             />
             <ChecklistItem
-              done={false}
+              done={widgetEnabled}
               number="2"
               title="Enable the chat widget"
-              description="Turn on the SEoS Assistant chat block in your active Shopify theme so customers see it on your storefront."
-              actionLabel="Open theme editor"
+              description={
+                widgetEnabled
+                  ? "Your storefront is loading the chat widget. Use the theme editor to adjust appearance and content."
+                  : "Turn on the SEoS Assistant chat block in your active Shopify theme so customers see it on your storefront."
+              }
+              actionLabel={widgetEnabled ? "Customize" : "Open theme editor"}
               actionUrl={themeEditorUrl}
               external
             />
