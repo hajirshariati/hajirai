@@ -474,7 +474,7 @@ export default function ApiKeys() {
                   <PlanGate
                     plan={plan}
                     feature="smartRouting"
-                    summary="Smart routing automatically swaps in the Fast model for simple follow-ups like 'thanks' or 'ok' — typically 60% cheaper without quality loss."
+                    summary="Smart routing automatically swaps in the Fast model for simple follow-ups like 'thanks' or 'ok'. Lower per-message cost on those follow-ups, no impact on product questions."
                   >
                     <BlockStack gap="400">
                       <Select
@@ -489,7 +489,7 @@ export default function ApiKeys() {
                         <Banner tone="info">
                           <Text as="p" variant="bodySm">
                             <strong>How smart routing works:</strong> When a customer sends a simple follow-up
-                            like "thanks", "ok", or "bye", SEoS Assistant uses the Fast model (up to 3x cheaper).
+                            like "thanks", "ok", or "bye", SEoS Assistant uses the Fast model.
                             Product questions, first messages, and detailed queries always use your primary model.
                           </Text>
                         </Banner>
@@ -566,13 +566,13 @@ export default function ApiKeys() {
                   <PlanGate
                     plan={plan}
                     feature="promptCaching"
-                    summary="Prompt caching reduces input token cost by up to 90% on repeat messages. Recommended for stores with 1,000+ monthly conversations."
+                    summary="Prompt caching lowers input token cost on repeat messages by reusing the cached system prompt. Recommended for stores with 1,000+ monthly conversations."
                   >
                     <Checkbox
                       label="Prompt caching"
                       checked={caching}
                       onChange={setCaching}
-                      helpText="Caches the system prompt across requests so repeat messages cost up to 90% less on input tokens. Recommended for stores with 1,000+ monthly conversations."
+                      helpText="Caches the system prompt across requests so repeat messages reuse it instead of re-sending it each turn. Recommended for stores with 1,000+ monthly conversations."
                     />
                   </PlanGate>
                 </BlockStack>
