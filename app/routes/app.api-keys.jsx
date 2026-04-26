@@ -1,5 +1,5 @@
 import { useLoaderData, useActionData, useNavigation, Form, useFetcher } from "react-router";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   Page,
   Layout,
@@ -19,7 +19,7 @@ import {
   Tag,
 } from "@shopify/polaris";
 import { CheckCircleIcon } from "@shopify/polaris-icons";
-import { TitleBar } from "@shopify/app-bridge-react";
+import { TitleBar, SaveBar } from "@shopify/app-bridge-react";
 import { authenticate } from "../shopify.server";
 import { getShopConfig, updateShopConfig } from "../models/ShopConfig.server";
 import { getShopPlan } from "../lib/billing.server";
@@ -319,10 +319,86 @@ export default function ApiKeys() {
   const [loyaltyPointsPerDollar, setLoyaltyPointsPerDollar] = useState(String(initLoyaltyPointsPerDollar));
   const [loyaltyRounding, setLoyaltyRounding] = useState(initLoyaltyRounding);
 
+  // Contextual Save Bar plumbing — BFS 4.1.5. Track dirty state via the
+  // form's onChange (Polaris components bubble change events to the parent
+  // form), reset on successful save, and let "Discard" restore the snapshot.
+  const formRef = useRef(null);
+  const [isDirty, setIsDirty] = useState(false);
+  const initialSnapshot = useRef({
+    model: anthropicModel || "claude-sonnet-4-6",
+    strategy: modelStrategy,
+    followUps: initFollowUps,
+    feedbackOn: initFeedback,
+    supportUrl: initSupportUrl,
+    supportLabel: initSupportLabel,
+    trackingPageUrl: initTrackingPageUrl,
+    returnsPageUrl: initReturnsPageUrl,
+    referralPageUrl: initReferralPageUrl,
+    caching: initCaching,
+    klaviyoFormId: initKlaviyoFormId,
+    klaviyoCompanyId: initKlaviyoCompanyId,
+    klaviyoListId: initKlaviyoListId,
+    vipMode: initVipMode,
+    showLoginPill: initShowLoginPill,
+    dailyCapEnabled: initDailyCapEnabled,
+    dailyCapMessages: String(initDailyCapMessages ?? 200),
+    yotpoLoyaltyGuid: initYotpoLoyaltyGuid,
+    loyaltyDisplay: initLoyaltyDisplay,
+    loyaltyPointsPerDollar: String(initLoyaltyPointsPerDollar),
+    loyaltyRounding: initLoyaltyRounding,
+  });
+
+  // Reset dirty + clear secret-input fields after a successful save.
+  useEffect(() => {
+    if (actionData?.success) {
+      setIsDirty(false);
+      setAnthropicKey("");
+      setYotpoKey("");
+      setAftershipKey("");
+      setKlaviyoPrivateKey("");
+      setYotpoLoyaltyKey("");
+    }
+  }, [actionData]);
+
+  const discardChanges = () => {
+    const s = initialSnapshot.current;
+    setAnthropicKey("");
+    setModel(s.model);
+    setStrategy(s.strategy);
+    setFollowUps(s.followUps);
+    setFeedbackOn(s.feedbackOn);
+    setYotpoKey("");
+    setAftershipKey("");
+    setSupportUrl(s.supportUrl);
+    setSupportLabel(s.supportLabel);
+    setTrackingPageUrl(s.trackingPageUrl);
+    setReturnsPageUrl(s.returnsPageUrl);
+    setReferralPageUrl(s.referralPageUrl);
+    setCaching(s.caching);
+    setKlaviyoFormId(s.klaviyoFormId);
+    setKlaviyoCompanyId(s.klaviyoCompanyId);
+    setKlaviyoListId(s.klaviyoListId);
+    setVipMode(s.vipMode);
+    setShowLoginPill(s.showLoginPill);
+    setKlaviyoPrivateKey("");
+    setYotpoLoyaltyKey("");
+    setYotpoLoyaltyGuidState(s.yotpoLoyaltyGuid);
+    setLoyaltyDisplay(s.loyaltyDisplay);
+    setLoyaltyPointsPerDollar(s.loyaltyPointsPerDollar);
+    setLoyaltyRounding(s.loyaltyRounding);
+    setDailyCapEnabled(s.dailyCapEnabled);
+    setDailyCapMessages(s.dailyCapMessages);
+    setIsDirty(false);
+  };
+
+  const submitForm = () => {
+    if (formRef.current) formRef.current.requestSubmit();
+  };
+
   return (
     <Page>
       <TitleBar title="Settings" />
-      <Form method="post">
+      <Form method="post" ref={formRef} onChange={() => setIsDirty(true)}>
         <BlockStack gap="500">
           <div style={{ height: "4px", borderRadius: "2px", background: "linear-gradient(90deg, #2D6B4F, #3a8a66, transparent)" }} />
           {actionData?.success && (
@@ -810,6 +886,21 @@ export default function ApiKeys() {
           </Box>
         </BlockStack>
       </Form>
+
+      {/* Contextual Save Bar — App Bridge ui-save-bar. Appears at the top of
+          the embedded admin whenever the form is dirty. The native <button>
+          children inside SaveBar use App Bridge custom attributes (variant,
+          loading) and are intentionally not Polaris components. */}
+      <SaveBar id="seos-settings-save-bar" open={isDirty}>
+        <button
+          variant="primary"
+          loading={saving ? "" : undefined}
+          onClick={submitForm}
+        >
+          Save changes
+        </button>
+        <button onClick={discardChanges}>Discard</button>
+      </SaveBar>
     </Page>
   );
 }
