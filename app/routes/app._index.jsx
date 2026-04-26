@@ -20,16 +20,18 @@ import { getShopConfig, getKnowledgeFiles, updateShopConfig } from "../models/Sh
 import { getCatalogSyncState, syncCatalogAsync } from "../models/Product.server";
 import { countEnrichmentsByShop } from "../models/ProductEnrichment.server";
 import { getUsageSummary } from "../models/ChatUsage.server";
+import { getFeedbackSummary } from "../models/ChatFeedback.server";
 import seosLogo from "../assets/SEoS.png";
 
 export const loader = async ({ request }) => {
   const { admin, session } = await authenticate.admin(request);
-  const [config, files, syncState, enrichmentCount, usage] = await Promise.all([
+  const [config, files, syncState, enrichmentCount, usage, feedback] = await Promise.all([
     getShopConfig(session.shop),
     getKnowledgeFiles(session.shop),
     getCatalogSyncState(session.shop),
     countEnrichmentsByShop(session.shop),
     getUsageSummary(session.shop, 30),
+    getFeedbackSummary(session.shop, 30),
   ]);
 
   if (!syncState.lastSyncedAt && syncState.status !== "running") {
@@ -49,6 +51,9 @@ export const loader = async ({ request }) => {
     enrichmentCount,
     totalCost: usage.totalCost,
     totalMessages: usage.totalMessages,
+    avgCostPerMessage: usage.avgCostPerMessage,
+    feedbackTotal: feedback.total,
+    satisfactionRate: feedback.satisfactionRate,
     modelStrategy: config.modelStrategy || "smart",
     rateLimitHits,
   };
@@ -142,11 +147,30 @@ function FeatureCard({ icon, title, description, stat }) {
   );
 }
 
+function formatCost(n) {
+  if (!n) return "$0.00";
+  if (n < 0.01) return "<$0.01";
+  if (n < 1000) return `$${n.toFixed(2)}`;
+  return `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+}
+
+function MetricTile({ label, value, sublabel }) {
+  return (
+    <Card>
+      <BlockStack gap="100">
+        <Text as="p" tone="subdued" variant="bodySm">{label}</Text>
+        <Text as="p" variant="heading2xl">{value}</Text>
+        {sublabel ? <Text as="p" tone="subdued" variant="bodySm">{sublabel}</Text> : null}
+      </BlockStack>
+    </Card>
+  );
+}
+
 export default function Home() {
   const {
     hasApiKey, fileCount, shop, themeEditorUrl,
-    productsCount, enrichmentCount, totalCost, totalMessages, modelStrategy,
-    rateLimitHits,
+    productsCount, enrichmentCount, totalCost, totalMessages, avgCostPerMessage,
+    feedbackTotal, satisfactionRate, modelStrategy, rateLimitHits,
   } = useLoaderData();
 
   const rateFetcher = useFetcher();
@@ -220,6 +244,37 @@ export default function Home() {
             </Text>
           </Banner>
         )}
+
+        {hasApiKey ? (
+          <BlockStack gap="300">
+            <InlineStack align="space-between" blockAlign="center" wrap>
+              <Text as="h2" variant="headingMd">Last 30 days</Text>
+              <Button url="/app/analytics" variant="plain">View detailed analytics</Button>
+            </InlineStack>
+            <InlineGrid columns={{ xs: 2, md: 4 }} gap="400">
+              <MetricTile
+                label="Conversations"
+                value={String(totalMessages)}
+                sublabel={totalMessages > 0 ? `Avg ${formatCost(avgCostPerMessage)} / msg` : "Awaiting first chat"}
+              />
+              <MetricTile
+                label="Satisfaction"
+                value={feedbackTotal > 0 ? `${satisfactionRate}%` : "—"}
+                sublabel={feedbackTotal > 0 ? `${feedbackTotal} ratings` : "Awaiting feedback"}
+              />
+              <MetricTile
+                label="AI cost"
+                value={formatCost(totalCost)}
+                sublabel="Anthropic API spend"
+              />
+              <MetricTile
+                label="Rate-limit hits"
+                value={String(rateLimitHits)}
+                sublabel={rateLimitHits > 0 ? "Increase your Anthropic tier" : "Within limits"}
+              />
+            </InlineGrid>
+          </BlockStack>
+        ) : null}
 
         <BlockStack gap="300">
           <Text as="h2" variant="headingMd">What SEoS Assistant does for you</Text>
