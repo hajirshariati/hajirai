@@ -1,5 +1,4 @@
-import { redirect, Form, useLoaderData } from "react-router";
-import { login } from "../../shopify.server";
+import { redirect } from "react-router";
 import styles from "./styles.module.css";
 
 export const meta = () => [
@@ -14,18 +13,20 @@ export const meta = () => [
 export const loader = async ({ request }) => {
   const url = new URL(request.url);
 
-  // Anyone arriving here with a ?shop= param is mid-install; Shopify expects
-  // an immediate redirect into the embedded admin OAuth flow.
+  // Anyone arriving here with a ?shop= param is mid-install via the App Store
+  // or Shopify admin; redirect into the embedded admin OAuth flow.
   if (url.searchParams.get("shop")) {
     throw redirect(`/app?${url.searchParams.toString()}`);
   }
 
-  return { showForm: Boolean(login) };
+  return null;
 };
 
+// Public marketing landing. Intentionally has no shop-domain input — Shopify
+// requires installs to start from a Shopify-owned surface (App Store listing
+// or the Shopify Admin), so we don't accept a manually-typed myshopify.com
+// here.
 export default function Landing() {
-  const { showForm } = useLoaderData();
-
   return (
     <div className={styles.index}>
       <div className={styles.content}>
@@ -34,24 +35,17 @@ export default function Landing() {
           AI shopping assistant for Shopify stores. Search Engine on Steroids.
         </p>
 
-        {showForm && (
-          <Form className={styles.form} method="post" action="/auth/login">
-            <label className={styles.label}>
-              <span>Install on your store</span>
-              <input
-                className={styles.input}
-                type="text"
-                name="shop"
-                placeholder="your-store.myshopify.com"
-                autoComplete="off"
-              />
-              <span>Enter your myshopify.com domain to continue.</span>
-            </label>
-            <button className={styles.button} type="submit">
-              Install
-            </button>
-          </Form>
-        )}
+        <p className={styles.text}>
+          Install from the{" "}
+          <a
+            href="https://apps.shopify.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Shopify App Store
+          </a>{" "}
+          or directly from your Shopify admin.
+        </p>
 
         <ul className={styles.list}>
           <li>
