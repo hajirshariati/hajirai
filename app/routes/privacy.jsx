@@ -109,8 +109,6 @@ export default function PrivacyPolicy() {
         <p>
           <strong>Contact:</strong>{" "}
           <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>
-          <br />
-          <strong>Address:</strong> HajirAi · [your street address] · [city, region, postal code, country]
         </p>
 
         <h2>1. Data we collect</h2>
