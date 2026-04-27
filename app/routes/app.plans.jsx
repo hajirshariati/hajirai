@@ -61,6 +61,19 @@ const FEATURE_ROWS = [
   { label: "Email support", get: () => true },
 ];
 
+// Sort rows so the features supported by the most plans float to the top and
+// tier-exclusive features sink to the bottom. Visual effect: in any one plan's
+// column, all the green checks stack first, then the row of dashes/X marks
+// stacks at the bottom — easy to scan what a tier is missing.
+const SORTED_FEATURE_ROWS = [...FEATURE_ROWS].sort((a, b) => {
+  const score = (row) =>
+    PLAN_ORDER.reduce(
+      (acc, id) => acc + (row.get(PLANS[id]) !== false ? 1 : 0),
+      0,
+    );
+  return score(b) - score(a);
+});
+
 function Cell({ value }) {
   if (value === true) {
     return (
@@ -92,7 +105,7 @@ function ComparisonTable({ currentPlanId, submitting, pendingPlan, onSubmit }) {
                 const isCurrent = id === currentPlanId;
                 const isPopular = id === "growth";
                 return (
-                  <th key={id} className={`hj-cmp-colhead ${isPopular ? "hj-cmp-popular" : ""} ${isCurrent ? "hj-cmp-current" : ""}`}>
+                  <th key={id} className={`hj-cmp-colhead ${isCurrent ? "hj-cmp-popular" : ""}`}>
                     <div className="hj-cmp-ribbons">
                       {isPopular ? <span className="hj-cmp-ribbon hj-cmp-ribbon-popular">Most popular</span> : null}
                       {isCurrent ? <span className="hj-cmp-ribbon hj-cmp-ribbon-current">Current plan</span> : null}
@@ -112,11 +125,11 @@ function ComparisonTable({ currentPlanId, submitting, pendingPlan, onSubmit }) {
             </tr>
           </thead>
           <tbody>
-            {FEATURE_ROWS.map((row) => (
+            {SORTED_FEATURE_ROWS.map((row) => (
               <tr key={row.label}>
                 <td className="hj-cmp-rowlabel">{row.label}</td>
                 {PLAN_ORDER.map((id) => (
-                  <td key={id} className={id === "growth" ? "hj-cmp-popular" : ""}>
+                  <td key={id} className={id === currentPlanId ? "hj-cmp-popular" : ""}>
                     <Cell value={row.get(PLANS[id])} />
                   </td>
                 ))}
@@ -131,7 +144,7 @@ function ComparisonTable({ currentPlanId, submitting, pendingPlan, onSubmit }) {
                 const isCurrent = id === currentPlanId;
                 const isDowngrade = PLAN_ORDER.indexOf(id) < PLAN_ORDER.indexOf(currentPlanId);
                 return (
-                  <td key={id} className={id === "growth" ? "hj-cmp-popular" : ""}>
+                  <td key={id} className={id === currentPlanId ? "hj-cmp-popular" : ""}>
                     <Form method="post" onSubmit={() => onSubmit(id)}>
                       <input type="hidden" name="intent" value="select" />
                       <input type="hidden" name="planId" value={id} />
