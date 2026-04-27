@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { redirect, data } from "react-router";
+import { useState, useEffect } from "react";
+import { data } from "react-router";
 import { useLoaderData, useActionData, Form, useNavigation } from "react-router";
 import {
   Page, Layout, Card, Text, Button, Badge, BlockStack, InlineStack, Banner,
@@ -38,7 +38,11 @@ export const action = async ({ request }) => {
       return data({ ok: true, message: "Switched to Free plan." });
     }
     const { confirmationUrl } = await createSubscription({ admin, shop: session.shop, planId, host });
-    return redirect(confirmationUrl);
+    // Don't redirect server-side — Shopify's billing approval page sends
+    // X-Frame-Options: DENY, so loading it inside the embedded admin iframe
+    // gives merchants a "refused to connect" error. Return the URL instead
+    // and let the client open it at the top level via App Bridge.
+    return data({ ok: true, confirmationUrl });
   }
   return data({ ok: false, message: "Unknown action" }, { status: 400 });
 };
@@ -369,6 +373,18 @@ export default function PlansPage() {
   const submitting = navigation.state === "submitting";
   const [pendingPlan, setPendingPlan] = useState(null);
   const current = PLANS[currentPlanId] || PLANS.free;
+
+  // After the action returns a confirmationUrl, escape the iframe and
+  // navigate the top-level browser window to Shopify's billing approval
+  // page. window.top.location is the safe top-level redirect — App Bridge
+  // intercepts and handles cross-origin properly.
+  useEffect(() => {
+    const url = actionData?.confirmationUrl;
+    if (!url) return;
+    if (typeof window !== "undefined" && window.top) {
+      window.top.location.href = url;
+    }
+  }, [actionData?.confirmationUrl]);
   const limit = current.conversationsPerMonth;
   const usagePct = limit === Infinity ? 0 : Math.min(100, Math.round((used / limit) * 100));
   const usageTone = usagePct >= 90 ? "critical" : usagePct >= 75 ? "caution" : "primary";
