@@ -1,0 +1,143 @@
+// Aetrex internal onboarding content. Pure data, no React/JSX.
+
+export const PHASES = [
+  { id: "install",   name: "Install",   icon: "📥", description: "Open the app, connect the AI engine, sync the catalog." },
+  { id: "configure", name: "Configure", icon: "⚙️", description: "Map attributes, upload Aetrex knowledge files." },
+  { id: "integrate", name: "Integrate", icon: "🔌", description: "Wire in Yotpo, Aftership, Klaviyo, and the fit predictor." },
+  { id: "launch",    name: "Launch",    icon: "🚀", description: "Style the widget, add to theme, QA, and monitor." },
+];
+
+export const ATTRIBUTE_MAPPINGS = [
+  { source: "metafield: custom.attr_gender",    attribute: "gender",     note: "Used to scope all category buttons + searches by men's / women's" },
+  { source: "metafield: custom.attr_category",  attribute: "category",   note: "Sneakers, Sandals, Clogs, Loafers, Slippers, Oxfords, etc." },
+  { source: "metafield: custom.attr_arch_type", attribute: "arch_type",  note: "Low / Medium / High — feeds fit recommendations" },
+  { source: "metafield: custom.attr_fit_type",  attribute: "fit_type",   note: "Standard / Wide / Narrow — feeds size predictor" },
+  { source: "metafield: custom.attr_use_case",  attribute: "use_case",   note: "Walking / Running / Casual / Dress / Athletic" },
+  { source: "tag prefix: color:",               attribute: "color",      note: "Tags like 'color:black' map to the color attribute" },
+  { source: "tag prefix: occasion:",            attribute: "occasion",   note: "Optional — only on dress styles" },
+];
+
+export const STEPS = [
+  {
+    phase: "install",
+    icon: "📂",
+    title: "Confirm install + open the app",
+    short: "Apps → SEoS Assistant in the Aetrex Shopify admin.",
+    body: "Open the SEoS Assistant app from the Aetrex Shopify admin (Apps → SEoS Assistant). The home page is the setup checklist — every following step lives in the admin, no external tools.",
+  },
+  {
+    phase: "install",
+    icon: "🔑",
+    title: "Connect the AI engine",
+    short: "Paste the Aetrex Anthropic key. Use Smart routing.",
+    body: "Settings → AI engine → API key. Paste the Aetrex Anthropic API key (kept in 1Password under 'Anthropic — Aetrex prod'). Choose Smart routing as the strategy.",
+    tip: "Smart routing sends 'thanks'/'ok' follow-ups to Claude Haiku and full product questions to Claude Sonnet, cutting cost on chatty conversations without affecting answer quality.",
+  },
+  {
+    phase: "install",
+    icon: "⏱",
+    title: "Wait for the catalog to sync",
+    short: "Aetrex's ~700 products mirror in 2–5 minutes.",
+    body: "First load triggers a full Shopify catalog sync. Aetrex's catalog (~700 products) usually takes 2–5 minutes. The home page shows '[X] products synced' once it's done; do not move on until that number stabilizes.",
+  },
+  {
+    phase: "configure",
+    icon: "🗂",
+    title: "Configure attribute mappings",
+    short: "Map custom.attr_* metafields to clean attribute names.",
+    body: "Rules & Knowledge → Catalog & attributes. Aetrex products use Shopify metafields under the `custom` namespace. Map each one to a clean attribute name the assistant uses for filtering. Use the reference table below — copy these exactly.",
+    showAttributeTable: true,
+  },
+  {
+    phase: "configure",
+    icon: "📚",
+    title: "Upload Aetrex knowledge files",
+    short: "FAQs, brand voice, sizing, fit glossary, product attrs CSV.",
+    body: "Rules & Knowledge → Knowledge files. Upload these files (kept in the shared Drive folder /Aetrex/SEoS-knowledge/):",
+    list: [
+      "aetrex-faqs.md — FAQ list (sizing, returns, shipping, technology questions)",
+      "brand-voice.md — tone guidelines (warm, expert, never pushy)",
+      "sizing-guide.md — Aetrex sizing chart and how to read it for men's/women's",
+      "fit-glossary.md — definitions of Lynco, HealthySteps, arch types, fit types",
+      "product-attributes.csv — SKU-keyed material/care/fit-notes per product",
+    ],
+    tip: "The CSV file with a SKU column auto-links to the catalog — useful for product-specific specs the AI can cite.",
+  },
+  {
+    phase: "integrate",
+    icon: "⭐",
+    title: "Connect Yotpo (reviews + loyalty)",
+    short: "Reviews powers fit summaries; Loyalty powers VIP perks.",
+    body: "Settings → Integrations → Yotpo Reviews and Yotpo Loyalty & Referrals. Both keys live in 1Password under 'Yotpo — Aetrex'.",
+    list: [
+      "Yotpo Reviews API key → enables review-based fit summaries",
+      "Yotpo Loyalty API key + GUID → enables points balance, tier, and personal referral link in chat",
+    ],
+  },
+  {
+    phase: "integrate",
+    icon: "📦",
+    title: "Connect Aftership",
+    short: "Branded tracking + return-reason data for fit predictor.",
+    body: "Settings → Integrations → Aftership. Paste the Aftership API key from 1Password. Two effects: return-reason data feeds the fit predictor (so 'too small' returns inform sizing recommendations), and tracking links shown to logged-in shoppers route to the Aetrex-branded Aftership tracking page.",
+  },
+  {
+    phase: "integrate",
+    icon: "📧",
+    title: "Connect Klaviyo",
+    short: "Segments adapt VIP-mode tone for logged-in shoppers.",
+    body: "Settings → Integrations → Klaviyo. Paste the Aetrex Klaviyo Company ID, List ID, and private API key. The private key unlocks segment enrichment in VIP mode — the assistant adapts tone based on whether a logged-in shopper is in the VIP, Winback, or Churn Risk segments. Segment names are never shown to the customer.",
+  },
+  {
+    phase: "integrate",
+    icon: "👤",
+    title: "Enable VIP mode",
+    short: "Personalize chat for logged-in Aetrex customers.",
+    body: "Settings → VIP customer experience → toggle VIP mode on. Logged-in shoppers now get personalized greetings, size recommendations anchored on their order history, and loyalty references in chat. None of their data is stored — every lookup is per-conversation, in-memory only.",
+    tip: "Test VIP mode with a real Aetrex customer account that has at least 2 past orders. Without past orders the size predictor falls back to review and return data.",
+  },
+  {
+    phase: "integrate",
+    icon: "📏",
+    title: "Configure the fit predictor",
+    short: "Combines reviews + returns + history + Aetrex sizing API.",
+    body: "Rules & Knowledge → Fit predictor → Enabled. The predictor combines Yotpo review fit data, Aftership return reasons, the customer's own order history, and the Aetrex external sizing API into a single confidence score per product. Paste the external sizing API endpoint and key from 1Password.",
+  },
+  {
+    phase: "launch",
+    icon: "🎨",
+    title: "Customize the widget appearance",
+    short: "Aetrex brand colors, logo, 'The Fit Concierge' naming.",
+    body: "Open Theme Editor → SEoS Assistant block. Set the Aetrex brand colors (Primary #2D6B4F to match site, accent your existing CTA color), upload the Aetrex avatar (square logo), and set the welcome banner. Confirm the assistant name is 'The Fit Concierge' and the tagline matches the rest of the site.",
+    tip: "The Enterprise plan removes the SEoS Assistant tagline from the widget footer. Confirm it's gone before going live.",
+  },
+  {
+    phase: "launch",
+    icon: "🧩",
+    title: "Add the chat block to the live theme",
+    short: "Add the block to the live theme body. Save.",
+    body: "In Theme Editor, add the SEoS Assistant block to the body of the live Aetrex theme. Save. The launcher now appears in the bottom corner of every storefront page. If you want to hide it on specific pages (cart, checkout-confirmation), use Settings → Widget visibility → Hide-on URLs.",
+  },
+  {
+    phase: "launch",
+    icon: "✅",
+    title: "QA with a real shopper account",
+    short: "Verify VIP greeting, fit cards, loyalty, tracking, gender-first flow.",
+    body: "Log into aetrex.com as a test customer with at least 2 past orders. Open the chat. Verify each:",
+    list: [
+      "Welcome message shows the customer's first name (VIP greeting)",
+      "Asking 'what size should I get in [product]' returns a fit prediction card with a confidence percentage",
+      "Asking about points or rewards mentions their actual Yotpo balance",
+      "Asking about an order's tracking returns an Aftership link to the Aetrex-branded tracking page",
+      "Asking 'I have foot pain, what should I wear?' walks the customer through gender → category → recommendation, only offering categories Aetrex actually sells for that gender",
+    ],
+  },
+  {
+    phase: "launch",
+    icon: "📊",
+    title: "Monitor in Analytics for the first week",
+    short: "Watch satisfaction, AI cost, rate-limit hits.",
+    body: "Analytics page tracks every conversation. Watch satisfaction rate (thumbs-up/down), AI cost, and rate-limit hits daily for the first week. Negative feedback surfaces specific responses to review and tune the knowledge files.",
+    tip: "If AI cost spikes unexpectedly, set a Daily message cap in Settings → Daily message cap. The assistant pauses when the cap is hit and resumes the next day at midnight UTC.",
+  },
+];
