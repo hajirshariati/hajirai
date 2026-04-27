@@ -371,46 +371,47 @@ export default function Home() {
           style={{
             background: "linear-gradient(135deg, #2D6B4F 0%, #3a8a66 100%)",
             borderRadius: "12px",
-            padding: "24px 28px",
+            padding: "20px 24px",
             color: "#fff",
+            display: "flex",
+            alignItems: "center",
+            gap: "16px",
+            flexWrap: "wrap",
           }}
         >
-          <InlineStack align="space-between" blockAlign="center" wrap gap="500">
-            <div style={{ flex: "1 1 320px", minWidth: 0 }}>
-              <BlockStack gap="200">
-                <InlineStack gap="200" blockAlign="center">
-                  <div
-                    style={{
-                      width: 36,
-                      height: 36,
-                      borderRadius: 10,
-                      background: "rgba(255,255,255,0.18)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: 18,
-                    }}
-                    aria-hidden="true"
-                  >
-                    {"📘"}
-                  </div>
-                  <Text as="h2" variant="headingMd">
-                    <span style={{ color: "#fff" }}>Setup guide</span>
-                  </Text>
-                </InlineStack>
-                <Text as="p" variant="bodyMd">
-                  <span style={{ color: "rgba(255,255,255,0.9)" }}>
-                    Plan-by-plan walkthrough for installing, configuring, and going live. Open it any time to refresh on a step.
-                  </span>
-                </Text>
-              </BlockStack>
-            </div>
-            <div style={{ flex: "0 0 auto" }}>
-              <Button url="/onboarding" external variant="primary" tone="success">
-                Open setup guide
-              </Button>
-            </div>
-          </InlineStack>
+          <div
+            style={{
+              flexShrink: 0,
+              width: 44,
+              height: 44,
+              borderRadius: 10,
+              background: "rgba(255,255,255,0.18)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 22,
+            }}
+            aria-hidden="true"
+          >
+            {"📘"}
+          </div>
+
+          <div style={{ flex: "1 1 280px", minWidth: 0 }}>
+            <Text as="h2" variant="headingMd">
+              <span style={{ color: "#fff" }}>Setup guide</span>
+            </Text>
+            <Text as="p" variant="bodyMd">
+              <span style={{ color: "rgba(255,255,255,0.92)" }}>
+                Plan-by-plan walkthrough for installing, configuring, and going live. Open it any time to refresh on a step.
+              </span>
+            </Text>
+          </div>
+
+          <div style={{ flexShrink: 0 }}>
+            <Button url="/onboarding" external variant="primary" tone="success">
+              Open setup guide
+            </Button>
+          </div>
         </div>
 
         <Card>
