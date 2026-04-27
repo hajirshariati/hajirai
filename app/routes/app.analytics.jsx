@@ -13,7 +13,6 @@ import { getFeedbackSummary, cleanupOldFeedback, getRecentQuestions } from "../m
 import {
   getTopProducts, getProductsByTool, getInterestBreakdown, cleanupOldMentions,
 } from "../models/ChatProductMention.server";
-import { toCsv, csvResponse } from "../lib/csv-export.server";
 
 const MODEL_LABELS = {
   "claude-sonnet-4-20250514": "Standard",
@@ -57,15 +56,6 @@ export const loader = async ({ request }) => {
   const prevStart = new Date(prevEnd.getTime() - spanDays * 86400000);
   const prevRange = { startDate: prevStart, endDate: prevEnd };
 
-  const exportSection = url.searchParams.get("export");
-  if (exportSection) {
-    const csv = await buildCsv(session.shop, exportSection, rangeArg);
-    if (csv) {
-      const fname = `${exportSection}_${startDate.toISOString().slice(0, 10)}_to_${endDate.toISOString().slice(0, 10)}.csv`;
-      return csvResponse(fname, csv);
-    }
-  }
-
   const [usage, feedback, topProducts, productsByTool, interest, recentQuestions, daily, prevUsage, prevFeedback] = await Promise.all([
     getUsageSummary(session.shop, rangeArg),
     getFeedbackSummary(session.shop, rangeArg),
@@ -86,42 +76,6 @@ export const loader = async ({ request }) => {
     range: { preset, label, startDate: startDate.toISOString(), endDate: endDate.toISOString(), days: spanDays },
   };
 };
-
-async function buildCsv(shop, section, rangeArg) {
-  if (section === "daily") {
-    const daily = await getDailySeries(shop, rangeArg);
-    return toCsv(
-      ["Date", "Messages", "Cost (USD)", "Tokens", "Tool Calls", "Helpful", "Not Helpful"],
-      daily.map((d) => [d.date, d.messages, d.cost.toFixed(4), d.tokens, d.toolCalls, d.up, d.down]),
-    );
-  }
-  if (section === "searched" || section === "viewed") {
-    const pt = await getProductsByTool(shop, rangeArg, 500);
-    const rows = (pt[section] || []).map((p, i) => [i + 1, p.title, p.handle, p.count]);
-    return toCsv(["Rank", "Product", "Handle", section === "searched" ? "Searches" : "Detail Views"], rows);
-  }
-  if (section === "top") {
-    const top = await getTopProducts(shop, rangeArg, 500);
-    return toCsv(["Rank", "Product", "Handle", "Mentions"], top.map((p, i) => [i + 1, p.title, p.handle, p.mentions]));
-  }
-  if (section === "questions") {
-    const qs = await getRecentQuestions(shop, rangeArg, 500);
-    return toCsv(["Date", "Question", "Rating", "Products"], qs.map((q) => [new Date(q.date).toISOString(), q.question, q.vote || "", (q.products || []).join(" | ")]));
-  }
-  if (section === "models") {
-    const usage = await getUsageSummary(shop, rangeArg);
-    const rows = Object.entries(usage.byModel).map(([m, d]) => [modelLabel(m), d.messages, d.cost.toFixed(4), d.messages > 0 ? (d.cost / d.messages).toFixed(6) : "0"]);
-    return toCsv(["Model", "Messages", "Total Cost (USD)", "Avg Cost per Msg (USD)"], rows);
-  }
-  if (section === "feedback") {
-    const fb = await getFeedbackSummary(shop, rangeArg);
-    return toCsv(
-      ["Date", "Vote", "User Hash", "Bot Response", "Products"],
-      fb.negativeFeedback.map((f) => [new Date(f.createdAt).toISOString(), f.vote, f.userHash || "", f.botResponse || "", (f.products || []).join(" | ")]),
-    );
-  }
-  return null;
-}
 
 function formatCost(n) {
   if (!n) return "$0.00";
@@ -306,16 +260,19 @@ export default function Analytics() {
   // CSV download has to run from inside the embedded iframe so the App Bridge
   // session token is available. Opening ?export=… in a new tab (the old
   // `external` Button) bypasses the iframe, has no session token, and gets
-  // bounced to the OAuth login page. Instead we fetch the same URL with the
-  // App Bridge JWT in the Authorization header, then trigger a download
-  // client-side from the returned blob.
+  // bounced to the OAuth login page. Instead we fetch a dedicated resource
+  // route (/app/exports) with the App Bridge JWT in the Authorization header
+  // and trigger a download client-side from the returned blob. The exports
+  // route is loader-only (no default component) so React Router serves the
+  // CSV Response directly without server-rendering a page underneath it.
   const handleExport = useCallback(async (section) => {
     if (exporting) return;
     setExporting(section);
     try {
       const params = new URLSearchParams(searchParams);
-      params.set("export", section);
-      const url = `?${params.toString()}`;
+      params.delete("export");
+      params.set("section", section);
+      const url = `/app/exports?${params.toString()}`;
       const token = await shopify.idToken();
       const res = await fetch(url, {
         headers: { Authorization: `Bearer ${token}` },
