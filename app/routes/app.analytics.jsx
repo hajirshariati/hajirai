@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
 import { useLoaderData, useSearchParams } from "react-router";
+import { useAppBridge } from "@shopify/app-bridge-react";
 import {
   Page, Card, BlockStack, InlineStack, Text, InlineGrid, Badge, Box,
   Button, ButtonGroup, DataTable, Banner, Popover, DatePicker, Divider,
@@ -216,7 +217,7 @@ function LineChart({ data, height = 220 }) {
   );
 }
 
-function SectionHeader({ title, count, tone, description, exportUrl }) {
+function SectionHeader({ title, count, tone, description, exportSection, onExport, exporting }) {
   return (
     <BlockStack gap="100">
       <InlineStack align="space-between" blockAlign="center" wrap={false}>
@@ -224,8 +225,16 @@ function SectionHeader({ title, count, tone, description, exportUrl }) {
           <Text as="h2" variant="headingMd">{title}</Text>
           {count != null ? <Badge tone={tone}>{String(count)}</Badge> : null}
         </InlineStack>
-        {exportUrl ? (
-          <Button icon={ExportIcon} variant="tertiary" url={exportUrl} external>Export CSV</Button>
+        {exportSection ? (
+          <Button
+            icon={ExportIcon}
+            variant="tertiary"
+            loading={exporting === exportSection}
+            disabled={Boolean(exporting) && exporting !== exportSection}
+            onClick={() => onExport(exportSection)}
+          >
+            Export CSV
+          </Button>
         ) : null}
       </InlineStack>
       {description ? <Text as="p" tone="subdued" variant="bodySm">{description}</Text> : null}
@@ -290,13 +299,47 @@ function RangeSelector({ current, searchParams }) {
 export default function Analytics() {
   const { usage, feedback, topProducts, productsByTool, interest, recentQuestions, daily, previous, range } = useLoaderData();
   const [searchParams] = useSearchParams();
+  const shopify = useAppBridge();
+  const [exporting, setExporting] = useState(null);
   const hasData = usage.totalMessages > 0;
 
-  const exportLink = (section) => {
-    const p = new URLSearchParams(searchParams);
-    p.set("export", section);
-    return `?${p.toString()}`;
-  };
+  // CSV download has to run from inside the embedded iframe so the App Bridge
+  // session token is available. Opening ?export=… in a new tab (the old
+  // `external` Button) bypasses the iframe, has no session token, and gets
+  // bounced to the OAuth login page. Instead we fetch the same URL with the
+  // App Bridge JWT in the Authorization header, then trigger a download
+  // client-side from the returned blob.
+  const handleExport = useCallback(async (section) => {
+    if (exporting) return;
+    setExporting(section);
+    try {
+      const params = new URLSearchParams(searchParams);
+      params.set("export", section);
+      const url = `?${params.toString()}`;
+      const token = await shopify.idToken();
+      const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error(`Export failed (${res.status})`);
+      const blob = await res.blob();
+      const filename =
+        res.headers.get("Content-Disposition")?.match(/filename="?([^";]+)"?/)?.[1] ||
+        `${section}.csv`;
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+    } catch (err) {
+      console.error("[analytics export] failed:", err);
+      shopify.toast.show("Export failed. Please try again.", { isError: true });
+    } finally {
+      setExporting(null);
+    }
+  }, [searchParams, shopify, exporting]);
 
   const modelRows = useMemo(() => Object.entries(usage.byModel).map(([m, d]) => [
     modelLabel(m), String(d.messages), formatCost(d.cost), d.messages > 0 ? formatCost(d.cost / d.messages) : "—",
@@ -347,7 +390,7 @@ export default function Analytics() {
 
         <Card>
           <BlockStack gap="400">
-            <SectionHeader title="Daily activity" description="Conversations (green, solid) and API cost (amber, dashed)." exportUrl={exportLink("daily")} />
+            <SectionHeader title="Daily activity" description="Conversations (green, solid) and API cost (amber, dashed)." exportSection="daily" onExport={handleExport} exporting={exporting} />
             <LineChart data={daily} />
             <InlineStack gap="400" blockAlign="center">
               <InlineStack gap="100" blockAlign="center"><span style={{ width: 14, height: 3, background: "#2D6B4F", display: "inline-block" }} /><Text as="span" variant="bodySm" tone="subdued">Conversations (left axis)</Text></InlineStack>
@@ -373,7 +416,7 @@ export default function Analytics() {
         {searchedRows.length > 0 && (
           <Card>
             <BlockStack gap="400">
-              <SectionHeader title="What customers are searching for" description="Products customers asked the AI to find." exportUrl={exportLink("searched")} />
+              <SectionHeader title="What customers are searching for" description="Products customers asked the AI to find." exportSection="searched" onExport={handleExport} exporting={exporting} />
               <DataTable columnContentTypes={["numeric", "text", "numeric"]} headings={["#", "Product", "Searches"]} rows={searchedRows} />
             </BlockStack>
           </Card>
@@ -382,7 +425,7 @@ export default function Analytics() {
         {viewedRows.length > 0 && (
           <Card>
             <BlockStack gap="400">
-              <SectionHeader title="Products with detail requests" description="Strongest purchase signals — customers asked about pricing, sizes, availability." exportUrl={exportLink("viewed")} />
+              <SectionHeader title="Products with detail requests" description="Strongest purchase signals — customers asked about pricing, sizes, availability." exportSection="viewed" onExport={handleExport} exporting={exporting} />
               <DataTable columnContentTypes={["numeric", "text", "numeric"]} headings={["#", "Product", "Detail views"]} rows={viewedRows} />
             </BlockStack>
           </Card>
@@ -391,7 +434,7 @@ export default function Analytics() {
         {recentQuestions.length > 0 && (
           <Card>
             <BlockStack gap="400">
-              <SectionHeader title="Customer questions" count={recentQuestions.length} tone="info" description="Real questions from customers — use to improve FAQs or product copy." exportUrl={exportLink("questions")} />
+              <SectionHeader title="Customer questions" count={recentQuestions.length} tone="info" description="Real questions from customers — use to improve FAQs or product copy." exportSection="questions" onExport={handleExport} exporting={exporting} />
               <BlockStack gap="200">
                 {recentQuestions.map((q, i) => (
                   <Box key={i} padding="300" background="bg-surface-secondary" borderRadius="200">
@@ -414,7 +457,7 @@ export default function Analytics() {
         {feedback.negativeFeedback.length > 0 && (
           <Card>
             <BlockStack gap="400">
-              <SectionHeader title="Responses flagged unhelpful" count={feedback.down} tone="critical" description="Review these to spot gaps in your knowledge base or product info." exportUrl={exportLink("feedback")} />
+              <SectionHeader title="Responses flagged unhelpful" count={feedback.down} tone="critical" description="Review these to spot gaps in your knowledge base or product info." exportSection="feedback" onExport={handleExport} exporting={exporting} />
               <BlockStack gap="200">
                 {feedback.negativeFeedback.slice(0, 10).map((f) => (
                   <Box key={f.id} padding="300" background="bg-surface-critical-subdued" borderRadius="200">
@@ -446,7 +489,7 @@ export default function Analytics() {
         {modelRows.length > 0 && (
           <Card>
             <BlockStack gap="400">
-              <SectionHeader title="Cost by model" description="Smart routing uses Fast for short follow-ups and Standard for product questions." exportUrl={exportLink("models")} />
+              <SectionHeader title="Cost by model" description="Smart routing uses Fast for short follow-ups and Standard for product questions." exportSection="models" onExport={handleExport} exporting={exporting} />
               <DataTable columnContentTypes={["text", "numeric", "numeric", "numeric"]} headings={["Model", "Messages", "Total cost", "Avg / msg"]} rows={modelRows} />
             </BlockStack>
           </Card>
