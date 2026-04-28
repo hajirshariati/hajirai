@@ -355,17 +355,24 @@ function overrideMatches(userLower, phrase) {
 
 // Merchant-configured via Rules & Knowledge → Search Rules.
 // Each rule: { whenQuery, excludeTerms, overrideTriggers? }
-// - whenQuery: comma-separated keywords; if any appears in the conversation, the rule fires
+// - whenQuery: comma-separated keywords; the rule fires when any appears in the
+//   user's latest message (or the AI's current search query)
 // - excludeTerms: comma-separated terms; matching products are hidden from results
-// - overrideTriggers (optional): comma-separated keywords; if any appears in the user's
-//   latest message (word-boundary, plural-aware), the rule is skipped for this turn
-function matchesCategoryRule(text, rules, userText = "") {
+// - overrideTriggers (optional): comma-separated keywords that skip the rule
+//   for this turn (word-boundary, plural-aware match against the latest message)
+//
+// Auto-bypass: even without a configured override, if the user's latest message
+// explicitly mentions any excludeTerm, the rule is skipped for this turn — the
+// customer is asking for the very thing the rule would hide.
+function matchesCategoryRule(triggerText, rules, latestUserText = "") {
   if (!rules || !Array.isArray(rules)) return null;
-  const lower = text.toLowerCase();
-  const userLower = (userText || "").toLowerCase();
+  const lower = triggerText.toLowerCase();
+  const userLower = (latestUserText || "").toLowerCase();
   for (const rule of rules) {
     const triggers = splitCsv(rule.whenQuery);
     if (!triggers.some((t) => lower.includes(t))) continue;
+    const excludes = splitCsv(rule.excludeTerms);
+    if (excludes.length > 0 && excludes.some((e) => overrideMatches(userLower, e))) continue;
     const overrides = splitCsv(rule.overrideTriggers);
     if (overrides.length > 0 && overrides.some((o) => overrideMatches(userLower, o))) continue;
     return rule.excludeTerms;
@@ -439,7 +446,7 @@ function genderFilterClause(gender) {
 
 async function searchProducts(
   { query, limit, filters },
-  { shop, deduplicateColors, sessionGender, categoryExclusions, querySynonyms, conversationText, userText }
+  { shop, deduplicateColors, sessionGender, categoryExclusions, querySynonyms, conversationText, userText, latestUserMessage }
 ) {
   const q = String(query || "").trim();
   if (!q) return { products: [] };
@@ -483,8 +490,12 @@ const searchQuery = detected.gender ? detected.query : q;
   }
 
   const synonymMap = buildSynonymMap(querySynonyms);
-  const userIntentText = `${q} ${userText || ""}`;
-  const merchantExclude = matchesCategoryRule(userIntentText, categoryExclusions, userText);
+  // Evaluate exclusion rules against the user's CURRENT message only — not the
+  // full history — so a topic-shift mid-conversation isn't blocked by a trigger
+  // that fired several turns ago.
+  const latestText = latestUserMessage || "";
+  const userIntentText = `${q} ${latestText}`;
+  const merchantExclude = matchesCategoryRule(userIntentText, categoryExclusions, latestText);
 
   const GENDER_KEYS_FOR_LOG = new Set(["gender", "gender_fallback", "genders"]);
   const extraFilterKeys = Object.keys(attrFilters).filter(
