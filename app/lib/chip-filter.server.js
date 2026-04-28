@@ -5,6 +5,33 @@ function normalize(s) {
 const SPECIFIC_CATEGORY_RE = /\b(sneakers?|sandals?|boots?|booties?|loafers?|slippers?|heels?|flats?|clogs?|mules?|oxfords?|moccasins?|slides?|pumps?|espadrilles?|wedges?|trainers?|runners?|cleats?|orthotics?|insoles?|inserts?|footbeds?)\b/i;
 const GENERIC_SHOE_RE = /\b(shoes?|footwear)\b/i;
 
+// Substring matches against any common footwear keyword. Used to filter the
+// catalog category list to only shoe-style options when a customer asks a
+// generic "what shoe should I wear?" question. Matches multi-word categories
+// like "slip ons", "mary janes", "ballet flats" via substring (not word
+// boundary) so plurals and joined forms work.
+const FOOTWEAR_KEYWORDS = [
+  "sneaker", "sandal", "boot", "loafer", "slipper", "heel", "flat",
+  "clog", "mule", "oxford", "moccasin", "slide", "pump", "espadrille",
+  "wedge", "trainer", "runner", "cleat", "slip on", "slip-on",
+  "mary jane", "ballet",
+];
+
+function isFootwearCategory(category) {
+  const lower = String(category || "").toLowerCase();
+  return FOOTWEAR_KEYWORDS.some((kw) => lower.includes(kw));
+}
+
+// "Footwear" / "Shoes" by themselves are parent terms — when a customer asks
+// a generic shoe question and we already have specific children (sneakers,
+// sandals, …), the generic parent shouldn't appear as one of the chip
+// options. Filtered out by isFootwearCategory naturally (no specific
+// keyword), but we keep this list explicit for clarity.
+function isGenericParent(category) {
+  const lower = String(category || "").toLowerCase().trim();
+  return lower === "footwear" || lower === "shoes" || lower === "shoe";
+}
+
 export function isGenericShoeQuery(userMessage) {
   const s = String(userMessage || "");
   if (!GENERIC_SHOE_RE.test(s)) return false;
@@ -33,13 +60,26 @@ export function enforceCategoryChipsForShoeQueries(text, catalogCategories, user
   const categoryChipCount = chipMatches.filter((m) => chipIsFromCategories(m[1], allowSet)).length;
   if (categoryChipCount >= 2) return { text, replaced: false };
 
-  const categoryChips = catalogCategories.slice(0, 5).map((c) => `<<${c}>>`).join("");
+  // For a generic "shoe" question, only offer specific shoe categories —
+  // no "Accessories", "Gift Card", "Socks", etc. Drop the generic parent
+  // ("Footwear") if its specific children are present in the same list.
+  const shoeOnly = catalogCategories.filter(
+    (c) => isFootwearCategory(c) && !isGenericParent(c),
+  );
+
+  // If the catalog has no recognizable shoe categories at all (a catalog
+  // not focused on footwear), fall back to the original full list rather
+  // than offering zero chips — better UX than a bare question.
+  const pool = shoeOnly.length >= 2 ? shoeOnly : catalogCategories;
+  const newChips = pool.slice(0, 5);
+
+  const categoryChips = newChips.map((c) => `<<${c}>>`).join("");
   const question = "What type of shoes are you looking for?";
   return {
     text: `${question}\n${categoryChips}`,
     replaced: true,
     replacedCount: chipMatches.length,
-    newChips: catalogCategories.slice(0, 5),
+    newChips,
   };
 }
 
