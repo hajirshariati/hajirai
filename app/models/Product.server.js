@@ -336,8 +336,19 @@ export async function getCatalogCategories(shop, { gender } = {}) {
   }
   const strict = !!gender && taggedCount > 0;
 
-  const set = new Set();
-  const sourceByCategory = new Map();
+  // Case-insensitive dedup. Aetrex (and similar stores) tag the same word in
+  // both productType and category metafield with different casings — without
+  // dedup, "Accessories" + "accessories" both leak into the chip list.
+  // Canonical display form is Title Case so chips look uniform.
+  const titleCase = (s) =>
+    String(s || "")
+      .trim()
+      .toLowerCase()
+      .split(/\s+/)
+      .map((w) => (w ? w[0].toUpperCase() + w.slice(1) : w))
+      .join(" ");
+
+  const byKey = new Map(); // key: lowercase trimmed; value: { display, sources }
   let included = 0;
   for (const r of rows) {
     const attrs = r.attributesJson;
@@ -345,26 +356,32 @@ export async function getCatalogCategories(shop, { gender } = {}) {
     if (!genderMatches(g, gender, { strict })) continue;
     included++;
 
-    const pt = (r.productType || "").trim();
-    if (pt) {
-      set.add(pt);
-      if (!sourceByCategory.has(pt)) sourceByCategory.set(pt, []);
-      if (sourceByCategory.get(pt).length < 3) sourceByCategory.get(pt).push(`${r.handle}(productType, gender=${JSON.stringify(g)})`);
-    }
-    for (const v of extractCategoryValues(attrs)) {
-      set.add(v);
-      if (!sourceByCategory.has(v)) sourceByCategory.set(v, []);
-      if (sourceByCategory.get(v).length < 3) sourceByCategory.get(v).push(`${r.handle}(category, gender=${JSON.stringify(g)})`);
-    }
+    const addCategory = (raw, kind) => {
+      const trimmed = String(raw || "").trim();
+      if (!trimmed) return;
+      const key = trimmed.toLowerCase();
+      if (!byKey.has(key)) {
+        byKey.set(key, { display: titleCase(trimmed), sources: [] });
+      }
+      const entry = byKey.get(key);
+      if (entry.sources.length < 3) {
+        entry.sources.push(`${r.handle}(${kind}, gender=${JSON.stringify(g)})`);
+      }
+    };
+
+    addCategory(r.productType, "productType");
+    for (const v of extractCategoryValues(attrs)) addCategory(v, "category");
   }
 
-  const categories = Array.from(set).sort((a, b) => a.localeCompare(b));
+  const categories = Array.from(byKey.values())
+    .map((v) => v.display)
+    .sort((a, b) => a.localeCompare(b));
   console.log(`[catalog-categories] shop=${shop} gender=${gender || "any"} strict=${strict} taggedProducts=${taggedCount}/${rows.length} included=${included} categories=${categories.join("|") || "(none)"}`);
   if (!strict && gender) {
     console.warn(`[catalog-categories] WARNING: strict=false means no products in shop "${shop}" have a "gender" attribute set. All categories will leak into every gendered query. Fix: map a "gender" attribute (metafield or tag_prefix) in the admin Rules & Knowledge page.`);
   }
-  for (const [cat, sources] of sourceByCategory) {
-    console.log(`[catalog-categories]   "${cat}" <- ${sources.join(", ")}`);
+  for (const [, entry] of byKey) {
+    console.log(`[catalog-categories]   "${entry.display}" <- ${entry.sources.join(", ")}`);
   }
 
   return categories;
