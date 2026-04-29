@@ -1,7 +1,7 @@
 import prisma from "../db.server";
 import { encrypt, decrypt } from "../utils/encryption.server";
 
-const ENCRYPTED_FIELDS = ["anthropicApiKey", "yotpoApiKey", "aftershipApiKey", "klaviyoPrivateKey", "yotpoLoyaltyApiKey"];
+const ENCRYPTED_FIELDS = ["anthropicApiKey", "yotpoApiKey", "aftershipApiKey", "klaviyoPrivateKey", "yotpoLoyaltyApiKey", "voyageApiKey", "openaiApiKey"];
 
 function decryptConfig(config) {
   if (!config) return config;

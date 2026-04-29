@@ -59,6 +59,9 @@ export const loader = async ({ request }) => {
     loyaltyRounding: config.loyaltyRounding || "exact",
     dailyCapEnabled: config.dailyCapEnabled === true,
     dailyCapMessages: config.dailyCapMessages ?? 200,
+    embeddingProvider: config.embeddingProvider || "",
+    hasVoyageKey: (config.voyageApiKey || "") !== "",
+    hasOpenaiKey: (config.openaiApiKey || "") !== "",
     plan: { id: plan.id, name: plan.name, features: plan.features },
   };
 };
@@ -88,6 +91,22 @@ export const action = async ({ request }) => {
   const aftershipKey = formData.get("aftershipApiKey");
   if (aftershipKey !== null && aftershipKey !== "") {
     data.aftershipApiKey = aftershipKey;
+  }
+
+  const embeddingProvider = formData.get("embeddingProvider");
+  if (embeddingProvider !== null) {
+    const v = String(embeddingProvider).trim();
+    if (v === "" || v === "voyage" || v === "openai") {
+      data.embeddingProvider = v;
+    }
+  }
+  const voyageKey = formData.get("voyageApiKey");
+  if (voyageKey !== null && voyageKey !== "") {
+    data.voyageApiKey = voyageKey;
+  }
+  const openaiKey = formData.get("openaiApiKey");
+  if (openaiKey !== null && openaiKey !== "") {
+    data.openaiApiKey = openaiKey;
   }
 
   const supportUrl = formData.get("supportUrl");
@@ -287,7 +306,7 @@ function HideUrlsPanel({ initial }) {
 }
 
 export default function ApiKeys() {
-  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, trackingPageUrl: initTrackingPageUrl, returnsPageUrl: initReturnsPageUrl, referralPageUrl: initReferralPageUrl, promptCaching: initCaching, klaviyoFormId: initKlaviyoFormId, klaviyoCompanyId: initKlaviyoCompanyId, klaviyoListId: initKlaviyoListId, vipModeEnabled: initVipMode, showLoginPill: initShowLoginPill, hasKlaviyoPrivateKey, hasYotpoLoyaltyKey, yotpoLoyaltyGuid: initYotpoLoyaltyGuid, loyaltyDisplay: initLoyaltyDisplay, loyaltyPointsPerDollar: initLoyaltyPointsPerDollar, loyaltyRounding: initLoyaltyRounding, dailyCapEnabled: initDailyCapEnabled, dailyCapMessages: initDailyCapMessages, plan } = useLoaderData();
+  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, trackingPageUrl: initTrackingPageUrl, returnsPageUrl: initReturnsPageUrl, referralPageUrl: initReferralPageUrl, promptCaching: initCaching, klaviyoFormId: initKlaviyoFormId, klaviyoCompanyId: initKlaviyoCompanyId, klaviyoListId: initKlaviyoListId, vipModeEnabled: initVipMode, showLoginPill: initShowLoginPill, hasKlaviyoPrivateKey, hasYotpoLoyaltyKey, yotpoLoyaltyGuid: initYotpoLoyaltyGuid, loyaltyDisplay: initLoyaltyDisplay, loyaltyPointsPerDollar: initLoyaltyPointsPerDollar, loyaltyRounding: initLoyaltyRounding, dailyCapEnabled: initDailyCapEnabled, dailyCapMessages: initDailyCapMessages, embeddingProvider: initEmbeddingProvider, hasVoyageKey, hasOpenaiKey, plan } = useLoaderData();
   const actionData = useActionData();
   const nav = useNavigation();
   const saving = nav.state === "submitting";
@@ -299,6 +318,9 @@ export default function ApiKeys() {
   const [feedbackOn, setFeedbackOn] = useState(initFeedback);
   const [yotpoKey, setYotpoKey] = useState("");
   const [aftershipKey, setAftershipKey] = useState("");
+  const [embeddingProvider, setEmbeddingProvider] = useState(initEmbeddingProvider || "");
+  const [voyageKey, setVoyageKey] = useState("");
+  const [openaiKey, setOpenaiKey] = useState("");
   const [supportUrl, setSupportUrl] = useState(initSupportUrl);
   const [supportLabel, setSupportLabel] = useState(initSupportLabel);
   const [trackingPageUrl, setTrackingPageUrl] = useState(initTrackingPageUrl);
@@ -357,6 +379,8 @@ export default function ApiKeys() {
       setAftershipKey("");
       setKlaviyoPrivateKey("");
       setYotpoLoyaltyKey("");
+      setVoyageKey("");
+      setOpenaiKey("");
     }
   }, [actionData]);
 
@@ -496,6 +520,76 @@ export default function ApiKeys() {
                       )}
                     </BlockStack>
                   </PlanGate>
+                </BlockStack>
+              </Card>
+            </Layout.AnnotatedSection>
+
+            <Layout.AnnotatedSection
+              title="Semantic search (optional)"
+              description={
+                <BlockStack gap="200">
+                  <Text as="p" tone="subdued" variant="bodySm">
+                    Match products by meaning, not just keywords. Customers asking for "shoes for standing all day" will find arch-support styles even when the description doesn't say "standing". Handles typos, synonyms (red ≈ crimson), and use-case queries.
+                  </Text>
+                  <Text as="p" tone="subdued" variant="bodySm">
+                    Bring your own API key from Voyage AI (recommended) or OpenAI. Cost is paid by you to the provider — typically under $1/month for catalogs under 5,000 products.
+                  </Text>
+                </BlockStack>
+              }
+            >
+              <Card>
+                <BlockStack gap="400">
+                  <Select
+                    label="Embedding provider"
+                    options={[
+                      { label: "Disabled (use keyword search only)", value: "" },
+                      { label: "Voyage AI — recommended (cheaper, optimized for retrieval)", value: "voyage" },
+                      { label: "OpenAI", value: "openai" },
+                    ]}
+                    value={embeddingProvider}
+                    onChange={setEmbeddingProvider}
+                    helpText="Disabled keeps the current keyword search. Enabling either provider adds semantic matching on top."
+                  />
+
+                  {embeddingProvider === "voyage" && (
+                    <BlockStack gap="200">
+                      <TextField
+                        label="Voyage AI API key"
+                        type="password"
+                        value={voyageKey}
+                        onChange={setVoyageKey}
+                        autoComplete="off"
+                        placeholder={hasVoyageKey ? "•••••••• (saved)" : "pa-..."}
+                        helpText={hasVoyageKey
+                          ? "A key is saved. Leave blank to keep it; paste a new value to replace."
+                          : "Get a key at voyageai.com → Account → API keys."}
+                      />
+                    </BlockStack>
+                  )}
+
+                  {embeddingProvider === "openai" && (
+                    <BlockStack gap="200">
+                      <TextField
+                        label="OpenAI API key"
+                        type="password"
+                        value={openaiKey}
+                        onChange={setOpenaiKey}
+                        autoComplete="off"
+                        placeholder={hasOpenaiKey ? "•••••••• (saved)" : "sk-..."}
+                        helpText={hasOpenaiKey
+                          ? "A key is saved. Leave blank to keep it; paste a new value to replace."
+                          : "Get a key at platform.openai.com → API keys. Uses text-embedding-3-small."}
+                      />
+                    </BlockStack>
+                  )}
+
+                  {embeddingProvider !== "" && (
+                    <Banner tone="info">
+                      <Text as="p" variant="bodySm">
+                        After saving, click <strong>Backfill embeddings</strong> on the Rules &amp; Knowledge page to embed your existing catalog. New and updated products are embedded automatically going forward.
+                      </Text>
+                    </Banner>
+                  )}
                 </BlockStack>
               </Card>
             </Layout.AnnotatedSection>
@@ -857,6 +951,9 @@ export default function ApiKeys() {
           <input type="hidden" name="showFeedback" value={String(feedbackOn)} />
           <input type="hidden" name="yotpoApiKey" value={yotpoKey} />
           <input type="hidden" name="aftershipApiKey" value={aftershipKey} />
+          <input type="hidden" name="embeddingProvider" value={embeddingProvider} />
+          <input type="hidden" name="voyageApiKey" value={voyageKey} />
+          <input type="hidden" name="openaiApiKey" value={openaiKey} />
           <input type="hidden" name="supportUrl" value={supportUrl} />
           <input type="hidden" name="supportLabel" value={supportLabel} />
           <input type="hidden" name="trackingPageUrl" value={trackingPageUrl} />
