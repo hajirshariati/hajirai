@@ -223,6 +223,7 @@ try{
 }catch(e){}
 
 var isOpen=false,isStreaming=false,messages=loadH(),abortCtrl=null;
+var lastUserMessage='',errorRetryCount=0;
 var IDLE_TIMEOUT=5*60*1000;
 var LMK='hajirai_chat_last_msg';
 var idleTimedOut=false;
@@ -352,6 +353,7 @@ var text=inputEl.value.trim();
 if(!text||isStreaming)return;
 var w=$('.ai-chat-welcome',msgsEl);
 if(w)w.remove();
+lastUserMessage=text;
 messages.push({role:'user',content:text});
 appendMsg('user',text);
 saveH(messages);
@@ -369,6 +371,45 @@ s+='<button class="ai-chat-dead-end__btn ai-chat-dead-end__btn--support" data-de
 s+='<button class="ai-chat-dead-end__btn ai-chat-dead-end__btn--new" data-dead-end="new-chat">Start a new chat</button>';
 s+='</div>';
 return s;
+}
+
+function isCreditOrCriticalError(t){return /temporarily unavailable|credit balance|insufficient|billing/i.test(t||'')}
+function isRateLimitError(t){return /high traffic|rate limit|getting a lot of/i.test(t||'')}
+function retryRowHtml(){return '<div class="ai-chat-retry-row" style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><button class="ai-chat-retry-btn" data-retry="1" style="padding:8px 14px;border:1px solid currentColor;background:transparent;color:inherit;border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit">↻ Try again</button></div>'}
+// Append either retry button or support escalation to an error bubble.
+// 3-strike rule: after 3 errors on the same chain, escalate to support.
+// Critical errors (credit/billing) escalate immediately — retry won't help.
+function attachErrorRecovery(bubble,errText){
+if(!bubble)return;
+errorRetryCount++;
+var critical=isCreditOrCriticalError(errText);
+var rate=isRateLimitError(errText);
+if(critical||errorRetryCount>=3||!lastUserMessage){
+  bubble.insertAdjacentHTML('beforeend',deadEndHtml());
+  inputEl.disabled=true;inputEl.placeholder='Choose an option above';sendBtn.disabled=true;
+  return;
+}
+bubble.insertAdjacentHTML('beforeend',retryRowHtml());
+if(rate){
+  var btn=bubble.querySelector('.ai-chat-retry-btn');
+  if(btn){
+    var sec=10;btn.disabled=true;btn.style.opacity='0.6';btn.textContent='Wait '+sec+'s…';
+    var iv=setInterval(function(){
+      sec--;
+      if(sec<=0){clearInterval(iv);btn.textContent='↻ Try again';btn.disabled=false;btn.style.opacity='1';return}
+      btn.textContent='Wait '+sec+'s…';
+    },1000);
+  }
+}
+}
+function showStreamError(em){
+isStreaming=false;sendBtn.disabled=false;
+typingEl.classList.remove('visible');
+var md=appendMsg('assistant',em);
+messages.push({role:'assistant',content:em});saveH(messages);
+var bb=$('.ai-chat-msg-bubble',md);
+attachErrorRecovery(bb,em);
+scrollBottom();
 }
 
 function showKlaviyoForm(label){
@@ -416,14 +457,8 @@ scrollBottom();
 }
 
 function showHighTraffic(){
-var em='I\'m experiencing high traffic right now. Please try again in a moment.';
-messages.push({role:'assistant',content:em});
-var md=appendMsg('assistant',em);
-var bb=$('.ai-chat-msg-bubble',md);
-if(bb)bb.insertAdjacentHTML('beforeend',deadEndHtml());
-inputEl.disabled=true;inputEl.placeholder='Choose an option above';sendBtn.disabled=true;
-saveH(messages);
-setTimeout(function(){showKlaviyoForm('Stay Connected')},500);
+showStreamError('I\'m experiencing high traffic right now. Please try again in a moment.');
+if(errorRetryCount>=3){setTimeout(function(){showKlaviyoForm('Stay Connected')},500)}
 }
 
 var streamWatchdog=null;
@@ -435,12 +470,7 @@ abortCtrl=new AbortController();
 streamWatchdog=setTimeout(function(){
   if(isStreaming&&abortCtrl){
     try{abortCtrl.abort()}catch(e){}
-    typingEl.classList.remove('visible');isStreaming=false;sendBtn.disabled=false;
-    var em='This is taking longer than expected. Please try again.';
-    var md=appendMsg('assistant',em);
-    var bb=$('.ai-chat-msg-bubble',md);
-    if(bb)bb.insertAdjacentHTML('beforeend',deadEndHtml());
-    inputEl.disabled=true;inputEl.placeholder='Choose an option above';sendBtn.disabled=true;
+    showStreamError('This is taking longer than expected. Please try again.');
   }
 },90000);
 var body={message:msg,session_id:getSess(),shop_domain:SHOP,assistant_name:NAME,history:messages.slice(-20).map(function(m){return{role:m.role,content:m.content}})};
@@ -520,19 +550,12 @@ if(p.type==='action'&&p.action==='show_dead_end'){
 }
 if(p.type==='done'){finish(full,prods,msgDiv,buffSugg,linkCTA,fitReport);return true}
 if(p.type==='error'){
-  typingEl.classList.remove('visible');isStreaming=false;sendBtn.disabled=false;
-  var errText=p.message||'I\'m sorry, I\'m having trouble right now. Please try again in a moment.';
-  var errDiv=appendMsg('assistant',errText);
-  messages.push({role:'assistant',content:errText});saveH(messages);
-  var errBub=$('.ai-chat-msg-bubble',errDiv);
-  if(errBub)errBub.insertAdjacentHTML('beforeend',deadEndHtml());
-  inputEl.disabled=true;inputEl.placeholder='Choose an option above';sendBtn.disabled=true;
-  scrollBottom();
+  showStreamError(p.message||'I\'m sorry, I\'m having trouble right now. Please try again in a moment.');
   return true;
 }
 }catch(e){}
 }return false}
-function read(){reader.read().then(function(r){if(r.done){finish(full||'I\'m having trouble right now. Please try again.',prods,msgDiv,buffSugg,linkCTA,fitReport);return}var done=proc(decoder.decode(r.value,{stream:true}));if(!done)read()}).catch(function(e){if(e.name!=='AbortError')finish(full||'Connection lost. Please try again.',prods,msgDiv,buffSugg,linkCTA,fitReport)})}
+function read(){reader.read().then(function(r){if(r.done){if(full)finish(full,prods,msgDiv,buffSugg,linkCTA,fitReport);else showStreamError('I\'m having trouble right now. Please try again.');return}var done=proc(decoder.decode(r.value,{stream:true}));if(!done)read()}).catch(function(e){if(e.name!=='AbortError'){if(full)finish(full,prods,msgDiv,buffSugg,linkCTA,fitReport);else showStreamError('Connection lost. Please try again.')}})}
 read();
 }
 
@@ -588,6 +611,7 @@ return '<div class="ai-chat-fit-card" role="region" aria-label="Size recommendat
 function finish(text,prods,md2,sugg,linkCTA,fitReport){
 clearWatchdog();
 typingEl.classList.remove('visible');isStreaming=false;sendBtn.disabled=false;
+errorRetryCount=0;
 var mDiv=md2;
 var choices=[];
 var cleanText=text||'';
@@ -652,6 +676,7 @@ msgsEl.innerHTML='';buildWelcome();
 if(abortCtrl){abortCtrl.abort();abortCtrl=null}
 isStreaming=false;sendBtn.disabled=false;typingEl.classList.remove('visible');
 idleTimedOut=false;clearLastMsg();
+errorRetryCount=0;lastUserMessage='';
 }
 
 /* Events */
@@ -669,6 +694,15 @@ menuBtn.addEventListener('click',function(e){e.stopPropagation();menu.style.disp
 menu.addEventListener('click',function(e){var item=e.target.closest('[data-action]');if(!item)return;if(item.dataset.action==='clear')clearChat();menu.style.display='none'});
 document.addEventListener('click',function(){menu.style.display='none'});
 msgsEl.addEventListener('click',function(e){
+var retryBtn=e.target.closest('[data-retry]');
+if(retryBtn){
+  if(retryBtn.disabled||isStreaming||!lastUserMessage)return;
+  var row=retryBtn.closest('.ai-chat-retry-row');
+  if(row&&row.parentNode)row.parentNode.removeChild(row);
+  inputEl.disabled=false;inputEl.placeholder=IPLACE;sendBtn.disabled=false;
+  inputEl.value=lastUserMessage;sendMessage();
+  return;
+}
 var btn=e.target.closest('[data-add-to-cart]');
 if(btn){e.preventDefault();var vid=btn.getAttribute('data-add-to-cart');btn.disabled=true;btn.textContent='Adding...';addToCart(vid,1).then(function(){btn.textContent='Added!';setTimeout(function(){btn.textContent='Add to Cart';btn.disabled=false},2000)}).catch(function(){btn.textContent='Error';btn.disabled=false});return}
 var deadEnd=e.target.closest('[data-dead-end]');
