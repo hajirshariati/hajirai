@@ -604,6 +604,8 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
 const collection = extractCollectionCTA(fullResponseText);
 fullResponseText = collection.text;
 
+console.log(`[chat] emit textLen=${fullResponseText.length} poolSize=${pool.length} searchAttempted=${productSearchAttempted}`);
+
 controller.enqueue(encoder.encode(sseChunk({
   type: "text",
   text: fullResponseText
