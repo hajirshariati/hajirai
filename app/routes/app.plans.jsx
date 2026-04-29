@@ -467,8 +467,96 @@ export default function PlansPage() {
 
         <Layout.Section>
           <Card>
+            <BlockStack gap="400">
+              <BlockStack gap="100">
+                <Text as="h3" variant="headingMd">How SEoS Assistant works</Text>
+                <Text as="p" tone="subdued" variant="bodySm">
+                  Every customer message flows through these steps. Feature badges show which plan unlocks each capability — items without a badge work on every plan.
+                </Text>
+              </BlockStack>
+
+              <FlowStep number="1" emoji="💬" title="Customer sends a message">
+                The chat widget on your storefront sends the message to SEoS Assistant along with the recent conversation history.
+              </FlowStep>
+
+              <FlowArrow />
+
+              <FlowStep number="2" emoji="🧠" title="AI reads context, understands intent">
+                Gender, category, color, size, condition — anything mentioned earlier in the chat becomes context. The AI never re-asks what the customer already told it.
+              </FlowStep>
+
+              <FlowArrow />
+
+              <FlowStep
+                number="3"
+                emoji="🔍"
+                title="Catalog search — keyword + meaning"
+                badges={[{ tone: "info", text: "Semantic search optional (BYO API key)" }]}
+              >
+                Keyword search matches title, tags, attributes, and description. With semantic search enabled, products are also matched by meaning — "shoes for standing all day" finds arch-support styles even when descriptions don't say "standing".
+              </FlowStep>
+
+              <FlowArrow />
+
+              <FlowStep
+                number="4"
+                emoji="🎯"
+                title="Smart filtering — only the right products"
+                badges={[
+                  { tone: "success", text: "Category groups (all plans)" },
+                  { tone: "attention", text: "Search rules — Growth+" },
+                ]}
+              >
+                Gender and category are locked from the conversation so wrong-gender products never show. Category groups keep choice buttons sharp ("shoes" only offers Footwear chips, not Orthotics or Accessories). Merchant-defined search rules can block products that shouldn't appear for specific queries.
+              </FlowStep>
+
+              <FlowArrow />
+
+              <FlowStep number="5" emoji="✍️" title="AI composes a clean, honest answer">
+                One sentence, no rambling, no echo headlines. Uses your knowledge files, brand voice, and tone settings. Never invents product names, SKUs, prices, or health claims — every product mentioned is backed by real catalog data.
+              </FlowStep>
+
+              <FlowArrow />
+
+              <FlowStep
+                number="6"
+                emoji="👤"
+                title="Personalization for logged-in customers"
+                badges={[{ tone: "magic", text: "VIP mode — Enterprise" }]}
+              >
+                For shoppers signed into your storefront, the assistant can use past order history, loyalty status, and prior fit feedback to personalize recommendations. None of their data is stored — every lookup is per-conversation, in-memory only.
+              </FlowStep>
+
+              <FlowArrow />
+
+              <FlowStep number="7" emoji="📦" title="Customer sees the response">
+                Clean text reply, real product cards (image + title + price, clickable), and a few follow-up question chips. Optional collection CTA, support button, fit-confidence badge, or Klaviyo signup form depending on context.
+              </FlowStep>
+
+              <Box padding="400" background="bg-surface-secondary" borderRadius="200">
+                <BlockStack gap="200">
+                  <InlineStack gap="200" blockAlign="center">
+                    <Text as="span" variant="headingSm">⚙️ Always running in the background</Text>
+                  </InlineStack>
+                  <Text as="p" tone="subdued" variant="bodySm">
+                    <strong>Catalog sync:</strong> Real-time webhooks keep the assistant's product index up to date the moment you edit a Shopify product.
+                  </Text>
+                  <Text as="p" tone="subdued" variant="bodySm">
+                    <strong>Auto-embedding:</strong> When semantic search is on, new and updated products are embedded automatically — no manual work after the initial backfill.
+                  </Text>
+                  <Text as="p" tone="subdued" variant="bodySm">
+                    <strong>Privacy:</strong> Customer feedback is hashed; no personal data is stored beyond what's needed to answer the conversation. GDPR-compliant deletion handlers run on uninstall.
+                  </Text>
+                </BlockStack>
+              </Box>
+            </BlockStack>
+          </Card>
+        </Layout.Section>
+
+        <Layout.Section>
+          <Card>
             <BlockStack gap="200">
-              <Text as="h3" variant="headingSm">Billing FAQ</Text>
+              <Text as="h3" variant="headingSm">FAQ</Text>
               <Text as="p" tone="subdued" variant="bodySm">
                 <strong>How am I billed?</strong> Charges are handled by Shopify and appear on your Shopify invoice.
               </Text>
@@ -481,10 +569,55 @@ export default function PlansPage() {
               <Text as="p" tone="subdued" variant="bodySm">
                 <strong>What happens if I hit my limit?</strong> The AI pauses for new conversations until next cycle or an upgrade — your widget still loads but won't reply.
               </Text>
+              <Text as="p" tone="subdued" variant="bodySm">
+                <strong>Where do AI costs go?</strong> Pay-as-you-go AI usage is billed by Anthropic directly from the API key you provide. We add zero markup. Smart routing automatically uses a faster, cheaper model for trivial follow-ups like "thanks" or "ok".
+              </Text>
+              <Text as="p" tone="subdued" variant="bodySm">
+                <strong>Does semantic search cost extra?</strong> It's free from us — you bring your own Voyage AI or OpenAI key and pay them directly. Typical cost: under $1/month for catalogs under 5,000 products.
+              </Text>
+              <Text as="p" tone="subdued" variant="bodySm">
+                <strong>What if a customer asks something the AI can't answer?</strong> The assistant offers to connect them with your support team and shows a Contact Customer Service button (URL configurable in Settings).
+              </Text>
+              <Text as="p" tone="subdued" variant="bodySm">
+                <strong>Can I see what customers are asking?</strong> Yes — the Analytics page shows conversation volume, satisfaction rate, AI cost, and per-message feedback so you can find friction and tune your knowledge files.
+              </Text>
             </BlockStack>
           </Card>
         </Layout.Section>
       </Layout>
     </Page>
+  );
+}
+
+function FlowStep({ number, emoji, title, badges, children }) {
+  return (
+    <Box padding="400" background="bg-surface-secondary" borderRadius="200">
+      <BlockStack gap="200">
+        <InlineStack gap="300" blockAlign="center" wrap>
+          <Box
+            background="bg-fill-brand"
+            borderRadius="full"
+            paddingInline="300"
+            paddingBlock="100"
+            minWidth="32px"
+          >
+            <Text as="span" variant="bodySm" fontWeight="bold" tone="text-inverse">{number}</Text>
+          </Box>
+          <Text as="span" variant="headingSm">{emoji} {title}</Text>
+          {Array.isArray(badges) && badges.map((b, i) => (
+            <Badge key={i} tone={b.tone}>{b.text}</Badge>
+          ))}
+        </InlineStack>
+        <Text as="p" tone="subdued" variant="bodySm">{children}</Text>
+      </BlockStack>
+    </Box>
+  );
+}
+
+function FlowArrow() {
+  return (
+    <Box paddingInlineStart="500">
+      <Text as="span" variant="bodyLg" tone="subdued">↓</Text>
+    </Box>
   );
 }
