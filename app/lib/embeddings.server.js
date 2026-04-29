@@ -125,3 +125,141 @@ export function productEmbeddingText(p) {
 export function vectorLiteral(vec) {
   return `[${vec.join(",")}]`;
 }
+
+// Resolve the (provider, apiKey) for a shop, or return null if semantic
+// search isn't configured. Caller decides what to do (skip, log, etc).
+export function resolveShopEmbedding(config) {
+  const provider = config?.embeddingProvider || "";
+  if (!isProviderSupported(provider)) return null;
+  const apiKey = provider === "voyage" ? config.voyageApiKey : config.openaiApiKey;
+  if (!apiKey) return null;
+  return { provider, apiKey };
+}
+
+// Embed a batch of product rows and write the resulting vectors back to
+// the Product table. Idempotent — call any time. Caller passes already-
+// loaded product rows. Returns { processed, failed }.
+export async function embedAndStoreProducts(prisma, provider, apiKey, products) {
+  if (!Array.isArray(products) || products.length === 0) {
+    return { processed: 0, failed: 0 };
+  }
+  const texts = products.map(productEmbeddingText);
+  let vectors;
+  try {
+    vectors = await embedTexts(provider, apiKey, texts, { inputType: "document" });
+  } catch (err) {
+    console.error(`[embeddings] batch failed:`, err?.message || err);
+    return { processed: 0, failed: products.length };
+  }
+
+  let processed = 0;
+  let failed = 0;
+  for (let i = 0; i < products.length; i++) {
+    const p = products[i];
+    const v = vectors[i];
+    if (!Array.isArray(v) || v.length !== EMBEDDING_DIMENSIONS) {
+      failed++;
+      continue;
+    }
+    try {
+      const lit = vectorLiteral(v);
+      await prisma.$executeRawUnsafe(
+        `UPDATE "Product" SET embedding = $1::vector, "embeddingUpdatedAt" = NOW() WHERE id = $2`,
+        lit,
+        p.id,
+      );
+      processed++;
+    } catch (err) {
+      console.error(`[embeddings] write failed for ${p.id}:`, err?.message || err);
+      failed++;
+    }
+  }
+  return { processed, failed };
+}
+
+// Backfill all products in a shop that don't yet have an embedding.
+// Runs in batches of 50 (safe for both Voyage and OpenAI). Stops at
+// `maxBatches` to bound runtime — caller can re-invoke until done.
+export async function backfillShopEmbeddings(prisma, shop, config, { batchSize = 50, maxBatches = 50 } = {}) {
+  const resolved = resolveShopEmbedding(config);
+  if (!resolved) return { skipped: true, reason: "no provider or api key" };
+
+  let totalProcessed = 0;
+  let totalFailed = 0;
+  let totalRemaining = 0;
+
+  for (let batch = 0; batch < maxBatches; batch++) {
+    const rows = await prisma.product.findMany({
+      where: { shop },
+      take: batchSize,
+      orderBy: { updatedAt: "desc" },
+      select: {
+        id: true,
+        title: true,
+        vendor: true,
+        productType: true,
+        tags: true,
+        description: true,
+        attributesJson: true,
+      },
+    });
+    // Filter to rows that don't have an embedding yet (raw SQL since
+    // Prisma doesn't expose the vector column).
+    const ids = rows.map((r) => r.id);
+    if (ids.length === 0) break;
+    const missingRows = await prisma.$queryRawUnsafe(
+      `SELECT id FROM "Product" WHERE id = ANY($1::text[]) AND embedding IS NULL`,
+      ids,
+    );
+    const missingIds = new Set(missingRows.map((r) => r.id));
+    const toEmbed = rows.filter((r) => missingIds.has(r.id));
+    if (toEmbed.length === 0) break;
+
+    const { processed, failed } = await embedAndStoreProducts(
+      prisma,
+      resolved.provider,
+      resolved.apiKey,
+      toEmbed,
+    );
+    totalProcessed += processed;
+    totalFailed += failed;
+    if (processed === 0 && failed > 0) break; // bail out if API is broken
+  }
+
+  // Count remaining null-embedding products for status reporting.
+  const remainingCountRows = await prisma.$queryRawUnsafe(
+    `SELECT COUNT(*)::int AS n FROM "Product" WHERE shop = $1 AND embedding IS NULL`,
+    shop,
+  );
+  totalRemaining = remainingCountRows?.[0]?.n || 0;
+
+  return { processed: totalProcessed, failed: totalFailed, remaining: totalRemaining };
+}
+
+// Convenience for the product webhook: re-embed a single product after
+// it's been upserted. Fire-and-forget — caller doesn't await. Failures
+// log but don't block the webhook response.
+export function embedSingleProductInBackground(prisma, shop, productId, config) {
+  const resolved = resolveShopEmbedding(config);
+  if (!resolved) return;
+  Promise.resolve().then(async () => {
+    try {
+      const row = await prisma.product.findUnique({
+        where: { id: productId },
+        select: {
+          id: true,
+          title: true,
+          vendor: true,
+          productType: true,
+          tags: true,
+          description: true,
+          attributesJson: true,
+        },
+      });
+      if (!row) return;
+      await embedAndStoreProducts(prisma, resolved.provider, resolved.apiKey, [row]);
+    } catch (err) {
+      console.error(`[embeddings] background embed for ${productId} failed:`, err?.message || err);
+    }
+  });
+}

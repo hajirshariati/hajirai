@@ -50,6 +50,8 @@ import {
   deleteKnowledgeFile,
   getKnowledgeFileForDownload,
 } from "../models/ShopConfig.server";
+import prisma from "../db.server";
+import { backfillShopEmbeddings, resolveShopEmbedding } from "../lib/embeddings.server";
 import {
   upsertEnrichmentsFromCsv,
   deleteEnrichmentsBySourceFile,
@@ -84,6 +86,19 @@ export const loader = async ({ request }) => {
   const enrichedCounts = await Promise.all(files.map((f) => countEnrichmentsBySourceFile(f.id)));
   const filesWithCounts = files.map((f, i) => ({ ...f, enrichedSkus: enrichedCounts[i] }));
 
+  // Embedding status: how many products have been embedded?
+  let embeddedCount = 0;
+  let embeddingProvider = config.embeddingProvider || "";
+  if (embeddingProvider) {
+    try {
+      const rows = await prisma.$queryRawUnsafe(
+        `SELECT COUNT(*)::int AS n FROM "Product" WHERE shop = $1 AND embedding IS NOT NULL`,
+        session.shop,
+      );
+      embeddedCount = rows?.[0]?.n || 0;
+    } catch { /* migration not yet applied; fall through */ }
+  }
+
   return {
     shop: session.shop,
     status: state.status,
@@ -94,6 +109,8 @@ export const loader = async ({ request }) => {
     mappings,
     categoryExclusions: safeParse(config.categoryExclusions, []),
     categoryGroups: safeParse(config.categoryGroups, []),
+    embeddingProvider,
+    embeddedCount,
     querySynonyms: safeParse(config.querySynonyms, []),
     similarMatchAttributes: safeParse(config.similarMatchAttributes, []),
     collectionLinks: safeParse(config.collectionLinks, []),
@@ -123,6 +140,20 @@ export const action = async ({ request }) => {
   if (intent === "stop_sync") {
     await stopCatalogSync(session.shop);
     return { stopped: true };
+  }
+
+  if (intent === "backfill_embeddings") {
+    const config = await getShopConfig(session.shop);
+    const resolved = resolveShopEmbedding(config);
+    if (!resolved) {
+      return { error: "Configure an embedding provider and API key in Settings first." };
+    }
+    try {
+      const result = await backfillShopEmbeddings(prisma, session.shop, config);
+      return { backfilled: true, ...result };
+    } catch (err) {
+      return { error: `Backfill failed: ${err?.message || "unknown error"}` };
+    }
   }
 
   if (intent === "save_mapping") {
@@ -1157,6 +1188,77 @@ function CategoryGroupsCard({ initial }) {
   );
 }
 
+function SemanticSearchCard({ provider, embeddedCount, productsCount }) {
+  const fetcher = useFetcher();
+  const isBackfilling = fetcher.state !== "idle" && fetcher.formData?.get("intent") === "backfill_embeddings";
+  const result = fetcher.data;
+  const displayEmbedded = (result?.processed != null)
+    ? Math.min(productsCount || 0, embeddedCount + (result.processed || 0))
+    : embeddedCount;
+
+  const startBackfill = () => {
+    const fd = new FormData();
+    fd.set("intent", "backfill_embeddings");
+    fetcher.submit(fd, { method: "post" });
+  };
+
+  if (!provider) {
+    return (
+      <Card>
+        <BlockStack gap="300">
+          <InlineStack gap="200" blockAlign="center">
+            <Text as="h2" variant="headingMd">Semantic search</Text>
+            <Badge>Disabled</Badge>
+          </InlineStack>
+          <Text as="p" tone="subdued">
+            Match products by meaning, not keywords. Customers asking for "shoes for standing all day" find arch-support styles even when descriptions don't say "standing". Configure a provider in <strong>Settings → Semantic search</strong> to enable.
+          </Text>
+        </BlockStack>
+      </Card>
+    );
+  }
+
+  const remaining = Math.max(0, (productsCount || 0) - displayEmbedded);
+  const tone = remaining === 0 ? "success" : "info";
+
+  return (
+    <Card>
+      <BlockStack gap="300">
+        <InlineStack gap="200" blockAlign="center">
+          <Text as="h2" variant="headingMd">Semantic search</Text>
+          <Badge tone={tone}>{provider === "voyage" ? "Voyage AI" : "OpenAI"}</Badge>
+        </InlineStack>
+        <Text as="p" tone="subdued">
+          {displayEmbedded.toLocaleString()} of {(productsCount || 0).toLocaleString()} products embedded.
+          {remaining > 0
+            ? ` ${remaining.toLocaleString()} remaining — click Backfill to embed them.`
+            : " All products are searchable by meaning."}
+        </Text>
+        {result?.error && (
+          <Banner tone="critical">{result.error}</Banner>
+        )}
+        {result?.backfilled && !result.error && (
+          <Banner tone="success">
+            Backfilled {result.processed?.toLocaleString() || 0} product
+            {result.processed === 1 ? "" : "s"}.
+            {result.failed > 0 ? ` ${result.failed} failed.` : ""}
+            {result.remaining > 0 ? ` ${result.remaining.toLocaleString()} remaining — run Backfill again.` : ""}
+          </Banner>
+        )}
+        <InlineStack gap="200">
+          <Button
+            onClick={startBackfill}
+            loading={isBackfilling}
+            disabled={remaining === 0 && !result?.error}
+          >
+            {remaining === 0 ? "All products embedded" : `Backfill ${remaining.toLocaleString()} products`}
+          </Button>
+        </InlineStack>
+      </BlockStack>
+    </Card>
+  );
+}
+
 function SearchRulesCard({ initial }) {
   const fetcher = useFetcher();
   const [rules, setRules] = useState(initial || []);
@@ -1563,6 +1665,11 @@ export default function RulesKnowledge() {
           >
             <BlockStack gap="400">
               <CategoryGroupsCard initial={data.categoryGroups} />
+              <SemanticSearchCard
+                provider={data.embeddingProvider}
+                embeddedCount={data.embeddedCount}
+                productsCount={data.productsCount}
+              />
               <SearchRulesCard initial={data.categoryExclusions} />
               <QuerySynonymsCard initial={data.querySynonyms} />
               <SimilarMatchAttributesCard initial={data.similarMatchAttributes} />

@@ -1,5 +1,7 @@
 import { authenticate } from "../shopify.server";
 import { upsertProductFromWebhook } from "../models/Product.server";
+import { getShopConfig } from "../models/ShopConfig.server";
+import { embedSingleProductInBackground } from "../lib/embeddings.server";
 import prisma from "../db.server";
 
 export const action = async ({ request }) => {
@@ -12,7 +14,11 @@ export const action = async ({ request }) => {
 
   console.log(`Received ${topic} webhook for ${shop}`);
   try {
-    await upsertProductFromWebhook(shop, payload);
+    const product = await upsertProductFromWebhook(shop, payload);
+    if (product?.id) {
+      const config = await getShopConfig(shop).catch(() => null);
+      if (config) embedSingleProductInBackground(prisma, shop, product.id, config);
+    }
   } catch (err) {
     console.error(`[webhook ${topic}] upsert failed:`, err?.message || err);
   }
