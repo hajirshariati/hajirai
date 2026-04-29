@@ -716,24 +716,41 @@ const isExcludedByRule = (p) => {
     .map((p) => {
       const fields = getScoredFields(p);
       let score = 0;
+      let groupsMatched = 0;
       for (const group of keywordGroups) {
+        let groupHit = false;
         for (const [key, weight] of Object.entries(FIELD_WEIGHTS)) {
           if (group.some((term) => fields[key].includes(term))) {
             score += weight;
+            groupHit = true;
           }
         }
+        if (groupHit) groupsMatched++;
       }
-      return { product: p, score };
+      return { product: p, score, groupsMatched };
     })
     .filter(({ product, score }) => {
       if (isExcludedByRule(product)) return false;
       if (keywordGroups.length === 0) return true;
       return score > 0;
     })
-    .sort((a, b) => b.score - a.score);
+    .sort((a, b) => {
+      if (a.groupsMatched !== b.groupsMatched) return b.groupsMatched - a.groupsMatched;
+      return b.score - a.score;
+    });
 
+  // Only return products at the highest match-tier. If 3 products matched
+  // all keywords ("women", "ultrasky", "sneaker") and 5 matched only some,
+  // return the 3 — never pad the result set with weaker matches that drop
+  // a qualifier (e.g. a regular sneaker shown for a "UltraSky sneaker"
+  // query). When NO product matches all keywords, max-tier degrades
+  // gracefully so the AI still gets results to show.
+  const topGroupsMatched = scored.length > 0
+    ? scored[0].groupsMatched
+    : 0;
+  const tieredScored = scored.filter((x) => x.groupsMatched >= topGroupsMatched);
 
-  let filtered = scored.map((x) => x.product);
+  let filtered = tieredScored.map((x) => x.product);
 
   if (attrKeys.length > 0) {
     const beforeAttrFilter = filtered;
