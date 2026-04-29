@@ -554,7 +554,10 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       const aiText = fullResponseText || "";
       const userAskedSupport = /\b(contact|reach|talk to|speak (to|with)|get (a )?hold of|how do i .{0,20}(contact|reach))\b.{0,40}\b(customer|support|service|care|team|human|agent|representative|rep|person|someone)\b/i.test(userText)
         || /\b(customer (service|care|support)|support (hub|team)|return policy|refund|exchange|my order|order status|shipping issue|problem with my)\b/i.test(userText);
-      const aiMentionsSupport = /\b(our (team|support|customer service|customer care)|support team|customer service|customer care|reach out|contact us|get in touch|happy to help)\b/i.test(aiText);
+      // Tightened: only fires when AI explicitly redirects to support, not
+      // on generic conversational phrases ('happy to help', 'our team', etc.)
+      // that legitimately appear in normal product replies.
+      const aiMentionsSupport = /\b(support team|customer service|customer care|reach out (to )?(our |the )?(team|support|customer service|customer care)|contact (our|the) (team|support|customer service|customer care))\b/i.test(aiText);
       if (userAskedSupport || aiMentionsSupport) {
         const defaultOldLabel = "Contact customer service";
         const label = ctx.supportLabel && ctx.supportLabel.trim() && ctx.supportLabel.trim() !== defaultOldLabel
