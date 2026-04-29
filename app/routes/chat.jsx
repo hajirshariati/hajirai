@@ -4,7 +4,7 @@ import { getShopConfig, getKnowledgeFilesWithContent, incrementRateLimitHits } f
 import { getAttributeMappings } from "../models/AttributeMapping.server";
 import { getCatalogCategories, getAllCatalogCategories } from "../models/Product.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
-import { filterForbiddenCategoryChips, enforceCategoryChipsForShoeQueries, isGenericShoeQuery, isFootwearCategory } from "../lib/chip-filter.server";
+import { filterForbiddenCategoryChips } from "../lib/chip-filter.server";
 import { sanitizeCtaLabel } from "../lib/cta-label.server";
 import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL, FIT_PREDICTOR_TOOL } from "../lib/chat-tools.server";
 import { fetchCustomerContext } from "../lib/customer-context.server";
@@ -592,12 +592,6 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       console.log(`[chat] ${ctx.shop} stripped off-catalog chips:`, filtered.stripped, "allowed:", ctx.catalogCategories);
     }
     fullResponseText = filtered.text;
-
-    const enforced = enforceCategoryChipsForShoeQueries(fullResponseText, ctx.catalogCategories, ctx.latestUserMessage);
-    if (enforced.replaced) {
-      console.log(`[chat] ${ctx.shop} replaced ${enforced.replacedCount} non-category chips with category chips for generic shoe query; new chips:`, enforced.newChips);
-      fullResponseText = enforced.text;
-    }
   }
 
 
@@ -841,13 +835,12 @@ export const action = async ({ request }) => {
     // Merchant-configured category groups: when the customer's latest message
     // contains a trigger word from exactly ONE group, narrow the catalog
     // allow-list passed to the prompt to that group's categories only. This
-    // is data-driven (no hardcoded vocabulary) and merchant-portable.
+    // is fully data-driven — no hardcoded vocabulary anywhere.
     //
-    // - Zero groups configured: legacy hardcoded shoe-only filter still
-    //   applies, so existing shops behave exactly as before until they
-    //   configure groups in Rules & Knowledge.
+    // - Zero groups configured: no filter applied (full allow-list goes
+    //   through). Configure groups in Rules & Knowledge to enable.
     // - Multiple groups match (e.g. "orthotic shoes" hits both Footwear and
-    //   Orthotics): no filter is applied — the AI sees the full allow-list
+    //   Orthotics): no filter applied — the AI sees the full allow-list
     //   and resolves the ambiguity itself. Safer than picking wrong.
     let merchantGroups = [];
     try { merchantGroups = JSON.parse(config.categoryGroups || "[]"); } catch { /* */ }
@@ -879,13 +872,6 @@ export const action = async ({ request }) => {
           catalogProductTypes = filtered;
           groupFilterApplied = g.name;
         }
-      }
-    } else if (isGenericShoeQuery(latestMessage)) {
-      // Legacy fallback for shops that haven't configured category groups yet.
-      const footwearOnly = catalogProductTypes.filter(isFootwearCategory);
-      if (footwearOnly.length >= 2) {
-        catalogProductTypes = footwearOnly;
-        groupFilterApplied = "Footwear (legacy)";
       }
     }
 
