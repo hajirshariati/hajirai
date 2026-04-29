@@ -180,19 +180,31 @@ export async function embedAndStoreProducts(prisma, provider, apiKey, products) 
 // Backfill all products in a shop that don't yet have an embedding.
 // Runs in batches of 50 (safe for both Voyage and OpenAI). Stops at
 // `maxBatches` to bound runtime — caller can re-invoke until done.
-export async function backfillShopEmbeddings(prisma, shop, config, { batchSize = 50, maxBatches = 50 } = {}) {
+export async function backfillShopEmbeddings(prisma, shop, config, { batchSize = 50, maxBatches = 30 } = {}) {
   const resolved = resolveShopEmbedding(config);
   if (!resolved) return { skipped: true, reason: "no provider or api key" };
 
   let totalProcessed = 0;
   let totalFailed = 0;
-  let totalRemaining = 0;
 
   for (let batch = 0; batch < maxBatches; batch++) {
+    // Fetch the next batch of products that still need embedding.
+    // Filter directly on `embedding IS NULL` via raw SQL so each iteration
+    // gets a fresh set — Prisma doesn't expose the vector column, so we
+    // pull IDs first and then load the row data via the typed API.
+    const missingRows = await prisma.$queryRawUnsafe(
+      `SELECT id FROM "Product"
+       WHERE shop = $1 AND embedding IS NULL
+       ORDER BY "updatedAt" DESC
+       LIMIT $2`,
+      shop,
+      batchSize,
+    );
+    if (!Array.isArray(missingRows) || missingRows.length === 0) break;
+
+    const ids = missingRows.map((r) => r.id);
     const rows = await prisma.product.findMany({
-      where: { shop },
-      take: batchSize,
-      orderBy: { updatedAt: "desc" },
+      where: { id: { in: ids } },
       select: {
         id: true,
         title: true,
@@ -203,23 +215,13 @@ export async function backfillShopEmbeddings(prisma, shop, config, { batchSize =
         attributesJson: true,
       },
     });
-    // Filter to rows that don't have an embedding yet (raw SQL since
-    // Prisma doesn't expose the vector column).
-    const ids = rows.map((r) => r.id);
-    if (ids.length === 0) break;
-    const missingRows = await prisma.$queryRawUnsafe(
-      `SELECT id FROM "Product" WHERE id = ANY($1::text[]) AND embedding IS NULL`,
-      ids,
-    );
-    const missingIds = new Set(missingRows.map((r) => r.id));
-    const toEmbed = rows.filter((r) => missingIds.has(r.id));
-    if (toEmbed.length === 0) break;
+    if (rows.length === 0) break;
 
     const { processed, failed } = await embedAndStoreProducts(
       prisma,
       resolved.provider,
       resolved.apiKey,
-      toEmbed,
+      rows,
     );
     totalProcessed += processed;
     totalFailed += failed;
@@ -231,7 +233,7 @@ export async function backfillShopEmbeddings(prisma, shop, config, { batchSize =
     `SELECT COUNT(*)::int AS n FROM "Product" WHERE shop = $1 AND embedding IS NULL`,
     shop,
   );
-  totalRemaining = remainingCountRows?.[0]?.n || 0;
+  const totalRemaining = remainingCountRows?.[0]?.n || 0;
 
   return { processed: totalProcessed, failed: totalFailed, remaining: totalRemaining };
 }
