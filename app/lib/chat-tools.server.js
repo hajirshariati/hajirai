@@ -666,20 +666,13 @@ const isExcludedByRule = (p) => {
     if (tHasWant) return true;
     if (tHasOpposite) return false;
 
-    // Permissive fallback: when no gender signal exists anywhere, keep the
-    // product. This is a deliberate trade-off:
-    //   - Strict (return false) avoids leaking opposite-gender products,
-    //     but breaks chat when catalog data is incomplete (e.g. metaobject
-    //     gender attributes that the app can't read without read_metaobjects
-    //     scope, or merchants who haven't tagged every product).
-    //   - Permissive (return true) lets some untagged products through but
-    //     keeps chat functional even when the merchant's catalog data has
-    //     gaps.
-    // Untagged products are statistically rare in well-maintained catalogs.
-    // Once a merchant's gender data is fully populated, this fallback will
-    // basically never fire — the explicit gender checks above will resolve
-    // everything before reaching here.
-    return true;
+    // Strict mode: when a specific gender was requested but the product has
+    // no gender signal anywhere (attrs.gender is empty AND title has neither
+    // gender word), DROP it. Showing untagged products under a specific
+    // gender risks leaking the wrong gender (e.g. men's products with empty
+    // gender attributes appearing in women's queries). Catalog data should
+    // tag every product; missing tags should fail closed, not open.
+    return false;
   };
 
   // Weighted scoring. A match in title / productType / category attributes
