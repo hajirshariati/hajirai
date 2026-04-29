@@ -418,6 +418,26 @@ function detectAndStripGender(query) {
   return { gender: null, query };
 }
 
+// For concatenated conversation history: return the gender mentioned LAST
+// (most recent), not first. Avoids "Men's" from turn 1 sticking forever after
+// the customer pivots to "women's wedges" later.
+function detectLatestGender(text) {
+  if (!text) return null;
+  let bestIdx = -1;
+  let bestGender = null;
+  for (const g of GENDER_DETECT) {
+    const globalPattern = new RegExp(g.pattern.source, "gi");
+    const matches = [...text.matchAll(globalPattern)];
+    if (matches.length === 0) continue;
+    const lastIdx = matches[matches.length - 1].index;
+    if (lastIdx > bestIdx) {
+      bestIdx = lastIdx;
+      bestGender = g.gender;
+    }
+  }
+  return bestGender;
+}
+
 function genderFilterClause(gender) {
   const want = gender.toLowerCase();
   const opposite = want === "men" ? "women" : want === "women" ? "men" : null;
@@ -455,8 +475,9 @@ async function searchProducts(
   const attrFilters = filters && typeof filters === "object" ? filters : {};
 
 const detected = detectAndStripGender(q);
-const detectedFromUserText = detectAndStripGender(userText || "");
-const detectedFromConversation = detectAndStripGender(conversationText || "");
+const detectedFromLatest = detectAndStripGender(latestUserMessage || "");
+const latestUserGender = detectLatestGender(userText || "");
+const latestConvoGender = detectLatestGender(conversationText || "");
 
 const filterGenderRaw = (attrFilters.gender || attrFilters.Gender || attrFilters.gender_fallback || "")
   .toString()
@@ -470,10 +491,14 @@ const filterGender =
     ? "women"
     : null;
 
+// Priority: AI's current search query > customer's latest message > most recent
+// gender mention anywhere in history > session/filter fallbacks. Scanning history
+// right-to-left avoids the first gender word from turn 1 sticking forever.
 const effectiveGender =
   detected.gender ||
-  detectedFromUserText.gender ||
-  detectedFromConversation.gender ||
+  detectedFromLatest.gender ||
+  latestUserGender ||
+  latestConvoGender ||
   sessionGender ||
   filterGender ||
   null;
