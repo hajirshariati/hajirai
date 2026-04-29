@@ -718,6 +718,44 @@ const isExcludedByRule = (p) => {
     };
   };
 
+  // Semantic search runs IN PARALLEL with keyword scoring, not as a fallback.
+  // Pre-compute similarity for top-N products so it can boost the scoring
+  // loop. Semantic-only candidates (no keyword match but high similarity) can
+  // surface alongside keyword matches.
+  let semanticMap = new Map();
+  const shopEmbedding = resolveShopEmbedding(shopConfig);
+  if (shopEmbedding && q) {
+    try {
+      const queryVec = await embedText(shopEmbedding.provider, shopEmbedding.apiKey, q, { inputType: "query" });
+      const lit = vectorLiteral(queryVec);
+      const semRows = await prisma.$queryRawUnsafe(
+        `SELECT id, 1 - (embedding <=> $1::vector) AS sim
+         FROM "Product"
+         WHERE shop = $2
+           AND embedding IS NOT NULL
+           AND NOT (status IN ('DRAFT', 'draft', 'ARCHIVED', 'archived'))
+         ORDER BY embedding <=> $1::vector
+         LIMIT 30`,
+        lit,
+        shop,
+      );
+      const SIMILARITY_THRESHOLD = 0.45;
+      for (const r of semRows) {
+        const sim = Number(r.sim);
+        if (sim >= SIMILARITY_THRESHOLD) {
+          semanticMap.set(r.id, sim);
+        }
+      }
+    } catch (err) {
+      console.error(`[search] semantic embedding failed:`, err?.message || err);
+    }
+  }
+  // Weight tuning: semantic score 0-1 multiplied by 10 → max +10 contribution.
+  // A perfect keyword match across multiple fields can score 20-30, so
+  // keyword still dominates exact matches; semantic helps when keyword is
+  // weak or missing (e.g. "red" → "Burgundy" via embedding).
+  const SEMANTIC_WEIGHT = 10;
+
   const scored = products
     .map((p) => {
       const fields = getScoredFields(p);
@@ -733,7 +771,15 @@ const isExcludedByRule = (p) => {
         }
         if (groupHit) groupsMatched++;
       }
-      return { product: p, score, groupsMatched };
+      const semSim = semanticMap.get(p.id) || 0;
+      if (semSim > 0) {
+        score += semSim * SEMANTIC_WEIGHT;
+        // Treat semantic as one virtual matched group so a semantic-only
+        // candidate (no keyword overlap) still passes the tier filter
+        // alongside products that matched at least one keyword group.
+        if (groupsMatched < 1) groupsMatched = 1;
+      }
+      return { product: p, score, groupsMatched, semSim };
     })
     .filter(({ product, score }) => {
       if (isExcludedByRule(product)) return false;
@@ -830,12 +876,28 @@ const isExcludedByRule = (p) => {
 
 
     // Safety net: if the attribute filters wiped out every keyword match,
-    // the LLM's filter value doesn't match this merchant's data. Returning
-    // zero dead-ends the customer, so drop the filter and keep the keyword
-    // matches. Gender filter and search-rule exclusions above are untouched.
+    // the LLM's filter value doesn't match this merchant's data verbatim.
+    // Two recovery strategies, in order of preference:
+    //
+    //  1. Semantic-first: if the shop has semantic search and this query
+    //     has any high-similarity products, prefer those over showing
+    //     filter-irrelevant items. Example: filter color_family=red
+    //     wiped out everything; semantic search has Burgundy/Crimson
+    //     products at 0.6+ similarity to "red" → return those.
+    //
+    //  2. Drop filter entirely: fall back to all keyword matches without
+    //     the LLM's filter. Less precise but better than dead-ending.
     if (filtered.length === 0 && beforeAttrFilter.length > 0) {
-      console.log(`[search]   filter-wipeout: dropping attrFilters=${JSON.stringify(attrFilters)}`);
-      filtered = beforeAttrFilter;
+      const semanticFallback = beforeAttrFilter
+        .filter((p) => semanticMap.has(p.id))
+        .sort((a, b) => (semanticMap.get(b.id) || 0) - (semanticMap.get(a.id) || 0));
+      if (semanticFallback.length > 0) {
+        console.log(`[search]   filter-wipeout: using ${semanticFallback.length} semantic matches instead of dropping attrFilters=${JSON.stringify(attrFilters)}`);
+        filtered = semanticFallback;
+      } else {
+        console.log(`[search]   filter-wipeout: dropping attrFilters=${JSON.stringify(attrFilters)}`);
+        filtered = beforeAttrFilter;
+      }
     }
   }
 
@@ -850,85 +912,10 @@ const isExcludedByRule = (p) => {
 
   filtered = filtered.slice(0, max);
 
-  // Semantic overlay (opt-in per merchant). Only runs if the shop has
-  // configured an embedding provider AND keyword search left room
-  // (filtered.length < max). Pure additive: existing keyword results are
-  // never reordered or removed. Semantic results are filtered through the
-  // same gender/category/exclusion logic as keyword results.
-  let semanticAdded = 0;
-  const shopEmbedding = resolveShopEmbedding(shopConfig);
-  if (shopEmbedding && filtered.length < max && q) {
-    const need = max - filtered.length;
-    try {
-      const queryVec = await embedText(shopEmbedding.provider, shopEmbedding.apiKey, q, { inputType: "query" });
-      const lit = vectorLiteral(queryVec);
-      const excludeIds = filtered.map((p) => p.id);
-      // Pull ~3x what we need so post-filtering still leaves enough.
-      const limit = Math.min(need * 3, 30);
-      const semRows = excludeIds.length > 0
-        ? await prisma.$queryRawUnsafe(
-            `SELECT id, 1 - (embedding <=> $1::vector) AS sim
-             FROM "Product"
-             WHERE shop = $2
-               AND embedding IS NOT NULL
-               AND id <> ALL($3::text[])
-               AND NOT (status IN ('DRAFT', 'draft', 'ARCHIVED', 'archived'))
-             ORDER BY embedding <=> $1::vector
-             LIMIT $4`,
-            lit, shop, excludeIds, limit,
-          )
-        : await prisma.$queryRawUnsafe(
-            `SELECT id, 1 - (embedding <=> $1::vector) AS sim
-             FROM "Product"
-             WHERE shop = $2
-               AND embedding IS NOT NULL
-               AND NOT (status IN ('DRAFT', 'draft', 'ARCHIVED', 'archived'))
-             ORDER BY embedding <=> $1::vector
-             LIMIT $3`,
-            lit, shop, limit,
-          );
-      // Threshold: only accept matches with cosine similarity >= 0.45.
-      // Below that, the match is too weak to be useful.
-      const SIMILARITY_THRESHOLD = 0.45;
-      const candidateIds = semRows
-        .filter((r) => Number(r.sim) >= SIMILARITY_THRESHOLD)
-        .map((r) => r.id);
-      if (candidateIds.length > 0) {
-        const semProducts = await prisma.product.findMany({
-          where: { id: { in: candidateIds } },
-          include: {
-            variants: {
-              select: {
-                sku: true,
-                price: true,
-                compareAtPrice: true,
-                attributesJson: true,
-              },
-            },
-          },
-        });
-        // Apply same gender + exclusion filters as keyword path.
-        const semFiltered = semProducts.filter((p) => {
-          if (isExcludedByRule(p)) return false;
-          if (effectiveGender && !matchesGender(p, effectiveGender.toLowerCase())) return false;
-          return true;
-        });
-        // Preserve semantic ordering (by similarity).
-        const orderById = new Map(semRows.map((r, i) => [r.id, i]));
-        semFiltered.sort((a, b) => (orderById.get(a.id) ?? 999) - (orderById.get(b.id) ?? 999));
-        const toAdd = semFiltered.slice(0, need);
-        if (toAdd.length > 0) {
-          filtered = filtered.concat(toAdd);
-          semanticAdded = toAdd.length;
-        }
-      }
-    } catch (err) {
-      console.error(`[search] semantic overlay failed:`, err?.message || err);
-      // Fall through silently — keyword results are still good.
-    }
-  }
-
-  console.log(`[search]   → db=${products.length} filtered=${filtered.length}${semanticAdded > 0 ? ` (semantic=+${semanticAdded})` : ""}`);
+  // Count how many of the final results got a semantic boost (for log
+  // visibility). Semantic was already merged into the scoring loop above.
+  const semanticBoosted = filtered.filter((p) => semanticMap.has(p.id)).length;
+  console.log(`[search]   → db=${products.length} filtered=${filtered.length}${semanticBoosted > 0 ? ` (semantic-boosted=${semanticBoosted})` : ""}`);
 
   const firstPrice = (variants) => {
     const v = (variants || []).find((vv) => vv.price);
