@@ -1289,6 +1289,14 @@ function SemanticSearchCard({ provider, embeddedCount, productsCount }) {
     ? Math.min(100, Math.round((displayEmbedded / productsCount) * 100))
     : 0;
 
+  // Stale-banner heuristic: a meaningful gap between products and embeddings
+  // indicates embeddings need refresh (e.g. attribute mappings just changed,
+  // or merchant just enabled the feature). Don't fire on tiny gaps caused by
+  // a few products in the middle of being webhook-embedded.
+  const staleGap = remaining;
+  const staleRatio = (productsCount || 0) > 0 ? staleGap / productsCount : 0;
+  const showStaleBanner = staleGap > 5 && staleRatio > 0.02 && !isBackfilling && !isReembedding;
+
   return (
     <Card>
       <BlockStack gap="300">
@@ -1296,6 +1304,14 @@ function SemanticSearchCard({ provider, embeddedCount, productsCount }) {
           <Text as="h2" variant="headingMd">Semantic search</Text>
           <Badge tone={tone}>{provider === "voyage" ? "Voyage AI" : "OpenAI"}</Badge>
         </InlineStack>
+        {showStaleBanner && (
+          <Banner tone="warning">
+            <Text as="p" variant="bodySm">
+              <strong>Embeddings are out of date.</strong> {staleGap.toLocaleString()} product
+              {staleGap === 1 ? "" : "s"} {staleGap === 1 ? "is" : "are"} unembedded — search results won't reflect them. Click <strong>Backfill</strong> below to embed pending products, or <strong>Re-embed all</strong> if you've recently changed attribute mappings, category groups, or product metadata.
+            </Text>
+          </Banner>
+        )}
         <BlockStack gap="200">
           <InlineStack align="space-between" blockAlign="center">
             <Text as="p" tone="subdued" variant="bodySm">
