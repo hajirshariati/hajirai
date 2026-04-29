@@ -1664,18 +1664,30 @@ function CatalogSyncCard({ data }) {
             <Text as="p" variant="bodyMd">{formatTime(data.lastSyncedAt)}</Text>
           </Box>
         </InlineStack>
-        {(data.status === "running" || data.status === "stopping") && syncedSoFar > 0 && (
+        {(data.status === "running" || data.status === "stopping") && (
           <BlockStack gap="200">
-            <InlineStack align="space-between">
+            <InlineStack align="space-between" blockAlign="center">
               <Text as="p" variant="bodySm" tone="subdued">
-                {isStopping ? "Stopping..." : `${syncedSoFar} products synced${pct !== null ? ` (${pct}%)` : ""}...`}
+                {isStopping
+                  ? "Stopping sync..."
+                  : syncedSoFar > 0
+                  ? `Syncing ${syncedSoFar.toLocaleString()}${estimate > 0 ? ` of ${estimate.toLocaleString()}` : ""} products${pct !== null ? ` (${pct}%)` : ""}...`
+                  : "Connecting to Shopify..."}
+              </Text>
+              <Text as="p" variant="bodySm" tone="subdued">
+                Auto-refreshing
               </Text>
             </InlineStack>
-            {pct !== null && (
-              <div style={{ height: "6px", borderRadius: "3px", background: "#e4e5e7", overflow: "hidden" }}>
-                <div style={{ height: "100%", width: `${pct}%`, borderRadius: "3px", background: "#2D6B4F", transition: "width 0.5s ease" }} />
-              </div>
-            )}
+            <ProgressBar
+              progress={pct !== null ? pct : 0}
+              tone={isStopping ? "critical" : "primary"}
+              size="small"
+            />
+            <Text as="p" tone="subdued" variant="bodySm">
+              {isStopping
+                ? "Finishing the current product, then stopping. Existing data is preserved."
+                : "Pulls every product, variant, price, and inventory level. Most catalogs finish in 1–5 minutes; very large catalogs (10k+ products) can take longer."}
+            </Text>
           </BlockStack>
         )}
         {data.lastError && (
