@@ -56,6 +56,14 @@ export function enforceCategoryChipsForShoeQueries(text, catalogCategories, user
   const chipMatches = [...text.matchAll(/<<([^<>|]+)>>/g)];
   if (chipMatches.length === 0) return { text, replaced: false };
 
+  // If the AI is asking gender first (correct DISCOVERY ORDER behavior),
+  // don't override its gender chips with category chips. Otherwise we force
+  // the customer into a category-first dead-end where they pick "Mary Janes"
+  // and only then learn no men's Mary Janes exist.
+  if (chipMatches.some((m) => isGenderChip(m[1]))) {
+    return { text, replaced: false };
+  }
+
   const allowSet = new Set(catalogCategories.map(normalize).filter(Boolean));
   const categoryChipCount = chipMatches.filter((m) => chipIsFromCategories(m[1], allowSet)).length;
   if (categoryChipCount >= 2) return { text, replaced: false };
@@ -92,6 +100,21 @@ function chipTokens(inner) {
     if (n) tokens.add(n);
   }
   return tokens;
+}
+
+const GENDER_CHIP_WORDS = new Set([
+  "men", "mens", "male",
+  "women", "womens", "female", "ladies",
+  "boy", "boys", "girl", "girls",
+  "kid", "kids", "children", "childrens", "unisex",
+]);
+
+function isGenderChip(inner) {
+  const tokens = chipTokens(inner);
+  for (const t of tokens) {
+    if (GENDER_CHIP_WORDS.has(t)) return true;
+  }
+  return false;
 }
 
 // A chip is considered a "category chip" only if one of its tokens matches
