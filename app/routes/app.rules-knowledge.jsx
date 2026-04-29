@@ -1045,6 +1045,118 @@ function FitPredictorCard({ enabled, config }) {
   );
 }
 
+function CategoryGroupsCard({ initial }) {
+  const fetcher = useFetcher();
+  const [groups, setGroups] = useState(initial || []);
+  const [name, setName] = useState("");
+  const [categories, setCategories] = useState("");
+  const [triggers, setTriggers] = useState("");
+
+  const save = (g) => {
+    const fd = new FormData();
+    fd.set("intent", "save_category_groups");
+    fd.set("categoryGroups", JSON.stringify(g));
+    fetcher.submit(fd, { method: "post" });
+  };
+
+  const addGroup = () => {
+    const n = name.trim();
+    const c = categories.split(",").map((s) => s.trim()).filter(Boolean);
+    const t = triggers.split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
+    if (!n || c.length === 0) return;
+    const updated = [...groups, { name: n, categories: c, triggers: t }];
+    setGroups(updated);
+    setName("");
+    setCategories("");
+    setTriggers("");
+    save(updated);
+  };
+
+  const removeGroup = (idx) => {
+    const updated = groups.filter((_, i) => i !== idx);
+    setGroups(updated);
+    save(updated);
+  };
+
+  const moveGroup = (idx, dir) => {
+    const target = idx + dir;
+    if (target < 0 || target >= groups.length) return;
+    const updated = [...groups];
+    [updated[idx], updated[target]] = [updated[target], updated[idx]];
+    setGroups(updated);
+    save(updated);
+  };
+
+  return (
+    <Card>
+      <BlockStack gap="400">
+        <BlockStack gap="100">
+          <InlineStack gap="200" blockAlign="center">
+            <Text as="h2" variant="headingMd">Category groups</Text>
+            <Badge tone="info">Routes customer intent to the right categories</Badge>
+          </InlineStack>
+          <Text as="p" tone="subdued">
+            Group your catalog categories so the AI understands customer intent. When a customer's message contains one of a group's trigger words, only that group's categories appear as choice buttons.
+          </Text>
+          <Text as="p" tone="subdued" variant="bodySm">
+            Example: a footwear store creates a <strong>Footwear</strong> group with categories <code>Boots, Sneakers, Sandals, Loafers</code> and triggers <code>shoe, shoes, footwear</code>. Now when a customer asks "find me shoes", they see only those four as buttons — not Orthotics, Socks, or Gift Card. Triggers match singular and plural automatically (entering <code>shoe</code> also matches <code>shoes</code>). Multi-match: if a message hits two groups (e.g. "orthotic shoes"), no filter is applied — the AI sees the full catalog and decides.
+          </Text>
+        </BlockStack>
+
+        {groups.length > 0 && (
+          <BlockStack gap="200">
+            {groups.map((g, i) => (
+              <Box key={i} padding="300" background="bg-surface-secondary" borderRadius="200">
+                <BlockStack gap="150">
+                  <InlineStack align="space-between" blockAlign="center">
+                    <InlineStack gap="150" blockAlign="center">
+                      <Badge>{String(i + 1)}</Badge>
+                      <Text as="span" variant="headingSm">{g.name}</Text>
+                    </InlineStack>
+                    <InlineStack gap="100">
+                      <Button size="slim" disabled={i === 0} onClick={() => moveGroup(i, -1)}>↑</Button>
+                      <Button size="slim" disabled={i === groups.length - 1} onClick={() => moveGroup(i, 1)}>↓</Button>
+                      <Button variant="plain" tone="critical" onClick={() => removeGroup(i)}>Remove</Button>
+                    </InlineStack>
+                  </InlineStack>
+                  <InlineStack gap="200" blockAlign="center" wrap>
+                    <Badge tone="success">Categories</Badge>
+                    <Text as="span" variant="bodySm"><code>{g.categories.join(", ")}</code></Text>
+                  </InlineStack>
+                  {g.triggers && g.triggers.length > 0 && (
+                    <InlineStack gap="200" blockAlign="center" wrap>
+                      <Badge tone="info">Triggers</Badge>
+                      <Text as="span" variant="bodySm"><code>{g.triggers.join(", ")}</code></Text>
+                    </InlineStack>
+                  )}
+                </BlockStack>
+              </Box>
+            ))}
+          </BlockStack>
+        )}
+
+        <Divider />
+
+        <BlockStack gap="200">
+          <Text as="h3" variant="headingSm">Add a group</Text>
+          <FormLayout>
+            <TextField label="Group name" value={name} onChange={setName}
+              placeholder="Footwear" autoComplete="off"
+              helpText="Internal name. Customers don't see this." />
+            <TextField label="Categories in this group" value={categories} onChange={setCategories}
+              placeholder="Boots, Sneakers, Sandals, Loafers" autoComplete="off"
+              helpText="Comma-separated. Must match category names from your catalog exactly (case-insensitive)." />
+            <TextField label="Trigger words" value={triggers} onChange={setTriggers}
+              placeholder="shoe, shoes, footwear" autoComplete="off"
+              helpText="Comma-separated. When any appears in the customer's latest message (word-boundary, plural-aware), this group's categories take priority." />
+            <Button onClick={addGroup} disabled={!name.trim() || !categories.trim()}>Add group</Button>
+          </FormLayout>
+        </BlockStack>
+      </BlockStack>
+    </Card>
+  );
+}
+
 function SearchRulesCard({ initial }) {
   const fetcher = useFetcher();
   const [rules, setRules] = useState(initial || []);
@@ -1450,6 +1562,7 @@ export default function RulesKnowledge() {
             summary="Custom search rules, query synonyms, and similar-match attributes let you tune how the AI matches customer questions to your catalog."
           >
             <BlockStack gap="400">
+              <CategoryGroupsCard initial={data.categoryGroups} />
               <SearchRulesCard initial={data.categoryExclusions} />
               <QuerySynonymsCard initial={data.querySynonyms} />
               <SimilarMatchAttributesCard initial={data.similarMatchAttributes} />
