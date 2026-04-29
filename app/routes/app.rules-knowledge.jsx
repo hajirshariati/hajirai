@@ -157,6 +157,28 @@ export const action = async ({ request }) => {
     }
   }
 
+  if (intent === "clear_and_reembed") {
+    const config = await getShopConfig(session.shop);
+    const resolved = resolveShopEmbedding(config);
+    if (!resolved) {
+      return { error: "Configure an embedding provider and API key in Settings first." };
+    }
+    try {
+      // Wipe all embeddings, then re-run backfill on the fresh catalog data.
+      // Use this when catalog metadata changed (new attribute mappings,
+      // metaobject scope granted after initial embed, bulk re-tagged
+      // products) so embeddings reflect the current data.
+      await prisma.$executeRawUnsafe(
+        `UPDATE "Product" SET embedding = NULL, "embeddingUpdatedAt" = NULL WHERE shop = $1`,
+        session.shop,
+      );
+      const result = await backfillShopEmbeddings(prisma, session.shop, config);
+      return { reembedded: true, ...result };
+    } catch (err) {
+      return { error: `Re-embed failed: ${err?.message || "unknown error"}` };
+    }
+  }
+
   if (intent === "save_mapping") {
     const attribute = String(formData.get("attribute") || "").trim().toLowerCase();
     const sourceType = String(formData.get("sourceType") || "metafield");
@@ -1191,15 +1213,33 @@ function CategoryGroupsCard({ initial }) {
 
 function SemanticSearchCard({ provider, embeddedCount, productsCount }) {
   const fetcher = useFetcher();
-  const isBackfilling = fetcher.state !== "idle" && fetcher.formData?.get("intent") === "backfill_embeddings";
+  const submittingIntent = fetcher.state !== "idle" ? fetcher.formData?.get("intent") : null;
+  const isBackfilling = submittingIntent === "backfill_embeddings";
+  const isReembedding = submittingIntent === "clear_and_reembed";
   const result = fetcher.data;
-  const displayEmbedded = (result?.processed != null)
-    ? Math.min(productsCount || 0, embeddedCount + (result.processed || 0))
-    : embeddedCount;
+  const displayEmbedded = (() => {
+    if (result?.reembedded) {
+      return Math.min(productsCount || 0, result.processed || 0);
+    }
+    if (result?.processed != null) {
+      return Math.min(productsCount || 0, embeddedCount + (result.processed || 0));
+    }
+    return embeddedCount;
+  })();
 
   const startBackfill = () => {
     const fd = new FormData();
     fd.set("intent", "backfill_embeddings");
+    fetcher.submit(fd, { method: "post" });
+  };
+
+  const startReembed = () => {
+    const ok = window.confirm(
+      "Re-embed all products? This wipes existing embeddings and re-creates them from current catalog data. Useful after attribute mappings or category metaobjects change. Takes 30-60 seconds for catalogs under 5,000 products."
+    );
+    if (!ok) return;
+    const fd = new FormData();
+    fd.set("intent", "clear_and_reembed");
     fetcher.submit(fd, { method: "post" });
   };
 
@@ -1257,15 +1297,34 @@ function SemanticSearchCard({ provider, embeddedCount, productsCount }) {
             {result.remaining > 0 ? ` ${result.remaining.toLocaleString()} remaining — run Backfill again.` : ""}
           </Banner>
         )}
-        <InlineStack gap="200">
+        {result?.reembedded && !result.error && (
+          <Banner tone="success">
+            Re-embedded {result.processed?.toLocaleString() || 0} product
+            {result.processed === 1 ? "" : "s"} with fresh catalog data.
+            {result.failed > 0 ? ` ${result.failed} failed.` : ""}
+          </Banner>
+        )}
+        <InlineStack gap="200" wrap>
           <Button
             onClick={startBackfill}
             loading={isBackfilling}
-            disabled={remaining === 0 && !result?.error}
+            disabled={(remaining === 0 && !result?.error) || isReembedding}
           >
             {remaining === 0 ? "All products embedded" : `Backfill ${remaining.toLocaleString()} products`}
           </Button>
+          <Button
+            onClick={startReembed}
+            loading={isReembedding}
+            disabled={isBackfilling || (productsCount || 0) === 0}
+            tone="critical"
+            variant="plain"
+          >
+            Re-embed all (refresh)
+          </Button>
         </InlineStack>
+        <Text as="p" tone="subdued" variant="bodySm">
+          Use <strong>Re-embed all</strong> after attribute mappings change, after the metaobject scope is granted, or after bulk catalog edits — those don't auto-refresh embeddings.
+        </Text>
       </BlockStack>
     </Card>
   );
