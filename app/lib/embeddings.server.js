@@ -61,8 +61,10 @@ export async function embedTexts(provider, apiKey, texts, { inputType = "documen
       input_type: inputType === "query" ? "query" : "document",
     };
   } else {
-    // OpenAI: request 1024 dimensions explicitly so it matches Voyage's
-    // native size — same DB column works for both providers.
+    // OpenAI: text-embedding-3-* models don't accept input_type — they
+    // produce a single embedding type used for both queries and documents.
+    // Request 1024 dimensions explicitly so it matches Voyage's native
+    // size — same DB column works for both providers.
     body = {
       model: cfg.model,
       input: inputs,

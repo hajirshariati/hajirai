@@ -263,7 +263,16 @@ export const action = async ({ request }) => {
         }))
         .filter((g) => g.name && g.categories.length > 0);
       await updateShopConfig(session.shop, { categoryGroups: JSON.stringify(cleaned) });
-      return { saved: true };
+      // Group changes affect how product attributes get included in the
+      // embedding text (categories appear in attrText). Clear stale
+      // embeddings so the next backfill captures the new grouping context.
+      try {
+        await prisma.$executeRawUnsafe(
+          `UPDATE "Product" SET embedding = NULL, "embeddingUpdatedAt" = NULL WHERE shop = $1`,
+          session.shop,
+        );
+      } catch { /* */ }
+      return { saved: true, embeddingsStale: true };
     } catch { /* */ }
     return { error: "Invalid category groups." };
   }
