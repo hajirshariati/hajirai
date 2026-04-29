@@ -87,6 +87,39 @@ export const loader = async ({ request }) => {
   const enrichedCounts = await Promise.all(files.map((f) => countEnrichmentsBySourceFile(f.id)));
   const filesWithCounts = files.map((f, i) => ({ ...f, enrichedSkus: enrichedCounts[i] }));
 
+  // Detect distinct attribute values from the synced catalog. For each
+  // configured mapping (gender, color, fit_type, etc.), scan products'
+  // attributesJson and count distinct values. Surfaces what's actually in
+  // the catalog so merchants know what customers can search by — and can
+  // configure synonyms (red → crimson/burgundy) appropriately.
+  const detectedValues = {};
+  if (mappings.length > 0 && count > 0) {
+    try {
+      const sample = await prisma.product.findMany({
+        where: { shop: session.shop },
+        select: { attributesJson: true },
+        take: 2000,
+      });
+      for (const m of mappings) {
+        const counts = new Map();
+        for (const p of sample) {
+          const v = p.attributesJson?.[m.attribute];
+          if (v == null || v === "") continue;
+          const values = Array.isArray(v) ? v : [v];
+          for (const val of values) {
+            const s = String(val).trim();
+            if (!s) continue;
+            counts.set(s, (counts.get(s) || 0) + 1);
+          }
+        }
+        const sorted = [...counts.entries()]
+          .sort((a, b) => b[1] - a[1])
+          .map(([value, n]) => ({ value, count: n }));
+        detectedValues[m.attribute] = sorted;
+      }
+    } catch { /* */ }
+  }
+
   // Embedding status: how many products have been embedded?
   let embeddedCount = 0;
   let embeddingProvider = config.embeddingProvider || "";
@@ -108,6 +141,7 @@ export const loader = async ({ request }) => {
     productsCount: count,
     syncedSoFar: state.syncedSoFar || 0,
     mappings,
+    detectedValues,
     categoryExclusions: safeParse(config.categoryExclusions, []),
     categoryGroups: safeParse(config.categoryGroups, []),
     embeddingProvider,
@@ -1488,7 +1522,7 @@ function SearchRulesCard({ initial }) {
   );
 }
 
-function AttributeMappingsCard({ mappings }) {
+function AttributeMappingsCard({ mappings, detectedValues = {} }) {
   const fetcher = useFetcher();
   const saving = fetcher.state !== "idle" && fetcher.formData?.get("intent") === "save_mapping";
   const lastError = fetcher.data?.error;
@@ -1550,25 +1584,49 @@ function AttributeMappingsCard({ mappings }) {
         {mappings.length > 0 && (
           <>
             <Divider />
-            <BlockStack gap="200">
-              {mappings.map((m) => (
-                <InlineStack key={m.id} align="space-between" blockAlign="center">
-                  <InlineStack gap="200" blockAlign="center">
-                    <Text as="span" variant="bodyMd" fontWeight="semibold">{m.attribute}</Text>
-                    <Badge tone={m.target === "variant" ? "attention" : "info"}>
-                      {m.target === "variant" ? "Variant" : "Product"}
-                    </Badge>
-                    {m.sourceType === "metafield" ? (
-                      <Tag>{`metafield: ${m.namespace}.${m.key}`}</Tag>
+            <BlockStack gap="300">
+              {mappings.map((m) => {
+                const detected = detectedValues[m.attribute] || [];
+                const top = detected.slice(0, 6);
+                const more = detected.length - top.length;
+                return (
+                  <BlockStack key={m.id} gap="100">
+                    <InlineStack align="space-between" blockAlign="center">
+                      <InlineStack gap="200" blockAlign="center">
+                        <Text as="span" variant="bodyMd" fontWeight="semibold">{m.attribute}</Text>
+                        <Badge tone={m.target === "variant" ? "attention" : "info"}>
+                          {m.target === "variant" ? "Variant" : "Product"}
+                        </Badge>
+                        {m.sourceType === "metafield" ? (
+                          <Tag>{`metafield: ${m.namespace}.${m.key}`}</Tag>
+                        ) : (
+                          <Tag>{`tag prefix: ${m.prefix}`}</Tag>
+                        )}
+                      </InlineStack>
+                      <Button variant="tertiary" tone="critical" onClick={() => handleDelete(m.attribute)}>
+                        Remove
+                      </Button>
+                    </InlineStack>
+                    {detected.length > 0 ? (
+                      <Text as="p" tone="subdued" variant="bodySm">
+                        {detected.length} value{detected.length === 1 ? "" : "s"} detected:{" "}
+                        {top.map((d, i) => (
+                          <span key={d.value}>
+                            {i > 0 && ", "}
+                            <Text as="span" fontWeight="medium">{d.value}</Text>
+                            {" "}({d.count})
+                          </span>
+                        ))}
+                        {more > 0 && ` +${more} more`}
+                      </Text>
                     ) : (
-                      <Tag>{`tag prefix: ${m.prefix}`}</Tag>
+                      <Text as="p" tone="subdued" variant="bodySm">
+                        No values detected yet — sync your catalog or check that products have this metafield set.
+                      </Text>
                     )}
-                  </InlineStack>
-                  <Button variant="tertiary" tone="critical" onClick={() => handleDelete(m.attribute)}>
-                    Remove
-                  </Button>
-                </InlineStack>
-              ))}
+                  </BlockStack>
+                );
+              })}
             </BlockStack>
           </>
         )}
@@ -1772,7 +1830,7 @@ export default function RulesKnowledge() {
             description="Where the AI's product data comes from — keep this in sync with your Shopify catalog and tell the AI which metafields to filter by."
           />
           <CatalogSyncCard data={data} />
-          <AttributeMappingsCard mappings={data.mappings} />
+          <AttributeMappingsCard mappings={data.mappings} detectedValues={data.detectedValues} />
         </BlockStack>
 
         <BlockStack gap="400">
