@@ -4,7 +4,7 @@ import { getShopConfig, getKnowledgeFilesWithContent, incrementRateLimitHits } f
 import { getAttributeMappings } from "../models/AttributeMapping.server";
 import { getCatalogCategories, getAllCatalogCategories } from "../models/Product.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
-import { filterForbiddenCategoryChips, enforceCategoryChipsForShoeQueries } from "../lib/chip-filter.server";
+import { filterForbiddenCategoryChips, enforceCategoryChipsForShoeQueries, isGenericShoeQuery, isFootwearCategory } from "../lib/chip-filter.server";
 import { sanitizeCtaLabel } from "../lib/cta-label.server";
 import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL, FIT_PREDICTOR_TOOL } from "../lib/chat-tools.server";
 import { fetchCustomerContext } from "../lib/customer-context.server";
@@ -831,13 +831,30 @@ export const action = async ({ request }) => {
     const messages = [...history, { role: "user", content: String(body.message) }];
     const sessionGender = detectGenderFromHistory(messages);
 
-    const [knowledge, attrMappings, catalogProductTypes, allCatalogCategories] = await Promise.all([
+    let [knowledge, attrMappings, catalogProductTypes, allCatalogCategories] = await Promise.all([
       getKnowledgeFilesWithContent(session.shop),
       getAttributeMappings(session.shop),
       getCatalogCategories(session.shop, { gender: sessionGender }),
       getAllCatalogCategories(session.shop),
     ]);
-    console.log(`[chat] ${session.shop} gender=${sessionGender || "any"} scoped-categories=${catalogProductTypes.length} full-catalog-categories=${allCatalogCategories.length}`);
+
+    // When the customer's latest message is a generic shoe/footwear query
+    // (e.g. "find men's shoes", "what shoes do you have"), narrow the
+    // catalog allow-list passed to the prompt to footwear-only categories.
+    // This prevents Claude from offering Orthotics, Accessories, Socks,
+    // Gift Card, etc. as "type of shoe" choice buttons. Non-footwear
+    // categories are still discoverable through other queries — they're
+    // just suppressed when the customer's intent is footwear.
+    const latestMessage = String(body.message || "");
+    const shoeOnlyIntent = isGenericShoeQuery(latestMessage);
+    if (shoeOnlyIntent) {
+      const footwearOnly = catalogProductTypes.filter(isFootwearCategory);
+      if (footwearOnly.length >= 2) {
+        catalogProductTypes = footwearOnly;
+      }
+    }
+
+    console.log(`[chat] ${session.shop} gender=${sessionGender || "any"} scoped-categories=${catalogProductTypes.length} full-catalog-categories=${allCatalogCategories.length}${shoeOnlyIntent ? " shoe-intent=true" : ""}`);
     const attributeNames = attrMappings.map((m) => m.attribute);
 
     let categoryExclusions = [];
