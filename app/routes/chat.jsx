@@ -16,11 +16,11 @@ import { canSendMessage } from "../lib/billing.server";
 
 const DEFAULT_MODEL = process.env.DEFAULT_MODEL || "claude-sonnet-4-6";
 const HAIKU_MODEL = "claude-haiku-4-5-20251001";
-const OPUS_MODEL = "claude-opus-4-20250514";
+const OPUS_MODEL = "claude-opus-4-7";
 const MAX_TOKENS = parseInt(process.env.CHAT_MAX_TOKENS, 10) || 1024;
 const MAX_TOOL_HOPS = parseInt(process.env.CHAT_MAX_TOOL_HOPS, 10) || 3;
 
-const DEPRECATED_MODELS = new Set(["claude-sonnet-4-20250514", "claude-3-5-sonnet-20241022", "claude-3-5-sonnet-20240620"]);
+const DEPRECATED_MODELS = new Set(["claude-sonnet-4-20250514", "claude-3-5-sonnet-20241022", "claude-3-5-sonnet-20240620", "claude-opus-4-20250514"]);
 
 const RATE_LIMIT_PER_IP_SHOP = parseInt(process.env.RATE_LIMIT_PER_IP_SHOP, 10) || 20;
 const RATE_LIMIT_WINDOW_MS = parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 60_000;
