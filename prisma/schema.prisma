@@ -93,6 +93,7 @@ model ShopConfig {
 
   hideOnUrls             String   @default("[]")
   categoryExclusions     String   @default("[]")
+  categoryGroups         String   @default("[]")
   querySynonyms          String   @default("[]")
   similarMatchAttributes String   @default("[]")
   collectionLinks        String   @default("[]")

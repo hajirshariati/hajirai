@@ -838,23 +838,58 @@ export const action = async ({ request }) => {
       getAllCatalogCategories(session.shop),
     ]);
 
-    // When the customer's latest message is a generic shoe/footwear query
-    // (e.g. "find men's shoes", "what shoes do you have"), narrow the
-    // catalog allow-list passed to the prompt to footwear-only categories.
-    // This prevents Claude from offering Orthotics, Accessories, Socks,
-    // Gift Card, etc. as "type of shoe" choice buttons. Non-footwear
-    // categories are still discoverable through other queries — they're
-    // just suppressed when the customer's intent is footwear.
+    // Merchant-configured category groups: when the customer's latest message
+    // contains a trigger word from exactly ONE group, narrow the catalog
+    // allow-list passed to the prompt to that group's categories only. This
+    // is data-driven (no hardcoded vocabulary) and merchant-portable.
+    //
+    // - Zero groups configured: legacy hardcoded shoe-only filter still
+    //   applies, so existing shops behave exactly as before until they
+    //   configure groups in Rules & Knowledge.
+    // - Multiple groups match (e.g. "orthotic shoes" hits both Footwear and
+    //   Orthotics): no filter is applied — the AI sees the full allow-list
+    //   and resolves the ambiguity itself. Safer than picking wrong.
+    let merchantGroups = [];
+    try { merchantGroups = JSON.parse(config.categoryGroups || "[]"); } catch { /* */ }
+
     const latestMessage = String(body.message || "");
-    const shoeOnlyIntent = isGenericShoeQuery(latestMessage);
-    if (shoeOnlyIntent) {
+    const messageLower = latestMessage.toLowerCase();
+    let groupFilterApplied = "";
+
+    if (Array.isArray(merchantGroups) && merchantGroups.length > 0) {
+      const triggerMatches = (msg, triggers) => {
+        if (!Array.isArray(triggers) || triggers.length === 0) return false;
+        for (const t of triggers) {
+          const phrase = String(t || "").trim();
+          if (!phrase) continue;
+          const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+          const withS = /s$/.test(phrase)
+            ? `(?:${escaped}|${escaped.slice(0, -1)})`
+            : `${escaped}(?:s|es)?`;
+          if (new RegExp(`\\b${withS}\\b`, "i").test(msg)) return true;
+        }
+        return false;
+      };
+      const matched = merchantGroups.filter((g) => triggerMatches(messageLower, g?.triggers || []));
+      if (matched.length === 1) {
+        const g = matched[0];
+        const allowed = new Set((g.categories || []).map((c) => String(c).toLowerCase()));
+        const filtered = catalogProductTypes.filter((c) => allowed.has(String(c).toLowerCase()));
+        if (filtered.length >= 1) {
+          catalogProductTypes = filtered;
+          groupFilterApplied = g.name;
+        }
+      }
+    } else if (isGenericShoeQuery(latestMessage)) {
+      // Legacy fallback for shops that haven't configured category groups yet.
       const footwearOnly = catalogProductTypes.filter(isFootwearCategory);
       if (footwearOnly.length >= 2) {
         catalogProductTypes = footwearOnly;
+        groupFilterApplied = "Footwear (legacy)";
       }
     }
 
-    console.log(`[chat] ${session.shop} gender=${sessionGender || "any"} scoped-categories=${catalogProductTypes.length} full-catalog-categories=${allCatalogCategories.length}${shoeOnlyIntent ? " shoe-intent=true" : ""}`);
+    console.log(`[chat] ${session.shop} gender=${sessionGender || "any"} scoped-categories=${catalogProductTypes.length} full-catalog-categories=${allCatalogCategories.length}${groupFilterApplied ? ` group=${groupFilterApplied}` : ""}`);
     const attributeNames = attrMappings.map((m) => m.attribute);
 
     let categoryExclusions = [];
