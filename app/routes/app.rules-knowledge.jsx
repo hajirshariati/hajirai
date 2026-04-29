@@ -204,13 +204,28 @@ export const action = async ({ request }) => {
       key: sourceType === "metafield" ? key : null,
       prefix: sourceType === "tag_prefix" ? prefix : null,
     });
-    return { saved: true };
+    // Mapping change means existing embeddings are stale (their attribute
+    // text no longer reflects the new mapping). Clear them; the next
+    // backfill or webhook update will recreate with fresh data.
+    try {
+      await prisma.$executeRawUnsafe(
+        `UPDATE "Product" SET embedding = NULL, "embeddingUpdatedAt" = NULL WHERE shop = $1`,
+        session.shop,
+      );
+    } catch { /* table might not have the column on shops without semantic search */ }
+    return { saved: true, embeddingsStale: true };
   }
 
   if (intent === "delete_mapping") {
     const attribute = String(formData.get("attribute") || "").trim();
     if (attribute) await deleteAttributeMapping(session.shop, attribute);
-    return { deleted: true };
+    try {
+      await prisma.$executeRawUnsafe(
+        `UPDATE "Product" SET embedding = NULL, "embeddingUpdatedAt" = NULL WHERE shop = $1`,
+        session.shop,
+      );
+    } catch { /* */ }
+    return { deleted: true, embeddingsStale: true };
   }
 
   if (intent === "toggle_dedup") {
