@@ -100,6 +100,13 @@ model ShopConfig {
   fitPredictorEnabled    Boolean  @default(false)
   fitPredictorConfig     String   @default("{}")
 
+  // Semantic search (opt-in per merchant). Provider is one of "", "voyage",
+  // or "openai". Empty disables semantic search; keyword search is used.
+  // API keys are encrypted at rest using app/utils/encryption.server.js.
+  embeddingProvider      String   @default("")
+  voyageApiKey           String   @default("")
+  openaiApiKey           String   @default("")
+
   supportUrl          String   @default("")
   supportLabel        String   @default("Contact customer service")
   trackingPageUrl     String   @default("")
