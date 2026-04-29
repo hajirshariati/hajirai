@@ -4,6 +4,14 @@ function normalize(s) {
 
 const SPECIFIC_CATEGORY_RE = /\b(sneakers?|sandals?|boots?|booties?|loafers?|slippers?|heels?|flats?|clogs?|mules?|oxfords?|moccasins?|slides?|pumps?|espadrilles?|wedges?|trainers?|runners?|cleats?|orthotics?|insoles?|inserts?|footbeds?)\b/i;
 const GENERIC_SHOE_RE = /\b(shoes?|footwear)\b/i;
+// "Running shoes", "training shoes", "casual shoes" etc. are NOT generic
+// catalog-disambiguation queries — they're activity-specific. Customers
+// reach these phrases either by typing them or by clicking a chip the AI
+// just offered (e.g. <<Running Shoes>><<Gym/Training Shoes>> in an
+// orthotic flow). Treat any shoe-word that is qualified by an activity as
+// specific, so the chip enforcer doesn't blow away the AI's contextual
+// response.
+const ACTIVITY_QUALIFIER_RE = /\b(running|training|gym|workout|athletic|tennis|basketball|hiking|walking|casual|formal|dress|work|orthotic|insole|insert)\b/i;
 
 // Substring matches against any common footwear keyword. Used to filter the
 // catalog category list to only shoe-style options when a customer asks a
@@ -36,6 +44,7 @@ export function isGenericShoeQuery(userMessage) {
   const s = String(userMessage || "");
   if (!GENERIC_SHOE_RE.test(s)) return false;
   if (SPECIFIC_CATEGORY_RE.test(s)) return false;
+  if (ACTIVITY_QUALIFIER_RE.test(s)) return false;
   return true;
 }
 
