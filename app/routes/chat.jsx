@@ -14,9 +14,16 @@ import prisma from "../db.server";
 import { recordChatUsage, getTodayMessageCount } from "../models/ChatUsage.server";
 import { canSendMessage } from "../lib/billing.server";
 
+// Model IDs are env-driven so you can update them in Railway without a code
+// deploy. When Anthropic ships a new model:
+//   1. Railway → Service → Variables → set OPUS_MODEL=<new-id> (or HAIKU/DEFAULT)
+//   2. Service auto-restarts
+//   3. Smoke-test a few chats; if anything's off, revert the env var
+// Defaults below are the current best as of code commit time. Without env vars
+// set, behavior is unchanged.
 const DEFAULT_MODEL = process.env.DEFAULT_MODEL || "claude-sonnet-4-6";
-const HAIKU_MODEL = "claude-haiku-4-5-20251001";
-const OPUS_MODEL = "claude-opus-4-7";
+const HAIKU_MODEL = process.env.HAIKU_MODEL || "claude-haiku-4-5-20251001";
+const OPUS_MODEL = process.env.OPUS_MODEL || "claude-opus-4-7";
 const MAX_TOKENS = parseInt(process.env.CHAT_MAX_TOKENS, 10) || 1024;
 const MAX_TOOL_HOPS = parseInt(process.env.CHAT_MAX_TOOL_HOPS, 10) || 3;
 
