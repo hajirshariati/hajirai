@@ -604,6 +604,19 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     fullResponseText = filtered.text;
   }
 
+  // Strip any markdown directive blocks (`:::name ... :::`) the model may
+  // emit. Some Anthropic responses generate `:::product-list ... :::` blocks
+  // listing handles separated by '|' as a markup directive — but our widget
+  // doesn't render directives, so the literal markup leaks into the chat
+  // message. Product cards already render via the separate `type: products`
+  // SSE event, so we just strip the directive blocks entirely.
+  if (fullResponseText) {
+    fullResponseText = fullResponseText
+      .replace(/:::[a-zA-Z][\w-]*[\s\S]*?:::/g, "")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
+  }
+
 
 const collection = extractCollectionCTA(fullResponseText);
 fullResponseText = collection.text;
