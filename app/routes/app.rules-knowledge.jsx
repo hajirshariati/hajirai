@@ -93,6 +93,7 @@ export const loader = async ({ request }) => {
     syncedSoFar: state.syncedSoFar || 0,
     mappings,
     categoryExclusions: safeParse(config.categoryExclusions, []),
+    categoryGroups: safeParse(config.categoryGroups, []),
     querySynonyms: safeParse(config.querySynonyms, []),
     similarMatchAttributes: safeParse(config.similarMatchAttributes, []),
     collectionLinks: safeParse(config.collectionLinks, []),
@@ -174,6 +175,28 @@ export const action = async ({ request }) => {
       }
     } catch { /* */ }
     return { error: "Invalid search rules." };
+  }
+
+  if (intent === "save_category_groups") {
+    const raw = formData.get("categoryGroups");
+    try {
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) return { error: "Invalid category groups." };
+      const cleaned = parsed
+        .map((g) => ({
+          name: String(g?.name || "").trim(),
+          categories: Array.isArray(g?.categories)
+            ? g.categories.map((c) => String(c || "").trim()).filter(Boolean)
+            : [],
+          triggers: Array.isArray(g?.triggers)
+            ? g.triggers.map((t) => String(t || "").trim().toLowerCase()).filter(Boolean)
+            : [],
+        }))
+        .filter((g) => g.name && g.categories.length > 0);
+      await updateShopConfig(session.shop, { categoryGroups: JSON.stringify(cleaned) });
+      return { saved: true };
+    } catch { /* */ }
+    return { error: "Invalid category groups." };
   }
 
   if (intent === "save_synonyms") {
