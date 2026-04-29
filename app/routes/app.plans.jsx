@@ -3,7 +3,7 @@ import { data } from "react-router";
 import { useLoaderData, useActionData, Form, useNavigation } from "react-router";
 import {
   Page, Layout, Card, Text, Button, Badge, BlockStack, InlineStack, Banner,
-  ProgressBar, Box, Icon,
+  ProgressBar, Box, Icon, InlineGrid,
 } from "@shopify/polaris";
 import { CheckCircleIcon, EmailIcon, MinusIcon, ClipboardIcon } from "@shopify/polaris-icons";
 import { TitleBar } from "@shopify/app-bridge-react";
@@ -51,18 +51,20 @@ const FEATURE_ROWS = [
   { label: "Conversations / month", get: (p) => formatLimit(p.conversationsPerMonth) },
   { label: "Knowledge files", get: (p) => formatLimit(p.knowledgeFiles) },
   { label: "Analytics history", get: (p) => `${p.analyticsRetentionDays} days` },
-  { label: "Smart model routing", get: (p) => planAllows(p, "smartRouting") },
-  { label: "Prompt caching", get: (p) => planAllows(p, "promptCaching") },
+  { label: "Smart routing + prompt caching", get: (p) => planAllows(p, "smartRouting") && planAllows(p, "promptCaching") },
   { label: "Advanced AI model", get: (p) => planAllows(p, "advancedModel") },
-  { label: "Search rules & synonyms", get: (p) => planAllows(p, "searchRules") },
-  { label: "Product enrichment (CSV)", get: (p) => planAllows(p, "productEnrichment") },
-  { label: "Fit predictor", get: (p) => planAllows(p, "fitPredictor") },
-  { label: "VIP mode (logged-in profiles)", get: (p) => planAllows(p, "vipMode") },
-  { label: "Klaviyo integration", get: (p) => planAllows(p, "klaviyoIntegration") },
-  { label: "Aftership integration", get: (p) => planAllows(p, "aftershipIntegration") },
-  { label: "Yotpo loyalty + reviews", get: (p) => planAllows(p, "yotpoIntegration") },
-  { label: "Remove SEoS Assistant branding", get: (p) => planAllows(p, "removeBranding") },
-  { label: "Email support", get: () => true },
+  { label: "Search rules, synonyms, product enrichment", get: (p) => planAllows(p, "searchRules") && planAllows(p, "productEnrichment") },
+  { label: "Fit predictor + VIP mode", get: (p) => planAllows(p, "fitPredictor") && planAllows(p, "vipMode") },
+  { label: "Integrations · Remove branding", get: (p) => {
+    const ints = [
+      planAllows(p, "klaviyoIntegration") && "Klaviyo",
+      planAllows(p, "yotpoIntegration") && "Yotpo",
+      planAllows(p, "aftershipIntegration") && "Aftership",
+    ].filter(Boolean);
+    if (ints.length === 0) return false;
+    const branding = planAllows(p, "removeBranding") ? " · Unbranded" : "";
+    return ints.join(" · ") + branding;
+  } },
 ];
 
 // Sort rows so the features supported by the most plans float to the top and
@@ -475,63 +477,53 @@ export default function PlansPage() {
                 </Text>
               </BlockStack>
 
-              <FlowStep number="1" emoji="💬" title="Customer sends a message">
-                The chat widget on your storefront sends the message to SEoS Assistant along with the recent conversation history.
-              </FlowStep>
+              <InlineGrid columns={{ xs: 1, md: 2 }} gap="300">
+                <FlowStep number="1" emoji="💬" title="Customer sends a message">
+                  The chat widget on your storefront sends the message to SEoS Assistant along with the recent conversation history.
+                </FlowStep>
 
-              <FlowArrow />
+                <FlowStep number="2" emoji="🧠" title="AI reads context, understands intent">
+                  Gender, category, color, size, condition — anything mentioned earlier in the chat becomes context. The AI never re-asks what the customer already told it.
+                </FlowStep>
 
-              <FlowStep number="2" emoji="🧠" title="AI reads context, understands intent">
-                Gender, category, color, size, condition — anything mentioned earlier in the chat becomes context. The AI never re-asks what the customer already told it.
-              </FlowStep>
+                <FlowStep
+                  number="3"
+                  emoji="🔍"
+                  title="Catalog search — keyword + meaning"
+                  badges={[{ tone: "info", text: "Semantic search optional (BYO API key)" }]}
+                >
+                  Keyword search matches title, tags, attributes, and description. With semantic search enabled, products are also matched by meaning — "shoes for standing all day" finds arch-support styles even when descriptions don't say "standing".
+                </FlowStep>
 
-              <FlowArrow />
+                <FlowStep
+                  number="4"
+                  emoji="🎯"
+                  title="Smart filtering — only the right products"
+                  badges={[
+                    { tone: "success", text: "Category groups (all plans)" },
+                    { tone: "attention", text: "Search rules — Growth+" },
+                  ]}
+                >
+                  Gender and category are locked from the conversation so wrong-gender products never show. Category groups keep choice buttons sharp ("shoes" only offers Footwear chips, not Orthotics or Accessories). Merchant-defined search rules can block products that shouldn't appear for specific queries.
+                </FlowStep>
 
-              <FlowStep
-                number="3"
-                emoji="🔍"
-                title="Catalog search — keyword + meaning"
-                badges={[{ tone: "info", text: "Semantic search optional (BYO API key)" }]}
-              >
-                Keyword search matches title, tags, attributes, and description. With semantic search enabled, products are also matched by meaning — "shoes for standing all day" finds arch-support styles even when descriptions don't say "standing".
-              </FlowStep>
+                <FlowStep number="5" emoji="✍️" title="AI composes a clean, honest answer">
+                  One sentence, no rambling, no echo headlines. Uses your knowledge files, brand voice, and tone settings. Never invents product names, SKUs, prices, or health claims — every product mentioned is backed by real catalog data.
+                </FlowStep>
 
-              <FlowArrow />
+                <FlowStep
+                  number="6"
+                  emoji="👤"
+                  title="Personalization for logged-in customers"
+                  badges={[{ tone: "magic", text: "VIP mode — Enterprise" }]}
+                >
+                  For shoppers signed into your storefront, the assistant can use past order history, loyalty status, and prior fit feedback to personalize recommendations. None of their data is stored — every lookup is per-conversation, in-memory only.
+                </FlowStep>
 
-              <FlowStep
-                number="4"
-                emoji="🎯"
-                title="Smart filtering — only the right products"
-                badges={[
-                  { tone: "success", text: "Category groups (all plans)" },
-                  { tone: "attention", text: "Search rules — Growth+" },
-                ]}
-              >
-                Gender and category are locked from the conversation so wrong-gender products never show. Category groups keep choice buttons sharp ("shoes" only offers Footwear chips, not Orthotics or Accessories). Merchant-defined search rules can block products that shouldn't appear for specific queries.
-              </FlowStep>
-
-              <FlowArrow />
-
-              <FlowStep number="5" emoji="✍️" title="AI composes a clean, honest answer">
-                One sentence, no rambling, no echo headlines. Uses your knowledge files, brand voice, and tone settings. Never invents product names, SKUs, prices, or health claims — every product mentioned is backed by real catalog data.
-              </FlowStep>
-
-              <FlowArrow />
-
-              <FlowStep
-                number="6"
-                emoji="👤"
-                title="Personalization for logged-in customers"
-                badges={[{ tone: "magic", text: "VIP mode — Enterprise" }]}
-              >
-                For shoppers signed into your storefront, the assistant can use past order history, loyalty status, and prior fit feedback to personalize recommendations. None of their data is stored — every lookup is per-conversation, in-memory only.
-              </FlowStep>
-
-              <FlowArrow />
-
-              <FlowStep number="7" emoji="📦" title="Customer sees the response">
-                Clean text reply, real product cards (image + title + price, clickable), and a few follow-up question chips. Optional collection CTA, support button, fit-confidence badge, or Klaviyo signup form depending on context.
-              </FlowStep>
+                <FlowStep number="7" emoji="📦" title="Customer sees the response">
+                  Clean text reply, real product cards (image + title + price, clickable), and a few follow-up question chips. Optional collection CTA, support button, fit-confidence badge, or Klaviyo signup form depending on context.
+                </FlowStep>
+              </InlineGrid>
 
               <Box padding="400" background="bg-surface-secondary" borderRadius="200">
                 <BlockStack gap="200">
@@ -614,10 +606,3 @@ function FlowStep({ number, emoji, title, badges, children }) {
   );
 }
 
-function FlowArrow() {
-  return (
-    <Box paddingInlineStart="500">
-      <Text as="span" variant="bodyLg" tone="subdued">↓</Text>
-    </Box>
-  );
-}
