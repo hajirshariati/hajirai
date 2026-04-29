@@ -67,6 +67,14 @@ export const loader = async ({ request }) => {
     satisfactionRate: feedback.satisfactionRate,
     modelStrategy: config.modelStrategy || "smart",
     rateLimitHits,
+    semanticEnabled: !!(config.embeddingProvider && (
+      (config.embeddingProvider === "voyage" && config.voyageApiKey) ||
+      (config.embeddingProvider === "openai" && config.openaiApiKey)
+    )),
+    semanticProvider: config.embeddingProvider || "",
+    categoryGroupsCount: (() => {
+      try { return (JSON.parse(config.categoryGroups || "[]") || []).length; } catch { return 0; }
+    })(),
   };
 };
 
@@ -182,6 +190,7 @@ export default function Home() {
     hasApiKey, fileCount, shop, themeEditorUrl, widgetEnabled,
     productsCount, enrichmentCount, totalCost, totalMessages, avgCostPerMessage,
     feedbackTotal, satisfactionRate, modelStrategy, rateLimitHits,
+    semanticEnabled, semanticProvider, categoryGroupsCount,
   } = useLoaderData();
 
   const rateFetcher = useFetcher();
@@ -361,6 +370,22 @@ export default function Home() {
               actionLabel={fileCount > 0 ? "Manage files" : "Upload"}
               actionUrl="/app/rules-knowledge"
             />
+            <ChecklistItem
+              done={categoryGroupsCount > 0}
+              number="4"
+              title="Define category groups (optional)"
+              description="Group your catalog (e.g. Footwear / Orthotics / Accessories) so the AI never offers irrelevant categories when a customer asks about one of them. Keeps choice buttons sharp and on-topic."
+              actionLabel={categoryGroupsCount > 0 ? `Manage (${categoryGroupsCount})` : "Set up groups"}
+              actionUrl="/app/rules-knowledge"
+            />
+            <ChecklistItem
+              done={semanticEnabled}
+              number="5"
+              title="Enable semantic search (optional)"
+              description="Match products by meaning, not just keywords. Customers asking for &quot;shoes for standing all day&quot; find arch-support styles even when descriptions don't contain those words. Bring your own Voyage AI or OpenAI key — typically under $1/month."
+              actionLabel={semanticEnabled ? `Manage (${semanticProvider === "voyage" ? "Voyage AI" : "OpenAI"})` : "Add provider"}
+              actionUrl="/app/api-keys"
+            />
           </BlockStack>
         </BlockStack>
 
@@ -421,6 +446,7 @@ export default function Home() {
               <BlockStack gap="200">
                 <Text as="p" variant="bodySm"><strong>Version:</strong> 1.0.0</Text>
                 <Text as="p" variant="bodySm"><strong>AI Engine:</strong> Anthropic Claude</Text>
+                <Text as="p" variant="bodySm"><strong>Semantic Search:</strong> {semanticEnabled ? `${semanticProvider === "voyage" ? "Voyage AI" : "OpenAI"} (active)` : "Optional — bring your own key"}</Text>
               </BlockStack>
               <BlockStack gap="200">
                 <Text as="p" variant="bodySm"><strong>UTM Tracking:</strong> All product links include utm_source=shopagent</Text>

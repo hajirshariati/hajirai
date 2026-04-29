@@ -27,6 +27,7 @@ import {
   DataTable,
   DropZone,
   EmptyState,
+  ProgressBar,
 } from "@shopify/polaris";
 import { DeleteIcon } from "@shopify/polaris-icons";
 import { TitleBar } from "@shopify/app-bridge-react";
@@ -1220,6 +1221,9 @@ function SemanticSearchCard({ provider, embeddedCount, productsCount }) {
 
   const remaining = Math.max(0, (productsCount || 0) - displayEmbedded);
   const tone = remaining === 0 ? "success" : "info";
+  const percent = (productsCount || 0) > 0
+    ? Math.min(100, Math.round((displayEmbedded / productsCount) * 100))
+    : 0;
 
   return (
     <Card>
@@ -1228,11 +1232,19 @@ function SemanticSearchCard({ provider, embeddedCount, productsCount }) {
           <Text as="h2" variant="headingMd">Semantic search</Text>
           <Badge tone={tone}>{provider === "voyage" ? "Voyage AI" : "OpenAI"}</Badge>
         </InlineStack>
-        <Text as="p" tone="subdued">
-          {displayEmbedded.toLocaleString()} of {(productsCount || 0).toLocaleString()} products embedded.
+        <BlockStack gap="200">
+          <InlineStack align="space-between" blockAlign="center">
+            <Text as="p" tone="subdued" variant="bodySm">
+              {displayEmbedded.toLocaleString()} of {(productsCount || 0).toLocaleString()} products embedded
+            </Text>
+            <Text as="p" tone="subdued" variant="bodySm">{percent}%</Text>
+          </InlineStack>
+          <ProgressBar progress={percent} tone={remaining === 0 ? "success" : "primary"} size="small" />
+        </BlockStack>
+        <Text as="p" tone="subdued" variant="bodySm">
           {remaining > 0
-            ? ` ${remaining.toLocaleString()} remaining — click Backfill to embed them.`
-            : " All products are searchable by meaning."}
+            ? `${remaining.toLocaleString()} remaining — click Backfill to embed them. New and updated products are embedded automatically.`
+            : "All products are searchable by meaning. New and updated products are embedded automatically."}
         </Text>
         {result?.error && (
           <Banner tone="critical">{result.error}</Banner>
