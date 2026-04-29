@@ -995,6 +995,7 @@ export const action = async ({ request }) => {
       trackingPageUrl: config.trackingPageUrl || "",
       returnsPageUrl: config.returnsPageUrl || "",
       catalogCategories: catalogProductTypes,
+      shopConfig: config,
       fullCatalogCategories: allCatalogCategories,
       latestUserMessage: String(body.message || ""),
     };

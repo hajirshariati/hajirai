@@ -1,6 +1,7 @@
 import prisma from "../db.server";
 import { logMentions } from "../models/ChatProductMention.server";
 import { fetchCustomerContext } from "./customer-context.server";
+import { embedText, vectorLiteral, resolveShopEmbedding } from "./embeddings.server";
 
 
 const flattenValues = (obj) => {
@@ -466,7 +467,7 @@ function genderFilterClause(gender) {
 
 async function searchProducts(
   { query, limit, filters },
-  { shop, deduplicateColors, sessionGender, categoryExclusions, querySynonyms, conversationText, userText, latestUserMessage }
+  { shop, deduplicateColors, sessionGender, categoryExclusions, querySynonyms, conversationText, userText, latestUserMessage, shopConfig }
 ) {
   const q = String(query || "").trim();
   if (!q) return { products: [] };
@@ -844,7 +845,85 @@ const isExcludedByRule = (p) => {
 
   filtered = filtered.slice(0, max);
 
-  console.log(`[search]   → db=${products.length} filtered=${filtered.length}`);
+  // Semantic overlay (opt-in per merchant). Only runs if the shop has
+  // configured an embedding provider AND keyword search left room
+  // (filtered.length < max). Pure additive: existing keyword results are
+  // never reordered or removed. Semantic results are filtered through the
+  // same gender/category/exclusion logic as keyword results.
+  let semanticAdded = 0;
+  const shopEmbedding = resolveShopEmbedding(shopConfig);
+  if (shopEmbedding && filtered.length < max && q) {
+    const need = max - filtered.length;
+    try {
+      const queryVec = await embedText(shopEmbedding.provider, shopEmbedding.apiKey, q, { inputType: "query" });
+      const lit = vectorLiteral(queryVec);
+      const excludeIds = filtered.map((p) => p.id);
+      // Pull ~3x what we need so post-filtering still leaves enough.
+      const limit = Math.min(need * 3, 30);
+      const semRows = excludeIds.length > 0
+        ? await prisma.$queryRawUnsafe(
+            `SELECT id, 1 - (embedding <=> $1::vector) AS sim
+             FROM "Product"
+             WHERE shop = $2
+               AND embedding IS NOT NULL
+               AND id <> ALL($3::text[])
+               AND NOT (status IN ('DRAFT', 'draft', 'ARCHIVED', 'archived'))
+             ORDER BY embedding <=> $1::vector
+             LIMIT $4`,
+            lit, shop, excludeIds, limit,
+          )
+        : await prisma.$queryRawUnsafe(
+            `SELECT id, 1 - (embedding <=> $1::vector) AS sim
+             FROM "Product"
+             WHERE shop = $2
+               AND embedding IS NOT NULL
+               AND NOT (status IN ('DRAFT', 'draft', 'ARCHIVED', 'archived'))
+             ORDER BY embedding <=> $1::vector
+             LIMIT $3`,
+            lit, shop, limit,
+          );
+      // Threshold: only accept matches with cosine similarity >= 0.45.
+      // Below that, the match is too weak to be useful.
+      const SIMILARITY_THRESHOLD = 0.45;
+      const candidateIds = semRows
+        .filter((r) => Number(r.sim) >= SIMILARITY_THRESHOLD)
+        .map((r) => r.id);
+      if (candidateIds.length > 0) {
+        const semProducts = await prisma.product.findMany({
+          where: { id: { in: candidateIds } },
+          include: {
+            variants: {
+              select: {
+                sku: true,
+                price: true,
+                compareAtPrice: true,
+                attributesJson: true,
+              },
+            },
+          },
+        });
+        // Apply same gender + exclusion filters as keyword path.
+        const semFiltered = semProducts.filter((p) => {
+          if (isExcludedByRule(p)) return false;
+          if (effectiveGender && !matchesGender(p, effectiveGender.toLowerCase())) return false;
+          return true;
+        });
+        // Preserve semantic ordering (by similarity).
+        const orderById = new Map(semRows.map((r, i) => [r.id, i]));
+        semFiltered.sort((a, b) => (orderById.get(a.id) ?? 999) - (orderById.get(b.id) ?? 999));
+        const toAdd = semFiltered.slice(0, need);
+        if (toAdd.length > 0) {
+          filtered = filtered.concat(toAdd);
+          semanticAdded = toAdd.length;
+        }
+      }
+    } catch (err) {
+      console.error(`[search] semantic overlay failed:`, err?.message || err);
+      // Fall through silently — keyword results are still good.
+    }
+  }
+
+  console.log(`[search]   → db=${products.length} filtered=${filtered.length}${semanticAdded > 0 ? ` (semantic=+${semanticAdded})` : ""}`);
 
   const firstPrice = (variants) => {
     const v = (variants || []).find((vv) => vv.price);
