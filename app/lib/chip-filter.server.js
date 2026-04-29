@@ -25,7 +25,7 @@ const FOOTWEAR_KEYWORDS = [
   "mary jane", "ballet",
 ];
 
-function isFootwearCategory(category) {
+export function isFootwearCategory(category) {
   const lower = String(category || "").toLowerCase();
   return FOOTWEAR_KEYWORDS.some((kw) => lower.includes(kw));
 }
