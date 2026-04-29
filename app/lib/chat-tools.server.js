@@ -876,12 +876,28 @@ const isExcludedByRule = (p) => {
 
 
     // Safety net: if the attribute filters wiped out every keyword match,
-    // the LLM's filter value doesn't match this merchant's data. Returning
-    // zero dead-ends the customer, so drop the filter and keep the keyword
-    // matches. Gender filter and search-rule exclusions above are untouched.
+    // the LLM's filter value doesn't match this merchant's data verbatim.
+    // Two recovery strategies, in order of preference:
+    //
+    //  1. Semantic-first: if the shop has semantic search and this query
+    //     has any high-similarity products, prefer those over showing
+    //     filter-irrelevant items. Example: filter color_family=red
+    //     wiped out everything; semantic search has Burgundy/Crimson
+    //     products at 0.6+ similarity to "red" → return those.
+    //
+    //  2. Drop filter entirely: fall back to all keyword matches without
+    //     the LLM's filter. Less precise but better than dead-ending.
     if (filtered.length === 0 && beforeAttrFilter.length > 0) {
-      console.log(`[search]   filter-wipeout: dropping attrFilters=${JSON.stringify(attrFilters)}`);
-      filtered = beforeAttrFilter;
+      const semanticFallback = beforeAttrFilter
+        .filter((p) => semanticMap.has(p.id))
+        .sort((a, b) => (semanticMap.get(b.id) || 0) - (semanticMap.get(a.id) || 0));
+      if (semanticFallback.length > 0) {
+        console.log(`[search]   filter-wipeout: using ${semanticFallback.length} semantic matches instead of dropping attrFilters=${JSON.stringify(attrFilters)}`);
+        filtered = semanticFallback;
+      } else {
+        console.log(`[search]   filter-wipeout: dropping attrFilters=${JSON.stringify(attrFilters)}`);
+        filtered = beforeAttrFilter;
+      }
     }
   }
 
