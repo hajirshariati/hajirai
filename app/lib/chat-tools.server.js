@@ -666,8 +666,13 @@ const isExcludedByRule = (p) => {
     if (tHasWant) return true;
     if (tHasOpposite) return false;
 
-    // Keep product if no strong gender signal is present.
-    return true;
+    // Strict mode: when a specific gender was requested but the product has
+    // no gender signal anywhere (attrs.gender is empty AND title has neither
+    // gender word), DROP it. Showing untagged products under a specific
+    // gender risks leaking the wrong gender (e.g. men's products with empty
+    // gender attributes appearing in women's queries). Catalog data should
+    // tag every product; missing tags should fail closed, not open.
+    return false;
   };
 
   // Weighted scoring. A match in title / productType / category attributes
