@@ -29,7 +29,12 @@ import {
   detectGenderFromHistory,
   stripBannedNarration,
   stripMetaNarration,
+  dedupeConsecutiveSentences,
 } from "../app/lib/chat-helpers.server.js";
+import {
+  filterForbiddenCategoryChips,
+  filterContradictingGenderChips,
+} from "../app/lib/chip-filter.server.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const argFlag = (name) => process.argv.find((a) => a.startsWith(`--${name}=`))?.slice(`--${name}=`.length);
@@ -80,6 +85,34 @@ const catalogProductTypes = [
 ];
 
 const attributeNames = ["gender", "color", "category", "footbed"];
+
+// Aetrex-shape category-gender map. Mirrors what
+// getCategoryGenderAvailability() returns from the live catalog.
+// Used so the eval's chip-filter step matches production behavior.
+const AETREX_CATEGORY_GENDER_MAP = {
+  boots:        { display: "Boots",        genders: ["women"] },
+  loafers:      { display: "Loafers",      genders: ["women"] },
+  oxfords:      { display: "Oxfords",      genders: ["women"] },
+  slippers:     { display: "Slippers",     genders: ["women"] },
+  "slip ons":   { display: "Slip Ons",     genders: ["women"] },
+  "mary janes": { display: "Mary Janes",   genders: ["women"] },
+  "wedges heels": { display: "Wedges Heels", genders: ["women"] },
+  cleats:       { display: "Cleats",       genders: ["unisex"] },
+  sandals:      { display: "Sandals",      genders: ["men", "women"] },
+  sneakers:     { display: "Sneakers",     genders: ["men", "women"] },
+  clogs:        { display: "Clogs",        genders: ["men", "women"] },
+  footwear:     { display: "Footwear",     genders: ["men", "women"] },
+  orthotics:    { display: "Orthotics",    genders: ["men", "women", "unisex"] },
+  accessories:  { display: "Accessories",  genders: ["women", "unisex"] },
+  socks:        { display: "Socks",        genders: ["women", "unisex"] },
+};
+
+// What the chip filter sees as "allowed" when no specific gender
+// scope applies (mirrors the gender=any catalog scoping). For
+// gender-specific scenarios the filter would receive the narrowed
+// list — we use the full list here so the eval doesn't over-strip.
+const AETREX_GENDER_SCOPED_CATEGORIES = catalogProductTypes;
+const AETREX_FULL_CATEGORIES = catalogProductTypes;
 
 const args = process.argv.slice(2);
 const filterIdx = args.indexOf("--filter");
@@ -178,6 +211,24 @@ async function runScenario(scenario) {
     .trim();
   text = stripBannedNarration(text);
   text = stripMetaNarration(text);
+  text = dedupeConsecutiveSentences(text);
+
+  // Apply the production chip filters so the eval matches what
+  // customers actually see (not the raw LLM output).
+  // - filterForbiddenCategoryChips: strips category chips not in the
+  //   gender-scoped allow-list.
+  // - filterContradictingGenderChips: strips gender chips that
+  //   contradict the user's mentioned category (Men's when user asked
+  //   for boots, since boots are women-only at Aetrex).
+  const conversationText = (scenario.history || [])
+    .concat((scenario.messages || []).map((c) => ({ role: "user", content: c })))
+    .filter((m) => m && typeof m.content === "string")
+    .map((m) => m.content)
+    .join(" ");
+  const fbcc = filterForbiddenCategoryChips(text, AETREX_GENDER_SCOPED_CATEGORIES, AETREX_FULL_CATEGORIES);
+  text = fbcc.text;
+  const fcgc = filterContradictingGenderChips(text, conversationText, AETREX_CATEGORY_GENDER_MAP);
+  text = fcgc.text;
 
   const checked = checkExpectations(scenario, text);
   if (scenario._source?.isFeedback) {
