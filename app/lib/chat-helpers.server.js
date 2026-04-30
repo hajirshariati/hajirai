@@ -33,7 +33,13 @@ export function detectGenderFromHistory(messages) {
 // when nothing matched, returns input.
 // Lookbehind so back-to-back phrases ("Hold on. Let me search.") both
 // match — `(?:^|\s)` would consume the boundary and miss the second.
-const BANNED_NARRATION = /(?<=^|\s)(?:let me (?:look (?:that )?up|find|search|check|see|pull up|grab)(?:[^.!?\n]*)?[.!?]?|one moment[!.]?|hold on[!.]?|right away[!.]?|i['‘’]?ll (?:look|find|search|check|see|pull up|grab)(?:[^.!?\n]*)?[.!?]?)/gi;
+// Covers:
+//   "let me X" / "i'll X" with a wide verb list (look, find, search,
+//     check, see, pull up, grab, get, look up, look at)
+//   "i need to X" / "let me get the details" — softer but still
+//     narrative announcements the AI ships before tool calls
+//   "one moment" / "hold on" / "right away" / "give me a second"
+const BANNED_NARRATION = /(?<=^|\s)(?:let me (?:look (?:that |it )?up|find|search|check|see|pull (?:up|that up|that)|grab|get|look at|get the details)(?:[^.!?\n]*)?[.!?]?|i['‘’]?ll (?:look|find|search|check|see|pull|grab|get|need to)(?:[^.!?\n]*)?[.!?]?|i need to (?:pull up|look up|look at|find|search|check|see|grab|get)(?:[^.!?\n]*)?[.!?]?|one moment[!.]?|hold on[!.]?|right away[!.]?|give me a (?:second|sec|moment)[!.]?)/gi;
 
 export function stripBannedNarration(text) {
   if (!text) return text;
@@ -83,29 +89,75 @@ export function hasChoiceButtons(text) {
   return /<<[^<>]+>>/.test(text || "");
 }
 
-// AI sometimes ships near-duplicate sentences ("Here are some great
-// men's casual orthotics designed for everyday support. Here are some
-// great men's casual orthotics built for everyday support and all-day
-// comfort..."). The NO REPETITION prompt rule says don't, but
-// compliance fails. Strip the second of any pair of consecutive
-// sentences that share 4+ leading words.
+// AI ships repetitive sentences in two distinct shapes:
+//   (a) Echo opener — two adjacent sentences starting with the same
+//       4+ words ("Here are some great X. Here are some great X with…").
+//   (b) Paraphrase — two adjacent sentences that say the same thing
+//       in different words ("The standard version provides cushioning
+//       and arch support... The standard Kids Orthotics offer
+//       cushioning and arch support...").
+//
+// Both violate the NO REPETITION prompt rule but the AI keeps shipping
+// them. Catch both: first by opener match (cheap, narrow), then by
+// content overlap (Jaccard-style, broader).
+const STOPWORDS = new Set([
+  "a", "an", "the", "and", "or", "but", "of", "in", "on", "at", "to", "for",
+  "with", "as", "by", "is", "are", "be", "been", "being", "was", "were",
+  "this", "that", "these", "those", "it", "its", "your", "you", "we", "our",
+  "i", "me", "my", "if", "while", "when", "what", "which", "who", "whose",
+  "than", "then", "so", "also", "just", "too", "very", "any", "some", "all",
+  "more", "most", "less", "no", "not", "do", "does", "did", "have", "has",
+  "had", "from", "into", "out", "up", "down", "over", "under", "between",
+]);
+
+function significantWords(s) {
+  return new Set(
+    String(s || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, " ")
+      .split(/\s+/)
+      .filter((w) => w.length > 2 && !STOPWORDS.has(w)),
+  );
+}
+
+function overlapRatio(setA, setB) {
+  if (setA.size === 0 || setB.size === 0) return 0;
+  let shared = 0;
+  for (const w of setA) if (setB.has(w)) shared++;
+  return shared / Math.min(setA.size, setB.size);
+}
+
 export function dedupeConsecutiveSentences(text) {
   if (!text) return text;
   const sentences = text.split(/(?<=[.!?])\s+/);
   if (sentences.length <= 1) return text;
   const kept = [];
-  let lastKey = null;
+  let lastTrimmed = null;
+  let lastOpener = null;
+  let lastWords = null;
   for (const s of sentences) {
     const trimmed = s.trim();
     if (!trimmed) continue;
-    const norm = trimmed.toLowerCase().replace(/[^a-z0-9\s]/g, "").split(/\s+/).filter(Boolean);
-    const key = norm.slice(0, 4).join(" ");
-    if (key && key === lastKey) {
-      // Same opener as previous sentence — drop this one.
-      continue;
+    const tokens = trimmed.toLowerCase().replace(/[^a-z0-9\s]/g, "").split(/\s+/).filter(Boolean);
+    const opener = tokens.slice(0, 4).join(" ");
+    const words = significantWords(trimmed);
+
+    if (lastTrimmed) {
+      // (a) Echo-opener: same first 4 words.
+      if (opener && opener === lastOpener) continue;
+      // (b) Paraphrase: ≥70% of significant words shared with previous
+      // sentence, AND each side has at least 5 significant words (so
+      // we don't false-trigger on short sentences with overlapping
+      // common words).
+      if (words.size >= 5 && lastWords && lastWords.size >= 5) {
+        const ratio = overlapRatio(words, lastWords);
+        if (ratio >= 0.7) continue;
+      }
     }
     kept.push(trimmed);
-    lastKey = key;
+    lastTrimmed = trimmed;
+    lastOpener = opener;
+    lastWords = words;
   }
   return kept.join(" ");
 }

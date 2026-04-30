@@ -388,6 +388,52 @@ cases.push({
   },
 });
 
+cases.push({
+  name: "dedupes paraphrased sentences (semantic repetition)",
+  run: () => {
+    const input = "The standard version provides general cushioning and arch support for kids with no specific discomfort, while the posted version adds extra reinforcement at the heel and arch — best when a child has arch or heel pain. The standard Kids Orthotics offer cushioning and arch support for everyday active kids with no specific discomfort, while the Posted version adds extra heel and arch reinforcement — ideal if your child experiences arch or heel pain.";
+    const out = dedupeConsecutiveSentences(input);
+    // Should drop the second sentence — they share too many significant words.
+    const occurrences = out.match(/standard/gi) || [];
+    assert.ok(occurrences.length <= 1, `expected at most 1 'standard', got ${occurrences.length}: ${out}`);
+  },
+});
+
+cases.push({
+  name: "keeps two sentences with low content overlap",
+  run: () => {
+    const input = "The Speed Orthotic targets running shoes specifically. Pricing starts at $69.95.";
+    const out = dedupeConsecutiveSentences(input);
+    assert.equal(out, input, `should preserve unrelated sentences: ${out}`);
+  },
+});
+
+cases.push({
+  name: "keeps short sentences even if they share generic words",
+  run: () => {
+    const input = "Got it. Got the size.";
+    const out = dedupeConsecutiveSentences(input);
+    // Both very short — content-overlap rule shouldn't fire (size threshold)
+    assert.equal(out, input);
+  },
+});
+
+cases.push({
+  name: "strips 'i need to pull up' narration",
+  run: () => assert.match(
+    stripBannedNarration("I need to pull up the Carly first to match you."),
+    /^(?:to match you\.?|)$/i,
+  ),
+});
+
+cases.push({
+  name: "strips 'let me get the details' narration",
+  run: () => {
+    const out = stripBannedNarration("Let me get the details for the Jillian.");
+    assert.ok(!/let me get the details/i.test(out), `still has narration: ${out}`);
+  },
+});
+
 // ── run all ───────────────────────────────────────────────────────────
 let pass = 0;
 const failures = [];

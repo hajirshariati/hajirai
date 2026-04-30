@@ -638,6 +638,12 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
 
   if (!fullResponseText && pool.length === 0) {
     fullResponseText = "I'm not finding a great match for that right now. Want to try a different style, or I can connect you with our support team?";
+  } else if (!fullResponseText && pool.length > 0) {
+    // Strips wiped the entire text (e.g. AI's only output was
+    // "Let me look that up for you!") but a search returned products.
+    // Without a fallback we'd ship an empty bubble above the cards.
+    console.log(`[chat] empty-text repair: text wiped by strips, pool=${pool.length}`);
+    fullResponseText = "Here are some options that match what you're looking for.";
   }
 
   // Strip stray HTML the model sometimes emits (literal <br>, <p>, etc.).
