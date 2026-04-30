@@ -986,7 +986,23 @@ const isExcludedByRule = (p) => {
 
 
   if (effectiveGender) {
-    filtered = filtered.filter((p) => matchesGender(p, effectiveGender.toLowerCase()));
+    const beforeGenderFilter = filtered.length;
+    const afterGender = filtered.filter((p) => matchesGender(p, effectiveGender.toLowerCase()));
+    const eg = effectiveGender.toLowerCase();
+    const isKidLike = eg === "kid" || eg === "kids" || eg === "boy" || eg === "boys" || eg === "girl" || eg === "girls" || eg === "child" || eg === "children" || eg === "youth";
+
+    if (afterGender.length === 0 && beforeGenderFilter > 0 && isKidLike) {
+      // Catalog rarely tags products with kid/boy/girl gender. matchesGender
+      // fails closed for adult-tagged products under a kids query, which
+      // wipes everything to zero. Customers wait through 3 retries then
+      // get a generic 'no match' message. Better UX: drop the gender
+      // filter for kid-like queries so adult products surface — the AI
+      // can frame them honestly ('we don't carry kids' sandals
+      // specifically, but here are unisex/women's sandals that…').
+      console.log(`[search]   gender filter ${eg}: WIPED ALL ${beforeGenderFilter} → falling back to unfiltered (no kids products in this category)`);
+    } else {
+      filtered = afterGender;
+    }
   }
 
   if (deduplicateColors) {

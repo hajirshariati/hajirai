@@ -798,5 +798,22 @@
       "mustNotContain": ["$", "L1", "L2", "L3", "L4", "L5", "L6", "L7"],
       "maxSentences": 3
     }
+  },
+  {
+    "name": "kids sandals (Aetrex doesn't carry) — honest, no 9-second retry loop",
+    "messages": ["I need red sandals for my 5-year-old"],
+    "expect": {
+      "shouldMentionAny": ["don't carry", "do not carry", "kids", "younger", "older", "support", "orthotic", "kid"],
+      "mustNotContain": ["here are kids' sandals", "perfect for your 5-year-old"],
+      "maxSentences": 5
+    }
+  },
+  {
+    "name": "boys sneakers (Aetrex doesn't carry kids footwear) — honest framing",
+    "messages": ["do you have boys sneakers in size 4?"],
+    "expect": {
+      "shouldMentionAny": ["don't carry", "do not carry", "kids", "youth", "not available", "adult"],
+      "mustNotContain": ["here are some boys' sneakers", "perfect boys"]
+    }
   }
 ]
