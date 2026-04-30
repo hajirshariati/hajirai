@@ -697,8 +697,46 @@ if (supportCTA) {
       textLower,
     );
 
+    // SKU-mention narrowing: if the AI text named a specific SKU (e.g.
+    // "the L700M is your best match"), render ONLY the card(s) for that
+    // SKU instead of all top-3 from the pool. Prevents the "text says one
+    // product, cards show three different ones" mismatch. Tolerant of
+    // gender suffixes — L700M and L700W both match L700 in the pool.
+    const baseSku = (s) => String(s).toUpperCase().replace(/[A-Z]$/, "");
+    const mentionedSkus = fullResponseText.match(SKU_PATTERN) || [];
+    let skuNarrowedCards = null;
+    if (mentionedSkus.length > 0) {
+      const wantedBases = new Set(mentionedSkus.map(baseSku));
+      const skuMatches = filteredPool.filter((card) => {
+        const cardSkus = [
+          ...skusFromCardText(card.title),
+          ...skusFromCardText(card.handle),
+        ];
+        return cardSkus.some((s) => wantedBases.has(baseSku(s)));
+      });
+      if (skuMatches.length > 0) {
+        skuNarrowedCards = skuMatches.slice(0, 3);
+        console.log(
+          `[chat] SKU-narrow: text mentions ${[...wantedBases].join(",")} → showing ${skuNarrowedCards.length} of ${filteredPool.length} pool cards`,
+        );
+      }
+    }
+
+    // Singular-prescriptive narrowing: even without a SKU, when the AI
+    // uses singular "the X is your best/perfect match" language, the
+    // customer expects ONE card. Narrow to the top-scored card so the
+    // text and the rendered card agree.
+    const singularPrescriptive = /\b(?:is (?:your|the) (?:best|perfect|ideal|top) (?:match|choice|pick|fit|one)|is the one for you|i (?:recommend|suggest) (?:the|trying))\b/i.test(
+      fullResponseText,
+    );
+
     let cards;
-    if (matched.length > 0) {
+    if (skuNarrowedCards) {
+      cards = skuNarrowedCards;
+    } else if (singularPrescriptive && scored.length > 0 && scored[0].score >= 0.6) {
+      cards = [scored[0].card];
+      console.log(`[chat] singular-narrow: text says "the X is best" → showing 1 card`);
+    } else if (matched.length > 0) {
       cards = matched.slice(0, 3).map((s) => s.card);
     } else if (!saysNoMatch) {
       cards = dropSiblingCards(scored, textLower).slice(0, 3).map((s) => s.card);
