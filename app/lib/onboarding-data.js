@@ -220,13 +220,14 @@ export const STEPS = [
     icon: "🧪",
     title: "How chat quality is measured",
     short: "Three layers of automated checks plus a real-customer feedback loop.",
-    body: "The chat is protected by three layers of testing. Each one catches a different kind of bug before customers see it. You don't need to memorize how they work — when something feels off, run the relevant command, read the output, and fix or open a ticket.",
+    body: "The chat is protected by four layers of testing. Each one catches a different kind of bug before customers see it. You don't need to memorize how they work — when something feels off, run the relevant command, read the output, and fix or open a ticket.",
     list: [
-      "Quick automated checks (eval) — 91 instant tests on the chat's logic. Free, takes 2 seconds. Run after any code change.",
-      "Real-AI scenario tests (eval:scenarios) — 55 simulated customer conversations sent to the real Anthropic API. Costs a few cents. Pass-rate tells you how the AI is actually behaving.",
+      "Quick automated checks (eval) — 116 instant tests on the chat's logic. Free, takes 2 seconds. Run after any code change.",
+      "Real-AI scenario tests (eval:scenarios) — simulated customer conversations sent to the real Anthropic API. Costs a few cents. Pass-rate tells you how the AI is actually behaving.",
       "Customer feedback loop (feedback:import) — every time a real customer hits 👎 in the chat widget, that conversation is stored. The import script pulls those into the test suite so the same bug never ships twice.",
+      "Hallucination audit (audit:hallucinations) — scans recent live responses, extracts every product code and brand-line claim the AI made, and checks each one against your synced catalog. Surfaces the 'made-up SKU' and 'fake product line' bugs that pattern-based runtime guards can't catch alone.",
     ],
-    tip: "Think of it as: 'quick checks' before deploy, 'AI scenarios' to measure quality, 'feedback' to learn from real customers. All three commands live in the project — anyone with terminal access can run them.",
+    tip: "Think of it as: 'quick checks' before deploy, 'AI scenarios' to measure quality, 'feedback' to learn from real customers, 'audit' to catch fabricated facts. All four commands live in the project — anyone with terminal access can run them.",
   },
   {
     phase: "maintain",
@@ -272,11 +273,27 @@ export const STEPS = [
       "npm run eval:feedback",
     ],
     list: [
-      "feedback:import — reads the last 30 days of 👎 from the database and writes them to scripts/scenarios.from-feedback.json. Output tells you how many were imported.",
+      "feedback:import — reads the last 30 days of 👎 from the database and writes them to scripts/scenarios.from-feedback.json. Output tells you how many were imported. Each scenario now includes _source.detectedGender (auto-pulled from the conversation) so the eval triggers production gender-locking correctly.",
       "eval:feedback — runs those imported scenarios against the live AI. Prints WHEN RATED 👎 (what got the thumbs-down) vs RESPONSE NOW (what the AI says today) for each scenario, so you can compare side by side.",
       "IMPORTANT: '100% pass' on the feedback eval ONLY means the AI's responses don't contain banned phrases. It does NOT confirm the customer's actual concern is resolved. You need to read both responses and judge whether RESPONSE NOW is genuinely better. If they look the same, the underlying bug isn't fixed.",
     ],
-    tip: "Optional flags: '--days=7' for the last week, '--shop=foo.myshopify.com' for one shop only, '--no-dedupe' to keep every 👎 instead of collapsing identical questions. The script prints a summary so you can see exactly how many records were fetched, how many had conversations captured, and how many got deduped.",
+    tip: "Optional flags: '--days=7' for the last week, '--shop=foo.myshopify.com' for one shop only, '--vote=all' to include 👍 too, '--no-dedupe' to keep every 👎, '--min-trigger=0' to keep short triggers like 'ok' (default skips anything under 8 chars to filter noise). The script prints a summary with how many were fetched, captured with conversation, deduped, and short-trigger-skipped.",
+  },
+  {
+    phase: "maintain",
+    icon: "🕵️",
+    title: "Audit AI claims against the catalog",
+    short: "npm run audit:hallucinations — find made-up SKUs and fake product lines.",
+    body: "This scans recent chat responses and pulls out every product code (SKU) and brand-line claim ('Lynco is our premium orthotic line') the AI mentioned. It then checks each one against your synced Shopify catalog. Anything that doesn't resolve to a real product or variant gets flagged as a likely hallucination. Useful right before a demo, after a model upgrade, or whenever a stakeholder reports the AI 'made something up'. Read-only — never touches the live chat.",
+    commands: [
+      "npm run audit:hallucinations -- --days=30",
+    ],
+    list: [
+      "Output prints a console summary (scanned / flagged / rate / top 10 flagged responses) plus a full JSON report at scripts/audit-hallucinations.json with every violation, the suspicious phrase, and a 400-char excerpt of what the AI said.",
+      "Two violation kinds today: orphan-sku (the AI mentioned a SKU like L500 that isn't in any synced ProductVariant.sku for this shop) and definitional-claim (the AI said 'X is our premium line' but X isn't a known vendor or title token in the catalog).",
+      "Flagged-rate of 0–2% is healthy; over 5% means either the catalog is out of sync (run a re-sync from Rules & Knowledge) or the model is genuinely fabricating — open the JSON report and look at the excerpts to tell which.",
+    ],
+    tip: "Optional flags: '--shop=foo.myshopify.com' for one shop, '--days=7' for last week, '--limit=200' to cap the scan, '--vote=down' to only audit thumbs-downed responses (those are the most suspicious already), '--json' to print the full report to stdout instead of the summary. Run this against production data — it reads ChatFeedback rows so it only sees responses that customers rated, which is the data set you most care about.",
   },
   {
     phase: "maintain",
