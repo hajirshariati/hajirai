@@ -11,6 +11,7 @@ import { extractAnsweredChoices } from "../lib/conversation-memory.server";
 import {
   detectGenderFromHistory as _detectGenderFromHistory,
   stripBannedNarration,
+  stripMetaNarration,
   looksLikeProductPitch,
   looksLikeDefinitionalHallucination,
   hasChoiceButtons,
@@ -578,6 +579,19 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     const stripped = stripBannedNarration(fullResponseText);
     if (stripped !== fullResponseText.trim()) {
       console.log(`[chat] stripped banned narration`);
+      fullResponseText = stripped;
+    }
+  }
+
+  // Strip meta-narration: "Since the customer already established
+  // Men's via the choice button…", "we know: A, B, C —", "the user
+  // has chosen…". Customer-facing text addresses them in second
+  // person; AI's reasoning chain doesn't belong in the bubble.
+  if (fullResponseText) {
+    const beforeMeta = fullResponseText;
+    const stripped = stripMetaNarration(fullResponseText);
+    if (stripped !== beforeMeta.trim()) {
+      console.log(`[chat] stripped meta-narration`);
       fullResponseText = stripped;
     }
   }

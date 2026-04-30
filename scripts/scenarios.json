@@ -397,5 +397,31 @@
     "expect": {
       "shouldMentionAny": ["months", "replace", "wear"]
     }
+  },
+  {
+    "name": "no meta-narration about 'the customer' or 'we know:'",
+    "messages": [
+      "I'm a soccer player and need an orthotic for my cleats."
+    ],
+    "expect": {
+      "mustNotMatch": "\\bthe\\s+(customer|user)\\b",
+      "mustNotMatch2": "\\b(since|given|based on|because)\\b[^.!?]{1,80}\\b(established|the customer|via the choice button|we know:)\\b"
+    }
+  },
+  {
+    "name": "no reasoning-chain dump after multi-turn flow",
+    "history": [
+      { "role": "user", "content": "I have foot pain." },
+      { "role": "assistant", "content": "Are you looking for footwear or an orthotic? <<New Footwear>><<Orthotic Insert>>" },
+      { "role": "user", "content": "Orthotic Insert" },
+      { "role": "assistant", "content": "Where is the pain — arch/heel, ball of foot, or both? <<Arch/Heel>><<Ball of Foot>><<Both>>" },
+      { "role": "user", "content": "Ball of Foot" }
+    ],
+    "messages": ["Cleats."],
+    "expect": {
+      "mustNotMatch": "\\bthe\\s+(customer|user)\\b",
+      "mustNotMatch2": "\\bwe\\s+know\\s*:",
+      "shouldMentionAny": ["Cleats", "metatarsal"]
+    }
   }
 ]

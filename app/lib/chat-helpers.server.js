@@ -82,3 +82,32 @@ export function normalizeGenderChipAnswer(raw) {
 export function hasChoiceButtons(text) {
   return /<<[^<>]+>>/.test(text || "");
 }
+
+// Strip meta-narration where the AI talks ABOUT the customer ("the
+// customer already established Men's via the choice button…") or
+// dumps its reasoning chain ("we know: orthotic insert, ball of foot
+// pain, cleats —"). Customer-facing text should address them in
+// second person and just answer.
+//
+// Three patterns:
+//   1. Leading meta-clauses: "Since the customer…", "Given that we
+//      know…" up to the first sentence-end or em-dash.
+//   2. Mid-text "we know: X, Y, Z —" inventory dumps.
+//   3. Third-person references "the customer" / "the user" — replace
+//      with "you" so the rest of the sentence stays grammatical.
+const META_PREAMBLE_RE = /(?:^|(?<=[.!?]\s+))(?:since|given|considering|because|based on)[^.!?\n,]{0,120}?(?:the\s+customer|the\s+user|via\s+the\s+choice\s+button|already\s+established|already\s+chose|already\s+selected|already\s+picked|already\s+told\s+me)[^.!?\n—,]*[.!?—,]\s*/gi;
+const INVENTORY_DUMP_RE = /(?:^|\s|—\s*)(?:and\s+)?we\s+know\s*:?\s*[^.!?—\n]*[—.!?]\s*/gi;
+const THIRD_PERSON_CUSTOMER_RE = /\bthe\s+(?:customer|user)\s+(?:has|is|already|wants|needs|said|told|chose|picked|selected|established|mentioned|asked)/gi;
+const THIRD_PERSON_BARE_RE = /\bthe\s+(customer|user)\b/gi;
+
+export function stripMetaNarration(text) {
+  if (!text) return text;
+  let out = text;
+  out = out.replace(META_PREAMBLE_RE, " ");
+  out = out.replace(INVENTORY_DUMP_RE, " ");
+  out = out.replace(THIRD_PERSON_CUSTOMER_RE, (m) =>
+    m.replace(/\bthe\s+(?:customer|user)\s+/i, "you "),
+  );
+  out = out.replace(THIRD_PERSON_BARE_RE, "you");
+  return out.replace(/\s{2,}/g, " ").replace(/^\s*[—–-]\s*/, "").trim();
+}

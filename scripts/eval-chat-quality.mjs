@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import {
   detectGenderFromHistory,
   stripBannedNarration,
+  stripMetaNarration,
   looksLikeProductPitch,
   looksLikeDefinitionalHallucination,
   normalizeGenderChipAnswer,
@@ -266,6 +267,54 @@ cases.push({
 cases.push({
   name: "empty text → false",
   run: () => assert.equal(hasChoiceButtons(""), false),
+});
+
+// ── stripMetaNarration ────────────────────────────────────────────────
+cases.push({
+  name: "strips full meta-preamble + we-know dump from screenshot bug",
+  run: () => {
+    const input = "Since the customer already established Men's via the choice button at the top, and we know: orthotic insert, ball of foot pain, cleats — The Unisex Cleats with Metatarsal Support is the go-to pick for ball-of-foot pain in soccer, football, or baseball cleats.";
+    const out = stripMetaNarration(input);
+    assert.match(out, /^The Unisex Cleats with Metatarsal Support/);
+    assert.ok(!/the customer/i.test(out), `still has "the customer": ${out}`);
+    assert.ok(!/we know:?/i.test(out), `still has "we know": ${out}`);
+  },
+});
+
+cases.push({
+  name: "strips 'Given that the user has chosen X' preamble",
+  run: () => {
+    const input = "Given that the user has chosen running shoes, the Speed line is the recommendation.";
+    const out = stripMetaNarration(input);
+    assert.match(out, /^the Speed line is the recommendation/i);
+  },
+});
+
+cases.push({
+  name: "replaces 'the customer' mid-sentence with 'you'",
+  run: () => {
+    const out = stripMetaNarration("The customer has foot pain so this orthotic helps.");
+    assert.match(out, /^you/i);
+    assert.ok(!/the customer/i.test(out));
+  },
+});
+
+cases.push({
+  name: "leaves 'since you have foot pain' alone (legit second-person)",
+  run: () => {
+    const input = "Since you have foot pain, the Speed orthotic is a great match.";
+    const out = stripMetaNarration(input);
+    assert.equal(out, input);
+  },
+});
+
+cases.push({
+  name: "leaves a clean reply unchanged",
+  run: () => {
+    const input = "Here's the L1205 — built for cleats with metatarsal support.";
+    const out = stripMetaNarration(input);
+    assert.equal(out, input);
+  },
 });
 
 // ── looksLikeDefinitionalHallucination ────────────────────────────────
