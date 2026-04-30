@@ -29,6 +29,11 @@ const limitArg = Number(arg("limit")) || 100;
 const sinceDays = Number(arg("days")) || 30;
 const voteFilter = arg("vote") || "down";
 const noDedupe = hasFlag("no-dedupe");
+// Skip records whose trigger user message is shorter than this (chars).
+// One- or two-word triggers like "ok" or "thanks" tend to be noise that
+// can't drive a useful regression test. Default 8 keeps "boots?" etc.
+// Override with --min-trigger=0 to disable.
+const minTrigger = Number(arg("min-trigger") ?? 8);
 
 // Import prisma after parsing args so the script can boot even if
 // the DB env isn't set up — useful for dry-run / --help.
@@ -92,9 +97,27 @@ const BASELINE_EXPECT = {
   mustNotMatch: "(let me look|i'?ll find|one moment|hold on|right away|we know\\s*:|since (the customer|you('ve)? established))",
 };
 
+// Quick gender pickup from the conversation. Mirrors the production
+// detectGenderFromHistory pattern at a high level (last user mention
+// wins). Generated scenarios get scopedGender so the eval matches the
+// real handler's gender-locking behavior.
+const MALE_RE = /\b(men['’]?s?|male|guy|guys|dad|father|husband|boyfriend|brother|son|grandpa|grandfather|uncle|nephew|man|boy|boys)\b/i;
+const FEMALE_RE = /\b(women['’]?s?|female|lady|ladies|mom|mother|wife|girlfriend|sister|daughter|grandma|grandmother|aunt|niece|woman|girl|girls)\b/i;
+
+function detectGenderFromMessages(messages) {
+  for (let i = messages.length - 1; i >= 0; i--) {
+    const m = messages[i];
+    if (m?.role !== "user" || typeof m.content !== "string") continue;
+    if (MALE_RE.test(m.content)) return "men";
+    if (FEMALE_RE.test(m.content)) return "women";
+  }
+  return null;
+}
+
 const scenarios = [];
 let skippedNoConv = 0;
 let skippedNoUserMsg = 0;
+let skippedShortTrigger = 0;
 
 for (const r of records) {
   let conv;
@@ -118,6 +141,7 @@ for (const r of records) {
 
   const triggerMessage = String(conv[lastUserIndex].content).trim();
   if (!triggerMessage) { skippedNoUserMsg++; continue; }
+  if (minTrigger > 0 && triggerMessage.length < minTrigger) { skippedShortTrigger++; continue; }
 
   // The rated response is the assistant message that came AFTER the
   // last user message — that's the bubble the customer thumbed-down.
@@ -134,6 +158,14 @@ for (const r of records) {
   const voteIcon = r.vote === "up" ? "thumbs-up" : "thumbs-down";
   const titleSnippet = triggerMessage.slice(0, 50) + (triggerMessage.length > 50 ? "…" : "");
 
+  // Auto-detect gender from the conversation (history + trigger) so
+  // the imported scenario triggers the production gender-locking
+  // pipeline correctly. Reviewers can override in the JSON file.
+  const gender = detectGenderFromMessages([
+    ...history,
+    { role: "user", content: triggerMessage },
+  ]);
+
   scenarios.push({
     name: `feedback ${voteIcon} ${r.id.slice(0, 8)}: ${titleSnippet}`,
     _source: {
@@ -143,6 +175,7 @@ for (const r of records) {
       shop: r.shop,
       previousResponse: ratedResponse.slice(0, 300),
       isFeedback: true,
+      ...(gender ? { detectedGender: gender } : {}),
     },
     ...(history.length > 0 ? { history } : {}),
     messages: [triggerMessage],
@@ -181,6 +214,7 @@ if (totalInRange > withConversation) {
 }
 if (skippedNoConv > 0) console.log(`  Skipped (parse error):      ${skippedNoConv}`);
 if (skippedNoUserMsg > 0) console.log(`  Skipped (no user message):  ${skippedNoUserMsg}`);
+if (skippedShortTrigger > 0) console.log(`  Skipped (trigger <${minTrigger} chars): ${skippedShortTrigger}  (use --min-trigger=0 to keep)`);
 if (!noDedupe && dedupedCount > 0) {
   console.log(`  Deduped (same trigger):     ${dedupedCount}  (use --no-dedupe to keep duplicates)`);
 }
