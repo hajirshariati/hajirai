@@ -32,7 +32,10 @@ import {
 } from "../app/lib/chat-helpers.server.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const SCENARIOS_PATH = path.join(__dirname, "scenarios.json");
+const argFlag = (name) => process.argv.find((a) => a.startsWith(`--${name}=`))?.slice(`--${name}=`.length + 1);
+const SCENARIOS_PATH = argFlag("file")
+  ? path.resolve(process.cwd(), argFlag("file"))
+  : path.join(__dirname, "scenarios.json");
 const MODEL = process.env.SCENARIO_MODEL || "claude-haiku-4-5-20251001";
 const THRESHOLD = Number(process.env.SCENARIO_THRESHOLD || 0.9);
 const MAX_TOKENS = 600;
@@ -176,7 +179,11 @@ async function runScenario(scenario) {
   text = stripBannedNarration(text);
   text = stripMetaNarration(text);
 
-  return checkExpectations(scenario, text);
+  const checked = checkExpectations(scenario, text);
+  if (scenario._source?.previousResponse) {
+    checked.previousResponse = scenario._source.previousResponse;
+  }
+  return checked;
 }
 
 function checkExpectations(scenario, text) {
@@ -255,7 +262,10 @@ async function runAll() {
         for (const reason of r.reasons) console.log(`      ${reason}`);
         if (r.text) {
           const trimmed = r.text.length > 200 ? r.text.slice(0, 200) + "…" : r.text;
-          console.log(`      RESPONSE: ${trimmed.replace(/\n/g, " ")}`);
+          console.log(`      RESPONSE NOW: ${trimmed.replace(/\n/g, " ")}`);
+        }
+        if (r.previousResponse) {
+          console.log(`      RESPONSE WHEN RATED DOWN: ${r.previousResponse.replace(/\n/g, " ")}`);
         }
       }
     }
