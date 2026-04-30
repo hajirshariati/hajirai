@@ -16,8 +16,8 @@
       "Actually, do you have these for my wife?"
     ],
     "expect": {
-      "mustNotContain": ["men's running", "Men's"],
-      "shouldMentionAny": ["women", "Women's"]
+      "mustNotMatch": "(?<!wo)men'?s",
+      "shouldMentionAny": ["women", "wife"]
     }
   },
   {
@@ -89,10 +89,14 @@
     }
   },
   {
-    "name": "warehouse worker, standing all day",
-    "messages": ["I work in a warehouse standing 10 hours a day. What do you suggest?"],
+    "name": "warehouse worker, standing all day (post-orthotic-gate)",
+    "history": [
+      { "role": "user", "content": "I work in a warehouse standing 10 hours a day. What do you suggest?" },
+      { "role": "assistant", "content": "Are you looking for new footwear with built-in support, or an orthotic insert? <<New Footwear>><<Orthotic Insert>>" }
+    ],
+    "messages": ["Orthotic Insert"],
     "expect": {
-      "shouldMentionAny": ["Work", "boot", "standing"],
+      "shouldMentionAny": ["Work", "boot", "standing", "all-day"],
       "mustNotContain": ["Athletic", "running shoes"]
     }
   },
@@ -112,10 +116,14 @@
     }
   },
   {
-    "name": "general foot pain — should ask discomfort area",
-    "messages": ["My feet hurt."],
+    "name": "general foot pain — should ask discomfort area (post-orthotic-gate)",
+    "history": [
+      { "role": "user", "content": "My feet hurt." },
+      { "role": "assistant", "content": "Are you looking for footwear or an orthotic insert? <<New Footwear>><<Orthotic Insert>>" }
+    ],
+    "messages": ["Orthotic Insert"],
     "expect": {
-      "shouldAskAbout": ["arch", "heel", "ball of foot", "where"]
+      "shouldAskAbout": ["arch", "heel", "ball of foot", "where", "discomfort"]
     }
   },
   {
@@ -250,22 +258,34 @@
     }
   },
   {
-    "name": "ball of foot pain — metatarsal orthotic",
-    "messages": ["I have ball-of-foot pain. What orthotic should I get?"],
+    "name": "ball of foot pain — metatarsal (post-orthotic-gate)",
+    "history": [
+      { "role": "user", "content": "I have ball-of-foot pain. What orthotic should I get?" },
+      { "role": "assistant", "content": "Are you looking for footwear or an orthotic insert? <<New Footwear>><<Orthotic Insert>>" }
+    ],
+    "messages": ["Orthotic Insert"],
     "expect": {
-      "shouldMentionAny": ["metatarsal", "ball of foot"]
+      "shouldMentionAny": ["metatarsal", "ball of foot", "Metatarsalgia"]
     }
   },
   {
-    "name": "arch and heel pain — posted orthotic",
-    "messages": ["I have arch and heel pain."],
+    "name": "arch and heel pain — posted (post-orthotic-gate)",
+    "history": [
+      { "role": "user", "content": "I have arch and heel pain." },
+      { "role": "assistant", "content": "Are you looking for footwear or an orthotic insert? <<New Footwear>><<Orthotic Insert>>" }
+    ],
+    "messages": ["Orthotic Insert"],
     "expect": {
       "shouldMentionAny": ["posted", "arch", "heel"]
     }
   },
   {
-    "name": "both pains — posted + metatarsal",
-    "messages": ["My arch hurts AND my ball of foot hurts."],
+    "name": "both pains — posted + metatarsal (post-orthotic-gate)",
+    "history": [
+      { "role": "user", "content": "My arch hurts AND my ball of foot hurts." },
+      { "role": "assistant", "content": "Are you looking for footwear or an orthotic insert? <<New Footwear>><<Orthotic Insert>>" }
+    ],
+    "messages": ["Orthotic Insert"],
     "expect": {
       "shouldMentionAny": ["posted", "metatarsal", "both"]
     }

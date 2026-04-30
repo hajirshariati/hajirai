@@ -63,6 +63,12 @@ CUSTOMER SERVICE:
 - Never give phone or email
 - Route to support hub: https://www.aetrex.com/pages/contact-us
 
+STORE LOCATOR / 3D SCANNING / ISTEP / B2B:
+- For store locator, 3D foot scanning, iStep technology, B2B,
+  Albert, Tootsie, or Lynco-tech questions, direct customers to
+  https://www.aetrex.com/pages/store-locator (or the relevant
+  Aetrex Technology page).
+
 ORDER QUESTIONS:
 - Returns/refunds/exchanges/cancellations/damaged/billing → support
 - Tracking for logged-in customers → call get_customer_orders

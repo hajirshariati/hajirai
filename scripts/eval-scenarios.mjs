@@ -25,7 +25,11 @@ import { fileURLToPath } from "node:url";
 import Anthropic from "@anthropic-ai/sdk";
 import { buildSystemPrompt } from "../app/lib/chat-prompt.server.js";
 import { extractAnsweredChoices } from "../app/lib/conversation-memory.server.js";
-import { detectGenderFromHistory } from "../app/lib/chat-helpers.server.js";
+import {
+  detectGenderFromHistory,
+  stripBannedNarration,
+  stripMetaNarration,
+} from "../app/lib/chat-helpers.server.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SCENARIOS_PATH = path.join(__dirname, "scenarios.json");
@@ -156,6 +160,21 @@ async function runScenario(scenario) {
   } catch (err) {
     return { name: scenario.name, ok: false, reasons: [`API error: ${err?.message || err}`] };
   }
+
+  // Mirror the production text-cleanup pipeline so the eval measures
+  // what the customer actually sees, not the raw LLM stream. Without
+  // this, we'd flag banned narration that the server already strips.
+  text = text
+    // Anthropic SDK occasionally leaks tool-call XML into text blocks
+    // when no tools are registered (the eval doesn't run tools).
+    // Strip those wrappers so they don't pollute assertions.
+    .replace(/<function_calls>[\s\S]*?<\/function_calls>/g, "")
+    .replace(/<invoke[\s\S]*?<\/invoke>/g, "")
+    .replace(/<parameter[\s\S]*?<\/parameter>/g, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+  text = stripBannedNarration(text);
+  text = stripMetaNarration(text);
 
   return checkExpectations(scenario, text);
 }
