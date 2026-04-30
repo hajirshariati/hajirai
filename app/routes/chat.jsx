@@ -6,6 +6,7 @@ import { getCatalogCategories, getAllCatalogCategories } from "../models/Product
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
 import { filterForbiddenCategoryChips } from "../lib/chip-filter.server";
 import { sanitizeCtaLabel } from "../lib/cta-label.server";
+import { analyzeCategoryIntent, cardMatchesActiveGroup } from "../lib/category-intent.server";
 import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL, FIT_PREDICTOR_TOOL } from "../lib/chat-tools.server";
 import { fetchCustomerContext } from "../lib/customer-context.server";
 import { fetchKlaviyoEnrichment } from "../lib/klaviyo-enrichment.server";
@@ -110,131 +111,6 @@ function detectGenderFromHistory(messages) {
     }
   }
   return null;
-}
-
-function escapeRegex(s) {
-  return String(s || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-function phraseMatches(text, phrase) {
-  const raw = String(phrase || "").trim();
-  if (!raw) return false;
-  const escaped = escapeRegex(raw);
-  const withS = /s$/i.test(raw)
-    ? `(?:${escaped}|${escapeRegex(raw.slice(0, -1))})`
-    : `${escaped}(?:s|es)?`;
-  return new RegExp(`\\b${withS}\\b`, "i").test(String(text || ""));
-}
-
-function compactGroup(group) {
-  if (!group) return null;
-  return {
-    name: String(group.name || "").trim(),
-    categories: Array.isArray(group.categories)
-      ? group.categories.map((c) => String(c || "").trim()).filter(Boolean)
-      : [],
-    triggers: Array.isArray(group.triggers)
-      ? group.triggers.map((t) => String(t || "").trim()).filter(Boolean)
-      : [],
-  };
-}
-
-function groupTerms(group, { includeTriggers = true } = {}) {
-  if (!group) return [];
-  const terms = [
-    group.name,
-    ...(Array.isArray(group.categories) ? group.categories : []),
-    ...(includeTriggers && Array.isArray(group.triggers) ? group.triggers : []),
-  ];
-  return terms.map((t) => String(t || "").trim()).filter(Boolean);
-}
-
-function matchingGroupsForText(text, groups, opts = {}) {
-  const source = String(text || "");
-  if (!source || !Array.isArray(groups)) return [];
-  return groups.filter((group) =>
-    groupTerms(group, opts).some((term) => phraseMatches(source, term)),
-  );
-}
-
-function sameGroup(a, b) {
-  if (!a || !b) return false;
-  const an = String(a.name || "").trim().toLowerCase();
-  const bn = String(b.name || "").trim().toLowerCase();
-  if (an && bn) return an === bn;
-  const ac = new Set((a.categories || []).map((c) => String(c).toLowerCase()));
-  return (b.categories || []).some((c) => ac.has(String(c).toLowerCase()));
-}
-
-function isShortChoice(text) {
-  const words = String(text || "").trim().split(/\s+/).filter(Boolean);
-  return words.length > 0 && words.length <= 5;
-}
-
-function hasExplicitPivotIntent(text) {
-  return /\b(show|find|search|shop|buy|get|need|want|looking for|recommend|suggest)\b/i.test(String(text || ""));
-}
-
-function analyzeCategoryIntent(messages, merchantGroups) {
-  const groups = Array.isArray(merchantGroups)
-    ? merchantGroups.map(compactGroup).filter((g) => g && (g.name || g.categories.length || g.triggers.length))
-    : [];
-  if (groups.length === 0) return { activeGroup: null, contextGroup: null, ambiguous: false };
-
-  const latestUser = [...messages].reverse().find((m) => m.role === "user" && typeof m.content === "string");
-  const previousMessages = messages.slice(0, Math.max(0, messages.lastIndexOf(latestUser)));
-  const previousAssistant = [...previousMessages].reverse().find((m) => m.role === "assistant" && typeof m.content === "string");
-
-  const latestMatches = matchingGroupsForText(latestUser?.content || "", groups, { includeTriggers: true });
-  const latestUnambiguous = latestMatches.length === 1 ? latestMatches[0] : null;
-  const latestAmbiguous = latestMatches.length > 1;
-
-  let priorActive = null;
-  let priorAmbiguous = false;
-  for (let i = previousMessages.length - 1; i >= 0; i--) {
-    const msg = previousMessages[i];
-    if (!msg || typeof msg.content !== "string") continue;
-    const includeTriggers = msg.role === "user";
-    const matches = matchingGroupsForText(msg.content, groups, { includeTriggers });
-    if (matches.length > 1) {
-      priorAmbiguous = true;
-      break;
-    }
-    if (matches.length === 1) {
-      priorActive = matches[0];
-      break;
-    }
-  }
-
-  if (latestUnambiguous && priorActive && !sameGroup(latestUnambiguous, priorActive)) {
-    const previousAssistantMentionsPrior = matchingGroupsForText(
-      previousAssistant?.content || "",
-      [priorActive],
-      { includeTriggers: false },
-    ).length === 1;
-    if (isShortChoice(latestUser?.content || "") && !hasExplicitPivotIntent(latestUser?.content || "") && previousAssistantMentionsPrior) {
-      return {
-        activeGroup: priorActive,
-        contextGroup: latestUnambiguous,
-        ambiguous: false,
-      };
-    }
-  }
-
-  if (latestUnambiguous) return { activeGroup: latestUnambiguous, contextGroup: null, ambiguous: false };
-  if (latestAmbiguous) return { activeGroup: null, contextGroup: null, ambiguous: true };
-  if (priorActive && !priorAmbiguous) return { activeGroup: priorActive, contextGroup: null, ambiguous: false };
-  return { activeGroup: null, contextGroup: null, ambiguous: priorAmbiguous };
-}
-
-function cardMatchesActiveGroup(card, activeGroup) {
-  if (!activeGroup || !Array.isArray(activeGroup.categories) || activeGroup.categories.length === 0) return true;
-  const cardCategory = String(card?._category || "").toLowerCase().trim();
-  if (!cardCategory) return true;
-  return activeGroup.categories.some((cat) => {
-    const c = String(cat || "").toLowerCase().trim();
-    return c && (cardCategory === c || cardCategory.includes(c) || c.includes(cardCategory));
-  });
 }
 
 function chooseModel(config, message, history) {

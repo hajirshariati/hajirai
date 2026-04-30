@@ -409,6 +409,7 @@ function matchesCategoryRule(triggerText, rules, latestUserText = "", activeGrou
   if (!rules || !Array.isArray(rules)) return null;
   const lower = triggerText.toLowerCase();
   const userLower = (latestUserText || "").toLowerCase();
+  const overrideLower = `${userLower} ${lower}`.trim();
   for (const rule of rules) {
     const triggers = splitCsv(rule.whenQuery);
     if (!triggers.some((t) => lower.includes(t))) continue;
@@ -417,9 +418,9 @@ function matchesCategoryRule(triggerText, rules, latestUserText = "", activeGrou
       console.log(`[search]   rule skipped: would exclude active group=${activeGroup?.name || "-"}`);
       continue;
     }
-    if (excludes.length > 0 && excludes.some((e) => overrideMatches(userLower, e))) continue;
+    if (excludes.length > 0 && excludes.some((e) => overrideMatches(overrideLower, e))) continue;
     const overrides = splitCsv(rule.overrideTriggers);
-    if (overrides.length > 0 && overrides.some((o) => overrideMatches(userLower, o))) continue;
+    if (overrides.length > 0 && overrides.some((o) => overrideMatches(overrideLower, o))) continue;
     return rule.excludeTerms;
   }
   return null;
@@ -1020,6 +1021,7 @@ async function getProductDetails({ handle }, { shop }) {
     vendor: product.vendor || undefined,
     productType: product.productType || undefined,
     tags: product.tags?.length ? product.tags : undefined,
+    attributes: product.attributesJson || undefined,
     status: product.status || undefined,
     description: truncate(product.description || "", 600),
     priceRange: priceRange(product.variants),
@@ -1265,6 +1267,7 @@ async function lookupSku({ skus }, { shop }) {
       sku: v.sku,
       productHandle: v.product.handle,
       productTitle: v.product.title,
+      productType: v.product.productType || undefined,
       variantTitle: v.title || undefined,
       price: v.price || undefined,
       compareAtPrice: v.compareAtPrice || undefined,
@@ -1934,6 +1937,8 @@ export function extractProductCards(name, result) {
       image: result.image || "",
       price_formatted: result.priceRange || (result.price ? `$${parseFloat(result.price).toFixed(2)}` : ""),
       compare_at_price: result.compareAtPrice ? Math.round(parseFloat(result.compareAtPrice) * 100) : undefined,
+      _category: categoryFromAttrs(result),
+      _gender: genderFromAttrs(result),
     }];
   }
   if (name === "lookup_sku" && Array.isArray(result.found)) {
@@ -1947,6 +1952,8 @@ export function extractProductCards(name, result) {
         image: f.image || "",
         price_formatted: f.price ? `$${parseFloat(f.price).toFixed(2)}` : "",
         compare_at_price: f.compareAtPrice ? Math.round(parseFloat(f.compareAtPrice) * 100) : undefined,
+        _category: categoryFromAttrs({ attributes: f.productAttributes, productType: f.productType }),
+        _gender: genderFromAttrs({ attributes: f.productAttributes }),
       }));
   }
   return [];
