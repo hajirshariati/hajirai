@@ -11,6 +11,7 @@ const groups = [
     name: "Orthotics",
     categories: ["Orthotics"],
     triggers: ["orthotic", "orthotics", "insole", "insert", "footbed", "arch support insert", "plantar fasciitis insert"],
+    goesInsideOf: "Footwear",
   },
   {
     name: "Accessories",

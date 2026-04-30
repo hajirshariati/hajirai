@@ -260,6 +260,7 @@ export const action = async ({ request }) => {
           triggers: Array.isArray(g?.triggers)
             ? g.triggers.map((t) => String(t || "").trim().toLowerCase()).filter(Boolean)
             : [],
+          goesInsideOf: String(g?.goesInsideOf || "").trim(),
         }))
         .filter((g) => g.name && g.categories.length > 0);
       await updateShopConfig(session.shop, { categoryGroups: JSON.stringify(cleaned) });
@@ -1120,6 +1121,7 @@ function CategoryGroupsCard({ initial }) {
   const [name, setName] = useState("");
   const [categories, setCategories] = useState("");
   const [triggers, setTriggers] = useState("");
+  const [goesInsideOf, setGoesInsideOf] = useState("");
 
   const save = (g) => {
     const fd = new FormData();
@@ -1132,12 +1134,14 @@ function CategoryGroupsCard({ initial }) {
     const n = name.trim();
     const c = categories.split(",").map((s) => s.trim()).filter(Boolean);
     const t = triggers.split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
+    const inside = goesInsideOf.trim();
     if (!n || c.length === 0) return;
-    const updated = [...groups, { name: n, categories: c, triggers: t }];
+    const updated = [...groups, { name: n, categories: c, triggers: t, goesInsideOf: inside }];
     setGroups(updated);
     setName("");
     setCategories("");
     setTriggers("");
+    setGoesInsideOf("");
     save(updated);
   };
 
@@ -1198,6 +1202,12 @@ function CategoryGroupsCard({ initial }) {
                       <Text as="span" variant="bodySm"><code>{g.triggers.join(", ")}</code></Text>
                     </InlineStack>
                   )}
+                  {g.goesInsideOf && (
+                    <InlineStack gap="200" blockAlign="center" wrap>
+                      <Badge tone="attention">Goes inside</Badge>
+                      <Text as="span" variant="bodySm"><code>{g.goesInsideOf}</code></Text>
+                    </InlineStack>
+                  )}
                 </BlockStack>
               </Box>
             ))}
@@ -1218,6 +1228,9 @@ function CategoryGroupsCard({ initial }) {
             <TextField label="Trigger words" value={triggers} onChange={setTriggers}
               placeholder="shoe, shoes, footwear" autoComplete="off"
               helpText="Comma-separated. When any appears in the customer's latest message (word-boundary, plural-aware), this group's categories take priority." />
+            <TextField label="Goes inside (optional)" value={goesInsideOf} onChange={setGoesInsideOf}
+              placeholder="Footwear" autoComplete="off"
+              helpText="If products in this group are designed to go INSIDE products from another group (e.g. orthotics inside shoes, lenses inside cameras), enter that other group's name here. Lets the AI map phrases like 'something to put inside my shoes' to the correct product type." />
             <Button onClick={addGroup} disabled={!name.trim() || !categories.trim()}>Add group</Button>
           </FormLayout>
         </BlockStack>

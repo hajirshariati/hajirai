@@ -6,7 +6,7 @@ import { getCatalogCategories, getAllCatalogCategories, getCategoryGenderAvailab
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
 import { filterForbiddenCategoryChips, filterContradictingGenderChips } from "../lib/chip-filter.server";
 import { sanitizeCtaLabel } from "../lib/cta-label.server";
-import { analyzeCategoryIntent, cardMatchesActiveGroup } from "../lib/category-intent.server";
+import { analyzeCategoryIntent, cardMatchesActiveGroup, textIntentDivergesFromGroup } from "../lib/category-intent.server";
 import { extractAnsweredChoices } from "../lib/conversation-memory.server";
 import {
   detectGenderFromHistory as _detectGenderFromHistory,
@@ -791,20 +791,23 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         });
 
     if (ctx.activeCategoryGroup) {
-      const groupName = String(ctx.activeCategoryGroup.name || "").toLowerCase();
-      const groupIsOrthotic = /orthotic|insole|insert/.test(groupName);
-
       // Mirror of the search-layer override (chat-tools.server.js): when
-      // the AI's reply is clearly about orthotics ("orthotic", "insole",
-      // "posted", "metatarsal", "footbed") but the active group is
-      // Footwear (or any non-orthotic group), the group lock is stale
-      // from earlier in the conversation. Trust the AI's intent and
-      // skip the render-layer filter so orthotic cards aren't wiped.
-      const replyLower = String(fullResponseText || "").toLowerCase();
-      const replyIsOrthoticIntent = /\b(orthotic|orthotics|insole|insoles|footbed|posted|metatarsal)\b/.test(replyLower);
+      // the AI's reply matches the terms of a DIFFERENT merchant group
+      // than the active one, the group lock is stale. Trust the AI's
+      // intent and skip the render-layer filter so the right cards
+      // aren't wiped.
+      //
+      // Pure data-driven: the merchant's categoryGroups define the
+      // divergence vocabulary. Works for any vertical (footwear,
+      // jewelry, apparel, etc.).
+      const replyDiverges = textIntentDivergesFromGroup(
+        fullResponseText,
+        ctx.activeCategoryGroup,
+        ctx.merchantGroups,
+      );
 
-      if (replyIsOrthoticIntent && !groupIsOrthotic) {
-        console.log(`[chat] product-card group guard: skip — reply is orthotic-intent but group=${ctx.activeCategoryGroup.name || "-"} (trusting reply)`);
+      if (replyDiverges) {
+        console.log(`[chat] product-card group guard: skip — reply matches a different group than locked group=${ctx.activeCategoryGroup.name || "-"} (trusting reply)`);
       } else {
         const beforeGroup = filteredPool.length;
         const groupScoped = filteredPool.filter((card) => cardMatchesActiveGroup(card, ctx.activeCategoryGroup));
@@ -1268,6 +1271,7 @@ export const action = async ({ request }) => {
       activeCategoryGroup: categoryIntent.activeGroup,
       contextCategoryGroup: categoryIntent.contextGroup,
       categoryIntentAmbiguous: Boolean(categoryIntent.ambiguous),
+      merchantGroups,
       shopConfig: config,
       fullCatalogCategories: allCatalogCategories,
       categoryGenderMap,

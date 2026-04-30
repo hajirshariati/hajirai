@@ -22,6 +22,12 @@ export function compactGroup(group) {
     triggers: Array.isArray(group.triggers)
       ? group.triggers.map((t) => String(t || "").trim()).filter(Boolean)
       : [],
+    // Optional containment relationship: name of another group that
+    // products in this group go INSIDE of. Lets the AI infer intent
+    // from phrases like "for heel pain that goes inside my shoes" —
+    // active = group with goesInsideOf=Footwear. Per-merchant data,
+    // not hardcoded vocabulary.
+    goesInsideOf: String(group.goesInsideOf || "").trim() || null,
   };
 }
 
@@ -61,29 +67,99 @@ function hasExplicitPivotIntent(text) {
   return /\b(show|find|search|shop|buy|get|need|want|looking for|recommend|suggest)\b/i.test(String(text || ""));
 }
 
-function isInsertLikeGroup(group) {
-  const terms = groupTerms(group, { includeTriggers: true }).join(" ").toLowerCase();
-  return /\b(orthotic|orthotics|insole|insoles|insert|inserts|footbed|arch support)\b/.test(terms);
-}
+// "X inside/into/with Y" containment intent — both X and Y resolve to
+// distinct merchant-configured groups via their name/categories/triggers.
+// Generalizes from "orthotics inside shoes" to any vertical:
+// "phone case for iPhone" → active=Cases, context=Phones.
+// "lens for camera" → active=Lenses, context=Cameras.
+//
+// Pure data-driven: there is no hardcoded list of "insert-like" or
+// "footwear-like" terms — the merchant's category groups define the
+// vocabulary.
+const CONTAINMENT_RE = /\b(inside|into|put in|wear inside|fit inside|fits? in|goes? in|underfoot|to go in|to fit in|to put in)\b/;
 
-function isFootwearLikeGroup(group) {
-  const terms = groupTerms(group, { includeTriggers: true }).join(" ").toLowerCase();
-  return /\b(shoe|shoes|footwear|sneaker|sneakers|boot|boots|sandal|sandals|loafer|loafers|slipper|slippers|clog|clogs|oxford|oxfords|slide|slides|mule|mules|wedge|wedges)\b/.test(terms);
-}
-
-function mentionsInsideFootwear(text) {
+function groupHitInRange(text, group, fromIdx, toIdx) {
   const source = String(text || "").toLowerCase();
-  const insideIntent = /\b(inside|into|put in|goes? in|wear inside|fit inside|fits? in|underfoot)\b/.test(source);
-  const footwearObject = /\b(shoe|shoes|sneaker|sneakers|boot|boots|sandal|sandals|loafer|loafers|slipper|slippers|clog|clogs|oxford|oxfords|slide|slides|mule|mules|wedge|wedges|footwear)\b/.test(source);
-  return insideIntent && footwearObject;
+  let best = -1;
+  for (const term of groupTerms(group, { includeTriggers: true })) {
+    const needle = String(term || "").toLowerCase();
+    if (!needle) continue;
+    let from = fromIdx ?? 0;
+    while (from <= (toIdx ?? source.length)) {
+      const idx = source.indexOf(needle, from);
+      if (idx < 0 || idx >= (toIdx ?? source.length)) break;
+      if (best < 0 || idx < best) best = idx;
+      from = idx + 1;
+    }
+  }
+  return best;
 }
 
-function inferInsideFootwearIntent(text, groups) {
-  if (!mentionsInsideFootwear(text)) return null;
-  const insertGroups = groups.filter(isInsertLikeGroup);
-  const footwearGroups = groups.filter(isFootwearLikeGroup);
-  if (insertGroups.length !== 1 || footwearGroups.length !== 1) return null;
-  return { activeGroup: insertGroups[0], contextGroup: footwearGroups[0] };
+function inferContainmentIntent(text, groups) {
+  const source = String(text || "").toLowerCase();
+  const m = source.match(CONTAINMENT_RE);
+  if (!m) return null;
+  const insideIdx = source.indexOf(m[0]);
+
+  // Per group, check separately whether any term hits BEFORE or AFTER
+  // the containment word. A single group can hit on both sides (e.g.
+  // Footwear via "heel pain ... inside my shoes") — we need both, not
+  // just earliest-overall.
+  const sided = (groups || []).map((g) => ({
+    group: g,
+    beforeIdx: groupHitInRange(source, g, 0, insideIdx),
+    afterIdx: groupHitInRange(source, g, insideIdx, source.length),
+  }));
+
+  // Container preference: a group named directly AFTER the containment
+  // word ("inside my shoes") wins. If none, fall back to a group
+  // mentioned anywhere in the text that has at least one declared
+  // insert (goesInsideOf=this group). That handles "support inside
+  // them" where "them" is a pronoun referring to a Footwear term in a
+  // prior sentence.
+  let containerGroup = null;
+  const afterHits = sided.filter((s) => s.afterIdx >= 0).sort((a, b) => a.afterIdx - b.afterIdx);
+  if (afterHits.length > 0) {
+    containerGroup = afterHits[0].group;
+  } else {
+    const candidates = sided.filter((s) => {
+      const mentioned = s.beforeIdx >= 0 || s.afterIdx >= 0;
+      if (!mentioned) return false;
+      const candidateName = String(s.group?.name || "").toLowerCase();
+      return (groups || []).some(
+        (g) =>
+          String(g?.goesInsideOf || "").toLowerCase() === candidateName &&
+          !sameGroup(g, s.group),
+      );
+    });
+    if (candidates.length === 1) containerGroup = candidates[0].group;
+  }
+  if (!containerGroup) return null;
+
+  // Explicit case: a DIFFERENT group is named BEFORE the containment
+  // word — that's the active product. "Insoles for loafers" /
+  // "orthotics inside shoes".
+  const beforeOther = sided
+    .filter((s) => s.beforeIdx >= 0 && !sameGroup(s.group, containerGroup))
+    .sort((a, b) => a.beforeIdx - b.beforeIdx);
+  if (beforeOther.length > 0) {
+    return { activeGroup: beforeOther[0].group, contextGroup: containerGroup };
+  }
+
+  // Implicit case: user only named the container ("for heel pain that
+  // goes inside my shoes"). The container has the answer encoded in
+  // admin data: a group declaring goesInsideOf=<containerName> is the
+  // implied active product. Pure data — merchant configures the
+  // containment relationship in Rules & Knowledge.
+  const containerName = String(containerGroup.name || "").toLowerCase();
+  const insertCandidates = (groups || []).filter((g) => {
+    const inside = String(g?.goesInsideOf || "").toLowerCase();
+    return inside && inside === containerName && !sameGroup(g, containerGroup);
+  });
+  if (insertCandidates.length === 1) {
+    return { activeGroup: insertCandidates[0], contextGroup: containerGroup };
+  }
+  return null;
 }
 
 function earliestGroupHit(text, group) {
@@ -133,16 +209,27 @@ function assistantFramesGroupAsContext(assistantText, contextGroup, activeGroup)
   const mentionsActiveGroup = matchingGroupsForText(text, [activeGroup], { includeTriggers: false }).length === 1;
   const refersToActiveByPronoun = /\b(them|it|those|that|fit|fits|inside)\b/i.test(text);
 
-  const asksFootwearContextForInsert =
-    isInsertLikeGroup(activeGroup) &&
-    isFootwearLikeGroup(contextGroup) &&
-    /\b(what|which|type|kind).{0,40}\b(shoe|shoes|footwear).{0,60}\b(wear|wears|worn|use|uses|fit|fits|inside|match|matches|for)\b/i.test(text);
+  // Question-shape "what <contextGroup-term> do you wear/use/fit...".
+  // Derive the term alternation from the contextGroup itself instead of
+  // hardcoding domain words — so jewelry merchants ("which finger size do
+  // you wear...") work the same as footwear ones.
+  let asksContextQuestion = false;
+  const contextTerms = groupTerms(contextGroup, { includeTriggers: true })
+    .map((t) => escapeRegex(String(t || "").trim().toLowerCase()))
+    .filter(Boolean);
+  if (contextTerms.length > 0) {
+    const re = new RegExp(
+      `\\b(what|which|type|kind).{0,40}\\b(${contextTerms.join("|")}).{0,60}\\b(wear|wears|worn|use|uses|fit|fits|inside|match|matches|for)\\b`,
+      "i",
+    );
+    asksContextQuestion = re.test(text);
+  }
 
-  return mentionsContextGroup && (mentionsActiveGroup || refersToActiveByPronoun || asksFootwearContextForInsert);
+  return mentionsContextGroup && (mentionsActiveGroup || refersToActiveByPronoun || asksContextQuestion);
 }
 
 function inferUserIntentFromText(text, groups) {
-  const insideIntent = inferInsideFootwearIntent(text, groups);
+  const insideIntent = inferContainmentIntent(text, groups);
   if (insideIntent) return { ...insideIntent, ambiguous: false };
 
   const matches = matchingGroupsForText(text, groups, { includeTriggers: true });
@@ -197,11 +284,11 @@ export function analyzeCategoryIntent(messages, merchantGroups) {
   const latestMatches = matchingGroupsForText(latestUser?.content || "", groups, { includeTriggers: true });
   const latestUnambiguous = latestMatches.length === 1 ? latestMatches[0] : null;
   const latestAmbiguous = latestMatches.length > 1;
-  const insideFootwearIntent = inferInsideFootwearIntent(latestUser?.content || "", groups);
+  const containmentIntent = inferContainmentIntent(latestUser?.content || "", groups);
   const forContextIntent = inferForContextIntent(latestUser?.content || "", latestMatches);
 
-  if (insideFootwearIntent) {
-    return { ...insideFootwearIntent, ambiguous: false };
+  if (containmentIntent) {
+    return { ...containmentIntent, ambiguous: false };
   }
   if (forContextIntent) {
     return { ...forContextIntent, ambiguous: false };
@@ -231,6 +318,27 @@ export function analyzeCategoryIntent(messages, merchantGroups) {
     return { activeGroup: priorActive, contextGroup: priorIntent.contextGroup || null, ambiguous: false };
   }
   return { activeGroup: null, contextGroup: null, ambiguous: priorAmbiguous };
+}
+
+// Returns true when `text` clearly belongs to a different merchant group
+// than `lockedGroup` — i.e. the text matches at least one OTHER group's
+// terms and does NOT match the locked group's terms.
+//
+// Used by the search and render layers to decide whether to skip a stale
+// active-group filter. Pure data-driven: no hardcoded vertical vocabulary.
+// For Aetrex: search query "orthotic insole" while activeGroup=Footwear
+//   diverges → caller skips the Footwear filter.
+// For a jewelry merchant: "ring for my wife" while activeGroup=Necklaces
+//   diverges → caller skips the Necklaces filter.
+//
+// `groups` should be the full merchant-configured group list (compacted
+// or raw — both work because matchingGroupsForText is tolerant).
+export function textIntentDivergesFromGroup(text, lockedGroup, groups) {
+  if (!lockedGroup || !Array.isArray(groups) || groups.length === 0) return false;
+  const matched = matchingGroupsForText(text, groups, { includeTriggers: true });
+  if (matched.length === 0) return false;
+  if (matched.some((g) => sameGroup(g, lockedGroup))) return false;
+  return true;
 }
 
 export function cardMatchesActiveGroup(card, activeGroup) {

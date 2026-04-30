@@ -3,6 +3,7 @@ import { logMentions } from "../models/ChatProductMention.server";
 import { fetchCustomerContext } from "./customer-context.server";
 import { embedText, vectorLiteral, resolveShopEmbedding } from "./embeddings.server";
 import { normalizeGenderChipAnswer } from "./chat-helpers.server";
+import { textIntentDivergesFromGroup } from "./category-intent.server";
 
 
 const flattenValues = (obj) => {
@@ -526,7 +527,7 @@ function genderFilterClause(gender) {
 
 async function searchProducts(
   { query, limit, filters },
-  { shop, deduplicateColors, sessionGender, categoryExclusions, querySynonyms, conversationText, userText, latestUserMessage, shopConfig, activeCategoryGroup }
+  { shop, deduplicateColors, sessionGender, categoryExclusions, querySynonyms, conversationText, userText, latestUserMessage, shopConfig, activeCategoryGroup, merchantGroups }
 ) {
   const q = String(query || "").trim();
   if (!q) return { products: [] };
@@ -610,19 +611,19 @@ const searchQuery = detected.gender ? detected.query : q;
   });
 
   if (activeCategoryGroup) {
-    const groupName = String(activeCategoryGroup.name || "").toLowerCase();
-    // Query-keyword override: when the AI's search query is clearly
-    // about orthotics ("orthotic", "insole", "posted", "metatarsal",
-    // "footbed", "arch support insert") but the active group is
-    // Footwear (or any non-Orthotics group), skip the filter. The
-    // category-intent walk locked the wrong group from earlier in
-    // the conversation; trust the explicit search query.
-    const queryLower = String(q || "").toLowerCase();
-    const queryIsOrthoticIntent = /\b(orthotic|orthotics|insole|insoles|footbed|posted|metatarsal|arch[- ]?support[- ]?insert)\b/.test(queryLower);
-    const groupIsOrthotic = /orthotic|insole|insert/.test(groupName);
+    // Data-driven divergence override: when the AI's search query clearly
+    // matches a DIFFERENT merchant-configured group than the active one,
+    // the group lock is stale (from earlier in the conversation). Trust
+    // the explicit query and skip the group filter.
+    //
+    // Works for any vertical: orthotic-store ("orthotic insole" vs locked
+    // Footwear), jewelry ("ring" vs locked Necklaces), apparel, etc. The
+    // merchant's own categoryGroups data defines the divergence vocabulary —
+    // there are no hardcoded domain keywords here.
+    const queryDiverges = textIntentDivergesFromGroup(q, activeCategoryGroup, merchantGroups);
 
-    if (queryIsOrthoticIntent && !groupIsOrthotic) {
-      console.log(`[search]   active-group skip: query is orthotic-intent but group=${activeCategoryGroup.name || "-"} — trusting query`);
+    if (queryDiverges) {
+      console.log(`[search]   active-group skip: query matches a different group than locked group=${activeCategoryGroup.name || "-"} — trusting query`);
     } else {
       const beforeGroup = products.length;
       const filtered = products.filter((p) => productMatchesGroupCategory(p, activeCategoryGroup));
