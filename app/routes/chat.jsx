@@ -790,13 +790,38 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         });
 
     if (ctx.activeCategoryGroup) {
-      const groupScoped = filteredPool.filter((card) => cardMatchesActiveGroup(card, ctx.activeCategoryGroup));
-      if (groupScoped.length !== filteredPool.length) {
-        console.log(
-          `[chat] product-card group guard: kept ${groupScoped.length}/${filteredPool.length} for group=${ctx.activeCategoryGroup.name || "-"}`,
-        );
+      const groupName = String(ctx.activeCategoryGroup.name || "").toLowerCase();
+      const groupIsOrthotic = /orthotic|insole|insert/.test(groupName);
+
+      // Mirror of the search-layer override (chat-tools.server.js): when
+      // the AI's reply is clearly about orthotics ("orthotic", "insole",
+      // "posted", "metatarsal", "footbed") but the active group is
+      // Footwear (or any non-orthotic group), the group lock is stale
+      // from earlier in the conversation. Trust the AI's intent and
+      // skip the render-layer filter so orthotic cards aren't wiped.
+      const replyLower = String(fullResponseText || "").toLowerCase();
+      const replyIsOrthoticIntent = /\b(orthotic|orthotics|insole|insoles|footbed|posted|metatarsal)\b/.test(replyLower);
+
+      if (replyIsOrthoticIntent && !groupIsOrthotic) {
+        console.log(`[chat] product-card group guard: skip — reply is orthotic-intent but group=${ctx.activeCategoryGroup.name || "-"} (trusting reply)`);
+      } else {
+        const beforeGroup = filteredPool.length;
+        const groupScoped = filteredPool.filter((card) => cardMatchesActiveGroup(card, ctx.activeCategoryGroup));
+        if (groupScoped.length === 0 && beforeGroup > 0) {
+          // Fail-open: filter wiped every card. Stale group lock; better
+          // to render the search results than ship an empty bubble that
+          // the customer reads as "AI claimed a recommendation but no
+          // card". Same fail-open pattern as the search layer.
+          console.log(`[chat] product-card group guard: WIPED ALL ${beforeGroup} for group=${ctx.activeCategoryGroup.name || "-"} → falling back to unfiltered`);
+        } else {
+          if (groupScoped.length !== beforeGroup) {
+            console.log(
+              `[chat] product-card group guard: kept ${groupScoped.length}/${beforeGroup} for group=${ctx.activeCategoryGroup.name || "-"}`,
+            );
+          }
+          filteredPool = groupScoped;
+        }
       }
-      filteredPool = groupScoped;
     }
 
     // When get_fit_recommendation ran, the customer is asking about ONE
