@@ -191,6 +191,19 @@ const STYLES = `
   }
   .tip strong { color: #92400e; }
 
+  .cmd-block {
+    margin: 12px 0;
+    padding: 12px 14px;
+    background: #1f2937;
+    color: #e5e7eb;
+    border-radius: 6px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    overflow-x: auto;
+    white-space: pre;
+  }
+
   .ref-table {
     width: 100%;
     background: #fff;
@@ -353,6 +366,11 @@ export default function Onboarding() {
                               </tbody>
                             </table>
                           </div>
+                        ) : null}
+                        {step.commands ? (
+                          <pre className="cmd-block" aria-label="Terminal commands">
+                            {step.commands.map((c) => `$ ${c}`).join("\n")}
+                          </pre>
                         ) : null}
                         {step.tip ? (
                           <div className="tip">

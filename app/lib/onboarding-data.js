@@ -213,4 +213,82 @@ export const STEPS = [
     body: "When Aetrex adds a new product type to Shopify (e.g. a new 'Sneaker Pro' category), open Rules & Knowledge → Category groups and add the new category to the right group (Footwear / Orthotics / Accessories). Without an entry, the new category falls outside the group filter and may appear in the wrong intent's chip list.",
     tip: "The Category Groups card in Rules & Knowledge shows your current groups. Compare against the catalog every time a new product line launches.",
   },
+
+  // ── Quality testing system ────────────────────────────────────────
+  {
+    phase: "maintain",
+    icon: "🧪",
+    title: "How chat quality is measured",
+    short: "Three layers of automated checks plus a real-customer feedback loop.",
+    body: "The chat is protected by three layers of testing. Each one catches a different kind of bug before customers see it. You don't need to memorize how they work — when something feels off, run the relevant command, read the output, and fix or open a ticket.",
+    list: [
+      "Quick automated checks (eval) — 91 instant tests on the chat's logic. Free, takes 2 seconds. Run after any code change.",
+      "Real-AI scenario tests (eval:scenarios) — 55 simulated customer conversations sent to the real Anthropic API. Costs a few cents. Pass-rate tells you how the AI is actually behaving.",
+      "Customer feedback loop (feedback:import) — every time a real customer hits 👎 in the chat widget, that conversation is stored. The import script pulls those into the test suite so the same bug never ships twice.",
+    ],
+    tip: "Think of it as: 'quick checks' before deploy, 'AI scenarios' to measure quality, 'feedback' to learn from real customers. All three commands live in the project — anyone with terminal access can run them.",
+  },
+  {
+    phase: "maintain",
+    icon: "✅",
+    title: "Run the quick automated checks",
+    short: "npm run eval — 91 instant tests, no API key needed.",
+    body: "These are the fastest checks. They cover the chat's parsing, filtering, intent detection, banned-language stripping, and card-rendering logic. Free to run, finishes in 2 seconds. Run this before pushing any code change to main.",
+    commands: [
+      "git pull",
+      "npm run eval",
+    ],
+    list: [
+      "Output 'category-intent eval passed: 39/39' / 'choice-memory eval passed: 9/9' / 'chat-quality eval passed: 43/43' = ALL GOOD, safe to push.",
+      "Any number on the left less than the number on the right = something broke. Don't deploy. Fix or revert.",
+    ],
+    tip: "If you're only changing rules/FAQ/brand text in the admin (not code), you don't need to run this — it tests code, not knowledge files. Skip to the AI scenario tests below.",
+  },
+  {
+    phase: "maintain",
+    icon: "🤖",
+    title: "Run the real-AI scenario tests",
+    short: "npm run eval:scenarios — 55 customer conversations vs the real AI.",
+    body: "This is the dashboard for chat quality. It sends 55 representative customer questions to the real Anthropic API using the same system prompt the live chat uses, and checks whether the responses pass each scenario's assertions (no banned phrases, mentions the right product line, doesn't ask gender twice, etc.). Costs roughly $0.05–0.20 per run depending on the model.",
+    commands: [
+      "export ANTHROPIC_API_KEY=<your-key>",
+      "npm run eval:scenarios",
+    ],
+    list: [
+      "Pass rate ≥ 90% = healthy.",
+      "Pass rate < 90% = something regressed. Each failed line shows the AI's actual response so you can see what broke.",
+      "Re-run the same command 2–3 times and average — the AI is non-deterministic, expect ±2-3% variance per run.",
+    ],
+    tip: "The Anthropic API key lives in 1Password under 'Anthropic — Aetrex prod'. Set it once per terminal session with the export command, then run as many times as you like. Never paste it into a chat or commit it to git.",
+  },
+  {
+    phase: "maintain",
+    icon: "👎",
+    title: "Pull customer thumbs-down into the test suite",
+    short: "Every 👎 in the widget becomes a regression test.",
+    body: "Whenever a customer hits the 'Not helpful' button in the chat widget, the conversation gets saved to the database. Run the feedback importer monthly (or after any complaint spike) to convert those into scenarios. The next test run will check whether the same kind of failure can still happen.",
+    commands: [
+      "npm run feedback:import",
+      "npm run eval:feedback",
+    ],
+    list: [
+      "feedback:import — reads the last 30 days of 👎 from the database and writes them to scripts/scenarios.from-feedback.json. Output tells you how many were imported.",
+      "eval:feedback — runs those imported scenarios against the live AI. Each failure prints both 'RESPONSE NOW' (what the AI says today) and 'RESPONSE WHEN RATED DOWN' (what got the 👎) so you can compare side-by-side.",
+      "If a scenario still fails: real bug, fix the code or the rules. If it passes now: the bug is resolved — your fixes worked.",
+    ],
+    tip: "Optional flags: '--days=7' for the last week, '--shop=foo.myshopify.com' for one shop only. The Anthropic API key needs to be set the same way as the scenario tests above.",
+  },
+  {
+    phase: "maintain",
+    icon: "✏️",
+    title: "Add a new scenario when you spot a bug",
+    short: "Open scripts/scenarios.json, copy an example, change a few fields.",
+    body: "When a customer or QA finds a chat issue that wasn't already covered, lock it in as a permanent test so it can't regress. The scenario file is plain JSON — you don't need to know JavaScript. Find a similar existing scenario, copy its block, edit the customer messages and what the AI must (or must not) say.",
+    list: [
+      "Each scenario has a name, optional 'history' array (prior turns), 'messages' array (the new user message(s)), and 'expect' object with assertions.",
+      "Common assertions: mustContain (these phrases must appear), mustNotContain (these phrases must NOT appear), shouldMentionAny (at least one of these), shouldAskAbout (the AI should ask about one of these topics), maxSentences (response can't be longer than N).",
+      "After editing the file, run 'npm run eval:scenarios' to confirm it passes (or fails as expected on a buggy build), then commit and push. The new scenario protects against that bug forever.",
+    ],
+    tip: "Don't write scenarios from scratch — open scripts/scenarios.json and copy the closest existing one. The 'no meta-narration' and 'soccer player asks for orthotic for cleats' scenarios are good templates for product flows; the 'asks about return policy' style is good for FAQ-style questions.",
+  },
 ];
