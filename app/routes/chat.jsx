@@ -918,6 +918,25 @@ export const action = async ({ request }) => {
     const sessionGender = detectGenderFromHistory(messages);
     const answeredChoices = extractAnsweredChoices(messages);
 
+    // When gender was detected from natural language ("for my dad",
+    // "my wife", "I'm a man") rather than from a chip answer, the
+    // existing answeredChoices doesn't include it — so the prompt's
+    // "Established Answers" block has no gender entry, and the AI
+    // ignores the rules-knowledge "gender is locked" intent and asks
+    // anyway. Inject a synthetic entry so the AI sees gender as
+    // already-answered and skips the gender question.
+    if (sessionGender && !answeredChoices.some((c) =>
+      /\b(men|women|gender|him|her|man|woman)\b/i.test(c.question || "") ||
+      /\b(men|women|men's|women's)\b/i.test(c.answer || "")
+    )) {
+      answeredChoices.unshift({
+        question: "Are these for men's or women's?",
+        answer: sessionGender === "men" ? "Men's" : "Women's",
+        rawAnswer: sessionGender === "men" ? "Men's" : "Women's",
+        options: ["Men's", "Women's"],
+      });
+    }
+
     let [knowledge, attrMappings, catalogProductTypes, allCatalogCategories] = await Promise.all([
       getKnowledgeFilesWithContent(session.shop),
       getAttributeMappings(session.shop),

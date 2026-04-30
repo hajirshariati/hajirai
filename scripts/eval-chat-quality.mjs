@@ -186,6 +186,68 @@ cases.push({
   run: () => assert.equal(normalizeGenderChipAnswer("men + boys"), "men"),
 });
 
+// ── synthetic gender-answered injection ───────────────────────────────
+// Mirror the logic from chat.jsx — given a detected gender and a list
+// of answered choices, the prompt should end up with a gender entry.
+function injectSyntheticGender(detectedGender, answeredChoices) {
+  const out = [...(answeredChoices || [])];
+  if (!detectedGender) return out;
+  const alreadyHasGender = out.some((c) =>
+    /\b(men|women|gender|him|her|man|woman)\b/i.test(c.question || "") ||
+    /\b(men|women|men's|women's)\b/i.test(c.answer || "")
+  );
+  if (alreadyHasGender) return out;
+  out.unshift({
+    question: "Are these for men's or women's?",
+    answer: detectedGender === "men" ? "Men's" : "Women's",
+    rawAnswer: detectedGender === "men" ? "Men's" : "Women's",
+    options: ["Men's", "Women's"],
+  });
+  return out;
+}
+
+cases.push({
+  name: "gender from 'dad' synthesizes Men's answered-choice",
+  run: () => {
+    const detected = detectGenderFromHistory([u("for my dad")]);
+    const out = injectSyntheticGender(detected, []);
+    assert.equal(out.length, 1);
+    assert.equal(out[0].answer, "Men's");
+  },
+});
+
+cases.push({
+  name: "gender from 'wife' synthesizes Women's answered-choice",
+  run: () => {
+    const detected = detectGenderFromHistory([u("for my wife")]);
+    const out = injectSyntheticGender(detected, []);
+    assert.equal(out[0].answer, "Women's");
+  },
+});
+
+cases.push({
+  name: "doesn't double-add when chip already answered gender",
+  run: () => {
+    const existing = [{
+      question: "Which styles? <<Men's>><<Women's>>",
+      answer: "Men's",
+      rawAnswer: "Men's",
+      options: ["Men's", "Women's"],
+    }];
+    const detected = detectGenderFromHistory([u("for my dad")]);
+    const out = injectSyntheticGender(detected, existing);
+    assert.equal(out.length, 1, "should not duplicate");
+  },
+});
+
+cases.push({
+  name: "no gender detected → answeredChoices unchanged",
+  run: () => {
+    const out = injectSyntheticGender(null, []);
+    assert.equal(out.length, 0);
+  },
+});
+
 // ── hasChoiceButtons ──────────────────────────────────────────────────
 cases.push({
   name: "detects choice buttons in text",
