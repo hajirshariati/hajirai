@@ -9,6 +9,7 @@ import {
   hasChoiceButtons,
   dedupeConsecutiveSentences,
 } from "../app/lib/chat-helpers.server.js";
+import { filterContradictingGenderChips } from "../app/lib/chip-filter.server.js";
 
 const u = (content) => ({ role: "user", content });
 const a = (content) => ({ role: "assistant", content });
@@ -431,6 +432,150 @@ cases.push({
   run: () => {
     const out = stripBannedNarration("Let me get the details for the Jillian.");
     assert.ok(!/let me get the details/i.test(out), `still has narration: ${out}`);
+  },
+});
+
+// ── filterContradictingGenderChips ────────────────────────────────────
+const aetrexMap = {
+  boots: { display: "Boots", genders: ["women"] },
+  "mary janes": { display: "Mary Janes", genders: ["women"] },
+  loafers: { display: "Loafers", genders: ["women"] },
+  oxfords: { display: "Oxfords", genders: ["women"] },
+  slippers: { display: "Slippers", genders: ["women"] },
+  "wedges heels": { display: "Wedges Heels", genders: ["women"] },
+  sneakers: { display: "Sneakers", genders: ["men", "women"] },
+  sandals: { display: "Sandals", genders: ["men", "women"] },
+  clogs: { display: "Clogs", genders: ["men", "women"] },
+  cleats: { display: "Cleats", genders: ["unisex"] },
+};
+
+cases.push({
+  name: "strips Men's chip when user mentioned boots (women-only)",
+  run: () => {
+    const out = filterContradictingGenderChips(
+      "Which styles? <<Men's>><<Women's>>",
+      "Can you show me your boots with memory foam?",
+      aetrexMap,
+    );
+    assert.deepEqual(out.stripped, ["Men's"]);
+    assert.match(out.text, /<<Women's>>/);
+    assert.ok(!/<<Men's>>/.test(out.text), `Men's should be gone: ${out.text}`);
+  },
+});
+
+cases.push({
+  name: "strips Men's chip when user mentioned wedges (women-only)",
+  run: () => {
+    const out = filterContradictingGenderChips(
+      "Pick one: <<Men's>><<Women's>>",
+      "I want some wedges",
+      aetrexMap,
+    );
+    assert.deepEqual(out.stripped, ["Men's"]);
+  },
+});
+
+cases.push({
+  name: "keeps both chips when user mentioned sneakers (multi-gender)",
+  run: () => {
+    const out = filterContradictingGenderChips(
+      "Which styles? <<Men's>><<Women's>>",
+      "I want sneakers",
+      aetrexMap,
+    );
+    assert.deepEqual(out.stripped, []);
+    assert.match(out.text, /<<Men's>>/);
+    assert.match(out.text, /<<Women's>>/);
+  },
+});
+
+cases.push({
+  name: "keeps both chips when user mentioned no category",
+  run: () => {
+    const out = filterContradictingGenderChips(
+      "Which styles? <<Men's>><<Women's>>",
+      "I have foot pain",
+      aetrexMap,
+    );
+    assert.deepEqual(out.stripped, []);
+    assert.match(out.text, /<<Men's>>/);
+    assert.match(out.text, /<<Women's>>/);
+  },
+});
+
+cases.push({
+  name: "keeps both chips for cleats (unisex satisfies both)",
+  run: () => {
+    const out = filterContradictingGenderChips(
+      "Which styles? <<Men's>><<Women's>>",
+      "I need cleats orthotics",
+      aetrexMap,
+    );
+    assert.deepEqual(out.stripped, []);
+  },
+});
+
+cases.push({
+  name: "keeps both chips when user mentioned BOTH boots AND sandals",
+  run: () => {
+    // Sandals supports men's, so Men's chip stays even though boots doesn't.
+    const out = filterContradictingGenderChips(
+      "Pick: <<Men's>><<Women's>>",
+      "I want boots or sandals",
+      aetrexMap,
+    );
+    assert.deepEqual(out.stripped, []);
+  },
+});
+
+cases.push({
+  name: "strips 'Boys' chip on women-only category",
+  run: () => {
+    const out = filterContradictingGenderChips(
+      "Pick: <<Boys>><<Girls>>",
+      "I want loafers",
+      aetrexMap,
+    );
+    assert.deepEqual(out.stripped, ["Boys"]);
+  },
+});
+
+cases.push({
+  name: "leaves non-gender chips alone (e.g. <<Running>><<Casual>>)",
+  run: () => {
+    const out = filterContradictingGenderChips(
+      "Which use case? <<Running>><<Casual>><<Dress>>",
+      "I want boots",
+      aetrexMap,
+    );
+    assert.deepEqual(out.stripped, []);
+    assert.match(out.text, /<<Running>>/);
+    assert.match(out.text, /<<Casual>>/);
+    assert.match(out.text, /<<Dress>>/);
+  },
+});
+
+cases.push({
+  name: "noop when categoryGenderMap empty",
+  run: () => {
+    const out = filterContradictingGenderChips(
+      "Pick: <<Men's>><<Women's>>",
+      "I want boots",
+      {},
+    );
+    assert.deepEqual(out.stripped, []);
+  },
+});
+
+cases.push({
+  name: "noop when conversationText empty",
+  run: () => {
+    const out = filterContradictingGenderChips(
+      "Pick: <<Men's>><<Women's>>",
+      "",
+      aetrexMap,
+    );
+    assert.deepEqual(out.stripped, []);
   },
 });
 

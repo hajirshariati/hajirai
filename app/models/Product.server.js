@@ -386,3 +386,73 @@ export async function getCatalogCategories(shop, { gender } = {}) {
 
   return categories;
 }
+
+// Returns a map of category → which genders carry it. Used so the AI can
+// avoid offering gender chips for single-gender categories ("boots" →
+// don't offer Men's chip if only women's boots exist).
+//
+// Shape: { "boots": { display: "Boots", genders: Set("women") }, ... }
+//
+// Genders normalize to "men", "women", or "unisex". Untagged products are
+// skipped (don't pollute the map with unknowns). One DB pass — same scan
+// as getCatalogCategories, just keeps the gender info per category.
+export async function getCategoryGenderAvailability(shop) {
+  const rows = await prisma.product.findMany({
+    where: { shop },
+    select: { handle: true, productType: true, attributesJson: true },
+  });
+
+  const titleCase = (s) =>
+    String(s || "")
+      .trim()
+      .toLowerCase()
+      .split(/\s+/)
+      .map((w) => (w ? w[0].toUpperCase() + w.slice(1) : w))
+      .join(" ");
+
+  const normalizeGender = (raw) => {
+    const g = String(raw || "").toLowerCase().trim();
+    if (!g) return null;
+    if (g === "unisex" || g === "all" || g === "both") return "unisex";
+    if (g.startsWith("men") || g.startsWith("male") || g.startsWith("boy")) return "men";
+    if (g.startsWith("women") || g.startsWith("female") || g.startsWith("girl") || g.startsWith("lad")) return "women";
+    return null;
+  };
+
+  const map = new Map(); // key: category lowercase, value: { display, genders: Set }
+  for (const r of rows) {
+    const attrs = r.attributesJson;
+    const gRaw = getAttrCaseInsensitive(attrs, "gender");
+    const genders = new Set();
+    if (Array.isArray(gRaw)) {
+      for (const v of gRaw) {
+        const norm = normalizeGender(v);
+        if (norm) genders.add(norm);
+      }
+    } else {
+      const norm = normalizeGender(gRaw);
+      if (norm) genders.add(norm);
+    }
+    if (genders.size === 0) continue; // skip untagged — can't infer
+
+    const cats = [];
+    if (r.productType) cats.push(String(r.productType).trim());
+    for (const v of extractCategoryValues(attrs)) cats.push(v);
+
+    for (const raw of cats) {
+      const trimmed = String(raw || "").trim();
+      if (!trimmed) continue;
+      const key = trimmed.toLowerCase();
+      if (!map.has(key)) map.set(key, { display: titleCase(trimmed), genders: new Set() });
+      const entry = map.get(key);
+      for (const g of genders) entry.genders.add(g);
+    }
+  }
+
+  // Convert to plain object so it serializes (Sets don't JSON-encode).
+  const out = {};
+  for (const [k, v] of map) {
+    out[k] = { display: v.display, genders: Array.from(v.genders).sort() };
+  }
+  return out;
+}

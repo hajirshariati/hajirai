@@ -2,9 +2,9 @@ import Anthropic from "@anthropic-ai/sdk";
 import { authenticate } from "../shopify.server";
 import { getShopConfig, getKnowledgeFilesWithContent, incrementRateLimitHits } from "../models/ShopConfig.server";
 import { getAttributeMappings } from "../models/AttributeMapping.server";
-import { getCatalogCategories, getAllCatalogCategories } from "../models/Product.server";
+import { getCatalogCategories, getAllCatalogCategories, getCategoryGenderAvailability } from "../models/Product.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
-import { filterForbiddenCategoryChips } from "../lib/chip-filter.server";
+import { filterForbiddenCategoryChips, filterContradictingGenderChips } from "../lib/chip-filter.server";
 import { sanitizeCtaLabel } from "../lib/cta-label.server";
 import { analyzeCategoryIntent, cardMatchesActiveGroup } from "../lib/category-intent.server";
 import { extractAnsweredChoices } from "../lib/conversation-memory.server";
@@ -663,6 +663,24 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       console.log(`[chat] ${ctx.shop} stripped off-catalog chips:`, filtered.stripped, "allowed:", ctx.catalogCategories);
     }
     fullResponseText = filtered.text;
+
+    // Strip gender chips that contradict the catalog given the user's
+    // mentioned categories. e.g. user said "boots" + AI offered <<Men's>>
+    // when only women's boots exist → strip the Men's chip. Keeps both
+    // when the mentioned category supports both, or when no category was
+    // mentioned. Pure data — categoryGenderMap is computed from the
+    // catalog every request.
+    if (ctx.categoryGenderMap) {
+      const genderFiltered = filterContradictingGenderChips(
+        fullResponseText,
+        ctx.conversationText,
+        ctx.categoryGenderMap,
+      );
+      if (genderFiltered.stripped.length > 0) {
+        console.log(`[chat] ${ctx.shop} stripped contradicting-gender chips:`, genderFiltered.stripped);
+      }
+      fullResponseText = genderFiltered.text;
+    }
   }
 
   // Strip any markdown directive blocks (`:::name ... :::`) the model may
@@ -1018,11 +1036,12 @@ export const action = async ({ request }) => {
       });
     }
 
-    let [knowledge, attrMappings, catalogProductTypes, allCatalogCategories] = await Promise.all([
+    let [knowledge, attrMappings, catalogProductTypes, allCatalogCategories, categoryGenderMap] = await Promise.all([
       getKnowledgeFilesWithContent(session.shop),
       getAttributeMappings(session.shop),
       getCatalogCategories(session.shop, { gender: sessionGender }),
       getAllCatalogCategories(session.shop),
+      getCategoryGenderAvailability(session.shop),
     ]);
 
     // Merchant-configured category groups: keep a server-side product-intent
@@ -1170,6 +1189,7 @@ export const action = async ({ request }) => {
       catalogProductTypes,
       scopedGender: sessionGender,
       answeredChoices,
+      categoryGenderMap,
     });
 
     const model = chooseModel(config, String(body.message), history);
@@ -1205,6 +1225,7 @@ export const action = async ({ request }) => {
       categoryIntentAmbiguous: Boolean(categoryIntent.ambiguous),
       shopConfig: config,
       fullCatalogCategories: allCatalogCategories,
+      categoryGenderMap,
       latestUserMessage: String(body.message || ""),
     };
     const encoder = new TextEncoder();

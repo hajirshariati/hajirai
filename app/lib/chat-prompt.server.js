@@ -6,7 +6,7 @@ const LABELS = {
   custom: "Custom Knowledge",
 };
 
-export function buildSystemPrompt({ config, knowledge, shop, attributeNames, categoryExclusions, querySynonyms, customerContext, fitPredictorEnabled, catalogProductTypes, scopedGender, answeredChoices }) {
+export function buildSystemPrompt({ config, knowledge, shop, attributeNames, categoryExclusions, querySynonyms, customerContext, fitPredictorEnabled, catalogProductTypes, scopedGender, answeredChoices, categoryGenderMap }) {
   const name = config?.assistantName || "AI Shopping Assistant";
   const tagline = config?.assistantTagline || "";
   const parts = [];
@@ -91,6 +91,38 @@ export function buildSystemPrompt({ config, knowledge, shop, attributeNames, cat
         `The catalog has not yet provided a category list. Do NOT offer product-category choice buttons (like <<Sneakers>><<Sandals>>) in this conversation — ` +
         `the categories cannot be verified. Ask a different clarifying question (gender, use case, size, etc.) instead, or run search_products first and infer categories from the results.`,
     );
+  }
+
+  // Category-gender availability — derived from the live catalog. Lets
+  // the AI avoid offering gender chips for single-gender categories
+  // (e.g. "boots" + men's chip when only women's boots are stocked).
+  if (categoryGenderMap && typeof categoryGenderMap === "object") {
+    const entries = Object.values(categoryGenderMap)
+      .filter((e) => e && e.display && Array.isArray(e.genders) && e.genders.length > 0)
+      .sort((a, b) => a.display.localeCompare(b.display));
+    if (entries.length > 0) {
+      const single = entries.filter((e) => e.genders.length === 1);
+      const multi = entries.filter((e) => e.genders.length > 1);
+      const lines = [];
+      if (single.length > 0) {
+        lines.push("Single-gender categories (only the listed gender is stocked):");
+        for (const e of single) lines.push(`- ${e.display}: ${e.genders[0]} only`);
+      }
+      if (multi.length > 0) {
+        lines.push("Multi-gender categories:");
+        for (const e of multi) lines.push(`- ${e.display}: ${e.genders.join(" + ")}`);
+      }
+      parts.push(
+        `\n=== Category Availability by Gender (DATA-DRIVEN, HIGHEST PRIORITY) ===\n` +
+          `${lines.join("\n")}\n` +
+          `\nGENDER-CHIP RULE: When you ask the customer to pick a gender (<<Men's>><<Women's>>) AFTER they mentioned a specific category, ` +
+          `ONLY offer the gender(s) that actually carry that category per the list above. ` +
+          `Example: customer says "show me boots" and Boots is "women only" → offer ONLY <<Women's>>, never <<Men's>>. ` +
+          `If no gender carries the requested category, lead with truth: "We carry [category] in [gender] only — want to see those, or browse [other category] instead?". ` +
+          `For multi-gender categories, both chips are valid. For unisex-only categories (e.g. Cleats), both Men's and Women's chips are valid (the unisex products work for either request). ` +
+          `The server will strip any gender chips that contradict this map — offering them is a wasted choice and frustrates customers.`,
+      );
+    }
   }
 
   const knowledgeByType = {};
