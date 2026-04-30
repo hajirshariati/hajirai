@@ -691,6 +691,21 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
 
   console.log(`[chat] emit textLen=${fullResponseText.length} poolSize=${pool.length} searchAttempted=${productSearchAttempted}`);
 
+  // Observability only — no behavior change. Flag long non-product
+  // replies (text >450 chars, no pool, no search) so we can spot
+  // runaway FAQ/explanation answers in the logs without truncating.
+  // Threshold ≈ 4 sentences worth — generous enough to allow real
+  // FAQ explanations, tight enough to surface unusual ramblings.
+  if (
+    fullResponseText &&
+    pool.length === 0 &&
+    !productSearchAttempted &&
+    fullResponseText.length > 450
+  ) {
+    const sentenceCount = (fullResponseText.match(/[.!?](?:\s|$)/g) || []).length;
+    console.log(`[chat] WARN long-non-product-reply chars=${fullResponseText.length} sentences~=${sentenceCount}`);
+  }
+
   controller.enqueue(encoder.encode(sseChunk({
     type: "text",
     text: fullResponseText
