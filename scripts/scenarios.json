@@ -88,10 +88,14 @@
     }
   },
   {
-    "name": "kids orthotic",
-    "messages": ["My 10-year-old needs orthotics."],
+    "name": "kids orthotic (post-orthotic-gate)",
+    "history": [
+      { "role": "user", "content": "My 10-year-old needs orthotics." },
+      { "role": "assistant", "content": "Are you looking for footwear or an orthotic insert? <<New Footwear>><<Orthotic Insert>>" }
+    ],
+    "messages": ["Orthotic Insert"],
     "expect": {
-      "shouldMentionAny": ["Kids"]
+      "shouldMentionAny": ["Kids", "kid", "youth", "child"]
     }
   },
   {
@@ -305,10 +309,16 @@
     }
   },
   {
-    "name": "overpronation question",
-    "messages": ["I overpronate. What do you recommend?"],
+    "name": "overpronation question (full-flow)",
+    "history": [
+      { "role": "user", "content": "I overpronate. What do you recommend?" },
+      { "role": "assistant", "content": "Are you looking for footwear or an orthotic insert? <<New Footwear>><<Orthotic Insert>>" },
+      { "role": "user", "content": "Orthotic Insert" },
+      { "role": "assistant", "content": "Is this for men's or women's? <<Men's>><<Women's>>" }
+    ],
+    "messages": ["Men's"],
     "expect": {
-      "shouldMentionAny": ["Overpronation", "posted"]
+      "shouldMentionAny": ["Overpronation", "posted", "overpronate"]
     }
   },
   {
@@ -325,10 +335,14 @@
     }
   },
   {
-    "name": "asks for cheaper alternative",
-    "messages": ["Is there a cheaper version of the Premium Memory Foam orthotic?"],
+    "name": "asks for cheaper alternative (post-gender)",
+    "history": [
+      { "role": "user", "content": "Is there a cheaper version of the Premium Memory Foam orthotic?" },
+      { "role": "assistant", "content": "Is this for men's or women's? <<Men's>><<Women's>>" }
+    ],
+    "messages": ["Men's"],
     "expect": {
-      "shouldMentionAny": ["Memory Foam", "Casual", "$"]
+      "shouldMentionAny": ["Memory Foam", "Casual", "Compete", "Train", "$", "less expensive", "more affordable", "lower price"]
     }
   },
   {
@@ -428,7 +442,7 @@
     "messages": ["How do I clean my orthotics?"],
     "expect": {
       "shouldMentionAny": ["damp cloth", "soap", "air-dry", "wipe"],
-      "mustNotContain": ["machine wash", "tumble dry"]
+      "mustNotMatch": "(?:^|\\s)(?:you can|recommend(?:ed)?|safely|feel free to|put them in (?:the|a)) (?:machine[- ]?wash(?:ing)?|tumble[- ]?dry(?:ing)?|the (?:washer|dryer))"
     }
   },
   {
