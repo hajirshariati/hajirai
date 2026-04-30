@@ -112,6 +112,131 @@ function detectGenderFromHistory(messages) {
   return null;
 }
 
+function escapeRegex(s) {
+  return String(s || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function phraseMatches(text, phrase) {
+  const raw = String(phrase || "").trim();
+  if (!raw) return false;
+  const escaped = escapeRegex(raw);
+  const withS = /s$/i.test(raw)
+    ? `(?:${escaped}|${escapeRegex(raw.slice(0, -1))})`
+    : `${escaped}(?:s|es)?`;
+  return new RegExp(`\\b${withS}\\b`, "i").test(String(text || ""));
+}
+
+function compactGroup(group) {
+  if (!group) return null;
+  return {
+    name: String(group.name || "").trim(),
+    categories: Array.isArray(group.categories)
+      ? group.categories.map((c) => String(c || "").trim()).filter(Boolean)
+      : [],
+    triggers: Array.isArray(group.triggers)
+      ? group.triggers.map((t) => String(t || "").trim()).filter(Boolean)
+      : [],
+  };
+}
+
+function groupTerms(group, { includeTriggers = true } = {}) {
+  if (!group) return [];
+  const terms = [
+    group.name,
+    ...(Array.isArray(group.categories) ? group.categories : []),
+    ...(includeTriggers && Array.isArray(group.triggers) ? group.triggers : []),
+  ];
+  return terms.map((t) => String(t || "").trim()).filter(Boolean);
+}
+
+function matchingGroupsForText(text, groups, opts = {}) {
+  const source = String(text || "");
+  if (!source || !Array.isArray(groups)) return [];
+  return groups.filter((group) =>
+    groupTerms(group, opts).some((term) => phraseMatches(source, term)),
+  );
+}
+
+function sameGroup(a, b) {
+  if (!a || !b) return false;
+  const an = String(a.name || "").trim().toLowerCase();
+  const bn = String(b.name || "").trim().toLowerCase();
+  if (an && bn) return an === bn;
+  const ac = new Set((a.categories || []).map((c) => String(c).toLowerCase()));
+  return (b.categories || []).some((c) => ac.has(String(c).toLowerCase()));
+}
+
+function isShortChoice(text) {
+  const words = String(text || "").trim().split(/\s+/).filter(Boolean);
+  return words.length > 0 && words.length <= 5;
+}
+
+function hasExplicitPivotIntent(text) {
+  return /\b(show|find|search|shop|buy|get|need|want|looking for|recommend|suggest)\b/i.test(String(text || ""));
+}
+
+function analyzeCategoryIntent(messages, merchantGroups) {
+  const groups = Array.isArray(merchantGroups)
+    ? merchantGroups.map(compactGroup).filter((g) => g && (g.name || g.categories.length || g.triggers.length))
+    : [];
+  if (groups.length === 0) return { activeGroup: null, contextGroup: null, ambiguous: false };
+
+  const latestUser = [...messages].reverse().find((m) => m.role === "user" && typeof m.content === "string");
+  const previousMessages = messages.slice(0, Math.max(0, messages.lastIndexOf(latestUser)));
+  const previousAssistant = [...previousMessages].reverse().find((m) => m.role === "assistant" && typeof m.content === "string");
+
+  const latestMatches = matchingGroupsForText(latestUser?.content || "", groups, { includeTriggers: true });
+  const latestUnambiguous = latestMatches.length === 1 ? latestMatches[0] : null;
+  const latestAmbiguous = latestMatches.length > 1;
+
+  let priorActive = null;
+  let priorAmbiguous = false;
+  for (let i = previousMessages.length - 1; i >= 0; i--) {
+    const msg = previousMessages[i];
+    if (!msg || typeof msg.content !== "string") continue;
+    const includeTriggers = msg.role === "user";
+    const matches = matchingGroupsForText(msg.content, groups, { includeTriggers });
+    if (matches.length > 1) {
+      priorAmbiguous = true;
+      break;
+    }
+    if (matches.length === 1) {
+      priorActive = matches[0];
+      break;
+    }
+  }
+
+  if (latestUnambiguous && priorActive && !sameGroup(latestUnambiguous, priorActive)) {
+    const previousAssistantMentionsPrior = matchingGroupsForText(
+      previousAssistant?.content || "",
+      [priorActive],
+      { includeTriggers: false },
+    ).length === 1;
+    if (isShortChoice(latestUser?.content || "") && !hasExplicitPivotIntent(latestUser?.content || "") && previousAssistantMentionsPrior) {
+      return {
+        activeGroup: priorActive,
+        contextGroup: latestUnambiguous,
+        ambiguous: false,
+      };
+    }
+  }
+
+  if (latestUnambiguous) return { activeGroup: latestUnambiguous, contextGroup: null, ambiguous: false };
+  if (latestAmbiguous) return { activeGroup: null, contextGroup: null, ambiguous: true };
+  if (priorActive && !priorAmbiguous) return { activeGroup: priorActive, contextGroup: null, ambiguous: false };
+  return { activeGroup: null, contextGroup: null, ambiguous: priorAmbiguous };
+}
+
+function cardMatchesActiveGroup(card, activeGroup) {
+  if (!activeGroup || !Array.isArray(activeGroup.categories) || activeGroup.categories.length === 0) return true;
+  const cardCategory = String(card?._category || "").toLowerCase().trim();
+  if (!cardCategory) return true;
+  return activeGroup.categories.some((cat) => {
+    const c = String(cat || "").toLowerCase().trim();
+    return c && (cardCategory === c || cardCategory.includes(c) || c.includes(cardCategory));
+  });
+}
+
 function chooseModel(config, message, history) {
   const strategy = config.modelStrategy || "smart";
   const stored = config.anthropicModel || DEFAULT_MODEL;
@@ -618,37 +743,38 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   }
 
 
-const collection = extractCollectionCTA(fullResponseText);
-fullResponseText = collection.text;
+  const collection = extractCollectionCTA(fullResponseText);
+  fullResponseText = collection.text;
 
-console.log(`[chat] emit textLen=${fullResponseText.length} poolSize=${pool.length} searchAttempted=${productSearchAttempted}`);
-
-controller.enqueue(encoder.encode(sseChunk({
-  type: "text",
-  text: fullResponseText
-})));
-
-
-if (supportCTA) {
-  controller.enqueue(encoder.encode(sseChunk({
-    type: "link",
-    url: supportCTA.url,
-    label: supportCTA.label
-  })));
-}
-
+  let genericCTA = null;
   if (!supportCTA && fullResponseText) {
-  const generic = extractGenericCTA(fullResponseText);
-  fullResponseText = generic.text;
+    const generic = extractGenericCTA(fullResponseText);
+    fullResponseText = generic.text;
+    genericCTA = generic.cta;
+  }
 
-  if (generic.cta) {
+  console.log(`[chat] emit textLen=${fullResponseText.length} poolSize=${pool.length} searchAttempted=${productSearchAttempted}`);
+
+  controller.enqueue(encoder.encode(sseChunk({
+    type: "text",
+    text: fullResponseText
+  })));
+
+  if (supportCTA) {
     controller.enqueue(encoder.encode(sseChunk({
       type: "link",
-      url: generic.cta.url,
-      label: generic.cta.label,
+      url: supportCTA.url,
+      label: supportCTA.label
     })));
   }
-}
+
+  if (!supportCTA && genericCTA) {
+    controller.enqueue(encoder.encode(sseChunk({
+      type: "link",
+      url: genericCTA.url,
+      label: genericCTA.label,
+    })));
+  }
 
   const userAskedSignup = /\b(sign ?up for (our|the|your|a).{0,25}(newsletter|list|email|sms|updates|deals|offers)|subscribe to (our|the|your).{0,20}(newsletter|list|email|sms|updates)|newsletter|mailing list|join our (list|newsletter|email|sms)|opt.?in|stay (connected|in touch|updated).{0,20}(email|offers|updates|news|deals))\b/i.test(ctx.userText || "");
   const aiMentionsSignup = /\b(newsletter|mailing list|subscribe to (our|the|your).{0,20}(newsletter|list|sms|email)|sign ?up for (our|the|my|your).{0,25}(newsletter|list|email|sms|updates|deals|offers)|join our (newsletter|list|email|sms)|stay connected.{0,20}(email|offers|updates|deals))\b/i.test(fullResponseText || "");
@@ -673,6 +799,16 @@ if (supportCTA) {
           if (fam && excludedFamilies.has(fam)) return false;
           return true;
         });
+
+    if (ctx.activeCategoryGroup) {
+      const groupScoped = filteredPool.filter((card) => cardMatchesActiveGroup(card, ctx.activeCategoryGroup));
+      if (groupScoped.length !== filteredPool.length) {
+        console.log(
+          `[chat] product-card group guard: kept ${groupScoped.length}/${filteredPool.length} for group=${ctx.activeCategoryGroup.name || "-"}`,
+        );
+      }
+      filteredPool = groupScoped;
+    }
 
     // When get_fit_recommendation ran, the customer is asking about ONE
     // specific product. Narrow the display to just the focused handle(s),
@@ -893,64 +1029,29 @@ export const action = async ({ request }) => {
       getAllCatalogCategories(session.shop),
     ]);
 
-    // Merchant-configured category groups: when the conversation clearly
-    // contains a trigger word from exactly ONE group, narrow the catalog
-    // allow-list passed to the prompt to that group's categories only. This
-    // is fully data-driven — no hardcoded vocabulary anywhere.
+    // Merchant-configured category groups: keep a server-side product-intent
+    // group from the conversation, then narrow the prompt/catalog surface to
+    // that group's categories. This is fully data-driven — no hardcoded store
+    // vocabulary anywhere.
     //
     // - Zero groups configured: no filter applied (full allow-list goes
     //   through). Configure groups in Rules & Knowledge to enable.
     // - Multiple groups match in the same user message (e.g. "orthotic shoes" hits both Footwear and
     //   Orthotics): no filter applied — the AI sees the full allow-list
     //   and resolves the ambiguity itself. Safer than picking wrong.
-    // - Short follow-up answers like "Men's" keep the most recent explicit
-    //   category-group intent from earlier user messages. That preserves
-    //   "shoes" after the gender question, so non-footwear groups don't leak
-    //   into the shoe-type chips just because the latest message only says
-    //   "Men's".
+    // - Short follow-up answers like "Men's" or "Running Shoes" keep the
+    //   prior product goal when the previous assistant turn was asking a
+    //   contextual question about another group. That preserves "orthotic"
+    //   as the thing to buy while using "running shoes" as fit context.
     let merchantGroups = [];
     try { merchantGroups = JSON.parse(config.categoryGroups || "[]"); } catch { /* */ }
 
-    const latestMessage = String(body.message || "");
     let groupFilterApplied = "";
+    const categoryIntent = analyzeCategoryIntent(messages, merchantGroups);
 
     if (Array.isArray(merchantGroups) && merchantGroups.length > 0) {
-      const triggerMatches = (msg, triggers) => {
-        if (!Array.isArray(triggers) || triggers.length === 0) return false;
-        for (const t of triggers) {
-          const phrase = String(t || "").trim();
-          if (!phrase) continue;
-          const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-          const withS = /s$/.test(phrase)
-            ? `(?:${escaped}|${escaped.slice(0, -1)})`
-            : `${escaped}(?:s|es)?`;
-          if (new RegExp(`\\b${withS}\\b`, "i").test(msg)) return true;
-        }
-        return false;
-      };
-
-      const userMessagesNewestFirst = messages
-        .filter((m) => m.role === "user" && typeof m.content === "string")
-        .map((m) => m.content)
-        .reverse();
-
-      let matchedGroup = null;
-      let ambiguousGroupMessage = false;
-      for (const text of userMessagesNewestFirst) {
-        const textLower = text.toLowerCase();
-        const matched = merchantGroups.filter((g) => triggerMatches(textLower, g?.triggers || []));
-        if (matched.length > 1) {
-          ambiguousGroupMessage = true;
-          break;
-        }
-        if (matched.length === 1) {
-          matchedGroup = matched[0];
-          break;
-        }
-      }
-
-      if (matchedGroup && !ambiguousGroupMessage) {
-        const g = matchedGroup;
+      if (categoryIntent.activeGroup && !categoryIntent.ambiguous) {
+        const g = categoryIntent.activeGroup;
         const allowed = new Set((g.categories || []).map((c) => String(c).toLowerCase()));
         const filtered = catalogProductTypes.filter((c) => allowed.has(String(c).toLowerCase()));
         if (filtered.length >= 1) {
@@ -960,7 +1061,7 @@ export const action = async ({ request }) => {
       }
     }
 
-    console.log(`[chat] ${session.shop} gender=${sessionGender || "any"} scoped-categories=${catalogProductTypes.length} full-catalog-categories=${allCatalogCategories.length}${groupFilterApplied ? ` group=${groupFilterApplied}` : ""}`);
+    console.log(`[chat] ${session.shop} gender=${sessionGender || "any"} scoped-categories=${catalogProductTypes.length} full-catalog-categories=${allCatalogCategories.length}${groupFilterApplied ? ` group=${groupFilterApplied}` : ""}${categoryIntent.contextGroup ? ` contextGroup=${categoryIntent.contextGroup.name}` : ""}${categoryIntent.ambiguous ? " group=ambiguous" : ""}`);
     const attributeNames = attrMappings.map((m) => m.attribute);
 
     let categoryExclusions = [];
@@ -1080,6 +1181,8 @@ export const action = async ({ request }) => {
       trackingPageUrl: config.trackingPageUrl || "",
       returnsPageUrl: config.returnsPageUrl || "",
       catalogCategories: catalogProductTypes,
+      activeCategoryGroup: categoryIntent.activeGroup,
+      contextCategoryGroup: categoryIntent.contextGroup,
       shopConfig: config,
       fullCatalogCategories: allCatalogCategories,
       latestUserMessage: String(body.message || ""),

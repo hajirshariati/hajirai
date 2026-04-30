@@ -354,6 +354,46 @@ function overrideMatches(userLower, phrase) {
   return new RegExp(`\\b${withS}\\b`).test(userLower);
 }
 
+function activeGroupTerms(activeGroup) {
+  if (!activeGroup || typeof activeGroup !== "object") return [];
+  return [
+    activeGroup.name,
+    ...(Array.isArray(activeGroup.categories) ? activeGroup.categories : []),
+    ...(Array.isArray(activeGroup.triggers) ? activeGroup.triggers : []),
+  ]
+    .map((t) => String(t || "").trim().toLowerCase())
+    .filter(Boolean);
+}
+
+function excludesActiveGroup(excludes, activeGroup) {
+  const terms = activeGroupTerms(activeGroup);
+  if (terms.length === 0 || excludes.length === 0) return false;
+  return excludes.some((exclude) =>
+    terms.some((term) => overrideMatches(term, exclude) || overrideMatches(exclude, term) || term.includes(exclude) || exclude.includes(term)),
+  );
+}
+
+function productMatchesGroupCategory(product, activeGroup) {
+  const categories = Array.isArray(activeGroup?.categories)
+    ? activeGroup.categories.map((c) => String(c || "").trim().toLowerCase()).filter(Boolean)
+    : [];
+  if (categories.length === 0) return true;
+  const attrs = product.attributesJson || {};
+  const parts = [
+    attrs.category,
+    attrs.category_for_filter,
+    attrs.subcategory,
+    product.productType,
+  ];
+  const haystack = parts
+    .flatMap((v) => (Array.isArray(v) ? v : [v]))
+    .filter(Boolean)
+    .map((v) => String(v).toLowerCase())
+    .join(" ");
+  if (!haystack) return false;
+  return categories.some((cat) => haystack.includes(cat) || cat.includes(haystack));
+}
+
 // Merchant-configured via Rules & Knowledge → Search Rules.
 // Each rule: { whenQuery, excludeTerms, overrideTriggers? }
 // - whenQuery: comma-separated keywords; the rule fires when any appears in the
@@ -365,7 +405,7 @@ function overrideMatches(userLower, phrase) {
 // Auto-bypass: even without a configured override, if the user's latest message
 // explicitly mentions any excludeTerm, the rule is skipped for this turn — the
 // customer is asking for the very thing the rule would hide.
-function matchesCategoryRule(triggerText, rules, latestUserText = "") {
+function matchesCategoryRule(triggerText, rules, latestUserText = "", activeGroup = null) {
   if (!rules || !Array.isArray(rules)) return null;
   const lower = triggerText.toLowerCase();
   const userLower = (latestUserText || "").toLowerCase();
@@ -373,6 +413,10 @@ function matchesCategoryRule(triggerText, rules, latestUserText = "") {
     const triggers = splitCsv(rule.whenQuery);
     if (!triggers.some((t) => lower.includes(t))) continue;
     const excludes = splitCsv(rule.excludeTerms);
+    if (excludesActiveGroup(excludes, activeGroup)) {
+      console.log(`[search]   rule skipped: would exclude active group=${activeGroup?.name || "-"}`);
+      continue;
+    }
     if (excludes.length > 0 && excludes.some((e) => overrideMatches(userLower, e))) continue;
     const overrides = splitCsv(rule.overrideTriggers);
     if (overrides.length > 0 && overrides.some((o) => overrideMatches(userLower, o))) continue;
@@ -467,7 +511,7 @@ function genderFilterClause(gender) {
 
 async function searchProducts(
   { query, limit, filters },
-  { shop, deduplicateColors, sessionGender, categoryExclusions, querySynonyms, conversationText, userText, latestUserMessage, shopConfig }
+  { shop, deduplicateColors, sessionGender, categoryExclusions, querySynonyms, conversationText, userText, latestUserMessage, shopConfig, activeCategoryGroup }
 ) {
   const q = String(query || "").trim();
   if (!q) return { products: [] };
@@ -521,7 +565,7 @@ const searchQuery = detected.gender ? detected.query : q;
   // that fired several turns ago.
   const latestText = latestUserMessage || "";
   const userIntentText = `${q} ${latestText}`;
-  const merchantExclude = matchesCategoryRule(userIntentText, categoryExclusions, latestText);
+  const merchantExclude = matchesCategoryRule(userIntentText, categoryExclusions, latestText, activeCategoryGroup);
 
   const GENDER_KEYS_FOR_LOG = new Set(["gender", "gender_fallback", "genders"]);
   const extraFilterKeys = Object.keys(attrFilters).filter(
@@ -556,6 +600,14 @@ const searchQuery = detected.gender ? detected.query : q;
     orderBy: { updatedAt: "desc" },
     take: 1200,
   });
+
+  if (activeCategoryGroup) {
+    const beforeGroup = products.length;
+    products = products.filter((p) => productMatchesGroupCategory(p, activeCategoryGroup));
+    if (products.length !== beforeGroup) {
+      console.log(`[search]   active-group filter ${activeCategoryGroup.name || "-"}: ${products.length}/${beforeGroup}`);
+    }
+  }
 
   const expandKeywordTerms = (kw) => {
     const out = new Set();
