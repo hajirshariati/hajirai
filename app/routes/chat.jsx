@@ -8,6 +8,12 @@ import { filterForbiddenCategoryChips } from "../lib/chip-filter.server";
 import { sanitizeCtaLabel } from "../lib/cta-label.server";
 import { analyzeCategoryIntent, cardMatchesActiveGroup } from "../lib/category-intent.server";
 import { extractAnsweredChoices } from "../lib/conversation-memory.server";
+import {
+  detectGenderFromHistory as _detectGenderFromHistory,
+  stripBannedNarration,
+  looksLikeProductPitch,
+  hasChoiceButtons,
+} from "../lib/chat-helpers.server";
 import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL, FIT_PREDICTOR_TOOL } from "../lib/chat-tools.server";
 import { fetchCustomerContext } from "../lib/customer-context.server";
 import { fetchKlaviyoEnrichment } from "../lib/klaviyo-enrichment.server";
@@ -96,23 +102,7 @@ function sseChunk(obj) {
 
 const SIMPLE_PATTERN = /^(hi|hey|hello|thanks|thank you|ok|okay|yes|no|bye|goodbye|cool|great|got it|perfect|sure|nice|awesome|alright|yep|nope|sounds good|that helps|appreciate it)\s*[.!?]*$/i;
 
-const MALE_PATTERN = /\b(men['‘’]?s|mens|men|male|males|guy|guys|dude|dudes|dad|father|husband|boyfriend|brother|son|grandpa|grandfather|uncle|nephew|man|boy|boys)\b/i;
-const FEMALE_PATTERN = /\b(women['‘’]?s|womens|women|female|females|lady|ladies|mom|mother|wife|girlfriend|sister|daughter|grandma|grandmother|aunt|niece|woman|girl|girls)\b/i;
-
-function detectGenderFromHistory(messages) {
-  for (let i = messages.length - 1; i >= 0; i--) {
-    const text = typeof messages[i].content === "string" ? messages[i].content : "";
-    if (messages[i].role === "user") {
-      if (MALE_PATTERN.test(text)) return "men";
-      if (FEMALE_PATTERN.test(text)) return "women";
-    }
-    if (messages[i].role === "assistant") {
-      if (/\bmen['‘’]?s\b/i.test(text) && !/\bwomen['‘’]?s\b/i.test(text)) return "men";
-      if (/\bwomen['‘’]?s\b/i.test(text) && !/\bmen['‘’]?s\b/i.test(text)) return "women";
-    }
-  }
-  return null;
-}
+const detectGenderFromHistory = _detectGenderFromHistory;
 
 function chooseModel(config, message, history) {
   const strategy = config.modelStrategy || "smart";
@@ -572,15 +562,23 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
 
   const pool = Array.from(allProductPool.values());
 
-  // If the AI tried a product search, got nothing back, but still wrote a
-  // pitch-sounding response, clear the text so the fallback below kicks in.
-  // Prevents "Here are some options!" showing above an empty card area.
-  if (productSearchAttempted && pool.length === 0 && fullResponseText) {
-    const looksLikePitch = /\b(here are|check out|check these|some great|great options|top picks|picks for you|styles for you|perfect (for|match)|gorgeous)\b/i.test(fullResponseText);
-    if (looksLikePitch) {
-      console.log(`[chat] empty-pool repair: replacing positive pitch with fallback`);
-      fullResponseText = "";
+  // Compliance backstop for the BANNED NARRATION prompt rule. Strips
+  // "let me look that up", "i'll find", "one moment", etc. — phrases
+  // the model ships despite being told not to.
+  if (fullResponseText) {
+    const stripped = stripBannedNarration(fullResponseText);
+    if (stripped !== fullResponseText.trim()) {
+      console.log(`[chat] stripped banned narration`);
+      fullResponseText = stripped;
     }
+  }
+
+  // Pitch text without products = incoherent turn. Replace with the
+  // graceful fallback below. Catches both "search ran, returned 0" and
+  // "AI claimed a recommendation without ever searching" cases.
+  if (pool.length === 0 && looksLikeProductPitch(fullResponseText)) {
+    console.log(`[chat] empty-pool repair: pitch text without products (searchAttempted=${productSearchAttempted})`);
+    fullResponseText = "";
   }
 
   if (!fullResponseText && pool.length === 0) {
@@ -637,6 +635,18 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     text: fullResponseText
   })));
 
+  // STALE-CARDS GUARD: emit an empty products event up front so the
+  // widget clears any cards left over from prior turns. The card-render
+  // block below may emit a non-empty products event afterwards — the
+  // widget treats each products event as a full replacement, so the last
+  // one wins. Without this guard, a customer who saw "Chase Sneaker" in
+  // turn 3 still sees those cards in turn 5 even after the AI pivoted to
+  // recommending an orthotic and didn't search this turn.
+  controller.enqueue(encoder.encode(sseChunk({
+    type: "products",
+    products: [],
+  })));
+
   if (supportCTA) {
     controller.enqueue(encoder.encode(sseChunk({
       type: "link",
@@ -659,7 +669,15 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     controller.enqueue(encoder.encode(sseChunk({ type: "klaviyo_form" })));
   }
 
-  if (pool.length > 0 && fullResponseText) {
+  // STRUCTURAL: never render cards in the same turn as choice buttons.
+  // Prompt rule said this; the AI sometimes ignores it. Customer reads
+  // cards as the answer and skips the buttons, getting wrong products.
+  const hasChoiceButtonsForCards = hasChoiceButtons(fullResponseText);
+  if (hasChoiceButtonsForCards && pool.length > 0) {
+    console.log(`[chat] suppressing ${pool.length} cards: turn has choice buttons`);
+  }
+
+  if (pool.length > 0 && fullResponseText && !hasChoiceButtonsForCards) {
     const textLower = fullResponseText.toLowerCase();
     const saysNoMatch = /\b(don't (?:have|see|carry)|not (?:see|carry|have)|don't appear|we don't|no .{0,20} available)\b/i.test(fullResponseText);
 

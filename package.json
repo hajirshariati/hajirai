@@ -19,7 +19,9 @@
     "vite": "vite",
     "typecheck": "react-router typegen && tsc --noEmit",
     "eval:intent": "node scripts/eval-category-intent.mjs",
-    "eval:memory": "node scripts/eval-choice-memory.mjs"
+    "eval:memory": "node scripts/eval-choice-memory.mjs",
+    "eval:quality": "node scripts/eval-chat-quality.mjs",
+    "eval": "npm run eval:intent && npm run eval:memory && npm run eval:quality"
   },
   "type": "module",
   "engines": {

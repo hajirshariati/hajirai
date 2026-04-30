@@ -2,6 +2,7 @@ import prisma from "../db.server";
 import { logMentions } from "../models/ChatProductMention.server";
 import { fetchCustomerContext } from "./customer-context.server";
 import { embedText, vectorLiteral, resolveShopEmbedding } from "./embeddings.server";
+import { normalizeGenderChipAnswer } from "./chat-helpers.server";
 
 
 const flattenValues = (obj) => {
@@ -390,7 +391,12 @@ function productMatchesGroupCategory(product, activeGroup) {
     .filter(Boolean)
     .map((v) => String(v).toLowerCase())
     .join(" ");
-  if (!haystack) return false;
+  // Don't fail closed when a product lacks all category metadata
+  // (older imports, missing metafields, productType empty). The UI guard
+  // in cardMatchesActiveGroup already passes such cards through; do the
+  // same here so a freshly installed catalog without tags doesn't return
+  // zero results forever. Loses some specificity but avoids dead-ending.
+  if (!haystack) return true;
   return categories.some((cat) => haystack.includes(cat) || cat.includes(haystack));
 }
 
@@ -525,17 +531,10 @@ const detectedFromLatest = detectAndStripGender(latestUserMessage || "");
 const latestUserGender = detectLatestGender(userText || "");
 const latestConvoGender = detectLatestGender(conversationText || "");
 
-const filterGenderRaw = (attrFilters.gender || attrFilters.Gender || attrFilters.gender_fallback || "")
-  .toString()
-  .toLowerCase()
-  .trim();
-
-const filterGender =
-  filterGenderRaw === "men" || filterGenderRaw === "mens" || filterGenderRaw === "men's" || filterGenderRaw === "male"
-    ? "men"
-    : filterGenderRaw === "women" || filterGenderRaw === "womens" || filterGenderRaw === "women's" || filterGenderRaw === "female"
-    ? "women"
-    : null;
+// Tolerate compound chip answers like "Men's & Boys'" or "Women's, Girls'"
+// by splitting on &/and/comma and matching the first recognized token.
+const filterGenderRaw = (attrFilters.gender || attrFilters.Gender || attrFilters.gender_fallback || "");
+const filterGender = normalizeGenderChipAnswer(filterGenderRaw);
 
 // Priority: AI's current search query > customer's latest message > most recent
 // gender mention anywhere in history > session/filter fallbacks. Scanning history
