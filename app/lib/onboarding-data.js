@@ -276,7 +276,7 @@ export const STEPS = [
       "eval:feedback — runs those imported scenarios against the live AI. Each failure prints both 'RESPONSE NOW' (what the AI says today) and 'RESPONSE WHEN RATED DOWN' (what got the 👎) so you can compare side-by-side.",
       "If a scenario still fails: real bug, fix the code or the rules. If it passes now: the bug is resolved — your fixes worked.",
     ],
-    tip: "Optional flags: '--days=7' for the last week, '--shop=foo.myshopify.com' for one shop only. The Anthropic API key needs to be set the same way as the scenario tests above.",
+    tip: "Optional flags: '--days=7' for the last week, '--shop=foo.myshopify.com' for one shop only, '--no-dedupe' to keep every 👎 instead of collapsing identical questions. The script prints a summary so you can see exactly how many records were fetched, how many had conversations captured, and how many got deduped.",
   },
   {
     phase: "maintain",

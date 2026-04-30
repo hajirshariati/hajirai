@@ -23,16 +23,39 @@ const OUT_PATH = path.join(__dirname, "scenarios.from-feedback.json");
 
 const args = process.argv.slice(2);
 const arg = (name) => args.find((a) => a.startsWith(`--${name}=`))?.slice(`--${name}=`.length);
+const hasFlag = (name) => args.includes(`--${name}`);
 const shopArg = arg("shop");
 const limitArg = Number(arg("limit")) || 100;
 const sinceDays = Number(arg("days")) || 30;
 const voteFilter = arg("vote") || "down";
+const noDedupe = hasFlag("no-dedupe");
 
 // Import prisma after parsing args so the script can boot even if
 // the DB env isn't set up — useful for dry-run / --help.
 const { default: prisma } = await import("../app/db.server.js");
 
 const since = new Date(Date.now() - sinceDays * 24 * 60 * 60 * 1000);
+
+// Two-pass count so we can show the user what we found vs what we
+// actually imported. The "with conversation" filter is what the eval
+// harness needs (history + trigger), but we want to surface the
+// difference if the widget didn't capture conversation on some turns.
+const totalInRange = await prisma.chatFeedback.count({
+  where: {
+    createdAt: { gte: since },
+    ...(voteFilter !== "all" ? { vote: voteFilter } : {}),
+    ...(shopArg ? { shop: shopArg } : {}),
+  },
+});
+const withConversation = await prisma.chatFeedback.count({
+  where: {
+    createdAt: { gte: since },
+    conversation: { not: null },
+    ...(voteFilter !== "all" ? { vote: voteFilter } : {}),
+    ...(shopArg ? { shop: shopArg } : {}),
+  },
+});
+
 const where = { createdAt: { gte: since }, conversation: { not: null } };
 if (voteFilter !== "all") where.vote = voteFilter;
 if (shopArg) where.shop = shopArg;
@@ -115,23 +138,40 @@ for (const r of records) {
 }
 
 // Dedupe by exact (history, trigger) match. Same customer asking the
-// same thing twice → one scenario.
-const seen = new Set();
-const unique = [];
-for (const s of scenarios) {
-  const key = JSON.stringify({ h: s.history || [], m: s.messages });
-  if (seen.has(key)) continue;
-  seen.add(key);
-  unique.push(s);
+// same thing twice → one scenario by default. Pass --no-dedupe to
+// keep every record (useful when you want to see all 👎 events).
+let unique = scenarios;
+let dedupedCount = 0;
+if (!noDedupe) {
+  const seen = new Set();
+  const out = [];
+  for (const s of scenarios) {
+    const key = JSON.stringify({ h: s.history || [], m: s.messages });
+    if (seen.has(key)) { dedupedCount++; continue; }
+    seen.add(key);
+    out.push(s);
+  }
+  unique = out;
 }
 
 fs.writeFileSync(OUT_PATH, JSON.stringify(unique, null, 2) + "\n");
 
 const up = unique.filter((s) => s._source.vote === "up").length;
 const down = unique.filter((s) => s._source.vote === "down").length;
-console.log(`Imported ${unique.length} scenarios from feedback (thumbs-up: ${up}, thumbs-down: ${down})`);
-if (skippedNoConv > 0) console.log(`Skipped ${skippedNoConv} records (no conversation data)`);
-if (skippedNoUserMsg > 0) console.log(`Skipped ${skippedNoUserMsg} records (no user message)`);
+
+console.log(``);
+console.log(`Feedback import summary (last ${sinceDays} days, vote=${voteFilter}${shopArg ? `, shop=${shopArg}` : ""}):`);
+console.log(`  Total feedback records:     ${totalInRange}`);
+console.log(`  With conversation captured: ${withConversation}`);
+if (totalInRange > withConversation) {
+  console.log(`    ⚠ ${totalInRange - withConversation} record(s) had no conversation field — widget may not be capturing the conversation on those events.`);
+}
+if (skippedNoConv > 0) console.log(`  Skipped (parse error):      ${skippedNoConv}`);
+if (skippedNoUserMsg > 0) console.log(`  Skipped (no user message):  ${skippedNoUserMsg}`);
+if (!noDedupe && dedupedCount > 0) {
+  console.log(`  Deduped (same trigger):     ${dedupedCount}  (use --no-dedupe to keep duplicates)`);
+}
+console.log(`  Imported scenarios:         ${unique.length}  (👍 ${up} / 👎 ${down})`);
 console.log(``);
 console.log(`File: ${path.relative(process.cwd(), OUT_PATH)}`);
 console.log(``);
