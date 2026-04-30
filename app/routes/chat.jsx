@@ -15,6 +15,7 @@ import {
   looksLikeProductPitch,
   looksLikeDefinitionalHallucination,
   hasChoiceButtons,
+  dedupeConsecutiveSentences,
 } from "../lib/chat-helpers.server";
 import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL, FIT_PREDICTOR_TOOL } from "../lib/chat-tools.server";
 import { fetchCustomerContext } from "../lib/customer-context.server";
@@ -552,7 +553,13 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     supportCTA = result.cta;
 
     if (!supportCTA) {
-      const userText = ctx.conversationText || "";
+      // Scope support-trigger detection to the LATEST user message, not
+      // the full conversation. Without this, any historical mention of
+      // "exchange", "refund", "return policy", "my order", etc. ANYWHERE
+      // earlier in the chat keeps gluing the Visit Support Hub button to
+      // every subsequent reply — even chip-only gating questions like
+      // "What shoes will your dad wear them in?".
+      const userText = ctx.userText || "";
       const aiText = fullResponseText || "";
       const userAskedSupport = /\b(contact|reach|talk to|speak (to|with)|get (a )?hold of|how do i .{0,20}(contact|reach))\b.{0,40}\b(customer|support|service|care|team|human|agent|representative|rep|person|someone)\b/i.test(userText)
         || /\b(customer (service|care|support)|support (hub|team)|return policy|refund|exchange|my order|order status|shipping issue|problem with my)\b/i.test(userText);
@@ -593,6 +600,18 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     if (stripped !== beforeMeta.trim()) {
       console.log(`[chat] stripped meta-narration`);
       fullResponseText = stripped;
+    }
+  }
+
+  // Dedupe back-to-back near-duplicate sentences. AI sometimes ships
+  // an "echo opener" pair ("Here are some great X. Here are some great
+  // X with arch support…") despite the NO REPETITION prompt rule.
+  if (fullResponseText) {
+    const beforeDedupe = fullResponseText;
+    const deduped = dedupeConsecutiveSentences(fullResponseText);
+    if (deduped !== beforeDedupe.trim()) {
+      console.log(`[chat] deduped repeated sentences`);
+      fullResponseText = deduped;
     }
   }
 

@@ -83,6 +83,33 @@ export function hasChoiceButtons(text) {
   return /<<[^<>]+>>/.test(text || "");
 }
 
+// AI sometimes ships near-duplicate sentences ("Here are some great
+// men's casual orthotics designed for everyday support. Here are some
+// great men's casual orthotics built for everyday support and all-day
+// comfort..."). The NO REPETITION prompt rule says don't, but
+// compliance fails. Strip the second of any pair of consecutive
+// sentences that share 4+ leading words.
+export function dedupeConsecutiveSentences(text) {
+  if (!text) return text;
+  const sentences = text.split(/(?<=[.!?])\s+/);
+  if (sentences.length <= 1) return text;
+  const kept = [];
+  let lastKey = null;
+  for (const s of sentences) {
+    const trimmed = s.trim();
+    if (!trimmed) continue;
+    const norm = trimmed.toLowerCase().replace(/[^a-z0-9\s]/g, "").split(/\s+/).filter(Boolean);
+    const key = norm.slice(0, 4).join(" ");
+    if (key && key === lastKey) {
+      // Same opener as previous sentence — drop this one.
+      continue;
+    }
+    kept.push(trimmed);
+    lastKey = key;
+  }
+  return kept.join(" ");
+}
+
 // Strip meta-narration where the AI talks ABOUT the customer ("the
 // customer already established Men's via the choice button…") or
 // dumps its reasoning chain ("we know: orthotic insert, ball of foot

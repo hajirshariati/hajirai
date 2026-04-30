@@ -7,6 +7,7 @@ import {
   looksLikeDefinitionalHallucination,
   normalizeGenderChipAnswer,
   hasChoiceButtons,
+  dedupeConsecutiveSentences,
 } from "../app/lib/chat-helpers.server.js";
 
 const u = (content) => ({ role: "user", content });
@@ -348,6 +349,43 @@ cases.push({
     looksLikeDefinitionalHallucination("Could you tell me more about what you're looking for?"),
     false,
   ),
+});
+
+// ── dedupeConsecutiveSentences ────────────────────────────────────────
+cases.push({
+  name: "dedupes back-to-back 'Here are some great' echo openers",
+  run: () => {
+    const input = "Here are some great men's casual orthotics designed for everyday support and comfort. Here are some great men's casual orthotics built for everyday support and all-day comfort.";
+    const out = dedupeConsecutiveSentences(input);
+    const matches = out.match(/Here are some great/g);
+    assert.equal(matches?.length, 1, `expected one occurrence of opener, got ${matches?.length}: ${out}`);
+  },
+});
+
+cases.push({
+  name: "leaves distinct sentences alone",
+  run: () => {
+    const input = "Here are some great picks for arch support. Each is built for all-day comfort.";
+    const out = dedupeConsecutiveSentences(input);
+    assert.equal(out, input);
+  },
+});
+
+cases.push({
+  name: "doesn't drop a sentence that just shares a single word",
+  run: () => {
+    const input = "I recommend the L700. The L720 also works well.";
+    const out = dedupeConsecutiveSentences(input);
+    assert.equal(out, input);
+  },
+});
+
+cases.push({
+  name: "empty / single-sentence input untouched",
+  run: () => {
+    assert.equal(dedupeConsecutiveSentences(""), "");
+    assert.equal(dedupeConsecutiveSentences("Just one sentence."), "Just one sentence.");
+  },
 });
 
 // ── run all ───────────────────────────────────────────────────────────
