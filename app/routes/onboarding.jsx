@@ -109,6 +109,74 @@ const STYLES = `
     color: var(--text-secondary);
   }
 
+  /* ── SEoS glow + acronym reveal ───────────────────────────── */
+  .seos {
+    position: relative;
+    color: var(--accent);
+    font-weight: 700;
+    cursor: help;
+  }
+  /* Light mode: clean accented word, tiny under-line on hover. */
+  .seos::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: 2px;
+    height: 1px;
+    background: currentColor;
+    opacity: 0;
+    transform: scaleX(0.4);
+    transform-origin: left;
+    transition: opacity 0.2s ease, transform 0.3s ease;
+  }
+  .seos:hover::after { opacity: 0.5; transform: scaleX(1); }
+  /* Dark mode: soft glow that intensifies on hover. */
+  [data-theme="dark"] .seos {
+    text-shadow:
+      0 0 14px rgba(74, 222, 128, 0.45),
+      0 0 28px rgba(74, 222, 128, 0.22),
+      0 0 56px rgba(74, 222, 128, 0.10);
+    transition: text-shadow 0.25s ease;
+  }
+  [data-theme="dark"] .seos:hover {
+    text-shadow:
+      0 0 12px rgba(74, 222, 128, 0.75),
+      0 0 32px rgba(74, 222, 128, 0.45),
+      0 0 64px rgba(74, 222, 128, 0.22);
+  }
+  /* Boost class is added briefly when an easter egg fires —
+     dramatic-but-brief glow pulse. */
+  .seos.is-boosted {
+    animation: seos-boost 1.6s ease-out;
+  }
+  @keyframes seos-boost {
+    0%   { text-shadow: 0 0 0 rgba(74, 222, 128, 0); }
+    25%  { text-shadow: 0 0 24px rgba(74, 222, 128, 1), 0 0 48px rgba(74, 222, 128, 0.7), 0 0 96px rgba(74, 222, 128, 0.4); }
+    100% { text-shadow: 0 0 14px rgba(74, 222, 128, 0.45), 0 0 28px rgba(74, 222, 128, 0.22), 0 0 56px rgba(74, 222, 128, 0.10); }
+  }
+  /* Tooltip with the acronym expansion. Hidden until hover. */
+  .seos-tip {
+    position: absolute;
+    left: 50%;
+    top: calc(100% + 6px);
+    transform: translateX(-50%) translateY(-4px);
+    background: var(--bg-cmd);
+    color: var(--bg-cmd-text);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    padding: 5px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    text-shadow: none;
+  }
+  .seos:hover .seos-tip {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
   /* ── Theme toggle (top-right of hero) ─────────────────────── */
   .theme-toggle {
     position: absolute;
@@ -414,15 +482,15 @@ const STYLES = `
 `;
 
 // Inline script that runs BEFORE React hydrates so the saved theme
-// applies on first paint — no flash of light theme on dark-preferred
-// users. Reads localStorage; falls back to OS prefers-color-scheme.
+// applies on first paint — no flash on first load. Defaults to dark
+// (the brand default for this internal page); a stored preference
+// from a prior visit always wins.
 const THEME_INIT_SCRIPT = `
   (function () {
     try {
       var stored = localStorage.getItem("aetrex-onboarding-theme");
-      var t = stored || (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-      document.documentElement.setAttribute("data-theme", t);
-    } catch (e) { /* localStorage blocked — default light is fine */ }
+      document.documentElement.setAttribute("data-theme", stored || "dark");
+    } catch (e) { document.documentElement.setAttribute("data-theme", "dark"); }
   })();
 `;
 
@@ -515,10 +583,10 @@ export default function Onboarding() {
   // <html> before React hydrates, so first paint is correct. We
   // sync React state from that on mount, then write back to both
   // documentElement and localStorage on change.
-  const [theme, setTheme] = useState("light");
+  const [theme, setTheme] = useState("dark");
   useEffect(() => {
     if (typeof document === "undefined") return;
-    const initial = document.documentElement.getAttribute("data-theme") || "light";
+    const initial = document.documentElement.getAttribute("data-theme") || "dark";
     setTheme(initial);
   }, []);
   useEffect(() => {
@@ -527,6 +595,76 @@ export default function Onboarding() {
     try { localStorage.setItem("aetrex-onboarding-theme", theme); } catch { /* ignore */ }
   }, [theme]);
   const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
+
+  // ── Hidden surface for the curious ───────────────────────────
+  // Three subtle eggs, none visible without poking around:
+  //   1. Console boot banner with ASCII "SEoS" + the acronym + a
+  //      welcome line. Stripe-style — only devs who open DevTools
+  //      ever see it.
+  //   2. Konami code → triggers a glow pulse on "SEoS" and a
+  //      console message. Click on the SEoS word does the same so
+  //      keyboard-less users can stumble onto it too.
+  //   3. Tab title swap when the page is hidden — title becomes
+  //      "🔍 Don't leave the engine running…" and reverts on focus.
+  const [boosted, setBoosted] = useState(false);
+  useEffect(() => {
+    if (boosted) {
+      const t = setTimeout(() => setBoosted(false), 1700);
+      return () => clearTimeout(t);
+    }
+  }, [boosted]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    // Egg 1 — console boot banner. Only fires once per page load.
+    const banner = [
+      "%c   ____   _____      ____  ",
+      "  / ___| | ____|___  / ___| ",
+      "  \\___ \\ |  _| / _ \\ \\___ \\ ",
+      "   ___) || |__| (_) | ___) |",
+      "  |____(_)_____\\___(_)____(_)",
+      "",
+      "  Search Engine on Steroids · Aetrex internal",
+      "  Built with caffeine and a stubborn refusal to ship hallucinations.",
+      "  Curious how it works? See app/lib/chat-tools.server.js",
+      "",
+    ].join("\n");
+    // eslint-disable-next-line no-console
+    console.log(banner, "color:#4ade80;font-family:ui-monospace,monospace;font-size:11px;line-height:1.3");
+
+    // Egg 2 — Konami code listener. ↑↑↓↓←→←→ B A
+    const KONAMI = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
+    let pos = 0;
+    const onKey = (e) => {
+      const k = e.key && e.key.length === 1 ? e.key.toLowerCase() : e.key;
+      if (k === KONAMI[pos]) {
+        pos++;
+        if (pos === KONAMI.length) {
+          pos = 0;
+          setBoosted(true);
+          // eslint-disable-next-line no-console
+          console.log("%c💪 Steroids engaged — search engine boosted.", "color:#4ade80;font-weight:700;font-size:13px");
+        }
+      } else {
+        pos = k === KONAMI[0] ? 1 : 0;
+      }
+    };
+    window.addEventListener("keydown", onKey);
+
+    // Egg 3 — tab-title swap when the page goes to background.
+    const original = document.title;
+    const onVis = () => {
+      if (document.hidden) document.title = "🔍 Don't leave the engine running…";
+      else document.title = original;
+    };
+    document.addEventListener("visibilitychange", onVis);
+
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.removeEventListener("visibilitychange", onVis);
+      document.title = original;
+    };
+  }, []);
 
   return (
     <>
@@ -557,7 +695,16 @@ export default function Onboarding() {
         </button>
         <div className="hero-inner">
           <p className="hero-eyebrow">Aetrex internal · Enterprise plan</p>
-          <h1>SEoS Assistant setup guide</h1>
+          <h1>
+            <span
+              className={"seos" + (boosted ? " is-boosted" : "")}
+              onClick={() => setBoosted(true)}
+            >
+              SEoS
+              <span className="seos-tip">Search engine on steroids</span>
+            </span>
+            {" Assistant setup guide"}
+          </h1>
           <p>
             Configure the AI shopping assistant for aetrex.com. Pick a phase
             below — first install takes about an hour, mostly waiting for the
