@@ -32,7 +32,7 @@ import {
 } from "../app/lib/chat-helpers.server.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const argFlag = (name) => process.argv.find((a) => a.startsWith(`--${name}=`))?.slice(`--${name}=`.length + 1);
+const argFlag = (name) => process.argv.find((a) => a.startsWith(`--${name}=`))?.slice(`--${name}=`.length);
 const SCENARIOS_PATH = argFlag("file")
   ? path.resolve(process.cwd(), argFlag("file"))
   : path.join(__dirname, "scenarios.json");

@@ -22,7 +22,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const OUT_PATH = path.join(__dirname, "scenarios.from-feedback.json");
 
 const args = process.argv.slice(2);
-const arg = (name) => args.find((a) => a.startsWith(`--${name}=`))?.slice(`--${name}=`.length + 1);
+const arg = (name) => args.find((a) => a.startsWith(`--${name}=`))?.slice(`--${name}=`.length);
 const shopArg = arg("shop");
 const limitArg = Number(arg("limit")) || 100;
 const sinceDays = Number(arg("days")) || 30;
