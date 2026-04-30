@@ -38,6 +38,29 @@ function answerMatchesOption(answer, option) {
   return containsNormalizedPhrase(a, o);
 }
 
+// Yes/no/sure replies that count as an affirmative answer to a non-chip
+// assistant question ("Want me to show some?" → "yes please").
+const AFFIRMATIVE_REPLIES = new Set([
+  "yes", "yeah", "yep", "yup", "sure", "ok", "okay", "please",
+  "yes please", "sounds good", "do it", "show me", "go ahead",
+]);
+const NEGATIVE_REPLIES = new Set([
+  "no", "nope", "nah", "not now", "not really", "no thanks",
+]);
+
+function classifyShortAffirmative(text) {
+  const norm = normalizeChoice(text);
+  if (!norm) return null;
+  if (norm.split(" ").length > 4) return null;
+  if (AFFIRMATIVE_REPLIES.has(norm)) return "Yes";
+  if (NEGATIVE_REPLIES.has(norm)) return "No";
+  return null;
+}
+
+function isLikelyQuestion(text) {
+  return /\?\s*$/.test(String(text || "").trim());
+}
+
 export function extractAnsweredChoices(messages, { limit = 8 } = {}) {
   const answered = [];
 
@@ -48,22 +71,38 @@ export function extractAnsweredChoices(messages, { limit = 8 } = {}) {
     if (typeof assistant.content !== "string" || typeof user.content !== "string") continue;
 
     const options = extractChoiceOptions(assistant.content);
-    if (options.length === 0) continue;
 
-    const matchedOption = [...options]
-      .sort((a, b) => normalizeChoice(b).length - normalizeChoice(a).length)
-      .find((option) => answerMatchesOption(user.content, option));
-    if (!matchedOption) continue;
+    if (options.length > 0) {
+      // Standard chip-driven match.
+      const matchedOption = [...options]
+        .sort((a, b) => normalizeChoice(b).length - normalizeChoice(a).length)
+        .find((option) => answerMatchesOption(user.content, option));
+      if (!matchedOption) continue;
 
-    const question = stripChoiceOptions(assistant.content);
-    if (!question) continue;
+      const question = stripChoiceOptions(assistant.content);
+      if (!question) continue;
 
-    answered.push({
-      question,
-      answer: matchedOption,
-      rawAnswer: user.content.trim(),
-      options,
-    });
+      answered.push({
+        question,
+        answer: matchedOption,
+        rawAnswer: user.content.trim(),
+        options,
+      });
+    } else if (isLikelyQuestion(assistant.content)) {
+      // Non-chip yes/no question. Ends in a "?", user replied with a
+      // short affirmative or negative. Record so the AI doesn't re-ask
+      // "want me to show some?" after the user already said yes.
+      const classified = classifyShortAffirmative(user.content);
+      if (!classified) continue;
+
+      const question = String(assistant.content).trim();
+      answered.push({
+        question,
+        answer: classified,
+        rawAnswer: user.content.trim(),
+        options: ["Yes", "No"],
+      });
+    }
   }
 
   const deduped = [];

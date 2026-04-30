@@ -77,6 +77,33 @@ const cases = [
     ],
     expected: [["Which color?", "Blue"]],
   },
+  {
+    name: "yes-reply to non-chip question is recorded as Yes",
+    messages: [
+      u("Can you help me find an orthotic?"),
+      a("Sure — want me to show some options?"),
+      u("yes please"),
+    ],
+    expected: [["Sure — want me to show some options?", "Yes"]],
+  },
+  {
+    name: "no-reply to non-chip question is recorded as No",
+    messages: [
+      u("I'm just looking."),
+      a("Should I show you some bestsellers?"),
+      u("nope"),
+    ],
+    expected: [["Should I show you some bestsellers?", "No"]],
+  },
+  {
+    name: "long answer to non-chip question is NOT auto-classified",
+    messages: [
+      u("Help me."),
+      a("What kind of shoes do you usually wear?"),
+      u("I usually wear sneakers but sometimes boots in winter."),
+    ],
+    expected: [],
+  },
 ];
 
 let passed = 0;

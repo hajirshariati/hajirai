@@ -12,6 +12,7 @@ import {
   detectGenderFromHistory as _detectGenderFromHistory,
   stripBannedNarration,
   looksLikeProductPitch,
+  looksLikeDefinitionalHallucination,
   hasChoiceButtons,
 } from "../lib/chat-helpers.server";
 import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL, FIT_PREDICTOR_TOOL } from "../lib/chat-tools.server";
@@ -243,6 +244,14 @@ function stripMissingSkus(text, missing) {
   }
   cleaned = cleaned
     .replace(/\(\s*\)/g, "")
+    // Repair dangling conjunction patterns left behind by SKU removal.
+    // E.g. "the L1305 and  are great picks" → "the L1305 is a great pick".
+    .replace(/\b(and|or|,)\s*(?=(?:and|or|,|are|is|both)\b)/gi, " ")
+    .replace(/\b(both|and)\s+(are|is)\b/gi, "$2")
+    .replace(/\bare\s+(?:both\s+)?great\s+picks\b/gi, "is a great pick")
+    .replace(/\bare\s+(?:both\s+)?(great|excellent|solid|nice)\b/gi, "is $1")
+    .replace(/,\s*,/g, ",")
+    .replace(/\s+,/g, ",")
     .replace(/\s+([.,!?;:])/g, "$1")
     .replace(/[ \t]{2,}/g, " ")
     .replace(/\n{3,}/g, "\n\n")
@@ -581,6 +590,19 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     fullResponseText = "";
   }
 
+  // Definitional hallucination check. If the AI tried a search,
+  // got nothing, but then confidently defines an unknown brand/line
+  // ("Lynco is our premium orthotic line that…"), strip the response.
+  // Forces the AI to ask a clarifying question on the next turn.
+  if (
+    productSearchAttempted &&
+    pool.length === 0 &&
+    looksLikeDefinitionalHallucination(fullResponseText)
+  ) {
+    console.log(`[chat] empty-pool repair: definitional hallucination`);
+    fullResponseText = "";
+  }
+
   if (!fullResponseText && pool.length === 0) {
     fullResponseText = "I'm not finding a great match for that right now. Want to try a different style, or I can connect you with our support team?";
   }
@@ -810,7 +832,12 @@ if (collection.cta) {
     url: collection.cta.url,
     label: collection.cta.label,
   })));
-} else if (Array.isArray(ctx.collectionLinks) && ctx.collectionLinks.length > 0 && categoryCounts.size > 0) {
+} else if (
+  Array.isArray(ctx.collectionLinks) &&
+  ctx.collectionLinks.length > 0 &&
+  categoryCounts.size > 0 &&
+  !ctx.categoryIntentAmbiguous
+) {
   const dominantCat = [...categoryCounts.entries()].sort((a, b) => b[1] - a[1])[0][0];
   const dominantGender = genderCounts.size > 0
     ? [...genderCounts.entries()].sort((a, b) => b[1] - a[1])[0][0]
@@ -976,6 +1003,28 @@ export const action = async ({ request }) => {
       }
     }
 
+    // Same idea as the synthetic gender injection above: if the category
+    // intent locked an active group from history (e.g. user said
+    // "orthotics" three turns ago, then answered "Both" for pain), make
+    // sure the prompt knows the category is established so the AI doesn't
+    // re-ask "what type of product?" after it already committed.
+    if (
+      categoryIntent.activeGroup &&
+      !categoryIntent.ambiguous &&
+      categoryIntent.activeGroup.name &&
+      !answeredChoices.some((c) =>
+        new RegExp(`\\b${categoryIntent.activeGroup.name}\\b`, "i").test(c.answer || "") ||
+        /\b(category|product type|what (?:type|kind))\b/i.test(c.question || "")
+      )
+    ) {
+      answeredChoices.unshift({
+        question: "What type of product are you looking for?",
+        answer: categoryIntent.activeGroup.name,
+        rawAnswer: categoryIntent.activeGroup.name,
+        options: [categoryIntent.activeGroup.name],
+      });
+    }
+
     console.log(`[chat] ${session.shop} gender=${sessionGender || "any"} scoped-categories=${catalogProductTypes.length} full-catalog-categories=${allCatalogCategories.length}${groupFilterApplied ? ` group=${groupFilterApplied}` : ""}${categoryIntent.contextGroup ? ` contextGroup=${categoryIntent.contextGroup.name}` : ""}${categoryIntent.ambiguous ? " group=ambiguous" : ""}`);
     const attributeNames = attrMappings.map((m) => m.attribute);
 
@@ -1099,6 +1148,7 @@ export const action = async ({ request }) => {
       catalogCategories: catalogProductTypes,
       activeCategoryGroup: categoryIntent.activeGroup,
       contextCategoryGroup: categoryIntent.contextGroup,
+      categoryIntentAmbiguous: Boolean(categoryIntent.ambiguous),
       shopConfig: config,
       fullCatalogCategories: allCatalogCategories,
       latestUserMessage: String(body.message || ""),

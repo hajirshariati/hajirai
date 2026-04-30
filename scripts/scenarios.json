@@ -1,0 +1,401 @@
+[
+  {
+    "name": "soccer player asks for orthotic for cleats",
+    "messages": ["I'm a soccer player and I need an orthotic for my cleats."],
+    "expect": {
+      "mustNotContain": ["Lynco", "trust me", "you'll love", "perfect for you", "I guarantee", "100%", "Work Boots"],
+      "mustNotMatch": "(let me look|i'?ll find|one moment|hold on|right away)",
+      "shouldMentionAny": ["Cleats", "cleat orthotic"],
+      "maxSentences": 4
+    }
+  },
+  {
+    "name": "user pivots gender mid-conversation",
+    "messages": [
+      "Looking for men's running shoes.",
+      "Actually, do you have these for my wife?"
+    ],
+    "expect": {
+      "mustNotContain": ["men's running", "Men's"],
+      "shouldMentionAny": ["women", "Women's"]
+    }
+  },
+  {
+    "name": "user says for my dad — no gender re-ask",
+    "messages": ["My dad has foot pain and needs an orthotic."],
+    "expect": {
+      "mustNotMatch": "men'?s.{1,30}(or|vs|versus).{1,30}women'?s",
+      "shouldMentionAny": ["dad", "men", "foot pain", "orthotic"]
+    }
+  },
+  {
+    "name": "user says for my wife — no gender re-ask",
+    "messages": ["My wife is a runner. Recommend an orthotic."],
+    "expect": {
+      "mustNotMatch": "men'?s.{1,30}(or|vs|versus).{1,30}women'?s",
+      "shouldMentionAny": ["women", "wife", "running", "speed"]
+    }
+  },
+  {
+    "name": "explicit men's request",
+    "messages": ["Show me men's sandals."],
+    "expect": {
+      "mustNotContain": ["women's"],
+      "shouldMentionAny": ["men", "sandals"]
+    }
+  },
+  {
+    "name": "plantar fasciitis condition mentioned",
+    "messages": ["I have plantar fasciitis. What do you recommend?"],
+    "expect": {
+      "mustNotContain": ["cures", "heals", "treats", "eliminates pain"],
+      "shouldMentionAny": ["Plantar Fasciitis Kit", "plantar"]
+    }
+  },
+  {
+    "name": "diabetic customer needs orthotic",
+    "messages": ["I have diabetes. Are there orthotics safe for me?"],
+    "expect": {
+      "mustNotContain": ["cures", "heals", "treats"],
+      "shouldMentionAny": ["Conform", "diabetes"]
+    }
+  },
+  {
+    "name": "winter boots orthotic",
+    "messages": ["I need an orthotic for my winter boots."],
+    "expect": {
+      "shouldMentionAny": ["Shearling", "winter", "lined"]
+    }
+  },
+  {
+    "name": "heels for fancy event",
+    "messages": ["I need an orthotic for heels for a wedding."],
+    "expect": {
+      "shouldMentionAny": ["Fashion", "heels", "dress"]
+    }
+  },
+  {
+    "name": "shoes without removable insole",
+    "messages": ["My flats don't have a removable insole. Can I still use an orthotic?"],
+    "expect": {
+      "shouldMentionAny": ["Thinsoles", "thin"]
+    }
+  },
+  {
+    "name": "kids orthotic",
+    "messages": ["My 10-year-old needs orthotics."],
+    "expect": {
+      "shouldMentionAny": ["Kids"]
+    }
+  },
+  {
+    "name": "warehouse worker, standing all day",
+    "messages": ["I work in a warehouse standing 10 hours a day. What do you suggest?"],
+    "expect": {
+      "shouldMentionAny": ["Work", "boot", "standing"],
+      "mustNotContain": ["Athletic", "running shoes"]
+    }
+  },
+  {
+    "name": "ESD anti-static workplace",
+    "messages": ["I work in an electronics lab and need anti-static orthotics."],
+    "expect": {
+      "shouldMentionAny": ["ESD", "Anti-Static", "static"]
+    }
+  },
+  {
+    "name": "marathon runner needs support",
+    "messages": ["I'm training for a marathon. Best orthotic for me?"],
+    "expect": {
+      "shouldMentionAny": ["Speed", "running", "Compete"],
+      "mustNotContain": ["Work Boots", "Slippers"]
+    }
+  },
+  {
+    "name": "general foot pain — should ask discomfort area",
+    "messages": ["My feet hurt."],
+    "expect": {
+      "shouldAskAbout": ["arch", "heel", "ball of foot", "where"]
+    }
+  },
+  {
+    "name": "ambiguous orthotic-or-shoe question",
+    "messages": ["I have heel pain."],
+    "expect": {
+      "shouldAskAbout": ["footwear", "orthotic", "insert", "shoes", "looking for"]
+    }
+  },
+  {
+    "name": "asks about Lynco — should NOT use that name",
+    "messages": ["Are these the same as Lynco?"],
+    "expect": {
+      "shouldMentionAny": ["Aetrex Orthotics", "Aetrex", "rebrand", "now branded"],
+      "mustNotMatch": "(yes,?\\s*they are)\\s*lynco"
+    }
+  },
+  {
+    "name": "asks if orthotics are trimmable",
+    "messages": ["Can I trim these orthotics to fit my shoe?"],
+    "expect": {
+      "shouldMentionAny": ["not trimmable", "NOT trim", "size", "match your usual"],
+      "mustNotMatch": "(yes,?\\s*you can trim)"
+    }
+  },
+  {
+    "name": "asks about shipping time",
+    "messages": ["How long does shipping take?"],
+    "expect": {
+      "shouldMentionAny": ["business days", "ground", "free", "shipping"]
+    }
+  },
+  {
+    "name": "asks about international shipping",
+    "messages": ["Do you ship to Canada?"],
+    "expect": {
+      "shouldMentionAny": ["United States", "U.S.", "currently", "only"]
+    }
+  },
+  {
+    "name": "asks about return policy",
+    "messages": ["What's your return policy?"],
+    "expect": {
+      "shouldMentionAny": ["30 days", "unworn", "return"]
+    }
+  },
+  {
+    "name": "wants to start a return",
+    "messages": ["I want to return an order."],
+    "expect": {
+      "shouldMentionAny": ["support", "team", "help"]
+    }
+  },
+  {
+    "name": "asks for phone number — should not give one",
+    "messages": ["What's your phone number?"],
+    "expect": {
+      "mustNotMatch": "\\b1-?[0-9]{3}-?[0-9]{3}-?[0-9]{4}\\b",
+      "mustNotMatch2": "\\b[0-9]{10}\\b",
+      "shouldMentionAny": ["support", "contact", "team"]
+    }
+  },
+  {
+    "name": "asks for email — should not give one",
+    "messages": ["What's your email address?"],
+    "expect": {
+      "mustNotMatch": "\\b[\\w.-]+@aetrex\\.com\\b",
+      "shouldMentionAny": ["support", "contact"]
+    }
+  },
+  {
+    "name": "asks about loyalty program",
+    "messages": ["How does Aetrex Access work?"],
+    "expect": {
+      "shouldMentionAny": ["points", "rewards", "earn", "5%"]
+    }
+  },
+  {
+    "name": "asks about referral",
+    "messages": ["How do I refer a friend?"],
+    "expect": {
+      "shouldMentionAny": ["$20", "referral", "give"]
+    }
+  },
+  {
+    "name": "asks about military discount",
+    "messages": ["Do you offer a military discount?"],
+    "expect": {
+      "shouldMentionAny": ["GOVX", "military", "discount", "verify"]
+    }
+  },
+  {
+    "name": "asks about teacher discount",
+    "messages": ["Do teachers get a discount?"],
+    "expect": {
+      "shouldMentionAny": ["GOVX", "teacher"]
+    }
+  },
+  {
+    "name": "speak to a human",
+    "messages": ["I want to speak to a human please."],
+    "expect": {
+      "shouldMentionAny": ["support", "team", "care"]
+    }
+  },
+  {
+    "name": "asks for invented product code",
+    "messages": ["Show me the L9999."],
+    "expect": {
+      "mustNotMatch": "\\bL9999\\b.*(perfect|recommend|here)"
+    }
+  },
+  {
+    "name": "asks 'what is HealthySteps' — unknown term",
+    "messages": ["What is HealthySteps?"],
+    "expect": {
+      "mustNotContain": ["HealthySteps is our", "HealthySteps is an", "HealthySteps is the"]
+    }
+  },
+  {
+    "name": "asks generically for shoes — should narrow",
+    "messages": ["I'm looking for shoes."],
+    "expect": {
+      "shouldAskAbout": ["men", "women", "type", "what kind"]
+    }
+  },
+  {
+    "name": "user says size 9.5 wide — needs grounded answer",
+    "messages": ["Do you have the Jillian sandal in size 9.5 wide?"],
+    "expect": {
+      "mustNotContain": ["100%", "definitely available", "guaranteed"]
+    }
+  },
+  {
+    "name": "ball of foot pain — metatarsal orthotic",
+    "messages": ["I have ball-of-foot pain. What orthotic should I get?"],
+    "expect": {
+      "shouldMentionAny": ["metatarsal", "ball of foot"]
+    }
+  },
+  {
+    "name": "arch and heel pain — posted orthotic",
+    "messages": ["I have arch and heel pain."],
+    "expect": {
+      "shouldMentionAny": ["posted", "arch", "heel"]
+    }
+  },
+  {
+    "name": "both pains — posted + metatarsal",
+    "messages": ["My arch hurts AND my ball of foot hurts."],
+    "expect": {
+      "shouldMentionAny": ["posted", "metatarsal", "both"]
+    }
+  },
+  {
+    "name": "overpronation question",
+    "messages": ["I overpronate. What do you recommend?"],
+    "expect": {
+      "shouldMentionAny": ["Overpronation", "posted"]
+    }
+  },
+  {
+    "name": "metatarsalgia question",
+    "messages": ["I was told I have metatarsalgia."],
+    "expect": {
+      "shouldMentionAny": ["Metatarsalgia", "metatarsal"]
+    }
+  },
+  {
+    "name": "asks for cheaper alternative",
+    "messages": ["Is there a cheaper version of the Premium Memory Foam orthotic?"],
+    "expect": {
+      "shouldMentionAny": ["Memory Foam", "Casual", "$"]
+    }
+  },
+  {
+    "name": "asks about gym training shoes",
+    "messages": ["What orthotic for gym/training shoes for men?"],
+    "expect": {
+      "shouldMentionAny": ["Train", "gym", "training", "Active"]
+    }
+  },
+  {
+    "name": "yes-reply to assistant question carries forward",
+    "messages": [
+      "I'm not sure what to get.",
+      "Yes please."
+    ],
+    "history": [
+      { "role": "user", "content": "I'm not sure what to get." },
+      { "role": "assistant", "content": "Want me to recommend an orthotic based on a quick few questions?" }
+    ],
+    "expect": {
+      "mustNotMatch": "(want me to|should i|do you want).{0,50}\\?"
+    }
+  },
+  {
+    "name": "complaint goes to support",
+    "messages": ["My order arrived damaged."],
+    "expect": {
+      "shouldMentionAny": ["support", "team", "care", "make it right"]
+    }
+  },
+  {
+    "name": "billing issue goes to support",
+    "messages": ["I was double-charged."],
+    "expect": {
+      "shouldMentionAny": ["support", "team", "billing"]
+    }
+  },
+  {
+    "name": "asks about cancellation",
+    "messages": ["I need to cancel my order."],
+    "expect": {
+      "shouldMentionAny": ["support", "team"]
+    }
+  },
+  {
+    "name": "asks about exchange for different size",
+    "messages": ["Can I exchange for a size 10?"],
+    "expect": {
+      "shouldMentionAny": ["support", "team", "exchange", "return"]
+    }
+  },
+  {
+    "name": "asks about Klarna / payment plan",
+    "messages": ["Do you offer payment plans?"],
+    "expect": {
+      "shouldMentionAny": ["Klarna", "payment", "checkout"]
+    }
+  },
+  {
+    "name": "non-binary customer — neutral phrasing",
+    "messages": ["I'm non-binary. What styles do you have?"],
+    "expect": {
+      "mustNotMatch": "\\b(are you a (man|woman))\\b",
+      "shouldMentionAny": ["men's", "women's", "browse"]
+    }
+  },
+  {
+    "name": "asks about iStep / 3D scanning — route to support",
+    "messages": ["Do you do 3D foot scanning?"],
+    "expect": {
+      "shouldMentionAny": ["aetrex.com", "store-locator", "Technology"]
+    }
+  },
+  {
+    "name": "casual chitchat — short reply",
+    "messages": ["Hi there!"],
+    "expect": {
+      "maxSentences": 3
+    }
+  },
+  {
+    "name": "thanks reply — brief",
+    "messages": ["Thanks!"],
+    "expect": {
+      "maxSentences": 2
+    }
+  },
+  {
+    "name": "user asks 'what's the difference between posted and metatarsal'",
+    "messages": ["What's the difference between posted and metatarsal orthotics?"],
+    "expect": {
+      "shouldMentionAny": ["posted", "metatarsal", "arch", "heel", "ball"]
+    }
+  },
+  {
+    "name": "user asks for orthotic care",
+    "messages": ["How do I clean my orthotics?"],
+    "expect": {
+      "shouldMentionAny": ["damp cloth", "soap", "air-dry", "wipe"],
+      "mustNotContain": ["machine wash", "tumble dry"]
+    }
+  },
+  {
+    "name": "user asks orthotic lifespan",
+    "messages": ["How long do these orthotics last?"],
+    "expect": {
+      "shouldMentionAny": ["months", "replace", "wear"]
+    }
+  }
+]

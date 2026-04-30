@@ -49,6 +49,21 @@ export function looksLikeProductPitch(text) {
   return Boolean(text) && PRODUCT_PITCH_RE.test(text);
 }
 
+// Detect a "definitional hallucination" — sentences like "X is our
+// premium orthotic line that..." where the model made up information
+// about a brand/product/term that isn't in the catalog (and didn't
+// turn up in search). Used after a search returned 0 results to catch
+// the AI confidently describing something we didn't validate.
+//
+// Returns true if the text contains a likely definitional sentence
+// pattern. Heuristic — false positives are acceptable since the
+// fallback is "I'd love to help — can you give me more detail?"
+const DEFINITIONAL_RE = /\b(?:[A-Z][\w-]{2,}\s+(?:is|are)\s+(?:our|an?|the)\s+(?:premium|signature|exclusive|new|advanced|patented|proprietary|flagship|line|technology|orthotic|insole|footbed|brand|collection|series))\b/;
+
+export function looksLikeDefinitionalHallucination(text) {
+  return Boolean(text) && DEFINITIONAL_RE.test(text);
+}
+
 // Multi-gender chip answer parsing. "Men's & Boys'" → "men". "Women's,
 // Girls'" → "women". Single-gender values return as-is.
 export function normalizeGenderChipAnswer(raw) {

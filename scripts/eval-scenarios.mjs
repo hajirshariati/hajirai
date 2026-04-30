@@ -1,0 +1,250 @@
+// Live-LLM scenario harness. Fires real Anthropic API calls against
+// the same system prompt the production chat handler uses, with a
+// representative merchant config (Aetrex). Captures responses, runs
+// assertions, prints a hit-rate.
+//
+// USAGE
+//   ANTHROPIC_API_KEY=sk-ant-... node scripts/eval-scenarios.mjs
+//   # or run a single scenario:
+//   ANTHROPIC_API_KEY=... node scripts/eval-scenarios.mjs --filter "soccer"
+//
+// EXIT CODES
+//   0 = pass-rate >= threshold (default 90%)
+//   1 = below threshold or error
+//
+// NOTE
+//   This skips actual tool calls — it tests TEXT-LEVEL behavior only.
+//   Tool-driven flows (search filters, card narrowing) are covered by
+//   the deterministic evals (eval-chat-quality, eval-category-intent).
+//   This harness is for the LLM-compliance long tail: banned phrases,
+//   rule following, gender locking, condition routing, etc.
+
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import Anthropic from "@anthropic-ai/sdk";
+import { buildSystemPrompt } from "../app/lib/chat-prompt.server.js";
+import { extractAnsweredChoices } from "../app/lib/conversation-memory.server.js";
+import { detectGenderFromHistory } from "../app/lib/chat-helpers.server.js";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const SCENARIOS_PATH = path.join(__dirname, "scenarios.json");
+const MODEL = process.env.SCENARIO_MODEL || "claude-haiku-4-5-20251001";
+const THRESHOLD = Number(process.env.SCENARIO_THRESHOLD || 0.9);
+const MAX_TOKENS = 600;
+const CONCURRENCY = Number(process.env.SCENARIO_CONCURRENCY || 4);
+
+const apiKey = process.env.ANTHROPIC_API_KEY;
+if (!apiKey) {
+  console.error("ANTHROPIC_API_KEY not set — skipping live scenario eval.");
+  console.error("Set the env var to run the live LLM eval. See scripts/eval-scenarios.mjs header.");
+  process.exit(0);
+}
+
+// Representative Aetrex merchant config so the system prompt has the
+// real catalog vocabulary and rules. Lifted from the user's installed
+// rules + brand + FAQ files.
+const SHOP = "aetrex.example.com";
+const config = {
+  assistantName: "The Fit Concierge",
+  assistantTagline: "",
+  embeddingProvider: "",
+};
+
+const knowledge = [
+  {
+    fileType: "rules",
+    content: fs.readFileSync(path.join(__dirname, "fixtures/rules.txt"), "utf-8"),
+  },
+  {
+    fileType: "brand",
+    content: fs.readFileSync(path.join(__dirname, "fixtures/brand.txt"), "utf-8"),
+  },
+  {
+    fileType: "faqs",
+    content: fs.readFileSync(path.join(__dirname, "fixtures/faqs.txt"), "utf-8"),
+  },
+];
+
+const catalogProductTypes = [
+  "Sandals", "Sneakers", "Boots", "Slippers", "Clogs", "Loafers",
+  "Mary Janes", "Slip Ons", "Wedges Heels", "Oxfords", "Orthotics",
+  "Accessories", "Footwear", "Socks", "Gift Card",
+];
+
+const attributeNames = ["gender", "color", "category", "footbed"];
+
+const args = process.argv.slice(2);
+const filterIdx = args.indexOf("--filter");
+const filterTerm = filterIdx >= 0 ? args[filterIdx + 1].toLowerCase() : null;
+
+const scenarios = JSON.parse(fs.readFileSync(SCENARIOS_PATH, "utf-8"));
+const filtered = filterTerm
+  ? scenarios.filter((s) => s.name.toLowerCase().includes(filterTerm))
+  : scenarios;
+
+if (filtered.length === 0) {
+  console.error(`No scenarios match filter "${filterTerm}"`);
+  process.exit(1);
+}
+
+const client = new Anthropic({ apiKey });
+
+function buildMessages(scenario) {
+  // Scenarios may include explicit "history" plus a final "messages"
+  // list (the new-this-turn user input). Concatenate to form the
+  // conversation history that gets sent to Anthropic.
+  const turns = [];
+  for (const t of scenario.history || []) {
+    if (t?.role === "user" || t?.role === "assistant") {
+      turns.push({ role: t.role, content: String(t.content) });
+    }
+  }
+  for (const m of scenario.messages || []) {
+    turns.push({ role: "user", content: String(m) });
+  }
+  return turns;
+}
+
+async function runScenario(scenario) {
+  const messages = buildMessages(scenario);
+  if (messages.length === 0) {
+    return { name: scenario.name, ok: false, reasons: ["no messages"] };
+  }
+
+  // Detect gender + answered choices the same way the real handler does.
+  const sessionGender = detectGenderFromHistory(messages);
+  const answeredChoices = extractAnsweredChoices(messages);
+  if (sessionGender && !answeredChoices.some((c) =>
+    /\b(men|women|gender|him|her|man|woman)\b/i.test(c.question || "") ||
+    /\b(men|women|men's|women's)\b/i.test(c.answer || "")
+  )) {
+    answeredChoices.unshift({
+      question: "Are these for men's or women's?",
+      answer: sessionGender === "men" ? "Men's" : "Women's",
+      rawAnswer: sessionGender === "men" ? "Men's" : "Women's",
+      options: ["Men's", "Women's"],
+    });
+  }
+
+  const system = buildSystemPrompt({
+    config,
+    knowledge,
+    shop: SHOP,
+    attributeNames,
+    categoryExclusions: [],
+    querySynonyms: [],
+    customerContext: null,
+    fitPredictorEnabled: false,
+    catalogProductTypes,
+    scopedGender: sessionGender,
+    answeredChoices,
+  });
+
+  let text;
+  try {
+    const response = await client.messages.create({
+      model: MODEL,
+      max_tokens: MAX_TOKENS,
+      system,
+      messages,
+    });
+    text = response.content
+      .filter((b) => b.type === "text")
+      .map((b) => b.text)
+      .join("\n");
+  } catch (err) {
+    return { name: scenario.name, ok: false, reasons: [`API error: ${err?.message || err}`] };
+  }
+
+  return checkExpectations(scenario, text);
+}
+
+function checkExpectations(scenario, text) {
+  const e = scenario.expect || {};
+  const reasons = [];
+  const lower = (text || "").toLowerCase();
+
+  for (const phrase of e.mustContain || []) {
+    if (!lower.includes(String(phrase).toLowerCase())) {
+      reasons.push(`mustContain "${phrase}" missing`);
+    }
+  }
+
+  for (const phrase of e.mustNotContain || []) {
+    if (lower.includes(String(phrase).toLowerCase())) {
+      reasons.push(`mustNotContain "${phrase}" present`);
+    }
+  }
+
+  for (const key of ["mustNotMatch", "mustNotMatch2"]) {
+    if (e[key]) {
+      const re = new RegExp(e[key], "i");
+      if (re.test(text)) reasons.push(`${key} /${e[key]}/ matched`);
+    }
+  }
+
+  if (Array.isArray(e.shouldMentionAny) && e.shouldMentionAny.length > 0) {
+    const hit = e.shouldMentionAny.some((p) => lower.includes(String(p).toLowerCase()));
+    if (!hit) reasons.push(`shouldMentionAny none matched: ${e.shouldMentionAny.join(", ")}`);
+  }
+
+  if (Array.isArray(e.shouldAskAbout) && e.shouldAskAbout.length > 0) {
+    const hit = e.shouldAskAbout.some((p) => lower.includes(String(p).toLowerCase()));
+    if (!hit) reasons.push(`shouldAskAbout none matched: ${e.shouldAskAbout.join(", ")}`);
+  }
+
+  if (Number.isFinite(e.maxSentences)) {
+    const sentences = text.split(/[.!?]+\s+/).filter((s) => s.trim().length > 0).length;
+    if (sentences > e.maxSentences) {
+      reasons.push(`maxSentences=${e.maxSentences}, got ${sentences}`);
+    }
+  }
+
+  return { name: scenario.name, ok: reasons.length === 0, reasons, text };
+}
+
+async function runAll() {
+  const results = [];
+  // Limited concurrency so we don't hammer the Anthropic API.
+  const queue = [...filtered];
+  const workers = Array.from({ length: Math.min(CONCURRENCY, queue.length) }, async () => {
+    while (queue.length > 0) {
+      const s = queue.shift();
+      const r = await runScenario(s);
+      results.push(r);
+      const tag = r.ok ? "✓" : "✗";
+      const detail = r.ok ? "" : `  · ${r.reasons.join("; ")}`;
+      console.log(`${tag} ${r.name}${detail}`);
+    }
+  });
+  await Promise.all(workers);
+
+  const pass = results.filter((r) => r.ok).length;
+  const total = results.length;
+  const rate = total > 0 ? pass / total : 0;
+  console.log("");
+  console.log(`scenario eval: ${pass}/${total} passed (${(rate * 100).toFixed(1)}%)`);
+  console.log(`threshold: ${(THRESHOLD * 100).toFixed(0)}%`);
+
+  if (rate < THRESHOLD) {
+    console.log("");
+    console.log("FAILED scenarios:");
+    for (const r of results) {
+      if (!r.ok) {
+        console.log(`  - ${r.name}`);
+        for (const reason of r.reasons) console.log(`      ${reason}`);
+        if (r.text) {
+          const trimmed = r.text.length > 200 ? r.text.slice(0, 200) + "…" : r.text;
+          console.log(`      RESPONSE: ${trimmed.replace(/\n/g, " ")}`);
+        }
+      }
+    }
+    process.exit(1);
+  }
+}
+
+runAll().catch((err) => {
+  console.error("FATAL:", err);
+  process.exit(1);
+});

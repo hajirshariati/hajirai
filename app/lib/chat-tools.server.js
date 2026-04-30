@@ -79,7 +79,7 @@ export const TOOLS = [
   {
     name: "find_similar_products",
     description:
-      "Find products similar to a specific reference product the customer named. Use this WHENEVER the customer asks for styles 'like', 'similar to', 'comparable to', 'supports like', 'feels like', or 'what else is like the <product name>' a specific product they named. Matches on the merchant's configured similarity attributes PLUS category PLUS gender of the reference product. Automatically excludes the reference product itself from results. Do NOT use search_products for this — search_products cannot exclude the reference and cannot guarantee the similarity-attribute match. If the customer names a product but you don't know its handle, call search_products first to get the handle, then call this tool.",
+      "Find products similar to a specific reference product the customer named. Use this WHENEVER the customer asks for styles 'like', 'similar to', 'comparable to', 'supports like', 'feels like', or 'what else is like the <product name>' a specific product they named. Matches on the merchant's configured similarity attributes PLUS category PLUS gender of the reference product. Automatically excludes the reference product itself from results. Supports optional priceMax (when customer asks for 'cheaper', 'under $50', 'less expensive') and query (additional keyword filter, e.g. 'leather' to narrow to leather-only). Do NOT use search_products for this — search_products cannot exclude the reference and cannot guarantee the similarity-attribute match. If the customer names a product but you don't know its handle, call search_products first to get the handle, then call this tool.",
     input_schema: {
       type: "object",
       properties: {
@@ -92,6 +92,14 @@ export const TOOLS = [
           description: "Maximum number of similar products to return (default 6, max 10).",
           minimum: 1,
           maximum: 10,
+        },
+        priceMax: {
+          type: "number",
+          description: "Optional maximum price ceiling. Use when the customer says 'cheaper', 'under $X', 'less expensive', 'budget'.",
+        },
+        query: {
+          type: "string",
+          description: "Optional keyword filter applied on top of similarity matching. Use for narrowing modifiers: 'leather', 'waterproof', 'wide width', 'memory foam', etc.",
         },
       },
       required: ["handle"],
@@ -1014,6 +1022,19 @@ async function getProductDetails({ handle }, { shop }) {
   const skus = product.variants.map((v) => v.sku).filter(Boolean);
   const enrich = await enrichmentMap(shop, skus);
 
+  // Pre-derive in-stock sizes so the AI doesn't have to scan variants[]
+  // and risk claiming "size 9 is available" when inventoryQty is 0.
+  // The prompt rule for size answers can cite this list directly.
+  const availableSizes = [];
+  for (const v of product.variants) {
+    const qty = v.inventoryQty;
+    const inStock = qty == null ? true : Number(qty) > 0;
+    if (!inStock) continue;
+    const opts = safeParseJson(v.optionsJson) || {};
+    const size = opts.Size || opts.size || opts.SIZE;
+    if (size && !availableSizes.includes(size)) availableSizes.push(size);
+  }
+
   return {
     handle: product.handle,
     title: product.title,
@@ -1028,12 +1049,14 @@ async function getProductDetails({ handle }, { shop }) {
     image: product.featuredImageUrl || undefined,
     price: product.variants[0]?.price || undefined,
     compareAtPrice: product.variants[0]?.compareAtPrice || undefined,
+    availableSizes: availableSizes.length > 0 ? availableSizes : undefined,
     variants: product.variants.map((v) => ({
       sku: v.sku || undefined,
       title: v.title || undefined,
       price: v.price || undefined,
       compareAtPrice: v.compareAtPrice || undefined,
       inventoryQty: v.inventoryQty ?? undefined,
+      inStock: v.inventoryQty == null ? undefined : Number(v.inventoryQty) > 0,
       options: safeParseJson(v.optionsJson) || undefined,
       attributes: v.attributesJson || undefined,
       enrichment: v.sku ? enrich.get(v.sku) || undefined : undefined,
@@ -1041,7 +1064,7 @@ async function getProductDetails({ handle }, { shop }) {
   };
 }
 
-async function findSimilarProducts({ handle, limit }, { shop, deduplicateColors, similarMatchAttributes }) {
+async function findSimilarProducts({ handle, limit, priceMax, query }, { shop, deduplicateColors, similarMatchAttributes }) {
   const h = String(handle || "").trim();
   if (!h) return { error: "handle is required" };
 
@@ -1204,6 +1227,35 @@ async function findSimilarProducts({ handle, limit }, { shop, deduplicateColors,
   });
 
   let final = matched;
+
+  // Optional price ceiling — applied AFTER similarity matching so the
+  // primary signal stays similarity, not price.
+  if (priceMax != null && Number.isFinite(Number(priceMax))) {
+    const cap = Number(priceMax);
+    final = final.filter((p) => {
+      const min = (p.variants || []).reduce(
+        (m, v) => (v.price != null && Number(v.price) < m ? Number(v.price) : m),
+        Infinity,
+      );
+      return Number.isFinite(min) && min <= cap;
+    });
+  }
+
+  // Optional keyword filter ("leather", "waterproof", "memory foam"
+  // etc). Applied as a permissive substring check across title, tags,
+  // and description.
+  if (query && typeof query === "string" && query.trim()) {
+    const needle = query.trim().toLowerCase();
+    final = final.filter((p) => {
+      const haystack = [
+        p.title,
+        p.description,
+        Array.isArray(p.tags) ? p.tags.join(" ") : "",
+      ].filter(Boolean).join(" ").toLowerCase();
+      return haystack.includes(needle);
+    });
+  }
+
   if (deduplicateColors) final = deduplicateByColor(final);
   final = final.slice(0, max);
 

@@ -3,6 +3,7 @@ import {
   detectGenderFromHistory,
   stripBannedNarration,
   looksLikeProductPitch,
+  looksLikeDefinitionalHallucination,
   normalizeGenderChipAnswer,
   hasChoiceButtons,
 } from "../app/lib/chat-helpers.server.js";
@@ -265,6 +266,39 @@ cases.push({
 cases.push({
   name: "empty text → false",
   run: () => assert.equal(hasChoiceButtons(""), false),
+});
+
+// ── looksLikeDefinitionalHallucination ────────────────────────────────
+cases.push({
+  name: "'Lynco is our premium orthotic line' is definitional hallucination",
+  run: () => assert.equal(
+    looksLikeDefinitionalHallucination("Lynco is our premium orthotic line that uses memory foam."),
+    true,
+  ),
+});
+
+cases.push({
+  name: "'UltraSKY is our advanced technology' is definitional hallucination",
+  run: () => assert.equal(
+    looksLikeDefinitionalHallucination("UltraSKY is our advanced technology used in select shoes."),
+    true,
+  ),
+});
+
+cases.push({
+  name: "regular product description is NOT definitional hallucination",
+  run: () => assert.equal(
+    looksLikeDefinitionalHallucination("Speed Orthotics offer support for runners."),
+    false,
+  ),
+});
+
+cases.push({
+  name: "clarifying question is NOT definitional hallucination",
+  run: () => assert.equal(
+    looksLikeDefinitionalHallucination("Could you tell me more about what you're looking for?"),
+    false,
+  ),
 });
 
 // ── run all ───────────────────────────────────────────────────────────
