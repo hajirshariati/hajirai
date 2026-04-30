@@ -16,6 +16,7 @@ import {
   looksLikeDefinitionalHallucination,
   hasChoiceButtons,
   dedupeConsecutiveSentences,
+  isSingularPrescriptive,
 } from "../lib/chat-helpers.server";
 import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL, FIT_PREDICTOR_TOOL } from "../lib/chat-tools.server";
 import { fetchCustomerContext } from "../lib/customer-context.server";
@@ -875,10 +876,14 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // Singular-prescriptive narrowing: even without a SKU, when the AI
     // uses singular "the X is your best/perfect match" language, the
     // customer expects ONE card. Narrow to the top-scored card so the
-    // text and the rendered card agree.
-    const singularPrescriptive = /\b(?:is (?:your|the) (?:best|perfect|ideal|top) (?:match|choice|pick|fit|one)|is the one for you|i (?:recommend|suggest) (?:the|trying))\b/i.test(
-      fullResponseText,
-    );
+    // text and the rendered card agree. Patterns expanded to catch:
+    //   "is the right pick / right choice / right fit / right one"
+    //   "is the go-to pick / go-to choice / go-to option"
+    //   "is a great choice / great pick / great option / great fit"
+    //   "is a good choice / good pick / good fit / good option"
+    //   "would be perfect / would be a great pick"
+    //   "I'd recommend / I'd suggest"
+    const singularPrescriptive = isSingularPrescriptive(fullResponseText);
 
     let cards;
     if (skuNarrowedCards) {
@@ -890,6 +895,21 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       cards = matched.slice(0, 3).map((s) => s.card);
     } else if (!saysNoMatch) {
       cards = dropSiblingCards(scored, textLower).slice(0, 3).map((s) => s.card);
+    }
+
+    // Text-card coherence guard: if the AI used singular-prescriptive
+    // language ("is the right pick", etc.) but no card scored ≥0.4
+    // (i.e. no card title meaningfully matches the AI's claim), the AI
+    // is naming a product that isn't really in the pool. Replace the
+    // text with neutral framing so the customer doesn't read "Kids
+    // Orthotics is the right pick" while seeing a Unisex Edge card.
+    if (
+      singularPrescriptive &&
+      cards && cards.length > 0 &&
+      (scored.length === 0 || scored[0].score < 0.4)
+    ) {
+      console.log(`[chat] coherence guard: AI named a product but no card matches well (top score=${scored[0]?.score?.toFixed(2) || "n/a"}) — neutral text`);
+      fullResponseText = "Here's an option that might work — let me know if you'd like to look at something different.";
     }
 
 

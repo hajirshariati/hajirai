@@ -89,6 +89,19 @@ export function hasChoiceButtons(text) {
   return /<<[^<>]+>>/.test(text || "");
 }
 
+// Detect singular-prescriptive AI language — when the AI claims ONE
+// specific product is "the right pick" / "the go-to choice" / "would
+// be perfect" / etc. Used by chat.jsx to narrow card rendering to a
+// single product so text and card agree. Patterns intentionally
+// generous: a false positive (narrowing to 1 card on softer language)
+// is better than a false negative (showing 3 cards under singular AI
+// text, which feels incoherent to the customer).
+const SINGULAR_PRESCRIPTIVE = /\b(?:is (?:your|the) (?:best|perfect|ideal|top|right|go-?to) (?:match|choice|pick|fit|one|option)|is (?:a |an )?(?:great|perfect|good|ideal|solid) (?:match|choice|pick|fit|option)|is the one for you|would be (?:a (?:great|good|perfect|solid))? ?(?:match|choice|pick|fit|option)|i'?d (?:recommend|suggest)|i (?:recommend|suggest) (?:the|trying|going with))\b/i;
+
+export function isSingularPrescriptive(text) {
+  return Boolean(text) && SINGULAR_PRESCRIPTIVE.test(text);
+}
+
 // AI ships repetitive sentences in two distinct shapes:
 //   (a) Echo opener — two adjacent sentences starting with the same
 //       4+ words ("Here are some great X. Here are some great X with…").

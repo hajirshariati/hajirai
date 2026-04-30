@@ -8,6 +8,7 @@ import {
   normalizeGenderChipAnswer,
   hasChoiceButtons,
   dedupeConsecutiveSentences,
+  isSingularPrescriptive,
 } from "../app/lib/chat-helpers.server.js";
 import { filterContradictingGenderChips } from "../app/lib/chip-filter.server.js";
 
@@ -576,6 +577,88 @@ cases.push({
       aetrexMap,
     );
     assert.deepEqual(out.stripped, []);
+  },
+});
+
+// ── isSingularPrescriptive ────────────────────────────────────────────
+cases.push({
+  name: "'is the right pick' is singular-prescriptive",
+  run: () => assert.equal(
+    isSingularPrescriptive("the standard Kids Orthotics is the right pick"),
+    true,
+  ),
+});
+
+cases.push({
+  name: "'is the go-to pick' is singular-prescriptive",
+  run: () => assert.equal(
+    isSingularPrescriptive("The Unisex Cleats with Metatarsal Support is the go-to pick"),
+    true,
+  ),
+});
+
+cases.push({
+  name: "'is a great choice' is singular-prescriptive",
+  run: () => assert.equal(
+    isSingularPrescriptive("The Speed Orthotic is a great choice for runners"),
+    true,
+  ),
+});
+
+cases.push({
+  name: "'I'd recommend' is singular-prescriptive",
+  run: () => assert.equal(
+    isSingularPrescriptive("I'd recommend the Conform line for diabetic feet"),
+    true,
+  ),
+});
+
+cases.push({
+  name: "'is the best match' (existing pattern) still works",
+  run: () => assert.equal(
+    isSingularPrescriptive("the L700 is your best match"),
+    true,
+  ),
+});
+
+cases.push({
+  name: "'is the perfect option' is singular-prescriptive",
+  run: () => assert.equal(
+    isSingularPrescriptive("This insole is the perfect option for your needs"),
+    true,
+  ),
+});
+
+cases.push({
+  name: "'would be a great pick' is singular-prescriptive",
+  run: () => assert.equal(
+    isSingularPrescriptive("The Speed Orthotic would be a great pick for marathon training"),
+    true,
+  ),
+});
+
+cases.push({
+  name: "'here are some options' is NOT singular-prescriptive",
+  run: () => assert.equal(
+    isSingularPrescriptive("Here are some great men's casual orthotics."),
+    false,
+  ),
+});
+
+cases.push({
+  name: "clarifying question is NOT singular-prescriptive",
+  run: () => assert.equal(
+    isSingularPrescriptive("Are these for men's or women's?"),
+    false,
+  ),
+});
+
+cases.push({
+  name: "empty/null input safe",
+  run: () => {
+    assert.equal(isSingularPrescriptive(""), false);
+    assert.equal(isSingularPrescriptive(null), false);
+    assert.equal(isSingularPrescriptive(undefined), false);
   },
 });
 
