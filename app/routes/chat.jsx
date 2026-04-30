@@ -697,8 +697,46 @@ if (supportCTA) {
       textLower,
     );
 
+    // SKU-mention narrowing: if the AI text named a specific SKU (e.g.
+    // "the L700M is your best match"), render ONLY the card(s) for that
+    // SKU instead of all top-3 from the pool. Prevents the "text says one
+    // product, cards show three different ones" mismatch. Tolerant of
+    // gender suffixes — L700M and L700W both match L700 in the pool.
+    const baseSku = (s) => String(s).toUpperCase().replace(/[A-Z]$/, "");
+    const mentionedSkus = fullResponseText.match(SKU_PATTERN) || [];
+    let skuNarrowedCards = null;
+    if (mentionedSkus.length > 0) {
+      const wantedBases = new Set(mentionedSkus.map(baseSku));
+      const skuMatches = filteredPool.filter((card) => {
+        const cardSkus = [
+          ...skusFromCardText(card.title),
+          ...skusFromCardText(card.handle),
+        ];
+        return cardSkus.some((s) => wantedBases.has(baseSku(s)));
+      });
+      if (skuMatches.length > 0) {
+        skuNarrowedCards = skuMatches.slice(0, 3);
+        console.log(
+          `[chat] SKU-narrow: text mentions ${[...wantedBases].join(",")} → showing ${skuNarrowedCards.length} of ${filteredPool.length} pool cards`,
+        );
+      }
+    }
+
+    // Singular-prescriptive narrowing: even without a SKU, when the AI
+    // uses singular "the X is your best/perfect match" language, the
+    // customer expects ONE card. Narrow to the top-scored card so the
+    // text and the rendered card agree.
+    const singularPrescriptive = /\b(?:is (?:your|the) (?:best|perfect|ideal|top) (?:match|choice|pick|fit|one)|is the one for you|i (?:recommend|suggest) (?:the|trying))\b/i.test(
+      fullResponseText,
+    );
+
     let cards;
-    if (matched.length > 0) {
+    if (skuNarrowedCards) {
+      cards = skuNarrowedCards;
+    } else if (singularPrescriptive && scored.length > 0 && scored[0].score >= 0.6) {
+      cards = [scored[0].card];
+      console.log(`[chat] singular-narrow: text says "the X is best" → showing 1 card`);
+    } else if (matched.length > 0) {
       cards = matched.slice(0, 3).map((s) => s.card);
     } else if (!saysNoMatch) {
       cards = dropSiblingCards(scored, textLower).slice(0, 3).map((s) => s.card);
@@ -855,21 +893,25 @@ export const action = async ({ request }) => {
       getAllCatalogCategories(session.shop),
     ]);
 
-    // Merchant-configured category groups: when the customer's latest message
+    // Merchant-configured category groups: when the conversation clearly
     // contains a trigger word from exactly ONE group, narrow the catalog
     // allow-list passed to the prompt to that group's categories only. This
     // is fully data-driven — no hardcoded vocabulary anywhere.
     //
     // - Zero groups configured: no filter applied (full allow-list goes
     //   through). Configure groups in Rules & Knowledge to enable.
-    // - Multiple groups match (e.g. "orthotic shoes" hits both Footwear and
+    // - Multiple groups match in the same user message (e.g. "orthotic shoes" hits both Footwear and
     //   Orthotics): no filter applied — the AI sees the full allow-list
     //   and resolves the ambiguity itself. Safer than picking wrong.
+    // - Short follow-up answers like "Men's" keep the most recent explicit
+    //   category-group intent from earlier user messages. That preserves
+    //   "shoes" after the gender question, so non-footwear groups don't leak
+    //   into the shoe-type chips just because the latest message only says
+    //   "Men's".
     let merchantGroups = [];
     try { merchantGroups = JSON.parse(config.categoryGroups || "[]"); } catch { /* */ }
 
     const latestMessage = String(body.message || "");
-    const messageLower = latestMessage.toLowerCase();
     let groupFilterApplied = "";
 
     if (Array.isArray(merchantGroups) && merchantGroups.length > 0) {
@@ -886,9 +928,29 @@ export const action = async ({ request }) => {
         }
         return false;
       };
-      const matched = merchantGroups.filter((g) => triggerMatches(messageLower, g?.triggers || []));
-      if (matched.length === 1) {
-        const g = matched[0];
+
+      const userMessagesNewestFirst = messages
+        .filter((m) => m.role === "user" && typeof m.content === "string")
+        .map((m) => m.content)
+        .reverse();
+
+      let matchedGroup = null;
+      let ambiguousGroupMessage = false;
+      for (const text of userMessagesNewestFirst) {
+        const textLower = text.toLowerCase();
+        const matched = merchantGroups.filter((g) => triggerMatches(textLower, g?.triggers || []));
+        if (matched.length > 1) {
+          ambiguousGroupMessage = true;
+          break;
+        }
+        if (matched.length === 1) {
+          matchedGroup = matched[0];
+          break;
+        }
+      }
+
+      if (matchedGroup && !ambiguousGroupMessage) {
+        const g = matchedGroup;
         const allowed = new Set((g.categories || []).map((c) => String(c).toLowerCase()));
         const filtered = catalogProductTypes.filter((c) => allowed.has(String(c).toLowerCase()));
         if (filtered.length >= 1) {
