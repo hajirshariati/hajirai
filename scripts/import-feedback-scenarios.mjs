@@ -119,6 +119,18 @@ for (const r of records) {
   const triggerMessage = String(conv[lastUserIndex].content).trim();
   if (!triggerMessage) { skippedNoUserMsg++; continue; }
 
+  // The rated response is the assistant message that came AFTER the
+  // last user message — that's the bubble the customer thumbed-down.
+  // If the widget also stored botResponse, fall back to that.
+  let ratedResponse = "";
+  for (let i = lastUserIndex + 1; i < conv.length; i++) {
+    if (conv[i]?.role === "assistant" && typeof conv[i].content === "string" && conv[i].content.trim()) {
+      ratedResponse = conv[i].content.trim();
+      break;
+    }
+  }
+  if (!ratedResponse && r.botResponse) ratedResponse = String(r.botResponse).trim();
+
   const voteIcon = r.vote === "up" ? "thumbs-up" : "thumbs-down";
   const titleSnippet = triggerMessage.slice(0, 50) + (triggerMessage.length > 50 ? "…" : "");
 
@@ -129,7 +141,8 @@ for (const r of records) {
       vote: r.vote,
       voteAt: r.createdAt.toISOString(),
       shop: r.shop,
-      previousResponse: (r.botResponse || "").slice(0, 200),
+      previousResponse: ratedResponse.slice(0, 300),
+      isFeedback: true,
     },
     ...(history.length > 0 ? { history } : {}),
     messages: [triggerMessage],

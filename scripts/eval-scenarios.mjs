@@ -180,7 +180,11 @@ async function runScenario(scenario) {
   text = stripMetaNarration(text);
 
   const checked = checkExpectations(scenario, text);
-  if (scenario._source?.previousResponse) {
+  if (scenario._source?.isFeedback) {
+    checked.isFeedback = true;
+    checked.previousResponse = scenario._source.previousResponse || "";
+    checked.userQuestion = scenario.messages?.[0] || "";
+  } else if (scenario._source?.previousResponse) {
     checked.previousResponse = scenario._source.previousResponse;
   }
   return checked;
@@ -255,31 +259,35 @@ async function runAll() {
 
   // Feedback scenarios are regression tests — passing the baseline
   // safety check (no banned phrases, no Lynco, etc.) doesn't prove
-  // the customer's original concern is resolved. Print both the new
-  // response and the response that earned the 👎 so the operator can
-  // judge whether the AI improved.
-  const feedbackResults = results.filter((r) => r.previousResponse);
+  // the customer's original concern is resolved. Print the customer
+  // question, what the AI said when it got 👎, and what the AI says
+  // now so the operator can judge whether the response improved.
+  const feedbackResults = results.filter((r) => r.isFeedback);
   if (feedbackResults.length > 0) {
+    const truncate = (s, n) => (s || "").length > n ? s.slice(0, n) + "…" : (s || "");
     console.log("");
     console.log("─".repeat(70));
     console.log(`FEEDBACK REVIEW — ${feedbackResults.length} scenario(s) imported from real 👎 events`);
-    console.log("Baseline pass = no banned phrases. To verify the issue is FIXED, compare both responses below:");
+    console.log("Baseline pass = no banned phrases. To verify the issue is FIXED, read both responses below:");
     console.log("─".repeat(70));
     for (const r of feedbackResults) {
       console.log("");
       console.log(`▸ ${r.name}`);
-      const trimmedNow = (r.text || "").length > 220 ? r.text.slice(0, 220) + "…" : (r.text || "");
-      const trimmedOld = (r.previousResponse || "").length > 220 ? r.previousResponse.slice(0, 220) + "…" : (r.previousResponse || "");
-      console.log(`  WHEN RATED 👎: ${trimmedOld.replace(/\n/g, " ")}`);
-      console.log(`  RESPONSE NOW:  ${trimmedNow.replace(/\n/g, " ")}`);
+      console.log(`  CUSTOMER ASKED:  ${truncate(r.userQuestion, 220).replace(/\n/g, " ")}`);
+      const oldResp = r.previousResponse
+        ? truncate(r.previousResponse, 260).replace(/\n/g, " ")
+        : "(not captured by the widget at the time)";
+      console.log(`  WHEN RATED 👎:   ${oldResp}`);
+      console.log(`  RESPONSE NOW:    ${truncate(r.text, 260).replace(/\n/g, " ")}`);
       if (!r.ok) {
         console.log(`  ⚠ BASELINE FAILED: ${r.reasons.join("; ")}`);
       }
     }
     console.log("");
     console.log("─".repeat(70));
-    console.log("If RESPONSE NOW reads better than WHEN RATED 👎, the issue is likely fixed.");
-    console.log("If they read the same (or worse), the bug is NOT resolved — investigate further.");
+    console.log("If RESPONSE NOW reads better than WHEN RATED 👎 → issue likely fixed.");
+    console.log("If they read the same (or worse) → the bug is NOT resolved.");
+    console.log("If WHEN RATED 👎 says (not captured), compare to the customer's question only.");
     console.log("─".repeat(70));
   }
 
