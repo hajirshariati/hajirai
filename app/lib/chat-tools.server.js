@@ -610,10 +610,33 @@ const searchQuery = detected.gender ? detected.query : q;
   });
 
   if (activeCategoryGroup) {
-    const beforeGroup = products.length;
-    products = products.filter((p) => productMatchesGroupCategory(p, activeCategoryGroup));
-    if (products.length !== beforeGroup) {
-      console.log(`[search]   active-group filter ${activeCategoryGroup.name || "-"}: ${products.length}/${beforeGroup}`);
+    const groupName = String(activeCategoryGroup.name || "").toLowerCase();
+    // Query-keyword override: when the AI's search query is clearly
+    // about orthotics ("orthotic", "insole", "posted", "metatarsal",
+    // "footbed", "arch support insert") but the active group is
+    // Footwear (or any non-Orthotics group), skip the filter. The
+    // category-intent walk locked the wrong group from earlier in
+    // the conversation; trust the explicit search query.
+    const queryLower = String(q || "").toLowerCase();
+    const queryIsOrthoticIntent = /\b(orthotic|orthotics|insole|insoles|footbed|posted|metatarsal|arch[- ]?support[- ]?insert)\b/.test(queryLower);
+    const groupIsOrthotic = /orthotic|insole|insert/.test(groupName);
+
+    if (queryIsOrthoticIntent && !groupIsOrthotic) {
+      console.log(`[search]   active-group skip: query is orthotic-intent but group=${activeCategoryGroup.name || "-"} — trusting query`);
+    } else {
+      const beforeGroup = products.length;
+      const filtered = products.filter((p) => productMatchesGroupCategory(p, activeCategoryGroup));
+      if (filtered.length === 0 && beforeGroup > 0) {
+        // Fail-open: the group filter wiped every candidate. The
+        // group lock is stale or wrong; better to return broader
+        // results than nothing.
+        console.log(`[search]   active-group filter ${activeCategoryGroup.name || "-"}: WIPED ALL ${beforeGroup} → falling back to unfiltered`);
+      } else {
+        products = filtered;
+        if (products.length !== beforeGroup) {
+          console.log(`[search]   active-group filter ${activeCategoryGroup.name || "-"}: ${products.length}/${beforeGroup}`);
+        }
+      }
     }
   }
 
