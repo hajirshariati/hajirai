@@ -358,13 +358,9 @@
   overscroll-behavior: contain;
 }
 
-/* In welcome state, the welcome itself fills the messages area exactly
-   and the banner flex-shrinks to fit — no scrollbar should ever
-   appear. Hiding overflow here also prevents tiny sub-pixel rounding
-   from showing a phantom scroll track. */
-.ai-chat-messages:has(.ai-chat-welcome) {
-  overflow: hidden;
-}
+/* In welcome state we don't want a scrollbar — the banner shrinks to
+   absorb whatever space is left after the other items take their
+   natural size. Keep overflow auto for real-message state. */
 
 .ai-chat-messages::-webkit-scrollbar {
   width: 5px;
@@ -388,10 +384,19 @@
   align-items: center;
   text-align: center;
   /* Bind welcome to exactly the messages-area height so the banner's
-     flex-shrink can absorb any overflow. min-height:100% would still
-     let welcome grow with its content — height:100% caps it. */
+     flex-shrink can absorb any overflow. min-height:100% would let
+     welcome grow with its content — height:100% caps it. */
   height: 100%;
   box-sizing: border-box;
+}
+
+/* Lock every welcome child EXCEPT the banner at its natural height,
+   so the banner is the only thing that shrinks when space is tight.
+   Without this, default flex-shrink:1 lets text rows compress too
+   and they crush their own line-height before the banner gives up
+   any pixels. */
+.ai-chat-welcome > *:not(.ai-chat-welcome__banner) {
+  flex-shrink: 0;
 }
 
 .ai-chat-welcome__banner {
