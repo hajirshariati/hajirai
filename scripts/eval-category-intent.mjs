@@ -127,6 +127,32 @@ const cases = [
     context: "Footwear",
   },
   {
+    name: "railway dad flow preserves orthotics after generic shoe question",
+    messages: [
+      u("i'm a soccer player, my dad came to soccer with me last week and he is 65 years old, he did fine but now he has a foot pain, what do you recommend he wear inside his shoes for the next match to help him with the pain so he can still play ?"),
+      a("Where is your dad's foot pain located? <<Arch / Heel>><<Ball of Foot>><<Both>>"),
+      u("Both"),
+      a("What type of shoes does your dad wear to the matches? <<Running shoes>><<Casual/Everyday shoes>>"),
+      u("Running shoes"),
+    ],
+    active: "Orthotics",
+    context: "Footwear",
+  },
+  {
+    name: "railway dad flow still preserves orthotics after user correction",
+    messages: [
+      u("i'm a soccer player, my dad came to soccer with me last week and he is 65 years old, he did fine but now he has a foot pain, what do you recommend he wear inside his shoes for the next match to help him with the pain so he can still play ?"),
+      a("Where is your dad's foot pain located? <<Arch / Heel>><<Ball of Foot>><<Both>>"),
+      u("Both"),
+      a("What type of shoes does your dad wear to the matches? <<Running shoes>><<Casual/Everyday shoes>>"),
+      u("Running shoes"),
+      a("Is your dad's pain more on the arch/heel side, ball of foot, or both areas?"),
+      u("i already said, both"),
+    ],
+    active: "Orthotics",
+    context: "Footwear",
+  },
+  {
     name: "orthotics flow plus oxfords context",
     messages: [
       u("I need inserts for arch pain."),

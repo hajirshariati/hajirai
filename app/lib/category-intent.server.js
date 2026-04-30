@@ -116,15 +116,83 @@ function inferForContextIntent(text, matchedGroups) {
   return null;
 }
 
+function previousAssistantFor(messages, userIndex) {
+  for (let i = userIndex - 1; i >= 0; i--) {
+    const msg = messages[i];
+    if (msg?.role === "assistant" && typeof msg.content === "string") return msg.content;
+    if (msg?.role === "user") break;
+  }
+  return "";
+}
+
+function assistantFramesGroupAsContext(assistantText, contextGroup, activeGroup) {
+  const text = String(assistantText || "");
+  if (!text || !contextGroup || !activeGroup) return false;
+
+  const mentionsContextGroup = matchingGroupsForText(text, [contextGroup], { includeTriggers: true }).length === 1;
+  const mentionsActiveGroup = matchingGroupsForText(text, [activeGroup], { includeTriggers: false }).length === 1;
+  const refersToActiveByPronoun = /\b(them|it|those|that|fit|fits|inside)\b/i.test(text);
+
+  const asksFootwearContextForInsert =
+    isInsertLikeGroup(activeGroup) &&
+    isFootwearLikeGroup(contextGroup) &&
+    /\b(what|which|type|kind).{0,40}\b(shoe|shoes|footwear).{0,60}\b(wear|wears|worn|use|uses|fit|fits|inside|match|matches|for)\b/i.test(text);
+
+  return mentionsContextGroup && (mentionsActiveGroup || refersToActiveByPronoun || asksFootwearContextForInsert);
+}
+
+function inferUserIntentFromText(text, groups) {
+  const insideIntent = inferInsideFootwearIntent(text, groups);
+  if (insideIntent) return { ...insideIntent, ambiguous: false };
+
+  const matches = matchingGroupsForText(text, groups, { includeTriggers: true });
+  const forIntent = inferForContextIntent(text, matches);
+  if (forIntent) return { ...forIntent, ambiguous: false };
+
+  if (matches.length === 1) return { activeGroup: matches[0], contextGroup: null, ambiguous: false };
+  if (matches.length > 1) return { activeGroup: null, contextGroup: null, ambiguous: true };
+  return { activeGroup: null, contextGroup: null, ambiguous: false };
+}
+
+function priorIntentBefore(messages, groups, beforeIndex) {
+  for (let i = beforeIndex - 1; i >= 0; i--) {
+    const msg = messages[i];
+    if (!msg || msg.role !== "user" || typeof msg.content !== "string") continue;
+
+    const intent = inferUserIntentFromText(msg.content, groups);
+    if (!intent.activeGroup && !intent.ambiguous) continue;
+    if (intent.ambiguous) return intent;
+
+    const earlier = priorIntentBefore(messages, groups, i);
+    const assistantText = previousAssistantFor(messages, i);
+    if (
+      earlier.activeGroup &&
+      !sameGroup(intent.activeGroup, earlier.activeGroup) &&
+      isShortChoice(msg.content) &&
+      !hasExplicitPivotIntent(msg.content) &&
+      assistantFramesGroupAsContext(assistantText, intent.activeGroup, earlier.activeGroup)
+    ) {
+      return {
+        activeGroup: earlier.activeGroup,
+        contextGroup: intent.activeGroup,
+        ambiguous: false,
+      };
+    }
+
+    return intent;
+  }
+  return { activeGroup: null, contextGroup: null, ambiguous: false };
+}
+
 export function analyzeCategoryIntent(messages, merchantGroups) {
   const groups = Array.isArray(merchantGroups)
     ? merchantGroups.map(compactGroup).filter((g) => g && (g.name || g.categories.length || g.triggers.length))
     : [];
   if (groups.length === 0) return { activeGroup: null, contextGroup: null, ambiguous: false };
 
-  const latestUser = [...messages].reverse().find((m) => m.role === "user" && typeof m.content === "string");
-  const previousMessages = messages.slice(0, Math.max(0, messages.lastIndexOf(latestUser)));
-  const previousAssistant = [...previousMessages].reverse().find((m) => m.role === "assistant" && typeof m.content === "string");
+  const latestUserIndex = messages.map((m, i) => ({ m, i })).reverse().find(({ m }) => m.role === "user" && typeof m.content === "string")?.i ?? -1;
+  const latestUser = latestUserIndex >= 0 ? messages[latestUserIndex] : null;
+  const previousAssistantText = previousAssistantFor(messages, latestUserIndex);
 
   const latestMatches = matchingGroupsForText(latestUser?.content || "", groups, { includeTriggers: true });
   const latestUnambiguous = latestMatches.length === 1 ? latestMatches[0] : null;
@@ -139,50 +207,15 @@ export function analyzeCategoryIntent(messages, merchantGroups) {
     return { ...forContextIntent, ambiguous: false };
   }
 
-  let priorActive = null;
-  let priorAmbiguous = false;
-  for (let i = previousMessages.length - 1; i >= 0; i--) {
-    const msg = previousMessages[i];
-    if (!msg || msg.role !== "user" || typeof msg.content !== "string") continue;
-    const insideIntent = inferInsideFootwearIntent(msg.content, groups);
-    if (insideIntent) {
-      priorActive = insideIntent.activeGroup;
-      break;
-    }
-    const matches = matchingGroupsForText(msg.content, groups, { includeTriggers: true });
-    const forIntent = inferForContextIntent(msg.content, matches);
-    if (forIntent) {
-      priorActive = forIntent.activeGroup;
-      break;
-    }
-    if (matches.length > 1) {
-      priorAmbiguous = true;
-      break;
-    }
-    if (matches.length === 1) {
-      priorActive = matches[0];
-      break;
-    }
-  }
+  const priorIntent = priorIntentBefore(messages, groups, latestUserIndex);
+  const priorActive = priorIntent.activeGroup;
+  const priorAmbiguous = priorIntent.ambiguous;
 
   if (latestUnambiguous && priorActive && !sameGroup(latestUnambiguous, priorActive)) {
-    const previousAssistantText = previousAssistant?.content || "";
-    const previousAssistantMentionsPrior = matchingGroupsForText(
-      previousAssistantText,
-      [priorActive],
-      { includeTriggers: false },
-    ).length === 1;
-    const previousAssistantRefersToPrior = /\b(them|it|those|that|fit|fits|inside)\b/i.test(previousAssistantText);
-    const previousAssistantFramesLatestAsContext = matchingGroupsForText(
-      previousAssistantText,
-      [latestUnambiguous],
-      { includeTriggers: true },
-    ).length === 1;
     if (
       isShortChoice(latestUser?.content || "") &&
       !hasExplicitPivotIntent(latestUser?.content || "") &&
-      (previousAssistantMentionsPrior || previousAssistantRefersToPrior) &&
-      previousAssistantFramesLatestAsContext
+      assistantFramesGroupAsContext(previousAssistantText, latestUnambiguous, priorActive)
     ) {
       return {
         activeGroup: priorActive,
@@ -194,7 +227,9 @@ export function analyzeCategoryIntent(messages, merchantGroups) {
 
   if (latestUnambiguous) return { activeGroup: latestUnambiguous, contextGroup: null, ambiguous: false };
   if (latestAmbiguous) return { activeGroup: null, contextGroup: null, ambiguous: true };
-  if (priorActive && !priorAmbiguous) return { activeGroup: priorActive, contextGroup: null, ambiguous: false };
+  if (priorActive && !priorAmbiguous) {
+    return { activeGroup: priorActive, contextGroup: priorIntent.contextGroup || null, ambiguous: false };
+  }
   return { activeGroup: null, contextGroup: null, ambiguous: priorAmbiguous };
 }
 
