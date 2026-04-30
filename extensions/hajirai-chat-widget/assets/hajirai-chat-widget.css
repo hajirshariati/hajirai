@@ -348,6 +348,7 @@
 /* ---------- Messages area ---------- */
 .ai-chat-messages {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   padding: 16px 16px 8px;
   display: flex;
@@ -355,6 +356,14 @@
   gap: 12px;
   scroll-behavior: smooth;
   overscroll-behavior: contain;
+}
+
+/* In welcome state, the welcome itself fills the messages area exactly
+   and the banner flex-shrinks to fit — no scrollbar should ever
+   appear. Hiding overflow here also prevents tiny sub-pixel rounding
+   from showing a phantom scroll track. */
+.ai-chat-messages:has(.ai-chat-welcome) {
+  overflow: hidden;
 }
 
 .ai-chat-messages::-webkit-scrollbar {
@@ -378,7 +387,10 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  min-height: 100%;
+  /* Bind welcome to exactly the messages-area height so the banner's
+     flex-shrink can absorb any overflow. min-height:100% would still
+     let welcome grow with its content — height:100% caps it. */
+  height: 100%;
   box-sizing: border-box;
 }
 
