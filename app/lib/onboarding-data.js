@@ -273,8 +273,8 @@ export const STEPS = [
     ],
     list: [
       "feedback:import — reads the last 30 days of 👎 from the database and writes them to scripts/scenarios.from-feedback.json. Output tells you how many were imported.",
-      "eval:feedback — runs those imported scenarios against the live AI. Each failure prints both 'RESPONSE NOW' (what the AI says today) and 'RESPONSE WHEN RATED DOWN' (what got the 👎) so you can compare side-by-side.",
-      "If a scenario still fails: real bug, fix the code or the rules. If it passes now: the bug is resolved — your fixes worked.",
+      "eval:feedback — runs those imported scenarios against the live AI. Prints WHEN RATED 👎 (what got the thumbs-down) vs RESPONSE NOW (what the AI says today) for each scenario, so you can compare side by side.",
+      "IMPORTANT: '100% pass' on the feedback eval ONLY means the AI's responses don't contain banned phrases. It does NOT confirm the customer's actual concern is resolved. You need to read both responses and judge whether RESPONSE NOW is genuinely better. If they look the same, the underlying bug isn't fixed.",
     ],
     tip: "Optional flags: '--days=7' for the last week, '--shop=foo.myshopify.com' for one shop only, '--no-dedupe' to keep every 👎 instead of collapsing identical questions. The script prints a summary so you can see exactly how many records were fetched, how many had conversations captured, and how many got deduped.",
   },

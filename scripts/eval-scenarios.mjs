@@ -253,6 +253,36 @@ async function runAll() {
   console.log(`scenario eval: ${pass}/${total} passed (${(rate * 100).toFixed(1)}%)`);
   console.log(`threshold: ${(THRESHOLD * 100).toFixed(0)}%`);
 
+  // Feedback scenarios are regression tests — passing the baseline
+  // safety check (no banned phrases, no Lynco, etc.) doesn't prove
+  // the customer's original concern is resolved. Print both the new
+  // response and the response that earned the 👎 so the operator can
+  // judge whether the AI improved.
+  const feedbackResults = results.filter((r) => r.previousResponse);
+  if (feedbackResults.length > 0) {
+    console.log("");
+    console.log("─".repeat(70));
+    console.log(`FEEDBACK REVIEW — ${feedbackResults.length} scenario(s) imported from real 👎 events`);
+    console.log("Baseline pass = no banned phrases. To verify the issue is FIXED, compare both responses below:");
+    console.log("─".repeat(70));
+    for (const r of feedbackResults) {
+      console.log("");
+      console.log(`▸ ${r.name}`);
+      const trimmedNow = (r.text || "").length > 220 ? r.text.slice(0, 220) + "…" : (r.text || "");
+      const trimmedOld = (r.previousResponse || "").length > 220 ? r.previousResponse.slice(0, 220) + "…" : (r.previousResponse || "");
+      console.log(`  WHEN RATED 👎: ${trimmedOld.replace(/\n/g, " ")}`);
+      console.log(`  RESPONSE NOW:  ${trimmedNow.replace(/\n/g, " ")}`);
+      if (!r.ok) {
+        console.log(`  ⚠ BASELINE FAILED: ${r.reasons.join("; ")}`);
+      }
+    }
+    console.log("");
+    console.log("─".repeat(70));
+    console.log("If RESPONSE NOW reads better than WHEN RATED 👎, the issue is likely fixed.");
+    console.log("If they read the same (or worse), the bug is NOT resolved — investigate further.");
+    console.log("─".repeat(70));
+  }
+
   if (rate < THRESHOLD) {
     console.log("");
     console.log("FAILED scenarios:");
