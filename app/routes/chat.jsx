@@ -7,6 +7,7 @@ import { buildSystemPrompt } from "../lib/chat-prompt.server";
 import { filterForbiddenCategoryChips } from "../lib/chip-filter.server";
 import { sanitizeCtaLabel } from "../lib/cta-label.server";
 import { analyzeCategoryIntent, cardMatchesActiveGroup } from "../lib/category-intent.server";
+import { extractAnsweredChoices } from "../lib/conversation-memory.server";
 import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL, FIT_PREDICTOR_TOOL } from "../lib/chat-tools.server";
 import { fetchCustomerContext } from "../lib/customer-context.server";
 import { fetchKlaviyoEnrichment } from "../lib/klaviyo-enrichment.server";
@@ -897,6 +898,7 @@ export const action = async ({ request }) => {
     const history = sanitizeHistory(body.history);
     const messages = [...history, { role: "user", content: String(body.message) }];
     const sessionGender = detectGenderFromHistory(messages);
+    const answeredChoices = extractAnsweredChoices(messages);
 
     let [knowledge, attrMappings, catalogProductTypes, allCatalogCategories] = await Promise.all([
       getKnowledgeFilesWithContent(session.shop),
@@ -1027,6 +1029,7 @@ export const action = async ({ request }) => {
       fitPredictorEnabled: config.fitPredictorEnabled === true,
       catalogProductTypes,
       scopedGender: sessionGender,
+      answeredChoices,
     });
 
     const model = chooseModel(config, String(body.message), history);

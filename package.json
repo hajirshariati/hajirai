@@ -18,7 +18,8 @@
     "graphql-codegen": "graphql-codegen",
     "vite": "vite",
     "typecheck": "react-router typegen && tsc --noEmit",
-    "eval:intent": "node scripts/eval-category-intent.mjs"
+    "eval:intent": "node scripts/eval-category-intent.mjs",
+    "eval:memory": "node scripts/eval-choice-memory.mjs"
   },
   "type": "module",
   "engines": {

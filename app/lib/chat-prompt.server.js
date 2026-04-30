@@ -6,7 +6,7 @@ const LABELS = {
   custom: "Custom Knowledge",
 };
 
-export function buildSystemPrompt({ config, knowledge, shop, attributeNames, categoryExclusions, querySynonyms, customerContext, fitPredictorEnabled, catalogProductTypes, scopedGender }) {
+export function buildSystemPrompt({ config, knowledge, shop, attributeNames, categoryExclusions, querySynonyms, customerContext, fitPredictorEnabled, catalogProductTypes, scopedGender, answeredChoices }) {
   const name = config?.assistantName || "AI Shopping Assistant";
   const tagline = config?.assistantTagline || "";
   const parts = [];
@@ -48,6 +48,22 @@ export function buildSystemPrompt({ config, knowledge, shop, attributeNames, cat
       "- LATEST MESSAGE WINS ON PIVOTS: If the customer's most recent message changes gender (\"actually for my wife\", \"women's instead\", \"do you have women's wedges?\") or category (\"what about orthotics?\", \"show me sandals instead\"), the new gender/category overrides anything established earlier in the conversation. Pass the NEW gender/category as filters in your next search_products call. Do NOT keep using the previously-locked gender or category once the customer has clearly pivoted. The latest user message is the source of truth for the next search.",
     ].join("\n"),
   );
+
+  if (Array.isArray(answeredChoices) && answeredChoices.length > 0) {
+    const lines = answeredChoices.map((item) => {
+      const question = String(item.question || "").trim();
+      const answer = String(item.answer || item.rawAnswer || "").trim();
+      if (!question || !answer) return null;
+      return `- Asked: "${question}"\n  Customer answered: "${answer}"`;
+    }).filter(Boolean);
+    if (lines.length > 0) {
+      parts.push(
+        `\n=== Established Answers From Choice Buttons (HIGH PRIORITY) ===\n` +
+          `The customer has already answered these assistant questions. Treat these as established facts for this turn, use them in tool calls/search queries, and do NOT ask for the same information again unless the customer's latest message clearly changes or contradicts an answer.\n` +
+          `${lines.join("\n")}`,
+      );
+    }
+  }
 
   if (Array.isArray(catalogProductTypes) && catalogProductTypes.length > 0) {
     const scopeNote = scopedGender
