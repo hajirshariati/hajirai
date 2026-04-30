@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PHASES, STEPS, ATTRIBUTE_MAPPINGS } from "../lib/onboarding-data";
+import { PHASES, STEPS, ATTRIBUTE_MAPPINGS, CADENCE_SECTIONS } from "../lib/onboarding-data";
 
 const SUPPORT_EMAIL = "hajiraiapp@gmail.com";
 
@@ -130,6 +130,25 @@ const STYLES = `
     margin: 0;
     color: #6b7280;
     font-size: 15px;
+  }
+  .cadence-section {
+    margin: 28px 0 14px;
+    padding: 0 0 8px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .cadence-section:first-of-type { margin-top: 8px; }
+  .cadence-section h3 {
+    margin: 0 0 4px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #2d6b4f;
+  }
+  .cadence-section p {
+    margin: 0;
+    font-size: 13px;
+    color: #6b7280;
   }
 
   /* ── Step list ────────────────────────────────────────────── */
@@ -328,6 +347,73 @@ function groupByPhase(steps) {
   }));
 }
 
+// Maintain phase has too many steps to read flat — group by cadence
+// (Weekly / Monthly / Quarterly / As-needed / Reference) so the user
+// knows what to do when. Order is determined by CADENCE_SECTIONS.
+function renderMaintainSteps(steps) {
+  const buckets = new Map(CADENCE_SECTIONS.map((s) => [s.id, []]));
+  const other = [];
+  for (const step of steps) {
+    if (step.cadence && buckets.has(step.cadence)) buckets.get(step.cadence).push(step);
+    else other.push(step);
+  }
+  const sections = CADENCE_SECTIONS
+    .map((s) => ({ ...s, steps: buckets.get(s.id) }))
+    .filter((s) => s.steps.length > 0);
+  if (other.length > 0) sections.push({ id: "other", label: "Other", blurb: "", steps: other });
+
+  let runningIdx = 0;
+  return (
+    <>
+      {sections.map((section) => (
+        <div key={section.id}>
+          <div className="cadence-section">
+            <h3>{section.label}</h3>
+            {section.blurb ? <p>{section.blurb}</p> : null}
+          </div>
+          <ol className="steps" style={{ listStyle: "none", padding: 0, margin: 0 }}>
+            {section.steps.map((step) => {
+              const stepIdx = runningIdx++;
+              return (
+                <li className="step" key={`maintain-${stepIdx}`}>
+                  <details>
+                    <summary className="step-summary">
+                      <span className="step-num" aria-hidden="true">{String(stepIdx + 1).padStart(2, "0")}</span>
+                      <div className="step-text">
+                        <p className="step-title">{step.title}</p>
+                        <p className="step-short">{step.short}</p>
+                      </div>
+                      <svg className="step-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </summary>
+                    <div className="step-detail">
+                      <p className="step-body">{step.body}</p>
+                      {step.list ? (
+                        <ul>
+                          {step.list.map((item, j) => (<li key={j}>{item}</li>))}
+                        </ul>
+                      ) : null}
+                      {step.commands ? (
+                        <pre className="cmd-block" aria-label="Terminal commands">
+                          {step.commands.map((c) => `$ ${c}`).join("\n")}
+                        </pre>
+                      ) : null}
+                      {step.tip ? (
+                        <div className="tip"><strong>Tip:</strong> {step.tip}</div>
+                      ) : null}
+                    </div>
+                  </details>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+      ))}
+    </>
+  );
+}
+
 export default function Onboarding() {
   const grouped = groupByPhase(STEPS);
   const [activeId, setActiveId] = useState(grouped[0]?.id || "");
@@ -378,6 +464,7 @@ export default function Onboarding() {
                 <p>{active.description}</p>
               </header>
 
+              {active.id === "maintain" ? renderMaintainSteps(active.steps) : (
               <ol className="steps" style={{ listStyle: "none", padding: 0, margin: 0 }}>
                 {active.steps.map((step, stepIdx) => (
                   <li className="step" key={`${active.id}-${stepIdx}`}>
@@ -453,6 +540,7 @@ export default function Onboarding() {
                   </li>
                 ))}
               </ol>
+              )}
             </section>
           ) : null}
 

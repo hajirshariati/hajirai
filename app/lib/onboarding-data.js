@@ -8,6 +8,19 @@ export const PHASES = [
   { id: "maintain",  name: "Maintain",  icon: "🔧", description: "Recurring tasks to keep the assistant healthy after launch." },
 ];
 
+// Maintain-phase steps are grouped by how often you should run them.
+// Display order is fixed here; the renderer in app/routes/onboarding.jsx
+// uses this list to insert subsection headers between groups. Any
+// maintain step missing a `cadence` field (or with an unknown value)
+// falls into the "Other" bucket at the bottom.
+export const CADENCE_SECTIONS = [
+  { id: "weekly",    label: "Weekly",      blurb: "Open every Monday morning." },
+  { id: "monthly",   label: "Monthly",     blurb: "Block 30 minutes on the first of each month." },
+  { id: "quarterly", label: "Quarterly",   blurb: "Once a quarter — calendar reminder helps." },
+  { id: "as-needed", label: "As needed",   blurb: "Triggered by a specific event (deploy, new product line, model release, bug report)." },
+  { id: "reference", label: "Reference",   blurb: "Read-once concept guides — no schedule." },
+];
+
 export const ATTRIBUTE_MAPPINGS = [
   { source: "metafield: custom.attr_gender",    attribute: "gender",     note: "Used to scope all category buttons + searches by men's / women's" },
   { source: "metafield: custom.attr_category",  attribute: "category",   note: "Sneakers, Sandals, Clogs, Loafers, Slippers, Oxfords, etc." },
@@ -143,6 +156,7 @@ export const STEPS = [
   },
   {
     phase: "maintain",
+    cadence: "as-needed",
     icon: "🤖",
     title: "Update the AI model when Anthropic ships a new version",
     short: "Swap the model ID in Railway env vars — no code deploy needed.",
@@ -156,6 +170,7 @@ export const STEPS = [
   },
   {
     phase: "maintain",
+    cadence: "monthly",
     icon: "⚠️",
     title: "Watch Railway logs for model deprecation warnings",
     short: "Anthropic gives ~6 months notice before a model retires.",
@@ -164,6 +179,7 @@ export const STEPS = [
   },
   {
     phase: "maintain",
+    cadence: "as-needed",
     icon: "🧠",
     title: "Re-embed the catalog after big content edits",
     short: "Click Backfill in Rules & Knowledge after bulk product description changes.",
@@ -172,6 +188,7 @@ export const STEPS = [
   },
   {
     phase: "maintain",
+    cadence: "quarterly",
     icon: "📚",
     title: "Quarterly knowledge file review",
     short: "Keep aetrex-faqs / sizing-guide / fit-glossary current.",
@@ -186,6 +203,7 @@ export const STEPS = [
   },
   {
     phase: "maintain",
+    cadence: "monthly",
     icon: "💳",
     title: "Monitor Anthropic credits & low-balance alerts",
     short: "Pay-as-you-go — chat goes silent if the balance hits zero.",
@@ -194,6 +212,7 @@ export const STEPS = [
   },
   {
     phase: "maintain",
+    cadence: "weekly",
     icon: "👍",
     title: "Review chat feedback weekly",
     short: "Analytics → Negative feedback list. Each thumbs-down is a tuning signal.",
@@ -207,6 +226,7 @@ export const STEPS = [
   },
   {
     phase: "maintain",
+    cadence: "as-needed",
     icon: "🗂",
     title: "Keep Category Groups aligned with new product types",
     short: "Add new categories to the right group when Aetrex launches new lines.",
@@ -217,6 +237,7 @@ export const STEPS = [
   // ── Quality testing system ────────────────────────────────────────
   {
     phase: "maintain",
+    cadence: "reference",
     icon: "🧪",
     title: "How chat quality is measured",
     short: "Three layers of automated checks plus a real-customer feedback loop.",
@@ -231,26 +252,28 @@ export const STEPS = [
   },
   {
     phase: "maintain",
+    cadence: "as-needed",
     icon: "✅",
-    title: "Run the quick automated checks",
-    short: "npm run eval — 91 instant tests, no API key needed.",
+    title: "Run the quick automated checks before every code push",
+    short: "npm run eval — 116 instant tests, no API key needed.",
     body: "These are the fastest checks. They cover the chat's parsing, filtering, intent detection, banned-language stripping, and card-rendering logic. Free to run, finishes in 2 seconds. Run this before pushing any code change to main.",
     commands: [
       "git pull",
       "npm run eval",
     ],
     list: [
-      "Output 'category-intent eval passed: 39/39' / 'choice-memory eval passed: 9/9' / 'chat-quality eval passed: 43/43' = ALL GOOD, safe to push.",
+      "Output 'category-intent eval passed: 39/39' / 'choice-memory eval passed: 9/9' / 'chat-quality eval passed: 68/68' = ALL GOOD, safe to push.",
       "Any number on the left less than the number on the right = something broke. Don't deploy. Fix or revert.",
     ],
     tip: "If you're only changing rules/FAQ/brand text in the admin (not code), you don't need to run this — it tests code, not knowledge files. Skip to the AI scenario tests below.",
   },
   {
     phase: "maintain",
+    cadence: "weekly",
     icon: "🤖",
     title: "Run the real-AI scenario tests",
-    short: "npm run eval:scenarios — 55 customer conversations vs the real AI.",
-    body: "This is the dashboard for chat quality. It sends 55 representative customer questions to the real Anthropic API using the same system prompt the live chat uses, and checks whether the responses pass each scenario's assertions (no banned phrases, mentions the right product line, doesn't ask gender twice, etc.). Costs roughly $0.05–0.20 per run depending on the model.",
+    short: "npm run eval:scenarios — representative chats vs the real AI.",
+    body: "This is the dashboard for chat quality. It sends the full scenario suite to the real Anthropic API using the same system prompt the live chat uses, and checks whether the responses pass each scenario's assertions (no banned phrases, mentions the right product line, doesn't ask gender twice, etc.). Costs roughly $0.05–0.20 per run depending on the model. Also run before any demo to a stakeholder.",
     commands: [
       "export ANTHROPIC_API_KEY=<your-key>",
       "npm run eval:scenarios",
@@ -264,6 +287,7 @@ export const STEPS = [
   },
   {
     phase: "maintain",
+    cadence: "monthly",
     icon: "👎",
     title: "Pull customer thumbs-down into the test suite",
     short: "Every 👎 in the widget becomes a regression test.",
@@ -281,12 +305,13 @@ export const STEPS = [
   },
   {
     phase: "maintain",
+    cadence: "monthly",
     icon: "🕵️",
     title: "Audit AI claims against the catalog",
     short: "npm run audit:hallucinations — find made-up SKUs and fake product lines.",
     body: "This scans recent chat responses and pulls out every product code (SKU) and brand-line claim ('Lynco is our premium orthotic line') the AI mentioned. It then checks each one against your synced Shopify catalog. Anything that doesn't resolve to a real product or variant gets flagged as a likely hallucination. Useful right before a demo, after a model upgrade, or whenever a stakeholder reports the AI 'made something up'. Read-only — never touches the live chat.",
     commands: [
-      "npm run audit:hallucinations -- --days=30",
+      "npm run audit:hallucinations -- --days=30 --shop=aetrex.myshopify.com",
     ],
     list: [
       "Output prints a console summary (scanned / flagged / rate / top 10 flagged responses) plus a full JSON report at scripts/audit-hallucinations.json with every violation, the suspicious phrase, and a 400-char excerpt of what the AI said.",
@@ -297,6 +322,7 @@ export const STEPS = [
   },
   {
     phase: "maintain",
+    cadence: "as-needed",
     icon: "✏️",
     title: "Add a new scenario when you spot a bug",
     short: "Open scripts/scenarios.json, copy an example, change a few fields.",
