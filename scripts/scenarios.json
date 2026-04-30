@@ -45,8 +45,14 @@
     }
   },
   {
-    "name": "plantar fasciitis condition mentioned",
-    "messages": ["I have plantar fasciitis. What do you recommend?"],
+    "name": "plantar fasciitis recommends kit (full-flow)",
+    "history": [
+      { "role": "user", "content": "I have plantar fasciitis. What do you recommend?" },
+      { "role": "assistant", "content": "Are you looking for footwear or an orthotic insert? <<New Footwear>><<Orthotic Insert>>" },
+      { "role": "user", "content": "Orthotic Insert" },
+      { "role": "assistant", "content": "Is this for men's or women's? <<Men's>><<Women's>>" }
+    ],
+    "messages": ["Men's"],
     "expect": {
       "mustNotContain": ["cures", "heals", "treats", "eliminates pain"],
       "shouldMentionAny": ["Plantar Fasciitis Kit", "plantar"]
@@ -269,25 +275,33 @@
     }
   },
   {
-    "name": "arch and heel pain — posted (post-orthotic-gate)",
+    "name": "arch and heel pain — posted (full-flow)",
     "history": [
       { "role": "user", "content": "I have arch and heel pain." },
-      { "role": "assistant", "content": "Are you looking for footwear or an orthotic insert? <<New Footwear>><<Orthotic Insert>>" }
+      { "role": "assistant", "content": "Are you looking for footwear or an orthotic insert? <<New Footwear>><<Orthotic Insert>>" },
+      { "role": "user", "content": "Orthotic Insert" },
+      { "role": "assistant", "content": "What shoes will you wear them in? <<Running>><<Casual>><<Dress>>" },
+      { "role": "user", "content": "Casual" },
+      { "role": "assistant", "content": "Is this for men's or women's? <<Men's>><<Women's>>" }
     ],
-    "messages": ["Orthotic Insert"],
+    "messages": ["Men's"],
     "expect": {
-      "shouldMentionAny": ["posted", "arch", "heel"]
+      "shouldMentionAny": ["posted", "arch", "heel", "Casual"]
     }
   },
   {
-    "name": "both pains — posted + metatarsal (post-orthotic-gate)",
+    "name": "both pains — posted + metatarsal (full-flow)",
     "history": [
       { "role": "user", "content": "My arch hurts AND my ball of foot hurts." },
-      { "role": "assistant", "content": "Are you looking for footwear or an orthotic insert? <<New Footwear>><<Orthotic Insert>>" }
+      { "role": "assistant", "content": "Are you looking for footwear or an orthotic insert? <<New Footwear>><<Orthotic Insert>>" },
+      { "role": "user", "content": "Orthotic Insert" },
+      { "role": "assistant", "content": "What shoes will you wear them in? <<Running>><<Casual>><<Dress>>" },
+      { "role": "user", "content": "Casual" },
+      { "role": "assistant", "content": "Is this for men's or women's? <<Men's>><<Women's>>" }
     ],
-    "messages": ["Orthotic Insert"],
+    "messages": ["Women's"],
     "expect": {
-      "shouldMentionAny": ["posted", "metatarsal", "both"]
+      "shouldMentionAny": ["posted", "metatarsal", "both", "Casual"]
     }
   },
   {
@@ -298,10 +312,16 @@
     }
   },
   {
-    "name": "metatarsalgia question",
-    "messages": ["I was told I have metatarsalgia."],
+    "name": "metatarsalgia recommends correct orthotic (full-flow)",
+    "history": [
+      { "role": "user", "content": "I was told I have metatarsalgia." },
+      { "role": "assistant", "content": "Are you looking for footwear or an orthotic insert? <<New Footwear>><<Orthotic Insert>>" },
+      { "role": "user", "content": "Orthotic Insert" },
+      { "role": "assistant", "content": "Is this for men's or women's? <<Men's>><<Women's>>" }
+    ],
+    "messages": ["Women's"],
     "expect": {
-      "shouldMentionAny": ["Metatarsalgia", "metatarsal"]
+      "shouldMentionAny": ["Metatarsalgia", "metatarsal", "ball of foot"]
     }
   },
   {
