@@ -1287,17 +1287,28 @@ export const action = async ({ request }) => {
         try {
           // CS-team cheat code: if the customer's exact message
           // matches the merchant-configured phrase, skip the AI and
-          // emit a deterministic dump of every active campaign. CS
-          // agents always see the same output, no API cost.
-          const cheatCode = String(config.campaignCheatCode || "").trim().toLowerCase();
-          const userMessageNorm = String(body.message || "").trim().toLowerCase();
-          if (cheatCode && userMessageNorm === cheatCode) {
-            const dump = formatCampaignsForCS(activeCampaigns, new Date());
-            controller.enqueue(encoder.encode(sseChunk({ type: "text", text: dump })));
-            controller.enqueue(encoder.encode(sseChunk({ type: "products", products: [] })));
-            controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
-            controller.close();
-            return;
+          // emit a deterministic dump of every active campaign.
+          //
+          // Inner try/catch so any failure here (Prisma, stream
+          // controller, formatter) just falls through to the normal
+          // AI flow instead of returning the generic "having trouble"
+          // error to the customer. The actual error still logs.
+          try {
+            const cheatCode = String(config.campaignCheatCode || "").trim().toLowerCase();
+            const userMessageNorm = String(body?.message || "").trim().toLowerCase();
+            if (cheatCode && userMessageNorm === cheatCode) {
+              const dump = formatCampaignsForCS(activeCampaigns, new Date());
+              controller.enqueue(encoder.encode(sseChunk({ type: "text", text: dump })));
+              controller.enqueue(encoder.encode(sseChunk({ type: "products", products: [] })));
+              controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
+              // Don't call controller.close() — the start() callback
+              // returning is what the React Router stream wrapper uses
+              // as the close signal. Calling close here can race with
+              // the wrapper's own teardown.
+              return;
+            }
+          } catch (cheatErr) {
+            console.error("[chat] cheat-code path failed, falling back to AI:", cheatErr?.stack || cheatErr?.message || cheatErr);
           }
 
           const activeTools = [...TOOLS];
