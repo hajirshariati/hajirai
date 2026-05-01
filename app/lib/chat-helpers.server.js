@@ -203,3 +203,27 @@ export function stripMetaNarration(text) {
   out = out.replace(THIRD_PERSON_BARE_RE, "you");
   return out.replace(/\s{2,}/g, " ").replace(/^\s*[—–-]\s*/, "").trim();
 }
+
+// Detect a product-shopping condition (medical / fit problem) or
+// occasion (situation the customer needs the product for) in free-
+// text. Used by the chat route to recover from the failure mode
+// where the AI generates pitch text without ever calling
+// search_products — when the user mentioned something searchable
+// like "plantar fasciitis" or "trip to Italy", we force a retry
+// that searches with the matched phrase as the query.
+//
+// Vocabulary is footwear/wellness-leaning since that's the dominant
+// merchant audience today. Generalize via admin config later if a
+// non-footwear merchant needs different keywords.
+const CONDITION_RE = /\b(plantar fasciitis|bunion(?:s)?|flat feet|fallen arches|heel pain|heel spur|metatarsal|neuropathy|diabet(?:es|ic)|high arches|arch pain|morton'?s neuroma|achilles|tendon(?:itis)?|supination|overpronation|knee pain|back pain|ankle pain|foot pain)\b/i;
+const OCCASION_RE = /\b(vacation|trip|travel|traveling|cruise|wedding|standing all day|on my feet|running|walking|hiking|gym|workout|everyday|casual|dressy|formal|outdoor|work shoes|office)\b/i;
+
+export function detectConditionOrOccasion(text) {
+  if (!text) return null;
+  const source = String(text);
+  const cm = source.match(CONDITION_RE);
+  if (cm) return { kind: "condition", phrase: cm[0].toLowerCase() };
+  const om = source.match(OCCASION_RE);
+  if (om) return { kind: "occasion", phrase: om[0].toLowerCase() };
+  return null;
+}

@@ -18,6 +18,7 @@ import {
   hasChoiceButtons,
   dedupeConsecutiveSentences,
   isSingularPrescriptive,
+  detectConditionOrOccasion,
 } from "../lib/chat-helpers.server";
 import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL, FIT_PREDICTOR_TOOL } from "../lib/chat-tools.server";
 import { fetchCustomerContext } from "../lib/customer-context.server";
@@ -579,6 +580,47 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }
   }
 
+  // Recovery hop — if the AI shipped pitch text without ever calling
+  // search_products, but the customer's history mentions a condition
+  // (plantar fasciitis, bunion, etc.) or occasion (trip, walking),
+  // bypass the AI and run the search ourselves. Replace the pitch
+  // text with neutral framing. Deterministic, no extra API call.
+  //
+  // Without this, the empty-pool repair below wipes the pitch text
+  // and renders a dead-end fallback — even when the customer gave
+  // us everything we needed to find a real product.
+  if (
+    !productSearchAttempted &&
+    looksLikeProductPitch(fullResponseText) &&
+    allProductPool.size === 0
+  ) {
+    const intent = detectConditionOrOccasion(ctx.userText || "");
+    if (intent) {
+      console.log(`[chat] recovery search: AI did not call tool, forcing query="${intent.phrase}" (${intent.kind})`);
+      try {
+        const recovery = await executeTool(
+          "search_products",
+          { query: intent.phrase, limit: intent.kind === "condition" ? 1 : 3 },
+          ctx,
+        );
+        if (recovery && Array.isArray(recovery.products) && recovery.products.length > 0) {
+          productSearchAttempted = true;
+          for (const p of recovery.products) {
+            if (p?.handle && !allProductPool.has(p.handle)) allProductPool.set(p.handle, p);
+          }
+          fullResponseText = intent.kind === "condition"
+            ? `Here's what I'd recommend for ${intent.phrase}.`
+            : `Here are some options for ${intent.phrase}.`;
+          console.log(`[chat] recovery search: filled pool with ${recovery.products.length} product(s)`);
+        } else {
+          console.log(`[chat] recovery search: returned 0 products`);
+        }
+      } catch (err) {
+        console.error("[chat] recovery search failed:", err?.message || err);
+      }
+    }
+  }
+
   const pool = Array.from(allProductPool.values());
 
   // Compliance backstop for the BANNED NARRATION prompt rule. Strips
@@ -994,7 +1036,7 @@ if (collection.cta) {
     }
   }
 
-  return { totalUsage, toolCallCount, model, fullResponseText };
+  return { totalUsage, toolCallCount, model, fullResponseText, productSearchAttempted };
 }
 
 export const loader = async () => {
