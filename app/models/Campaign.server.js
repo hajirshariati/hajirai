@@ -49,13 +49,11 @@ export async function deleteCampaign(shop, id) {
   await prisma.campaign.deleteMany({ where: { id, shop } });
 }
 
-// Plain-text template the merchant can copy/paste into the content
-// field as a starting structure. Covers the most common sale types
-// (% off, BOGO, free shipping, free gift) without being so prescriptive
-// the AI parrots it back verbatim.
-export const CAMPAIGN_TEMPLATE = `# [Campaign name, e.g. Summer Sale 2026]
-
-## What's on sale
+// Plain-text template the merchant copy/pastes into the content
+// field. Name and dates are NOT included — those live in their own
+// structured fields and the system prompt formats them automatically
+// from the database, so duplicating them here would invite drift.
+export const CAMPAIGN_TEMPLATE = `## What's on sale
 - [Eligible products or categories — e.g. all women's boots, all orthotics, sitewide except gift cards]
 - [Any explicit exclusions — e.g. excludes already-discounted items, sale items, gift cards]
 
@@ -65,13 +63,28 @@ export const CAMPAIGN_TEMPLATE = `# [Campaign name, e.g. Summer Sale 2026]
 - [Stacking rules — e.g. cannot be combined with other codes]
 - [Limit — e.g. one use per customer]
 
-## Dates
-- Starts: [date and time, with time zone]
-- Ends: [date and time, with time zone]
-
 ## Returns and exchanges
 - [Same as standard policy / sale items final sale / etc.]
 
 ## Anything else customers ask about
 - [Free gift threshold, BOGO mechanic details, gift wrap, expedited shipping cutoffs, etc.]
 `;
+
+// Server-rendered, deterministic dump of every currently-active
+// campaign. Used by the CS-team cheat-code path in chat.jsx — bypasses
+// the AI so CS agents see the exact same text every time.
+export function formatCampaignsForCS(activeCampaigns, now = new Date()) {
+  const list = Array.isArray(activeCampaigns) ? activeCampaigns : [];
+  if (list.length === 0) {
+    return "No active campaigns right now.";
+  }
+  const fmtDate = (d) => {
+    try { return new Date(d).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }); }
+    catch { return String(d); }
+  };
+  const blocks = list.map((c) => {
+    return `**${c.name}**\nActive: ${fmtDate(c.startsAt)} – ${fmtDate(c.endsAt)}\n\n${c.content}`;
+  });
+  const header = `Active campaigns (${list.length}) — as of ${fmtDate(now)}`;
+  return `${header}\n\n${blocks.join("\n\n———\n\n")}`;
+}

@@ -116,6 +116,12 @@ model ShopConfig {
   vipModeEnabled      Boolean  @default(false)
   showLoginPill       Boolean  @default(true)
 
+  // CS-team cheat code: when a customer (or CS agent posing as one)
+  // types this exact phrase in chat, the response is a server-built
+  // dump of every currently-active campaign. Bypasses the AI for
+  // determinism. Empty = feature disabled.
+  campaignCheatCode   String   @default("")
+
   plan                    String    @default("free")
   subscriptionId          String?
   subscriptionActivatedAt DateTime?

@@ -140,6 +140,7 @@ export const loader = async ({ request }) => {
       updatedAt: c.updatedAt.toISOString(),
     })),
     campaignTemplate: CAMPAIGN_TEMPLATE,
+    campaignCheatCode: config.campaignCheatCode || "",
   };
 };
 
@@ -302,6 +303,12 @@ export const action = async ({ request }) => {
     const id = String(formData.get("id") || "").trim();
     if (!id) return { error: "Missing campaign id." };
     await deleteCampaign(session.shop, id);
+    return { saved: true };
+  }
+
+  if (intent === "save_campaign_cheat_code") {
+    const code = String(formData.get("campaignCheatCode") || "").trim().slice(0, 80);
+    await updateShopConfig(session.shop, { campaignCheatCode: code });
     return { saved: true };
   }
 
@@ -1288,8 +1295,9 @@ function toLocalInputValue(iso) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-function CampaignsCard({ initial, template }) {
+function CampaignsCard({ initial, template, initialCheatCode }) {
   const fetcher = useFetcher();
+  const cheatFetcher = useFetcher();
   const [campaigns, setCampaigns] = useState(initial || []);
   const [editingId, setEditingId] = useState(null);
   const [name, setName] = useState("");
@@ -1298,9 +1306,19 @@ function CampaignsCard({ initial, template }) {
   const [endsAt, setEndsAt] = useState("");
   const [showTemplate, setShowTemplate] = useState(false);
   const [error, setError] = useState("");
+  const [cheatCode, setCheatCode] = useState(initialCheatCode || "");
+  const [cheatSavedNote, setCheatSavedNote] = useState("");
 
   // Re-sync local state when the loader returns new data after a save/delete.
   useEffect(() => { setCampaigns(initial || []); }, [initial]);
+  useEffect(() => { setCheatCode(initialCheatCode || ""); }, [initialCheatCode]);
+  useEffect(() => {
+    if (cheatFetcher.data?.saved) {
+      setCheatSavedNote("Saved.");
+      const t = setTimeout(() => setCheatSavedNote(""), 2500);
+      return () => clearTimeout(t);
+    }
+  }, [cheatFetcher.data]);
 
   useEffect(() => {
     if (fetcher.data?.error) setError(fetcher.data.error);
@@ -1351,6 +1369,14 @@ function CampaignsCard({ initial, template }) {
     setShowTemplate(false);
   };
 
+  const saveCheatCode = () => {
+    const fd = new FormData();
+    fd.set("intent", "save_campaign_cheat_code");
+    fd.set("campaignCheatCode", cheatCode.trim());
+    cheatFetcher.submit(fd, { method: "post" });
+  };
+  const cheatSubmitting = cheatFetcher.state !== "idle";
+
   const now = new Date();
   const submitting = fetcher.state !== "idle";
   const validForm = name.trim() && content.trim() && startsAt && endsAt && new Date(endsAt) > new Date(startsAt);
@@ -1369,6 +1395,36 @@ function CampaignsCard({ initial, template }) {
         </BlockStack>
 
         {error ? <Banner tone="critical">{error}</Banner> : null}
+
+        <Box padding="300" background="bg-surface-secondary" borderRadius="200">
+          <BlockStack gap="200">
+            <InlineStack gap="200" blockAlign="center">
+              <Text as="h3" variant="headingSm">CS team cheat code</Text>
+              <Badge tone="info">Optional</Badge>
+            </InlineStack>
+            <Text as="p" tone="subdued" variant="bodySm">
+              Set a phrase that, when typed in the chat, returns every currently-active campaign in one reply. Bypasses the AI for determinism — your CS team always sees the exact same dump. Leave blank to disable. Pick something a regular customer would never type by accident.
+            </Text>
+            <FormLayout>
+              <FormLayout.Group>
+                <TextField
+                  label="Cheat code"
+                  value={cheatCode}
+                  onChange={setCheatCode}
+                  placeholder="seos-show-campaigns"
+                  autoComplete="off"
+                  helpText="Case-insensitive exact match on the customer's whole message."
+                />
+                <Box paddingBlockStart="600">
+                  <InlineStack gap="200" blockAlign="center">
+                    <Button onClick={saveCheatCode} loading={cheatSubmitting} disabled={cheatSubmitting}>Save</Button>
+                    {cheatSavedNote ? <Text as="span" tone="success" variant="bodySm">{cheatSavedNote}</Text> : null}
+                  </InlineStack>
+                </Box>
+              </FormLayout.Group>
+            </FormLayout>
+          </BlockStack>
+        </Box>
 
         {campaigns.length > 0 ? (
           <BlockStack gap="200">
@@ -2049,7 +2105,7 @@ export default function RulesKnowledge() {
             title="Scheduled sales and campaign details"
             description="Schedule promotions with start/end dates. The chat reads only what's currently live — expired campaigns auto-disappear with no manual cleanup."
           />
-          <CampaignsCard initial={data.campaigns} template={data.campaignTemplate} />
+          <CampaignsCard initial={data.campaigns} template={data.campaignTemplate} initialCheatCode={data.campaignCheatCode} />
         </BlockStack>
 
         <BlockStack gap="400">

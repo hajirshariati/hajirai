@@ -142,8 +142,16 @@ export function buildSystemPrompt({ config, knowledge, shop, attributeNames, cat
   // these directly when customers ask about sales / discount codes /
   // free shipping / BOGO mechanics.
   if (Array.isArray(activeCampaigns) && activeCampaigns.length > 0) {
+    // Name + dates come from the merchant's structured fields and are
+    // formatted here automatically — the merchant should NOT repeat
+    // them inside the content field. content holds only the sale's
+    // mechanic, eligibility, codes, exclusions, and free-form notes.
+    const fmtDate = (d) => {
+      try { return new Date(d).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }); }
+      catch { return String(d); }
+    };
     const block = activeCampaigns
-      .map((c) => `## ${c.name}\n${c.content}`)
+      .map((c) => `## ${c.name}\nRunning: ${fmtDate(c.startsAt)} – ${fmtDate(c.endsAt)}\n\n${c.content}`)
       .join("\n\n");
     parts.push(
       `\n=== Active Promotions ===\n` +

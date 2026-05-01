@@ -3,7 +3,7 @@ import { authenticate } from "../shopify.server";
 import { getShopConfig, getKnowledgeFilesWithContent, incrementRateLimitHits } from "../models/ShopConfig.server";
 import { getAttributeMappings } from "../models/AttributeMapping.server";
 import { getCatalogCategories, getAllCatalogCategories, getCategoryGenderAvailability } from "../models/Product.server";
-import { getActiveCampaigns } from "../models/Campaign.server";
+import { getActiveCampaigns, formatCampaignsForCS } from "../models/Campaign.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
 import { filterForbiddenCategoryChips, filterContradictingGenderChips } from "../lib/chip-filter.server";
 import { sanitizeCtaLabel } from "../lib/cta-label.server";
@@ -1285,6 +1285,21 @@ export const action = async ({ request }) => {
     const stream = new ReadableStream({
       async start(controller) {
         try {
+          // CS-team cheat code: if the customer's exact message
+          // matches the merchant-configured phrase, skip the AI and
+          // emit a deterministic dump of every active campaign. CS
+          // agents always see the same output, no API cost.
+          const cheatCode = String(config.campaignCheatCode || "").trim().toLowerCase();
+          const userMessageNorm = String(body.message || "").trim().toLowerCase();
+          if (cheatCode && userMessageNorm === cheatCode) {
+            const dump = formatCampaignsForCS(activeCampaigns, new Date());
+            controller.enqueue(encoder.encode(sseChunk({ type: "text", text: dump })));
+            controller.enqueue(encoder.encode(sseChunk({ type: "products", products: [] })));
+            controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
+            controller.close();
+            return;
+          }
+
           const activeTools = [...TOOLS];
           if (loggedInCustomerId && config.vipModeEnabled === true && accessToken) {
             activeTools.push(CUSTOMER_ORDERS_TOOL);
