@@ -41,6 +41,25 @@ export function groupTerms(group, { includeTriggers = true } = {}) {
   return terms.map((t) => String(t || "").trim()).filter(Boolean);
 }
 
+// Strip medical / fit condition phrases that contain words which
+// collide with category triggers. Example: "flat feet" contains
+// "flat" which is a Footwear trigger ("flats" the shoe style). When
+// the customer is describing their condition, that overlap should
+// NOT pull Footwear into the matched groups. Strip the condition
+// phrase before trigger matching.
+//
+// Returns the cleaned string. Pure helper, no allocation when no
+// match is found.
+const TRIGGER_COLLIDING_CONDITIONS = /\b(plantar fasciitis|bunion(?:s)?|flat feet|fallen arches|heel pain|heel spur|metatarsal pain|metatarsalgia|neuropathy|diabet(?:es|ic)|high arches|arch pain|morton'?s neuroma|achilles tendonitis|supination|overpronation|knee pain|back pain|ankle pain|foot pain|sore feet|aching feet|tired feet|ball of foot pain|burning ball)\b/gi;
+
+export function stripConditionPhrases(text) {
+  if (!text) return text;
+  const source = String(text);
+  if (!TRIGGER_COLLIDING_CONDITIONS.test(source)) return source;
+  TRIGGER_COLLIDING_CONDITIONS.lastIndex = 0;
+  return source.replace(TRIGGER_COLLIDING_CONDITIONS, " ");
+}
+
 export function matchingGroupsForText(text, groups, opts = {}) {
   const source = String(text || "");
   if (!source || !Array.isArray(groups)) return [];
@@ -248,11 +267,21 @@ function assistantFramesGroupAsContext(assistantText, contextGroup, activeGroup)
 }
 
 function inferUserIntentFromText(text, groups) {
-  const insideIntent = inferContainmentIntent(text, groups);
+  // Strip condition phrases ("flat feet", "heel pain", "plantar
+  // fasciitis", etc.) before trigger matching. These describe the
+  // customer, not their product preference, but their words can
+  // collide with footwear triggers ("flat" → flats the style,
+  // "heel" → heels the style). Without this strip, "i have flat
+  // feet, what orthotic do you recommend?" matches BOTH Footwear
+  // and Orthotics → ambiguous → no prior active group → next message
+  // ("sneakers") wins as Footwear → wrong recommendation.
+  const cleaned = stripConditionPhrases(text);
+
+  const insideIntent = inferContainmentIntent(cleaned, groups);
   if (insideIntent) return { ...insideIntent, ambiguous: false };
 
-  const matches = matchingGroupsForText(text, groups, { includeTriggers: true });
-  const forIntent = inferForContextIntent(text, matches);
+  const matches = matchingGroupsForText(cleaned, groups, { includeTriggers: true });
+  const forIntent = inferForContextIntent(cleaned, matches);
   if (forIntent) return { ...forIntent, ambiguous: false };
 
   if (matches.length === 1) return { activeGroup: matches[0], contextGroup: null, ambiguous: false };
@@ -300,11 +329,16 @@ export function analyzeCategoryIntent(messages, merchantGroups) {
   const latestUser = latestUserIndex >= 0 ? messages[latestUserIndex] : null;
   const previousAssistantText = previousAssistantFor(messages, latestUserIndex);
 
-  const latestMatches = matchingGroupsForText(latestUser?.content || "", groups, { includeTriggers: true });
+  // Strip condition phrases before matching — same reason as in
+  // inferUserIntentFromText. Without this, "i have flat feet, what
+  // orthotic do you recommend?" matches both Footwear (via "flat")
+  // and Orthotics (via "orthotic") → ambiguous → no active group.
+  const cleanedLatest = stripConditionPhrases(latestUser?.content || "");
+  const latestMatches = matchingGroupsForText(cleanedLatest, groups, { includeTriggers: true });
   const latestUnambiguous = latestMatches.length === 1 ? latestMatches[0] : null;
   const latestAmbiguous = latestMatches.length > 1;
-  const containmentIntent = inferContainmentIntent(latestUser?.content || "", groups);
-  const forContextIntent = inferForContextIntent(latestUser?.content || "", latestMatches);
+  const containmentIntent = inferContainmentIntent(cleanedLatest, groups);
+  const forContextIntent = inferForContextIntent(cleanedLatest, latestMatches);
 
   if (containmentIntent) {
     return { ...containmentIntent, ambiguous: false };
