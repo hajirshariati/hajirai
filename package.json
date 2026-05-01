@@ -23,6 +23,7 @@
     "eval:quality": "node scripts/eval-chat-quality.mjs",
     "eval:scenarios": "node scripts/eval-scenarios.mjs",
     "eval:feedback": "node scripts/eval-scenarios.mjs --file=scripts/scenarios.from-feedback.json",
+    "eval:e2e": "node scripts/eval-e2e.mjs",
     "feedback:import": "node scripts/import-feedback-scenarios.mjs",
     "audit:hallucinations": "node scripts/audit-hallucinations.mjs",
     "eval": "npm run eval:intent && npm run eval:memory && npm run eval:quality"

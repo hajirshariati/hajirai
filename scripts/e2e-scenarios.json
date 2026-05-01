@@ -1,0 +1,139 @@
+[
+  {
+    "name": "condition + category named: must call search_products with orthotic intent",
+    "messages": [
+      "I have flat feet, what orthotic do you recommend?"
+    ],
+    "merchantConfig": {
+      "shop": "test.myshopify.com",
+      "catalogProductTypes": ["Orthotics", "Sneakers", "Sandals", "Boots"],
+      "scopedGender": "women",
+      "answeredChoices": [
+        { "question": "Are these for men's or women's?", "answer": "Women's", "rawAnswer": "Women's", "options": ["Men's", "Women's"] }
+      ]
+    },
+    "toolStubs": {
+      "search_products": [
+        {
+          "if_query_matches": "orthotic|posted|insert|footbed",
+          "return": {
+            "products": [
+              { "handle": "casual-comfort-posted-w", "title": "Women's Casual Comfort Posted Orthotic", "_category": "Orthotics" }
+            ]
+          }
+        },
+        {
+          "if_query_matches": ".",
+          "return": { "products": [] }
+        }
+      ]
+    },
+    "expect": {
+      "must_call_tool": "search_products",
+      "tool_query_matches": "orthotic|posted|insert|footbed|flat",
+      "text_must_not_contain": ["sneaker", "casual slip"]
+    }
+  },
+
+  {
+    "name": "plantar fasciitis + occasion: must search, must NOT pitch without products",
+    "messages": [
+      "I have plantar fasciitis and going on a trip to Italy, what shoes do you recommend?"
+    ],
+    "merchantConfig": {
+      "shop": "test.myshopify.com",
+      "catalogProductTypes": ["Sneakers", "Sandals", "Loafers", "Walking Shoes", "Orthotics"],
+      "scopedGender": "women",
+      "answeredChoices": [
+        { "question": "Are these for men's or women's?", "answer": "Women's", "rawAnswer": "Women's", "options": ["Men's", "Women's"] }
+      ]
+    },
+    "toolStubs": {
+      "search_products": [
+        {
+          "if_query_matches": "plantar|fasciitis|walking|travel|trip",
+          "return": {
+            "products": [
+              { "handle": "danika-walking-w", "title": "Danika Walking Sneaker", "_category": "Sneakers" },
+              { "handle": "carly-arch-support-w", "title": "Carly Arch Support Sneaker", "_category": "Sneakers" }
+            ]
+          }
+        },
+        {
+          "if_query_matches": ".",
+          "return": { "products": [] }
+        }
+      ]
+    },
+    "expect": {
+      "must_call_tool": "search_products"
+    }
+  },
+
+  {
+    "name": "simple greeting: must NOT call any tool",
+    "messages": [
+      "hi"
+    ],
+    "merchantConfig": {
+      "shop": "test.myshopify.com",
+      "catalogProductTypes": ["Sneakers", "Sandals"]
+    },
+    "toolStubs": {
+      "search_products": [
+        { "if_query_matches": ".", "return": { "products": [] } }
+      ]
+    },
+    "expect": {
+      "must_not_call_tool": "search_products",
+      "text_must_not_contain": ["here are some great", "let me search"]
+    }
+  },
+
+  {
+    "name": "specific category named: must call search with category in query",
+    "messages": [
+      "Show me women's running sneakers"
+    ],
+    "merchantConfig": {
+      "shop": "test.myshopify.com",
+      "catalogProductTypes": ["Sneakers", "Sandals", "Boots"],
+      "scopedGender": "women"
+    },
+    "toolStubs": {
+      "search_products": [
+        {
+          "if_query_matches": "sneaker|running",
+          "return": {
+            "products": [
+              { "handle": "carly-running-w", "title": "Carly Running Sneaker", "_category": "Sneakers" }
+            ]
+          }
+        }
+      ]
+    },
+    "expect": {
+      "must_call_tool": "search_products",
+      "tool_query_matches": "sneaker|running"
+    }
+  },
+
+  {
+    "name": "no banned narration in greeting reply",
+    "messages": [
+      "hello there"
+    ],
+    "merchantConfig": {
+      "shop": "test.myshopify.com",
+      "catalogProductTypes": ["Sneakers"]
+    },
+    "toolStubs": {
+      "search_products": [
+        { "if_query_matches": ".", "return": { "products": [] } }
+      ]
+    },
+    "expect": {
+      "text_must_not_contain": ["let me look", "let me search", "let me find", "one moment", "right away"]
+    }
+  }
+]
