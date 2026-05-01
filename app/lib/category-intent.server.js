@@ -67,6 +67,25 @@ function hasExplicitPivotIntent(text) {
   return /\b(show|find|search|shop|buy|get|need|want|looking for|recommend|suggest)\b/i.test(String(text || ""));
 }
 
+// Medical / fit conditions describe the customer, not a product
+// they want. Should NOT trigger a group switch even when the phrase
+// happens to contain words that overlap with category triggers
+// (e.g. "flat feet" overlapping the "flat" Footwear trigger). Used
+// in analyzeCategoryIntent to preserve prior product intent when
+// the latest message is just describing a condition.
+const CONDITION_DESCRIPTOR_RE = /\b(plantar fasciitis|bunion(?:s)?|flat feet|fallen arches|heel pain|heel spur|metatarsal pain|neuropathy|diabet(?:es|ic)|high arches|arch pain|morton'?s neuroma|achilles|tendon(?:itis)?|supination|overpronation|knee pain|back pain|ankle pain|foot pain|sore feet|aching feet|tired feet)\b/i;
+
+function isConditionDescriptorMessage(text) {
+  if (!text) return false;
+  const source = String(text);
+  if (!CONDITION_DESCRIPTOR_RE.test(source)) return false;
+  // Quick guard against pivot language ("show me boots, I have flat
+  // feet") — if the customer also explicitly asked for something,
+  // honor that intent, don't suppress.
+  if (hasExplicitPivotIntent(source)) return false;
+  return true;
+}
+
 // "X inside/into/with Y" containment intent — both X and Y resolve to
 // distinct merchant-configured groups via their name/categories/triggers.
 // Generalizes from "orthotics inside shoes" to any vertical:
@@ -219,7 +238,7 @@ function assistantFramesGroupAsContext(assistantText, contextGroup, activeGroup)
     .filter(Boolean);
   if (contextTerms.length > 0) {
     const re = new RegExp(
-      `\\b(what|which|type|kind).{0,40}\\b(${contextTerms.join("|")}).{0,60}\\b(wear|wears|worn|use|uses|fit|fits|inside|match|matches|for)\\b`,
+      `\\b(what|which|type|kind).{0,40}\\b(${contextTerms.join("|")}).{0,60}\\b(wear|wears|wearing|worn|use|using|uses|fit|fitting|fits|inside|match|matches|matching|for|put|puts|putting)\\b`,
       "i",
     );
     asksContextQuestion = re.test(text);
@@ -297,6 +316,19 @@ export function analyzeCategoryIntent(messages, merchantGroups) {
   const priorIntent = priorIntentBefore(messages, groups, latestUserIndex);
   const priorActive = priorIntent.activeGroup;
   const priorAmbiguous = priorIntent.ambiguous;
+
+  // Condition-descriptor messages ("i have flat feet", "plantar
+  // fasciitis is acting up") describe the customer, not a product
+  // they want. Even if they happen to match a group's triggers
+  // (e.g. "flat" → Footwear), they shouldn't flip the active group
+  // away from whatever the customer was originally shopping for.
+  if (isConditionDescriptorMessage(latestUser?.content || "") && priorActive) {
+    return {
+      activeGroup: priorActive,
+      contextGroup: priorIntent.contextGroup || null,
+      ambiguous: false,
+    };
+  }
 
   if (latestUnambiguous && priorActive && !sameGroup(latestUnambiguous, priorActive)) {
     if (
