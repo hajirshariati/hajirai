@@ -44,6 +44,12 @@ import {
   deleteAttributeMapping,
 } from "../models/AttributeMapping.server";
 import {
+  listCampaigns,
+  saveCampaign,
+  deleteCampaign,
+  CAMPAIGN_TEMPLATE,
+} from "../models/Campaign.server";
+import {
   getShopConfig,
   updateShopConfig,
   getKnowledgeFiles,
@@ -76,13 +82,14 @@ function safeParse(raw, fallback) {
 
 export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
-  const [state, count, mappings, config, files, plan] = await Promise.all([
+  const [state, count, mappings, config, files, plan, campaigns] = await Promise.all([
     getCatalogSyncState(session.shop),
     getProductCount(session.shop),
     getAttributeMappings(session.shop),
     getShopConfig(session.shop),
     getKnowledgeFiles(session.shop),
     getShopPlan(session.shop),
+    listCampaigns(session.shop),
   ]);
   const enrichedCounts = await Promise.all(files.map((f) => countEnrichmentsBySourceFile(f.id)));
   const filesWithCounts = files.map((f, i) => ({ ...f, enrichedSkus: enrichedCounts[i] }));
@@ -125,6 +132,14 @@ export const loader = async ({ request }) => {
     deduplicateColors: config.deduplicateColors,
     files: filesWithCounts,
     plan: { id: plan.id, name: plan.name, features: plan.features, knowledgeFiles: plan.knowledgeFiles },
+    campaigns: campaigns.map((c) => ({
+      ...c,
+      startsAt: c.startsAt.toISOString(),
+      endsAt: c.endsAt.toISOString(),
+      createdAt: c.createdAt.toISOString(),
+      updatedAt: c.updatedAt.toISOString(),
+    })),
+    campaignTemplate: CAMPAIGN_TEMPLATE,
   };
 };
 
@@ -267,6 +282,27 @@ export const action = async ({ request }) => {
       return { saved: true };
     } catch { /* */ }
     return { error: "Invalid category groups." };
+  }
+
+  if (intent === "save_campaign") {
+    const id = String(formData.get("id") || "").trim() || null;
+    const name = String(formData.get("name") || "").trim();
+    const content = String(formData.get("content") || "").trim();
+    const startsAt = String(formData.get("startsAt") || "").trim();
+    const endsAt = String(formData.get("endsAt") || "").trim();
+    try {
+      const saved = await saveCampaign(session.shop, { id, name, content, startsAt, endsAt });
+      return { saved: true, campaignId: saved.id };
+    } catch (err) {
+      return { error: err?.message || "Could not save campaign." };
+    }
+  }
+
+  if (intent === "delete_campaign") {
+    const id = String(formData.get("id") || "").trim();
+    if (!id) return { error: "Missing campaign id." };
+    await deleteCampaign(session.shop, id);
+    return { saved: true };
   }
 
   if (intent === "save_synonyms") {
@@ -1239,6 +1275,206 @@ function CategoryGroupsCard({ initial }) {
   );
 }
 
+function campaignStatus(now, startsAt, endsAt) {
+  if (now < startsAt) return { label: "Scheduled", tone: "info" };
+  if (now >= startsAt && now <= endsAt) return { label: "Active", tone: "success" };
+  return { label: "Expired", tone: undefined };
+}
+
+function toLocalInputValue(iso) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function CampaignsCard({ initial, template }) {
+  const fetcher = useFetcher();
+  const [campaigns, setCampaigns] = useState(initial || []);
+  const [editingId, setEditingId] = useState(null);
+  const [name, setName] = useState("");
+  const [content, setContent] = useState("");
+  const [startsAt, setStartsAt] = useState("");
+  const [endsAt, setEndsAt] = useState("");
+  const [showTemplate, setShowTemplate] = useState(false);
+  const [error, setError] = useState("");
+
+  // Re-sync local state when the loader returns new data after a save/delete.
+  useEffect(() => { setCampaigns(initial || []); }, [initial]);
+
+  useEffect(() => {
+    if (fetcher.data?.error) setError(fetcher.data.error);
+    if (fetcher.data?.saved) {
+      setError("");
+      setEditingId(null);
+      setName(""); setContent(""); setStartsAt(""); setEndsAt("");
+    }
+  }, [fetcher.data]);
+
+  const reset = () => {
+    setEditingId(null);
+    setName(""); setContent(""); setStartsAt(""); setEndsAt("");
+    setError("");
+  };
+
+  const startEdit = (c) => {
+    setEditingId(c.id);
+    setName(c.name);
+    setContent(c.content);
+    setStartsAt(toLocalInputValue(c.startsAt));
+    setEndsAt(toLocalInputValue(c.endsAt));
+    setError("");
+  };
+
+  const submit = () => {
+    setError("");
+    const fd = new FormData();
+    fd.set("intent", "save_campaign");
+    if (editingId) fd.set("id", editingId);
+    fd.set("name", name.trim());
+    fd.set("content", content.trim());
+    fd.set("startsAt", new Date(startsAt).toISOString());
+    fd.set("endsAt", new Date(endsAt).toISOString());
+    fetcher.submit(fd, { method: "post" });
+  };
+
+  const remove = (id) => {
+    if (!window.confirm("Delete this campaign? This cannot be undone.")) return;
+    const fd = new FormData();
+    fd.set("intent", "delete_campaign");
+    fd.set("id", id);
+    fetcher.submit(fd, { method: "post" });
+  };
+
+  const copyTemplate = () => {
+    setContent(template || "");
+    setShowTemplate(false);
+  };
+
+  const now = new Date();
+  const submitting = fetcher.state !== "idle";
+  const validForm = name.trim() && content.trim() && startsAt && endsAt && new Date(endsAt) > new Date(startsAt);
+
+  return (
+    <Card>
+      <BlockStack gap="400">
+        <BlockStack gap="100">
+          <InlineStack gap="200" blockAlign="center">
+            <Text as="h2" variant="headingMd">Active promotions</Text>
+            <Badge tone="info">Auto-expires by date</Badge>
+          </InlineStack>
+          <Text as="p" tone="subdued">
+            Schedule each campaign with start and end dates and times. Only campaigns currently within their window appear in the chat — expired ones disappear automatically with no manual cleanup.
+          </Text>
+        </BlockStack>
+
+        {error ? <Banner tone="critical">{error}</Banner> : null}
+
+        {campaigns.length > 0 ? (
+          <BlockStack gap="200">
+            {campaigns.map((c) => {
+              const startDate = new Date(c.startsAt);
+              const endDate = new Date(c.endsAt);
+              const status = campaignStatus(now, startDate, endDate);
+              return (
+                <Box key={c.id} padding="300" background="bg-surface-secondary" borderRadius="200">
+                  <BlockStack gap="200">
+                    <InlineStack align="space-between" blockAlign="center" wrap>
+                      <InlineStack gap="200" blockAlign="center" wrap>
+                        <Badge tone={status.tone}>{status.label}</Badge>
+                        <Text as="span" variant="headingSm">{c.name}</Text>
+                      </InlineStack>
+                      <InlineStack gap="100">
+                        <Button size="slim" onClick={() => startEdit(c)} disabled={submitting}>Edit</Button>
+                        <Button size="slim" tone="critical" variant="plain" onClick={() => remove(c.id)} disabled={submitting}>Delete</Button>
+                      </InlineStack>
+                    </InlineStack>
+                    <Text as="span" variant="bodySm" tone="subdued">
+                      {startDate.toLocaleString()} → {endDate.toLocaleString()}
+                    </Text>
+                  </BlockStack>
+                </Box>
+              );
+            })}
+          </BlockStack>
+        ) : (
+          <Banner tone="info">No campaigns yet. Add one below — the chat starts answering questions about it the moment its start time arrives.</Banner>
+        )}
+
+        <Divider />
+
+        <BlockStack gap="200">
+          <InlineStack align="space-between" blockAlign="center" wrap>
+            <Text as="h3" variant="headingSm">{editingId ? "Edit campaign" : "Add a campaign"}</Text>
+            <Button variant="plain" onClick={() => setShowTemplate((v) => !v)}>
+              {showTemplate ? "Hide template" : "Show template"}
+            </Button>
+          </InlineStack>
+
+          {showTemplate ? (
+            <Box padding="300" background="bg-surface-secondary" borderRadius="200">
+              <BlockStack gap="200">
+                <Text as="p" tone="subdued" variant="bodySm">
+                  Copy this template into the campaign content field below as a starting structure, then fill in the bracketed placeholders with your actual sale details.
+                </Text>
+                <Box padding="200" background="bg-surface" borderRadius="100">
+                  <pre style={{ margin: 0, whiteSpace: "pre-wrap", fontSize: 12.5, fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace" }}>{template}</pre>
+                </Box>
+                <InlineStack>
+                  <Button onClick={copyTemplate}>Use this template</Button>
+                </InlineStack>
+              </BlockStack>
+            </Box>
+          ) : null}
+
+          <FormLayout>
+            <TextField
+              label="Campaign name"
+              value={name}
+              onChange={setName}
+              placeholder="Summer Sale 2026"
+              autoComplete="off"
+              helpText="Internal label only — customers don't see this."
+            />
+            <FormLayout.Group>
+              <TextField
+                label="Starts at"
+                type="datetime-local"
+                value={startsAt}
+                onChange={setStartsAt}
+                autoComplete="off"
+                helpText="Local time of the merchant. The chat starts mentioning this campaign at this moment."
+              />
+              <TextField
+                label="Ends at"
+                type="datetime-local"
+                value={endsAt}
+                onChange={setEndsAt}
+                autoComplete="off"
+                helpText="The chat stops mentioning this campaign at this moment. Must be after the start."
+              />
+            </FormLayout.Group>
+            <TextField
+              label="Campaign content"
+              value={content}
+              onChange={setContent}
+              multiline={10}
+              autoComplete="off"
+              helpText="Plain text or markdown. The AI quotes from this when customers ask about the sale, codes, or terms. Don't paste internal-only notes."
+            />
+            <InlineStack gap="200">
+              <Button variant="primary" onClick={submit} disabled={!validForm || submitting} loading={submitting}>
+                {editingId ? "Save changes" : "Add campaign"}
+              </Button>
+              {editingId ? <Button onClick={reset} disabled={submitting}>Cancel</Button> : null}
+            </InlineStack>
+          </FormLayout>
+        </BlockStack>
+      </BlockStack>
+    </Card>
+  );
+}
+
 function SemanticSearchCard({ provider, embeddedCount, productsCount }) {
   const fetcher = useFetcher();
   const submittingIntent = fetcher.state !== "idle" ? fetcher.formData?.get("intent") : null;
@@ -1805,6 +2041,15 @@ export default function RulesKnowledge() {
             description="Soft context — FAQs, brand voice, sizing guides, product details."
           />
           <KnowledgeFilesCard files={data.files} />
+        </BlockStack>
+
+        <BlockStack gap="400">
+          <SectionHeading
+            eyebrow="5 · Active promotions"
+            title="Scheduled sales and campaign details"
+            description="Schedule promotions with start/end dates. The chat reads only what's currently live — expired campaigns auto-disappear with no manual cleanup."
+          />
+          <CampaignsCard initial={data.campaigns} template={data.campaignTemplate} />
         </BlockStack>
 
         <BlockStack gap="400">

@@ -279,6 +279,24 @@ model ChatProductMention {
   @@index([createdAt])
 }
 
+// One row per scheduled marketing campaign. The chat reads only
+// campaigns where now is between startsAt and endsAt — auto-expires
+// without manual cleanup. Multiple active campaigns can run at once
+// (BOGO + sitewide % off + free shipping over $X all coexist).
+model Campaign {
+  id        String   @id @default(cuid())
+  shop      String
+  name      String
+  content   String   // Markdown-ish text the chat reads as system context
+  startsAt  DateTime
+  endsAt    DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([shop])
+  @@index([shop, startsAt, endsAt])
+}
+
 // One row per order whose orders/create webhook arrived with the
 // _seos_attributed cart attribute set by the chat widget on a product
 // click. Lets the analytics + home page show "Chat-driven sales:

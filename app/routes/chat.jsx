@@ -3,6 +3,7 @@ import { authenticate } from "../shopify.server";
 import { getShopConfig, getKnowledgeFilesWithContent, incrementRateLimitHits } from "../models/ShopConfig.server";
 import { getAttributeMappings } from "../models/AttributeMapping.server";
 import { getCatalogCategories, getAllCatalogCategories, getCategoryGenderAvailability } from "../models/Product.server";
+import { getActiveCampaigns } from "../models/Campaign.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
 import { filterForbiddenCategoryChips, filterContradictingGenderChips } from "../lib/chip-filter.server";
 import { sanitizeCtaLabel } from "../lib/cta-label.server";
@@ -1084,12 +1085,13 @@ export const action = async ({ request }) => {
       });
     }
 
-    let [knowledge, attrMappings, catalogProductTypes, allCatalogCategories, categoryGenderMap] = await Promise.all([
+    let [knowledge, attrMappings, catalogProductTypes, allCatalogCategories, categoryGenderMap, activeCampaigns] = await Promise.all([
       getKnowledgeFilesWithContent(session.shop),
       getAttributeMappings(session.shop),
       getCatalogCategories(session.shop, { gender: sessionGender }),
       getAllCatalogCategories(session.shop),
       getCategoryGenderAvailability(session.shop),
+      getActiveCampaigns(session.shop),
     ]);
 
     // Merchant-configured category groups: keep a server-side product-intent
@@ -1238,6 +1240,7 @@ export const action = async ({ request }) => {
       scopedGender: sessionGender,
       answeredChoices,
       categoryGenderMap,
+      activeCampaigns,
     });
 
     const model = chooseModel(config, String(body.message), history);

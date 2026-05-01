@@ -6,7 +6,7 @@ const LABELS = {
   custom: "Custom Knowledge",
 };
 
-export function buildSystemPrompt({ config, knowledge, shop, attributeNames, categoryExclusions, querySynonyms, customerContext, fitPredictorEnabled, catalogProductTypes, scopedGender, answeredChoices, categoryGenderMap }) {
+export function buildSystemPrompt({ config, knowledge, shop, attributeNames, categoryExclusions, querySynonyms, customerContext, fitPredictorEnabled, catalogProductTypes, scopedGender, answeredChoices, categoryGenderMap, activeCampaigns }) {
   const name = config?.assistantName || "AI Shopping Assistant";
   const tagline = config?.assistantTagline || "";
   const parts = [];
@@ -135,6 +135,22 @@ export function buildSystemPrompt({ config, knowledge, shop, attributeNames, cat
   for (const [type, contents] of Object.entries(knowledgeByType)) {
     const label = LABELS[type] || type;
     parts.push(`\n=== ${label} ===\n${contents.join("\n\n")}`);
+  }
+
+  // Active campaigns — only those with now within startsAt..endsAt at
+  // request time. Auto-expire without manual cleanup. The AI quotes
+  // these directly when customers ask about sales / discount codes /
+  // free shipping / BOGO mechanics.
+  if (Array.isArray(activeCampaigns) && activeCampaigns.length > 0) {
+    const block = activeCampaigns
+      .map((c) => `## ${c.name}\n${c.content}`)
+      .join("\n\n");
+    parts.push(
+      `\n=== Active Promotions ===\n` +
+      `These promotions are currently live. When customers ask about sales, discount codes, BOGO offers, free shipping, or any promotional terms, ` +
+      `answer using ONLY the details below. Do NOT invent codes, dates, percentages, or eligibility rules. If the customer asks about a promo that's not listed here, say it isn't currently active.\n\n` +
+      block,
+    );
   }
 
   if (attributeNames && attributeNames.length > 0) {
