@@ -34,7 +34,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import Anthropic from "@anthropic-ai/sdk";
 import { buildSystemPrompt } from "../app/lib/chat-prompt.server.js";
-import { TOOLS } from "../app/lib/chat-tools.server.js";
+import { TOOLS } from "../app/lib/chat-tool-schemas.js";
 import {
   stripBannedNarration,
   stripMetaNarration,
