@@ -719,6 +719,22 @@ if(deadEnd){
 }
 var cta=e.target.closest('[data-message]');
 if(cta){var t=cta.getAttribute('data-message');if(t){inputEl.disabled=false;inputEl.placeholder=IPLACE;sendBtn.disabled=false;inputEl.value=t;sendMessage()}}
+/* Chat product link clicks → set a cart attribute so the orders/create
+   webhook can tag the resulting order "SEoS". keepalive lets the POST
+   complete even though the browser is navigating away. Best-effort —
+   any failure is silent (we don't block navigation on a tracking call). */
+var prodLink=e.target.closest('a.ai-chat-product-card');
+if(prodLink){
+  try{
+    fetch('/cart/update.js',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify({attributes:{_seos_attributed:'1'}}),
+      keepalive:true,
+      credentials:'same-origin'
+    }).catch(function(){});
+  }catch(_){/* ignore */}
+}
 });
 
 /* Init */

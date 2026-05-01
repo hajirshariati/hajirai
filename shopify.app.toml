@@ -29,13 +29,17 @@ api_version = "2026-04"
   topics = [ "products/delete" ]
   uri = "/webhooks/products/delete"
 
+  [[webhooks.subscriptions]]
+  topics = [ "orders/create" ]
+  uri = "/webhooks/orders/create"
+
   [webhooks.privacy_compliance]
   customer_deletion_url = "/webhooks/customers/redact"
   customer_data_request_url = "/webhooks/customers/data_request"
   shop_deletion_url = "/webhooks/shop/redact"
 
 [access_scopes]
-scopes = "read_products,read_customers,read_orders,read_metaobjects"
+scopes = "read_products,read_customers,read_orders,write_orders,read_metaobjects"
 
 [auth]
 redirect_urls = [

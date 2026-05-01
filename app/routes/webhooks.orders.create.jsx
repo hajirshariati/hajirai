@@ -1,0 +1,57 @@
+import { authenticate } from "../shopify.server";
+
+const ATTR_NAME = "_seos_attributed";
+const ORDER_TAG = "SEoS";
+
+// orders/create webhook → if the order's note_attributes contain the
+// `_seos_attributed=1` flag the widget set on a chat product-link
+// click, append the "SEoS" tag to the order. Lets merchants filter
+// chat-driven sales in Shopify Orders via the standard tag filter.
+//
+// Best-effort: any failure (auth, GraphQL, malformed payload) is
+// logged and swallowed. Tagging is observability — a failure must
+// not surface to Shopify (which would retry) or to customers.
+export const action = async ({ request }) => {
+  const { shop, payload, topic, admin } = await authenticate.webhook(request);
+
+  try {
+    const noteAttrs = Array.isArray(payload?.note_attributes) ? payload.note_attributes : [];
+    const attributed = noteAttrs.some((a) =>
+      String(a?.name || "").toLowerCase() === ATTR_NAME &&
+      String(a?.value || "").toLowerCase() !== "0" &&
+      String(a?.value || "").toLowerCase() !== "false" &&
+      String(a?.value || "") !== "",
+    );
+    if (!attributed) {
+      return new Response();
+    }
+
+    const orderGid = `gid://shopify/Order/${payload.id}`;
+    if (!admin) {
+      console.warn(`[webhook ${topic}] no admin client for ${shop} — skipping tag for ${orderGid}`);
+      return new Response();
+    }
+
+    const result = await admin.graphql(
+      `#graphql
+      mutation tagSeos($id: ID!, $tags: [String!]!) {
+        tagsAdd(id: $id, tags: $tags) {
+          node { id }
+          userErrors { field message }
+        }
+      }`,
+      { variables: { id: orderGid, tags: [ORDER_TAG] } },
+    );
+    const json = await result.json().catch(() => null);
+    const errs = json?.data?.tagsAdd?.userErrors || [];
+    if (errs.length > 0) {
+      console.warn(`[webhook ${topic}] tagsAdd userErrors for ${orderGid}:`, errs);
+    } else {
+      console.log(`[webhook ${topic}] tagged ${orderGid} with ${ORDER_TAG}`);
+    }
+  } catch (err) {
+    console.error(`[webhook ${topic}] failed for ${shop}:`, err?.message || err);
+  }
+
+  return new Response();
+};

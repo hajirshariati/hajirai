@@ -139,7 +139,13 @@ export const TOOLS = [
 ];
 
 function productUrl(shop, handle) {
-  return `https://${shop}/products/${handle}?utm_source=shopagent&utm_medium=chat&utm_campaign=ai_recommendation`;
+  // utm_content (not utm_source) so the chat doesn't overwrite the
+  // attribution from Facebook/email/etc. utm_content is a sub-dimension
+  // — Shopify and GA4 still report on it but it doesn't trigger
+  // session re-attribution. Order-level "this came from the chat"
+  // signal lives in the cart attribute set by the widget on click,
+  // which orders/create webhook converts to a SEoS order tag.
+  return `https://${shop}/products/${handle}?utm_content=SEoS`;
 }
 
 function safeParseJson(s) {
