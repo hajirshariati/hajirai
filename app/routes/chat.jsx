@@ -7,7 +7,7 @@ import { getActiveCampaigns, formatCampaignsForCS } from "../models/Campaign.ser
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
 import { filterForbiddenCategoryChips, filterContradictingGenderChips } from "../lib/chip-filter.server";
 import { sanitizeCtaLabel } from "../lib/cta-label.server";
-import { analyzeCategoryIntent, cardMatchesActiveGroup, textIntentDivergesFromGroup } from "../lib/category-intent.server";
+import { analyzeCategoryIntent, cardMatchesActiveGroup, textIntentDivergesFromGroup, matchingGroupsForText } from "../lib/category-intent.server";
 import { extractAnsweredChoices } from "../lib/conversation-memory.server";
 import {
   detectGenderFromHistory as _detectGenderFromHistory,
@@ -850,7 +850,32 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       );
 
       if (replyDiverges) {
-        console.log(`[chat] product-card group guard: skip — reply matches a different group than locked group=${ctx.activeCategoryGroup.name || "-"} (trusting reply)`);
+        // The AI's reply is about a different group than the locked
+        // one — switch the filter to that group instead of skipping
+        // entirely. Skipping was the old behavior and let wrong cards
+        // through (e.g. customer asks for orthotics → conversation
+        // locks Footwear via a chip → AI says "the right orthotic
+        // is X" but cards are sneakers because the filter was bypassed).
+        // Now we filter to whatever group the reply actually mentions.
+        const replyGroups = matchingGroupsForText(fullResponseText, ctx.merchantGroups, { includeTriggers: true });
+        if (replyGroups.length === 1) {
+          const replyGroup = replyGroups[0];
+          const beforeGroup = filteredPool.length;
+          const groupScoped = filteredPool.filter((card) => cardMatchesActiveGroup(card, replyGroup));
+          if (groupScoped.length > 0) {
+            console.log(`[chat] product-card group guard: SWITCH locked=${ctx.activeCategoryGroup.name || "-"} → reply-matched=${replyGroup.name} (${groupScoped.length}/${beforeGroup})`);
+            filteredPool = groupScoped;
+          } else {
+            // Reply mentions a group but no cards match it. Wipe so
+            // the empty-pool repair turns this into the dead-end
+            // fallback rather than rendering wrong cards beneath
+            // text the AI got right.
+            console.log(`[chat] product-card group guard: reply mentions ${replyGroup.name} but no matching cards in pool — wiping`);
+            filteredPool = [];
+          }
+        } else {
+          console.log(`[chat] product-card group guard: skip — reply matches ${replyGroups.length} groups, ambiguous`);
+        }
       } else {
         const beforeGroup = filteredPool.length;
         const groupScoped = filteredPool.filter((card) => cardMatchesActiveGroup(card, ctx.activeCategoryGroup));
