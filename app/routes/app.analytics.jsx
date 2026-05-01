@@ -13,6 +13,7 @@ import { getFeedbackSummary, cleanupOldFeedback, getRecentQuestions } from "../m
 import {
   getTopProducts, getProductsByTool, getInterestBreakdown, cleanupOldMentions,
 } from "../models/ChatProductMention.server";
+import { getConversionSummary } from "../models/ChatConversion.server";
 
 const MODEL_LABELS = {
   "claude-sonnet-4-20250514": "Standard",
@@ -56,7 +57,7 @@ export const loader = async ({ request }) => {
   const prevStart = new Date(prevEnd.getTime() - spanDays * 86400000);
   const prevRange = { startDate: prevStart, endDate: prevEnd };
 
-  const [usage, feedback, topProducts, productsByTool, interest, recentQuestions, daily, prevUsage, prevFeedback] = await Promise.all([
+  const [usage, feedback, topProducts, productsByTool, interest, recentQuestions, daily, prevUsage, prevFeedback, conversions, prevConversions] = await Promise.all([
     getUsageSummary(session.shop, rangeArg),
     getFeedbackSummary(session.shop, rangeArg),
     getTopProducts(session.shop, rangeArg, 10),
@@ -66,13 +67,22 @@ export const loader = async ({ request }) => {
     getDailySeries(session.shop, rangeArg),
     getUsageSummary(session.shop, prevRange),
     getFeedbackSummary(session.shop, prevRange),
+    getConversionSummary(session.shop, rangeArg),
+    getConversionSummary(session.shop, prevRange),
   ]);
   cleanupOldFeedback().catch(() => {});
   cleanupOldMentions().catch(() => {});
 
   return {
-    usage, feedback, topProducts, productsByTool, interest, recentQuestions, daily,
-    previous: { messages: prevUsage.totalMessages, cost: prevUsage.totalCost, satisfaction: prevFeedback.satisfactionRate, toolCalls: prevUsage.totalToolCalls },
+    usage, feedback, topProducts, productsByTool, interest, recentQuestions, daily, conversions,
+    previous: {
+      messages: prevUsage.totalMessages,
+      cost: prevUsage.totalCost,
+      satisfaction: prevFeedback.satisfactionRate,
+      toolCalls: prevUsage.totalToolCalls,
+      conversionCount: prevConversions.count,
+      conversionRevenue: prevConversions.revenue,
+    },
     range: { preset, label, startDate: startDate.toISOString(), endDate: endDate.toISOString(), days: spanDays },
   };
 };
@@ -82,6 +92,19 @@ function formatCost(n) {
   if (n < 0.01) return "<$0.01";
   if (n < 1000) return `$${n.toFixed(2)}`;
   return `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+}
+
+function formatRevenue(n, currency) {
+  const code = (currency && String(currency).trim()) || "USD";
+  try {
+    return new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency: code,
+      maximumFractionDigits: n >= 1000 ? 0 : 2,
+    }).format(n || 0);
+  } catch {
+    return `${code} ${(n || 0).toFixed(2)}`;
+  }
 }
 
 function formatTokens(n) {
@@ -251,7 +274,7 @@ function RangeSelector({ current, searchParams }) {
 }
 
 export default function Analytics() {
-  const { usage, feedback, topProducts, productsByTool, interest, recentQuestions, daily, previous, range } = useLoaderData();
+  const { usage, feedback, topProducts, productsByTool, interest, recentQuestions, daily, conversions, previous, range } = useLoaderData();
   const [searchParams] = useSearchParams();
   const shopify = useAppBridge();
   const [exporting, setExporting] = useState(null);
@@ -332,6 +355,25 @@ export default function Analytics() {
             <p>Pick a wider range or wait for customers to start chatting. Data appears here as soon as the widget is live.</p>
           </Banner>
         )}
+
+        <InlineGrid columns={{ xs: 1, sm: 2 }} gap="400">
+          <KpiCard
+            label="Chat-driven orders"
+            value={String(conversions.count)}
+            sublabel={conversions.count > 0 ? `Tagged "SEoS" in Shopify` : "Awaiting first chat-attributed order"}
+            curr={conversions.count}
+            prev={previous.conversionCount}
+            goodDirection="up"
+          />
+          <KpiCard
+            label="Chat-driven revenue"
+            value={conversions.count > 0 ? formatRevenue(conversions.revenue, conversions.currency) : "—"}
+            sublabel={conversions.count > 0 ? `Avg ${formatRevenue(conversions.aov, conversions.currency)} / order` : "Tracked via the SEoS order tag"}
+            curr={conversions.revenue}
+            prev={previous.conversionRevenue}
+            goodDirection="up"
+          />
+        </InlineGrid>
 
         <InlineGrid columns={{ xs: 2, md: 4 }} gap="400">
           <KpiCard label="Conversations" value={String(usage.totalMessages)} curr={usage.totalMessages} prev={previous.messages} goodDirection="up" />

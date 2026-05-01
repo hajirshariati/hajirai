@@ -278,3 +278,25 @@ model ChatProductMention {
   @@index([shop, handle])
   @@index([createdAt])
 }
+
+// One row per order whose orders/create webhook arrived with the
+// _seos_attributed cart attribute set by the chat widget on a product
+// click. Lets the analytics + home page show "Chat-driven sales:
+// N orders / $X revenue" without an extra Shopify API call.
+//
+// Idempotent on (shop, orderId) so webhook retries don't double-count.
+model ChatConversion {
+  id          String   @id @default(cuid())
+  shop        String
+  orderId     String
+  orderName   String?
+  totalAmount Float?
+  currency    String?
+  customerId  String?
+  createdAt   DateTime @default(now())
+
+  @@unique([shop, orderId])
+  @@index([shop])
+  @@index([shop, createdAt])
+  @@index([createdAt])
+}

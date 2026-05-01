@@ -21,17 +21,19 @@ import { getCatalogSyncState, syncCatalogAsync } from "../models/Product.server"
 import { countEnrichmentsByShop } from "../models/ProductEnrichment.server";
 import { getUsageSummary } from "../models/ChatUsage.server";
 import { getFeedbackSummary } from "../models/ChatFeedback.server";
+import { getConversionSummary } from "../models/ChatConversion.server";
 import seosLogo from "../assets/SEoS.png";
 
 export const loader = async ({ request }) => {
   const { admin, session } = await authenticate.admin(request);
-  const [config, files, syncState, enrichmentCount, usage, feedback] = await Promise.all([
+  const [config, files, syncState, enrichmentCount, usage, feedback, conversions] = await Promise.all([
     getShopConfig(session.shop),
     getKnowledgeFiles(session.shop),
     getCatalogSyncState(session.shop),
     countEnrichmentsByShop(session.shop),
     getUsageSummary(session.shop, 30),
     getFeedbackSummary(session.shop, 30),
+    getConversionSummary(session.shop, 30),
   ]);
 
   if (!syncState.lastSyncedAt && syncState.status !== "running") {
@@ -65,6 +67,9 @@ export const loader = async ({ request }) => {
     avgCostPerMessage: usage.avgCostPerMessage,
     feedbackTotal: feedback.total,
     satisfactionRate: feedback.satisfactionRate,
+    conversionCount: conversions.count,
+    conversionRevenue: conversions.revenue,
+    conversionCurrency: conversions.currency,
     modelStrategy: config.modelStrategy || "smart",
     rateLimitHits,
     semanticEnabled: !!(config.embeddingProvider && (
@@ -173,6 +178,19 @@ function formatCost(n) {
   return `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
 }
 
+function formatRevenue(n, currency) {
+  const code = (currency && String(currency).trim()) || "USD";
+  try {
+    return new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency: code,
+      maximumFractionDigits: n >= 1000 ? 0 : 2,
+    }).format(n || 0);
+  } catch {
+    return `${code} ${(n || 0).toFixed(2)}`;
+  }
+}
+
 function MetricTile({ label, value, sublabel }) {
   return (
     <Card>
@@ -191,6 +209,7 @@ export default function Home() {
     productsCount, enrichmentCount, totalCost, totalMessages, avgCostPerMessage,
     feedbackTotal, satisfactionRate, modelStrategy, rateLimitHits,
     semanticEnabled, semanticProvider, categoryGroupsCount,
+    conversionCount, conversionRevenue, conversionCurrency,
   } = useLoaderData();
 
   const rateFetcher = useFetcher();
@@ -271,6 +290,18 @@ export default function Home() {
               <Text as="h2" variant="headingMd">Last 30 days</Text>
               <Button url="/app/analytics" variant="plain">View detailed analytics</Button>
             </InlineStack>
+            <InlineGrid columns={{ xs: 1, sm: 2 }} gap="400">
+              <MetricTile
+                label="Chat-driven orders"
+                value={String(conversionCount || 0)}
+                sublabel={conversionCount > 0 ? `Tagged "SEoS" in Shopify` : "Awaiting first chat-attributed order"}
+              />
+              <MetricTile
+                label="Chat-driven revenue"
+                value={conversionCount > 0 ? formatRevenue(conversionRevenue, conversionCurrency) : "—"}
+                sublabel={conversionCount > 0 ? `${conversionCount} order${conversionCount === 1 ? "" : "s"} attributed to chat` : "Tracked via the SEoS order tag"}
+              />
+            </InlineGrid>
             <InlineGrid columns={{ xs: 2, md: 4 }} gap="400">
               <MetricTile
                 label="Conversations"

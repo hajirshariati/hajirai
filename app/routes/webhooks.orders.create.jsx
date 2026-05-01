@@ -1,4 +1,5 @@
 import { authenticate } from "../shopify.server";
+import { recordChatConversion } from "../models/ChatConversion.server";
 
 const ATTR_NAME = "_seos_attributed";
 const ORDER_TAG = "SEoS";
@@ -49,6 +50,18 @@ export const action = async ({ request }) => {
     } else {
       console.log(`[webhook ${topic}] tagged ${orderGid} with ${ORDER_TAG}`);
     }
+
+    // Mirror the conversion into our own DB so the analytics +
+    // home-page metrics don't depend on a Shopify Admin API call on
+    // every page load. Idempotent on (shop, orderId).
+    await recordChatConversion({
+      shop,
+      orderId: payload.id,
+      orderName: payload.name || payload.order_number ? `#${payload.order_number || payload.name}` : null,
+      totalAmount: payload.total_price ? Number(payload.total_price) : null,
+      currency: payload.currency || payload.presentment_currency || null,
+      customerId: payload.customer?.id ? String(payload.customer.id) : null,
+    });
   } catch (err) {
     console.error(`[webhook ${topic}] failed for ${shop}:`, err?.message || err);
   }
