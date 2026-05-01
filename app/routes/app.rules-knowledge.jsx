@@ -1295,6 +1295,19 @@ function toLocalInputValue(iso) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
+// New-campaign time defaults: start of today at 12:00 AM, end at
+// 3:00 AM. Date is today; merchant changes both date and time via
+// the picker. Most sales merchants line up with calendar-day
+// boundaries, and a 12 AM / 3 AM default makes it obvious which
+// field is which without forcing a re-pick of the time.
+function localTodayAt(hour) {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(hour)}:00`;
+}
+const DEFAULT_START_VALUE = () => localTodayAt(0);
+const DEFAULT_END_VALUE = () => localTodayAt(3);
+
 function CampaignsCard({ initial, template, initialCheatCode }) {
   const fetcher = useFetcher();
   const cheatFetcher = useFetcher();
@@ -1302,8 +1315,8 @@ function CampaignsCard({ initial, template, initialCheatCode }) {
   const [editingId, setEditingId] = useState(null);
   const [name, setName] = useState("");
   const [content, setContent] = useState("");
-  const [startsAt, setStartsAt] = useState("");
-  const [endsAt, setEndsAt] = useState("");
+  const [startsAt, setStartsAt] = useState(DEFAULT_START_VALUE);
+  const [endsAt, setEndsAt] = useState(DEFAULT_END_VALUE);
   const [showTemplate, setShowTemplate] = useState(false);
   const [error, setError] = useState("");
   const [cheatCode, setCheatCode] = useState(initialCheatCode || "");
@@ -1325,7 +1338,7 @@ function CampaignsCard({ initial, template, initialCheatCode }) {
     if (fetcher.data?.saved) {
       setError("");
       setEditingId(null);
-      setName(""); setContent(""); setStartsAt(""); setEndsAt("");
+      setName(""); setContent(""); setStartsAt(DEFAULT_START_VALUE()); setEndsAt(DEFAULT_END_VALUE());
     }
   }, [fetcher.data]);
 
