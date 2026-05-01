@@ -49,6 +49,82 @@ export async function deleteCampaign(shop, id) {
   await prisma.campaign.deleteMany({ where: { id, shop } });
 }
 
+// Mirror of the runtime SKU pattern in app/routes/chat.jsx. Kept
+// duplicated so this file has no cross-imports of route code; the
+// pattern shape hasn't changed, divergence risk is low.
+const SKU_PATTERN = /\b[A-Z]{1,2}\d{3,5}[A-Z]?\b/g;
+
+// Save-time validation. Extracts every SKU-shaped token from the
+// campaign content and cross-references against the merchant's
+// synced catalog. Returns the list of tokens that did NOT resolve to
+// a real ProductVariant.sku, Product handle token, or Product title
+// token. The caller surfaces these as a soft warning — typos like
+// "L5OO" (letter O instead of zero) get caught before customers see
+// fabricated promo info.
+//
+// Tolerant in two ways:
+//   • Strips trailing single uppercase letter (gender suffix) before
+//     comparing — "L500M" passes if "L500" exists in the catalog.
+//   • Accepts a SKU mention if it appears as a token in any product
+//     title or handle (some catalogs encode SKU in handle, not in
+//     ProductVariant.sku).
+//
+// Returns [] for empty content. Never throws — DB errors are
+// swallowed and treated as "no validation possible" so a broken
+// catalog sync can't block campaign saves.
+export async function findUnknownSkus(shop, content) {
+  if (!shop || !content) return [];
+  const matches = String(content).match(SKU_PATTERN) || [];
+  if (matches.length === 0) return [];
+
+  const seen = new Set();
+  const tokens = [];
+  for (const raw of matches) {
+    const sku = raw.toUpperCase();
+    if (seen.has(sku)) continue;
+    seen.add(sku);
+    tokens.push(sku);
+  }
+
+  let products;
+  try {
+    products = await prisma.product.findMany({
+      where: { shop },
+      select: { handle: true, title: true, variants: { select: { sku: true } } },
+    });
+  } catch (err) {
+    console.error("[Campaign.findUnknownSkus] catalog read failed:", err?.message);
+    return [];
+  }
+
+  const knownSkus = new Set();
+  const titleTokens = new Set();
+  for (const p of products || []) {
+    if (p.handle) {
+      for (const t of String(p.handle).toLowerCase().split(/[-_/]/).filter((x) => x.length >= 3)) {
+        titleTokens.add(t);
+      }
+    }
+    for (const t of String(p.title || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, " ")
+      .split(/\s+/)
+      .filter((x) => x.length >= 3)) {
+      titleTokens.add(t);
+    }
+    for (const v of p.variants || []) {
+      if (v.sku) knownSkus.add(String(v.sku).toUpperCase().trim());
+    }
+  }
+
+  return tokens.filter((t) => {
+    const base = t.replace(/[A-Z]$/, "");
+    if (knownSkus.has(t) || knownSkus.has(base)) return false;
+    if (titleTokens.has(t.toLowerCase()) || titleTokens.has(base.toLowerCase())) return false;
+    return true;
+  });
+}
+
 // Plain-text template the merchant copy/pastes into the content
 // field. Name and dates are NOT included — those live in their own
 // structured fields and the system prompt formats them automatically

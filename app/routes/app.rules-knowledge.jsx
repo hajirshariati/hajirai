@@ -47,6 +47,7 @@ import {
   listCampaigns,
   saveCampaign,
   deleteCampaign,
+  findUnknownSkus,
   CAMPAIGN_TEMPLATE,
 } from "../models/Campaign.server";
 import {
@@ -293,7 +294,13 @@ export const action = async ({ request }) => {
     const endsAt = String(formData.get("endsAt") || "").trim();
     try {
       const saved = await saveCampaign(session.shop, { id, name, content, startsAt, endsAt });
-      return { saved: true, campaignId: saved.id };
+      // Soft validation: flag SKU-shaped tokens that don't resolve to
+      // a real product or variant in the synced catalog. Catches typos
+      // like "L5OO" before they show up in customer answers. The
+      // campaign is saved either way — merchant decides if the warning
+      // matters (e.g. a campaign for unreleased SKUs is fine).
+      const unknownSkus = await findUnknownSkus(session.shop, content);
+      return { saved: true, campaignId: saved.id, unknownSkus };
     } catch (err) {
       return { error: err?.message || "Could not save campaign." };
     }
@@ -1319,6 +1326,7 @@ function CampaignsCard({ initial, template, initialCheatCode }) {
   const [endsAt, setEndsAt] = useState(DEFAULT_END_VALUE);
   const [showTemplate, setShowTemplate] = useState(false);
   const [error, setError] = useState("");
+  const [unknownSkus, setUnknownSkus] = useState([]);
   const [cheatCode, setCheatCode] = useState(initialCheatCode || "");
   const [cheatSavedNote, setCheatSavedNote] = useState("");
 
@@ -1337,6 +1345,7 @@ function CampaignsCard({ initial, template, initialCheatCode }) {
     if (fetcher.data?.error) setError(fetcher.data.error);
     if (fetcher.data?.saved) {
       setError("");
+      setUnknownSkus(Array.isArray(fetcher.data.unknownSkus) ? fetcher.data.unknownSkus : []);
       setEditingId(null);
       setName(""); setContent(""); setStartsAt(DEFAULT_START_VALUE()); setEndsAt(DEFAULT_END_VALUE());
     }
@@ -1408,6 +1417,16 @@ function CampaignsCard({ initial, template, initialCheatCode }) {
         </BlockStack>
 
         {error ? <Banner tone="critical">{error}</Banner> : null}
+
+        {unknownSkus.length > 0 ? (
+          <Banner tone="warning" onDismiss={() => setUnknownSkus([])} title={`${unknownSkus.length} SKU${unknownSkus.length === 1 ? "" : "s"} not found in your catalog`}>
+            <BlockStack gap="100">
+              <Text as="p" variant="bodySm">
+                Saved. The campaign content references these SKU-shaped values that don't match any synced product or variant: <strong>{unknownSkus.join(", ")}</strong>. Verify these are correct (a typo like "L5OO" with the letter O instead of zero is a common one) or re-sync your catalog if these are new.
+              </Text>
+            </BlockStack>
+          </Banner>
+        ) : null}
 
         <Box padding="300" background="bg-surface-secondary" borderRadius="200">
           <BlockStack gap="200">
