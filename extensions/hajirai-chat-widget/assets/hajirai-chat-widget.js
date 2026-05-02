@@ -364,16 +364,22 @@ function showcaseWrap(productsHtml){
 
 function updateShowcaseArrows(wrap){
   var row=wrap.querySelector('.ai-chat-products--showcase');
-  if(!row)return;
-  var firstImg=row.querySelector('.ai-chat-product-img');
-  if(firstImg){
-    var top=firstImg.offsetTop+firstImg.offsetHeight/2;
-    wrap.style.setProperty('--arrow-top',top+'px');
+  if(!row||!row.clientWidth)return;
+  /* Anchor on the first card's vertical center (not just the image)
+     so the arrow lands in the middle of the visible card —
+     between the shoe and the title — at any card width. */
+  var firstCard=row.querySelector('.ai-chat-product-card');
+  if(firstCard&&firstCard.offsetHeight){
+    var cardR=firstCard.getBoundingClientRect();
+    var wrapR=wrap.getBoundingClientRect();
+    wrap.style.setProperty('--arrow-top',((cardR.top-wrapR.top)+cardR.height/2)+'px');
   }
   var prev=wrap.querySelector('.ai-chat-products-arrow--prev');
   var next=wrap.querySelector('.ai-chat-products-arrow--next');
-  var atStart=row.scrollLeft<=1;
-  var atEnd=row.scrollLeft+row.clientWidth>=row.scrollWidth-1;
+  /* 8px tolerance — scroll-snap snaps to the first card's snap point,
+     which sits at the showcase's 4px left-padding offset, not 0. */
+  var atStart=row.scrollLeft<=8;
+  var atEnd=row.scrollLeft+row.clientWidth>=row.scrollWidth-8;
   if(prev)prev.hidden=atStart;
   if(next)next.hidden=atEnd;
 }
@@ -393,6 +399,9 @@ function initShowcaseArrows(wrap){
   if(next)next.addEventListener('click',function(e){e.preventDefault();step(1)});
   row.addEventListener('scroll',function(){updateShowcaseArrows(wrap)},{passive:true});
   requestAnimationFrame(function(){updateShowcaseArrows(wrap)});
+  /* Safety-net update for layouts that haven't fully settled by the
+     first paint (image aspect-ratio sometimes resolves a frame late). */
+  setTimeout(function(){updateShowcaseArrows(wrap)},150);
 }
 
 /* Single global resize listener — recompute arrow Y for every active wrap
