@@ -45,12 +45,15 @@ import {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SCENARIOS_PATH = path.join(__dirname, "e2e-scenarios.json");
+const FIXTURES_DIR = path.join(__dirname, "e2e-fixtures");
 
 const args = process.argv.slice(2);
 const arg = (n) => args.find((a) => a.startsWith(`--${n}=`))?.slice(`--${n}=`.length);
 const hasFlag = (n) => args.includes(`--${n}`);
 const filterTerm = arg("filter")?.toLowerCase() || "";
 const verbose = hasFlag("verbose");
+const onlyHard = hasFlag("hard");
+const onlySimple = hasFlag("simple");
 
 const apiKey = process.env.ANTHROPIC_API_KEY;
 if (!apiKey) {
@@ -62,6 +65,24 @@ const client = new Anthropic({ apiKey });
 const MODEL = process.env.E2E_MODEL || "claude-sonnet-4-6";
 const MAX_TOKENS = 1024;
 const MAX_HOPS = 3;
+
+// Load a knowledge fixture by name from scripts/e2e-fixtures/. Lets
+// hard-mode scenarios reference shared knowledge content (e.g.
+// 'aetrex' loads aetrex-style FAQs / rules / brand) without inlining
+// kilobytes of text into the scenarios JSON.
+const fixtureCache = new Map();
+function loadKnowledgeFixture(name) {
+  if (!name) return null;
+  if (fixtureCache.has(name)) return fixtureCache.get(name);
+  const file = path.join(FIXTURES_DIR, `knowledge-${name}.json`);
+  if (!fs.existsSync(file)) {
+    console.error(`Missing knowledge fixture: ${file}`);
+    process.exit(1);
+  }
+  const content = JSON.parse(fs.readFileSync(file, "utf-8"));
+  fixtureCache.set(name, content);
+  return content;
+}
 
 // Apply the same tool-result stubbing per scenario. A stub is a list of
 // rules; the FIRST rule whose `if_query_matches` regex matches the
@@ -95,7 +116,14 @@ async function runScenario(scenario) {
   for (const m of scenario.messages || []) messages.push({ role: "user", content: String(m) });
 
   const config = buildScenarioConfig(scenario);
-  const knowledge = scenario.merchantConfig?.knowledge || [];
+  // Knowledge can be inline (scenario.merchantConfig.knowledge) or loaded
+  // from a shared fixture (scenario.merchantConfig.knowledgeFixture: 'aetrex').
+  // Hard-mode scenarios use the fixture to push prompt size near production scale.
+  const inlineKnowledge = scenario.merchantConfig?.knowledge || [];
+  const fixtureName = scenario.merchantConfig?.knowledgeFixture;
+  const knowledge = fixtureName
+    ? [...inlineKnowledge, ...(loadKnowledgeFixture(fixtureName) || [])]
+    : inlineKnowledge;
   const systemPrompt = buildSystemPrompt({
     config,
     knowledge,
@@ -230,12 +258,13 @@ function checkAssertions(scenario, result) {
 
 // ── Main ───────────────────────────────────────────────────────
 const scenarios = JSON.parse(fs.readFileSync(SCENARIOS_PATH, "utf-8"));
-const filtered = filterTerm
-  ? scenarios.filter((s) => s.name.toLowerCase().includes(filterTerm))
-  : scenarios;
+let filtered = scenarios;
+if (filterTerm) filtered = filtered.filter((s) => s.name.toLowerCase().includes(filterTerm));
+if (onlyHard) filtered = filtered.filter((s) => s._mode === "hard");
+if (onlySimple) filtered = filtered.filter((s) => s._mode !== "hard");
 
 if (filtered.length === 0) {
-  console.error(`No scenarios match filter "${filterTerm}"`);
+  console.error(`No scenarios match the active filters (filter="${filterTerm}" hard=${onlyHard} simple=${onlySimple})`);
   process.exit(1);
 }
 

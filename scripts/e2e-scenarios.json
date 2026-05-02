@@ -135,5 +135,130 @@
     "expect": {
       "text_must_not_contain": ["let me look", "let me search", "let me find", "one moment", "right away"]
     }
+  },
+
+  {
+    "_mode": "hard",
+    "name": "HARD: flat feet -> orthotic -> sneakers chip should NOT pivot to footwear",
+    "history": [
+      { "role": "user", "content": "i have flat feet, what orthotic do you recommend?" },
+      { "role": "assistant", "content": "What shoes will you be wearing the orthotic in? For flat feet in everyday casual shoes, the Women's Casual Comfort Posted Orthotic is the go-to. <<Running/Athletic>><<Casual/Walking>><<Dress Shoes>><<Work Boots>>" }
+    ],
+    "messages": [
+      "sneakers"
+    ],
+    "merchantConfig": {
+      "shop": "test.myshopify.com",
+      "catalogProductTypes": ["Orthotics", "Sneakers", "Sandals", "Boots", "Loafers", "Clogs", "Slip Ons", "Slippers", "Mary Janes", "Oxfords", "Wedges Heels", "Accessories"],
+      "scopedGender": "women",
+      "answeredChoices": [
+        { "question": "Are these for men's or women's?", "answer": "Women's", "rawAnswer": "Women's", "options": ["Men's", "Women's"] }
+      ],
+      "knowledgeFixture": "aetrex",
+      "attributeNames": ["gender", "category", "color_family", "footbed", "helps_with"],
+      "activeCampaigns": [
+        { "name": "Spring Sale 2026", "content": "20% off all sneakers and casual shoes through May 31. Code SPRING20. Cannot be combined with other codes. Excludes orthotics, gift cards, and already-discounted items.", "startsAt": "2026-04-15T00:00:00Z", "endsAt": "2026-05-31T23:59:59Z" }
+      ]
+    },
+    "toolStubs": {
+      "search_products": [
+        {
+          "if_query_matches": "casual posted|posted casual|casual orthotic|orthotic casual|casual.*posted|posted.*casual",
+          "return": {
+            "products": [
+              { "handle": "casual-comfort-posted-w", "title": "Women's Casual Comfort Posted Orthotic with Metatarsal Support", "_category": "Orthotics" }
+            ]
+          }
+        },
+        {
+          "if_query_matches": "orthotic|insert|footbed|posted",
+          "return": {
+            "products": [
+              { "handle": "casual-posted-w", "title": "Women's Casual Posted Orthotic", "_category": "Orthotics" }
+            ]
+          }
+        },
+        {
+          "if_query_matches": "sneaker|casual shoe|maeve",
+          "return": {
+            "products": [
+              { "handle": "maeve-casual-slip-on-taupe", "title": "Maeve Casual Slip-On - Taupe", "_category": "Slip Ons" }
+            ]
+          }
+        },
+        { "if_query_matches": ".", "return": { "products": [] } }
+      ]
+    },
+    "expect": {
+      "must_call_tool": "search_products",
+      "tool_query_matches": "orthotic|posted|insert|casual.*posted",
+      "products_must_not_include_handle": "maeve-casual-slip-on-taupe",
+      "text_must_not_contain": ["maeve", "slip-on", "casual slip"]
+    }
+  },
+
+  {
+    "_mode": "hard",
+    "name": "HARD: plantar fasciitis + Italy trip + women MUST search (no dead-end)",
+    "messages": [
+      "I have plantar fasciitis and going on a trip to Italy, what shoes do you recommend?"
+    ],
+    "merchantConfig": {
+      "shop": "test.myshopify.com",
+      "catalogProductTypes": ["Orthotics", "Sneakers", "Sandals", "Boots", "Loafers", "Clogs", "Slip Ons", "Slippers", "Mary Janes", "Oxfords", "Wedges Heels", "Accessories"],
+      "scopedGender": "women",
+      "answeredChoices": [
+        { "question": "Are these for men's or women's?", "answer": "Women's", "rawAnswer": "Women's", "options": ["Men's", "Women's"] }
+      ],
+      "knowledgeFixture": "aetrex",
+      "attributeNames": ["gender", "category", "color_family", "footbed", "helps_with"],
+      "activeCampaigns": [
+        { "name": "Spring Sale 2026", "content": "20% off all sneakers and casual shoes through May 31. Code SPRING20.", "startsAt": "2026-04-15T00:00:00Z", "endsAt": "2026-05-31T23:59:59Z" }
+      ]
+    },
+    "toolStubs": {
+      "search_products": [
+        {
+          "if_query_matches": "plantar|fasciitis|walking|travel|comfort|posted|arch",
+          "return": {
+            "products": [
+              { "handle": "danika-walking-w", "title": "Danika Walking Sneaker - Pink", "_category": "Sneakers" },
+              { "handle": "carly-arch-support-w", "title": "Carly Arch Support Sneaker - Navy", "_category": "Sneakers" }
+            ]
+          }
+        },
+        { "if_query_matches": ".", "return": { "products": [] } }
+      ]
+    },
+    "expect": {
+      "must_call_tool": "search_products",
+      "text_must_not_contain": ["i'm not finding", "dead-end", "support team"]
+    }
+  },
+
+  {
+    "_mode": "hard",
+    "name": "HARD: simple greeting under 30K-char prompt MUST NOT trigger search",
+    "messages": [
+      "hi there"
+    ],
+    "merchantConfig": {
+      "shop": "test.myshopify.com",
+      "catalogProductTypes": ["Orthotics", "Sneakers", "Sandals", "Boots", "Loafers", "Clogs", "Slip Ons", "Slippers", "Mary Janes", "Oxfords", "Wedges Heels", "Accessories"],
+      "knowledgeFixture": "aetrex",
+      "attributeNames": ["gender", "category", "color_family", "footbed", "helps_with"],
+      "activeCampaigns": [
+        { "name": "Spring Sale 2026", "content": "20% off all sneakers and casual shoes through May 31. Code SPRING20.", "startsAt": "2026-04-15T00:00:00Z", "endsAt": "2026-05-31T23:59:59Z" }
+      ]
+    },
+    "toolStubs": {
+      "search_products": [
+        { "if_query_matches": ".", "return": { "products": [] } }
+      ]
+    },
+    "expect": {
+      "must_not_call_tool": "search_products",
+      "text_must_not_contain": ["here are some", "let me search", "let me look", "let me find"]
+    }
   }
 ]
