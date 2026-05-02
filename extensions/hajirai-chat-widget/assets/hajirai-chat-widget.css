@@ -865,6 +865,8 @@ a.ai-chat-welcome__hint--link:hover {
   font-size: 14px;
   line-height: 1.5;
   word-break: break-word;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .ai-chat-msg--user .ai-chat-msg-bubble {
