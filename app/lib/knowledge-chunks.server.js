@@ -18,7 +18,7 @@
 //    these into the system prompt instead of dumping the whole
 //    knowledge corpus.
 
-import { embedText, embedTexts, vectorLiteral, resolveShopEmbedding, EMBEDDING_DIMENSIONS } from "./embeddings.server";
+import { embedText, embedTexts, vectorLiteral, resolveShopEmbedding, EMBEDDING_DIMENSIONS } from "./embeddings.server.js";
 
 // Tuneable defaults. Kept as constants here (not env vars) since
 // changing them is a code-review discussion, not an ops setting.
