@@ -545,6 +545,67 @@ function formatSize(bytes) {
   return (bytes / (1024 * 1024)).toFixed(1) + " MB";
 }
 
+// Knowledge-corpus size thresholds, in KB. Numbers picked to match
+// real-world prompt-quality experience: under 20KB is comfortable
+// even on the legacy full-dump path; 20-40KB starts crowding the
+// system prompt and risks "lost in the middle" behavior; over 40KB
+// degrades chat quality unless RAG is enabled. The bar is purely
+// informational — nothing on the server enforces it.
+const KNOWLEDGE_SIZE_LIMITS = { warn: 20 * 1024, danger: 40 * 1024, max: 60 * 1024 };
+
+function knowledgeUsageState(totalBytes) {
+  if (totalBytes >= KNOWLEDGE_SIZE_LIMITS.danger) {
+    return {
+      tone: "critical",
+      barColor: "#d72c0d",
+      label: "Too much — trim files or enable RAG to keep chat quality high.",
+    };
+  }
+  if (totalBytes >= KNOWLEDGE_SIZE_LIMITS.warn) {
+    return {
+      tone: "warning",
+      barColor: "#b98900",
+      label: "Getting heavy. Consider trimming or enabling RAG before adding more.",
+    };
+  }
+  return {
+    tone: "subdued",
+    barColor: "#202223",
+    label: "Within the comfortable range for chat-prompt size.",
+  };
+}
+
+function KnowledgeUsageBar({ files }) {
+  const totalBytes = files.reduce((sum, f) => sum + (Number(f.fileSize) || 0), 0);
+  const { barColor, label, tone } = knowledgeUsageState(totalBytes);
+  const pct = Math.min(100, (totalBytes / KNOWLEDGE_SIZE_LIMITS.max) * 100);
+  const warnPct = (KNOWLEDGE_SIZE_LIMITS.warn / KNOWLEDGE_SIZE_LIMITS.max) * 100;
+  const dangerPct = (KNOWLEDGE_SIZE_LIMITS.danger / KNOWLEDGE_SIZE_LIMITS.max) * 100;
+  return (
+    <BlockStack gap="100">
+      <InlineStack align="space-between" blockAlign="center" wrap>
+        <Text as="span" variant="bodySm" fontWeight="semibold">
+          Knowledge size: {formatSize(totalBytes)} of ~{formatSize(KNOWLEDGE_SIZE_LIMITS.max)} budget
+        </Text>
+        <Text as="span" tone={tone} variant="bodySm">{label}</Text>
+      </InlineStack>
+      <div
+        role="progressbar"
+        aria-valuenow={Math.round(pct)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label="Knowledge corpus size relative to chat-prompt budget"
+        style={{ position: "relative", width: "100%", height: 8, background: "#e1e3e5", borderRadius: 4, overflow: "hidden" }}
+      >
+        <div style={{ width: `${pct}%`, height: "100%", background: barColor, transition: "width .2s, background .2s" }} />
+        {/* Threshold tick marks so merchants can see where yellow/red kicks in */}
+        <div style={{ position: "absolute", left: `${warnPct}%`, top: 0, bottom: 0, width: 1, background: "rgba(0,0,0,0.25)" }} />
+        <div style={{ position: "absolute", left: `${dangerPct}%`, top: 0, bottom: 0, width: 1, background: "rgba(0,0,0,0.25)" }} />
+      </div>
+    </BlockStack>
+  );
+}
+
 function statusBadge(status) {
   if (status === "running") return <Badge tone="info">Syncing</Badge>;
   if (status === "error") return <Badge tone="critical">Error</Badge>;
@@ -646,6 +707,8 @@ function KnowledgeFilesCard({ files }) {
             Upload extra context the AI can't get from Shopify — FAQs, brand voice, sizing guides, product details. One file per category; re-uploading replaces the previous. CSVs with a <code>sku</code> column auto-link to matching variants.
           </Text>
         </BlockStack>
+
+        {files.length > 0 && <KnowledgeUsageBar files={files} />}
 
         {actionData?.uploaded && dismissed !== actionData.message && (
           <Banner title={actionData.message} tone={actionData.skuWarning ? "warning" : "success"} onDismiss={() => setDismissed(actionData.message)} />
