@@ -26,6 +26,7 @@
     "eval:e2e": "node scripts/eval-e2e.mjs",
     "feedback:import": "node scripts/import-feedback-scenarios.mjs",
     "audit:hallucinations": "node scripts/audit-hallucinations.mjs",
+    "backfill:knowledge-chunks": "node scripts/backfill-knowledge-chunks.mjs",
     "eval": "npm run eval:intent && npm run eval:memory && npm run eval:quality"
   },
   "type": "module",
