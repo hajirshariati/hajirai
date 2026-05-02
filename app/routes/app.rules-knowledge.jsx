@@ -132,6 +132,7 @@ export const loader = async ({ request }) => {
       } catch { return {}; }
     })(),
     deduplicateColors: config.deduplicateColors,
+    knowledgeRagEnabled: config.knowledgeRagEnabled === true,
     files: filesWithCounts,
     plan: { id: plan.id, name: plan.name, features: plan.features, knowledgeFiles: plan.knowledgeFiles },
     campaigns: campaigns.map((c) => ({
@@ -249,6 +250,22 @@ export const action = async ({ request }) => {
   if (intent === "toggle_dedup") {
     const value = formData.get("deduplicateColors") === "true";
     await updateShopConfig(session.shop, { deduplicateColors: value });
+    return { saved: true };
+  }
+
+  if (intent === "toggle_rag") {
+    const value = formData.get("knowledgeRagEnabled") === "true";
+    if (value) {
+      // Block opt-in if no embedding provider — flag would be on but
+      // retrieval would always return [] and silently fall back to
+      // legacy. Better to nudge the merchant to Settings first.
+      const cfg = await getShopConfig(session.shop);
+      const resolved = resolveShopEmbedding(cfg);
+      if (!resolved) {
+        return { error: "Configure an embedding provider and API key in Settings before enabling RAG." };
+      }
+    }
+    await updateShopConfig(session.shop, { knowledgeRagEnabled: value });
     return { saved: true };
   }
 
@@ -545,13 +562,15 @@ function formatSize(bytes) {
   return (bytes / (1024 * 1024)).toFixed(1) + " MB";
 }
 
-// Knowledge-corpus size thresholds, in KB. Numbers picked to match
-// real-world prompt-quality experience: under 20KB is comfortable
-// even on the legacy full-dump path; 20-40KB starts crowding the
-// system prompt and risks "lost in the middle" behavior; over 40KB
-// degrades chat quality unless RAG is enabled. The bar is purely
-// informational — nothing on the server enforces it.
-const KNOWLEDGE_SIZE_LIMITS = { warn: 20 * 1024, danger: 40 * 1024, max: 60 * 1024 };
+// Knowledge-corpus size thresholds. The bar fills from 0 to the
+// danger threshold (40KB) — beyond that it's pegged at 100% and
+// turns red. Picking danger as the "full" point makes the visual
+// fill match the color: ~half-full = yellow zone, completely full
+// = red zone. Numbers based on observed prompt-bloat behavior:
+// under 20KB is comfortable on the legacy full-dump path; 20-40KB
+// crowds the system prompt and risks "lost in the middle"; over
+// 40KB degrades chat quality unless RAG is on.
+const KNOWLEDGE_SIZE_LIMITS = { warn: 20 * 1024, danger: 40 * 1024 };
 
 function knowledgeUsageState(totalBytes) {
   if (totalBytes >= KNOWLEDGE_SIZE_LIMITS.danger) {
@@ -578,14 +597,13 @@ function knowledgeUsageState(totalBytes) {
 function KnowledgeUsageBar({ files }) {
   const totalBytes = files.reduce((sum, f) => sum + (Number(f.fileSize) || 0), 0);
   const { barColor, label, tone } = knowledgeUsageState(totalBytes);
-  const pct = Math.min(100, (totalBytes / KNOWLEDGE_SIZE_LIMITS.max) * 100);
-  const warnPct = (KNOWLEDGE_SIZE_LIMITS.warn / KNOWLEDGE_SIZE_LIMITS.max) * 100;
-  const dangerPct = (KNOWLEDGE_SIZE_LIMITS.danger / KNOWLEDGE_SIZE_LIMITS.max) * 100;
+  const pct = Math.min(100, (totalBytes / KNOWLEDGE_SIZE_LIMITS.danger) * 100);
+  const warnPct = (KNOWLEDGE_SIZE_LIMITS.warn / KNOWLEDGE_SIZE_LIMITS.danger) * 100;
   return (
     <BlockStack gap="100">
       <InlineStack align="space-between" blockAlign="center" wrap>
         <Text as="span" variant="bodySm" fontWeight="semibold">
-          Knowledge size: {formatSize(totalBytes)} of ~{formatSize(KNOWLEDGE_SIZE_LIMITS.max)} budget
+          Knowledge size: {formatSize(totalBytes)} of ~{formatSize(KNOWLEDGE_SIZE_LIMITS.danger)} comfortable budget
         </Text>
         <Text as="span" tone={tone} variant="bodySm">{label}</Text>
       </InlineStack>
@@ -598,9 +616,8 @@ function KnowledgeUsageBar({ files }) {
         style={{ position: "relative", width: "100%", height: 8, background: "#e1e3e5", borderRadius: 4, overflow: "hidden" }}
       >
         <div style={{ width: `${pct}%`, height: "100%", background: barColor, transition: "width .2s, background .2s" }} />
-        {/* Threshold tick marks so merchants can see where yellow/red kicks in */}
+        {/* Single tick at the warn threshold so merchants can see where yellow kicks in */}
         <div style={{ position: "absolute", left: `${warnPct}%`, top: 0, bottom: 0, width: 1, background: "rgba(0,0,0,0.25)" }} />
-        <div style={{ position: "absolute", left: `${dangerPct}%`, top: 0, bottom: 0, width: 1, background: "rgba(0,0,0,0.25)" }} />
       </div>
     </BlockStack>
   );
@@ -612,13 +629,21 @@ function statusBadge(status) {
   return <Badge tone="success">Idle</Badge>;
 }
 
-function KnowledgeFilesCard({ files }) {
+function KnowledgeFilesCard({ files, ragEnabled, embeddingProvider }) {
   const actionData = useActionData();
   const nav = useNavigation();
   const submit = useSubmit();
   const downloadFetcher = useFetcher();
+  const ragFetcher = useFetcher();
   const saving = nav.state === "submitting" &&
     (nav.formData?.get("intent") === "upload" || nav.formData?.get("intent") === "delete_file");
+  const handleToggleRag = (checked) => {
+    const fd = new FormData();
+    fd.set("intent", "toggle_rag");
+    fd.set("knowledgeRagEnabled", String(checked));
+    ragFetcher.submit(fd, { method: "post" });
+  };
+  const ragHasProvider = Boolean(embeddingProvider);
 
   const [selectedType, setSelectedType] = useState("faqs");
   const [uploadFile, setUploadFile] = useState(null);
@@ -709,6 +734,25 @@ function KnowledgeFilesCard({ files }) {
         </BlockStack>
 
         {files.length > 0 && <KnowledgeUsageBar files={files} />}
+
+        <Box padding="300" background="bg-surface-secondary" borderRadius="200">
+          <BlockStack gap="150">
+            <Checkbox
+              label="Use RAG retrieval (only inject the most relevant knowledge per chat turn)"
+              helpText={
+                ragHasProvider
+                  ? "Instead of dumping every knowledge file into every chat, the AI receives only the top sections most relevant to the customer's current message. Recommended once your corpus is heavy. Requires running the backfill once after enabling."
+                  : "Configure an embedding provider (OpenAI or Voyage) and key in Settings before enabling. Without one, RAG can't embed your knowledge files."
+              }
+              checked={ragEnabled}
+              disabled={!ragHasProvider || ragFetcher.state === "submitting"}
+              onChange={handleToggleRag}
+            />
+            {ragFetcher.data?.error && (
+              <Text as="p" tone="critical" variant="bodySm">{ragFetcher.data.error}</Text>
+            )}
+          </BlockStack>
+        </Box>
 
         {actionData?.uploaded && dismissed !== actionData.message && (
           <Banner title={actionData.message} tone={actionData.skuWarning ? "warning" : "success"} onDismiss={() => setDismissed(actionData.message)} />
@@ -2219,7 +2263,7 @@ export default function RulesKnowledge() {
             title="Knowledge the AI can reference"
             description="Soft context — FAQs, brand voice, sizing guides, product details."
           />
-          <KnowledgeFilesCard files={data.files} />
+          <KnowledgeFilesCard files={data.files} ragEnabled={data.knowledgeRagEnabled} embeddingProvider={data.embeddingProvider} />
         </BlockStack>
 
         <BlockStack gap="400">
