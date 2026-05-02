@@ -138,15 +138,19 @@ export function buildSystemPrompt({ config, knowledge, retrievedChunks, shop, at
   //       (RAG flag off, no embedding provider, no chunks embedded
   //       yet, or retrieval returned empty). Dump every knowledge
   //       file as before. Identical to pre-2c behavior — safe.
+  const knowledgeByType = {};
   if (Array.isArray(retrievedChunks) && retrievedChunks.length > 0) {
     const blocks = retrievedChunks.map((c) => {
       const label = LABELS[c.fileType] || c.fileType || "Knowledge";
       const titleSuffix = c.sectionTitle ? ` — ${c.sectionTitle}` : "";
+      // Track types injected so the prompt log stays meaningful in
+      // both the RAG and legacy paths.
+      if (!knowledgeByType[c.fileType]) knowledgeByType[c.fileType] = [];
+      knowledgeByType[c.fileType].push(c.content);
       return `--- (${label}${titleSuffix})\n${c.content}`;
     });
     parts.push(`\n=== Relevant knowledge (${retrievedChunks.length} sections) ===\n${blocks.join("\n\n")}`);
   } else {
-    const knowledgeByType = {};
     for (const k of knowledge || []) {
       if (!k?.content) continue;
       if (!knowledgeByType[k.fileType]) knowledgeByType[k.fileType] = [];
