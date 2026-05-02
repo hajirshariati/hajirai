@@ -338,11 +338,20 @@ function scrollBottom(){requestAnimationFrame(function(){msgsEl.scrollTop=msgsEl
    at the bottom (especially noticeable on mobile with tall answers). */
 function scrollMsgTop(elm){
   if(!elm||!msgsEl)return scrollBottom();
-  requestAnimationFrame(function(){
-    var top=Math.max(0,elm.offsetTop-8);
+  /* Use getBoundingClientRect-based delta — .ai-chat-messages has no
+     position: relative, so elm.offsetTop is measured against a wrong
+     ancestor (panel/body) and would produce a stale scrollTop value. */
+  function go(){
+    var elmR=elm.getBoundingClientRect();
+    var msgsR=msgsEl.getBoundingClientRect();
+    var top=Math.max(0,msgsEl.scrollTop+(elmR.top-msgsR.top)-8);
     if(typeof msgsEl.scrollTo==='function'){msgsEl.scrollTo({top:top,behavior:'smooth'})}
     else{msgsEl.scrollTop=top}
-  });
+  }
+  requestAnimationFrame(go);
+  /* Re-align after product images settle — image aspect-ratio + late
+     paint can shift the message position by 100s of px on mobile. */
+  setTimeout(go,250);
 }
 
 /* Showcase navigation arrows.
