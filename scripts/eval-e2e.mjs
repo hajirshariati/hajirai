@@ -155,7 +155,12 @@ async function runScenario(scenario) {
         tools: TOOLS,
       });
     } catch (err) {
-      return { ok: false, reasons: [`Anthropic error on hop ${hop}: ${err?.message || err}`], toolCalls };
+      return {
+        ok: false,
+        name: scenario.name,
+        reasons: [`Anthropic error on hop ${hop}: ${err?.message || err}`],
+        toolCalls,
+      };
     }
 
     for (const block of response.content) {
