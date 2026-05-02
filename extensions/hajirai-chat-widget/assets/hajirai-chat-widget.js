@@ -333,6 +333,17 @@ if(isOpen){
 }
 
 function scrollBottom(){requestAnimationFrame(function(){msgsEl.scrollTop=msgsEl.scrollHeight})}
+/* Align the top of a message with the top of the visible area so the
+   reader sees the answer first instead of landing on the feedback CTAs
+   at the bottom (especially noticeable on mobile with tall answers). */
+function scrollMsgTop(elm){
+  if(!elm||!msgsEl)return scrollBottom();
+  requestAnimationFrame(function(){
+    var top=Math.max(0,elm.offsetTop-8);
+    if(typeof msgsEl.scrollTo==='function'){msgsEl.scrollTo({top:top,behavior:'smooth'})}
+    else{msgsEl.scrollTop=top}
+  });
+}
 
 function appendMsg(role,content,products){
 var isU=role==='user';
@@ -687,7 +698,7 @@ if(prods&&prods.length>0&&mDiv){
     });
   }
 }
-scrollBottom();
+scrollMsgTop(mDiv);
 }
 
 function clearChat(){
