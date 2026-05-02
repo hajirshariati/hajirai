@@ -1261,9 +1261,13 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
     padding-bottom: max(8px, env(safe-area-inset-bottom));
   }
 
-  .ai-chat-welcome__banner img {
-    max-height: 180px;
-    object-fit: cover;
+  .ai-chat-welcome__banner {
+    /* Clamp the container itself on mobile — the desktop rule caps at
+       280px which is too tall on a phone-sized viewport and leaves the
+       gradient fallback visible below the image. The img already has
+       height:100% + object-fit:cover so it fills whatever the
+       container resolves to; no separate img rule needed. */
+    height: clamp(80px, calc(100% - 320px), 180px);
   }
 
   .ai-chat-welcome__avatar {
