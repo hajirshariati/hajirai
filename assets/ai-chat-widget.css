@@ -741,6 +741,8 @@
   font-size: 14px;
   line-height: 1.5;
   word-break: break-word;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .ai-chat-msg--user .ai-chat-msg-bubble {
@@ -790,19 +792,43 @@
 /* ---------- Product cards ---------- */
 .ai-chat-products {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 10px;
   margin-top: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  padding-bottom: 4px;
+}
+
+.ai-chat-products::-webkit-scrollbar {
+  height: 6px;
+}
+
+.ai-chat-products::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ai-chat-products::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
 }
 
 .ai-chat-product-card {
   display: flex;
-  gap: 12px;
+  flex-direction: column;
+  gap: 8px;
   padding: 10px;
   border: 1px solid var(--ai-chat-border);
   border-radius: 12px;
   background: #fff;
   transition: box-shadow 0.15s;
+  width: 160px;
+  flex: 0 0 160px;
+  scroll-snap-align: start;
 }
 
 @media (hover: hover) {
@@ -812,8 +838,8 @@
 }
 
 .ai-chat-product-img {
-  width: 72px;
-  height: 72px;
+  width: 100%;
+  aspect-ratio: 1 / 1;
   border-radius: 8px;
   overflow: hidden;
   flex-shrink: 0;
@@ -1137,13 +1163,16 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
   }
 
   .ai-chat-product-card {
-    gap: 8px;
+    gap: 6px;
     padding: 8px;
+    width: 140px;
+    flex: 0 0 140px;
   }
 
   .ai-chat-product-img {
-    width: 60px;
-    height: 60px;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    height: auto;
   }
 }
 
