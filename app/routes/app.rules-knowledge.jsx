@@ -493,43 +493,122 @@ const FILE_TYPES = [
     label: "FAQs & Policies",
     value: "faqs",
     description: "Shipping, returns, warranty, common customer questions.",
-    templateName: "faqs-template.csv",
-    columns: "question, answer",
-    template: `question,answer
-"What is your return policy?","We accept returns within 30 days."
-"How long does shipping take?","Standard shipping takes 5-7 business days."`,
+    templateName: "faqs-template.txt",
+    template: `RETURN POLICY
+═══════════════════════════════════════
+We accept returns within 30 days of delivery for unworn items in original
+packaging. Refunds are issued to the original payment method within 5-7
+business days after we receive the return.
+
+Exchanges are processed the same way — return the original, then place a
+new order for the replacement.
+
+═══════════════════════════════════════
+
+SHIPPING
+═══════════════════════════════════════
+Standard shipping takes 5-7 business days within the US (free over $75).
+Expedited shipping (2-3 days) is available at checkout.
+
+International shipping is available to most countries. Customs and duties
+are the customer's responsibility.
+
+═══════════════════════════════════════
+
+WARRANTY
+═══════════════════════════════════════
+All products carry a 1-year manufacturer warranty against defects in
+materials and workmanship. Normal wear and tear is not covered.
+
+═══════════════════════════════════════
+
+ORDER CHANGES
+═══════════════════════════════════════
+Orders can be modified or cancelled within 1 hour of placement. After that,
+they enter our fulfillment queue and cannot be changed.
+
+═══════════════════════════════════════
+`,
   },
   {
     label: "Rules & Guidelines",
     value: "rules",
     description: "Things the AI must always/never do — tone, routing rules, banned phrases, escalation paths.",
     templateName: "rules-template.txt",
-    template: `ALWAYS:
-- Keep replies to 1-2 sentences.
+    template: `TONE & STYLE
+═══════════════════════════════════════
+ALWAYS:
+- Keep replies to 1-2 sentences unless answering a complex question.
 - Use the customer's first name sparingly when logged in.
+- Match the brand voice (warm, knowledgeable, never pushy).
 
 NEVER:
-- Invent product codes or make up details.
-- Claim items are out of stock.
+- Invent product codes, SKUs, or model numbers.
+- Claim items are out of stock without checking inventory.
+- Promise specific delivery dates beyond what shipping policy states.
 
-ROUTING:
-- Returns, refunds, billing, damaged items → support team.`,
+═══════════════════════════════════════
+
+ROUTING RULES
+═══════════════════════════════════════
+Send these topics to the support team (do NOT attempt to resolve in chat):
+- Returns, refunds, billing issues
+- Damaged or missing items
+- Account / login problems
+- Order modifications past the 1-hour window
+
+═══════════════════════════════════════
+
+ESCALATION
+═══════════════════════════════════════
+If a customer is frustrated or asks for a human, share the support email
+and let them know expected response time. Do not promise callbacks.
+
+═══════════════════════════════════════
+`,
   },
   {
     label: "Brand / About",
     value: "brand",
     description: "Your story, values, voice, and tone.",
-    templateName: "brand-voice-template.txt",
-    template: `Brand Name: [Your Brand Name]
+    templateName: "brand-template.txt",
+    template: `BRAND OVERVIEW
+═══════════════════════════════════════
+Brand Name: [Your Brand Name]
+Founded: [Year]
+Headquarters: [City, Country]
 
-Our Story:
-[Write 2-3 sentences about how your brand started.]
+In one sentence: [What you make and who you make it for.]
 
-Brand Voice:
-- Tone: [e.g., friendly / premium / casual]
+═══════════════════════════════════════
 
-Values:
-- [e.g., Sustainability]`,
+OUR STORY
+═══════════════════════════════════════
+[2-3 sentences about how the brand started and what makes it different.
+This is what the AI uses when customers ask "what's your brand about?" or
+"why should I buy from you?"]
+
+═══════════════════════════════════════
+
+VALUES
+═══════════════════════════════════════
+- [Value 1, e.g. "Sustainability — every product has a take-back program."]
+- [Value 2, e.g. "Quality over quantity — small batches, lifetime repairs."]
+- [Value 3]
+
+═══════════════════════════════════════
+
+VOICE & TONE
+═══════════════════════════════════════
+We sound: [warm / premium / playful / technical / etc.]
+We avoid: [jargon / hard-sell / hyperbole / etc.]
+
+Example phrasing the AI can mirror:
+- "[Sample sentence in your voice.]"
+- "[Another sample.]"
+
+═══════════════════════════════════════
+`,
   },
   {
     label: "Product Details",
@@ -538,16 +617,47 @@ Values:
     templateName: "product-details-template.csv",
     columns: "sku, material, care_instructions, fit_notes, weight, made_in",
     template: `sku,material,care_instructions,fit_notes,weight,made_in
-"SKU-001","100% organic cotton","Machine wash cold","Runs true to size","200g","Portugal"`,
+"SKU-001","100% organic cotton","Machine wash cold","Runs true to size","200g","Portugal"
+"SKU-002","80% wool / 20% nylon","Hand wash, lay flat","Size up for relaxed fit","420g","Italy"
+`,
   },
   {
     label: "Custom Knowledge",
     value: "custom",
     description: "Anything else the AI should know — promotions, seasonal info, store policies.",
-    templateName: "custom-knowledge-template.csv",
-    columns: "topic, details",
-    template: `topic,details
-"Current promotion","Buy 2 get 1 free on all t-shirts until end of month."`,
+    templateName: "custom-knowledge-template.txt",
+    template: `CURRENT PROMOTION
+═══════════════════════════════════════
+[Promotion name, e.g. "Summer Sale"]
+Dates: [Start] – [End]
+Mechanic: [e.g. "20% off all sandals with code SUMMER20"]
+Eligibility: [Who qualifies, exclusions]
+
+═══════════════════════════════════════
+
+LOYALTY PROGRAM
+═══════════════════════════════════════
+[Name of program]
+- How to join: [signup details]
+- Earning: [points-per-dollar or tier rules]
+- Redeeming: [what points get you]
+
+═══════════════════════════════════════
+
+STORE LOCATIONS
+═══════════════════════════════════════
+[City 1] — [Address, hours]
+[City 2] — [Address, hours]
+
+═══════════════════════════════════════
+
+SEASONAL NOTES
+═══════════════════════════════════════
+[Anything time-bound that customers ask about — winter shipping delays,
+holiday return-window extensions, restock schedules, etc.]
+
+═══════════════════════════════════════
+`,
   },
 ];
 
@@ -773,6 +883,11 @@ function KnowledgeFilesCard({ files, ragEnabled, embeddingProvider }) {
                     <Button size="slim" onClick={downloadTemplate}>Download</Button>
                   </InlineStack>
                   {currentType?.columns && <Text as="p" tone="subdued" variant="bodySm">Columns: <code>{currentType.columns}</code></Text>}
+                  {!currentType?.columns && (
+                    <Text as="p" tone="subdued" variant="bodySm">
+                      Sections are separated by <code>═══</code> dividers. Keep this format — when RAG is on, each section becomes a retrievable chunk, so a clean divider = a focused chunk the AI can pull on demand.
+                    </Text>
+                  )}
                 </BlockStack>
               </Box>
               <DropZone

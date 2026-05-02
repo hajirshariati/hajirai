@@ -75,7 +75,21 @@ export const STEPS = [
       "fit-glossary.md — definitions of Lynco, HealthySteps, arch types, fit types",
       "product-attributes.csv — SKU-keyed material/care/fit-notes per product",
     ],
-    tip: "The CSV file with a SKU column auto-links to the catalog — useful for product-specific specs the AI can cite.",
+    tip: "Use the in-app templates (Rules & Knowledge → category → Download) — they're pre-formatted with `═══` dividers so each section becomes one retrievable chunk when RAG is on. The product-attributes CSV with a SKU column auto-links to the catalog.",
+  },
+  {
+    phase: "configure",
+    icon: "🧠",
+    title: "Turn on semantic search + RAG retrieval",
+    short: "Embed catalog and knowledge so the AI matches by meaning.",
+    body: "Settings → Semantic search. Paste an OpenAI or Voyage AI key (Aetrex's lives in 1Password under 'Embedding — OpenAI'). One key powers two features: semantic product matching (customers asking 'shoes for standing all day' find arch-support styles even when 'standing' isn't in the description), and RAG over knowledge files (only the top relevant sections are sent to the AI per chat turn instead of the full corpus).",
+    list: [
+      "Paste the embedding API key in Settings → Semantic search and save.",
+      "Open Rules & Knowledge → click Backfill embeddings — embeds the product catalog (~$0.05 one-time for a 700-product catalog).",
+      "Toggle 'Use RAG retrieval' on the Knowledge files card — only enabled once an embedding provider is configured.",
+      "After enabling RAG, re-upload existing knowledge files OR run: npm run backfill:knowledge-chunks -- --shop=<your-shop>.myshopify.com",
+    ],
+    tip: "New uploads embed automatically — no manual rebuild needed once RAG is on. The Knowledge size bar on Rules & Knowledge shows your total upload size; with RAG on, only ~3 KB reaches the AI per turn regardless of total size.",
   },
   {
     phase: "integrate",
@@ -232,6 +246,24 @@ export const STEPS = [
     short: "Add new categories to the right group when Aetrex launches new lines.",
     body: "When Aetrex adds a new product type to Shopify (e.g. a new 'Sneaker Pro' category), open Rules & Knowledge → Category groups and add the new category to the right group (Footwear / Orthotics / Accessories). Without an entry, the new category falls outside the group filter and may appear in the wrong intent's chip list.",
     tip: "The Category Groups card in Rules & Knowledge shows your current groups. Compare against the catalog every time a new product line launches.",
+  },
+
+  // ── How RAG works ─────────────────────────────────────────────────
+  {
+    phase: "maintain",
+    cadence: "reference",
+    icon: "📖",
+    title: "How RAG retrieval works",
+    short: "Top-K relevant knowledge chunks per chat turn instead of dumping all files.",
+    body: "Without RAG, every chat turn injects every uploaded knowledge file into the system prompt — 10–30KB of text. That bloat causes 'lost in the middle' (the AI ignores info buried in long prompts) and burns tokens on every turn. With RAG on, only the most relevant sections are retrieved per customer message. End to end:",
+    list: [
+      "Indexing (one-time per file): the chunker splits each file on `═══` dividers — paragraph-pack fallback if there are no dividers. Each section is embedded via your configured embedding provider (OpenAI or Voyage) and stored in the KnowledgeChunk table with a 1024-dim vector.",
+      "Retrieval (every chat turn): the customer's message is embedded with the same provider. A pgvector cosine-similarity query pulls the top-5 chunks above 0.35 similarity. Those chunks (~3KB) are injected into the system prompt instead of the full ~22KB corpus.",
+      "Fallback safety net: if retrieval returns nothing (no chunks embedded yet, or none meet the threshold), the prompt builder falls back to the legacy full-dump path. Nothing breaks — worst case is unchanged behavior.",
+      "Cost: ~$0.0000004 per chat turn for embedding the customer query (effectively free). Token savings on the Anthropic call usually offset embedding cost 10x over.",
+      "Multi-tenant: every chunk is scoped by shop column. One Postgres instance can serve any number of merchants — each sees only their own data.",
+    ],
+    tip: "The Knowledge size bar on Rules & Knowledge reflects upload size, not runtime size. With RAG on, the AI only ever sees ~3KB of knowledge per turn even if you've uploaded 60KB total — but the bar still shows 60KB because that's what's in storage.",
   },
 
   // ── Quality testing system ────────────────────────────────────────

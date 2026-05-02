@@ -62,6 +62,7 @@ export const loader = async ({ request }) => {
     embeddingProvider: config.embeddingProvider || "",
     hasVoyageKey: (config.voyageApiKey || "") !== "",
     hasOpenaiKey: (config.openaiApiKey || "") !== "",
+    knowledgeRagEnabled: config.knowledgeRagEnabled === true,
     plan: { id: plan.id, name: plan.name, features: plan.features },
   };
 };
@@ -306,7 +307,7 @@ function HideUrlsPanel({ initial }) {
 }
 
 export default function ApiKeys() {
-  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, trackingPageUrl: initTrackingPageUrl, returnsPageUrl: initReturnsPageUrl, referralPageUrl: initReferralPageUrl, promptCaching: initCaching, klaviyoFormId: initKlaviyoFormId, klaviyoCompanyId: initKlaviyoCompanyId, klaviyoListId: initKlaviyoListId, vipModeEnabled: initVipMode, showLoginPill: initShowLoginPill, hasKlaviyoPrivateKey, hasYotpoLoyaltyKey, yotpoLoyaltyGuid: initYotpoLoyaltyGuid, loyaltyDisplay: initLoyaltyDisplay, loyaltyPointsPerDollar: initLoyaltyPointsPerDollar, loyaltyRounding: initLoyaltyRounding, dailyCapEnabled: initDailyCapEnabled, dailyCapMessages: initDailyCapMessages, embeddingProvider: initEmbeddingProvider, hasVoyageKey, hasOpenaiKey, plan } = useLoaderData();
+  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, trackingPageUrl: initTrackingPageUrl, returnsPageUrl: initReturnsPageUrl, referralPageUrl: initReferralPageUrl, promptCaching: initCaching, klaviyoFormId: initKlaviyoFormId, klaviyoCompanyId: initKlaviyoCompanyId, klaviyoListId: initKlaviyoListId, vipModeEnabled: initVipMode, showLoginPill: initShowLoginPill, hasKlaviyoPrivateKey, hasYotpoLoyaltyKey, yotpoLoyaltyGuid: initYotpoLoyaltyGuid, loyaltyDisplay: initLoyaltyDisplay, loyaltyPointsPerDollar: initLoyaltyPointsPerDollar, loyaltyRounding: initLoyaltyRounding, dailyCapEnabled: initDailyCapEnabled, dailyCapMessages: initDailyCapMessages, embeddingProvider: initEmbeddingProvider, hasVoyageKey, hasOpenaiKey, knowledgeRagEnabled, plan } = useLoaderData();
   const actionData = useActionData();
   const nav = useNavigation();
   const saving = nav.state === "submitting";
@@ -590,6 +591,61 @@ export default function ApiKeys() {
                       </Text>
                     </Banner>
                   )}
+                </BlockStack>
+              </Card>
+            </Layout.AnnotatedSection>
+
+            <Layout.AnnotatedSection
+              title="Knowledge retrieval (RAG)"
+              description={
+                <BlockStack gap="200">
+                  <Text as="p" tone="subdued" variant="bodySm">
+                    Instead of injecting every knowledge file into every chat, RAG embeds your knowledge files and pulls only the most relevant sections per customer message. Keeps prompts focused and chat quality high as your knowledge base grows.
+                  </Text>
+                  <Text as="p" tone="subdued" variant="bodySm">
+                    Uses the same embedding provider as Semantic search above. No extra setup or extra cost beyond the embedding provider you already configured.
+                  </Text>
+                </BlockStack>
+              }
+            >
+              <Card>
+                <BlockStack gap="400">
+                  <InlineStack gap="200" blockAlign="center">
+                    <Text as="p" variant="bodyMd" fontWeight="semibold">Status:</Text>
+                    {!embeddingProvider ? (
+                      <Badge tone="warning">Requires embedding provider</Badge>
+                    ) : knowledgeRagEnabled ? (
+                      <Badge tone="success">Enabled</Badge>
+                    ) : (
+                      <Badge>Disabled</Badge>
+                    )}
+                  </InlineStack>
+
+                  <Box background="bg-surface-secondary" padding="300" borderRadius="200">
+                    <BlockStack gap="200">
+                      <Text as="p" variant="bodySm" fontWeight="semibold">How it works</Text>
+                      <Text as="p" variant="bodySm" tone="subdued">
+                        1. You upload knowledge files (FAQs, brand voice, rules) on the Rules &amp; Knowledge page.
+                      </Text>
+                      <Text as="p" variant="bodySm" tone="subdued">
+                        2. The app splits each file into sections and creates an embedding for each one — one-time, on upload.
+                      </Text>
+                      <Text as="p" variant="bodySm" tone="subdued">
+                        3. On every chat turn, your customer&apos;s message is embedded and matched against your sections. Only the top-5 most relevant ones are sent to the AI.
+                      </Text>
+                      <Text as="p" variant="bodySm" tone="subdued">
+                        4. The AI answers using that focused context — fewer distractions, better responses, lower token cost.
+                      </Text>
+                    </BlockStack>
+                  </Box>
+
+                  <Banner tone="info">
+                    <BlockStack gap="100">
+                      <Text as="p" variant="bodySm">
+                        <strong>To turn on or off:</strong> open <strong>Rules &amp; Knowledge</strong> → <strong>Knowledge files</strong> section → toggle <em>&ldquo;Use RAG retrieval&rdquo;</em>. After enabling, run <strong>Backfill embeddings</strong> from the same page.
+                      </Text>
+                    </BlockStack>
+                  </Banner>
                 </BlockStack>
               </Card>
             </Layout.AnnotatedSection>
