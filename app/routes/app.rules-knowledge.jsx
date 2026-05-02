@@ -132,6 +132,7 @@ export const loader = async ({ request }) => {
       } catch { return {}; }
     })(),
     deduplicateColors: config.deduplicateColors,
+    productCardStyle: config.productCardStyle === "showcase" ? "showcase" : "horizontal",
     knowledgeRagEnabled: config.knowledgeRagEnabled === true,
     files: filesWithCounts,
     plan: { id: plan.id, name: plan.name, features: plan.features, knowledgeFiles: plan.knowledgeFiles },
@@ -250,6 +251,16 @@ export const action = async ({ request }) => {
   if (intent === "toggle_dedup") {
     const value = formData.get("deduplicateColors") === "true";
     await updateShopConfig(session.shop, { deduplicateColors: value });
+    return { saved: true };
+  }
+
+  if (intent === "set_card_style") {
+    const raw = String(formData.get("productCardStyle") || "horizontal");
+    // Whitelist values — anything else falls back to the default so a
+    // bad form post can't put an unknown string in the DB and break
+    // the widget.
+    const value = raw === "showcase" ? "showcase" : "horizontal";
+    await updateShopConfig(session.shop, { productCardStyle: value });
     return { saved: true };
   }
 
@@ -969,25 +980,49 @@ function KnowledgeFilesCard({ files, ragEnabled, embeddingProvider }) {
   );
 }
 
-function DisplayCard({ deduplicateColors }) {
+function DisplayCard({ deduplicateColors, productCardStyle }) {
   const fetcher = useFetcher();
+  const styleFetcher = useFetcher();
   const handleDedup = (checked) => {
     const fd = new FormData();
     fd.set("intent", "toggle_dedup");
     fd.set("deduplicateColors", String(checked));
     fetcher.submit(fd, { method: "post" });
   };
+  const handleStyleChange = (value) => {
+    const fd = new FormData();
+    fd.set("intent", "set_card_style");
+    fd.set("productCardStyle", value);
+    styleFetcher.submit(fd, { method: "post" });
+  };
   return (
     <Card>
-      <BlockStack gap="300">
+      <BlockStack gap="400">
         <Text as="h2" variant="headingMd">Display</Text>
+
+        <BlockStack gap="200">
+          <Select
+            label="Product card style"
+            options={[
+              { label: "Compact — image left, info right (up to 3 cards)", value: "horizontal" },
+              { label: "Showcase — square image on top, scrollable row (up to 10 cards)", value: "showcase" },
+            ]}
+            value={productCardStyle || "horizontal"}
+            onChange={handleStyleChange}
+            disabled={styleFetcher.state === "submitting"}
+            helpText="Compact stacks cards vertically and is best when the AI usually returns 1–3 strong matches. Showcase is a horizontal scroll-snap row of larger square cards — good for browse-style queries where customers want to compare more options."
+          />
+        </BlockStack>
+
+        <Divider />
+
         <Checkbox label="Deduplicate colors in search results"
           helpText="When enabled, products that differ only by color show a single card instead of one per color variant. Useful when each color is a separate Shopify product."
           checked={deduplicateColors} onChange={handleDedup} />
         <Box background="bg-surface-secondary" padding="300" borderRadius="200">
           <BlockStack gap="150">
             <Text as="p" variant="bodySm" tone="subdued">
-              <strong>How it works:</strong> the app groups products by everything before the last dash in the title. For this to work, your product titles must follow this format:
+              <strong>How dedup works:</strong> the app groups products by everything before the last dash in the title. For this to work, your product titles must follow this format:
             </Text>
             <Text as="p" variant="bodySm">
               <code>Product Name - Color</code>
@@ -2396,7 +2431,7 @@ export default function RulesKnowledge() {
             title="Product card presentation"
             description="How product cards are deduplicated and shown in chat."
           />
-          <DisplayCard deduplicateColors={data.deduplicateColors} />
+          <DisplayCard deduplicateColors={data.deduplicateColors} productCardStyle={data.productCardStyle} />
         </BlockStack>
       </BlockStack>
     </Page>

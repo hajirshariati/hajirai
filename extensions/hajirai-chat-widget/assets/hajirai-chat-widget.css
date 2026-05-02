@@ -992,6 +992,115 @@ a.ai-chat-welcome__hint--link:hover {
   margin-left: 6px;
 }
 
+/* The "View product" CTA only shows in showcase style. Hide by
+   default so the legacy horizontal layout is unchanged. */
+.ai-chat-product-cta {
+  display: none;
+}
+
+/* ================================================================
+   PRODUCT CARDS — SHOWCASE STYLE (opt-in via merchant setting)
+   ================================================================
+   Layout differences vs legacy horizontal:
+   - Container is a horizontal scroll-snap row (overflow-x: auto)
+   - Each card stacks vertically: square image on top, info below
+   - Up to 10 cards (vs legacy cap of 3) — server-side cap is bumped
+     to match in chat.jsx when productCardStyle === "showcase"
+   - "View product" CTA is shown at the bottom of each card
+   - Fit predictor bar is hidden (doesn't fit the layout)
+   - On mobile, single card = full width, multiple cards = 1.5
+     visible (so users can see there's more to scroll to)
+   ================================================================ */
+.ai-chat-products--showcase {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 10px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  /* Negative margin + padding lets the scroll area bleed to the
+     bubble edge so the rightmost card is flush with the bubble. */
+  margin: 8px -4px 0;
+  padding: 0 4px 8px;
+}
+
+.ai-chat-products--showcase .ai-chat-product-card {
+  flex: 0 0 180px;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  scroll-snap-align: start;
+  padding: 0;
+  overflow: hidden;
+  gap: 0;
+}
+
+.ai-chat-products--showcase .ai-chat-product-img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  border-radius: 0;
+  flex-shrink: 0;
+}
+
+.ai-chat-products--showcase .ai-chat-product-info {
+  width: 100%;
+  padding: 10px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  justify-content: flex-start;
+}
+
+.ai-chat-products--showcase .ai-chat-product-title {
+  font-size: 13px;
+  margin: 0;
+  -webkit-line-clamp: 2;
+  /* Reserve 2 lines so 1-line and 2-line titles align across cards */
+  min-height: calc(1.4em * 2);
+  line-height: 1.4;
+}
+
+.ai-chat-products--showcase .ai-chat-product-price {
+  font-size: 14px;
+  margin: 0;
+}
+
+.ai-chat-products--showcase .ai-chat-product-cta {
+  display: block;
+  margin-top: 4px;
+  padding: 8px 12px;
+  background: var(--ai-chat-primary);
+  color: var(--ai-chat-bg, #fff);
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  letter-spacing: 0.02em;
+}
+
+/* Hide fit predictor in showcase — the inline bar doesn't fit
+   the narrower vertical cards and would crowd the price/CTA. */
+.ai-chat-products--showcase .ai-chat-product-fit {
+  display: none;
+}
+
+/* Mobile: when there are 2+ cards, show ~1.5 cards so the cut-off
+   right edge signals "scroll for more". When there's only ONE
+   card, expand to full width — no need to peek a second card
+   that doesn't exist. `:only-child` correctly selects exactly
+   that case (and nothing else). */
+@media (max-width: 600px) {
+  .ai-chat-products--showcase .ai-chat-product-card {
+    flex: 0 0 64%;
+  }
+  .ai-chat-products--showcase .ai-chat-product-card:only-child {
+    flex: 0 0 100%;
+  }
+}
+
 /* ---------- Typing indicator ---------- */
 .ai-chat-typing {
   display: none;

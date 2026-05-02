@@ -81,6 +81,12 @@ model ShopConfig {
   showFeedback        Boolean  @default(true)
   deduplicateColors   Boolean  @default(false)
   promptCaching       Boolean  @default(false)
+  // Product card layout in the storefront chat widget.
+  // "horizontal" (default): legacy — thumbnail left, title/price right,
+  // capped at 3 cards stacked vertically. "showcase": square image
+  // top, title/price/CTA below, up to 10 cards in a horizontal
+  // scroll-snap row. Per-shop merchant preference.
+  productCardStyle    String   @default("horizontal")
   klaviyoFormId       String   @default("")
   klaviyoCompanyId    String   @default("")
   klaviyoListId       String   @default("")

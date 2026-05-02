@@ -51,6 +51,7 @@ export const loader = async ({ request }) => {
         klaviyoListId: config.klaviyoListId || "",
         vipModeEnabled: config.vipModeEnabled === true,
         showLoginPill: config.showLoginPill !== false,
+        productCardStyle: config.productCardStyle === "showcase" ? "showcase" : "horizontal",
       },
       {
         // 60s keeps the storefront responsive without making merchant config

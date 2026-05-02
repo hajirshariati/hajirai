@@ -920,6 +920,10 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       textLower,
     );
 
+    // Per-shop card cap, set in chat action from config.productCardStyle.
+    // Horizontal layout = 3 (legacy); showcase layout = 10 (scroll-snap row).
+    const cardCap = ctx.productCardCap || 3;
+
     // SKU-mention narrowing: if the AI text named a specific SKU (e.g.
     // "the L700M is your best match"), render ONLY the card(s) for that
     // SKU instead of all top-3 from the pool. Prevents the "text says one
@@ -938,7 +942,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         return cardSkus.some((s) => wantedBases.has(baseSku(s)));
       });
       if (skuMatches.length > 0) {
-        skuNarrowedCards = skuMatches.slice(0, 3);
+        skuNarrowedCards = skuMatches.slice(0, cardCap);
         console.log(
           `[chat] SKU-narrow: text mentions ${[...wantedBases].join(",")} → showing ${skuNarrowedCards.length} of ${filteredPool.length} pool cards`,
         );
@@ -964,9 +968,9 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       cards = [scored[0].card];
       console.log(`[chat] singular-narrow: text says "the X is best" → showing 1 card`);
     } else if (matched.length > 0) {
-      cards = matched.slice(0, 3).map((s) => s.card);
+      cards = matched.slice(0, cardCap).map((s) => s.card);
     } else if (!saysNoMatch) {
-      cards = dropSiblingCards(scored, textLower).slice(0, 3).map((s) => s.card);
+      cards = dropSiblingCards(scored, textLower).slice(0, cardCap).map((s) => s.card);
     }
 
     // Text-card coherence guard: if the AI used singular-prescriptive
@@ -1363,6 +1367,10 @@ export const action = async ({ request }) => {
       accessToken,
       loggedInCustomerId,
       vipModeEnabled: config.vipModeEnabled === true,
+      // Showcase layout supports a horizontal scroll-snap row of up to
+      // 10 cards. Legacy horizontal layout stays capped at 3 since
+      // 4+ stacked cards crowd the chat panel vertically.
+      productCardCap: config.productCardStyle === "showcase" ? 10 : 3,
       trackingPageUrl: config.trackingPageUrl || "",
       returnsPageUrl: config.returnsPageUrl || "",
       catalogCategories: catalogProductTypes,

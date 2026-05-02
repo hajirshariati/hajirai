@@ -37,6 +37,7 @@ fetch(CONFIG_URL).then(function(r){return r.json()}).then(function(d){
   if(d.klaviyoFormId)KLAVIYO_FORM_ID=d.klaviyoFormId;
   if(d.klaviyoCompanyId)KLAVIYO_COMPANY_ID=d.klaviyoCompanyId;
   if(d.klaviyoListId)KLAVIYO_LIST_ID=d.klaviyoListId;
+  if(d.productCardStyle==='showcase')PRODUCT_CARD_STYLE='showcase';
   if(d.showLoginPill===false){
     SHOW_LOGIN_PILL=false;
     var pill=document.querySelector('.ai-chat-header__login-pill,.ai-chat-header__vip-pill');
@@ -87,6 +88,10 @@ var CUST_NAME=C.customerFirstName||'';
 var CUST_ID=C.customerId||null;
 var CUST_LOGIN_URL=C.customerLoginUrl||'/account/login';
 var SHOW_LOGIN_PILL=true;
+// "horizontal" = legacy thumbnail-left layout, capped at 3 cards.
+// "showcase" = square image on top, scroll-snap row, up to 10 cards.
+// Set from /widget-config response; merchants pick this in the admin.
+var PRODUCT_CARD_STYLE='horizontal';
 var KLAVIYO_FORM_ID='';
 var KLAVIYO_COMPANY_ID='';
 var KLAVIYO_LIST_ID='';
@@ -328,7 +333,8 @@ var av=isU?'<span>You</span>':assistantBubbleAvatar;
 d.innerHTML='<div class="ai-chat-msg-avatar">'+av+'</div><div class="ai-chat-msg-bubble"><p>'+md(esc(content))+'</p></div>';
 if(products&&products.length){
   var b=$('.ai-chat-msg-bubble',d);
-  var ph='<div class="ai-chat-products">';
+  var styleSuffix=PRODUCT_CARD_STYLE==='showcase'?' ai-chat-products--showcase':'';
+  var ph='<div class="ai-chat-products'+styleSuffix+'">';
   for(var i=0;i<products.length;i++)ph+=prodCard(products[i]);
   ph+='</div>';
   b.insertAdjacentHTML('beforeend',ph);
@@ -345,7 +351,13 @@ var u=p.url||(p.handle?('/products/'+p.handle):'#');
 var pr=esc(p.price_formatted||(p.price?fmt(p.price):''));
 var cp=p.compare_at_price?esc(fmt(p.compare_at_price)):'';
 var ariaParts=[t];if(pr)ariaParts.push(pr);var ariaLabel=esc(ariaParts.join(' — '));
-return '<a class="ai-chat-product-card" data-handle="'+esc(p.handle||'')+'" href="'+esc(u)+'" aria-label="'+ariaLabel+'" style="text-decoration:none;color:inherit">'+(img?'<div class="ai-chat-product-img"><img src="'+esc(img)+'" alt="" loading="lazy"></div>':'')+'<div class="ai-chat-product-info"><span class="ai-chat-product-title">'+t+'</span><div class="ai-chat-product-price">'+pr+(cp?'<span class="compare-at">'+cp+'</span>':'')+'</div></div></a>';
+// In showcase style we add a "View product" CTA below the price. The
+// CTA is rendered for both layouts but CSS-hidden on horizontal so
+// the markup is identical and we don't need to special-case anywhere
+// else (event handlers, fit-predictor injection, etc).
+var imgHtml=img?'<div class="ai-chat-product-img"><img src="'+esc(img)+'" alt="" loading="lazy"></div>':'';
+var infoHtml='<div class="ai-chat-product-info"><span class="ai-chat-product-title">'+t+'</span><div class="ai-chat-product-price">'+pr+(cp?'<span class="compare-at">'+cp+'</span>':'')+'</div><span class="ai-chat-product-cta" aria-hidden="true">View product</span></div>';
+return '<a class="ai-chat-product-card" data-handle="'+esc(p.handle||'')+'" href="'+esc(u)+'" aria-label="'+ariaLabel+'" style="text-decoration:none;color:inherit">'+imgHtml+infoHtml+'</a>';
 }
 
 function sendMessage(){
@@ -620,7 +632,7 @@ var cm;while((cm=choiceRe.exec(cleanText))!==null){choices.push(cm[1])}
 if(choices.length>0)cleanText=cleanText.replace(/\s*<<[^<>]+>>/g,'').trim();
 if(cleanText){
   if(!mDiv)mDiv=appendMsg('assistant',cleanText,prods);
-  else{var b=$('.ai-chat-msg-bubble',mDiv);if(b){b.innerHTML='<p>'+md(esc(cleanText))+'</p>';if(prods&&prods.length){var ph='<div class="ai-chat-products">';for(var pi=0;pi<prods.length;pi++)ph+=prodCard(prods[pi]);ph+='</div>';b.insertAdjacentHTML('beforeend',ph)}}}
+  else{var b=$('.ai-chat-msg-bubble',mDiv);if(b){b.innerHTML='<p>'+md(esc(cleanText))+'</p>';if(prods&&prods.length){var styleSuffix2=PRODUCT_CARD_STYLE==='showcase'?' ai-chat-products--showcase':'';var ph='<div class="ai-chat-products'+styleSuffix2+'">';for(var pi=0;pi<prods.length;pi++)ph+=prodCard(prods[pi]);ph+='</div>';b.insertAdjacentHTML('beforeend',ph)}}}
   messages.push({role:'assistant',content:cleanText,products:prods||[]});saveH(messages)
 }
 if(choices.length>0&&mDiv){
