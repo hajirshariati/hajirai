@@ -1092,6 +1092,62 @@ a.ai-chat-welcome__hint--link:hover {
   letter-spacing: 0.02em;
 }
 
+/* Showcase nav arrows — black circle, white chevron, vertically
+   centered on the first card's image (anchor set in JS via
+   --arrow-top so it stays correct at any card width). */
+.ai-chat-products-wrap {
+  position: relative;
+}
+
+.ai-chat-products-arrow {
+  position: absolute;
+  top: var(--arrow-top, 50%);
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: #000;
+  color: #fff;
+  cursor: pointer;
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  /* Hidden by default — only shown on hover-capable, wide enough screens.
+     On phones/tablets the swipe gesture + peeking 4th card cover this. */
+  display: none;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.ai-chat-products-arrow svg {
+  display: block;
+}
+
+.ai-chat-products-arrow--prev {
+  left: 4px;
+}
+
+.ai-chat-products-arrow--next {
+  right: 4px;
+}
+
+@media (min-width: 768px) and (hover: hover) {
+  .ai-chat-products-arrow {
+    display: flex;
+  }
+  .ai-chat-products-arrow[hidden] {
+    display: none;
+  }
+  .ai-chat-products-arrow:hover {
+    background: #1a1a1a;
+  }
+  .ai-chat-products-arrow:active {
+    transform: translateY(-50%) scale(0.92);
+  }
+}
+
 /* Hide fit predictor in showcase — the inline bar doesn't fit
    the narrower vertical cards and would crowd the price/CTA. */
 .ai-chat-products--showcase .ai-chat-product-fit {

@@ -345,6 +345,63 @@ function scrollMsgTop(elm){
   });
 }
 
+/* Showcase navigation arrows.
+   - Wraps the .ai-chat-products--showcase row in a positioned container.
+   - Vertical position is anchored to the first card's image so the arrows
+     land on the photo, not the title/CTA, at any card width.
+   - Left arrow hides at scrollLeft 0; right arrow hides at end of scroll.
+   - CSS scopes the visible state to >=768px hover devices. */
+var ARROW_CHEVRON_PREV='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>';
+var ARROW_CHEVRON_NEXT='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+
+function showcaseWrap(productsHtml){
+  return '<div class="ai-chat-products-wrap">'+
+    '<button class="ai-chat-products-arrow ai-chat-products-arrow--prev" type="button" aria-label="Scroll left" hidden>'+ARROW_CHEVRON_PREV+'</button>'+
+    productsHtml+
+    '<button class="ai-chat-products-arrow ai-chat-products-arrow--next" type="button" aria-label="Scroll right">'+ARROW_CHEVRON_NEXT+'</button>'+
+  '</div>';
+}
+
+function updateShowcaseArrows(wrap){
+  var row=wrap.querySelector('.ai-chat-products--showcase');
+  if(!row)return;
+  var firstImg=row.querySelector('.ai-chat-product-img');
+  if(firstImg){
+    var top=firstImg.offsetTop+firstImg.offsetHeight/2;
+    wrap.style.setProperty('--arrow-top',top+'px');
+  }
+  var prev=wrap.querySelector('.ai-chat-products-arrow--prev');
+  var next=wrap.querySelector('.ai-chat-products-arrow--next');
+  var atStart=row.scrollLeft<=1;
+  var atEnd=row.scrollLeft+row.clientWidth>=row.scrollWidth-1;
+  if(prev)prev.hidden=atStart;
+  if(next)next.hidden=atEnd;
+}
+
+function initShowcaseArrows(wrap){
+  var row=wrap.querySelector('.ai-chat-products--showcase');
+  if(!row)return;
+  var prev=wrap.querySelector('.ai-chat-products-arrow--prev');
+  var next=wrap.querySelector('.ai-chat-products-arrow--next');
+  function step(dir){
+    var card=row.querySelector('.ai-chat-product-card');
+    var delta=(card?card.offsetWidth+10:row.clientWidth*0.8)*dir;
+    if(typeof row.scrollBy==='function')row.scrollBy({left:delta,behavior:'smooth'});
+    else row.scrollLeft+=delta;
+  }
+  if(prev)prev.addEventListener('click',function(e){e.preventDefault();step(-1)});
+  if(next)next.addEventListener('click',function(e){e.preventDefault();step(1)});
+  row.addEventListener('scroll',function(){updateShowcaseArrows(wrap)},{passive:true});
+  requestAnimationFrame(function(){updateShowcaseArrows(wrap)});
+}
+
+/* Single global resize listener — recompute arrow Y for every active wrap
+   instead of leaking one listener per render. */
+window.addEventListener('resize',function(){
+  var wraps=document.querySelectorAll('.ai-chat-products-wrap');
+  for(var i=0;i<wraps.length;i++)updateShowcaseArrows(wraps[i]);
+});
+
 function appendMsg(role,content,products){
 var isU=role==='user';
 var d=el('div','ai-chat-msg ai-chat-msg--'+role);
@@ -352,11 +409,13 @@ var av=isU?'<span>You</span>':assistantBubbleAvatar;
 d.innerHTML='<div class="ai-chat-msg-avatar">'+av+'</div><div class="ai-chat-msg-bubble"><p>'+md(esc(content))+'</p></div>';
 if(products&&products.length){
   var b=$('.ai-chat-msg-bubble',d);
-  var styleSuffix=PRODUCT_CARD_STYLE==='showcase'?' ai-chat-products--showcase':'';
+  var isShowcase=PRODUCT_CARD_STYLE==='showcase';
+  var styleSuffix=isShowcase?' ai-chat-products--showcase':'';
   var ph='<div class="ai-chat-products'+styleSuffix+'">';
   for(var i=0;i<products.length;i++)ph+=prodCard(products[i]);
   ph+='</div>';
-  b.insertAdjacentHTML('beforeend',ph);
+  b.insertAdjacentHTML('beforeend',isShowcase?showcaseWrap(ph):ph);
+  if(isShowcase){var w=b.querySelector('.ai-chat-products-wrap');if(w)initShowcaseArrows(w)}
 }
 msgsEl.appendChild(d);
 scrollBottom();
@@ -651,7 +710,7 @@ var cm;while((cm=choiceRe.exec(cleanText))!==null){choices.push(cm[1])}
 if(choices.length>0)cleanText=cleanText.replace(/\s*<<[^<>]+>>/g,'').trim();
 if(cleanText){
   if(!mDiv)mDiv=appendMsg('assistant',cleanText,prods);
-  else{var b=$('.ai-chat-msg-bubble',mDiv);if(b){b.innerHTML='<p>'+md(esc(cleanText))+'</p>';if(prods&&prods.length){var styleSuffix2=PRODUCT_CARD_STYLE==='showcase'?' ai-chat-products--showcase':'';var ph='<div class="ai-chat-products'+styleSuffix2+'">';for(var pi=0;pi<prods.length;pi++)ph+=prodCard(prods[pi]);ph+='</div>';b.insertAdjacentHTML('beforeend',ph)}}}
+  else{var b=$('.ai-chat-msg-bubble',mDiv);if(b){b.innerHTML='<p>'+md(esc(cleanText))+'</p>';if(prods&&prods.length){var isShowcase2=PRODUCT_CARD_STYLE==='showcase';var styleSuffix2=isShowcase2?' ai-chat-products--showcase':'';var ph='<div class="ai-chat-products'+styleSuffix2+'">';for(var pi=0;pi<prods.length;pi++)ph+=prodCard(prods[pi]);ph+='</div>';b.insertAdjacentHTML('beforeend',isShowcase2?showcaseWrap(ph):ph);if(isShowcase2){var w2=b.querySelector('.ai-chat-products-wrap');if(w2)initShowcaseArrows(w2)}}}}
   messages.push({role:'assistant',content:cleanText,products:prods||[]});saveH(messages)
 }
 if(choices.length>0&&mDiv){
