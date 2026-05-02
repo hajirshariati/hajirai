@@ -1,5 +1,5 @@
-import prisma from "../db.server";
-import { encrypt, decrypt } from "../utils/encryption.server";
+import prisma from "../db.server.js";
+import { encrypt, decrypt } from "../utils/encryption.server.js";
 
 const ENCRYPTED_FIELDS = ["anthropicApiKey", "yotpoApiKey", "aftershipApiKey", "klaviyoPrivateKey", "yotpoLoyaltyApiKey", "voyageApiKey", "openaiApiKey"];
 
