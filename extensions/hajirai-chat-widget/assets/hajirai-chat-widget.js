@@ -17,6 +17,7 @@ var CHAT_URL='/apps/hajirai/chat';
 var FEEDBACK_URL='/apps/hajirai/feedback';
 var CONFIG_URL='/apps/hajirai/widget-config';
 var HRK='hajirai_hide_rules';
+var PCSK='hajirai_product_card_style';
 
 function matchesHideRule(rules){
   if(!rules||!rules.length)return false;
@@ -38,6 +39,10 @@ fetch(CONFIG_URL).then(function(r){return r.json()}).then(function(d){
   if(d.klaviyoCompanyId)KLAVIYO_COMPANY_ID=d.klaviyoCompanyId;
   if(d.klaviyoListId)KLAVIYO_LIST_ID=d.klaviyoListId;
   if(d.productCardStyle==='showcase')PRODUCT_CARD_STYLE='showcase';
+  /* Cache so the next page load knows the style synchronously,
+     before history is restored. Otherwise saved product cards
+     render in default style until the fetch resolves. */
+  try{localStorage.setItem(PCSK,PRODUCT_CARD_STYLE)}catch(e){}
   if(d.showLoginPill===false){
     SHOW_LOGIN_PILL=false;
     var pill=document.querySelector('.ai-chat-header__login-pill,.ai-chat-header__vip-pill');
@@ -91,7 +96,10 @@ var SHOW_LOGIN_PILL=true;
 // "horizontal" = legacy thumbnail-left layout, capped at 3 cards.
 // "showcase" = square image on top, scroll-snap row, up to 10 cards.
 // Set from /widget-config response; merchants pick this in the admin.
+// Hydrated synchronously from localStorage so restored history on
+// page refresh renders with the right style before fetch resolves.
 var PRODUCT_CARD_STYLE='horizontal';
+try{var _cachedStyle=localStorage.getItem(PCSK);if(_cachedStyle==='showcase')PRODUCT_CARD_STYLE='showcase'}catch(e){}
 var KLAVIYO_FORM_ID='';
 var KLAVIYO_COMPANY_ID='';
 var KLAVIYO_LIST_ID='';
