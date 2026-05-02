@@ -6,7 +6,7 @@ const LABELS = {
   custom: "Custom Knowledge",
 };
 
-export function buildSystemPrompt({ config, knowledge, shop, attributeNames, categoryExclusions, querySynonyms, customerContext, fitPredictorEnabled, catalogProductTypes, scopedGender, answeredChoices, categoryGenderMap, activeCampaigns }) {
+export function buildSystemPrompt({ config, knowledge, retrievedChunks, shop, attributeNames, categoryExclusions, querySynonyms, customerContext, fitPredictorEnabled, catalogProductTypes, scopedGender, answeredChoices, categoryGenderMap, activeCampaigns }) {
   const name = config?.assistantName || "AI Shopping Assistant";
   const tagline = config?.assistantTagline || "";
   const parts = [];
@@ -126,16 +126,36 @@ export function buildSystemPrompt({ config, knowledge, shop, attributeNames, cat
     }
   }
 
-  const knowledgeByType = {};
-  for (const k of knowledge || []) {
-    if (!k?.content) continue;
-    if (!knowledgeByType[k.fileType]) knowledgeByType[k.fileType] = [];
-    knowledgeByType[k.fileType].push(k.content);
-  }
-
-  for (const [type, contents] of Object.entries(knowledgeByType)) {
-    const label = LABELS[type] || type;
-    parts.push(`\n=== ${label} ===\n${contents.join("\n\n")}`);
+  // Knowledge injection. Two paths:
+  //
+  //   (1) RAG: caller (chat.jsx) ran retrieveRelevantChunks for this
+  //       turn's user message and passes the top-K chunks as
+  //       `retrievedChunks`. We inject only those — typically 3-5
+  //       chunks (~3K chars) instead of the full knowledge corpus
+  //       (~10-30K chars). The whole point of batch 2c.
+  //
+  //   (2) Legacy / fallback: caller didn't pass retrievedChunks
+  //       (RAG flag off, no embedding provider, no chunks embedded
+  //       yet, or retrieval returned empty). Dump every knowledge
+  //       file as before. Identical to pre-2c behavior — safe.
+  if (Array.isArray(retrievedChunks) && retrievedChunks.length > 0) {
+    const blocks = retrievedChunks.map((c) => {
+      const label = LABELS[c.fileType] || c.fileType || "Knowledge";
+      const titleSuffix = c.sectionTitle ? ` — ${c.sectionTitle}` : "";
+      return `--- (${label}${titleSuffix})\n${c.content}`;
+    });
+    parts.push(`\n=== Relevant knowledge (${retrievedChunks.length} sections) ===\n${blocks.join("\n\n")}`);
+  } else {
+    const knowledgeByType = {};
+    for (const k of knowledge || []) {
+      if (!k?.content) continue;
+      if (!knowledgeByType[k.fileType]) knowledgeByType[k.fileType] = [];
+      knowledgeByType[k.fileType].push(k.content);
+    }
+    for (const [type, contents] of Object.entries(knowledgeByType)) {
+      const label = LABELS[type] || type;
+      parts.push(`\n=== ${label} ===\n${contents.join("\n\n")}`);
+    }
   }
 
   // Active campaigns — only those with now within startsAt..endsAt at

@@ -5,6 +5,7 @@ import { getAttributeMappings } from "../models/AttributeMapping.server";
 import { getCatalogCategories, getAllCatalogCategories, getCategoryGenderAvailability } from "../models/Product.server";
 import { getActiveCampaigns, formatCampaignsForCS } from "../models/Campaign.server";
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
+import { retrieveRelevantChunks } from "../lib/knowledge-chunks.server";
 import { filterForbiddenCategoryChips, filterContradictingGenderChips } from "../lib/chip-filter.server";
 import { sanitizeCtaLabel } from "../lib/cta-label.server";
 import { analyzeCategoryIntent, cardMatchesActiveGroup, textIntentDivergesFromGroup, matchingGroupsForText } from "../lib/category-intent.server";
@@ -1294,9 +1295,36 @@ export const action = async ({ request }) => {
       }
     }
 
+    // RAG retrieval (batch 2c). When the shop has opted in via
+    // knowledgeRagEnabled and a query string is available, retrieve
+    // top-K most-relevant KnowledgeChunk rows for the customer's
+    // latest message and pass them to buildSystemPrompt INSTEAD of
+    // the full knowledge dump. Failures (no provider, no chunks
+    // embedded yet, query empty) return [] and the prompt builder
+    // falls back to the legacy full-dump path automatically.
+    let retrievedChunks = null;
+    if (config.knowledgeRagEnabled === true) {
+      const ragQuery = String(body.message || "").trim();
+      if (ragQuery) {
+        try {
+          retrievedChunks = await retrieveRelevantChunks(prisma, {
+            shop: session.shop,
+            query: ragQuery,
+            config,
+            limit: 5,
+          });
+          console.log(`[rag] retrieved ${retrievedChunks?.length || 0} chunk(s) for query="${ragQuery.slice(0, 60)}"`);
+        } catch (err) {
+          console.error("[rag] retrieval failed, falling back to full dump:", err?.message || err);
+          retrievedChunks = null;
+        }
+      }
+    }
+
     const systemPrompt = buildSystemPrompt({
       config,
       knowledge,
+      retrievedChunks,
       shop: session.shop,
       attributeNames,
       categoryExclusions,

@@ -122,6 +122,15 @@ model ShopConfig {
   // determinism. Empty = feature disabled.
   campaignCheatCode   String   @default("")
 
+  // RAG over knowledge files. When true, chat-prompt.server.js
+  // retrieves the top-K most semantically relevant KnowledgeChunk
+  // rows for the customer's latest message and injects only those
+  // — instead of dumping every knowledge file in every prompt.
+  // Default OFF: feature must be opted into per-shop. Requires
+  // semantic search (embeddingProvider + apiKey) + a successful
+  // backfill (npm run backfill:knowledge-chunks) before enabling.
+  knowledgeRagEnabled Boolean  @default(false)
+
   plan                    String    @default("free")
   subscriptionId          String?
   subscriptionActivatedAt DateTime?
