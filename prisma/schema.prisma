@@ -324,3 +324,35 @@ model ChatConversion {
   @@index([shop, createdAt])
   @@index([createdAt])
 }
+
+// One row per chunk of a merchant's knowledge file (FAQs, brand
+// voice, rules, etc.). Used by the RAG path in chat-prompt.server.js
+// — instead of injecting the entire knowledge corpus on every turn
+// (~10-30K chars), we embed each chunk once and retrieve the top-K
+// most semantically relevant ones for the customer's current message.
+//
+// Chunks are typically split on section headers (Aetrex's `═══`
+// dividers) so each chunk is a coherent topic. The embedding column
+// itself is `vector(1024)` and lives outside the Prisma schema —
+// added via raw SQL in the migration since Prisma doesn't natively
+// support pgvector. Same pattern as Product.embedding.
+//
+// On knowledge-file update, all chunks for that sourceFileId are
+// deleted and replaced (idempotent rebuild).
+model KnowledgeChunk {
+  id                 String    @id @default(cuid())
+  shop               String
+  sourceFileId       String?
+  fileType           String
+  sectionTitle       String?
+  chunkIndex         Int
+  content            String
+  embeddingProvider  String?
+  embeddingUpdatedAt DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@index([shop])
+  @@index([shop, fileType])
+  @@index([sourceFileId])
+}
