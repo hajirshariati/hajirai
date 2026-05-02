@@ -219,7 +219,7 @@
     "toolStubs": {
       "search_products": [
         {
-          "if_query_matches": "plantar|fasciitis|walking|travel|comfort|posted|arch",
+          "if_query_matches": "plantar|fasciitis|walking|travel|comfort|posted|arch|italy|trip|vacation|shoe|orthotic|insert|sneaker|sandal|loafer|footwear",
           "return": {
             "products": [
               { "handle": "danika-walking-w", "title": "Danika Walking Sneaker - Pink", "_category": "Sneakers" },
@@ -227,11 +227,19 @@
             ]
           }
         },
-        { "if_query_matches": ".", "return": { "products": [] } }
+        {
+          "if_query_matches": ".",
+          "return": {
+            "products": [
+              { "handle": "fallback-walking-w", "title": "All-Day Comfort Walking Shoe", "_category": "Sneakers" }
+            ]
+          }
+        }
       ]
     },
     "expect": {
       "must_call_tool": "search_products",
+      "products_must_include_handle": "danika-walking-w",
       "text_must_not_contain": ["i'm not finding", "dead-end", "support team"]
     }
   },
