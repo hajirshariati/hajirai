@@ -67,6 +67,12 @@
     {%- if block.settings.color_cta_hover != blank -%}
       --ai-chat-cta-hover: {{ block.settings.color_cta_hover }};
     {%- endif -%}
+    {%- if block.settings.color_product_cta_bg != blank -%}
+      --ai-chat-product-cta-bg: {{ block.settings.color_product_cta_bg }};
+    {%- endif -%}
+    {%- if block.settings.color_product_cta_text != blank -%}
+      --ai-chat-product-cta-text: {{ block.settings.color_product_cta_text }};
+    {%- endif -%}
   }
   .ai-chat-overlay.visible { background: rgba(0, 0, 0, 0.4) !important; }
   .ai-chat-panel { --ai-chat-panel-w: 560px !important; }
@@ -244,6 +250,20 @@
       "id": "color_cta_hover",
       "label": "CTA Hover",
       "default": "#d4ebdb"
+    },
+    {
+      "type": "color",
+      "id": "color_product_cta_bg",
+      "label": "Product CTA Background",
+      "info": "Background color of the 'View product' button on product cards.",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "color_product_cta_text",
+      "label": "Product CTA Text",
+      "info": "Text color of the 'View product' button on product cards.",
+      "default": "#ffffff"
     },
 
     { "type": "header", "content": "Welcome CTAs & Quick Picks", "info": "Up to 4 starting questions, plus shorter quick-pick prompts." },

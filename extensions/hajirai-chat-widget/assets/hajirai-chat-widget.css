@@ -1030,7 +1030,9 @@ a.ai-chat-welcome__hint--link:hover {
 }
 
 .ai-chat-products--showcase .ai-chat-product-card {
-  flex: 0 0 180px;
+  /* 3.3 cards visible so the 4th peeks at the right edge,
+     signalling there's more to scroll. (100% - 3*10px gaps) / 3.3 */
+  flex: 0 0 calc((100% - 30px) / 3.3);
   flex-direction: column;
   flex-wrap: nowrap;
   scroll-snap-align: start;
@@ -1074,8 +1076,8 @@ a.ai-chat-welcome__hint--link:hover {
   display: block;
   margin-top: 4px;
   padding: 8px 12px;
-  background: var(--ai-chat-primary);
-  color: var(--ai-chat-bg, #fff);
+  background: var(--ai-chat-product-cta-bg, #000);
+  color: var(--ai-chat-product-cta-text, #fff);
   text-align: center;
   font-size: 12px;
   font-weight: 600;
