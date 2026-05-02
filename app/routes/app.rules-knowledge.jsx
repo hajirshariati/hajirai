@@ -60,6 +60,7 @@ import {
 } from "../models/ShopConfig.server";
 import prisma from "../db.server";
 import { backfillShopEmbeddings, resolveShopEmbedding } from "../lib/embeddings.server";
+import { rebuildChunksForFile } from "../lib/knowledge-chunks.server";
 import {
   upsertEnrichmentsFromCsv,
   deleteEnrichmentsBySourceFile,
@@ -422,12 +423,39 @@ export const action = async ({ request }) => {
       }
     }
 
+    // Fire-and-forget: rebuild RAG chunks so retrieval reflects the new
+    // file. Skipped silently if the shop has no embedding provider —
+    // legacy full-dump path keeps working until they opt in. Don't
+    // await, so the upload UX stays snappy.
+    (async () => {
+      try {
+        const config = await getShopConfig(session.shop);
+        const resolved = resolveShopEmbedding(config);
+        if (!resolved) return;
+        const result = await rebuildChunksForFile(prisma, {
+          shop: session.shop,
+          sourceFileId: saved.id,
+          fileType: saved.fileType,
+          content: saved.content,
+          provider: resolved.provider,
+          apiKey: resolved.apiKey,
+        });
+        console.log(`[knowledge-chunks] rebuilt for shop=${session.shop} file=${saved.id}:`, result);
+      } catch (err) {
+        console.error(`[knowledge-chunks] background rebuild failed for shop=${session.shop} file=${saved.id}:`, err?.message || err);
+      }
+    })();
+
     return { uploaded: true, skuWarning, message: `${fileName} uploaded successfully.${enrichmentMessage}` };
   }
 
   if (intent === "delete_file") {
     const fileId = formData.get("fileId");
     await deleteEnrichmentsBySourceFile(fileId);
+    // Drop chunks before the parent file row — KnowledgeChunk has no
+    // FK to KnowledgeFile (sourceFileId is a plain string), so this
+    // keeps the orphan-row count at zero without a cascade.
+    await prisma.knowledgeChunk.deleteMany({ where: { shop: session.shop, sourceFileId: fileId } });
     await deleteKnowledgeFile(fileId);
     return { deleted: true };
   }
