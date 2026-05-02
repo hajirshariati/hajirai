@@ -1022,11 +1022,18 @@ a.ai-chat-welcome__hint--link:hover {
   overflow-y: hidden;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
+  /* Hide the horizontal scrollbar — the peeking 4th card already
+     signals there's more to scroll. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   /* Negative margin + padding lets the scroll area bleed to the
      bubble edge so the rightmost card is flush with the bubble. */
   margin: 8px -4px 0;
   padding: 0 4px 8px;
+}
+
+.ai-chat-products--showcase::-webkit-scrollbar {
+  display: none;
 }
 
 .ai-chat-products--showcase .ai-chat-product-card {
