@@ -1092,6 +1092,50 @@ a.ai-chat-welcome__hint--link:hover {
   letter-spacing: 0.02em;
 }
 
+/* Single-card "featured" layout. When the showcase has exactly one
+   card the 3.3-card width leaves a huge empty bubble — switch to a
+   horizontal image-left/info-right layout that fills the bubble and
+   reads as a prescriptive recommendation. Scoped to :only-child so
+   multi-card behavior is untouched. The mobile :only-child rule
+   below keeps the simpler full-width vertical layout for narrow
+   screens (horizontal looks cramped under ~600px). */
+@media (min-width: 601px) {
+  .ai-chat-products--showcase .ai-chat-product-card:only-child {
+    flex: 0 0 100%;
+    flex-direction: row;
+    gap: 0;
+    align-items: stretch;
+  }
+  .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-product-img {
+    width: 160px;
+    flex: 0 0 160px;
+    aspect-ratio: 1 / 1;
+    align-self: flex-start;
+  }
+  .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-product-info {
+    flex: 1 1 auto;
+    padding: 16px 18px;
+    justify-content: center;
+    gap: 8px;
+  }
+  .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-product-title {
+    font-size: 15px;
+    -webkit-line-clamp: 3;
+    min-height: 0;
+    line-height: 1.35;
+  }
+  .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-product-price {
+    font-size: 16px;
+  }
+  .ai-chat-products--showcase .ai-chat-product-card:only-child .ai-chat-product-cta {
+    margin-top: 6px;
+    padding: 10px 16px;
+    font-size: 13px;
+    align-self: flex-start;
+    min-width: 140px;
+  }
+}
+
 /* Showcase nav arrows — black circle, white chevron, vertically
    centered on the first card's image (anchor set in JS via
    --arrow-top so it stays correct at any card width). */
