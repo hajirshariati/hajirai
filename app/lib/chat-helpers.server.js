@@ -102,6 +102,22 @@ export function isSingularPrescriptive(text) {
   return Boolean(text) && SINGULAR_PRESCRIPTIVE.test(text);
 }
 
+// Plural-intro framing — the AI is presenting MULTIPLE options at once
+// instead of recommending one. When this framing is present, the
+// downstream score-threshold filter (which checks how many of each
+// card's distinctive title words appear in the AI text) under-counts:
+// a generic intro like "Here are some great wedges" doesn't repeat
+// each product name, so most cards fall below the threshold and the
+// customer sees fewer cards than the text promises ("Both of these
+// wedges…" rendering 1 card). Catch the framing here so chat.jsx can
+// skip the threshold and render the full pool. Vocabulary-agnostic —
+// works for any catalog vertical.
+const PLURAL_INTRO_FRAMING = /\b(?:here are|here'?s a (?:few|couple|handful)|both of (?:these|them)|these (?:are|two|three|few|options)|some great|several (?:great )?(?:options|picks|choices)|a few (?:options|picks|choices)|check out (?:these|some)|take a look at (?:these|some))\b/i;
+
+export function hasPluralIntroFraming(text) {
+  return Boolean(text) && PLURAL_INTRO_FRAMING.test(text);
+}
+
 // AI ships repetitive sentences in two distinct shapes:
 //   (a) Echo opener — two adjacent sentences starting with the same
 //       4+ words ("Here are some great X. Here are some great X with…").

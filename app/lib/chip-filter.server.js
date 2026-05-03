@@ -24,10 +24,28 @@ function chipTokens(inner) {
 // has women's boots but no men's boots, "boot" is in fullKnownCategories
 // (because women's boots exist) but not in the men's allow-list — so
 // <<Boots>> gets stripped when the customer asked for men's shoes.
-export function filterForbiddenCategoryChips(text, catalogCategories, fullKnownCategories) {
+//
+// `extraAllowCategories` extends the allow-list. Used when the active
+// category group declares a containment relationship via `goesInsideOf`
+// (e.g. Orthotics goesInside Footwear, Cases goesInside Phones, Lenses
+// goesInside Cameras). In that flow the AI naturally generates chips for
+// the CONTAINER's categories (the "what shoes will the orthotic go inside?"
+// question), and stripping those would damage the assistant text the
+// downstream intent analyzer relies on. Pure data — pulled from the
+// merchant's group config, no hardcoded vocabulary.
+export function filterForbiddenCategoryChips(
+  text,
+  catalogCategories,
+  fullKnownCategories,
+  extraAllowCategories,
+) {
   if (!text || typeof text !== "string") return { text: text || "", stripped: [] };
 
   const allow = new Set((catalogCategories || []).map(normalize).filter(Boolean));
+  for (const c of extraAllowCategories || []) {
+    const n = normalize(c);
+    if (n) allow.add(n);
+  }
   const known = new Set(((fullKnownCategories && fullKnownCategories.length > 0) ? fullKnownCategories : catalogCategories || []).map(normalize).filter(Boolean));
   const stripped = [];
 

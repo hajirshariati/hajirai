@@ -19,6 +19,7 @@ import {
   hasChoiceButtons,
   dedupeConsecutiveSentences,
   isSingularPrescriptive,
+  hasPluralIntroFraming,
   detectConditionOrOccasion,
 } from "../lib/chat-helpers.server";
 import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL, FIT_PREDICTOR_TOOL } from "../lib/chat-tools.server";
@@ -703,9 +704,23 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       .replace(/\n{3,}/g, "\n\n")
       .trim();
 
-    const filtered = filterForbiddenCategoryChips(fullResponseText, ctx.catalogCategories, ctx.fullCatalogCategories);
+    // When the active group declares a containment relationship
+     // (Orthotics goesInside Footwear, Cases goesInside Phones, etc.),
+     // also allow chips from the container group's categories. The AI
+     // legitimately offers container-category chips during the
+     // "what does it go inside?" turn, and stripping them damages the
+     // assistant text the next turn's intent analyzer reads.
+    let extraChipAllow = [];
+    if (ctx.activeCategoryGroup?.goesInsideOf && Array.isArray(ctx.merchantGroups)) {
+      const containerName = String(ctx.activeCategoryGroup.goesInsideOf).toLowerCase();
+      const container = ctx.merchantGroups.find((g) => String(g?.name || "").toLowerCase() === containerName);
+      if (container && Array.isArray(container.categories)) {
+        extraChipAllow = container.categories;
+      }
+    }
+    const filtered = filterForbiddenCategoryChips(fullResponseText, ctx.catalogCategories, ctx.fullCatalogCategories, extraChipAllow);
     if (filtered.stripped.length > 0) {
-      console.log(`[chat] ${ctx.shop} stripped off-catalog chips:`, filtered.stripped, "allowed:", ctx.catalogCategories);
+      console.log(`[chat] ${ctx.shop} stripped off-catalog chips:`, filtered.stripped, "allowed:", ctx.catalogCategories, extraChipAllow.length > 0 ? `extra(via goesInsideOf):${extraChipAllow.join(",")}` : "");
     }
     fullResponseText = filtered.text;
 
@@ -961,12 +976,24 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     //   "I'd recommend / I'd suggest"
     const singularPrescriptive = isSingularPrescriptive(fullResponseText);
 
+    // Plural-intro escape hatch: when the AI uses plural framing
+    // ("Here are some great wedges", "Both of these…"), the score
+    // threshold under-counts because the intro doesn't repeat each
+    // product name. Skip the threshold and use the full ranked pool
+    // (still passed through dropSiblingCards to fold near-duplicates).
+    // Only applies when SKU-narrowing and singular-prescriptive both
+    // fail — those are stronger signals and stay first.
+    const pluralIntro = hasPluralIntroFraming(fullResponseText);
+
     let cards;
     if (skuNarrowedCards) {
       cards = skuNarrowedCards;
     } else if (singularPrescriptive && scored.length > 0 && scored[0].score >= 0.6) {
       cards = [scored[0].card];
       console.log(`[chat] singular-narrow: text says "the X is best" → showing 1 card`);
+    } else if (pluralIntro && !singularPrescriptive && scored.length > 0) {
+      cards = dropSiblingCards(scored, textLower).slice(0, cardCap).map((s) => s.card);
+      console.log(`[chat] plural-intro: skipped 0.6 threshold → showing ${cards.length} of ${scored.length} pool cards`);
     } else if (matched.length > 0) {
       cards = matched.slice(0, cardCap).map((s) => s.card);
     } else if (!saysNoMatch) {
