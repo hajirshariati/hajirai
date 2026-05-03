@@ -277,6 +277,46 @@ function showIdleTimeout(){
   saveH(messages);scrollBottom();
 }
 
+/* Multilingual rotator for the welcome CTA. Lead frame is whatever
+   the merchant typed in the theme block (defaults to English). The
+   remaining frames are fixed translations of the default phrase
+   ("What can I help you find today?") into Spanish, Arabic, Japanese,
+   Hebrew, Hindi, and Farsi. RTL languages get dir="rtl" so they align
+   correctly. The rotator stops on its own when the welcome screen
+   leaves the DOM (first user message, refresh, etc.) and is restarted
+   each time buildWelcome runs. */
+var GREET_CTA_FRAMES=[
+  {text:GREETCTA,dir:'ltr',code:'en'},
+  {text:'¿En qué puedo ayudarte hoy?',dir:'ltr',code:'es'},
+  {text:'كيف يمكنني مساعدتك اليوم؟',dir:'rtl',code:'ar'},
+  {text:'今日は何をお探しですか？',dir:'ltr',code:'ja'},
+  {text:'במה אוכל לעזור לך היום?',dir:'rtl',code:'he'},
+  {text:'आज मैं आपकी क्या मदद कर सकती हूँ?',dir:'ltr',code:'hi'},
+  {text:'امروز چطور می‌توانم کمکتان کنم؟',dir:'rtl',code:'fa'}
+];
+var greetCtaTimer=null;
+var greetCtaIdx=0;
+function stopGreetCtaRotator(){if(greetCtaTimer){clearInterval(greetCtaTimer);greetCtaTimer=null}}
+function startGreetCtaRotator(){
+  stopGreetCtaRotator();
+  if(GREET_CTA_FRAMES.length<2)return;
+  greetCtaIdx=0;
+  greetCtaTimer=setInterval(function(){
+    var node=$('.ai-chat-welcome__greeting-cta',msgsEl);
+    if(!node){stopGreetCtaRotator();return}
+    greetCtaIdx=(greetCtaIdx+1)%GREET_CTA_FRAMES.length;
+    var f=GREET_CTA_FRAMES[greetCtaIdx];
+    node.classList.add('is-fading');
+    setTimeout(function(){
+      if(!node.isConnected)return;
+      node.textContent=f.text;
+      node.setAttribute('dir',f.dir);
+      node.setAttribute('lang',f.code);
+      node.classList.remove('is-fading');
+    },250);
+  },3500);
+}
+
 function buildWelcome(){
 var h='<div class="ai-chat-welcome">';
 if(SHOWBAN){
@@ -326,6 +366,7 @@ if(CUST_LOGGED_IN){
 }
 h+='</div>';
 msgsEl.innerHTML=h;
+if(GREETCTA)startGreetCtaRotator();
 }
 
 function toggle(force){

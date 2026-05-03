@@ -578,6 +578,20 @@
   color: var(--ai-chat-text);
   margin-top: 4px;
   margin-bottom: 12px;
+  transition: opacity 0.25s ease;
+  min-height: 1.4em;
+}
+
+/* Cross-fade frame swap for the multilingual rotator. The JS adds
+   .is-fading just before swapping textContent, then removes it. */
+.ai-chat-welcome__greeting-cta.is-fading {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-chat-welcome__greeting-cta {
+    transition: none;
+  }
 }
 
 .ai-chat-welcome__hint {
