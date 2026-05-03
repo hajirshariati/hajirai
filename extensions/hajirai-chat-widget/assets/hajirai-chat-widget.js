@@ -290,7 +290,7 @@ var GREET_CTA_FRAMES=[
   {text:'¿En qué puedo ayudarte hoy?',dir:'ltr',code:'es'},
   {text:'كيف يمكنني مساعدتك اليوم؟',dir:'rtl',code:'ar'},
   {text:'今日は何をお探しですか？',dir:'ltr',code:'ja'},
-  {text:'במה אוכל לעזור לך היום?',dir:'rtl',code:'he'},
+  {text:'איך אוכל לעזור היום?',dir:'rtl',code:'he'},
   {text:'आज मैं आपकी क्या मदद कर सकती हूँ?',dir:'ltr',code:'hi'},
   {text:'امروز چطور می‌توانم کمکتان کنم؟',dir:'rtl',code:'fa'}
 ];
