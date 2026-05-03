@@ -782,9 +782,17 @@ function clearChat(){
 messages=[];localStorage.removeItem(HK);localStorage.removeItem(SK);
 msgsEl.innerHTML='';buildWelcome();
 if(abortCtrl){abortCtrl.abort();abortCtrl=null}
-isStreaming=false;sendBtn.disabled=false;typingEl.classList.remove('visible');
+isStreaming=false;typingEl.classList.remove('visible');
 idleTimedOut=false;clearLastMsg();
 errorRetryCount=0;lastUserMessage='';
+/* Always restore the input — dead-end paths (error retries, banned-
+   reply fallbacks, support/new-chat dead-ends) disable inputEl and
+   set a "Choose an option above" placeholder. Without this reset the
+   input stays locked after a refresh, leaving the customer unable to
+   type. */
+inputEl.disabled=false;inputEl.placeholder=IPLACE;inputEl.value='';
+inputEl.style.height='auto';
+sendBtn.disabled=false;
 }
 
 /* Events */
