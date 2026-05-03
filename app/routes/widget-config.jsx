@@ -1,5 +1,6 @@
 import { authenticate } from "../shopify.server";
 import { getShopConfig } from "../models/ShopConfig.server";
+import { getGreetingCtaTranslations } from "../lib/greeting-translation.server";
 import prisma from "../db.server";
 
 const FIVE_MIN_MS = 5 * 60 * 1000;
@@ -43,6 +44,19 @@ export const loader = async ({ request }) => {
       /* malformed json — fall through with empty array */
     }
 
+    // Welcome-CTA rotator. Generate translations once per phrase change
+    // (cached on ShopConfig). Skip the call when the merchant has the
+    // rotator off — saves the lookup. Wrapped in try/catch because a
+    // translation failure must never fail widget-config.
+    let greetingCtaTranslations = [];
+    if (config.rotateGreetingCta !== false) {
+      try {
+        greetingCtaTranslations = await getGreetingCtaTranslations(config);
+      } catch (err) {
+        console.error("[widget-config] greeting translation skipped:", err?.message || err);
+      }
+    }
+
     return Response.json(
       {
         hideOnUrls,
@@ -52,6 +66,8 @@ export const loader = async ({ request }) => {
         vipModeEnabled: config.vipModeEnabled === true,
         showLoginPill: config.showLoginPill !== false,
         productCardStyle: config.productCardStyle === "showcase" ? "showcase" : "horizontal",
+        rotateGreetingCta: config.rotateGreetingCta !== false,
+        greetingCtaTranslations,
       },
       {
         // 60s keeps the storefront responsive without making merchant config

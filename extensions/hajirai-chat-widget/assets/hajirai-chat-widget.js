@@ -39,6 +39,13 @@ fetch(CONFIG_URL).then(function(r){return r.json()}).then(function(d){
   if(d.klaviyoCompanyId)KLAVIYO_COMPANY_ID=d.klaviyoCompanyId;
   if(d.klaviyoListId)KLAVIYO_LIST_ID=d.klaviyoListId;
   if(d.productCardStyle==='showcase')PRODUCT_CARD_STYLE='showcase';
+  /* Welcome-CTA translations from server. Theme block toggle wins over
+     the server echo (both must agree to enable rotation). When ready,
+     append translations to the frames array — the running rotator
+     picks them up on its next tick. */
+  if(GREET_CTA_ROTATE && d.rotateGreetingCta!==false && Array.isArray(d.greetingCtaTranslations) && d.greetingCtaTranslations.length>0){
+    GREET_CTA_FRAMES=[{text:GREETCTA,dir:'ltr',code:'en'}].concat(d.greetingCtaTranslations);
+  }
   /* Cache so the next page load knows the style synchronously,
      before history is restored. Otherwise saved product cards
      render in default style until the fetch resolves. */
@@ -285,25 +292,28 @@ function showIdleTimeout(){
    correctly. The rotator stops on its own when the welcome screen
    leaves the DOM (first user message, refresh, etc.) and is restarted
    each time buildWelcome runs. */
-var GREET_CTA_FRAMES=[
-  {text:GREETCTA,dir:'ltr',code:'en'},
-  {text:'¿En qué puedo ayudarte hoy?',dir:'ltr',code:'es'},
-  {text:'كيف يمكنني مساعدتك اليوم؟',dir:'rtl',code:'ar'},
-  {text:'今日は何をお探しですか？',dir:'ltr',code:'ja'},
-  {text:'איך אוכל לעזור היום?',dir:'rtl',code:'he'},
-  {text:'आज मैं आपकी क्या मदद कर सकती हूँ?',dir:'ltr',code:'hi'},
-  {text:'امروز چطور می‌توانم کمکتان کنم؟',dir:'rtl',code:'fa'}
-];
+/* Frame 0 is the merchant's English (preserves any custom text).
+   Frames 1..N come from /widget-config — server-side Haiku translations
+   of the merchant's actual greetingCta, cached on ShopConfig and
+   regenerated whenever the phrase changes. We start English-only;
+   the running rotator picks up new frames on its next tick once the
+   widget-config fetch resolves. */
+var GREET_CTA_FRAMES=[{text:GREETCTA,dir:'ltr',code:'en'}];
+var GREET_CTA_ROTATE=C.rotateGreetingCta!==false;
 var greetCtaTimer=null;
 var greetCtaIdx=0;
 function stopGreetCtaRotator(){if(greetCtaTimer){clearInterval(greetCtaTimer);greetCtaTimer=null}}
 function startGreetCtaRotator(){
   stopGreetCtaRotator();
-  if(GREET_CTA_FRAMES.length<2)return;
+  if(!GREET_CTA_ROTATE)return;
   greetCtaIdx=0;
+  /* Always start the timer when the rotator is enabled, even if the
+     server hasn't returned translations yet — once they arrive, the
+     frames array is updated and the next tick picks them up. */
   greetCtaTimer=setInterval(function(){
     var node=$('.ai-chat-welcome__greeting-cta',msgsEl);
     if(!node){stopGreetCtaRotator();return}
+    if(GREET_CTA_FRAMES.length<2)return;
     greetCtaIdx=(greetCtaIdx+1)%GREET_CTA_FRAMES.length;
     var f=GREET_CTA_FRAMES[greetCtaIdx];
     node.classList.add('is-fading');

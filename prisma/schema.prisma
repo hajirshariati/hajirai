@@ -71,6 +71,17 @@ model ShopConfig {
   disclaimerText      String   @default("Powered by AI")
   privacyUrl          String   @default("/pages/privacy-policy")
 
+  // Cached translations of greetingCta for the welcome-CTA rotator.
+  // JSON: { phrase: "...", results: [{code,dir,text}, ...] }.
+  // Generated on demand via Anthropic Haiku (greeting-translation.server.js)
+  // and refreshed when the cached `phrase` no longer matches the
+  // current greetingCta. Empty `{}` = not yet generated.
+  greetingCtaTranslations String   @default("{}")
+  // Merchant toggle to disable the multilingual rotator entirely.
+  // Default true so existing installs get the rotator on first deploy;
+  // merchants can opt out via the theme block.
+  rotateGreetingCta       Boolean  @default(true)
+
   anthropicApiKey     String   @default("")
   anthropicModel      String   @default("claude-sonnet-4-6")
   modelStrategy       String   @default("smart")

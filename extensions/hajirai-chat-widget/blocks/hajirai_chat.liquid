@@ -40,6 +40,7 @@
     chatWidth: {{ block.settings.chat_width | json }},
     hideOnMobile: {{ block.settings.hide_on_mobile | json }},
     inputAutocorrect: {{ block.settings.input_autocorrect | json }},
+    rotateGreetingCta: {{ block.settings.rotate_greeting_cta | json }},
     customerLoggedIn: {% if customer %}true{% else %}false{% endif %},
     customerFirstName: {% if customer %}{{ customer.first_name | json }}{% else %}""{% endif %},
     customerId: {% if customer %}{{ customer.id | json }}{% else %}null{% endif %},
@@ -223,6 +224,13 @@
       "id": "input_autocorrect",
       "label": "Enable autocorrect & spellcheck on chat input",
       "info": "Turns on the browser's typo correction (mobile keyboards) and spellcheck red-underline (desktop) inside the chat textbox.",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "rotate_greeting_cta",
+      "label": "Rotate Greeting CTA through 6 languages",
+      "info": "Cross-fades the welcome line through Spanish, Arabic, Japanese, Hebrew, Hindi, and Farsi translations of your text — signals to international shoppers that the assistant understands them. Translations regenerate automatically (server-side, cached) whenever you edit the Greeting CTA above.",
       "default": true
     },
     {
