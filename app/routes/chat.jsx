@@ -882,12 +882,32 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
             console.log(`[chat] product-card group guard: SWITCH locked=${ctx.activeCategoryGroup.name || "-"} → reply-matched=${replyGroup.name} (${groupScoped.length}/${beforeGroup})`);
             filteredPool = groupScoped;
           } else {
-            // Reply mentions a group but no cards match it. Wipe so
-            // the empty-pool repair turns this into the dead-end
-            // fallback rather than rendering wrong cards beneath
-            // text the AI got right.
-            console.log(`[chat] product-card group guard: reply mentions ${replyGroup.name} but no matching cards in pool — wiping`);
-            filteredPool = [];
+            // Before wiping, check whether the AI actually NAMED one of
+            // the active-group cards in its reply. If yes, the
+            // divergent-group term is incidental context, not the
+            // recommendation — e.g. "the Unisex Cleats Med/High Arch
+            // Orthotic is your perfect match — built for cleated
+            // **footwear**" mentions a Footwear trigger in passing but
+            // the actual recommendation is the orthotic that's already
+            // in the pool. Wiping in that case erases a correct
+            // recommendation. Pure substring check on the card title;
+            // generic across verticals.
+            const textLower = fullResponseText.toLowerCase();
+            const aiNamedActiveCard = filteredPool.some((card) => {
+              const title = String(card.title || "").trim().toLowerCase();
+              return title.length >= 5 && textLower.includes(title);
+            });
+            if (aiNamedActiveCard) {
+              console.log(`[chat] product-card group guard: SKIP wipe — AI named an active-group card despite incidental ${replyGroup.name} mention`);
+            } else {
+              // Reply mentions a group but no cards match it AND the
+              // AI didn't name any active-group card — likely a
+              // hallucination. Wipe so the empty-pool repair turns
+              // this into the dead-end fallback rather than rendering
+              // wrong cards beneath text the AI got right.
+              console.log(`[chat] product-card group guard: reply mentions ${replyGroup.name} but no matching cards in pool — wiping`);
+              filteredPool = [];
+            }
           }
         } else {
           console.log(`[chat] product-card group guard: skip — reply matches ${replyGroups.length} groups, ambiguous`);
