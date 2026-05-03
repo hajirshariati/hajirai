@@ -6,7 +6,7 @@ const LABELS = {
   custom: "Custom Knowledge",
 };
 
-export function buildSystemPrompt({ config, knowledge, retrievedChunks, shop, attributeNames, categoryExclusions, querySynonyms, customerContext, fitPredictorEnabled, catalogProductTypes, scopedGender, answeredChoices, categoryGenderMap, activeCampaigns }) {
+export function buildSystemPrompt({ config, knowledge, retrievedChunks, shop, attributeNames, categoryExclusions, querySynonyms, customerContext, fitPredictorEnabled, catalogProductTypes, scopedGender, answeredChoices, categoryGenderMap, activeCampaigns, merchantGroups }) {
   const name = config?.assistantName || "AI Shopping Assistant";
   const tagline = config?.assistantTagline || "";
   const parts = [];
@@ -93,6 +93,44 @@ export function buildSystemPrompt({ config, knowledge, retrievedChunks, shop, at
         `The catalog has not yet provided a category list. Do NOT offer product-category choice buttons (like <<Sneakers>><<Sandals>>) in this conversation — ` +
         `the categories cannot be verified. Ask a different clarifying question (gender, use case, size, etc.) instead, or run search_products first and infer categories from the results.`,
     );
+  }
+
+  // Primary chip preference — derived from the merchant's configured
+  // category groups. Categories that appear in any group are "primary"
+  // (the merchant has explicitly grouped them as part of their core
+  // offering); categories in the catalog but ungrouped are edge-cases
+  // and should not lead chip suggestions for open-ended questions.
+  // Pure data — no hardcoded vocabulary.
+  if (
+    Array.isArray(merchantGroups) &&
+    merchantGroups.length > 0 &&
+    Array.isArray(catalogProductTypes) &&
+    catalogProductTypes.length > 0
+  ) {
+    const groupedSet = new Set();
+    for (const g of merchantGroups) {
+      const cats = Array.isArray(g?.categories) ? g.categories : [];
+      for (const c of cats) {
+        const norm = String(c || "").trim().toLowerCase();
+        if (norm) groupedSet.add(norm);
+      }
+    }
+    if (groupedSet.size > 0) {
+      const allowed = catalogProductTypes
+        .map((c) => String(c || "").trim())
+        .filter(Boolean);
+      const primary = allowed.filter((c) => groupedSet.has(c.toLowerCase()));
+      const secondary = allowed.filter((c) => !groupedSet.has(c.toLowerCase()));
+      if (primary.length > 0 && secondary.length > 0) {
+        parts.push(
+          `\n=== Primary Chip Categories (PREFERENCE for choice buttons) ===\n` +
+            `Of the allow-list above, these are the merchant's PRIMARY categories — prefer them when offering <<Option>> chips for open-ended questions ("what are you looking for?", brand-comparison redirects, generic browse intents):\n` +
+            `${primary.join(", ")}\n` +
+            `\nThese are SECONDARY (in catalog but not part of the merchant's primary lineup): ${secondary.join(", ")}.\n` +
+            `RULE: when the customer's current message does NOT specifically reference a secondary category, offer chips ONLY from the primary list. Pick 3–5 primary categories that best fit the conversation. A secondary category may appear as a chip only when the customer's current message directly mentions it (e.g. they asked "do you carry [secondary]?"). The allow-list above still constrains what's allowed; this section just narrows preference within it.`,
+        );
+      }
+    }
   }
 
   // Category-gender availability — derived from the live catalog. Lets

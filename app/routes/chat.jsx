@@ -1367,6 +1367,7 @@ export const action = async ({ request }) => {
       answeredChoices,
       categoryGenderMap,
       activeCampaigns,
+      merchantGroups,
     });
 
     const model = chooseModel(config, String(body.message), history);
