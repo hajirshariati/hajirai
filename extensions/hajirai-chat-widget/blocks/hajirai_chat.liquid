@@ -39,6 +39,7 @@
     launcherWidth: {{ block.settings.launcher_width | json }},
     chatWidth: {{ block.settings.chat_width | json }},
     hideOnMobile: {{ block.settings.hide_on_mobile | json }},
+    inputAutocorrect: {{ block.settings.input_autocorrect | json }},
     customerLoggedIn: {% if customer %}true{% else %}false{% endif %},
     customerFirstName: {% if customer %}{{ customer.first_name | json }}{% else %}""{% endif %},
     customerId: {% if customer %}{{ customer.id | json }}{% else %}null{% endif %},
@@ -216,6 +217,13 @@
       "label": "Hide chatbot on mobile",
       "info": "Hides the launcher and chat panel on screens narrower than 768px.",
       "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "input_autocorrect",
+      "label": "Enable autocorrect & spellcheck on chat input",
+      "info": "Turns on the browser's typo correction (mobile keyboards) and spellcheck red-underline (desktop) inside the chat textbox.",
+      "default": true
     },
     {
       "type": "paragraph",
