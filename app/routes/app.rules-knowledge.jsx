@@ -693,6 +693,27 @@ function formatSize(bytes) {
 // 40KB degrades chat quality unless RAG is on.
 const KNOWLEDGE_SIZE_LIMITS = { warn: 20 * 1024, danger: 40 * 1024 };
 
+// Campaign content goes verbatim into the system prompt while a
+// campaign is live. Approximate the prompt-time footprint of each
+// campaign so the knowledge-size meter reflects the FULL prompt
+// budget (knowledge files + active campaign blocks), not just files.
+//
+// The boilerplate ('## name\nRunning: <date> – <date>\n\n') is roughly
+// 120 chars per campaign. The section header above all campaigns is
+// roughly 280 chars. Sum name + content + boilerplate per campaign.
+const CAMPAIGN_BLOCK_OVERHEAD = 120; // per-campaign formatting bytes
+const CAMPAIGN_SECTION_OVERHEAD = 280; // section header bytes (only added when ≥1)
+export function calcCampaignBytes(campaigns) {
+  if (!Array.isArray(campaigns) || campaigns.length === 0) return 0;
+  let bytes = CAMPAIGN_SECTION_OVERHEAD;
+  for (const c of campaigns) {
+    bytes += CAMPAIGN_BLOCK_OVERHEAD;
+    bytes += String(c?.name || "").length;
+    bytes += String(c?.content || "").length;
+  }
+  return bytes;
+}
+
 function knowledgeUsageState(totalBytes) {
   if (totalBytes >= KNOWLEDGE_SIZE_LIMITS.danger) {
     return {
@@ -715,19 +736,26 @@ function knowledgeUsageState(totalBytes) {
   };
 }
 
-function KnowledgeUsageBar({ files }) {
-  const totalBytes = files.reduce((sum, f) => sum + (Number(f.fileSize) || 0), 0);
+function KnowledgeUsageBar({ files, campaignBytes = 0, campaignCount = 0 }) {
+  const fileBytes = files.reduce((sum, f) => sum + (Number(f.fileSize) || 0), 0);
+  const totalBytes = fileBytes + campaignBytes;
   const { barColor, label, tone } = knowledgeUsageState(totalBytes);
   const pct = Math.min(100, (totalBytes / KNOWLEDGE_SIZE_LIMITS.danger) * 100);
   const warnPct = (KNOWLEDGE_SIZE_LIMITS.warn / KNOWLEDGE_SIZE_LIMITS.danger) * 100;
+  const breakdown = campaignBytes > 0
+    ? `${formatSize(fileBytes)} files + ${formatSize(campaignBytes)} from ${campaignCount} ${campaignCount === 1 ? "campaign" : "campaigns"}`
+    : null;
   return (
     <BlockStack gap="100">
       <InlineStack align="space-between" blockAlign="center" wrap>
         <Text as="span" variant="bodySm" fontWeight="semibold">
-          Knowledge size: {formatSize(totalBytes)} of ~{formatSize(KNOWLEDGE_SIZE_LIMITS.danger)} comfortable budget
+          Prompt context size: {formatSize(totalBytes)} of ~{formatSize(KNOWLEDGE_SIZE_LIMITS.danger)} comfortable budget
         </Text>
         <Text as="span" tone={tone} variant="bodySm">{label}</Text>
       </InlineStack>
+      {breakdown && (
+        <Text as="span" variant="bodySm" tone="subdued">{breakdown}</Text>
+      )}
       <div
         role="progressbar"
         aria-valuenow={Math.round(pct)}
@@ -750,7 +778,7 @@ function statusBadge(status) {
   return <Badge tone="success">Idle</Badge>;
 }
 
-function KnowledgeFilesCard({ files, ragEnabled, embeddingProvider }) {
+function KnowledgeFilesCard({ files, ragEnabled, embeddingProvider, campaignBytes = 0, campaignCount = 0 }) {
   const actionData = useActionData();
   const nav = useNavigation();
   const submit = useSubmit();
@@ -854,7 +882,7 @@ function KnowledgeFilesCard({ files, ragEnabled, embeddingProvider }) {
           </Text>
         </BlockStack>
 
-        {files.length > 0 && <KnowledgeUsageBar files={files} />}
+        {(files.length > 0 || campaignBytes > 0) && <KnowledgeUsageBar files={files} campaignBytes={campaignBytes} campaignCount={campaignCount} />}
 
         <Box padding="300" background="bg-surface-secondary" borderRadius="200">
           <BlockStack gap="150">
@@ -1600,7 +1628,7 @@ function localTodayAt(hour) {
 const DEFAULT_START_VALUE = () => localTodayAt(0);
 const DEFAULT_END_VALUE = () => localTodayAt(3);
 
-function CampaignsCard({ initial, template, initialCheatCode }) {
+function CampaignsCard({ initial, template, initialCheatCode, onStatsChange }) {
   const fetcher = useFetcher();
   const cheatFetcher = useFetcher();
   const [campaigns, setCampaigns] = useState(initial || []);
@@ -1618,6 +1646,25 @@ function CampaignsCard({ initial, template, initialCheatCode }) {
   // Re-sync local state when the loader returns new data after a save/delete.
   useEffect(() => { setCampaigns(initial || []); }, [initial]);
   useEffect(() => { setCheatCode(initialCheatCode || ""); }, [initialCheatCode]);
+
+  // Live-track campaign bytes for the prompt-budget meter. Includes
+  // saved campaigns plus the in-progress draft (or the row being
+  // edited) so the bar reflects the merchant's typing.
+  useEffect(() => {
+    if (typeof onStatsChange !== "function") return;
+    const draft = name || content
+      ? [{ name, content }]
+      : [];
+    // When editing an existing campaign, swap the saved row out for the
+    // edited values to avoid double-counting.
+    const merged = editingId
+      ? campaigns.map((c) => (c.id === editingId ? { ...c, name, content } : c))
+      : campaigns.concat(draft);
+    onStatsChange({
+      bytes: calcCampaignBytes(merged),
+      count: merged.length,
+    });
+  }, [campaigns, name, content, editingId, onStatsChange]);
   useEffect(() => {
     if (cheatFetcher.data?.saved) {
       setCheatSavedNote("Saved.");
@@ -1789,6 +1836,9 @@ function CampaignsCard({ initial, template, initialCheatCode }) {
               <BlockStack gap="200">
                 <Text as="p" tone="subdued" variant="bodySm">
                   Copy this template into the campaign content field below as a starting structure, then fill in the bracketed placeholders with your actual sale details.
+                </Text>
+                <Text as="p" tone="subdued" variant="bodySm">
+                  <strong>Keep it tight.</strong> Every character of campaign content lands in every chat prompt while the campaign is live — bullet points beat prose, and short codes/dates are better than full sentences. Aim for under ~500 characters (~100 words) per campaign so multiple promos can run together without crowding the AI's working memory. The progress bar at the top of this page tracks the combined size.
                 </Text>
                 <Box padding="200" background="bg-surface" borderRadius="100">
                   <pre style={{ margin: 0, whiteSpace: "pre-wrap", fontSize: 12.5, fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace" }}>{template}</pre>
@@ -2342,6 +2392,13 @@ function SectionHeading({ eyebrow, title, description }) {
 
 export default function RulesKnowledge() {
   const data = useLoaderData();
+  // Live-tracked campaign bytes — CampaignsCard reports its current
+  // bytes via a callback so KnowledgeUsageBar can include them in
+  // the prompt-budget meter as the merchant edits campaign text.
+  const [campaignStats, setCampaignStats] = useState(() => ({
+    bytes: calcCampaignBytes(data.campaigns),
+    count: Array.isArray(data.campaigns) ? data.campaigns.length : 0,
+  }));
 
   return (
     <Page>
@@ -2413,7 +2470,7 @@ export default function RulesKnowledge() {
             title="Knowledge the AI can reference"
             description="Soft context — FAQs, brand voice, sizing guides, product details."
           />
-          <KnowledgeFilesCard files={data.files} ragEnabled={data.knowledgeRagEnabled} embeddingProvider={data.embeddingProvider} />
+          <KnowledgeFilesCard files={data.files} ragEnabled={data.knowledgeRagEnabled} embeddingProvider={data.embeddingProvider} campaignBytes={campaignStats.bytes} campaignCount={campaignStats.count} />
         </BlockStack>
 
         <BlockStack gap="400">
@@ -2422,7 +2479,7 @@ export default function RulesKnowledge() {
             title="Scheduled sales and campaign details"
             description="Schedule promotions with start/end dates. The chat reads only what's currently live — expired campaigns auto-disappear with no manual cleanup."
           />
-          <CampaignsCard initial={data.campaigns} template={data.campaignTemplate} initialCheatCode={data.campaignCheatCode} />
+          <CampaignsCard initial={data.campaigns} template={data.campaignTemplate} initialCheatCode={data.campaignCheatCode} onStatsChange={setCampaignStats} />
         </BlockStack>
 
         <BlockStack gap="400">
