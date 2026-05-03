@@ -1375,6 +1375,16 @@ a.ai-chat-welcome__hint--link:hover {
   outline: none;
 }
 
+/* Hide the customer toggle on devices with a precise pointer (desktop
+   with mouse) — silent autocorrect is iOS/Android only, and desktop
+   browsers expose spellcheck through the browser's own settings.
+   Showing the toggle there would just confuse customers. */
+@media (hover: hover) and (pointer: fine) {
+  .ai-chat-autocorrect-wrap {
+    display: none;
+  }
+}
+
 /* ---------- Overlay backdrop ---------- */
 .ai-chat-overlay {
   position: fixed;
