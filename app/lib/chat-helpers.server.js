@@ -55,10 +55,46 @@ const BANNED_NARRATION = /(?<=^|\s)(?:let me (?:look (?:that |it )?up|find|searc
 // followed by "you (already|just) told|said|mentioned|noted me/us…"
 const SELF_CORRECTION_RE = /(?:[^.!?\n]*\?\s+)?\b(?:wait|actually|oh|sorry|hmm|never\s*mind|nevermind|hold\s+on)[\s,—–-]+you\s+(?:already\s+|just\s+)?(?:told|said|mentioned|noted)\s+(?:me|us)?\b[^.!?\n]*[.!?]?\s*/gi;
 
+// Reasoning-leak strip — AI sometimes narrates its internal decision
+// process to the customer ("Based on the merchant's flow, I need to
+// identify discomfort and gender before searching", "Following the
+// rules, I should ask…", "Per the guide…", "X is already
+// established"). Direct-address rule forbids this but the model
+// intermittently leaks. Strip the offending sentence; the next
+// sentence (usually the actual question to the customer) survives.
+//
+// Patterns covered:
+//   - "based on / according to / per / following / given (the
+//     merchant's flow|guide|rules|knowledge|sequence|context|
+//     prompt|system|instructions|guidelines)..."
+//   - "i need to / i still need to / i have to / i must / before i
+//     can (identify|determine|establish|figure out|find out|
+//     check|verify|confirm|know|search)..."
+//   - "(the |your )(pain|gender|category|shoe type|product type|
+//     activity|condition|use case|line|...) is (already )?
+//     (established|set|locked|known|determined|confirmed|identified|
+//     covered)..."
+//   - "(per|in line with|consistent with) (the )?(merchant|store|
+//     guide|flow|rules|guidelines|instructions)..."
+const REASONING_LEAK_RE = new RegExp(
+  [
+    // "based on / according to / per / following / given the X"
+    String.raw`\b(?:based on|according to|per|following|given|in line with|consistent with)\s+(?:the\s+|my\s+|our\s+|this\s+|your\s+)?(?:merchant['‘’]?s?|store['‘’]?s?|seller['‘’]?s?|knowledge|guide(?:lines?)?|rules?|flow|sequence|prompt|system|context|instructions?|decision\s+(?:tree|process)|process)\b[^.!?\n]*[.!?]?\s*`,
+    // "i (still |also )?need to / have to / must / will need to / should X" + reasoning verb + "before|first|then"
+    String.raw`\bi\s+(?:still\s+|also\s+|just\s+)?(?:need\s+to|have\s+to|must|should|will\s+need\s+to)\s+(?:identify|determine|establish|figure\s+out|find\s+out|verify|confirm)\b[^.!?\n]*[.!?]?\s*`,
+    // "before i (can )?recommend|suggest|search|show|help"
+    String.raw`\bbefore\s+i\s+(?:can\s+)?(?:recommend|suggest|search|show|help|narrow|pick|choose)\b[^.!?\n]*[.!?]?\s*`,
+    // "the X is (already)? (established|set|known|locked|determined|confirmed|identified|covered)"
+    String.raw`\b(?:the|your)\s+(?:pain|gender|category|shoe(?:\s+type)?|product(?:\s+type)?|activity|condition|use\s*case|line|brand|fit|style|topic|context|scope)\s+(?:is|are)\s+(?:already\s+|now\s+)?(?:established|set|locked|known|determined|confirmed|identified|covered|in\s+place)\b[^.!?\n]*[.!?]?\s*`,
+  ].join("|"),
+  "gi",
+);
+
 export function stripBannedNarration(text) {
   if (!text) return text;
   return text
     .replace(SELF_CORRECTION_RE, " ")
+    .replace(REASONING_LEAK_RE, " ")
     .replace(BANNED_NARRATION, " ")
     .replace(/\s{2,}/g, " ")
     .trim();
