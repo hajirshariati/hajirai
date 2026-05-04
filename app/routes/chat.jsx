@@ -385,6 +385,208 @@ function titleStyleFamily(title) {
   return "";
 }
 
+// ============================================================
+// TOOL-CALL REWRITE PIPELINE
+// ----------------------------------------------------------------
+// Production AI agents shouldn't trust the LLM with structural
+// signals. The customer's literal latest message is the high-
+// confidence input; the AI's tool-call construction is a low-
+// confidence intermediate. When the two disagree, the customer
+// wins.
+//
+// Each rewrite below is a pure function:
+//   (toolCall, ctx) → toolCall
+// Falls through (returns input unchanged) when the rewrite
+// doesn't apply. Composable in a chain.
+//
+// All vocabulary is data-driven from merchant config — no hard-
+// coded category lists, color lists, or SKU patterns specific
+// to any merchant.
+// ============================================================
+
+const RE_ESCAPE = /[.*+?^${}()|[\]\\]/g;
+function escapeRe(s) {
+  return String(s).replace(RE_ESCAPE, "\\$&");
+}
+
+// Fix B — scope-reset stale-category strip.
+// When the customer's latest message is open-ended ("anything",
+// "everything", "any X", "show me whatever"), the AI sometimes
+// carries a category from the prior turn into its search query.
+// Strip category words that ARE in the AI's query but NOT in the
+// customer's literal latest message. Vocabulary comes from the
+// merchant's own categoryGroups.
+function stripStaleCategoriesOnScopeReset(toolCall, ctx) {
+  if (toolCall.name !== "search_products") return toolCall;
+  const latest = String(ctx.latestUserMessage || "").trim();
+  if (!latest) return toolCall;
+
+  const SCOPE_RESET_RE = /\b(anything|everything|any\s+\w+|all\s+(?:of\s+)?your|whatever|all\s+styles|every\s+\w+)\b/i;
+  if (!SCOPE_RESET_RE.test(latest)) return toolCall;
+
+  const groups = Array.isArray(ctx.merchantGroups) ? ctx.merchantGroups : [];
+  const categoryTokens = new Set();
+  for (const g of groups) {
+    for (const c of (g?.categories || [])) {
+      const norm = String(c || "").trim().toLowerCase();
+      if (!norm) continue;
+      // Both full name and individual words (≥4 chars) so "Wedges
+      // Heels" and "wedges"/"heels" both register.
+      categoryTokens.add(norm);
+      for (const tok of norm.split(/\s+/)) {
+        if (tok.length >= 4) categoryTokens.add(tok);
+      }
+    }
+  }
+  if (categoryTokens.size === 0) return toolCall;
+
+  const query = String(toolCall.input?.query || "");
+  const userLower = latest.toLowerCase();
+  let cleaned = query;
+
+  for (const token of categoryTokens) {
+    const tokenInUser = new RegExp(`\\b${escapeRe(token)}s?\\b`, "i").test(userLower);
+    if (tokenInUser) continue; // customer mentioned it — keep
+    // Strip from query (with optional plural s)
+    const stripRe = new RegExp(`\\b${escapeRe(token)}s?\\b`, "gi");
+    cleaned = cleaned.replace(stripRe, " ");
+  }
+  cleaned = cleaned.replace(/\s+/g, " ").trim();
+
+  if (cleaned !== query.trim() && cleaned.length > 0) {
+    console.log(`[chat] scope-reset: stripped stale categories — "${query}" → "${cleaned}"`);
+    return { ...toolCall, input: { ...toolCall.input, query: cleaned } };
+  }
+  return toolCall;
+}
+
+// Fix C — multi-SKU comparison routing.
+// When the customer's latest message contains 2+ SKU-like tokens
+// AND a comparison verb, the AI sometimes combines them into a
+// single search_products query and gets 0 results. Rewrite to
+// lookup_sku per SKU. SKU pattern (SKU_PATTERN) is structural —
+// matches whatever shape the merchant's SKUs take.
+function forceComparisonLookup(toolCall, ctx) {
+  const latest = String(ctx.latestUserMessage || "");
+  if (!latest) return toolCall;
+
+  const COMPARISON_RE = /\b(better|worse|which|compare|vs\.?|versus|difference|between)\b/i;
+  if (!COMPARISON_RE.test(latest)) return toolCall;
+
+  const skus = (latest.match(SKU_PATTERN) || []).map((s) => s.toUpperCase());
+  if (skus.length < 2) return toolCall;
+  const uniqueSkus = Array.from(new Set(skus));
+  if (uniqueSkus.length < 2) return toolCall;
+
+  if (toolCall.name === "search_products") {
+    console.log(`[chat] comparison-routing: detected ${uniqueSkus.length} SKUs + comparison verb → rewriting search_products to lookup_sku`);
+    return { ...toolCall, name: "lookup_sku", input: { skus: uniqueSkus } };
+  }
+  if (toolCall.name === "lookup_sku") {
+    const existing = Array.isArray(toolCall.input?.skus) ? toolCall.input.skus : [];
+    const merged = Array.from(new Set([...existing.map((s) => String(s).toUpperCase()), ...uniqueSkus]));
+    if (merged.length !== existing.length) {
+      console.log(`[chat] comparison-routing: expanded lookup_sku from ${existing.length} → ${merged.length} SKUs`);
+      return { ...toolCall, input: { ...toolCall.input, skus: merged } };
+    }
+  }
+  return toolCall;
+}
+
+// Fix D — color filter injection.
+// When the customer mentions a color value the merchant has
+// actually tagged, inject as filters.color so the search runs
+// the structured filter (and our existing relaxedFilters
+// mechanism kicks in if no exact match exists). Color values
+// come from the merchant's own attributesJson — no hardcoded
+// color list.
+//
+// The set is loaded lazily once per request and cached on ctx.
+async function loadMerchantColors(ctx) {
+  if (Array.isArray(ctx._merchantColors)) return ctx._merchantColors;
+  try {
+    const products = await prisma.product.findMany({
+      where: { shop: ctx.shop, NOT: { status: { in: ["DRAFT", "ARCHIVED"] } } },
+      select: { attributesJson: true, variants: { select: { attributesJson: true } } },
+      take: 1500,
+    });
+    const colorKeys = ["color", "Color", "color_family", "Color Family", "color_fallback"];
+    const colorSet = new Set();
+    const addFrom = (attrs) => {
+      if (!attrs || typeof attrs !== "object") return;
+      for (const k of colorKeys) {
+        const v = attrs[k];
+        if (!v) continue;
+        const arr = Array.isArray(v) ? v : [v];
+        for (const x of arr) {
+          const s = String(x || "").trim().toLowerCase();
+          if (s && s.length >= 3 && s.length <= 30) colorSet.add(s);
+        }
+      }
+    };
+    for (const p of products) {
+      addFrom(p.attributesJson);
+      for (const variant of (p.variants || [])) addFrom(variant.attributesJson);
+    }
+    ctx._merchantColors = Array.from(colorSet);
+    console.log(`[chat] color-enum: ${ctx._merchantColors.length} distinct color values from catalog`);
+  } catch (err) {
+    console.error("[chat] color enumeration failed:", err?.message || err);
+    ctx._merchantColors = [];
+  }
+  return ctx._merchantColors;
+}
+
+function injectStructuredColorFilter(toolCall, ctx) {
+  if (toolCall.name !== "search_products") return toolCall;
+  const colors = ctx._merchantColors;
+  if (!Array.isArray(colors) || colors.length === 0) return toolCall;
+  const existingFilter = toolCall.input?.filters || {};
+  if (existingFilter.color || existingFilter.Color) return toolCall; // AI already passed one
+
+  const latest = String(ctx.latestUserMessage || "").toLowerCase();
+  if (!latest) return toolCall;
+
+  // Longest-match-first so "hunter green" beats "green".
+  const sorted = [...colors].sort((a, b) => b.length - a.length);
+  for (const color of sorted) {
+    const re = new RegExp(`\\b${escapeRe(color)}\\b`, "i");
+    if (re.test(latest)) {
+      console.log(`[chat] color-inject: "${color}" detected in user text → filters.color`);
+      return {
+        ...toolCall,
+        input: {
+          ...toolCall.input,
+          filters: { ...existingFilter, color },
+        },
+      };
+    }
+  }
+  return toolCall;
+}
+
+// Compose the pipeline. Order matters slightly:
+//   1. Comparison routing (might change tool name from search→lookup)
+//   2. Scope reset (strips stale category from search query)
+//   3. Color injection (adds structured color filter to search)
+async function rewriteToolCall(toolCall, ctx) {
+  let rewritten = toolCall;
+  rewritten = forceComparisonLookup(rewritten, ctx);
+  rewritten = stripStaleCategoriesOnScopeReset(rewritten, ctx);
+  rewritten = injectStructuredColorFilter(rewritten, ctx);
+  return rewritten;
+}
+
+// Fix E — availability-denial detection.
+// When the AI ends a turn without searching but its response
+// implies "we don't have X", that's almost always wrong (the
+// AI hallucinated availability from training data). Detect
+// the pattern; the caller can use it to force a search hop.
+const AVAILABILITY_DENIAL_RE = /\b(?:we|i|the (?:store|shop)) (?:don'?t|do not|cannot|can'?t)\s+(?:have|carry|sell|stock|offer|see|find)\b|\b(?:not (?:available|in stock|carried)|out of stock|couldn'?t find|don'?t see (?:any|that|those|it))\b|\bwe don'?t (?:appear to|seem to)/i;
+function containsAvailabilityDenial(text) {
+  return Boolean(text) && AVAILABILITY_DENIAL_RE.test(text);
+}
+
 async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, controller, encoder, promptCaching, tools }) {
   const totalUsage = { input_tokens: 0, output_tokens: 0, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 };
   let toolCallCount = 0;
@@ -446,10 +648,34 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       productSearchAttempted = true;
     }
 
+    // Pre-load merchant color values once per request so the
+    // injectStructuredColorFilter rewrite can match without a DB
+    // round-trip per tool call.
+    if (ctx._merchantColors === undefined && toolUses.some((u) => u.name === "search_products")) {
+      await loadMerchantColors(ctx);
+    }
+
+    // Tool-call rewrite pipeline: structural fixes B, C, D.
+    // Runs the customer's literal latest message against each tool
+    // input and corrects mismatches (stale carry-over category,
+    // multi-SKU comparison, free-text color → structured filter)
+    // before dispatch. Falls through cleanly when no rewrite needed.
+    const rewrittenUses = await Promise.all(
+      toolUses.map((u) => rewriteToolCall(u, ctx)),
+    );
 
     const results = await Promise.all(
-      toolUses.map((u) => executeTool(u.name, u.input, ctx)),
+      rewrittenUses.map((u) => executeTool(u.name, u.input, ctx)),
     );
+
+    // Mutate the messages-array view so the AI sees its own corrected
+    // tool calls (and uses them when narrating in the next hop).
+    for (let i = 0; i < toolUses.length; i++) {
+      if (rewrittenUses[i] !== toolUses[i]) {
+        toolUses[i].input = rewrittenUses[i].input;
+        toolUses[i].name = rewrittenUses[i].name;
+      }
+    }
 
     let hopHasProducts = false;
     for (let i = 0; i < toolUses.length; i++) {
@@ -620,6 +846,48 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       } catch (err) {
         console.error("[chat] recovery search failed:", err?.message || err);
       }
+    }
+  }
+
+  // Fix E — availability-denial recovery.
+  // When the AI ends a turn without searching but its text says
+  // "we don't have", "we don't carry", "couldn't find", "not
+  // available", etc., that's almost always wrong — the AI
+  // hallucinated unavailability instead of calling search. The
+  // existing prompt rule "NEVER imply the store lacks an item"
+  // is supposed to prevent this; the AI ignores it. Detect the
+  // pattern, force a search using the customer's literal latest
+  // message, and either replace the denial with real results or
+  // (if the search confirms 0 results) keep the denial honest.
+  if (
+    !productSearchAttempted &&
+    fullResponseText &&
+    containsAvailabilityDenial(fullResponseText) &&
+    ctx.latestUserMessage
+  ) {
+    console.log(`[chat] denial-recovery: AI denied availability without searching; forcing search of latest user message`);
+    try {
+      const denialQuery = String(ctx.latestUserMessage || "").slice(0, 200).trim();
+      const recovery = await executeTool(
+        "search_products",
+        { query: denialQuery, limit: 6 },
+        ctx,
+      );
+      if (recovery && Array.isArray(recovery.products) && recovery.products.length > 0) {
+        productSearchAttempted = true;
+        for (const p of recovery.products) {
+          if (p?.handle && !allProductPool.has(p.handle)) allProductPool.set(p.handle, p);
+        }
+        // The AI's denial text is wrong. Replace with a neutral
+        // pitch that matches the products we actually found.
+        fullResponseText = "Let me show you what I found that might fit.";
+        console.log(`[chat] denial-recovery: replaced denial with ${recovery.products.length} real product(s)`);
+      } else {
+        productSearchAttempted = true; // we did try
+        console.log(`[chat] denial-recovery: search returned 0 — denial appears accurate`);
+      }
+    } catch (err) {
+      console.error("[chat] denial-recovery failed:", err?.message || err);
     }
   }
 
@@ -1143,13 +1411,27 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         titleMatches.push(card);
         consumed.push([idx, end]);
       }
-      const shouldNarrow =
-        titleMatches.length >= 2 ||
-        (titleMatches.length === 1 && singularIntent);
-      if (shouldNarrow && titleMatches.length < filteredPool.length) {
+      // Narrowing decision tree:
+      //   singularIntent + ≥2 named  → force to top 1 (customer asked
+      //                                "which is best", AI hedged with
+      //                                multiple — give them the answer)
+      //   ≥2 named                    → narrow to those named
+      //   1 named + singularIntent    → narrow to that 1
+      //   1 named + plural intent     → SKIP (let pool through)
+      if (singularIntent && titleMatches.length > 1) {
+        titleNarrowedCards = [titleMatches[0]];
+        console.log(
+          `[chat] title-narrow: singular intent + AI named ${titleMatches.length} → forcing 1 card (top match)`,
+        );
+      } else if (titleMatches.length >= 2 && titleMatches.length < filteredPool.length) {
         titleNarrowedCards = titleMatches.slice(0, cardCap);
         console.log(
           `[chat] title-narrow: text names ${titleMatches.length} card(s) by title → showing ${titleNarrowedCards.length} of ${filteredPool.length} pool cards`,
+        );
+      } else if (titleMatches.length === 1 && singularIntent && titleMatches.length < filteredPool.length) {
+        titleNarrowedCards = [titleMatches[0]];
+        console.log(
+          `[chat] title-narrow: text names 1 card + singular intent → showing 1 of ${filteredPool.length} pool cards`,
         );
       } else if (titleMatches.length === 1 && !singularIntent) {
         console.log(
