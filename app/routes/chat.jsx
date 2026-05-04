@@ -1077,7 +1077,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // Vocabulary-agnostic — no catalog terms, works in any vertical.
     // Plural intent (the much larger surface) is the implicit default,
     // so we don't try to enumerate plural phrasings.
-    const SINGULAR_INTENT_RE = /\btell me (?:more |a (?:bit|little) more )?about\b|\bmore (?:info|information|details) (?:on|about)\b|\b(?:what|how) about\b|\bhow is\b|\bis the\b|\bdoes (?:the|this|that)\b|\b(?:this|that) one\b|\bthe (?:first|second|third|last|cheapest|cheaper|priciest|most expensive|red|blue|black|white|same) one\b/i;
+    const SINGULAR_INTENT_RE = /\btell me (?:more |a (?:bit|little) more )?about\b|\bmore (?:info|information|details) (?:on|about)\b|\b(?:what|how) about\b|\bhow is\b|\bis the\b|\bdoes (?:the|this|that)\b|\b(?:this|that) one\b|\bthe (?:first|second|third|last|cheapest|cheaper|priciest|most expensive|best|top|finest|red|blue|black|white|same)\s+(?:one\b|[a-z'-]+s?\b)|\bwhich\s+[a-z'-]+\s+(?:is|are)\s+(?:best|most|finest|top|the\s+(?:best|most))\b|\bwhat\s*'?s\s+(?:the\s+)?(?:best|cheapest|priciest|most expensive|finest|top|most\s+[a-z'-]+)\b/i;
     const singularIntent = SINGULAR_INTENT_RE.test(ctx.userText || "");
 
     // SKU-mention narrowing: if the AI text named a specific SKU (e.g.
