@@ -1045,6 +1045,43 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       }
     }
 
+    // Title-mention narrowing: if the AI named specific products by
+    // their full title (e.g. "the Women's Dress Posted Orthotics W/
+    // Metatarsal Support is your best bet"), render ONLY those
+    // cards. Catches the case where the AI didn't use a SKU code.
+    //
+    // Substring overlap: a longer title ("Women's Dress Posted
+    // Orthotics W/ Metatarsal Support") fully contains a shorter
+    // sibling ("Women's Dress Posted Orthotics"). We process longest
+    // titles first and skip any card whose title falls inside an
+    // already-claimed text span — so naming one product doesn't
+    // accidentally match a less-specific sibling.
+    let titleNarrowedCards = null;
+    if (!skuNarrowedCards && filteredPool.length > 1) {
+      const sortedByLen = [...filteredPool].sort(
+        (a, b) => (String(b.title || "").length) - (String(a.title || "").length),
+      );
+      const consumed = [];
+      const titleMatches = [];
+      for (const card of sortedByLen) {
+        const title = String(card.title || "").trim().toLowerCase();
+        if (title.length < 5) continue;
+        const idx = textLower.indexOf(title);
+        if (idx === -1) continue;
+        const end = idx + title.length;
+        const overlap = consumed.some(([s, e]) => idx >= s && end <= e);
+        if (overlap) continue;
+        titleMatches.push(card);
+        consumed.push([idx, end]);
+      }
+      if (titleMatches.length > 0 && titleMatches.length < filteredPool.length) {
+        titleNarrowedCards = titleMatches.slice(0, cardCap);
+        console.log(
+          `[chat] title-narrow: text names ${titleMatches.length} card(s) by title → showing ${titleNarrowedCards.length} of ${filteredPool.length} pool cards`,
+        );
+      }
+    }
+
     // Kept for the coherence guard below — when the AI uses
     // prescriptive singular language ("X is your best fit") but the
     // pool has nothing close to it, we replace the text rather than
@@ -1069,6 +1106,8 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     let cards;
     if (skuNarrowedCards) {
       cards = skuNarrowedCards;
+    } else if (titleNarrowedCards) {
+      cards = titleNarrowedCards;
     } else if (singularIntent && scored.length > 0 && scored[0].score >= 0.5) {
       // Customer asked about ONE thing — show just the top match.
       cards = [scored[0].card];
