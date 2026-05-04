@@ -19,6 +19,7 @@ import {
   hasChoiceButtons,
   dedupeConsecutiveSentences,
   isSingularPrescriptive,
+  hasPluralIntroFraming,
   detectConditionOrOccasion,
 } from "../lib/chat-helpers.server";
 import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL, FIT_PREDICTOR_TOOL } from "../lib/chat-tools.server";
@@ -874,15 +875,47 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     controller.enqueue(encoder.encode(sseChunk({ type: "klaviyo_form" })));
   }
 
-  // STRUCTURAL: never render cards in the same turn as choice buttons.
-  // Prompt rule said this; the AI sometimes ignores it. Customer reads
-  // cards as the answer and skips the buttons, getting wrong products.
+  // STRUCTURAL: cards-with-chips suppression.
+  //
+  // Original intent: prevent the bug where the AI shows product
+  // cards alongside a CLARIFYING question (e.g. "Are you a man or a
+  // woman? <<Men>><<Women>>"). Customer reads the cards as the
+  // answer and skips the gating question.
+  //
+  // But the AI also legitimately combines "here are some products
+  // + want to see more styles? <<Sneakers>><<Loafers>>" in a single
+  // turn. That's a "browse more" affordance, not a gating question.
+  // Suppressing cards there hides the actual answer.
+  //
+  // Heuristic: only suppress when the text looks like a PURE
+  // gating question — short, no plural-intro presentation, and no
+  // pool product title named in the body. If the AI presented
+  // products (plural-intro framing OR named a pool product), the
+  // cards are the answer; chips are extras.
   const hasChoiceButtonsForCards = hasChoiceButtons(fullResponseText);
+  let suppressCardsForChips = false;
   if (hasChoiceButtonsForCards && pool.length > 0) {
-    console.log(`[chat] suppressing ${pool.length} cards: turn has choice buttons`);
+    const firstChipIdx = fullResponseText.indexOf("<<");
+    const beforeChips = firstChipIdx >= 0
+      ? fullResponseText.slice(0, firstChipIdx).trim()
+      : fullResponseText.trim();
+    const beforeLower = beforeChips.toLowerCase();
+    const usesPluralIntro = hasPluralIntroFraming(beforeChips);
+    const namesPoolProduct = pool.some((card) => {
+      const title = String(card.title || "").trim().toLowerCase();
+      return title.length >= 5 && beforeLower.includes(title);
+    });
+    const looksLikePresentation =
+      usesPluralIntro || namesPoolProduct || beforeChips.length >= 120;
+    suppressCardsForChips = !looksLikePresentation;
+    if (suppressCardsForChips) {
+      console.log(`[chat] suppressing ${pool.length} cards: turn has choice buttons + no product presentation in text`);
+    } else {
+      console.log(`[chat] keeping ${pool.length} cards despite choice buttons: text presents products (pluralIntro=${usesPluralIntro}, namedTitle=${namesPoolProduct}, len=${beforeChips.length})`);
+    }
   }
 
-  if (pool.length > 0 && fullResponseText && !hasChoiceButtonsForCards) {
+  if (pool.length > 0 && fullResponseText && !suppressCardsForChips) {
     const textLower = fullResponseText.toLowerCase();
     const saysNoMatch = /\b(don't (?:have|see|carry)|not (?:see|carry|have)|don't appear|we don't|no .{0,20} available)\b/i.test(fullResponseText);
 
