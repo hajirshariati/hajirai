@@ -23,6 +23,8 @@ import {
   detectConditionOrOccasion,
 } from "../lib/chat-helpers.server";
 import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL, FIT_PREDICTOR_TOOL } from "../lib/chat-tools.server";
+import { rewriteToolCall } from "../lib/chat-tool-rewrite.server";
+import { withAnthropicRetry, classifyAnthropicError } from "../lib/anthropic-resilience.server";
 import { fetchCustomerContext } from "../lib/customer-context.server";
 import { fetchKlaviyoEnrichment } from "../lib/klaviyo-enrichment.server";
 import { fetchYotpoLoyalty } from "../lib/yotpo-loyalty.server";
@@ -386,22 +388,14 @@ function titleStyleFamily(title) {
 }
 
 // ============================================================
-// TOOL-CALL REWRITE PIPELINE
+// TOOL-CALL REWRITE PIPELINE — SUPPORT
 // ----------------------------------------------------------------
-// Production AI agents shouldn't trust the LLM with structural
-// signals. The customer's literal latest message is the high-
-// confidence input; the AI's tool-call construction is a low-
-// confidence intermediate. When the two disagree, the customer
-// wins.
-//
-// Each rewrite below is a pure function:
-//   (toolCall, ctx) → toolCall
-// Falls through (returns input unchanged) when the rewrite
-// doesn't apply. Composable in a chain.
-//
-// All vocabulary is data-driven from merchant config — no hard-
-// coded category lists, color lists, or SKU patterns specific
-// to any merchant.
+// Pure rewrite functions live in app/lib/chat-tool-rewrite.server.js
+// so the eval harness can import + test them outside the React
+// Router bundler. loadMerchantColors stays here because it reads
+// Prisma — it's the one place merchant color enumeration touches
+// the DB. It populates ctx._merchantColors which the rewrite
+// pipeline consumes.
 // ============================================================
 
 const RE_ESCAPE = /[.*+?^${}()|[\]\\]/g;
@@ -409,99 +403,6 @@ function escapeRe(s) {
   return String(s).replace(RE_ESCAPE, "\\$&");
 }
 
-// Fix B — scope-reset stale-category strip.
-// When the customer's latest message is open-ended ("anything",
-// "everything", "any X", "show me whatever"), the AI sometimes
-// carries a category from the prior turn into its search query.
-// Strip category words that ARE in the AI's query but NOT in the
-// customer's literal latest message. Vocabulary comes from the
-// merchant's own categoryGroups.
-function stripStaleCategoriesOnScopeReset(toolCall, ctx) {
-  if (toolCall.name !== "search_products") return toolCall;
-  const latest = String(ctx.latestUserMessage || "").trim();
-  if (!latest) return toolCall;
-
-  const SCOPE_RESET_RE = /\b(anything|everything|any\s+\w+|all\s+(?:of\s+)?your|whatever|all\s+styles|every\s+\w+)\b/i;
-  if (!SCOPE_RESET_RE.test(latest)) return toolCall;
-
-  const groups = Array.isArray(ctx.merchantGroups) ? ctx.merchantGroups : [];
-  const categoryTokens = new Set();
-  for (const g of groups) {
-    for (const c of (g?.categories || [])) {
-      const norm = String(c || "").trim().toLowerCase();
-      if (!norm) continue;
-      // Both full name and individual words (≥4 chars) so "Wedges
-      // Heels" and "wedges"/"heels" both register.
-      categoryTokens.add(norm);
-      for (const tok of norm.split(/\s+/)) {
-        if (tok.length >= 4) categoryTokens.add(tok);
-      }
-    }
-  }
-  if (categoryTokens.size === 0) return toolCall;
-
-  const query = String(toolCall.input?.query || "");
-  const userLower = latest.toLowerCase();
-  let cleaned = query;
-
-  for (const token of categoryTokens) {
-    const tokenInUser = new RegExp(`\\b${escapeRe(token)}s?\\b`, "i").test(userLower);
-    if (tokenInUser) continue; // customer mentioned it — keep
-    // Strip from query (with optional plural s)
-    const stripRe = new RegExp(`\\b${escapeRe(token)}s?\\b`, "gi");
-    cleaned = cleaned.replace(stripRe, " ");
-  }
-  cleaned = cleaned.replace(/\s+/g, " ").trim();
-
-  if (cleaned !== query.trim() && cleaned.length > 0) {
-    console.log(`[chat] scope-reset: stripped stale categories — "${query}" → "${cleaned}"`);
-    return { ...toolCall, input: { ...toolCall.input, query: cleaned } };
-  }
-  return toolCall;
-}
-
-// Fix C — multi-SKU comparison routing.
-// When the customer's latest message contains 2+ SKU-like tokens
-// AND a comparison verb, the AI sometimes combines them into a
-// single search_products query and gets 0 results. Rewrite to
-// lookup_sku per SKU. SKU pattern (SKU_PATTERN) is structural —
-// matches whatever shape the merchant's SKUs take.
-function forceComparisonLookup(toolCall, ctx) {
-  const latest = String(ctx.latestUserMessage || "");
-  if (!latest) return toolCall;
-
-  const COMPARISON_RE = /\b(better|worse|which|compare|vs\.?|versus|difference|between)\b/i;
-  if (!COMPARISON_RE.test(latest)) return toolCall;
-
-  const skus = (latest.match(SKU_PATTERN) || []).map((s) => s.toUpperCase());
-  if (skus.length < 2) return toolCall;
-  const uniqueSkus = Array.from(new Set(skus));
-  if (uniqueSkus.length < 2) return toolCall;
-
-  if (toolCall.name === "search_products") {
-    console.log(`[chat] comparison-routing: detected ${uniqueSkus.length} SKUs + comparison verb → rewriting search_products to lookup_sku`);
-    return { ...toolCall, name: "lookup_sku", input: { skus: uniqueSkus } };
-  }
-  if (toolCall.name === "lookup_sku") {
-    const existing = Array.isArray(toolCall.input?.skus) ? toolCall.input.skus : [];
-    const merged = Array.from(new Set([...existing.map((s) => String(s).toUpperCase()), ...uniqueSkus]));
-    if (merged.length !== existing.length) {
-      console.log(`[chat] comparison-routing: expanded lookup_sku from ${existing.length} → ${merged.length} SKUs`);
-      return { ...toolCall, input: { ...toolCall.input, skus: merged } };
-    }
-  }
-  return toolCall;
-}
-
-// Fix D — color filter injection.
-// When the customer mentions a color value the merchant has
-// actually tagged, inject as filters.color so the search runs
-// the structured filter (and our existing relaxedFilters
-// mechanism kicks in if no exact match exists). Color values
-// come from the merchant's own attributesJson — no hardcoded
-// color list.
-//
-// The set is loaded lazily once per request and cached on ctx.
 async function loadMerchantColors(ctx) {
   if (Array.isArray(ctx._merchantColors)) return ctx._merchantColors;
   try {
@@ -535,46 +436,6 @@ async function loadMerchantColors(ctx) {
     ctx._merchantColors = [];
   }
   return ctx._merchantColors;
-}
-
-function injectStructuredColorFilter(toolCall, ctx) {
-  if (toolCall.name !== "search_products") return toolCall;
-  const colors = ctx._merchantColors;
-  if (!Array.isArray(colors) || colors.length === 0) return toolCall;
-  const existingFilter = toolCall.input?.filters || {};
-  if (existingFilter.color || existingFilter.Color) return toolCall; // AI already passed one
-
-  const latest = String(ctx.latestUserMessage || "").toLowerCase();
-  if (!latest) return toolCall;
-
-  // Longest-match-first so "hunter green" beats "green".
-  const sorted = [...colors].sort((a, b) => b.length - a.length);
-  for (const color of sorted) {
-    const re = new RegExp(`\\b${escapeRe(color)}\\b`, "i");
-    if (re.test(latest)) {
-      console.log(`[chat] color-inject: "${color}" detected in user text → filters.color`);
-      return {
-        ...toolCall,
-        input: {
-          ...toolCall.input,
-          filters: { ...existingFilter, color },
-        },
-      };
-    }
-  }
-  return toolCall;
-}
-
-// Compose the pipeline. Order matters slightly:
-//   1. Comparison routing (might change tool name from search→lookup)
-//   2. Scope reset (strips stale category from search query)
-//   3. Color injection (adds structured color filter to search)
-async function rewriteToolCall(toolCall, ctx) {
-  let rewritten = toolCall;
-  rewritten = forceComparisonLookup(rewritten, ctx);
-  rewritten = stripStaleCategoriesOnScopeReset(rewritten, ctx);
-  rewritten = injectStructuredColorFilter(rewritten, ctx);
-  return rewritten;
 }
 
 // Fix E — availability-denial detection.
@@ -617,22 +478,38 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }
 
     const hopStart = Date.now();
-    const stream = anthropic.messages.stream({
-
-      model,
-      max_tokens: MAX_TOKENS,
-      system,
-      tools: activeTools,
-      messages,
-    });
-
-    for await (const event of stream) {
-      if (event.type === "content_block_delta" && event.delta?.type === "text_delta") {
-        fullResponseText += event.delta.text;
-      }
-    }
-
-    const final = await stream.finalMessage();
+    // Retry the stream init only when this hop has not yet contributed
+    // any text — if we already emitted tokens for THIS hop we can't
+    // safely retry without duplicating output to the customer. The
+    // retry covers the common "Anthropic returned 503/429 on connect"
+    // failure mode invisibly.
+    const textBeforeHop = fullResponseText.length;
+    const final = await withAnthropicRetry(
+      async () => {
+        if (fullResponseText.length > textBeforeHop) {
+          // Hop already streamed tokens once; cannot safely retry.
+          // Throw a marker error that withAnthropicRetry classifies as
+          // non-retryable to bail out cleanly.
+          const err = new Error("partial-stream-no-retry");
+          err.status = 0;
+          throw err;
+        }
+        const stream = anthropic.messages.stream({
+          model,
+          max_tokens: MAX_TOKENS,
+          system,
+          tools: activeTools,
+          messages,
+        });
+        for await (const event of stream) {
+          if (event.type === "content_block_delta" && event.delta?.type === "text_delta") {
+            fullResponseText += event.delta.text;
+          }
+        }
+        return await stream.finalMessage();
+      },
+      { label: "chat-stream", maxRetries: 2 },
+    );
     addUsage(totalUsage, final.usage || {});
     console.log(`[chat] hop=${hop} stop=${final.stop_reason} ms=${Date.now() - hopStart} textLen=${fullResponseText.length}`);
 
@@ -730,14 +607,18 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   let initialPool = Array.from(allProductPool.values());
 
   if (!fullResponseText && initialPool.length > 0) {
-    const wrap = await anthropic.messages.create({
-      model,
-      max_tokens: MAX_TOKENS,
-      system,
-      tools: TOOLS,
-      tool_choice: { type: "none" },
-      messages,
-    });
+    // Wrap-up call is safe to retry — no partial output yet.
+    const wrap = await withAnthropicRetry(
+      () => anthropic.messages.create({
+        model,
+        max_tokens: MAX_TOKENS,
+        system,
+        tools: TOOLS,
+        tool_choice: { type: "none" },
+        messages,
+      }),
+      { label: "chat-wrap", maxRetries: 2 },
+    );
     addUsage(totalUsage, wrap.usage || {});
 
     for (const block of wrap.content) {
@@ -1345,8 +1226,46 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // Vocabulary-agnostic — no catalog terms, works in any vertical.
     // Plural intent (the much larger surface) is the implicit default,
     // so we don't try to enumerate plural phrasings.
+    //
+    // SCOPE: latest user message ONLY. Testing the full concatenated
+    // user history caused intent to leak across turns — one earlier
+    // "which is best" pinned singular for every subsequent turn,
+    // including unrelated plural follow-ups like "show me sneakers
+    // under $100". Latest message wins.
     const SINGULAR_INTENT_RE = /\btell me (?:more |a (?:bit|little) more )?about\b|\bmore (?:info|information|details) (?:on|about)\b|\b(?:what|how) about\b|\bhow is\b|\bis the\b|\bdoes (?:the|this|that)\b|\b(?:this|that) one\b|\bthe (?:first|second|third|last|cheapest|cheaper|priciest|most expensive|best|top|finest|red|blue|black|white|same)\s+(?:one\b|[a-z'-]+s?\b)|\bwhich\s+[a-z'-]+\s+(?:is|are)\s+(?:best|most|finest|top|the\s+(?:best|most))\b|\bwhat\s*'?s\s+(?:the\s+)?(?:best|cheapest|priciest|most expensive|finest|top|most\s+[a-z'-]+)\b/i;
-    const singularIntent = SINGULAR_INTENT_RE.test(ctx.userText || "");
+    const latestMsgForIntent = String(ctx.latestUserMessage || "");
+    let singularIntent = SINGULAR_INTENT_RE.test(latestMsgForIntent);
+
+    // Comparison override: when the customer is asking to compare two
+    // options ("which is better, X or Y", "compare A vs B", "what's the
+    // difference between …"), they want to SEE both items side-by-side
+    // — even if the phrasing also matches singular ("the cheapest and
+    // most comfortable"). Comparison wins.
+    const COMPARISON_INTENT_RE = /\b(?:compare|comparison|vs\.?|versus|difference between|better between|between [a-z0-9'-]+ (?:and|or) [a-z0-9'-]+|which (?:is|one is) (?:better|worse)|side[- ]by[- ]side)\b/i;
+    if (singularIntent && COMPARISON_INTENT_RE.test(latestMsgForIntent)) {
+      console.log(`[chat] singular-suppress: comparison phrasing in latest message — keeping plural pool`);
+      singularIntent = false;
+    }
+
+    // Plural-catalog-noun override: if the latest message names a
+    // catalog category in plural form ("sneakers under $100", "show
+    // me orthotics", "what boots do you have"), the customer is
+    // browsing a category — show the pool, not one card. Plural
+    // forms come from the merchant's catalogCategories — no
+    // hardcoded vocabulary.
+    if (singularIntent && Array.isArray(ctx.fullCatalogCategories) && ctx.fullCatalogCategories.length > 0) {
+      const lower = latestMsgForIntent.toLowerCase();
+      const matchedPlural = ctx.fullCatalogCategories.find((cat) => {
+        const c = String(cat || "").toLowerCase().trim();
+        if (!c) return false;
+        const pluralForms = c.endsWith("s") ? [c] : [c + "s", c + "es"];
+        return pluralForms.some((p) => new RegExp(`\\b${escapeRe(p)}\\b`).test(lower));
+      });
+      if (matchedPlural) {
+        console.log(`[chat] singular-suppress: latest message names "${matchedPlural}" (plural catalog noun) — keeping plural pool`);
+        singularIntent = false;
+      }
+    }
 
     // SKU-mention narrowing: if the AI text named a specific SKU (e.g.
     // "the L700M is your best match"), render ONLY the card(s) for that
@@ -1971,13 +1890,26 @@ export const action = async ({ request }) => {
           }).catch((err) => console.error("[chat] usage log error:", err?.message));
         } catch (err) {
           console.error("[chat] stream error:", err?.message || err);
-          let userMsg = "I'm sorry, I'm having trouble right now. Please try again in a moment.";
-          const raw = String(err?.message || "");
-          if (raw.includes("credit balance") || raw.includes("billing") || raw.includes("insufficient")) {
-            userMsg = "I'm temporarily unavailable. Please try again later or reach out to our customer service team for help.";
-          } else if (raw.includes("rate limit") || raw.includes("429")) {
-            userMsg = "I'm getting a lot of questions right now! Please try again in a moment.";
-            incrementRateLimitHits(session.shop).catch(() => {});
+          // classifyAnthropicError tells us if the error was retryable
+          // (we already retried up to 2x in withAnthropicRetry — if we
+          // got here, retries were exhausted) and gives a stable kind
+          // for the customer-facing message.
+          const classified = classifyAnthropicError(err);
+          let userMsg;
+          switch (classified.kind) {
+            case "billing":
+              userMsg = "I'm temporarily unavailable. Please try again later or reach out to our customer service team for help.";
+              break;
+            case "rate_limit":
+              userMsg = "I'm getting a lot of questions right now! Please try again in a moment.";
+              incrementRateLimitHits(session.shop).catch(() => {});
+              break;
+            case "upstream":
+            case "network":
+              userMsg = "I'm having trouble reaching my service right now. Please try again in a moment.";
+              break;
+            default:
+              userMsg = "I'm sorry, I'm having trouble right now. Please try again in a moment.";
           }
           controller.enqueue(
             encoder.encode(sseChunk({ type: "error", message: userMsg })),

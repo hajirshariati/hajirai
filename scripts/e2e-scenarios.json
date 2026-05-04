@@ -246,6 +246,123 @@
 
   {
     "_mode": "hard",
+    "name": "HARD: gender lock fires after long pivot — late-turn search uses women's filter",
+    "history": [
+      { "role": "user", "content": "Looking for men's running shoes" },
+      { "role": "assistant", "content": "Great! Here are some men's running options." },
+      { "role": "user", "content": "Show me more" },
+      { "role": "assistant", "content": "More men's running shoes coming up." },
+      { "role": "user", "content": "actually this is for me — I'm a woman" },
+      { "role": "assistant", "content": "Got it, switching to women's. What activity?" },
+      { "role": "user", "content": "running" },
+      { "role": "assistant", "content": "Here are women's running options." },
+      { "role": "user", "content": "any in red?" },
+      { "role": "assistant", "content": "Here are some red women's running shoes." }
+    ],
+    "messages": [
+      "show me waterproof options"
+    ],
+    "merchantConfig": {
+      "shop": "test.myshopify.com",
+      "catalogProductTypes": ["Sneakers", "Sandals", "Boots", "Walking Shoes"],
+      "scopedGender": "women",
+      "answeredChoices": [
+        { "question": "Are these for men's or women's?", "answer": "Women's", "rawAnswer": "Women's", "options": ["Men's", "Women's"] }
+      ]
+    },
+    "toolStubs": {
+      "search_products": [
+        {
+          "if_query_matches": "waterproof|water resistant|rain",
+          "return": {
+            "products": [
+              { "handle": "danika-waterproof-w", "title": "Danika Waterproof Walking Shoe", "_category": "Walking Shoes" },
+              { "handle": "carly-rainproof-w", "title": "Carly All-Weather Sneaker", "_category": "Sneakers" }
+            ]
+          }
+        },
+        { "if_query_matches": ".", "return": { "products": [] } }
+      ]
+    },
+    "expect": {
+      "must_call_tool": "search_products",
+      "tool_input_must_match": "\"gender\":\"women\"",
+      "products_must_not_include_handle": "any-mens-handle",
+      "text_must_not_contain": ["men's", "for him"]
+    }
+  },
+
+  {
+    "_mode": "hard",
+    "name": "HARD: comparison query rewrites search to lookup_sku for 2 SKUs",
+    "messages": [
+      "Compare L700M vs L701W for me — which is better?"
+    ],
+    "merchantConfig": {
+      "shop": "test.myshopify.com",
+      "catalogProductTypes": ["Orthotics", "Sneakers"],
+      "scopedGender": "women"
+    },
+    "toolStubs": {
+      "lookup_sku": [
+        {
+          "if_query_matches": "L700M|L701W",
+          "return": {
+            "products": [
+              { "handle": "comfort-orthotic-w", "title": "Comfort Posted Orthotic - W", "sku": "L700M", "_category": "Orthotics" },
+              { "handle": "support-orthotic-w", "title": "Support Posted Orthotic - W", "sku": "L701W", "_category": "Orthotics" }
+            ]
+          }
+        },
+        { "if_query_matches": ".", "return": { "products": [] } }
+      ],
+      "search_products": [
+        { "if_query_matches": ".", "return": { "products": [] } }
+      ]
+    },
+    "expect": {
+      "rewritten_tool_name": "lookup_sku",
+      "tool_input_must_match": "L700M.*L701W|L701W.*L700M"
+    }
+  },
+
+  {
+    "_mode": "hard",
+    "name": "HARD: plural noun query — gender lock injected even when AI omits it",
+    "messages": [
+      "show me sneakers under $100"
+    ],
+    "merchantConfig": {
+      "shop": "test.myshopify.com",
+      "catalogProductTypes": ["Sneakers", "Sandals", "Boots"],
+      "scopedGender": "women",
+      "answeredChoices": [
+        { "question": "Are these for men's or women's?", "answer": "Women's", "rawAnswer": "Women's", "options": ["Men's", "Women's"] }
+      ]
+    },
+    "toolStubs": {
+      "search_products": [
+        {
+          "if_query_matches": "sneaker",
+          "return": {
+            "products": [
+              { "handle": "blake-sneaker-w", "title": "Blake Sneaker - White", "_category": "Sneakers" },
+              { "handle": "carly-sneaker-w", "title": "Carly Sneaker - Pink", "_category": "Sneakers" },
+              { "handle": "danika-sneaker-w", "title": "Danika Sneaker - Navy", "_category": "Sneakers" }
+            ]
+          }
+        },
+        { "if_query_matches": ".", "return": { "products": [] } }
+      ]
+    },
+    "expect": {
+      "must_call_tool": "search_products",
+      "tool_input_must_match": "\"gender\":\"women\""
+    }
+  },
+
+  {
+    "_mode": "hard",
     "name": "HARD: simple greeting under 30K-char prompt MUST NOT trigger search",
     "messages": [
       "hi there"
