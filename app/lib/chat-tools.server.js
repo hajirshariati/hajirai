@@ -477,7 +477,31 @@ const searchQuery = detected.gender ? detected.query : q;
   // that fired several turns ago.
   const latestText = latestUserMessage || "";
   const userIntentText = `${q} ${latestText}`;
-  const merchantExclude = matchesCategoryRule(userIntentText, categoryExclusions, latestText, activeCategoryGroup);
+  let merchantExclude = matchesCategoryRule(userIntentText, categoryExclusions, latestText, activeCategoryGroup);
+
+  // Auto-bypass merchant exclusion rule when the AI passed an
+  // explicit category filter and that category isn't in the rule's
+  // excludeTerms. The exclusion rule was meant to clean up broad
+  // semantic matches ("sandals" search picking up orthotic inserts);
+  // it shouldn't run on top of a focused category search.
+  // Otherwise products whose `category` attribute is multi-valued
+  // (e.g. ["Wedges Heels", "Orthotic Footwear"]) get wiped because
+  // the joined string contains the excluded term as a substring.
+  const explicitCategoryFilter = String(
+    attrFilters.category || attrFilters.Category || ""
+  ).toLowerCase().trim();
+  if (merchantExclude && explicitCategoryFilter) {
+    const excludeList = splitCsv(merchantExclude);
+    const categoryOverlapsExclude = excludeList.some(
+      (e) => explicitCategoryFilter.includes(e) || e.includes(explicitCategoryFilter),
+    );
+    if (!categoryOverlapsExclude) {
+      console.log(
+        `[search]   rule skipped: AI's category=${explicitCategoryFilter} doesn't overlap excludeTerms — focused search trumps broad exclusion`,
+      );
+      merchantExclude = null;
+    }
+  }
 
   const GENDER_KEYS_FOR_LOG = new Set(["gender", "gender_fallback", "genders"]);
   const extraFilterKeys = Object.keys(attrFilters).filter(
