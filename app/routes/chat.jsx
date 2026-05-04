@@ -19,7 +19,6 @@ import {
   hasChoiceButtons,
   dedupeConsecutiveSentences,
   isSingularPrescriptive,
-  hasPluralIntroFraming,
   detectConditionOrOccasion,
 } from "../lib/chat-helpers.server";
 import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL, FIT_PREDICTOR_TOOL } from "../lib/chat-tools.server";
@@ -1036,68 +1035,38 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       }
     }
 
-    // Singular-prescriptive narrowing: even without a SKU, when the AI
-    // uses singular "the X is your best/perfect match" language, the
-    // customer expects ONE card. Narrow to the top-scored card so the
-    // text and the rendered card agree. Patterns expanded to catch:
-    //   "is the right pick / right choice / right fit / right one"
-    //   "is the go-to pick / go-to choice / go-to option"
-    //   "is a great choice / great pick / great option / great fit"
-    //   "is a good choice / good pick / good fit / good option"
-    //   "would be perfect / would be a great pick"
-    //   "I'd recommend / I'd suggest"
+    // Kept for the coherence guard below — when the AI uses
+    // prescriptive singular language ("X is your best fit") but the
+    // pool has nothing close to it, we replace the text rather than
+    // letting the customer read one product name above a different
+    // product card.
     const singularPrescriptive = isSingularPrescriptive(fullResponseText);
 
-    // Plural-question detector — when the customer phrased their
-    // question in plural ("what wedges do you carry", "do you have
-    // colorful sneakers", "what heel heights do these come in",
-    // "options for X"), they expect a category-wide / multi-product
-    // answer. Singular-narrow can still fire on the AI's own wording
-    // even when the actual question is plural — and the customer
-    // sees one card under text that names a single product, while
-    // their plural question goes unanswered. Override singular-narrow
-    // in that case. Pure regex on the user message; no hardcoded
-    // catalog vocabulary. Works for any vertical's "what X do you
-    // have" / "show me Xs" / "options for X" patterns.
-    // Plural-intent detection on the user's message. Matches the common
-    // shapes customers use when they want a category-wide answer
-    // rather than a single product:
-    //   - "what X do you recommend / carry / have / sell / offer"
-    //   - "what X are good / come in / work for / fit"
-    //   - "do you have / carry / sell / stock [plural noun]"
-    //   - "show me X" / "show me your Xs"
-    //   - "what are your options / sizes / colors"
-    //   - "options for X" / "alternatives" / "any other styles"
-    //   - "all your X" / "every X" / "both of"
-    // Pure regex on the user message — no catalog vocabulary.
-    const PLURAL_QUESTION_RE = /\b(?:what|which)\s+(?:\S+\s+){0,5}(?:do you (?:recommend|suggest|carry|have|sell|offer|stock|like)|are (?:there|your|some|good|the best)|come in|work (?:for|with|best)|fit)\b|\bdo you (?:have|carry|sell|offer|stock) (?:any |other |different |multiple |several |some |more )?[a-z'-]+s\b|\bshow me (?:your |some |all |a few |any |the )?[a-z'-]+s\b|\b(?:recommend|suggest) (?:some|any|the best|a few)?\s*[a-z'-]+s\b|\bwhat (?:'s|is| are)?\s*(?:your )?(?:options?|sizes?|colors?|styles?|prices?|widths?|heights?|materials?|kinds?|types?|variations?)\b|\boptions for\b|\bany (?:other |alternative |different )?(?:options?|styles?|kinds?|types?|colors?|alternatives?)\b|\b(?:all (?:of )?your|every (?:option|style|kind|type)|both of|alternatives?)\b/i;
-    const pluralQuestion = PLURAL_QUESTION_RE.test(ctx.userText || "");
-
-    // Plural-intro escape hatch: when the AI uses plural framing
-    // ("Here are some great wedges", "Both of these…"), the score
-    // threshold under-counts because the intro doesn't repeat each
-    // product name. Skip the threshold and use the full ranked pool
-    // (still passed through dropSiblingCards to fold near-duplicates).
-    // Only applies when SKU-narrowing and singular-prescriptive both
-    // fail — those are stronger signals and stay first.
-    const pluralIntro = hasPluralIntroFraming(fullResponseText);
+    // Singular INTENT from the customer — the small, stable surface.
+    // Default behavior is plural (show top cardCap from the pool). We
+    // only collapse to a single card when the customer themselves
+    // signalled they're asking about ONE specific item:
+    //   - "tell me (more) about [X]" / "more info|details on [X]"
+    //   - "what about [X]" / "how about [X]" / "how is [X]"
+    //   - "is the [X]" / "does (the|this|that) [X]" — qualifier on a thing
+    //   - "this one" / "that one" / "the [first|cheapest|red|same] one"
+    // Vocabulary-agnostic — no catalog terms, works in any vertical.
+    // Plural intent (the much larger surface) is the implicit default,
+    // so we don't try to enumerate plural phrasings.
+    const SINGULAR_INTENT_RE = /\btell me (?:more |a (?:bit|little) more )?about\b|\bmore (?:info|information|details) (?:on|about)\b|\b(?:what|how) about\b|\bhow is\b|\bis the\b|\bdoes (?:the|this|that)\b|\b(?:this|that) one\b|\bthe (?:first|second|third|last|cheapest|cheaper|priciest|most expensive|red|blue|black|white|same) one\b/i;
+    const singularIntent = SINGULAR_INTENT_RE.test(ctx.userText || "");
 
     let cards;
     if (skuNarrowedCards) {
       cards = skuNarrowedCards;
-    } else if (singularPrescriptive && !pluralQuestion && scored.length > 0 && scored[0].score >= 0.6) {
+    } else if (singularIntent && scored.length > 0 && scored[0].score >= 0.5) {
+      // Customer asked about ONE thing — show just the top match.
       cards = [scored[0].card];
-      console.log(`[chat] singular-narrow: text says "the X is best" → showing 1 card`);
-    } else if ((pluralIntro || pluralQuestion) && !singularPrescriptive && scored.length > 0) {
-      cards = dropSiblingCards(scored, textLower).slice(0, cardCap).map((s) => s.card);
-      console.log(`[chat] plural-${pluralQuestion ? "question" : "intro"}: skipped 0.6 threshold → showing ${cards.length} of ${scored.length} pool cards`);
-    } else if (pluralQuestion && singularPrescriptive && scored.length > 0) {
-      // User asked plural but AI wrote singular — show full pool, override
-      cards = dropSiblingCards(scored, textLower).slice(0, cardCap).map((s) => s.card);
-      console.log(`[chat] plural-question override: AI wrote singular but user asked plural → showing ${cards.length} of ${scored.length} pool cards`);
-    } else if (matched.length > 0) {
-      cards = matched.slice(0, cardCap).map((s) => s.card);
-    } else if (!saysNoMatch) {
+      console.log(`[chat] singular-narrow: customer expressed singular intent → 1 card`);
+    } else if (!saysNoMatch && scored.length > 0) {
+      // Default: show the top of the ranked pool (siblings folded).
+      // Plural is the assumed mode — if the customer wanted one item
+      // they would have used singular phrasing or named a SKU.
       cards = dropSiblingCards(scored, textLower).slice(0, cardCap).map((s) => s.card);
     }
 
