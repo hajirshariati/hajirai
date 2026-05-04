@@ -623,6 +623,58 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }
   }
 
+  // Auto-broaden — when the AI's search returned a tiny pool (≤2)
+  // and the customer's query was a broad-need (no specific category
+  // named, mentions an occasion/condition/use-case), the pool is
+  // probably skewed toward one category that semantically matched the
+  // query best. Customers asking "what should I wear for X" deserve
+  // variety, not two of the same thing. Run a follow-up search with
+  // the literal user phrase (no category filter) and merge in any
+  // products from a category not already represented in the pool.
+  // Pure data: dominant category comes from the products themselves;
+  // no hardcoded vertical vocabulary.
+  if (productSearchAttempted && allProductPool.size > 0 && allProductPool.size <= 2) {
+    const userT = String(ctx.userText || "").toLowerCase();
+    const namesCategory = Array.isArray(ctx.catalogCategories) && ctx.catalogCategories.some((c) => {
+      const norm = String(c || "").trim().toLowerCase().replace(/s$/, "");
+      if (!norm || norm.length < 3) return false;
+      try { return new RegExp(`\\b${norm}s?\\b`, "i").test(userT); } catch { return false; }
+    });
+    const BROAD_NEED_RE = /\b(trip|vacation|cruise|wedding|gift|present|going to|on my feet|all day|need shoes|need something|recommend|suggestion|what should|some advice|help me find|surprise me|something for)\b/i;
+    const broadNeed = BROAD_NEED_RE.test(userT);
+    if (!namesCategory && broadNeed) {
+      const catCounts = new Map();
+      for (const p of allProductPool.values()) {
+        const cat = String(p?._category || p?.category || p?.productType || "").toLowerCase().trim();
+        if (cat) catCounts.set(cat, (catCounts.get(cat) || 0) + 1);
+      }
+      const dominant = [...catCounts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0];
+      console.log(`[chat] auto-broaden trigger: pool=${allProductPool.size} dominant=${dominant || "-"} broad-need=true`);
+      try {
+        const broaden = await executeTool(
+          "search_products",
+          { query: String(ctx.userText || "").slice(0, 120), limit: 5 },
+          ctx,
+        );
+        if (broaden && Array.isArray(broaden.products)) {
+          let added = 0;
+          for (const p of broaden.products) {
+            if (!p?.handle || allProductPool.has(p.handle)) continue;
+            const cat = String(p?._category || p?.category || p?.productType || "").toLowerCase().trim();
+            // Skip products from the same dominant category — we want diversity
+            if (dominant && cat === dominant) continue;
+            allProductPool.set(p.handle, p);
+            added++;
+            if (added >= 3) break;
+          }
+          console.log(`[chat] auto-broaden: added ${added} product(s) outside dominant category`);
+        }
+      } catch (err) {
+        console.error("[chat] auto-broaden failed:", err?.message || err);
+      }
+    }
+  }
+
   const pool = Array.from(allProductPool.values());
 
   // Compliance backstop for the BANNED NARRATION prompt rule. Strips
@@ -996,6 +1048,20 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     //   "I'd recommend / I'd suggest"
     const singularPrescriptive = isSingularPrescriptive(fullResponseText);
 
+    // Plural-question detector — when the customer phrased their
+    // question in plural ("what wedges do you carry", "do you have
+    // colorful sneakers", "what heel heights do these come in",
+    // "options for X"), they expect a category-wide / multi-product
+    // answer. Singular-narrow can still fire on the AI's own wording
+    // even when the actual question is plural — and the customer
+    // sees one card under text that names a single product, while
+    // their plural question goes unanswered. Override singular-narrow
+    // in that case. Pure regex on the user message; no hardcoded
+    // catalog vocabulary. Works for any vertical's "what X do you
+    // have" / "show me Xs" / "options for X" patterns.
+    const PLURAL_QUESTION_RE = /\b(what(?:'s| is)? (?:are|the)?(?: ?your)? (?:options?|colors?|sizes?|styles?|heights?|widths?|materials?|prices?|types?|kinds?|variations?|differences?)|which (?:options?|colors?|sizes?|styles?|types?|kinds?|ones?)|do you (?:have|carry|sell|offer|stock) (?:any |other |different |multiple |several )?[a-z]+s\b|how many|all (?:of )?your|both of|every|each one|other (?:options?|styles?|colors?|kinds?)|alternatives?)\b/i;
+    const pluralQuestion = PLURAL_QUESTION_RE.test(ctx.userText || "");
+
     // Plural-intro escape hatch: when the AI uses plural framing
     // ("Here are some great wedges", "Both of these…"), the score
     // threshold under-counts because the intro doesn't repeat each
@@ -1008,12 +1074,16 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     let cards;
     if (skuNarrowedCards) {
       cards = skuNarrowedCards;
-    } else if (singularPrescriptive && scored.length > 0 && scored[0].score >= 0.6) {
+    } else if (singularPrescriptive && !pluralQuestion && scored.length > 0 && scored[0].score >= 0.6) {
       cards = [scored[0].card];
       console.log(`[chat] singular-narrow: text says "the X is best" → showing 1 card`);
-    } else if (pluralIntro && !singularPrescriptive && scored.length > 0) {
+    } else if ((pluralIntro || pluralQuestion) && !singularPrescriptive && scored.length > 0) {
       cards = dropSiblingCards(scored, textLower).slice(0, cardCap).map((s) => s.card);
-      console.log(`[chat] plural-intro: skipped 0.6 threshold → showing ${cards.length} of ${scored.length} pool cards`);
+      console.log(`[chat] plural-${pluralQuestion ? "question" : "intro"}: skipped 0.6 threshold → showing ${cards.length} of ${scored.length} pool cards`);
+    } else if (pluralQuestion && singularPrescriptive && scored.length > 0) {
+      // User asked plural but AI wrote singular — show full pool, override
+      cards = dropSiblingCards(scored, textLower).slice(0, cardCap).map((s) => s.card);
+      console.log(`[chat] plural-question override: AI wrote singular but user asked plural → showing ${cards.length} of ${scored.length} pool cards`);
     } else if (matched.length > 0) {
       cards = matched.slice(0, cardCap).map((s) => s.card);
     } else if (!saysNoMatch) {
