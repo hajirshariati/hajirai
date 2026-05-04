@@ -901,6 +901,27 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         });
 
     if (ctx.activeCategoryGroup) {
+      // ROOT-CAUSE PROTECTION: cards whose full title appears
+      // verbatim in the AI's reply text are AI-named. They reflect
+      // the AI's specific recommendation for THIS turn and override
+      // the conversation's active-group lock — the lock can be
+      // stale (set 3 turns ago by a chip click) while the AI has
+      // since pivoted to a different group at the customer's
+      // request. Without this, a stale Footwear lock can wipe the
+      // very Orthotic cards the AI just named, leaving the customer
+      // reading "the X Orthotic is best" with sandals shown. Same
+      // protection logic the search layer uses (`active-group skip:
+      // query matches a different group`); we just apply it at
+      // render time too. Pure substring check — no vocabulary.
+      const textLowerForProtection = fullResponseText.toLowerCase();
+      const protectedHandles = new Set();
+      for (const card of filteredPool) {
+        const title = String(card.title || "").trim().toLowerCase();
+        if (title.length >= 5 && textLowerForProtection.includes(title)) {
+          protectedHandles.add(card.handle);
+        }
+      }
+
       // Mirror of the search-layer override (chat-tools.server.js): when
       // the AI's reply matches the terms of a DIFFERENT merchant group
       // than the active one, the group lock is stale. Trust the AI's
@@ -928,54 +949,46 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         if (replyGroups.length === 1) {
           const replyGroup = replyGroups[0];
           const beforeGroup = filteredPool.length;
-          const groupScoped = filteredPool.filter((card) => cardMatchesActiveGroup(card, replyGroup));
+          const groupScoped = filteredPool.filter(
+            (card) => protectedHandles.has(card.handle) || cardMatchesActiveGroup(card, replyGroup),
+          );
           if (groupScoped.length > 0) {
-            console.log(`[chat] product-card group guard: SWITCH locked=${ctx.activeCategoryGroup.name || "-"} → reply-matched=${replyGroup.name} (${groupScoped.length}/${beforeGroup})`);
+            console.log(`[chat] product-card group guard: SWITCH locked=${ctx.activeCategoryGroup.name || "-"} → reply-matched=${replyGroup.name} (${groupScoped.length}/${beforeGroup}${protectedHandles.size > 0 ? `, protected ${protectedHandles.size} AI-named` : ""})`);
             filteredPool = groupScoped;
+          } else if (protectedHandles.size > 0) {
+            // No cards match the divergent group, but the AI named
+            // some cards from the original pool by title. Trust the
+            // AI's named recommendations and skip the wipe.
+            const named = filteredPool.filter((c) => protectedHandles.has(c.handle));
+            console.log(`[chat] product-card group guard: SKIP wipe — keeping ${named.length} AI-named card(s) over divergent ${replyGroup.name} match`);
+            filteredPool = named;
+          } else if (!isSingularPrescriptive(fullResponseText)) {
+            // Generic / plural-intro framing ("here are some great
+            // options with arch support") often shares vocabulary
+            // with adjacent groups — but isn't a specific
+            // recommendation from those groups. Wiping the active-
+            // group cards in that case turns the right answer into
+            // a text-only response with zero cards. Keep the cards
+            // and let the customer browse what the search returned.
+            console.log(`[chat] product-card group guard: SKIP wipe — reply is generic (no singular-prescriptive claim) so ${replyGroup.name} mention is incidental vocabulary`);
           } else {
-            // Before wiping, check whether the AI actually NAMED one of
-            // the active-group cards in its reply. If yes, the
-            // divergent-group term is incidental context, not the
-            // recommendation — e.g. "the Unisex Cleats Med/High Arch
-            // Orthotic is your perfect match — built for cleated
-            // **footwear**" mentions a Footwear trigger in passing but
-            // the actual recommendation is the orthotic that's already
-            // in the pool. Wiping in that case erases a correct
-            // recommendation. Pure substring check on the card title;
-            // generic across verticals.
-            const textLower = fullResponseText.toLowerCase();
-            const aiNamedActiveCard = filteredPool.some((card) => {
-              const title = String(card.title || "").trim().toLowerCase();
-              return title.length >= 5 && textLower.includes(title);
-            });
-            if (aiNamedActiveCard) {
-              console.log(`[chat] product-card group guard: SKIP wipe — AI named an active-group card despite incidental ${replyGroup.name} mention`);
-            } else if (!isSingularPrescriptive(fullResponseText)) {
-              // Generic / plural-intro framing ("here are some great
-              // options with arch support") often shares vocabulary
-              // with adjacent groups — but isn't a specific
-              // recommendation from those groups. Wiping the active-
-              // group cards in that case turns the right answer into
-              // a text-only response with zero cards. Keep the cards
-              // and let the customer browse what the search returned.
-              console.log(`[chat] product-card group guard: SKIP wipe — reply is generic (no singular-prescriptive claim) so ${replyGroup.name} mention is incidental vocabulary`);
-            } else {
-              // Reply mentions a group but no cards match it AND the
-              // AI made a singular-prescriptive claim AND didn't name
-              // any active-group card — likely a hallucination. Wipe
-              // so the empty-pool repair turns this into the dead-end
-              // fallback rather than rendering wrong cards beneath
-              // text the AI got right.
-              console.log(`[chat] product-card group guard: reply mentions ${replyGroup.name} but no matching cards in pool — wiping`);
-              filteredPool = [];
-            }
+            // Reply mentions a group but no cards match it AND the
+            // AI made a singular-prescriptive claim AND didn't name
+            // any active-group card — likely a hallucination. Wipe
+            // so the empty-pool repair turns this into the dead-end
+            // fallback rather than rendering wrong cards beneath
+            // text the AI got right.
+            console.log(`[chat] product-card group guard: reply mentions ${replyGroup.name} but no matching cards in pool — wiping`);
+            filteredPool = [];
           }
         } else {
           console.log(`[chat] product-card group guard: skip — reply matches ${replyGroups.length} groups, ambiguous`);
         }
       } else {
         const beforeGroup = filteredPool.length;
-        const groupScoped = filteredPool.filter((card) => cardMatchesActiveGroup(card, ctx.activeCategoryGroup));
+        const groupScoped = filteredPool.filter(
+          (card) => protectedHandles.has(card.handle) || cardMatchesActiveGroup(card, ctx.activeCategoryGroup),
+        );
         if (groupScoped.length === 0 && beforeGroup > 0) {
           // Fail-open: filter wiped every card. Stale group lock; better
           // to render the search results than ship an empty bubble that
@@ -985,7 +998,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         } else {
           if (groupScoped.length !== beforeGroup) {
             console.log(
-              `[chat] product-card group guard: kept ${groupScoped.length}/${beforeGroup} for group=${ctx.activeCategoryGroup.name || "-"}`,
+              `[chat] product-card group guard: kept ${groupScoped.length}/${beforeGroup} for group=${ctx.activeCategoryGroup.name || "-"}${protectedHandles.size > 0 ? ` (protected ${protectedHandles.size} AI-named)` : ""}`,
             );
           }
           filteredPool = groupScoped;
