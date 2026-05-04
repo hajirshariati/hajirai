@@ -438,7 +438,38 @@ async function loadMerchantColors(ctx) {
   return ctx._merchantColors;
 }
 
-// Fix E — availability-denial detection.
+// ============================================================
+// dispatchTool — guarantee EVERY tool dispatch goes through the
+// rewrite pipeline.
+// ----------------------------------------------------------------
+// The main agentic loop already runs rewriteToolCall before each
+// executeTool call. But there are FOUR recovery paths in this file
+// (SKU-recovery, condition/occasion-recovery, denial-recovery,
+// auto-broaden) that historically called executeTool directly,
+// bypassing rewriteToolCall — meaning gender-lock, color injection,
+// scope-reset, and comparison-routing all silently no-op'd for them.
+//
+// dispatchTool is the one-entry-point fix. Every recovery path now
+// goes through it. Future recovery paths added later will inherit
+// rewrite-pipeline coverage automatically.
+// ============================================================
+async function dispatchTool(name, input, ctx) {
+  const rewritten = rewriteToolCall({ name, input }, ctx);
+  return await executeTool(rewritten.name, rewritten.input, ctx);
+}
+
+// Guard against denial-recovery firing on policy/discount/return
+// questions where the AI's "we don't have/offer X" is a legitimate
+// answer about merchant policy, NOT a hallucinated product
+// availability denial. Without this guard, the customer asks
+// "Can I get a discount if I buy both?" → AI politely answers
+// "I don't have info on bundle discounts" → AVAILABILITY_DENIAL_RE
+// matches "don't have" → recovery forces a product search and
+// shows random orthotic cards under a discount question.
+const POLICY_QUESTION_RE = /\b(discount|coupon|promo(?:tion)?|sale|deal|refund|return|exchange|warranty|guarantee|policy|polic(?:ies|y)|ship(?:ping|ment)?|deliver(?:y|ies)?|bundle|payment|installment|hours|track(?:ing)?|order (?:status|number|history)|account|sign\s*in|log\s*in|coupon)\b/i;
+function isPolicyOrServiceQuestion(text) {
+  return Boolean(text) && POLICY_QUESTION_RE.test(text);
+}
 // When the AI ends a turn without searching but its response
 // implies "we don't have X", that's almost always wrong (the
 // AI hallucinated availability from training data). Detect
@@ -634,7 +665,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     if (orphanSkus.length > 0) {
       const recoveredSkus = new Set();
       try {
-        const recovery = await executeTool("lookup_sku", { skus: orphanSkus.slice(0, 10) }, ctx);
+        const recovery = await dispatchTool("lookup_sku", { skus: orphanSkus.slice(0, 10) }, ctx);
         toolCallCount += 1;
         const newCards = extractProductCards("lookup_sku", recovery);
         for (const card of newCards) {
@@ -707,7 +738,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     if (intent) {
       console.log(`[chat] recovery search: AI did not call tool, forcing query="${intent.phrase}" (${intent.kind})`);
       try {
-        const recovery = await executeTool(
+        const recovery = await dispatchTool(
           "search_products",
           { query: intent.phrase, limit: intent.kind === "condition" ? 1 : 3 },
           ctx,
@@ -744,12 +775,13 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     !productSearchAttempted &&
     fullResponseText &&
     containsAvailabilityDenial(fullResponseText) &&
-    ctx.latestUserMessage
+    ctx.latestUserMessage &&
+    !isPolicyOrServiceQuestion(ctx.latestUserMessage)
   ) {
     console.log(`[chat] denial-recovery: AI denied availability without searching; forcing search of latest user message`);
     try {
       const denialQuery = String(ctx.latestUserMessage || "").slice(0, 200).trim();
-      const recovery = await executeTool(
+      const recovery = await dispatchTool(
         "search_products",
         { query: denialQuery, limit: 6 },
         ctx,
@@ -800,7 +832,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       const dominant = [...catCounts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0];
       console.log(`[chat] auto-broaden trigger: pool=${allProductPool.size} dominant=${dominant || "-"} broad-need=true`);
       try {
-        const broaden = await executeTool(
+        const broaden = await dispatchTool(
           "search_products",
           { query: String(ctx.userText || "").slice(0, 120), limit: 5 },
           ctx,

@@ -448,16 +448,27 @@ const latestConvoGender = detectLatestGender(conversationText || "");
 const filterGenderRaw = (attrFilters.gender || attrFilters.Gender || attrFilters.gender_fallback || "");
 const filterGender = normalizeGenderChipAnswer(filterGenderRaw);
 
-// Priority: AI's current search query > customer's latest message > most recent
-// gender mention anywhere in history > session/filter fallbacks. Scanning history
-// right-to-left avoids the first gender word from turn 1 sticking forever.
+// Priority: explicit filters.gender (from rewrite pipeline or AI) wins
+// when set — that's the customer's stated intent post-rewrite, the
+// authoritative signal. When NOT set, fall back to detection from
+// query → latest message → history → session, scanning right-to-left
+// so the most recent mention wins.
+//
+// Why filterGender is FIRST: the rewrite pipeline's injectLockedGender
+// reads ctx.sessionGender (which itself comes from a user-only scan
+// of message history) and writes filters.gender = sessionGender on
+// every search call. If the customer pivoted gender mid-conversation,
+// sessionGender already reflects the pivot. Without this promotion,
+// internal re-detection from userText (which still contains
+// "husband"/"him" from earlier turns) overrides the post-pivot
+// gender and the wrong products surface.
 const effectiveGender =
+  filterGender ||
   detected.gender ||
   detectedFromLatest.gender ||
   latestUserGender ||
   latestConvoGender ||
   sessionGender ||
-  filterGender ||
   null;
 
 const searchQuery = detected.gender ? detected.query : q;
