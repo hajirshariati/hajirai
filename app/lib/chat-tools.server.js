@@ -490,14 +490,58 @@ const searchQuery = detected.gender ? detected.query : q;
   const explicitCategoryFilter = String(
     attrFilters.category || attrFilters.Category || ""
   ).toLowerCase().trim();
-  if (merchantExclude && explicitCategoryFilter) {
+
+  // Implicit category inference. When the AI's free-text query (or
+  // the user's latest message) mentions a category name from the
+  // merchant's configured categoryGroups, treat it the same as an
+  // explicit `attrFilters.category` for the rule-bypass / divergence
+  // / tier-cutoff gates below. This catches the case where the AI
+  // searches "everyday wedges" without setting category=wedges
+  // heels — the merchant rule + tier cutoff would otherwise collapse
+  // the pool to one wedge (the only one matching both "everyday"
+  // and "wedges").
+  //
+  // Match priority: longer category names first (so "Wedges Heels"
+  // wins over "Heels" if both could match). Then word-boundary check
+  // on the full name; then on individual tokens of length >= 4.
+  // Pure data — uses merchantGroups verbatim. Vocabulary-agnostic.
+  const inferredCategory = (() => {
+    if (!Array.isArray(merchantGroups) || merchantGroups.length === 0) return "";
+    const haystack = `${q} ${latestText}`.toLowerCase();
+    const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const allCats = [];
+    for (const g of merchantGroups) {
+      for (const c of (g?.categories || [])) {
+        const norm = String(c || "").toLowerCase().trim();
+        if (norm) allCats.push(norm);
+      }
+    }
+    allCats.sort((a, b) => b.length - a.length);
+    for (const cat of allCats) {
+      const fullRe = new RegExp(`\\b${escapeRe(cat)}\\b`, "i");
+      if (fullRe.test(haystack)) return cat;
+      const tokens = cat.split(/\s+/).filter((t) => t.length >= 4);
+      for (const tok of tokens) {
+        // Strip trailing 's' so "orthotics" stems to "orthotic" and
+        // matches both "orthotic" and "orthotics" in the haystack.
+        const stem = tok.endsWith("s") ? tok.slice(0, -1) : tok;
+        const tokRe = new RegExp(`\\b${escapeRe(stem)}s?\\b`, "i");
+        if (tokRe.test(haystack)) return cat;
+      }
+    }
+    return "";
+  })();
+
+  const effectiveCategory = explicitCategoryFilter || inferredCategory;
+  if (merchantExclude && effectiveCategory) {
     const excludeList = splitCsv(merchantExclude);
     const categoryOverlapsExclude = excludeList.some(
-      (e) => explicitCategoryFilter.includes(e) || e.includes(explicitCategoryFilter),
+      (e) => effectiveCategory.includes(e) || e.includes(effectiveCategory),
     );
     if (!categoryOverlapsExclude) {
+      const source = explicitCategoryFilter ? "filter" : "query";
       console.log(
-        `[search]   rule skipped: AI's category=${explicitCategoryFilter} doesn't overlap excludeTerms — focused search trumps broad exclusion`,
+        `[search]   rule skipped: ${source} category=${effectiveCategory} doesn't overlap excludeTerms — focused search trumps broad exclusion`,
       );
       merchantExclude = null;
     }
@@ -550,21 +594,22 @@ const searchQuery = detected.gender ? detected.query : q;
     // Pure data: walks the merchant's own categoryGroups to decide
     // which group (if any) owns the explicit category. Works for
     // any vertical.
-    const explicitFilterCategory = String(
-      attrFilters?.category || attrFilters?.Category || ""
-    ).toLowerCase().trim();
+    // Use the same effectiveCategory (explicit filter OR inferred
+    // from query text) computed earlier — so an implicit "wedges"
+    // mention in the query is treated the same as an explicit
+    // category filter for divergence purposes.
     let filterDivergesGroup = false;
-    if (explicitFilterCategory && Array.isArray(merchantGroups) && merchantGroups.length > 0) {
+    if (effectiveCategory && Array.isArray(merchantGroups) && merchantGroups.length > 0) {
       const activeCats = new Set(
         (Array.isArray(activeCategoryGroup?.categories) ? activeCategoryGroup.categories : [])
           .map((c) => String(c || "").trim().toLowerCase())
           .filter(Boolean),
       );
-      if (!activeCats.has(explicitFilterCategory)) {
+      if (!activeCats.has(effectiveCategory)) {
         filterDivergesGroup = merchantGroups.some((g) => {
           const cats = Array.isArray(g?.categories) ? g.categories : [];
           return cats.some(
-            (c) => String(c || "").trim().toLowerCase() === explicitFilterCategory,
+            (c) => String(c || "").trim().toLowerCase() === effectiveCategory,
           );
         });
       }
@@ -582,7 +627,8 @@ const searchQuery = detected.gender ? detected.query : q;
     const queryDiverges = textIntentDivergesFromGroup(q, activeCategoryGroup, merchantGroups);
 
     if (filterDivergesGroup) {
-      console.log(`[search]   active-group skip: explicit filter category=${explicitFilterCategory} belongs to a different group than locked group=${activeCategoryGroup.name || "-"} — trusting explicit filter`);
+      const source = explicitCategoryFilter ? "filter" : "query";
+      console.log(`[search]   active-group skip: ${source} category=${effectiveCategory} belongs to a different group than locked group=${activeCategoryGroup.name || "-"} — trusting category`);
     } else if (queryDiverges) {
       console.log(`[search]   active-group skip: query matches a different group than locked group=${activeCategoryGroup.name || "-"} — trusting query`);
     } else {
@@ -844,16 +890,16 @@ const isExcludedByRule = (p) => {
   // gracefully so the AI still gets results to show.
   //
   // EXCEPTION — explicit category filter relaxes the tier.
-  // When the AI passed `category=X`, the category filter is the
-  // authoritative narrowing. A vague qualifier in the user's query
-  // (e.g. "everyday wedges") shouldn't collapse the pool to 1
-  // because only one wedge happens to have "everyday" in its
-  // description. Skip the strict tier cutoff in that case and let
-  // the category filter do the narrowing — the customer asked for
-  // a category, they should see the category. We still sort by
-  // groupsMatched so the most relevant come first.
+  // When the AI passed `category=X` (or the query mentions a known
+  // catalog category), the category is the authoritative narrowing.
+  // A vague qualifier in the user's query (e.g. "everyday wedges")
+  // shouldn't collapse the pool to 1 because only one wedge happens
+  // to have "everyday" in its description. Skip the strict tier
+  // cutoff in that case and let the category narrowing do the work —
+  // the customer asked for a category, they should see the category.
+  // We still sort by groupsMatched so the most relevant come first.
   let tieredScored;
-  if (explicitCategoryFilter) {
+  if (effectiveCategory) {
     tieredScored = scored;
   } else {
     const topGroupsMatched = scored.length > 0
