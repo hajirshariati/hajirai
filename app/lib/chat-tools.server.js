@@ -538,6 +538,38 @@ const searchQuery = detected.gender ? detected.query : q;
   });
 
   if (activeCategoryGroup) {
+    // Explicit-filter divergence — the AI passed a category filter
+    // (`attrFilters.category=X`) where X belongs to a DIFFERENT
+    // merchant group than the active lock. The lock is stale; the
+    // AI's explicit filter is a stronger signal than the text-based
+    // queryDiverges check below. Without this, an Orthotics search
+    // gets blocked by a Footwear lock from earlier in the
+    // conversation, then filter-wipeout drops the orthotic filter
+    // and the customer sees a sneaker for an orthotic question.
+    //
+    // Pure data: walks the merchant's own categoryGroups to decide
+    // which group (if any) owns the explicit category. Works for
+    // any vertical.
+    const explicitFilterCategory = String(
+      attrFilters?.category || attrFilters?.Category || ""
+    ).toLowerCase().trim();
+    let filterDivergesGroup = false;
+    if (explicitFilterCategory && Array.isArray(merchantGroups) && merchantGroups.length > 0) {
+      const activeCats = new Set(
+        (Array.isArray(activeCategoryGroup?.categories) ? activeCategoryGroup.categories : [])
+          .map((c) => String(c || "").trim().toLowerCase())
+          .filter(Boolean),
+      );
+      if (!activeCats.has(explicitFilterCategory)) {
+        filterDivergesGroup = merchantGroups.some((g) => {
+          const cats = Array.isArray(g?.categories) ? g.categories : [];
+          return cats.some(
+            (c) => String(c || "").trim().toLowerCase() === explicitFilterCategory,
+          );
+        });
+      }
+    }
+
     // Data-driven divergence override: when the AI's search query clearly
     // matches a DIFFERENT merchant-configured group than the active one,
     // the group lock is stale (from earlier in the conversation). Trust
@@ -549,7 +581,9 @@ const searchQuery = detected.gender ? detected.query : q;
     // there are no hardcoded domain keywords here.
     const queryDiverges = textIntentDivergesFromGroup(q, activeCategoryGroup, merchantGroups);
 
-    if (queryDiverges) {
+    if (filterDivergesGroup) {
+      console.log(`[search]   active-group skip: explicit filter category=${explicitFilterCategory} belongs to a different group than locked group=${activeCategoryGroup.name || "-"} — trusting explicit filter`);
+    } else if (queryDiverges) {
       console.log(`[search]   active-group skip: query matches a different group than locked group=${activeCategoryGroup.name || "-"} — trusting query`);
     } else {
       const beforeGroup = products.length;
