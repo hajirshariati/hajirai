@@ -41,9 +41,27 @@ export function detectGenderFromHistory(messages) {
 //   "one moment" / "hold on" / "right away" / "give me a second"
 const BANNED_NARRATION = /(?<=^|\s)(?:let me (?:look (?:that |it )?up|find|search|check|see|pull (?:up|that up|that)|grab|get|look at|get the details|broaden|widen|expand|try (?:a |again|another)|narrow|refine|search again|do (?:a|another) search)(?:[^.!?\n]*)?[.!?]?|i['‘’]?ll (?:look|find|search|check|see|pull|grab|get|need to|try|broaden|widen)(?:[^.!?\n]*)?[.!?]?|i need to (?:pull up|look up|look at|find|search|check|see|grab|get|broaden|widen|try)(?:[^.!?\n]*)?[.!?]?|one moment[!.]?|hold on[!.]?|right away[!.]?|give me a (?:second|sec|moment)[!.]?|that (?:result|search|one) (?:is|was|isn['‘’]?t|doesn['‘’]?t)(?:[^.!?\n]*)?[.!?]?|the (?:search (?:above|results?)|results? (?:above|so far|i found)|previous (?:result|search))(?:[^.!?\n]*)?[.!?]?|searching (?:for|the catalog|now)(?:[^.!?\n]*)?[.!?]?|here['‘’]?s what (?:i|we) (?:found|got)(?:[^.!?\n]*)?[.!?]?)/gi;
 
+// Self-correction strip. The model sometimes streams a follow-up
+// question, then realizes mid-stream that the customer already
+// answered it: "Do you have arch pain? Wait — you already told me:
+// arch pain." Both halves are dead weight to the customer.
+//
+// The leading `(?:[^.!?\n]*\?\s+)?` optionally consumes the preceding
+// question sentence so we don't leave a stale question behind. The
+// strip only fires when the self-correction phrase is present, so we
+// never accidentally eat a real question.
+//
+// Triggers: wait / actually / oh / sorry / hmm / nevermind / hold on
+// followed by "you (already|just) told|said|mentioned|noted me/us…"
+const SELF_CORRECTION_RE = /(?:[^.!?\n]*\?\s+)?\b(?:wait|actually|oh|sorry|hmm|never\s*mind|nevermind|hold\s+on)[\s,—–-]+you\s+(?:already\s+|just\s+)?(?:told|said|mentioned|noted)\s+(?:me|us)?\b[^.!?\n]*[.!?]?\s*/gi;
+
 export function stripBannedNarration(text) {
   if (!text) return text;
-  return text.replace(BANNED_NARRATION, " ").replace(/\s{2,}/g, " ").trim();
+  return text
+    .replace(SELF_CORRECTION_RE, " ")
+    .replace(BANNED_NARRATION, " ")
+    .replace(/\s{2,}/g, " ")
+    .trim();
 }
 
 // Pitch-shaped text: AI claiming a recommendation is being made (with
