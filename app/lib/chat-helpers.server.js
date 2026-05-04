@@ -7,22 +7,25 @@
 const MALE_PATTERN = /\b(men['‘’]?s|mens|men|male|males|guy|guys|dude|dudes|dad|father|husband|boyfriend|brother|son|grandpa|grandfather|uncle|nephew|man|boy|boys)\b/i;
 const FEMALE_PATTERN = /\b(women['‘’]?s|womens|women|female|females|lady|ladies|mom|mother|wife|girlfriend|sister|daughter|grandma|grandmother|aunt|niece|woman|girl|girls)\b/i;
 
-// Latest user gender wins over assistant echoes. Without this, an
-// assistant turn that re-mentions "men's" between the user's original
-// "men's running" and a later pivot like "actually for my wife"
-// silently overrides the pivot.
+// Latest USER gender wins. We only ever read user messages — never
+// assistant text. The assistant echoes whatever it last said, so an
+// assistant fallback always biases toward the AI's previous turn
+// instead of toward the customer's actual current intent. If the
+// customer pivots ("actually this is for me — I'm a woman"), the
+// nearest user turn carrying a gender token wins, and pre-pivot
+// assistant mentions of the prior gender don't get a vote.
+//
+// Chip-driven answers (where the user clicks "Women's" but their
+// next free-text message has no gender word) are covered by the
+// synthetic-choice injection in chat.jsx, which seeds answeredChoices
+// from the chip click — so we don't need the assistant fallback to
+// recover those cases.
 export function detectGenderFromHistory(messages) {
   for (let i = (messages?.length ?? 0) - 1; i >= 0; i--) {
     if (messages[i]?.role !== "user") continue;
     const text = typeof messages[i].content === "string" ? messages[i].content : "";
     if (MALE_PATTERN.test(text)) return "men";
     if (FEMALE_PATTERN.test(text)) return "women";
-  }
-  for (let i = (messages?.length ?? 0) - 1; i >= 0; i--) {
-    if (messages[i]?.role !== "assistant") continue;
-    const text = typeof messages[i].content === "string" ? messages[i].content : "";
-    if (/\bmen['‘’]?s\b/i.test(text) && !/\bwomen['‘’]?s\b/i.test(text)) return "men";
-    if (/\bwomen['‘’]?s\b/i.test(text) && !/\bmen['‘’]?s\b/i.test(text)) return "women";
   }
   return null;
 }

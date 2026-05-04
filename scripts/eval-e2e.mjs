@@ -42,6 +42,7 @@ import {
   looksLikeProductPitch,
   detectConditionOrOccasion,
 } from "../app/lib/chat-helpers.server.js";
+import { rewriteToolCall } from "../app/lib/chat-tool-rewrite.server.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SCENARIOS_PATH = path.join(__dirname, "e2e-scenarios.json");
@@ -174,9 +175,30 @@ async function runScenario(scenario) {
 
     messages.push({ role: "assistant", content: response.content });
 
-    const toolResults = toolUses.map((tu) => {
+    // Run the production rewrite pipeline on each tool use BEFORE
+    // stubbing results. This makes the harness end-to-end: it
+    // validates that gender lock, comparison routing, color
+    // injection, and scope-reset rewrites fire as expected. The
+    // ctx mirrors the production shape — eval scenarios populate
+    // sessionGender, _merchantColors, merchantGroups via
+    // merchantConfig.
+    const evalCtx = {
+      sessionGender: scenario.merchantConfig?.scopedGender || null,
+      latestUserMessage: String(scenario.messages?.[scenario.messages.length - 1] || ""),
+      _merchantColors: scenario.merchantConfig?.merchantColors || [],
+      merchantGroups: scenario.merchantConfig?.merchantGroups || [],
+    };
+    const rewrittenUses = toolUses.map((tu) => rewriteToolCall(tu, evalCtx));
+
+    const toolResults = rewrittenUses.map((tu, idx) => {
       const stubbed = stubToolResult(tu.name, tu.input, scenario.toolStubs);
-      toolCalls.push({ name: tu.name, input: tu.input, stubbed });
+      toolCalls.push({
+        name: tu.name,
+        input: tu.input,
+        original_name: toolUses[idx].name,
+        original_input: toolUses[idx].input,
+        stubbed,
+      });
       if (Array.isArray(stubbed.products)) {
         for (const p of stubbed.products) {
           if (!allProducts.find((x) => x.handle === p.handle)) allProducts.push(p);
@@ -184,7 +206,7 @@ async function runScenario(scenario) {
       }
       return {
         type: "tool_result",
-        tool_use_id: tu.id,
+        tool_use_id: toolUses[idx].id,
         content: JSON.stringify(stubbed),
       };
     });
@@ -236,6 +258,34 @@ function checkAssertions(scenario, result) {
       if (!re.test(queryStr)) {
         reasons.push(`${expect.must_call_tool} input did not match /${expect.tool_query_matches}/i (was: ${queryStr.slice(0, 200)})`);
       }
+    }
+  }
+  // Asserts a regex on the FINAL (post-rewrite) tool input JSON.
+  // Use this to validate the rewrite pipeline injected/corrected a
+  // filter — e.g. `tool_input_must_match: "\"gender\":\"women\""`
+  // catches the gender lock firing.
+  if (expect.tool_input_must_match) {
+    const toolName = expect.must_call_tool || result.toolCalls[0]?.name;
+    const call = result.toolCalls.find((c) => c.name === toolName);
+    if (!call) {
+      reasons.push(`tool_input_must_match: no ${toolName} call to inspect`);
+    } else {
+      const re = new RegExp(expect.tool_input_must_match);
+      const inputStr = JSON.stringify(call.input || {});
+      if (!re.test(inputStr)) {
+        reasons.push(`${toolName} (post-rewrite) input did not match /${expect.tool_input_must_match}/ (was: ${inputStr.slice(0, 200)})`);
+      }
+    }
+  }
+  // Asserts a tool name that the rewrite pipeline produced from the
+  // AI's original call. Use this to validate forceComparisonLookup
+  // rewrote a search_products → lookup_sku.
+  if (expect.rewritten_tool_name) {
+    const matched = result.toolCalls.find((c) =>
+      c.name === expect.rewritten_tool_name && c.original_name && c.original_name !== expect.rewritten_tool_name,
+    );
+    if (!matched) {
+      reasons.push(`expected rewrite to "${expect.rewritten_tool_name}" but no rewrite occurred (calls: ${result.toolCalls.map((c) => `${c.original_name || c.name}→${c.name}`).join(", ")})`);
     }
   }
   if (expect.products_must_include_handle) {

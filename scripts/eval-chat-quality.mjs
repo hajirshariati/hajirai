@@ -11,6 +11,17 @@ import {
   isSingularPrescriptive,
 } from "../app/lib/chat-helpers.server.js";
 import { filterContradictingGenderChips } from "../app/lib/chip-filter.server.js";
+import {
+  forceComparisonLookup,
+  stripStaleCategoriesOnScopeReset,
+  injectStructuredColorFilter,
+  injectLockedGender,
+  rewriteToolCall,
+} from "../app/lib/chat-tool-rewrite.server.js";
+import {
+  withAnthropicRetry,
+  classifyAnthropicError,
+} from "../app/lib/anthropic-resilience.server.js";
 
 const u = (content) => ({ role: "user", content });
 const a = (content) => ({ role: "assistant", content });
@@ -39,24 +50,56 @@ cases.push({
 });
 
 cases.push({
-  name: "no user gender, assistant 'men's' fallback fires",
+  name: "no user gender → null (assistant text is never a gender source)",
   run: () => assert.equal(
     detectGenderFromHistory([
       u("foot pain"),
       a("Here are some men's options."),
     ]),
-    "men",
+    null,
   ),
 });
 
 cases.push({
-  name: "assistant mentions both genders → fallback ignores it",
+  name: "assistant 'men's or women's?' question never sets gender",
   run: () => assert.equal(
     detectGenderFromHistory([
       u("foot pain"),
       a("Are these for men's or women's?"),
     ]),
     null,
+  ),
+});
+
+cases.push({
+  name: "post-pivot: assistant echoes old gender, latest user is new — new wins",
+  run: () => assert.equal(
+    detectGenderFromHistory([
+      u("show me men's sneakers"),
+      a("Here are some men's sneakers!"),
+      u("Actually I need this for me, I'm a woman"),
+      a("Got it, switching to women's."),
+      u("yes please"),
+    ]),
+    "women",
+  ),
+});
+
+cases.push({
+  name: "long pivot chain: 5 turns of assistant echo can't override user pivot",
+  run: () => assert.equal(
+    detectGenderFromHistory([
+      u("men's running shoes"),
+      a("Great choice — here are some men's options."),
+      u("show me more"),
+      a("More men's running shoes coming up."),
+      u("actually for my wife"),
+      a("Switching to women's options."),
+      u("show me more"),
+      a("Here are more women's options."),
+      u("any in pink?"),
+    ]),
+    "women",
   ),
 });
 
@@ -662,12 +705,456 @@ cases.push({
   },
 });
 
+// ── tool-call rewrite pipeline ────────────────────────────────────────
+// These are the production safety net — they run between the AI's tool
+// emission and dispatch. AI compliance becomes irrelevant when the
+// rewrite catches the mismatch.
+
+const search = (input) => ({ name: "search_products", input });
+const lookup = (input) => ({ name: "lookup_sku", input });
+const findSimilar = (input) => ({ name: "find_similar_products", input });
+
+// injectLockedGender ─────────────────────────────────────────────────
+cases.push({
+  name: "gender-lock: injects gender when AI omitted it",
+  run: () => {
+    const out = injectLockedGender(
+      search({ query: "running shoes", filters: {} }),
+      { sessionGender: "women" },
+    );
+    assert.equal(out.input.filters.gender, "women");
+  },
+});
+
+cases.push({
+  name: "gender-lock: overrides AI's stale gender on pivot",
+  run: () => {
+    // Customer pivoted to women but AI's tool call still says men.
+    const out = injectLockedGender(
+      search({ query: "sneakers", filters: { gender: "men" } }),
+      { sessionGender: "women" },
+    );
+    assert.equal(out.input.filters.gender, "women");
+  },
+});
+
+cases.push({
+  name: "gender-lock: leaves matching filter alone",
+  run: () => {
+    const input = search({ query: "x", filters: { gender: "women" } });
+    const out = injectLockedGender(input, { sessionGender: "women" });
+    assert.equal(out, input); // identity = no rewrite
+  },
+});
+
+cases.push({
+  name: "gender-lock: no-op when no session gender",
+  run: () => {
+    const input = search({ query: "x", filters: {} });
+    const out = injectLockedGender(input, { sessionGender: null });
+    assert.equal(out, input);
+  },
+});
+
+cases.push({
+  name: "gender-lock: applies to find_similar_products",
+  run: () => {
+    const out = injectLockedGender(
+      findSimilar({ handle: "x", filters: {} }),
+      { sessionGender: "men" },
+    );
+    assert.equal(out.input.filters.gender, "men");
+  },
+});
+
+cases.push({
+  name: "gender-lock: skips lookup_sku (handle-specific tools)",
+  run: () => {
+    const input = lookup({ skus: ["L700"] });
+    const out = injectLockedGender(input, { sessionGender: "women" });
+    assert.equal(out, input);
+  },
+});
+
+// forceComparisonLookup ──────────────────────────────────────────────
+cases.push({
+  name: "comparison-routing: 2 SKUs + 'compare' → lookup_sku",
+  run: () => {
+    const out = forceComparisonLookup(
+      search({ query: "L700 vs L701" }),
+      { latestUserMessage: "compare L700 and L701 for me" },
+    );
+    assert.equal(out.name, "lookup_sku");
+    assert.deepEqual(out.input.skus, ["L700", "L701"]);
+  },
+});
+
+cases.push({
+  name: "comparison-routing: 'between X and Y' triggers",
+  run: () => {
+    const out = forceComparisonLookup(
+      search({ query: "x" }),
+      { latestUserMessage: "what's the difference between L700M and L701W" },
+    );
+    assert.equal(out.name, "lookup_sku");
+    assert.equal(out.input.skus.length, 2);
+  },
+});
+
+cases.push({
+  name: "comparison-routing: only 1 SKU → no rewrite",
+  run: () => {
+    const input = search({ query: "x" });
+    const out = forceComparisonLookup(input, {
+      latestUserMessage: "is L700 better than the others?",
+    });
+    assert.equal(out, input);
+  },
+});
+
+cases.push({
+  name: "comparison-routing: 2 SKUs without comparison verb → no rewrite",
+  run: () => {
+    const input = search({ query: "x" });
+    const out = forceComparisonLookup(input, {
+      latestUserMessage: "show me L700 and L701",
+    });
+    assert.equal(out, input);
+  },
+});
+
+// injectStructuredColorFilter ────────────────────────────────────────
+cases.push({
+  name: "color-inject: detects merchant-tagged color in user text",
+  run: () => {
+    const out = injectStructuredColorFilter(
+      search({ query: "sneakers" }),
+      {
+        latestUserMessage: "do you have these in red?",
+        _merchantColors: ["red", "blue", "black"],
+      },
+    );
+    assert.equal(out.input.filters.color, "red");
+  },
+});
+
+cases.push({
+  name: "color-inject: longest-match wins (hunter green > green)",
+  run: () => {
+    const out = injectStructuredColorFilter(
+      search({ query: "shoes" }),
+      {
+        latestUserMessage: "any in hunter green?",
+        _merchantColors: ["green", "hunter green", "blue"],
+      },
+    );
+    assert.equal(out.input.filters.color, "hunter green");
+  },
+});
+
+cases.push({
+  name: "color-inject: skips when AI already passed a color",
+  run: () => {
+    const input = search({ query: "x", filters: { color: "blue" } });
+    const out = injectStructuredColorFilter(input, {
+      latestUserMessage: "any in red?",
+      _merchantColors: ["red", "blue"],
+    });
+    assert.equal(out, input);
+  },
+});
+
+cases.push({
+  name: "color-inject: skips when color not in merchant catalog",
+  run: () => {
+    const input = search({ query: "x" });
+    const out = injectStructuredColorFilter(input, {
+      latestUserMessage: "any in chartreuse?",
+      _merchantColors: ["red", "blue", "black"],
+    });
+    assert.equal(out, input);
+  },
+});
+
+// stripStaleCategoriesOnScopeReset ───────────────────────────────────
+cases.push({
+  name: "scope-reset: strips stale 'sneakers' on 'any pink ones'",
+  run: () => {
+    const out = stripStaleCategoriesOnScopeReset(
+      search({ query: "women's sneakers pink" }),
+      {
+        latestUserMessage: "any pink ones?",
+        merchantGroups: [
+          { name: "Footwear", categories: ["Sneakers", "Boots"] },
+        ],
+      },
+    );
+    assert.equal(out.input.query, "women's pink");
+  },
+});
+
+cases.push({
+  name: "scope-reset: keeps category if customer mentions it",
+  run: () => {
+    const input = search({ query: "women's sneakers pink" });
+    const out = stripStaleCategoriesOnScopeReset(input, {
+      latestUserMessage: "any pink sneakers?",
+      merchantGroups: [
+        { name: "Footwear", categories: ["Sneakers", "Boots"] },
+      ],
+    });
+    assert.equal(out, input); // 'sneakers' in user msg → keep
+  },
+});
+
+cases.push({
+  name: "scope-reset: no-op without scope-reset trigger word",
+  run: () => {
+    const input = search({ query: "women's sneakers pink" });
+    const out = stripStaleCategoriesOnScopeReset(input, {
+      latestUserMessage: "show me one in pink",
+      merchantGroups: [
+        { name: "Footwear", categories: ["Sneakers"] },
+      ],
+    });
+    assert.equal(out, input);
+  },
+});
+
+// rewriteToolCall composition ────────────────────────────────────────
+cases.push({
+  name: "pipeline: gender + color stack on a single search",
+  run: () => {
+    const out = rewriteToolCall(
+      search({ query: "running" }),
+      {
+        sessionGender: "women",
+        latestUserMessage: "any red running shoes?",
+        _merchantColors: ["red", "blue"],
+        merchantGroups: [],
+      },
+    );
+    assert.equal(out.input.filters.gender, "women");
+    assert.equal(out.input.filters.color, "red");
+  },
+});
+
+cases.push({
+  name: "pipeline: 20-turn gender pivot — late turn searches with woman gender",
+  run: () => {
+    // Simulates the bug: AI on turn 20 fires search with men's filter
+    // because of context drift; sessionGender (from latest user pivot
+    // 5 turns ago) is "women". Rewrite must override.
+    const out = rewriteToolCall(
+      search({ query: "waterproof shoes", filters: { gender: "men" } }),
+      {
+        sessionGender: "women",
+        latestUserMessage: "any waterproof options?",
+        _merchantColors: [],
+        merchantGroups: [],
+      },
+    );
+    assert.equal(out.input.filters.gender, "women");
+  },
+});
+
+// ── anthropic-resilience ─────────────────────────────────────────────
+// Tests that the retry helper retries on transient errors and bails
+// out cleanly on non-retryable errors. Uses async functions that
+// throw scripted errors — no real Anthropic calls.
+
+cases.push({
+  name: "withAnthropicRetry: succeeds first try (no retry)",
+  run: async () => {
+    let calls = 0;
+    const out = await withAnthropicRetry(async () => {
+      calls++;
+      return "ok";
+    });
+    assert.equal(out, "ok");
+    assert.equal(calls, 1);
+  },
+});
+
+cases.push({
+  name: "withAnthropicRetry: retries on 503 then succeeds",
+  run: async () => {
+    let calls = 0;
+    const out = await withAnthropicRetry(
+      async () => {
+        calls++;
+        if (calls === 1) {
+          const err = new Error("upstream blip");
+          err.status = 503;
+          throw err;
+        }
+        return "recovered";
+      },
+      { baseDelayMs: 1, maxRetries: 2 },
+    );
+    assert.equal(out, "recovered");
+    assert.equal(calls, 2);
+  },
+});
+
+cases.push({
+  name: "withAnthropicRetry: retries on 429 rate limit",
+  run: async () => {
+    let calls = 0;
+    const out = await withAnthropicRetry(
+      async () => {
+        calls++;
+        if (calls < 3) {
+          const err = new Error("rate limited");
+          err.status = 429;
+          throw err;
+        }
+        return "ok";
+      },
+      { baseDelayMs: 1, maxRetries: 2 },
+    );
+    assert.equal(out, "ok");
+    assert.equal(calls, 3);
+  },
+});
+
+cases.push({
+  name: "withAnthropicRetry: does NOT retry on 401 (auth)",
+  run: async () => {
+    let calls = 0;
+    let caught;
+    try {
+      await withAnthropicRetry(
+        async () => {
+          calls++;
+          const err = new Error("unauthorized");
+          err.status = 401;
+          throw err;
+        },
+        { baseDelayMs: 1, maxRetries: 2 },
+      );
+    } catch (e) {
+      caught = e;
+    }
+    assert.equal(calls, 1);
+    assert.equal(caught?.status, 401);
+  },
+});
+
+cases.push({
+  name: "withAnthropicRetry: does NOT retry on 400 (validation)",
+  run: async () => {
+    let calls = 0;
+    try {
+      await withAnthropicRetry(
+        async () => {
+          calls++;
+          const err = new Error("bad request");
+          err.status = 400;
+          throw err;
+        },
+        { baseDelayMs: 1, maxRetries: 2 },
+      );
+    } catch { /* expected */ }
+    assert.equal(calls, 1);
+  },
+});
+
+cases.push({
+  name: "withAnthropicRetry: retries on ECONNRESET network error",
+  run: async () => {
+    let calls = 0;
+    const out = await withAnthropicRetry(
+      async () => {
+        calls++;
+        if (calls === 1) {
+          const err = new Error("connection reset");
+          err.code = "ECONNRESET";
+          throw err;
+        }
+        return "ok";
+      },
+      { baseDelayMs: 1, maxRetries: 2 },
+    );
+    assert.equal(out, "ok");
+    assert.equal(calls, 2);
+  },
+});
+
+cases.push({
+  name: "withAnthropicRetry: gives up after maxRetries",
+  run: async () => {
+    let calls = 0;
+    let caught;
+    try {
+      await withAnthropicRetry(
+        async () => {
+          calls++;
+          const err = new Error("upstream down");
+          err.status = 503;
+          throw err;
+        },
+        { baseDelayMs: 1, maxRetries: 2 },
+      );
+    } catch (e) {
+      caught = e;
+    }
+    assert.equal(calls, 3); // initial + 2 retries
+    assert.equal(caught?.status, 503);
+  },
+});
+
+cases.push({
+  name: "classifyAnthropicError: billing → not retryable",
+  run: () => {
+    const c = classifyAnthropicError(new Error("Your credit balance is too low"));
+    assert.equal(c.kind, "billing");
+    assert.equal(c.retryable, false);
+  },
+});
+
+cases.push({
+  name: "classifyAnthropicError: 429 → rate_limit retryable",
+  run: () => {
+    const err = new Error("rate limit");
+    err.status = 429;
+    const c = classifyAnthropicError(err);
+    assert.equal(c.kind, "rate_limit");
+    assert.equal(c.retryable, true);
+  },
+});
+
+cases.push({
+  name: "classifyAnthropicError: 503 → upstream retryable",
+  run: () => {
+    const err = new Error("service unavailable");
+    err.status = 503;
+    const c = classifyAnthropicError(err);
+    assert.equal(c.kind, "upstream");
+    assert.equal(c.retryable, true);
+  },
+});
+
+cases.push({
+  name: "classifyAnthropicError: ECONNRESET → network retryable",
+  run: () => {
+    const err = new Error("reset");
+    err.code = "ECONNRESET";
+    const c = classifyAnthropicError(err);
+    assert.equal(c.kind, "network");
+    assert.equal(c.retryable, true);
+  },
+});
+
 // ── run all ───────────────────────────────────────────────────────────
 let pass = 0;
 const failures = [];
 for (const c of cases) {
   try {
-    c.run();
+    // Await every run — covers both sync (returns undefined) and async
+    // (returns a Promise) cases. Without `await`, async failures get
+    // silently swallowed as unhandled rejections.
+    await c.run();
     pass++;
   } catch (err) {
     failures.push({ name: c.name, msg: err?.message || String(err) });
