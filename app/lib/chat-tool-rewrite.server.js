@@ -21,6 +21,22 @@ export function escapeRe(s) {
   return String(s).replace(RE_ESCAPE, "\\$&");
 }
 
+// Negation context detector — checks whether a term that appeared at
+// position `matchIndex` in `text` is preceded (within ~25 chars) by a
+// negation word like "no", "not", "without", "skip", "forget",
+// "anything but", "don't want", "other than". Used by color and other
+// structured-filter injection to avoid false positives like
+// "no red" → filters.color = "red".
+const NEGATION_WINDOW_CHARS = 30;
+const NEGATION_PRECEDING_RE = /\b(?:no|not|without|except|skip|forget|anything\s+but|don'?t\s+want|other\s+than|never)\s+\S*$/i;
+export function isPrecededByNegation(text, matchIndex) {
+  const window = String(text || "").slice(
+    Math.max(0, Number(matchIndex) - NEGATION_WINDOW_CHARS),
+    Number(matchIndex),
+  );
+  return NEGATION_PRECEDING_RE.test(window);
+}
+
 // Structural — works for any merchant whose SKUs have 1-2 letters then
 // 3-5 digits with an optional trailing letter. Examples: L700, L700M,
 // AB1234, T9999W. Not catalog-specific.
@@ -127,16 +143,24 @@ export function injectStructuredColorFilter(toolCall, ctx) {
   const sorted = [...colors].sort((a, b) => b.length - a.length);
   for (const color of sorted) {
     const re = new RegExp(`\\b${escapeRe(color)}\\b`, "i");
-    if (re.test(latest)) {
-      console.log(`[chat] color-inject: "${color}" detected in user text → filters.color`);
-      return {
-        ...toolCall,
-        input: {
-          ...toolCall.input,
-          filters: { ...existingFilter, color },
-        },
-      };
+    const m = re.exec(latest);
+    if (!m) continue;
+    if (isPrecededByNegation(latest, m.index)) {
+      // Customer said "no red" / "forget red" / "anything but red".
+      // Skip injection — the affirmative answer is somewhere else
+      // in the message OR the customer is explicitly excluding this
+      // color. Either way, don't filter ON the negated value.
+      console.log(`[chat] color-inject: SKIP — "${color}" appears in negation context`);
+      continue;
     }
+    console.log(`[chat] color-inject: "${color}" detected in user text → filters.color`);
+    return {
+      ...toolCall,
+      input: {
+        ...toolCall.input,
+        filters: { ...existingFilter, color },
+      },
+    };
   }
   return toolCall;
 }

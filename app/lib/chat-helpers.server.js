@@ -7,6 +7,27 @@
 const MALE_PATTERN = /\b(men['‘’]?s|mens|men|male|males|guy|guys|dude|dudes|dad|father|husband|boyfriend|brother|son|grandpa|grandfather|uncle|nephew|man|boy|boys)\b/i;
 const FEMALE_PATTERN = /\b(women['‘’]?s|womens|women|female|females|lady|ladies|mom|mother|wife|girlfriend|sister|daughter|grandma|grandmother|aunt|niece|woman|girl|girls)\b/i;
 
+// Negation-aware match-finder. Tests whether `text` contains a match
+// of `pattern` that is NOT preceded by a negation word (no/not/without/
+// skip/forget/anything but/don't want/other than) within ~25 chars.
+// Returns the index of the first affirmed match, or -1.
+//
+// Rationale: the customer can say "not for men, for women" — naive
+// MALE_PATTERN.test("not for men, for women") returns true and would
+// pin gender=men. A regex match in negation context should NOT count.
+const NEGATION_RE = /\b(?:no|not|without|except|skip|forget|anything\s+but|don'?t\s+want|other\s+than|never)\s+\S*$/i;
+function findAffirmedMatch(text, pattern) {
+  const re = new RegExp(pattern.source, pattern.flags.includes("g") ? pattern.flags : pattern.flags + "g");
+  let m;
+  while ((m = re.exec(text)) !== null) {
+    const window = String(text).slice(Math.max(0, m.index - 30), m.index);
+    if (!NEGATION_RE.test(window)) return m.index;
+    // Move past this match to avoid infinite loop on zero-width.
+    if (re.lastIndex === m.index) re.lastIndex += 1;
+  }
+  return -1;
+}
+
 // Latest USER gender wins. We only ever read user messages — never
 // assistant text. The assistant echoes whatever it last said, so an
 // assistant fallback always biases toward the AI's previous turn
@@ -14,6 +35,11 @@ const FEMALE_PATTERN = /\b(women['‘’]?s|womens|women|female|females|lady|lad
 // customer pivots ("actually this is for me — I'm a woman"), the
 // nearest user turn carrying a gender token wins, and pre-pivot
 // assistant mentions of the prior gender don't get a vote.
+//
+// Negation-aware: "not for men, for women" returns "women" (the
+// affirmed term wins, not the negated one). "I don't want men's"
+// + later turn says "for my wife" → wife wins, men's was negated
+// AND superseded.
 //
 // Chip-driven answers (where the user clicks "Women's" but their
 // next free-text message has no gender word) are covered by the
@@ -24,8 +50,16 @@ export function detectGenderFromHistory(messages) {
   for (let i = (messages?.length ?? 0) - 1; i >= 0; i--) {
     if (messages[i]?.role !== "user") continue;
     const text = typeof messages[i].content === "string" ? messages[i].content : "";
-    if (MALE_PATTERN.test(text)) return "men";
-    if (FEMALE_PATTERN.test(text)) return "women";
+    const maleIdx = findAffirmedMatch(text, MALE_PATTERN);
+    const femaleIdx = findAffirmedMatch(text, FEMALE_PATTERN);
+    // Both affirmed in the same message: the LATER (rightmost) one
+    // wins, since "men's, actually women's" or "for him — wait,
+    // her" represents a within-message correction.
+    if (maleIdx >= 0 && femaleIdx >= 0) {
+      return maleIdx > femaleIdx ? "men" : "women";
+    }
+    if (maleIdx >= 0) return "men";
+    if (femaleIdx >= 0) return "women";
   }
   return null;
 }
