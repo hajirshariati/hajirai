@@ -1033,6 +1033,20 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // Horizontal layout = 3 (legacy); showcase layout = 10 (scroll-snap row).
     const cardCap = ctx.productCardCap || 3;
 
+    // Singular INTENT from the customer — the small, stable surface.
+    // Default behavior is plural (show top cardCap from the pool). We
+    // only collapse to a single card when the customer themselves
+    // signalled they're asking about ONE specific item:
+    //   - "tell me (more) about [X]" / "more info|details on [X]"
+    //   - "what about [X]" / "how about [X]" / "how is [X]"
+    //   - "is the [X]" / "does (the|this|that) [X]" — qualifier on a thing
+    //   - "this one" / "that one" / "the [first|cheapest|red|same] one"
+    // Vocabulary-agnostic — no catalog terms, works in any vertical.
+    // Plural intent (the much larger surface) is the implicit default,
+    // so we don't try to enumerate plural phrasings.
+    const SINGULAR_INTENT_RE = /\btell me (?:more |a (?:bit|little) more )?about\b|\bmore (?:info|information|details) (?:on|about)\b|\b(?:what|how) about\b|\bhow is\b|\bis the\b|\bdoes (?:the|this|that)\b|\b(?:this|that) one\b|\bthe (?:first|second|third|last|cheapest|cheaper|priciest|most expensive|red|blue|black|white|same) one\b/i;
+    const singularIntent = SINGULAR_INTENT_RE.test(ctx.userText || "");
+
     // SKU-mention narrowing: if the AI text named a specific SKU (e.g.
     // "the L700M is your best match"), render ONLY the card(s) for that
     // SKU instead of all top-3 from the pool. Prevents the "text says one
@@ -1069,6 +1083,15 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // titles first and skip any card whose title falls inside an
     // already-claimed text span — so naming one product doesn't
     // accidentally match a less-specific sibling.
+    //
+    // Plural-intent guard: if the AI named only ONE product and the
+    // customer's question was clearly plural ("what heel heights do
+    // your wedges come in?"), do NOT narrow to that one card. The
+    // customer wanted a category overview; the AI just happened to
+    // pick a representative example. Show the full pool so they can
+    // compare. Narrow only when (a) the AI named 2+ products
+    // explicitly (clear small set), or (b) the AI named 1 AND the
+    // customer expressed singular intent.
     let titleNarrowedCards = null;
     if (!skuNarrowedCards && filteredPool.length > 1) {
       const sortedByLen = [...filteredPool].sort(
@@ -1087,10 +1110,17 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         titleMatches.push(card);
         consumed.push([idx, end]);
       }
-      if (titleMatches.length > 0 && titleMatches.length < filteredPool.length) {
+      const shouldNarrow =
+        titleMatches.length >= 2 ||
+        (titleMatches.length === 1 && singularIntent);
+      if (shouldNarrow && titleMatches.length < filteredPool.length) {
         titleNarrowedCards = titleMatches.slice(0, cardCap);
         console.log(
           `[chat] title-narrow: text names ${titleMatches.length} card(s) by title → showing ${titleNarrowedCards.length} of ${filteredPool.length} pool cards`,
+        );
+      } else if (titleMatches.length === 1 && !singularIntent) {
+        console.log(
+          `[chat] title-narrow: SKIP — AI named 1 card but customer asked plural; showing full pool of ${filteredPool.length}`,
         );
       }
     }
@@ -1101,20 +1131,6 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // letting the customer read one product name above a different
     // product card.
     const singularPrescriptive = isSingularPrescriptive(fullResponseText);
-
-    // Singular INTENT from the customer — the small, stable surface.
-    // Default behavior is plural (show top cardCap from the pool). We
-    // only collapse to a single card when the customer themselves
-    // signalled they're asking about ONE specific item:
-    //   - "tell me (more) about [X]" / "more info|details on [X]"
-    //   - "what about [X]" / "how about [X]" / "how is [X]"
-    //   - "is the [X]" / "does (the|this|that) [X]" — qualifier on a thing
-    //   - "this one" / "that one" / "the [first|cheapest|red|same] one"
-    // Vocabulary-agnostic — no catalog terms, works in any vertical.
-    // Plural intent (the much larger surface) is the implicit default,
-    // so we don't try to enumerate plural phrasings.
-    const SINGULAR_INTENT_RE = /\btell me (?:more |a (?:bit|little) more )?about\b|\bmore (?:info|information|details) (?:on|about)\b|\b(?:what|how) about\b|\bhow is\b|\bis the\b|\bdoes (?:the|this|that)\b|\b(?:this|that) one\b|\bthe (?:first|second|third|last|cheapest|cheaper|priciest|most expensive|red|blue|black|white|same) one\b/i;
-    const singularIntent = SINGULAR_INTENT_RE.test(ctx.userText || "");
 
     let cards;
     if (skuNarrowedCards) {
