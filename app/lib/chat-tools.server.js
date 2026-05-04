@@ -422,7 +422,7 @@ function genderFilterClause(gender) {
 }
 
 async function searchProducts(
-  { query, limit, filters },
+  { query, limit, filters, priceMax, priceMin },
   { shop, deduplicateColors, sessionGender, categoryExclusions, querySynonyms, conversationText, userText, latestUserMessage, shopConfig, activeCategoryGroup, merchantGroups }
 ) {
   const q = String(query || "").trim();
@@ -1013,6 +1013,35 @@ const isExcludedByRule = (p) => {
         filtered = beforeAttrFilter;
         relaxedFilters = { ...attrFilters, _reason: "no exact match — filter dropped, showing closest available" };
       }
+    }
+  }
+
+  // Optional price ceiling/floor. AI passes `priceMax` and/or
+  // `priceMin` when the customer mentions a budget ('under $100',
+  // 'less than $50', 'at least $80'). Applied AFTER attribute filters
+  // so the primary signal stays category/keyword match. We compare
+  // against the cheapest variant price — a shoe with a $79 small size
+  // and a $129 wide size still passes priceMax=100 because the
+  // customer can buy the cheaper variant. Same pattern as
+  // findSimilarProducts (line ~1305).
+  const priceCeil = priceMax != null && Number.isFinite(Number(priceMax)) ? Number(priceMax) : null;
+  const priceFloor = priceMin != null && Number.isFinite(Number(priceMin)) ? Number(priceMin) : null;
+  if (priceCeil != null || priceFloor != null) {
+    const beforePrice = filtered.length;
+    filtered = filtered.filter((p) => {
+      const variantPrices = (p.variants || [])
+        .map((v) => (v.price != null ? Number(v.price) : null))
+        .filter((n) => Number.isFinite(n));
+      if (variantPrices.length === 0) return true; // no price data — keep
+      const minP = Math.min(...variantPrices);
+      const maxP = Math.max(...variantPrices);
+      if (priceCeil != null && minP > priceCeil) return false;
+      if (priceFloor != null && maxP < priceFloor) return false;
+      return true;
+    });
+    if (filtered.length !== beforePrice) {
+      const range = `${priceFloor != null ? `>=$${priceFloor}` : ""}${priceCeil != null ? `<=$${priceCeil}` : ""}`;
+      console.log(`[search]   price filter ${range}: ${filtered.length}/${beforePrice}`);
     }
   }
 
