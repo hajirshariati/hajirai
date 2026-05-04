@@ -31,6 +31,14 @@ export const TOOLS = [
           description: "Optional attribute filters. Keys are attribute names (e.g. 'gender', 'color', 'material'), values are the desired value. Only attributes the merchant has mapped will be usable.",
           additionalProperties: { type: "string" },
         },
+        priceMax: {
+          type: "number",
+          description: "Optional dollar ceiling on the cheapest variant. Pass when the customer says 'under $X', 'less than $Y', 'cheaper than $Z', 'no more than $N'. A product with a $79 small size and $129 wide size still passes priceMax=100 (cheapest variant counts).",
+        },
+        priceMin: {
+          type: "number",
+          description: "Optional dollar floor on the most-expensive variant. Pass when the customer says 'at least $X' or 'over $Y'. Rare — most customers ask for 'under' not 'over'.",
+        },
       },
       required: ["query"],
     },
