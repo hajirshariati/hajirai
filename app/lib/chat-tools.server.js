@@ -808,10 +808,25 @@ const isExcludedByRule = (p) => {
   // a qualifier (e.g. a regular sneaker shown for a "UltraSky sneaker"
   // query). When NO product matches all keywords, max-tier degrades
   // gracefully so the AI still gets results to show.
-  const topGroupsMatched = scored.length > 0
-    ? scored[0].groupsMatched
-    : 0;
-  const tieredScored = scored.filter((x) => x.groupsMatched >= topGroupsMatched);
+  //
+  // EXCEPTION — explicit category filter relaxes the tier.
+  // When the AI passed `category=X`, the category filter is the
+  // authoritative narrowing. A vague qualifier in the user's query
+  // (e.g. "everyday wedges") shouldn't collapse the pool to 1
+  // because only one wedge happens to have "everyday" in its
+  // description. Skip the strict tier cutoff in that case and let
+  // the category filter do the narrowing — the customer asked for
+  // a category, they should see the category. We still sort by
+  // groupsMatched so the most relevant come first.
+  let tieredScored;
+  if (explicitCategoryFilter) {
+    tieredScored = scored;
+  } else {
+    const topGroupsMatched = scored.length > 0
+      ? scored[0].groupsMatched
+      : 0;
+    tieredScored = scored.filter((x) => x.groupsMatched >= topGroupsMatched);
+  }
 
   let filtered = tieredScored.map((x) => x.product);
 
