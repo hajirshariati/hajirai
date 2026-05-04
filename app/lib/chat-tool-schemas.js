@@ -22,7 +22,7 @@ export const TOOLS = [
         },
         limit: {
           type: "integer",
-          description: "Maximum number of products to return (default 6, max 10).",
+          description: "Pool size to fetch from the catalog (default 6, max 10). NOT the number of cards rendered to the customer — the chat layer decides card count from customer intent. Set higher only if you want a larger candidate pool to choose from.",
           minimum: 1,
           maximum: 10,
         },

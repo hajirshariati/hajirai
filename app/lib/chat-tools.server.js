@@ -428,7 +428,14 @@ async function searchProducts(
   const q = String(query || "").trim();
   if (!q) return { products: [] };
 
-  const max = Math.min(Math.max(parseInt(limit, 10) || 6, 1), 10);
+  // Floor the pool at 5 even when the AI passes limit:1. The card-
+  // narrowing layer in chat.jsx decides whether to render 1 card or
+  // many based on the customer's intent (singular phrasing → 1, else
+  // top of pool). If we honored limit:1 here, that decision would be
+  // pre-empted and a plural question like "what sandals do you
+  // recommend for plantar fasciitis" would only have one product to
+  // render. Default 6, max 10.
+  const max = Math.min(Math.max(parseInt(limit, 10) || 6, 5), 10);
   const attrFilters = filters && typeof filters === "object" ? filters : {};
 
 const detected = detectAndStripGender(q);
