@@ -1059,7 +1059,18 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // in that case. Pure regex on the user message; no hardcoded
     // catalog vocabulary. Works for any vertical's "what X do you
     // have" / "show me Xs" / "options for X" patterns.
-    const PLURAL_QUESTION_RE = /\b(what(?:'s| is)? (?:are|the)?(?: ?your)? (?:options?|colors?|sizes?|styles?|heights?|widths?|materials?|prices?|types?|kinds?|variations?|differences?)|which (?:options?|colors?|sizes?|styles?|types?|kinds?|ones?)|do you (?:have|carry|sell|offer|stock) (?:any |other |different |multiple |several )?[a-z]+s\b|how many|all (?:of )?your|both of|every|each one|other (?:options?|styles?|colors?|kinds?)|alternatives?)\b/i;
+    // Plural-intent detection on the user's message. Matches the common
+    // shapes customers use when they want a category-wide answer
+    // rather than a single product:
+    //   - "what X do you recommend / carry / have / sell / offer"
+    //   - "what X are good / come in / work for / fit"
+    //   - "do you have / carry / sell / stock [plural noun]"
+    //   - "show me X" / "show me your Xs"
+    //   - "what are your options / sizes / colors"
+    //   - "options for X" / "alternatives" / "any other styles"
+    //   - "all your X" / "every X" / "both of"
+    // Pure regex on the user message — no catalog vocabulary.
+    const PLURAL_QUESTION_RE = /\b(?:what|which)\s+(?:\S+\s+){0,5}(?:do you (?:recommend|suggest|carry|have|sell|offer|stock|like)|are (?:there|your|some|good|the best)|come in|work (?:for|with|best)|fit)\b|\bdo you (?:have|carry|sell|offer|stock) (?:any |other |different |multiple |several |some |more )?[a-z'-]+s\b|\bshow me (?:your |some |all |a few |any |the )?[a-z'-]+s\b|\b(?:recommend|suggest) (?:some|any|the best|a few)?\s*[a-z'-]+s\b|\bwhat (?:'s|is| are)?\s*(?:your )?(?:options?|sizes?|colors?|styles?|prices?|widths?|heights?|materials?|kinds?|types?|variations?)\b|\boptions for\b|\bany (?:other |alternative |different )?(?:options?|styles?|kinds?|types?|colors?|alternatives?)\b|\b(?:all (?:of )?your|every (?:option|style|kind|type)|both of|alternatives?)\b/i;
     const pluralQuestion = PLURAL_QUESTION_RE.test(ctx.userText || "");
 
     // Plural-intro escape hatch: when the AI uses plural framing
