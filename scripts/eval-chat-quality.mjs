@@ -17,6 +17,7 @@ import {
   injectStructuredColorFilter,
   injectLockedGender,
   rewriteToolCall,
+  isPrecededByNegation,
 } from "../app/lib/chat-tool-rewrite.server.js";
 import {
   withAnthropicRetry,
@@ -956,6 +957,189 @@ cases.push({
     );
     assert.equal(out.input.filters.gender, "women");
   },
+});
+
+// ── negation guard for color injection ────────────────────────────────
+// Customer says "no red" — the rewrite pipeline must NOT inject
+// filters.color = "red". Same for "forget red", "anything but red",
+// "without red", "skip red", "don't want red".
+
+cases.push({
+  name: "color-inject: negation 'no red' skips injection",
+  run: () => {
+    const input = search({ query: "shoes" });
+    const out = injectStructuredColorFilter(input, {
+      latestUserMessage: "no red, anything else?",
+      _merchantColors: ["red", "blue", "black"],
+    });
+    assert.equal(out, input);
+  },
+});
+
+cases.push({
+  name: "color-inject: negation 'forget red' skips injection",
+  run: () => {
+    const input = search({ query: "shoes" });
+    const out = injectStructuredColorFilter(input, {
+      latestUserMessage: "ok forget red — show me everything",
+      _merchantColors: ["red"],
+    });
+    assert.equal(out, input);
+  },
+});
+
+cases.push({
+  name: "color-inject: negation 'anything but black' skips injection",
+  run: () => {
+    const input = search({ query: "shoes" });
+    const out = injectStructuredColorFilter(input, {
+      latestUserMessage: "anything but black",
+      _merchantColors: ["black", "blue"],
+    });
+    assert.equal(out, input);
+  },
+});
+
+cases.push({
+  name: "color-inject: negation 'don't want pink' skips injection",
+  run: () => {
+    const input = search({ query: "shoes" });
+    const out = injectStructuredColorFilter(input, {
+      latestUserMessage: "I don't want pink, prefer something else",
+      _merchantColors: ["pink"],
+    });
+    assert.equal(out, input);
+  },
+});
+
+cases.push({
+  name: "color-inject: 'any red?' (affirmed) still injects",
+  run: () => {
+    const out = injectStructuredColorFilter(
+      search({ query: "shoes" }),
+      {
+        latestUserMessage: "any red?",
+        _merchantColors: ["red"],
+      },
+    );
+    assert.equal(out.input.filters.color, "red");
+  },
+});
+
+cases.push({
+  name: "color-inject: 'red please' (affirmed) still injects",
+  run: () => {
+    const out = injectStructuredColorFilter(
+      search({ query: "shoes" }),
+      {
+        latestUserMessage: "red please",
+        _merchantColors: ["red"],
+      },
+    );
+    assert.equal(out.input.filters.color, "red");
+  },
+});
+
+cases.push({
+  name: "color-inject: 'without red, in blue' picks blue (skips red)",
+  run: () => {
+    const out = injectStructuredColorFilter(
+      search({ query: "shoes" }),
+      {
+        latestUserMessage: "without red, in blue please",
+        _merchantColors: ["red", "blue"],
+      },
+    );
+    // longest-first sort puts both at len 3-4; test that whichever
+    // wins, it's NOT red.
+    assert.notEqual(out.input.filters.color, "red");
+  },
+});
+
+// ── isPrecededByNegation primitive ────────────────────────────────────
+cases.push({
+  name: "isPrecededByNegation: 'no red' at index of 'red' → true",
+  run: () => {
+    const t = "no red";
+    const idx = t.indexOf("red");
+    assert.equal(isPrecededByNegation(t, idx), true);
+  },
+});
+
+cases.push({
+  name: "isPrecededByNegation: 'any red' → false (no negation)",
+  run: () => {
+    const t = "any red";
+    const idx = t.indexOf("red");
+    assert.equal(isPrecededByNegation(t, idx), false);
+  },
+});
+
+cases.push({
+  name: "isPrecededByNegation: 'forget red' → true",
+  run: () => {
+    const t = "ok forget red please";
+    const idx = t.indexOf("red");
+    assert.equal(isPrecededByNegation(t, idx), true);
+  },
+});
+
+cases.push({
+  name: "isPrecededByNegation: 'never red' → true",
+  run: () => {
+    const t = "never red";
+    const idx = t.indexOf("red");
+    assert.equal(isPrecededByNegation(t, idx), true);
+  },
+});
+
+// ── negation-aware gender detection ───────────────────────────────────
+cases.push({
+  name: "gender: 'not for men, for women' → women (negation skips men)",
+  run: () => assert.equal(
+    detectGenderFromHistory([u("not for men, for women please")]),
+    "women",
+  ),
+});
+
+cases.push({
+  name: "gender: 'I don't want men's, show me women's' → women",
+  run: () => assert.equal(
+    detectGenderFromHistory([u("I don't want men's, show me women's")]),
+    "women",
+  ),
+});
+
+cases.push({
+  name: "gender: 'for my husband' (no negation) → men",
+  run: () => assert.equal(
+    detectGenderFromHistory([u("for my husband")]),
+    "men",
+  ),
+});
+
+cases.push({
+  name: "gender: 'I'm a woman' (no negation) → women",
+  run: () => assert.equal(
+    detectGenderFromHistory([u("actually this is for me — I'm a woman")]),
+    "women",
+  ),
+});
+
+cases.push({
+  name: "gender: 'no men, no women' → null (both negated)",
+  run: () => assert.equal(
+    detectGenderFromHistory([u("no men, no women, just unisex")]),
+    null,
+  ),
+});
+
+cases.push({
+  name: "gender: 'men's, actually women's' (later wins same msg)",
+  run: () => assert.equal(
+    detectGenderFromHistory([u("men's, actually women's")]),
+    "women",
+  ),
 });
 
 // ── anthropic-resilience ─────────────────────────────────────────────
