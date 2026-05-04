@@ -950,12 +950,22 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
             });
             if (aiNamedActiveCard) {
               console.log(`[chat] product-card group guard: SKIP wipe — AI named an active-group card despite incidental ${replyGroup.name} mention`);
+            } else if (!isSingularPrescriptive(fullResponseText)) {
+              // Generic / plural-intro framing ("here are some great
+              // options with arch support") often shares vocabulary
+              // with adjacent groups — but isn't a specific
+              // recommendation from those groups. Wiping the active-
+              // group cards in that case turns the right answer into
+              // a text-only response with zero cards. Keep the cards
+              // and let the customer browse what the search returned.
+              console.log(`[chat] product-card group guard: SKIP wipe — reply is generic (no singular-prescriptive claim) so ${replyGroup.name} mention is incidental vocabulary`);
             } else {
               // Reply mentions a group but no cards match it AND the
-              // AI didn't name any active-group card — likely a
-              // hallucination. Wipe so the empty-pool repair turns
-              // this into the dead-end fallback rather than rendering
-              // wrong cards beneath text the AI got right.
+              // AI made a singular-prescriptive claim AND didn't name
+              // any active-group card — likely a hallucination. Wipe
+              // so the empty-pool repair turns this into the dead-end
+              // fallback rather than rendering wrong cards beneath
+              // text the AI got right.
               console.log(`[chat] product-card group guard: reply mentions ${replyGroup.name} but no matching cards in pool — wiping`);
               filteredPool = [];
             }
