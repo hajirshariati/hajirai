@@ -814,6 +814,13 @@ const isExcludedByRule = (p) => {
   // loop. Semantic-only candidates (no keyword match but high similarity) can
   // surface alongside keyword matches.
   let semanticMap = new Map();
+  // When the AI's attrFilters can't be satisfied (e.g. customer asked
+  // for "red" but no products are tagged red), we relax the filter and
+  // either return semantic near-matches or drop the filter entirely.
+  // Surfacing this to the AI lets it write honest framing instead of
+  // pretending near-matches are exact ("here are red wedges" when
+  // they're actually burgundy).
+  let relaxedFilters = null;
   const shopEmbedding = resolveShopEmbedding(shopConfig);
   if (shopEmbedding && q) {
     try {
@@ -1000,9 +1007,11 @@ const isExcludedByRule = (p) => {
       if (semanticFallback.length > 0) {
         console.log(`[search]   filter-wipeout: using ${semanticFallback.length} semantic matches instead of dropping attrFilters=${JSON.stringify(attrFilters)}`);
         filtered = semanticFallback;
+        relaxedFilters = { ...attrFilters, _reason: "no exact match — showing nearest semantic matches" };
       } else {
         console.log(`[search]   filter-wipeout: dropping attrFilters=${JSON.stringify(attrFilters)}`);
         filtered = beforeAttrFilter;
+        relaxedFilters = { ...attrFilters, _reason: "no exact match — filter dropped, showing closest available" };
       }
     }
   }
@@ -1053,6 +1062,7 @@ const isExcludedByRule = (p) => {
     query: q,
     count: filtered.length,
     filters: attrKeys.length > 0 ? attrFilters : undefined,
+    relaxedFilters: relaxedFilters || undefined,
     products: filtered.map((p) => ({
       handle: p.handle,
       title: p.title,
