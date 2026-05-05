@@ -926,6 +926,40 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }
   }
 
+  // Hard cap on response length when product cards will render. The
+  // prompt has a "ONE SENTENCE when showing products" rule but the AI
+  // ignores it on long customer messages. Code-level enforcement: if
+  // products are coming AND text exceeds a generous threshold, truncate
+  // to the first 1-2 sentences. The cards carry the detail; the text is
+  // an opener, not a sales pitch.
+  //
+  // Threshold is generous (300 chars) so legitimate 1-sentence presentations
+  // pass untouched. Comparison-style requests ("compare X vs Y") are
+  // harder — those legitimately need 2-3 sentences. We allow up to the
+  // first sentence-end past 300 chars to handle that case.
+  const PRODUCT_REPLY_HARD_CAP = 300;
+  if (
+    pool.length > 0 &&
+    fullResponseText &&
+    fullResponseText.length > PRODUCT_REPLY_HARD_CAP &&
+    !hasChoiceButtons(fullResponseText) // never truncate when AI is asking — keep the question intact
+  ) {
+    // Find first sentence-end at or after the cap. If we can't find one
+    // within +200 chars of the cap, hard-truncate at cap with an ellipsis.
+    const slice = fullResponseText.slice(0, PRODUCT_REPLY_HARD_CAP + 200);
+    const sentenceEnd = slice.search(/[.!?](\s|$)/);
+    let truncated;
+    if (sentenceEnd >= 0 && sentenceEnd < PRODUCT_REPLY_HARD_CAP + 200) {
+      truncated = fullResponseText.slice(0, sentenceEnd + 1).trim();
+    } else {
+      truncated = fullResponseText.slice(0, PRODUCT_REPLY_HARD_CAP).trim() + "…";
+    }
+    if (truncated.length < fullResponseText.length) {
+      console.log(`[chat] response-length cap: ${fullResponseText.length} → ${truncated.length} chars (pool=${pool.length})`);
+      fullResponseText = truncated;
+    }
+  }
+
   // Pitch text without products = incoherent turn. Replace with the
   // graceful fallback below. Catches both "search ran, returned 0" and
   // "AI claimed a recommendation without ever searching" cases.
@@ -1118,8 +1152,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       const title = String(card.title || "").trim().toLowerCase();
       return title.length >= 5 && beforeLower.includes(title);
     });
-    const looksLikePresentation =
-      usesPluralIntro || namesPoolProduct || beforeChips.length >= 120;
+    const looksLikePresentation = usesPluralIntro || namesPoolProduct;
     suppressCardsForChips = !looksLikePresentation;
     if (suppressCardsForChips) {
       console.log(`[chat] suppressing ${pool.length} cards: turn has choice buttons + no product presentation in text`);

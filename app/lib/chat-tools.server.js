@@ -1000,30 +1000,62 @@ const isExcludedByRule = (p) => {
 
 
     // Safety net: if the attribute filters wiped out every keyword match,
-    // the LLM's filter value doesn't match this merchant's data verbatim.
-    // Two recovery strategies, in order of preference:
+    // recover in PRIORITY ORDER, never sacrificing category:
     //
-    //  1. Semantic-first: if the shop has semantic search and this query
-    //     has any high-similarity products, prefer those over showing
-    //     filter-irrelevant items. Example: filter color_family=red
-    //     wiped out everything; semantic search has Burgundy/Crimson
-    //     products at 0.6+ similarity to "red" → return those.
+    //  1. Category is SACRED — if attrFilters.category was set, retry
+    //     with category alone. Customer asked for sneakers; never
+    //     surface orthotics just because pink-sneaker matches were
+    //     thin. Better to show non-pink sneakers than off-category items.
     //
-    //  2. Drop filter entirely: fall back to all keyword matches without
-    //     the LLM's filter. Less precise but better than dead-ending.
+    //  2. If still empty (or no category filter to begin with), try
+    //     semantic-first across the keyword pool — only when no
+    //     category was set, so we don't violate rule #1.
+    //
+    //  3. Last resort: drop everything and return all keyword matches.
     if (filtered.length === 0 && beforeAttrFilter.length > 0) {
-      const semanticFallback = beforeAttrFilter
-        .filter((p) => semanticMap.has(p.id))
-        .sort((a, b) => (semanticMap.get(b.id) || 0) - (semanticMap.get(a.id) || 0));
-      if (semanticFallback.length > 0) {
-        console.log(`[search]   filter-wipeout: using ${semanticFallback.length} semantic matches instead of dropping attrFilters=${JSON.stringify(attrFilters)}`);
-        filtered = semanticFallback;
-        relaxedFilters = { ...attrFilters, _reason: "no exact match — showing nearest semantic matches" };
-      } else {
-        console.log(`[search]   filter-wipeout: dropping attrFilters=${JSON.stringify(attrFilters)}`);
-        filtered = beforeAttrFilter;
-        relaxedFilters = { ...attrFilters, _reason: "no exact match — filter dropped, showing closest available" };
+      const categoryWant = String(
+        attrFilters.category || attrFilters.Category || ""
+      ).toLowerCase().trim();
+
+      let recovered = null;
+      if (categoryWant) {
+        const categoryOnly = beforeAttrFilter.filter((p) => matchesCategoryWant(p, categoryWant));
+        if (categoryOnly.length > 0) {
+          // Drop only the non-category filters (color, etc.). Category stays.
+          const dropped = Object.fromEntries(
+            Object.entries(attrFilters).filter(
+              ([k]) => k.toLowerCase() !== "category",
+            ),
+          );
+          console.log(`[search]   filter-wipeout: keeping category="${categoryWant}", dropping ${Object.keys(dropped).join(",") || "(none)"} — got ${categoryOnly.length} on-category matches`);
+          recovered = categoryOnly;
+          relaxedFilters = { ...dropped, _reason: `no exact match — kept category="${categoryWant}", relaxed other filters` };
+        } else {
+          console.log(`[search]   filter-wipeout: category="${categoryWant}" had zero in keyword pool — falling through (will NOT pull off-category items)`);
+        }
       }
+
+      if (!recovered && !categoryWant) {
+        // No category to protect — old semantic fallback applies.
+        const semanticFallback = beforeAttrFilter
+          .filter((p) => semanticMap.has(p.id))
+          .sort((a, b) => (semanticMap.get(b.id) || 0) - (semanticMap.get(a.id) || 0));
+        if (semanticFallback.length > 0) {
+          console.log(`[search]   filter-wipeout: using ${semanticFallback.length} semantic matches instead of dropping attrFilters=${JSON.stringify(attrFilters)}`);
+          recovered = semanticFallback;
+          relaxedFilters = { ...attrFilters, _reason: "no exact match — showing nearest semantic matches" };
+        } else {
+          console.log(`[search]   filter-wipeout: dropping attrFilters=${JSON.stringify(attrFilters)}`);
+          recovered = beforeAttrFilter;
+          relaxedFilters = { ...attrFilters, _reason: "no exact match — filter dropped, showing closest available" };
+        }
+      }
+
+      // categoryWant set but had zero on-category matches: leave filtered=[].
+      // Better to return empty (and let the AI honestly say "no sneakers
+      // match these constraints") than to ship orthotics under a sneaker
+      // request.
+      if (recovered) filtered = recovered;
     }
   }
 
