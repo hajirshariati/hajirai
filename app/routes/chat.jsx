@@ -28,6 +28,7 @@ import { withAnthropicRetry, classifyAnthropicError } from "../lib/anthropic-res
 import { fetchCustomerContext } from "../lib/customer-context.server";
 import { fetchKlaviyoEnrichment } from "../lib/klaviyo-enrichment.server";
 import { fetchYotpoLoyalty } from "../lib/yotpo-loyalty.server";
+import { dispatchDecisionTree } from "../lib/decision-tree-dispatch.server";
 import prisma from "../db.server";
 import { recordChatUsage, getTodayMessageCount } from "../models/ChatUsage.server";
 import { canSendMessage } from "../lib/billing.server";
@@ -1965,6 +1966,48 @@ export const action = async ({ request }) => {
             }
           } catch (cheatErr) {
             console.error("[chat] cheat-code path failed, falling back to AI:", cheatErr?.stack || cheatErr?.message || cheatErr);
+          }
+
+          // Decision-tree dispatcher. Gated by
+          // ShopConfig.decisionTreeEnabled — when off (default), this
+          // is a no-op and the existing AI flow runs unchanged. When
+          // on AND an enabled tree's trigger matches the current
+          // category intent, the engine handles the turn entirely:
+          // emits the next question + chips, or the final product
+          // card. The LLM is bypassed for those turns. Wrapped in
+          // try/catch so any dispatcher failure falls through to the
+          // normal AI flow rather than dead-ending the customer.
+          try {
+            const dt = await dispatchDecisionTree({
+              shop: session.shop,
+              config,
+              categoryIntent,
+              messages,
+              latestUserMessage: String(body.message || ""),
+              sessionGender,
+              answeredChoices,
+            });
+            if (dt?.handled) {
+              const text = dt.response?.text || "";
+              const products = Array.isArray(dt.response?.products) ? dt.response.products : [];
+              if (text) controller.enqueue(encoder.encode(sseChunk({ type: "text", text })));
+              controller.enqueue(encoder.encode(sseChunk({ type: "products", products })));
+              controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
+              if (dt.telemetry) {
+                console.log(
+                  `[decision-tree] handled turn shop=${session.shop} ` +
+                    `tree=${dt.telemetry.treeId} intent=${dt.telemetry.intent} ` +
+                    `completed=${dt.telemetry.completed} ` +
+                    `${dt.telemetry.masterSku ? "masterSku=" + dt.telemetry.masterSku : "node=" + dt.telemetry.currentNodeId}`,
+                );
+              }
+              return;
+            }
+          } catch (dtErr) {
+            console.error(
+              "[decision-tree] dispatcher failed, falling back to AI:",
+              dtErr?.stack || dtErr?.message || dtErr,
+            );
           }
 
           const activeTools = [...TOOLS];
