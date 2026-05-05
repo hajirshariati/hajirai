@@ -545,17 +545,18 @@ const searchQuery = detected.gender ? detected.query : q;
 
   const effectiveCategory = explicitCategoryFilter || inferredCategory;
   if (merchantExclude && effectiveCategory) {
-    const excludeList = splitCsv(merchantExclude);
-    const categoryOverlapsExclude = excludeList.some(
-      (e) => effectiveCategory.includes(e) || e.includes(effectiveCategory),
+    // ALWAYS skip the merchant exclusion rule when there's an
+    // explicit/inferred category filter — the rule is broad cleanup
+    // for unfocused semantic searches; a category filter IS the
+    // focus. Without this, a rule that excludes "sneaker, sneakers"
+    // (intended to clean up orthotic searches) wipes the keyword
+    // pool when the customer literally asked for sneakers, producing
+    // nondeterministic 0-result responses across identical queries.
+    const source = explicitCategoryFilter ? "filter" : "query";
+    console.log(
+      `[search]   rule skipped: ${source} category=${effectiveCategory} present — focused search trumps broad exclusion`,
     );
-    if (!categoryOverlapsExclude) {
-      const source = explicitCategoryFilter ? "filter" : "query";
-      console.log(
-        `[search]   rule skipped: ${source} category=${effectiveCategory} doesn't overlap excludeTerms — focused search trumps broad exclusion`,
-      );
-      merchantExclude = null;
-    }
+    merchantExclude = null;
   }
 
   const GENDER_KEYS_FOR_LOG = new Set(["gender", "gender_fallback", "genders"]);
