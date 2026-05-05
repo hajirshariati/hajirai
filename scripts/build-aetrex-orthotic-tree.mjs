@@ -20,34 +20,13 @@ const masterPath = process.argv[2] || resolve(here, "../master-index.json");
 const masterIndex = JSON.parse(readFileSync(masterPath, "utf8"));
 
 const definition = {
-  rootNodeId: "q_gender",
+  // Order: use-case first so the gender question can prune to only
+  // the genders Aetrex actually makes for that shoe context (e.g.
+  // hockey skates → only Unisex SKUs exist → engine auto-skips the
+  // gender question entirely). Keeps the funnel tight.
+  rootNodeId: "q_use_case",
 
-  // Order matters: the engine walks nodes following `next` links;
-  // skipIfKnown lets gender (or anything else) be pre-filled by the
-  // existing choice-button system in chat.jsx.
   nodes: [
-    {
-      id: "q_gender",
-      type: "question",
-      attribute: "gender",
-      skipIfKnown: true,
-      question: "Who are these orthotics for?",
-      chips: [
-        { label: "Men", value: "Men" },
-        { label: "Women", value: "Women" },
-        { label: "Boys", value: "Boys" },
-        { label: "Girls", value: "Girls" },
-        { label: "Kids", value: "Kids" },
-      ],
-      next: {
-        Men:   "q_use_case",
-        Women: "q_use_case",
-        Boys:  "q_kids_use_case",
-        Girls: "q_kids_use_case",
-        Kids:  "q_kids_use_case",
-      },
-    },
-
     {
       id: "q_use_case",
       type: "question",
@@ -67,23 +46,28 @@ const definition = {
         { label: "Work / on my feet all day",            value: "work_all_day" },
         { label: "Just want comfort / relief",           value: "comfort" },
       ],
-      next: { _default: "q_condition" },
+      next: { _default: "q_gender" },
     },
 
     {
-      id: "q_kids_use_case",
+      id: "q_gender",
       type: "question",
-      attribute: "useCase",
-      question: "What kind of shoes will they go in?",
+      attribute: "gender",
+      // Per merchant: collapse Boys + Girls into Kids; expose Unisex
+      // explicitly so the customer can see when an orthotic isn't
+      // gender-specific (cleats, skates, ESD anti-static).
+      // Engine auto-skips this whole question if only one chip
+      // survives the dynamic-chip filter for the chosen useCase.
+      skipIfKnown: true,
+      autoSkipIfSingle: true,
+      question: "Who are these orthotics for?",
       chips: [
-        { label: "Sport / athletic shoes", value: "kids" },
-        { label: "Casual shoes",           value: "kids" },
-        { label: "Dress shoes",            value: "kids" },
+        { label: "Men",     value: "Men" },
+        { label: "Women",   value: "Women" },
+        { label: "Kids",    value: "Kids" },
+        { label: "Unisex",  value: "Unisex" },
       ],
-      // Kids tree resolves immediately. Aetrex's kids line doesn't
-      // differentiate by overpronation/met-support; arch is filled
-      // from defaults. Keeps the parent UX to two taps.
-      next: { _default: "q_resolve" },
+      next: { _default: "q_condition" },
     },
 
     {
@@ -115,7 +99,7 @@ const definition = {
         { label: "I don't know",                       value: "Medium / High Arch" },
       ],
       next: {
-        "Flat / Low Arch":     "q_resolve",  // flat already implies posted via derivation
+        "Flat / Low Arch":     "q_resolve",
         "Medium / High Arch":  "q_overpronation",
       },
     },
