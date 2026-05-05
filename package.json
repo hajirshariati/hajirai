@@ -27,6 +27,8 @@
     "feedback:import": "node scripts/import-feedback-scenarios.mjs",
     "audit:hallucinations": "node scripts/audit-hallucinations.mjs",
     "backfill:knowledge-chunks": "node scripts/backfill-knowledge-chunks.mjs",
+    "seed:decision-tree": "node scripts/seed-decision-tree.mjs",
+    "eval:decision-tree": "node scripts/eval-decision-tree.mjs",
     "eval": "npm run eval:intent && npm run eval:memory && npm run eval:quality"
   },
   "type": "module",

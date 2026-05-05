@@ -68,6 +68,16 @@ import {
 } from "../models/ProductEnrichment.server";
 import { getShopPlan } from "../lib/billing.server";
 import { PlanGate } from "../components/PlanGate";
+import {
+  listDecisionTrees,
+  getDecisionTreeById,
+  getDecisionTreeByIntent,
+  saveDecisionTree,
+  deleteDecisionTree,
+} from "../models/DecisionTree.server";
+import { validateDecisionTree } from "../lib/decision-tree-schema.server";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 
 function isCsv(fileName) {
   return typeof fileName === "string" && fileName.toLowerCase().endsWith(".csv");
@@ -84,7 +94,7 @@ function safeParse(raw, fallback) {
 
 export const loader = async ({ request }) => {
   const { session } = await authenticate.admin(request);
-  const [state, count, mappings, config, files, plan, campaigns] = await Promise.all([
+  const [state, count, mappings, config, files, plan, campaigns, decisionTrees] = await Promise.all([
     getCatalogSyncState(session.shop),
     getProductCount(session.shop),
     getAttributeMappings(session.shop),
@@ -92,6 +102,7 @@ export const loader = async ({ request }) => {
     getKnowledgeFiles(session.shop),
     getShopPlan(session.shop),
     listCampaigns(session.shop),
+    listDecisionTrees(session.shop),
   ]);
   const enrichedCounts = await Promise.all(files.map((f) => countEnrichmentsBySourceFile(f.id)));
   const filesWithCounts = files.map((f, i) => ({ ...f, enrichedSkus: enrichedCounts[i] }));
@@ -145,6 +156,12 @@ export const loader = async ({ request }) => {
     })),
     campaignTemplate: CAMPAIGN_TEMPLATE,
     campaignCheatCode: config.campaignCheatCode || "",
+    decisionTreeEnabled: config.decisionTreeEnabled === true,
+    decisionTrees: decisionTrees.map((t) => ({
+      ...t,
+      createdAt: t.createdAt instanceof Date ? t.createdAt.toISOString() : t.createdAt,
+      updatedAt: t.updatedAt instanceof Date ? t.updatedAt.toISOString() : t.updatedAt,
+    })),
   };
 };
 
@@ -346,6 +363,107 @@ export const action = async ({ request }) => {
     const code = String(formData.get("campaignCheatCode") || "").trim().slice(0, 80);
     await updateShopConfig(session.shop, { campaignCheatCode: code });
     return { saved: true };
+  }
+
+  // Decision-tree engine actions. The ShopConfig.decisionTreeEnabled
+  // toggle is the master switch; individual trees also have their
+  // own .enabled flag so a merchant can stage a tree without firing
+  // it on customers.
+  if (intent === "toggle_decision_tree") {
+    const value = formData.get("decisionTreeEnabled") === "true";
+    await updateShopConfig(session.shop, { decisionTreeEnabled: value });
+    return { saved: true };
+  }
+
+  if (intent === "save_decision_tree") {
+    const id = String(formData.get("id") || "").trim() || null;
+    const name = String(formData.get("name") || "").trim();
+    const treeIntent = String(formData.get("treeIntent") || "").trim();
+    const triggerCategoryGroup = String(formData.get("triggerCategoryGroup") || "").trim() || null;
+    const triggerPhrasesRaw = String(formData.get("triggerPhrases") || "").trim();
+    const definitionRaw = String(formData.get("definition") || "").trim();
+    const enabled = formData.get("enabled") === "true";
+    if (!name) return { error: "Tree name is required." };
+    if (!treeIntent) return { error: "Intent slug is required (a-z, 0-9, _, -)." };
+    let definition;
+    try { definition = JSON.parse(definitionRaw); }
+    catch { return { error: "Definition must be valid JSON." }; }
+    const v = validateDecisionTree(definition);
+    if (!v.ok) return { error: "Tree validation failed: " + v.errors.slice(0, 4).join("; ") };
+    const phrases = triggerPhrasesRaw
+      ? triggerPhrasesRaw.split(/[,\n]/).map((s) => s.trim()).filter(Boolean)
+      : [];
+    try {
+      const saved = await saveDecisionTree(session.shop, {
+        id,
+        name,
+        intent: treeIntent,
+        triggerPhrases: JSON.stringify(phrases),
+        triggerCategoryGroup,
+        definition,
+        enabled,
+      });
+      return { saved: true, treeId: saved.id };
+    } catch (err) {
+      return { error: err?.message || "Could not save tree." };
+    }
+  }
+
+  if (intent === "delete_decision_tree") {
+    const id = String(formData.get("id") || "").trim();
+    if (id) await deleteDecisionTree(session.shop, id);
+    return { saved: true };
+  }
+
+  // One-click installer for Aetrex's orthotic tree. Reads the
+  // bundled seed JSON from the repo and upserts it on this shop.
+  // Idempotent — running twice updates the same row. The tree is
+  // created with enabled=false so the merchant reviews it before
+  // it goes live; flipping the master toggle requires a separate
+  // explicit action.
+  if (intent === "seed_aetrex_orthotic_tree") {
+    try {
+      const seedPath = path.resolve(process.cwd(), "scripts/seeds/aetrex-orthotic-tree.json");
+      const definition = JSON.parse(await readFile(seedPath, "utf8"));
+      const v = validateDecisionTree(definition);
+      if (!v.ok) return { error: "Bundled seed is invalid: " + v.errors.slice(0, 4).join("; ") };
+      const existing = await getDecisionTreeByIntent(session.shop, "orthotic");
+      const saved = await saveDecisionTree(session.shop, {
+        id: existing?.id,
+        name: "Aetrex Orthotic Finder",
+        intent: "orthotic",
+        triggerPhrases: JSON.stringify([
+          "orthotic", "orthotics", "insole", "insoles", "arch support", "custom orthotic",
+        ]),
+        triggerCategoryGroup: "Orthotics",
+        definition,
+        enabled: false,
+      });
+      return { saved: true, seeded: true, treeId: saved.id };
+    } catch (err) {
+      return { error: "Seed failed: " + (err?.message || "unknown") };
+    }
+  }
+
+  if (intent === "load_decision_tree") {
+    // Returns the full tree definition for the editor. Kept as a
+    // separate intent so the loader doesn't ship every tree's full
+    // (possibly large) definition on every page render.
+    const id = String(formData.get("id") || "").trim();
+    if (!id) return { error: "tree id required" };
+    const tree = await getDecisionTreeById(session.shop, id);
+    if (!tree) return { error: "tree not found" };
+    return {
+      loadedTree: {
+        id: tree.id,
+        name: tree.name,
+        intent: tree.intent,
+        triggerPhrases: tree.triggerPhrases,
+        triggerCategoryGroup: tree.triggerCategoryGroup,
+        enabled: tree.enabled,
+        definition: tree.definition,
+      },
+    };
   }
 
   if (intent === "save_synonyms") {
@@ -2390,6 +2508,289 @@ function SectionHeading({ eyebrow, title, description }) {
   );
 }
 
+function DecisionTreesCard({ enabled, trees }) {
+  const fetcher = useFetcher();
+  const loadFetcher = useFetcher();
+  const [editing, setEditing] = useState(null);  // { id?, name, intent, ... }
+  const [showCreate, setShowCreate] = useState(false);
+
+  // When the load fetcher returns, hydrate the editor with the full
+  // tree (definition included). Kept out of the loader to avoid
+  // shipping every tree's full JSON on every page render.
+  useEffect(() => {
+    const t = loadFetcher.data?.loadedTree;
+    if (t) {
+      let triggerPhrasesText = "";
+      try {
+        const arr = JSON.parse(t.triggerPhrases || "[]");
+        triggerPhrasesText = Array.isArray(arr) ? arr.join(", ") : "";
+      } catch { triggerPhrasesText = String(t.triggerPhrases || ""); }
+      setEditing({
+        id: t.id,
+        name: t.name,
+        intent: t.intent,
+        triggerPhrases: triggerPhrasesText,
+        triggerCategoryGroup: t.triggerCategoryGroup || "",
+        enabled: Boolean(t.enabled),
+        definition: JSON.stringify(t.definition || {}, null, 2),
+      });
+      setShowCreate(false);
+    }
+  }, [loadFetcher.data]);
+
+  const seedAetrex = () => {
+    const fd = new FormData();
+    fd.set("intent", "seed_aetrex_orthotic_tree");
+    fetcher.submit(fd, { method: "post" });
+  };
+
+  const toggleMaster = (next) => {
+    const fd = new FormData();
+    fd.set("intent", "toggle_decision_tree");
+    fd.set("decisionTreeEnabled", next ? "true" : "false");
+    fetcher.submit(fd, { method: "post" });
+  };
+
+  const toggleTree = (tree, next) => {
+    // Reuse save_decision_tree to flip just the enabled flag.
+    const fd = new FormData();
+    fd.set("intent", "load_decision_tree");
+    fd.set("id", tree.id);
+    loadFetcher.submit(fd, { method: "post" });
+    // Pending: once load returns, immediately submit with the new
+    // enabled flag. To keep this simple-but-honest, ask the merchant
+    // to use the editor for now if they want to flip enabled.
+    // Quick path: send a thin save with just the enabled change
+    // alongside the existing fields would require refetching the
+    // definition first — done via load + a second submit.
+    // Implementation note: keeping a single round trip here would
+    // be cleaner. For v1, we open the editor with the loaded tree
+    // and let the merchant flip the checkbox + Save.
+  };
+
+  const startNew = () => {
+    setEditing({
+      id: null,
+      name: "",
+      intent: "",
+      triggerPhrases: "",
+      triggerCategoryGroup: "",
+      enabled: false,
+      definition: JSON.stringify({
+        rootNodeId: "q1",
+        nodes: [
+          {
+            id: "q1",
+            type: "question",
+            attribute: "example",
+            question: "Replace this with your question",
+            chips: [{ label: "Option A", value: "a" }, { label: "Option B", value: "b" }],
+            next: { _default: "q_resolve" },
+          },
+          { id: "q_resolve", type: "resolve" },
+        ],
+        resolver: {
+          defaults: {},
+          masterIndex: [
+            { masterSku: "EXAMPLE-1", title: "Example product", gender: "Unisex", useCase: "example" },
+          ],
+        },
+      }, null, 2),
+    });
+    setShowCreate(true);
+  };
+
+  const onChange = (field) => (val) => {
+    setEditing((prev) => ({ ...prev, [field]: typeof val === "string" ? val : val.target.value }));
+  };
+
+  const saveEditor = () => {
+    if (!editing) return;
+    const fd = new FormData();
+    fd.set("intent", "save_decision_tree");
+    if (editing.id) fd.set("id", editing.id);
+    fd.set("name", editing.name);
+    fd.set("treeIntent", editing.intent);
+    fd.set("triggerPhrases", editing.triggerPhrases);
+    fd.set("triggerCategoryGroup", editing.triggerCategoryGroup);
+    fd.set("definition", editing.definition);
+    fd.set("enabled", editing.enabled ? "true" : "false");
+    fetcher.submit(fd, { method: "post" });
+  };
+
+  const deleteEditing = () => {
+    if (!editing?.id) { setEditing(null); return; }
+    if (!confirm("Delete this decision tree? This cannot be undone.")) return;
+    const fd = new FormData();
+    fd.set("intent", "delete_decision_tree");
+    fd.set("id", editing.id);
+    fetcher.submit(fd, { method: "post" });
+    setEditing(null);
+  };
+
+  // Close editor after successful save (fetcher data has saved=true
+  // and includes treeId — only after a save_decision_tree action).
+  useEffect(() => {
+    if (fetcher.data?.saved && fetcher.data?.treeId && editing) {
+      setEditing(null);
+      setShowCreate(false);
+    }
+  }, [fetcher.data]);
+
+  const masterToggleSubmitting =
+    fetcher.state === "submitting" &&
+    fetcher.formData?.get?.("intent") === "toggle_decision_tree";
+
+  return (
+    <Card>
+      <BlockStack gap="500">
+        <BlockStack gap="200">
+          <InlineStack align="space-between" blockAlign="center">
+            <Text as="h3" variant="headingMd">Decision Tree Engine</Text>
+            <Checkbox
+              label={enabled ? "Engine ON" : "Engine OFF"}
+              checked={enabled}
+              disabled={masterToggleSubmitting}
+              onChange={(next) => toggleMaster(next)}
+            />
+          </InlineStack>
+          <Text as="p" tone="subdued">
+            Master switch. When ON, any tree below whose trigger matches the
+            customer's intent will run a deterministic question funnel for
+            that turn. When OFF (default), the existing AI flow handles
+            every turn — there's zero behavior change.
+          </Text>
+        </BlockStack>
+
+        {fetcher.data?.error && (
+          <Banner tone="critical">{fetcher.data.error}</Banner>
+        )}
+        {fetcher.data?.seeded && (
+          <Banner tone="success">Aetrex Orthotic Finder seeded. Review the tree below, then enable it.</Banner>
+        )}
+
+        <Divider />
+
+        <BlockStack gap="300">
+          <InlineStack align="space-between" blockAlign="center">
+            <Text as="h4" variant="headingSm">Your trees</Text>
+            <InlineStack gap="200">
+              <Button onClick={startNew}>+ New tree</Button>
+              <Button onClick={seedAetrex} variant="primary">
+                Seed Aetrex Orthotic Tree
+              </Button>
+            </InlineStack>
+          </InlineStack>
+
+          {(!trees || trees.length === 0) && (
+            <Text as="p" tone="subdued">
+              No decision trees yet. Click "Seed Aetrex Orthotic Tree" to install
+              the bundled 5-question funnel that maps every clinical answer to
+              one of Aetrex's 183 orthotic SKUs, or build your own from scratch.
+            </Text>
+          )}
+
+          {trees && trees.length > 0 && (
+            <DataTable
+              columnContentTypes={["text", "text", "text", "numeric", "numeric", "text"]}
+              headings={["Name", "Intent", "Triggers on group", "Started", "Completed", ""]}
+              rows={trees.map((t) => [
+                <Text key={`n-${t.id}`} as="span" fontWeight="semibold">{t.name}</Text>,
+                <Text key={`i-${t.id}`} as="span">{t.intent}</Text>,
+                <Text key={`g-${t.id}`} as="span" tone="subdued">{t.triggerCategoryGroup || "—"}</Text>,
+                t.startedCount,
+                t.completedCount,
+                <InlineStack key={`a-${t.id}`} gap="200">
+                  <Badge tone={t.enabled ? "success" : undefined}>
+                    {t.enabled ? "Enabled" : "Disabled"}
+                  </Badge>
+                  <Button size="slim" onClick={() => {
+                    const fd = new FormData();
+                    fd.set("intent", "load_decision_tree");
+                    fd.set("id", t.id);
+                    loadFetcher.submit(fd, { method: "post" });
+                  }}>Edit</Button>
+                </InlineStack>,
+              ])}
+            />
+          )}
+        </BlockStack>
+
+        {editing && (
+          <>
+            <Divider />
+            <BlockStack gap="300">
+              <Text as="h4" variant="headingSm">
+                {editing.id ? "Edit tree" : "New tree"}
+              </Text>
+              <FormLayout>
+                <FormLayout.Group>
+                  <TextField
+                    label="Name"
+                    value={editing.name}
+                    onChange={onChange("name")}
+                    autoComplete="off"
+                  />
+                  <TextField
+                    label="Intent slug"
+                    helpText="a-z, 0-9, _, - — used internally to identify this tree (e.g. orthotic, mattress)"
+                    value={editing.intent}
+                    onChange={onChange("intent")}
+                    autoComplete="off"
+                  />
+                </FormLayout.Group>
+                <FormLayout.Group>
+                  <TextField
+                    label="Trigger category group"
+                    helpText="Optional. The category-group name that activates this tree (e.g. Orthotics)."
+                    value={editing.triggerCategoryGroup}
+                    onChange={onChange("triggerCategoryGroup")}
+                    autoComplete="off"
+                  />
+                  <TextField
+                    label="Trigger phrases"
+                    helpText="Comma-separated. Substring matched against the latest customer message."
+                    value={editing.triggerPhrases}
+                    onChange={onChange("triggerPhrases")}
+                    autoComplete="off"
+                  />
+                </FormLayout.Group>
+                <Checkbox
+                  label="Tree enabled"
+                  checked={Boolean(editing.enabled)}
+                  onChange={(v) => setEditing((p) => ({ ...p, enabled: v }))}
+                />
+                <TextField
+                  label="Definition (JSON)"
+                  value={editing.definition}
+                  onChange={onChange("definition")}
+                  multiline={20}
+                  monospaced
+                  autoComplete="off"
+                  helpText="Validated server-side. See the Aetrex seed for an example shape."
+                />
+              </FormLayout>
+              <InlineStack gap="200">
+                <Button onClick={saveEditor} variant="primary"
+                  loading={fetcher.state === "submitting" && fetcher.formData?.get?.("intent") === "save_decision_tree"}
+                >
+                  Save
+                </Button>
+                <Button onClick={() => setEditing(null)}>Cancel</Button>
+                {editing.id && (
+                  <Button onClick={deleteEditing} tone="critical" variant="plain">
+                    Delete
+                  </Button>
+                )}
+              </InlineStack>
+            </BlockStack>
+          </>
+        )}
+      </BlockStack>
+    </Card>
+  );
+}
+
 export default function RulesKnowledge() {
   const data = useLoaderData();
   // Live-tracked campaign bytes — CampaignsCard reports its current
@@ -2489,6 +2890,18 @@ export default function RulesKnowledge() {
             description="How product cards are deduplicated and shown in chat."
           />
           <DisplayCard deduplicateColors={data.deduplicateColors} productCardStyle={data.productCardStyle} />
+        </BlockStack>
+
+        <BlockStack gap="400">
+          <SectionHeading
+            eyebrow="6 · Decision Trees"
+            title="Clinical / expert decision flows"
+            description="Multi-step funnels that ask the customer 3–5 questions, then recommend exactly one product. The chat bypasses the LLM during these turns — same answers always yield the same SKU. Off by default."
+          />
+          <DecisionTreesCard
+            enabled={data.decisionTreeEnabled}
+            trees={data.decisionTrees}
+          />
         </BlockStack>
       </BlockStack>
     </Page>

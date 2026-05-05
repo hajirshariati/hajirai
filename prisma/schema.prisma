@@ -148,6 +148,16 @@ model ShopConfig {
   // backfill (npm run backfill:knowledge-chunks) before enabling.
   knowledgeRagEnabled Boolean  @default(false)
 
+  // Decision Tree Engine — clinical/expert funnels (e.g. Aetrex's
+  // orthotic finder). When true, an active DecisionTree row whose
+  // intent matches the customer's current category will run a
+  // deterministic question funnel, bypassing the LLM during its
+  // active turns and returning the next question directly. Default
+  // OFF — a merchant must (1) define a tree in the admin and
+  // (2) flip this flag before customers see any funnel UX.
+  // Existing chat behavior is identical when this flag is false.
+  decisionTreeEnabled Boolean  @default(false)
+
   plan                    String    @default("free")
   subscriptionId          String?
   subscriptionActivatedAt DateTime?
@@ -349,6 +359,63 @@ model ChatConversion {
   @@index([shop])
   @@index([shop, createdAt])
   @@index([createdAt])
+}
+
+// One row per merchant-defined decision tree (clinical/expert
+// funnel). Each tree owns one intent slug — e.g. "orthotic",
+// "mattress" — and a deterministic resolver that maps collected
+// attribute answers to a master SKU (or short ranked list). Trees
+// are interactive: while one is active, chat.jsx bypasses the LLM
+// and returns each next question directly. Multiple trees per shop
+// supported; intent collisions fall back to the existing
+// category-intent disambiguation in chat-prompt.server.js.
+//
+// `definition` is a JSON document validated by
+// app/lib/decision-tree-schema.server.js. Shape (high-level):
+//   {
+//     rootNodeId: "q_gender",
+//     nodes: [
+//       { id, type: "question"|"resolve",
+//         attribute, question, chips: [{label,value}],
+//         next: { "<chipValue>": "<nodeId>" } | null,
+//         skipIfKnown: bool },
+//       ...
+//     ],
+//     resolver: {
+//       defaults: { arch: "Medium / High Arch" },
+//       rules: [
+//         { when: { gender:"Men", useCase:"Dress", arch:"...", posted:false, met:false },
+//           masterSku: "L100M", title: "Men's In-Style Orthotics" },
+//         ...
+//       ],
+//       fallback: { masterSku: "...", reason: "..." }
+//     }
+//   }
+//
+// Pure data — no executable code. Same answers in always yields the
+// same SKU out. The resolver's `rules` are evaluated top-down by the
+// engine; first match wins. `defaults` fill unanswered attributes
+// (e.g. "I don't know my arch" → Medium / High Arch).
+model DecisionTree {
+  id                   String   @id @default(cuid())
+  shop                 String
+  name                 String                 // human-readable label, shown in admin
+  intent               String                 // slug, e.g. "orthotic"
+  triggerPhrases       String   @default("[]") // JSON array of phrases that activate this tree
+  triggerCategoryGroup String?                // optional: only fire when categoryIntent.activeGroup matches this
+  definition           Json                   // tree shape — see comment above
+  enabled              Boolean  @default(false)
+
+  // Lifetime counters — analytics-only, incremented atomically.
+  startedCount         Int      @default(0)
+  completedCount       Int      @default(0)
+
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@unique([shop, intent])
+  @@index([shop])
+  @@index([shop, enabled])
 }
 
 // One row per chunk of a merchant's knowledge file (FAQs, brand
