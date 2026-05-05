@@ -32,7 +32,7 @@ export function escapeRe(s) {
 // AB1234, T9999W. Not catalog-specific.
 export const SKU_PATTERN = /\b[A-Z]{1,2}\d{3,5}[A-Z]?\b/g;
 
-// ── stripStaleCategoriesOnScopeReset ─────────────────────────────
+// ── stripStaleCategoriesOnScopeReset ─────────────────────────────────
 // When the customer's latest message is open-ended ("anything",
 // "everything", "any X", "show me whatever"), the AI sometimes carries
 // a category from the prior turn into its search query. Strip category
@@ -80,7 +80,7 @@ export function stripStaleCategoriesOnScopeReset(toolCall, ctx) {
   return toolCall;
 }
 
-// ── forceComparisonLookup ─────────────────────────────────
+// ── forceComparisonLookup ───────────────────────────────────────────
 // When the customer's latest message contains 2+ SKU-like tokens AND a
 // comparison verb, the AI sometimes combines them into a single
 // search_products query and gets 0 results. Rewrite to lookup_sku per
@@ -112,7 +112,7 @@ export function forceComparisonLookup(toolCall, ctx) {
   return toolCall;
 }
 
-// ── injectStructuredColorFilter ────────────────────────────
+// ── injectStructuredColorFilter ────────────────────────────────────
 // When the customer mentions a color value the merchant has actually
 // tagged, inject as filters.color so the search runs the structured
 // filter (and our existing relaxedFilters mechanism kicks in if no
@@ -155,7 +155,7 @@ export function injectStructuredColorFilter(toolCall, ctx) {
   return toolCall;
 }
 
-// ── injectLockedGender ───────────────────────────────────
+// ── injectLockedGender ──────────────────────────────────────────────
 // The "ABSOLUTE GENDER LOCK" prompt rule asks the AI to pass
 // filters.gender on every search once a gender is established. The AI
 // complies most of the time but drifts on long conversations — by turn
@@ -199,16 +199,116 @@ export function injectLockedGender(toolCall, ctx) {
   };
 }
 
+// ── injectOccasionCategory ──────────────────────────────────────────
+// Semantic search returns embedding-similar products regardless of
+// physical fit — slippers and walking shoes both score high on
+// "comfort" / "support" / "cushioning". A slipper is the wrong product
+// for an Italy walking trip even if descriptively similar.
+//
+// When the customer mentions an occasion that physically constrains
+// footwear type (extended walking, marathon, wedding, beach, etc.) AND
+// the AI didn't pick a category in its tool call, inject a category
+// from the merchant's actual catalog using generic occasion-to-
+// category-name patterns.
+//
+// Generic on both sides:
+//   - Occasion regex: standard English phrases (trip/vacation/walking/
+//     marathon/wedding/etc.). Works for any vertical.
+//   - Category regex: standard fashion taxonomy keywords (sneaker/
+//     athletic/heel/sandal/loafer/slipper). Matches against the
+//     merchant's catalogCategories — never injects a category the
+//     merchant doesn't have.
+//
+// Skip injection if:
+//   - AI already chose a category
+//   - Customer's message names a catalog category explicitly
+//     ("walking sandals" → customer wants sandals; don't override
+//     to sneakers)
+const OCCASION_TO_CATEGORY_PATTERNS = [
+  {
+    name: "walking-active",
+    occasionRe: /\b(trip|vacation|sightseeing|walking|on (?:my|your|our) feet|all day|hiking|exploring|tourist|tourism|disney|europe|italy|france|spain|cobblestone|cruise|amusement|standing all day|long walks?|busy day|on the go)\b/i,
+    categoryRe: /sneaker|walking|athletic|sport|running|trainer/i,
+  },
+  {
+    name: "running",
+    occasionRe: /\b(running|jog|jogging|marathon|sprint|track|gym|workout|crossfit|hiit|fitness|treadmill)\b/i,
+    categoryRe: /running|athletic|sneaker|trainer|sport/i,
+  },
+  {
+    name: "indoor",
+    occasionRe: /\b(bedtime|lounging|around the house|at home|cozy|nap|bedroom|relaxing|pajamas|movie night|indoors)\b/i,
+    categoryRe: /slipper/i,
+  },
+  {
+    name: "beach-pool",
+    occasionRe: /\b(beach|pool|swimming|swim|water park|lake|ocean|sand|tropical|cabana)\b/i,
+    categoryRe: /sandal|slide|flip[- ]?flop/i,
+  },
+  {
+    name: "formal-dressy",
+    occasionRe: /\b(wedding|formal|dressy|gala|prom|black[- ]tie|cocktail|reception|special occasion|fancy|evening event)\b/i,
+    categoryRe: /heel|oxford|loafer|dress|wedge|pump|stiletto|mary[- ]?jane/i,
+  },
+  {
+    name: "work-office",
+    occasionRe: /\b(office|professional|business casual|business meeting|corporate|conference|board meeting|nine[- ]to[- ]five|9[- ]to[- ]5)\b/i,
+    categoryRe: /loafer|oxford|dress|flat|heel|pump/i,
+  },
+];
+
+export function injectOccasionCategory(toolCall, ctx) {
+  if (toolCall.name !== "search_products") return toolCall;
+  const filters = toolCall.input?.filters || {};
+  if (filters.category || filters.Category) return toolCall;
+
+  const latest = String(ctx.latestUserMessage || "");
+  if (!latest) return toolCall;
+
+  const cats = Array.isArray(ctx.catalogCategories) ? ctx.catalogCategories : [];
+  if (cats.length === 0) return toolCall;
+
+  // If customer explicitly named a catalog category, the AI should
+  // honor that — don't override.
+  const lower = latest.toLowerCase();
+  const customerNamedCategory = cats.some((c) => {
+    const norm = String(c || "").toLowerCase().trim();
+    if (!norm || norm.length < 3) return false;
+    try {
+      return new RegExp(`\\b${escapeRe(norm)}s?\\b`, "i").test(lower);
+    } catch {
+      return false;
+    }
+  });
+  if (customerNamedCategory) return toolCall;
+
+  for (const { name, occasionRe, categoryRe } of OCCASION_TO_CATEGORY_PATTERNS) {
+    if (!occasionRe.test(latest)) continue;
+    const match = cats.find((c) => categoryRe.test(String(c)));
+    if (match) {
+      console.log(`[chat] occasion-category: "${name}" detected → filters.category="${match}"`);
+      return {
+        ...toolCall,
+        input: { ...toolCall.input, filters: { ...filters, category: match } },
+      };
+    }
+  }
+  return toolCall;
+}
+
 // Compose the pipeline. Order matters slightly:
 //   1. Comparison routing (might change tool name from search→lookup)
 //   2. Scope reset (strips stale category from search query)
 //   3. Color injection (adds structured color filter to search)
 //   4. Gender lock (force-overlay customer-stated gender)
+//   5. Occasion category (constrain to walking/dressy/etc. when AI
+//      didn't pick a category and the occasion implies one)
 export function rewriteToolCall(toolCall, ctx) {
   let rewritten = toolCall;
   rewritten = forceComparisonLookup(rewritten, ctx);
   rewritten = stripStaleCategoriesOnScopeReset(rewritten, ctx);
   rewritten = injectStructuredColorFilter(rewritten, ctx);
   rewritten = injectLockedGender(rewritten, ctx);
+  rewritten = injectOccasionCategory(rewritten, ctx);
   return rewritten;
 }

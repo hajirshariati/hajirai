@@ -470,6 +470,37 @@ const POLICY_QUESTION_RE = /\b(discount|coupon|promo(?:tion)?|sale|deal|refund|r
 function isPolicyOrServiceQuestion(text) {
   return Boolean(text) && POLICY_QUESTION_RE.test(text);
 }
+
+// Generic brand-mention detector. When the customer asks "do you have
+// anything from <Brand>?" / "by <Brand>" / "made by <Brand>" / "the
+// <Brand> brand", the AI's "we don't carry <Brand>" is a legitimate
+// answer about brand availability — not a hallucinated denial.
+// Without this guard, denial-recovery would fire and search the catalog
+// for random products that have nothing to do with the brand.
+//
+// No hardcoded brand list — works for ANY merchant. Detects the
+// structural pattern: lead word ("from"/"by"/"made by"/"brand") +
+// capitalized proper noun. The capital-letter check is what filters
+// out non-brand uses like "from your spring collection" or "by mail".
+//
+// If the merchant's OWN brand is mentioned, the AI wouldn't deny so
+// recovery wouldn't trigger — this guard only fires AFTER a denial
+// is detected, so it's safe.
+const BRAND_LEAD_RE = /\b(?:from|by|made\s+by|brand|brands)\s+(\S+)/gi;
+function hasCompetitorBrandMention(text) {
+  if (!text) return false;
+  let m;
+  BRAND_LEAD_RE.lastIndex = 0;
+  while ((m = BRAND_LEAD_RE.exec(text)) !== null) {
+    const candidate = m[1] || "";
+    // Brand-like: starts with capital letter + at least 1 more letter.
+    // Strips punctuation off the end ("Nike?" → "Nike").
+    const cleaned = candidate.replace(/[^\w].*$/, "");
+    if (/^[A-Z][A-Za-z]/.test(cleaned)) return true;
+    if (BRAND_LEAD_RE.lastIndex === m.index) BRAND_LEAD_RE.lastIndex += 1;
+  }
+  return false;
+}
 // When the AI ends a turn without searching but its response
 // implies "we don't have X", that's almost always wrong (the
 // AI hallucinated availability from training data). Detect
@@ -776,7 +807,8 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     fullResponseText &&
     containsAvailabilityDenial(fullResponseText) &&
     ctx.latestUserMessage &&
-    !isPolicyOrServiceQuestion(ctx.latestUserMessage)
+    !isPolicyOrServiceQuestion(ctx.latestUserMessage) &&
+    !hasCompetitorBrandMention(ctx.latestUserMessage)
   ) {
     console.log(`[chat] denial-recovery: AI denied availability without searching; forcing search of latest user message`);
     try {

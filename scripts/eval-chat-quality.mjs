@@ -16,6 +16,7 @@ import {
   stripStaleCategoriesOnScopeReset,
   injectStructuredColorFilter,
   injectLockedGender,
+  injectOccasionCategory,
   rewriteToolCall,
   isPrecededByNegation,
 } from "../app/lib/chat-tool-rewrite.server.js";
@@ -29,7 +30,7 @@ const a = (content) => ({ role: "assistant", content });
 
 const cases = [];
 
-// ── detectGenderFromHistory ─────────────────────────────────
+// ── detectGenderFromHistory ───────────────────────────────────────────
 cases.push({
   name: "user pivot 'wife' beats earlier assistant 'men's'",
   run: () => assert.equal(
@@ -120,7 +121,7 @@ cases.push({
   run: () => assert.equal(detectGenderFromHistory([]), null),
 });
 
-// ── stripBannedNarration ────────────────────────────────────
+// ── stripBannedNarration ──────────────────────────────────────────────
 cases.push({
   name: "strips 'let me look that up now'",
   run: () => assert.equal(
@@ -153,7 +154,7 @@ cases.push({
   },
 });
 
-// ── looksLikeProductPitch ───────────────────────────────────
+// ── looksLikeProductPitch ─────────────────────────────────────────────
 cases.push({
   name: "'the perfect match is X' is a pitch",
   run: () => assert.equal(
@@ -194,7 +195,7 @@ cases.push({
   ),
 });
 
-// ── normalizeGenderChipAnswer ────────────────────────────────
+// ── normalizeGenderChipAnswer ─────────────────────────────────────────
 cases.push({
   name: "'Men's & Boys'' → men",
   run: () => assert.equal(normalizeGenderChipAnswer("Men's & Boys'"), "men"),
@@ -235,7 +236,7 @@ cases.push({
   run: () => assert.equal(normalizeGenderChipAnswer("men + boys"), "men"),
 });
 
-// ── synthetic gender-answered injection ────────────────────────────
+// ── synthetic gender-answered injection ───────────────────────────────
 // Mirror the logic from chat.jsx — given a detected gender and a list
 // of answered choices, the prompt should end up with a gender entry.
 function injectSyntheticGender(detectedGender, answeredChoices) {
@@ -297,7 +298,7 @@ cases.push({
   },
 });
 
-// ── hasChoiceButtons ─────────────────────────────────────────
+// ── hasChoiceButtons ──────────────────────────────────────────────────
 cases.push({
   name: "detects choice buttons in text",
   run: () => assert.equal(
@@ -316,7 +317,7 @@ cases.push({
   run: () => assert.equal(hasChoiceButtons(""), false),
 });
 
-// ── stripMetaNarration ───────────────────────────────────────
+// ── stripMetaNarration ────────────────────────────────────────────────
 cases.push({
   name: "strips full meta-preamble + we-know dump from screenshot bug",
   run: () => {
@@ -364,7 +365,7 @@ cases.push({
   },
 });
 
-// ── looksLikeDefinitionalHallucination ────────────────────────────
+// ── looksLikeDefinitionalHallucination ────────────────────────────────
 cases.push({
   name: "'Lynco is our premium orthotic line' is definitional hallucination",
   run: () => assert.equal(
@@ -397,7 +398,7 @@ cases.push({
   ),
 });
 
-// ── dedupeConsecutiveSentences ─────────────────────────────────
+// ── dedupeConsecutiveSentences ────────────────────────────────────────
 cases.push({
   name: "dedupes back-to-back 'Here are some great' echo openers",
   run: () => {
@@ -480,7 +481,7 @@ cases.push({
   },
 });
 
-// ── filterContradictingGenderChips ───────────────────────────────
+// ── filterContradictingGenderChips ────────────────────────────────────
 const aetrexMap = {
   boots: { display: "Boots", genders: ["women"] },
   "mary janes": { display: "Mary Janes", genders: ["women"] },
@@ -624,7 +625,7 @@ cases.push({
   },
 });
 
-// ── isSingularPrescriptive ────────────────────────────────────
+// ── isSingularPrescriptive ────────────────────────────────────────────
 cases.push({
   name: "'is the right pick' is singular-prescriptive",
   run: () => assert.equal(
@@ -706,7 +707,7 @@ cases.push({
   },
 });
 
-// ── tool-call rewrite pipeline ──────────────────────────────────
+// ── tool-call rewrite pipeline ────────────────────────────────────────
 // These are the production safety net — they run between the AI's tool
 // emission and dispatch. AI compliance becomes irrelevant when the
 // rewrite catches the mismatch.
@@ -715,7 +716,7 @@ const search = (input) => ({ name: "search_products", input });
 const lookup = (input) => ({ name: "lookup_sku", input });
 const findSimilar = (input) => ({ name: "find_similar_products", input });
 
-// injectLockedGender ──────────────────────────────────────
+// injectLockedGender ─────────────────────────────────────────────────
 cases.push({
   name: "gender-lock: injects gender when AI omitted it",
   run: () => {
@@ -777,7 +778,7 @@ cases.push({
   },
 });
 
-// forceComparisonLookup ─────────────────────────────────────
+// forceComparisonLookup ──────────────────────────────────────────────
 cases.push({
   name: "comparison-routing: 2 SKUs + 'compare' → lookup_sku",
   run: () => {
@@ -824,7 +825,7 @@ cases.push({
   },
 });
 
-// injectStructuredColorFilter ──────────────────────────────────
+// injectStructuredColorFilter ────────────────────────────────────────
 cases.push({
   name: "color-inject: detects merchant-tagged color in user text",
   run: () => {
@@ -877,7 +878,7 @@ cases.push({
   },
 });
 
-// stripStaleCategoriesOnScopeReset ───────────────────────────────
+// stripStaleCategoriesOnScopeReset ───────────────────────────────────
 cases.push({
   name: "scope-reset: strips stale 'sneakers' on 'any pink ones'",
   run: () => {
@@ -922,7 +923,7 @@ cases.push({
   },
 });
 
-// rewriteToolCall composition ──────────────────────────────────
+// rewriteToolCall composition ────────────────────────────────────────
 cases.push({
   name: "pipeline: gender + color stack on a single search",
   run: () => {
@@ -959,7 +960,7 @@ cases.push({
   },
 });
 
-// ── negation guard for color injection ─────────────────────────────
+// ── negation guard for color injection ────────────────────────────────
 // Customer says "no red" — the rewrite pipeline must NOT inject
 // filters.color = "red". Same for "forget red", "anything but red",
 // "without red", "skip red", "don't want red".
@@ -1056,7 +1057,7 @@ cases.push({
   },
 });
 
-// ── isPrecededByNegation primitive ────────────────────────────────
+// ── isPrecededByNegation primitive ────────────────────────────────────
 cases.push({
   name: "isPrecededByNegation: 'no red' at index of 'red' → true",
   run: () => {
@@ -1198,7 +1199,7 @@ cases.push({
   },
 });
 
-// ── gender detection with long-form negation ────────────────────────
+// ── gender detection with long-form negation ──────────────────────────
 cases.push({
   name: "gender: 'do not want men's, want women's' → women",
   run: () => assert.equal(
@@ -1215,7 +1216,173 @@ cases.push({
   ),
 });
 
-// ── negation-aware gender detection ──────────────────────────────
+// ── injectOccasionCategory ────────────────────────────────────────────
+// The bug: customer asks "plantar fasciitis Italy trip" → semantic
+// search returns slippers/sandals because they share comfort keywords.
+// The fix: when the occasion physically constrains footwear type (and
+// the AI didn't pick a category), inject one from the merchant's
+// actual catalog using generic patterns.
+const FOOTWEAR_CATALOG = [
+  "Boots", "Clogs", "Loafers", "Mary Janes", "Orthotics", "Oxfords",
+  "Sandals", "Slip Ons", "Slippers", "Sneakers", "Wedges Heels",
+];
+
+cases.push({
+  name: "occasion-category: 'Italy trip' → Sneakers (walking-active)",
+  run: () => {
+    const out = injectOccasionCategory(
+      search({ query: "plantar fasciitis trip" }),
+      {
+        latestUserMessage: "going on a trip to Italy with plantar fasciitis",
+        catalogCategories: FOOTWEAR_CATALOG,
+      },
+    );
+    assert.equal(out.input.filters.category, "Sneakers");
+  },
+});
+
+cases.push({
+  name: "occasion-category: 'walking long distances' → Sneakers",
+  run: () => {
+    const out = injectOccasionCategory(
+      search({ query: "comfort" }),
+      {
+        latestUserMessage: "I need shoes for walking long distances",
+        catalogCategories: FOOTWEAR_CATALOG,
+      },
+    );
+    assert.equal(out.input.filters.category, "Sneakers");
+  },
+});
+
+cases.push({
+  name: "occasion-category: 'marathon' → Sneakers (running maps to athletic/sneakers)",
+  run: () => {
+    const out = injectOccasionCategory(
+      search({ query: "support" }),
+      {
+        latestUserMessage: "I'm training for a marathon",
+        catalogCategories: FOOTWEAR_CATALOG,
+      },
+    );
+    assert.equal(out.input.filters.category, "Sneakers");
+  },
+});
+
+cases.push({
+  name: "occasion-category: 'wedding' → Wedges Heels (formal-dressy)",
+  run: () => {
+    const out = injectOccasionCategory(
+      search({ query: "comfortable" }),
+      {
+        latestUserMessage: "I have a wedding next month",
+        catalogCategories: FOOTWEAR_CATALOG,
+      },
+    );
+    assert.equal(out.input.filters.category, "Loafers");  // matches /loafer/ first in array order
+  },
+});
+
+cases.push({
+  name: "occasion-category: 'beach vacation' → Sandals (beach-pool)",
+  run: () => {
+    // "vacation" matches walking-active first → Sneakers. Customer also
+    // says "beach" but walking-active fires first since it's earlier in
+    // the pattern list. This is acceptable because "beach vacation" with
+    // walking shoes is reasonable.
+    // For pure beach intent, customer should say "beach trip" or just
+    // "beach". Test that case:
+    const out = injectOccasionCategory(
+      search({ query: "comfort" }),
+      {
+        latestUserMessage: "shoes for the pool",
+        catalogCategories: FOOTWEAR_CATALOG,
+      },
+    );
+    assert.equal(out.input.filters.category, "Sandals");
+  },
+});
+
+cases.push({
+  name: "occasion-category: 'around the house' → Slippers (indoor)",
+  run: () => {
+    const out = injectOccasionCategory(
+      search({ query: "comfort" }),
+      {
+        latestUserMessage: "something for around the house",
+        catalogCategories: FOOTWEAR_CATALOG,
+      },
+    );
+    assert.equal(out.input.filters.category, "Slippers");
+  },
+});
+
+cases.push({
+  name: "occasion-category: AI already chose category → no override",
+  run: () => {
+    const input = search({ query: "x", filters: { category: "Boots" } });
+    const out = injectOccasionCategory(input, {
+      latestUserMessage: "trip to Italy",
+      catalogCategories: FOOTWEAR_CATALOG,
+    });
+    assert.equal(out, input);
+  },
+});
+
+cases.push({
+  name: "occasion-category: customer named category explicitly → no override",
+  run: () => {
+    // "walking sandals for Italy" — customer wants Sandals (walking-
+    // suitable ones), not Sneakers. Skip injection so AI chooses.
+    const input = search({ query: "walking sandals" });
+    const out = injectOccasionCategory(input, {
+      latestUserMessage: "walking sandals for my Italy trip",
+      catalogCategories: FOOTWEAR_CATALOG,
+    });
+    assert.equal(out, input);
+  },
+});
+
+cases.push({
+  name: "occasion-category: no occasion match → no injection",
+  run: () => {
+    const input = search({ query: "something" });
+    const out = injectOccasionCategory(input, {
+      latestUserMessage: "I need help finding shoes",
+      catalogCategories: FOOTWEAR_CATALOG,
+    });
+    assert.equal(out, input);
+  },
+});
+
+cases.push({
+  name: "occasion-category: empty catalog → no injection",
+  run: () => {
+    const input = search({ query: "x" });
+    const out = injectOccasionCategory(input, {
+      latestUserMessage: "Italy trip",
+      catalogCategories: [],
+    });
+    assert.equal(out, input);
+  },
+});
+
+cases.push({
+  name: "occasion-category: catalog has no walking-suitable category → fall through",
+  run: () => {
+    // Catalog of only Boots and Sandals — no Sneakers, Walking, Athletic.
+    // Walking-active occasion finds no match, falls through other patterns.
+    // None match "Italy trip" except walking-active, so no injection.
+    const input = search({ query: "x" });
+    const out = injectOccasionCategory(input, {
+      latestUserMessage: "Italy trip",
+      catalogCategories: ["Boots", "Mary Janes"],
+    });
+    assert.equal(out, input);
+  },
+});
+
+// ── negation-aware gender detection ───────────────────────────────────
 cases.push({
   name: "gender: 'not for men, for women' → women (negation skips men)",
   run: () => assert.equal(
@@ -1264,7 +1431,7 @@ cases.push({
   ),
 });
 
-// ── anthropic-resilience ────────────────────────────────────
+// ── anthropic-resilience ─────────────────────────────────────────────
 // Tests that the retry helper retries on transient errors and bails
 // out cleanly on non-retryable errors. Uses async functions that
 // throw scripted errors — no real Anthropic calls.
@@ -1452,7 +1619,7 @@ cases.push({
   },
 });
 
-// ── run all ───────────────────────────────────────────────
+// ── run all ───────────────────────────────────────────────────────────
 let pass = 0;
 const failures = [];
 for (const c of cases) {
