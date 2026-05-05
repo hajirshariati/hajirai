@@ -944,13 +944,14 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     fullResponseText.length > PRODUCT_REPLY_HARD_CAP &&
     !hasChoiceButtons(fullResponseText) // never truncate when AI is asking — keep the question intact
   ) {
-    // Find first sentence-end at or after the cap. If we can't find one
-    // within +200 chars of the cap, hard-truncate at cap with an ellipsis.
-    const slice = fullResponseText.slice(0, PRODUCT_REPLY_HARD_CAP + 200);
-    const sentenceEnd = slice.search(/[.!?](\s|$)/);
+    // Find first sentence-end AT OR AFTER the cap. Searching from position 0
+    // would catch early sentence-ends like "Got it." and truncate at ~8 chars.
+    // The cap is a MINIMUM length, not a starting point.
+    const tail = fullResponseText.slice(PRODUCT_REPLY_HARD_CAP, PRODUCT_REPLY_HARD_CAP + 200);
+    const relativeEnd = tail.search(/[.!?](\s|$)/);
     let truncated;
-    if (sentenceEnd >= 0 && sentenceEnd < PRODUCT_REPLY_HARD_CAP + 200) {
-      truncated = fullResponseText.slice(0, sentenceEnd + 1).trim();
+    if (relativeEnd >= 0) {
+      truncated = fullResponseText.slice(0, PRODUCT_REPLY_HARD_CAP + relativeEnd + 1).trim();
     } else {
       truncated = fullResponseText.slice(0, PRODUCT_REPLY_HARD_CAP).trim() + "…";
     }
