@@ -217,6 +217,30 @@ check("history walk == live step (medium scenario)", () => {
   }
 });
 
+// Mid-funnel lock: if state has any answers and isn't completed,
+// we treat the tree as in-progress. The dispatcher uses the same
+// signal to override category-intent and prevent LLM hijack.
+console.log("\nmid-funnel lock signal");
+check("after one answer, state is in-progress (non-empty answers, not completed)", () => {
+  let { nextState } = startTree(tree);
+  ({ nextState } = stepTree(tree, nextState, "casual"));
+  assert(Object.keys(nextState.answers).length > 0, "answers should be populated");
+  assert(!nextState.completed, "should not be completed");
+});
+
+check("dispatcher source has findInProgressTree + chip-matcher hook", () => {
+  const src = readFileSync(resolve(here, "../app/lib/decision-tree-dispatch.server.js"), "utf8");
+  assert(/function\s+findInProgressTree/.test(src), "missing findInProgressTree");
+  assert(/llmMatchChip/.test(src), "missing llmMatchChip");
+  assert(/CHIP_MATCHER_MODEL/.test(src), "missing CHIP_MATCHER_MODEL constant");
+  // Mid-funnel lock must run BEFORE pickActiveTree fallback.
+  const inProgressIdx = src.indexOf("findInProgressTree(trees");
+  const pickActiveIdx = src.indexOf("pickActiveTree(trees,");
+  assert(inProgressIdx > 0, "findInProgressTree call site not found");
+  assert(pickActiveIdx > 0, "pickActiveTree call site not found");
+  assert(inProgressIdx < pickActiveIdx, "findInProgressTree must be checked before pickActiveTree");
+});
+
 // 5. Regression: with the master flag OFF, the dispatcher must be
 // a strict no-op — no DB calls, no compute, just `handled: false`.
 // This is the property that lets us ship without touching the

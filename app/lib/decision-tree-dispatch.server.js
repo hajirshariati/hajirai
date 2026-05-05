@@ -1,3 +1,4 @@
+import Anthropic from "@anthropic-ai/sdk";
 import prisma from "../db.server.js";
 import {
   getEnabledDecisionTrees,
@@ -6,6 +7,62 @@ import {
 } from "../models/DecisionTree.server.js";
 import { extractTreeStateFromHistory, stepTree } from "./decision-tree-engine.server.js";
 import { validateDecisionTree } from "./decision-tree-schema.server.js";
+
+// Cheap natural-language → chip-value translator. The decision-tree
+// engine only does literal/substring matching against chip labels
+// and values. When a customer types "sneakers" instead of clicking
+// "Athletic — court / general", the engine doesn't know they're
+// the same thing. We send Haiku a tiny structured prompt asking it
+// to pick the closest chip (or NONE), and re-step the tree with the
+// result. This gives the funnel free natural-language understanding
+// without sacrificing the deterministic resolver.
+//
+// Bounded cost: only fires on unmatched mid-funnel input, ~30
+// output tokens, model is Haiku 4.5. ~$0.0001 per call. Latency
+// ~300-500ms.
+const CHIP_MATCHER_MODEL = "claude-haiku-4-5-20251001";
+const CHIP_MATCHER_MAX_TOKENS = 30;
+
+async function llmMatchChip({ anthropic, node, userMessage }) {
+  if (!anthropic || !node || !Array.isArray(node.chips) || node.chips.length === 0) {
+    return null;
+  }
+  const text = String(userMessage || "").trim();
+  if (!text) return null;
+  // Limit chip list to viable chips (already pruned by engine) plus
+  // raw labels — cheaper prompt, no junk options.
+  const list = node.chips
+    .map((c) => `- "${c.label}" → ${c.value}`)
+    .join("\n");
+  const prompt =
+    `A customer is in a guided product funnel. They were asked:\n` +
+    `"${node.question}"\n\n` +
+    `They typed: "${text.slice(0, 200)}"\n\n` +
+    `Available options (label → value):\n${list}\n\n` +
+    `Pick the option whose meaning best matches what the customer said. ` +
+    `Reply with ONLY the value (the part after →), exactly as written. ` +
+    `If none of the options fit, reply with the single word: NONE`;
+
+  let res;
+  try {
+    res = await anthropic.messages.create({
+      model: CHIP_MATCHER_MODEL,
+      max_tokens: CHIP_MATCHER_MAX_TOKENS,
+      messages: [{ role: "user", content: prompt }],
+    });
+  } catch (err) {
+    console.error("[decision-tree] chip-matcher LLM error:", err?.message || err);
+    return null;
+  }
+  const out = String(res?.content?.[0]?.text || "").trim().replace(/^["']|["']$/g, "");
+  if (!out || out.toUpperCase() === "NONE") return null;
+  // Exact value match wins; fall back to label match.
+  return (
+    node.chips.find((c) => c.value === out) ||
+    node.chips.find((c) => c.label === out) ||
+    null
+  );
+}
 
 // Decision-tree turn dispatcher. Called from chat.jsx BEFORE the
 // AI loop, but ONLY when ShopConfig.decisionTreeEnabled is true.
@@ -29,6 +86,28 @@ import { validateDecisionTree } from "./decision-tree-schema.server.js";
 //      (resolved).
 
 const PER_REQUEST_CACHE = new WeakMap();
+
+// Mid-funnel lock. Walks every enabled tree's history reconstruction
+// against the conversation; if any tree has prior answers and isn't
+// completed, that tree owns the next turn — even if category-intent
+// has shifted (e.g. customer typed "sneakers" mid-orthotic-funnel
+// and category-intent re-routed to Footwear). Without this, the
+// LLM hijacks mid-funnel turns. Returns { tree, priorState } or null.
+function findInProgressTree(trees, messages, prefill) {
+  if (!trees || trees.length === 0) return null;
+  const historyOnly = messages.slice(0, -1);
+  for (const t of trees) {
+    let state;
+    try {
+      state = extractTreeStateFromHistory(t, historyOnly, prefill);
+    } catch { continue; }
+    if (!state || state.completed) continue;
+    if (Object.keys(state.answers || {}).length > 0) {
+      return { tree: t, priorState: state };
+    }
+  }
+  return null;
+}
 
 function pickActiveTree(trees, { categoryIntent, latestUserMessage }) {
   if (!trees || trees.length === 0) return null;
@@ -141,8 +220,21 @@ export async function dispatchDecisionTree({
     PER_REQUEST_CACHE.set(config, trees);
   }
 
-  const tree = pickActiveTree(trees, { categoryIntent, latestUserMessage });
-  if (!tree) return { handled: false };
+  const prefill = buildPrefill({ sessionGender, answeredChoices });
+
+  // Mid-funnel lock takes priority over category-intent matching.
+  // If any enabled tree has in-progress state, that tree owns the
+  // turn regardless of what the customer typed.
+  const inProgress = findInProgressTree(trees, messages, prefill);
+  let tree, priorState;
+  if (inProgress) {
+    tree = inProgress.tree;
+    priorState = inProgress.priorState;
+  } else {
+    tree = pickActiveTree(trees, { categoryIntent, latestUserMessage });
+    if (!tree) return { handled: false };
+    priorState = extractTreeStateFromHistory(tree, messages.slice(0, -1), prefill);
+  }
 
   // Validate the tree definition before running it. A merchant who
   // saves a malformed tree should not crash the chat — fall through
@@ -153,13 +245,43 @@ export async function dispatchDecisionTree({
     return { handled: false };
   }
 
-  const prefill = buildPrefill({ sessionGender, answeredChoices });
-  // Reconstruct state from message HISTORY (excluding the latest
-  // user message — that's the message we still need to step).
-  const historyOnly = messages.slice(0, -1);
-  const priorState = extractTreeStateFromHistory(tree, historyOnly, prefill);
+  let stepped = stepTree(tree, priorState, latestUserMessage);
 
-  const stepped = stepTree(tree, priorState, latestUserMessage);
+  // If the engine couldn't literal-match the customer's typed input
+  // to any chip on the current question, ask Haiku to translate. We
+  // only do this when (a) the question node has chips (i.e. we know
+  // what we're choosing between), (b) the customer typed something
+  // non-trivial (skip empty / single-char), (c) we have an apiKey.
+  if (
+    stepped?.response?.unmatched &&
+    !priorState.completed &&
+    config.anthropicApiKey &&
+    String(latestUserMessage || "").trim().length >= 2
+  ) {
+    const node = (tree.definition?.nodes || []).find((n) => n.id === priorState.currentNodeId);
+    if (node && node.type === "question" && Array.isArray(node.chips) && node.chips.length > 0) {
+      try {
+        const anthropic = new Anthropic({ apiKey: config.anthropicApiKey });
+        const matched = await llmMatchChip({
+          anthropic,
+          node,
+          userMessage: latestUserMessage,
+        });
+        if (matched) {
+          // Re-step with the chip's value — the engine's literal
+          // matcher will hit on this exact value.
+          stepped = stepTree(tree, priorState, matched.value);
+          console.log(
+            `[decision-tree] chip-matcher mapped "${String(latestUserMessage).slice(0, 60)}" → ${matched.value}`,
+          );
+        }
+      } catch (err) {
+        console.error("[decision-tree] chip-matcher failed:", err?.message || err);
+        // fall through with the original unmatched response
+      }
+    }
+  }
+
   const state = stepped.nextState;
   const response = stepped.response;
 
