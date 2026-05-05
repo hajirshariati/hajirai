@@ -825,7 +825,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         }
         // The AI's denial text is wrong. Replace with a neutral
         // pitch that matches the products we actually found.
-        fullResponseText = "Let me show you what I found that might fit.";
+        fullResponseText = "Actually, take a look at these — they should be a solid fit for what you're after.";
         console.log(`[chat] denial-recovery: replaced denial with ${recovery.products.length} real product(s)`);
       } else {
         productSearchAttempted = true; // we did try
@@ -947,6 +947,12 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // Find first sentence-end AT OR AFTER the cap. Searching from position 0
     // would catch early sentence-ends like "Got it." and truncate at ~8 chars.
     // The cap is a MINIMUM length, not a starting point.
+    //
+    // Then prefer cutting at a natural list/colon break BEFORE the sentence
+    // end if one exists — so we don't ship a half-eaten markdown bullet like
+    // "Top picks: - **Danika Arch Support Sneaker - N…" when the AI ignored
+    // the no-inline-list rule. The product cards render below; the text only
+    // needs the lead-in sentence.
     const tail = fullResponseText.slice(PRODUCT_REPLY_HARD_CAP, PRODUCT_REPLY_HARD_CAP + 200);
     const relativeEnd = tail.search(/[.!?](\s|$)/);
     let truncated;
@@ -954,6 +960,19 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       truncated = fullResponseText.slice(0, PRODUCT_REPLY_HARD_CAP + relativeEnd + 1).trim();
     } else {
       truncated = fullResponseText.slice(0, PRODUCT_REPLY_HARD_CAP).trim() + "…";
+    }
+    // Cut any inline markdown product list that started before the cap —
+    // the cards render those names below, and a half-list reads as broken.
+    // Detect the first list marker (`- `, `* `, `1. `, `**Name`) and trim
+    // back to the prior sentence-end / colon. Keep the lead-in sentence.
+    const listStart = truncated.search(/(?:\n|^)\s*(?:[-*]\s+\*?\*?|\d+[.)]\s+|\*\*[A-Z])/);
+    if (listStart >= 0) {
+      const head = truncated.slice(0, listStart).trimEnd();
+      // Strip trailing "Top picks:" / "Here are:" lead-in (no products to list)
+      const cleaned = head.replace(/[\s,;:—–-]+$/, "").replace(/\s+(top picks|here are|a few|some options|the picks|the options)\s*$/i, "").trim();
+      if (cleaned.length >= 30) {
+        truncated = cleaned.endsWith(".") || cleaned.endsWith("!") || cleaned.endsWith("?") ? cleaned : cleaned + ".";
+      }
     }
     if (truncated.length < fullResponseText.length) {
       console.log(`[chat] response-length cap: ${fullResponseText.length} → ${truncated.length} chars (pool=${pool.length})`);
@@ -983,13 +1002,13 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   }
 
   if (!fullResponseText && pool.length === 0) {
-    fullResponseText = "I'm not finding a great match for that right now. Want to try a different style, or I can connect you with our support team?";
+    fullResponseText = "Hmm, nothing's quite hitting that combination — want to widen the budget, try a different color, or look at another style?";
   } else if (!fullResponseText && pool.length > 0) {
     // Strips wiped the entire text (e.g. AI's only output was
     // "Let me look that up for you!") but a search returned products.
     // Without a fallback we'd ship an empty bubble above the cards.
     console.log(`[chat] empty-text repair: text wiped by strips, pool=${pool.length}`);
-    fullResponseText = "Here are some options that match what you're looking for.";
+    fullResponseText = "Take a look — these are the closest matches I've got.";
   }
 
   // Strip stray HTML the model sometimes emits (literal <br>, <p>, etc.).
