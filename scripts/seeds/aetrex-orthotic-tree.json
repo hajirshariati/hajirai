@@ -1,42 +1,6 @@
 {
-  "rootNodeId": "q_gender",
+  "rootNodeId": "q_use_case",
   "nodes": [
-    {
-      "id": "q_gender",
-      "type": "question",
-      "attribute": "gender",
-      "skipIfKnown": true,
-      "question": "Who are these orthotics for?",
-      "chips": [
-        {
-          "label": "Men",
-          "value": "Men"
-        },
-        {
-          "label": "Women",
-          "value": "Women"
-        },
-        {
-          "label": "Boys",
-          "value": "Boys"
-        },
-        {
-          "label": "Girls",
-          "value": "Girls"
-        },
-        {
-          "label": "Kids",
-          "value": "Kids"
-        }
-      ],
-      "next": {
-        "Men": "q_use_case",
-        "Women": "q_use_case",
-        "Boys": "q_kids_use_case",
-        "Girls": "q_kids_use_case",
-        "Kids": "q_kids_use_case"
-      }
-    },
     {
       "id": "q_use_case",
       "type": "question",
@@ -93,30 +57,36 @@
         }
       ],
       "next": {
-        "_default": "q_condition"
+        "_default": "q_gender"
       }
     },
     {
-      "id": "q_kids_use_case",
+      "id": "q_gender",
       "type": "question",
-      "attribute": "useCase",
-      "question": "What kind of shoes will they go in?",
+      "attribute": "gender",
+      "skipIfKnown": true,
+      "autoSkipIfSingle": true,
+      "question": "Who are these orthotics for?",
       "chips": [
         {
-          "label": "Sport / athletic shoes",
-          "value": "kids"
+          "label": "Men",
+          "value": "Men"
         },
         {
-          "label": "Casual shoes",
-          "value": "kids"
+          "label": "Women",
+          "value": "Women"
         },
         {
-          "label": "Dress shoes",
-          "value": "kids"
+          "label": "Kids",
+          "value": "Kids"
+        },
+        {
+          "label": "Unisex",
+          "value": "Unisex"
         }
       ],
       "next": {
-        "_default": "q_resolve"
+        "_default": "q_condition"
       }
     },
     {
@@ -1142,7 +1112,7 @@
       {
         "masterSku": "L400G",
         "title": "Girl's Sport Orthotics - L400G Orthotics-G1",
-        "gender": "Girls",
+        "gender": "Kids",
         "useCase": "kids",
         "arch": "Medium / High Arch",
         "posted": false,
@@ -1169,7 +1139,7 @@
       {
         "masterSku": "L400Y",
         "title": "Boy's Sport Orthotics - L400Y Orthotics-Y1",
-        "gender": "Boys",
+        "gender": "Kids",
         "useCase": "kids",
         "arch": "Medium / High Arch",
         "posted": false,
@@ -1205,7 +1175,7 @@
       {
         "masterSku": "L420G",
         "title": "Girl's Sport Orthotics - L420G Orthotics-G1",
-        "gender": "Girls",
+        "gender": "Kids",
         "useCase": "kids",
         "arch": "Flat / Low Arch",
         "posted": false,
@@ -1232,7 +1202,7 @@
       {
         "masterSku": "L420Y",
         "title": "Boy's Sport Orthotics - L420Y Orthotics",
-        "gender": "Boys",
+        "gender": "Kids",
         "useCase": "kids",
         "arch": "Flat / Low Arch",
         "posted": false,
@@ -1259,7 +1229,7 @@
       {
         "masterSku": "L425Y",
         "title": "Boy's Sport Orthotics - L425Y Orthotics-Y1",
-        "gender": "Boys",
+        "gender": "Kids",
         "useCase": "kids",
         "arch": "Flat / Low Arch",
         "posted": false,
@@ -1351,7 +1321,7 @@
       {
         "masterSku": "L500G",
         "title": "Girl's Dress Orthotics - L500G Orthotics-G1",
-        "gender": "Girls",
+        "gender": "Kids",
         "useCase": "dress",
         "arch": "Medium / High Arch",
         "posted": false,
@@ -1378,7 +1348,7 @@
       {
         "masterSku": "L500Y",
         "title": "Boy's Dress Orthotics - L500Y Orthotics-Y1",
-        "gender": "Boys",
+        "gender": "Kids",
         "useCase": "dress",
         "arch": "Medium / High Arch",
         "posted": false,
@@ -1414,7 +1384,7 @@
       {
         "masterSku": "L520G",
         "title": "Girl's Dress Orthotics - L520G Orthotics-G1",
-        "gender": "Girls",
+        "gender": "Kids",
         "useCase": "dress",
         "arch": "Flat / Low Arch",
         "posted": false,
@@ -1477,7 +1447,7 @@
       {
         "masterSku": "L600G",
         "title": "Girl's Casual Orthotics - L600G Orthotics-G1",
-        "gender": "Girls",
+        "gender": "Kids",
         "useCase": "casual",
         "arch": "Medium / High Arch",
         "posted": false,
@@ -1504,7 +1474,7 @@
       {
         "masterSku": "L600Y",
         "title": "Boy's Casual Orthotics - L600Y Orthotics-Y1",
-        "gender": "Boys",
+        "gender": "Kids",
         "useCase": "casual",
         "arch": "Medium / High Arch",
         "posted": false,
@@ -1578,7 +1548,7 @@
       {
         "masterSku": "L620G",
         "title": "Girl's Casual Orthotics - L620G Orthotics-G1",
-        "gender": "Girls",
+        "gender": "Kids",
         "useCase": "casual",
         "arch": "Flat / Low Arch",
         "posted": false,
@@ -1605,7 +1575,7 @@
       {
         "masterSku": "L620Y",
         "title": "Boy's Casual Orthotics - L620Y Orthotics-Y1",
-        "gender": "Boys",
+        "gender": "Kids",
         "useCase": "casual",
         "arch": "Flat / Low Arch",
         "posted": false,

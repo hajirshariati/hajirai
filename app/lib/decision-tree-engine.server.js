@@ -32,6 +32,65 @@ function findNode(tree, id) {
   return (tree.definition?.nodes || []).find((n) => n.id === id) || null;
 }
 
+// Hard-filter check: would picking `chip.value` for `node.attribute`
+// (combined with what's already answered) leave at least one
+// candidate in the resolver's masterIndex?
+//
+// This is "shop-aware" filtering — keeps the customer from being
+// offered options that have zero inventory in the merchant's
+// catalog. Examples on Aetrex's catalog:
+//   - useCase=skates → only Unisex SKUs exist → gender chip filter
+//     hides Men/Women/Kids → only Unisex remains → autoSkipIfSingle
+//     fires and the gender question is never shown.
+//   - useCase=cleats → same shape (Unisex-only family).
+//   - gender=Kids → no athletic / cleats / skates / winter / work
+//     SKUs → those use-case chips never appear if gender is asked
+//     first.
+//
+// Hard-filter attrs we apply: gender (with Unisex acceptance), useCase.
+// Soft attrs (arch, posted, metSupport, condition) are ignored for
+// pruning — the resolver scores those, doesn't filter on them, so
+// every candidate matches at the chip-pruning level.
+const HARD_FILTER_ATTRS_FOR_PRUNE = ["gender", "useCase"];
+
+// Strict equality for chip pruning. Without this, Aetrex's Unisex
+// skate/cleat SKUs would satisfy every gender query and every gender
+// chip would look viable — which is the opposite of what we want.
+// The resolver's runtime gender filter keeps its Unisex fallback so
+// once a customer picks "Men" + skates, they still get the Unisex
+// skate SKU. Pruning is shop-aware, runtime is forgiving.
+function genderMatchPrune(candidateGender, askedGender) {
+  if (!askedGender) return true;
+  return candidateGender === askedGender;
+}
+
+function chipHasCandidates(node, chip, answers, resolver) {
+  if (!resolver || !Array.isArray(resolver.masterIndex)) return true;
+  const projected = { ...answers, [node.attribute]: chip.value };
+  for (const m of resolver.masterIndex) {
+    let ok = true;
+    for (const k of HARD_FILTER_ATTRS_FOR_PRUNE) {
+      const v = projected[k];
+      if (v === undefined || v === null || v === "") continue;
+      if (k === "gender") { if (!genderMatchPrune(m.gender, v)) { ok = false; break; } continue; }
+      if (m[k] !== v) { ok = false; break; }
+    }
+    if (ok) return true;
+  }
+  return false;
+}
+
+// Returns the subset of a node's chips that would lead to ≥1
+// candidate in the catalog given the current answers. Pure.
+export function availableChipsForNode(tree, node, answers) {
+  if (!node || !Array.isArray(node.chips)) return [];
+  const resolver = tree.definition?.resolver;
+  if (!resolver) return node.chips;
+  // Always allow chips for soft attributes (no hard-filter effect).
+  if (!HARD_FILTER_ATTRS_FOR_PRUNE.includes(node.attribute)) return node.chips;
+  return node.chips.filter((c) => chipHasCandidates(node, c, answers || {}, resolver));
+}
+
 function rootState(tree) {
   return {
     treeId: tree.id,
@@ -105,9 +164,22 @@ function evalCondition(cond, answers) {
   return false;
 }
 
-// Skip-if-known: if the next node's attribute is already in answers
-// (e.g. gender pre-filled from a choice button outside the tree),
-// fast-forward through it. Caps at 16 hops to prevent runaway.
+// Walks question nodes, applying three skip rules in order:
+//   1. resolve nodes terminate the walk and run the resolver.
+//   2. skipIfKnown: if the node's attribute is already in answers
+//      (pre-filled from outside, e.g. gender from a choice button),
+//      fast-forward.
+//   3. autoSkipIfSingle: if dynamic chip pruning leaves exactly one
+//      viable chip given current answers, set the attribute to that
+//      chip's value and fast-forward. This is what removes the
+//      pointless "gender?" question after the customer says
+//      "Hockey skates" — only Unisex is viable, so the engine
+//      auto-picks it instead of asking.
+//   4. autoFallback: if pruning leaves zero viable chips, use the
+//      node's first chip as a deterministic fallback to avoid a
+//      dead-end. Resolver's own fallback handles SKU mapping.
+//
+// Cap at 16 hops to prevent runaway on a misconfigured tree.
 function advance(tree, fromState) {
   let state = fromState;
   for (let i = 0; i < 16; i++) {
@@ -129,6 +201,35 @@ function advance(tree, fromState) {
       if (!target) break;
       state = { ...state, currentNodeId: target };
       continue;
+    }
+    if (node.autoSkipIfSingle && node.attribute) {
+      const viable = availableChipsForNode(tree, node, state.answers);
+      if (viable.length === 1) {
+        const onlyChip = viable[0];
+        const target = nextNodeId(node, onlyChip.value);
+        if (!target) break;
+        state = {
+          ...state,
+          answers: { ...state.answers, [node.attribute]: onlyChip.value },
+          currentNodeId: target,
+        };
+        continue;
+      }
+      if (viable.length === 0) {
+        // No catalog coverage at all — pick the first declared chip
+        // as a deterministic fallback. The resolver's `fallback`
+        // surfaces a sensible SKU.
+        const fallbackChip = node.chips?.[0];
+        if (!fallbackChip) break;
+        const target = nextNodeId(node, fallbackChip.value);
+        if (!target) break;
+        state = {
+          ...state,
+          answers: { ...state.answers, [node.attribute]: fallbackChip.value },
+          currentNodeId: target,
+        };
+        continue;
+      }
     }
     break;
   }
@@ -154,13 +255,18 @@ export function stepTree(tree, state, userMessage) {
     const advanced = advance(tree, state);
     return { nextState: advanced, response: stateToResponse(tree, advanced) };
   }
+  // Match against the FULL chip list — customer might have typed
+  // an option we'd normally prune (rare). If they pick a pruned
+  // chip, the resolver still finds a fallback or scores best-effort,
+  // which is fine.
   const chip = matchChip(userMessage, node.chips);
   if (!chip) {
+    const viable = availableChipsForNode(tree, node, state.answers);
     return {
       nextState: state,
       response: {
         text: `Pick one of the options below to continue:\n\n${node.question}`,
-        chips: node.chips,
+        chips: viable.length > 0 ? viable : node.chips,
         completed: false,
         resolved: null,
         unmatched: true,
@@ -186,9 +292,15 @@ function stateToResponse(tree, state) {
   }
   const node = findNode(tree, state.currentNodeId);
   if (!node) return { text: "", chips: [], completed: false, resolved: null };
+  // Render only the chips that have catalog coverage given current
+  // answers. advance() already auto-skipped the 0/1-viable cases —
+  // by the time we render, this list is at least 2 entries for
+  // hard-filter attrs, or unfiltered for soft attrs.
+  const renderedChips = availableChipsForNode(tree, node, state.answers);
+  const finalChips = renderedChips.length > 0 ? renderedChips : (node.chips || []);
   return {
     text: node.question,
-    chips: node.chips || [],
+    chips: finalChips,
     completed: false,
     resolved: null,
   };
