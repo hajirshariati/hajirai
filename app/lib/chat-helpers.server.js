@@ -135,7 +135,12 @@ export function detectGenderFromHistory(messages) {
 //   "i need to X" / "let me get the details" — softer but still
 //     narrative announcements the AI ships before tool calls
 //   "one moment" / "hold on" / "right away" / "give me a second"
-const BANNED_NARRATION = /(?<=^|\s)(?:let me (?:look (?:that |it )?up|find|search|check|see|pull (?:up|that up|that)|grab|get|look at|get the details|broaden|widen|expand|try (?:a |again|another)|narrow|refine|search again|do (?:a|another) search)(?:[^.!?\n]*)?[.!?]?|i['‘’]?ll (?:look|find|search|check|see|pull|grab|get|need to|try|broaden|widen)(?:[^.!?\n]*)?[.!?]?|i need to (?:pull up|look up|look at|find|search|check|see|grab|get|broaden|widen|try)(?:[^.!?\n]*)?[.!?]?|one moment[!.]?|hold on[!.]?|right away[!.]?|give me a (?:second|sec|moment)[!.]?|that (?:result|search|one) (?:is|was|isn['‘’]?t|doesn['‘’]?t)(?:[^.!?\n]*)?[.!?]?|the (?:search (?:above|results?)|results? (?:above|so far|i found)|previous (?:result|search))(?:[^.!?\n]*)?[.!?]?|searching (?:for|the catalog|now)(?:[^.!?\n]*)?[.!?]?|here['‘’]?s what (?:i|we) (?:found|got)(?:[^.!?\n]*)?[.!?]?)/gi;
+// Note: "here's what I found/got" is INTENTIONALLY not in this list.
+// It's a normal plural-intro presentation phrase, and stripping it
+// (with the trailing [^.!?]* sentence-eater) deletes the entire
+// product-presentation sentence — which then makes hasPluralIntroFraming
+// fail and cascades into cards getting suppressed. Leave it alone.
+const BANNED_NARRATION = /(?<=^|\s)(?:let me (?:look (?:that |it )?up|find|search|check|see|pull (?:up|that up|that)|grab|get|look at|get the details|broaden|widen|expand|try (?:a |again|another)|narrow|refine|search again|do (?:a|another) search)(?:[^.!?\n]*)?[.!?]?|i['‘’]?ll (?:look|find|search|check|see|pull|grab|get|need to|try|broaden|widen)(?:[^.!?\n]*)?[.!?]?|i need to (?:pull up|look up|look at|find|search|check|see|grab|get|broaden|widen|try)(?:[^.!?\n]*)?[.!?]?|one moment[!.]?|hold on[!.]?|right away[!.]?|give me a (?:second|sec|moment)[!.]?|that (?:result|search|one) (?:is|was|isn['‘’]?t|doesn['‘’]?t)(?:[^.!?\n]*)?[.!?]?|the (?:search (?:above|results?)|results? (?:above|so far|i found)|previous (?:result|search))(?:[^.!?\n]*)?[.!?]?|searching (?:for|the catalog|now)(?:[^.!?\n]*)?[.!?]?)/gi;
 
 // Self-correction strip. The model sometimes streams a follow-up
 // question, then realizes mid-stream that the customer already
@@ -262,7 +267,7 @@ export function isSingularPrescriptive(text) {
 // wedges…" rendering 1 card). Catch the framing here so chat.jsx can
 // skip the threshold and render the full pool. Vocabulary-agnostic —
 // works for any catalog vertical.
-const PLURAL_INTRO_FRAMING = /\b(?:here are|here'?s a (?:few|couple|handful)|both of (?:these|them)|these (?:are|two|three|few|options)|some great|several (?:great )?(?:options|picks|choices)|a few (?:options|picks|choices)|check out (?:these|some)|take a look at (?:these|some))\b/i;
+const PLURAL_INTRO_FRAMING = /\b(?:here are|here'?s a (?:few|couple|handful)|here'?s what (?:i|we) (?:found|got|recommend)|both of (?:these|them)|these (?:are|two|three|few|options)|some great|several (?:great )?(?:options|picks|choices)|a few (?:options|picks|choices)|check out (?:these|some)|take a look at (?:these|some)|i'?d recommend|i recommend)\b/i;
 
 export function hasPluralIntroFraming(text) {
   return Boolean(text) && PLURAL_INTRO_FRAMING.test(text);
