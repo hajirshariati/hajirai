@@ -29,7 +29,7 @@ const a = (content) => ({ role: "assistant", content });
 
 const cases = [];
 
-// ── detectGenderFromHistory ───────────────────────────────────────────
+// ── detectGenderFromHistory ─────────────────────────────────
 cases.push({
   name: "user pivot 'wife' beats earlier assistant 'men's'",
   run: () => assert.equal(
@@ -120,7 +120,7 @@ cases.push({
   run: () => assert.equal(detectGenderFromHistory([]), null),
 });
 
-// ── stripBannedNarration ──────────────────────────────────────────────
+// ── stripBannedNarration ────────────────────────────────────
 cases.push({
   name: "strips 'let me look that up now'",
   run: () => assert.equal(
@@ -153,7 +153,7 @@ cases.push({
   },
 });
 
-// ── looksLikeProductPitch ─────────────────────────────────────────────
+// ── looksLikeProductPitch ───────────────────────────────────
 cases.push({
   name: "'the perfect match is X' is a pitch",
   run: () => assert.equal(
@@ -194,7 +194,7 @@ cases.push({
   ),
 });
 
-// ── normalizeGenderChipAnswer ─────────────────────────────────────────
+// ── normalizeGenderChipAnswer ────────────────────────────────
 cases.push({
   name: "'Men's & Boys'' → men",
   run: () => assert.equal(normalizeGenderChipAnswer("Men's & Boys'"), "men"),
@@ -235,7 +235,7 @@ cases.push({
   run: () => assert.equal(normalizeGenderChipAnswer("men + boys"), "men"),
 });
 
-// ── synthetic gender-answered injection ───────────────────────────────
+// ── synthetic gender-answered injection ────────────────────────────
 // Mirror the logic from chat.jsx — given a detected gender and a list
 // of answered choices, the prompt should end up with a gender entry.
 function injectSyntheticGender(detectedGender, answeredChoices) {
@@ -297,7 +297,7 @@ cases.push({
   },
 });
 
-// ── hasChoiceButtons ──────────────────────────────────────────────────
+// ── hasChoiceButtons ─────────────────────────────────────────
 cases.push({
   name: "detects choice buttons in text",
   run: () => assert.equal(
@@ -316,7 +316,7 @@ cases.push({
   run: () => assert.equal(hasChoiceButtons(""), false),
 });
 
-// ── stripMetaNarration ────────────────────────────────────────────────
+// ── stripMetaNarration ───────────────────────────────────────
 cases.push({
   name: "strips full meta-preamble + we-know dump from screenshot bug",
   run: () => {
@@ -364,7 +364,7 @@ cases.push({
   },
 });
 
-// ── looksLikeDefinitionalHallucination ────────────────────────────────
+// ── looksLikeDefinitionalHallucination ────────────────────────────
 cases.push({
   name: "'Lynco is our premium orthotic line' is definitional hallucination",
   run: () => assert.equal(
@@ -397,7 +397,7 @@ cases.push({
   ),
 });
 
-// ── dedupeConsecutiveSentences ────────────────────────────────────────
+// ── dedupeConsecutiveSentences ─────────────────────────────────
 cases.push({
   name: "dedupes back-to-back 'Here are some great' echo openers",
   run: () => {
@@ -480,7 +480,7 @@ cases.push({
   },
 });
 
-// ── filterContradictingGenderChips ────────────────────────────────────
+// ── filterContradictingGenderChips ───────────────────────────────
 const aetrexMap = {
   boots: { display: "Boots", genders: ["women"] },
   "mary janes": { display: "Mary Janes", genders: ["women"] },
@@ -624,7 +624,7 @@ cases.push({
   },
 });
 
-// ── isSingularPrescriptive ────────────────────────────────────────────
+// ── isSingularPrescriptive ────────────────────────────────────
 cases.push({
   name: "'is the right pick' is singular-prescriptive",
   run: () => assert.equal(
@@ -706,7 +706,7 @@ cases.push({
   },
 });
 
-// ── tool-call rewrite pipeline ────────────────────────────────────────
+// ── tool-call rewrite pipeline ──────────────────────────────────
 // These are the production safety net — they run between the AI's tool
 // emission and dispatch. AI compliance becomes irrelevant when the
 // rewrite catches the mismatch.
@@ -715,7 +715,7 @@ const search = (input) => ({ name: "search_products", input });
 const lookup = (input) => ({ name: "lookup_sku", input });
 const findSimilar = (input) => ({ name: "find_similar_products", input });
 
-// injectLockedGender ─────────────────────────────────────────────────
+// injectLockedGender ──────────────────────────────────────
 cases.push({
   name: "gender-lock: injects gender when AI omitted it",
   run: () => {
@@ -777,7 +777,7 @@ cases.push({
   },
 });
 
-// forceComparisonLookup ──────────────────────────────────────────────
+// forceComparisonLookup ─────────────────────────────────────
 cases.push({
   name: "comparison-routing: 2 SKUs + 'compare' → lookup_sku",
   run: () => {
@@ -824,7 +824,7 @@ cases.push({
   },
 });
 
-// injectStructuredColorFilter ────────────────────────────────────────
+// injectStructuredColorFilter ──────────────────────────────────
 cases.push({
   name: "color-inject: detects merchant-tagged color in user text",
   run: () => {
@@ -877,7 +877,7 @@ cases.push({
   },
 });
 
-// stripStaleCategoriesOnScopeReset ───────────────────────────────────
+// stripStaleCategoriesOnScopeReset ───────────────────────────────
 cases.push({
   name: "scope-reset: strips stale 'sneakers' on 'any pink ones'",
   run: () => {
@@ -922,7 +922,7 @@ cases.push({
   },
 });
 
-// rewriteToolCall composition ────────────────────────────────────────
+// rewriteToolCall composition ──────────────────────────────────
 cases.push({
   name: "pipeline: gender + color stack on a single search",
   run: () => {
@@ -959,7 +959,7 @@ cases.push({
   },
 });
 
-// ── negation guard for color injection ────────────────────────────────
+// ── negation guard for color injection ─────────────────────────────
 // Customer says "no red" — the rewrite pipeline must NOT inject
 // filters.color = "red". Same for "forget red", "anything but red",
 // "without red", "skip red", "don't want red".
@@ -1056,7 +1056,7 @@ cases.push({
   },
 });
 
-// ── isPrecededByNegation primitive ────────────────────────────────────
+// ── isPrecededByNegation primitive ────────────────────────────────
 cases.push({
   name: "isPrecededByNegation: 'no red' at index of 'red' → true",
   run: () => {
@@ -1093,7 +1093,129 @@ cases.push({
   },
 });
 
-// ── negation-aware gender detection ───────────────────────────────────
+// ── long-form negation (multiple words between negation and term) ─────
+cases.push({
+  name: "isPrecededByNegation: 'do not want anything black' → true (3 words gap)",
+  run: () => {
+    const t = "I really do not want anything black or boring";
+    const idx = t.indexOf("black");
+    assert.equal(isPrecededByNegation(t, idx), true);
+  },
+});
+
+cases.push({
+  name: "isPrecededByNegation: 'absolutely no red' → true",
+  run: () => {
+    const t = "absolutely no red — looks tacky";
+    const idx = t.indexOf("red");
+    assert.equal(isPrecededByNegation(t, idx), true);
+  },
+});
+
+cases.push({
+  name: "isPrecededByNegation: don't want X (3 words gap) → true",
+  run: () => {
+    const t = "I don't want any pink in this";
+    const idx = t.indexOf("pink");
+    assert.equal(isPrecededByNegation(t, idx), true);
+  },
+});
+
+// ── 'but X' reaffirmation cancels prior negation ──────────────────────
+cases.push({
+  name: "isPrecededByNegation: 'not red but green' → green is NOT negated",
+  run: () => {
+    const t = "not red but green";
+    const idx = t.indexOf("green");
+    assert.equal(isPrecededByNegation(t, idx), false);
+  },
+});
+
+cases.push({
+  name: "isPrecededByNegation: 'no red, but I'd love blue' → blue is NOT negated",
+  run: () => {
+    const t = "no red, but I'd love blue";
+    const idx = t.indexOf("blue");
+    assert.equal(isPrecededByNegation(t, idx), false);
+  },
+});
+
+cases.push({
+  name: "isPrecededByNegation: 'anything but pink' → pink IS negated",
+  run: () => {
+    const t = "anything but pink";
+    const idx = t.indexOf("pink");
+    assert.equal(isPrecededByNegation(t, idx), true);
+  },
+});
+
+// ── distance check — far-away negation does NOT propagate ─────────────
+cases.push({
+  name: "isPrecededByNegation: negation far away (>4 tokens) → false",
+  run: () => {
+    const t = "not for hiking, just casual walking on weekends in red";
+    const idx = t.indexOf("red");
+    assert.equal(isPrecededByNegation(t, idx), false);
+  },
+});
+
+// ── color-inject end-to-end with long-form negation ───────────────────
+cases.push({
+  name: "color-inject: 'do not want anything black' skips injection",
+  run: () => {
+    const input = search({ query: "shoes" });
+    const out = injectStructuredColorFilter(input, {
+      latestUserMessage: "I really do not want anything black or boring",
+      _merchantColors: ["black", "blue", "red"],
+    });
+    assert.equal(out, input);
+  },
+});
+
+cases.push({
+  name: "color-inject: 'no red but love blue' picks blue",
+  run: () => {
+    const out = injectStructuredColorFilter(
+      search({ query: "shoes" }),
+      {
+        latestUserMessage: "no red but I'd love blue",
+        _merchantColors: ["red", "blue"],
+      },
+    );
+    assert.equal(out.input.filters.color, "blue");
+  },
+});
+
+cases.push({
+  name: "color-inject: 'absolutely no red' skips injection",
+  run: () => {
+    const input = search({ query: "shoes" });
+    const out = injectStructuredColorFilter(input, {
+      latestUserMessage: "absolutely no red — red just looks tacky on me",
+      _merchantColors: ["red"],
+    });
+    assert.equal(out, input);
+  },
+});
+
+// ── gender detection with long-form negation ────────────────────────
+cases.push({
+  name: "gender: 'do not want men's, want women's' → women",
+  run: () => assert.equal(
+    detectGenderFromHistory([u("I do not want men's, I want women's please")]),
+    "women",
+  ),
+});
+
+cases.push({
+  name: "gender: 'not for men but for women' → women (reaffirmation)",
+  run: () => assert.equal(
+    detectGenderFromHistory([u("not for men but for women")]),
+    "women",
+  ),
+});
+
+// ── negation-aware gender detection ──────────────────────────────
 cases.push({
   name: "gender: 'not for men, for women' → women (negation skips men)",
   run: () => assert.equal(
@@ -1142,7 +1264,7 @@ cases.push({
   ),
 });
 
-// ── anthropic-resilience ─────────────────────────────────────────────
+// ── anthropic-resilience ────────────────────────────────────
 // Tests that the retry helper retries on transient errors and bails
 // out cleanly on non-retryable errors. Uses async functions that
 // throw scripted errors — no real Anthropic calls.
@@ -1330,7 +1452,7 @@ cases.push({
   },
 });
 
-// ── run all ───────────────────────────────────────────────────────────
+// ── run all ───────────────────────────────────────────────
 let pass = 0;
 const failures = [];
 for (const c of cases) {

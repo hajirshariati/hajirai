@@ -16,25 +16,15 @@
 // stays in chat.jsx; this module receives ctx._merchantColors as
 // input. That keeps this module dependency-free and unit-testable.
 
+// Negation detection lives in chat-helpers.server.js so gender detection
+// and color injection share the same logic. Re-exported here so existing
+// imports (eval harness, future modules) keep working from this module.
+import { isPrecededByNegation } from "./chat-helpers.server.js";
+export { isPrecededByNegation };
+
 const RE_ESCAPE = /[.*+?^${}()|[\]\\]/g;
 export function escapeRe(s) {
   return String(s).replace(RE_ESCAPE, "\\$&");
-}
-
-// Negation context detector — checks whether a term that appeared at
-// position `matchIndex` in `text` is preceded (within ~25 chars) by a
-// negation word like "no", "not", "without", "skip", "forget",
-// "anything but", "don't want", "other than". Used by color and other
-// structured-filter injection to avoid false positives like
-// "no red" → filters.color = "red".
-const NEGATION_WINDOW_CHARS = 30;
-const NEGATION_PRECEDING_RE = /\b(?:no|not|without|except|skip|forget|anything\s+but|don'?t\s+want|other\s+than|never)\s+\S*$/i;
-export function isPrecededByNegation(text, matchIndex) {
-  const window = String(text || "").slice(
-    Math.max(0, Number(matchIndex) - NEGATION_WINDOW_CHARS),
-    Number(matchIndex),
-  );
-  return NEGATION_PRECEDING_RE.test(window);
 }
 
 // Structural — works for any merchant whose SKUs have 1-2 letters then
@@ -42,7 +32,7 @@ export function isPrecededByNegation(text, matchIndex) {
 // AB1234, T9999W. Not catalog-specific.
 export const SKU_PATTERN = /\b[A-Z]{1,2}\d{3,5}[A-Z]?\b/g;
 
-// ── stripStaleCategoriesOnScopeReset ─────────────────────────────────
+// ── stripStaleCategoriesOnScopeReset ─────────────────────────────
 // When the customer's latest message is open-ended ("anything",
 // "everything", "any X", "show me whatever"), the AI sometimes carries
 // a category from the prior turn into its search query. Strip category
@@ -90,7 +80,7 @@ export function stripStaleCategoriesOnScopeReset(toolCall, ctx) {
   return toolCall;
 }
 
-// ── forceComparisonLookup ───────────────────────────────────────────
+// ── forceComparisonLookup ─────────────────────────────────
 // When the customer's latest message contains 2+ SKU-like tokens AND a
 // comparison verb, the AI sometimes combines them into a single
 // search_products query and gets 0 results. Rewrite to lookup_sku per
@@ -122,7 +112,7 @@ export function forceComparisonLookup(toolCall, ctx) {
   return toolCall;
 }
 
-// ── injectStructuredColorFilter ────────────────────────────────────
+// ── injectStructuredColorFilter ────────────────────────────
 // When the customer mentions a color value the merchant has actually
 // tagged, inject as filters.color so the search runs the structured
 // filter (and our existing relaxedFilters mechanism kicks in if no
@@ -165,7 +155,7 @@ export function injectStructuredColorFilter(toolCall, ctx) {
   return toolCall;
 }
 
-// ── injectLockedGender ──────────────────────────────────────────────
+// ── injectLockedGender ───────────────────────────────────
 // The "ABSOLUTE GENDER LOCK" prompt rule asks the AI to pass
 // filters.gender on every search once a gender is established. The AI
 // complies most of the time but drifts on long conversations — by turn
