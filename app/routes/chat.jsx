@@ -1483,18 +1483,30 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // product card.
     const singularPrescriptive = isSingularPrescriptive(fullResponseText);
 
-    // saysNoMatch override: if the AI named ANY pool product by title,
-    // it's pivoting ("we don't have pink, but here are navy ones") — not
-    // denying. Treat as not-a-denial so cards still render. Without this,
-    // a partial-denial pivot leaves the customer reading "we don't have
-    // pink BUT…" with no cards beneath — broken UX.
+    // saysNoMatch override: if the AI named ANY pool product by title
+    // OR uses plural-intro framing ("here are our closest...") OR uses
+    // pivot phrasing ("we don't have X, but here are Y") it's pivoting,
+    // not denying. Treat as not-a-denial so cards still render.
+    //
+    // Without this, partial-denial pivots like "We don't have an exact
+    // red match, but here are our closest options" leave the customer
+    // reading the apology with no cards beneath — broken UX, especially
+    // when the search layer already relaxed the filter and found close
+    // matches.
     const aiNamesAnyPoolProduct = filteredPool.some((card) => {
       const title = String(card.title || "").trim().toLowerCase();
       return title.length >= 5 && textLower.includes(title);
     });
-    const effectiveSaysNoMatch = saysNoMatch && !aiNamesAnyPoolProduct;
-    if (saysNoMatch && aiNamesAnyPoolProduct) {
-      console.log(`[chat] saysNoMatch override: AI named a pool product despite denial phrasing — treating as pivot, not denial`);
+    const aiUsesPresentationFraming = hasPluralIntroFraming(fullResponseText);
+    const aiUsesPivotPhrasing = /\bbut\s+(?:here|these|those|our|i\s+do|i'?ve\s+got|we\s+do|we'?ve\s+got)\b/i.test(fullResponseText)
+      || /\b(?:closest|nearest|next\s+best|similar)\s+(?:option|options|match|matches|pick|picks|alternative|alternatives)\b/i.test(fullResponseText);
+    const aiPivotsOrPresents = aiNamesAnyPoolProduct || aiUsesPresentationFraming || aiUsesPivotPhrasing;
+    const effectiveSaysNoMatch = saysNoMatch && !aiPivotsOrPresents;
+    if (saysNoMatch && aiPivotsOrPresents) {
+      const reason = aiNamesAnyPoolProduct ? "named a pool product" :
+                     aiUsesPresentationFraming ? "plural-intro framing" :
+                     "pivot phrasing";
+      console.log(`[chat] saysNoMatch override: ${reason} despite denial words — treating as pivot, not denial`);
     }
 
     let cards;
