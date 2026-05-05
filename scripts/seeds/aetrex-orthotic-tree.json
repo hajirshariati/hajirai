@@ -1,0 +1,1947 @@
+{
+  "rootNodeId": "q_gender",
+  "nodes": [
+    {
+      "id": "q_gender",
+      "type": "question",
+      "attribute": "gender",
+      "skipIfKnown": true,
+      "question": "Who are these orthotics for?",
+      "chips": [
+        {
+          "label": "Men",
+          "value": "Men"
+        },
+        {
+          "label": "Women",
+          "value": "Women"
+        },
+        {
+          "label": "Boys",
+          "value": "Boys"
+        },
+        {
+          "label": "Girls",
+          "value": "Girls"
+        },
+        {
+          "label": "Kids",
+          "value": "Kids"
+        }
+      ],
+      "next": {
+        "Men": "q_use_case",
+        "Women": "q_use_case",
+        "Boys": "q_kids_use_case",
+        "Girls": "q_kids_use_case",
+        "Kids": "q_kids_use_case"
+      }
+    },
+    {
+      "id": "q_use_case",
+      "type": "question",
+      "attribute": "useCase",
+      "question": "What kind of shoes will the orthotics go in?",
+      "chips": [
+        {
+          "label": "Dress shoes",
+          "value": "dress"
+        },
+        {
+          "label": "Dress shoes (no removable insole)",
+          "value": "dress_no_removable"
+        },
+        {
+          "label": "Premium dress shoes",
+          "value": "dress_premium"
+        },
+        {
+          "label": "Everyday / casual shoes",
+          "value": "casual"
+        },
+        {
+          "label": "Athletic — running",
+          "value": "athletic_running"
+        },
+        {
+          "label": "Athletic — gym / training",
+          "value": "athletic_training"
+        },
+        {
+          "label": "Athletic — court / general",
+          "value": "athletic_general"
+        },
+        {
+          "label": "Cleats",
+          "value": "cleats"
+        },
+        {
+          "label": "Hockey skates",
+          "value": "skates"
+        },
+        {
+          "label": "Winter boots",
+          "value": "winter_boots"
+        },
+        {
+          "label": "Work / on my feet all day",
+          "value": "work_all_day"
+        },
+        {
+          "label": "Just want comfort / relief",
+          "value": "comfort"
+        }
+      ],
+      "next": {
+        "_default": "q_condition"
+      }
+    },
+    {
+      "id": "q_kids_use_case",
+      "type": "question",
+      "attribute": "useCase",
+      "question": "What kind of shoes will they go in?",
+      "chips": [
+        {
+          "label": "Sport / athletic shoes",
+          "value": "kids"
+        },
+        {
+          "label": "Casual shoes",
+          "value": "kids"
+        },
+        {
+          "label": "Dress shoes",
+          "value": "kids"
+        }
+      ],
+      "next": {
+        "_default": "q_resolve"
+      }
+    },
+    {
+      "id": "q_condition",
+      "type": "question",
+      "attribute": "condition",
+      "question": "Any specific foot pain or condition we should match?",
+      "chips": [
+        {
+          "label": "Plantar fasciitis",
+          "value": "plantar_fasciitis"
+        },
+        {
+          "label": "Heel spurs",
+          "value": "heel_spurs"
+        },
+        {
+          "label": "Ball-of-foot pain / metatarsalgia",
+          "value": "metatarsalgia"
+        },
+        {
+          "label": "Morton's neuroma",
+          "value": "mortons_neuroma"
+        },
+        {
+          "label": "Overpronation / flat feet",
+          "value": "overpronation_flat_feet"
+        },
+        {
+          "label": "Diabetic feet",
+          "value": "diabetic"
+        },
+        {
+          "label": "None — just want comfort",
+          "value": "none"
+        }
+      ],
+      "next": {
+        "_default": "q_arch"
+      }
+    },
+    {
+      "id": "q_arch",
+      "type": "question",
+      "attribute": "arch",
+      "question": "What's your arch type?",
+      "chips": [
+        {
+          "label": "Flat / Low",
+          "value": "Flat / Low Arch"
+        },
+        {
+          "label": "Medium",
+          "value": "Medium / High Arch"
+        },
+        {
+          "label": "High",
+          "value": "Medium / High Arch"
+        },
+        {
+          "label": "I don't know",
+          "value": "Medium / High Arch"
+        }
+      ],
+      "next": {
+        "Flat / Low Arch": "q_resolve",
+        "Medium / High Arch": "q_overpronation"
+      }
+    },
+    {
+      "id": "q_overpronation",
+      "type": "question",
+      "attribute": "overpronation",
+      "question": "When you walk or stand, do your ankles roll inward or do you have flat-feet symptoms?",
+      "chips": [
+        {
+          "label": "Yes",
+          "value": "yes"
+        },
+        {
+          "label": "No",
+          "value": "no"
+        },
+        {
+          "label": "Not sure",
+          "value": "no"
+        }
+      ],
+      "next": {
+        "_default": "q_resolve"
+      }
+    },
+    {
+      "id": "q_resolve",
+      "type": "resolve"
+    }
+  ],
+  "derivations": [
+    {
+      "set": "posted",
+      "value": true,
+      "when": {
+        "any": [
+          {
+            "attr": "arch",
+            "eq": "Flat / Low Arch"
+          },
+          {
+            "attr": "overpronation",
+            "eq": "yes"
+          }
+        ]
+      }
+    },
+    {
+      "set": "posted",
+      "value": false,
+      "when": {
+        "all": [
+          {
+            "attr": "arch",
+            "eq": "Medium / High Arch"
+          },
+          {
+            "attr": "overpronation",
+            "eq": "no"
+          }
+        ]
+      }
+    },
+    {
+      "set": "metSupport",
+      "value": true,
+      "when": {
+        "any": [
+          {
+            "attr": "condition",
+            "eq": "metatarsalgia"
+          },
+          {
+            "attr": "condition",
+            "eq": "mortons_neuroma"
+          }
+        ]
+      }
+    }
+  ],
+  "resolver": {
+    "defaults": {
+      "arch": "Medium / High Arch",
+      "posted": false,
+      "metSupport": false,
+      "condition": "none"
+    },
+    "masterIndex": [
+      {
+        "masterSku": "A100M",
+        "title": "Aetrex Mens Instyle Orthotics:Comfort For Dress Shoes with non removable insoles",
+        "gender": "Men",
+        "useCase": "dress",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "A100W",
+        "title": "Aetrex Womens Fashion Orthotics:For Heels, Pumps, Flats: Comfort & Arch Support",
+        "gender": "Women",
+        "useCase": "dress",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "A2300M",
+        "title": "Aetrex Men's Premium Memory Foam Orthotics: Extra Comfort & Support at WORK",
+        "gender": "Men",
+        "useCase": "work_all_day",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "A2300W",
+        "title": "Aetrex Women's Premium Memory Foam Orthotics: Extra Comfort & Support at WORK",
+        "gender": "Women",
+        "useCase": "work_all_day",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "A400M",
+        "title": "Men's Compete Orthotics - Insoles for Active Lifestyles",
+        "gender": "Men",
+        "useCase": "athletic_general",
+        "arch": null,
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "A400W",
+        "title": "Women's Compete Orthotics - Insoles for Active Lifestyles",
+        "gender": "Women",
+        "useCase": "athletic_general",
+        "arch": null,
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "A600M",
+        "title": "Aetrex Men's Casual Memory Foam Orthotics: Plantar Fasciitis, Flat Feet Relief",
+        "gender": "Men",
+        "useCase": "comfort",
+        "arch": null,
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "A600W",
+        "title": "Aetrex Women's Casual Memory Foam Orthotics:Plantar Fasciitis, Flat Feet Relief",
+        "gender": "Women",
+        "useCase": "comfort",
+        "arch": null,
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "A700M",
+        "title": "Aetrex Men's Speed Runners Orthotics: Improve Performance & Prevent Injuries",
+        "gender": "Men",
+        "useCase": "athletic_running",
+        "arch": null,
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "A700W",
+        "title": "Aetrex Women's Speed Runners Orthotics: Improve Performance & Prevent Injuries",
+        "gender": "Women",
+        "useCase": "athletic_running",
+        "arch": null,
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "A800M",
+        "title": "Aetrex Men's Train Workout Orthotics:Foot Pain Relief:Comfort & Shock Absorption",
+        "gender": "Men",
+        "useCase": "athletic_training",
+        "arch": null,
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "A800W",
+        "title": "Aetrex Women's Train Workout Orthotics:Ease Foot Pain:Comfort & Shock Absorption",
+        "gender": "Women",
+        "useCase": "athletic_training",
+        "arch": null,
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L100M",
+        "title": "Men's In-Style Orthotics - Insole for Dress Shoes",
+        "gender": "Men",
+        "useCase": "dress",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L100W",
+        "title": "Women's Fashion Orthotics - Insole for Heels",
+        "gender": "Women",
+        "useCase": "dress",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L105M",
+        "title": "Men's In-Style Orthotics W/ Metatarsal Support",
+        "gender": "Men",
+        "useCase": "dress",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L105W",
+        "title": "Women's Fashion Orthotics W/ Metatarsal Support",
+        "gender": "Women",
+        "useCase": "dress",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L1100M",
+        "title": "Men's Low Profile Orthotics - Insoles for Shoes with No Depth",
+        "gender": "Men",
+        "useCase": "dress_no_removable",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L1105M",
+        "title": "Men's Low Profile Orthotics W/ Metatarsal Support",
+        "gender": "Men",
+        "useCase": "dress_no_removable",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L1120M",
+        "title": "Men's Low Profile Posted Orthotics",
+        "gender": "Men",
+        "useCase": "dress_no_removable",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L1125M",
+        "title": "Men's Low Profile Posted Orthotics W/ Metatarsal Support",
+        "gender": "Men",
+        "useCase": "dress_no_removable",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L1200U",
+        "title": "Unisex Cleats Orthotics - Insole for Sports",
+        "gender": "Unisex",
+        "useCase": "cleats",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L1205U",
+        "title": "Unisex Cleat Orthotics W/ Metatarsal Support",
+        "gender": "Unisex",
+        "useCase": "cleats",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L120M",
+        "title": "Men's In-Style Posted Orthotics - Insole for Dress Shoes",
+        "gender": "Men",
+        "useCase": "dress",
+        "arch": "Medium / High Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L120W",
+        "title": "Women's Fashion Posted Orthotics - Insole for Heels",
+        "gender": "Women",
+        "useCase": "dress",
+        "arch": "Medium / High Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L1220U",
+        "title": "Unisex Cleats Posted Orthotics",
+        "gender": "Unisex",
+        "useCase": "cleats",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L1300U",
+        "title": "Unisex Thinsoles Orthotics - Insole for Shoes Without Removable Insoles",
+        "gender": "Unisex",
+        "useCase": "dress_no_removable",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L1305U",
+        "title": "Unisex Thinsoles Orthotics W/ Metatarsal Support",
+        "gender": "Unisex",
+        "useCase": "dress_no_removable",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L1320U",
+        "title": "Unisex Thinsoles Posted Orthotics",
+        "gender": "Unisex",
+        "useCase": "dress_no_removable",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L1500M",
+        "title": "Men's Heritage Orthotics - Premium Insole for Dress Shoes",
+        "gender": "Men",
+        "useCase": "dress_premium",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L1500W",
+        "title": "Women's Heritage Orthotics - Premium Insole for Dress Shoes",
+        "gender": "Women",
+        "useCase": "dress_premium",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L1505M",
+        "title": "Men's Heritage Orthotics W/ Metatarsal Support",
+        "gender": "Men",
+        "useCase": "dress_premium",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L1505W",
+        "title": "Women's Heritage Orthotics W/ Metatarsal Support",
+        "gender": "Women",
+        "useCase": "dress_premium",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L1520M",
+        "title": "Men's Heritage Posted Orthotics",
+        "gender": "Men",
+        "useCase": "dress_premium",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L1520W",
+        "title": "Women's Heritage Posted Orthotics",
+        "gender": "Women",
+        "useCase": "dress_premium",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L1525M",
+        "title": "Men's Heritage Posted Orthotics W/ Metatarsal Support",
+        "gender": "Men",
+        "useCase": "dress_premium",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L1525W",
+        "title": "Women's Heritage Posted Orthotics W/ Metatarsal Support",
+        "gender": "Women",
+        "useCase": "dress_premium",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L1600M",
+        "title": "Men's Premium Casual Orthotics - Insoles for Everyday Activities",
+        "gender": "Men",
+        "useCase": "casual",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L1600W",
+        "title": "Women's Premium Casual Orthotics - Insoles for Everyday Activities",
+        "gender": "Women",
+        "useCase": "casual",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L1700Y",
+        "title": "Kids Orthotics",
+        "gender": "Kids",
+        "useCase": "kids",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L1705Y",
+        "title": "Kids Orthotics W/ Metatarsal Support",
+        "gender": "Kids",
+        "useCase": "kids",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L1720Y",
+        "title": "Kids Posted Orthotics",
+        "gender": "Kids",
+        "useCase": "kids",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L1800U",
+        "title": "Unisex Edge Orthotics",
+        "gender": "Unisex",
+        "useCase": "comfort",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L1805U",
+        "title": "Unisex Edge Orthotics W/ Metatarsal Support",
+        "gender": "Unisex",
+        "useCase": "comfort",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L1820U",
+        "title": "Unisex Edge Posted Orthotics",
+        "gender": "Unisex",
+        "useCase": "comfort",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L1900M",
+        "title": "Men's Active Orthotics - Insole for Athletic Footwear",
+        "gender": "Men",
+        "useCase": "athletic_general",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L1900W",
+        "title": "Women's Active Orthotics - Insole for Athletic Footwear",
+        "gender": "Women",
+        "useCase": "athletic_general",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L1905M",
+        "title": "Men's Active Orthotics W/ Metatarsal Support",
+        "gender": "Men",
+        "useCase": "athletic_general",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L1905W",
+        "title": "Women's Active Orthotics W/ Metatarsal Support",
+        "gender": "Women",
+        "useCase": "athletic_general",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L1920M",
+        "title": "Men's Active Posted Orthotics",
+        "gender": "Men",
+        "useCase": "athletic_general",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L1920W",
+        "title": "Women's Active Posted Orthotics",
+        "gender": "Women",
+        "useCase": "athletic_general",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L1925M",
+        "title": "Men's Active Posted Orthotics W/ Metatarsal Support",
+        "gender": "Men",
+        "useCase": "athletic_general",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L1925W",
+        "title": "Women's Active Posted Orthotics W/ Metatarsal Support",
+        "gender": "Women",
+        "useCase": "athletic_general",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L200M",
+        "title": "Men's Conform Orthotics - Insole For Low-risk Diabetes",
+        "gender": "Men",
+        "useCase": "comfort",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false,
+        "condition": "diabetic"
+      },
+      {
+        "masterSku": "L200W",
+        "title": "Women's Conform Orthotics -  Insole For Low-risk Diabetes",
+        "gender": "Women",
+        "useCase": "comfort",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false,
+        "condition": "diabetic"
+      },
+      {
+        "masterSku": "L205M",
+        "title": "Men's Conform Orthotics W/ Metatarsal Support",
+        "gender": "Men",
+        "useCase": "comfort",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true,
+        "condition": "diabetic"
+      },
+      {
+        "masterSku": "L205W",
+        "title": "Women's Conform Orthotics W/ Metatarsal Support",
+        "gender": "Women",
+        "useCase": "comfort",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true,
+        "condition": "diabetic"
+      },
+      {
+        "masterSku": "L2200M",
+        "title": "Men's Memory Foam Orthotics - Insole for Extra Cushioning",
+        "gender": "Men",
+        "useCase": "comfort",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L2200W",
+        "title": "Women's Memory Foam Orthotics - Insole for Extra Cushioning",
+        "gender": "Women",
+        "useCase": "comfort",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L2205M",
+        "title": "Men's Memory Foam Orthotics W/ Metatarsal Support",
+        "gender": "Men",
+        "useCase": "comfort",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L2205W",
+        "title": "Women's Memory Foam Orthotics W/ Metatarsal Support",
+        "gender": "Women",
+        "useCase": "comfort",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L220M",
+        "title": "Men's Conform Posted Orthotics",
+        "gender": "Men",
+        "useCase": "comfort",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": false,
+        "condition": "diabetic"
+      },
+      {
+        "masterSku": "L220W",
+        "title": "Women's Conform Posted Orthotics",
+        "gender": "Women",
+        "useCase": "comfort",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": false,
+        "condition": "diabetic"
+      },
+      {
+        "masterSku": "L2220M",
+        "title": "Men's Memory Foam Posted Orthotics",
+        "gender": "Men",
+        "useCase": "comfort",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L2220W",
+        "title": "Women's Memory Foam Posted Orthotics",
+        "gender": "Women",
+        "useCase": "comfort",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L2225M",
+        "title": "Men's Memory Foam Posted Orthotics W/ Metatarsal Support",
+        "gender": "Men",
+        "useCase": "comfort",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L2225W",
+        "title": "Women's Memory Foam Posted Orthotics W/ Metatarsal Support",
+        "gender": "Women",
+        "useCase": "comfort",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L225M",
+        "title": "Men's Conform Posted Orthotics W/ Metatarsal Support",
+        "gender": "Men",
+        "useCase": "comfort",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": true,
+        "condition": "diabetic"
+      },
+      {
+        "masterSku": "L225W",
+        "title": "Women's Conform Posted Orthotics W/ Metatarsal Support",
+        "gender": "Women",
+        "useCase": "comfort",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": true,
+        "condition": "diabetic"
+      },
+      {
+        "masterSku": "L2300M",
+        "title": "Men's Premium Memory Foam Orthotics - Insole for Extra Comfort",
+        "gender": "Men",
+        "useCase": "comfort",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L2300W",
+        "title": "Women's Premium Memory Foam Orthotics - Insole for Extra Comfort",
+        "gender": "Women",
+        "useCase": "comfort",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L2305M",
+        "title": "Men's Premium Memory Foam Orthotics W/ Metatarsal Support",
+        "gender": "Men",
+        "useCase": "comfort",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L2305W",
+        "title": "Women's Premium Memory Foam Orthotics W/ Metatarsal Support",
+        "gender": "Women",
+        "useCase": "comfort",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L2320M",
+        "title": "Men's Premium Memory Foam Posted Orthotics",
+        "gender": "Men",
+        "useCase": "comfort",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L2320W",
+        "title": "Women's Premium Memory Foam Posted Orthotics",
+        "gender": "Women",
+        "useCase": "comfort",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L2325M",
+        "title": "Men's Premium Memory Foam Posted Orthotics W/ Metatarsal Support",
+        "gender": "Men",
+        "useCase": "comfort",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L2325W",
+        "title": "Women's Premium Memory Foam Posted Orthotics W/ Metatarsal Support",
+        "gender": "Women",
+        "useCase": "comfort",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L2400M",
+        "title": "Men's Customizable Orthotics - Insole for Personalized Comfort",
+        "gender": "Men",
+        "useCase": "comfort",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L2400W",
+        "title": "Women's Customizable Orthotics - Insole for Personalized Comfort",
+        "gender": "Women",
+        "useCase": "comfort",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L2405M",
+        "title": "Men's Customizable Orthotics W/ Metatarsal Support",
+        "gender": "Men",
+        "useCase": "comfort",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L2405W",
+        "title": "Women's Customizable Orthotics W/ Metatarsal Support",
+        "gender": "Women",
+        "useCase": "comfort",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L2420M",
+        "title": "Men's Customizable Posted Orthotics",
+        "gender": "Men",
+        "useCase": "comfort",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L2420W",
+        "title": "Women's Customizable Posted Orthotics",
+        "gender": "Women",
+        "useCase": "comfort",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L2425M",
+        "title": "Men's Customizable Posted Orthotics W/ Metatarsal Support",
+        "gender": "Men",
+        "useCase": "comfort",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L2425W",
+        "title": "Women's Customizable Posted Orthotics W/ Metatarsal Support",
+        "gender": "Women",
+        "useCase": "comfort",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L2460M",
+        "title": "Men's Orthotics for Heel Spurs",
+        "gender": "Men",
+        "useCase": "comfort",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false,
+        "condition": "heel_spurs"
+      },
+      {
+        "masterSku": "L2460W",
+        "title": "Women's Orthotics for Heel Spurs",
+        "gender": "Women",
+        "useCase": "comfort",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false,
+        "condition": "heel_spurs"
+      },
+      {
+        "masterSku": "L2465M",
+        "title": "Men's Orthotics for Morton's Neuroma",
+        "gender": "Men",
+        "useCase": "comfort",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true,
+        "condition": "mortons_neuroma"
+      },
+      {
+        "masterSku": "L2465W",
+        "title": "Women's Orthotics for Morton's Neuroma",
+        "gender": "Women",
+        "useCase": "comfort",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true,
+        "condition": "mortons_neuroma"
+      },
+      {
+        "masterSku": "L2500X",
+        "title": "Bauer Aetrex® Skate Orthotics",
+        "gender": "Unisex",
+        "useCase": "skates",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L2505X",
+        "title": "Bauer Aetrex® Skate Orthotics W/ Metatarsal Support",
+        "gender": "Unisex",
+        "useCase": "skates",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L2520X",
+        "title": "Bauer Aetrex® Skate Posted Orthotics",
+        "gender": "Unisex",
+        "useCase": "skates",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L2525X",
+        "title": "Bauer Aetrex® Skate Posted Orthotics W/ Metatarsal Support",
+        "gender": "Unisex",
+        "useCase": "skates",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L2900M",
+        "title": "Men's Performance Comfort Orthotics - Insoles for Athletic Activities",
+        "gender": "Men",
+        "useCase": "athletic_general",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L2900W",
+        "title": "Women's Performance Comfort Orthotics - Insoles for Athletic Activities",
+        "gender": "Women",
+        "useCase": "athletic_general",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L400C",
+        "title": "Children's Sport Orthotics - L400C Orthotics-C10",
+        "gender": "Kids",
+        "useCase": "kids",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L400G",
+        "title": "Girl's Sport Orthotics - L400G Orthotics-G1",
+        "gender": "Girls",
+        "useCase": "kids",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L400M",
+        "title": "Men's Compete Orthotics - Insoles for Active Lifestyles",
+        "gender": "Men",
+        "useCase": "athletic_general",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L400W",
+        "title": "Women's Compete Orthotics - Insoles for Active Lifestyles",
+        "gender": "Women",
+        "useCase": "athletic_general",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L400Y",
+        "title": "Boy's Sport Orthotics - L400Y Orthotics-Y1",
+        "gender": "Boys",
+        "useCase": "kids",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L405M",
+        "title": "Men's Compete Orthotics W/ Metatarsal Support",
+        "gender": "Men",
+        "useCase": "athletic_general",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L405W",
+        "title": "Women's Compete Orthotics W/ Metatarsal Support",
+        "gender": "Women",
+        "useCase": "athletic_general",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L420C",
+        "title": "Children's Sport Orthotics - L420C Orthotics-C10",
+        "gender": "Kids",
+        "useCase": "kids",
+        "arch": "Flat / Low Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L420G",
+        "title": "Girl's Sport Orthotics - L420G Orthotics-G1",
+        "gender": "Girls",
+        "useCase": "kids",
+        "arch": "Flat / Low Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L420M",
+        "title": "Men's Compete Posted Orthotics",
+        "gender": "Men",
+        "useCase": "athletic_general",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L420W",
+        "title": "Women's Compete Posted Orthotics",
+        "gender": "Women",
+        "useCase": "athletic_general",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L420Y",
+        "title": "Boy's Sport Orthotics - L420Y Orthotics",
+        "gender": "Boys",
+        "useCase": "kids",
+        "arch": "Flat / Low Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L425M",
+        "title": "Men's Compete Posted Orthotics W/ Metatarsal Support",
+        "gender": "Men",
+        "useCase": "athletic_general",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L425W",
+        "title": "Women's Compete Posted Orthotics W/ Metatarsal Support",
+        "gender": "Women",
+        "useCase": "athletic_general",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L425Y",
+        "title": "Boy's Sport Orthotics - L425Y Orthotics-Y1",
+        "gender": "Boys",
+        "useCase": "kids",
+        "arch": "Flat / Low Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L4500U",
+        "title": "Unisex ESD Anti-Static Orthotics - Insoles For Anti-Static Protection",
+        "gender": "Unisex",
+        "useCase": "work_all_day",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L4505U",
+        "title": "Unisex ESD Anti-Static Orthotics - Insoles For Anti-Static Protection",
+        "gender": "Unisex",
+        "useCase": "work_all_day",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L4520U",
+        "title": "Unisex ESD Anti-Static Posted Orthotics - for Anti-Static Protection",
+        "gender": "Unisex",
+        "useCase": "work_all_day",
+        "arch": "Medium / High Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L4600M",
+        "title": "Men's Work Orthotics - Insole for Heels",
+        "gender": "Men",
+        "useCase": "work_all_day",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L4605M",
+        "title": "Men's Work Orthotics - Insole for Heels",
+        "gender": "Men",
+        "useCase": "work_all_day",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L4620M",
+        "title": "Men's Work Orthotics - Insole for Heels",
+        "gender": "Men",
+        "useCase": "work_all_day",
+        "arch": "Flat / Low Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L4640M",
+        "title": "Men's Orthotics for Overpronation",
+        "gender": "Men",
+        "useCase": "comfort",
+        "arch": "Flat / Low Arch",
+        "posted": false,
+        "metSupport": false,
+        "condition": "overpronation_flat_feet"
+      },
+      {
+        "masterSku": "L4640W",
+        "title": "Women's Orthotics for Overpronation",
+        "gender": "Women",
+        "useCase": "comfort",
+        "arch": "Flat / Low Arch",
+        "posted": false,
+        "metSupport": false,
+        "condition": "overpronation_flat_feet"
+      },
+      {
+        "masterSku": "L500C",
+        "title": "Children's Dress MED/HIGH ARCH Orthotics-C045",
+        "gender": "Kids",
+        "useCase": "dress",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L500G",
+        "title": "Girl's Dress Orthotics - L500G Orthotics-G1",
+        "gender": "Girls",
+        "useCase": "dress",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L500M",
+        "title": "Men's Dress Orthotics - 3/4 Insole for Dress Shoes",
+        "gender": "Men",
+        "useCase": "dress",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L500W",
+        "title": "Women's Dress Orthotics - 3/4 Insole for Dress Shoes",
+        "gender": "Women",
+        "useCase": "dress",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L500Y",
+        "title": "Boy's Dress Orthotics - L500Y Orthotics-Y1",
+        "gender": "Boys",
+        "useCase": "dress",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L505M",
+        "title": "Men's Dress Orthotics W/ Metatarsal Support",
+        "gender": "Men",
+        "useCase": "dress",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L505W",
+        "title": "Women's Dress Orthotics W/ Metatarsal Support",
+        "gender": "Women",
+        "useCase": "dress",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L520C",
+        "title": "Children's Dress FLAT/LOW Arch Orthotics-C045",
+        "gender": "Kids",
+        "useCase": "dress",
+        "arch": "Flat / Low Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L520G",
+        "title": "Girl's Dress Orthotics - L520G Orthotics-G1",
+        "gender": "Girls",
+        "useCase": "dress",
+        "arch": "Flat / Low Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L520M",
+        "title": "Men's Dress Posted Orthotics",
+        "gender": "Men",
+        "useCase": "dress",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L520W",
+        "title": "Women's Dress Posted Orthotics",
+        "gender": "Women",
+        "useCase": "dress",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L520Y",
+        "title": "Children's Dress Orthotics - L520Y Orthotics-Y1",
+        "gender": "Kids",
+        "useCase": "dress",
+        "arch": "Flat / Low Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L525M",
+        "title": "Men's Dress Posted Orthotics W/ Metatarsal Support",
+        "gender": "Men",
+        "useCase": "dress",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L525W",
+        "title": "Women's Dress Posted Orthotics W/ Metatarsal Support",
+        "gender": "Women",
+        "useCase": "dress",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L600C",
+        "title": "Children's Casual Orthotics - L600C Orthotics-C10",
+        "gender": "Kids",
+        "useCase": "casual",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L600G",
+        "title": "Girl's Casual Orthotics - L600G Orthotics-G1",
+        "gender": "Girls",
+        "useCase": "casual",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L600M",
+        "title": "Men's Casual Orthotics - Insole For Everyday Shoes",
+        "gender": "Men",
+        "useCase": "casual",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L600W",
+        "title": "Women's Casual Orthotics - Insole For Everyday Shoes",
+        "gender": "Women",
+        "useCase": "casual",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L600Y",
+        "title": "Boy's Casual Orthotics - L600Y Orthotics-Y1",
+        "gender": "Boys",
+        "useCase": "casual",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L605M",
+        "title": "Men's Casual Comfort Orthotics W/ Metatarsal Support",
+        "gender": "Men",
+        "useCase": "casual",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L605W",
+        "title": "Women's Casual Comfort Orthotics W/ Metatarsal Support",
+        "gender": "Women",
+        "useCase": "casual",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L6200M",
+        "title": "Men's Extreme Comfort Orthotics - Insoles for Superior Cushioning",
+        "gender": "Men",
+        "useCase": "comfort",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L6200W",
+        "title": "Women's Extreme Comfort Orthotics - Insoles for Superior Cushioning",
+        "gender": "Women",
+        "useCase": "comfort",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L6205M",
+        "title": "Men's Orthotics for Metatarsalgia",
+        "gender": "Men",
+        "useCase": "comfort",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true,
+        "condition": "metatarsalgia"
+      },
+      {
+        "masterSku": "L6205W",
+        "title": "Women's Orthotics for Metatarsalgia",
+        "gender": "Women",
+        "useCase": "comfort",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true,
+        "condition": "metatarsalgia"
+      },
+      {
+        "masterSku": "L620C",
+        "title": "Children's Casual Orthotics - L620C Orthotics-C10",
+        "gender": "Kids",
+        "useCase": "casual",
+        "arch": "Flat / Low Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L620G",
+        "title": "Girl's Casual Orthotics - L620G Orthotics-G1",
+        "gender": "Girls",
+        "useCase": "casual",
+        "arch": "Flat / Low Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L620M",
+        "title": "Men's Casual Comfort Posted Orthotics",
+        "gender": "Men",
+        "useCase": "casual",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L620W",
+        "title": "Women's Casual Comfort Posted Orthotics",
+        "gender": "Women",
+        "useCase": "casual",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L620Y",
+        "title": "Boy's Casual Orthotics - L620Y Orthotics-Y1",
+        "gender": "Boys",
+        "useCase": "casual",
+        "arch": "Flat / Low Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L625M",
+        "title": "Men's Casual Comfort Posted Orthotics W/ Metatarsal Support",
+        "gender": "Men",
+        "useCase": "casual",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L625W",
+        "title": "Women's Casual Comfort Posted Orthotics W/ Metatarsal Support",
+        "gender": "Women",
+        "useCase": "casual",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L700M",
+        "title": "Men's Speed Orthotics - Insole For Running",
+        "gender": "Men",
+        "useCase": "athletic_running",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L700W",
+        "title": "Women's Speed Orthotics - Insole For Running",
+        "gender": "Women",
+        "useCase": "athletic_running",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L705M",
+        "title": "Men's Speed Orthotics W/ Metatarsal Support",
+        "gender": "Men",
+        "useCase": "athletic_running",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L705W",
+        "title": "Women's Speed Orthotics W/ Metatarsal Support",
+        "gender": "Women",
+        "useCase": "athletic_running",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L720M",
+        "title": "Men's Speed Posted Orthotics",
+        "gender": "Men",
+        "useCase": "athletic_running",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L720W",
+        "title": "Women's Speed Posted Orthotics",
+        "gender": "Women",
+        "useCase": "athletic_running",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L725M",
+        "title": "Men's Speed Posted Orthotics W/ Metatarsal Support",
+        "gender": "Men",
+        "useCase": "athletic_running",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L725W",
+        "title": "Women's Speed Posted Orthotics W/ Metatarsal Support",
+        "gender": "Women",
+        "useCase": "athletic_running",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L800M",
+        "title": "Men's Train Orthotics - Insole for Exercise",
+        "gender": "Men",
+        "useCase": "athletic_training",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L800W",
+        "title": "Women's Train Orthotics - Insole for Exercise",
+        "gender": "Women",
+        "useCase": "athletic_training",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L805M",
+        "title": "Men's Train Orthotics W/ Metatarsal Support",
+        "gender": "Men",
+        "useCase": "athletic_training",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L805W",
+        "title": "Women's Train Orthotics W/ Metatarsal Support",
+        "gender": "Women",
+        "useCase": "athletic_training",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L820M",
+        "title": "Men's Train Posted Orthotics",
+        "gender": "Men",
+        "useCase": "athletic_training",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L820W",
+        "title": "Women's Train Posted Orthotics",
+        "gender": "Women",
+        "useCase": "athletic_training",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L825M",
+        "title": "Men's Train Posted Orthotics W/ Metatarsal Support",
+        "gender": "Men",
+        "useCase": "athletic_training",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L825W",
+        "title": "Women's Train Posted Orthotics W/ Metatarsal Support",
+        "gender": "Women",
+        "useCase": "athletic_training",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L900M",
+        "title": "Men's Shearling Orthotics - Insoles For Winter Boots",
+        "gender": "Men",
+        "useCase": "winter_boots",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L900W",
+        "title": "Women's Shearling Orthotics - Insoles For Winter Boots",
+        "gender": "Women",
+        "useCase": "winter_boots",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L905M",
+        "title": "Lynco Shearling Series - L905 Orthotics 10",
+        "gender": "Men",
+        "useCase": "winter_boots",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L905W",
+        "title": "Shearling Orthotics - L905 Orthotics 10",
+        "gender": "Women",
+        "useCase": "winter_boots",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L920M",
+        "title": "Lynco Shearling Series - L920 Orthotics 10",
+        "gender": "Men",
+        "useCase": "winter_boots",
+        "arch": "Flat / Low Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L920W",
+        "title": "Shearling Orthotics - L920 Orthotics 10",
+        "gender": "Women",
+        "useCase": "winter_boots",
+        "arch": "Flat / Low Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "L925M",
+        "title": "Lynco Shearling Series - L925 Orthotics 10",
+        "gender": "Men",
+        "useCase": "winter_boots",
+        "arch": "Flat / Low Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "L925W",
+        "title": "Shearling Orthotics - L925 Orthotics 10",
+        "gender": "Women",
+        "useCase": "winter_boots",
+        "arch": "Flat / Low Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "LL2400M",
+        "title": "First Generation Men's Customizable Orthotics - Insole for Personalized Comfort",
+        "gender": "Men",
+        "useCase": "comfort",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "LL2400W",
+        "title": "First Generation Women's Customizable Orthotics - Insole for Personalized Comfort",
+        "gender": "Women",
+        "useCase": "comfort",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": false
+      },
+      {
+        "masterSku": "LL2405M",
+        "title": "First Generation Men's Customizable Orthotics W/ Metatarsal Support",
+        "gender": "Men",
+        "useCase": "comfort",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "LL2405W",
+        "title": "First Generation Women's Customizable Orthotics W/ Metatarsal Support",
+        "gender": "Women",
+        "useCase": "comfort",
+        "arch": "Medium / High Arch",
+        "posted": false,
+        "metSupport": true
+      },
+      {
+        "masterSku": "LL2420M",
+        "title": "First Generation Men's Customizable Posted Orthotics",
+        "gender": "Men",
+        "useCase": "comfort",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "LL2420W",
+        "title": "First Generation Women's Customizable Posted Orthotics",
+        "gender": "Women",
+        "useCase": "comfort",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": false
+      },
+      {
+        "masterSku": "LL2425M",
+        "title": "First Generation Men's Customizable Posted Orthotics W/ Metatarsal Support",
+        "gender": "Men",
+        "useCase": "comfort",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": true
+      },
+      {
+        "masterSku": "LL2425W",
+        "title": "First Generation Women's Customizable Posted Orthotics W/ Metatarsal Support",
+        "gender": "Women",
+        "useCase": "comfort",
+        "arch": "Flat / Low Arch",
+        "posted": true,
+        "metSupport": true
+      },
+      {
+        "masterSku": "PFKM",
+        "title": "Men's Plantar Fasciitis Kit",
+        "gender": "Men",
+        "useCase": "comfort",
+        "arch": "Flat / Low Arch",
+        "posted": false,
+        "metSupport": false,
+        "condition": "plantar_fasciitis"
+      },
+      {
+        "masterSku": "PFKW",
+        "title": "Women's Plantar Fasciitis Kit",
+        "gender": "Women",
+        "useCase": "comfort",
+        "arch": "Flat / Low Arch",
+        "posted": false,
+        "metSupport": false,
+        "condition": "plantar_fasciitis"
+      }
+    ],
+    "fallback": {
+      "masterSku": "L1800U",
+      "title": "Unisex Edge Orthotics",
+      "reason": "no exact match — universal default"
+    }
+  }
+}

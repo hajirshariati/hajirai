@@ -20,7 +20,19 @@
 // engine sets the answer flag accordingly before calling resolve();
 // the resolver itself just consumes whatever boolean it's given.
 
-const HARD_FILTER_ATTRS = ["gender", "useCase"];
+const HARD_FILTER_ATTRS = ["useCase"];
+
+// Gender filter is special: customer says "Men" but the only SKU
+// in that use-case is Unisex (e.g. cleats, skates) — we want to
+// surface the Unisex one rather than fall back to a wrong-gender
+// SKU. So the gender filter accepts {customer_gender, "Unisex"}.
+// Generic across catalogs (any catalog with a Unisex tier benefits).
+function genderMatch(candidateGender, askedGender) {
+  if (!askedGender) return true;
+  if (candidateGender === askedGender) return true;
+  if (candidateGender === "Unisex") return true;
+  return false;
+}
 
 // Specialty conditions that have dedicated SKUs in the Aetrex
 // catalog. The engine sets `attrs.condition` from the condition
@@ -35,7 +47,8 @@ const CONDITION_TARGETS = {
 
 function score(candidate, attrs) {
   let s = 0;
-  if (attrs.arch && candidate.arch === attrs.arch) s += 4;
+  if (attrs.arch && candidate.arch === attrs.arch) s += 8;
+  if (attrs.gender && candidate.gender === attrs.gender) s += 4;  // exact > Unisex
   if (attrs.posted !== undefined && candidate.posted === attrs.posted) s += 2;
   if (attrs.metSupport !== undefined && candidate.metSupport === attrs.metSupport) s += 1;
   return s;
@@ -58,15 +71,56 @@ export function resolveTree(answers, resolver) {
 
   const attrs = applyDefaults(answers || {}, resolver.defaults);
 
-  // Hard filter
-  let candidates = resolver.masterIndex.filter((m) => {
-    for (const k of HARD_FILTER_ATTRS) {
-      if (attrs[k] !== undefined && attrs[k] !== null && attrs[k] !== "" && m[k] !== attrs[k]) {
-        return false;
-      }
+  // Specialty condition takes priority over use-case. If the
+  // customer reports e.g. heel_spurs and a heel-spur-specific SKU
+  // exists in the catalog, that SKU wins regardless of whether
+  // useCase is "casual", "dress", or "comfort" — the clinical
+  // condition is the load-bearing fact. Exception: shoe-context-
+  // critical use cases (cleats, skates, winter_boots, athletic_*)
+  // keep their family SKU because the specialty insole won't fit
+  // the shoe shape.
+  const SHOE_CONTEXT_LOCKS = new Set([
+    "cleats", "skates", "winter_boots",
+    "athletic_running", "athletic_training", "athletic_general",
+    "dress_no_removable",
+  ]);
+
+  let candidates;
+  const specialtyTest =
+    attrs.condition && attrs.condition !== "none" ? CONDITION_TARGETS[attrs.condition] : null;
+
+  if (specialtyTest && !SHOE_CONTEXT_LOCKS.has(attrs.useCase)) {
+    candidates = resolver.masterIndex.filter(
+      (m) => genderMatch(m.gender, attrs.gender) && specialtyTest(m),
+    );
+    if (candidates.length === 0) {
+      // Fall through to standard hard-filter if no specialty SKU exists
+      // for this gender.
+      candidates = resolver.masterIndex.filter((m) => {
+        if (!genderMatch(m.gender, attrs.gender)) return false;
+        for (const k of HARD_FILTER_ATTRS) {
+          if (attrs[k] !== undefined && attrs[k] !== null && attrs[k] !== "" && m[k] !== attrs[k]) {
+            return false;
+          }
+        }
+        return true;
+      });
     }
-    return true;
-  });
+  } else {
+    candidates = resolver.masterIndex.filter((m) => {
+      if (!genderMatch(m.gender, attrs.gender)) return false;
+      for (const k of HARD_FILTER_ATTRS) {
+        if (attrs[k] !== undefined && attrs[k] !== null && attrs[k] !== "" && m[k] !== attrs[k]) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }
+
+  // Score also rewards exact gender match so a Men's SKU is preferred
+  // over a Unisex one when both exist. Bump is smaller than arch but
+  // ahead of metSupport.
 
   if (candidates.length === 0) {
     return {
@@ -76,13 +130,12 @@ export function resolveTree(answers, resolver) {
     };
   }
 
-  // Condition override
-  if (attrs.condition && attrs.condition !== "none") {
-    const test = CONDITION_TARGETS[attrs.condition];
-    if (test) {
-      const conditional = candidates.filter(test);
-      if (conditional.length > 0) candidates = conditional;
-    }
+  // Within-bucket condition refinement (after the priority logic
+  // above). If we're in shoe-context-locked mode but the family
+  // happens to contain a condition-specific variant, prefer it.
+  if (specialtyTest && SHOE_CONTEXT_LOCKS.has(attrs.useCase)) {
+    const refined = candidates.filter(specialtyTest);
+    if (refined.length > 0) candidates = refined;
   }
 
   // Score + deterministic tiebreak
