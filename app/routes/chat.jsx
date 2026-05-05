@@ -1464,6 +1464,20 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // product card.
     const singularPrescriptive = isSingularPrescriptive(fullResponseText);
 
+    // saysNoMatch override: if the AI named ANY pool product by title,
+    // it's pivoting ("we don't have pink, but here are navy ones") — not
+    // denying. Treat as not-a-denial so cards still render. Without this,
+    // a partial-denial pivot leaves the customer reading "we don't have
+    // pink BUT…" with no cards beneath — broken UX.
+    const aiNamesAnyPoolProduct = filteredPool.some((card) => {
+      const title = String(card.title || "").trim().toLowerCase();
+      return title.length >= 5 && textLower.includes(title);
+    });
+    const effectiveSaysNoMatch = saysNoMatch && !aiNamesAnyPoolProduct;
+    if (saysNoMatch && aiNamesAnyPoolProduct) {
+      console.log(`[chat] saysNoMatch override: AI named a pool product despite denial phrasing — treating as pivot, not denial`);
+    }
+
     let cards;
     if (skuNarrowedCards) {
       cards = skuNarrowedCards;
@@ -1473,7 +1487,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       // Customer asked about ONE thing — show just the top match.
       cards = [scored[0].card];
       console.log(`[chat] singular-narrow: customer expressed singular intent → 1 card`);
-    } else if (!saysNoMatch && scored.length > 0) {
+    } else if (!effectiveSaysNoMatch && scored.length > 0) {
       // Default: show the top of the ranked pool (siblings folded).
       // Plural is the assumed mode — if the customer wanted one item
       // they would have used singular phrasing or named a SKU.
