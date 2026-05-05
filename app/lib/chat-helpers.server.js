@@ -7,21 +7,80 @@
 const MALE_PATTERN = /\b(men['‘’]?s|mens|men|male|males|guy|guys|dude|dudes|dad|father|husband|boyfriend|brother|son|grandpa|grandfather|uncle|nephew|man|boy|boys)\b/i;
 const FEMALE_PATTERN = /\b(women['‘’]?s|womens|women|female|females|lady|ladies|mom|mother|wife|girlfriend|sister|daughter|grandma|grandmother|aunt|niece|woman|girl|girls)\b/i;
 
+// ── Negation context detection (shared) ───────────────────────────────
+// Used by gender detection AND color injection. Decides whether a term
+// matched at position `matchIndex` in `text` is preceded by a negation
+// that semantically excludes it.
+//
+// Why this is harder than "regex for 'no' before the term":
+//   - Long-form negation: "I do not want anything black" — 3 words sit
+//     between 'not' and 'black'. A tight regex misses it.
+//   - Reaffirmation: "not red but green" — 'but' cancels the 'not' for
+//     'green'. A simple distance check would mistakenly flag 'green' as
+//     negated.
+//   - Distance: "not for hiking, in red please" — 'red' is far past the
+//     'not'; the negation referred to "hiking", not the color. We cap
+//     the distance at 4 tokens.
+//
+// The window is fixed at 50 chars before the term. We scan all negation
+// words in the window, take the LAST one (closest to the term), then:
+//   - If the gap contains "but" or "except" → reaffirmation, NOT negated.
+//   - If the gap exceeds 4 tokens → too far away, NOT negated.
+//   - Otherwise → negated.
+//
+// Vocabulary is generic English — no merchant-specific terms. Works
+// identically for any vertical (footwear, apparel, electronics, etc.).
+const NEGATION_WORDS_RE = /\b(?:no|not|without|except|skip|forget|anything\s+but|don'?t\s+want|do\s+not\s+want|other\s+than|never|absolutely\s+no)\b/gi;
+// Reaffirmation cancels the negation for the term being checked.
+//   - Explicit conjunctions: "but", "except", "instead", "rather"
+//   - Clause boundary (comma or semicolon) followed by a positive lead
+//     word: "for", "in", "with", "i (want|need|prefer|like)", "show",
+//     "give", etc. Catches "not for men, for women" and "I don't want
+//     red, show me blue".
+const REAFFIRMATION_RE = /\b(?:but|except|other\s+than|instead|rather)\b|[,;]\s+(?:for|in|with|i'?d|i\s+(?:want|need|prefer|like)|just|maybe|please|show|give|let|find|the|want|need|prefer|like|got|how\s+about|what\s+about)\b/i;
+const NEGATION_WINDOW_CHARS = 50;
+const MAX_NEGATION_DISTANCE_TOKENS = 4;
+
+export function isPrecededByNegation(text, matchIndex) {
+  const window = String(text || "").slice(
+    Math.max(0, Number(matchIndex) - NEGATION_WINDOW_CHARS),
+    Number(matchIndex),
+  );
+  // Find the LAST (closest-to-term) negation word in the window.
+  let lastNeg = null;
+  let m;
+  NEGATION_WORDS_RE.lastIndex = 0;
+  while ((m = NEGATION_WORDS_RE.exec(window)) !== null) {
+    lastNeg = m;
+    if (NEGATION_WORDS_RE.lastIndex === m.index) NEGATION_WORDS_RE.lastIndex += 1;
+  }
+  if (!lastNeg) return false;
+
+  // Text between the negation word and the matched term.
+  const afterNeg = window.slice(lastNeg.index + lastNeg[0].length);
+
+  // Reaffirmation: "not red but green" — for 'green', the 'but' cancels
+  // the 'not'. Skip the term-is-negated verdict.
+  if (REAFFIRMATION_RE.test(afterNeg)) return false;
+
+  // Distance check: too many tokens between negation and term means the
+  // negation referred to something else.
+  const tokens = afterNeg.trim().split(/\s+/).filter(Boolean);
+  return tokens.length <= MAX_NEGATION_DISTANCE_TOKENS;
+}
+
 // Negation-aware match-finder. Tests whether `text` contains a match
-// of `pattern` that is NOT preceded by a negation word (no/not/without/
-// skip/forget/anything but/don't want/other than) within ~25 chars.
-// Returns the index of the first affirmed match, or -1.
+// of `pattern` that is NOT preceded by a negation word. Returns the
+// index of the first affirmed match, or -1.
 //
 // Rationale: the customer can say "not for men, for women" — naive
 // MALE_PATTERN.test("not for men, for women") returns true and would
 // pin gender=men. A regex match in negation context should NOT count.
-const NEGATION_RE = /\b(?:no|not|without|except|skip|forget|anything\s+but|don'?t\s+want|other\s+than|never)\s+\S*$/i;
 function findAffirmedMatch(text, pattern) {
   const re = new RegExp(pattern.source, pattern.flags.includes("g") ? pattern.flags : pattern.flags + "g");
   let m;
   while ((m = re.exec(text)) !== null) {
-    const window = String(text).slice(Math.max(0, m.index - 30), m.index);
-    if (!NEGATION_RE.test(window)) return m.index;
+    if (!isPrecededByNegation(text, m.index)) return m.index;
     // Move past this match to avoid infinite loop on zero-width.
     if (re.lastIndex === m.index) re.lastIndex += 1;
   }
