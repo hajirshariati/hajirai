@@ -525,16 +525,57 @@
 }
 
 /* ---------- Dead-end CTAs ---------- */
-/* ---------- Inline choice buttons (quiz answers) ---------- */
+/* ---------- Inline choice buttons (quiz answers) ----------
+ * Horizontal scroll-snap row. Long lists (12+ orthotic use-cases,
+ * etc.) used to wrap into 4 cramped rows; now they live on one
+ * line and the customer swipes/scrolls. Edges fade so it's
+ * visually obvious there's more, and snap-align keeps swipe
+ * gestures landing on whole chips. Works identically on
+ * desktop (mouse wheel + drag), mobile (swipe), and keyboard
+ * (focus auto-scrolls the active button into view).
+ */
 .ai-chat-choices {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
   margin-top: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0,0,0,0.18) transparent;
+  /* Bottom padding so the (thin) scrollbar doesn't touch chip edges. */
+  padding-bottom: 4px;
+  /* Edge fades: hint at scrollable content without a separate gradient div. */
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 14px, #000 calc(100% - 18px), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 14px, #000 calc(100% - 18px), transparent 100%);
+}
+
+/* Webkit-specific scrollbar styling — thin, subtle, only on hover.
+ * Firefox uses scrollbar-width above. */
+.ai-chat-choices::-webkit-scrollbar { height: 4px; }
+.ai-chat-choices::-webkit-scrollbar-track { background: transparent; }
+.ai-chat-choices::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.18);
+  border-radius: 4px;
+}
+
+/* Drop the mask if user prefers reduced motion / the fade hint
+ * actually crops a single-row's first chip on very small screens. */
+@media (max-width: 360px) {
+  .ai-chat-choices {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
 }
 
 .ai-chat-choice-btn {
   display: inline-block;
+  flex-shrink: 0;          /* don't squish on overflow */
+  white-space: nowrap;     /* keep label on one line */
+  scroll-snap-align: start;
+  scroll-margin-inline: 14px;  /* keyboard focus scrolls past the mask edge */
   padding: 8px 16px;
   border-radius: 20px;
   font-size: 13px;
