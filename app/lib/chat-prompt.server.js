@@ -6,7 +6,7 @@ const LABELS = {
   custom: "Custom Knowledge",
 };
 
-export function buildSystemPrompt({ config, knowledge, retrievedChunks, shop, attributeNames, categoryExclusions, querySynonyms, customerContext, fitPredictorEnabled, catalogProductTypes, scopedGender, answeredChoices, categoryGenderMap, activeCampaigns, merchantGroups }) {
+export function buildSystemPrompt({ config, knowledge, retrievedChunks, shop, attributeNames, categoryExclusions, querySynonyms, customerContext, fitPredictorEnabled, catalogProductTypes, fullCatalogProductTypes, scopedGender, answeredChoices, categoryGenderMap, activeCampaigns, merchantGroups }) {
   const name = config?.assistantName || "AI Shopping Assistant";
   const tagline = config?.assistantTagline || "";
   const parts = [];
@@ -71,6 +71,33 @@ export function buildSystemPrompt({ config, knowledge, retrievedChunks, shop, at
           `${lines.join("\n")}`,
       );
     }
+  }
+
+  // STORE FACTS — non-negotiable ground truth, separate from the
+  // turn-scoped allow-list below. The scoped list narrows when the
+  // active-group detector locks (e.g. user mentioned "orthotic" so
+  // scope=Orthotics only). Without this full-catalog fact the AI
+  // would see scope=[Orthotics] and conclude "the store only sells
+  // orthotics" — and tell the customer the store doesn't carry
+  // shoes. The full list below is sourced from the merchant's
+  // synced Shopify catalog, NOT from training data, and overrides
+  // any inference the AI might draw from the scoped list.
+  const fullCats = Array.isArray(fullCatalogProductTypes)
+    ? fullCatalogProductTypes.map((c) => String(c || "").trim()).filter(Boolean)
+    : [];
+  if (fullCats.length > 0) {
+    parts.push(
+      `\n=== STORE FACTS (UNDISPUTABLE) ===\n` +
+        `This store's complete catalog spans these product categories: ${fullCats.join(", ")}.\n` +
+        `These come straight from the merchant's synced Shopify catalog. The list is the truth.\n` +
+        `ABSOLUTE RULE — NEVER deny availability of any category in the list above. ` +
+        `Forbidden phrases (no matter how confident you are or what the conversation context suggests): ` +
+        `"we don't sell <X>", "we don't carry <X>", "we don't have <X>", "this store only carries <X>", ` +
+        `"we only sell <X>", "<X> isn't something we carry", "(not shoes)", "(not <category>)", or any rephrasing that implies a category in the list above is absent. ` +
+        `If the customer asks about a category in the list, your job is to call search_products and SHOW them — not to claim absence.\n` +
+        `If the search returns zero items for a specific subset (e.g. "pink running sneakers" → 0 hits) you may say "I don't see any matching that exact combination" — that's product-level, not category-level — but you must still treat the parent category as carried.\n` +
+        `Even if the current turn is scoped (e.g. the conversation is focused on Orthotics), the rest of the catalog is still real and orderable — never deny it.`,
+    );
   }
 
   if (Array.isArray(catalogProductTypes) && catalogProductTypes.length > 0) {
