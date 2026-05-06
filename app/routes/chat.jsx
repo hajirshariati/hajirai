@@ -1079,7 +1079,15 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // the cards render those names below, and a half-list reads as broken.
     // Detect the first list marker (`- `, `* `, `1. `, `**Name`) and trim
     // back to the prior sentence-end / colon. Keep the lead-in sentence.
-    const listStart = truncated.search(/(?:\n|^)\s*(?:[-*]\s+\*?\*?|\d+[.)]\s+|\*\*[A-Z])/);
+    // Match BOTH start-of-line list markers AND inline markers like
+    // ": - **Name" or ": **Name**" that the AI uses when packing a list
+    // into a single paragraph instead of breaking on newlines.
+    const lineStartListRe = /(?:\n|^)\s*(?:[-*]\s+\*?\*?|\d+[.)]\s+|\*\*[A-Z])/;
+    const inlineListRe = /(?::\s*[-*]\s+\*\*|:\s+\*\*[A-Z]|—\s*\*\*[A-Z])/;
+    const lineStartIdx = truncated.search(lineStartListRe);
+    const inlineIdx = truncated.search(inlineListRe);
+    const candidates = [lineStartIdx, inlineIdx].filter((i) => i >= 0);
+    const listStart = candidates.length > 0 ? Math.min(...candidates) : -1;
     if (listStart >= 0) {
       const head = truncated.slice(0, listStart).trimEnd();
       // Strip trailing "Top picks:" / "Here are:" lead-in (no products to list)
