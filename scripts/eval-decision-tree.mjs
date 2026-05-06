@@ -152,6 +152,47 @@ check("executor returns needMoreInfo when only arch is provided", async () => {
   assert(r.masterSku === undefined, "should NOT resolve a SKU when required attrs are missing");
 });
 
+check("derivations fire: condition=metatarsalgia → resolver picks W/ Met Support SKU", async () => {
+  const { executeRecommenderTool } = await import("../app/lib/recommender-tools.server.js");
+  const r = await executeRecommenderTool({
+    toolName: "recommend_orthotic",
+    input: {
+      gender: "Men",
+      useCase: "athletic_running",
+      condition: "metatarsalgia",
+      arch: "Medium / High Arch",
+    },
+    shop: null,
+    trees: [tree],
+  });
+  // L705M = Men's Speed Orthotics W/ Metatarsal Support
+  // L700M = Men's Speed Orthotics (no met)
+  // Without derivations the resolver picks L700M (wrong);
+  // with derivations applied, condition=metatarsalgia sets
+  // metSupport=true and L705M wins.
+  assert.equal(r.masterSku, "L705M",
+    `derivation must fire — expected L705M (W/ Met Support), got ${r.masterSku}`);
+});
+
+check("derivations fire: arch=Flat → posted=true → resolver picks Posted SKU", async () => {
+  const { executeRecommenderTool } = await import("../app/lib/recommender-tools.server.js");
+  const r = await executeRecommenderTool({
+    toolName: "recommend_orthotic",
+    input: {
+      gender: "Women",
+      useCase: "athletic_running",
+      condition: "none",
+      arch: "Flat / Low Arch",
+    },
+    shop: null,
+    trees: [tree],
+  });
+  // arch=Flat triggers the posted=true derivation → Speed Posted
+  // SKUs (L720W, L725W) score higher than the non-posted L700W/L705W.
+  assert(/posted/i.test(r.title || ""),
+    `derivation must set posted=true for flat arch; got ${r.masterSku} (${r.title})`);
+});
+
 check("executor proceeds normally when all required attributes are present", async () => {
   const { executeRecommenderTool } = await import("../app/lib/recommender-tools.server.js");
   const r = await executeRecommenderTool({
