@@ -378,7 +378,7 @@ function detectAndStripGender(query) {
 // For concatenated conversation history: return the gender mentioned LAST
 // (most recent), not first. Avoids "Men's" from turn 1 sticking forever after
 // the customer pivots to "women's wedges" later.
-function detectLatestGender(text) {
+export function detectLatestGender(text) {
   if (!text) return null;
   let bestIdx = -1;
   let bestGender = null;

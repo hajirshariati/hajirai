@@ -22,7 +22,7 @@ import {
   hasPluralIntroFraming,
   detectConditionOrOccasion,
 } from "../lib/chat-helpers.server";
-import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL, FIT_PREDICTOR_TOOL } from "../lib/chat-tools.server";
+import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL, FIT_PREDICTOR_TOOL, detectLatestGender } from "../lib/chat-tools.server";
 import { rewriteToolCall } from "../lib/chat-tool-rewrite.server";
 import { withAnthropicRetry, classifyAnthropicError } from "../lib/anthropic-resilience.server";
 import { fetchCustomerContext } from "../lib/customer-context.server";
@@ -1943,7 +1943,34 @@ export const action = async ({ request }) => {
 
     const history = sanitizeHistory(body.history);
     const messages = [...history, { role: "user", content: String(body.message) }];
-    const sessionGender = detectGenderFromHistory(messages);
+
+    // Gender-pivot detection. detectGenderFromHistory walks the entire
+    // conversation; if the customer clicked the Men's chip in turn 1
+    // and now says "oh wait this is for my mom" in turn 5, the prior
+    // chip answer pollutes the prompt's Established Answers block and
+    // the AI keeps recommending men's products. Re-run gender
+    // detection on JUST the latest user message — if it surfaces a
+    // clear pivot signal, that overrides the historical session
+    // gender. Gated on relationship words / explicit gender mentions
+    // only (no bare pronouns) so a stray "his cousin asked me about
+    // this" doesn't flip the entire conversation.
+    const PIVOT_RE = /\b(men|mens|men['’]?s|women|womens|women['’]?s|male|female|mom|mother|wife|girlfriend|sister|daughter|grandma|grandmother|aunt|niece|dad|father|husband|boyfriend|brother|son|grandpa|grandfather|uncle|nephew|lady|ladies|guy|dude|girl|girls|boy|boys|kid|kids|children)\b/i;
+    const latestUserMessage = String(body.message || "");
+    const historicalSessionGender = detectGenderFromHistory(messages);
+    const latestPivotedGender =
+      PIVOT_RE.test(latestUserMessage) ? detectLatestGender(latestUserMessage) : null;
+    // Pivot wins. When the latest message has a clear pivot signal,
+    // that's the source of truth for this turn forward — catalog
+    // scoping, ctx.sessionGender, search filters, all flow from this
+    // single value. Without the pivot, fall back to the historical
+    // detection (chip clicks + earlier mentions).
+    const sessionGender = latestPivotedGender || historicalSessionGender;
+    if (latestPivotedGender && latestPivotedGender !== historicalSessionGender) {
+      console.log(
+        `[chat] gender-pivot: history=${historicalSessionGender || "-"} → latest=${latestPivotedGender} ` +
+          `(triggered by "${latestUserMessage.slice(0, 60)}")`,
+      );
+    }
     const answeredChoices = extractAnsweredChoices(messages);
 
     // When gender was detected from natural language ("for my dad",
@@ -1953,16 +1980,36 @@ export const action = async ({ request }) => {
     // ignores the rules-knowledge "gender is locked" intent and asks
     // anyway. Inject a synthetic entry so the AI sees gender as
     // already-answered and skips the gender question.
-    if (sessionGender && !answeredChoices.some((c) =>
-      /\b(men|women|gender|him|her|man|woman)\b/i.test(c.question || "") ||
-      /\b(men|women|men's|women's)\b/i.test(c.answer || "")
-    )) {
-      answeredChoices.unshift({
-        question: "Are these for men's or women's?",
-        answer: sessionGender === "men" ? "Men's" : "Women's",
-        rawAnswer: sessionGender === "men" ? "Men's" : "Women's",
-        options: ["Men's", "Women's"],
-      });
+    //
+    // On a real pivot (latestPivotedGender different from history),
+    // drop any prior gender chip-answer first so the new gender takes
+    // precedence — otherwise an old "Men's" chip click in turn 1
+    // sticks and contradicts the new "for my mom" context.
+    if (sessionGender) {
+      const isPivot = Boolean(latestPivotedGender) && latestPivotedGender !== historicalSessionGender;
+      if (isPivot) {
+        for (let i = answeredChoices.length - 1; i >= 0; i--) {
+          const c = answeredChoices[i];
+          if (
+            /\b(men|women|gender|him|her|man|woman)\b/i.test(c.question || "") ||
+            /\b(men|women|men's|women's)\b/i.test(c.answer || "")
+          ) {
+            answeredChoices.splice(i, 1);
+          }
+        }
+      }
+      const alreadyHas = answeredChoices.some((c) =>
+        /\b(men|women|gender|him|her|man|woman)\b/i.test(c.question || "") ||
+        /\b(men|women|men's|women's)\b/i.test(c.answer || ""),
+      );
+      if (isPivot || !alreadyHas) {
+        answeredChoices.unshift({
+          question: "Are these for men's or women's?",
+          answer: sessionGender === "men" ? "Men's" : "Women's",
+          rawAnswer: sessionGender === "men" ? "Men's" : "Women's",
+          options: ["Men's", "Women's"],
+        });
+      }
     }
 
     let [knowledge, attrMappings, catalogProductTypes, allCatalogCategories, categoryGenderMap, activeCampaigns] = await Promise.all([
