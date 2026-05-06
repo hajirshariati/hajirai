@@ -2115,10 +2115,51 @@ export function extractProductCards(name, result) {
         _gender: genderFromAttrs({ attributes: f.productAttributes }),
       }));
   }
+  // Smart Recommender result. The recommender returns a single
+  // `product` shaped like the variant-lookup output; expose it as a
+  // single-card array so the chat layer renders it the same way as
+  // any other tool's product output.
+  if (typeof name === "string" && name.startsWith("recommend_") && result.product?.handle) {
+    const p = result.product;
+    return [{
+      title: p.title,
+      url: p.url,
+      handle: p.handle,
+      image: p.image || "",
+      price_formatted: p.price ? `$${parseFloat(p.price).toFixed(2)}` : "",
+      compare_at_price: p.compareAtPrice ? Math.round(parseFloat(p.compareAtPrice) * 100) : undefined,
+      _category: categoryFromAttrs(p),
+      _gender: genderFromAttrs(p),
+    }];
+  }
   return [];
 }
 
 export async function executeTool(name, input, ctx) {
+  // Smart Recommender tools are dynamic (one per merchant-defined
+  // intent). Their handlers aren't in HANDLERS — route them by name
+  // prefix into the recommender executor instead. ctx.recommenderTrees
+  // is populated by chat.jsx before each turn (once per request).
+  if (typeof name === "string" && name.startsWith("recommend_")) {
+    try {
+      const { executeRecommenderTool } = await import("./recommender-tools.server.js");
+      const result = await executeRecommenderTool({
+        toolName: name,
+        input: input || {},
+        shop: ctx?.shop,
+        trees: ctx?.recommenderTrees || [],
+      });
+      console.log(
+        `[recommender] tool=${name} masterSku=${result?.masterSku || "(none)"}` +
+          `${result?.error ? " error=" + JSON.stringify(result.error) : ""}`,
+      );
+      return result;
+    } catch (err) {
+      console.error(`[recommender] tool ${name} crashed:`, err?.message || err);
+      return { error: `Recommender tool failed: ${err?.message || "unknown"}` };
+    }
+  }
+
   const handler = HANDLERS[name];
   if (!handler) return { error: `Unknown tool '${name}'.` };
   try {
