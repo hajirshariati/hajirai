@@ -584,7 +584,18 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     if (toolUses.length === 0) break;
 
     toolCallCount += toolUses.length;
-    if (toolUses.some((u) => u.name === "search_products" || u.name === "get_product_details" || u.name === "lookup_sku" || u.name === "find_similar_products")) {
+    if (toolUses.some((u) =>
+      u.name === "search_products" ||
+      u.name === "get_product_details" ||
+      u.name === "lookup_sku" ||
+      u.name === "find_similar_products" ||
+      // Smart Recommender tools count as a successful search — they
+      // return one deterministic master SKU + product card. Without
+      // this, the recovery-search safety net below wrongly fires on
+      // turns where recommend_<intent> already produced the card,
+      // and overwrites it with an unrelated search_products result.
+      u.name.startsWith("recommend_")
+    )) {
       productSearchAttempted = true;
     }
 
@@ -655,8 +666,14 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       role: "user",
       content: toolUses.map((u, i) => {
         const payload = results[i] ?? {};
-        if (hopHasProducts && (u.name === "search_products" || u.name === "get_product_details" || u.name === "lookup_sku" || u.name === "find_similar_products")) {
-          payload._display = "Product cards are shown automatically. Do NOT list products with links. Write a brief summary only.";
+        if (hopHasProducts && (
+          u.name === "search_products" ||
+          u.name === "get_product_details" ||
+          u.name === "lookup_sku" ||
+          u.name === "find_similar_products" ||
+          u.name.startsWith("recommend_")
+        )) {
+          payload._display = "Product card is shown automatically. Do NOT list products with links or repeat the SKU/handle in your text. Write a brief 1-2 sentence summary explaining why this fits.";
         }
         return {
           type: "tool_result",
