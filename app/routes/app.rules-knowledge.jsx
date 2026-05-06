@@ -2576,19 +2576,15 @@ function DecisionTreesCard({ enabled, trees }) {
       triggerPhrases: "",
       triggerCategoryGroup: "",
       enabled: false,
+      // Minimal valid recommender shape. Only resolver.masterIndex
+      // is read by the runtime; the nodes array is preserved for
+      // back-compat with rows authored under the previous
+      // funnel-based design and for the schema validator (which
+      // still requires a rootNodeId pointing at a node — easy to
+      // satisfy with a single resolve node).
       definition: JSON.stringify({
-        rootNodeId: "q1",
-        nodes: [
-          {
-            id: "q1",
-            type: "question",
-            attribute: "example",
-            question: "Replace this with your question",
-            chips: [{ label: "Option A", value: "a" }, { label: "Option B", value: "b" }],
-            next: { _default: "q_resolve" },
-          },
-          { id: "q_resolve", type: "resolve" },
-        ],
+        rootNodeId: "q_resolve",
+        nodes: [{ id: "q_resolve", type: "resolve" }],
         resolver: {
           defaults: {},
           masterIndex: [
@@ -2646,19 +2642,22 @@ function DecisionTreesCard({ enabled, trees }) {
       <BlockStack gap="500">
         <BlockStack gap="200">
           <InlineStack align="space-between" blockAlign="center">
-            <Text as="h3" variant="headingMd">Decision Tree Engine</Text>
+            <Text as="h3" variant="headingMd">Smart Recommenders</Text>
             <Checkbox
-              label={enabled ? "Engine ON" : "Engine OFF"}
+              label={enabled ? "Recommenders ON" : "Recommenders OFF"}
               checked={enabled}
               disabled={masterToggleSubmitting}
               onChange={(next) => toggleMaster(next)}
             />
           </InlineStack>
           <Text as="p" tone="subdued">
-            Master switch. When ON, any tree below whose trigger matches the
-            customer's intent will run a deterministic question funnel for
-            that turn. When OFF (default), the existing AI flow handles
-            every turn — there's zero behavior change.
+            Master switch. When ON, every enabled recommender below is
+            registered as a tool the AI can call when it judges the
+            customer needs a structured pick. The AI is always in
+            charge — recommenders never hijack a conversation. Same
+            attributes in always yield the same SKU out (no
+            hallucinated products). When OFF (default), no
+            recommender tools are exposed and the chat is unchanged.
           </Text>
         </BlockStack>
 
@@ -2666,39 +2665,38 @@ function DecisionTreesCard({ enabled, trees }) {
           <Banner tone="critical">{fetcher.data.error}</Banner>
         )}
         {fetcher.data?.seeded && (
-          <Banner tone="success">Aetrex Orthotic Finder seeded. Review the tree below, then enable it.</Banner>
+          <Banner tone="success">Aetrex Orthotic Finder seeded. Review it below, then enable.</Banner>
         )}
 
         <Divider />
 
         <BlockStack gap="300">
           <InlineStack align="space-between" blockAlign="center">
-            <Text as="h4" variant="headingSm">Your trees</Text>
+            <Text as="h4" variant="headingSm">Your recommenders</Text>
             <InlineStack gap="200">
-              <Button onClick={startNew}>+ New tree</Button>
+              <Button onClick={startNew}>+ New recommender</Button>
               <Button onClick={seedAetrex} variant="primary">
-                Seed Aetrex Orthotic Tree
+                Seed Aetrex Orthotic Finder
               </Button>
             </InlineStack>
           </InlineStack>
 
           {(!trees || trees.length === 0) && (
             <Text as="p" tone="subdued">
-              No decision trees yet. Click "Seed Aetrex Orthotic Tree" to install
-              the bundled 5-question funnel that maps every clinical answer to
-              one of Aetrex's 183 orthotic SKUs, or build your own from scratch.
+              No recommenders yet. Click "Seed Aetrex Orthotic Finder" to install
+              the bundled lookup table that maps clinical attributes to one of
+              Aetrex's 183 orthotic SKUs, or build your own (mattress, pillow,
+              supplement — any vertical with a typed attribute → SKU mapping).
             </Text>
           )}
 
           {trees && trees.length > 0 && (
             <DataTable
-              columnContentTypes={["text", "text", "text", "numeric", "numeric", "text"]}
-              headings={["Name", "Intent", "Triggers on group", "Started", "Completed", ""]}
+              columnContentTypes={["text", "text", "numeric", "text"]}
+              headings={["Name", "Intent", "Calls", ""]}
               rows={trees.map((t) => [
                 <Text key={`n-${t.id}`} as="span" fontWeight="semibold">{t.name}</Text>,
                 <Text key={`i-${t.id}`} as="span">{t.intent}</Text>,
-                <Text key={`g-${t.id}`} as="span" tone="subdued">{t.triggerCategoryGroup || "—"}</Text>,
-                t.startedCount,
                 t.completedCount,
                 <InlineStack key={`a-${t.id}`} gap="200">
                   <Badge tone={t.enabled ? "success" : undefined}>
@@ -2721,53 +2719,38 @@ function DecisionTreesCard({ enabled, trees }) {
             <Divider />
             <BlockStack gap="300">
               <Text as="h4" variant="headingSm">
-                {editing.id ? "Edit tree" : "New tree"}
+                {editing.id ? "Edit recommender" : "New recommender"}
               </Text>
               <FormLayout>
                 <FormLayout.Group>
                   <TextField
                     label="Name"
+                    helpText="Shown in the admin and in the AI's tool description (e.g. Aetrex Orthotic Finder)."
                     value={editing.name}
                     onChange={onChange("name")}
                     autoComplete="off"
                   />
                   <TextField
                     label="Intent slug"
-                    helpText="a-z, 0-9, _, - — used internally to identify this tree (e.g. orthotic, mattress)"
+                    helpText="a-z, 0-9, _, - — becomes the tool name (recommend_<intent>) the AI can call. e.g. orthotic, mattress, supplement."
                     value={editing.intent}
                     onChange={onChange("intent")}
                     autoComplete="off"
                   />
                 </FormLayout.Group>
-                <FormLayout.Group>
-                  <TextField
-                    label="Trigger category group"
-                    helpText="Optional. The category-group name that activates this tree (e.g. Orthotics)."
-                    value={editing.triggerCategoryGroup}
-                    onChange={onChange("triggerCategoryGroup")}
-                    autoComplete="off"
-                  />
-                  <TextField
-                    label="Trigger phrases"
-                    helpText="Comma-separated. Substring matched against the latest customer message."
-                    value={editing.triggerPhrases}
-                    onChange={onChange("triggerPhrases")}
-                    autoComplete="off"
-                  />
-                </FormLayout.Group>
                 <Checkbox
-                  label="Tree enabled"
+                  label="Recommender enabled"
                   checked={Boolean(editing.enabled)}
                   onChange={(v) => setEditing((p) => ({ ...p, enabled: v }))}
                 />
                 <TextField
-                  label="Definition (JSON)"
+                  label="Lookup table (JSON)"
                   value={editing.definition}
                   onChange={onChange("definition")}
                   multiline={20}
                   monospaced
                   autoComplete="off"
-                  helpText="Validated server-side. See the Aetrex seed for an example shape."
+                  helpText="The resolver.masterIndex array drives the recommendation: each entry maps an attribute set (gender, useCase, condition, etc.) to a master SKU. Validated server-side; bad JSON is rejected. The Aetrex seed is the canonical example."
                 />
               </FormLayout>
               <InlineStack gap="200">
@@ -2894,9 +2877,9 @@ export default function RulesKnowledge() {
 
         <BlockStack gap="400">
           <SectionHeading
-            eyebrow="6 · Decision Trees"
-            title="Clinical / expert decision flows"
-            description="Multi-step funnels that ask the customer 3–5 questions, then recommend exactly one product. The chat bypasses the LLM during these turns — same answers always yield the same SKU. Off by default."
+            eyebrow="6 · Smart Recommenders"
+            title="Deterministic product finders the AI can call"
+            description="Define a typed lookup table — given a set of attributes the customer mentions (gender, condition, use-case, etc.), it returns exactly one master SKU. Each recommender becomes a tool the AI can call when it judges the customer needs a structured pick. Same answers in always yield the same SKU out — no hallucinated products. Multiple recommenders per shop (orthotic, mattress, supplement, etc.). Off by default."
           />
           <DecisionTreesCard
             enabled={data.decisionTreeEnabled}
