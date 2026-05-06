@@ -26,6 +26,7 @@
     "eval:e2e": "node scripts/eval-e2e.mjs",
     "feedback:import": "node scripts/import-feedback-scenarios.mjs",
     "audit:hallucinations": "node scripts/audit-hallucinations.mjs",
+    "audit:recommender": "node scripts/audit-recommender-vs-catalog.mjs",
     "backfill:knowledge-chunks": "node scripts/backfill-knowledge-chunks.mjs",
     "seed:recommender": "node scripts/seed-decision-tree.mjs",
     "eval:recommender": "node scripts/eval-decision-tree.mjs",
