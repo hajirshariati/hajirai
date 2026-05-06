@@ -664,12 +664,20 @@ a.ai-chat-welcome__hint--link:hover {
 
 /* ---------- Dead-end CTAs ---------- */
 /* ---------- Inline choice buttons (quiz answers) ----------
- * Horizontal scroll-snap row. Long lists (12+ orthotic use-cases,
- * etc.) used to wrap into 4 cramped rows; now they live on one
- * line and the customer swipes/scrolls. Edges fade so it's
- * visually obvious there's more, and snap-align keeps swipe
- * gestures landing on whole chips. Works on desktop (drag/wheel),
- * mobile (swipe), and keyboard (focus auto-scrolls into view).
+ * Single-row horizontal scroll. Long chip lists used to wrap into
+ * 3-4 cramped rows; now they live on one line and the customer
+ * swipes / scrolls / tabs through them.
+ *
+ * Visual hints are STATE-AWARE — only show when there's actually
+ * more content to scroll into:
+ *   - .has-overflow         → scrollable (JS adds when scrollWidth > clientWidth)
+ *   - .at-start             → scrolled to leftmost (no left fade)
+ *   - .at-end               → scrolled to rightmost (no right fade)
+ * No overflow → no fades, no track. Looks like a normal flex row.
+ *
+ * The scroll-position track (.ai-chat-choices-track) is a sibling
+ * element appended by JS (initChoicesScroll). It doubles as the
+ * "swipe me" hint and a position indicator.
  */
 .ai-chat-choices {
   display: flex;
@@ -680,25 +688,22 @@ a.ai-chat-welcome__hint--link:hover {
   overflow-y: hidden;
   scroll-snap-type: x proximity;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(0,0,0,0.18) transparent;
-  padding-bottom: 4px;
-  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 14px, #000 calc(100% - 18px), transparent 100%);
-  mask-image: linear-gradient(90deg, transparent 0, #000 14px, #000 calc(100% - 18px), transparent 100%);
+  scrollbar-width: none;            /* native bar hidden — track replaces it */
 }
+.ai-chat-choices::-webkit-scrollbar { display: none; }
 
-.ai-chat-choices::-webkit-scrollbar { height: 4px; }
-.ai-chat-choices::-webkit-scrollbar-track { background: transparent; }
-.ai-chat-choices::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.18);
-  border-radius: 4px;
+/* Edge fades only when there IS hidden content in that direction. */
+.ai-chat-choices.has-overflow:not(.at-start):not(.at-end) {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 16px, #000 calc(100% - 20px), transparent 100%);
+          mask-image: linear-gradient(90deg, transparent 0, #000 16px, #000 calc(100% - 20px), transparent 100%);
 }
-
-@media (max-width: 360px) {
-  .ai-chat-choices {
-    -webkit-mask-image: none;
-    mask-image: none;
-  }
+.ai-chat-choices.has-overflow.at-start:not(.at-end) {
+  -webkit-mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 20px), transparent 100%);
+          mask-image: linear-gradient(90deg, #000 0, #000 calc(100% - 20px), transparent 100%);
+}
+.ai-chat-choices.has-overflow.at-end:not(.at-start) {
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 16px, #000 100%);
+          mask-image: linear-gradient(90deg, transparent 0, #000 16px, #000 100%);
 }
 
 .ai-chat-choice-btn {
@@ -706,7 +711,7 @@ a.ai-chat-welcome__hint--link:hover {
   flex-shrink: 0;
   white-space: nowrap;
   scroll-snap-align: start;
-  scroll-margin-inline: 14px;
+  scroll-margin-inline: 16px;
   padding: 8px 16px;
   border-radius: 20px;
   font-size: 13px;
@@ -725,6 +730,32 @@ a.ai-chat-welcome__hint--link:hover {
     background: var(--ai-chat-primary, #2d6b4f);
     color: #fff;
   }
+}
+
+/* Scroll-position track — visible only when JS detects overflow.
+ * Slim pill with a thumb that grows/moves with scroll. Doubles as
+ * the visual hint "there's more, swipe to see it". Centered under
+ * the chip row, max 60% wide so it doesn't dominate the bubble. */
+.ai-chat-choices-track {
+  display: none;            /* JS unhides + sets display='' when overflow detected */
+  position: relative;
+  height: 4px;
+  width: 60%;
+  max-width: 200px;
+  margin: 8px auto 2px;
+  background: rgba(0,0,0,0.08);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.ai-chat-choices-thumb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: var(--ai-chat-primary, #2d6b4f);
+  border-radius: 4px;
+  transition: left 0.12s ease-out, width 0.12s ease-out;
+  opacity: 0.85;
 }
 
 /* ---------- Suggested follow-up questions ---------- */

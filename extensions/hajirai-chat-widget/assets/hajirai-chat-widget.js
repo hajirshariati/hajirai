@@ -486,6 +486,50 @@ window.addEventListener('resize',function(){
   for(var i=0;i<wraps.length;i++)updateShowcaseArrows(wraps[i]);
 });
 
+/* Initialize a chip choices row for horizontal scroll feedback.
+   Toggles three classes on the container based on real overflow:
+     .has-overflow  — content extends past clientWidth (scroll possible)
+     .at-start      — scrolled to leftmost
+     .at-end        — scrolled to rightmost
+   CSS uses these to:
+     - hide edge fades when there's nothing to scroll into,
+     - hide the right-edge fade when at-end (and left-edge when at-start),
+     - show a slim scroll-position indicator (the .ai-chat-choices-track) only when has-overflow.
+   The track is appended once and updated as the user scrolls. */
+function initChoicesScroll(container){
+  if(!container||container._choicesInited)return;
+  container._choicesInited=true;
+  /* The progress track sits AFTER the row, not inside it (so it doesn't
+     scroll with the chips). It's a visible "you are here" hint. */
+  var track=document.createElement('div');
+  track.className='ai-chat-choices-track';
+  track.innerHTML='<span class="ai-chat-choices-thumb"></span>';
+  container.parentNode.insertBefore(track,container.nextSibling);
+  var thumb=track.querySelector('.ai-chat-choices-thumb');
+  function update(){
+    var overflow=container.scrollWidth>container.clientWidth+1;
+    container.classList.toggle('has-overflow',overflow);
+    if(!overflow){track.style.display='none';return}
+    track.style.display='';
+    var atStart=container.scrollLeft<=1;
+    var atEnd=container.scrollLeft+container.clientWidth>=container.scrollWidth-1;
+    container.classList.toggle('at-start',atStart);
+    container.classList.toggle('at-end',atEnd);
+    /* Thumb width = visible / total. Position = scroll / max-scroll. */
+    var ratio=container.clientWidth/container.scrollWidth;
+    var thumbPct=Math.max(15,ratio*100);
+    var maxScroll=container.scrollWidth-container.clientWidth;
+    var posPct=maxScroll>0?(container.scrollLeft/maxScroll)*(100-thumbPct):0;
+    thumb.style.width=thumbPct+'%';
+    thumb.style.left=posPct+'%';
+  }
+  container.addEventListener('scroll',update,{passive:true});
+  window.addEventListener('resize',update);
+  /* Initial paint may not have measured layout yet — defer one frame. */
+  requestAnimationFrame(update);
+  setTimeout(update,150);
+}
+
 function appendMsg(role,content,products){
 var isU=role==='user';
 var d=el('div','ai-chat-msg ai-chat-msg--'+role);
@@ -695,7 +739,7 @@ if(p.type==='choices'&&p.options&&p.options.length){
   typingEl.classList.remove('visible');
   if(!msgDiv)msgDiv=appendMsg('assistant',full||'');
   var b=$('.ai-chat-msg-bubble',msgDiv);
-  if(b){var ch='<div class="ai-chat-choices">';for(var ci=0;ci<p.options.length;ci++){ch+='<button class="ai-chat-choice-btn" data-message="'+esc(p.options[ci])+'">'+esc(p.options[ci])+'</button>'}ch+='</div>';b.insertAdjacentHTML('beforeend',ch)}
+  if(b){var ch='<div class="ai-chat-choices">';for(var ci=0;ci<p.options.length;ci++){ch+='<button class="ai-chat-choice-btn" data-message="'+esc(p.options[ci])+'">'+esc(p.options[ci])+'</button>'}ch+='</div>';b.insertAdjacentHTML('beforeend',ch);var lc=b.querySelector('.ai-chat-choices:last-of-type');if(lc)initChoicesScroll(lc)}
   scrollBottom();
 }
 if(p.type==='suggestions'&&p.questions&&p.questions.length){
@@ -799,7 +843,7 @@ if(cleanText){
 }
 if(choices.length>0&&mDiv){
   var cb=$('.ai-chat-msg-bubble',mDiv);
-  if(cb){var ch='<div class="ai-chat-choices">';for(var ci=0;ci<choices.length;ci++){ch+='<button class="ai-chat-choice-btn" data-message="'+esc(choices[ci])+'">'+esc(choices[ci])+'</button>'}ch+='</div>';cb.insertAdjacentHTML('beforeend',ch)}
+  if(cb){var ch='<div class="ai-chat-choices">';for(var ci=0;ci<choices.length;ci++){ch+='<button class="ai-chat-choice-btn" data-message="'+esc(choices[ci])+'">'+esc(choices[ci])+'</button>'}ch+='</div>';cb.insertAdjacentHTML('beforeend',ch);var lc2=cb.querySelector('.ai-chat-choices:last-of-type');if(lc2)initChoicesScroll(lc2)}
 }
 if(linkCTA&&linkCTA.url&&mDiv){
   var lb=$('.ai-chat-msg-bubble',mDiv);
