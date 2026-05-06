@@ -142,6 +142,38 @@ export function detectGenderFromHistory(messages) {
 // fail and cascades into cards getting suppressed. Leave it alone.
 const BANNED_NARRATION = /(?<=^|\s)(?:let me (?:look (?:that |it )?up|find|search|check|see|pull (?:up|that up|that)|grab|get|look at|get the details|broaden|widen|expand|try (?:a |again|another)|narrow|refine|search again|do (?:a|another) search)(?:[^.!?\n]*)?[.!?]?|i['‘’]?ll (?:look|find|search|check|see|pull|grab|get|need to|try|broaden|widen)(?:[^.!?\n]*)?[.!?]?|i need to (?:pull up|look up|look at|find|search|check|see|grab|get|broaden|widen|try)(?:[^.!?\n]*)?[.!?]?|one moment[!.]?|hold on[!.]?|right away[!.]?|give me a (?:second|sec|moment)[!.]?|that (?:result|search|one) (?:is|was|isn['‘’]?t|doesn['‘’]?t)(?:[^.!?\n]*)?[.!?]?|the (?:search (?:above|results?)|results? (?:above|so far|i found)|previous (?:result|search))(?:[^.!?\n]*)?[.!?]?|searching (?:for|the catalog|now)(?:[^.!?\n]*)?[.!?]?)/gi;
 
+// Tool-use / process narration. The AI sometimes explains to the
+// customer how it ran its tools — "The search returned X rather
+// than Y", "I searched for shoes and got insoles", "My search
+// turned up...", "Looking at the results...". Customers don't care
+// about the AI's process; they care about the answer. These leak
+// the robot underneath. Strip the entire offending sentence.
+//
+// Patterns:
+//   "the search/my search/that search (returned|found|yielded|came back with|surfaced|gave me|brought back|pulled up|showed) X (rather than|but|however) Y."
+//   "I (searched|looked) (for|up|at) X (and|but) Y."
+//   "the results (came back|returned|show|showed|include|are) X (rather than|but) Y."
+//   "looking at (the|my) (results|search|catalog), X."
+//   "after searching/checking/looking, X."
+// Two flavors:
+//   FULL — sentence-shaped narration that's ALL process: strip the
+//   whole sentence ("The search returned X. ...", "I searched for X").
+//   PREFIX — clause-shaped narration that prefixes a real answer:
+//   strip only up to the comma so the actual answer survives
+//   ("Looking at the catalog, here are some sandals" → "here are
+//   some sandals").
+const TOOL_NARRATION_RE = new RegExp(
+  [
+    // FULL strips (consume to sentence end)
+    String.raw`\b(?:the\s+search|my\s+search|that\s+search|the\s+results|search\s+results|my\s+results)\s+(?:returned|found|yielded|came\s+back\s+with|came\s+back|surfaced|gave\s+me|brought\s+back|pulled\s+up|showed|show|include|are)\b[^.!?\n]*[.!?]?\s*`,
+    String.raw`\bi\s+(?:searched|looked|checked|pulled\s+up|ran\s+a\s+search)\s+(?:for|up|at|through|over)\b[^.!?\n]*[.!?]?\s*`,
+    // PREFIX strips (consume only to comma — leave the actual answer)
+    String.raw`\b(?:looking\s+at|after\s+(?:searching|checking|looking))\s+(?:the|my|our)?\s*(?:results|search|catalog|inventory)\b[^,\n]*,\s*`,
+    String.raw`\b(?:from|based\s+on)\s+(?:the|my)\s+(?:search|search\s+results|results)\b[^,\n]*,\s*`,
+  ].join("|"),
+  "gi",
+);
+
 // Self-correction strip. The model sometimes streams a follow-up
 // question, then realizes mid-stream that the customer already
 // answered it: "Do you have arch pain? Wait — you already told me:
@@ -206,6 +238,7 @@ export function stripBannedNarration(text) {
   return text
     .replace(SELF_CORRECTION_RE, " ")
     .replace(REASONING_LEAK_RE, " ")
+    .replace(TOOL_NARRATION_RE, " ")
     .replace(BANNED_NARRATION, " ")
     .replace(/\s{2,}/g, " ")
     .trim();
