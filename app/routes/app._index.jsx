@@ -399,7 +399,7 @@ export default function Home() {
               title="Upload extra knowledge (optional)"
               description="FAQs, brand voice, sizing guides, product specs — CSV files with a SKU column are automatically linked to your catalog."
               actionLabel={fileCount > 0 ? "Manage files" : "Upload"}
-              actionUrl="/app/rules-knowledge"
+              actionUrl="/app/knowledge"
             />
             <ChecklistItem
               done={categoryGroupsCount > 0}
@@ -407,7 +407,7 @@ export default function Home() {
               title="Define category groups (optional)"
               description="Group your catalog (e.g. Footwear / Orthotics / Accessories) so the AI never offers irrelevant categories when a customer asks about one of them. Keeps choice buttons sharp and on-topic."
               actionLabel={categoryGroupsCount > 0 ? `Manage (${categoryGroupsCount})` : "Set up groups"}
-              actionUrl="/app/rules-knowledge"
+              actionUrl="/app/catalog"
             />
             <ChecklistItem
               done={semanticEnabled}
