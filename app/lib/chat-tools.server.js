@@ -1449,14 +1449,56 @@ async function lookupSku({ skus }, { shop }) {
   ).slice(0, 10);
   if (list.length === 0) return { found: [], missing: [] };
 
-  const variants = await prisma.productVariant.findMany({
-    where: { sku: { in: list }, product: { shop, NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } } } },
+  // Exact match first (case-insensitive). Postgres `=` is case-
+  // sensitive by default; the merchant's catalog SKUs may be either
+  // upper or lower case (e.g. "L1300U" vs "ew732w35"), and customers
+  // type whatever they remember.
+  let variants = await prisma.productVariant.findMany({
+    where: {
+      OR: list.map((s) => ({ sku: { equals: s, mode: "insensitive" } })),
+      product: { shop, NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } } },
+    },
     include: { product: true },
   });
-  const enrich = await enrichmentMap(shop, list);
 
-  const foundSet = new Set(variants.map((v) => v.sku));
-  const missing = list.filter((s) => !foundSet.has(s));
+  // Prefix-match fallback for unmatched terms. Customers often paste
+  // the master/style SKU (e.g. "EW732W") while the catalog stores
+  // variant SKUs with a size suffix ("ew732w35", "ew732w40"). When
+  // exact matching missed, try `startsWith` for those terms and
+  // surface the first variant per matched product.
+  const matchedExactly = new Set(
+    variants.map((v) => String(v.sku || "").toLowerCase()),
+  );
+  const unmatched = list.filter(
+    (s) => ![...matchedExactly].some((m) => m === s.toLowerCase()),
+  );
+  if (unmatched.length > 0) {
+    const prefixHits = await prisma.productVariant.findMany({
+      where: {
+        OR: unmatched.map((s) => ({ sku: { startsWith: s, mode: "insensitive" } })),
+        product: { shop, NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } } },
+      },
+      include: { product: true },
+    });
+    // De-dup by product so a 30-size run of EW732W variants doesn't
+    // return 30 cards — one variant per product is enough for the AI
+    // to answer "do you carry this".
+    const seenProduct = new Set(variants.map((v) => v.productId));
+    for (const v of prefixHits) {
+      if (!seenProduct.has(v.productId)) {
+        variants.push(v);
+        seenProduct.add(v.productId);
+      }
+    }
+  }
+
+  const skuList = variants.map((v) => v.sku).filter(Boolean);
+  const enrich = await enrichmentMap(shop, skuList);
+
+  const foundLower = new Set(variants.map((v) => String(v.sku || "").toLowerCase()));
+  const missing = list.filter(
+    (s) => ![...foundLower].some((m) => m === s.toLowerCase() || m.startsWith(s.toLowerCase())),
+  );
 
   return {
     found: variants.map((v) => ({
