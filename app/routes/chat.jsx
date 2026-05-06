@@ -590,6 +590,110 @@ function detectFalseCategoryDenial(text, categories) {
   return null;
 }
 
+// Mirror of detectFalseCategoryDenial but for AFFIRMATIONS:
+// did the AI claim "we (absolutely)? have/carry men's slippers"
+// when categoryGenderMap says slippers is women-only? Catches the
+// hallucinations where the AI answers from training memory and
+// never calls searchProducts (so the in-tool genderCategoryMismatch
+// gate never fires). Returns {category, requestedGender,
+// availableGenders} if a false affirmation is detected, else null.
+function detectFalseGenderCategoryAffirmation(text, categoryGenderMap) {
+  if (!text || !categoryGenderMap || typeof categoryGenderMap !== "object") return null;
+  const t = String(text);
+  const lower = t.toLowerCase();
+  const entries = Object.entries(categoryGenderMap);
+  if (entries.length === 0) return null;
+
+  // Process longer category keys first so "wedges heels" wins over
+  // bare "heels" when both could match. Skip < 3 char keys (noise).
+  const sorted = entries
+    .filter(([k]) => k && k.length >= 3)
+    .sort((a, b) => b[0].length - a[0].length);
+
+  // Build a gender-token set the AI might use in prose. Keep tight
+  // — this regex is checked against AI prose, not user text. Bare
+  // pronouns (his/her) are NOT included to avoid stray sentence
+  // matches like "her cousin asked" being treated as gender claims.
+  const genderToTokens = {
+    men: ["men's", "men", "mens", "male", "guy", "guys", "gentleman", "gentlemen", "boys'", "boys"],
+    women: ["women's", "women", "womens", "female", "lady", "ladies", "girls'", "girls"],
+  };
+
+  for (const [catKey, entry] of sorted) {
+    if (!entry || !Array.isArray(entry.genders) || entry.genders.length === 0) continue;
+    if (entry.genders.includes("unisex")) continue; // unisex serves all
+    const supported = new Set(entry.genders.map((g) => String(g).toLowerCase()));
+    // Determine the missing genders. If both men + women are
+    // supported, this category serves everyone — skip.
+    const missingGenders = ["men", "women"].filter((g) => !supported.has(g));
+    if (missingGenders.length === 0) continue;
+
+    // Build singular/plural alternation for the category.
+    const c = String(catKey).toLowerCase().trim();
+    const stem = c.endsWith("s") ? c.slice(0, -1) : c;
+    const variants = c === stem ? [c] : [c, stem];
+    const escapedCats = variants.map((v) => v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    const catAlt = escapedCats.map((v) => `${v}s?`).join("|");
+
+    for (const missingGender of missingGenders) {
+      const tokens = genderToTokens[missingGender] || [];
+      const escapedTokens = tokens.map((tok) => tok.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+      const tokenAlt = escapedTokens.join("|");
+
+      // Affirmation patterns. Each represents a class of false claims:
+      //   "we (absolutely)? carry/have/sell/stock/offer men's slippers"
+      //   "yes, we have men's wedges"
+      //   "(yes,)? we (absolutely)? do (carry|have)? men's loafers"
+      //   "these (are )?men's slippers" / "here are some men's wedges"
+      //   "our men's wedges combine ..."
+      const verbAlt = "have|carry|sell|stock|offer|got";
+      const affirmPatterns = [
+        new RegExp(`\\bwe (?:absolutely\\s+)?(?:do (?:${verbAlt})|${verbAlt})\\s+(?:some\\s+|a\\s+few\\s+)?(?:${tokenAlt})\\s+(?:${catAlt})\\b`, "i"),
+        new RegExp(`\\byes,?\\s+we (?:absolutely\\s+)?(?:do |${verbAlt})\\s+(?:some\\s+|a\\s+few\\s+)?(?:${tokenAlt})\\s+(?:${catAlt})\\b`, "i"),
+        new RegExp(`\\b(?:these|those|here are)\\s+(?:are\\s+)?(?:some\\s+|a\\s+few\\s+|our\\s+)?(?:${tokenAlt})\\s+(?:${catAlt})\\b`, "i"),
+        new RegExp(`\\bour\\s+(?:${tokenAlt})\\s+(?:${catAlt})\\b`, "i"),
+      ];
+      for (const re of affirmPatterns) {
+        if (re.test(t) || re.test(lower)) {
+          return {
+            category: entry.display || catKey,
+            requestedGender: missingGender === "men" ? "men's" : "women's",
+            availableGenders: entry.genders.slice(),
+          };
+        }
+      }
+    }
+  }
+  return null;
+}
+
+// Outbound strip for raw tool-call syntax that the model occasionally
+// emits in its visible text alongside the proper structured tool_use
+// block. Customers should NEVER see XML-ish or JSON-ish control
+// tokens. Patterns observed: <function_calls>, search_products {…},
+// recommend_orthotic {…}, <invoke name="…">, etc.
+function stripToolCallSyntax(text) {
+  if (!text) return text;
+  let out = String(text);
+  // Strip XML-ish control blocks the model uses internally.
+  out = out.replace(/<\/?(?:function_calls|invoke|antml:[a-z_]+|parameter)[^>]*>/gi, "");
+  // Strip "tool_name {...JSON...}" leading fragments. The AI sometimes
+  // narrates its own tool call as plain text. Match tool name + JSON
+  // body up to the closing brace; non-greedy across newlines.
+  out = out.replace(
+    /\b(?:search_products|get_product_details|lookup_sku|find_similar_products|recommend_[a-z_]+|get_customer_orders|get_product_reviews|get_return_insights|get_fit_recommendation)\s*\{[\s\S]*?\}\s*/gi,
+    "",
+  );
+  // Strip bare tool-name leaders followed by prose (e.g. "search_products The Casual…").
+  out = out.replace(
+    /^\s*(?:search_products|get_product_details|lookup_sku|find_similar_products|recommend_[a-z_]+)\s+(?=[A-Z])/i,
+    "",
+  );
+  // Collapse the whitespace gap left behind.
+  out = out.replace(/\s{2,}/g, " ").replace(/\s+([.,!?])/g, "$1").trim();
+  return out;
+}
+
 async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, controller, encoder, promptCaching, tools }) {
   const totalUsage = { input_tokens: 0, output_tokens: 0, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 };
   let toolCallCount = 0;
@@ -1295,6 +1399,50 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     genericCTA = generic.cta;
   }
 
+  // Tool-call syntax leak strip. The model occasionally emits raw
+  // <function_calls>, "search_products {...}", or other control
+  // tokens in its visible text alongside the proper structured
+  // tool_use block — those should never reach the customer.
+  if (fullResponseText && /(?:<\/?(?:function_calls|invoke|antml|parameter)|\b(?:search_products|get_product_details|lookup_sku|find_similar_products|recommend_[a-z_]+)\s*\{)/i.test(fullResponseText)) {
+    const before = fullResponseText.length;
+    const stripped = stripToolCallSyntax(fullResponseText);
+    // Defensive: if the strip would leave the reply nearly empty,
+    // the leaked syntax was the entire response. Better to ship the
+    // sanitized fragment than nothing — keep whatever's left, but
+    // log so we can spot the upstream model glitch.
+    fullResponseText = stripped;
+    if (fullResponseText.length !== before) {
+      console.log(
+        `[chat] ${ctx.shop} stripped tool-call syntax from outbound text ` +
+          `(${before}→${fullResponseText.length} chars)`,
+      );
+    }
+  }
+
+  // Hallucinated affirmation guard. Mirrors AVAILABILITY_DENIAL_RE
+  // but for false POSITIVES: the AI claims "we absolutely carry
+  // men's slippers" when categoryGenderMap says slippers is women-
+  // only. The Stage-2 in-tool genderCategoryMismatch fix only fires
+  // when the AI calls searchProducts with explicit gender+category
+  // filters — when the AI answers from training memory without
+  // calling any tool, that gate is bypassed. Detect the pattern in
+  // the emitted text and rewrite to honest framing.
+  if (ctx.categoryGenderMap) {
+    const fa = detectFalseGenderCategoryAffirmation(fullResponseText, ctx.categoryGenderMap);
+    if (fa) {
+      console.log(
+        `[chat] ${ctx.shop} detected false ${fa.requestedGender} ${fa.category} affirmation — ` +
+          `rewriting to honest framing (available=${fa.availableGenders.join(",")})`,
+      );
+      const otherGender = fa.availableGenders.includes("women") ? "women's" : (fa.availableGenders.includes("men") ? "men's" : null);
+      const tail = otherGender
+        ? ` We do carry ${otherGender} ${fa.category.toLowerCase()} — happy to show those if helpful.`
+        : "";
+      fullResponseText =
+        `We don't carry ${fa.requestedGender} ${fa.category.toLowerCase()} in our catalog.${tail}`;
+    }
+  }
+
   // Stock-claim hallucination guard. The SIZE & STOCK GROUNDING
   // prompt rule tells the AI to call get_product_details before
   // claiming a specific size is in stock. When it skips that call
@@ -1330,15 +1478,48 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // when sanitizeHistory missed a leak in a long-running session),
   // remove them before emit. Customers should NEVER see those tokens.
   if (fullResponseText && /\b(?:Human|Assistant)\s*:/i.test(fullResponseText)) {
-    const before = fullResponseText.length;
-    fullResponseText = fullResponseText
+    const before = fullResponseText;
+    const candidate = fullResponseText
       .replace(/^\s*(?:Human|Assistant)\s*:\s*/i, "")
       .replace(/\n\s*(?:Human|Assistant)\s*:\s*/gi, "\n")
       .replace(/\s*(?:Human|Assistant)\s*:\s*/gi, " ")
       .replace(/[ \t]{2,}/g, " ")
       .trim();
-    if (fullResponseText.length !== before) {
-      console.log(`[chat] ${ctx.shop} stripped role-marker tokens from outbound text`);
+    // Defensive: if stripping role markers leaves a near-empty
+    // string (the entire response was a role-marker fragment with
+    // no real content after it), keep the original so the empty-
+    // pool repair downstream gets something to react to. Without
+    // this, we trade "Human: Assistant, wait..." for "" — a
+    // worse customer experience.
+    if (candidate.length >= 5) {
+      fullResponseText = candidate;
+      if (fullResponseText !== before) {
+        console.log(`[chat] ${ctx.shop} stripped role-marker tokens from outbound text`);
+      }
+    } else {
+      console.log(
+        `[chat] ${ctx.shop} role-marker strip would leave ${candidate.length} chars — ` +
+          `keeping original for empty-pool repair to handle`,
+      );
+    }
+  }
+
+  // Final empty-text guard. After the full strip cascade (banned
+  // narration, length cap, list trim, denial validation, dedup,
+  // tool-call syntax, role-marker, stock-claim) the response can
+  // still end up empty if every layer trimmed something. Rather
+  // than ship 0 chars, substitute a coherent fallback that fits
+  // the turn shape (cards present vs not).
+  if (!fullResponseText || fullResponseText.trim().length < 3) {
+    if (pool.length > 0) {
+      fullResponseText = "Take a look — these are the closest matches I've got.";
+      console.log(`[chat] ${ctx.shop} empty-text repair (pool=${pool.length}): substituted generic pitch`);
+    } else if (productSearchAttempted) {
+      fullResponseText = "I couldn't find a match for that — happy to try a different angle if you can tell me more.";
+      console.log(`[chat] ${ctx.shop} empty-text repair (search-attempted, no pool): substituted clarify-ask`);
+    } else {
+      fullResponseText = "Could you tell me a bit more about what you're looking for?";
+      console.log(`[chat] ${ctx.shop} empty-text repair (no search): substituted clarify-ask`);
     }
   }
 
