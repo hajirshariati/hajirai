@@ -97,12 +97,22 @@ if (!globalThis.__shopagentRateSweeper) {
   globalThis.__shopagentRateSweeper.unref?.();
 }
 
+// Defensive cleanup of inbound chat history. The widget client may
+// re-send a previous turn whose `content` accidentally captured a
+// raw "Human:" / "Assistant:" role marker (from an upstream model
+// glitch or a copy-paste from a transcript export). Without this,
+// the marker rides into the next request as ordinary message text
+// and the next-turn model sometimes echoes it back to the customer
+// ("Human: Assistant, wait for the tool results..."). Strip leading
+// role tokens defensively. Idempotent — no-op on clean history.
 function sanitizeHistory(history) {
   const out = [];
   for (const turn of history || []) {
     if (!turn?.role || !turn?.content) continue;
     if (turn.role !== "user" && turn.role !== "assistant") continue;
-    out.push({ role: turn.role, content: String(turn.content) });
+    let content = String(turn.content).replace(/^\s*(?:Human|Assistant)\s*:\s*/i, "");
+    content = content.replace(/\n\s*(?:Human|Assistant)\s*:\s*/gi, "\n");
+    out.push({ role: turn.role, content });
   }
   return out;
 }
@@ -1261,6 +1271,24 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     const generic = extractGenericCTA(fullResponseText);
     fullResponseText = generic.text;
     genericCTA = generic.cta;
+  }
+
+  // Outbound role-marker scrub. Belt-and-suspenders alongside
+  // sanitizeHistory's inbound strip: if the model literally generated
+  // "Human:" / "Assistant:" tokens in its reply (rare but observed
+  // when sanitizeHistory missed a leak in a long-running session),
+  // remove them before emit. Customers should NEVER see those tokens.
+  if (fullResponseText && /\b(?:Human|Assistant)\s*:/i.test(fullResponseText)) {
+    const before = fullResponseText.length;
+    fullResponseText = fullResponseText
+      .replace(/^\s*(?:Human|Assistant)\s*:\s*/i, "")
+      .replace(/\n\s*(?:Human|Assistant)\s*:\s*/gi, "\n")
+      .replace(/\s*(?:Human|Assistant)\s*:\s*/gi, " ")
+      .replace(/[ \t]{2,}/g, " ")
+      .trim();
+    if (fullResponseText.length !== before) {
+      console.log(`[chat] ${ctx.shop} stripped role-marker tokens from outbound text`);
+    }
   }
 
   console.log(`[chat] emit textLen=${fullResponseText.length} poolSize=${pool.length} searchAttempted=${productSearchAttempted}`);
