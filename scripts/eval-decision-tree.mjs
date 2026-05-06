@@ -121,10 +121,11 @@ check("Malformed definition returns null instead of throwing", () => {
 });
 
 console.log("\nrequired-attributes gate");
-check("seed declares gender + useCase as required", () => {
+check("seed declares gender + useCase + condition as required", () => {
   assert(Array.isArray(definition.requiredAttributes), "missing requiredAttributes array");
   assert(definition.requiredAttributes.includes("gender"), "gender should be required");
   assert(definition.requiredAttributes.includes("useCase"), "useCase should be required");
+  assert(definition.requiredAttributes.includes("condition"), "condition should be required");
 });
 
 check("seed has merchant-supplied attributePrompts for required fields", () => {
@@ -153,12 +154,12 @@ check("executor returns needMoreInfo when only arch is provided", async () => {
   const { executeRecommenderTool } = await import("../app/lib/recommender-tools.server.js");
   const r = await executeRecommenderTool({
     toolName: "recommend_orthotic",
-    input: { arch: "Medium / High Arch" }, // missing gender + useCase
+    input: { arch: "Medium / High Arch" }, // missing gender + useCase + condition
     shop: null, // shop irrelevant — the gate fires before the catalog filter
     trees: [tree],
   });
   assert.equal(r.needMoreInfo, true, "should return needMoreInfo");
-  assert.deepEqual(r.missingAttributes.sort(), ["gender", "useCase"]);
+  assert.deepEqual(r.missingAttributes.sort(), ["condition", "gender", "useCase"]);
   assert(typeof r.instruction === "string" && /ask/i.test(r.instruction),
     "instruction should tell the LLM to ask the customer");
   assert(r.masterSku === undefined, "should NOT resolve a SKU when required attrs are missing");
@@ -209,7 +210,7 @@ check("executor proceeds normally when all required attributes are present", asy
   const { executeRecommenderTool } = await import("../app/lib/recommender-tools.server.js");
   const r = await executeRecommenderTool({
     toolName: "recommend_orthotic",
-    input: { gender: "Women", useCase: "casual" },
+    input: { gender: "Women", useCase: "casual", condition: "none" },
     shop: null, // catalog-filter falls through gracefully when shop is null
     trees: [tree],
   });
