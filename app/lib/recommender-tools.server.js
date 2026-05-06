@@ -201,6 +201,55 @@ async function lookupProductByMasterSku(shop, masterSku) {
   };
 }
 
+// Filter the resolver's masterIndex to only SKUs the shop actually
+// carries in its synced Shopify catalog. The merchant's recommender
+// data may be a superset (e.g. shared across dev/prod replicas, or
+// authored before products were imported); without this filter the
+// resolver can pick a SKU that has no ProductVariant and the
+// recommendation card is empty.
+//
+// One Postgres query per tool call. Could be cached per-shop if it
+// shows up in profiling, but the variant table is indexed on `sku`
+// and we're doing a single IN over <200 prefixes — fast.
+async function filterMasterIndexByShop(shop, masterIndex) {
+  if (!shop || !Array.isArray(masterIndex) || masterIndex.length === 0) {
+    return masterIndex || [];
+  }
+  const prisma = await getPrisma();
+  // For each master SKU, check whether ANY variant whose SKU starts
+  // with it exists on this shop with a non-archived product. Batched
+  // with OR-startsWith — Prisma converts to a SQL OR-LIKE chain.
+  const prefixes = masterIndex.map((m) => m.masterSku).filter(Boolean);
+  if (prefixes.length === 0) return [];
+  let rows;
+  try {
+    rows = await prisma.productVariant.findMany({
+      where: {
+        OR: prefixes.map((p) => ({ sku: { startsWith: p } })),
+        product: {
+          shop,
+          NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } },
+        },
+      },
+      select: { sku: true },
+    });
+  } catch (err) {
+    console.error("[recommender] catalog filter failed, using full index:", err?.message || err);
+    return masterIndex;
+  }
+  const presentPrefixes = new Set();
+  for (const r of rows) {
+    const sku = String(r.sku || "");
+    for (const p of prefixes) {
+      if (sku.startsWith(p)) {
+        presentPrefixes.add(p);
+        break;
+      }
+    }
+  }
+  return masterIndex.filter((m) => presentPrefixes.has(m.masterSku));
+}
+
 // Execute a recommend_<intent> tool call. Returns the structure the
 // LLM gets back — a plain object the agentic loop can stringify
 // into a tool_result block. The product card travels back via the
@@ -218,7 +267,38 @@ export async function executeRecommenderTool({ toolName, input, shop, trees }) {
   if (!tree.definition?.resolver) {
     return { error: "Recommender has no resolver configured." };
   }
-  const result = resolveTree(input || {}, tree.definition.resolver);
+
+  // Filter the masterIndex to SKUs the shop actually has in stock
+  // BEFORE the resolver picks. Without this, the resolver can land
+  // on a SKU that's in the merchant's recommender data but missing
+  // from their Shopify catalog (e.g. dev shop with a partial sync,
+  // or a recommender authored ahead of catalog imports), and the
+  // resulting recommendation card comes through empty.
+  const fullMasterIndex = tree.definition.resolver.masterIndex || [];
+  const availableMasterIndex = await filterMasterIndexByShop(shop, fullMasterIndex);
+  if (availableMasterIndex.length === 0) {
+    console.warn(
+      `[recommender] no resolver SKUs in shop catalog for intent=${intent} ` +
+        `(masterIndex has ${fullMasterIndex.length}, shop has 0). ` +
+        `Either the merchant's catalog isn't synced or the recommender data ` +
+        `references SKUs that don't exist on this shop.`,
+    );
+    return {
+      error:
+        "None of the recommender's SKUs are present in this shop's catalog. " +
+        "Please verify the catalog sync and the recommender's master-index data.",
+      attributesUsed: input,
+    };
+  }
+  if (availableMasterIndex.length < fullMasterIndex.length) {
+    console.log(
+      `[recommender] filtered masterIndex: ${availableMasterIndex.length}/${fullMasterIndex.length} ` +
+        `SKUs are present in shop catalog`,
+    );
+  }
+
+  const filteredResolver = { ...tree.definition.resolver, masterIndex: availableMasterIndex };
+  const result = resolveTree(input || {}, filteredResolver);
   if (!result?.resolved) {
     return {
       error: result?.reason || "No matching product for the given attributes.",
