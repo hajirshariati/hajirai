@@ -367,10 +367,8 @@ export async function executeRecommenderTool({ toolName, input, shop, trees }) {
         needMoreInfo: true,
         missingAttributes: missing,
         instruction:
-          `Before recommending, the customer needs to answer the following question${missing.length === 1 ? "" : "s"} ` +
-          `in normal conversation. ASK them — do NOT call this tool again until you have answers:\n\n${questions}\n\n` +
-          `Once the customer has provided each missing attribute, call recommend_${tree.intent} again with the ` +
-          `complete attribute set. Use only the enum values listed in this tool's schema for those attributes.`,
+          `Before recommending, ${missing.length === 1 ? "this attribute is" : "these attributes are"} still missing: ${missing.join(", ")}. ` +
+          `ASK ONLY THE FIRST QUESTION below — one question per turn. Do NOT preface with "a few quick questions" or "I just need a few details" or number the question ("1.", "2.") — those phrasings imply a multi-question form, but each missing attribute is collected on its own conversational turn. Just ask the first question naturally as if it's the only thing you need. After the customer answers, call recommend_${tree.intent} again with what they gave you; the tool will tell you what's still missing.\n\nQuestions, in order (ask only the first):\n${questions}\n\nUse only the enum values listed in this tool's schema for those attributes.`,
         attributesProvided: provided,
       };
     }
