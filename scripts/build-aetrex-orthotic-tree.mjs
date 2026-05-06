@@ -121,6 +121,29 @@ const definition = {
     { id: "q_resolve", type: "resolve" },
   ],
 
+  // Required-attributes gate. The recommender tool refuses to
+  // resolve a SKU until the LLM has collected values for all of
+  // these in normal conversation. This restores the doctor-flow
+  // UX (multi-turn elicitation) without bringing back the
+  // funnel-style chip dispatcher: the LLM does the asking, the
+  // resolver picks the SKU. Required attributes for Aetrex's
+  // orthotic line are gender + useCase — the two load-bearing
+  // dimensions; the rest (arch, posted, metSupport, condition)
+  // can be derived or defaulted.
+  requiredAttributes: ["gender", "useCase"],
+
+  // Suggested phrasing per attribute when the LLM needs to ask. The
+  // tool returns these in the needMoreInfo response so the LLM uses
+  // good clinical language instead of robotic questions. Merchants
+  // can edit these in the admin to match their brand voice.
+  attributePrompts: {
+    gender: "Is this for a man, woman, kid, or are you looking for a unisex option?",
+    useCase: "What kind of shoes will the orthotics go in? (dress shoes, casual/everyday, athletic, cleats, hockey skates, winter boots, work, or just looking for general comfort)",
+    condition: "Any specific foot pain or condition we should match? (plantar fasciitis, heel spurs, ball-of-foot pain / metatarsalgia, Morton's neuroma, overpronation / flat feet, diabetic feet, or none — just looking for comfort)",
+    arch: "What's your arch type — flat / low, medium, or high? If you're not sure, that's fine.",
+    overpronation: "When you walk or stand, do your ankles tend to roll inward, or do you have flat-feet symptoms? (yes / no / not sure)",
+  },
+
   // Aetrex spec, confirmed by merchant:
   //   posted = (arch == Flat) OR (overpronation == "yes")
   //   metSupport = condition is one of {ball-of-foot, mortons, metatarsalgia}
