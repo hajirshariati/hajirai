@@ -1200,6 +1200,18 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }
     fullResponseText = filtered.text;
 
+    // Strip <<Unisex>> / <<Other>> / <<Either>> / <<Both>> gender chips —
+    // those aren't customer-facing gender choices (Unisex is a product-side
+    // compatibility tag, not a gender). Also clean up the trailing-space
+    // gap left when the chip is removed mid-text.
+    {
+      const unisexChipRe = /\s*<<\s*(?:Unisex|Other|Either|Both)\s*>>/gi;
+      if (unisexChipRe.test(fullResponseText)) {
+        fullResponseText = fullResponseText.replace(unisexChipRe, "").replace(/[ \t]{2,}/g, " ");
+        console.log(`[chat] ${ctx.shop} stripped non-gender chips (Unisex/Other/Either/Both)`);
+      }
+    }
+
     // Strip gender chips that contradict the catalog given the user's
     // mentioned categories. e.g. user said "boots" + AI offered <<Men's>>
     // when only women's boots exist → strip the Men's chip. Keeps both

@@ -344,7 +344,16 @@ export async function executeRecommenderTool({ toolName, input, shop, trees }) {
     });
     if (missing.length > 0) {
       const questions = missing.map((k) => {
-        const prompt = attributePrompts[k];
+        let prompt = attributePrompts[k];
+        // Defensive: scrub any "unisex" mention from the gender
+        // prompt text — Unisex is a product-side compatibility tag,
+        // not a customer-facing gender choice. Merchants seeded
+        // before that distinction was made still have stale prompt
+        // text in their DB; this rewrites it on the fly so the LLM
+        // doesn't echo a <<Unisex>> chip from the prompt.
+        if (k === "gender" && typeof prompt === "string" && /unisex/i.test(prompt)) {
+          prompt = "Who are these orthotics for — a man, woman, or kid?";
+        }
         if (typeof prompt === "string" && prompt.trim()) return `- ${prompt}`;
         // Fallback question text by attribute name. Reasonable
         // defaults; merchant overrides via attributePrompts.
