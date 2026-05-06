@@ -774,11 +774,20 @@ a.ai-chat-welcome__hint--link:hover {
 }
 
 @media (min-width: 768px) and (hover: hover) {
+  .ai-chat-choices-wrap.has-overflow {
+    padding-inline: 36px;
+  }
   .ai-chat-choices-arrow {
     display: flex;
   }
   .ai-chat-choices-arrow[hidden] {
     display: none;
+  }
+  .ai-chat-choices-wrap.has-overflow .ai-chat-choices-arrow--prev {
+    left: 0;
+  }
+  .ai-chat-choices-wrap.has-overflow .ai-chat-choices-arrow--next {
+    right: 0;
   }
   .ai-chat-choices-arrow:hover {
     background: #1a1a1a;

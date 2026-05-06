@@ -521,6 +521,7 @@ function initChoicesScroll(container){
   function update(){
     var overflow=container.scrollWidth>container.clientWidth+1;
     container.classList.toggle('has-overflow',overflow);
+    if(wrap)wrap.classList.toggle('has-overflow',overflow);
     if(!overflow){
       track.style.display='none';
       if(prev)prev.hidden=true;
