@@ -256,6 +256,17 @@ export function buildSuggestedMapping(distinct) {
       { titleContains: "Heel Spurs", condition: "heel_spurs", useCase: "comfort" },
       { titleContains: "Conform", condition: "diabetic" },
       { titleContains: "Diabet", condition: "diabetic" },
+      // Fashion / dress-shoe lines: Aetrex's activity metafield on
+      // these is sometimes mislabeled "Everyday Comfort" instead of
+      // "Dress" or "Fashion". Trust the title — these are low-
+      // profile orthotics for slim dress/fashion shoes, NOT for
+      // athletic sneakers. Without these overrides an 85yo asking
+      // for sneaker comfort gets the L105 Fashion (wrong shoe shape).
+      { titleContains: "Fashion", useCase: "dress_no_removable" },
+      { titleContains: "In-Style", useCase: "dress_no_removable" },
+      { titleContains: "Instyle", useCase: "dress_no_removable" },
+      { titleContains: "Low Profile", useCase: "dress_no_removable" },
+      { titleContains: "Heritage", useCase: "dress_premium" },
     ],
   };
 }
@@ -312,7 +323,20 @@ export function regenerateMasterIndex({ products, mapping }) {
       if (m.posted) posted = true;
     }
 
-    const specialtyOverrides = Array.isArray(mapping?.specialtyOverrides) ? mapping.specialtyOverrides : [];
+    // Always-on title overrides for product lines whose Shopify
+    // metafield is commonly mislabeled. These run on every regen
+    // even if the merchant's persisted vocabularyMapping is stale —
+    // so the fix lands without re-discovery. Merchant entries in
+    // mapping.specialtyOverrides run AFTER and can override these.
+    const builtInOverrides = [
+      { titleContains: "Fashion", useCase: "dress_no_removable" },
+      { titleContains: "In-Style", useCase: "dress_no_removable" },
+      { titleContains: "Instyle", useCase: "dress_no_removable" },
+      { titleContains: "Low Profile", useCase: "dress_no_removable" },
+      { titleContains: "Heritage", useCase: "dress_premium" },
+    ];
+    const merchantOverrides = Array.isArray(mapping?.specialtyOverrides) ? mapping.specialtyOverrides : [];
+    const specialtyOverrides = [...builtInOverrides, ...merchantOverrides];
     const titleLower = String(product.title || "").toLowerCase();
     for (const ov of specialtyOverrides) {
       if (!ov?.titleContains) continue;

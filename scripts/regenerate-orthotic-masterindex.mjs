@@ -321,6 +321,13 @@ if (discoverMode || !fs.existsSync(MAPPING_PATH)) {
       { titleContains: "Heel Spurs", condition: "heel_spurs", useCase: "comfort" },
       { titleContains: "Conform", condition: "diabetic" },
       { titleContains: "Diabet", condition: "diabetic" },
+      // Fashion / dress-shoe lines: activity metafield is often
+      // mislabeled "Everyday Comfort" — title is the truth.
+      { titleContains: "Fashion", useCase: "dress_no_removable" },
+      { titleContains: "In-Style", useCase: "dress_no_removable" },
+      { titleContains: "Instyle", useCase: "dress_no_removable" },
+      { titleContains: "Low Profile", useCase: "dress_no_removable" },
+      { titleContains: "Heritage", useCase: "dress_premium" },
     ],
   };
   fs.writeFileSync(MAPPING_PATH, JSON.stringify(mapping, null, 2));
