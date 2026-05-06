@@ -22,7 +22,7 @@ import {
   hasPluralIntroFraming,
   detectConditionOrOccasion,
 } from "../lib/chat-helpers.server";
-import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL, FIT_PREDICTOR_TOOL } from "../lib/chat-tools.server";
+import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL, FIT_PREDICTOR_TOOL, detectLatestGender } from "../lib/chat-tools.server";
 import { rewriteToolCall } from "../lib/chat-tool-rewrite.server";
 import { withAnthropicRetry, classifyAnthropicError } from "../lib/anthropic-resilience.server";
 import { fetchCustomerContext } from "../lib/customer-context.server";
@@ -97,12 +97,22 @@ if (!globalThis.__shopagentRateSweeper) {
   globalThis.__shopagentRateSweeper.unref?.();
 }
 
+// Defensive cleanup of inbound chat history. The widget client may
+// re-send a previous turn whose `content` accidentally captured a
+// raw "Human:" / "Assistant:" role marker (from an upstream model
+// glitch or a copy-paste from a transcript export). Without this,
+// the marker rides into the next request as ordinary message text
+// and the next-turn model sometimes echoes it back to the customer
+// ("Human: Assistant, wait for the tool results..."). Strip leading
+// role tokens defensively. Idempotent — no-op on clean history.
 function sanitizeHistory(history) {
   const out = [];
   for (const turn of history || []) {
     if (!turn?.role || !turn?.content) continue;
     if (turn.role !== "user" && turn.role !== "assistant") continue;
-    out.push({ role: turn.role, content: String(turn.content) });
+    let content = String(turn.content).replace(/^\s*(?:Human|Assistant)\s*:\s*/i, "");
+    content = content.replace(/\n\s*(?:Human|Assistant)\s*:\s*/gi, "\n");
+    out.push({ role: turn.role, content });
   }
   return out;
 }
@@ -591,6 +601,12 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // so the empty-pool repair / definitional-hallucination strips
   // below must not wipe it.
   let recommenderAskedForMoreInfo = false;
+  // Track tool calls per turn so post-emit guards can validate the
+  // AI's claims against what was actually queried. Specifically,
+  // stock-availability claims ("currently available in size 9") must
+  // be backed by a get_product_details call this turn — without that,
+  // the size statement is hallucinated. Set wins all tools by name.
+  const toolsCalledThisTurn = new Set();
   const allProductPool = new Map();
   const excludedFamilies = new Set();
   const excludedHandles = new Set();
@@ -660,6 +676,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     if (toolUses.length === 0) break;
 
     toolCallCount += toolUses.length;
+    for (const u of toolUses) toolsCalledThisTurn.add(u.name);
     if (toolUses.some((u) =>
       u.name === "search_products" ||
       u.name === "get_product_details" ||
@@ -715,6 +732,21 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         if (r.reference.handle) excludedHandles.add(String(r.reference.handle).toLowerCase());
         const fam = titleStyleFamily(r.reference.title || "");
         if (fam) excludedFamilies.add(fam);
+        // When find_similar_products resolved a reference but found
+        // ZERO matching siblings (config gap, narrow similarity
+        // attributes, or the catalog genuinely has no peers), reset
+        // productSearchAttempted so the recovery hop downstream gets
+        // a chance to run a generic search_products with the latest
+        // user message. Without this, the AI emits an empty reply
+        // ("same support as carly" → no text, no cards) because the
+        // attempted-flag blocks the safety net.
+        if (!Array.isArray(r.products) || r.products.length === 0) {
+          console.log(
+            `[chat] ${ctx.shop} find_similar_products returned zero products for ` +
+              `ref=${r.reference.handle || "?"} — letting recovery hop run`,
+          );
+          productSearchAttempted = false;
+        }
       }
       if (u.name === "get_fit_recommendation" && r && !r.error && r.recommendation?.shouldDisplay) {
         if (r.handle) focusedHandles.add(String(r.handle).toLowerCase());
@@ -1261,6 +1293,53 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     const generic = extractGenericCTA(fullResponseText);
     fullResponseText = generic.text;
     genericCTA = generic.cta;
+  }
+
+  // Stock-claim hallucination guard. The SIZE & STOCK GROUNDING
+  // prompt rule tells the AI to call get_product_details before
+  // claiming a specific size is in stock. When it skips that call
+  // and asserts availability anyway ("currently available in size
+  // 9", "in stock in size 11", "we have it in 9.5"), the claim is
+  // hallucinated — the AI doesn't have real-time inventory in its
+  // training data. Detect the pattern; if get_product_details
+  // wasn't called this turn, strip the affirmation and substitute
+  // an honest deferral. Legitimate post-tool stock claims pass
+  // through because the tool name is in toolsCalledThisTurn.
+  const STOCK_CLAIM_AFFIRMATION_RE =
+    /\b(?:currently |right now |presently )?(?:available|in stock|we have (?:(?:it|them|these|those|that|this|some))?)\s+(?:in\s+)?(?:size\s+)?(?:\d+(?:\.\d+)?(?:[\s-](?:wide|narrow|x-?wide|w|n|m|d|ee|eee))?|wide|narrow|x-?wide)\b/i;
+  if (
+    fullResponseText &&
+    !toolsCalledThisTurn.has("get_product_details") &&
+    STOCK_CLAIM_AFFIRMATION_RE.test(fullResponseText)
+  ) {
+    console.log(
+      `[chat] ${ctx.shop} stock-claim without get_product_details — stripping affirmation`,
+    );
+    fullResponseText = fullResponseText
+      .replace(STOCK_CLAIM_AFFIRMATION_RE, "")
+      .replace(/\s{2,}/g, " ")
+      .replace(/\s+([.,!?])/g, "$1")
+      .trim();
+    if (fullResponseText && !/[.!?]$/.test(fullResponseText)) fullResponseText += ".";
+    fullResponseText = (fullResponseText + " I can't check live stock from here — the product page or our support team can confirm the size.").trim();
+  }
+
+  // Outbound role-marker scrub. Belt-and-suspenders alongside
+  // sanitizeHistory's inbound strip: if the model literally generated
+  // "Human:" / "Assistant:" tokens in its reply (rare but observed
+  // when sanitizeHistory missed a leak in a long-running session),
+  // remove them before emit. Customers should NEVER see those tokens.
+  if (fullResponseText && /\b(?:Human|Assistant)\s*:/i.test(fullResponseText)) {
+    const before = fullResponseText.length;
+    fullResponseText = fullResponseText
+      .replace(/^\s*(?:Human|Assistant)\s*:\s*/i, "")
+      .replace(/\n\s*(?:Human|Assistant)\s*:\s*/gi, "\n")
+      .replace(/\s*(?:Human|Assistant)\s*:\s*/gi, " ")
+      .replace(/[ \t]{2,}/g, " ")
+      .trim();
+    if (fullResponseText.length !== before) {
+      console.log(`[chat] ${ctx.shop} stripped role-marker tokens from outbound text`);
+    }
   }
 
   console.log(`[chat] emit textLen=${fullResponseText.length} poolSize=${pool.length} searchAttempted=${productSearchAttempted}`);
@@ -1864,7 +1943,34 @@ export const action = async ({ request }) => {
 
     const history = sanitizeHistory(body.history);
     const messages = [...history, { role: "user", content: String(body.message) }];
-    const sessionGender = detectGenderFromHistory(messages);
+
+    // Gender-pivot detection. detectGenderFromHistory walks the entire
+    // conversation; if the customer clicked the Men's chip in turn 1
+    // and now says "oh wait this is for my mom" in turn 5, the prior
+    // chip answer pollutes the prompt's Established Answers block and
+    // the AI keeps recommending men's products. Re-run gender
+    // detection on JUST the latest user message — if it surfaces a
+    // clear pivot signal, that overrides the historical session
+    // gender. Gated on relationship words / explicit gender mentions
+    // only (no bare pronouns) so a stray "his cousin asked me about
+    // this" doesn't flip the entire conversation.
+    const PIVOT_RE = /\b(men|mens|men['’]?s|women|womens|women['’]?s|male|female|mom|mother|wife|girlfriend|sister|daughter|grandma|grandmother|aunt|niece|dad|father|husband|boyfriend|brother|son|grandpa|grandfather|uncle|nephew|lady|ladies|guy|dude|girl|girls|boy|boys|kid|kids|children)\b/i;
+    const latestUserMessage = String(body.message || "");
+    const historicalSessionGender = detectGenderFromHistory(messages);
+    const latestPivotedGender =
+      PIVOT_RE.test(latestUserMessage) ? detectLatestGender(latestUserMessage) : null;
+    // Pivot wins. When the latest message has a clear pivot signal,
+    // that's the source of truth for this turn forward — catalog
+    // scoping, ctx.sessionGender, search filters, all flow from this
+    // single value. Without the pivot, fall back to the historical
+    // detection (chip clicks + earlier mentions).
+    const sessionGender = latestPivotedGender || historicalSessionGender;
+    if (latestPivotedGender && latestPivotedGender !== historicalSessionGender) {
+      console.log(
+        `[chat] gender-pivot: history=${historicalSessionGender || "-"} → latest=${latestPivotedGender} ` +
+          `(triggered by "${latestUserMessage.slice(0, 60)}")`,
+      );
+    }
     const answeredChoices = extractAnsweredChoices(messages);
 
     // When gender was detected from natural language ("for my dad",
@@ -1874,16 +1980,36 @@ export const action = async ({ request }) => {
     // ignores the rules-knowledge "gender is locked" intent and asks
     // anyway. Inject a synthetic entry so the AI sees gender as
     // already-answered and skips the gender question.
-    if (sessionGender && !answeredChoices.some((c) =>
-      /\b(men|women|gender|him|her|man|woman)\b/i.test(c.question || "") ||
-      /\b(men|women|men's|women's)\b/i.test(c.answer || "")
-    )) {
-      answeredChoices.unshift({
-        question: "Are these for men's or women's?",
-        answer: sessionGender === "men" ? "Men's" : "Women's",
-        rawAnswer: sessionGender === "men" ? "Men's" : "Women's",
-        options: ["Men's", "Women's"],
-      });
+    //
+    // On a real pivot (latestPivotedGender different from history),
+    // drop any prior gender chip-answer first so the new gender takes
+    // precedence — otherwise an old "Men's" chip click in turn 1
+    // sticks and contradicts the new "for my mom" context.
+    if (sessionGender) {
+      const isPivot = Boolean(latestPivotedGender) && latestPivotedGender !== historicalSessionGender;
+      if (isPivot) {
+        for (let i = answeredChoices.length - 1; i >= 0; i--) {
+          const c = answeredChoices[i];
+          if (
+            /\b(men|women|gender|him|her|man|woman)\b/i.test(c.question || "") ||
+            /\b(men|women|men's|women's)\b/i.test(c.answer || "")
+          ) {
+            answeredChoices.splice(i, 1);
+          }
+        }
+      }
+      const alreadyHas = answeredChoices.some((c) =>
+        /\b(men|women|gender|him|her|man|woman)\b/i.test(c.question || "") ||
+        /\b(men|women|men's|women's)\b/i.test(c.answer || ""),
+      );
+      if (isPivot || !alreadyHas) {
+        answeredChoices.unshift({
+          question: "Are these for men's or women's?",
+          answer: sessionGender === "men" ? "Men's" : "Women's",
+          rawAnswer: sessionGender === "men" ? "Men's" : "Women's",
+          options: ["Men's", "Women's"],
+        });
+      }
     }
 
     let [knowledge, attrMappings, catalogProductTypes, allCatalogCategories, categoryGenderMap, activeCampaigns] = await Promise.all([
