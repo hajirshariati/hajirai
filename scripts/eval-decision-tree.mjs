@@ -75,6 +75,18 @@ check("Athletic running + flat-arch + posted (Women) → Posted Speed SKU",
   )));
 check("No matching cell falls back gracefully (uses fallback or Unisex)",
   () => assert(sku({ gender: "Men", useCase: "skates" }), "skates is Unisex-only; resolver should still return"));
+check("Kids never get a Unisex SKU (cleats has no Kids variant)",
+  () => assert.equal(sku({ gender: "Kids", useCase: "cleats" }), undefined,
+    "Kids must NOT match Unisex cleats; expected null/no match"));
+check("Kids + skates → no match (skates is Unisex-only)",
+  () => assert.equal(sku({ gender: "Kids", useCase: "skates" }), undefined,
+    "Kids must NOT fall back to Unisex skates"));
+check("Kids + kids-useCase → Kids SKU still resolves",
+  () => {
+    const r = sku({ gender: "Kids", useCase: "kids" });
+    assert(typeof r === "string" && r.startsWith("L17"),
+      `expected a Kids L17* SKU, got ${r}`);
+  });
 
 console.log("\nrecommender → tool definition");
 check("recommenderToToolDef returns a Claude-shaped tool", () => {

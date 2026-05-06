@@ -25,11 +25,23 @@ const HARD_FILTER_ATTRS = ["useCase"];
 // Gender filter is special: customer says "Men" but the only SKU
 // in that use-case is Unisex (e.g. cleats, skates) — we want to
 // surface the Unisex one rather than fall back to a wrong-gender
-// SKU. So the gender filter accepts {customer_gender, "Unisex"}.
-// Generic across catalogs (any catalog with a Unisex tier benefits).
+// SKU. So adult genders (Men/Women) accept {asked, "Unisex"}.
+//
+// Kids are different. A child's foot is anatomically different from
+// an adult's, and merchant policy is: a Kids customer must ONLY get
+// a Kids-tagged product. Unisex (which means "adult unisex" in this
+// catalog) is NOT a valid substitute for a child. If no Kids SKU
+// exists for the asked use-case, the resolver returns no match and
+// lets the caller surface a clean "we don't carry a kids product
+// for that use-case" message rather than ship a wrong-fit Unisex.
+const KIDS_GENDERS = new Set(["Kids", "Boys", "Girls", "Kid", "Child"]);
+function isKidsGender(g) {
+  return typeof g === "string" && KIDS_GENDERS.has(g);
+}
 function genderMatch(candidateGender, askedGender) {
   if (!askedGender) return true;
   if (candidateGender === askedGender) return true;
+  if (isKidsGender(askedGender)) return false;
   if (candidateGender === "Unisex") return true;
   return false;
 }
@@ -123,9 +135,20 @@ export function resolveTree(answers, resolver) {
   // ahead of metSupport.
 
   if (candidates.length === 0) {
+    // Refuse the global fallback for Kids unless the fallback itself
+    // is Kids-tagged. The merchant's universal default is typically a
+    // Unisex SKU — fine for adults, wrong for children.
+    const fallback = resolver.fallback || null;
+    const fallbackGender = fallback?.gender;
+    const fallbackOk =
+      !fallback ||
+      !isKidsGender(attrs.gender) ||
+      isKidsGender(fallbackGender);
     return {
-      resolved: resolver.fallback || null,
-      reason: "no candidates after hard filter",
+      resolved: fallbackOk ? fallback : null,
+      reason: fallbackOk
+        ? "no candidates after hard filter"
+        : "no kids-specific product for this use-case; not falling back to a non-kids SKU",
       attrs,
     };
   }
