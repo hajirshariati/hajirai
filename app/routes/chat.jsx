@@ -515,6 +515,13 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   const totalUsage = { input_tokens: 0, output_tokens: 0, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 };
   let toolCallCount = 0;
   let productSearchAttempted = false;
+  // Set when a recommender tool returned needMoreInfo (the gate
+  // detected required attributes were missing and instructed the
+  // LLM to ask the customer first). When this fires, the AI's
+  // next-hop text is a clarifying question — not a failed pitch —
+  // so the empty-pool repair / definitional-hallucination strips
+  // below must not wipe it.
+  let recommenderAskedForMoreInfo = false;
   const allProductPool = new Map();
   const excludedFamilies = new Set();
   const excludedHandles = new Set();
@@ -632,6 +639,9 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     for (let i = 0; i < toolUses.length; i++) {
       const u = toolUses[i];
       const r = results[i];
+      if (u.name.startsWith("recommend_") && r && r.needMoreInfo === true) {
+        recommenderAskedForMoreInfo = true;
+      }
       if (u.name === "find_similar_products" && r && !r.error && r.reference) {
         if (r.reference.handle) excludedHandles.add(String(r.reference.handle).toLowerCase());
         const fam = titleStyleFamily(r.reference.title || "");
@@ -1029,7 +1039,12 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     const lastChunk = trimmed.split(/[.!]\s+/).pop() || "";
     return /\?\s*$/.test(lastChunk.trim());
   };
-  if (pool.length === 0 && looksLikeProductPitch(fullResponseText) && !looksLikeClarifyingQuestion(fullResponseText)) {
+  if (
+    pool.length === 0 &&
+    looksLikeProductPitch(fullResponseText) &&
+    !looksLikeClarifyingQuestion(fullResponseText) &&
+    !recommenderAskedForMoreInfo
+  ) {
     console.log(`[chat] empty-pool repair: pitch text without products (searchAttempted=${productSearchAttempted})`);
     fullResponseText = "";
   }
@@ -1041,6 +1056,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   if (
     productSearchAttempted &&
     pool.length === 0 &&
+    !recommenderAskedForMoreInfo &&
     looksLikeDefinitionalHallucination(fullResponseText)
   ) {
     console.log(`[chat] empty-pool repair: definitional hallucination`);
