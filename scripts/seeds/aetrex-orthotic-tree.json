@@ -79,10 +79,6 @@
         {
           "label": "Kids",
           "value": "Kids"
-        },
-        {
-          "label": "Unisex",
-          "value": "Unisex"
         }
       ],
       "next": {
@@ -190,7 +186,7 @@
     "condition"
   ],
   "attributePrompts": {
-    "gender": "Is this for a man, woman, kid, or are you looking for a unisex option?",
+    "gender": "Who are these orthotics for — a man, woman, or kid?",
     "useCase": "What kind of shoes will the orthotics go in? Pick the closest match — dress shoes, casual/everyday, athletic (running/training/general gym), cleats (soccer, football, baseball, lacrosse, rugby, any spike/stud sport shoe), hockey skates, winter boots, work boots, or general comfort (walking, standing all day). If the customer plays a field/court sport, that's CLEATS — never 'comfort'.",
     "condition": "Any specific foot pain or condition we should match? (plantar fasciitis, heel spurs, ball-of-foot pain / metatarsalgia, Morton's neuroma, overpronation / flat feet, diabetic feet, or none — just looking for comfort)",
     "arch": "What's your arch type — flat / low, medium, or high? If you're not sure, that's fine.",

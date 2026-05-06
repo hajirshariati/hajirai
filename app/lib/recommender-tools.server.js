@@ -94,6 +94,14 @@ function discoverAttributes(definition) {
       out.get(k).add(String(v));
     }
   }
+  // "Unisex" is a product-side compatibility tag (a Unisex SKU
+  // satisfies both Men's and Women's queries via genderMatch), not
+  // a gender the customer can select. Keep it on products in the
+  // masterIndex but hide it from the LLM's gender enum so the tool
+  // can't be called with gender="Unisex".
+  if (out.has("gender")) {
+    out.get("gender").delete("Unisex");
+  }
   return Array.from(out.entries()).map(([name, vals]) => ({
     name,
     values: Array.from(vals).sort(),
