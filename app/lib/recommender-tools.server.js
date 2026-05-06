@@ -104,10 +104,13 @@ export function recommenderToToolDef(tree) {
     ? tree.definition.requiredAttributes.filter((s) => typeof s === "string" && s.trim())
     : [];
   const requiredLine = required.length > 0
-    ? `\n\nBEFORE calling this tool, the conversation MUST have established values for: ${required.join(", ")}. ` +
-      `If the customer hasn't mentioned any of these, ASK them in conversation first using natural-language ` +
-      `questions — do not call the tool with placeholders or guesses. The tool will refuse to resolve and ` +
-      `tell you what's still missing if you call too early.`
+    ? `\n\nALWAYS call this tool when the customer asks for a ${tree.intent} recommendation, even if you only ` +
+      `have partial information. Pass whatever attributes the customer has mentioned. ` +
+      `If required attributes (${required.join(", ")}) are missing, the tool will return a needMoreInfo response ` +
+      `containing the exact natural-language questions to ask the customer. Read the tool's "instruction" field, ` +
+      `write those questions to the customer in your reply, wait for their answer, then call this tool again ` +
+      `with the complete set. Do NOT skip calling the tool just because you're missing attributes — the tool ` +
+      `IS how you find out what to ask. Do NOT make up answers; only use values the customer provided.`
     : "";
   const description =
     `AUTHORITATIVE recommender for "${tree.intent}" queries on this shop. ` +
