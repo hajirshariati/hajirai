@@ -750,7 +750,7 @@ a.ai-chat-welcome__hint--link:hover {
   padding: 0;
   border: none;
   border-radius: 50%;
-  background: #000;
+  background: #c5a370;
   color: #fff;
   cursor: pointer;
   z-index: 2;
@@ -790,7 +790,7 @@ a.ai-chat-welcome__hint--link:hover {
     right: 0;
   }
   .ai-chat-choices-arrow:hover {
-    background: #1a1a1a;
+    background: #b8945e;
   }
   .ai-chat-choices-arrow:active {
     transform: translateY(-50%) scale(0.92);
