@@ -59,7 +59,10 @@ export default function App() {
       <PolarisAppProvider i18n={enTranslations} linkComponent={PolarisLink}>
         <NavMenu>
           <Link to="/app" rel="home">SEoS Assistant</Link>
-          <Link to="/app/rules-knowledge">Rules & Knowledge</Link>
+          <Link to="/app/catalog">Catalog</Link>
+          <Link to="/app/rules">Rules</Link>
+          <Link to="/app/knowledge">Knowledge</Link>
+          <Link to="/app/recommenders">Smart Recommenders</Link>
           <Link to="/app/analytics">Analytics</Link>
           <Link to="/app/plans">Plans &amp; Support</Link>
           <Link to="/app/api-keys">Settings</Link>
