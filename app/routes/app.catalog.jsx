@@ -2791,7 +2791,6 @@ export default function RulesKnowledge() {
       <BlockStack gap="800">
         <BlockStack gap="400">
           <SectionHeading
-            eyebrow="1 · Catalog sync"
             title="Product data from Shopify"
             description="Keep the AI's product index in sync with your Shopify catalog. Re-sync after large bulk imports, or let webhooks handle incremental changes automatically."
           />
@@ -2800,7 +2799,18 @@ export default function RulesKnowledge() {
 
         <BlockStack gap="400">
           <SectionHeading
-            eyebrow="2 · Attribute mappings"
+            title="Match products by meaning, not just keywords"
+            description="Embed your catalog so customers asking for 'shoes for standing all day' find arch-support styles even when the description doesn't say 'standing'. Configure the provider + API key in Settings; manage the index here."
+          />
+          <SemanticSearchCard
+            provider={data.embeddingProvider}
+            embeddedCount={data.embeddedCount}
+            productsCount={data.productsCount}
+          />
+        </BlockStack>
+
+        <BlockStack gap="400">
+          <SectionHeading
             title="Tell the AI which metafields to filter by"
             description="Map gender, color, size, and other attributes to the metafields or tags they live on in your products."
           />
@@ -2809,7 +2819,6 @@ export default function RulesKnowledge() {
 
         <BlockStack gap="400">
           <SectionHeading
-            eyebrow="3 · Category groups"
             title="How product types group together"
             description="Group your product types (Sneakers + Boots + Sandals = 'Footwear', for example). The AI uses these groups to scope searches and route customer intent."
           />
@@ -2820,19 +2829,6 @@ export default function RulesKnowledge() {
           >
             <CategoryGroupsCard initial={data.categoryGroups} />
           </PlanGate>
-        </BlockStack>
-
-        <BlockStack gap="400">
-          <SectionHeading
-            eyebrow="4 · Semantic search"
-            title="Match products by meaning, not just keywords"
-            description="Embed your catalog so customers asking for 'shoes for standing all day' find arch-support styles even when the description doesn't say 'standing'. Configure the provider + API key in Settings; manage the index here."
-          />
-          <SemanticSearchCard
-            provider={data.embeddingProvider}
-            embeddedCount={data.embeddedCount}
-            productsCount={data.productsCount}
-          />
         </BlockStack>
       </BlockStack>
     </Page>

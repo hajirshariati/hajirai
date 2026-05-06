@@ -59,7 +59,7 @@ export const STEPS = [
     icon: "🗂",
     title: "Configure attribute mappings",
     short: "Map custom.attr_* metafields to clean attribute names.",
-    body: "Rules & Knowledge → Catalog & attributes. Aetrex products use Shopify metafields under the `custom` namespace. Map each one to a clean attribute name the assistant uses for filtering. Use the reference table below — copy these exactly.",
+    body: "Catalog → Attribute mappings. Aetrex products use Shopify metafields under the `custom` namespace. Map each one to a clean attribute name the assistant uses for filtering. Use the reference table below — copy these exactly.",
     showAttributeTable: true,
   },
   {
@@ -67,7 +67,7 @@ export const STEPS = [
     icon: "📚",
     title: "Upload Aetrex knowledge files",
     short: "FAQs, brand voice, sizing, fit glossary, product attrs CSV.",
-    body: "Rules & Knowledge → Knowledge files. Upload these files (kept in the shared Drive folder /Aetrex/SEoS-knowledge/):",
+    body: "Knowledge → Knowledge files. Upload these files (kept in the shared Drive folder /Aetrex/SEoS-knowledge/):",
     list: [
       "aetrex-faqs.md — FAQ list (sizing, returns, shipping, technology questions)",
       "brand-voice.md — tone guidelines (warm, expert, never pushy)",
@@ -75,7 +75,7 @@ export const STEPS = [
       "fit-glossary.md — definitions of Lynco, HealthySteps, arch types, fit types",
       "product-attributes.csv — SKU-keyed material/care/fit-notes per product",
     ],
-    tip: "Use the in-app templates (Rules & Knowledge → category → Download) — they're pre-formatted with `═══` dividers so each section becomes one retrievable chunk when RAG is on. The product-attributes CSV with a SKU column auto-links to the catalog.",
+    tip: "Use the in-app templates (Knowledge → Knowledge files → each category has a Download button) — they're pre-formatted with `═══` dividers so each section becomes one retrievable chunk when RAG is on. The product-attributes CSV with a SKU column auto-links to the catalog.",
   },
   {
     phase: "configure",
@@ -85,11 +85,11 @@ export const STEPS = [
     body: "Settings → Semantic search. Paste an OpenAI or Voyage AI key (Aetrex's lives in 1Password under 'Embedding — OpenAI'). One key powers two features: semantic product matching (customers asking 'shoes for standing all day' find arch-support styles even when 'standing' isn't in the description), and RAG over knowledge files (only the top relevant sections are sent to the AI per chat turn instead of the full corpus).",
     list: [
       "Paste the embedding API key in Settings → Semantic search and save.",
-      "Open Rules & Knowledge → click Backfill embeddings — embeds the product catalog (~$0.05 one-time for a 700-product catalog).",
-      "Toggle 'Use RAG retrieval' on the Knowledge files card — only enabled once an embedding provider is configured.",
+      "Open Catalog → Semantic search and click Backfill embeddings — embeds the product catalog (~$0.05 one-time for a 700-product catalog).",
+      "Open Knowledge → Knowledge files and toggle 'Use RAG retrieval' — only enabled once an embedding provider is configured.",
       "After enabling RAG, re-upload existing knowledge files OR run: npm run backfill:knowledge-chunks -- --shop=<your-shop>.myshopify.com",
     ],
-    tip: "New uploads embed automatically — no manual rebuild needed once RAG is on. The Knowledge size bar on Rules & Knowledge shows your total upload size; with RAG on, only ~3 KB reaches the AI per turn regardless of total size.",
+    tip: "New uploads embed automatically — no manual rebuild needed once RAG is on. The Knowledge size bar on the Knowledge page shows your total upload size; with RAG on, only ~3 KB reaches the AI per turn regardless of total size.",
   },
   {
     phase: "integrate",
@@ -129,7 +129,7 @@ export const STEPS = [
     icon: "📏",
     title: "Configure the fit predictor",
     short: "Combines reviews + returns + history + Aetrex sizing API.",
-    body: "Rules & Knowledge → Fit predictor → Enabled. The predictor combines Yotpo review fit data, Aftership return reasons, the customer's own order history, and the Aetrex external sizing API into a single confidence score per product. Paste the external sizing API endpoint and key from 1Password.",
+    body: "Fit predictor (Beta) → Enable. The predictor combines Yotpo review fit data, Aftership return reasons, the customer's own order history, and the Aetrex external sizing API into a single confidence score per product. Paste the external sizing API endpoint and key from 1Password.",
   },
   {
     phase: "launch",
@@ -196,8 +196,8 @@ export const STEPS = [
     cadence: "as-needed",
     icon: "🧠",
     title: "Re-embed the catalog after big content edits",
-    short: "Click Backfill in Rules & Knowledge after bulk product description changes.",
-    body: "Individual product create/update webhooks auto-re-embed in the background. But bulk operations (CSV import, mass title rename, bulk description rewrite via a third-party tool) often skip webhooks. After such an operation, open Rules & Knowledge → Semantic search and click Backfill to refresh embeddings for any products that changed.",
+    short: "Click Backfill in Catalog → Semantic search after bulk product description changes.",
+    body: "Individual product create/update webhooks auto-re-embed in the background. But bulk operations (CSV import, mass title rename, bulk description rewrite via a third-party tool) often skip webhooks. After such an operation, open Catalog → Semantic search and click Backfill to refresh embeddings for any products that changed.",
     tip: "If the embedded count drops below the total products count and you didn't expect it, that's the sign — click Backfill until the bar hits 100% again.",
   },
   {
@@ -206,7 +206,7 @@ export const STEPS = [
     icon: "📚",
     title: "Quarterly knowledge file review",
     short: "Keep aetrex-faqs / sizing-guide / fit-glossary current.",
-    body: "Once per quarter, open Rules & Knowledge → Knowledge files and re-upload any of these that have changed on aetrex.com:",
+    body: "Once per quarter, open Knowledge → Knowledge files and re-upload any of these that have changed on aetrex.com:",
     list: [
       "aetrex-faqs.md — if shipping policy, return policy, or FAQ page on the site changed",
       "sizing-guide.md — if Aetrex updated the sizing chart or added new size ranges",
@@ -234,7 +234,7 @@ export const STEPS = [
     list: [
       "Wrong product recommended → tune knowledge files or attribute mappings",
       "AI re-asked something already answered → check that conversation history is being passed correctly",
-      "AI claimed a product doesn't exist when it does → check Search Rules / Category Groups for over-aggressive filtering",
+      "AI claimed a product doesn't exist when it does → check Rules → Search behavior and Catalog → Category groups for over-aggressive filtering",
       "AI gave outdated info → refresh the relevant knowledge file",
     ],
   },
@@ -244,8 +244,8 @@ export const STEPS = [
     icon: "🗂",
     title: "Keep Category Groups aligned with new product types",
     short: "Add new categories to the right group when Aetrex launches new lines.",
-    body: "When Aetrex adds a new product type to Shopify (e.g. a new 'Sneaker Pro' category), open Rules & Knowledge → Category groups and add the new category to the right group (Footwear / Orthotics / Accessories). Without an entry, the new category falls outside the group filter and may appear in the wrong intent's chip list.",
-    tip: "The Category Groups card in Rules & Knowledge shows your current groups. Compare against the catalog every time a new product line launches.",
+    body: "When Aetrex adds a new product type to Shopify (e.g. a new 'Sneaker Pro' category), open Catalog → Category groups and add the new category to the right group (Footwear / Orthotics / Accessories). Without an entry, the new category falls outside the group filter and may appear in the wrong intent's chip list.",
+    tip: "The Category groups card on the Catalog page shows your current groups. Compare against the catalog every time a new product line launches.",
   },
 
   // ── How RAG works ─────────────────────────────────────────────────
@@ -263,7 +263,7 @@ export const STEPS = [
       "Cost: ~$0.0000004 per chat turn for embedding the customer query (effectively free). Token savings on the Anthropic call usually offset embedding cost 10x over.",
       "Multi-tenant: every chunk is scoped by shop column. One Postgres instance can serve any number of merchants — each sees only their own data.",
     ],
-    tip: "The Knowledge size bar on Rules & Knowledge reflects upload size, not runtime size. With RAG on, the AI only ever sees ~3KB of knowledge per turn even if you've uploaded 60KB total — but the bar still shows 60KB because that's what's in storage.",
+    tip: "The Knowledge size bar on the Knowledge page reflects upload size, not runtime size. With RAG on, the AI only ever sees ~3KB of knowledge per turn even if you've uploaded 60KB total — but the bar still shows 60KB because that's what's in storage.",
   },
 
   // ── Quality testing system ────────────────────────────────────────
@@ -348,7 +348,7 @@ export const STEPS = [
     list: [
       "Output prints a console summary (scanned / flagged / rate / top 10 flagged responses) plus a full JSON report at scripts/audit-hallucinations.json with every violation, the suspicious phrase, and a 400-char excerpt of what the AI said.",
       "Two violation kinds today: orphan-sku (the AI mentioned a SKU like L500 that isn't in any synced ProductVariant.sku for this shop) and definitional-claim (the AI said 'X is our premium line' but X isn't a known vendor or title token in the catalog).",
-      "Flagged-rate of 0–2% is healthy; over 5% means either the catalog is out of sync (run a re-sync from Rules & Knowledge) or the model is genuinely fabricating — open the JSON report and look at the excerpts to tell which.",
+      "Flagged-rate of 0–2% is healthy; over 5% means either the catalog is out of sync (run a re-sync from Catalog → Catalog sync) or the model is genuinely fabricating — open the JSON report and look at the excerpts to tell which.",
     ],
     tip: "Optional flags: '--shop=foo.myshopify.com' for one shop, '--days=7' for last week, '--limit=200' to cap the scan, '--vote=down' to only audit thumbs-downed responses (those are the most suspicious already), '--json' to print the full report to stdout instead of the summary. Run this against production data — it reads ChatFeedback rows so it only sees responses that customers rated, which is the data set you most care about.",
   },
