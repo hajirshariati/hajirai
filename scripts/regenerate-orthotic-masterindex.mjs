@@ -197,28 +197,37 @@ function firstMetaValue(product, key) {
 }
 
 // ── Derive the SKU prefix that becomes masterSku ──────────────────────
-// Aetrex variants follow the pattern <masterSku><sizecode>, e.g. SKUs
-// L100M07, L100M08, L100M09 all collapse to master L100M. The shared
-// prefix across all variants of a product IS the masterSku.
+// Aetrex variants follow the pattern <letter-prefix><number><letter-suffix>[size]
+// e.g. L1300U07 → L1300U, PFKM07 → PFKM, A100M07 → A100M, L4500U-M → L4500U.
+// Use the first variant's SKU and pattern-match the master portion.
+// LCP across variants is too aggressive when variants have varying
+// suffix lengths ("L1300U07" + "L1300U-XS" → LCP "L1300U" works, but
+// "L1300U" + "L1305U" → LCP "L130" → wrong).
+const ORTHOTIC_SKU_RE = /^([A-Z]+\d+[A-Z]+)/i;
 function deriveMasterSku(product) {
   const skus = (product.variants?.edges || [])
     .map((e) => String(e.node?.sku || "").trim())
     .filter(Boolean);
   if (skus.length === 0) return null;
-  if (skus.length === 1) {
-    // Single-variant product (e.g. PFK kit) — strip a trailing 2-digit size
-    // if the SKU pattern is "PFKM07"; otherwise return as-is.
-    const m = skus[0].match(/^(.*?[A-Za-z])\d{1,3}$/);
-    return m ? m[1] : skus[0];
+
+  // Pattern match against the first variant — Aetrex's master prefix is
+  // always a letter-block + digit-block + letter-block, e.g. L1300U.
+  for (const sku of skus) {
+    const m = sku.match(ORTHOTIC_SKU_RE);
+    if (m && m[1]) return m[1];
   }
-  // Multi-variant: longest common prefix.
+
+  // Fallback: longest common prefix, then keep only chars up to the
+  // first run of trailing digits. Used for non-standard SKUs (kits,
+  // bundles) that don't fit the L/A/PFK pattern.
   let prefix = skus[0];
   for (let i = 1; i < skus.length; i++) {
     let j = 0;
     while (j < prefix.length && j < skus[i].length && prefix[j] === skus[i][j]) j++;
     prefix = prefix.slice(0, j);
   }
-  return prefix.replace(/[^A-Za-z]+$/, "") || prefix;
+  // Strip ONLY a complete trailing size code (2-3 digits), not partial digits.
+  return prefix.replace(/\d{2,3}$/, "") || prefix;
 }
 
 // ── Discovery pass: find distinct metafield values ────────────────────
