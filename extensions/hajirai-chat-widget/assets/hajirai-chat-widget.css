@@ -692,6 +692,15 @@ a.ai-chat-welcome__hint--link:hover {
 }
 .ai-chat-choices::-webkit-scrollbar { display: none; }
 
+.ai-chat-choices-wrap {
+  position: relative;
+  margin-top: 12px;
+}
+
+.ai-chat-choices-wrap .ai-chat-choices {
+  margin-top: 0;
+}
+
 /* Edge fades only when there IS hidden content in that direction. */
 .ai-chat-choices.has-overflow:not(.at-start):not(.at-end) {
   -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 16px, #000 calc(100% - 20px), transparent 100%);
@@ -729,6 +738,53 @@ a.ai-chat-welcome__hint--link:hover {
   .ai-chat-choice-btn:hover {
     background: var(--ai-chat-primary, #2d6b4f);
     color: #fff;
+  }
+}
+
+.ai-chat-choices-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: #000;
+  color: #fff;
+  cursor: pointer;
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.ai-chat-choices-arrow svg {
+  display: block;
+}
+
+.ai-chat-choices-arrow--prev {
+  left: -6px;
+}
+
+.ai-chat-choices-arrow--next {
+  right: -6px;
+}
+
+@media (min-width: 768px) and (hover: hover) {
+  .ai-chat-choices-arrow {
+    display: flex;
+  }
+  .ai-chat-choices-arrow[hidden] {
+    display: none;
+  }
+  .ai-chat-choices-arrow:hover {
+    background: #1a1a1a;
+  }
+  .ai-chat-choices-arrow:active {
+    transform: translateY(-50%) scale(0.92);
   }
 }
 
