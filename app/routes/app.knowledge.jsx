@@ -2791,7 +2791,6 @@ export default function RulesKnowledge() {
       <BlockStack gap="800">
         <BlockStack gap="400">
           <SectionHeading
-            eyebrow="1 · Knowledge files"
             title="Soft context the AI can reference"
             description="FAQs, brand voice, sizing guides, store policies. Upload files; the AI reads them as background context on every chat turn."
           />
@@ -2800,7 +2799,6 @@ export default function RulesKnowledge() {
 
         <BlockStack gap="400">
           <SectionHeading
-            eyebrow="2 · Active promotions"
             title="Scheduled sales and campaign details"
             description="Schedule promotions with start/end dates. The chat reads only what's currently live — expired campaigns auto-disappear with no manual cleanup."
           />

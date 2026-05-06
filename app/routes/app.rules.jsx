@@ -2789,11 +2789,8 @@ export default function RulesKnowledge() {
       <TitleBar title="Rules" />
       <div style={{ height: "4px", borderRadius: "2px", background: "linear-gradient(90deg, #2D6B4F, #3a8a66, transparent)", marginBottom: "20px" }} />
       <BlockStack gap="800">
-        <PriorityExplainer />
-
         <BlockStack gap="400">
           <SectionHeading
-            eyebrow="1 · Search behavior"
             title="How the AI searches your catalog"
             description="Hard filters, synonym expansions, and what counts as 'similar' for recommendations."
           />
@@ -2812,9 +2809,8 @@ export default function RulesKnowledge() {
 
         <BlockStack gap="400">
           <SectionHeading
-            eyebrow="2 · Recommendations & CTAs"
             title="What the customer sees below the chat"
-            description="Shop-all buttons beneath product cards, and the visual size-fit recommendation."
+            description="Shop-all buttons that appear beneath product cards in the customer's chat."
           />
           <PlanGate
             plan={data.plan}
@@ -2823,18 +2819,10 @@ export default function RulesKnowledge() {
           >
             <CollectionLinksCard initial={data.collectionLinks} />
           </PlanGate>
-          <PlanGate
-            plan={data.plan}
-            feature="fitPredictor"
-            summary="Visual fit-confidence card with size recommendation, aggregating reviews, return reasons, customer order history, and any merchant-configured external fit API."
-          >
-            <FitPredictorCard enabled={data.fitPredictorEnabled} config={data.fitPredictorConfig} />
-          </PlanGate>
         </BlockStack>
 
         <BlockStack gap="400">
           <SectionHeading
-            eyebrow="3 · Display"
             title="Product card presentation"
             description="How product cards are deduplicated and shown in chat."
           />

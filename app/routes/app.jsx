@@ -59,13 +59,14 @@ export default function App() {
       <PolarisAppProvider i18n={enTranslations} linkComponent={PolarisLink}>
         <NavMenu>
           <Link to="/app" rel="home">SEoS Assistant</Link>
-          <Link to="/app/catalog">Catalog</Link>
           <Link to="/app/rules">Rules</Link>
           <Link to="/app/knowledge">Knowledge</Link>
+          <Link to="/app/catalog">Catalog</Link>
           <Link to="/app/recommenders">Smart Recommenders</Link>
+          <Link to="/app/fit-predictor">Fit predictor (Beta)</Link>
           <Link to="/app/analytics">Analytics</Link>
-          <Link to="/app/plans">Plans &amp; Support</Link>
           <Link to="/app/api-keys">Settings</Link>
+          <Link to="/app/plans">Plans &amp; Support</Link>
         </NavMenu>
         <Outlet />
         <div style={{ marginTop: "40px", padding: "16px", textAlign: "center", borderTop: "2px solid #2D6B4F" }}>
