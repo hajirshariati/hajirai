@@ -124,10 +124,31 @@ export function recommenderToToolDef(tree) {
 
   const attrs = discoverAttributes(tree.definition);
   const properties = {};
+  // Per-attribute description hints. The LLM picks tool args based on
+  // these strings; generic "X attribute" wording leaves it guessing
+  // about clinical mappings (e.g. "ball-of-foot pain" → metSupport)
+  // and producing wrong picks. Keep merchant-agnostic — only attribute
+  // names that map to widely-recognized concepts get hints; everything
+  // else falls back to the generic description.
+  const ATTR_HINTS = {
+    metSupport:
+      "Set to 'true' when the customer mentions ball-of-foot pain, forefoot pain, metatarsal/metatarsalgia, OR Morton's neuroma — these signal a metatarsal pad is needed. Pass this IN ADDITION to 'condition' (which only carries one value). Example: customer reports BOTH arch pain AND forefoot pain → condition='overpronation_flat_feet' AND metSupport='true'. Don't omit it just because you already chose a different condition.",
+    posted:
+      "Set to 'true' when the customer mentions arch pain, flat feet, low arches, overpronation, ankle-rolling, or fallen arches — these signal the orthotic should be posted (rear-foot posted for medial support). Set to 'false' for medium/high arches with no overpronation.",
+    arch:
+      "Customer's arch type. 'Flat / Low Arch' for flat feet / low arches / overpronation; 'Medium / High Arch' for medium-to-high arches or when unknown.",
+    condition:
+      "Single dominant clinical condition. If the customer reports multiple complaints, pick ONE for this field but ALSO pass the relevant booleans (metSupport, posted) so the resolver sees the full clinical picture. Available enum values are listed below.",
+    useCase:
+      "What kind of shoe the orthotic goes in. Pick the closest enum match. 'cleats' for any spike/stud field/court sport (soccer, football, baseball, lacrosse), 'skates' for hockey, 'athletic_*' for sneakers/running/training, 'dress_*' for dress shoes, 'comfort' for general walking/standing/casual.",
+    gender:
+      "Allowed values: 'Men', 'Women', 'Kids'. NEVER pass 'Unisex' — that's a product-side compatibility tag, not a customer-facing gender.",
+  };
   for (const a of attrs) {
+    const hint = ATTR_HINTS[a.name];
     const prop = {
       type: "string",
-      description: `${a.name} attribute used to refine the recommendation`,
+      description: hint || `${a.name} attribute used to refine the recommendation`,
     };
     if (a.values.length > 0 && a.values.length <= MAX_ENUM_SIZE) {
       prop.enum = a.values;
