@@ -94,17 +94,29 @@ export function recommenderToToolDef(tree) {
     properties[a.name] = prop;
   }
 
-  // The tool description is what the LLM reads to decide WHEN to
-  // call. Merchants will customize this in the admin; the default
-  // is reasonable for the orthotic case but explicitly says "use
-  // when customer asks for X", which keeps the LLM from calling it
-  // for unrelated queries.
+  // Tool description Claude reads to decide WHEN to call. Two
+  // jobs: (a) tell Claude this is the AUTHORITATIVE recommender
+  // for the intent — preferred over search_products — so the
+  // existing "MANDATORY SEARCH BEFORE TEXT" rule doesn't pre-empt
+  // it; (b) bound when NOT to call (clearly unrelated queries) so
+  // the merchant's "do not hijack other intents" requirement is
+  // honored. Merchants will be able to customize this in the admin
+  // (Layer 1 from the bulletproof discussion); the auto-generated
+  // default below is reasonable until they do.
   const description =
-    `Recommend the right product from the merchant's "${tree.name}" catalog. ` +
-    `Use this tool ONLY when the customer is clearly asking for help picking ` +
-    `a "${tree.intent}" product. Provide as many attributes as the customer ` +
-    `has mentioned or implied; unspecified attributes will use sensible ` +
-    `defaults. Returns one matching master SKU plus a product card.`;
+    `AUTHORITATIVE recommender for "${tree.intent}" queries on this shop. ` +
+    `When a customer is asking for help picking a ${tree.intent} product ` +
+    `("recommend a ${tree.intent}", "I need a ${tree.intent} for X", ` +
+    `"which ${tree.intent} for Y condition"), call THIS tool — do NOT call ` +
+    `search_products for the same purpose. The resolver returns a single ` +
+    `deterministic master SKU based on the attributes you supply, so the ` +
+    `customer never gets a wrong-fit pick. Provide every attribute the ` +
+    `customer has mentioned or clearly implied; unspecified attributes use ` +
+    `sensible defaults. Returns one master SKU plus a product card.\n\n` +
+    `Do NOT call this tool when the customer is asking about a different ` +
+    `product type (e.g. shoes, sandals, socks, accessories), or about ` +
+    `non-product topics (returns, sizing, shipping, store policies). For ` +
+    `those, the existing search_products and other tools apply normally.`;
 
   return {
     name: `recommend_${tree.intent}`,
