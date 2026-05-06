@@ -248,14 +248,16 @@ export function stripBannedNarration(text) {
 // or without an actual product card). Used to detect incoherent turns
 // where the AI announces a match but no product was returned.
 //
-// Also matches MINIMAL transition acks ("got it", "okay", "sure",
-// "alright") that the model emits as a lead-in before a tool call
-// when it pivots gender or category. Without them in the regex, the
-// strip cascade can leave just "Got it —" as the entire customer-
-// facing reply when the tool result didn't produce cards. Catching
-// them here routes the empty-pool repair to substitute a coherent
-// fallback instead of shipping a 7-character orphan sentence.
-const PRODUCT_PITCH_RE = /\b(here are|check out|check these|some great|great options|top picks|picks for you|styles for you|perfect (?:for|match|pick|choice)|the (?:best|ideal|right) (?:match|choice|pick|option)|i (?:recommend|suggest)|points to|cleat-?compatible|look that up|got it|okay|alright|sure thing)\b/i;
+// IMPORTANT: this regex must NOT match common transition acks ("got
+// it", "okay", "alright"). Those appear in tons of legitimate
+// chip-answered turns (e.g. "Got it — for training, you'll want…")
+// which precede a tool call on the next hop. Including them caused
+// the empty-pool repair to fire on every chip-click turn and
+// replace the AI's actual question with a generic "nothing's
+// hitting" recovery — broke the flow entirely. Stick to phrases
+// that genuinely imply a product pitch ("here are", "top picks",
+// "perfect match" etc).
+const PRODUCT_PITCH_RE = /\b(here are|check out|check these|some great|great options|top picks|picks for you|styles for you|perfect (?:for|match|pick|choice)|the (?:best|ideal|right) (?:match|choice|pick|option)|i (?:recommend|suggest)|points to|cleat-?compatible|look that up)\b/i;
 
 export function looksLikeProductPitch(text) {
   return Boolean(text) && PRODUCT_PITCH_RE.test(text);
