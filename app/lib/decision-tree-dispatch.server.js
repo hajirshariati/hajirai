@@ -29,19 +29,29 @@ async function llmMatchChip({ anthropic, node, userMessage }) {
   }
   const text = String(userMessage || "").trim();
   if (!text) return null;
-  // Limit chip list to viable chips (already pruned by engine) plus
-  // raw labels — cheaper prompt, no junk options.
   const list = node.chips
     .map((c) => `- "${c.label}" → ${c.value}`)
     .join("\n");
+  // Be conservative. The prompt explicitly tells Haiku to return
+  // NONE when the customer's text is a different KIND of answer than
+  // the question is asking for — e.g. customer says "Morton's neuroma"
+  // (a foot condition) when the question asks about shoe context.
+  // Earlier version of this prompt was too eager and mapped condition
+  // words to "comfort" (Just want comfort / relief), losing the
+  // condition signal entirely. NONE is the correct answer there —
+  // the engine then re-asks and the customer can pick a real shoe
+  // context, then answer the condition question that comes next.
   const prompt =
-    `A customer is in a guided product funnel. They were asked:\n` +
-    `"${node.question}"\n\n` +
+    `A customer is answering a guided product-finder question.\n\n` +
+    `Question: "${node.question}"\n` +
+    `Question topic: ${node.attribute}\n\n` +
     `They typed: "${text.slice(0, 200)}"\n\n` +
-    `Available options (label → value):\n${list}\n\n` +
-    `Pick the option whose meaning best matches what the customer said. ` +
-    `Reply with ONLY the value (the part after →), exactly as written. ` +
-    `If none of the options fit, reply with the single word: NONE`;
+    `Available answers (label → value):\n${list}\n\n` +
+    `Rules:\n` +
+    `1. Pick the option whose meaning is a DIRECT, OBVIOUS match for what the customer said.\n` +
+    `2. If the customer's text is about a DIFFERENT topic than the question (e.g. they named a foot condition when the question asks about shoe type, or vice versa), reply NONE — do not force-fit.\n` +
+    `3. If the match requires guessing or reaching, reply NONE.\n\n` +
+    `Reply with ONLY the value (the part after →), exactly as written. Otherwise reply with the single word: NONE`;
 
   let res;
   try {

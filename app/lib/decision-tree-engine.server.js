@@ -102,22 +102,37 @@ function rootState(tree) {
   };
 }
 
+// Normalize smart quotes / typographic punctuation that macOS and
+// iOS auto-correct insert into the chat input. Without this,
+// `Morton's neuroma` (curly apostrophe from auto-correct) won't
+// match the chip label `Morton's neuroma` (straight apostrophe).
+// Cheap, no false positives — just normalizes characters that
+// represent the same intent.
+function normalizeForMatch(s) {
+  return String(s || "")
+    .toLowerCase()
+    .replace(/[‘’‚‛′]/g, "'")  // curly singles → '
+    .replace(/[“”„‟″]/g, '"')  // curly doubles → "
+    .replace(/[–—]/g, "-")                    // en/em dash → -
+    .trim();
+}
+
 // Match a free-text user reply against the chips of the current
 // node. Order:
-//   1. Exact (case-insensitive) match on chip.value.
+//   1. Exact (case-insensitive, smart-quote-normalized) match on chip.value.
 //   2. Exact match on chip.label.
 //   3. Substring contains match on label or value.
 //   4. None — caller asks the question again.
 function matchChip(userText, chips) {
   if (!chips || chips.length === 0) return null;
-  const t = String(userText || "").trim().toLowerCase();
+  const t = normalizeForMatch(userText);
   if (!t) return null;
   for (const c of chips) {
-    if (t === String(c.value).toLowerCase() || t === String(c.label).toLowerCase()) return c;
+    if (t === normalizeForMatch(c.value) || t === normalizeForMatch(c.label)) return c;
   }
   for (const c of chips) {
-    const lv = String(c.value).toLowerCase();
-    const ll = String(c.label).toLowerCase();
+    const lv = normalizeForMatch(c.value);
+    const ll = normalizeForMatch(c.label);
     if (t.includes(lv) || lv.includes(t)) return c;
     if (t.includes(ll) || ll.includes(t)) return c;
   }

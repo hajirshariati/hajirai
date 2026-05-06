@@ -183,6 +183,15 @@ check("Boys and Girls are no longer offered as gender chips (collapsed into Kids
   assert(labels.includes("Unisex"), "Unisex chip present");
 });
 
+check("Smart-quote apostrophes match chip labels (macOS auto-correct fix)", () => {
+  // Customer typing "Morton's neuroma" with curly apostrophe (auto-correct
+  // on macOS) used to fail the literal match against the straight-quote
+  // chip label. matchChip now normalizes typographic punctuation.
+  const { state, response } = runScenario({}, ["casual", "Women", "Morton’s neuroma", "Medium / High Arch", "no"]);
+  assert(response.completed, `did not complete; node=${state.currentNodeId}`);
+  assert.equal(state.answers.condition, "mortons_neuroma");
+});
+
 check("Unmatched user reply re-asks (no advance)", () => {
   let { nextState, response } = startTree(tree);
   ({ nextState, response } = stepTree(tree, nextState, "I have no idea"));
