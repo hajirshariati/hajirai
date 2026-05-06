@@ -1,6 +1,39 @@
 import { resolveTree } from "./decision-tree-resolver.server.js";
 import { validateDecisionTree } from "./decision-tree-schema.server.js";
 
+// Apply tree-level derivations to the customer's answer set BEFORE
+// resolving. Derivations let merchants encode rules like "if
+// condition is metatarsalgia, set metSupport=true" or "if
+// arch=Flat OR overpronation=yes, set posted=true". These were
+// part of the original engine; the refactor moved resolution into
+// a tool but the derivations slipped through the cracks. Without
+// this, the resolver sees only what the LLM passed in and can't
+// honor the merchant's clinical mappings, so e.g. ball-of-foot
+// pain returns the no-met SKU instead of the W/ Met Support twin.
+//
+// Pure function. The when-clause grammar (any / all / eq / in)
+// matches the original engine's evalCondition for backward compat
+// with tree definitions authored under the funnel-era schema.
+function evalDerivationCondition(cond, answers) {
+  if (!cond) return false;
+  if (Array.isArray(cond.any)) return cond.any.some((c) => evalDerivationCondition(c, answers));
+  if (Array.isArray(cond.all)) return cond.all.every((c) => evalDerivationCondition(c, answers));
+  if (cond.attr && "eq" in cond) return answers[cond.attr] === cond.eq;
+  if (cond.attr && Array.isArray(cond.in)) return cond.in.includes(answers[cond.attr]);
+  return false;
+}
+function applyDerivations(answers, derivations) {
+  if (!Array.isArray(derivations) || derivations.length === 0) return answers || {};
+  const out = { ...(answers || {}) };
+  for (const rule of derivations) {
+    if (!rule || !rule.set || rule.value === undefined || !rule.when) continue;
+    if (evalDerivationCondition(rule.when, out)) {
+      out[rule.set] = rule.value;
+    }
+  }
+  return out;
+}
+
 // Lazy-imported so this module can be loaded by tooling that
 // doesn't have @prisma/client available (e.g. the eval harness
 // running pure-function checks in CI). Cached after first await.
@@ -356,7 +389,19 @@ export async function executeRecommenderTool({ toolName, input, shop, trees }) {
   }
 
   const filteredResolver = { ...tree.definition.resolver, masterIndex: availableMasterIndex };
-  const result = resolveTree(input || {}, filteredResolver);
+
+  // Apply tree-level derivations BEFORE resolving so merchant-
+  // defined clinical mappings (condition → metSupport, arch →
+  // posted, etc.) are honored. Without this, the resolver only
+  // sees raw LLM-provided attributes and misses the implied ones.
+  const derivedInput = applyDerivations(input || {}, tree.definition.derivations);
+  if (Object.keys(derivedInput).length !== Object.keys(input || {}).length) {
+    const added = Object.keys(derivedInput).filter((k) => !(k in (input || {})));
+    if (added.length > 0) {
+      console.log(`[recommender] derivations added attribute(s): ${added.join(", ")}`);
+    }
+  }
+  const result = resolveTree(derivedInput, filteredResolver);
   if (!result?.resolved) {
     return {
       error: result?.reason || "No matching product for the given attributes.",
