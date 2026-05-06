@@ -31,6 +31,13 @@ import {
   deleteDecisionTree,
 } from "../models/DecisionTree.server";
 import { validateDecisionTree } from "../lib/decision-tree-schema.server";
+import {
+  fetchActiveOrthoticProducts,
+  discoverDistinctValues,
+  buildSuggestedMapping,
+  regenerateMasterIndex,
+} from "../lib/regenerate-orthotic.server";
+import prisma from "../db.server";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
@@ -144,8 +151,118 @@ export const action = async ({ request }) => {
     };
   }
 
+  // Discover what's in the live Shopify catalog so the merchant can
+  // see distinct activity / helps_with metafield values BEFORE the
+  // regen runs. Used the first time and any time new metafield values
+  // appear that the saved mapping doesn't cover.
+  if (intent === "regen_orthotic_discover") {
+    try {
+      const accessToken = await getOfflineToken(session.shop);
+      if (!accessToken) return { error: "No offline session for this shop. Re-install the app to refresh the token." };
+      const products = await fetchActiveOrthoticProducts({ shop: session.shop, accessToken });
+      const distinct = discoverDistinctValues(products);
+      const existing = await getDecisionTreeByIntent(session.shop, "orthotic");
+      const savedMapping = existing?.definition?.vocabularyMapping || null;
+      const suggestedMapping = buildSuggestedMapping(distinct);
+      // If a saved mapping already exists, surface only the NEW values
+      // (the ones the merchant hasn't mapped yet) so they aren't asked
+      // to re-confirm everything they already approved.
+      const newActivity = savedMapping?.activity
+        ? distinct.distinctActivity.filter((v) => !(v in savedMapping.activity))
+        : distinct.distinctActivity;
+      const newHelpsWith = savedMapping?.helps_with
+        ? distinct.distinctHelpsWith.filter((v) => !(v in savedMapping.helps_with))
+        : distinct.distinctHelpsWith;
+      return {
+        discovery: {
+          productCount: products.length,
+          distinctActivity: distinct.distinctActivity,
+          distinctHelpsWith: distinct.distinctHelpsWith,
+          distinctGender: distinct.distinctGender,
+          newActivity,
+          newHelpsWith,
+          suggestedMapping,
+          savedMapping,
+        },
+      };
+    } catch (err) {
+      return { error: "Discovery failed: " + (err?.message || "unknown") };
+    }
+  }
+
+  // Apply the merchant-reviewed mapping, regenerate the masterIndex
+  // straight from live Shopify, and write it to the orthotic
+  // DecisionTree row. The mapping is persisted inside
+  // definition.vocabularyMapping so future regens reuse it.
+  if (intent === "regen_orthotic_apply") {
+    try {
+      const accessToken = await getOfflineToken(session.shop);
+      if (!accessToken) return { error: "No offline session for this shop." };
+      let mapping;
+      try {
+        mapping = JSON.parse(formData.get("mapping") || "{}");
+      } catch {
+        return { error: "Invalid mapping JSON." };
+      }
+      const products = await fetchActiveOrthoticProducts({ shop: session.shop, accessToken });
+      const result = regenerateMasterIndex({ products, mapping });
+
+      const existing = await getDecisionTreeByIntent(session.shop, "orthotic");
+      if (!existing) {
+        return { error: "No orthotic recommender exists yet. Click 'Seed Aetrex Orthotic Finder' first to install the base structure." };
+      }
+      const oldDef = existing.definition || {};
+      const newDef = {
+        ...oldDef,
+        resolver: {
+          ...(oldDef.resolver || {}),
+          masterIndex: result.masterIndex,
+          fallback: result.fallback,
+        },
+        vocabularyMapping: mapping,
+        _lastRegenAt: new Date().toISOString(),
+        _lastRegenSource: "shopify-live",
+      };
+      const v = validateDecisionTree(newDef);
+      if (!v.ok) return { error: "Generated tree is invalid: " + v.errors.slice(0, 4).join("; ") };
+      await saveDecisionTree(session.shop, {
+        id: existing.id,
+        name: existing.name,
+        intent: existing.intent,
+        triggerPhrases: existing.triggerPhrases,
+        triggerCategoryGroup: existing.triggerCategoryGroup,
+        definition: newDef,
+        enabled: existing.enabled,
+      });
+      return {
+        regenerated: {
+          productCount: products.length,
+          masterIndexCount: result.masterIndex.length,
+          skippedCount: result.skipped.length,
+          skipped: result.skipped,
+          fallback: result.fallback,
+          unmappedActivity: result.unmappedActivity,
+          unmappedHelpsWith: result.unmappedHelpsWith,
+        },
+      };
+    } catch (err) {
+      return { error: "Regeneration failed: " + (err?.message || "unknown") };
+    }
+  }
+
   return { error: "Unknown action" };
 };
+
+// Look up the most recent offline access token for a shop. The same
+// pattern the chat layer uses — every Shopify-side call goes through
+// the offline session so the token survives admin sign-out/in cycles.
+async function getOfflineToken(shop) {
+  const session = await prisma.session.findFirst({
+    where: { shop, isOnline: false, accessToken: { not: "" } },
+    orderBy: { expires: "desc" },
+  });
+  return session?.accessToken || null;
+}
 
 function SectionHeading({ eyebrow, title, description }) {
   return (
@@ -163,8 +280,35 @@ function SectionHeading({ eyebrow, title, description }) {
 function DecisionTreesCard({ enabled, trees }) {
   const fetcher = useFetcher();
   const loadFetcher = useFetcher();
+  const regenFetcher = useFetcher();
   const [editing, setEditing] = useState(null);  // { id?, name, intent, ... }
   const [showCreate, setShowCreate] = useState(false);
+  // Regenerate-from-Shopify modal state. When discovery returns
+  // unmapped values (or this is the first run), show the merchant
+  // the suggested mapping in a textarea so they can review/tweak
+  // before applying. Saved mappings hide the textarea by default.
+  const [regenStep, setRegenStep] = useState("idle"); // idle | review | done
+  const [mappingDraft, setMappingDraft] = useState("");
+
+  useEffect(() => {
+    if (regenFetcher.data?.discovery) {
+      const d = regenFetcher.data.discovery;
+      const merged = d.savedMapping
+        ? {
+            ...d.savedMapping,
+            activity: { ...d.suggestedMapping.activity, ...d.savedMapping.activity },
+            helps_with: { ...d.suggestedMapping.helps_with, ...d.savedMapping.helps_with },
+            gender: { ...d.suggestedMapping.gender, ...d.savedMapping.gender },
+            specialtyOverrides: d.savedMapping.specialtyOverrides || d.suggestedMapping.specialtyOverrides,
+          }
+        : d.suggestedMapping;
+      setMappingDraft(JSON.stringify(merged, null, 2));
+      setRegenStep("review");
+    }
+    if (regenFetcher.data?.regenerated) {
+      setRegenStep("done");
+    }
+  }, [regenFetcher.data]);
 
   // When the load fetcher returns, hydrate the editor with the full
   // tree (definition included). Kept out of the loader to avoid
@@ -194,6 +338,25 @@ function DecisionTreesCard({ enabled, trees }) {
     const fd = new FormData();
     fd.set("intent", "seed_aetrex_orthotic_tree");
     fetcher.submit(fd, { method: "post" });
+  };
+
+  const startRegen = () => {
+    setRegenStep("discovering");
+    const fd = new FormData();
+    fd.set("intent", "regen_orthotic_discover");
+    regenFetcher.submit(fd, { method: "post" });
+  };
+
+  const applyRegen = () => {
+    const fd = new FormData();
+    fd.set("intent", "regen_orthotic_apply");
+    fd.set("mapping", mappingDraft);
+    regenFetcher.submit(fd, { method: "post" });
+  };
+
+  const closeRegen = () => {
+    setRegenStep("idle");
+    setMappingDraft("");
   };
 
   const toggleMaster = (next) => {
@@ -327,8 +490,15 @@ function DecisionTreesCard({ enabled, trees }) {
             <Text as="h4" variant="headingSm">Your recommenders</Text>
             <InlineStack gap="200">
               <Button onClick={startNew}>+ New recommender</Button>
-              <Button onClick={seedAetrex} variant="primary">
+              <Button onClick={seedAetrex}>
                 Seed Aetrex Orthotic Finder
+              </Button>
+              <Button
+                onClick={startRegen}
+                variant="primary"
+                loading={regenFetcher.state !== "idle" && regenStep === "discovering"}
+              >
+                Regenerate from Shopify
               </Button>
             </InlineStack>
           </InlineStack>
@@ -365,6 +535,79 @@ function DecisionTreesCard({ enabled, trees }) {
             />
           )}
         </BlockStack>
+
+        {regenFetcher.data?.error && (
+          <Banner tone="critical">{regenFetcher.data.error}</Banner>
+        )}
+
+        {regenStep === "review" && regenFetcher.data?.discovery && (
+          <>
+            <Divider />
+            <BlockStack gap="300">
+              <Text as="h4" variant="headingSm">Review mapping (Step 2 of 2)</Text>
+              <Text as="p" tone="subdued">
+                Pulled <strong>{regenFetcher.data.discovery.productCount}</strong> active orthotic products from Shopify.
+                Found {regenFetcher.data.discovery.distinctActivity.length} activity values, {regenFetcher.data.discovery.distinctHelpsWith.length} helps_with values, and {regenFetcher.data.discovery.distinctGender.length} gender values.
+              </Text>
+              {(regenFetcher.data.discovery.newActivity?.length > 0 ||
+                regenFetcher.data.discovery.newHelpsWith?.length > 0) && (
+                <Banner tone="info">
+                  New metafield values found that weren't in your saved mapping. They've been merged with sensible-guess defaults below — review before applying.
+                  {regenFetcher.data.discovery.newActivity?.length > 0 && (
+                    <Text as="p" variant="bodySm">New activity: {regenFetcher.data.discovery.newActivity.join(", ")}</Text>
+                  )}
+                  {regenFetcher.data.discovery.newHelpsWith?.length > 0 && (
+                    <Text as="p" variant="bodySm">New helps_with: {regenFetcher.data.discovery.newHelpsWith.join(", ")}</Text>
+                  )}
+                </Banner>
+              )}
+              <TextField
+                label="Mapping (edit any guess that's wrong, then Apply)"
+                helpText="The mapping is saved with the recommender so future regenerations reuse it. Only edit values you know are wrong."
+                value={mappingDraft}
+                onChange={(v) => setMappingDraft(v)}
+                multiline={20}
+                autoComplete="off"
+              />
+              <InlineStack gap="200" align="end">
+                <Button onClick={closeRegen}>Cancel</Button>
+                <Button
+                  onClick={applyRegen}
+                  variant="primary"
+                  loading={regenFetcher.state !== "idle" && regenStep === "review"}
+                >
+                  Apply mapping & regenerate
+                </Button>
+              </InlineStack>
+            </BlockStack>
+          </>
+        )}
+
+        {regenStep === "done" && regenFetcher.data?.regenerated && (
+          <>
+            <Divider />
+            <Banner tone="success">
+              <BlockStack gap="200">
+                <Text as="p" fontWeight="semibold">
+                  Regenerated {regenFetcher.data.regenerated.masterIndexCount} entries from {regenFetcher.data.regenerated.productCount} active Shopify products.
+                </Text>
+                {regenFetcher.data.regenerated.fallback && (
+                  <Text as="p" variant="bodySm">
+                    Fallback: <code>{regenFetcher.data.regenerated.fallback.masterSku}</code> — {regenFetcher.data.regenerated.fallback.title}
+                  </Text>
+                )}
+                {regenFetcher.data.regenerated.skippedCount > 0 && (
+                  <Text as="p" variant="bodySm" tone="subdued">
+                    {regenFetcher.data.regenerated.skippedCount} product{regenFetcher.data.regenerated.skippedCount === 1 ? "" : "s"} skipped — usually missing gender or activity metafield. Open the tree to review.
+                  </Text>
+                )}
+                <InlineStack>
+                  <Button onClick={closeRegen}>Close</Button>
+                </InlineStack>
+              </BlockStack>
+            </Banner>
+          </>
+        )}
 
         {editing && (
           <>
