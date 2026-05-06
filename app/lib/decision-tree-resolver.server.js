@@ -106,17 +106,20 @@ export function resolveTree(answers, resolver) {
       (m) => genderMatch(m.gender, attrs.gender) && specialtyTest(m),
     );
     if (candidates.length === 0) {
-      // Fall through to standard hard-filter if no specialty SKU exists
-      // for this gender.
-      candidates = resolver.masterIndex.filter((m) => {
-        if (!genderMatch(m.gender, attrs.gender)) return false;
-        for (const k of HARD_FILTER_ATTRS) {
-          if (attrs[k] !== undefined && attrs[k] !== null && attrs[k] !== "" && m[k] !== attrs[k]) {
-            return false;
-          }
-        }
-        return true;
-      });
+      // The customer named a specific clinical condition (e.g. heel
+      // spurs) but no specialty SKU exists for that condition+gender
+      // in this shop's catalog (might be missing from the merchant's
+      // recommender data, or not yet synced from Shopify). Returning
+      // a generic comfort SKU here is misleading — the AI's text
+      // would say "for heel spurs" but the card would show a
+      // diabetic / generic comfort orthotic. Bail out with a clear
+      // reason so the caller can tell the customer truthfully.
+      return {
+        resolved: null,
+        reason: `no SKU available for condition=${attrs.condition} and gender=${attrs.gender || "any"}`,
+        attrs,
+        missingSpecialty: { condition: attrs.condition, gender: attrs.gender || null },
+      };
     }
   } else {
     candidates = resolver.masterIndex.filter((m) => {

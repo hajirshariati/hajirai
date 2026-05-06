@@ -73,6 +73,19 @@ check("Athletic running + flat-arch + posted (Women) → Posted Speed SKU",
       definition.resolver,
     ).resolved?.title || "",
   )));
+check("condition=overpronation_flat_feet (Women athletic) → derivation makes posted=true → Posted SKU", async () => {
+  const { executeRecommenderTool } = await import("../app/lib/recommender-tools.server.js");
+  const r = await executeRecommenderTool({
+    toolName: "recommend_orthotic",
+    input: { gender: "Women", useCase: "athletic_running", condition: "overpronation_flat_feet" },
+    shop: null,
+    trees: [tree],
+  });
+  assert(r.attributesUsed?.posted === true,
+    `expected posted=true after derivation; got ${JSON.stringify(r.attributesUsed)}`);
+  assert(/posted/i.test(r.title || ""),
+    `expected a Posted SKU; got ${r.masterSku} (${r.title})`);
+});
 check("No matching cell falls back gracefully (uses fallback or Unisex)",
   () => assert(sku({ gender: "Men", useCase: "skates" }), "skates is Unisex-only; resolver should still return"));
 check("Kids never get a Unisex SKU (cleats has no Kids variant)",
