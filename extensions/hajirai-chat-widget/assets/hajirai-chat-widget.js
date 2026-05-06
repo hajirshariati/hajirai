@@ -533,6 +533,10 @@ function initChoicesScroll(container){
     var atEnd=container.scrollLeft+container.clientWidth>=container.scrollWidth-1;
     container.classList.toggle('at-start',atStart);
     container.classList.toggle('at-end',atEnd);
+    if(wrap){
+      wrap.classList.toggle('at-start',atStart);
+      wrap.classList.toggle('at-end',atEnd);
+    }
     if(prev)prev.hidden=atStart;
     if(next)next.hidden=atEnd;
     /* Thumb width = visible / total. Position = scroll / max-scroll. */
