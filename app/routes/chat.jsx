@@ -778,10 +778,21 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // Without this, the empty-pool repair below wipes the pitch text
   // and renders a dead-end fallback — even when the customer gave
   // us everything we needed to find a real product.
+  // Skip recovery if the AI's text ends with a clarifying question
+  // (e.g. "Are these for men or women?"). That's the recommender-
+  // flow elicitation step and shouldn't be overridden by a search.
+  const aiAskedClarifyingQuestion = (() => {
+    const t = String(fullResponseText || "").trim();
+    if (!t) return false;
+    if (t.endsWith("?")) return true;
+    const lastChunk = t.split(/[.!]\s+/).pop() || "";
+    return /\?\s*$/.test(lastChunk.trim());
+  })();
   if (
     !productSearchAttempted &&
     looksLikeProductPitch(fullResponseText) &&
-    allProductPool.size === 0
+    allProductPool.size === 0 &&
+    !aiAskedClarifyingQuestion
   ) {
     const intent = detectConditionOrOccasion(ctx.userText || "");
     if (intent) {
@@ -1001,7 +1012,24 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // Pitch text without products = incoherent turn. Replace with the
   // graceful fallback below. Catches both "search ran, returned 0" and
   // "AI claimed a recommendation without ever searching" cases.
-  if (pool.length === 0 && looksLikeProductPitch(fullResponseText)) {
+  //
+  // EXCEPT when the AI is legitimately asking a clarifying question
+  // (e.g. recommender tool returned needMoreInfo and the AI wrote
+  // "Are these for men or women, and what kind of shoes?"). That's
+  // not a failed pitch — it's the elicitation step of the
+  // recommender flow. Detect by: ends with a question mark, OR the
+  // text contains a question phrasing followed by a question mark
+  // anywhere. Those responses must pass through unedited.
+  const looksLikeClarifyingQuestion = (txt) => {
+    if (!txt) return false;
+    const trimmed = String(txt).trim();
+    if (!trimmed) return false;
+    if (trimmed.endsWith("?")) return true;
+    // Check the last sentence for a question.
+    const lastChunk = trimmed.split(/[.!]\s+/).pop() || "";
+    return /\?\s*$/.test(lastChunk.trim());
+  };
+  if (pool.length === 0 && looksLikeProductPitch(fullResponseText) && !looksLikeClarifyingQuestion(fullResponseText)) {
     console.log(`[chat] empty-pool repair: pitch text without products (searchAttempted=${productSearchAttempted})`);
     fullResponseText = "";
   }

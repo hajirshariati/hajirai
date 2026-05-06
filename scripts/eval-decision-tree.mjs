@@ -124,12 +124,14 @@ check("seed has merchant-supplied attributePrompts for required fields", () => {
   }
 });
 
-check("tool description mentions the required attributes when present", () => {
+check("tool description tells AI to call tool always, and lists required attrs", () => {
   const td = recommenderToToolDef(tree);
-  assert(td.description.includes("gender"), "tool description should mention 'gender' as required");
-  assert(td.description.includes("useCase"), "tool description should mention 'useCase' as required");
-  assert(/before/i.test(td.description) && /required/i.test(td.description) === false || /must/i.test(td.description),
-    "tool description should make the requirement explicit");
+  assert(td.description.includes("gender"), "tool description should mention 'gender'");
+  assert(td.description.includes("useCase"), "tool description should mention 'useCase'");
+  assert(/always call/i.test(td.description),
+    "description should tell AI to call the tool always (the tool collects info via needMoreInfo)");
+  assert(/needmoreinfo|need more info|missing/i.test(td.description),
+    "description should mention the needMoreInfo / missing-attribute response path");
 });
 
 // Runtime gate: when a required attribute is missing in the tool
