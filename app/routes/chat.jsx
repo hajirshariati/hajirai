@@ -601,6 +601,12 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // so the empty-pool repair / definitional-hallucination strips
   // below must not wipe it.
   let recommenderAskedForMoreInfo = false;
+  // Track tool calls per turn so post-emit guards can validate the
+  // AI's claims against what was actually queried. Specifically,
+  // stock-availability claims ("currently available in size 9") must
+  // be backed by a get_product_details call this turn — without that,
+  // the size statement is hallucinated. Set wins all tools by name.
+  const toolsCalledThisTurn = new Set();
   const allProductPool = new Map();
   const excludedFamilies = new Set();
   const excludedHandles = new Set();
@@ -670,6 +676,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     if (toolUses.length === 0) break;
 
     toolCallCount += toolUses.length;
+    for (const u of toolUses) toolsCalledThisTurn.add(u.name);
     if (toolUses.some((u) =>
       u.name === "search_products" ||
       u.name === "get_product_details" ||
@@ -725,6 +732,21 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         if (r.reference.handle) excludedHandles.add(String(r.reference.handle).toLowerCase());
         const fam = titleStyleFamily(r.reference.title || "");
         if (fam) excludedFamilies.add(fam);
+        // When find_similar_products resolved a reference but found
+        // ZERO matching siblings (config gap, narrow similarity
+        // attributes, or the catalog genuinely has no peers), reset
+        // productSearchAttempted so the recovery hop downstream gets
+        // a chance to run a generic search_products with the latest
+        // user message. Without this, the AI emits an empty reply
+        // ("same support as carly" → no text, no cards) because the
+        // attempted-flag blocks the safety net.
+        if (!Array.isArray(r.products) || r.products.length === 0) {
+          console.log(
+            `[chat] ${ctx.shop} find_similar_products returned zero products for ` +
+              `ref=${r.reference.handle || "?"} — letting recovery hop run`,
+          );
+          productSearchAttempted = false;
+        }
       }
       if (u.name === "get_fit_recommendation" && r && !r.error && r.recommendation?.shouldDisplay) {
         if (r.handle) focusedHandles.add(String(r.handle).toLowerCase());
@@ -1271,6 +1293,35 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     const generic = extractGenericCTA(fullResponseText);
     fullResponseText = generic.text;
     genericCTA = generic.cta;
+  }
+
+  // Stock-claim hallucination guard. The SIZE & STOCK GROUNDING
+  // prompt rule tells the AI to call get_product_details before
+  // claiming a specific size is in stock. When it skips that call
+  // and asserts availability anyway ("currently available in size
+  // 9", "in stock in size 11", "we have it in 9.5"), the claim is
+  // hallucinated — the AI doesn't have real-time inventory in its
+  // training data. Detect the pattern; if get_product_details
+  // wasn't called this turn, strip the affirmation and substitute
+  // an honest deferral. Legitimate post-tool stock claims pass
+  // through because the tool name is in toolsCalledThisTurn.
+  const STOCK_CLAIM_AFFIRMATION_RE =
+    /\b(?:currently |right now |presently )?(?:available|in stock|we have (?:(?:it|them|these|those|that|this|some))?)\s+(?:in\s+)?(?:size\s+)?(?:\d+(?:\.\d+)?(?:[\s-](?:wide|narrow|x-?wide|w|n|m|d|ee|eee))?|wide|narrow|x-?wide)\b/i;
+  if (
+    fullResponseText &&
+    !toolsCalledThisTurn.has("get_product_details") &&
+    STOCK_CLAIM_AFFIRMATION_RE.test(fullResponseText)
+  ) {
+    console.log(
+      `[chat] ${ctx.shop} stock-claim without get_product_details — stripping affirmation`,
+    );
+    fullResponseText = fullResponseText
+      .replace(STOCK_CLAIM_AFFIRMATION_RE, "")
+      .replace(/\s{2,}/g, " ")
+      .replace(/\s+([.,!?])/g, "$1")
+      .trim();
+    if (fullResponseText && !/[.!?]$/.test(fullResponseText)) fullResponseText += ".";
+    fullResponseText = (fullResponseText + " I can't check live stock from here — the product page or our support team can confirm the size.").trim();
   }
 
   // Outbound role-marker scrub. Belt-and-suspenders alongside

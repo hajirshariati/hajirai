@@ -423,7 +423,7 @@ function genderFilterClause(gender) {
 
 async function searchProducts(
   { query, limit, filters, priceMax, priceMin },
-  { shop, deduplicateColors, sessionGender, categoryExclusions, querySynonyms, conversationText, userText, latestUserMessage, shopConfig, activeCategoryGroup, merchantGroups }
+  { shop, deduplicateColors, sessionGender, categoryExclusions, querySynonyms, conversationText, userText, latestUserMessage, shopConfig, activeCategoryGroup, merchantGroups, categoryGenderMap }
 ) {
   const q = String(query || "").trim();
   if (!q) return { products: [] };
@@ -544,6 +544,44 @@ const searchQuery = detected.gender ? detected.query : q;
   })();
 
   const effectiveCategory = explicitCategoryFilter || inferredCategory;
+
+  // Honest gender×category mismatch detection. categoryGenderMap is
+  // built from the live catalog at request time (Product.server.js)
+  // and lists which genders carry which category. If the customer
+  // (or AI) requested an explicit gender + category combo that the
+  // catalog doesn't support (e.g. "men's slippers" when slippers
+  // are women-only), return a structured signal so the AI can lead
+  // with the truth ("we don't carry men's slippers — here are
+  // women's") instead of silently broadening the search and
+  // pitching products from a different gender as if they answered
+  // the question. Without this guard, the AI gets {count:0} with
+  // no hint of WHY and pivots to "we absolutely do" with women's
+  // products, which reads as a bait-and-switch.
+  if (effectiveCategory && effectiveGender && categoryGenderMap && typeof categoryGenderMap === "object") {
+    const catKey = String(effectiveCategory).toLowerCase().trim();
+    const entry = categoryGenderMap[catKey] || categoryGenderMap[effectiveCategory];
+    if (entry && Array.isArray(entry.genders) && entry.genders.length > 0) {
+      const reqGenderLower = String(effectiveGender).toLowerCase();
+      const supported = entry.genders.map((g) => String(g).toLowerCase());
+      const isUnisexBucket = supported.includes("unisex");
+      const supportsRequested = supported.includes(reqGenderLower);
+      if (!supportsRequested && !isUnisexBucket) {
+        console.log(
+          `[search] gender×category mismatch: requested=${reqGenderLower} category=${catKey} ` +
+            `available=[${entry.genders.join(",")}] — returning honest-redirect signal, not silent broaden`,
+        );
+        return {
+          products: [],
+          genderCategoryMismatch: {
+            category: entry.display || effectiveCategory,
+            requestedGender: effectiveGender,
+            availableGenders: entry.genders,
+          },
+        };
+      }
+    }
+  }
+
   if (merchantExclude && effectiveCategory) {
     // ALWAYS skip the merchant exclusion rule when there's an
     // explicit/inferred category filter — the rule is broad cleanup
