@@ -100,6 +100,18 @@ check("Kids + kids-useCase → Kids SKU still resolves",
     assert(typeof r === "string" && r.startsWith("L17"),
       `expected a Kids L17* SKU, got ${r}`);
   });
+check("Kids + ball-of-foot pain → L1705Y (Kids met support, not the no-met variant)",
+  () => {
+    // The customer has metatarsalgia / ball-of-foot pain. The
+    // specialty filter must accept L1705Y because metSupport=true
+    // even though the title says 'Metatarsal' (no 'gia').
+    const r = resolveTree(
+      { gender: "Kids", useCase: "kids", condition: "metatarsalgia" },
+      definition.resolver,
+    ).resolved;
+    assert(r && r.metSupport === true,
+      `expected a Kids met-support SKU; got ${r?.masterSku} (${r?.title})`);
+  });
 
 console.log("\nrecommender → tool definition");
 check("recommenderToToolDef returns a Claude-shaped tool", () => {

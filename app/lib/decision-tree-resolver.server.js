@@ -49,12 +49,19 @@ function genderMatch(candidateGender, askedGender) {
 // Specialty conditions that have dedicated SKUs in the Aetrex
 // catalog. The engine sets `attrs.condition` from the condition
 // question; the resolver maps it to a candidate-set filter.
+//
+// metatarsalgia / mortons_neuroma also accept any SKU with
+// metSupport=true — that's the merchant's clinical signal for
+// "this product addresses ball-of-foot conditions". The seed's
+// titles often say "Metatarsal Support" (not "Metatarsalgia") so a
+// pure regex match misses the right SKU. metSupport=true bridges
+// the two.
 const CONDITION_TARGETS = {
-  heel_spurs:        (m) => /heel spurs?/i.test(m.title || "") || m.condition === "heel_spurs",
-  mortons_neuroma:   (m) => /morton/i.test(m.title || "")      || m.condition === "mortons_neuroma",
-  metatarsalgia:     (m) => /metatarsalgia/i.test(m.title||"") || m.condition === "metatarsalgia",
-  diabetic:          (m) => /conform|diabet/i.test(m.title||"")|| m.condition === "diabetic",
-  plantar_fasciitis: (m) => /plantar fasciitis kit/i.test(m.title||"") || m.condition === "plantar_fasciitis",
+  heel_spurs:        (m) => /heel\s*spurs?/i.test(m.title || "") || m.condition === "heel_spurs",
+  mortons_neuroma:   (m) => /morton/i.test(m.title || "")        || m.condition === "mortons_neuroma" || m.metSupport === true,
+  metatarsalgia:     (m) => /metatars/i.test(m.title || "")      || m.condition === "metatarsalgia"   || m.metSupport === true,
+  diabetic:          (m) => /conform|diabet/i.test(m.title||"")  || m.condition === "diabetic",
+  plantar_fasciitis: (m) => /plantar\s*fasciitis\s*kit/i.test(m.title||"") || m.condition === "plantar_fasciitis",
 };
 
 function score(candidate, attrs) {
