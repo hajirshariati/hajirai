@@ -804,7 +804,13 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     allProductPool.size === 0 &&
     !aiAskedClarifyingQuestion
   ) {
-    const intent = detectConditionOrOccasion(ctx.userText || "");
+    // Use the latest user message only — ctx.userText concatenates the
+    // entire conversation history, so on a pivot (e.g. user said
+    // "morton's neuroma" two turns ago, now says "high arch what
+    // orthotic"), CONDITION_RE picks up the stale phrase and the
+    // recovery search runs the WRONG query. Always recover against
+    // what the customer just asked.
+    const intent = detectConditionOrOccasion(ctx.latestUserMessage || ctx.userText || "");
     if (intent) {
       console.log(`[chat] recovery search: AI did not call tool, forcing query="${intent.phrase}" (${intent.kind})`);
       try {

@@ -153,8 +153,15 @@ const BANNED_NARRATION = /(?<=^|\s)(?:let me (?:look (?:that |it )?up|find|searc
 // never accidentally eat a real question.
 //
 // Triggers: wait / actually / oh / sorry / hmm / nevermind / hold on
-// followed by "you (already|just) told|said|mentioned|noted me/us…"
-const SELF_CORRECTION_RE = /(?:[^.!?\n]*\?\s+)?\b(?:wait|actually|oh|sorry|hmm|never\s*mind|nevermind|hold\s+on)[\s,—–-]+you\s+(?:already\s+|just\s+)?(?:told|said|mentioned|noted)\s+(?:me|us)?\b[^.!?\n]*[.!?]?\s*/gi;
+// followed by EITHER:
+//   (a) "you (already|just) told|said|mentioned|noted me/us…", OR
+//   (b) the AI confessing its own mistake: "let me correct that",
+//       "let me re(do|word|phrase|state) that", "I should rephrase",
+//       "I (made|noticed) (a mistake|an error)", "scratch that",
+//       "ignore that", "I meant…", "actually, …" mid-message.
+// Both halves are visible noise — the customer just wants the
+// answer, not an apology and a do-over written out loud.
+const SELF_CORRECTION_RE = /(?:[^.!?\n]*\?\s+)?\b(?:wait|actually|oh|sorry|hmm|never\s*mind|nevermind|hold\s+on|scratch\s+that|ignore\s+that)[\s,—–-]+(?:you\s+(?:already\s+|just\s+)?(?:told|said|mentioned|noted)\s+(?:me|us)?\b[^.!?\n]*[.!?]?\s*|let\s+me\s+(?:correct|rephrase|reword|restate|redo|fix|revise)\s+(?:that|this|myself)\b[^.!?\n]*[.!?]?\s*|i\s+(?:should|need\s+to|meant\s+to)\s+(?:rephrase|reword|correct|clarify|restate)\b[^.!?\n]*[.!?]?\s*|i\s+(?:made|noticed)\s+(?:a\s+mistake|an\s+error)\b[^.!?\n]*[.!?]?\s*|i\s+meant\b[^.!?\n]*[.!?]?\s*)/gi;
 
 // Reasoning-leak strip — AI sometimes narrates its internal decision
 // process to the customer ("Based on the merchant's flow, I need to
@@ -187,6 +194,9 @@ const REASONING_LEAK_RE = new RegExp(
     String.raw`\bbefore\s+i\s+(?:can\s+)?(?:recommend|suggest|search|show|help|narrow|pick|choose)\b[^.!?\n]*[.!?]?\s*`,
     // "the X is (already)? (established|set|known|locked|determined|confirmed|identified|covered)"
     String.raw`\b(?:the|your)\s+(?:pain|gender|category|shoe(?:\s+type)?|product(?:\s+type)?|activity|condition|use\s*case|line|brand|fit|style|topic|context|scope)\s+(?:is|are)\s+(?:already\s+|now\s+)?(?:established|set|locked|known|determined|confirmed|identified|covered|in\s+place)\b[^.!?\n]*[.!?]?\s*`,
+    // "i (notice|see|notice that) X (wasn't|isn't|hasn't been) established/asked/answered/clarified"
+    // — AI calling out its own workflow gap to the customer.
+    String.raw`\bi\s+(?:notice|see|noticed|realize|realized|notice\s+that|see\s+that)\b[^.!?\n]*?\b(?:wasn['‘’]?t|isn['‘’]?t|hasn['‘’]?t\s+been|isn['‘’]?t\s+yet|wasn['‘’]?t\s+yet)\s+(?:established|set|asked|answered|clarified|determined|confirmed|specified|provided|mentioned)\b[^.!?\n]*[.!?]?\s*`,
   ].join("|"),
   "gi",
 );
@@ -386,7 +396,7 @@ export function stripMetaNarration(text) {
 // Vocabulary is footwear/wellness-leaning since that's the dominant
 // merchant audience today. Generalize via admin config later if a
 // non-footwear merchant needs different keywords.
-const CONDITION_RE = /\b(plantar fasciitis|bunion(?:s)?|flat feet|fallen arches|heel pain|heel spur|metatarsal|neuropathy|diabet(?:es|ic)|high arches|arch pain|morton'?s neuroma|achilles|tendon(?:itis)?|supination|overpronation|knee pain|back pain|ankle pain|foot pain)\b/i;
+const CONDITION_RE = /\b(plantar fasciitis|bunion(?:s)?|flat feet|flat foot|fallen arches?|heel pain|heel spurs?|metatarsal(?:gia)?|neuropathy|diabet(?:es|ic)|high arches?|low arches?|arch pain|morton'?s neuroma|achilles|tendon(?:itis)?|supination|overpronation|knee pain|back pain|ankle pain|foot pain|ball[\s-]of[\s-]foot)\b/i;
 const OCCASION_RE = /\b(vacation|trip|travel|traveling|cruise|wedding|standing all day|on my feet|running|walking|hiking|gym|workout|everyday|casual|dressy|formal|outdoor|work shoes|office)\b/i;
 
 export function detectConditionOrOccasion(text) {
