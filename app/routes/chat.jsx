@@ -511,6 +511,75 @@ function containsAvailabilityDenial(text) {
   return Boolean(text) && AVAILABILITY_DENIAL_RE.test(text);
 }
 
+// Stricter check: did the AI assert the store doesn't carry a
+// category that's actually IN the synced catalog? Catches phrasings
+// the AVAILABILITY_DENIAL_RE misses, like "this store carries
+// orthotics (not shoes)" — a parenthetical exclusion that's still
+// a denial. Returns the offending category name if found, or null.
+//
+// `categories` is the full catalog list (allCatalogCategories) —
+// every entry is a category the merchant actually carries, so the
+// AI is never allowed to deny any of them. Both singular and plural
+// forms are checked because the AI might say "we don't carry shoe"
+// or "boot" loosely.
+//
+// Hypernym handling: customers and the AI both use words like
+// "shoes" to refer to the Footwear umbrella. If "shoes/shoe/
+// footwear" is denied AND the catalog has any of {Footwear, Sneakers,
+// Boots, Sandals, Clogs, Loafers, Oxfords, Slip Ons, Wedges Heels,
+// Mary Janes, Slippers}, that's a false denial — call it out as
+// "Footwear" so the recovery message reads naturally.
+const FOOTWEAR_HYPERNYMS = ["shoe", "shoes", "footwear"];
+const FOOTWEAR_CATEGORY_SET = new Set([
+  "footwear", "sneakers", "sneaker", "boots", "boot", "sandals", "sandal",
+  "clogs", "clog", "loafers", "loafer", "oxfords", "oxford", "slip ons", "slip-ons",
+  "wedges heels", "mary janes", "slippers", "slipper", "heels", "flats", "mules",
+]);
+function detectFalseCategoryDenial(text, categories) {
+  if (!text || !Array.isArray(categories) || categories.length === 0) return null;
+  const t = String(text);
+  const lower = t.toLowerCase();
+
+  // Build the effective category set: actual catalog categories plus
+  // hypernyms (shoe/shoes/footwear) when the catalog contains any
+  // footwear-family category. The hypernym entry is mapped back to
+  // "Footwear" in the returned name so recovery copy reads naturally.
+  const hasFootwearFamily = categories.some((cat) => FOOTWEAR_CATEGORY_SET.has(String(cat || "").trim().toLowerCase()));
+  const checks = categories.map((cat) => ({ cat, displayName: cat }));
+  if (hasFootwearFamily) {
+    for (const h of FOOTWEAR_HYPERNYMS) {
+      checks.push({ cat: h, displayName: "Footwear" });
+    }
+  }
+
+  for (const { cat, displayName } of checks) {
+    const c = String(cat || "").trim().toLowerCase();
+    if (!c || c.length < 3) continue;
+    // Build alternation for singular/plural ("sneaker"/"sneakers", "shoe"/"shoes").
+    const stem = c.endsWith("s") ? c.slice(0, -1) : c;
+    const variants = c === stem ? [c] : [c, stem];
+    const alt = variants.map((v) => v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
+    // Patterns:
+    //   "(not <cat>)"            — parenthetical exclusion
+    //   "we don't sell/carry/have <cat>"
+    //   "this store doesn't sell <cat>"
+    //   "<cat> aren't/isn't something we carry"
+    //   "we only carry/sell X (not <cat>)"
+    //   "no <cat> in this store"
+    const denialPatterns = [
+      new RegExp(`\\(\\s*not\\s+(?:${alt})s?\\s*\\)`, "i"),
+      new RegExp(`\\bwe (?:don'?t|do not|cannot|can'?t) (?:have|carry|sell|stock|offer)\\s+(?:any\\s+)?(?:${alt})s?\\b`, "i"),
+      new RegExp(`\\b(?:this|the)\\s+(?:store|shop)\\s+(?:doesn'?t|does not)\\s+(?:have|carry|sell|stock|offer)\\s+(?:any\\s+)?(?:${alt})s?\\b`, "i"),
+      new RegExp(`\\b(?:${alt})s?\\s+(?:are\\s+not|aren'?t|is\\s+not|isn'?t)\\s+(?:something|a category|a product|a line)\\s+(?:we|this store|the store)\\s+(?:carry|carries|sell|sells|stock|stocks|offer|offers)\\b`, "i"),
+      new RegExp(`\\bno\\s+(?:${alt})s?\\s+(?:in|at|from)\\s+(?:this|the|our)\\s+(?:store|shop|catalog)\\b`, "i"),
+    ];
+    for (const re of denialPatterns) {
+      if (re.test(t) || re.test(lower)) return displayName;
+    }
+  }
+  return null;
+}
+
 async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, controller, encoder, promptCaching, tools }) {
   const totalUsage = { input_tokens: 0, output_tokens: 0, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 };
   let toolCallCount = 0;
@@ -1067,6 +1136,26 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   ) {
     console.log(`[chat] empty-pool repair: definitional hallucination`);
     fullResponseText = "";
+  }
+
+  // False category-denial guard. The AI sometimes claims the store
+  // doesn't carry a category that's actually in the synced catalog
+  // (e.g. "this store carries orthotics (not shoes)" when shoes are
+  // a real product type). The STORE FACTS section of the prompt
+  // forbids this, but the LLM can still slip — especially with
+  // parenthetical exclusions like "(not shoes)" that read past the
+  // existing AVAILABILITY_DENIAL_RE. Catch it here, strip the
+  // response, and let the empty-text fallback render a neutral
+  // recovery message that doesn't mislead the customer.
+  const fullCats = Array.isArray(ctx.fullCatalogCategories) ? ctx.fullCatalogCategories : [];
+  if (fullCats.length > 0 && fullResponseText) {
+    const deniedCat = detectFalseCategoryDenial(fullResponseText, fullCats);
+    if (deniedCat) {
+      console.log(`[chat] false-denial guard: AI claimed the store doesn't carry "${deniedCat}" — stripping (catalog actually contains it)`);
+      fullResponseText = pool.length > 0
+        ? `Take a look — here are some ${deniedCat.toLowerCase()} from the catalog.`
+        : `We do carry ${deniedCat.toLowerCase()} — could you share a bit more (gender, style, occasion)? I can pull up a few for you.`;
+    }
   }
 
   if (!fullResponseText && pool.length === 0) {
@@ -1956,6 +2045,12 @@ export const action = async ({ request }) => {
       customerContext,
       fitPredictorEnabled: config.fitPredictorEnabled === true,
       catalogProductTypes,
+      // Full catalog category list — independent of the active-group
+      // scope. Pinned in the prompt so the AI never claims a real
+      // category is absent just because the current turn is scoped
+      // narrowly (e.g. activeGroup=Orthotics shouldn't make the AI
+      // say "we don't sell shoes").
+      fullCatalogProductTypes: allCatalogCategories,
       scopedGender: sessionGender,
       answeredChoices,
       categoryGenderMap,
