@@ -184,6 +184,17 @@
       "type": "resolve"
     }
   ],
+  "requiredAttributes": [
+    "gender",
+    "useCase"
+  ],
+  "attributePrompts": {
+    "gender": "Is this for a man, woman, kid, or are you looking for a unisex option?",
+    "useCase": "What kind of shoes will the orthotics go in? (dress shoes, casual/everyday, athletic, cleats, hockey skates, winter boots, work, or just looking for general comfort)",
+    "condition": "Any specific foot pain or condition we should match? (plantar fasciitis, heel spurs, ball-of-foot pain / metatarsalgia, Morton's neuroma, overpronation / flat feet, diabetic feet, or none — just looking for comfort)",
+    "arch": "What's your arch type — flat / low, medium, or high? If you're not sure, that's fine.",
+    "overpronation": "When you walk or stand, do your ankles tend to roll inward, or do you have flat-feet symptoms? (yes / no / not sure)"
+  },
   "derivations": [
     {
       "set": "posted",

@@ -94,15 +94,21 @@ export function recommenderToToolDef(tree) {
     properties[a.name] = prop;
   }
 
-  // Tool description Claude reads to decide WHEN to call. Two
-  // jobs: (a) tell Claude this is the AUTHORITATIVE recommender
-  // for the intent — preferred over search_products — so the
-  // existing "MANDATORY SEARCH BEFORE TEXT" rule doesn't pre-empt
-  // it; (b) bound when NOT to call (clearly unrelated queries) so
-  // the merchant's "do not hijack other intents" requirement is
-  // honored. Merchants will be able to customize this in the admin
-  // (Layer 1 from the bulletproof discussion); the auto-generated
-  // default below is reasonable until they do.
+  // Tool description Claude reads to decide WHEN to call. Three jobs:
+  // (a) tell Claude this is the AUTHORITATIVE recommender for the
+  // intent — preferred over search_products; (b) bound when NOT to
+  // call (different product types, non-product topics); (c) when
+  // requiredAttributes is set, instruct Claude to gather those FIRST
+  // through normal conversation before calling the tool.
+  const required = Array.isArray(tree.definition?.requiredAttributes)
+    ? tree.definition.requiredAttributes.filter((s) => typeof s === "string" && s.trim())
+    : [];
+  const requiredLine = required.length > 0
+    ? `\n\nBEFORE calling this tool, the conversation MUST have established values for: ${required.join(", ")}. ` +
+      `If the customer hasn't mentioned any of these, ASK them in conversation first using natural-language ` +
+      `questions — do not call the tool with placeholders or guesses. The tool will refuse to resolve and ` +
+      `tell you what's still missing if you call too early.`
+    : "";
   const description =
     `AUTHORITATIVE recommender for "${tree.intent}" queries on this shop. ` +
     `When a customer is asking for help picking a ${tree.intent} product ` +
@@ -111,12 +117,13 @@ export function recommenderToToolDef(tree) {
     `search_products for the same purpose. The resolver returns a single ` +
     `deterministic master SKU based on the attributes you supply, so the ` +
     `customer never gets a wrong-fit pick. Provide every attribute the ` +
-    `customer has mentioned or clearly implied; unspecified attributes use ` +
-    `sensible defaults. Returns one master SKU plus a product card.\n\n` +
+    `customer has mentioned or clearly implied; unspecified non-required ` +
+    `attributes use sensible defaults. Returns one master SKU plus a product card.\n\n` +
     `Do NOT call this tool when the customer is asking about a different ` +
     `product type (e.g. shoes, sandals, socks, accessories), or about ` +
     `non-product topics (returns, sizing, shipping, store policies). For ` +
-    `those, the existing search_products and other tools apply normally.`;
+    `those, the existing search_products and other tools apply normally.` +
+    requiredLine;
 
   return {
     name: `recommend_${tree.intent}`,
@@ -266,6 +273,54 @@ export async function executeRecommenderTool({ toolName, input, shop, trees }) {
   }
   if (!tree.definition?.resolver) {
     return { error: "Recommender has no resolver configured." };
+  }
+
+  // Required-attributes gate. If the merchant declared any
+  // requiredAttributes on this recommender (e.g. ["gender",
+  // "useCase"]), the LLM must collect them through conversation
+  // BEFORE the tool resolves a SKU. Without this gate the LLM is
+  // too eager — a single attribute mention triggers a tool call,
+  // defaults fill the rest, and the customer gets a generic pick
+  // without ever being asked the questions a doctor would. The
+  // gate returns a structured needMoreInfo response that tells
+  // the LLM exactly what to ask next; on the next turn (after the
+  // customer answers), the LLM calls the tool again with the
+  // complete attribute set.
+  const required = Array.isArray(tree.definition.requiredAttributes)
+    ? tree.definition.requiredAttributes.filter((s) => typeof s === "string" && s.trim())
+    : [];
+  const attributePrompts = (tree.definition.attributePrompts && typeof tree.definition.attributePrompts === "object")
+    ? tree.definition.attributePrompts
+    : {};
+  if (required.length > 0) {
+    const provided = input || {};
+    const missing = required.filter((k) => {
+      const v = provided[k];
+      return v === undefined || v === null || (typeof v === "string" && !v.trim());
+    });
+    if (missing.length > 0) {
+      const questions = missing.map((k) => {
+        const prompt = attributePrompts[k];
+        if (typeof prompt === "string" && prompt.trim()) return `- ${prompt}`;
+        // Fallback question text by attribute name. Reasonable
+        // defaults; merchant overrides via attributePrompts.
+        return `- What is the customer's ${k}?`;
+      }).join("\n");
+      console.log(
+        `[recommender] gate: ${missing.length} required attribute(s) missing on ` +
+          `tool call — ${missing.join(", ")}. Asking LLM to gather first.`,
+      );
+      return {
+        needMoreInfo: true,
+        missingAttributes: missing,
+        instruction:
+          `Before recommending, the customer needs to answer the following question${missing.length === 1 ? "" : "s"} ` +
+          `in normal conversation. ASK them — do NOT call this tool again until you have answers:\n\n${questions}\n\n` +
+          `Once the customer has provided each missing attribute, call recommend_${tree.intent} again with the ` +
+          `complete attribute set. Use only the enum values listed in this tool's schema for those attributes.`,
+        attributesProvided: provided,
+      };
+    }
   }
 
   // Filter the masterIndex to SKUs the shop actually has in stock

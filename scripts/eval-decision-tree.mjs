@@ -108,6 +108,61 @@ check("Malformed definition returns null instead of throwing", () => {
   assert.equal(td, null, "should return null on malformed input");
 });
 
+console.log("\nrequired-attributes gate");
+check("seed declares gender + useCase as required", () => {
+  assert(Array.isArray(definition.requiredAttributes), "missing requiredAttributes array");
+  assert(definition.requiredAttributes.includes("gender"), "gender should be required");
+  assert(definition.requiredAttributes.includes("useCase"), "useCase should be required");
+});
+
+check("seed has merchant-supplied attributePrompts for required fields", () => {
+  assert(definition.attributePrompts && typeof definition.attributePrompts === "object",
+    "missing attributePrompts");
+  for (const k of definition.requiredAttributes) {
+    assert(typeof definition.attributePrompts[k] === "string" && definition.attributePrompts[k].trim(),
+      `missing prompt text for required attribute "${k}"`);
+  }
+});
+
+check("tool description mentions the required attributes when present", () => {
+  const td = recommenderToToolDef(tree);
+  assert(td.description.includes("gender"), "tool description should mention 'gender' as required");
+  assert(td.description.includes("useCase"), "tool description should mention 'useCase' as required");
+  assert(/before/i.test(td.description) && /required/i.test(td.description) === false || /must/i.test(td.description),
+    "tool description should make the requirement explicit");
+});
+
+// Runtime gate: when a required attribute is missing in the tool
+// input, the executor returns needMoreInfo with the missing list
+// and a per-attribute prompt question, instead of resolving a SKU.
+check("executor returns needMoreInfo when only arch is provided", async () => {
+  const { executeRecommenderTool } = await import("../app/lib/recommender-tools.server.js");
+  const r = await executeRecommenderTool({
+    toolName: "recommend_orthotic",
+    input: { arch: "Medium / High Arch" }, // missing gender + useCase
+    shop: null, // shop irrelevant — the gate fires before the catalog filter
+    trees: [tree],
+  });
+  assert.equal(r.needMoreInfo, true, "should return needMoreInfo");
+  assert.deepEqual(r.missingAttributes.sort(), ["gender", "useCase"]);
+  assert(typeof r.instruction === "string" && /ask/i.test(r.instruction),
+    "instruction should tell the LLM to ask the customer");
+  assert(r.masterSku === undefined, "should NOT resolve a SKU when required attrs are missing");
+});
+
+check("executor proceeds normally when all required attributes are present", async () => {
+  const { executeRecommenderTool } = await import("../app/lib/recommender-tools.server.js");
+  const r = await executeRecommenderTool({
+    toolName: "recommend_orthotic",
+    input: { gender: "Women", useCase: "casual" },
+    shop: null, // catalog-filter falls through gracefully when shop is null
+    trees: [tree],
+  });
+  // Either resolves (catalog-filter no-op) or returns the catalog
+  // empty error — but in NEITHER case does it return needMoreInfo.
+  assert(!r.needMoreInfo, "should not gate when required attrs are present");
+});
+
 console.log("\nbackward compat");
 check("Old funnel-shaped seeds still work — only resolver.masterIndex is read at runtime", () => {
   // Even though the seed has q_use_case / q_gender / chips etc., the
