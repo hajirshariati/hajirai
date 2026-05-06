@@ -186,7 +186,8 @@
   ],
   "requiredAttributes": [
     "gender",
-    "useCase"
+    "useCase",
+    "condition"
   ],
   "attributePrompts": {
     "gender": "Is this for a man, woman, kid, or are you looking for a unisex option?",
