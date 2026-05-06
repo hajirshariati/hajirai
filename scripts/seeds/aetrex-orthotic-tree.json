@@ -191,7 +191,7 @@
   ],
   "attributePrompts": {
     "gender": "Is this for a man, woman, kid, or are you looking for a unisex option?",
-    "useCase": "What kind of shoes will the orthotics go in? (dress shoes, casual/everyday, athletic, cleats, hockey skates, winter boots, work, or just looking for general comfort)",
+    "useCase": "What kind of shoes will the orthotics go in? Pick the closest match — dress shoes, casual/everyday, athletic (running/training/general gym), cleats (soccer, football, baseball, lacrosse, rugby, any spike/stud sport shoe), hockey skates, winter boots, work boots, or general comfort (walking, standing all day). If the customer plays a field/court sport, that's CLEATS — never 'comfort'.",
     "condition": "Any specific foot pain or condition we should match? (plantar fasciitis, heel spurs, ball-of-foot pain / metatarsalgia, Morton's neuroma, overpronation / flat feet, diabetic feet, or none — just looking for comfort)",
     "arch": "What's your arch type — flat / low, medium, or high? If you're not sure, that's fine.",
     "overpronation": "When you walk or stand, do your ankles tend to roll inward, or do you have flat-feet symptoms? (yes / no / not sure)"
@@ -209,6 +209,10 @@
           {
             "attr": "overpronation",
             "eq": "yes"
+          },
+          {
+            "attr": "condition",
+            "eq": "overpronation_flat_feet"
           }
         ]
       }
@@ -241,6 +245,22 @@
           {
             "attr": "condition",
             "eq": "mortons_neuroma"
+          }
+        ]
+      }
+    },
+    {
+      "set": "arch",
+      "value": "Flat / Low Arch",
+      "when": {
+        "any": [
+          {
+            "attr": "condition",
+            "eq": "overpronation_flat_feet"
+          },
+          {
+            "attr": "overpronation",
+            "eq": "yes"
           }
         ]
       }

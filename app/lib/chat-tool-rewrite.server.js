@@ -184,6 +184,17 @@ export function injectLockedGender(toolCall, ctx) {
   const lockedNorm = String(locked).toLowerCase().trim();
   if (aiGender === lockedNorm) return toolCall;
 
+  // If the AI explicitly passed a kids gender, trust it. The session
+  // gender detector only knows "men" / "women" and triggers on words
+  // like "son" / "daughter" — but those are kids signals, not adult
+  // ones. Overriding the AI's "kids" with the stale adult lock from
+  // an earlier "for my husband" turn ships men's products to a child.
+  const KIDS_TOKENS = new Set(["kids", "kid", "boys", "boy", "girls", "girl", "child", "children"]);
+  if (KIDS_TOKENS.has(aiGender)) {
+    console.log(`[chat] gender-lock: AI passed kids gender="${aiGender}"; respecting (locked="${lockedNorm}")`);
+    return toolCall;
+  }
+
   if (aiGender && aiGender !== lockedNorm) {
     console.log(`[chat] gender-lock: AI passed gender="${aiGender}" but customer is "${lockedNorm}" — overriding`);
   } else {
