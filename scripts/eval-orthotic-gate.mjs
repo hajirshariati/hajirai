@@ -138,6 +138,97 @@ await test("emits next question on Layer-2 keyword reply ('for my mom')", async 
   assert.match(events[0].text, /pain or condition/i);
 });
 
+await test("Layer 3: free-text reply mapped via mock Anthropic hook", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  let calls = 0;
+  const fakeAnthropic = {
+    messages: {
+      create: async () => { calls += 1; return { content: [{ text: '{"value":"Women"}' }] }; },
+    },
+  };
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "assistant", content: "Who are these for? <<Men>><<Women>><<Kids>>" },
+      // 65 years old: no chip text, no pronoun, no kin keyword —
+      // L1 + L2 both miss, so the gate must call Layer 3.
+      { role: "user", content: "65 years old" },
+    ],
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+    anthropic: fakeAnthropic,
+    haikuModel: "claude-haiku-4-5-20251001",
+  });
+  assert.equal(calls, 1, "Anthropic mock should be called once");
+  assert.equal(out.handled, true);
+  assert.equal(events[0].type, "text");
+  // Should advance to q_condition.
+  assert.match(events[0].text, /pain or condition/i);
+});
+
+await test("Layer 3: returns null → falls through to LLM", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  const fakeAnthropic = {
+    messages: {
+      create: async () => ({ content: [{ text: '{"value":null}' }] }),
+    },
+  };
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "assistant", content: "Who are these for? <<Men>><<Women>><<Kids>>" },
+      { role: "user", content: "I'm not really sure how to answer that" },
+    ],
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+    anthropic: fakeAnthropic,
+    haikuModel: "claude-haiku-4-5-20251001",
+  });
+  assert.equal(out.handled, false);
+  assert.equal(events.length, 0);
+});
+
+await test("Layer 3: API error → falls through to LLM", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  const fakeAnthropic = {
+    messages: {
+      create: async () => { throw new Error("API timeout"); },
+    },
+  };
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "assistant", content: "Who are these for? <<Men>><<Women>><<Kids>>" },
+      { role: "user", content: "blarghable" },
+    ],
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+    anthropic: fakeAnthropic,
+    haikuModel: "claude-haiku-4-5-20251001",
+  });
+  assert.equal(out.handled, false);
+  assert.equal(events.length, 0);
+});
+
+await test("off-topic reply (shipping policy mid-flow) → falls through", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "assistant", content: "Who are these for? <<Men>><<Women>><<Kids>>" },
+      { role: "user", content: "what's your shipping policy?" },
+    ],
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+  });
+  assert.equal(out.handled, false);
+  assert.equal(events.length, 0);
+});
+
 await test("falls through when assistant chips don't match any seed node", async () => {
   const { events, encoder, controller } = makeMockSse();
   const out = await maybeRunOrthoticFlow({

@@ -36,6 +36,9 @@ import {
   mapAnswerToEnum,
   findNodeByChipsInText,
   nextNodeFromTransition,
+  buildConstrainedAnswerPrompt,
+  parseConstrainedAnswerResponse,
+  isOffTopicReply,
 } from "./orthotic-flow.server.js";
 import { executeRecommenderTool } from "./recommender-tools.server.js";
 
@@ -163,12 +166,34 @@ export async function maybeRunOrthoticFlow({
     return { handled: false };
   }
 
-  // Map the latest user reply through Layer 1 + 2 only for now.
-  // Layer 3 (LLM free-text mapping) is wired in Stage C — we fall
-  // through to the LLM agentic loop on unmapped, which is safer
-  // than blocking and avoids changing the perceived behavior on
-  // anything but clean chip clicks.
-  const mapped = await mapAnswerToEnum(rawUserText, currentNode, tree.definition);
+  // Off-topic interrupt — customer asked about shipping/returns
+  // mid-flow. Yield to the LLM so it can answer the policy
+  // question naturally. The LLM may rephrase the next chip
+  // question on resume; that's acceptable trade-off — the
+  // alternative is the gate blocking off-topic replies, which
+  // is worse customer experience.
+  if (isOffTopicReply(rawUserText, currentNode)) {
+    console.log(
+      `[orthotic-flow] off-topic reply on ${currentNode.id} ("${rawUserText.slice(0, 40)}"); ` +
+        `falling through to LLM`,
+    );
+    return { handled: false };
+  }
+
+  // Map the latest user reply through Layer 1 → 2 → 3.
+  // Layer 3 calls Haiku with a tightly-constrained JSON-only
+  // prompt that's much harder to mess up than the full chat LLM.
+  // If Anthropic is unavailable or the call fails, the layer
+  // returns null and the gate falls through to the agentic loop.
+  const askLLM = anthropic && haikuModel
+    ? makeLayer3Hook(anthropic, haikuModel)
+    : null;
+  const mapped = await mapAnswerToEnum(
+    rawUserText,
+    currentNode,
+    tree.definition,
+    askLLM ? { askLLM } : {},
+  );
   if (!mapped || mapped.value === null || mapped.value === undefined) {
     console.log(
       `[orthotic-flow] reply on node ${currentNode.id} didn't map (layer=${mapped?.layer || "n/a"}); ` +
@@ -286,6 +311,31 @@ function humanizeCondition(c) {
     case "diabetic":          return "diabetic foot care";
     default: return c;
   }
+}
+
+// Build a Layer 3 LLM hook bound to the given Anthropic client +
+// model id. The hook signature matches what mapAnswerToEnum expects:
+// `async (rawAnswer, node, tree) => { value }`. Returns null on
+// errors so the orchestrator can fall through cleanly.
+function makeLayer3Hook(anthropic, model) {
+  return async function askLLM(rawAnswer, node /* , tree */) {
+    const prompt = buildConstrainedAnswerPrompt(rawAnswer, node);
+    if (!prompt) return { value: null };
+    try {
+      const res = await anthropic.messages.create({
+        model,
+        max_tokens: 80,
+        messages: [{ role: "user", content: prompt }],
+      });
+      const text = res?.content?.[0]?.text || "";
+      const value = parseConstrainedAnswerResponse(text, node);
+      return { value };
+    } catch (err) {
+      // Re-throw so mapAnswerToEnum's catch records it as
+      // layer="llm-error" — caller (gate) treats that as unmapped.
+      throw err;
+    }
+  };
 }
 
 function humanizeUseCase(u) {
