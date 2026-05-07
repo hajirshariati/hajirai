@@ -64,7 +64,30 @@ function sseChunk(obj) {
  * customer's click on "None — just want comfort" maps cleanly back
  * to condition="none" via Layer 1 exact match next turn.
  */
-function renderQuestionText(node) {
+const KIDS_GENDER_VALUES = new Set(["Kids", "Boys", "Girls", "Kid", "Child"]);
+function isKidsGenderValue(v) {
+  return typeof v === "string" && KIDS_GENDER_VALUES.has(v);
+}
+
+// Compute the set of useCase values that have at least one Kids
+// SKU in the resolver's masterIndex. Used to filter the q_use_case
+// chips when the customer has selected Kids — we only want to ask
+// about shoe types we actually carry a Kids orthotic for, instead
+// of letting them pick "Dress shoes" and dead-ending into a
+// "we don't have it" message.
+function kidsAvailableUseCases(tree) {
+  const masterIndex = tree?.definition?.resolver?.masterIndex;
+  if (!Array.isArray(masterIndex)) return null;
+  const out = new Set();
+  for (const m of masterIndex) {
+    if (isKidsGenderValue(m?.gender) && typeof m?.useCase === "string") {
+      out.add(m.useCase);
+    }
+  }
+  return out;
+}
+
+function renderQuestionText(node, answers, tree) {
   if (!node || node.type !== "question") return "";
   const q = String(node.question || "").trim();
   // Defensive Unisex / Other / Either / Both strip — production
@@ -76,10 +99,35 @@ function renderQuestionText(node) {
   // filter is safe to run on any node — the labels never appear
   // on non-gender questions.
   const NONSENSE_GENDER = /^(?:unisex|other|either|both)\b/i;
-  const chipLabels = (node.chips || [])
-    .map((c) => String(c?.label || "").trim())
-    .filter(Boolean)
-    .filter((label) => !NONSENSE_GENDER.test(label));
+  let chips = (node.chips || []).filter((c) => {
+    const label = String(c?.label || "").trim();
+    return label && !NONSENSE_GENDER.test(label);
+  });
+
+  // Kids-aware useCase filtering. If the customer already chose
+  // Kids, only show shoe-type chips that have at least one Kids
+  // SKU in the master index. Without this, Kids customers can pick
+  // dress shoes / cleats / skates / etc. and dead-end at a "no
+  // matching SKU" message because the catalog doesn't carry a kids
+  // orthotic for those use-cases. Filter at the question stage so
+  // the customer never reaches the dead-end.
+  if (
+    node.attribute === "useCase" &&
+    answers &&
+    isKidsGenderValue(answers.gender)
+  ) {
+    const allowed = kidsAvailableUseCases(tree);
+    if (allowed && allowed.size > 0) {
+      const filtered = chips.filter((c) => allowed.has(c.value));
+      // If the filter wiped out everything (catalog has no kids
+      // SKUs at all for this merchant), keep the original chips —
+      // emitting an empty chip line is worse than letting the LLM
+      // handle it.
+      if (filtered.length > 0) chips = filtered;
+    }
+  }
+
+  const chipLabels = chips.map((c) => String(c.label).trim()).filter(Boolean);
   if (chipLabels.length === 0) return q;
   const chipLine = chipLabels.map((l) => `<<${l}>>`).join(" ");
   return `${q}\n\n${chipLine}`;
@@ -182,8 +230,6 @@ export async function maybeRunOrthoticFlow({
   // never what the customer means; if they truly need to switch from
   // a child to themselves they say so explicitly ('actually it's for
   // me' / 'it's for my mom'), which the LLM handles outside the gate.
-  const KIDS_GENDER_VALUES = new Set(["Kids", "Boys", "Girls", "Kid", "Child"]);
-  const isKidsGenderValue = (v) => typeof v === "string" && KIDS_GENDER_VALUES.has(v);
   if (
     isKidsGenderValue(accumulated.gender) &&
     latestExtracted.gender &&
@@ -361,26 +407,50 @@ export async function maybeRunOrthoticFlow({
     return { handled: false };
   }
 
-  // Walk forward from root, transitioning past every node whose
-  // attribute is already in `answers`. Bounded at 16 hops to defend
-  // against malformed seeds with cyclic transitions.
-  const root = getRootNode(tree.definition);
-  if (!root) return { handled: false };
-  let currentNodeId = root.id;
-  for (let i = 0; i < 16; i++) {
-    const node = findNodeById(tree.definition, currentNodeId);
-    if (!node || node.type !== "question") break;
-    if (!node.attribute || answers[node.attribute] === undefined) break;
-    const nextId = nextNodeFromTransition(node, answers[node.attribute]);
-    if (!nextId) break;
-    currentNodeId = nextId;
+  // Pick the next question node by `requiredAttributes` order rather
+  // than following the seed's `next` chain. This guarantees gender
+  // is always asked first, then useCase, then condition — regardless
+  // of how the merchant's DB-stored tree happens to be wired (the
+  // canonical seed file says gender-first but older DB copies may
+  // still chain useCase → gender → condition). When all required
+  // attributes are filled, fall through to the seed's node chain so
+  // the resolve step at the end still fires.
+  const required = Array.isArray(tree.definition?.requiredAttributes)
+    ? tree.definition.requiredAttributes.filter((s) => typeof s === "string")
+    : [];
+  let currentNodeId = null;
+  for (const attr of required) {
+    if (answers[attr] !== undefined) continue;
+    const candidate = (tree.definition?.nodes || []).find(
+      (n) => n && n.type === "question" && n.attribute === attr,
+    );
+    if (candidate) {
+      currentNodeId = candidate.id;
+      break;
+    }
+  }
+  // All required attrs are filled (or no requiredAttributes defined):
+  // walk the seed chain from root, skipping past answered nodes,
+  // until we land on the resolve step.
+  if (!currentNodeId) {
+    const root = getRootNode(tree.definition);
+    if (!root) return { handled: false };
+    currentNodeId = root.id;
+    for (let i = 0; i < 16; i++) {
+      const node = findNodeById(tree.definition, currentNodeId);
+      if (!node || node.type !== "question") break;
+      if (!node.attribute || answers[node.attribute] === undefined) break;
+      const nextId = nextNodeFromTransition(node, answers[node.attribute]);
+      if (!nextId) break;
+      currentNodeId = nextId;
+    }
   }
 
   const state = { currentNodeId, answers, unmappedTurns: 0 };
   const step = resolveSkippableSteps(state, tree.definition);
 
   if (step.type === "question") {
-    const text = renderQuestionText(step.node);
+    const text = renderQuestionText(step.node, answers, tree);
     if (!text) return { handled: false };
     controller.enqueue(encoder.encode(sseChunk({ type: "text", text })));
     controller.enqueue(encoder.encode(sseChunk({ type: "products", products: [] })));

@@ -41,15 +41,18 @@ function isKidsGender(g) {
 function genderMatch(candidateGender, askedGender) {
   if (!askedGender) return true;
   if (candidateGender === askedGender) return true;
-  // Kids are strict: a Kids customer must ONLY get a Kids-tagged
-  // product. A child's foot is anatomically different from an
-  // adult's, and merchant policy is explicit — no Unisex (which
-  // means "adult unisex" in this catalog), no Men's, no Women's.
-  // If no Kids SKU exists for the asked use-case, the resolver
-  // returns no match and lets the caller surface a clean "we
-  // don't carry a kids product for that use-case" message rather
-  // than ship a wrong-fit adult or Unisex SKU.
-  if (isKidsGender(askedGender)) return false;
+  // Kids prefer Kids SKUs but accept Unisex as a fallback. Adult
+  // Men's/Women's are NEVER acceptable for a child. The orthotic-
+  // flow gate filters the q_use_case chips up-front to only show
+  // shoe-types where a Kids SKU exists in the catalog, so in the
+  // golden path Kids → Kids SKU happens through chip filtering,
+  // not through the resolver. This Unisex fallback is here as a
+  // safety net for free-text paths or merchant catalogs where
+  // some Kids-appropriate orthotics are tagged Unisex.
+  if (isKidsGender(askedGender)) {
+    if (candidateGender === "Unisex") return true;
+    return false;
+  }
   if (candidateGender === "Unisex") return true;
   return false;
 }

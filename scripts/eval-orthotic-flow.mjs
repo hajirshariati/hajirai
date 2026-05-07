@@ -76,9 +76,9 @@ test("findNodeById returns null on miss", () => {
   assert.equal(findNodeById(tree, "nonexistent"), null);
 });
 
-test("getRootNode returns q_use_case", () => {
+test("getRootNode returns q_gender", () => {
   const root = getRootNode(tree);
-  assert.equal(root?.id, "q_use_case");
+  assert.equal(root?.id, "q_gender");
 });
 
 section("chip extraction + matching");
@@ -114,7 +114,7 @@ section("transitions");
 
 test("nextNodeFromTransition follows _default", () => {
   const node = findNodeById(tree, "q_use_case");
-  assert.equal(nextNodeFromTransition(node, "casual"), "q_gender");
+  assert.equal(nextNodeFromTransition(node, "casual"), "q_condition");
 });
 
 test("nextNodeFromTransition branches by value (q_arch)", () => {
@@ -132,19 +132,18 @@ section("detectFlowState");
 
 test("empty messages → state at root, no answers", () => {
   const state = detectFlowState([], tree);
-  assert.equal(state.currentNodeId, "q_use_case");
+  assert.equal(state.currentNodeId, "q_gender");
   assert.deepEqual(state.answers, {});
 });
 
-test("after gender answer, state advances to q_condition", () => {
-  // Real seed flow: root is q_use_case → q_gender → q_condition.
-  // So we need to advance through q_use_case first.
+test("after gender + useCase answers, state advances to q_condition", () => {
+  // Real seed flow: root is q_gender → q_use_case → q_condition.
   const messages = [
     { role: "user", content: "I need orthotics" },
-    { role: "assistant", content: "What kind of shoes? <<Dress shoes>><<Everyday / casual shoes>><<Cleats>><<Hockey skates>>" },
-    { role: "user", content: "Everyday / casual shoes" },
     { role: "assistant", content: "Who are these for? <<Men>><<Women>><<Kids>>" },
     { role: "user", content: "Women" },
+    { role: "assistant", content: "What kind of shoes? <<Dress shoes>><<Everyday / casual shoes>><<Cleats>><<Hockey skates>>" },
+    { role: "user", content: "Everyday / casual shoes" },
   ];
   const state = detectFlowState(messages, tree);
   assert.equal(state.currentNodeId, "q_condition");
@@ -155,11 +154,11 @@ test("after gender answer, state advances to q_condition", () => {
 test("unmapped free-text answer leaves state unchanged + counts", () => {
   const messages = [
     { role: "user", content: "I need orthotics" },
-    { role: "assistant", content: "What kind of shoes? <<Dress shoes>><<Everyday / casual shoes>><<Cleats>>" },
+    { role: "assistant", content: "Who are these orthotics for? <<Men>><<Women>><<Kids>>" },
     { role: "user", content: "uhh I'm not really sure" },
   ];
   const state = detectFlowState(messages, tree);
-  assert.equal(state.currentNodeId, "q_use_case"); // didn't advance
+  assert.equal(state.currentNodeId, "q_gender"); // didn't advance
   assert.equal(state.unmappedTurns, 1);
 });
 
@@ -284,16 +283,16 @@ section("getNextStep");
 test("empty state → first question (root)", () => {
   const step = getNextStep({ currentNodeId: null, answers: {} }, tree);
   assert.equal(step.type, "question");
-  assert.equal(step.node.id, "q_use_case");
+  assert.equal(step.node.id, "q_gender");
 });
 
-test("after q_use_case answered → q_gender", () => {
+test("after q_gender answered → q_use_case", () => {
   const step = getNextStep({
-    currentNodeId: "q_gender",
-    answers: { useCase: "casual" },
+    currentNodeId: "q_use_case",
+    answers: { gender: "Women" },
   }, tree);
   assert.equal(step.type, "question");
-  assert.equal(step.node.id, "q_gender");
+  assert.equal(step.node.id, "q_use_case");
 });
 
 test("at resolve node → resolve step with attrs", () => {
@@ -312,9 +311,8 @@ test("skipIfKnown skips q_gender if gender already in answers", () => {
     answers: { gender: "Women", useCase: "casual" },
   }, tree);
   // With skipIfKnown=true on q_gender + answer present, we
-  // transition to q_condition without re-asking.
+  // transition past it without re-asking.
   assert.notEqual(step.node?.id, "q_gender");
-  assert.equal(step.node?.id, "q_condition");
 });
 
 section("Layer 3 prompt + parser");

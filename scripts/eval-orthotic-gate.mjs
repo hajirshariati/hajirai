@@ -94,8 +94,8 @@ await test("re-asks current question when reply is gibberish but intent is estab
     encoder,
   });
   assert.equal(out.handled, true);
-  // Walks root → q_use_case (no useCase known) → emit q_use_case.
-  assert.match(events[0].text, /What kind of shoes/i);
+  // Walks required-attrs in order: gender first since it's missing.
+  assert.match(events[0].text, /Who are these orthotics for/i);
 });
 
 await test("emits next seed question on chip click (Layer 1)", async () => {
@@ -245,7 +245,7 @@ await test("off-topic reply (shipping policy mid-flow) → falls through", async
   assert.equal(events.length, 0);
 });
 
-await test("bootstrap: 'I need orthotics' → emits q_use_case (no prior assistant)", async () => {
+await test("bootstrap: 'I need orthotics' → emits q_gender (no prior assistant)", async () => {
   const { events, encoder, controller } = makeMockSse();
   const out = await maybeRunOrthoticFlow({
     messages: [{ role: "user", content: "I need orthotics" }],
@@ -256,10 +256,11 @@ await test("bootstrap: 'I need orthotics' → emits q_use_case (no prior assista
   });
   assert.equal(out.handled, true);
   assert.equal(events[0].type, "text");
-  assert.match(events[0].text, /What kind of shoes/i);
+  assert.match(events[0].text, /Who are these orthotics for/i);
   // Seed-byte-exact chips so the next turn's chip click maps via Layer 1.
-  assert.match(events[0].text, /<<Dress shoes>>/);
-  assert.match(events[0].text, /<<Everyday \/ casual shoes>>/);
+  assert.match(events[0].text, /<<Men>>/);
+  assert.match(events[0].text, /<<Women>>/);
+  assert.match(events[0].text, /<<Kids>>/);
 });
 
 await test("bootstrap: pre-fills useCase + gender from rich first message", async () => {
@@ -292,9 +293,9 @@ await test("bootstrap: fires when last assistant chips were rephrased (drift cas
     encoder,
   });
   assert.equal(out.handled, true);
-  // condition=plantar_fasciitis prefilled. With no useCase/gender, bootstrap
-  // walks from root → q_use_case (use-case is the root, not skipped).
-  assert.match(events[0].text, /What kind of shoes/i);
+  // condition=plantar_fasciitis prefilled. Required-attrs order
+  // walks gender first (still missing).
+  assert.match(events[0].text, /Who are these orthotics for/i);
 });
 
 await test("regression (curly apostrophe): 'Find men’s shoes for my needs' must NOT engage", async () => {

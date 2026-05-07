@@ -1,5 +1,5 @@
 {
-  "rootNodeId": "q_use_case",
+  "rootNodeId": "q_gender",
   "nodes": [
     {
       "id": "q_use_case",
@@ -57,7 +57,7 @@
         }
       ],
       "next": {
-        "_default": "q_gender"
+        "_default": "q_condition"
       }
     },
     {
@@ -82,7 +82,7 @@
         }
       ],
       "next": {
-        "_default": "q_condition"
+        "_default": "q_use_case"
       }
     },
     {
