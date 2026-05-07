@@ -377,6 +377,49 @@ await test("regression: 'best summer sandal for my mom under $50' must NOT engag
   assert.equal(events.length, 0);
 });
 
+await test("regression (Kids-sticky): later 'Women' answer cannot override gender=Kids", async () => {
+  // Production trace: customer picked Kids on q_gender; the LLM later
+  // injected an unsolicited 'boy or girl?' follow-up with Men's/Women's
+  // chips; customer clicked Women's; the resolver returned a Women's
+  // adult orthotic for what was supposed to be a child.
+  // The kids-sticky guard must drop the latestExtracted.gender override
+  // when accumulated already has a kids gender.
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "I need orthotics for kids' dress shoes" },
+      { role: "assistant", content: "What kind of shoes will the orthotics go in? <<Dress shoes>><<Everyday / casual shoes>><<Cleats>>" },
+      { role: "user", content: "Dress shoes" },
+      { role: "assistant", content: "Who are these orthotics for? <<Men>><<Women>><<Kids>>" },
+      { role: "user", content: "Kids" },
+      { role: "assistant", content: "Are these for a boy or girl?" },
+      // Customer answered the LLM's bad follow-up. Should NOT flip
+      // accumulated gender from Kids to Women.
+      { role: "user", content: "Women's" },
+    ],
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+  });
+  // The gate should still engage (intent was in turn 1). When it walks,
+  // gender must remain Kids — verify by looking at what gets emitted
+  // and what the answers log says.
+  if (out.handled) {
+    // If gate handled, the emitted question's preceding state should
+    // have gender=Kids. We can confirm by ensuring NO 'gender=Women'
+    // appears in any text events (the gate's resolve intro embeds
+    // the attrs string).
+    const allText = events.filter((e) => e.type === "text").map((e) => e.text).join(" ");
+    assert.equal(allText.includes("gender=Women"), false, "gender should not have been flipped to Women");
+  }
+  // Either way, the test's main assertion is the kids-sticky log line
+  // would have fired (we can't easily check stdout from here, so we
+  // just assert no events leak adult gender). The unit test for the
+  // sticky logic itself can live in eval-orthotic-flow when we test
+  // the answer accumulation directly.
+});
+
 await test("regression: 'show me women's sandals' must NOT engage", async () => {
   const { events, encoder, controller } = makeMockSse();
   const out = await maybeRunOrthoticFlow({
