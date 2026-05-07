@@ -1344,6 +1344,58 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }
     fullResponseText = filtered.text;
 
+    // Customer-rejection guard. When the customer's latest message
+    // explicitly rejected a category ("doesn't like shoes", "not
+    // into orthotics", "no sandals", "without boots"), strip any
+    // chip in that rejected category from the AI's reply. The AI
+    // sometimes offers <<Slippers>> / <<Sandals>> after the customer
+    // said "doesn't like shoes" — both ARE shoes, contradicting
+    // the customer's stated constraint.
+    {
+      const latestUser = String(ctx.latestUserMessage || "");
+      const REJECT_RE = /\b(?:no|not|don'?t|doesn'?t|didn'?t|don't[\s-]?(?:like|want)|doesn't[\s-]?(?:like|want)|hate|hates|dislike|dislikes|avoid|avoids|without|besides|other[\s-]?than|except|instead[\s-]?of|rather[\s-]?than|not[\s-]?into|not[\s-]?a[\s-]?fan)\b[^.!?\n]{0,50}\b((?:shoes?|footwear|orthotics?|insoles?|footbeds?|sandals?|sneakers?|boots?|clogs?|loafers?|slippers?|oxfords?|wedges?|heels?|flats?|mules?|mary[\s-]?janes?|slip[\s-]?ons?))\b/gi;
+      const rejectedTerms = new Set();
+      let m;
+      while ((m = REJECT_RE.exec(latestUser)) !== null) {
+        const term = m[1].toLowerCase().replace(/\s+/g, " ").trim();
+        rejectedTerms.add(term);
+        // Footwear umbrella: "shoes" / "footwear" rejects ALL the
+        // shoe categories — sandals, sneakers, boots, clogs,
+        // loafers, slippers, oxfords, wedges, heels, mary janes,
+        // slip ons. The chip-filter expects exact category labels,
+        // so expand the umbrella to its members.
+        if (term === "shoes" || term === "shoe" || term === "footwear") {
+          ["sandals", "sneakers", "boots", "clogs", "loafers", "slippers", "oxfords", "wedges heels", "wedges", "heels", "flats", "mules", "mary janes", "slip ons", "footwear"].forEach((c) => rejectedTerms.add(c));
+        }
+      }
+      if (rejectedTerms.size > 0) {
+        const before = fullResponseText;
+        const stripped = [];
+        // Match each <<Label>> chip; if its (case-insensitive,
+        // whitespace-normalized) label matches a rejected term —
+        // either exactly or as plural/singular — strip it.
+        fullResponseText = fullResponseText.replace(/<<\s*([^<>]+?)\s*>>/g, (full, label) => {
+          const norm = String(label).toLowerCase().trim().replace(/\s+/g, " ");
+          const stem = norm.endsWith("s") ? norm.slice(0, -1) : norm;
+          for (const t of rejectedTerms) {
+            const tStem = t.endsWith("s") ? t.slice(0, -1) : t;
+            if (norm === t || stem === tStem || stem === t || norm === tStem) {
+              stripped.push(label);
+              return "";
+            }
+          }
+          return full;
+        });
+        if (stripped.length > 0) {
+          fullResponseText = fullResponseText.replace(/[ \t]{2,}/g, " ").trim();
+          console.log(
+            `[chat] ${ctx.shop} stripped customer-rejected chips: [${stripped.join(", ")}] ` +
+              `(rejected terms in latest message: [${[...rejectedTerms].join(", ")}])`,
+          );
+        }
+      }
+    }
+
     // Strip <<Unisex>> / <<Other>> / <<Either>> / <<Both>> gender chips —
     // those aren't customer-facing gender choices (Unisex is a product-side
     // compatibility tag, not a gender). Also clean up the trailing-space

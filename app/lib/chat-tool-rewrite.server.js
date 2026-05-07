@@ -361,6 +361,25 @@ export function redirectOrthoticSearchToRecommender(toolCall, ctx) {
   const matchesDomain = ORTHOTIC_DOMAIN_RE.test(latest) || ORTHOTIC_DOMAIN_RE.test(queryStr);
   if (!matchesDomain) return toolCall;
 
+  // Negation escape hatch: customer said "doesn't like orthotics",
+  // "not orthotics", "no orthotics", "without orthotics", "besides
+  // orthotics", "other than orthotics". The orthotic-domain word
+  // appears, but the customer is REJECTING that domain. Redirecting
+  // to recommend_orthotic in this case is the opposite of what the
+  // customer wants — they're asking for something OTHER THAN an
+  // orthotic. Let search_products run with the AI's actual query
+  // (e.g. "accessories gift") so the search finds non-orthotic
+  // alternatives.
+  const NEGATION_RE = /\b(?:no|not|don'?t|doesn'?t|didn'?t|don't[\s-]?like|doesn't[\s-]?like|without|besides|other[\s-]?than|except|aside[\s-]?from|instead[\s-]?of|rather[\s-]?than|hate|hates|dislike|dislikes|avoid|avoids|skip)\b[^.!?\n]{0,40}\b(?:orthotic|orthotics|insole|insoles|footbed|footbeds|shoes?|footwear|sandals?|sneakers?|boots?|clogs?|loafers?|slippers?|oxfords?|wedges?|heels?|flats?|mules?|mary[\s-]?jane|slip[\s-]?ons?)\b/i;
+  if (NEGATION_RE.test(latest)) {
+    console.log(
+      `[chat] orthotic-routing: skipped redirect — customer's message contains a negation ` +
+        `("doesn't like / not / no / without orthotics-or-shoes"). Letting search_products run ` +
+        `with the AI's actual query so non-orthotic alternatives surface.`,
+    );
+    return toolCall;
+  }
+
   // Sandal escape hatch: if the customer is asking for an orthotic
   // FOR sandals, don't redirect — orthotic inserts don't fit open
   // sandals, and the recommender would resolve to a wrong product.
