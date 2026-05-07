@@ -2222,13 +2222,29 @@ export const action = async ({ request }) => {
     let groupFilterApplied = "";
     const categoryIntent = analyzeCategoryIntent(messages, merchantGroups);
 
+    // Active-group narrowing is used to prefer chips and bias
+    // search filters, NOT to shrink the prompt's ALLOW-LIST. When
+    // the customer asks "do you have closed-toe option with
+    // orthotic footbed", the active-group detector may pick
+    // Orthotics, but the women's catalog still has 14 categories
+    // — narrowing the ALLOW-LIST to "Orthotics" alone makes the AI
+    // tell the customer the catalog only carries orthotics.
+    //
+    // Keep the gender-filtered catalogProductTypes as the source
+    // of truth for the ALLOW-LIST. Store the narrowed result
+    // separately so chip-preference logic can still use it via
+    // `merchantGroups` + active-group context — but the AI's
+    // category awareness stays correct.
     if (Array.isArray(merchantGroups) && merchantGroups.length > 0) {
       if (categoryIntent.activeGroup && !categoryIntent.ambiguous) {
         const g = categoryIntent.activeGroup;
         const allowed = new Set((g.categories || []).map((c) => String(c).toLowerCase()));
         const filtered = catalogProductTypes.filter((c) => allowed.has(String(c).toLowerCase()));
         if (filtered.length >= 1) {
-          catalogProductTypes = filtered;
+          // Track which group narrowed for downstream search filtering
+          // and observability — but do NOT overwrite catalogProductTypes
+          // (the prompt's ALLOW-LIST). The active group is advisory
+          // for chip selection, not a denial of other categories.
           groupFilterApplied = g.name;
         }
       }
