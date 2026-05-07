@@ -513,6 +513,19 @@ export async function executeRecommenderTool({ toolName, input, shop, trees, con
       } else if (/\bdiabet(?:ic|es)\b/i.test(t)) {
         enrichedInput.condition = "diabetic";
         enrichedFromText.push("condition=diabetic");
+      } else if (
+        // "No condition" / "just comfort" / "general support" answer
+        // patterns. The AI sometimes paraphrases the seed's
+        // "None — just want comfort" chip as "Just Comfort &
+        // Support" / "general comfort" / "everyday support" — when
+        // the customer clicks that, the LLM doesn't always map the
+        // answer back to condition="none", so the gate keeps re-
+        // asking the same question. Catch these patterns and pin
+        // condition="none" so the resolver runs.
+        /\b(?:no\s+(?:specific\s+)?(?:pain|condition|issue|concern)|just\s+(?:comfort|support|want\s+(?:comfort|support))|general\s+(?:comfort|support)|everyday\s+(?:comfort|support|wear)|no\s+(?:foot\s+)?problem|just\s+looking\s+for\s+(?:comfort|support|something)|comfort\s*(?:&|and)\s*support|nothing\s+specific|no\s+issues?|none\s+(?:really|specifically)?|not\s+(?:really|specifically)|just\s+everyday)\b/i.test(t)
+      ) {
+        enrichedInput.condition = "none";
+        enrichedFromText.push("condition=none(no-pain/just-comfort signal)");
       }
     }
   }
