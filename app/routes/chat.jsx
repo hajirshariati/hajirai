@@ -2255,6 +2255,39 @@ export const action = async ({ request }) => {
       getActiveCampaigns(session.shop),
     ]);
 
+    // Aetrex-specific suppressed categories. These exist in the live
+    // Shopify catalog (3 sock SKUs, 1 gift-card SKU at last sync) but
+    // the merchant has confirmed they're not actively sold or
+    // promoted. Strip them from BOTH the gender-scoped allow-list
+    // (catalogProductTypes — used for chips) and the full-catalog
+    // list (allCatalogCategories — used by STORE FACTS). Without
+    // this strip, the AI suggested "<<Socks>>" and "<<Gift Card>>"
+    // as Mother's Day gift chips when the customer asked for non-
+    // shoe non-orthotic options.
+    //
+    // Long-term: this should become a per-merchant admin config
+    // ("hidden categories" list). For now, hardcoded matches the
+    // Aetrex-specific direction the project is taking.
+    const SUPPRESSED_CATEGORIES = new Set(["socks", "gift card"]);
+    const suppressFn = (cats) => Array.isArray(cats)
+      ? cats.filter((c) => !SUPPRESSED_CATEGORIES.has(String(c || "").toLowerCase().trim()))
+      : cats;
+    const beforeScopedCount = catalogProductTypes.length;
+    const beforeFullCount = allCatalogCategories.length;
+    catalogProductTypes = suppressFn(catalogProductTypes);
+    allCatalogCategories = suppressFn(allCatalogCategories);
+    if (
+      catalogProductTypes.length !== beforeScopedCount ||
+      allCatalogCategories.length !== beforeFullCount
+    ) {
+      console.log(
+        `[chat] ${session.shop} suppressed categories from allow-list: ` +
+          `[${[...SUPPRESSED_CATEGORIES].join(", ")}] ` +
+          `(scoped: ${beforeScopedCount}→${catalogProductTypes.length}, ` +
+          `full: ${beforeFullCount}→${allCatalogCategories.length})`,
+      );
+    }
+
     // Merchant-configured category groups: keep a server-side product-intent
     // group from the conversation, then narrow the prompt/catalog surface to
     // that group's categories. This is fully data-driven — no hardcoded store
