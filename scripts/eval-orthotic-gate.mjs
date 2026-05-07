@@ -297,6 +297,36 @@ await test("bootstrap: fires when last assistant chips were rephrased (drift cas
   assert.match(events[0].text, /What kind of shoes/i);
 });
 
+await test("regression: 'Find men's shoes for my needs' must NOT engage orthotic flow", async () => {
+  // Production bug: Layer 2 extracted gender=Men from "men's", which
+  // alone triggered the gate to ask q_use_case 'What kind of shoes
+  // will the orthotics go in?' — hijacking a clear footwear request.
+  // Engagement rule must require intent or accumulated answers or
+  // chip fingerprint, NOT a single Layer-2 hit on the latest message.
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [{ role: "user", content: "Find men's shoes for my needs" }],
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+  });
+  assert.equal(out.handled, false);
+  assert.equal(events.length, 0);
+});
+
+await test("regression: 'show me women's sandals' must NOT engage", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [{ role: "user", content: "show me women's sandals" }],
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+  });
+  assert.equal(out.handled, false);
+});
+
 await test("bootstrap: skips when no orthotic intent", async () => {
   const { events, encoder, controller } = makeMockSse();
   const out = await maybeRunOrthoticFlow({

@@ -190,9 +190,16 @@ export async function maybeRunOrthoticFlow({
         detectOrthoticIntent(m.content),
     );
   const haveAccumulated = Object.keys(accumulated).length > 0;
-  const haveLatestExtract = Object.keys(latestExtracted).length > 0;
 
-  if (!intentInHistory && !haveAccumulated && !haveLatestExtract && !fingerprintNode) {
+  // Engagement rule. We deliberately do NOT engage on a Layer-1/2
+  // hit in the LATEST message alone — production showed that
+  // 'Find men's shoes for my needs' extracts gender=Men via the
+  // pronoun pattern and would otherwise hijack a footwear request
+  // into the orthotic flow. The customer must have actually
+  // expressed orthotic intent (now or earlier), or be already
+  // mid-flow (accumulated answers from prior turns), or be in the
+  // middle of answering a recognized seed question (fingerprintNode).
+  if (!intentInHistory && !haveAccumulated && !fingerprintNode) {
     return { handled: false };
   }
   if (fingerprintNode && isOffTopicReply(rawUserText, fingerprintNode)) {
@@ -242,7 +249,7 @@ export async function maybeRunOrthoticFlow({
     fingerprintNode &&
     !intentInHistory &&
     !haveAccumulated &&
-    !haveLatestExtract &&
+    Object.keys(latestExtracted).length === 0 &&
     layer3Attempted &&
     !layer3Mapped
   ) {
