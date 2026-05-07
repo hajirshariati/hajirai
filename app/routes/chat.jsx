@@ -2581,14 +2581,74 @@ export const action = async ({ request }) => {
                 messages: [
                   {
                     role: "user",
-                    content: `You are generating follow-up suggestions for "${ctx.shop}", a Shopify store. The store's AI assistant is named "${config.assistantName || "AI Shopping Assistant"}".\n\nCustomer asked: "${String(body.message).slice(0, 200)}"\nAssistant replied: "${lastText.slice(0, 300)}"${catalogLine}\n\nSuggest 2-3 brief follow-up questions the CUSTOMER would naturally ask next.\n\nRULES:\n- Questions MUST be directly relevant to the assistant's response. If the assistant asked the customer a question, suggest answers the customer might give — not unrelated questions.\n- Only reference products, styles, or details the assistant ACTUALLY mentioned. Never ask about things not yet discussed.\n- NEVER invent product categories the store might not carry. Only reference categories or product types that appeared in the conversation above OR appear in the CATALOG ALLOW-LIST above.\n- NEVER mention "brands" — this is a single-brand store.\n- NEVER ask about shoe size, availability, or pricing if no specific product has been shown yet.\n- Write from the customer's perspective.\n- Keep questions short and specific.\n\nReturn ONLY a JSON array of strings, nothing else.`,
+                    content: `You are generating follow-up suggestions for "${ctx.shop}", a Shopify store. The store's AI assistant is named "${config.assistantName || "AI Shopping Assistant"}".\n\nCustomer asked: "${String(body.message).slice(0, 200)}"\nAssistant replied: "${lastText.slice(0, 300)}"${catalogLine}\n\nSuggest 2-3 brief follow-up questions the CUSTOMER would naturally ask next.\n\nRULES:\n- Questions MUST be directly relevant to the assistant's response. If the assistant asked the customer a question, suggest answers the customer might give — not unrelated questions.\n- Only reference products, styles, or details the assistant ACTUALLY mentioned. Never ask about things not yet discussed.\n- NEVER invent product categories the store might not carry. Only reference categories or product types that appeared in the conversation above OR appear in the CATALOG ALLOW-LIST above.\n- NEVER mention "brands" — this is a single-brand store.\n- NEVER ask about shoe size, availability, or pricing if no specific product has been shown yet.\n- NEVER suggest "Tell me more about [TechnologyName]", "What is [TM]", "How does [feature] work", or "Explain [material]" — those questions trigger AI hallucination because the catalog has marketing-level descriptions, not engineering specs. The AI cannot answer them accurately.\n- NEVER reference a trademarked or branded technology name (anything with TM, ®, ™, or a TitleCase product-tech term like UltraSKY, OrthoLite, etc.) UNLESS that exact term appeared verbatim in the assistant's reply above. Even then, prefer pivot questions over tech deep-dives.\n- NEVER ask about specific specs or measurements (heel height, stack height, drop, weight, density, foam grade, dimensions, gradient) unless the assistant's reply quoted those exact numbers.\n- PREFER pivot questions: different gender ("Do you have these for women?"), different category ("Show me sneakers"), different price/feature filter ("Anything under $100?", "Do you have wider widths?"), or honest comparisons between products already mentioned.\n- Write from the customer's perspective.\n- Keep questions short and specific.\n\nReturn ONLY a JSON array of strings, nothing else.`,
                   },
                 ],
               });
               const raw = fuRes.content?.[0]?.text || "";
               const match = raw.match(/\[[\s\S]*\]/);
               if (match) {
-                const questions = JSON.parse(match[0]).filter((q) => typeof q === "string").slice(0, 3);
+                let questions = JSON.parse(match[0]).filter((q) => typeof q === "string").slice(0, 3);
+                // Server-side validator. Even with tightened prompt
+                // rules, Haiku occasionally generates questions the
+                // main AI can't answer (tech-name deep-dives, spec
+                // numbers, deeply branded terms). Strip those before
+                // emit. Customer is better off with 1-2 good
+                // suggestions than 3 with one that triggers a
+                // hallucinated reply on the next turn.
+                const lastTextLower = lastText.toLowerCase();
+                const TECH_NAME_RE = /(?:[™®]|\b[A-Z][A-Za-z]*(?:[A-Z][A-Za-z]+){1,}\b)/;
+                const SPEC_DEEPDIVE_RE = /\b(?:tell me more about|explain|how does .* work|what (?:is|are) the (?:[a-z]+\s+)?(?:technology|system|fabric|foam|material|tech)|details?\s+(?:on|about)\s+the)\b/i;
+                const SPEC_MEASURE_RE = /\b(?:heel\s+height|stack\s+height|toe\s+drop|heel-to-toe\s+drop|stack|gradient|density|grade|weight\s+in\s+(?:oz|grams|g)|dimensions|cm\b|mm\b)\b/i;
+                const filtered = [];
+                const dropped = [];
+                for (const q of questions) {
+                  const lower = q.toLowerCase();
+
+                  // Spec deep-dive pattern check.
+                  if (SPEC_DEEPDIVE_RE.test(q)) {
+                    // Allowed only if the question's subject already
+                    // appeared in the assistant's reply (e.g. AI
+                    // mentioned UltraSKY → customer can drill in).
+                    const subjectMatch = q.match(/\babout\s+(?:the\s+)?([A-Za-z][A-Za-z0-9™®\s-]{2,40})/i);
+                    const subj = subjectMatch ? subjectMatch[1].trim().toLowerCase() : "";
+                    if (!subj || !lastTextLower.includes(subj.replace(/[™®]/g, "").trim())) {
+                      dropped.push({ q, reason: "spec-deepdive without prior mention" });
+                      continue;
+                    }
+                  }
+
+                  // Trademarked / TitleCase tech-name check.
+                  const techMatches = q.match(new RegExp(TECH_NAME_RE.source, "g")) || [];
+                  let techHallucination = false;
+                  for (const term of techMatches) {
+                    const cleaned = term.replace(/[™®]/g, "").trim();
+                    if (cleaned.length < 4) continue;
+                    if (!lastTextLower.includes(cleaned.toLowerCase())) {
+                      techHallucination = true;
+                      break;
+                    }
+                  }
+                  if (techHallucination) {
+                    dropped.push({ q, reason: "branded tech term not in reply" });
+                    continue;
+                  }
+
+                  // Spec/measurement check.
+                  if (SPEC_MEASURE_RE.test(q) && !SPEC_MEASURE_RE.test(lastText)) {
+                    dropped.push({ q, reason: "spec measurement not in reply" });
+                    continue;
+                  }
+
+                  filtered.push(q);
+                }
+                if (dropped.length > 0) {
+                  console.log(
+                    `[chat] ${ctx.shop} follow-up validator: dropped ${dropped.length}/${questions.length} suggestion(s) — ` +
+                      dropped.map((d) => `"${d.q.slice(0, 50)}" (${d.reason})`).join("; "),
+                  );
+                }
+                questions = filtered;
                 if (questions.length > 0) {
                   controller.enqueue(encoder.encode(sseChunk({ type: "suggestions", questions })));
                 }
