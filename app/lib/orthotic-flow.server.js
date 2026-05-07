@@ -819,6 +819,17 @@ export function detectOrthoticIntent(rawText) {
   return false;
 }
 
+// Returns true when the message ACTIVELY rejects orthotics ("I don't
+// want orthotics", "no insoles, just shoes"). The unified gate uses
+// this as a hard veto — even if Layer 1/2 picks up a chip-shaped
+// signal in the same message, an explicit rejection means the
+// customer wants something else and the LLM should handle it.
+export function hasOrthoticRejection(rawText) {
+  const t = String(rawText || "").trim();
+  if (!t) return false;
+  return ORTHOTIC_NEGATION_RE.test(t);
+}
+
 /**
  * Run Layer 1 + 2 against EVERY question node in the tree to
  * pre-extract any answers the customer's bootstrap message
@@ -845,6 +856,39 @@ export function preExtractAnswers(rawText, tree) {
     if (kw !== undefined) {
       out[node.attribute] = kw;
     }
+  }
+  return out;
+}
+
+/**
+ * Walk the WHOLE conversation history and accumulate every
+ * Layer-1/Layer-2 answer signal across all user messages.
+ *
+ * Why this exists: detectFlowState only advances when it sees
+ * user→assistant→user chip-mapped pairs, and findNodeByChipsInText
+ * needs the assistant's `<<chip>>` markers to survive the widget's
+ * history round-trip — which they apparently don't, judging by
+ * production logs where bootstrap fires every turn but continuation
+ * never does. accumulateAnswers sidesteps both problems by treating
+ * the customer's history as a bag of clinical facts and harvesting
+ * each with a per-node Layer-1/2 scan. Later turns merge over
+ * earlier ones, so a chip click on turn 3 doesn't erase a condition
+ * the customer named on turn 1.
+ *
+ * Pure function. Sync. The merge order is chronological — earliest
+ * message first, latest user message last — so the latest signal
+ * wins on conflict (matches "the customer just said X" semantics).
+ */
+export function accumulateAnswers(messages, tree) {
+  const out = {};
+  if (!tree || !Array.isArray(tree.nodes)) return out;
+  if (!Array.isArray(messages)) return out;
+  for (const msg of messages) {
+    if (!msg || msg.role !== "user") continue;
+    const text = typeof msg.content === "string" ? msg.content : "";
+    if (!text) continue;
+    const turn = preExtractAnswers(text, tree);
+    Object.assign(out, turn);
   }
   return out;
 }
