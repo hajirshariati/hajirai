@@ -315,6 +315,29 @@ await test("regression: 'Find men's shoes for my needs' must NOT engage orthotic
   assert.equal(events.length, 0);
 });
 
+await test("regression: footwear-path commit (multi-turn) must NOT hijack on chip click", async () => {
+  // Production trace: customer said "I have foot pain, what should I
+  // wear?", AI offered <<New Footwear>>|<<Orthotic Insert>>, customer
+  // clicked <<New Footwear>>, AI asked <<Men's>>|<<Women's>>, customer
+  // clicked <<Women's>>. Layer 2 extracted gender=Women → gate hijacked.
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "I have foot pain, what should I wear?" },
+      { role: "assistant", content: "Are you looking for new footwear or an orthotic insert? <<New Footwear>><<Orthotic Insert>>" },
+      { role: "user", content: "New Footwear" },
+      { role: "assistant", content: "Which styles would you like to browse — men's or women's? <<Men's>><<Women's>>" },
+      { role: "user", content: "Women's" },
+    ],
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+  });
+  assert.equal(out.handled, false);
+  assert.equal(events.length, 0);
+});
+
 await test("regression: 'show me women's sandals' must NOT engage", async () => {
   const { events, encoder, controller } = makeMockSse();
   const out = await maybeRunOrthoticFlow({
