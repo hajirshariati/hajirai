@@ -295,16 +295,289 @@ export function getNextStep(_state, _tree) {
   return { type: "stub", _stub: true };
 }
 
+// ──────────────────────────────────────────────────────────────
+// Layer 2 keyword tables — per-attribute paraphrase → enum value.
+//
+// Customer types free text instead of clicking a chip; we map it
+// to an enum without an LLM call. Each entry's `patterns` are
+// regex tested IN ORDER against the normalized answer; first
+// match wins. Order matters when patterns could overlap (Kids
+// is checked before Men/Women so "for my niece" hits Kids).
+//
+// These mirror the keyword enrichment regex already in
+// recommender-tools.server.js (the band-aid we built today),
+// reorganized here as the deterministic Layer-2 fallback for
+// the state-machine answer mapper.
+// ──────────────────────────────────────────────────────────────
+const KEYWORD_PATTERNS = {
+  gender: [
+    {
+      value: "Kids",
+      patterns: [
+        /\b(kid|kids|kid'?s|child|children|youth|grandkid|grandchild|nephew|niece|son\s+of|daughter\s+of)\b/i,
+        // "boys" / "girls" plural defaults to Kids in Aetrex's
+        // catalog (boys-line / girls-line products). Singular
+        // "boy" / "girl" is ambiguous — falls through to Men/
+        // Women for adults.
+        /\b(boys|girls|boy'?s|girl'?s)\b/i,
+      ],
+    },
+    {
+      value: "Women",
+      patterns: [
+        /\b(women|womens|women'?s|woman|female|lady|ladies|girlfriend|sister|daughter|wife|mom|mother|grandma|grandmother|aunt|niece|her|hers|female|she'?s)\b/i,
+      ],
+    },
+    {
+      value: "Men",
+      patterns: [
+        /\b(men|mens|men'?s|man|male|guy|guys|gentleman|gentlemen|boyfriend|brother|son|husband|dad|father|grandpa|grandfather|uncle|nephew|him|his|he'?s)\b/i,
+      ],
+    },
+  ],
+  useCase: [
+    {
+      value: "athletic_running",
+      patterns: [
+        /\b(running|run\b|jog(?:ging)?|marathon|half[\s-]?marathon|5k|10k|sprint|track\b)\b/i,
+      ],
+    },
+    {
+      value: "athletic_training",
+      patterns: [
+        /\b(gym|training|workout|cross[\s-]?train|crossfit|weights?[\s-]?lift|strength[\s-]?train|pilates|barre|hiit)\b/i,
+      ],
+    },
+    {
+      value: "cleats",
+      patterns: [
+        /\b(cleats?|soccer|football|baseball|softball|lacrosse|rugby|spike[\s-]?shoes?|field[\s-]?sport)\b/i,
+      ],
+    },
+    {
+      value: "skates",
+      patterns: [
+        /\b(skates?|hockey|ice[\s-]?skate|figure[\s-]?skat)/i,
+      ],
+    },
+    {
+      value: "winter_boots",
+      patterns: [
+        /\b(winter[\s-]?boots?|snow[\s-]?boots?|cold[\s-]?weather[\s-]?boots?|ski[\s-]?boots?)\b/i,
+      ],
+    },
+    {
+      value: "work_all_day",
+      patterns: [
+        /\b(work[\s-]?boots?|work[\s-]?shoes?|standing[\s-]?all[\s-]?day|on\s+(?:my|her|his|their)\s+feet[\s-]?all[\s-]?day|warehouse|nursing|nurse|retail|server|waitress|waiter|restaurant|construction|all[\s-]?day[\s-]?on\s+feet)\b/i,
+      ],
+    },
+    {
+      value: "athletic_general",
+      patterns: [
+        /\b(athletic|active|sports?|sport[\s-]?shoes?|tennis|basketball|court[\s-]?shoes?|pickleball|volleyball)\b/i,
+      ],
+    },
+    {
+      value: "dress_no_removable",
+      patterns: [
+        /\b(no[\s-]?removable[\s-]?insole|without[\s-]?removable|fixed[\s-]?insole|built[\s-]?in[\s-]?insole|slim[\s-]?dress|low[\s-]?profile[\s-]?dress)\b/i,
+      ],
+    },
+    {
+      value: "dress_premium",
+      patterns: [
+        /\b(premium[\s-]?dress|high[\s-]?end[\s-]?dress|formal[\s-]?heels?|gala|wedding[\s-]?shoes?|evening[\s-]?(?:shoes?|wear))\b/i,
+      ],
+    },
+    {
+      value: "dress",
+      patterns: [
+        /\b(dress[\s-]?shoes?|dressy|formal|business[\s-]?(?:formal|attire|shoes?)|office[\s-]?shoes?|professional)\b/i,
+      ],
+    },
+    {
+      value: "casual",
+      patterns: [
+        /\b(casual|everyday[\s-]?shoes?|day[\s-]?to[\s-]?day|street[\s-]?shoes?|knockabout)\b/i,
+      ],
+    },
+    {
+      value: "comfort",
+      patterns: [
+        /\b(no[\s-]?(?:specific[\s-]?)?(?:pain|condition|issue)|just[\s-]?(?:want[\s-]?)?(?:comfort|support|relief)|general[\s-]?(?:comfort|support|relief)|everyday[\s-]?(?:comfort|support|wear|use)|walking[\s-]?around|walking[\s-]?shoes?|relief|nothing[\s-]?specific|comfort[\s-]?and[\s-]?support|comfort\s*&\s*support)\b/i,
+      ],
+    },
+  ],
+  condition: [
+    {
+      value: "plantar_fasciitis",
+      // Catches "plantar fasciitis", "plantar fasciatis" (typo),
+      // "plantarfaciitis" (no space common typo).
+      patterns: [
+        /\bplantar[\s-]?fasc(?:i|ii)tis\b/i,
+        /\bplantar\s*fasciatis\b/i,
+        /\bplantarfaciitis\b/i,
+      ],
+    },
+    {
+      value: "heel_spurs",
+      patterns: [/\bheel[\s-]?spurs?\b/i],
+    },
+    {
+      value: "metatarsalgia",
+      patterns: [
+        /\b(metatars(?:al|algia)|ball[\s-]?of[\s-]?(?:the[\s-]?)?foot|forefoot|fore[\s-]?foot|met[\s-]?pad|met[\s-]?head|toe[\s-]?box[\s-]?pain|under[\s-]?the[\s-]?ball)\b/i,
+      ],
+    },
+    {
+      value: "mortons_neuroma",
+      patterns: [/\bmorton(?:'?s)?[\s-]?neuroma\b/i],
+    },
+    {
+      value: "overpronation_flat_feet",
+      patterns: [
+        /\b(overpronat(?:e|ion|es|ing)|over[\s-]?pronat(?:e|ion|es|ing)|flat[\s-]?feet|flat[\s-]?foot|fallen[\s-]?arch(?:es)?|low[\s-]?arch(?:es)?|ankles?[\s-]?roll(?:ing)?[\s-]?in(?:ward)?|pronate[\s-]?inward|arch[\s-]?pain)\b/i,
+      ],
+    },
+    {
+      value: "diabetic",
+      patterns: [/\bdiabet(?:ic|es)\b/i],
+    },
+    {
+      value: "none",
+      patterns: [
+        /\b(?:no\s+(?:specific\s+)?(?:pain|condition|issue|concern|problems?)|just\s+(?:want\s+)?(?:comfort|support)|general\s+(?:comfort|support)|everyday\s+(?:comfort|support|wear)|just\s+looking\s+for\s+(?:comfort|support|something)|comfort\s*(?:&|and)\s*support|nothing\s+specific|no\s+issues?|none\s+(?:really|specifically)?|not\s+(?:really|specifically)|just\s+everyday|just\s+general)\b/i,
+        /^(?:no|none|nope|nothing|n\/?a|not really|not sure)\.?$/i,
+      ],
+    },
+  ],
+  arch: [
+    {
+      value: "Flat / Low Arch",
+      patterns: [
+        /\b(flat[\s-]?(?:feet|foot|arch(?:es)?)|fallen[\s-]?arch(?:es)?|low[\s-]?arch(?:es)?|low\b)\b/i,
+      ],
+    },
+    {
+      value: "Medium / High Arch",
+      patterns: [
+        /\b(high[\s-]?arch(?:es|ed)?|medium[\s-]?arch(?:es)?|normal[\s-]?arch(?:es)?|standard[\s-]?arch|high\b|medium\b|normal\b|don'?t[\s-]?know|not[\s-]?sure|no[\s-]?idea|unsure|i[\s-]?dunno|i[\s-]?guess|i[\s-]?have[\s-]?no[\s-]?idea)\b/i,
+      ],
+    },
+  ],
+  overpronation: [
+    {
+      value: "yes",
+      patterns: [
+        /^(?:yes|yeah|yep|yup|sure|definitely|absolutely|correct|exactly|right|i\s+do|they\s+do|kind of|kinda|sometimes)\b/i,
+        /\b(roll(?:ing)?[\s-]?in(?:ward)?|pronate|overpronate|flat[\s-]?feet|fallen[\s-]?arch)\b/i,
+      ],
+    },
+    {
+      value: "no",
+      patterns: [
+        /^(?:no|nope|not really|not sure|don'?t think so|not at all|i don'?t|they don'?t|negative|neither)\b/i,
+        /\b(no[\s-]?rolling|no[\s-]?overpronation|don'?t[\s-]?roll|don'?t[\s-]?pronate)\b/i,
+      ],
+    },
+  ],
+};
+
+/**
+ * Layer 1 — exact chip-label match.
+ * Returns the enum value, or undefined if no exact normalized match.
+ */
+function matchChipExact(rawAnswer, node) {
+  const lookup = buildChipLookup(node);
+  if (!lookup) return undefined;
+  const norm = normalizeText(rawAnswer);
+  if (!norm) return undefined;
+  return lookup.get(norm); // undefined if no match
+}
+
+/**
+ * Layer 2 — keyword enrichment.
+ * Walks the per-attribute pattern table; first match wins.
+ * Returns the enum value, or undefined if nothing matches.
+ *
+ * The matched value is also validated against the node's own
+ * chip values: if a keyword pattern returns "athletic_running"
+ * but the current node only has chips with values
+ * ["dress", "casual"], we don't return the unrelated value.
+ * Keeps the layer scoped to the question being asked.
+ */
+function matchKeyword(rawAnswer, node) {
+  if (!node || !node.attribute) return undefined;
+  const table = KEYWORD_PATTERNS[node.attribute];
+  if (!Array.isArray(table)) return undefined;
+  const text = String(rawAnswer || "");
+  if (!text.trim()) return undefined;
+  const allowedValues = new Set(
+    Array.isArray(node.chips)
+      ? node.chips.map((c) => c && c.value).filter((v) => v !== undefined && v !== null)
+      : [],
+  );
+  for (const entry of table) {
+    if (allowedValues.size > 0 && !allowedValues.has(entry.value)) continue;
+    for (const re of entry.patterns) {
+      if (re.test(text)) return entry.value;
+    }
+  }
+  return undefined;
+}
+
 /**
  * Map the customer's raw answer (chip click or free text) to the
  * current question's enum value. Layered fallback:
- *   1. Exact chip-label match.
- *   2. Keyword enrichment.
- *   3. Constrained LLM call (caller passes the function).
- *   4. Null return → caller re-asks the question.
+ *   1. Exact chip-label match (case-/punct-insensitive).
+ *   2. Keyword enrichment table.
+ *   3. Constrained LLM call (caller passes via opts.askLLM).
+ *      ← TO BE IMPLEMENTED IN BATCH A5.
+ *   4. Null value return → caller re-asks the question.
  *
- * NOT YET IMPLEMENTED — Batches A3 + A5.
+ * Returns:
+ *   { value: <enum>, layer: 1|2|3 }  on success
+ *   { value: null, layer: "unmapped" } on failure
+ *
+ * `opts.askLLM` is async (rawAnswer, node, tree) → {value} | null.
+ * Wired in Batch A5.
  */
-export async function mapAnswerToEnum(_rawAnswer, _node, _tree, _opts) {
-  return { value: null, layer: "stub", _stub: true };
+export async function mapAnswerToEnum(rawAnswer, node, tree, opts = {}) {
+  if (!node || node.type !== "question") {
+    return { value: null, layer: "no-question-node" };
+  }
+
+  // Layer 1 — exact chip-label match.
+  const exact = matchChipExact(rawAnswer, node);
+  if (exact !== undefined) return { value: exact, layer: 1 };
+
+  // Layer 2 — keyword enrichment.
+  const keyword = matchKeyword(rawAnswer, node);
+  if (keyword !== undefined) return { value: keyword, layer: 2 };
+
+  // Layer 3 — constrained LLM call. Wired in Batch A5; for now
+  // the caller can pass opts.askLLM as a placeholder.
+  if (typeof opts.askLLM === "function") {
+    try {
+      const llmResult = await opts.askLLM(rawAnswer, node, tree);
+      if (llmResult && llmResult.value !== undefined && llmResult.value !== null) {
+        const allowedValues = new Set(
+          Array.isArray(node.chips)
+            ? node.chips.map((c) => c && c.value).filter((v) => v !== undefined && v !== null)
+            : [],
+        );
+        if (allowedValues.size === 0 || allowedValues.has(llmResult.value)) {
+          return { value: llmResult.value, layer: 3 };
+        }
+      }
+    } catch (err) {
+      // LLM errors don't crash the flow — fall through to unmapped
+      // and let the caller re-ask. The error is observable via the
+      // returned shape.
+      return { value: null, layer: "llm-error", error: err?.message || String(err) };
+    }
+  }
+
+  return { value: null, layer: "unmapped" };
 }
