@@ -1,5 +1,11 @@
 import { resolveTree } from "./decision-tree-resolver.server.js";
 import { validateDecisionTree } from "./decision-tree-schema.server.js";
+import { accumulateAnswers } from "./orthotic-flow.server.js";
+
+const KIDS_GENDER_VALUES = new Set(["Kids", "Boys", "Girls", "Kid", "Child"]);
+function isKidsGenderValue(v) {
+  return typeof v === "string" && KIDS_GENDER_VALUES.has(v);
+}
 
 // Apply tree-level derivations to the customer's answer set BEFORE
 // resolving. Derivations let merchants encode rules like "if
@@ -327,7 +333,7 @@ async function filterMasterIndexByShop(shop, masterIndex) {
 // into a tool_result block. The product card travels back via the
 // dedicated card-extraction path the chat layer already has, so we
 // also surface `product` directly for that side channel.
-export async function executeRecommenderTool({ toolName, input, shop, trees, conversationText, latestUserText }) {
+export async function executeRecommenderTool({ toolName, input, shop, trees, conversationText, latestUserText, messages }) {
   if (!toolName || !toolName.startsWith("recommend_")) {
     return { error: "not a recommender tool" };
   }
@@ -371,6 +377,37 @@ export async function executeRecommenderTool({ toolName, input, shop, trees, con
       sandalIncompatible: true,
       attributesUsed: input,
     };
+  }
+
+  // Gap-fill `input` from prior conversation. The LLM frequently
+  // drops attributes from later tool calls — e.g. user answered
+  // "Kids" on turn 2, then "Overpronation / flat feet" on turn 3,
+  // and the LLM's turn-3 tool call only carries condition/arch
+  // without re-passing gender. Without this, the required-attrs
+  // gate below would say "gender missing" and the LLM would ask
+  // it AGAIN (and sometimes hallucinate that Kids isn't a valid
+  // option). Accumulated answers come from chip selections the
+  // customer already made — strictly safer than asking twice.
+  // LLM-passed values take precedence over accumulated ones, so
+  // the LLM can still correct an earlier answer if the customer
+  // reconsidered mid-flow.
+  if (Array.isArray(messages) && messages.length > 0) {
+    const accumulated = accumulateAnswers(messages, tree.definition);
+    const merged = { ...accumulated, ...(input || {}) };
+    // Kids-sticky: don't let an LLM-provided adult gender override
+    // a Kids selection the customer made earlier via chip. The chat
+    // sometimes asks "boy or girl?" and the customer answers "Women"
+    // (meaning women's-shaped product for a girl); we still want
+    // to keep gender=Kids for the resolver, which now accepts
+    // Unisex SKUs for kids.
+    if (isKidsGenderValue(accumulated.gender) && merged.gender && !isKidsGenderValue(merged.gender)) {
+      merged.gender = accumulated.gender;
+    }
+    const filled = Object.keys(merged).filter((k) => !(k in (input || {})));
+    if (filled.length > 0) {
+      console.log(`[recommender] gap-filled from history: ${filled.map((k) => `${k}=${merged[k]}`).join(", ")}`);
+    }
+    input = merged;
   }
 
   // Required-attributes gate. If the merchant declared any

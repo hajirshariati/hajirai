@@ -2639,6 +2639,7 @@ export const action = async ({ request }) => {
       fullCatalogCategories: allCatalogCategories,
       categoryGenderMap,
       latestUserMessage: String(body.message || ""),
+      messages,
     };
     const encoder = new TextEncoder();
 

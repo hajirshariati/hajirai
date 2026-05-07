@@ -2239,6 +2239,10 @@ export async function executeTool(name, input, ctx) {
         // into a later query — see prod Bug 5).
         conversationText: ctx?.conversationText || ctx?.userText || "",
         latestUserText: ctx?.latestUserMessage || "",
+        // Message history so the executor can recover attributes the
+        // LLM dropped from a later tool call (e.g. gender=Kids picked
+        // on turn 2 but missing from turn 3's args).
+        messages: ctx?.messages || [],
       });
       console.log(
         `[recommender] tool=${name} masterSku=${result?.masterSku || "(none)"}` +
