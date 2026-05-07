@@ -217,94 +217,134 @@ function formatRevenue(n, currency) {
   }
 }
 
-// At-a-glance health row in the hero banner. Each chip shows the
-// state of one infrastructure piece (catalog sync, semantic search,
-// chat widget, recommender, AI key, knowledge base) with a tone the
-// merchant can scan in <5 seconds. A chip in 'critical' or 'warning'
-// tone tells them where to click. Doesn't affect any runtime
-// behavior — purely a status surface.
-function StatusCluster({ items }) {
-  const TONE_BG = {
-    success: "rgba(76, 175, 80, 0.18)",
-    warning: "rgba(255, 193, 7, 0.22)",
-    critical: "rgba(229, 62, 62, 0.22)",
-    subdued: "rgba(255, 255, 255, 0.14)",
+// System-status panel rendered as its own Card below the hero.
+// Each tile: tone-coded left border + status label + value + small
+// indicator dot + count of any attention-needing items in the
+// section header. Replaces the older inline chip row that lived
+// inside the green hero banner — visual hierarchy was off there
+// because the cluster competed with the page title.
+function StatusPanel({ items }) {
+  const TONE = {
+    success:  { dot: "#108043", border: "#108043", chipBg: "#E2F1E8", chipFg: "#0F5132" },
+    warning:  { dot: "#B85C00", border: "#FFC453", chipBg: "#FFF3D6", chipFg: "#7A4100" },
+    critical: { dot: "#D72C0D", border: "#D72C0D", chipBg: "#FFEAE5", chipFg: "#8C1F11" },
+    subdued:  { dot: "#8C9196", border: "#E1E3E5", chipBg: "#F1F2F4", chipFg: "#5C5F62" },
   };
-  const TONE_DOT = {
-    success: "#4caf50",
-    warning: "#ffc107",
-    critical: "#ff5252",
-    subdued: "rgba(255,255,255,0.55)",
-  };
+  const attentionCount = items.filter((it) => it.tone === "critical" || it.tone === "warning").length;
+  const allHealthy = attentionCount === 0;
   return (
-    <Box paddingBlockStart="200">
-      <InlineStack gap="200" wrap>
-        {items.map((it) => {
-          const chip = (
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 8,
-                padding: "6px 12px",
-                borderRadius: 999,
-                background: TONE_BG[it.tone] || TONE_BG.subdued,
-                color: "#fff",
-                fontSize: 12.5,
-                fontWeight: 500,
-                lineHeight: 1.2,
-                whiteSpace: "nowrap",
-                border: "1px solid rgba(255,255,255,0.18)",
-              }}
-              title={it.tooltip || ""}
-            >
-              <span
+    <Card padding="0">
+      <Box padding="400" borderBlockEndWidth="025" borderColor="border">
+        <InlineStack align="space-between" blockAlign="center" wrap>
+          <InlineStack gap="200" blockAlign="center">
+            <Text as="h2" variant="headingMd">System status</Text>
+            {allHealthy ? (
+              <Badge tone="success">All systems go</Badge>
+            ) : (
+              <Badge tone={items.some((it) => it.tone === "critical") ? "critical" : "warning"}>
+                {`${attentionCount} item${attentionCount > 1 ? "s" : ""} need${attentionCount > 1 ? "" : "s"} attention`}
+              </Badge>
+            )}
+          </InlineStack>
+          <Text as="span" variant="bodySm" tone="subdued">
+            Click any tile to manage.
+          </Text>
+        </InlineStack>
+      </Box>
+      <Box padding="400">
+        <InlineGrid columns={{ xs: 1, sm: 2, md: 3 }} gap="300">
+          {items.map((it) => {
+            const t = TONE[it.tone] || TONE.subdued;
+            const inner = (
+              <div
                 style={{
-                  width: 8, height: 8, borderRadius: "50%",
-                  background: TONE_DOT[it.tone] || TONE_DOT.subdued,
-                  flexShrink: 0,
-                  boxShadow: it.tone === "success" ? "0 0 6px rgba(76,175,80,0.6)" : "none",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 8,
+                  padding: "14px 16px",
+                  borderRadius: 12,
+                  background: "var(--p-color-bg-surface)",
+                  border: "1px solid var(--p-color-border)",
+                  borderLeft: `4px solid ${t.border}`,
+                  cursor: it.url ? "pointer" : "default",
+                  transition: "transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease",
+                  height: "100%",
+                  minHeight: 78,
                 }}
-                aria-hidden="true"
-              />
-              <span>
-                <strong>{it.label}:</strong> {it.value}
-              </span>
-            </span>
-          );
-          if (!it.url) return <span key={it.label}>{chip}</span>;
-          // External URLs (themeEditor, console.anthropic.com) need
-          // target=_blank so they escape the embedded-admin iframe.
-          // INTERNAL admin paths must NOT be a raw <a href> — that
-          // triggers a full-page navigation, drops the App Bridge
-          // session token, and Shopify bounces the merchant to the
-          // 'Install from a Shopify-owned surface' fallback. Use
-          // react-router Link (client-side nav, session preserved).
-          if (it.external) {
-            return (
-              <a
-                key={it.label}
-                href={it.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ textDecoration: "none" }}
+                onMouseEnter={(e) => {
+                  if (!it.url) return;
+                  e.currentTarget.style.background = "var(--p-color-bg-surface-secondary)";
+                  e.currentTarget.style.boxShadow = "0 2px 6px rgba(0,0,0,0.06)";
+                }}
+                onMouseLeave={(e) => {
+                  if (!it.url) return;
+                  e.currentTarget.style.background = "var(--p-color-bg-surface)";
+                  e.currentTarget.style.boxShadow = "none";
+                }}
+                title={it.tooltip || ""}
               >
-                {chip}
-              </a>
+                <InlineStack gap="200" blockAlign="center" wrap={false}>
+                  <span
+                    style={{
+                      width: 10, height: 10, borderRadius: "50%",
+                      background: t.dot, flexShrink: 0,
+                      boxShadow: it.tone === "success" ? `0 0 0 3px ${t.dot}22` : "none",
+                    }}
+                    aria-hidden="true"
+                  />
+                  <Text as="span" variant="bodySm" tone="subdued" fontWeight="semibold">
+                    {it.label.toUpperCase()}
+                  </Text>
+                </InlineStack>
+                <div
+                  style={{
+                    display: "inline-flex",
+                    alignSelf: "flex-start",
+                    padding: "3px 10px",
+                    borderRadius: 999,
+                    background: t.chipBg,
+                    color: t.chipFg,
+                    fontSize: 13,
+                    fontWeight: 600,
+                    lineHeight: 1.3,
+                  }}
+                >
+                  {it.value}
+                </div>
+              </div>
             );
-          }
-          return (
-            <Link
-              key={it.label}
-              to={it.url}
-              style={{ textDecoration: "none" }}
-            >
-              {chip}
-            </Link>
-          );
-        })}
-      </InlineStack>
-    </Box>
+            if (!it.url) return <div key={it.label}>{inner}</div>;
+            // External URLs need target=_blank to escape the iframe;
+            // internal admin paths must use react-router Link to keep
+            // the App Bridge session token alive (raw <a> drops it
+            // and bounces to the 'Install from a Shopify-owned
+            // surface' fallback).
+            if (it.external) {
+              return (
+                <a
+                  key={it.label}
+                  href={it.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ textDecoration: "none", color: "inherit" }}
+                >
+                  {inner}
+                </a>
+              );
+            }
+            return (
+              <Link
+                key={it.label}
+                to={it.url}
+                style={{ textDecoration: "none", color: "inherit" }}
+              >
+                {inner}
+              </Link>
+            );
+          })}
+        </InlineGrid>
+      </Box>
+    </Card>
   );
 }
 
@@ -403,7 +443,6 @@ export default function Home() {
                 <Text as="p" variant="bodyMd">
                   <span style={{ color: "rgba(255,255,255,0.85)" }}>Search Engine on Steroids</span>
                 </Text>
-                <StatusCluster items={statusItems} />
                 {(totalMessages > 0 || showRateLimit) && (
                   <Box paddingBlockStart="100">
                     <InlineStack align="start" gap="200" wrap>
@@ -429,6 +468,8 @@ export default function Home() {
             </div>
           </InlineStack>
         </div>
+
+        <StatusPanel items={statusItems} />
 
         {showRateLimit && (
           <Banner
@@ -489,48 +530,6 @@ export default function Home() {
             </InlineGrid>
           </BlockStack>
         ) : null}
-
-        <BlockStack gap="300">
-          <Text as="h2" variant="headingMd">What SEoS Assistant does for you</Text>
-          <Text as="p" tone="subdued" variant="bodySm">
-            Everything runs automatically — just connect your account and let the AI handle customer questions.
-          </Text>
-          <InlineGrid columns={{ xs: 1, sm: 2 }} gap="400">
-            <FeatureCard
-              icon={"\uD83D\uDCE6"}
-              title="Knows your products"
-              description="Your entire catalog — products, prices, sizes, and availability — is always up to date. Any changes you make in Shopify are reflected instantly."
-              stat={productsCount > 0 ? `${productsCount} products synced` : null}
-            />
-            <FeatureCard
-              icon={"\uD83D\uDCCB"}
-              title="Learns your extra info"
-              description="Upload files with FAQs, sizing guides, care instructions, or brand info. The AI uses this to give more detailed, personalized answers."
-              stat={enrichmentCount > 0 ? `${enrichmentCount} products enriched` : null}
-            />
-            <FeatureCard
-              icon={"\uD83D\uDD0D"}
-              title="Finds the right products"
-              description="When a customer asks about a product, the AI searches your catalog in real time — by name, category, price, or any detail you've uploaded."
-            />
-            <FeatureCard
-              icon={"\u26A1"}
-              title="Keeps costs low"
-              description="Quick replies like 'thanks' or 'okay' use a faster, cheaper model. Detailed product questions use the full-powered model. You save without lifting a finger."
-              stat={strategyLabel}
-            />
-            <FeatureCard
-              icon={"🧭"}
-              title="Guided product finders"
-              description="For categories where the right pick depends on a few specific answers (orthotics, mattresses, supplements), a short Q&A walks the customer through and returns one deterministic product. Configure it on the Smart Recommenders page."
-            />
-            <FeatureCard
-              icon={"🛡️"}
-              title="Stays on track"
-              description="Built-in guardrails catch off-topic questions, customer pivots, and impossible requests gracefully — the assistant never loops or pushes the wrong product when someone has clearly asked for something else."
-            />
-          </InlineGrid>
-        </BlockStack>
 
         <Divider />
 
