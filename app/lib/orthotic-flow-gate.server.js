@@ -300,6 +300,7 @@ export async function maybeRunOrthoticFlow({
       shop,
       trees: [tree],
       conversationText,
+      latestUserText: rawUserText,
     });
     if (result?.error || !result?.product) {
       console.log(
