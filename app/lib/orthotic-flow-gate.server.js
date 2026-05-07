@@ -104,13 +104,12 @@ function renderQuestionText(node, answers, tree) {
     return label && !NONSENSE_GENDER.test(label);
   });
 
-  // Kids-aware useCase filtering. If the customer already chose
-  // Kids, only show shoe-type chips that have at least one Kids
-  // SKU in the master index. Without this, Kids customers can pick
-  // dress shoes / cleats / skates / etc. and dead-end at a "no
-  // matching SKU" message because the catalog doesn't carry a kids
-  // orthotic for those use-cases. Filter at the question stage so
-  // the customer never reaches the dead-end.
+  // Kids-aware useCase filtering. If the customer chose Kids, only
+  // show chips whose value has at least one Kids SKU in the master
+  // index. The gate's auto-fill step usually skips this question
+  // entirely for Kids (because no chip values match Kids useCases
+  // like "kids"); this filter is here as a defense-in-depth in case
+  // the gate path is ever bypassed.
   if (
     node.attribute === "useCase" &&
     answers &&
@@ -118,12 +117,7 @@ function renderQuestionText(node, answers, tree) {
   ) {
     const allowed = kidsAvailableUseCases(tree);
     if (allowed && allowed.size > 0) {
-      const filtered = chips.filter((c) => allowed.has(c.value));
-      // If the filter wiped out everything (catalog has no kids
-      // SKUs at all for this merchant), keep the original chips —
-      // emitting an empty chip line is worse than letting the LLM
-      // handle it.
-      if (filtered.length > 0) chips = filtered;
+      chips = chips.filter((c) => allowed.has(c.value));
     }
   }
 
@@ -243,6 +237,38 @@ export async function maybeRunOrthoticFlow({
   }
 
   const answers = { ...accumulated, ...latestExtracted };
+
+  // Kids auto-fill for useCase. When gender=Kids, the seed's q_use_case
+  // chips (Dress shoes, Cleats, Skates, etc.) almost never have a
+  // Kids-tagged SKU behind them — the merchant's Kids orthotic line
+  // (L17xx) is a generic "kids" useCase that doesn't appear as a chip
+  // label. Asking the customer to pick a shoe-type only sends them to
+  // a dead-end. Instead: if the masterIndex has any Kids-tagged SKUs,
+  // auto-fill answers.useCase to the first one (lex-sorted for
+  // determinism) and skip the q_use_case question entirely. Customer
+  // goes directly to q_condition. If they already picked a non-Kids
+  // useCase via chip ("Cleats"), override it — Kids selection wins.
+  if (isKidsGenderValue(answers.gender)) {
+    const allowed = kidsAvailableUseCases(tree);
+    if (allowed && allowed.size > 0) {
+      const sorted = [...allowed].sort();
+      const target = sorted[0];
+      if (answers.useCase !== target && !allowed.has(answers.useCase)) {
+        if (answers.useCase) {
+          console.log(
+            `[orthotic-flow] kids auto-fill: overriding useCase=${answers.useCase} → ${target} ` +
+              `(no Kids SKU exists for ${answers.useCase}; available=${[...allowed].join(",")})`,
+          );
+        } else {
+          console.log(
+            `[orthotic-flow] kids auto-fill: useCase=${target} ` +
+              `(skipping q_use_case; available=${[...allowed].join(",")})`,
+          );
+        }
+        answers.useCase = target;
+      }
+    }
+  }
 
   // Hard veto: customer explicitly rejected orthotics in their
   // latest message ("I don't want orthotics, just sneakers"). The
