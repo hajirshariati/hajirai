@@ -356,6 +356,16 @@ export default function Home() {
               description="Quick replies like 'thanks' or 'okay' use a faster, cheaper model. Detailed product questions use the full-powered model. You save without lifting a finger."
               stat={strategyLabel}
             />
+            <FeatureCard
+              icon={"🧭"}
+              title="Guided product finders"
+              description="For categories where the right pick depends on a few specific answers (orthotics, mattresses, supplements), a short Q&A walks the customer through and returns one deterministic product. Configure it on the Smart Recommenders page."
+            />
+            <FeatureCard
+              icon={"🛡️"}
+              title="Stays on track"
+              description="Built-in guardrails catch off-topic questions, customer pivots, and impossible requests gracefully — the assistant never loops or pushes the wrong product when someone has clearly asked for something else."
+            />
           </InlineGrid>
         </BlockStack>
 
