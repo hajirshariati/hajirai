@@ -340,6 +340,39 @@ export async function executeRecommenderTool({ toolName, input, shop, trees, con
     return { error: "Recommender has no resolver configured." };
   }
 
+  // Sandals incompatibility guard. Aetrex's orthotic inserts (full-
+  // length and heel-cup designs) don't fit in open-construction
+  // sandals — the catalog has no sandal-compatible insert, and
+  // every resolved SKU for a "orthotic for sandals" query is
+  // wrong by definition. Catch the pattern early and return a
+  // graceful redirect instead of letting the resolver pick a
+  // wrong product (e.g. L100W Fashion-for-Heels). The chat layer
+  // turns this into an honest text reply.
+  //
+  // Match: orthotic-recommender-only AND customer's text mentions
+  // sandal/sandals. The intent name is checked so this only fires
+  // for the orthotic recommender, not for any future merchant
+  // intents (e.g. "sandal" recommender wouldn't be self-blocking).
+  if (
+    /orthotic|insole|footbed/i.test(intent) &&
+    typeof conversationText === "string" &&
+    /\bsandals?\b/i.test(conversationText)
+  ) {
+    console.log(
+      `[recommender] sandal-incompatibility guard fired — customer asked for orthotic + sandals; ` +
+        `Aetrex inserts don't fit open sandals. Returning redirect to footwear search.`,
+    );
+    return {
+      error:
+        "Orthotic inserts don't fit in open-construction sandals — the catalog doesn't have a sandal-compatible insert. " +
+        "Tell the customer honestly that orthotics aren't designed for sandals, then offer to show ARCH-SUPPORTIVE SANDALS instead " +
+        "(the merchant's Sandals category has built-in support — call search_products with category='Sandals' and gender filter " +
+        "from context). Do NOT pick a non-sandal orthotic and pretend it fits.",
+      sandalIncompatible: true,
+      attributesUsed: input,
+    };
+  }
+
   // Required-attributes gate. If the merchant declared any
   // requiredAttributes on this recommender (e.g. ["gender",
   // "useCase"]), the LLM must collect them through conversation
