@@ -321,13 +321,22 @@ if (discoverMode || !fs.existsSync(MAPPING_PATH)) {
       { titleContains: "Heel Spurs", condition: "heel_spurs", useCase: "comfort" },
       { titleContains: "Conform", condition: "diabetic" },
       { titleContains: "Diabet", condition: "diabetic" },
-      // Fashion / dress-shoe lines: activity metafield is often
-      // mislabeled "Everyday Comfort" — title is the truth.
-      { titleContains: "Fashion", useCase: "dress_no_removable" },
-      { titleContains: "In-Style", useCase: "dress_no_removable" },
-      { titleContains: "Instyle", useCase: "dress_no_removable" },
-      { titleContains: "Low Profile", useCase: "dress_no_removable" },
+      // Granular Fashion-line mapping — activity metafield is often
+      // mislabeled "Everyday Comfort" on these. Title disambiguates:
+      //   Thinsoles / Without Removable → dress_no_removable
+      //   Insole for Heels → dress_premium (heel-shaped)
+      //   Fashion Posted / Insole for Dress Shoes → dress
+      //   In-Style / Heritage → dress_premium
+      //   Low Profile → dress
+      { titleContains: "Thinsoles", useCase: "dress_no_removable" },
+      { titleContains: "Without Removable", useCase: "dress_no_removable" },
+      { titleContains: "Insole for Heels", useCase: "dress_premium" },
+      { titleContains: "Fashion Posted", useCase: "dress" },
+      { titleContains: "Insole for Dress Shoes", useCase: "dress" },
+      { titleContains: "In-Style", useCase: "dress_premium" },
+      { titleContains: "Instyle", useCase: "dress_premium" },
       { titleContains: "Heritage", useCase: "dress_premium" },
+      { titleContains: "Low Profile", useCase: "dress" },
     ],
   };
   fs.writeFileSync(MAPPING_PATH, JSON.stringify(mapping, null, 2));

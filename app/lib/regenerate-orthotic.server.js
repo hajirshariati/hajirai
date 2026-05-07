@@ -328,12 +328,29 @@ export function regenerateMasterIndex({ products, mapping }) {
     // even if the merchant's persisted vocabularyMapping is stale —
     // so the fix lands without re-discovery. Merchant entries in
     // mapping.specialtyOverrides run AFTER and can override these.
+    //
+    // ORDER MATTERS — first match wins per useCase update, then
+    // gets re-overridden by later matches. So we list the most
+    // specific patterns FIRST, then broader ones. The Thinsoles
+    // line is the actual "no removable insole" line; the Fashion
+    // line is heel/dress-shoe specific.
     const builtInOverrides = [
-      { titleContains: "Fashion", useCase: "dress_no_removable" },
-      { titleContains: "In-Style", useCase: "dress_no_removable" },
-      { titleContains: "Instyle", useCase: "dress_no_removable" },
-      { titleContains: "Low Profile", useCase: "dress_no_removable" },
+      // True no-removable insole line — Thinsoles for shoes that
+      // don't accept full-length inserts (some sandals, slim
+      // dress shoes, no-insole flats).
+      { titleContains: "Thinsoles", useCase: "dress_no_removable" },
+      { titleContains: "Without Removable", useCase: "dress_no_removable" },
+      // Heel-specific Fashion line — slim insole shaped for high
+      // heels and pumps. Don't bucket with no-removable.
+      { titleContains: "Insole for Heels", useCase: "dress_premium" },
+      { titleContains: "Fashion Posted", useCase: "dress" },
+      { titleContains: "Insole for Dress Shoes", useCase: "dress" },
+      // In-Style / Heritage — premium dress lines.
+      { titleContains: "In-Style", useCase: "dress_premium" },
+      { titleContains: "Instyle", useCase: "dress_premium" },
       { titleContains: "Heritage", useCase: "dress_premium" },
+      // Low Profile — slim profile, dress-shoe friendly.
+      { titleContains: "Low Profile", useCase: "dress" },
     ];
     const merchantOverrides = Array.isArray(mapping?.specialtyOverrides) ? mapping.specialtyOverrides : [];
     const specialtyOverrides = [...builtInOverrides, ...merchantOverrides];

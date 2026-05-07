@@ -361,6 +361,20 @@ export function redirectOrthoticSearchToRecommender(toolCall, ctx) {
   const matchesDomain = ORTHOTIC_DOMAIN_RE.test(latest) || ORTHOTIC_DOMAIN_RE.test(queryStr);
   if (!matchesDomain) return toolCall;
 
+  // Sandal escape hatch: if the customer is asking for an orthotic
+  // FOR sandals, don't redirect — orthotic inserts don't fit open
+  // sandals, and the recommender would resolve to a wrong product.
+  // Let search_products run instead so the AI can show arch-
+  // supportive sandals (the actual answer) or honestly say
+  // "orthotics don't fit sandals."
+  if (/\bsandals?\b/i.test(latest) || /\bsandals?\b/i.test(queryStr)) {
+    console.log(
+      `[chat] orthotic-routing: skipped redirect — customer mentioned sandals + orthotic ` +
+        `(orthotic inserts don't fit sandals; letting search_products run for honest framing)`,
+    );
+    return toolCall;
+  }
+
   console.log(
     `[chat] orthotic-routing: search_products(query="${queryStr.slice(0, 60)}") on orthotic-domain ` +
       `query → rewriting to recommend_${orthoticTree.intent} (gate will collect attributes)`,
