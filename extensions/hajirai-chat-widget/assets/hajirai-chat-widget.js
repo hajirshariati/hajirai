@@ -963,17 +963,46 @@ inputEl.addEventListener('input',function(){this.style.height='auto';this.style.
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&isOpen)toggle(false)});
 menuBtn.addEventListener('click',function(e){e.stopPropagation();menu.style.display=menu.style.display==='none'?'block':'none'});
 /* Customer-facing autocorrect toggle in the footer. Persists per
-   browser, live-updates the textarea attributes so the change takes
-   effect without reload. */
+   browser, swaps in a fresh textarea so the change actually takes
+   effect on mobile keyboards (iOS Safari/Chrome read the autocorrect/
+   autocapitalize/spellcheck attributes ONCE when the input is created
+   and ignore later setAttribute calls — preserving the original
+   keyboard session). Replacing the node forces a clean re-init while
+   restoring the in-progress message, focus, and selection. */
+function bindInputEvents(el){
+  el.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}});
+  el.addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'});
+}
+function rebuildInputForAutocorrect(){
+  var oldEl=inputEl;
+  var wasFocused=document.activeElement===oldEl;
+  var ss=oldEl.selectionStart,se=oldEl.selectionEnd;
+  var newEl=document.createElement('textarea');
+  newEl.className=oldEl.className;
+  newEl.rows=oldEl.rows;
+  newEl.placeholder=oldEl.placeholder;
+  newEl.disabled=oldEl.disabled;
+  newEl.value=oldEl.value;
+  newEl.style.cssText=oldEl.style.cssText;
+  newEl.setAttribute('aria-label',oldEl.getAttribute('aria-label')||'Type your message');
+  newEl.setAttribute('autocorrect',INPUT_AUTOCORRECT?'on':'off');
+  newEl.setAttribute('autocapitalize',INPUT_AUTOCORRECT?'sentences':'off');
+  newEl.setAttribute('spellcheck',INPUT_AUTOCORRECT?'true':'false');
+  oldEl.parentNode.replaceChild(newEl,oldEl);
+  inputEl=newEl;
+  bindInputEvents(newEl);
+  if(wasFocused){
+    newEl.focus();
+    try{newEl.setSelectionRange(ss,se)}catch(err){}
+  }
+}
 var autocorrectBtn=$('.ai-chat-autocorrect-toggle',panel);
 if(autocorrectBtn){
   autocorrectBtn.addEventListener('click',function(e){
     e.preventDefault();
     INPUT_AUTOCORRECT=!INPUT_AUTOCORRECT;
     try{localStorage.setItem(AUTOCORRECT_K,INPUT_AUTOCORRECT?'1':'0')}catch(err){}
-    inputEl.setAttribute('autocorrect',INPUT_AUTOCORRECT?'on':'off');
-    inputEl.setAttribute('autocapitalize',INPUT_AUTOCORRECT?'sentences':'off');
-    inputEl.setAttribute('spellcheck',INPUT_AUTOCORRECT?'true':'false');
+    rebuildInputForAutocorrect();
     autocorrectBtn.setAttribute('aria-pressed',INPUT_AUTOCORRECT?'true':'false');
     var stateEl=$('.ai-chat-autocorrect-state',autocorrectBtn);
     if(stateEl)stateEl.textContent=INPUT_AUTOCORRECT?'on':'off';
