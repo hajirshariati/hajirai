@@ -1545,6 +1545,37 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }
   }
 
+  // Yes/No follow-up card suppression. When the customer's latest
+  // message is a yes/no question about an already-shown product
+  // ("do they work with sneakers", "does this come in red", "is
+  // it good for plantar fasciitis"), and the AI's reply opens
+  // with "Yes" or "No" or similar, the customer wants a direct
+  // answer — NOT a fresh card grid. The agentic loop sometimes
+  // calls search_products anyway and pulls 6 lookalikes by
+  // semantic similarity (kids orthotics for women's questions,
+  // diabetic for active questions, etc.) which dumps unrelated
+  // cards under the answer text. Suppress the pool in that case.
+  //
+  // Detection is conservative — must hit BOTH (a) yes/no question
+  // shape in the customer's message AND (b) yes/no opener in the
+  // AI's reply. A genuine "show me more like this" wouldn't open
+  // with "Yes —"; the customer's message wouldn't match a yes/no
+  // shape. Pool stays untouched.
+  if (pool.length > 0 && fullResponseText) {
+    const userMsg = String(ctx.latestUserMessage || "").trim();
+    const YESNO_QUESTION_RE = /^\s*(?:do(?:es)?|did|will|would|can|could|is|are|was|were|has|have|had|should|may|might)\b[^?!.\n]{0,140}\?/i;
+    const YESNO_ANSWER_RE = /^\s*(?:yes|yeah|yep|yup|absolutely|definitely|correct|right|exactly|sure|of course|no\b|nope|not really|unfortunately,?\s+no|sadly,?\s+no)/i;
+    const isYesNoQuestion = userMsg.length > 0 && userMsg.length < 200 && YESNO_QUESTION_RE.test(userMsg);
+    const isYesNoAnswer = YESNO_ANSWER_RE.test(fullResponseText);
+    if (isYesNoQuestion && isYesNoAnswer) {
+      console.log(
+        `[chat] ${ctx.shop} yes/no-suppress: customer asked yes/no, AI answered yes/no — ` +
+          `suppressing card pool of ${pool.length} (would have been noise under the text answer)`,
+      );
+      pool.length = 0;
+    }
+  }
+
   console.log(`[chat] emit textLen=${fullResponseText.length} poolSize=${pool.length} searchAttempted=${productSearchAttempted}`);
 
   // Observability only — no behavior change. Flag long non-product
