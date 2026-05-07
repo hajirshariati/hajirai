@@ -810,7 +810,10 @@ const CONDITION_SIGNAL_RE =
   /\b(?:plantar\s*fasc(?:i|ii)tis|heel\s*spurs?|metatarsalg(?:ia|ic)|morton'?s?\s*neuroma|fallen\s*arch(?:es)?|flat\s*feet|flat\s*foot|over\s*pronat(?:e|ion|ing)|diabetic\s*(?:foot|feet))\b/i;
 
 export function detectOrthoticIntent(rawText) {
-  const t = String(rawText || "").trim();
+  const t = String(rawText || "")
+    .replace(/[‘’‚‛]/g, "'")
+    .replace(/[“”„‟]/g, '"')
+    .trim();
   if (!t) return false;
   if (ORTHOTIC_NEGATION_RE.test(t)) return false;
   if (FOOTWEAR_FEATURE_RE.test(t)) return false;
@@ -825,7 +828,10 @@ export function detectOrthoticIntent(rawText) {
 // signal in the same message, an explicit rejection means the
 // customer wants something else and the LLM should handle it.
 export function hasOrthoticRejection(rawText) {
-  const t = String(rawText || "").trim();
+  const t = String(rawText || "")
+    .replace(/[‘’‚‛]/g, "'")
+    .replace(/[“”„‟]/g, '"')
+    .trim();
   if (!t) return false;
   return ORTHOTIC_NEGATION_RE.test(t);
 }
@@ -848,7 +854,14 @@ const FOOTWEAR_PATH_RE =
   /\b(?:new\s*footwear|just\s+(?:looking\s+for\s+)?(?:new\s+)?(?:shoes?|footwear|sneakers?|sandals?|boots?)|find\s+(?:me\s+)?(?:some\s+)?(?:men'?s?|women'?s?|kids?'?s?|new)?\s*(?:shoes?|footwear|sneakers?|sandals?|boots?|loafers?|wedges?|heels?|oxfords?|slippers?|clogs?|mary[\s-]?janes?)|show\s+(?:me\s+)?(?:some\s+)?(?:men'?s?|women'?s?|kids?'?s?|new)?\s*(?:shoes?|footwear|sneakers?|sandals?|boots?)|i\s+(?:want|need|am\s+looking\s+for)\s+(?:some\s+)?(?:new\s+)?(?:men'?s?|women'?s?|kids?'?s?)?\s*(?:shoes?|footwear|sneakers?|sandals?|boots?|loafers?|wedges?|heels?))\b/i;
 
 export function looksLikeFootwearCommit(rawText) {
-  const t = String(rawText || "").trim();
+  // Production showed widget-emitted text using curly apostrophes
+  // ('men's shoes' with U+2019) which made `men'?s?` patterns miss.
+  // Normalize curly apostrophes/quotes to straight ASCII before
+  // regex matching so the veto fires on widget output too.
+  const t = String(rawText || "")
+    .replace(/[‘’‚‛]/g, "'")
+    .replace(/[“”„‟]/g, '"')
+    .trim();
   if (!t) return false;
   // If the same message has clear orthotic intent, it's not a
   // footwear-only commit (could be "shoes for my orthotic" type).

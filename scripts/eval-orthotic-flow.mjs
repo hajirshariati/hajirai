@@ -388,6 +388,12 @@ test("intent: empty / null → false", () => {
   assert.equal(detectOrthoticIntent(null), false);
 });
 
+test("intent: curly apostrophe normalization (don’t want orthotics → false)", () => {
+  // U+2019 RIGHT SINGLE QUOTATION MARK — what most widget chat
+  // clients emit instead of a straight ASCII apostrophe.
+  assert.equal(detectOrthoticIntent("I don’t want orthotics"), false);
+});
+
 section("preExtractAnswers");
 
 test("extracts useCase from 'running orthotics'", () => {
