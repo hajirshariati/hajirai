@@ -10,6 +10,8 @@ import {
   Card,
   BlockStack,
   InlineStack,
+  InlineGrid,
+  Box,
   Text,
   Button,
   Badge,
@@ -277,6 +279,176 @@ function SectionHeading({ eyebrow, title, description }) {
     </BlockStack>
   );
 }
+
+// Plain-language walkthrough of the conversational flow the
+// recommender drives. Sits at the top of the page so merchants can
+// understand WHY their customers are seeing chip-button questions
+// before they see the JSON editor below. Each step maps to a real
+// piece of code — but the copy is intentionally non-technical.
+function HowItWorksCard() {
+  const Step = ({ n, title, body }) => (
+    <Box
+      padding="400"
+      background="bg-surface-secondary"
+      borderRadius="300"
+      borderWidth="025"
+      borderColor="border"
+    >
+      <InlineStack gap="400" blockAlign="start" wrap={false}>
+        <div
+          style={{
+            flexShrink: 0,
+            width: 32, height: 32,
+            borderRadius: "50%",
+            background: "linear-gradient(135deg, #2D6B4F, #3a8a66)",
+            color: "#fff",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontWeight: 600, fontSize: 14,
+          }}
+        >
+          {n}
+        </div>
+        <BlockStack gap="100">
+          <Text as="h4" variant="headingSm">{title}</Text>
+          <Text as="p" tone="subdued" variant="bodySm">{body}</Text>
+        </BlockStack>
+      </InlineStack>
+    </Box>
+  );
+  return (
+    <Card>
+      <BlockStack gap="400">
+        <BlockStack gap="100">
+          <Text as="h3" variant="headingMd">How the conversation flows</Text>
+          <Text as="p" tone="subdued">
+            When a customer asks for an orthotic recommendation, the assistant runs a
+            short, deterministic Q&amp;A on top of your lookup table. The questions and
+            answer choices come straight from your saved data — the AI doesn't
+            paraphrase them, so a customer's click on "Plantar fasciitis" always maps
+            to the same product every time.
+          </Text>
+        </BlockStack>
+        <InlineGrid columns={{ xs: 1, md: 2 }} gap="300">
+          <Step
+            n={1}
+            title="Customer expresses orthotic intent"
+            body="The assistant detects clear orthotic-finder intent — phrases like 'I need orthotics', 'plantar fasciitis', 'flat feet', or condition signals. Generic shopping questions like 'find me men's shoes' are left to the regular product search."
+          />
+          <Step
+            n={2}
+            title="Server emits the next question"
+            body="Your saved questions and choice-button labels are sent to the customer exactly as you wrote them. No AI rephrasing means the customer's reply maps cleanly back to a known answer on the very next turn."
+          />
+          <Step
+            n={3}
+            title="Answer is captured (3 ways)"
+            body="A clicked button maps directly. Free-text replies are matched against keyword patterns ('for my mom' → Women, 'flat feet' → Flat / Low Arch). Anything still ambiguous goes through a tightly-scoped AI call that picks one of your defined options or hands back to the open chat."
+          />
+          <Step
+            n={4}
+            title="Answers accumulate across turns"
+            body="Each answer is remembered for the rest of the conversation. The customer can pivot mid-flow and the assistant won't forget what they already shared. Questions whose answers are already known get skipped automatically."
+          />
+          <Step
+            n={5}
+            title="Resolver picks one product"
+            body="Once enough attributes are collected, your lookup table runs and returns exactly one master SKU. The product card is shown immediately with no further AI generation in the loop — same answers in always yield the same SKU out."
+          />
+          <Step
+            n={6}
+            title="Follow-ups go back to the AI"
+            body="After the product is shown, normal chat takes over for follow-up questions ('does it fit my shoe?', 'what size?', 'can I see something cheaper?'). The recommender stays out of the way until another orthotic intent comes up."
+          />
+        </InlineGrid>
+      </BlockStack>
+    </Card>
+  );
+}
+
+// Each row maps to a specific guardrail in the live code. The copy
+// stays product-friendly — no internal function names — so a non-
+// technical merchant can read the page and trust what's happening
+// without needing the source code open.
+function BuiltInSafeguardsCard() {
+  const Row = ({ icon, title, body }) => (
+    <InlineStack gap="300" blockAlign="start" wrap={false}>
+      <div
+        style={{
+          flexShrink: 0,
+          width: 28, height: 28,
+          borderRadius: 8,
+          background: "rgba(45,107,79,0.1)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 14,
+        }}
+        aria-hidden="true"
+      >
+        {icon}
+      </div>
+      <BlockStack gap="050">
+        <Text as="span" variant="bodySm" fontWeight="semibold">{title}</Text>
+        <Text as="span" tone="subdued" variant="bodySm">{body}</Text>
+      </BlockStack>
+    </InlineStack>
+  );
+  return (
+    <Card>
+      <BlockStack gap="400">
+        <BlockStack gap="100">
+          <Text as="h3" variant="headingMd">Built-in safeguards</Text>
+          <Text as="p" tone="subdued">
+            The recommender has guardrails that protect the customer experience. You
+            don't have to configure these — they're always on when the recommender is
+            enabled.
+          </Text>
+        </BlockStack>
+        <InlineGrid columns={{ xs: 1, sm: 2 }} gap="400">
+          <Row
+            icon={"👟"}
+            title="Footwear pivot is respected"
+            body="If a customer asks for shoes, sandals, sneakers, etc. — or explicitly picks the footwear path on a 'shoes vs orthotics' question — the orthotic flow stays out of the way and a normal product search runs."
+          />
+          <Row
+            icon={"✖️"}
+            title="Explicit rejections honored"
+            body="Replies like 'I don't want orthotics, just shoes' immediately exit the orthotic flow. The customer is never trapped."
+          />
+          <Row
+            icon={"❓"}
+            title="Off-topic interrupts handled"
+            body="Mid-flow questions about shipping, returns, sizing, or store policy hand off to the regular chat so the customer gets a real answer instead of being asked another product question."
+          />
+          <Row
+            icon={"🔁"}
+            title="No looping on impossible matches"
+            body="If a customer asks for an orthotic that physically can't work (e.g. an insert for open sandals), the assistant says so once and pivots to suggest arch-supportive sandals — instead of trying the same lookup three times."
+          />
+          <Row
+            icon={"📝"}
+            title="Latest message wins"
+            body="Clinical signals are read from the customer's most recent reply, not stale phrases from earlier turns. Saying 'plantar fasciitis' on turn 5 doesn't get mixed up with 'ball-of-foot pain' from turn 1."
+          />
+          <Row
+            icon={"✍️"}
+            title="Smart-quote tolerance"
+            body="Mobile keyboards and chat clients often replace straight apostrophes with curly ones (men's vs men’s). The recommender treats both forms the same so phrasing differences never break the flow."
+          />
+          <Row
+            icon={"🎯"}
+            title="No hallucinated SKUs"
+            body="The product shown at the end always exists in your live Shopify catalog — the recommender filters its lookup table against your actual synced inventory before resolving."
+          />
+          <Row
+            icon={"👶"}
+            title="Kids never get an adult product"
+            body="When a customer says the orthotic is for a child, the recommender never falls back to a unisex adult SKU — if no kids' product matches, it tells the customer honestly instead."
+          />
+        </InlineGrid>
+      </BlockStack>
+    </Card>
+  );
+}
+
 function DecisionTreesCard({ enabled, trees }) {
   const fetcher = useFetcher();
   const loadFetcher = useFetcher();
@@ -457,7 +629,7 @@ function DecisionTreesCard({ enabled, trees }) {
       <BlockStack gap="500">
         <BlockStack gap="200">
           <InlineStack align="space-between" blockAlign="center">
-            <Text as="h3" variant="headingMd">Smart Recommenders</Text>
+            <Text as="h3" variant="headingMd">Manage recommenders</Text>
             <Checkbox
               label={enabled ? "Recommenders ON" : "Recommenders OFF"}
               checked={enabled}
@@ -466,13 +638,12 @@ function DecisionTreesCard({ enabled, trees }) {
             />
           </InlineStack>
           <Text as="p" tone="subdued">
-            Master switch. When ON, every enabled recommender below is
-            registered as a tool the AI can call when it judges the
-            customer needs a structured pick. The AI is always in
-            charge — recommenders never hijack a conversation. Same
-            attributes in always yield the same SKU out (no
-            hallucinated products). When OFF (default), no
-            recommender tools are exposed and the chat is unchanged.
+            Master switch. When ON, every enabled recommender below becomes a
+            guided flow the AI can hand off to when it sees a clear orthotic-finder
+            intent. The customer answers a few choice-button questions, the
+            lookup runs, and one specific product is shown. When OFF (default),
+            the recommender stays out of the way completely and the chat behaves
+            like a standard product-search assistant.
           </Text>
         </BlockStack>
 
@@ -679,9 +850,11 @@ export default function SmartRecommenders() {
         <BlockStack gap="400">
           <SectionHeading
             eyebrow="Smart Recommenders"
-            title="Deterministic product finders the AI can call"
-            description="Define a typed lookup table — given a set of attributes the customer mentions (gender, condition, use-case, etc.), it returns exactly one master SKU. Each recommender becomes a tool the AI can call when it judges the customer needs a structured pick. Same answers in always yield the same SKU out — no hallucinated products. Multiple recommenders per shop (orthotic, mattress, supplement, etc.). Off by default."
+            title="Guided product finders the AI can call"
+            description="A short, deterministic Q&A on top of your lookup table. The customer answers a handful of questions (use-case, gender, condition, arch type, etc.) using the exact button labels you define — and the recommender returns one specific master SKU. Same answers in always yield the same product out, so what you test is exactly what your customers see. Multiple recommenders per shop (orthotic, mattress, supplement, anything with a typed attribute → SKU mapping). Off by default."
           />
+          <HowItWorksCard />
+          <BuiltInSafeguardsCard />
           <DecisionTreesCard
             enabled={data.decisionTreeEnabled}
             trees={data.decisionTrees}
