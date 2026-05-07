@@ -327,7 +327,7 @@ async function filterMasterIndexByShop(shop, masterIndex) {
 // into a tool_result block. The product card travels back via the
 // dedicated card-extraction path the chat layer already has, so we
 // also surface `product` directly for that side channel.
-export async function executeRecommenderTool({ toolName, input, shop, trees }) {
+export async function executeRecommenderTool({ toolName, input, shop, trees, conversationText }) {
   if (!toolName || !toolName.startsWith("recommend_")) {
     return { error: "not a recommender tool" };
   }
@@ -437,7 +437,59 @@ export async function executeRecommenderTool({ toolName, input, shop, trees }) {
       console.log(`[recommender] derivations added attribute(s): ${added.join(", ")}`);
     }
   }
-  const result = resolveTree(derivedInput, filteredResolver);
+
+  // Clinical-keyword enrichment from the customer's conversation
+  // text. The LLM only passes one `condition` value to the tool, so
+  // when a customer reports MULTIPLE complaints (e.g. "both arch and
+  // ball of foot"), the LLM picks one and drops the other — and the
+  // resolver tie-breaks on lex order to a wrong-product (L700W
+  // basic Speed instead of L705W Speed W/ Met Support).
+  //
+  // Mitigation: scan the customer's text for unambiguous clinical
+  // signals and inject the derived booleans the LLM omitted. Only
+  // ADDS attributes — never overrides what the LLM/derivations
+  // already set. Aetrex-specific keyword set; safe because each
+  // term has a clear 1:1 mapping to a resolver attribute.
+  const enrichedInput = { ...derivedInput };
+  const enrichedFromText = [];
+  if (typeof conversationText === "string" && conversationText.trim()) {
+    const t = conversationText.toLowerCase();
+    // metSupport ← forefoot / ball-of-foot / metatarsal vocabulary.
+    if (enrichedInput.metSupport === undefined || enrichedInput.metSupport === null) {
+      if (/\b(ball[\s-]?of[\s-]?(?:the[\s-]?)?foot|forefoot|fore[\s-]?foot|metatars(?:al|algia)|morton(?:'?s)?[\s-]?neuroma|met[\s-]?pad|met[\s-]?head|toe[\s-]?box[\s-]?pain|under[\s-]?the[\s-]?ball)\b/i.test(t)) {
+        enrichedInput.metSupport = true;
+        enrichedFromText.push("metSupport=true(forefoot signal)");
+      }
+    }
+    // posted ← arch pain / flat-foot / overpronation vocabulary.
+    if (enrichedInput.posted === undefined || enrichedInput.posted === null) {
+      if (/\b(arch[\s-]?pain|fallen[\s-]?arch(?:es)?|flat[\s-]?feet|flat[\s-]?foot|overpronat(?:e|ion|es|ing)|over[\s-]?pronat(?:e|ion|es|ing)|ankles?[\s-]?roll(?:ing)?[\s-]?in(?:ward)?|pronate[\s-]?inward|low[\s-]?arch(?:es)?)\b/i.test(t)) {
+        enrichedInput.posted = true;
+        enrichedFromText.push("posted=true(arch/flat-foot signal)");
+      }
+    }
+    // condition ← heel-spur / plantar-fasciitis / diabetic vocabulary
+    // (only if condition not already specified — never override).
+    if (!enrichedInput.condition) {
+      if (/\bheel[\s-]?spurs?\b/i.test(t)) {
+        enrichedInput.condition = "heel_spurs";
+        enrichedFromText.push("condition=heel_spurs");
+      } else if (/\bplantar[\s-]?fasc(?:i|ii)tis\b/i.test(t)) {
+        enrichedInput.condition = "plantar_fasciitis";
+        enrichedFromText.push("condition=plantar_fasciitis");
+      } else if (/\bdiabet(?:ic|es)\b/i.test(t)) {
+        enrichedInput.condition = "diabetic";
+        enrichedFromText.push("condition=diabetic");
+      }
+    }
+  }
+  if (enrichedFromText.length > 0) {
+    console.log(
+      `[recommender] enriched from conversation text: ${enrichedFromText.join(", ")}`,
+    );
+  }
+
+  const result = resolveTree(enrichedInput, filteredResolver);
   if (!result?.resolved) {
     return {
       error: result?.reason || "No matching product for the given attributes.",

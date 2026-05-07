@@ -2223,11 +2223,17 @@ export async function executeTool(name, input, ctx) {
   if (typeof name === "string" && name.startsWith("recommend_")) {
     try {
       const { executeRecommenderTool } = await import("./recommender-tools.server.js");
+      // Pass the customer's full conversation text so the
+      // recommender can keyword-enrich missing clinical attributes
+      // (the LLM only carries one `condition` value, so multi-
+      // complaint queries like "both arch and ball of foot" lose
+      // the secondary signal otherwise).
       const result = await executeRecommenderTool({
         toolName: name,
         input: input || {},
         shop: ctx?.shop,
         trees: ctx?.recommenderTrees || [],
+        conversationText: ctx?.conversationText || ctx?.userText || "",
       });
       console.log(
         `[recommender] tool=${name} masterSku=${result?.masterSku || "(none)"}` +
