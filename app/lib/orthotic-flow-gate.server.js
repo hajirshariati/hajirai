@@ -193,6 +193,7 @@ export async function maybeRunOrthoticFlow({
   encoder,
   anthropic,
   haikuModel,
+  classifiedIntent,
 }) {
   if (!tree || tree.intent !== ORTHOTIC_INTENT) return { handled: false };
   if (!tree.definition || !Array.isArray(tree.definition.nodes)) {
@@ -230,6 +231,21 @@ export async function maybeRunOrthoticFlow({
   const accumulated = accumulateAnswers(priorMessages, tree.definition);
   const latestExtracted = preExtractAnswers(rawUserText, tree.definition);
 
+  // Classifier-extracted attributes from Haiku take PRECEDENCE over
+  // the legacy regex pre-extraction for the latest message. Haiku
+  // handles natural language we used to chase with regex patches —
+  // "my son" → Kids (not Men), "high arch" → high_arch condition,
+  // typos like "orhtotic", curly apostrophes, kid signals like
+  // "my 9-year-old" or "grandson". Only applied when the classifier
+  // ran successfully; on null we keep the regex extraction so the
+  // gate never goes offline on classifier failure.
+  if (classifiedIntent && classifiedIntent.attributes) {
+    const a = classifiedIntent.attributes;
+    if (a.gender) latestExtracted.gender = a.gender;
+    if (a.useCase) latestExtracted.useCase = a.useCase;
+    if (a.condition) latestExtracted.condition = a.condition;
+  }
+
   // Kids-sticky: once gender=Kids is established, it CANNOT be silently
   // flipped to Men/Women by a subsequent message. Production trace —
   // customer chose Kids on q_gender, the LLM later asked an unsolicited
@@ -266,6 +282,19 @@ export async function maybeRunOrthoticFlow({
   // useCase via chip ("Cleats"), override it — Kids selection wins.
   if (isKidsGenderValue(answers.gender)) {
     const allowed = kidsAvailableUseCases(tree);
+    if (!allowed || allowed.size === 0) {
+      // Merchant's masterIndex has zero Kids-tagged SKUs. Don't lead
+      // the customer through a chip flow that ends in "we don't carry
+      // it" — fall through to the LLM, which can say so honestly in a
+      // single message and offer alternatives. Logged so the merchant
+      // can see they need to either tag products as Kids or remove
+      // the Kids chip from their gender question.
+      console.log(
+        `[orthotic-flow] kids classifier-extracted but no Kids items in masterIndex; ` +
+          `falling through to LLM`,
+      );
+      return { handled: false };
+    }
     if (allowed && allowed.size > 0) {
       const sorted = [...allowed].sort();
       const target = sorted[0];
@@ -287,22 +316,27 @@ export async function maybeRunOrthoticFlow({
   }
 
   // Hard veto: customer explicitly rejected orthotics in their
-  // latest message ("I don't want orthotics, just sneakers"). The
-  // LLM should handle this; the gate must not press on with the
-  // orthotic flow even if Layer 2 picked up an incidental chip.
-  if (hasOrthoticRejection(rawUserText)) {
+  // latest message. Classifier-first; regex fallback only when the
+  // classifier didn't run (network error etc).
+  const rejected = classifiedIntent
+    ? classifiedIntent.isRejection
+    : hasOrthoticRejection(rawUserText);
+  if (rejected) {
     return { handled: false };
   }
 
   // Hard veto #1: customer committed to the FOOTWEAR path — either
-  // in the latest message or in a prior turn (e.g. clicked
-  // <<New Footwear>> on a bifurcation question, or said "find men's
-  // shoes for my needs"). Even if Layer 2 picks up an incidental
-  // chip-shaped signal like gender=Women from "Women's", we MUST
-  // stay out of the way. The veto is overridden only by an explicit
-  // orthotic-intent pivot in the latest message.
-  const intentInLatestForVeto = detectOrthoticIntent(rawUserText);
-  const footwearCommitInLatest = looksLikeFootwearCommit(rawUserText);
+  // in the latest message or in a prior turn. Classifier-first; the
+  // classifier returns isFootwearRequest=true when the customer is
+  // shoe-shopping AND isOrthoticRequest=false. The latest-message
+  // pivot rule (orthotic intent overrides prior footwear commit)
+  // is implicit in the classifier's joint output.
+  const intentInLatestForVeto = classifiedIntent
+    ? classifiedIntent.isOrthoticRequest
+    : detectOrthoticIntent(rawUserText);
+  const footwearCommitInLatest = classifiedIntent
+    ? classifiedIntent.isFootwearRequest
+    : looksLikeFootwearCommit(rawUserText);
   const footwearCommitInPrior =
     !intentInLatestForVeto &&
     priorMessages.some(
@@ -365,7 +399,14 @@ export async function maybeRunOrthoticFlow({
     ? findNodeByChipsInText(lastAssistantText, tree.definition)
     : null;
 
-  const intentInLatest = detectOrthoticIntent(rawUserText);
+  // Classifier-first intent check. Haiku reads the entire trimmed
+  // history and decides whether the customer is asking for an
+  // orthotic — so intentInLatest already incorporates the history
+  // signal. We still scan priorMessages for legacy regex on
+  // classifier-failure paths.
+  const intentInLatest = classifiedIntent
+    ? classifiedIntent.isOrthoticRequest
+    : detectOrthoticIntent(rawUserText);
   const intentInHistory =
     intentInLatest ||
     priorMessages.some(

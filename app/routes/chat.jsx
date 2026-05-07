@@ -30,6 +30,7 @@ import { fetchKlaviyoEnrichment } from "../lib/klaviyo-enrichment.server";
 import { fetchYotpoLoyalty } from "../lib/yotpo-loyalty.server";
 import { buildRecommenderTools } from "../lib/recommender-tools.server";
 import { maybeRunOrthoticFlow } from "../lib/orthotic-flow-gate.server";
+import { classifyOrthoticTurn } from "../lib/orthotic-classifier.server";
 import prisma from "../db.server";
 import { recordChatUsage, getTodayMessageCount } from "../models/ChatUsage.server";
 import { canSendMessage } from "../lib/billing.server";
@@ -2713,6 +2714,20 @@ export const action = async ({ request }) => {
           try {
             const orthoticTree = (recommenderTrees || []).find((t) => t?.intent === "orthotic");
             if (orthoticTree) {
+              // Run the LLM-based intent classifier ONCE per turn
+              // before the gate. Replaces the brittle regex stack
+              // (detectOrthoticIntent / looksLikeFootwearCommit /
+              // GENDER_DETECT) with a single Haiku call that returns
+              // structured intent + extracted attributes. Customer
+              // explicitly chose accuracy over latency. On classifier
+              // failure (network error, schema miss), the gate falls
+              // back to the legacy regex paths so we never go
+              // offline.
+              const classifiedIntent = await classifyOrthoticTurn({
+                messages,
+                anthropic,
+                shop: session.shop,
+              });
               const gate = await maybeRunOrthoticFlow({
                 messages,
                 tree: orthoticTree,
@@ -2721,6 +2736,7 @@ export const action = async ({ request }) => {
                 encoder,
                 anthropic,
                 haikuModel: HAIKU_MODEL,
+                classifiedIntent,
               });
               if (gate?.handled) {
                 // Gate already emitted text, products, and done.
