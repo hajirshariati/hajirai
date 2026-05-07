@@ -1446,10 +1446,12 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
 
     // Strip <<Unisex>> / <<Other>> / <<Either>> / <<Both>> gender chips —
     // those aren't customer-facing gender choices (Unisex is a product-side
-    // compatibility tag, not a gender). Also clean up the trailing-space
-    // gap left when the chip is removed mid-text.
+    // compatibility tag, not a gender). Catches both the bare label and
+    // common qualifier suffixes the LLM occasionally appends, like
+    // <<Unisex (any)>> or <<Unisex - kids>>. Also cleans up the trailing
+    // space left when the chip is removed mid-text.
     {
-      const unisexChipRe = /\s*<<\s*(?:Unisex|Other|Either|Both)\s*>>/gi;
+      const unisexChipRe = /\s*<<\s*(?:Unisex|Other|Either|Both)(?:\s*[-—–:/(][^<>]*)?\s*>>/gi;
       if (unisexChipRe.test(fullResponseText)) {
         fullResponseText = fullResponseText.replace(unisexChipRe, "").replace(/[ \t]{2,}/g, " ");
         console.log(`[chat] ${ctx.shop} stripped non-gender chips (Unisex/Other/Either/Both)`);

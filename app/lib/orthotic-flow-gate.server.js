@@ -161,6 +161,31 @@ export async function maybeRunOrthoticFlow({
   const priorMessages = messages.slice(0, -1);
   const accumulated = accumulateAnswers(priorMessages, tree.definition);
   const latestExtracted = preExtractAnswers(rawUserText, tree.definition);
+
+  // Kids-sticky: once gender=Kids is established, it CANNOT be silently
+  // flipped to Men/Women by a subsequent message. Production trace —
+  // customer chose Kids on q_gender, the LLM later asked an unsolicited
+  // 'boy or girl?' follow-up with Men's/Women's chips, customer
+  // clicked Women's, Layer 2 mapped that to gender=Women, the resolver
+  // returned a Women's adult orthotic for what was supposed to be a
+  // child. Letting an adult-gender override a kids-gender is virtually
+  // never what the customer means; if they truly need to switch from
+  // a child to themselves they say so explicitly ('actually it's for
+  // me' / 'it's for my mom'), which the LLM handles outside the gate.
+  const KIDS_GENDER_VALUES = new Set(["Kids", "Boys", "Girls", "Kid", "Child"]);
+  const isKidsGenderValue = (v) => typeof v === "string" && KIDS_GENDER_VALUES.has(v);
+  if (
+    isKidsGenderValue(accumulated.gender) &&
+    latestExtracted.gender &&
+    !isKidsGenderValue(latestExtracted.gender)
+  ) {
+    console.log(
+      `[orthotic-flow] kids-sticky: blocking gender override ` +
+        `(accumulated=${accumulated.gender} → latest=${latestExtracted.gender})`,
+    );
+    delete latestExtracted.gender;
+  }
+
   const answers = { ...accumulated, ...latestExtracted };
 
   // Hard veto: customer explicitly rejected orthotics in their
