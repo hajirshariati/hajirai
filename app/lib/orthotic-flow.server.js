@@ -869,6 +869,32 @@ export function looksLikeFootwearCommit(rawText) {
   return FOOTWEAR_PATH_RE.test(t);
 }
 
+// Catches the broader "this message names a non-orthotic product"
+// case that looksLikeFootwearCommit misses — production showed
+// "best summer sandal for a beach for my mom" hijacking into orthotic
+// flow because none of the find/show/want/need/looking-for triggers
+// matched. Any mention of a concrete footwear noun (sandals, sneakers,
+// boots, loafers, wedges, heels, oxfords, slippers, clogs, mary janes,
+// pumps, flats, mules) is enough to veto, UNLESS the same message also
+// names an orthotic product noun (orthotic, insole, footbed, insert,
+// arch support — caught by ORTHOTIC_PRODUCT_RE).
+const FOOTWEAR_PRODUCT_NOUN_RE =
+  /\b(?:sandals?|sneakers?|boots?|loafers?|wedges?|heels?|oxfords?|slippers?|clogs?|mary[\s-]?janes?|pumps?|flats?|mules?|trainers?|footwear)\b/i;
+
+export function mentionsNonOrthoticFootwear(rawText) {
+  const t = String(rawText || "")
+    .replace(/[‘’‚‛]/g, "'")
+    .replace(/[“”„‟]/g, '"')
+    .trim();
+  if (!t) return false;
+  if (!FOOTWEAR_PRODUCT_NOUN_RE.test(t)) return false;
+  // Latent orthotic mention — "orthotics for sneakers" etc. — defers
+  // to the orthotic flow / sandal-incompatibility guard rather than
+  // vetoing here.
+  if (ORTHOTIC_PRODUCT_RE.test(t)) return false;
+  return true;
+}
+
 /**
  * Run Layer 1 + 2 against EVERY question node in the tree to
  * pre-extract any answers the customer's bootstrap message

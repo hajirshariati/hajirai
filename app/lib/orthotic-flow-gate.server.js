@@ -43,6 +43,7 @@ import {
   detectOrthoticIntent,
   hasOrthoticRejection,
   looksLikeFootwearCommit,
+  mentionsNonOrthoticFootwear,
   preExtractAnswers,
   accumulateAnswers,
 } from "./orthotic-flow.server.js";
@@ -170,8 +171,8 @@ export async function maybeRunOrthoticFlow({
     return { handled: false };
   }
 
-  // Hard veto: customer committed to the FOOTWEAR path — either in
-  // the latest message or in a prior turn (e.g. clicked
+  // Hard veto #1: customer committed to the FOOTWEAR path — either
+  // in the latest message or in a prior turn (e.g. clicked
   // <<New Footwear>> on a bifurcation question, or said "find men's
   // shoes for my needs"). Even if Layer 2 picks up an incidental
   // chip-shaped signal like gender=Women from "Women's", we MUST
@@ -192,6 +193,23 @@ export async function maybeRunOrthoticFlow({
     console.log(
       `[orthotic-flow] footwear-path veto: customer committed to footwear ` +
         `(${footwearCommitInLatest ? "latest" : "prior"}); falling through to LLM`,
+    );
+    return { handled: false };
+  }
+
+  // Hard veto #2: latest message names a concrete non-orthotic
+  // footwear product (sandals, sneakers, boots, loafers, wedges,
+  // heels, oxfords, slippers, clogs, mary janes, pumps, flats,
+  // mules, trainers, footwear). Production showed
+  // "best summer sandal for a beach for my mom" slipping past
+  // looksLikeFootwearCommit (no find/show/need/want trigger word)
+  // and engaging the orthotic flow because Layer 2 picked gender=
+  // Women from "for my mom". Catching the product noun directly
+  // is more robust than enumerating phrasings.
+  if (mentionsNonOrthoticFootwear(rawUserText)) {
+    console.log(
+      `[orthotic-flow] non-orthotic-footwear veto: latest names a footwear ` +
+        `product without orthotic intent; falling through to LLM`,
     );
     return { handled: false };
   }
@@ -218,15 +236,19 @@ export async function maybeRunOrthoticFlow({
     );
   const haveAccumulated = Object.keys(accumulated).length > 0;
 
-  // Engagement rule. We deliberately do NOT engage on a Layer-1/2
-  // hit in the LATEST message alone — production showed that
-  // 'Find men's shoes for my needs' extracts gender=Men via the
-  // pronoun pattern and would otherwise hijack a footwear request
-  // into the orthotic flow. The customer must have actually
-  // expressed orthotic intent (now or earlier), or be already
-  // mid-flow (accumulated answers from prior turns), or be in the
-  // middle of answering a recognized seed question (fingerprintNode).
-  if (!intentInHistory && !haveAccumulated && !fingerprintNode) {
+  // Engagement rule. The customer must EITHER have expressed clear
+  // orthotic intent at some point in the conversation, OR be on a
+  // recognized seed question (fingerprintNode) — accumulated answers
+  // alone are NOT enough.
+  //
+  // Production scenario this rule fixes: customer browses sneakers
+  // and sandals across several turns. Layer 2 incidentally picks up
+  // gender=Women from "for my mom" or pronouns. Accumulated answers
+  // grow without any orthotic context. Then the customer asks for a
+  // sandal — and the gate would have engaged purely because
+  // haveAccumulated was true. With this rule it does not, since
+  // intentInHistory stays false on a footwear-only conversation.
+  if (!intentInHistory && !fingerprintNode) {
     return { handled: false };
   }
   if (fingerprintNode && isOffTopicReply(rawUserText, fingerprintNode)) {
