@@ -867,11 +867,16 @@ if(fitReport&&fitReport.size&&mDiv){
 }
 if(sugg&&sugg.length>0&&mDiv){
   var sb=$('.ai-chat-msg-bubble',mDiv);
-  // Subtle "Customers also asked" header above the follow-up
-  // suggestion chips. Frames the chips as natural next questions
-  // rather than AI prompts. Small, low-contrast, left-aligned;
-  // CSS handles responsive sizing.
-  if(sb){var sg='<div class="ai-chat-suggestions"><div class="ai-chat-suggestions-label">Customers also asked</div>';for(var si=0;si<sugg.length;si++){sg+='<button class="ai-chat-suggest-btn" data-message="'+esc(sugg[si])+'"><span class="suggest-plus">+</span> '+esc(sugg[si])+'</button>'}sg+='</div>';sb.insertAdjacentHTML('beforeend',sg)}
+  // Subtle "Quick replies" header above the follow-up
+  // suggestion chips. Was "Customers also asked" originally — but
+  // production showed the AI generates not just questions, but full
+  // reply phrasings ("I have flat feet and my ankles roll inward..."),
+  // condition descriptions, and "yes / no" answers. The "customers
+  // also asked" framing implied social proof for content that's
+  // actually AI-suggested next-replies. "Quick Replies" matches the
+  // iMessage / WhatsApp / Messenger UX pattern users already
+  // recognize as 'tap to send' and works for any reply shape.
+  if(sb){var sg='<div class="ai-chat-suggestions"><div class="ai-chat-suggestions-label">Quick replies</div>';for(var si=0;si<sugg.length;si++){sg+='<button class="ai-chat-suggest-btn" data-message="'+esc(sugg[si])+'"><span class="suggest-plus">+</span> '+esc(sugg[si])+'</button>'}sg+='</div>';sb.insertAdjacentHTML('beforeend',sg)}
 }
 if(prods&&prods.length>0&&mDiv){
   var fb=$('.ai-chat-msg-bubble',mDiv);
