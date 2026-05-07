@@ -297,6 +297,21 @@ await test("bootstrap: fires when last assistant chips were rephrased (drift cas
   assert.match(events[0].text, /What kind of shoes/i);
 });
 
+await test("regression (curly apostrophe): 'Find men’s shoes for my needs' must NOT engage", async () => {
+  // Production-exact string the widget client sends. U+2019 instead
+  // of straight ASCII '. The veto regex was missing this case.
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [{ role: "user", content: "Find men’s shoes for my needs" }],
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+  });
+  assert.equal(out.handled, false);
+  assert.equal(events.length, 0);
+});
+
 await test("regression: 'Find men's shoes for my needs' must NOT engage orthotic flow", async () => {
   // Production bug: Layer 2 extracted gender=Men from "men's", which
   // alone triggered the gate to ask q_use_case 'What kind of shoes
