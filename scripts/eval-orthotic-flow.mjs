@@ -20,6 +20,8 @@ import {
   buildConstrainedAnswerPrompt,
   parseConstrainedAnswerResponse,
   isOffTopicReply,
+  detectOrthoticIntent,
+  preExtractAnswers,
 } from "../app/lib/orthotic-flow.server.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -352,6 +354,57 @@ test("parseConstrainedAnswerResponse rejects hallucinated values", () => {
 test("parseConstrainedAnswerResponse returns null for {value:null}", () => {
   const node = findNodeById(tree, "q_gender");
   assert.equal(parseConstrainedAnswerResponse('{"value":null}', node), null);
+});
+
+section("orthotic-intent detector");
+
+test("intent: 'I need orthotics' → true", () => {
+  assert.equal(detectOrthoticIntent("I need orthotics for everyday shoes"), true);
+});
+test("intent: 'recommend an insole' → true", () => {
+  assert.equal(detectOrthoticIntent("can you recommend an insole?"), true);
+});
+test("intent: 'plantar fasciitis help' → true (condition signal)", () => {
+  assert.equal(detectOrthoticIntent("I have plantar fasciitis"), true);
+});
+test("intent: 'flat feet' → true", () => {
+  assert.equal(detectOrthoticIntent("my dad has flat feet"), true);
+});
+test("intent: 'I don't want orthotics' → false (negation)", () => {
+  assert.equal(detectOrthoticIntent("I don't want orthotics, just shoes"), false);
+});
+test("intent: 'shoes with arch support' → false (footwear feature)", () => {
+  assert.equal(detectOrthoticIntent("show me shoes with arch support"), false);
+});
+test("intent: 'orthotic-friendly shoes' → false", () => {
+  assert.equal(detectOrthoticIntent("any orthotic-friendly shoes?"), false);
+});
+test("intent: 'show me sandals' → false (no signal)", () => {
+  assert.equal(detectOrthoticIntent("show me sandals"), false);
+});
+test("intent: empty / null → false", () => {
+  assert.equal(detectOrthoticIntent(""), false);
+  assert.equal(detectOrthoticIntent(null), false);
+});
+
+section("preExtractAnswers");
+
+test("extracts useCase from 'running orthotics'", () => {
+  const a = preExtractAnswers("I need running orthotics", tree);
+  assert.equal(a.useCase, "athletic_running");
+});
+test("extracts gender from 'for my dad'", () => {
+  const a = preExtractAnswers("I need orthotics for my dad", tree);
+  assert.equal(a.gender, "Men");
+});
+test("extracts useCase + gender + condition from rich message", () => {
+  const a = preExtractAnswers("plantar fasciitis running orthotics for my mom", tree);
+  assert.equal(a.useCase, "athletic_running");
+  assert.equal(a.gender, "Women");
+  assert.equal(a.condition, "plantar_fasciitis");
+});
+test("returns {} on no signals", () => {
+  assert.deepEqual(preExtractAnswers("hello", tree), {});
 });
 
 section("off-topic detection");
