@@ -49,12 +49,51 @@ export async function getFeedbackSummary(shop, range = 30) {
   const down = all.filter((f) => f.vote === "down").length;
   const total = up + down;
 
+  // Pre-parse conversation JSON into a clean transcript array so the
+  // analytics page can render the full back-and-forth without re-
+  // parsing client-side. Each entry is {role, content} (assistant or
+  // user), capped at 20 turns and 1000 chars per turn for sanity —
+  // the raw column may already be 500-char-bot-response truncated,
+  // but the conversation JSON wasn't bounded.
+  const decorated = all
+    .filter((f) => f.vote === "down")
+    .map((f) => {
+      let transcript = [];
+      if (f.conversation) {
+        try {
+          const conv = JSON.parse(f.conversation);
+          if (Array.isArray(conv)) {
+            transcript = conv
+              .filter((m) => m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string")
+              .slice(-20)
+              .map((m) => ({
+                role: m.role,
+                content: String(m.content).slice(0, 1000),
+              }));
+          }
+        } catch {}
+      }
+      // Find the customer's last question before the flagged
+      // response. Helps show "what was the customer asking when this
+      // bad response came back?" without expanding the full thread.
+      const lastUser = [...transcript].reverse().find((m) => m.role === "user");
+      return {
+        id: f.id,
+        createdAt: f.createdAt,
+        vote: f.vote,
+        botResponse: f.botResponse,
+        products: f.products || [],
+        transcript,
+        lastUserQuestion: lastUser?.content || null,
+      };
+    });
+
   return {
     total,
     up,
     down,
     satisfactionRate: total > 0 ? Math.round((up / total) * 100) : 0,
-    negativeFeedback: all.filter((f) => f.vote === "down").slice(0, 20),
+    negativeFeedback: decorated.slice(0, 20),
   };
 }
 
@@ -70,15 +109,23 @@ export async function getRecentQuestions(shop, range = 30, limit = 15) {
   for (const r of records) {
     try {
       const conv = JSON.parse(r.conversation);
-      const firstUser = (Array.isArray(conv) ? conv : []).find((m) => m.role === "user");
-      if (firstUser?.content) {
-        questions.push({
-          question: String(firstUser.content).slice(0, 150),
-          vote: r.vote,
-          products: r.products || [],
-          date: r.createdAt,
-        });
-      }
+      if (!Array.isArray(conv)) continue;
+      const firstUser = conv.find((m) => m.role === "user");
+      if (!firstUser?.content) continue;
+      // Surface the full transcript alongside the headline question.
+      // The page can collapse it by default and let the merchant
+      // expand to see what the AI actually said back.
+      const transcript = conv
+        .filter((m) => m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string")
+        .slice(-20)
+        .map((m) => ({ role: m.role, content: String(m.content).slice(0, 1000) }));
+      questions.push({
+        question: String(firstUser.content).slice(0, 150),
+        vote: r.vote,
+        products: r.products || [],
+        date: r.createdAt,
+        transcript,
+      });
     } catch {}
     if (questions.length >= limit) break;
   }

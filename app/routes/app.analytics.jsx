@@ -219,6 +219,106 @@ function SectionHeader({ title, count, tone, description, exportSection, onExpor
   );
 }
 
+// Compact feedback row that shows the headline question + first
+// flagged AI response inline, then expands on click into a full
+// chat-style transcript so the merchant can see exactly what the
+// customer asked, what the AI said, and where the conversation
+// went off the rails. Backed by ChatFeedback.conversation column —
+// already stored, just wasn't surfaced in the UI before.
+function ConversationRow({
+  date, vote, productsCount, productsList, headlineText, aiResponseText, transcript, tone,
+}) {
+  const [open, setOpen] = useState(false);
+  const surfaceBg = tone === "critical" ? "bg-surface-critical-subdued" : "bg-surface-secondary";
+  const hasTranscript = Array.isArray(transcript) && transcript.length > 0;
+  return (
+    <Box padding="300" background={surfaceBg} borderRadius="200">
+      <BlockStack gap="200">
+        <InlineStack gap="200" blockAlign="center" wrap>
+          <Text as="span" variant="bodySm" tone="subdued">
+            {new Date(date).toLocaleString(undefined, {
+              year: "numeric", month: "short", day: "numeric",
+              hour: "numeric", minute: "2-digit",
+            })}
+          </Text>
+          {vote === "up" && <Badge tone="success">Helpful</Badge>}
+          {vote === "down" && <Badge tone="critical">Not helpful</Badge>}
+          {productsCount > 0 && (
+            <Badge>{`${productsCount} product${productsCount > 1 ? "s" : ""}`}</Badge>
+          )}
+          {hasTranscript && (
+            <Badge>{`${transcript.length} turn${transcript.length > 1 ? "s" : ""}`}</Badge>
+          )}
+        </InlineStack>
+        {headlineText && (
+          <BlockStack gap="050">
+            <Text as="span" variant="bodySm" tone="subdued" fontWeight="semibold">
+              CUSTOMER ASKED
+            </Text>
+            <Text as="p" variant="bodyMd">{headlineText}</Text>
+          </BlockStack>
+        )}
+        {aiResponseText && (
+          <BlockStack gap="050">
+            <Text as="span" variant="bodySm" tone="subdued" fontWeight="semibold">
+              AI RESPONDED
+            </Text>
+            <Text as="p" variant="bodyMd">{aiResponseText}</Text>
+          </BlockStack>
+        )}
+        {Array.isArray(productsList) && productsList.length > 0 && (
+          <Text as="p" variant="bodySm" tone="subdued">Products shown: {productsList.join(", ")}</Text>
+        )}
+        {hasTranscript && (
+          <InlineStack>
+            <Button
+              variant="plain"
+              onClick={() => setOpen((v) => !v)}
+              ariaExpanded={open}
+            >
+              {open ? "Hide full conversation" : `Show full conversation (${transcript.length} turn${transcript.length > 1 ? "s" : ""})`}
+            </Button>
+          </InlineStack>
+        )}
+        {open && hasTranscript && (
+          <Box
+            padding="300"
+            background="bg-surface"
+            borderRadius="200"
+            borderWidth="025"
+            borderColor="border"
+          >
+            <BlockStack gap="300">
+              {transcript.map((m, idx) => {
+                const isUser = m.role === "user";
+                return (
+                  <BlockStack key={idx} gap="100">
+                    <Text
+                      as="span"
+                      variant="bodySm"
+                      tone={isUser ? "subdued" : "magic"}
+                      fontWeight="semibold"
+                    >
+                      {isUser ? "Customer" : "Assistant"}
+                    </Text>
+                    <Box
+                      padding="200"
+                      background={isUser ? "bg-surface-secondary" : "bg-surface-active"}
+                      borderRadius="200"
+                    >
+                      <Text as="p" variant="bodyMd">{m.content}</Text>
+                    </Box>
+                  </BlockStack>
+                );
+              })}
+            </BlockStack>
+          </Box>
+        )}
+      </BlockStack>
+    </Box>
+  );
+}
+
 function RangeSelector({ current, searchParams }) {
   const [open, setOpen] = useState(false);
   const [pickerMonth, setPickerMonth] = useState(new Date().getMonth());
@@ -433,20 +533,18 @@ export default function Analytics() {
         {recentQuestions.length > 0 && (
           <Card>
             <BlockStack gap="400">
-              <SectionHeader title="Customer questions" count={recentQuestions.length} tone="info" description="Real questions from customers — use to improve FAQs or product copy." exportSection="questions" onExport={handleExport} exporting={exporting} />
+              <SectionHeader title="Customer questions" count={recentQuestions.length} tone="info" description="Click any row to expand the full conversation — see what the customer asked and exactly how the assistant replied." exportSection="questions" onExport={handleExport} exporting={exporting} />
               <BlockStack gap="200">
                 {recentQuestions.map((q, i) => (
-                  <Box key={i} padding="300" background="bg-surface-secondary" borderRadius="200">
-                    <BlockStack gap="100">
-                      <InlineStack gap="200" blockAlign="center" wrap>
-                        <Text as="span" variant="bodySm" tone="subdued">{new Date(q.date).toLocaleDateString()}</Text>
-                        {q.vote === "up" && <Badge tone="success">Helpful</Badge>}
-                        {q.vote === "down" && <Badge tone="critical">Not helpful</Badge>}
-                        {q.products?.length > 0 && <Badge>{`${q.products.length} product${q.products.length > 1 ? "s" : ""}`}</Badge>}
-                      </InlineStack>
-                      <Text as="p" variant="bodyMd">{q.question}</Text>
-                    </BlockStack>
-                  </Box>
+                  <ConversationRow
+                    key={i}
+                    date={q.date}
+                    vote={q.vote}
+                    productsCount={q.products?.length || 0}
+                    headlineText={q.question}
+                    transcript={q.transcript}
+                    tone="info"
+                  />
                 ))}
               </BlockStack>
             </BlockStack>
@@ -456,16 +554,20 @@ export default function Analytics() {
         {feedback.negativeFeedback.length > 0 && (
           <Card>
             <BlockStack gap="400">
-              <SectionHeader title="Responses flagged unhelpful" count={feedback.down} tone="critical" description="Review these to spot gaps in your knowledge base or product info." exportSection="feedback" onExport={handleExport} exporting={exporting} />
+              <SectionHeader title="Responses flagged unhelpful" count={feedback.down} tone="critical" description="Each row shows the customer question + AI response. Click to expand the full conversation around it." exportSection="feedback" onExport={handleExport} exporting={exporting} />
               <BlockStack gap="200">
                 {feedback.negativeFeedback.slice(0, 10).map((f) => (
-                  <Box key={f.id} padding="300" background="bg-surface-critical-subdued" borderRadius="200">
-                    <BlockStack gap="100">
-                      <Text as="span" variant="bodySm" tone="subdued">{new Date(f.createdAt).toLocaleDateString()}</Text>
-                      <Text as="p" variant="bodyMd">{f.botResponse}</Text>
-                      {f.products?.length > 0 && <Text as="p" variant="bodySm" tone="subdued">Products: {f.products.join(", ")}</Text>}
-                    </BlockStack>
-                  </Box>
+                  <ConversationRow
+                    key={f.id}
+                    date={f.createdAt}
+                    vote="down"
+                    productsCount={f.products?.length || 0}
+                    productsList={f.products}
+                    headlineText={f.lastUserQuestion}
+                    aiResponseText={f.botResponse}
+                    transcript={f.transcript}
+                    tone="critical"
+                  />
                 ))}
               </BlockStack>
             </BlockStack>
