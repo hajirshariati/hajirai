@@ -853,7 +853,7 @@ a.ai-chat-welcome__hint--link:hover {
   gap: 10px;
   font-size: 11px;
   font-weight: 500;
-  text-transform: uppercase;
+  text-transform: capitalize;
   letter-spacing: 0.04em;
   color: rgba(0, 0, 0, 0.42);
   margin-bottom: 4px;
