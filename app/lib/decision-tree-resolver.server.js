@@ -70,6 +70,22 @@ function score(candidate, attrs) {
   if (attrs.gender && candidate.gender === attrs.gender) s += 4;  // exact > Unisex
   if (attrs.posted !== undefined && candidate.posted === attrs.posted) s += 2;
   if (attrs.metSupport !== undefined && candidate.metSupport === attrs.metSupport) s += 1;
+  // Tie-break preference: when the customer's useCase is "comfort"
+  // (the broadest casual/everyday bucket) and the candidate's own
+  // useCase ALSO matches comfort, give it a small bonus over
+  // candidates from athletic / dress / specialty buckets that
+  // happened to score equally on arch/gender/posted/metSupport.
+  // Without this, the resolver tie-broke to athletic-line SKUs
+  // (L1920W Active) for "no pain just support" queries because
+  // they share the same arch/posted profile and L19xx beats L100
+  // on lex order. Tiny bonus (0.5) only fires when useCase already
+  // matches — so it never overrides an arch/gender mismatch.
+  if (
+    attrs.useCase === "comfort" &&
+    candidate.useCase === "comfort"
+  ) {
+    s += 0.5;
+  }
   return s;
 }
 
