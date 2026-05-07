@@ -337,16 +337,16 @@ function matchesCategoryRule(triggerText, rules, latestUserText = "", activeGrou
   return null;
 }
 
+// Order matters — kid patterns checked FIRST. "son" / "daughter" /
+// "grandson" / "granddaughter" / "my X-year-old" all imply a child,
+// so they must match the kid bucket before falling through to the
+// men/women buckets (where "son" used to land via the brother/dad
+// list, dragging adult gender into queries about children).
 const GENDER_DETECT = [
   {
-    pattern: /\b(men|mens|men['’]?s|male|guy|dude|dad|father|husband|boyfriend|brother|son|grandpa|grandfather|uncle|nephew|him|his)\b/i,
-    gender: "men",
-    strip: /\b(men|mens|men['’]?s|male|guy|dude|dad|father|husband|boyfriend|brother|son|grandpa|grandfather|uncle|nephew)\b/gi,
-  },
-  {
-    pattern: /\b(women|womens|women['’]?s|female|lady|ladies|mom|mother|wife|girlfriend|sister|daughter|grandma|grandmother|aunt|niece|her|hers)\b/i,
-    gender: "women",
-    strip: /\b(women|womens|women['’]?s|female|lady|ladies|mom|mother|wife|girlfriend|sister|daughter|grandma|grandmother|aunt|niece)\b/gi,
+    pattern: /\b(?:son|daughter|grandson|granddaughter|child|children|children['’]?s|childrens|kid|kids|kid['’]?s|my\s+\d{1,2}[\s-]?year[\s-]?old|toddler|infant)\b/i,
+    gender: "kid",
+    strip: /\b(?:son|daughter|grandson|granddaughter|child|children|children['’]?s|childrens|kid|kids|kid['’]?s|my\s+\d{1,2}[\s-]?year[\s-]?old|toddler|infant)\b/gi,
   },
   {
     pattern: /\b(boy|boys|boy['’]?s)\b/i,
@@ -359,9 +359,14 @@ const GENDER_DETECT = [
     strip: /\b(girl|girls|girl['’]?s)\b/gi,
   },
   {
-    pattern: /\b(kid|kids|kid['’]?s|children|children['’]?s|childrens)\b/i,
-    gender: "kid",
-    strip: /\b(kid|kids|kid['’]?s|children|children['’]?s|childrens)\b/gi,
+    pattern: /\b(men|mens|men['’]?s|male|guy|dude|dad|father|husband|boyfriend|brother|grandpa|grandfather|uncle|nephew|him|his)\b/i,
+    gender: "men",
+    strip: /\b(men|mens|men['’]?s|male|guy|dude|dad|father|husband|boyfriend|brother|grandpa|grandfather|uncle|nephew)\b/gi,
+  },
+  {
+    pattern: /\b(women|womens|women['’]?s|female|lady|ladies|mom|mother|wife|girlfriend|sister|grandma|grandmother|aunt|niece|her|hers)\b/i,
+    gender: "women",
+    strip: /\b(women|womens|women['’]?s|female|lady|ladies|mom|mother|wife|girlfriend|sister|grandma|grandmother|aunt|niece)\b/gi,
   },
 ];
 

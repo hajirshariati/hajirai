@@ -807,7 +807,7 @@ const FOOTWEAR_FEATURE_RE =
 const ORTHOTIC_PRODUCT_RE =
   /\b(?:orthotics?|insoles?|footbeds?|arch[\s-]?support|inserts?)\b/i;
 const CONDITION_SIGNAL_RE =
-  /\b(?:plantar\s*fasc(?:i|ii)tis|heel\s*spurs?|metatarsalg(?:ia|ic)|morton'?s?\s*neuroma|fallen\s*arch(?:es)?|flat\s*feet|flat\s*foot|over\s*pronat(?:e|ion|ing)|diabetic\s*(?:foot|feet))\b/i;
+  /\b(?:plantar\s*fasc(?:i|ii)tis|heel\s*spurs?|metatarsalg(?:ia|ic)|morton'?s?\s*neuroma|fallen\s*arch(?:es)?|flat\s*feet|flat\s*foot|over\s*pronat(?:e|ion|ing)|under\s*pronat(?:e|ion|ing)|supinat(?:e|ion|ing)|diabetic\s*(?:foot|feet)|high\s*arch(?:es|ed)?|low\s*arch(?:es|ed)?|medium\s*arch(?:es|ed)?|arch\s*(?:pain|support)|heel\s*pain|ball[\s-]?of[\s-]?(?:the[\s-]?)?foot\s*pain|foot\s*pain|feet\s*hurt)\b/i;
 
 export function detectOrthoticIntent(rawText) {
   const t = String(rawText || "")
