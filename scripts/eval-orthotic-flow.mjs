@@ -22,6 +22,7 @@ import {
   isOffTopicReply,
   detectOrthoticIntent,
   preExtractAnswers,
+  accumulateAnswers,
 } from "../app/lib/orthotic-flow.server.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -405,6 +406,43 @@ test("extracts useCase + gender + condition from rich message", () => {
 });
 test("returns {} on no signals", () => {
   assert.deepEqual(preExtractAnswers("hello", tree), {});
+});
+
+section("accumulateAnswers");
+
+test("merges signals across multiple user turns", () => {
+  const messages = [
+    { role: "user", content: "I have plantar fasciitis and am going to Italy" },
+    { role: "assistant", content: "What kind of shoes?" },
+    { role: "user", content: "Dress shoes (no removable insole)" },
+    { role: "assistant", content: "Who's it for?" },
+    { role: "user", content: "Women" },
+  ];
+  const a = accumulateAnswers(messages, tree);
+  // condition from turn 1, useCase from turn 2, gender from turn 3 — all preserved.
+  assert.equal(a.condition, "plantar_fasciitis");
+  assert.equal(a.useCase, "dress_no_removable");
+  assert.equal(a.gender, "Women");
+});
+
+test("later turn overrides earlier on same attribute", () => {
+  const messages = [
+    { role: "user", content: "for my dad" },
+    { role: "user", content: "actually for my mom" },
+  ];
+  const a = accumulateAnswers(messages, tree);
+  assert.equal(a.gender, "Women");
+});
+
+test("ignores assistant messages", () => {
+  const messages = [
+    { role: "assistant", content: "Plantar fasciitis is common" },
+  ];
+  assert.deepEqual(accumulateAnswers(messages, tree), {});
+});
+
+test("returns {} on empty history", () => {
+  assert.deepEqual(accumulateAnswers([], tree), {});
 });
 
 section("off-topic detection");

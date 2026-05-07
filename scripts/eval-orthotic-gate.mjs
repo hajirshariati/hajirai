@@ -77,7 +77,10 @@ await test("falls through when no prior assistant turn AND no orthotic intent", 
   assert.equal(events.length, 0);
 });
 
-await test("falls through when reply doesn't map", async () => {
+await test("re-asks current question when reply is gibberish but intent is established", async () => {
+  // With the unified gate, a gibberish reply on a known question
+  // doesn't fall through — we re-emit the earliest unanswered seed
+  // question. Customer gets a chance to retry with chips.
   const { events, encoder, controller } = makeMockSse();
   const out = await maybeRunOrthoticFlow({
     messages: [
@@ -90,8 +93,9 @@ await test("falls through when reply doesn't map", async () => {
     controller,
     encoder,
   });
-  assert.equal(out.handled, false);
-  assert.equal(events.length, 0);
+  assert.equal(out.handled, true);
+  // Walks root → q_use_case (no useCase known) → emit q_use_case.
+  assert.match(events[0].text, /What kind of shoes/i);
 });
 
 await test("emits next seed question on chip click (Layer 1)", async () => {
@@ -120,10 +124,14 @@ await test("emits next seed question on chip click (Layer 1)", async () => {
   assert.equal(events[2].type, "done");
 });
 
-await test("emits next question on Layer-2 keyword reply ('for my mom')", async () => {
+await test("captures gender from 'for my mom' (Layer 2 + history walk)", async () => {
   const { events, encoder, controller } = makeMockSse();
   const out = await maybeRunOrthoticFlow({
     messages: [
+      // Establish orthotic context first so accumulateAnswers /
+      // intent picks up the flow. Without prior intent, "for my mom"
+      // alone isn't enough engagement signal.
+      { role: "user", content: "I need orthotics for casual shoes" },
       { role: "assistant", content: "Who are these for? <<Men>><<Women>><<Kids>>" },
       { role: "user", content: "for my mom" },
     ],
@@ -133,8 +141,8 @@ await test("emits next question on Layer-2 keyword reply ('for my mom')", async 
     encoder,
   });
   assert.equal(out.handled, true);
-  assert.equal(events[0].type, "text");
-  // Should advance to q_condition (next after q_gender).
+  // Both useCase=casual (turn 1) and gender=Women (turn 3) accumulated.
+  // Walk skips q_use_case + q_gender → emits q_condition.
   assert.match(events[0].text, /pain or condition/i);
 });
 
@@ -148,9 +156,12 @@ await test("Layer 3: free-text reply mapped via mock Anthropic hook", async () =
   };
   const out = await maybeRunOrthoticFlow({
     messages: [
+      // Establish orthotic flow first so the gate engages on the
+      // chip-fingerprint-known question. Then "65 years old" is
+      // L1+L2-immune (no orthotic words, no pronoun, no kin
+      // keyword), forcing the Layer-3 hook.
+      { role: "user", content: "I need orthotics for casual shoes" },
       { role: "assistant", content: "Who are these for? <<Men>><<Women>><<Kids>>" },
-      // 65 years old: no chip text, no pronoun, no kin keyword —
-      // L1 + L2 both miss, so the gate must call Layer 3.
       { role: "user", content: "65 years old" },
     ],
     tree,
@@ -163,11 +174,14 @@ await test("Layer 3: free-text reply mapped via mock Anthropic hook", async () =
   assert.equal(calls, 1, "Anthropic mock should be called once");
   assert.equal(out.handled, true);
   assert.equal(events[0].type, "text");
-  // Should advance to q_condition.
+  // useCase=casual + gender=Women (via L3) → next is q_condition.
   assert.match(events[0].text, /pain or condition/i);
 });
 
-await test("Layer 3: returns null → falls through to LLM", async () => {
+await test("Layer 3: returns null → falls through (only fingerprint engagement, no map)", async () => {
+  // Engagement comes ONLY from the chip fingerprint (no prior intent,
+  // no accumulated answers, no Layer-1/2 hit on the latest reply).
+  // Layer 3 returns null → fall through to LLM.
   const { events, encoder, controller } = makeMockSse();
   const fakeAnthropic = {
     messages: {
@@ -177,7 +191,9 @@ await test("Layer 3: returns null → falls through to LLM", async () => {
   const out = await maybeRunOrthoticFlow({
     messages: [
       { role: "assistant", content: "Who are these for? <<Men>><<Women>><<Kids>>" },
-      { role: "user", content: "I'm not really sure how to answer that" },
+      // Truly unmappable across L1+L2: no chip text, no kin / pronoun,
+      // no pain / condition keyword.
+      { role: "user", content: "qwerty xyzzy" },
     ],
     tree,
     shop: "test.myshopify.com",
@@ -320,6 +336,77 @@ await test("falls through when assistant chips don't match any seed node and no 
   });
   assert.equal(out.handled, false);
   assert.equal(events.length, 0);
+});
+
+await test("unified: remembers answers across multiple turns (regression for prod Bug 2)", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  // Production scenario: turn 1 names plantar fasciitis, turn 2
+  // names dress-no-removable, turn 3 picks Women. By turn 3 the
+  // gate must still know condition=plantar_fasciitis from turn 1 —
+  // otherwise it re-asks q_condition and falls back to the LLM.
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "I have plantar fasciitis going on a trip to Italy" },
+      { role: "assistant", content: "What kind of shoes will the orthotics go in?" },
+      { role: "user", content: "Dress shoes (no removable insole)" },
+      { role: "assistant", content: "Who are these orthotics for?" },
+      { role: "user", content: "Women" },
+    ],
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+  });
+  assert.equal(out.handled, true);
+  // All three answers accumulated → gate should walk root → q_use_case
+  // (skip, useCase known) → q_gender (skip, gender known) →
+  // q_condition (skip, condition known) → q_arch. So the next
+  // emitted question should be q_arch.
+  assert.match(events[0].text, /arch type/i);
+  assert.match(events[0].text, /<<Flat \/ Low>>/);
+});
+
+await test("unified: chip click without intent words still continues flow", async () => {
+  // Production Bug 3: customer clicks <<Women>>, which has no orthotic
+  // intent words and (in old code) chip syntax was lost from history.
+  // Unified gate should still engage because we already have answers
+  // accumulated from prior turns.
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "I have plantar fasciitis" },
+      { role: "assistant", content: "What kind of shoes?" },
+      { role: "user", content: "Dress shoes (no removable insole)" },
+      { role: "assistant", content: "Who are these orthotics for?" },
+      { role: "user", content: "Women" }, // ← chip click, no intent words
+    ],
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+  });
+  assert.equal(out.handled, true);
+});
+
+await test("unified: chip syntax lost from assistant history — gate still works", async () => {
+  // Simulates the exact production round-trip: widget rendered chips
+  // as buttons and stripped <<>> markers from history. Gate must still
+  // engage and continue the flow off pure user-side signals.
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "I need orthotics for plantar fasciitis" },
+      { role: "assistant", content: "What kind of shoes will the orthotics go in?" }, // no <<>>
+      { role: "user", content: "Everyday / casual shoes" },
+    ],
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+  });
+  assert.equal(out.handled, true);
+  // condition=plantar_fasciitis + useCase=casual → next is q_gender.
+  assert.match(events[0].text, /Who are these orthotics for/i);
 });
 
 console.log("");
