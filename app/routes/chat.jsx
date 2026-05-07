@@ -29,6 +29,7 @@ import { fetchCustomerContext } from "../lib/customer-context.server";
 import { fetchKlaviyoEnrichment } from "../lib/klaviyo-enrichment.server";
 import { fetchYotpoLoyalty } from "../lib/yotpo-loyalty.server";
 import { buildRecommenderTools } from "../lib/recommender-tools.server";
+import { maybeRunOrthoticFlow } from "../lib/orthotic-flow-gate.server";
 import prisma from "../db.server";
 import { recordChatUsage, getTodayMessageCount } from "../models/ChatUsage.server";
 import { canSendMessage } from "../lib/billing.server";
@@ -2640,6 +2641,40 @@ export const action = async ({ request }) => {
           } catch (recErr) {
             console.error("[recommender] tool registration failed:", recErr?.message || recErr);
           }
+
+          // Orthotic-flow gate: when a customer is mid-orthotic-Q&A
+          // (the prior assistant turn shows seed-tree chips and the
+          // current reply is a clean chip click or keyword match),
+          // the deterministic state machine answers the turn —
+          // emitting the next seed-authoritative question or the
+          // resolved product card — without an LLM call. Any reply
+          // the state machine can't confidently advance falls
+          // through to the normal agentic loop below.
+          try {
+            const orthoticTree = (recommenderTrees || []).find((t) => t?.intent === "orthotic");
+            if (orthoticTree) {
+              const gate = await maybeRunOrthoticFlow({
+                messages,
+                tree: orthoticTree,
+                shop: session.shop,
+                controller,
+                encoder,
+                anthropic,
+                haikuModel: HAIKU_MODEL,
+              });
+              if (gate?.handled) {
+                // Gate already emitted text, products, and done.
+                // Skip the agentic loop, follow-up suggestions, and
+                // usage recording (no LLM tokens consumed).
+                return;
+              }
+            }
+          } catch (gateErr) {
+            // Never let the gate take down the chat. On any error,
+            // fall through to the LLM as if the gate hadn't run.
+            console.error("[orthotic-flow] gate threw, falling through:", gateErr?.message || gateErr);
+          }
+
           const result = await runAgenticLoop({
             anthropic,
             model,
