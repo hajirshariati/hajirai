@@ -1,4 +1,4 @@
-import { useLoaderData, useFetcher } from "react-router";
+import { useLoaderData, useFetcher, Link } from "react-router";
 import {
   Page,
   Card,
@@ -272,17 +272,35 @@ function StatusCluster({ items }) {
               </span>
             </span>
           );
-          return it.url ? (
-            <a
+          if (!it.url) return <span key={it.label}>{chip}</span>;
+          // External URLs (themeEditor, console.anthropic.com) need
+          // target=_blank so they escape the embedded-admin iframe.
+          // INTERNAL admin paths must NOT be a raw <a href> — that
+          // triggers a full-page navigation, drops the App Bridge
+          // session token, and Shopify bounces the merchant to the
+          // 'Install from a Shopify-owned surface' fallback. Use
+          // react-router Link (client-side nav, session preserved).
+          if (it.external) {
+            return (
+              <a
+                key={it.label}
+                href={it.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ textDecoration: "none" }}
+              >
+                {chip}
+              </a>
+            );
+          }
+          return (
+            <Link
               key={it.label}
-              href={it.url}
-              {...(it.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+              to={it.url}
               style={{ textDecoration: "none" }}
             >
               {chip}
-            </a>
-          ) : (
-            <span key={it.label}>{chip}</span>
+            </Link>
           );
         })}
       </InlineStack>
