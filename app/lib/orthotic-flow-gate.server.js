@@ -67,9 +67,19 @@ function sseChunk(obj) {
 function renderQuestionText(node) {
   if (!node || node.type !== "question") return "";
   const q = String(node.question || "").trim();
+  // Defensive Unisex / Other / Either / Both strip — production
+  // showed those labels appearing on q_gender despite the canonical
+  // seed file having only Men/Women/Kids. The DB-stored tree may
+  // have drifted (manual edit, older seed version, etc.); strip
+  // them at emit time so customers never see a non-gender chip.
+  // Also strips for the gender attribute specifically, but the
+  // filter is safe to run on any node — the labels never appear
+  // on non-gender questions.
+  const NONSENSE_GENDER = /^(?:unisex|other|either|both)\b/i;
   const chipLabels = (node.chips || [])
     .map((c) => String(c?.label || "").trim())
-    .filter(Boolean);
+    .filter(Boolean)
+    .filter((label) => !NONSENSE_GENDER.test(label));
   if (chipLabels.length === 0) return q;
   const chipLine = chipLabels.map((l) => `<<${l}>>`).join(" ");
   return `${q}\n\n${chipLine}`;

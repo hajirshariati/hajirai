@@ -88,12 +88,18 @@ check("condition=overpronation_flat_feet (Women athletic) → derivation makes p
 });
 check("No matching cell falls back gracefully (uses fallback or Unisex)",
   () => assert(sku({ gender: "Men", useCase: "skates" }), "skates is Unisex-only; resolver should still return"));
-check("Kids never get a Unisex SKU (cleats has no Kids variant)",
-  () => assert.equal(sku({ gender: "Kids", useCase: "cleats" }), undefined,
-    "Kids must NOT match Unisex cleats; expected null/no match"));
-check("Kids + skates → no match (skates is Unisex-only)",
-  () => assert.equal(sku({ gender: "Kids", useCase: "skates" }), undefined,
-    "Kids must NOT fall back to Unisex skates"));
+// Behavior change: Kids now accept Unisex SKUs as a fallback.
+// Aetrex's catalog tags many orthotics as Unisex (size-graded for
+// any foot) without a dedicated Kids tag — the previous strict-only
+// rule returned 'no match' for any Kids query, which was worse than
+// returning a usable Unisex product. The strict guard against
+// Men's/Women's leaking to Kids is still in place.
+check("Kids accept Unisex SKUs (cleats Unisex)",
+  () => assert(sku({ gender: "Kids", useCase: "cleats" }),
+    "Kids should resolve to the Unisex cleats SKU"));
+check("Kids + skates resolves to Unisex skates",
+  () => assert(sku({ gender: "Kids", useCase: "skates" }),
+    "Kids should resolve to the Unisex skates SKU"));
 check("Kids + kids-useCase → Kids SKU still resolves",
   () => {
     const r = sku({ gender: "Kids", useCase: "kids" });
