@@ -133,6 +133,47 @@ function groupHitInRange(text, group, fromIdx, toIdx) {
   return best;
 }
 
+// Footwear words a customer uses to refer to a shoe. Distinct from
+// the merchant's category names because customers often say
+// "closed toe", "shoe", "footwear", or partial words. Used by
+// inferShoeWithFeatureIntent to detect "shoe + feature" intent.
+const FOOTWEAR_NOUN_RE = /\b(closed?[\s-]?toe|open[\s-]?toe|shoe|shoes|footwear|sneaker|sneakers|sandal|sandals|clog|clogs|loafer|loafers|slipper|slippers|boot|boots|oxford|oxfords|wedge|wedges|heel|heels|flat|flats|mary[\s-]?jane|slip[\s-]?on|slip[\s-]?ons|moccasin|mule|slide)\b/i;
+
+// "with X" / "having X" / "featuring X" / "w/ X" / "that has X" /
+// "built[-]in X" — feature-attribution patterns where X is an
+// orthotic/footbed/insole/arch support feature. The "X" is a
+// FEATURE of the shoe, not the product itself.
+const SHOE_FEATURE_RE = /\b(?:with|having|featuring|that\s+has|that\s+have|w\/|w\s+\/|including|includes|come(?:s)?\s+with|comes\s+with|built[-\s]?in|integrated|in[-\s]?built)\s+(?:an?\s+|the\s+)?(?:orthotic[\s-]?(?:footbed|insole|insert|support)?|footbed|insole|insert|arch[\s-]?support|cushioned[\s-]?footbed|memory[\s-]?foam|cushioned[\s-]?insole|aetrex[\s-]?(?:orthotic|footbed)|signature[\s-]?(?:arch|orthotic|footbed))\b/i;
+
+function inferShoeWithFeatureIntent(text, groups) {
+  const source = String(text || "");
+  if (!source) return null;
+  if (!SHOE_FEATURE_RE.test(source)) return null;
+  if (!FOOTWEAR_NOUN_RE.test(source)) return null;
+
+  // The customer wants a shoe with an orthotic feature. Pick the
+  // Footwear-like group from the merchant's groups by name match
+  // (case-insensitive). Aetrex names this group "Footwear" — but
+  // we don't hardcode that name; we look for any group whose name
+  // or category list contains a footwear-noun term.
+  let footwearGroup = null;
+  for (const g of groups || []) {
+    const groupNameLower = String(g?.name || "").toLowerCase();
+    if (/\b(footwear|shoes?)\b/.test(groupNameLower)) {
+      footwearGroup = g;
+      break;
+    }
+    // Fallback: any group whose category list contains a footwear-noun term
+    const cats = (g?.categories || []).map((c) => String(c || "").toLowerCase());
+    if (cats.some((c) => FOOTWEAR_NOUN_RE.test(c))) {
+      footwearGroup = g;
+      break;
+    }
+  }
+  if (!footwearGroup) return null;
+  return { activeGroup: footwearGroup, contextGroup: null };
+}
+
 function inferContainmentIntent(text, groups) {
   const source = String(text || "").toLowerCase();
   const m = source.match(CONTAINMENT_RE);
@@ -148,7 +189,6 @@ function inferContainmentIntent(text, groups) {
     beforeIdx: groupHitInRange(source, g, 0, insideIdx),
     afterIdx: groupHitInRange(source, g, insideIdx, source.length),
   }));
-
   // Container preference: a group named directly AFTER the containment
   // word ("inside my shoes") wins. If none, fall back to a group
   // mentioned anywhere in the text that has at least one declared
@@ -277,6 +317,17 @@ function inferUserIntentFromText(text, groups) {
   // ("sneakers") wins as Footwear → wrong recommendation.
   const cleaned = stripConditionPhrases(text);
 
+  // Shoe-with-orthotic-feature intent. When the customer asks for
+  // a SHOE (closed toe, sandal, sneaker, clog, etc.) THAT HAS an
+  // orthotic / footbed / arch support BUILT IN, the product is
+  // Footwear — the orthotic is just a feature description. Word-
+  // matching on "orthotic" alone would route this to Orthotics
+  // group and tell the customer the women's catalog only carries
+  // Orthotics. Catch the "X with orthotic Y" / "X w/ footbed" /
+  // "X having arch support" patterns and force Footwear.
+  const featureIntent = inferShoeWithFeatureIntent(cleaned, groups);
+  if (featureIntent) return { ...featureIntent, ambiguous: false };
+
   const insideIntent = inferContainmentIntent(cleaned, groups);
   if (insideIntent) return { ...insideIntent, ambiguous: false };
 
@@ -337,6 +388,19 @@ export function analyzeCategoryIntent(messages, merchantGroups) {
   const latestMatches = matchingGroupsForText(cleanedLatest, groups, { includeTriggers: true });
   const latestUnambiguous = latestMatches.length === 1 ? latestMatches[0] : null;
   const latestAmbiguous = latestMatches.length > 1;
+  // Shoe-with-feature intent runs FIRST (before containment / for-
+  // context). "do you have a closed-toe option with orthotic
+  // footbed?" mentions both Footwear (closed toe) and Orthotics
+  // (orthotic) — without this gate, latestMatches.length=2 →
+  // ambiguous → falls through to prior intent, which can stick
+  // on Orthotics from earlier turns. The pattern is unambiguous:
+  // FOOTWEAR_WORD + "with/featuring/built-in" + ORTHOTIC_FEATURE
+  // means the customer wants a shoe with that feature.
+  const featureIntent = inferShoeWithFeatureIntent(cleanedLatest, groups);
+  if (featureIntent) {
+    return { ...featureIntent, ambiguous: false };
+  }
+
   const containmentIntent = inferContainmentIntent(cleanedLatest, groups);
   const forContextIntent = inferForContextIntent(cleanedLatest, latestMatches);
 
