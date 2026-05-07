@@ -314,9 +314,64 @@ export function injectOccasionCategory(toolCall, ctx) {
 //   4. Gender lock (force-overlay customer-stated gender)
 //   5. Occasion category (constrain to walking/dressy/etc. when AI
 //      didn't pick a category and the occasion implies one)
+// ── redirectOrthoticSearchToRecommender ────────────────────────────
+// When the LLM calls search_products with an orthotic-shaped query
+// AND a recommend_<intent> tool is registered for the shop,
+// redirect to the recommender. Customer questions like "can I get
+// orthotics separately", "do you have orthotics for sneakers",
+// "what insole works for plantar fasciitis" parse as availability
+// search to the LLM but should enter the guided recommender flow
+// (gate fires, asks shoe type / condition / arch, resolver picks
+// one deterministic SKU) rather than dump 6 lookalikes via
+// semantic similarity.
+//
+// Strict matching to avoid false positives:
+//   - Customer's latest message OR the LLM's query must contain a
+//     standalone orthotic-domain word ("orthotic"/"orthotics"/
+//     "insole"/"insoles"/"footbed").
+//   - A recommender tree with intent matching one of those words
+//     must be enabled on this shop (ctx.recommenderTrees has the
+//     loaded list — same source the prompt uses).
+// On match: rewrite { name: "recommend_<intent>", input: {} } so
+// the gate runs from a clean slate. Original input is discarded;
+// the gate's needMoreInfo response will tell the LLM what to
+// actually ask.
+const ORTHOTIC_DOMAIN_RE = /\b(orthotic|orthotics|insole|insoles|footbed|footbeds)\b/i;
+
+export function redirectOrthoticSearchToRecommender(toolCall, ctx) {
+  if (toolCall.name !== "search_products") return toolCall;
+  const trees = Array.isArray(ctx?.recommenderTrees) ? ctx.recommenderTrees : [];
+  if (trees.length === 0) return toolCall;
+
+  // Find a tree whose intent matches the orthotic domain. Aetrex's
+  // intent is literally "orthotic" — match the intent name against
+  // the orthotic-domain regex so any future merchant with a similar
+  // intent (e.g. "insole") still routes correctly.
+  const orthoticTree = trees.find((t) =>
+    typeof t?.intent === "string" && ORTHOTIC_DOMAIN_RE.test(t.intent),
+  );
+  if (!orthoticTree) return toolCall;
+
+  // Customer's text OR the LLM's query string must mention an
+  // orthotic-domain word. The query is what the LLM thinks the
+  // customer wants; the latest message is ground truth. Either
+  // hitting the regex is sufficient.
+  const latest = String(ctx?.latestUserMessage || "");
+  const queryStr = String(toolCall?.input?.query || "");
+  const matchesDomain = ORTHOTIC_DOMAIN_RE.test(latest) || ORTHOTIC_DOMAIN_RE.test(queryStr);
+  if (!matchesDomain) return toolCall;
+
+  console.log(
+    `[chat] orthotic-routing: search_products(query="${queryStr.slice(0, 60)}") on orthotic-domain ` +
+      `query → rewriting to recommend_${orthoticTree.intent} (gate will collect attributes)`,
+  );
+  return { name: `recommend_${orthoticTree.intent}`, input: {}, id: toolCall.id };
+}
+
 export function rewriteToolCall(toolCall, ctx) {
   let rewritten = toolCall;
   rewritten = forceComparisonLookup(rewritten, ctx);
+  rewritten = redirectOrthoticSearchToRecommender(rewritten, ctx);
   rewritten = stripStaleCategoriesOnScopeReset(rewritten, ctx);
   rewritten = injectStructuredColorFilter(rewritten, ctx);
   rewritten = injectLockedGender(rewritten, ctx);
