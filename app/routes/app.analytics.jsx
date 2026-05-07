@@ -319,6 +319,81 @@ function ConversationRow({
   );
 }
 
+// Unified feedback card. Replaced the previous two stacked cards
+// ('Customer questions' + 'Responses flagged unhelpful') which
+// duplicated rows: every flagged row was already in customer
+// questions with a critical badge. Now one section, one filter,
+// one export — much shorter page.
+function ConversationsCard({ rows, counts, onExport, exporting }) {
+  const [filter, setFilter] = useState("all");
+  const filtered = useMemo(() => {
+    if (filter === "all") return rows;
+    if (filter === "down") return rows.filter((r) => r.vote === "down");
+    if (filter === "up") return rows.filter((r) => r.vote === "up");
+    if (filter === "unrated") return rows.filter((r) => r.vote !== "up" && r.vote !== "down");
+    return rows;
+  }, [rows, filter]);
+  const unrated = rows.length - (counts?.up || 0) - (counts?.down || 0);
+  const FilterChip = ({ value, label, count, tone }) => (
+    <Button
+      pressed={filter === value}
+      onClick={() => setFilter(value)}
+      size="slim"
+      tone={tone}
+    >
+      {`${label} (${count})`}
+    </Button>
+  );
+  return (
+    <Card>
+      <BlockStack gap="400">
+        <SectionHeader
+          title="Customer conversations"
+          count={rows.length}
+          tone="info"
+          description="Every recent chat where the customer voted or that completed with a recommendation. Filter by helpful, not helpful, or unrated. Click any row to expand the full back-and-forth."
+          exportSection="conversations"
+          onExport={onExport}
+          exporting={exporting}
+        />
+        <InlineStack gap="200" wrap>
+          <FilterChip value="all" label="All" count={rows.length} />
+          {(counts?.down || 0) > 0 && (
+            <FilterChip value="down" label="Not helpful" count={counts.down} tone="critical" />
+          )}
+          {(counts?.up || 0) > 0 && (
+            <FilterChip value="up" label="Helpful" count={counts.up} tone="success" />
+          )}
+          {unrated > 0 && (
+            <FilterChip value="unrated" label="No vote" count={unrated} />
+          )}
+        </InlineStack>
+        {filtered.length === 0 ? (
+          <Box padding="400" background="bg-surface-secondary" borderRadius="200">
+            <Text as="p" tone="subdued" alignment="center">No conversations match this filter.</Text>
+          </Box>
+        ) : (
+          <BlockStack gap="200">
+            {filtered.map((q) => (
+              <ConversationRow
+                key={q.id}
+                date={q.date}
+                vote={q.vote}
+                productsCount={q.products?.length || 0}
+                productsList={q.products}
+                headlineText={q.lastUserQuestion || q.question}
+                aiResponseText={q.flaggedAiResponse}
+                transcript={q.transcript}
+                tone={q.vote === "down" ? "critical" : "info"}
+              />
+            ))}
+          </BlockStack>
+        )}
+      </BlockStack>
+    </Card>
+  );
+}
+
 function RangeSelector({ current, searchParams }) {
   const [open, setOpen] = useState(false);
   const [pickerMonth, setPickerMonth] = useState(new Date().getMonth());
@@ -531,52 +606,14 @@ export default function Analytics() {
         )}
 
         {recentQuestions.length > 0 && (
-          <Card>
-            <BlockStack gap="400">
-              <SectionHeader title="Customer questions" count={recentQuestions.length} tone="info" description="Click any row to expand the full conversation — see what the customer asked and exactly how the assistant replied." exportSection="questions" onExport={handleExport} exporting={exporting} />
-              <BlockStack gap="200">
-                {recentQuestions.map((q, i) => (
-                  <ConversationRow
-                    key={i}
-                    date={q.date}
-                    vote={q.vote}
-                    productsCount={q.products?.length || 0}
-                    headlineText={q.question}
-                    transcript={q.transcript}
-                    tone="info"
-                  />
-                ))}
-              </BlockStack>
-            </BlockStack>
-          </Card>
+          <ConversationsCard
+            rows={recentQuestions}
+            counts={{ up: feedback.up, down: feedback.down, total: recentQuestions.length }}
+            onExport={handleExport}
+            exporting={exporting}
+          />
         )}
 
-        {feedback.negativeFeedback.length > 0 && (
-          <Card>
-            <BlockStack gap="400">
-              <SectionHeader title="Responses flagged unhelpful" count={feedback.down} tone="critical" description="Each row shows the customer question + AI response. Click to expand the full conversation around it." exportSection="feedback" onExport={handleExport} exporting={exporting} />
-              <BlockStack gap="200">
-                {feedback.negativeFeedback.slice(0, 10).map((f) => (
-                  <ConversationRow
-                    key={f.id}
-                    date={f.createdAt}
-                    vote="down"
-                    productsCount={f.products?.length || 0}
-                    productsList={f.products}
-                    headlineText={f.lastUserQuestion}
-                    aiResponseText={f.botResponse}
-                    transcript={f.transcript}
-                    tone="critical"
-                  />
-                ))}
-              </BlockStack>
-            </BlockStack>
-          </Card>
-        )}
-
-        {feedback.total > 0 && feedback.down === 0 && (
-          <Banner tone="success" title="No negative feedback in this period" />
-        )}
 
         <Divider />
 

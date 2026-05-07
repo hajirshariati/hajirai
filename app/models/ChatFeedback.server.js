@@ -102,7 +102,14 @@ export async function getRecentQuestions(shop, range = 30, limit = 15) {
   const records = await prisma.chatFeedback.findMany({
     where: { shop, createdAt: { gte: start, lte: end }, conversation: { not: null } },
     orderBy: { createdAt: "desc" },
-    select: { conversation: true, vote: true, products: true, createdAt: true },
+    select: {
+      id: true,
+      conversation: true,
+      vote: true,
+      products: true,
+      botResponse: true,
+      createdAt: true,
+    },
     take: limit * 2,
   });
   const questions = [];
@@ -112,15 +119,22 @@ export async function getRecentQuestions(shop, range = 30, limit = 15) {
       if (!Array.isArray(conv)) continue;
       const firstUser = conv.find((m) => m.role === "user");
       if (!firstUser?.content) continue;
-      // Surface the full transcript alongside the headline question.
-      // The page can collapse it by default and let the merchant
-      // expand to see what the AI actually said back.
       const transcript = conv
         .filter((m) => m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string")
         .slice(-20)
         .map((m) => ({ role: m.role, content: String(m.content).slice(0, 1000) }));
+      // The customer's last question before the vote landed — useful
+      // as a 'CUSTOMER ASKED' headline when the conversation is long
+      // and the first message is no longer the relevant one.
+      const lastUser = [...transcript].reverse().find((m) => m.role === "user");
       questions.push({
-        question: String(firstUser.content).slice(0, 150),
+        id: r.id,
+        question: String(firstUser.content).slice(0, 200),
+        lastUserQuestion: lastUser?.content || null,
+        // For down-voted rows, surface the AI's response that was
+        // flagged. Rendered inline as 'AI RESPONDED' on the row so
+        // the merchant can see the failure mode without expanding.
+        flaggedAiResponse: r.vote === "down" ? (r.botResponse || null) : null,
         vote: r.vote,
         products: r.products || [],
         date: r.createdAt,
