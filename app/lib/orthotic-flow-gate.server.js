@@ -121,6 +121,22 @@ function renderQuestionText(node, answers, tree) {
     }
   }
 
+  // Hide the Kids gender chip if the merchant's masterIndex has zero
+  // Kids-tagged SKUs. Without this, customers can pick Kids and then
+  // either dead-end (strict resolver returns null) or get an
+  // adult-shaped product (legacy fallback). Both are wrong. Removing
+  // the chip is the cleanest fix — if the merchant doesn't carry
+  // kids products, they shouldn't be offered as an option.
+  if (node.attribute === "gender") {
+    const masterIndex = tree?.definition?.resolver?.masterIndex;
+    if (Array.isArray(masterIndex)) {
+      const hasKidsItems = masterIndex.some((m) => isKidsGenderValue(m?.gender));
+      if (!hasKidsItems) {
+        chips = chips.filter((c) => !isKidsGenderValue(c?.value) && !/^(kids?|boys?|girls?|child)\b/i.test(String(c?.label || "")));
+      }
+    }
+  }
+
   const chipLabels = chips.map((c) => String(c.label).trim()).filter(Boolean);
   if (chipLabels.length === 0) return q;
   const chipLine = chipLabels.map((l) => `<<${l}>>`).join(" ");

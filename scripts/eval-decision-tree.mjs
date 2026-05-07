@@ -88,18 +88,17 @@ check("condition=overpronation_flat_feet (Women athletic) → derivation makes p
 });
 check("No matching cell falls back gracefully (uses fallback or Unisex)",
   () => assert(sku({ gender: "Men", useCase: "skates" }), "skates is Unisex-only; resolver should still return"));
-// Kids prefer Kids SKUs but accept Unisex as a resolver fallback.
-// Adult Men's/Women's are still blocked. The orthotic-flow gate
-// filters q_use_case chips so Kids customers only see shoe-types
-// with a Kids SKU available — this resolver behavior is the safety
-// net for free-text paths or merchant catalogs that tag some
-// kid-appropriate orthotics as Unisex.
-check("Kids accept Unisex SKUs (cleats Unisex)",
-  () => assert(sku({ gender: "Kids", useCase: "cleats" }),
-    "Kids should resolve to the Unisex cleats SKU as fallback"));
-check("Kids + skates resolves to Unisex skates",
-  () => assert(sku({ gender: "Kids", useCase: "skates" }),
-    "Kids should resolve to the Unisex skates SKU as fallback"));
+// Strict Kids: a Kids customer must only get a Kids-tagged product.
+// Unisex (adult unisex in this catalog) is NOT acceptable for a
+// child. The gate hides the Kids chip when the merchant's
+// masterIndex has no Kids items, so this strict guard rarely fires
+// in the golden path.
+check("Kids + cleats (no Kids SKU) returns no match — refuses Unisex",
+  () => assert(sku({ gender: "Kids", useCase: "cleats" }) === undefined,
+    "Kids must NOT resolve to the Unisex cleats SKU"));
+check("Kids + skates (no Kids SKU) returns no match — refuses Unisex",
+  () => assert(sku({ gender: "Kids", useCase: "skates" }) === undefined,
+    "Kids must NOT resolve to the Unisex skates SKU"));
 check("Kids + kids-useCase → Kids SKU still resolves",
   () => {
     const r = sku({ gender: "Kids", useCase: "kids" });

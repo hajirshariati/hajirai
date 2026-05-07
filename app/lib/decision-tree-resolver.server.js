@@ -41,18 +41,15 @@ function isKidsGender(g) {
 function genderMatch(candidateGender, askedGender) {
   if (!askedGender) return true;
   if (candidateGender === askedGender) return true;
-  // Kids prefer Kids SKUs but accept Unisex as a fallback. Adult
-  // Men's/Women's are NEVER acceptable for a child. The orthotic-
-  // flow gate filters the q_use_case chips up-front to only show
-  // shoe-types where a Kids SKU exists in the catalog, so in the
-  // golden path Kids → Kids SKU happens through chip filtering,
-  // not through the resolver. This Unisex fallback is here as a
-  // safety net for free-text paths or merchant catalogs where
-  // some Kids-appropriate orthotics are tagged Unisex.
-  if (isKidsGender(askedGender)) {
-    if (candidateGender === "Unisex") return true;
-    return false;
-  }
+  // Strict Kids: a Kids customer must ONLY get a Kids-tagged
+  // product. Unisex (which means "adult unisex" in this catalog)
+  // is NOT acceptable for a child. The gate hides the Kids chip
+  // from q_gender if the merchant's masterIndex has no Kids items,
+  // so in the golden path this strict guard never fires — but
+  // when it does (e.g. customer says "for my kid" in free text),
+  // returning null is correct: the bot tells them honestly we
+  // don't carry a kids product.
+  if (isKidsGender(askedGender)) return false;
   if (candidateGender === "Unisex") return true;
   return false;
 }
