@@ -42,6 +42,7 @@ import {
   isOffTopicReply,
   detectOrthoticIntent,
   hasOrthoticRejection,
+  looksLikeFootwearCommit,
   preExtractAnswers,
   accumulateAnswers,
 } from "./orthotic-flow.server.js";
@@ -166,6 +167,32 @@ export async function maybeRunOrthoticFlow({
   // LLM should handle this; the gate must not press on with the
   // orthotic flow even if Layer 2 picked up an incidental chip.
   if (hasOrthoticRejection(rawUserText)) {
+    return { handled: false };
+  }
+
+  // Hard veto: customer committed to the FOOTWEAR path — either in
+  // the latest message or in a prior turn (e.g. clicked
+  // <<New Footwear>> on a bifurcation question, or said "find men's
+  // shoes for my needs"). Even if Layer 2 picks up an incidental
+  // chip-shaped signal like gender=Women from "Women's", we MUST
+  // stay out of the way. The veto is overridden only by an explicit
+  // orthotic-intent pivot in the latest message.
+  const intentInLatestForVeto = detectOrthoticIntent(rawUserText);
+  const footwearCommitInLatest = looksLikeFootwearCommit(rawUserText);
+  const footwearCommitInPrior =
+    !intentInLatestForVeto &&
+    priorMessages.some(
+      (m) =>
+        m &&
+        m.role === "user" &&
+        typeof m.content === "string" &&
+        looksLikeFootwearCommit(m.content),
+    );
+  if (footwearCommitInLatest || footwearCommitInPrior) {
+    console.log(
+      `[orthotic-flow] footwear-path veto: customer committed to footwear ` +
+        `(${footwearCommitInLatest ? "latest" : "prior"}); falling through to LLM`,
+    );
     return { handled: false };
   }
 

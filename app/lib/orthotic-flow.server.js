@@ -830,6 +830,32 @@ export function hasOrthoticRejection(rawText) {
   return ORTHOTIC_NEGATION_RE.test(t);
 }
 
+// Returns true when the message commits the customer to the FOOTWEAR-
+// only path — they explicitly picked footwear over orthotics on a
+// bifurcation question, or asked for footwear directly.
+//
+// Production trace: customer said "I have foot pain, what should I
+// wear?", AI offered <<New Footwear>> | <<Orthotic Insert>>, customer
+// clicked <<New Footwear>>, AI asked <<Men's>>|<<Women's>>, customer
+// clicked <<Women's>>. Layer 2 extracted gender=Women from "Women's"
+// → engagement rule fired → orthotic flow hijacked the footwear
+// query. The customer had committed to footwear two turns ago.
+//
+// This veto runs BEFORE engagement, on every prior user message AND
+// the latest. If any one is a footwear commitment AND the latest
+// doesn't pivot back to orthotic, the gate falls through.
+const FOOTWEAR_PATH_RE =
+  /\b(?:new\s*footwear|just\s+(?:looking\s+for\s+)?(?:new\s+)?(?:shoes?|footwear|sneakers?|sandals?|boots?)|find\s+(?:me\s+)?(?:some\s+)?(?:men'?s?|women'?s?|kids?'?s?|new)?\s*(?:shoes?|footwear|sneakers?|sandals?|boots?|loafers?|wedges?|heels?|oxfords?|slippers?|clogs?|mary[\s-]?janes?)|show\s+(?:me\s+)?(?:some\s+)?(?:men'?s?|women'?s?|kids?'?s?|new)?\s*(?:shoes?|footwear|sneakers?|sandals?|boots?)|i\s+(?:want|need|am\s+looking\s+for)\s+(?:some\s+)?(?:new\s+)?(?:men'?s?|women'?s?|kids?'?s?)?\s*(?:shoes?|footwear|sneakers?|sandals?|boots?|loafers?|wedges?|heels?))\b/i;
+
+export function looksLikeFootwearCommit(rawText) {
+  const t = String(rawText || "").trim();
+  if (!t) return false;
+  // If the same message has clear orthotic intent, it's not a
+  // footwear-only commit (could be "shoes for my orthotic" type).
+  if (detectOrthoticIntent(t)) return false;
+  return FOOTWEAR_PATH_RE.test(t);
+}
+
 /**
  * Run Layer 1 + 2 against EVERY question node in the tree to
  * pre-extract any answers the customer's bootstrap message
