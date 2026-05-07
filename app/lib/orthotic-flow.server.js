@@ -873,13 +873,20 @@ export function looksLikeFootwearCommit(rawText) {
 // case that looksLikeFootwearCommit misses — production showed
 // "best summer sandal for a beach for my mom" hijacking into orthotic
 // flow because none of the find/show/want/need/looking-for triggers
-// matched. Any mention of a concrete footwear noun (sandals, sneakers,
-// boots, loafers, wedges, heels, oxfords, slippers, clogs, mary janes,
-// pumps, flats, mules) is enough to veto, UNLESS the same message also
-// names an orthotic product noun (orthotic, insole, footbed, insert,
-// arch support — caught by ORTHOTIC_PRODUCT_RE).
+// matched. Any mention of a concrete footwear noun is enough to veto,
+// UNLESS the same message also names an orthotic product noun
+// (orthotic, insole, footbed, insert, arch support — caught by
+// ORTHOTIC_PRODUCT_RE) or a clinical condition signal (plantar
+// fasciitis, flat feet, heel spurs — caught by CONDITION_SIGNAL_RE).
+//
+// Plural-only for body-part-ambiguous words (heels, flats, wedges,
+// pumps, mules) — production showed `flats?` matching the word
+// "flat" in "I have flat feet" and falsely vetoing a clear orthotic
+// intent. The shoe categories ARE always plural ("women's flats",
+// "kitten heels"); singular forms are body parts ("flat foot",
+// "high heel").
 const FOOTWEAR_PRODUCT_NOUN_RE =
-  /\b(?:sandals?|sneakers?|boots?|loafers?|wedges?|heels?|oxfords?|slippers?|clogs?|mary[\s-]?janes?|pumps?|flats?|mules?|trainers?|footwear)\b/i;
+  /\b(?:shoes?|sandals?|sneakers?|boots?|loafers?|oxfords?|slippers?|clogs?|mary[\s-]?janes?|trainers?|footwear|wedges|heels|flats|pumps|mules)\b/i;
 
 export function mentionsNonOrthoticFootwear(rawText) {
   const t = String(rawText || "")
@@ -892,6 +899,11 @@ export function mentionsNonOrthoticFootwear(rawText) {
   // to the orthotic flow / sandal-incompatibility guard rather than
   // vetoing here.
   if (ORTHOTIC_PRODUCT_RE.test(t)) return false;
+  // Clinical-condition mention — "best sandals for plantar fasciitis",
+  // "I have flat feet and my ankles roll inward". Customer wants help
+  // with their condition, not just shopping. Defer to the gate which
+  // has its own sandal-incompatibility / impossible-match guard.
+  if (CONDITION_SIGNAL_RE.test(t)) return false;
   return true;
 }
 

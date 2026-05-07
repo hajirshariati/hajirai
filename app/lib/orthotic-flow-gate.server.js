@@ -223,15 +223,33 @@ export async function maybeRunOrthoticFlow({
   }
 
   // Hard veto #2: latest message names a concrete non-orthotic
-  // footwear product (sandals, sneakers, boots, loafers, wedges,
-  // heels, oxfords, slippers, clogs, mary janes, pumps, flats,
-  // mules, trainers, footwear). Production showed
+  // footwear product (shoes, sandals, sneakers, boots, loafers,
+  // oxfords, slippers, clogs, mary janes, trainers, footwear,
+  // wedges, heels, flats, pumps, mules). Production showed
   // "best summer sandal for a beach for my mom" slipping past
   // looksLikeFootwearCommit (no find/show/need/want trigger word)
   // and engaging the orthotic flow because Layer 2 picked gender=
   // Women from "for my mom". Catching the product noun directly
   // is more robust than enumerating phrasings.
-  if (mentionsNonOrthoticFootwear(rawUserText)) {
+  //
+  // BUT only apply this when no orthotic intent is already
+  // established in history. Once a customer has said "I need
+  // orthotics" earlier in the conversation, their later messages
+  // ARE expected to mention footwear nouns — they're answering
+  // questions like "What kind of shoes will the orthotics go in?"
+  // with chip values like "Everyday / casual shoes". Without this
+  // intent-history bypass, the veto would catch chip clicks and
+  // bump the customer out of mid-flow. Equivalent guard already
+  // lives inside looksLikeFootwearCommit via detectOrthoticIntent
+  // for the latest message; the history-level intent check covers
+  // the multi-turn case.
+  const intentAnywhereInHistory =
+    intentInLatestForVeto ||
+    priorMessages.some(
+      (m) => m && m.role === "user" && typeof m.content === "string" &&
+        detectOrthoticIntent(m.content),
+    );
+  if (!intentAnywhereInHistory && mentionsNonOrthoticFootwear(rawUserText)) {
     console.log(
       `[orthotic-flow] non-orthotic-footwear veto: latest names a footwear ` +
         `product without orthotic intent; falling through to LLM`,
