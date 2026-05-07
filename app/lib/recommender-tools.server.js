@@ -528,6 +528,12 @@ export async function executeRecommenderTool({ toolName, input, shop, trees, con
       if (/\b(ball[\s-]?of[\s-]?(?:the[\s-]?)?foot|forefoot|fore[\s-]?foot|metatars(?:al|algia)|morton(?:'?s)?[\s-]?neuroma|met[\s-]?pad|met[\s-]?head|toe[\s-]?box[\s-]?pain|under[\s-]?the[\s-]?ball)\b/i.test(t)) {
         enrichedInput.metSupport = true;
         enrichedFromText.push("metSupport=true(forefoot signal)");
+      } else if (/\bno[\s-]?(?:specific[\s-]?)?(?:pain|condition|issue|forefoot|ball[\s-]?of[\s-]?foot|metatars)\b/i.test(t) || /\bjust[\s-]?(?:want[\s-]?)?(?:comfort|support)\b/i.test(t)) {
+        // Explicit "no pain" / "just comfort" → metSupport not needed.
+        // Setting false (vs leaving undefined) lets the resolver
+        // de-prioritize met-support SKUs when scoring.
+        enrichedInput.metSupport = false;
+        enrichedFromText.push("metSupport=false(no-pain signal)");
       }
     }
     // posted ← arch pain / flat-foot / overpronation vocabulary.
@@ -535,6 +541,34 @@ export async function executeRecommenderTool({ toolName, input, shop, trees, con
       if (/\b(arch[\s-]?pain|fallen[\s-]?arch(?:es)?|flat[\s-]?feet|flat[\s-]?foot|overpronat(?:e|ion|es|ing)|over[\s-]?pronat(?:e|ion|es|ing)|ankles?[\s-]?roll(?:ing)?[\s-]?in(?:ward)?|pronate[\s-]?inward|low[\s-]?arch(?:es)?)\b/i.test(t)) {
         enrichedInput.posted = true;
         enrichedFromText.push("posted=true(arch/flat-foot signal)");
+      } else if (/\bhigh[\s-]?arch(?:es|ed)?\b/i.test(t) || /\bno[\s-]?(?:specific[\s-]?)?(?:pain|condition|issue|arch[\s-]?pain|flat[\s-]?feet|overpronation)\b/i.test(t) || /\bjust[\s-]?(?:want[\s-]?)?(?:comfort|support)\b/i.test(t)) {
+        // High arches don't need posting; explicit no-condition
+        // also means no posted needed. Setting false explicitly
+        // lets the resolver de-prioritize Posted SKUs.
+        enrichedInput.posted = false;
+        enrichedFromText.push("posted=false(high-arch/no-pain signal)");
+      }
+    }
+    // arch ← arch-type vocabulary. Resolver scoring uses this
+    // heavily (+8 weight, vs +2 for posted). Without it, the
+    // resolver guesses and tie-breaks badly. Mirror the posted
+    // signals: flat/low → "Flat / Low Arch", high → "Medium /
+    // High Arch", "I don't know" / "no idea" → "Medium / High
+    // Arch" as the safer default per the seed JSON.
+    if (!enrichedInput.arch) {
+      if (/\b(flat[\s-]?feet|flat[\s-]?foot|fallen[\s-]?arch(?:es)?|low[\s-]?arch(?:es)?|overpronat(?:e|ion|es|ing))\b/i.test(t)) {
+        enrichedInput.arch = "Flat / Low Arch";
+        enrichedFromText.push("arch=Flat/Low(flat-foot signal)");
+      } else if (/\b(high[\s-]?arch(?:es|ed)?|medium[\s-]?arch(?:es)?|normal[\s-]?arch(?:es)?)\b/i.test(t)) {
+        enrichedInput.arch = "Medium / High Arch";
+        enrichedFromText.push("arch=Medium/High(arch-type signal)");
+      } else if (/\b(don'?t[\s-]?know|not[\s-]?sure|no[\s-]?idea|unsure|i[\s-]?dunno|i[\s-]?guess)\b/i.test(t) || /\bno[\s-]?(?:specific[\s-]?)?(?:pain|condition|issue)\b/i.test(t) || /\bjust[\s-]?(?:want[\s-]?)?(?:comfort|support)\b/i.test(t)) {
+        // Default to medium/high — that's the seed's safe default
+        // for unknown/no-issue customers. Per Aetrex's clinical
+        // model: posted SKUs are for confirmed flat-foot; medium/
+        // high arch = standard fit.
+        enrichedInput.arch = "Medium / High Arch";
+        enrichedFromText.push("arch=Medium/High(unknown/no-pain default)");
       }
     }
     // condition ← heel-spur / plantar-fasciitis / diabetic vocabulary
@@ -565,6 +599,24 @@ export async function executeRecommenderTool({ toolName, input, shop, trees, con
       }
     }
   }
+  // Final safety-net defaults. After all keyword-based enrichment,
+  // if useCase / condition are STILL missing, fill the safest
+  // defaults so the resolver always runs and returns a sensible
+  // SKU rather than tie-breaking arbitrarily on partial input.
+  // - useCase=comfort: broadest bucket; closest to "just give me
+  //   a sensible everyday orthotic". Better default than letting
+  //   the resolver guess.
+  // - condition=none: "no specific clinical condition" — same
+  //   bucket as the seed's "None — just want comfort" chip.
+  if (!enrichedInput.useCase) {
+    enrichedInput.useCase = "comfort";
+    enrichedFromText.push("useCase=comfort(safety-net default)");
+  }
+  if (!enrichedInput.condition) {
+    enrichedInput.condition = "none";
+    enrichedFromText.push("condition=none(safety-net default)");
+  }
+
   if (enrichedFromText.length > 0) {
     console.log(
       `[recommender] enriched from conversation text: ${enrichedFromText.join(", ")}`,
