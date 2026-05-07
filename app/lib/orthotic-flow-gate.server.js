@@ -35,10 +35,14 @@ import {
   getNextStep,
   mapAnswerToEnum,
   findNodeByChipsInText,
+  findNodeById,
+  getRootNode,
   nextNodeFromTransition,
   buildConstrainedAnswerPrompt,
   parseConstrainedAnswerResponse,
   isOffTopicReply,
+  detectOrthoticIntent,
+  preExtractAnswers,
 } from "./orthotic-flow.server.js";
 import { executeRecommenderTool } from "./recommender-tools.server.js";
 
@@ -140,30 +144,36 @@ export async function maybeRunOrthoticFlow({
   const priorMessages = messages.slice(0, -1);
   const state = detectFlowState(priorMessages, tree.definition);
 
-  // Gate condition: state must already be on a question node whose
-  // chip fingerprint was matched in the most recent assistant turn.
-  // If detectFlowState landed on the root because no prior assistant
-  // turn looked like a tree question, fall through — the LLM is
-  // still in charge of opening the flow.
+  // Try to identify the current question node from the last
+  // assistant turn's chip fingerprint. If the LLM rephrased the
+  // chips (the documented drift problem), this returns null and
+  // we route to the bootstrap path instead of falling through.
   const lastAssistant = [...priorMessages].reverse().find((m) => m.role === "assistant");
-  if (!lastAssistant) return { handled: false };
-  const lastAssistantText = typeof lastAssistant.content === "string"
+  const lastAssistantText = lastAssistant && typeof lastAssistant.content === "string"
     ? lastAssistant.content
     : "";
-  // Quick reject: assistant turn must contain chip syntax for us to
-  // even consider this a state-machine continuation.
-  if (!/<<[^<>]+>>/.test(lastAssistantText)) return { handled: false };
+  const currentNode = lastAssistantText && /<<[^<>]+>>/.test(lastAssistantText)
+    ? findNodeByChipsInText(lastAssistantText, tree.definition)
+    : null;
 
-  // The CURRENT node — what the assistant just asked — is read
-  // directly from the last assistant turn's chip fingerprint.
-  // Requiring a recognized seed-tree fingerprint (not just any
-  // chips) is what makes the gate safe and opt-in: if the LLM
-  // asked a side question with non-tree chips (e.g. "compare or
-  // similar?"), the gate stays out of the way and the LLM stays
-  // in charge.
-  const currentNode = findNodeByChipsInText(lastAssistantText, tree.definition);
+  // BOOTSTRAP path — fires when:
+  //   (a) there's no prior assistant chip turn at all (truly
+  //       fresh chat), OR
+  //   (b) the assistant's prior chips don't match any seed-tree
+  //       node (drift — LLM rephrased the chips), AND
+  //   (c) the customer's message expresses orthotic intent.
+  //
+  // Pre-extracts answers from the customer's bootstrap message
+  // (e.g. "I need running orthotics for my dad" pre-fills
+  // useCase=athletic_running + gender=Men), then emits the next
+  // unanswered seed question with byte-exact chips. From the
+  // next turn onward the regular continuation path takes over
+  // because the gate's emitted assistant turn now carries seed
+  // chips that findNodeByChipsInText recognizes.
   if (!currentNode || currentNode.type !== "question") {
-    return { handled: false };
+    return await runBootstrap({
+      rawUserText, tree, controller, encoder,
+    });
   }
 
   // Off-topic interrupt — customer asked about shipping/returns
@@ -281,6 +291,79 @@ export async function maybeRunOrthoticFlow({
   // step.type === "done" — no question and no resolve (shouldn't
   // happen on a well-formed seed but defended). Fall through to LLM.
   console.log(`[orthotic-flow] unexpected step type=${step.type}; falling through`);
+  return { handled: false };
+}
+
+/**
+ * Bootstrap the state machine on the customer's first message.
+ * Called when the continuation path can't engage — either no
+ * prior assistant turn or the prior chips weren't seed-recognized.
+ *
+ * Logic:
+ *   1. Bail unless the message expresses unambiguous orthotic
+ *      intent (detectOrthoticIntent's negation + footwear-feature
+ *      guards keep this from misfiring).
+ *   2. Pre-extract any answers the message already gave us by
+ *      running Layer 1 + 2 across every question node.
+ *   3. Walk forward from root, transitioning past nodes whose
+ *      attribute is already pre-filled.
+ *   4. Emit the next unanswered question (or resolve, if the
+ *      message somehow gave us everything).
+ *
+ * Returns { handled: true } when the gate took the turn,
+ * { handled: false } otherwise so the LLM agentic loop runs.
+ */
+async function runBootstrap({ rawUserText, tree, controller, encoder }) {
+  if (!detectOrthoticIntent(rawUserText)) {
+    return { handled: false };
+  }
+  const def = tree.definition;
+  const root = getRootNode(def);
+  if (!root) return { handled: false };
+
+  const answers = preExtractAnswers(rawUserText, def);
+  const prefilled = Object.keys(answers);
+  if (prefilled.length > 0) {
+    console.log(
+      `[orthotic-flow] bootstrap pre-extracted: ${prefilled.map((k) => `${k}=${answers[k]}`).join(", ")}`,
+    );
+  }
+
+  // Walk forward from root, advancing past any node whose
+  // attribute is already in `answers`. Bounded at 16 hops so a
+  // pathological seed with cyclic transitions can't loop forever.
+  let currentNodeId = root.id;
+  for (let i = 0; i < 16; i++) {
+    const node = findNodeById(def, currentNodeId);
+    if (!node || node.type !== "question") break;
+    if (!node.attribute || answers[node.attribute] === undefined) break;
+    const nextId = nextNodeFromTransition(node, answers[node.attribute]);
+    if (!nextId) break;
+    currentNodeId = nextId;
+  }
+
+  const state = { currentNodeId, answers, unmappedTurns: 0 };
+  const step = resolveSkippableSteps(state, def);
+
+  if (step.type === "question") {
+    const text = renderQuestionText(step.node);
+    if (!text) return { handled: false };
+    controller.enqueue(encoder.encode(sseChunk({ type: "text", text })));
+    controller.enqueue(encoder.encode(sseChunk({ type: "products", products: [] })));
+    controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
+    console.log(
+      `[orthotic-flow] bootstrap emitted seed question ${step.node.id} (${step.node.attribute}); ` +
+        `prefilled=${prefilled.length}; bypassed LLM`,
+    );
+    return { handled: true };
+  }
+  // step.type === "resolve" or "done" — for the bootstrap turn,
+  // it's safer to fall through to the LLM than emit a card on
+  // turn 1 with potentially wrong pre-extracted attrs. Customer
+  // hasn't confirmed anything yet.
+  console.log(
+    `[orthotic-flow] bootstrap step=${step.type} (not "question"); falling through to LLM`,
+  );
   return { handled: false };
 }
 

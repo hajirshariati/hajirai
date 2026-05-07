@@ -782,3 +782,69 @@ export function isOffTopicReply(rawAnswer, node) {
   const containsOffTopicKeyword = OFF_TOPIC_KEYWORDS_RE.test(text);
   return endsWithQuestion || containsOffTopicKeyword;
 }
+
+// ──────────────────────────────────────────────────────────────
+// Orthotic-intent detector (Stage B+ bootstrap).
+//
+// Tells the gate whether the customer's first message expresses
+// "I want an orthotic recommendation". When true, the gate
+// initiates the state machine on this turn instead of waiting
+// for the LLM to ask a chip question (which it would rephrase,
+// breaking the seed-fingerprint match).
+//
+// Conservative by design — only fires on unambiguous intent.
+// The negation guard prevents firing on "I don't want orthotics,
+// just shoes". The footwear-with-feature guard prevents firing
+// on "shoes with built-in arch support" (that's a footwear
+// query). False negatives are fine here — the LLM still handles
+// anything the gate skips.
+// ──────────────────────────────────────────────────────────────
+
+const ORTHOTIC_NEGATION_RE =
+  /\b(?:not|no|without|don'?t\s+(?:want|need|like)|hate|never)\s+(?:any\s+)?(?:an?\s+)?(?:orthotics?|insoles?|footbeds?|arch[\s-]?support|inserts?)\b/i;
+const FOOTWEAR_FEATURE_RE =
+  /\b(?:orthotic[\s-]?friendly|orthotic[\s-]?compatible)\b|\bshoes?\s+(?:with|for|that\s+have)\s+(?:built[\s-]?in\s+)?(?:orthotics?|inserts?|arch[\s-]?support)\b/i;
+const ORTHOTIC_PRODUCT_RE =
+  /\b(?:orthotics?|insoles?|footbeds?|arch[\s-]?support|inserts?)\b/i;
+const CONDITION_SIGNAL_RE =
+  /\b(?:plantar\s*fasc(?:i|ii)tis|heel\s*spurs?|metatarsalg(?:ia|ic)|morton'?s?\s*neuroma|fallen\s*arch(?:es)?|flat\s*feet|flat\s*foot|over\s*pronat(?:e|ion|ing)|diabetic\s*(?:foot|feet))\b/i;
+
+export function detectOrthoticIntent(rawText) {
+  const t = String(rawText || "").trim();
+  if (!t) return false;
+  if (ORTHOTIC_NEGATION_RE.test(t)) return false;
+  if (FOOTWEAR_FEATURE_RE.test(t)) return false;
+  if (ORTHOTIC_PRODUCT_RE.test(t)) return true;
+  if (CONDITION_SIGNAL_RE.test(t)) return true;
+  return false;
+}
+
+/**
+ * Run Layer 1 + 2 against EVERY question node in the tree to
+ * pre-extract any answers the customer's bootstrap message
+ * already contains. Lets the gate skip past questions the
+ * customer implicitly answered ("I need running orthotics for
+ * my dad" → useCase=athletic_running, gender=Men).
+ *
+ * Sync-only — no Layer 3 here. Bootstrap should be cheap and
+ * deterministic; if a customer's first message is too ambiguous
+ * for L1/L2, we just emit q_use_case and ask normally.
+ */
+export function preExtractAnswers(rawText, tree) {
+  const out = {};
+  if (!tree || !Array.isArray(tree.nodes)) return out;
+  if (!rawText || typeof rawText !== "string") return out;
+  for (const node of tree.nodes) {
+    if (!node || node.type !== "question" || !node.attribute) continue;
+    const exact = matchChipExact(rawText, node);
+    if (exact !== undefined) {
+      out[node.attribute] = exact;
+      continue;
+    }
+    const kw = matchKeyword(rawText, node);
+    if (kw !== undefined) {
+      out[node.attribute] = kw;
+    }
+  }
+  return out;
+}
