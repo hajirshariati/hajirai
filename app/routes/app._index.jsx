@@ -22,11 +22,12 @@ import { countEnrichmentsByShop } from "../models/ProductEnrichment.server";
 import { getUsageSummary } from "../models/ChatUsage.server";
 import { getFeedbackSummary } from "../models/ChatFeedback.server";
 import { getConversionSummary } from "../models/ChatConversion.server";
+import { listDecisionTrees } from "../models/DecisionTree.server";
 import seosLogo from "../assets/SEoS.png";
 
 export const loader = async ({ request }) => {
   const { admin, session } = await authenticate.admin(request);
-  const [config, files, syncState, enrichmentCount, usage, feedback, conversions] = await Promise.all([
+  const [config, files, syncState, enrichmentCount, usage, feedback, conversions, decisionTrees] = await Promise.all([
     getShopConfig(session.shop),
     getKnowledgeFiles(session.shop),
     getCatalogSyncState(session.shop),
@@ -34,6 +35,7 @@ export const loader = async ({ request }) => {
     getUsageSummary(session.shop, 30),
     getFeedbackSummary(session.shop, 30),
     getConversionSummary(session.shop, 30),
+    listDecisionTrees(session.shop).catch(() => []),
   ]);
 
   if (!syncState.lastSyncedAt && syncState.status !== "running") {
@@ -53,6 +55,24 @@ export const loader = async ({ request }) => {
   const widgetEnabled =
     Boolean(config.lastWidgetSeenAt) &&
     Date.now() - new Date(config.lastWidgetSeenAt).getTime() < SEVEN_DAYS;
+
+  // Catalog freshness: anything older than 7 days suggests the
+  // merchant changed inventory but the sync didn't run. Surfaces in
+  // the home banner status cluster as 'Stale' to prompt a manual
+  // sync from Catalog → Refresh.
+  const lastSyncedAt = syncState.lastSyncedAt
+    ? new Date(syncState.lastSyncedAt).toISOString()
+    : null;
+  const hoursSinceSync = lastSyncedAt
+    ? Math.round((Date.now() - new Date(lastSyncedAt).getTime()) / 3_600_000)
+    : null;
+
+  // Recommender status: master toggle ON + at least one enabled
+  // recommender row. The toggle alone isn't enough — a shop with
+  // no enabled trees yet should show 'Off' on the cluster.
+  const enabledRecommenderCount = (decisionTrees || []).filter((t) => t?.enabled).length;
+  const recommenderActive =
+    config.decisionTreeEnabled === true && enabledRecommenderCount > 0;
 
   return {
     hasApiKey: config.anthropicApiKey !== "",
@@ -80,6 +100,12 @@ export const loader = async ({ request }) => {
     categoryGroupsCount: (() => {
       try { return (JSON.parse(config.categoryGroups || "[]") || []).length; } catch { return 0; }
     })(),
+    // Status-cluster fields
+    catalogSyncStatus: syncState.status || "idle",
+    lastSyncedAt,
+    hoursSinceSync,
+    recommenderActive,
+    enabledRecommenderCount,
   };
 };
 
@@ -191,6 +217,79 @@ function formatRevenue(n, currency) {
   }
 }
 
+// At-a-glance health row in the hero banner. Each chip shows the
+// state of one infrastructure piece (catalog sync, semantic search,
+// chat widget, recommender, AI key, knowledge base) with a tone the
+// merchant can scan in <5 seconds. A chip in 'critical' or 'warning'
+// tone tells them where to click. Doesn't affect any runtime
+// behavior — purely a status surface.
+function StatusCluster({ items }) {
+  const TONE_BG = {
+    success: "rgba(76, 175, 80, 0.18)",
+    warning: "rgba(255, 193, 7, 0.22)",
+    critical: "rgba(229, 62, 62, 0.22)",
+    subdued: "rgba(255, 255, 255, 0.14)",
+  };
+  const TONE_DOT = {
+    success: "#4caf50",
+    warning: "#ffc107",
+    critical: "#ff5252",
+    subdued: "rgba(255,255,255,0.55)",
+  };
+  return (
+    <Box paddingBlockStart="200">
+      <InlineStack gap="200" wrap>
+        {items.map((it) => {
+          const chip = (
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                padding: "6px 12px",
+                borderRadius: 999,
+                background: TONE_BG[it.tone] || TONE_BG.subdued,
+                color: "#fff",
+                fontSize: 12.5,
+                fontWeight: 500,
+                lineHeight: 1.2,
+                whiteSpace: "nowrap",
+                border: "1px solid rgba(255,255,255,0.18)",
+              }}
+              title={it.tooltip || ""}
+            >
+              <span
+                style={{
+                  width: 8, height: 8, borderRadius: "50%",
+                  background: TONE_DOT[it.tone] || TONE_DOT.subdued,
+                  flexShrink: 0,
+                  boxShadow: it.tone === "success" ? "0 0 6px rgba(76,175,80,0.6)" : "none",
+                }}
+                aria-hidden="true"
+              />
+              <span>
+                <strong>{it.label}:</strong> {it.value}
+              </span>
+            </span>
+          );
+          return it.url ? (
+            <a
+              key={it.label}
+              href={it.url}
+              {...(it.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+              style={{ textDecoration: "none" }}
+            >
+              {chip}
+            </a>
+          ) : (
+            <span key={it.label}>{chip}</span>
+          );
+        })}
+      </InlineStack>
+    </Box>
+  );
+}
+
 function MetricTile({ label, value, sublabel }) {
   return (
     <Card>
@@ -210,7 +309,52 @@ export default function Home() {
     feedbackTotal, satisfactionRate, modelStrategy, rateLimitHits,
     semanticEnabled, semanticProvider, categoryGroupsCount,
     conversionCount, conversionRevenue, conversionCurrency,
+    catalogSyncStatus, lastSyncedAt, hoursSinceSync,
+    recommenderActive, enabledRecommenderCount,
   } = useLoaderData();
+
+  // Build the status-cluster items shown in the hero banner. Each
+  // item has tone (success/warning/critical/subdued), short value
+  // text, optional tooltip, and a click target (URL). Order is from
+  // most-likely-to-need-attention down to nice-to-have.
+  const statusItems = (() => {
+    const items = [];
+    items.push(
+      hasApiKey
+        ? { label: "AI", value: "Connected", tone: "success", url: "/app/api-keys", tooltip: "Anthropic API key configured." }
+        : { label: "AI", value: "Missing key", tone: "critical", url: "/app/api-keys", tooltip: "Add your Anthropic API key to enable the chat." }
+    );
+    items.push(
+      widgetEnabled
+        ? { label: "Widget", value: "Live", tone: "success", url: themeEditorUrl, external: true, tooltip: "Storefront chat widget is loading on your theme." }
+        : { label: "Widget", value: "Not enabled", tone: "warning", url: themeEditorUrl, external: true, tooltip: "Enable the SEoS Assistant block in your active theme." }
+    );
+    if (catalogSyncStatus === "running") {
+      items.push({ label: "Catalog", value: "Syncing…", tone: "warning", url: "/app/catalog", tooltip: "Catalog sync currently in progress." });
+    } else if (productsCount === 0) {
+      items.push({ label: "Catalog", value: "Not synced", tone: "critical", url: "/app/catalog", tooltip: "No products synced yet. Run a manual sync." });
+    } else if (hoursSinceSync !== null && hoursSinceSync > 168) {
+      items.push({ label: "Catalog", value: `Stale (${Math.round(hoursSinceSync / 24)}d)`, tone: "warning", url: "/app/catalog", tooltip: `Last sync ${Math.round(hoursSinceSync / 24)} days ago. Run a refresh from the Catalog page.` });
+    } else {
+      items.push({ label: "Catalog", value: `${productsCount} synced`, tone: "success", url: "/app/catalog", tooltip: lastSyncedAt ? `Last synced ${new Date(lastSyncedAt).toLocaleString()}` : "Synced." });
+    }
+    items.push(
+      semanticEnabled
+        ? { label: "Semantic", value: semanticProvider === "voyage" ? "Voyage AI" : "OpenAI", tone: "success", url: "/app/api-keys", tooltip: "Semantic search active. Customers find products by meaning, not just keywords." }
+        : { label: "Semantic", value: "Off", tone: "subdued", url: "/app/api-keys", tooltip: "Optional. Add a Voyage AI or OpenAI key to enable meaning-based product matching." }
+    );
+    items.push(
+      recommenderActive
+        ? { label: "Recommenders", value: `${enabledRecommenderCount} active`, tone: "success", url: "/app/recommenders", tooltip: "Smart Recommender flow is live for at least one intent." }
+        : { label: "Recommenders", value: "Off", tone: "subdued", url: "/app/recommenders", tooltip: "Optional. Configure a guided product finder for orthotics, mattresses, etc." }
+    );
+    items.push(
+      fileCount > 0
+        ? { label: "Knowledge", value: `${fileCount} file${fileCount > 1 ? "s" : ""}`, tone: "success", url: "/app/knowledge", tooltip: "Custom FAQs / brand info available to the AI." }
+        : { label: "Knowledge", value: "None", tone: "subdued", url: "/app/knowledge", tooltip: "Optional. Upload FAQs or product specs the AI can reference." }
+    );
+    return items;
+  })();
 
   const rateFetcher = useFetcher();
   const rateDismissed = rateFetcher.state !== "idle" || rateFetcher.data?.dismissed;
@@ -241,6 +385,7 @@ export default function Home() {
                 <Text as="p" variant="bodyMd">
                   <span style={{ color: "rgba(255,255,255,0.85)" }}>Search Engine on Steroids</span>
                 </Text>
+                <StatusCluster items={statusItems} />
                 {(totalMessages > 0 || showRateLimit) && (
                   <Box paddingBlockStart="100">
                     <InlineStack align="start" gap="200" wrap>
