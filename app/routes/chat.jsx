@@ -1356,6 +1356,28 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       }
     }
 
+    // Chip-label dedupe. The LLM occasionally rephrases the same
+    // question twice in one reply (e.g. recommender's needMoreInfo
+    // instruction provides a list and the model paraphrases each
+    // entry), emitting the same chip group twice in the same
+    // message. Strip any later occurrence of a chip label that
+    // already appeared earlier (case-insensitive). Keep the first.
+    {
+      const seen = new Set();
+      const before = fullResponseText;
+      const dedupedText = fullResponseText.replace(/<<\s*([^<>]+?)\s*>>/g, (match, label) => {
+        const key = String(label).trim().toLowerCase();
+        if (!key) return "";
+        if (seen.has(key)) return "";
+        seen.add(key);
+        return match;
+      });
+      if (dedupedText !== before) {
+        fullResponseText = dedupedText.replace(/[ \t]{2,}/g, " ").trim();
+        console.log(`[chat] ${ctx.shop} deduped repeated chip labels`);
+      }
+    }
+
     // Strip gender chips that contradict the catalog given the user's
     // mentioned categories. e.g. user said "boots" + AI offered <<Men's>>
     // when only women's boots exist → strip the Men's chip. Keeps both
