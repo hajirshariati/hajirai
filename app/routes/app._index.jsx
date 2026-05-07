@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useLoaderData, useFetcher, Link } from "react-router";
 import {
   Page,
@@ -138,6 +139,131 @@ function StepCircle({ done, number }) {
         {number}
       </Text>
     </div>
+  );
+}
+
+// Wraps the five-step setup list. When everything's done, render a
+// compact 'Setup complete' banner instead of stacking five 'Done'
+// rows — keeps the home page short for established merchants but
+// stays one click away if they want to revisit. Tracks expand
+// state in component state; defaults to collapsed when complete,
+// expanded when anything's still pending or in 'Action needed'.
+function SetupChecklist({
+  hasApiKey, widgetEnabled, fileCount, categoryGroupsCount, semanticEnabled,
+  semanticProvider, themeEditorUrl,
+}) {
+  const items = [
+    {
+      done: hasApiKey,
+      number: "1",
+      title: "Connect the AI engine",
+      description: "Paste your API key to power the AI assistant. Pay-as-you-go — you only pay for what you use.",
+      actionLabel: hasApiKey ? "Manage" : "Add key",
+      actionUrl: "/app/api-keys",
+    },
+    {
+      done: widgetEnabled,
+      number: "2",
+      title: "Enable the chat widget",
+      description: widgetEnabled
+        ? "Your storefront is loading the chat widget. Use the theme editor to adjust appearance and content."
+        : "Turn on the SEoS Assistant chat block in your active Shopify theme so customers see it on your storefront.",
+      actionLabel: widgetEnabled ? "Customize" : "Open theme editor",
+      actionUrl: themeEditorUrl,
+      external: true,
+    },
+    {
+      done: fileCount > 0,
+      number: "3",
+      title: "Upload extra knowledge (optional)",
+      description: "FAQs, brand voice, sizing guides, product specs — CSV files with a SKU column are automatically linked to your catalog.",
+      actionLabel: fileCount > 0 ? "Manage files" : "Upload",
+      actionUrl: "/app/knowledge",
+    },
+    {
+      done: categoryGroupsCount > 0,
+      number: "4",
+      title: "Define category groups (optional)",
+      description: "Group your catalog (e.g. Footwear / Orthotics / Accessories) so the AI never offers irrelevant categories when a customer asks about one of them. Keeps choice buttons sharp and on-topic.",
+      actionLabel: categoryGroupsCount > 0 ? `Manage (${categoryGroupsCount})` : "Set up groups",
+      actionUrl: "/app/catalog",
+    },
+    {
+      done: semanticEnabled,
+      number: "5",
+      title: "Enable semantic search (optional)",
+      description: "Match products by meaning, not just keywords. Customers asking for \"shoes for standing all day\" find arch-support styles even when descriptions don't contain those words. Bring your own Voyage AI or OpenAI key — typically under $1/month.",
+      actionLabel: semanticEnabled ? `Manage (${semanticProvider === "voyage" ? "Voyage AI" : "OpenAI"})` : "Add provider",
+      actionUrl: "/app/api-keys",
+    },
+  ];
+  const doneCount = items.filter((i) => i.done).length;
+  const allDone = doneCount === items.length;
+  const requiredDone = hasApiKey && widgetEnabled;
+  // Default collapsed once all done; expanded if anything's pending
+  // OR the required steps aren't met yet.
+  const [expanded, setExpanded] = useState(!allDone);
+
+  if (allDone && !expanded) {
+    return (
+      <Card>
+        <InlineStack align="space-between" blockAlign="center" wrap>
+          <InlineStack gap="300" blockAlign="center" wrap={false}>
+            <div style={{ width: 28, height: 28, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", color: "#108043" }}>
+              <Icon source={CheckCircleIcon} tone="success" />
+            </div>
+            <BlockStack gap="050">
+              <Text as="h2" variant="headingMd">Setup complete</Text>
+              <Text as="span" tone="subdued" variant="bodySm">
+                All 5 steps done. Your assistant is fully configured.
+              </Text>
+            </BlockStack>
+          </InlineStack>
+          <Button variant="plain" onClick={() => setExpanded(true)}>
+            View checklist
+          </Button>
+        </InlineStack>
+      </Card>
+    );
+  }
+
+  return (
+    <BlockStack gap="300">
+      <InlineStack gap="300" blockAlign="center" align="space-between" wrap>
+        <InlineStack gap="300" blockAlign="center">
+          <Text as="h2" variant="headingMd">Setup checklist</Text>
+          {allDone ? (
+            <Badge tone="success">Complete</Badge>
+          ) : requiredDone ? (
+            <Badge tone="success">Ready</Badge>
+          ) : (
+            <Badge tone="attention">Action needed</Badge>
+          )}
+          <Text as="span" tone="subdued" variant="bodySm">
+            {doneCount} of {items.length} done
+          </Text>
+        </InlineStack>
+        {allDone && (
+          <Button variant="plain" onClick={() => setExpanded(false)}>
+            Collapse
+          </Button>
+        )}
+      </InlineStack>
+      <BlockStack gap="300">
+        {items.map((item) => (
+          <ChecklistItem
+            key={item.number}
+            done={item.done}
+            number={item.number}
+            title={item.title}
+            description={item.description}
+            actionLabel={item.actionLabel}
+            actionUrl={item.actionUrl}
+            external={item.external}
+          />
+        ))}
+      </BlockStack>
+    </BlockStack>
   );
 }
 
@@ -533,64 +659,15 @@ export default function Home() {
 
         <Divider />
 
-        <BlockStack gap="300">
-          <InlineStack gap="300" blockAlign="center">
-            <Text as="h2" variant="headingMd">Setup checklist</Text>
-            {hasApiKey ? (
-              <Badge tone="success">Ready</Badge>
-            ) : (
-              <Badge tone="attention">Action needed</Badge>
-            )}
-          </InlineStack>
-
-          <BlockStack gap="300">
-            <ChecklistItem
-              done={hasApiKey}
-              number="1"
-              title="Connect the AI engine"
-              description="Paste your API key to power the AI assistant. Pay-as-you-go — you only pay for what you use."
-              actionLabel={hasApiKey ? "Manage" : "Add key"}
-              actionUrl="/app/api-keys"
-            />
-            <ChecklistItem
-              done={widgetEnabled}
-              number="2"
-              title="Enable the chat widget"
-              description={
-                widgetEnabled
-                  ? "Your storefront is loading the chat widget. Use the theme editor to adjust appearance and content."
-                  : "Turn on the SEoS Assistant chat block in your active Shopify theme so customers see it on your storefront."
-              }
-              actionLabel={widgetEnabled ? "Customize" : "Open theme editor"}
-              actionUrl={themeEditorUrl}
-              external
-            />
-            <ChecklistItem
-              done={fileCount > 0}
-              number="3"
-              title="Upload extra knowledge (optional)"
-              description="FAQs, brand voice, sizing guides, product specs — CSV files with a SKU column are automatically linked to your catalog."
-              actionLabel={fileCount > 0 ? "Manage files" : "Upload"}
-              actionUrl="/app/knowledge"
-            />
-            <ChecklistItem
-              done={categoryGroupsCount > 0}
-              number="4"
-              title="Define category groups (optional)"
-              description="Group your catalog (e.g. Footwear / Orthotics / Accessories) so the AI never offers irrelevant categories when a customer asks about one of them. Keeps choice buttons sharp and on-topic."
-              actionLabel={categoryGroupsCount > 0 ? `Manage (${categoryGroupsCount})` : "Set up groups"}
-              actionUrl="/app/catalog"
-            />
-            <ChecklistItem
-              done={semanticEnabled}
-              number="5"
-              title="Enable semantic search (optional)"
-              description="Match products by meaning, not just keywords. Customers asking for &quot;shoes for standing all day&quot; find arch-support styles even when descriptions don't contain those words. Bring your own Voyage AI or OpenAI key — typically under $1/month."
-              actionLabel={semanticEnabled ? `Manage (${semanticProvider === "voyage" ? "Voyage AI" : "OpenAI"})` : "Add provider"}
-              actionUrl="/app/api-keys"
-            />
-          </BlockStack>
-        </BlockStack>
+        <SetupChecklist
+          hasApiKey={hasApiKey}
+          widgetEnabled={widgetEnabled}
+          fileCount={fileCount}
+          categoryGroupsCount={categoryGroupsCount}
+          semanticEnabled={semanticEnabled}
+          semanticProvider={semanticProvider}
+          themeEditorUrl={themeEditorUrl}
+        />
 
         {/* Setup guide quick-link — opens the public /onboarding page in a
             new tab so merchants can revisit the plan-by-plan walkthrough
