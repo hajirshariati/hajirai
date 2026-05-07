@@ -908,7 +908,11 @@ if(fitReport&&fitReport.size&&mDiv){
 }
 if(sugg&&sugg.length>0&&mDiv){
   var sb=$('.ai-chat-msg-bubble',mDiv);
-  if(sb){var sg='<div class="ai-chat-suggestions">';for(var si=0;si<sugg.length;si++){sg+='<button class="ai-chat-suggest-btn" data-message="'+esc(sugg[si])+'"><span class="suggest-plus">+</span> '+esc(sugg[si])+'</button>'}sg+='</div>';sb.insertAdjacentHTML('beforeend',sg)}
+  // Subtle "Customers also asked" header above the follow-up
+  // suggestion chips. Frames the chips as natural next questions
+  // rather than AI prompts. Small, low-contrast, left-aligned;
+  // CSS handles responsive sizing.
+  if(sb){var sg='<div class="ai-chat-suggestions"><div class="ai-chat-suggestions-label">Customers also asked</div>';for(var si=0;si<sugg.length;si++){sg+='<button class="ai-chat-suggest-btn" data-message="'+esc(sugg[si])+'"><span class="suggest-plus">+</span> '+esc(sugg[si])+'</button>'}sg+='</div>';sb.insertAdjacentHTML('beforeend',sg)}
 }
 if(prods&&prods.length>0&&mDiv){
   var fb=$('.ai-chat-msg-bubble',mDiv);
