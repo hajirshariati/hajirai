@@ -487,6 +487,42 @@ export async function executeRecommenderTool({ toolName, input, shop, trees, con
   const enrichedFromText = [];
   if (typeof conversationText === "string" && conversationText.trim()) {
     const t = conversationText.toLowerCase();
+    // useCase ← shoe-type vocabulary. The LLM sometimes calls
+    // recommend_orthotic without useCase even when the customer's
+    // intent is clear ("no pain just support" → casual/comfort,
+    // "for running" → athletic_running, etc.). Without a useCase,
+    // the resolver tie-breaks to a wrong line (e.g. Active Posted
+    // for a comfort query). Derive useCase from unambiguous text
+    // signals when not already set. Order matters — most specific
+    // patterns first; "casual / no pain / everyday" lands on
+    // comfort which is the broad fallback.
+    if (!enrichedInput.useCase) {
+      let derivedUseCase = null;
+      if (/\b(running|run\b|jog(?:ging)?|marathon|5k|10k)\b/i.test(t)) {
+        derivedUseCase = "athletic_running";
+      } else if (/\b(gym|training|workout|cross[\s-]?train|crossfit|weights?[\s-]?lift|strength[\s-]?train)\b/i.test(t)) {
+        derivedUseCase = "athletic_training";
+      } else if (/\b(cleats?|soccer|football|baseball|lacrosse|rugby|spike[\s-]?shoes?)\b/i.test(t)) {
+        derivedUseCase = "cleats";
+      } else if (/\b(skates?|hockey|ice[\s-]?skate)\b/i.test(t)) {
+        derivedUseCase = "skates";
+      } else if (/\b(winter[\s-]?boots?|snow[\s-]?boots?|cold[\s-]?weather)\b/i.test(t)) {
+        derivedUseCase = "winter_boots";
+      } else if (/\b(work[\s-]?(?:boots?|shoes)?|standing[\s-]?all[\s-]?day|on\s+(?:my|her|his)\s+feet[\s-]?all[\s-]?day|warehouse|nursing|nurse)\b/i.test(t)) {
+        derivedUseCase = "work_all_day";
+      } else if (/\b(athletic|active|sports?|sport[\s-]?shoes?|tennis|basketball|court[\s-]?shoes?|sneakers?[\s-]+for[\s-]+(?:gym|run|sport))\b/i.test(t)) {
+        derivedUseCase = "athletic_general";
+      } else if (/\b(dress[\s-]?shoes?|heels?|pumps?|formal|wedding|gala|business[\s-]?(?:formal|attire))\b/i.test(t)) {
+        derivedUseCase = "dress";
+      } else if (/\b(no[\s-]?(?:pain|condition|issue)|just[\s-]?(?:want[\s-]?)?(?:comfort|support)|general[\s-]?(?:comfort|support)|everyday[\s-]?(?:wear|comfort|support|use)|casual|walking[\s-]?around|day[\s-]?to[\s-]?day|every[\s-]?day|just[\s-]?everyday|relief|nothing[\s-]?specific)\b/i.test(t)) {
+        derivedUseCase = "comfort";
+      }
+      if (derivedUseCase) {
+        enrichedInput.useCase = derivedUseCase;
+        enrichedFromText.push(`useCase=${derivedUseCase}(text signal)`);
+      }
+    }
+
     // metSupport ← forefoot / ball-of-foot / metatarsal vocabulary.
     if (enrichedInput.metSupport === undefined || enrichedInput.metSupport === null) {
       if (/\b(ball[\s-]?of[\s-]?(?:the[\s-]?)?foot|forefoot|fore[\s-]?foot|metatars(?:al|algia)|morton(?:'?s)?[\s-]?neuroma|met[\s-]?pad|met[\s-]?head|toe[\s-]?box[\s-]?pain|under[\s-]?the[\s-]?ball)\b/i.test(t)) {
