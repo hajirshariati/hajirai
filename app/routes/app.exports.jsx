@@ -79,6 +79,28 @@ async function buildCsv(shop, section, rangeArg) {
       ]),
     );
   }
+  // Unified conversations export — replaces the old separate
+  // 'questions' and 'feedback' exports the analytics page used to
+  // offer when those sections were rendered as two cards.
+  // Exports every recent feedback row with full transcript flattened
+  // into a single 'Conversation' column (turns separated by ' | ').
+  if (section === "conversations") {
+    const qs = await getRecentQuestions(shop, rangeArg, 500);
+    return toCsv(
+      ["Date", "Vote", "First Question", "Last Question", "Flagged AI Response", "Products", "Conversation"],
+      qs.map((q) => [
+        new Date(q.date).toISOString(),
+        q.vote || "",
+        q.question || "",
+        q.lastUserQuestion || "",
+        q.flaggedAiResponse || "",
+        (q.products || []).join(" | "),
+        (q.transcript || [])
+          .map((m) => `${m.role === "user" ? "C" : "A"}: ${String(m.content || "").replace(/\s+/g, " ")}`)
+          .join(" | "),
+      ]),
+    );
+  }
   return null;
 }
 
