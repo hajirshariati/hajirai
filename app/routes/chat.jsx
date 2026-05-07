@@ -2088,7 +2088,17 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       return title.length >= 5 && textLower.includes(title);
     });
     const aiUsesPresentationFraming = hasPluralIntroFraming(fullResponseText);
-    const aiUsesPivotPhrasing = /\bbut\s+(?:here|these|those|our|i\s+do|i'?ve\s+got|we\s+do|we'?ve\s+got)\b/i.test(fullResponseText)
+    // Pivot phrasing: "we don't have X, but [...] here/these/those/our/all
+    // of these/etc.". Allow up to ~30 chars of filler between 'but' and
+    // the presentational pronoun so phrases like 'but all of these
+    // sandals are tagged for bunions' or 'but I do have a few options'
+    // count as a pivot. Production trace: customer asked for a yellow
+    // sandal; AI replied 'We don't have an exact yellow option right
+    // now, but all of these sandals are specifically tagged for
+    // bunions...'. Without the relaxed match, saysNoMatch stayed true,
+    // the card pool was suppressed, and the customer saw the 'we don't
+    // have' apology with no products beneath.
+    const aiUsesPivotPhrasing = /\bbut\b[\s\S]{0,30}?\b(?:here|these|those|our|all\s+of\s+(?:these|those|the|them)|every\s+(?:one|single)|each\s+(?:one|of\s+these)|i\s+do(?:\s+have)?|i'?ve\s+got|we\s+do(?:\s+have)?|we'?ve\s+got)\b/i.test(fullResponseText)
       || /\b(?:closest|nearest|next\s+best|similar)\s+(?:option|options|match|matches|pick|picks|alternative|alternatives)\b/i.test(fullResponseText);
     const aiPivotsOrPresents = aiNamesAnyPoolProduct || aiUsesPresentationFraming || aiUsesPivotPhrasing;
     const effectiveSaysNoMatch = saysNoMatch && !aiPivotsOrPresents;
