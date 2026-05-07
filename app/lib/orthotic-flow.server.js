@@ -285,14 +285,88 @@ export function detectFlowState(messages, tree) {
 }
 
 /**
- * Given the current state, return the next step to take:
- *   { type: "question", node }  ← server should ask this question
- *   { type: "resolve", attrs }  ← server should run the resolver
+ * Given the current state from detectFlowState, return the next
+ * step the server should take:
+ *   { type: "question", node }    ← ask this question + emit chips
+ *   { type: "resolve",  attrs }   ← run the resolver, emit product
+ *   { type: "done",     attrs }   ← terminal node with no resolve
  *
- * NOT YET IMPLEMENTED — Batch A4.
+ * Honors the seed's skipIfKnown flag: if a question's attribute is
+ * already in answers (collected from earlier turns or pre-seeded),
+ * we transition past without asking again. Loops in case multiple
+ * consecutive skips chain (with a hard 16-step ceiling to defend
+ * against malformed trees with cyclic transitions).
+ *
+ * autoSkipIfSingle: if a node has only one chip after filtering by
+ * answers, auto-pick it. Currently a no-op for the Aetrex seed
+ * since chip lists are static, but kept for future flexibility.
  */
-export function getNextStep(_state, _tree) {
-  return { type: "stub", _stub: true };
+export function getNextStep(state, tree) {
+  if (!state || !tree) {
+    return { type: "done", attrs: {}, reason: "no-state-or-tree" };
+  }
+  const answers = (state && typeof state.answers === "object") ? { ...state.answers } : {};
+  let currentId = state.currentNodeId;
+  if (!currentId) {
+    const root = getRootNode(tree);
+    if (!root) return { type: "done", attrs: answers, reason: "no-root-node" };
+    currentId = root.id;
+  }
+
+  let guard = 0;
+  while (guard < 16) {
+    guard += 1;
+    const node = findNodeById(tree, currentId);
+    if (!node) {
+      return { type: "done", attrs: answers, reason: `node-not-found:${currentId}` };
+    }
+
+    // Resolve nodes terminate the question loop.
+    if (node.type === "resolve") {
+      return { type: "resolve", attrs: answers, nodeId: node.id };
+    }
+
+    if (node.type !== "question") {
+      // Unknown node type — terminate cleanly so the caller doesn't
+      // hang. The caller treats this like resolve.
+      return { type: "done", attrs: answers, reason: `unknown-node-type:${node.type}` };
+    }
+
+    // skipIfKnown: if the customer already gave a value for this
+    // attribute (via free-text earlier in the conversation, or
+    // pre-seeded by the caller), skip ahead without re-asking.
+    const attr = node.attribute;
+    if (node.skipIfKnown === true && attr && answers[attr] !== undefined && answers[attr] !== null && answers[attr] !== "") {
+      const nextId = nextNodeFromTransition(node, answers[attr]);
+      if (nextId && nextId !== currentId) {
+        currentId = nextId;
+        continue;
+      }
+      // No transition / self-loop → fall through to ask the question.
+    }
+
+    // autoSkipIfSingle: kept for the seed's future use. If the
+    // node lists only one chip we pick it automatically.
+    if (
+      node.autoSkipIfSingle === true &&
+      Array.isArray(node.chips) &&
+      node.chips.length === 1 &&
+      node.chips[0] &&
+      node.chips[0].value !== undefined
+    ) {
+      const onlyValue = node.chips[0].value;
+      if (attr) answers[attr] = onlyValue;
+      const nextId = nextNodeFromTransition(node, onlyValue);
+      if (nextId && nextId !== currentId) {
+        currentId = nextId;
+        continue;
+      }
+    }
+
+    // Normal question — caller asks this.
+    return { type: "question", node, answers };
+  }
+  return { type: "done", attrs: answers, reason: "transition-ceiling-reached" };
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -580,4 +654,131 @@ export async function mapAnswerToEnum(rawAnswer, node, tree, opts = {}) {
   }
 
   return { value: null, layer: "unmapped" };
+}
+
+// ──────────────────────────────────────────────────────────────
+// Layer 3 — constrained LLM helper (Batch A5).
+//
+// Caller (chat.jsx) provides the actual Anthropic call; this
+// module produces the prompt + parses the JSON response. Keeps
+// orthotic-flow.server.js free of API SDK imports / config —
+// pure logic.
+// ──────────────────────────────────────────────────────────────
+
+/**
+ * Build the Layer-3 prompt for the constrained LLM call. The LLM
+ * has ONE narrow job: given the customer's free text and the
+ * current question's chip options, pick the closest match. JSON-
+ * only response. Much smaller surface area than the full chat
+ * LLM, so much harder for the model to mess up.
+ *
+ * Returns a string suitable as the `content` of a single user
+ * message to a small/fast model (Haiku). Caller wraps with the
+ * SDK call and parses the JSON.
+ */
+export function buildConstrainedAnswerPrompt(rawAnswer, node) {
+  if (!node || node.type !== "question" || !Array.isArray(node.chips) || node.chips.length === 0) {
+    return null;
+  }
+  const safeAnswer = String(rawAnswer || "").slice(0, 240).replace(/[\r\n]+/g, " ").trim();
+  const optionsBlock = node.chips
+    .filter((c) => c && c.value !== undefined && typeof c.label === "string")
+    .map((c, i) => `  ${i + 1}. label: "${c.label}", value: "${c.value}"`)
+    .join("\n");
+  const questionText = String(node.question || node.attribute || "(question)").trim();
+  return [
+    `You are mapping a shopping-assistant customer's free-text answer to one of a fixed list of enum options. ONE job: pick the option whose meaning best matches the customer's reply.`,
+    ``,
+    `Question the customer was asked: ${questionText}`,
+    ``,
+    `Available options (use the EXACT value, not the label, in your response):`,
+    optionsBlock,
+    ``,
+    `Customer's reply: "${safeAnswer}"`,
+    ``,
+    `Rules:`,
+    `- Return ONLY a JSON object: {"value":"<one of the values above>"} or {"value":null} if the reply is too ambiguous to map confidently.`,
+    `- Do NOT invent values not in the list above.`,
+    `- Do NOT explain your reasoning. JSON only.`,
+    `- Prefer null over a wrong guess. The system will re-ask if you return null.`,
+    `- If the customer's reply is off-topic (asking about shipping, returns, etc), return {"value":null}.`,
+  ].join("\n");
+}
+
+/**
+ * Parse the constrained LLM's JSON response into a value or null.
+ * Tolerant of leading/trailing whitespace, code fences, and the
+ * occasional explanatory sentence the model might emit despite
+ * being told not to.
+ *
+ * Returns the enum value string, or null if unparseable / not a
+ * valid option for the node.
+ */
+export function parseConstrainedAnswerResponse(rawResponse, node) {
+  if (!rawResponse) return null;
+  const text = String(rawResponse);
+  const match = text.match(/\{[\s\S]*?\}/);
+  if (!match) return null;
+  let parsed;
+  try {
+    parsed = JSON.parse(match[0]);
+  } catch {
+    return null;
+  }
+  if (!parsed || typeof parsed !== "object") return null;
+  const value = parsed.value;
+  if (value === null || value === undefined || value === "") return null;
+  // Validate against node chips — model may hallucinate enum names.
+  const allowed = new Set(
+    Array.isArray(node?.chips)
+      ? node.chips.map((c) => c && c.value).filter((v) => v !== undefined && v !== null)
+      : [],
+  );
+  if (allowed.size > 0 && !allowed.has(value)) return null;
+  return value;
+}
+
+// ──────────────────────────────────────────────────────────────
+// Off-topic detector (Batch A6).
+//
+// When the customer's reply mid-flow doesn't look like an answer
+// to the current question, route it to the full LLM for that one
+// turn (e.g. customer asks "what's your return policy?" while
+// answering condition). The state machine resumes on the next
+// turn.
+// ──────────────────────────────────────────────────────────────
+
+const OFF_TOPIC_KEYWORDS_RE = /\b(?:shipping|delivery|return|returns|exchange|refund|warranty|sizing|size[\s-]?chart|store[\s-]?(?:hours|location)|wholesale|coupon|discount|promo|sale\b|order\s+status|track(?:ing)?|cancel|payment|klarna|afterpay|gift[\s-]?card|how\s+(?:much|long|do|does)|where|when|why|who\s+is)\b/i;
+
+/**
+ * Heuristic: is the customer's reply NOT an answer to the current
+ * question, but instead an off-topic ask we should hand to the
+ * full LLM?
+ *
+ * Conservative — only fires when:
+ *   1. The reply doesn't match Layer 1 (exact chip).
+ *   2. The reply doesn't match Layer 2 (keyword enrichment).
+ *   3. AND either (a) it ends with a question mark, or (b) it
+ *      contains an off-topic keyword (shipping/return/warranty/etc).
+ *
+ * Returns true → caller should bypass the state machine for this
+ * turn and let the full LLM handle the message normally. The
+ * state machine resumes on the next user turn.
+ *
+ * False positives risk: customer says "yes?" — ends with ?, but
+ * clearly affirmative. Mitigated by checking Layer 1+2 first; if
+ * "yes" matched the overpronation chip set we never reach this.
+ */
+export function isOffTopicReply(rawAnswer, node) {
+  if (!node || node.type !== "question") return false;
+  const text = String(rawAnswer || "").trim();
+  if (!text) return false;
+  // Already mappable via Layer 1 — not off-topic.
+  if (matchChipExact(text, node) !== undefined) return false;
+  // Already mappable via Layer 2 — not off-topic.
+  if (matchKeyword(text, node) !== undefined) return false;
+  // Off-topic indicators.
+  const endsWithQuestion = /\?\s*$/.test(text);
+  const containsOffTopicKeyword = OFF_TOPIC_KEYWORDS_RE.test(text);
+  return endsWithQuestion || containsOffTopicKeyword;
 }
