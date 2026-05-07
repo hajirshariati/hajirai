@@ -832,9 +832,14 @@ a.ai-chat-welcome__hint--link:hover {
   flex-direction: column;
   gap: 8px;
   margin-top: 14px;
-  /* Border moved off the container — see .ai-chat-suggestions-label,
-     which renders the divider as a horizontal rule beside the label
-     instead of stacked above it. */
+  /* Border-top intentionally NOT set here. The section divider is
+     drawn inline beside the label by .ai-chat-suggestions-label::after,
+     not stacked as a full-width hairline above the label. The
+     'border-top: none' below is defensive against older deployed
+     CSS being served from cache; once the new build lands and the
+     CDN flushes it's a no-op. */
+  border-top: none;
+  padding-top: 0;
 }
 
 /* Subtle "Customers also asked" eyebrow with the section divider
