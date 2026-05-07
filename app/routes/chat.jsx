@@ -712,6 +712,15 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // be backed by a get_product_details call this turn — without that,
   // the size statement is hallucinated. Set wins all tools by name.
   const toolsCalledThisTurn = new Set();
+  // Tracks recommender tools that have already returned a hard,
+  // self-explaining error this turn (sandal-incompatibility, kids-
+  // gender no-match, etc). The agentic loop short-circuits any
+  // subsequent identical-tool call to the same cached error, so the
+  // LLM can't burn 2-3 hops re-issuing the same losing call.
+  // Production showed three sequential recommend_orthotic calls all
+  // hitting the sandal-incompat guard in one turn — the LLM ignored
+  // the redirect instruction and tried again. Cache breaks the loop.
+  const recommenderHardErrorsThisTurn = new Map();
   const allProductPool = new Map();
   const excludedFamilies = new Set();
   const excludedHandles = new Set();
@@ -814,8 +823,46 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     );
 
     const results = await Promise.all(
-      rewrittenUses.map((u) => executeTool(u.name, u.input, ctx)),
+      rewrittenUses.map((u) => {
+        // Short-circuit repeat recommender calls that already returned
+        // a hard error this turn. Without this, the LLM loops on the
+        // sandal-incompatibility guard 2-3 times, each call adding
+        // ~1-3s and ~5k tokens before the LLM gives up and replies in
+        // text. The cached payload swaps the verbose redirect for a
+        // terse "stop calling" instruction the LLM can't misread.
+        if (u.name && u.name.startsWith("recommend_") && recommenderHardErrorsThisTurn.has(u.name)) {
+          const prior = recommenderHardErrorsThisTurn.get(u.name);
+          console.log(
+            `[recommender] short-circuit: ${u.name} already returned hard error this turn (${prior.kind}); ` +
+              `skipping resolver, returning stop-instruction`,
+          );
+          return Promise.resolve({
+            error: prior.error,
+            instruction:
+              `STOP calling ${u.name}. It already returned this exact error this turn. ` +
+              `Reply to the customer in plain TEXT now using the redirect already provided. ` +
+              `Do NOT invoke any recommend_* tool again this turn.`,
+            stopCalling: true,
+          });
+        }
+        return executeTool(u.name, u.input, ctx);
+      }),
     );
+
+    // Cache hard errors from recommender tools so any further calls
+    // in the SAME turn (next hop) get the short-circuit above.
+    for (let i = 0; i < rewrittenUses.length; i++) {
+      const u = rewrittenUses[i];
+      const r = results[i];
+      if (!u || !u.name || !u.name.startsWith("recommend_")) continue;
+      if (!r || r.stopCalling) continue;
+      if (r.sandalIncompatible || (r.error && !r.needMoreInfo)) {
+        const kind = r.sandalIncompatible
+          ? "sandal-incompat"
+          : r.missingSpecialty ? "missing-specialty" : "error";
+        recommenderHardErrorsThisTurn.set(u.name, { kind, error: r.error });
+      }
+    }
 
     // Mutate the messages-array view so the AI sees its own corrected
     // tool calls (and uses them when narrating in the next hop).

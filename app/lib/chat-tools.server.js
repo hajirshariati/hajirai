@@ -2233,7 +2233,12 @@ export async function executeTool(name, input, ctx) {
         input: input || {},
         shop: ctx?.shop,
         trees: ctx?.recommenderTrees || [],
+        // Full history for the sandal-incompatibility guard (overall
+        // context). Latest message only for clinical-keyword enrichment
+        // (avoids stale forefoot signals from earlier turns leaking
+        // into a later query — see prod Bug 5).
         conversationText: ctx?.conversationText || ctx?.userText || "",
+        latestUserText: ctx?.latestUserMessage || "",
       });
       console.log(
         `[recommender] tool=${name} masterSku=${result?.masterSku || "(none)"}` +

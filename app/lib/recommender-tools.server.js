@@ -327,7 +327,7 @@ async function filterMasterIndexByShop(shop, masterIndex) {
 // into a tool_result block. The product card travels back via the
 // dedicated card-extraction path the chat layer already has, so we
 // also surface `product` directly for that side channel.
-export async function executeRecommenderTool({ toolName, input, shop, trees, conversationText }) {
+export async function executeRecommenderTool({ toolName, input, shop, trees, conversationText, latestUserText }) {
   if (!toolName || !toolName.startsWith("recommend_")) {
     return { error: "not a recommender tool" };
   }
@@ -485,8 +485,21 @@ export async function executeRecommenderTool({ toolName, input, shop, trees, con
   // term has a clear 1:1 mapping to a resolver attribute.
   const enrichedInput = { ...derivedInput };
   const enrichedFromText = [];
-  if (typeof conversationText === "string" && conversationText.trim()) {
-    const t = conversationText.toLowerCase();
+  // Scope enrichment to the LATEST user message when the caller
+  // supplies it. Production showed stale clinical signals from
+  // earlier turns leaking into a later, unrelated query — e.g. a
+  // turn 1 "ball-of-foot pain" forced metSupport=true on a turn 5
+  // plantar-fasciitis-dress query, resolving to Fashion-for-Heels
+  // instead of the correct PF specialty SKU. The full conversation
+  // text is still used for the sandal-incompatibility guard above
+  // (intentional — that guard is about overall context). Falls
+  // back to conversationText if the caller didn't pass latestUserText
+  // so existing call sites don't regress.
+  const enrichmentText = (typeof latestUserText === "string" && latestUserText.trim())
+    ? latestUserText
+    : (typeof conversationText === "string" ? conversationText : "");
+  if (enrichmentText && enrichmentText.trim()) {
+    const t = enrichmentText.toLowerCase();
     // useCase ← shoe-type vocabulary. The LLM sometimes calls
     // recommend_orthotic without useCase even when the customer's
     // intent is clear ("no pain just support" → casual/comfort,
