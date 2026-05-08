@@ -36,7 +36,7 @@ import {
   detectComparisonIntent,
   detectAiPivotPhrasing,
   validateFollowUpSuggestion,
-} from "../lib/chat-postprocessing.server";
+} from "../lib/chat-postprocessing";
 import prisma from "../db.server";
 import { recordChatUsage, getTodayMessageCount } from "../models/ChatUsage.server";
 import { canSendMessage } from "../lib/billing.server";
@@ -1955,7 +1955,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // "which is best" pinned singular for every subsequent turn,
     // including unrelated plural follow-ups like "show me sneakers
     // under $100". Latest message wins.
-    // Singular intent — extracted to chat-postprocessing.server.js
+    // Singular intent — extracted to chat-postprocessing.js
     // and unit-tested in eval-chat-postprocessing.mjs. The detector
     // also handles the comparison-overrides-singular rule.
     const latestMsgForIntent = String(ctx.latestUserMessage || "");
@@ -1967,7 +1967,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // — even if the phrasing also matches singular ("the cheapest and
     // most comfortable"). Comparison wins.
     // Comparison override is now handled inside detectSingularIntent
-    // (see chat-postprocessing.server.js). Logging the suppress for
+    // (see chat-postprocessing.js). Logging the suppress for
     // backwards compat with operational logs.
     if (detectComparisonIntent(latestMsgForIntent)) {
       console.log(`[chat] singular-suppress: comparison phrasing in latest message — keeping plural pool`);

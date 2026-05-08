@@ -1,7 +1,7 @@
 // Unit eval for chat post-processing heuristics.
 //
 // Tests the pure functions extracted from chat.jsx into
-// chat-postprocessing.server.js, plus selected exports from
+// chat-postprocessing.js, plus selected exports from
 // chat-helpers.server.js. Catches the chat.jsx-side bugs that don't
 // live in the gate or classifier — singular-narrow misfires,
 // follow-up suggestion validation, pivot-phrasing detection, etc.
@@ -23,7 +23,7 @@ import {
   detectComparisonIntent,
   detectAiPivotPhrasing,
   validateFollowUpSuggestion,
-} from "../app/lib/chat-postprocessing.server.js";
+} from "../app/lib/chat-postprocessing.js";
 import {
   isSingularPrescriptive,
   hasPluralIntroFraming,
