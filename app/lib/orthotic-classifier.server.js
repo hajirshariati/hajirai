@@ -43,16 +43,26 @@ const CLASSIFIER_TOOL = {
       isOrthoticRequest: {
         type: "boolean",
         description:
-          "true if the customer is asking for or open to an orthotic / insole / arch-support / footbed recommendation. " +
-          "Includes clinical signals like plantar fasciitis, heel spurs, flat feet, high arch, foot pain, etc. " +
-          "false if the customer is shopping for footwear (shoes, sandals, sneakers, boots) or anything non-orthotic.",
+          "true ONLY if the customer is asking for an orthotic / insole / arch-support / footbed / insert as the PRODUCT they want. " +
+          "Examples that ARE orthotic requests: 'I need orthotics', 'recommend an insole for plantar fasciitis', " +
+          "'arch support for my flat feet', 'my son has high arch what orthotic should he wear'. " +
+          "CRITICAL: a clinical condition alone (plantar fasciitis, heel spurs, etc.) does NOT make this an orthotic request. " +
+          "Look at the PRODUCT NOUN the customer named. If they said 'shoe' / 'sandal' / 'sneaker' / 'boot' / 'footwear' " +
+          "as the thing they want — even WITH a condition — that's a FOOTWEAR request, not orthotic. " +
+          "Examples that are NOT orthotic requests: 'show me shoes for plantar fasciitis', " +
+          "'sandals with arch support', 'sneakers for flat feet', 'boots for heel pain'. " +
+          "When in doubt, look at the noun the customer used: orthotic-noun → orthotic request; " +
+          "footwear-noun → NOT an orthotic request.",
       },
       isFootwearRequest: {
         type: "boolean",
         description:
-          "true if the customer is committed to buying FOOTWEAR (shoes, sandals, sneakers, boots, loafers, etc.) " +
-          "and NOT asking about an orthotic. Use this to keep the orthotic flow OUT of the way of shoe shoppers. " +
-          "Note: 'shoes for my orthotic' is NOT a footwear request — that's an orthotic-context question.",
+          "true if the customer is asking for FOOTWEAR (shoes, sandals, sneakers, boots, loafers, clogs, etc.) " +
+          "as the product they want — INCLUDING when paired with a clinical condition. " +
+          "Examples: 'show me shoes for plantar fasciitis', 'sandals with arch support', " +
+          "'find men's shoes', 'boots for flat feet', 'sneakers for heel pain'. " +
+          "Note: 'shoes for my orthotic' (asking which shoes work WITH orthotics) is NOT a footwear request " +
+          "— that's an orthotic-context question. Look at what the customer is shopping for as the primary product.",
       },
       isRejection: {
         type: "boolean",
