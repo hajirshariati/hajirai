@@ -58,16 +58,24 @@ const CLASSIFIER_TOOL = {
           "even paired with a condition. 'show me shoes for plantar fasciitis' → false. " +
           "'sandals with arch support' → false. 'boots for flat feet' → false. " +
           "(b) Customer is asking about something else entirely (returns, shipping, sizing, hello). " +
-          "(c) CRITICAL — OFF-TOPIC SIDE QUESTION MID-FLOW: judge ONLY the customer's LATEST " +
-          "message, not accumulated conversation history. If the latest message is an off-topic " +
-          "side question — shipping ('do you ship internationally', 'how long does shipping take'), " +
-          "policy ('what's your return policy', 'refund policy'), brand ('what brand are these', " +
-          "'who makes these'), pricing ('how much', 'discount'), location ('where are you based'), " +
-          "or any other non-orthotic-shopping topic — return isOrthoticRequest=false EVEN IF earlier " +
-          "turns established orthotic intent. The orthotic flow may still be active downstream; " +
-          "the gate handles re-engagement. Your job is to classify THIS message, not the whole " +
-          "session. Examples mid-flow: 'do you ship to Canada' → false. 'what brand is this' → " +
-          "false. 'is this on sale' → false. 'can I return it' → false.",
+          "(c) OFF-TOPIC SIDE QUESTION (narrow rule): if the latest message is a QUESTION on a " +
+          "non-shopping topic — shipping ('do you ship internationally'), policy ('what's your " +
+          "return policy'), brand ('what brand are these', 'who makes these'), pricing-only " +
+          "('how much', 'discount'), location ('where are you based') — return " +
+          "isOrthoticRequest=false EVEN IF earlier turns established orthotic intent. The " +
+          "downstream gate handles re-engagement. Examples mid-flow: 'do you ship to Canada' → " +
+          "false. 'what brand is this' → false. 'can I return it' → false. " +
+          "IMPORTANT EXCEPTIONS to rule (c) — these still inherit orthotic context from history: " +
+          "(c1) SHORT ATTRIBUTE ANSWERS like 'men's', 'women's', 'kids', 'casual', 'running', " +
+          "'flat feet', 'medium arch', or chip clicks like 'Men' / 'Women' — these are answers " +
+          "to a prior chip question and KEEP isOrthoticRequest=true if the flow was active. " +
+          "(c2) AFFIRMATIONS like 'yes', 'ok', 'sure', 'go ahead', 'next', 'continue' — these are " +
+          "keep-alive responses, not topic changes. KEEP isOrthoticRequest=true if flow was active. " +
+          "(c3) COMPOUND statements that include both rejection AND a NEW shopping intent like " +
+          "'I don't want orthotics, just shoes' or 'no insoles, just sneakers' — set " +
+          "isFootwearRequest=true (the 'just X' clause is a positive footwear request), " +
+          "isRejection=true (the 'no orthotics' clause), isOrthoticRequest=false. The rejection " +
+          "and the new request are BOTH signals.",
       },
       isFootwearRequest: {
         type: "boolean",
