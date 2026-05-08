@@ -87,6 +87,41 @@ function kidsAvailableUseCases(tree) {
   return out;
 }
 
+// For the condition question: only show condition chips whose value
+// has at least one SKU matching the customer's already-answered
+// gender (and useCase if filled). Production bug — Kids customer
+// got "Heel spurs", "Plantar fasciitis" etc. as options even though
+// the merchant has no Kids+heel_spurs SKU; clicking those landed
+// at "we don't have it" instead of just hiding the option upfront.
+//
+// "none" is always allowed — it represents "general support, no
+// specific condition", which the resolver maps to the base SKU for
+// whatever gender+useCase the customer chose. The catch-all option
+// must never disappear.
+function availableConditionsForAnswers(tree, answers) {
+  const masterIndex = tree?.definition?.resolver?.masterIndex;
+  if (!Array.isArray(masterIndex) || !answers) return null;
+  const out = new Set(["none"]);
+  for (const m of masterIndex) {
+    if (answers.gender) {
+      const askedGender = answers.gender;
+      const cand = m?.gender;
+      const kidsAsked = isKidsGenderValue(askedGender);
+      const kidsCand = isKidsGenderValue(cand);
+      if (kidsAsked) {
+        if (!kidsCand) continue;
+      } else if (cand !== askedGender && cand !== "Unisex") {
+        continue;
+      }
+    }
+    if (answers.useCase && m?.useCase && m.useCase !== answers.useCase) continue;
+    if (typeof m?.condition === "string" && m.condition) {
+      out.add(m.condition);
+    }
+  }
+  return out;
+}
+
 function renderQuestionText(node, answers, tree) {
   if (!node || node.type !== "question") return "";
   const q = String(node.question || "").trim();
@@ -116,6 +151,18 @@ function renderQuestionText(node, answers, tree) {
     isKidsGenderValue(answers.gender)
   ) {
     const allowed = kidsAvailableUseCases(tree);
+    if (allowed && allowed.size > 0) {
+      chips = chips.filter((c) => allowed.has(c.value));
+    }
+  }
+
+  // Condition-chip filtering. Hide condition chips that have no
+  // resolvable SKU given the customer's already-answered gender +
+  // useCase. "none" is always kept as a catch-all. Without this,
+  // a Kids customer would see "Heel spurs" / "Plantar fasciitis"
+  // chips and click them, only to dead-end at "no SKU available".
+  if (node.attribute === "condition" && answers) {
+    const allowed = availableConditionsForAnswers(tree, answers);
     if (allowed && allowed.size > 0) {
       chips = chips.filter((c) => allowed.has(c.value));
     }
