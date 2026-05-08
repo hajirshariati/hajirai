@@ -1949,7 +1949,16 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // "which is best" pinned singular for every subsequent turn,
     // including unrelated plural follow-ups like "show me sneakers
     // under $100". Latest message wins.
-    const SINGULAR_INTENT_RE = /\btell me (?:more |a (?:bit|little) more )?about\b|\bmore (?:info|information|details) (?:on|about)\b|\b(?:what|how) about\b|\bhow is\b|\bis the\b|\bdoes (?:the|this|that)\b|\b(?:this|that) one\b|\bthe (?:first|second|third|last|cheapest|cheaper|priciest|most expensive|best|top|finest|red|blue|black|white|same)\s+(?:one\b|[a-z'-]+s?\b)|\bwhich\s+[a-z'-]+\s+(?:is|are)\s+(?:best|most|finest|top|the\s+(?:best|most))\b|\bwhat\s*'?s\s+(?:the\s+)?(?:best|cheapest|priciest|most expensive|finest|top|most\s+[a-z'-]+)\b/i;
+    // Singular intent — customer asking about ONE specific item.
+    // Production bug: previous regex matched "how about" / "what about"
+    // bare, which caught category pivots like "how about for women?"
+    // (the customer was asking about a DIFFERENT category's options,
+    // not narrowing to one item). The narrowing rule then collapsed
+    // a 6-card pool down to 1 sandal. Fix: only count "how about" /
+    // "what about" as singular intent when followed by a clear
+    // singular reference ("this one", "the [adjective] one"). Bare
+    // "how about [category]" is a pivot, not singular.
+    const SINGULAR_INTENT_RE = /\btell me (?:more |a (?:bit|little) more )?about\b|\bmore (?:info|information|details) (?:on|about)\b|\b(?:what|how) about\s+(?:this|that|the\s+\w+\s+one\b)|\bhow is\b|\bis the\b|\bdoes (?:the|this|that)\b|\b(?:this|that) one\b|\bthe (?:first|second|third|last|cheapest|cheaper|priciest|most expensive|best|top|finest|red|blue|black|white|same)\s+(?:one\b|[a-z'-]+s?\b)|\bwhich\s+[a-z'-]+\s+(?:is|are)\s+(?:best|most|finest|top|the\s+(?:best|most))\b|\bwhat\s*'?s\s+(?:the\s+)?(?:best|cheapest|priciest|most expensive|finest|top|most\s+[a-z'-]+)\b/i;
     const latestMsgForIntent = String(ctx.latestUserMessage || "");
     let singularIntent = SINGULAR_INTENT_RE.test(latestMsgForIntent);
 
