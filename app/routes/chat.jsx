@@ -36,6 +36,19 @@ import {
   detectComparisonIntent,
   detectAiPivotPhrasing,
   validateFollowUpSuggestion,
+  detectRejectedCategories,
+  stripRejectedCategoryChips,
+  stripToolCallSyntax,
+  detectStockClaim,
+  stripStockClaim,
+  isYesNoQuestion,
+  isYesNoAnswer,
+  detectUserSignupIntent,
+  detectAiSignupMention,
+  scrubRoleMarkers,
+  detectBroadNeed,
+  detectAiNoMatchPhrasing,
+  looksLikeClarifyingQuestion,
 } from "../lib/chat-postprocessing";
 import prisma from "../db.server";
 import { recordChatUsage, getTodayMessageCount } from "../models/ChatUsage.server";
@@ -675,33 +688,6 @@ function detectFalseGenderCategoryAffirmation(text, categoryGenderMap) {
   return null;
 }
 
-// Outbound strip for raw tool-call syntax that the model occasionally
-// emits in its visible text alongside the proper structured tool_use
-// block. Customers should NEVER see XML-ish or JSON-ish control
-// tokens. Patterns observed: <function_calls>, search_products {…},
-// recommend_orthotic {…}, <invoke name="…">, etc.
-function stripToolCallSyntax(text) {
-  if (!text) return text;
-  let out = String(text);
-  // Strip XML-ish control blocks the model uses internally.
-  out = out.replace(/<\/?(?:function_calls|invoke|antml:[a-z_]+|parameter)[^>]*>/gi, "");
-  // Strip "tool_name {...JSON...}" leading fragments. The AI sometimes
-  // narrates its own tool call as plain text. Match tool name + JSON
-  // body up to the closing brace; non-greedy across newlines.
-  out = out.replace(
-    /\b(?:search_products|get_product_details|lookup_sku|find_similar_products|recommend_[a-z_]+|get_customer_orders|get_product_reviews|get_return_insights|get_fit_recommendation)\s*\{[\s\S]*?\}\s*/gi,
-    "",
-  );
-  // Strip bare tool-name leaders followed by prose (e.g. "search_products The Casual…").
-  out = out.replace(
-    /^\s*(?:search_products|get_product_details|lookup_sku|find_similar_products|recommend_[a-z_]+)\s+(?=[A-Z])/i,
-    "",
-  );
-  // Collapse the whitespace gap left behind.
-  out = out.replace(/\s{2,}/g, " ").replace(/\s+([.,!?])/g, "$1").trim();
-  return out;
-}
-
 async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, controller, encoder, promptCaching, tools }) {
   const totalUsage = { input_tokens: 0, output_tokens: 0, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 };
   let toolCallCount = 0;
@@ -1165,8 +1151,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       if (!norm || norm.length < 3) return false;
       try { return new RegExp(`\\b${norm}s?\\b`, "i").test(userT); } catch { return false; }
     });
-    const BROAD_NEED_RE = /\b(trip|vacation|cruise|wedding|gift|present|going to|on my feet|all day|need shoes|need something|recommend|suggestion|what should|some advice|help me find|surprise me|something for)\b/i;
-    const broadNeed = BROAD_NEED_RE.test(userT);
+    const broadNeed = detectBroadNeed(userT);
     if (!namesCategory && broadNeed) {
       const catCounts = new Map();
       for (const p of allProductPool.values()) {
@@ -1311,15 +1296,6 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // recommender flow. Detect by: ends with a question mark, OR the
   // text contains a question phrasing followed by a question mark
   // anywhere. Those responses must pass through unedited.
-  const looksLikeClarifyingQuestion = (txt) => {
-    if (!txt) return false;
-    const trimmed = String(txt).trim();
-    if (!trimmed) return false;
-    if (trimmed.endsWith("?")) return true;
-    // Check the last sentence for a question.
-    const lastChunk = trimmed.split(/[.!]\s+/).pop() || "";
-    return /\?\s*$/.test(lastChunk.trim());
-  };
   if (
     pool.length === 0 &&
     looksLikeProductPitch(fullResponseText) &&
@@ -1414,44 +1390,13 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // said "doesn't like shoes" — both ARE shoes, contradicting
     // the customer's stated constraint.
     {
-      const latestUser = String(ctx.latestUserMessage || "");
-      const REJECT_RE = /\b(?:no|not|don'?t|doesn'?t|didn'?t|don't[\s-]?(?:like|want)|doesn't[\s-]?(?:like|want)|hate|hates|dislike|dislikes|avoid|avoids|without|besides|other[\s-]?than|except|instead[\s-]?of|rather[\s-]?than|not[\s-]?into|not[\s-]?a[\s-]?fan)\b[^.!?\n]{0,50}\b((?:shoes?|footwear|orthotics?|insoles?|footbeds?|sandals?|sneakers?|boots?|clogs?|loafers?|slippers?|oxfords?|wedges?|heels?|flats?|mules?|mary[\s-]?janes?|slip[\s-]?ons?))\b/gi;
-      const rejectedTerms = new Set();
-      let m;
-      while ((m = REJECT_RE.exec(latestUser)) !== null) {
-        const term = m[1].toLowerCase().replace(/\s+/g, " ").trim();
-        rejectedTerms.add(term);
-        // Footwear umbrella: "shoes" / "footwear" rejects ALL the
-        // shoe categories — sandals, sneakers, boots, clogs,
-        // loafers, slippers, oxfords, wedges, heels, mary janes,
-        // slip ons. The chip-filter expects exact category labels,
-        // so expand the umbrella to its members.
-        if (term === "shoes" || term === "shoe" || term === "footwear") {
-          ["sandals", "sneakers", "boots", "clogs", "loafers", "slippers", "oxfords", "wedges heels", "wedges", "heels", "flats", "mules", "mary janes", "slip ons", "footwear"].forEach((c) => rejectedTerms.add(c));
-        }
-      }
+      const rejectedTerms = detectRejectedCategories(ctx.latestUserMessage);
       if (rejectedTerms.size > 0) {
-        const before = fullResponseText;
-        const stripped = [];
-        // Match each <<Label>> chip; if its (case-insensitive,
-        // whitespace-normalized) label matches a rejected term —
-        // either exactly or as plural/singular — strip it.
-        fullResponseText = fullResponseText.replace(/<<\s*([^<>]+?)\s*>>/g, (full, label) => {
-          const norm = String(label).toLowerCase().trim().replace(/\s+/g, " ");
-          const stem = norm.endsWith("s") ? norm.slice(0, -1) : norm;
-          for (const t of rejectedTerms) {
-            const tStem = t.endsWith("s") ? t.slice(0, -1) : t;
-            if (norm === t || stem === tStem || stem === t || norm === tStem) {
-              stripped.push(label);
-              return "";
-            }
-          }
-          return full;
-        });
-        if (stripped.length > 0) {
-          fullResponseText = fullResponseText.replace(/[ \t]{2,}/g, " ").trim();
+        const r = stripRejectedCategoryChips(fullResponseText, rejectedTerms);
+        fullResponseText = r.text;
+        if (r.stripped.length > 0) {
           console.log(
-            `[chat] ${ctx.shop} stripped customer-rejected chips: [${stripped.join(", ")}] ` +
+            `[chat] ${ctx.shop} stripped customer-rejected chips: [${r.stripped.join(", ")}] ` +
               `(rejected terms in latest message: [${[...rejectedTerms].join(", ")}])`,
           );
         }
@@ -1591,23 +1536,15 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // wasn't called this turn, strip the affirmation and substitute
   // an honest deferral. Legitimate post-tool stock claims pass
   // through because the tool name is in toolsCalledThisTurn.
-  const STOCK_CLAIM_AFFIRMATION_RE =
-    /\b(?:currently |right now |presently )?(?:available|in stock|we have (?:(?:it|them|these|those|that|this|some))?)\s+(?:in\s+)?(?:size\s+)?(?:\d+(?:\.\d+)?(?:[\s-](?:wide|narrow|x-?wide|w|n|m|d|ee|eee))?|wide|narrow|x-?wide)\b/i;
   if (
     fullResponseText &&
     !toolsCalledThisTurn.has("get_product_details") &&
-    STOCK_CLAIM_AFFIRMATION_RE.test(fullResponseText)
+    detectStockClaim(fullResponseText)
   ) {
     console.log(
       `[chat] ${ctx.shop} stock-claim without get_product_details — stripping affirmation`,
     );
-    fullResponseText = fullResponseText
-      .replace(STOCK_CLAIM_AFFIRMATION_RE, "")
-      .replace(/\s{2,}/g, " ")
-      .replace(/\s+([.,!?])/g, "$1")
-      .trim();
-    if (fullResponseText && !/[.!?]$/.test(fullResponseText)) fullResponseText += ".";
-    fullResponseText = (fullResponseText + " I can't check live stock from here — the product page or our support team can confirm the size.").trim();
+    fullResponseText = stripStockClaim(fullResponseText);
   }
 
   // Outbound role-marker scrub. Belt-and-suspenders alongside
@@ -1615,28 +1552,14 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // "Human:" / "Assistant:" tokens in its reply (rare but observed
   // when sanitizeHistory missed a leak in a long-running session),
   // remove them before emit. Customers should NEVER see those tokens.
-  if (fullResponseText && /\b(?:Human|Assistant)\s*:/i.test(fullResponseText)) {
-    const before = fullResponseText;
-    const candidate = fullResponseText
-      .replace(/^\s*(?:Human|Assistant)\s*:\s*/i, "")
-      .replace(/\n\s*(?:Human|Assistant)\s*:\s*/gi, "\n")
-      .replace(/\s*(?:Human|Assistant)\s*:\s*/gi, " ")
-      .replace(/[ \t]{2,}/g, " ")
-      .trim();
-    // Defensive: if stripping role markers leaves a near-empty
-    // string (the entire response was a role-marker fragment with
-    // no real content after it), keep the original so the empty-
-    // pool repair downstream gets something to react to. Without
-    // this, we trade "Human: Assistant, wait..." for "" — a
-    // worse customer experience.
-    if (candidate.length >= 5) {
-      fullResponseText = candidate;
-      if (fullResponseText !== before) {
-        console.log(`[chat] ${ctx.shop} stripped role-marker tokens from outbound text`);
-      }
-    } else {
+  if (fullResponseText) {
+    const r = scrubRoleMarkers(fullResponseText);
+    if (r.changed) {
+      fullResponseText = r.text;
+      console.log(`[chat] ${ctx.shop} stripped role-marker tokens from outbound text`);
+    } else if (r.candidate !== fullResponseText && r.candidate.length < 5) {
       console.log(
-        `[chat] ${ctx.shop} role-marker strip would leave ${candidate.length} chars — ` +
+        `[chat] ${ctx.shop} role-marker strip would leave ${r.candidate.length} chars — ` +
           `keeping original for empty-pool repair to handle`,
       );
     }
@@ -1678,12 +1601,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // with "Yes —"; the customer's message wouldn't match a yes/no
   // shape. Pool stays untouched.
   if (pool.length > 0 && fullResponseText) {
-    const userMsg = String(ctx.latestUserMessage || "").trim();
-    const YESNO_QUESTION_RE = /^\s*(?:do(?:es)?|did|will|would|can|could|is|are|was|were|has|have|had|should|may|might)\b[^?!.\n]{0,140}\?/i;
-    const YESNO_ANSWER_RE = /^\s*(?:yes|yeah|yep|yup|absolutely|definitely|correct|right|exactly|sure|of course|no\b|nope|not really|unfortunately,?\s+no|sadly,?\s+no)/i;
-    const isYesNoQuestion = userMsg.length > 0 && userMsg.length < 200 && YESNO_QUESTION_RE.test(userMsg);
-    const isYesNoAnswer = YESNO_ANSWER_RE.test(fullResponseText);
-    if (isYesNoQuestion && isYesNoAnswer) {
+    if (isYesNoQuestion(ctx.latestUserMessage) && isYesNoAnswer(fullResponseText)) {
       console.log(
         `[chat] ${ctx.shop} yes/no-suppress: customer asked yes/no, AI answered yes/no — ` +
           `suppressing card pool of ${pool.length} (would have been noise under the text answer)`,
@@ -1742,9 +1660,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     })));
   }
 
-  const userAskedSignup = /\b(sign ?up for (our|the|your|a).{0,25}(newsletter|list|email|sms|updates|deals|offers)|subscribe to (our|the|your).{0,20}(newsletter|list|email|sms|updates)|newsletter|mailing list|join our (list|newsletter|email|sms)|opt.?in|stay (connected|in touch|updated).{0,20}(email|offers|updates|news|deals))\b/i.test(ctx.userText || "");
-  const aiMentionsSignup = /\b(newsletter|mailing list|subscribe to (our|the|your).{0,20}(newsletter|list|sms|email)|sign ?up for (our|the|my|your).{0,25}(newsletter|list|email|sms|updates|deals|offers)|join our (newsletter|list|email|sms)|stay connected.{0,20}(email|offers|updates|deals))\b/i.test(fullResponseText || "");
-  if (userAskedSignup || aiMentionsSignup) {
+  if (detectUserSignupIntent(ctx.userText) || detectAiSignupMention(fullResponseText)) {
     controller.enqueue(encoder.encode(sseChunk({ type: "klaviyo_form" })));
   }
 
@@ -1789,7 +1705,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
 
   if (pool.length > 0 && fullResponseText && !suppressCardsForChips) {
     const textLower = fullResponseText.toLowerCase();
-    const saysNoMatch = /\b(don't (?:have|see|carry)|not (?:see|carry|have)|don't appear|we don't|no .{0,20} available)\b/i.test(fullResponseText);
+    const saysNoMatch = detectAiNoMatchPhrasing(fullResponseText);
 
     // When find_similar_products ran, drop every card whose handle or style
     // family matches the reference — otherwise Jillian from an earlier

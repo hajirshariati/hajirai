@@ -149,3 +149,235 @@ export function validateFollowUpSuggestion(suggestion, replyText) {
 
   return { allowed: true, reason: null };
 }
+
+// =====================================================================
+// Customer-rejected category detection + chip stripping
+// =====================================================================
+// When the customer says "I don't like shoes" / "no sandals", the AI
+// sometimes still offers chips for those exact categories. This pair
+// of functions detects rejected categories from the customer's latest
+// message and removes matching <<Label>> chips from the AI reply.
+
+const REJECT_RE = /\b(?:no|not|don'?t|doesn'?t|didn'?t|don't[\s-]?(?:like|want)|doesn't[\s-]?(?:like|want)|hate|hates|dislike|dislikes|avoid|avoids|without|besides|other[\s-]?than|except|instead[\s-]?of|rather[\s-]?than|not[\s-]?into|not[\s-]?a[\s-]?fan)\b[^.!?\n]{0,50}\b((?:shoes?|footwear|orthotics?|insoles?|footbeds?|sandals?|sneakers?|boots?|clogs?|loafers?|slippers?|oxfords?|wedges?|heels?|flats?|mules?|mary[\s-]?janes?|slip[\s-]?ons?))\b/gi;
+
+// Footwear umbrella — "shoes" / "footwear" rejects all member
+// categories. Chip filter expects exact category labels, so we
+// expand the umbrella term into its members.
+const FOOTWEAR_UMBRELLA_MEMBERS = [
+  "sandals", "sneakers", "boots", "clogs", "loafers", "slippers",
+  "oxfords", "wedges heels", "wedges", "heels", "flats", "mules",
+  "mary janes", "slip ons", "footwear",
+];
+
+export function detectRejectedCategories(text) {
+  const out = new Set();
+  if (typeof text !== "string" || !text) return out;
+  REJECT_RE.lastIndex = 0;
+  let m;
+  while ((m = REJECT_RE.exec(text)) !== null) {
+    const term = m[1].toLowerCase().replace(/\s+/g, " ").trim();
+    out.add(term);
+    if (term === "shoes" || term === "shoe" || term === "footwear") {
+      FOOTWEAR_UMBRELLA_MEMBERS.forEach((c) => out.add(c));
+    }
+  }
+  return out;
+}
+
+/**
+ * Remove <<Label>> chips whose normalized label matches any rejected
+ * term (exact match or singular/plural stem match).
+ *
+ * @param {string} text       full assistant reply
+ * @param {Set<string>} rejected  rejected category terms
+ * @returns {{ text: string, stripped: string[] }}
+ */
+export function stripRejectedCategoryChips(text, rejected) {
+  if (!text || !rejected || rejected.size === 0) {
+    return { text: text || "", stripped: [] };
+  }
+  const stripped = [];
+  let out = String(text).replace(/<<\s*([^<>]+?)\s*>>/g, (full, label) => {
+    const norm = String(label).toLowerCase().trim().replace(/\s+/g, " ");
+    const stem = norm.endsWith("s") ? norm.slice(0, -1) : norm;
+    for (const t of rejected) {
+      const tStem = t.endsWith("s") ? t.slice(0, -1) : t;
+      if (norm === t || stem === tStem || stem === t || norm === tStem) {
+        stripped.push(label);
+        return "";
+      }
+    }
+    return full;
+  });
+  if (stripped.length > 0) {
+    out = out.replace(/[ \t]{2,}/g, " ").trim();
+  }
+  return { text: out, stripped };
+}
+
+// =====================================================================
+// Tool-call syntax stripping
+// =====================================================================
+// Belt-and-suspenders against the model leaking control tokens in its
+// reply. Customers should never see XML-ish or JSON-ish control
+// fragments. Patterns observed: <function_calls>, search_products {…},
+// recommend_orthotic {…}, <invoke name="…">, etc.
+
+export function stripToolCallSyntax(text) {
+  if (!text) return text;
+  let out = String(text);
+  out = out.replace(/<\/?(?:function_calls|invoke|antml:[a-z_]+|parameter)[^>]*>/gi, "");
+  out = out.replace(
+    /\b(?:search_products|get_product_details|lookup_sku|find_similar_products|recommend_[a-z_]+|get_customer_orders|get_product_reviews|get_return_insights|get_fit_recommendation)\s*\{[\s\S]*?\}\s*/gi,
+    "",
+  );
+  out = out.replace(
+    /^\s*(?:search_products|get_product_details|lookup_sku|find_similar_products|recommend_[a-z_]+)\s+(?=[A-Z])/i,
+    "",
+  );
+  out = out.replace(/\s{2,}/g, " ").replace(/\s+([.,!?])/g, "$1").trim();
+  return out;
+}
+
+// =====================================================================
+// Hallucinated stock-claim detection
+// =====================================================================
+// The model sometimes generates "currently available in size 9 wide"
+// without the get_product_details tool ever firing. This is a pattern
+// from training data — never a real signal. Detect and strip.
+
+export const STOCK_CLAIM_RE =
+  /\b(?:currently |right now |presently )?(?:available|in stock|we have (?:(?:it|them|these|those|that|this|some))?)\s+(?:in\s+)?(?:size\s+)?(?:\d+(?:\.\d+)?(?:[\s-](?:wide|narrow|x-?wide|w|n|m|d|ee|eee))?|wide|narrow|x-?wide)\b/i;
+
+export function detectStockClaim(text) {
+  if (typeof text !== "string" || !text) return false;
+  return STOCK_CLAIM_RE.test(text);
+}
+
+/**
+ * Strip a hallucinated stock-claim phrase and append an honest
+ * deferral. Caller decides whether get_product_details was invoked
+ * this turn — only call this when it WASN'T.
+ */
+export function stripStockClaim(text) {
+  if (!text) return "";
+  let out = String(text)
+    .replace(STOCK_CLAIM_RE, "")
+    .replace(/\s{2,}/g, " ")
+    .replace(/\s+([.,!?])/g, "$1")
+    .trim();
+  if (out && !/[.!?]$/.test(out)) out += ".";
+  return (out + " I can't check live stock from here — the product page or our support team can confirm the size.").trim();
+}
+
+// =====================================================================
+// Yes/No Q&A pattern detection
+// =====================================================================
+// When the customer asks a yes/no question and the AI opens with
+// yes/no, the customer wants a direct answer — not a fresh card grid.
+// Use these to suppress the card pool in that case.
+
+const YESNO_QUESTION_RE = /^\s*(?:do(?:es)?|did|will|would|can|could|is|are|was|were|has|have|had|should|may|might)\b[^?!.\n]{0,140}\?/i;
+const YESNO_ANSWER_RE = /^\s*(?:yes|yeah|yep|yup|absolutely|definitely|correct|right|exactly|sure|of course|no\b|nope|not really|unfortunately,?\s+no|sadly,?\s+no)/i;
+
+export function isYesNoQuestion(text) {
+  if (typeof text !== "string") return false;
+  const trimmed = text.trim();
+  return trimmed.length > 0 && trimmed.length < 200 && YESNO_QUESTION_RE.test(trimmed);
+}
+
+export function isYesNoAnswer(text) {
+  if (typeof text !== "string" || !text) return false;
+  return YESNO_ANSWER_RE.test(text);
+}
+
+// =====================================================================
+// Signup / newsletter intent detection
+// =====================================================================
+// When either side mentions newsletter / signup / mailing list, we
+// emit a Klaviyo form CTA. Detection is intentionally broad — better
+// to over-trigger and let the customer dismiss than miss the moment.
+
+const USER_SIGNUP_RE = /\b(sign ?up for (our|the|your|a).{0,25}(newsletter|list|email|sms|updates|deals|offers)|subscribe to (our|the|your).{0,20}(newsletter|list|email|sms|updates)|newsletter|mailing list|join our (list|newsletter|email|sms)|opt.?in|stay (connected|in touch|updated).{0,20}(email|offers|updates|news|deals))\b/i;
+const AI_SIGNUP_RE = /\b(newsletter|mailing list|subscribe to (our|the|your).{0,20}(newsletter|list|sms|email)|sign ?up for (our|the|my|your).{0,25}(newsletter|list|email|sms|updates|deals|offers)|join our (newsletter|list|email|sms)|stay connected.{0,20}(email|offers|updates|deals))\b/i;
+
+export function detectUserSignupIntent(text) {
+  if (typeof text !== "string" || !text) return false;
+  return USER_SIGNUP_RE.test(text);
+}
+
+export function detectAiSignupMention(text) {
+  if (typeof text !== "string" || !text) return false;
+  return AI_SIGNUP_RE.test(text);
+}
+
+// =====================================================================
+// Role-marker scrub
+// =====================================================================
+// If the model literally generates "Human:" / "Assistant:" tokens in
+// its reply (rare but observed in long sessions when sanitizeHistory
+// missed an inbound leak), scrub them. Returns the cleaned text plus
+// a flag so the caller can choose to keep the original if cleaning
+// would leave a near-empty string.
+
+export function scrubRoleMarkers(text) {
+  if (!text || typeof text !== "string") {
+    return { text: text || "", changed: false, candidate: text || "" };
+  }
+  if (!/\b(?:Human|Assistant)\s*:/i.test(text)) {
+    return { text, changed: false, candidate: text };
+  }
+  const candidate = text
+    .replace(/^\s*(?:Human|Assistant)\s*:\s*/i, "")
+    .replace(/\n\s*(?:Human|Assistant)\s*:\s*/gi, "\n")
+    .replace(/\s*(?:Human|Assistant)\s*:\s*/gi, " ")
+    .replace(/[ \t]{2,}/g, " ")
+    .trim();
+  // Defensive: caller should keep original if candidate is too short.
+  // If the entire reply was a role-marker fragment with nothing else,
+  // stripping leaves "" — empty-pool repair downstream needs SOMETHING
+  // to react to.
+  if (candidate.length < 5) {
+    return { text, changed: false, candidate };
+  }
+  return { text: candidate, changed: candidate !== text, candidate };
+}
+
+// =====================================================================
+// Smaller heuristics
+// =====================================================================
+
+// Open-ended customer query — "trip", "wedding", "what should I get"
+// etc. Used to trigger auto-broaden when product search returned ≤ 2
+// hits, so the customer sees a wider sample instead of a near-empty
+// grid.
+const BROAD_NEED_RE = /\b(trip|vacation|cruise|wedding|gift|present|going to|on my feet|all day|need shoes|need something|recommend|suggestion|what should|some advice|help me find|surprise me|something for)\b/i;
+
+export function detectBroadNeed(text) {
+  if (typeof text !== "string" || !text) return false;
+  return BROAD_NEED_RE.test(text);
+}
+
+// AI denial phrasing — "we don't have X / we don't carry / no X
+// available". Used (with detectAiPivotPhrasing as override) to decide
+// whether to hide the card pool when the AI says no but cards are
+// still attached.
+const AI_NO_MATCH_RE = /\b(don't (?:have|see|carry)|not (?:see|carry|have)|don't appear|we don't|no .{0,20} available)\b/i;
+
+export function detectAiNoMatchPhrasing(text) {
+  if (typeof text !== "string" || !text) return false;
+  return AI_NO_MATCH_RE.test(text);
+}
+
+// Clarifying-question detection — the AI's reply ends with a
+// question mark, OR the last sentence is a question. Used to protect
+// recommender elicitation turns from product-pitch repair (no pool +
+// pitch text would otherwise trigger a fallback).
+export function looksLikeClarifyingQuestion(text) {
+  if (!text || typeof text !== "string") return false;
+  const trimmed = text.trim();
+  if (!trimmed) return false;
+  if (trimmed.endsWith("?")) return true;
+  const lastChunk = trimmed.split(/[.!]\s+/).pop() || "";
+  return /\?\s*$/.test(lastChunk.trim());
+}
