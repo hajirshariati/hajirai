@@ -70,8 +70,18 @@ const CLASSIFIER_TOOL = {
           "'what shoes work with my orthotic', 'I have an orthotic, what shoes fit it', " +
           "'orthotic-friendly sneakers'. The customer already HAS an orthotic and is " +
           "shopping for shoes that accommodate it — that's a footwear request. " +
-          "Set false only when the customer is shopping for the orthotic itself, OR for non-shopping queries " +
-          "(returns, shipping, hello, FAQ).",
+          "CRITICAL — CONTEXT-AWARE EXCEPTION: If prior turns established the customer is " +
+          "shopping for an ORTHOTIC (isOrthoticRequest was true earlier in the conversation, " +
+          "or the assistant just asked something like 'what kind of shoes will the orthotic " +
+          "go in?'), and the customer's current message is a SHORT shoe-type phrase like " +
+          "'casual shoes', 'dress shoes', 'athletic shoes', 'sneakers', 'sandals', 'boots', " +
+          "'work shoes', etc., that is the customer ANSWERING the use-case question for the " +
+          "orthotic — NOT a pivot to footwear shopping. In that case set isOrthoticRequest=true " +
+          "and isFootwearRequest=false, and extract the useCase from the phrase. The orthotic " +
+          "context dominates the literal noun. " +
+          "Set false (this field) only when the customer is shopping for the orthotic itself, " +
+          "OR for non-shopping queries (returns, shipping, hello, FAQ), OR for the " +
+          "context-aware case above where 'X shoes' is a use-case answer mid-orthotic-flow.",
       },
       isRejection: {
         type: "boolean",

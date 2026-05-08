@@ -222,12 +222,12 @@ const SCENARIOS = [
       },
       {
         user: "ok thanks. I have plantar fasciitis",
-        assistant: "Got it.",
+        assistant: "Got it. Are these orthotics for a man, a woman, or a kid?",
         expect: { isOrthoticRequest: true, attributes: { condition: "plantar_fasciitis" } },
       },
       {
         user: "Women",
-        assistant: "Got it.",
+        assistant: "Great. What kind of shoes will the orthotic go in?",
         expect: { isOrthoticRequest: true, attributes: { gender: "Women", condition: "plantar_fasciitis" } },
       },
       {
