@@ -31,6 +31,12 @@ import { fetchYotpoLoyalty } from "../lib/yotpo-loyalty.server";
 import { buildRecommenderTools } from "../lib/recommender-tools.server";
 import { maybeRunOrthoticFlow } from "../lib/orthotic-flow-gate.server";
 import { classifyOrthoticTurn } from "../lib/orthotic-classifier.server";
+import {
+  detectSingularIntent,
+  detectComparisonIntent,
+  detectAiPivotPhrasing,
+  validateFollowUpSuggestion,
+} from "../lib/chat-postprocessing.server";
 import prisma from "../db.server";
 import { recordChatUsage, getTodayMessageCount } from "../models/ChatUsage.server";
 import { canSendMessage } from "../lib/billing.server";
@@ -1949,28 +1955,22 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // "which is best" pinned singular for every subsequent turn,
     // including unrelated plural follow-ups like "show me sneakers
     // under $100". Latest message wins.
-    // Singular intent — customer asking about ONE specific item.
-    // Production bug: previous regex matched "how about" / "what about"
-    // bare, which caught category pivots like "how about for women?"
-    // (the customer was asking about a DIFFERENT category's options,
-    // not narrowing to one item). The narrowing rule then collapsed
-    // a 6-card pool down to 1 sandal. Fix: only count "how about" /
-    // "what about" as singular intent when followed by a clear
-    // singular reference ("this one", "the [adjective] one"). Bare
-    // "how about [category]" is a pivot, not singular.
-    const SINGULAR_INTENT_RE = /\btell me (?:more |a (?:bit|little) more )?about\b|\bmore (?:info|information|details) (?:on|about)\b|\b(?:what|how) about\s+(?:this|that|the\s+\w+\s+one\b)|\bhow is\b|\bis the\b|\bdoes (?:the|this|that)\b|\b(?:this|that) one\b|\bthe (?:first|second|third|last|cheapest|cheaper|priciest|most expensive|best|top|finest|red|blue|black|white|same)\s+(?:one\b|[a-z'-]+s?\b)|\bwhich\s+[a-z'-]+\s+(?:is|are)\s+(?:best|most|finest|top|the\s+(?:best|most))\b|\bwhat\s*'?s\s+(?:the\s+)?(?:best|cheapest|priciest|most expensive|finest|top|most\s+[a-z'-]+)\b/i;
+    // Singular intent — extracted to chat-postprocessing.server.js
+    // and unit-tested in eval-chat-postprocessing.mjs. The detector
+    // also handles the comparison-overrides-singular rule.
     const latestMsgForIntent = String(ctx.latestUserMessage || "");
-    let singularIntent = SINGULAR_INTENT_RE.test(latestMsgForIntent);
+    let singularIntent = detectSingularIntent(latestMsgForIntent);
 
     // Comparison override: when the customer is asking to compare two
     // options ("which is better, X or Y", "compare A vs B", "what's the
     // difference between …"), they want to SEE both items side-by-side
     // — even if the phrasing also matches singular ("the cheapest and
     // most comfortable"). Comparison wins.
-    const COMPARISON_INTENT_RE = /\b(?:compare|comparison|vs\.?|versus|difference between|better between|between [a-z0-9'-]+ (?:and|or) [a-z0-9'-]+|which (?:is|one is) (?:better|worse)|side[- ]by[- ]side)\b/i;
-    if (singularIntent && COMPARISON_INTENT_RE.test(latestMsgForIntent)) {
+    // Comparison override is now handled inside detectSingularIntent
+    // (see chat-postprocessing.server.js). Logging the suppress for
+    // backwards compat with operational logs.
+    if (detectComparisonIntent(latestMsgForIntent)) {
       console.log(`[chat] singular-suppress: comparison phrasing in latest message — keeping plural pool`);
-      singularIntent = false;
     }
 
     // Plural-catalog-noun override: if the latest message names a
@@ -2117,8 +2117,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // bunions...'. Without the relaxed match, saysNoMatch stayed true,
     // the card pool was suppressed, and the customer saw the 'we don't
     // have' apology with no products beneath.
-    const aiUsesPivotPhrasing = /\bbut\b[\s\S]{0,30}?\b(?:here|these|those|our|all\s+of\s+(?:these|those|the|them)|every\s+(?:one|single)|each\s+(?:one|of\s+these)|i\s+do(?:\s+have)?|i'?ve\s+got|we\s+do(?:\s+have)?|we'?ve\s+got)\b/i.test(fullResponseText)
-      || /\b(?:closest|nearest|next\s+best|similar)\s+(?:option|options|match|matches|pick|picks|alternative|alternatives)\b/i.test(fullResponseText);
+    const aiUsesPivotPhrasing = detectAiPivotPhrasing(fullResponseText);
     const aiPivotsOrPresents = aiNamesAnyPoolProduct || aiUsesPresentationFraming || aiUsesPivotPhrasing;
     const effectiveSaysNoMatch = saysNoMatch && !aiPivotsOrPresents;
     if (saysNoMatch && aiPivotsOrPresents) {
