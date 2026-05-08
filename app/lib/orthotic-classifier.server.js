@@ -170,6 +170,11 @@ const CLASSIFIER_TOOL = {
               "'arch pain' alone → 'arch_pain'. " +
               "Generic 'foot pain' with no specific location → 'foot_pain'. " +
               "Customer explicitly said 'no pain' / 'just comfort' / 'no specific issue' → 'none'. " +
+              "NON-FOOT pain (knee pain, back pain, hip pain, ankle pain, leg pain, shin splints) → " +
+              "'none'. The merchant only carries foot orthotics — non-foot conditions don't map to " +
+              "any specialty SKU, but a general-support orthotic may still help with biomechanics. " +
+              "Use 'none' so the resolver picks the merchant's general-comfort line, and the bot " +
+              "can clarify in text that we don't make condition-specific orthotics for non-foot pain. " +
               "null if not stated.",
           },
         },

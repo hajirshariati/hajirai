@@ -630,6 +630,17 @@ export async function maybeRunOrthoticFlow({
   const step = resolveSkippableSteps(state, tree.definition);
 
   if (step.type === "question") {
+    // Note: there used to be a "stuck-loop" detector here that fired
+    // when the same question was asked twice in a row. It was too
+    // aggressive — false-positives on legitimate corrections, fragment
+    // answers, and "ok / next / go on" keep-alives. Removed.
+    //
+    // The production trace that motivated it ('knee pain' loop) is
+    // now handled at the classifier level: the classifier prompt
+    // explicitly maps non-foot pain (knee/back/hip) to
+    // condition='none' so the resolver picks a general orthotic
+    // and the flow advances.
+
     const text = renderQuestionText(step.node, answers, tree);
     if (!text) return { handled: false };
     controller.enqueue(encoder.encode(sseChunk({ type: "text", text })));

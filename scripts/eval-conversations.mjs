@@ -1237,6 +1237,20 @@ const SCENARIOS = [
   },
 
   {
+    name: "Non-foot condition: 'knee pain' → classifier maps to condition='none' (per prompt rules)",
+    turns: [
+      { user: "I need orthotics", classifier: C({}), expect: { questionMatches: /Who are these orthotics for/i } },
+      { user: "Kids", classifier: C({ attributes: { gender: "Kids" } }), expect: { questionMatches: /condition|pain/i } },
+      // The classifier prompt rule for non-foot pain (knee/back/hip)
+      // maps to condition='none'. This test pins that contract: when
+      // condition arrives as 'none', the gate accepts it and advances.
+      // (The actual mapping is verified by eval-classifier-live.mjs;
+      // here we stub it to test the gate's behavior on 'none'.)
+      { user: "he has knee pain", classifier: C({ attributes: { gender: "Kids", condition: "none" } }), expect: { gateHandled: true } },
+    ],
+  },
+
+  {
     name: "Long-8: customer asks '/help' or system command-like inputs",
     turns: [
       { user: "/help", classifier: { isOrthoticRequest: false, isFootwearRequest: false, isRejection: false, attributes: {}, confidence: "low" }, expect: { gateHandled: false }, synthesizedAssistant: "I can help you find shoes or orthotics." },
