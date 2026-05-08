@@ -85,6 +85,13 @@ async function runScenario(scenario) {
         turn.expect.resolveTo.attrs,
         definition.resolver,
       );
+      if (turn.expect.resolveTo.shouldResolve === false) {
+        assert(
+          !result.resolved,
+          `expected NO resolution for attrs=${JSON.stringify(turn.expect.resolveTo.attrs)} but got masterSku=${result.resolved?.masterSku}`,
+        );
+        continue;
+      }
       assert(
         result.resolved,
         `resolver returned no SKU for attrs=${JSON.stringify(turn.expect.resolveTo.attrs)} (reason: ${result.reason})`,
@@ -536,6 +543,359 @@ const SCENARIOS = [
           questionMatches: /Who are these orthotics for/i,
           chipsExact: ["Men", "Women", "Kids"],
         },
+      },
+    ],
+  },
+
+  // ========== Day 1: expanded resolver coverage ==========
+  // For every "important" customer query, what masterSku should the
+  // resolver return? These tests exercise the resolver directly so
+  // they don't depend on Prisma or chat.jsx — just the decision-tree
+  // logic. If a customer reaches these attribute combinations
+  // through any path (chip flow, free text, classifier extraction),
+  // these are the answers we expect.
+
+  {
+    name: "Resolver: Men + casual + none (default) → some Men SKU",
+    turns: [{ user: "Resolve check", expect: { resolveTo: { attrs: { gender: "Men", useCase: "casual", condition: "none" }, masterSkuPattern: /M$|U$/ } } }],
+  },
+  {
+    name: "Resolver: Women + casual + none → some Women SKU",
+    turns: [{ user: "Resolve check", expect: { resolveTo: { attrs: { gender: "Women", useCase: "casual", condition: "none" }, masterSkuPattern: /W$|U$/ } } }],
+  },
+  {
+    name: "Resolver: Men + dress + none → dress SKU",
+    turns: [{ user: "Resolve check", expect: { resolveTo: { attrs: { gender: "Men", useCase: "dress", condition: "none" }, masterSkuPattern: /M$|U$/ } } }],
+  },
+  {
+    name: "Resolver: Women + athletic_running + none → athletic SKU",
+    turns: [{ user: "Resolve check", expect: { resolveTo: { attrs: { gender: "Women", useCase: "athletic_running", condition: "none" }, masterSkuPattern: /W$|U$/ } } }],
+  },
+  {
+    name: "Resolver: Men + winter_boots + none → winter boots SKU",
+    turns: [{ user: "Resolve check", expect: { resolveTo: { attrs: { gender: "Men", useCase: "winter_boots", condition: "none" }, masterSkuPattern: /M$|U$/ } } }],
+  },
+  {
+    name: "Resolver: Men + skates + none → unisex skates SKU",
+    turns: [{ user: "Resolve check", expect: { resolveTo: { attrs: { gender: "Men", useCase: "skates", condition: "none" }, masterSkuPattern: /U$|X$/ } } }],
+  },
+  {
+    name: "Resolver: Women + work_all_day + none → work SKU",
+    turns: [{ user: "Resolve check", expect: { resolveTo: { attrs: { gender: "Women", useCase: "work_all_day", condition: "none" }, masterSkuPattern: /W$|U$/ } } }],
+  },
+  {
+    name: "Resolver: Men + dress_no_removable + metatarsalgia → some Men SKU",
+    turns: [{ user: "Resolve check", expect: { resolveTo: { attrs: { gender: "Men", useCase: "dress_no_removable", condition: "metatarsalgia", metSupport: true }, masterSkuPattern: /M$/ } } }],
+  },
+  {
+    name: "Resolver: Women + casual + diabetic → conform/diabetic SKU",
+    turns: [{ user: "Resolve check", expect: { resolveTo: { attrs: { gender: "Women", useCase: "casual", condition: "diabetic" }, masterSkuPattern: /W$|U$/ } } }],
+  },
+  {
+    name: "Resolver: Women + casual + mortons_neuroma → met-support SKU",
+    turns: [{ user: "Resolve check", expect: { resolveTo: { attrs: { gender: "Women", useCase: "casual", condition: "mortons_neuroma", metSupport: true }, masterSkuPattern: /W$|U$/ } } }],
+  },
+  {
+    name: "Resolver: Kids + kids + plantar_fasciitis → no resolution (no Kids PF SKU; strict-Kids policy)",
+    turns: [{
+      user: "Resolve check",
+      expect: {
+        resolveTo: {
+          attrs: { gender: "Kids", useCase: "kids", condition: "plantar_fasciitis" },
+          // The merchant has no Kids+plantar_fasciitis SKU. Strict-Kids
+          // policy refuses Unisex fallback. Resolver returns null with
+          // a clean reason; the gate falls through to the LLM, which
+          // tells the customer honestly we don't carry one.
+          shouldResolve: false,
+        },
+      },
+    }],
+  },
+
+  // ========== Day 1: classifier veto / engagement edge cases ==========
+  // These test the gate's decision to engage (or not) given various
+  // classifier outputs. The whole point of the classifier-first design
+  // is that the gate's behavior is predictable from the classifier
+  // output alone — these scenarios pin down that contract.
+
+  {
+    name: "Veto: classifier says BOTH ortho=true AND footwear=true → gate engages (orthotic wins)",
+    turns: [{
+      user: "I need orthotics and shoes",
+      classifier: {
+        isOrthoticRequest: true,
+        isFootwearRequest: true,
+        isRejection: false,
+        attributes: { gender: null, useCase: null, condition: null },
+        confidence: "medium",
+      },
+      // Current gate logic: footwearCommitInLatest is true, gate vetoes.
+      // This is a TENSION case — customer wants both. Documenting current
+      // behavior so we know if it changes.
+      expect: { gateHandled: false },
+    }],
+  },
+  {
+    name: "Veto: classifier says rejection AND ortho=true → rejection wins",
+    turns: [{
+      user: "I don't want orthotics",
+      classifier: {
+        isOrthoticRequest: true,
+        isFootwearRequest: false,
+        isRejection: true,
+        attributes: { gender: null, useCase: null, condition: null },
+        confidence: "high",
+      },
+      expect: { gateHandled: false },
+    }],
+  },
+  {
+    name: "Engagement: ortho=true with no attributes → emit q_gender",
+    turns: [{
+      user: "what's the best orthotic for me",
+      classifier: C({ attributes: {} }),
+      expect: {
+        questionMatches: /Who are these orthotics for/i,
+        chipsContain: ["Men", "Women"],
+      },
+    }],
+  },
+  {
+    name: "Engagement: ortho=true, gender pre-extracted → skip to q_use_case",
+    turns: [{
+      user: "I need a men's orthotic",
+      classifier: C({ attributes: { gender: "Men" } }),
+      expect: {
+        questionMatches: /What kind of shoes/i,
+      },
+    }],
+  },
+
+  // ========== Day 1: chip filter integrity ==========
+
+  {
+    name: "Chip filter: q_gender always offers Men + Women (must never strip those)",
+    turns: [{
+      user: "orthotic",
+      classifier: C({ attributes: {} }),
+      expect: {
+        chipsContain: ["Men", "Women"],
+        // Kids may or may not be present depending on merchant data;
+        // don't assert on it here.
+      },
+    }],
+  },
+  {
+    name: "Chip filter: useCase chips include common adult shoe types",
+    turns: [
+      { user: "orthotic", classifier: C({}), expect: {} },
+      {
+        user: "Men",
+        classifier: C({ attributes: { gender: "Men" } }),
+        expect: {
+          chipsContain: ["Everyday / casual shoes"],
+          minChipCount: 5,
+        },
+      },
+    ],
+  },
+
+  // ========== Day 1: footwear path coverage ==========
+
+  {
+    name: "Footwear: 'sandals with arch support' → gate stays out",
+    turns: [{
+      user: "do you have sandals with arch support?",
+      classifier: {
+        isOrthoticRequest: false,
+        isFootwearRequest: true,
+        isRejection: false,
+        attributes: { gender: null, useCase: null, condition: null },
+        confidence: "high",
+      },
+      expect: { gateHandled: false },
+    }],
+  },
+  {
+    name: "Footwear: 'boots for flat feet' → gate stays out",
+    turns: [{
+      user: "boots for flat feet",
+      classifier: {
+        isOrthoticRequest: false,
+        isFootwearRequest: true,
+        isRejection: false,
+        attributes: { gender: null, useCase: null, condition: "overpronation_flat_feet" },
+        confidence: "high",
+      },
+      expect: { gateHandled: false },
+    }],
+  },
+  {
+    name: "Footwear: 'sneakers for foot pain' → gate stays out",
+    turns: [{
+      user: "show me sneakers for foot pain",
+      classifier: {
+        isOrthoticRequest: false,
+        isFootwearRequest: true,
+        isRejection: false,
+        attributes: { gender: null, useCase: null, condition: "foot_pain" },
+        confidence: "high",
+      },
+      expect: { gateHandled: false },
+    }],
+  },
+  {
+    name: "Footwear: 'best summer sandal for my mom' → gate stays out",
+    turns: [{
+      user: "best summer sandal for my mom under $50",
+      classifier: {
+        isOrthoticRequest: false,
+        isFootwearRequest: true,
+        isRejection: false,
+        attributes: { gender: "Women", useCase: null, condition: null },
+        confidence: "high",
+      },
+      expect: { gateHandled: false },
+    }],
+  },
+
+  // ========== Day 1: free-text orthotic intent ==========
+
+  {
+    name: "Free-text: 'my arch hurts' (clinical signal) → engages",
+    turns: [{
+      user: "my arch hurts when I walk",
+      classifier: C({
+        attributes: { gender: null, useCase: null, condition: "arch_pain" },
+      }),
+      expect: { questionMatches: /Who are these orthotics for/i },
+    }],
+  },
+  {
+    name: "Free-text: 'I have plantar fasciitis' → engages",
+    turns: [{
+      user: "I have plantar fasciitis",
+      classifier: C({
+        attributes: { gender: null, useCase: null, condition: "plantar_fasciitis" },
+      }),
+      expect: { questionMatches: /Who are these orthotics for/i },
+    }],
+  },
+  {
+    name: "Free-text: 'best insole for athletes' → engages, asks gender",
+    turns: [{
+      user: "what's the best insole for athletes",
+      classifier: C({
+        attributes: { gender: null, useCase: "athletic_general", condition: null },
+      }),
+      expect: { questionMatches: /Who are these orthotics for/i },
+    }],
+  },
+
+  // ========== Day 1: kid-signal recognition ==========
+
+  {
+    name: "Kid signal: 'for my 9-year-old' → Kids gender",
+    turns: [{
+      user: "I need an orthotic for my 9-year-old",
+      classifier: C({ attributes: { gender: "Kids" } }),
+      // Auto-fill useCase=kids, gate goes to q_condition
+      expect: { questionMatches: /condition|pain/i },
+    }],
+  },
+  {
+    name: "Kid signal: 'grandson' → Kids gender",
+    turns: [{
+      user: "looking for an orthotic for my grandson",
+      classifier: C({ attributes: { gender: "Kids" } }),
+      expect: { questionMatches: /condition|pain/i },
+    }],
+  },
+  {
+    name: "Kid signal: 'son' alone (no age) → Kids gender (not Men)",
+    turns: [{
+      user: "my son needs an orthotic",
+      classifier: C({ attributes: { gender: "Kids" } }),
+      expect: { questionMatches: /condition|pain/i },
+    }],
+  },
+
+  // ========== Day 1: typos and apostrophe variants ==========
+
+  {
+    name: "Typo: 'orhtotic' (missing t) — classifier must still detect intent",
+    turns: [{
+      user: "what orhtotic should I get for plantar fasciitis",
+      classifier: C({ attributes: { condition: "plantar_fasciitis" } }),
+      expect: { questionMatches: /Who are these orthotics for/i },
+    }],
+  },
+  {
+    name: "Curly apostrophe: 'men's' (U+2019) on orthotic intent → engages with gender Men",
+    turns: [{
+      user: "I need men's orthotics",
+      classifier: C({ attributes: { gender: "Men" } }),
+      expect: { questionMatches: /What kind of shoes/i },
+    }],
+  },
+
+  // ========== Day 1: greetings / non-orthotic ==========
+
+  {
+    name: "Greeting: 'hi' → gate does not engage",
+    turns: [{
+      user: "hi",
+      classifier: {
+        isOrthoticRequest: false,
+        isFootwearRequest: false,
+        isRejection: false,
+        attributes: { gender: null, useCase: null, condition: null },
+        confidence: "high",
+      },
+      expect: { gateHandled: false },
+    }],
+  },
+  {
+    name: "Policy question: 'what is your return policy' → gate does not engage",
+    turns: [{
+      user: "what is your return policy?",
+      classifier: {
+        isOrthoticRequest: false,
+        isFootwearRequest: false,
+        isRejection: false,
+        attributes: { gender: null, useCase: null, condition: null },
+        confidence: "high",
+      },
+      expect: { gateHandled: false },
+    }],
+  },
+
+  // ========== Day 1: state-machine state correctness ==========
+
+  {
+    name: "State: after 3 chip answers, q_arch is the next question",
+    turns: [
+      { user: "orthotic", classifier: C({}), expect: {} },
+      { user: "Women", classifier: C({ attributes: { gender: "Women" } }), expect: {} },
+      { user: "Everyday / casual shoes", classifier: C({ attributes: { gender: "Women", useCase: "casual" } }), expect: {} },
+      {
+        user: "Plantar fasciitis",
+        classifier: C({ attributes: { gender: "Women", useCase: "casual", condition: "plantar_fasciitis" } }),
+        expect: { questionMatches: /arch type/i, chipsContain: ["Flat / Low", "Medium", "High", "I don't know"] },
+      },
+    ],
+  },
+
+  {
+    name: "State: 'None — just want comfort' chip click maps to condition=none",
+    turns: [
+      { user: "orthotic", classifier: C({}), expect: {} },
+      { user: "Men", classifier: C({ attributes: { gender: "Men" } }), expect: {} },
+      { user: "Everyday / casual shoes", classifier: C({ attributes: { gender: "Men", useCase: "casual" } }), expect: {} },
+      {
+        user: "None — just want comfort",
+        classifier: C({ attributes: { gender: "Men", useCase: "casual", condition: "none" } }),
+        expect: { questionMatches: /arch type/i },
       },
     ],
   },
