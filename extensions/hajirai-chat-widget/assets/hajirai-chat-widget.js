@@ -144,7 +144,7 @@ return fetch('/cart/add.js',{method:'POST',headers:{'Content-Type':'application/
 }
 
 var avatarImg=AVATAR?'<img src="'+AVATAR+'" alt="'+esc(NAME)+'">':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
-var assistantBubbleAvatar=AVATAR?'<img src="'+AVATAR+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+var assistantBubbleAvatar=AVATAR?'<img src="'+AVATAR+'" alt="" role="presentation" aria-hidden="true" style="width:100%;height:100%;object-fit:cover;border-radius:50%">':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" role="presentation" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
 
 /* Build launcher */
 var launcher=el('div','ai-chat-launcher ai-chat-launcher--'+POS);
@@ -159,6 +159,9 @@ panel.style.width=panelW+'px';
 panel.style.maxWidth='calc(100vw - 16px)';
 panel.setAttribute('role','dialog');
 panel.setAttribute('aria-label','AI Shopping Assistant');
+// Inherit page language so screen readers announce content correctly.
+// Falls back to <html lang> or 'en' if neither is set.
+panel.setAttribute('lang',(document.documentElement.getAttribute('lang')||navigator.language||'en').split('-')[0]);
 
 var headerAv=AVATAR?'<div class="ai-chat-header__avatar"><img src="'+AVATAR+'" alt="'+esc(NAME)+'"></div>':'<div class="ai-chat-header__avatar ai-chat-header__avatar--placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>';
 
@@ -331,7 +334,7 @@ function buildWelcome(){
 var h='<div class="ai-chat-welcome">';
 if(SHOWBAN){
   h+='<div class="ai-chat-welcome__banner">';
-  if(BANNER)h+='<img src="'+BANNER+'" alt="">';
+  if(BANNER)h+='<img src="'+BANNER+'" alt="Welcome banner">';
   h+='</div>';
 }
 h+='<div class="ai-chat-welcome__avatar">'+avatarImg+'</div>';
@@ -602,7 +605,7 @@ var ariaParts=[t];if(pr)ariaParts.push(pr);var ariaLabel=esc(ariaParts.join(' â€
 // CTA is rendered for both layouts but CSS-hidden on horizontal so
 // the markup is identical and we don't need to special-case anywhere
 // else (event handlers, fit-predictor injection, etc).
-var imgHtml=img?'<div class="ai-chat-product-img"><img src="'+esc(img)+'" alt="" loading="lazy"></div>':'';
+var imgHtml=img?'<div class="ai-chat-product-img"><img src="'+esc(img)+'" alt="'+t+'" loading="lazy"></div>':'';
 var infoHtml='<div class="ai-chat-product-info"><span class="ai-chat-product-title">'+t+'</span><div class="ai-chat-product-price">'+pr+(cp?'<span class="compare-at">'+cp+'</span>':'')+'</div><span class="ai-chat-product-cta" aria-hidden="true">View product</span></div>';
 return '<a class="ai-chat-product-card" data-handle="'+esc(p.handle||'')+'" href="'+esc(u)+'" aria-label="'+ariaLabel+'" style="text-decoration:none;color:inherit">'+imgHtml+infoHtml+'</a>';
 }
@@ -677,10 +680,10 @@ var d=appendMsg('assistant',label||'Stay Connected');
 var b=$('.ai-chat-msg-bubble',d);
 if(!b)return;
 var formHtml='<div class="ai-chat-klaviyo-form" style="margin-top:12px;padding:16px;background:#f8f8f8;border-radius:10px">'
-+'<input type="email" class="ai-kl-email" placeholder="Email address" style="display:block;width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit;margin-bottom:8px;box-sizing:border-box" />'
-+'<input type="tel" class="ai-kl-phone" placeholder="Phone number (optional)" style="display:block;width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit;margin-bottom:10px;box-sizing:border-box" />'
-+'<button class="ai-kl-submit" style="display:block;width:100%;padding:12px;background:var(--ai-chat-primary,#2d6b4f);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">Subscribe</button>'
-+'<div class="ai-kl-status" style="font-size:12px;margin-top:8px;text-align:center;display:none"></div>'
++'<input type="email" class="ai-kl-email" placeholder="Email address" aria-label="Email address" autocomplete="email" required style="display:block;width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit;margin-bottom:8px;box-sizing:border-box" />'
++'<input type="tel" class="ai-kl-phone" placeholder="Phone number (optional)" aria-label="Phone number, optional" autocomplete="tel" style="display:block;width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit;margin-bottom:10px;box-sizing:border-box" />'
++'<button class="ai-kl-submit" type="submit" style="display:block;width:100%;padding:12px;background:var(--ai-chat-primary,#2d6b4f);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">Subscribe</button>'
++'<div class="ai-kl-status" role="status" aria-live="polite" style="font-size:12px;margin-top:8px;text-align:center;display:none"></div>'
 +'</div>';
 b.insertAdjacentHTML('beforeend',formHtml);
 var form=$('.ai-chat-klaviyo-form',b);

@@ -634,10 +634,13 @@ a.ai-chat-welcome__hint--link:hover {
 }
 
 .ai-chat-welcome__qp-btn {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px; /* WCAG 2.5.5 AAA touch target */
   padding: 6px 14px;
   border: 1px solid var(--ai-chat-border);
-  border-radius: 16px;
+  border-radius: 22px;
   background: #fff;
   color: var(--ai-chat-text);
   font-size: 12.5px;
@@ -721,8 +724,12 @@ a.ai-chat-welcome__hint--link:hover {
   white-space: nowrap;
   scroll-snap-align: start;
   scroll-margin-inline: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px; /* WCAG 2.5.5 AAA touch target */
   padding: 8px 16px;
-  border-radius: 20px;
+  border-radius: 22px;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -745,8 +752,11 @@ a.ai-chat-welcome__hint--link:hover {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 28px;
-  height: 28px;
+  width: 44px; /* WCAG 2.5.5 AAA touch target */
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 0;
   border: none;
   border-radius: 50%;
@@ -879,7 +889,8 @@ a.ai-chat-welcome__hint--link:hover {
 
 .ai-chat-suggest-btn {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
+  min-height: 44px; /* WCAG 2.5.5 AAA touch target */
   gap: 8px;
   padding: 10px 14px;
   border-radius: 10px;
@@ -923,9 +934,11 @@ a.ai-chat-welcome__hint--link:hover {
 .ai-chat-fb-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  min-height: 44px; /* WCAG 2.5.5 AAA touch target */
   gap: 5px;
   padding: 6px 14px;
-  border-radius: 20px;
+  border-radius: 22px;
   border: 1.5px solid #ddd;
   background: #fff;
   cursor: pointer;
