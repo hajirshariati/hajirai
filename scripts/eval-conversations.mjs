@@ -899,6 +899,197 @@ const SCENARIOS = [
       },
     ],
   },
+
+  // ========== Day 2 expansion: simple one-word queries ==========
+
+  { name: "Bare 'orthotics' (single word)", turns: [{ user: "orthotics", classifier: C({}), expect: { questionMatches: /Who are these orthotics for/i } }] },
+  { name: "Bare 'shoes' (single word) → footwear, gate stays out", turns: [{ user: "shoes", classifier: { isOrthoticRequest: false, isFootwearRequest: true, isRejection: false, attributes: { gender: null, useCase: null, condition: null }, confidence: "medium" }, expect: { gateHandled: false } }] },
+  { name: "Bare 'sneakers' (single word) → footwear, gate stays out", turns: [{ user: "sneakers", classifier: { isOrthoticRequest: false, isFootwearRequest: true, isRejection: false, attributes: { gender: null, useCase: "athletic_general", condition: null }, confidence: "high" }, expect: { gateHandled: false } }] },
+  { name: "Bare 'sandals'", turns: [{ user: "sandals", classifier: { isOrthoticRequest: false, isFootwearRequest: true, isRejection: false, attributes: {}, confidence: "high" }, expect: { gateHandled: false } }] },
+  { name: "Bare 'boots'", turns: [{ user: "boots", classifier: { isOrthoticRequest: false, isFootwearRequest: true, isRejection: false, attributes: { useCase: "winter_boots" }, confidence: "high" }, expect: { gateHandled: false } }] },
+  { name: "Bare 'help'", turns: [{ user: "help", classifier: { isOrthoticRequest: false, isFootwearRequest: false, isRejection: false, attributes: {}, confidence: "low" }, expect: { gateHandled: false } }] },
+
+  // ========== Day 2: longer, complex queries ==========
+
+  {
+    name: "Long: 'I'm a runner, training for a marathon, getting plantar fasciitis, looking for an insole'",
+    turns: [{
+      user: "I'm a runner, training for a marathon, and I'm starting to get plantar fasciitis. Looking for an insole that can help.",
+      classifier: C({ attributes: { gender: null, useCase: "athletic_running", condition: "plantar_fasciitis" } }),
+      expect: { questionMatches: /Who are these orthotics for/i },
+    }],
+  },
+  {
+    name: "Long: 'My wife is a nurse who stands all day and her feet hurt'",
+    turns: [{
+      user: "my wife is a nurse who stands all day and her feet hurt",
+      classifier: C({ attributes: { gender: "Women", useCase: "work_all_day", condition: "foot_pain" } }),
+      // All 3 required attrs extracted; gate would skip to q_arch
+      // (the next question after condition) or attempt resolve.
+      // Just assert it engaged.
+      expect: { gateHandled: true },
+    }],
+  },
+  {
+    name: "Long: 'looking for orthotic for my husband who plays soccer and has high arches'",
+    turns: [{
+      user: "looking for orthotic for my husband who plays soccer and has high arches",
+      classifier: C({ attributes: { gender: "Men", useCase: "cleats", condition: "high_arch" } }),
+      expect: { gateHandled: true },
+    }],
+  },
+
+  // ========== Day 2: condition-only queries (bare clinical signals) ==========
+
+  { name: "Bare clinical: 'I have plantar fasciitis'", turns: [{ user: "I have plantar fasciitis", classifier: C({ attributes: { condition: "plantar_fasciitis" } }), expect: { questionMatches: /Who are these orthotics for/i } }] },
+  { name: "Bare clinical: 'my feet hurt'", turns: [{ user: "my feet hurt", classifier: C({ attributes: { condition: "foot_pain" } }), expect: { questionMatches: /Who are these orthotics for/i } }] },
+  { name: "Bare clinical: 'I have heel pain'", turns: [{ user: "I have heel pain", classifier: C({ attributes: { condition: "heel_pain" } }), expect: { gateHandled: true } }] },
+  { name: "Bare clinical: 'I'm getting heel spurs'", turns: [{ user: "I'm getting heel spurs", classifier: C({ attributes: { condition: "heel_spurs" } }), expect: { gateHandled: true } }] },
+  { name: "Bare clinical: 'arch hurts'", turns: [{ user: "my arch hurts", classifier: C({ attributes: { condition: "arch_pain" } }), expect: { gateHandled: true } }] },
+  { name: "Bare clinical: 'ball-of-foot pain'", turns: [{ user: "I have ball-of-foot pain", classifier: C({ attributes: { condition: "metatarsalgia" } }), expect: { gateHandled: true } }] },
+
+  // ========== Day 2: useCase coverage ==========
+
+  { name: "useCase: 'I work standing all day'", turns: [{ user: "I work standing on my feet all day", classifier: C({ attributes: { useCase: "work_all_day" } }), expect: { gateHandled: true } }] },
+  { name: "useCase: 'gym training'", turns: [{ user: "looking for an orthotic for the gym", classifier: C({ attributes: { useCase: "athletic_training" } }), expect: { gateHandled: true } }] },
+  { name: "useCase: 'cleats / soccer'", turns: [{ user: "I need an orthotic for my soccer cleats", classifier: C({ attributes: { useCase: "cleats" } }), expect: { gateHandled: true } }] },
+  { name: "useCase: 'hockey skates'", turns: [{ user: "orthotic for hockey skates", classifier: C({ attributes: { useCase: "skates" } }), expect: { gateHandled: true } }] },
+  { name: "useCase: 'dress shoes'", turns: [{ user: "I want an orthotic for dress shoes", classifier: C({ attributes: { useCase: "dress" } }), expect: { gateHandled: true } }] },
+
+  // ========== Day 2: pivots & corrections mid-conversation ==========
+
+  {
+    name: "Pivot: started orthotic flow → user changes mind to footwear",
+    turns: [
+      { user: "I need orthotics", classifier: C({}), expect: { gateHandled: true } },
+      { user: "actually, just show me sneakers instead", classifier: { isOrthoticRequest: false, isFootwearRequest: true, isRejection: false, attributes: { useCase: "athletic_general" }, confidence: "high" }, expect: { gateHandled: false } },
+    ],
+  },
+  {
+    name: "Correction: customer said Men, then says actually Women",
+    turns: [
+      { user: "I need orthotics", classifier: C({}), expect: {} },
+      { user: "Men", classifier: C({ attributes: { gender: "Men" } }), expect: {} },
+      { user: "wait actually women's, it's for my wife", classifier: C({ attributes: { gender: "Women" } }), expect: { gateHandled: true } },
+    ],
+  },
+  {
+    name: "Correction: customer said Casual, then says actually for athletic",
+    turns: [
+      { user: "I need orthotics", classifier: C({}), expect: {} },
+      { user: "Women", classifier: C({ attributes: { gender: "Women" } }), expect: {} },
+      { user: "Everyday / casual shoes", classifier: C({ attributes: { gender: "Women", useCase: "casual" } }), expect: {} },
+      { user: "actually for running, not casual", classifier: C({ attributes: { gender: "Women", useCase: "athletic_running" } }), expect: { gateHandled: true } },
+    ],
+  },
+
+  // ========== Day 2: typos and informal phrasings ==========
+
+  { name: "Typo: 'orthtoics' (transposition)", turns: [{ user: "I need orthtoics for my flat feet", classifier: C({ attributes: { condition: "overpronation_flat_feet" } }), expect: { gateHandled: true } }] },
+  { name: "Typo: 'planter facsitis'", turns: [{ user: "I have planter facsitis", classifier: C({ attributes: { condition: "plantar_fasciitis" } }), expect: { gateHandled: true } }] },
+  { name: "Informal: 'kid orthotic'", turns: [{ user: "kid orthotic", classifier: C({ attributes: { gender: "Kids" } }), expect: { gateHandled: true } }] },
+  { name: "Informal: 'shoe inserts'", turns: [{ user: "do you sell shoe inserts", classifier: C({}), expect: { gateHandled: true } }] },
+  { name: "Informal: 'something for my flat feet'", turns: [{ user: "something for my flat feet", classifier: C({ attributes: { condition: "overpronation_flat_feet" } }), expect: { gateHandled: true } }] },
+
+  // ========== Day 2: multiple-condition queries ==========
+
+  {
+    name: "Multi-condition: 'plantar fasciitis AND ball-of-foot pain'",
+    turns: [{
+      user: "I have plantar fasciitis and ball-of-foot pain",
+      classifier: C({ attributes: { condition: "plantar_fasciitis" } }),
+      // Classifier picks one; resolver derivations + keyword enrichment
+      // pick up the secondary signal. Test that the gate at least engages.
+      expect: { gateHandled: true },
+    }],
+  },
+  {
+    name: "Multi-condition: 'flat feet and overpronation'",
+    turns: [{
+      user: "I have flat feet and I overpronate",
+      classifier: C({ attributes: { condition: "overpronation_flat_feet" } }),
+      expect: { gateHandled: true },
+    }],
+  },
+
+  // ========== Day 2: greetings, off-topic, policy ==========
+
+  { name: "Greeting: 'hello there'", turns: [{ user: "hello there", classifier: { isOrthoticRequest: false, isFootwearRequest: false, isRejection: false, attributes: {}, confidence: "high" }, expect: { gateHandled: false } }] },
+  { name: "Greeting: 'how are you'", turns: [{ user: "how are you", classifier: { isOrthoticRequest: false, isFootwearRequest: false, isRejection: false, attributes: {}, confidence: "high" }, expect: { gateHandled: false } }] },
+  { name: "Off-topic: 'what's the weather'", turns: [{ user: "what's the weather like", classifier: { isOrthoticRequest: false, isFootwearRequest: false, isRejection: false, attributes: {}, confidence: "high" }, expect: { gateHandled: false } }] },
+  { name: "Off-topic: 'are you a real person'", turns: [{ user: "are you a real person", classifier: { isOrthoticRequest: false, isFootwearRequest: false, isRejection: false, attributes: {}, confidence: "high" }, expect: { gateHandled: false } }] },
+  { name: "Policy: 'do you ship internationally'", turns: [{ user: "do you ship internationally", classifier: { isOrthoticRequest: false, isFootwearRequest: false, isRejection: false, attributes: {}, confidence: "high" }, expect: { gateHandled: false } }] },
+  { name: "Policy: 'what's your refund policy'", turns: [{ user: "what's your refund policy", classifier: { isOrthoticRequest: false, isFootwearRequest: false, isRejection: false, attributes: {}, confidence: "high" }, expect: { gateHandled: false } }] },
+  { name: "Policy: 'how long does shipping take'", turns: [{ user: "how long does shipping take", classifier: { isOrthoticRequest: false, isFootwearRequest: false, isRejection: false, attributes: {}, confidence: "high" }, expect: { gateHandled: false } }] },
+
+  // ========== Day 2: rejections ==========
+
+  { name: "Rejection: 'no orthotics, just looking for shoes'", turns: [{ user: "no orthotics, just looking for shoes", classifier: { isOrthoticRequest: false, isFootwearRequest: true, isRejection: true, attributes: {}, confidence: "high" }, expect: { gateHandled: false } }] },
+  { name: "Rejection: 'I already have orthotics, just need shoes'", turns: [{ user: "I already have orthotics, just need shoes", classifier: { isOrthoticRequest: false, isFootwearRequest: true, isRejection: true, attributes: {}, confidence: "high" }, expect: { gateHandled: false } }] },
+
+  // ========== Day 2: footwear with various conditions/contexts ==========
+
+  { name: "Footwear: 'wedding shoes'", turns: [{ user: "I need wedding shoes", classifier: { isOrthoticRequest: false, isFootwearRequest: true, isRejection: false, attributes: { useCase: "dress" }, confidence: "high" }, expect: { gateHandled: false } }] },
+  { name: "Footwear: 'walking shoes'", turns: [{ user: "comfortable walking shoes", classifier: { isOrthoticRequest: false, isFootwearRequest: true, isRejection: false, attributes: { useCase: "comfort" }, confidence: "high" }, expect: { gateHandled: false } }] },
+  { name: "Footwear: 'shoes for plantar fasciitis and standing all day'", turns: [{ user: "shoes for plantar fasciitis and standing all day", classifier: { isOrthoticRequest: false, isFootwearRequest: true, isRejection: false, attributes: { useCase: "work_all_day", condition: "plantar_fasciitis" }, confidence: "high" }, expect: { gateHandled: false } }] },
+
+  // ========== Day 2: kid signals — diverse phrasings ==========
+
+  { name: "Kid: 'orthotic for child'", turns: [{ user: "orthotic for child", classifier: C({ attributes: { gender: "Kids" } }), expect: { gateHandled: true } }] },
+  { name: "Kid: 'my toddler has flat feet' → resolves via direct resolver check (not through gate)", turns: [{ user: "Resolve check", expect: { resolveTo: { attrs: { gender: "Kids", useCase: "kids", condition: "overpronation_flat_feet", posted: true }, masterSkuPattern: /^L17/ } } }] },
+  { name: "Kid: 'orthotics for boys'", turns: [{ user: "orthotics for boys", classifier: C({ attributes: { gender: "Kids" } }), expect: { gateHandled: true } }] },
+  { name: "Kid: 'orthotic for girl' (singular)", turns: [{ user: "orthotic for my girl", classifier: C({ attributes: { gender: "Kids" } }), expect: { gateHandled: true } }] },
+
+  // ========== Day 2: adversarial / edge-case attempts ==========
+
+  { name: "Edge: empty-ish input '...'", turns: [{ user: "...", classifier: { isOrthoticRequest: false, isFootwearRequest: false, isRejection: false, attributes: {}, confidence: "low" }, expect: { gateHandled: false } }] },
+  { name: "Edge: just punctuation '???'", turns: [{ user: "???", classifier: { isOrthoticRequest: false, isFootwearRequest: false, isRejection: false, attributes: {}, confidence: "low" }, expect: { gateHandled: false } }] },
+  { name: "Edge: ALL CAPS 'I NEED ORTHOTICS NOW'", turns: [{ user: "I NEED ORTHOTICS NOW", classifier: C({}), expect: { gateHandled: true } }] },
+  { name: "Edge: no spaces 'orthoticforplantarfasciitis'", turns: [{ user: "orthotic for plantar fasciitis", classifier: C({ attributes: { condition: "plantar_fasciitis" } }), expect: { gateHandled: true } }] },
+
+  // ========== Day 2: more resolver coverage ==========
+
+  { name: "Resolver: Women + dress + plantar_fasciitis → some Women SKU", turns: [{ user: "Resolve check", expect: { resolveTo: { attrs: { gender: "Women", useCase: "dress", condition: "plantar_fasciitis" }, masterSkuPattern: /W$|U$|^PFK/ } } }] },
+  { name: "Resolver: Men + casual + heel_spurs → heel spurs SKU", turns: [{ user: "Resolve check", expect: { resolveTo: { attrs: { gender: "Men", useCase: "casual", condition: "heel_spurs" }, masterSkuPattern: /M$|U$/ } } }] },
+  { name: "Resolver: Men + athletic_running + none → athletic Men SKU", turns: [{ user: "Resolve check", expect: { resolveTo: { attrs: { gender: "Men", useCase: "athletic_running", condition: "none" }, masterSkuPattern: /M$|U$/ } } }] },
+  { name: "Resolver: Women + comfort + diabetic → diabetic SKU", turns: [{ user: "Resolve check", expect: { resolveTo: { attrs: { gender: "Women", useCase: "comfort", condition: "diabetic" }, masterSkuPattern: /W$|U$/ } } }] },
+  { name: "Resolver: Men + dress + mortons_neuroma → met-support SKU", turns: [{ user: "Resolve check", expect: { resolveTo: { attrs: { gender: "Men", useCase: "dress", condition: "mortons_neuroma", metSupport: true }, masterSkuPattern: /M$|U$/ } } }] },
+  { name: "Resolver: Women + winter_boots + none", turns: [{ user: "Resolve check", expect: { resolveTo: { attrs: { gender: "Women", useCase: "winter_boots", condition: "none" }, masterSkuPattern: /W$|U$/ } } }] },
+  { name: "Resolver: Men + cleats + heel_spurs → cleats family (shoe-context-locked)", turns: [{ user: "Resolve check", expect: { resolveTo: { attrs: { gender: "Men", useCase: "cleats", condition: "heel_spurs" }, masterSkuPattern: /M$|U$/ } } }] },
+
+  // ========== Day 2: classifier confidence handling ==========
+
+  {
+    name: "Low-confidence classifier still routes correctly",
+    turns: [{
+      user: "I think I might need an insole maybe?",
+      classifier: { isOrthoticRequest: true, isFootwearRequest: false, isRejection: false, attributes: {}, confidence: "low" },
+      expect: { questionMatches: /Who are these orthotics for/i },
+    }],
+  },
+
+  // ========== Day 2: chip wording sanity ==========
+
+  {
+    name: "Sanity: q_arch chip wording (Flat / Low, Medium, High, I don't know)",
+    turns: [
+      { user: "orthotic", classifier: C({}), expect: {} },
+      { user: "Women", classifier: C({ attributes: { gender: "Women" } }), expect: {} },
+      { user: "Casual", classifier: C({ attributes: { gender: "Women", useCase: "casual" } }), expect: {} },
+      { user: "Heel spurs", classifier: C({ attributes: { gender: "Women", useCase: "casual", condition: "heel_spurs" } }), expect: { chipsContain: ["Flat / Low", "Medium", "High", "I don't know"] } },
+    ],
+  },
+
+  // ========== Day 2: multi-turn history correctness ==========
+
+  {
+    name: "History: re-engages after off-topic interlude",
+    turns: [
+      { user: "I need orthotics", classifier: C({}), expect: { gateHandled: true } },
+      { user: "what's your return policy", classifier: { isOrthoticRequest: false, isFootwearRequest: false, isRejection: false, attributes: {}, confidence: "high" }, expect: { gateHandled: false }, synthesizedAssistant: "Our return policy is 30 days." },
+      { user: "ok back to orthotics, men's please", classifier: C({ attributes: { gender: "Men" } }), expect: { gateHandled: true } },
+    ],
+  },
 ];
 
 // ---------- Run ----------

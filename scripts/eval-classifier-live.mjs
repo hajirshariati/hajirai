@@ -247,6 +247,100 @@ const CASES = [
       isFootwearRequest: true,
     },
   },
+
+  // ===== Day 2 expansion: simple one-word queries =====
+  { phrase: "orthotics", expect: { isOrthoticRequest: true } },
+  { phrase: "shoes", expect: { isOrthoticRequest: false, isFootwearRequest: true } },
+  { phrase: "sneakers", expect: { isOrthoticRequest: false, isFootwearRequest: true } },
+  { phrase: "boots", expect: { isOrthoticRequest: false, isFootwearRequest: true } },
+  { phrase: "sandals", expect: { isOrthoticRequest: false, isFootwearRequest: true } },
+  { phrase: "insole", expect: { isOrthoticRequest: true } },
+  { phrase: "arch support", expect: { isOrthoticRequest: true } },
+  { phrase: "help", expect: { isOrthoticRequest: false, isFootwearRequest: false } },
+
+  // ===== Day 2: longer / multi-clause queries =====
+  {
+    phrase: "I'm a runner training for a marathon and I'm starting to get plantar fasciitis. Looking for an insole that can help.",
+    expect: {
+      isOrthoticRequest: true,
+      attributes: { useCase: "athletic_running", condition: "plantar_fasciitis" },
+    },
+  },
+  {
+    phrase: "my wife is a nurse who stands all day and her feet hurt",
+    expect: {
+      attributes: { gender: "Women", useCase: "work_all_day" },
+    },
+  },
+  {
+    phrase: "looking for an orthotic for my husband who plays soccer and has high arches",
+    expect: {
+      isOrthoticRequest: true,
+      attributes: { gender: "Men", useCase: "cleats", condition: "high_arch" },
+    },
+  },
+  {
+    phrase: "I'm going on a long trip to Europe and walking a lot, what insole should I get",
+    expect: { isOrthoticRequest: true },
+  },
+
+  // ===== Day 2: bare clinical signals (must default to orthotic) =====
+  { phrase: "I have plantar fasciitis", expect: { isOrthoticRequest: true } },
+  { phrase: "my feet hurt", expect: { isOrthoticRequest: true } },
+  { phrase: "I'm getting heel spurs", expect: { isOrthoticRequest: true } },
+  { phrase: "my arch hurts", expect: { isOrthoticRequest: true } },
+  { phrase: "I have ball of foot pain", expect: { isOrthoticRequest: true, attributes: { condition: "metatarsalgia" } } },
+  { phrase: "my feet always feel tired", expect: { isOrthoticRequest: true } },
+
+  // ===== Day 2: useCase coverage =====
+  { phrase: "I work standing on my feet all day", expect: { attributes: { useCase: "work_all_day" } } },
+  { phrase: "looking for an orthotic for the gym", expect: { isOrthoticRequest: true, attributes: { useCase: "athletic_training" } } },
+  { phrase: "I need an orthotic for my soccer cleats", expect: { isOrthoticRequest: true, attributes: { useCase: "cleats" } } },
+  { phrase: "orthotic for hockey skates", expect: { isOrthoticRequest: true, attributes: { useCase: "skates" } } },
+  { phrase: "I want an orthotic for dress shoes", expect: { isOrthoticRequest: true, attributes: { useCase: "dress" } } },
+
+  // ===== Day 2: pivots and corrections (single-turn captures) =====
+  { phrase: "actually just show me sneakers instead", expect: { isOrthoticRequest: false, isFootwearRequest: true } },
+  { phrase: "wait actually women's", expect: { attributes: { gender: "Women" } } },
+  { phrase: "no orthotics, just looking for shoes", expect: { isRejection: true, isFootwearRequest: true } },
+
+  // ===== Day 2: typos & informal =====
+  { phrase: "I need orthtoics for my flat feet", expect: { isOrthoticRequest: true, attributes: { condition: "overpronation_flat_feet" } } },
+  { phrase: "I have planter facsitis", expect: { isOrthoticRequest: true, attributes: { condition: "plantar_fasciitis" } } },
+  { phrase: "do you sell shoe inserts", expect: { isOrthoticRequest: true } },
+  { phrase: "something for my flat feet", expect: { isOrthoticRequest: true, attributes: { condition: "overpronation_flat_feet" } } },
+
+  // ===== Day 2: edge phrasings =====
+  { phrase: "I NEED ORTHOTICS NOW", expect: { isOrthoticRequest: true } },
+  { phrase: "do u have insoles 4 plantar fasciitis", expect: { isOrthoticRequest: true, attributes: { condition: "plantar_fasciitis" } } },
+
+  // ===== Day 2: kid signals (diverse) =====
+  { phrase: "my toddler has flat feet", expect: { attributes: { gender: "Kids", condition: "overpronation_flat_feet" } } },
+  { phrase: "orthotics for boys", expect: { attributes: { gender: "Kids" } } },
+  { phrase: "orthotic for my child", expect: { attributes: { gender: "Kids" } } },
+  { phrase: "what should my 7 year old wear for arch support", expect: { isOrthoticRequest: true, attributes: { gender: "Kids" } } },
+
+  // ===== Day 2: ambiguous / non-shopping =====
+  { phrase: "hello there", expect: { isOrthoticRequest: false, isFootwearRequest: false } },
+  { phrase: "how are you", expect: { isOrthoticRequest: false, isFootwearRequest: false } },
+  { phrase: "are you a real person", expect: { isOrthoticRequest: false, isFootwearRequest: false } },
+  { phrase: "do you ship internationally", expect: { isOrthoticRequest: false, isFootwearRequest: false } },
+  { phrase: "what's your refund policy", expect: { isOrthoticRequest: false, isFootwearRequest: false } },
+  { phrase: "how long does shipping take", expect: { isOrthoticRequest: false, isFootwearRequest: false } },
+  { phrase: "where are you located", expect: { isOrthoticRequest: false, isFootwearRequest: false } },
+
+  // ===== Day 2: footwear with various contexts =====
+  { phrase: "I need wedding shoes", expect: { isOrthoticRequest: false, isFootwearRequest: true } },
+  { phrase: "comfortable walking shoes", expect: { isOrthoticRequest: false, isFootwearRequest: true } },
+  { phrase: "shoes for plantar fasciitis and standing all day", expect: { isOrthoticRequest: false, isFootwearRequest: true, attributes: { condition: "plantar_fasciitis" } } },
+  { phrase: "do you have men's loafers", expect: { isOrthoticRequest: false, isFootwearRequest: true, attributes: { gender: "Men" } } },
+  { phrase: "wedges for my mom", expect: { isOrthoticRequest: false, isFootwearRequest: true, attributes: { gender: "Women" } } },
+
+  // ===== Day 2: tricky cases =====
+  { phrase: "shoes for orthotics", expect: { isFootwearRequest: true } }, // shoes that fit orthotics
+  { phrase: "what shoes work with my orthotic", expect: { isFootwearRequest: true } },
+  { phrase: "I have an orthotic, need a shoe to wear it in", expect: { isFootwearRequest: true } },
+  { phrase: "diabetic shoes for my dad", expect: { isFootwearRequest: true, attributes: { gender: "Men", condition: "diabetic" } } },
 ];
 
 // ---------- Run ----------
