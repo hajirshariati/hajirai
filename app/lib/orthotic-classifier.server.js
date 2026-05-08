@@ -43,16 +43,21 @@ const CLASSIFIER_TOOL = {
       isOrthoticRequest: {
         type: "boolean",
         description:
-          "true ONLY if the customer is asking for an orthotic / insole / arch-support / footbed / insert as the PRODUCT they want. " +
-          "Examples that ARE orthotic requests: 'I need orthotics', 'recommend an insole for plantar fasciitis', " +
-          "'arch support for my flat feet', 'my son has high arch what orthotic should he wear'. " +
-          "CRITICAL: a clinical condition alone (plantar fasciitis, heel spurs, etc.) does NOT make this an orthotic request. " +
-          "Look at the PRODUCT NOUN the customer named. If they said 'shoe' / 'sandal' / 'sneaker' / 'boot' / 'footwear' " +
-          "as the thing they want — even WITH a condition — that's a FOOTWEAR request, not orthotic. " +
-          "Examples that are NOT orthotic requests: 'show me shoes for plantar fasciitis', " +
-          "'sandals with arch support', 'sneakers for flat feet', 'boots for heel pain'. " +
-          "When in doubt, look at the noun the customer used: orthotic-noun → orthotic request; " +
-          "footwear-noun → NOT an orthotic request.",
+          "true if the customer's intent is an orthotic / insole / arch-support / footbed / insert recommendation. " +
+          "Three cases set this to true: " +
+          "(1) Customer named an orthotic-shaped noun: 'I need orthotics', 'recommend an insole for plantar fasciitis', " +
+          "'arch support for my flat feet'. " +
+          "(2) Customer mentioned a clinical foot condition with NO product noun at all: " +
+          "'I have plantar fasciitis', 'my heels hurt', 'I'm a 45-year-old woman with plantar fasciitis', " +
+          "'my arch hurts when I walk'. Orthotics are this merchant's primary clinical-support product, " +
+          "so a bare clinical signal defaults to orthotic intent. " +
+          "(3) Customer asked about a kid's foot issue with no specific product noun: " +
+          "'my son has high arch', 'what should my daughter wear, she has flat feet'. " +
+          "Set to FALSE when: " +
+          "(a) Customer named a FOOTWEAR noun (shoe / sandal / sneaker / boot / loafer / clog / footwear) " +
+          "even paired with a condition. 'show me shoes for plantar fasciitis' → false. " +
+          "'sandals with arch support' → false. 'boots for flat feet' → false. " +
+          "(b) Customer is asking about something else entirely (returns, shipping, sizing, hello).",
       },
       isFootwearRequest: {
         type: "boolean",
@@ -123,7 +128,20 @@ const CLASSIFIER_TOOL = {
               null,
             ],
             description:
-              "Specific clinical condition the customer named. 'none' if they explicitly said no pain / no condition. " +
+              "Specific clinical condition the customer named. " +
+              "MAPPING RULES (use these exact enum values for the listed phrases — downstream resolver depends on them): " +
+              "'flat feet' / 'fallen arches' / 'overpronation' / 'pronate inward' → 'overpronation_flat_feet' (NOT 'low_arch'). " +
+              "'high arches' / 'high arch' / 'supination' / 'underpronation' / 'roll outward' → 'high_arch'. " +
+              "'low arches' / 'low arch' (only when explicitly said 'low arch', not 'flat feet') → 'low_arch'. " +
+              "'plantar fasciitis' / 'PF' → 'plantar_fasciitis'. " +
+              "'heel spurs' / 'spur' → 'heel_spurs'. " +
+              "'ball-of-foot pain' / 'metatarsalgia' / 'forefoot pain' → 'metatarsalgia'. " +
+              "'morton's neuroma' / 'neuroma' → 'mortons_neuroma'. " +
+              "'diabetic foot' / 'diabetes' / 'neuropathy' → 'diabetic'. " +
+              "'heel pain' alone (no spur) → 'heel_pain'. " +
+              "'arch pain' alone → 'arch_pain'. " +
+              "Generic 'foot pain' with no specific location → 'foot_pain'. " +
+              "Customer explicitly said 'no pain' / 'just comfort' / 'no specific issue' → 'none'. " +
               "null if not stated.",
           },
         },
