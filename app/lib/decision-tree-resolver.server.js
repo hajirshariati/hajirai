@@ -34,9 +34,10 @@ const HARD_FILTER_ATTRS = ["useCase"];
 // exists for the asked use-case, the resolver returns no match and
 // lets the caller surface a clean "we don't carry a kids product
 // for that use-case" message rather than ship a wrong-fit Unisex.
-const KIDS_GENDERS = new Set(["Kids", "Boys", "Girls", "Kid", "Child"]);
+const KIDS_GENDERS = new Set(["kids", "boys", "girls", "kid", "child"]);
 function isKidsGender(g) {
-  return typeof g === "string" && KIDS_GENDERS.has(g);
+  if (typeof g !== "string") return false;
+  return KIDS_GENDERS.has(g.toLowerCase());
 }
 function genderMatch(candidateGender, askedGender) {
   if (!askedGender) return true;

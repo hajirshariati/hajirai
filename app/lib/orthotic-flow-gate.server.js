@@ -89,9 +89,10 @@ function sseChunk(obj) {
  * customer's click on "None — just want comfort" maps cleanly back
  * to condition="none" via Layer 1 exact match next turn.
  */
-const KIDS_GENDER_VALUES = new Set(["Kids", "Boys", "Girls", "Kid", "Child"]);
+const KIDS_GENDER_VALUES = new Set(["kids", "boys", "girls", "kid", "child"]);
 function isKidsGenderValue(v) {
-  return typeof v === "string" && KIDS_GENDER_VALUES.has(v);
+  if (typeof v !== "string") return false;
+  return KIDS_GENDER_VALUES.has(v.toLowerCase());
 }
 
 // Compute the set of useCase values that have at least one Kids
@@ -367,23 +368,21 @@ export async function maybeRunOrthoticFlow({
       );
       return { handled: false };
     }
-    if (allowed && allowed.size > 0) {
-      const sorted = [...allowed].sort();
-      const target = sorted[0];
-      if (answers.useCase !== target && !allowed.has(answers.useCase)) {
-        if (answers.useCase) {
-          console.log(
-            `[orthotic-flow] kids auto-fill: overriding useCase=${answers.useCase} → ${target} ` +
-              `(no Kids SKU exists for ${answers.useCase}; available=${[...allowed].join(",")})`,
-          );
-        } else {
-          console.log(
-            `[orthotic-flow] kids auto-fill: useCase=${target} ` +
-              `(skipping q_use_case; available=${[...allowed].join(",")})`,
-          );
-        }
-        answers.useCase = target;
-      }
+    // ALWAYS override useCase to the first kids-available value when
+    // gender=Kids. Aetrex's Kids line is a single useCase ("kids")
+    // and the customer's earlier-mentioned shoe-context ("casual",
+    // "dress", "athletic", whatever) doesn't have a Kids SKU behind
+    // it. Older versions only overrode conditionally — but the
+    // condition was unreliable in production (saw cases where
+    // useCase=casual reached the resolver and produced "no SKU
+    // available" errors). Unconditional is robust.
+    const target = [...allowed].sort()[0];
+    if (answers.useCase !== target) {
+      console.log(
+        `[orthotic-flow] kids auto-fill: useCase=${answers.useCase || "(unset)"} → ${target} ` +
+          `(kids-available=${[...allowed].join(",")})`,
+      );
+      answers.useCase = target;
     }
   }
 
@@ -621,7 +620,7 @@ export async function maybeRunOrthoticFlow({
     const conversationText = messages
       .map((m) => (typeof m.content === "string" ? m.content : ""))
       .join("\n");
-    const result = await executeRecommenderTool({
+    let result = await executeRecommenderTool({
       toolName: `recommend_${ORTHOTIC_INTENT}`,
       input: step.attrs,
       shop,
@@ -629,6 +628,42 @@ export async function maybeRunOrthoticFlow({
       conversationText,
       latestUserText: rawUserText,
     });
+    // Kids safety-net retry. If the first resolve fails for a Kids
+    // customer, force useCase to the first kids-available value
+    // and try again. The auto-fill above SHOULD prevent ever
+    // reaching here with a non-kids useCase, but production has
+    // shown cases where it didn't fire (stale data, edge cases),
+    // and the failure mode is brutal — customer dead-ends after a
+    // 4-question form. This retry is defense-in-depth: if a Kids
+    // customer reaches here unresolved, force the kids line and
+    // try once more.
+    if (
+      (result?.error || !result?.product) &&
+      isKidsGenderValue(step.attrs?.gender)
+    ) {
+      const kidsAllowed = kidsAvailableUseCases(tree);
+      if (kidsAllowed && kidsAllowed.size > 0) {
+        const kidsTarget = [...kidsAllowed].sort()[0];
+        if (step.attrs.useCase !== kidsTarget) {
+          console.log(
+            `[orthotic-flow] kids resolve retry: useCase=${step.attrs.useCase || "(unset)"} → ${kidsTarget}`,
+          );
+          const retryAttrs = { ...step.attrs, useCase: kidsTarget };
+          const retry = await executeRecommenderTool({
+            toolName: `recommend_${ORTHOTIC_INTENT}`,
+            input: retryAttrs,
+            shop,
+            trees: [tree],
+            conversationText,
+            latestUserText: rawUserText,
+          });
+          if (retry?.product) {
+            result = retry;
+            step.attrs = retryAttrs;
+          }
+        }
+      }
+    }
     if (result?.error || !result?.product) {
       console.log(
         `[orthotic-flow] resolve failed (${result?.error || "no product"}); falling through to LLM`,
