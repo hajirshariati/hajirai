@@ -365,15 +365,15 @@ export async function maybeRunOrthoticFlow({
       );
       return { handled: false };
     }
-    // ALWAYS override useCase to the first kids-available value when
-    // gender=Kids. Aetrex's Kids line is a single useCase ("kids")
-    // and the customer's earlier-mentioned shoe-context ("casual",
-    // "dress", "athletic", whatever) doesn't have a Kids SKU behind
-    // it. Older versions only overrode conditionally — but the
-    // condition was unreliable in production (saw cases where
-    // useCase=casual reached the resolver and produced "no SKU
-    // available" errors). Unconditional is robust.
-    const target = [...allowed].sort()[0];
+    // ALWAYS override useCase to a kids-available value when
+    // gender=Kids. The merchant's Kids line spans a few useCase
+    // buckets (kids / dress / casual) and the customer's earlier-
+    // mentioned shoe-context doesn't have a Kids SKU behind it.
+    // Priority: prefer the literal "kids" useCase if available
+    // (it's the merchant's general kids line, useCase-agnostic),
+    // otherwise lex-first. The conversation eval caught the
+    // alphabetical-sort picking "casual" over "kids".
+    const target = allowed.has("kids") ? "kids" : [...allowed].sort()[0];
     if (answers.useCase !== target) {
       console.log(
         `[orthotic-flow] kids auto-fill: useCase=${answers.useCase || "(unset)"} → ${target} ` +
@@ -640,7 +640,9 @@ export async function maybeRunOrthoticFlow({
     ) {
       const kidsAllowed = kidsAvailableUseCases(tree);
       if (kidsAllowed && kidsAllowed.size > 0) {
-        const kidsTarget = [...kidsAllowed].sort()[0];
+        const kidsTarget = kidsAllowed.has("kids")
+          ? "kids"
+          : [...kidsAllowed].sort()[0];
         if (step.attrs.useCase !== kidsTarget) {
           console.log(
             `[orthotic-flow] kids resolve retry: useCase=${step.attrs.useCase || "(unset)"} → ${kidsTarget}`,
