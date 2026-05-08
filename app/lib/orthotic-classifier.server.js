@@ -64,10 +64,14 @@ const CLASSIFIER_TOOL = {
         description:
           "true if the customer is asking for FOOTWEAR (shoes, sandals, sneakers, boots, loafers, clogs, etc.) " +
           "as the product they want — INCLUDING when paired with a clinical condition. " +
-          "Examples: 'show me shoes for plantar fasciitis', 'sandals with arch support', " +
+          "Examples that ARE footwear requests: 'show me shoes for plantar fasciitis', 'sandals with arch support', " +
           "'find men's shoes', 'boots for flat feet', 'sneakers for heel pain'. " +
-          "Note: 'shoes for my orthotic' (asking which shoes work WITH orthotics) is NOT a footwear request " +
-          "— that's an orthotic-context question. Look at what the customer is shopping for as the primary product.",
+          "ALSO footwear requests (orthotic-compatible footwear): 'shoes for my orthotic', " +
+          "'what shoes work with my orthotic', 'I have an orthotic, what shoes fit it', " +
+          "'orthotic-friendly sneakers'. The customer already HAS an orthotic and is " +
+          "shopping for shoes that accommodate it — that's a footwear request. " +
+          "Set false only when the customer is shopping for the orthotic itself, OR for non-shopping queries " +
+          "(returns, shipping, hello, FAQ).",
       },
       isRejection: {
         type: "boolean",
@@ -107,8 +111,22 @@ const CLASSIFIER_TOOL = {
               null,
             ],
             description:
-              "Shoe context the orthotic will go in. 'kids' for any general kid orthotic request. " +
-              "null if not stated.",
+              "Shoe context the orthotic will go in. " +
+              "MAPPING RULES (use these exact enum values for the listed phrases): " +
+              "'soccer' / 'football' / 'baseball' / 'lacrosse' / 'rugby' / 'spike shoes' / 'cleats' → 'cleats'. " +
+              "'hockey' / 'ice skates' / 'skates' → 'skates'. " +
+              "'running' / 'jog' / 'jogging' / 'marathon' / '5k' / '10k' → 'athletic_running'. " +
+              "'gym' / 'training' / 'crossfit' / 'weights' / 'lifting' → 'athletic_training'. " +
+              "'tennis' / 'basketball' / 'court shoes' / 'pickleball' / generic 'athletic' → 'athletic_general'. " +
+              "'work boots' / 'standing all day' / 'on my feet all day' / 'warehouse' / 'nursing' → 'work_all_day'. " +
+              "'winter boots' / 'snow boots' / 'cold weather boots' → 'winter_boots'. " +
+              "'dress shoes' (no other detail) → 'dress'. " +
+              "'dress shoes without removable insole' / 'slim dress shoes' → 'dress_no_removable'. " +
+              "'premium dress' / 'leather dress shoes' → 'dress_premium'. " +
+              "'casual' / 'everyday' / 'walking around' / 'day to day' → 'casual'. " +
+              "'comfort' / 'just want comfort' / 'general support' / 'no specific' → 'comfort'. " +
+              "Any kid orthotic request (gender=Kids) → 'kids'. " +
+              "null if no shoe-context is stated.",
           },
           condition: {
             type: ["string", "null"],
