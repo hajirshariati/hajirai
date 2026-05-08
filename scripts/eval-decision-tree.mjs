@@ -83,8 +83,14 @@ check("condition=overpronation_flat_feet (Women athletic) → derivation makes p
   });
   assert(r.attributesUsed?.posted === true,
     `expected posted=true after derivation; got ${JSON.stringify(r.attributesUsed)}`);
-  assert(/posted/i.test(r.title || ""),
-    `expected a Posted SKU; got ${r.masterSku} (${r.title})`);
+  // With shop=null in the eval env, Prisma can't fetch a product so
+  // executeRecommenderTool returns its missing-product error shape.
+  // The masterSku + title are surfaced under r.missingProduct (or
+  // r.title on the success path when running with a real shop).
+  const title = r.title || r.missingProduct?.title || "";
+  const sku = r.masterSku || r.missingProduct?.masterSku || "";
+  assert(/posted/i.test(title),
+    `expected a Posted SKU; got ${sku} (${title})`);
 });
 check("No matching cell falls back gracefully (uses fallback or Unisex)",
   () => assert(sku({ gender: "Men", useCase: "skates" }), "skates is Unisex-only; resolver should still return"));
@@ -213,8 +219,12 @@ check("derivations fire: condition=metatarsalgia → resolver picks W/ Met Suppo
   // Without derivations the resolver picks L700M (wrong);
   // with derivations applied, condition=metatarsalgia sets
   // metSupport=true and L705M wins.
-  assert.equal(r.masterSku, "L705M",
-    `derivation must fire — expected L705M (W/ Met Support), got ${r.masterSku}`);
+  // When shop=null and the product isn't in any catalog, the executor
+  // returns the resolver's pick under r.missingProduct rather than at
+  // the top level. Either shape proves the derivation fired.
+  const picked = r.masterSku || r.missingProduct?.masterSku;
+  assert.equal(picked, "L705M",
+    `derivation must fire — expected L705M (W/ Met Support), got ${picked}`);
 });
 
 check("derivations fire: arch=Flat → posted=true → resolver picks Posted SKU", async () => {
@@ -232,8 +242,10 @@ check("derivations fire: arch=Flat → posted=true → resolver picks Posted SKU
   });
   // arch=Flat triggers the posted=true derivation → Speed Posted
   // SKUs (L720W, L725W) score higher than the non-posted L700W/L705W.
-  assert(/posted/i.test(r.title || ""),
-    `derivation must set posted=true for flat arch; got ${r.masterSku} (${r.title})`);
+  const title = r.title || r.missingProduct?.title || "";
+  const sku = r.masterSku || r.missingProduct?.masterSku || "";
+  assert(/posted/i.test(title),
+    `derivation must set posted=true for flat arch; got ${sku} (${title})`);
 });
 
 check("executor proceeds normally when all required attributes are present", async () => {
