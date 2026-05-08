@@ -113,34 +113,31 @@ function kidsAvailableUseCases(tree) {
   return out;
 }
 
-// For the condition question: only show condition chips whose value
-// has at least one SKU matching the customer's already-answered
-// gender (and useCase if filled). Production bug — Kids customer
-// got "Heel spurs", "Plantar fasciitis" etc. as options even though
-// the merchant has no Kids+heel_spurs SKU; clicking those landed
-// at "we don't have it" instead of just hiding the option upfront.
+// For the condition question: filter chips only for Kids customers
+// (where the dead-end risk is real because the merchant has limited
+// Kids SKUs and the resolver is strict-Kids). For adults, return
+// null so the consumer skips filtering and shows all conditions.
 //
-// "none" is always allowed — it represents "general support, no
-// specific condition", which the resolver maps to the base SKU for
-// whatever gender+useCase the customer chose. The catch-all option
-// must never disappear.
+// Why no filtering for adults: most masterIndex items don't set an
+// explicit `condition` field — only specialty SKUs (plantar_fasciitis,
+// heel_spurs, metatarsalgia, etc.) do. The resolver uses
+// CONDITION_TARGETS regex matchers and SHOE_CONTEXT_LOCKS to map a
+// customer's stated condition to either a specialty SKU or the
+// base family SKU. My old narrow filter (require gender+useCase+
+// condition all match) hid every condition chip for Women+athletic
+// because no L2900W item literally has condition="heel_spurs" set.
+// The resolver would have happily returned the L2900W family SKU.
 function availableConditionsForAnswers(tree, answers) {
   const masterIndex = tree?.definition?.resolver?.masterIndex;
   if (!Array.isArray(masterIndex) || !answers) return null;
+  // Adults: no condition filtering. Resolver handles all conditions
+  // via specialty tests and shoe-context locks.
+  if (!isKidsGenderValue(answers.gender)) return null;
+  // Kids: strict filter. Only show conditions present on Kids items.
+  // "none" is always allowed as the catch-all.
   const out = new Set(["none"]);
   for (const m of masterIndex) {
-    if (answers.gender) {
-      const askedGender = answers.gender;
-      const cand = m?.gender;
-      const kidsAsked = isKidsGenderValue(askedGender);
-      const kidsCand = isKidsGenderValue(cand);
-      if (kidsAsked) {
-        if (!kidsCand) continue;
-      } else if (cand !== askedGender && cand !== "Unisex") {
-        continue;
-      }
-    }
-    if (answers.useCase && m?.useCase && m.useCase !== answers.useCase) continue;
+    if (!isKidsGenderValue(m?.gender)) continue;
     if (typeof m?.condition === "string" && m.condition) {
       out.add(m.condition);
     }
