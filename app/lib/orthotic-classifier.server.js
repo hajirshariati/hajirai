@@ -57,7 +57,17 @@ const CLASSIFIER_TOOL = {
           "(a) Customer named a FOOTWEAR noun (shoe / sandal / sneaker / boot / loafer / clog / footwear) " +
           "even paired with a condition. 'show me shoes for plantar fasciitis' → false. " +
           "'sandals with arch support' → false. 'boots for flat feet' → false. " +
-          "(b) Customer is asking about something else entirely (returns, shipping, sizing, hello).",
+          "(b) Customer is asking about something else entirely (returns, shipping, sizing, hello). " +
+          "(c) CRITICAL — OFF-TOPIC SIDE QUESTION MID-FLOW: judge ONLY the customer's LATEST " +
+          "message, not accumulated conversation history. If the latest message is an off-topic " +
+          "side question — shipping ('do you ship internationally', 'how long does shipping take'), " +
+          "policy ('what's your return policy', 'refund policy'), brand ('what brand are these', " +
+          "'who makes these'), pricing ('how much', 'discount'), location ('where are you based'), " +
+          "or any other non-orthotic-shopping topic — return isOrthoticRequest=false EVEN IF earlier " +
+          "turns established orthotic intent. The orthotic flow may still be active downstream; " +
+          "the gate handles re-engagement. Your job is to classify THIS message, not the whole " +
+          "session. Examples mid-flow: 'do you ship to Canada' → false. 'what brand is this' → " +
+          "false. 'is this on sale' → false. 'can I return it' → false.",
       },
       isFootwearRequest: {
         type: "boolean",
