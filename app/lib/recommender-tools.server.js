@@ -655,6 +655,29 @@ export async function executeRecommenderTool({ toolName, input, shop, trees, con
     };
   }
   const product = await lookupProductByMasterSku(shop, result.resolved.masterSku);
+  if (!product) {
+    // The resolver picked a SKU that's in the masterIndex but the
+    // matching Shopify product is missing, draft, archived, or has no
+    // sellable variant. Returning the SKU + name with no product card
+    // led to confident text ("X is your match") without an actual
+    // clickable card — the customer was stuck. Better: return an
+    // error so the LLM tells the customer honestly we don't have it
+    // available right now and offers to search for alternatives.
+    console.warn(
+      `[recommender] resolver picked masterSku=${result.resolved.masterSku} ` +
+        `but lookupProductByMasterSku returned null (product likely draft/archived/missing variant)`,
+    );
+    return {
+      error:
+        `The recommended SKU (${result.resolved.masterSku} — ${result.resolved.title}) ` +
+        `isn't currently available in this shop's catalog. ` +
+        `Tell the customer honestly that the specific match isn't in stock right now ` +
+        `and offer to show similar products via search_products instead. ` +
+        `Do NOT claim a product is "the perfect match" without an actual card.`,
+      attributesUsed: result.attrs,
+      missingProduct: { masterSku: result.resolved.masterSku, title: result.resolved.title },
+    };
+  }
   return {
     masterSku: result.resolved.masterSku,
     title: result.resolved.title,
@@ -663,8 +686,6 @@ export async function executeRecommenderTool({ toolName, input, shop, trees, con
       ? { masterSku: result.runnerUp.masterSku, title: result.runnerUp.title }
       : null,
     attributesUsed: result.attrs,
-    note: product
-      ? "Show this product as the recommended pick. The card data is in `product`."
-      : "Master SKU matched but the product card couldn't be loaded; recommend by name only and offer to retry.",
+    note: "Show this product as the recommended pick. The card data is in `product`.",
   };
 }

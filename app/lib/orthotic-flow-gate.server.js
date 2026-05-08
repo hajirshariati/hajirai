@@ -49,6 +49,31 @@ import {
 } from "./orthotic-flow.server.js";
 import { executeRecommenderTool } from "./recommender-tools.server.js";
 
+// Format a recommender-returned product the same way chat-tools'
+// extractProductCards does. Inlined (rather than imported) to keep
+// the gate's dependency surface small — chat-tools.server.js pulls
+// in Prisma, which breaks the eval-orthotic-gate runtime.
+//
+// Why this matters: variant.price comes out of the DB as a decimal
+// string ("69.95"). The widget's fallback price formatter divides
+// by 100 (the rest of the codebase uses cents elsewhere), so emitting
+// the raw product object renders $0.70 for a $69.95 item. Setting
+// price_formatted as a pre-formatted string the widget renders
+// verbatim avoids the bug.
+function formatRecommenderCard(product) {
+  if (!product || !product.handle) return null;
+  return {
+    title: product.title,
+    url: product.url,
+    handle: product.handle,
+    image: product.image || "",
+    price_formatted: product.price ? `$${parseFloat(product.price).toFixed(2)}` : "",
+    compare_at_price: product.compareAtPrice
+      ? Math.round(parseFloat(product.compareAtPrice) * 100)
+      : undefined,
+  };
+}
+
 const ORTHOTIC_INTENT = "orthotic";
 
 function sseChunk(obj) {
@@ -610,11 +635,18 @@ export async function maybeRunOrthoticFlow({
       );
       return { handled: false };
     }
+    const card = formatRecommenderCard(result.product);
+    if (!card) {
+      console.log(
+        `[orthotic-flow] resolved sku=${result.masterSku} but card formatting failed; falling through to LLM`,
+      );
+      return { handled: false };
+    }
     const intro = buildResolveIntro(result, step.attrs);
     controller.enqueue(encoder.encode(sseChunk({ type: "text", text: intro })));
     controller.enqueue(encoder.encode(sseChunk({
       type: "products",
-      products: [result.product],
+      products: [card],
     })));
     controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
     console.log(

@@ -699,6 +699,12 @@ function stripToolCallSyntax(text) {
 async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, controller, encoder, promptCaching, tools }) {
   const totalUsage = { input_tokens: 0, output_tokens: 0, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 };
   let toolCallCount = 0;
+  // Track whether ANY recommend_* tool fired this turn. Used to
+  // suppress follow-up suggestions on recommendation turns —
+  // production showed Haiku generating "Do you have X in other
+  // styles?" / "Would a different color work?" follow-ups that the
+  // recommender resolver cannot fulfill, leading to a dead-end.
+  let recommenderInvokedThisTurn = false;
   let productSearchAttempted = false;
   // Set when a recommender tool returned needMoreInfo (the gate
   // detected required attributes were missing and instructed the
@@ -856,6 +862,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       const u = rewrittenUses[i];
       const r = results[i];
       if (!u || !u.name || !u.name.startsWith("recommend_")) continue;
+      recommenderInvokedThisTurn = true;
       if (!r || r.stopCalling) continue;
       if (r.sandalIncompatible || (r.error && !r.needMoreInfo)) {
         const kind = r.sandalIncompatible
@@ -2221,7 +2228,14 @@ if (collection.cta) {
     }
   }
 
-  return { totalUsage, toolCallCount, model, fullResponseText, productSearchAttempted };
+  return {
+    totalUsage,
+    toolCallCount,
+    model,
+    fullResponseText,
+    productSearchAttempted,
+    recommenderInvokedThisTurn,
+  };
 }
 
 export const loader = async () => {
@@ -2766,7 +2780,14 @@ export const action = async ({ request }) => {
           const lastText = result.fullResponseText || "";
           const hasChoiceButtons = /<<[^<>]+>>/.test(lastText);
 
-          if (config.showFollowUps !== false && !hasChoiceButtons) {
+          // Suppress follow-up suggestions when a recommend_* tool fired
+          // this turn. The recommender resolves to ONE specific SKU based
+          // on the customer's collected attributes; "alternative" follow-
+          // ups ("in other styles?", "different color?") imply variants
+          // the resolver may not have, leading to dead-ends. Customer
+          // already got their definitive answer — don't dilute with
+          // questions we can't reliably fulfill.
+          if (config.showFollowUps !== false && !hasChoiceButtons && !result.recommenderInvokedThisTurn) {
             try {
               const catalogLine = catalogProductTypes.length > 0
                 ? `\n\nCATALOG ALLOW-LIST: this store sells ONLY these product categories: ${catalogProductTypes.join(", ")}. Any follow-up that names or implies a category MUST use one of these exact categories — it is FORBIDDEN to reference a category not on this list.`
