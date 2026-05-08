@@ -393,6 +393,35 @@ export async function maybeRunOrthoticFlow({
     return { handled: false };
   }
 
+  // Off-topic side question mid-flow. If the classifier confidently
+  // says the latest message is NEITHER orthotic NOR footwear (e.g.
+  // 'are you a real person', 'what's your return policy', 'how long
+  // does shipping take'), AND the latest message doesn't look like a
+  // chip click, fall through to the LLM so it can answer the side
+  // question. The next turn will resume the flow naturally.
+  //
+  // Without this, customers asking side questions mid-orthotic-flow
+  // see the bot re-emit the chip question instead of answering them
+  // — broken UX. The eval caught this on a 9-turn scenario.
+  if (
+    classifiedIntent &&
+    classifiedIntent.isOrthoticRequest === false &&
+    classifiedIntent.isFootwearRequest === false &&
+    classifiedIntent.isRejection === false
+  ) {
+    // Check whether the latest message is a chip click (would map to
+    // an attribute via preExtractAnswers). If so, the classifier is
+    // wrong — the customer DID answer a chip — treat as in-flow.
+    const latestExtractedCheck = preExtractAnswers(rawUserText, tree.definition);
+    const isChipShaped = Object.keys(latestExtractedCheck).length > 0;
+    if (!isChipShaped) {
+      console.log(
+        `[orthotic-flow] off-topic side question mid-flow (classifier: neither ortho nor footwear); falling through to LLM`,
+      );
+      return { handled: false };
+    }
+  }
+
   // Hard veto #1: customer committed to the FOOTWEAR path — either
   // in the latest message or in a prior turn. Classifier-first; the
   // classifier returns isFootwearRequest=true when the customer is

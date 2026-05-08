@@ -1090,6 +1090,162 @@ const SCENARIOS = [
       { user: "ok back to orthotics, men's please", classifier: C({ attributes: { gender: "Men" } }), expect: { gateHandled: true } },
     ],
   },
+
+  // ========== Day 2: LONG conversations (8-15 turns) ==========
+  // These test that state accumulation doesn't break, that the gate
+  // doesn't lose context across long histories, and that multi-step
+  // refinements all resolve correctly. This is the "AI breaks on
+  // long conversations" failure mode the user flagged.
+
+  {
+    name: "Long-15: full orthotic flow + Q&A + correction + resolve",
+    turns: [
+      { user: "hi", classifier: { isOrthoticRequest: false, isFootwearRequest: false, isRejection: false, attributes: {}, confidence: "high" }, expect: { gateHandled: false }, synthesizedAssistant: "Hi! How can I help?" },
+      { user: "what's your return policy", classifier: { isOrthoticRequest: false, isFootwearRequest: false, isRejection: false, attributes: {}, confidence: "high" }, expect: { gateHandled: false }, synthesizedAssistant: "30-day returns." },
+      { user: "ok cool. I need orthotics", classifier: C({}), expect: { questionMatches: /Who are these orthotics for/i } },
+      { user: "Men", classifier: C({ attributes: { gender: "Men" } }), expect: { questionMatches: /What kind of shoes/i } },
+      { user: "athletic running", classifier: C({ attributes: { gender: "Men", useCase: "athletic_running" } }), expect: { questionMatches: /condition|pain/i } },
+      { user: "actually wait, casual not athletic", classifier: C({ attributes: { gender: "Men", useCase: "casual" } }), expect: { gateHandled: true } },
+      { user: "Plantar fasciitis", classifier: C({ attributes: { gender: "Men", useCase: "casual", condition: "plantar_fasciitis" } }), expect: { questionMatches: /arch type/i } },
+      { user: "do you have free shipping", classifier: { isOrthoticRequest: false, isFootwearRequest: false, isRejection: false, attributes: {}, confidence: "high" }, expect: { gateHandled: false }, synthesizedAssistant: "Free shipping over $50." },
+      // After off-topic, customer comes back. The gate's history walk
+      // should still see the prior chip answers and continue from where
+      // it left off.
+      { user: "ok, my arch is medium", classifier: C({ attributes: { gender: "Men", useCase: "casual", condition: "plantar_fasciitis" } }), expect: { gateHandled: true } },
+      // Verify the resolver picks the right thing for the accumulated state
+      { user: "Resolve check", expect: { resolveTo: { attrs: { gender: "Men", useCase: "casual", condition: "plantar_fasciitis", arch: "Medium / High Arch", overpronation: "no" }, masterSkuPattern: /^PFKM$|M$/ } } },
+    ],
+  },
+
+  {
+    name: "Long-12: customer pivots gender mid-conversation, state should reflect latest pivot",
+    turns: [
+      { user: "I need orthotics", classifier: C({}), expect: { gateHandled: true } },
+      { user: "Men", classifier: C({ attributes: { gender: "Men" } }), expect: { gateHandled: true } },
+      { user: "Athletic — gym / training", classifier: C({ attributes: { gender: "Men", useCase: "athletic_training" } }), expect: { gateHandled: true } },
+      { user: "Heel spurs", classifier: C({ attributes: { gender: "Men", useCase: "athletic_training", condition: "heel_spurs" } }), expect: { gateHandled: true } },
+      // Pivot — actually it's for the wife
+      { user: "wait, actually it's for my wife not me", classifier: C({ attributes: { gender: "Women", useCase: "athletic_training", condition: "heel_spurs" } }), expect: { gateHandled: true } },
+      // Resolver should now use Women, not Men
+      { user: "Resolve check", expect: { resolveTo: { attrs: { gender: "Women", useCase: "athletic_training", condition: "heel_spurs" }, masterSkuPattern: /W$|U$/ } } },
+    ],
+  },
+
+  {
+    name: "Long-10: family shopping — orthotic for self, then for spouse, separate sessions",
+    turns: [
+      { user: "I need orthotics for me, men's, athletic running, plantar fasciitis", classifier: C({ attributes: { gender: "Men", useCase: "athletic_running", condition: "plantar_fasciitis" } }), expect: { gateHandled: true } },
+      { user: "Resolve self", expect: { resolveTo: { attrs: { gender: "Men", useCase: "athletic_running", condition: "plantar_fasciitis" }, masterSkuPattern: /M$|U$|^PFK/ } } },
+      // Customer asks for spouse next. New "intent" — gate must accept the
+      // new context as fresh.
+      { user: "now I need one for my wife", classifier: C({ attributes: { gender: "Women" } }), expect: { gateHandled: true } },
+      { user: "Casual", classifier: C({ attributes: { gender: "Women", useCase: "casual" } }), expect: { gateHandled: true } },
+      { user: "None — just want comfort", classifier: C({ attributes: { gender: "Women", useCase: "casual", condition: "none" } }), expect: { gateHandled: true } },
+      { user: "Resolve wife", expect: { resolveTo: { attrs: { gender: "Women", useCase: "casual", condition: "none" }, masterSkuPattern: /W$|U$/ } } },
+    ],
+  },
+
+  {
+    name: "Long-9: customer asks Q&A between every chip click",
+    turns: [
+      { user: "I need an orthotic", classifier: C({}), expect: { gateHandled: true } },
+      { user: "are you a real person", classifier: { isOrthoticRequest: false, isFootwearRequest: false, isRejection: false, attributes: {}, confidence: "high" }, expect: { gateHandled: false }, synthesizedAssistant: "I'm an AI assistant." },
+      { user: "Women", classifier: C({ attributes: { gender: "Women" } }), expect: { gateHandled: true } },
+      { user: "what brand are these", classifier: { isOrthoticRequest: false, isFootwearRequest: false, isRejection: false, attributes: {}, confidence: "high" }, expect: { gateHandled: false }, synthesizedAssistant: "Aetrex." },
+      { user: "Casual", classifier: C({ attributes: { gender: "Women", useCase: "casual" } }), expect: { gateHandled: true } },
+      { user: "made in usa?", classifier: { isOrthoticRequest: false, isFootwearRequest: false, isRejection: false, attributes: {}, confidence: "high" }, expect: { gateHandled: false }, synthesizedAssistant: "Designed in NJ." },
+      { user: "Plantar fasciitis", classifier: C({ attributes: { gender: "Women", useCase: "casual", condition: "plantar_fasciitis" } }), expect: { gateHandled: true } },
+      { user: "Resolve after Q&A interruptions", expect: { resolveTo: { attrs: { gender: "Women", useCase: "casual", condition: "plantar_fasciitis" }, masterSkuPattern: /W$|U$|^PFK/ } } },
+    ],
+  },
+
+  {
+    name: "Long-8: customer goes through full chip flow, then asks about shoes after",
+    turns: [
+      { user: "orthotic recommendation please", classifier: C({}), expect: { gateHandled: true } },
+      { user: "Men", classifier: C({ attributes: { gender: "Men" } }), expect: { gateHandled: true } },
+      { user: "Dress shoes", classifier: C({ attributes: { gender: "Men", useCase: "dress" } }), expect: { gateHandled: true } },
+      { user: "Heel spurs", classifier: C({ attributes: { gender: "Men", useCase: "dress", condition: "heel_spurs" } }), expect: { gateHandled: true } },
+      // Customer transitions from orthotic flow to footwear shopping
+      { user: "great. now show me men's dress shoes", classifier: { isOrthoticRequest: false, isFootwearRequest: true, isRejection: false, attributes: { gender: "Men", useCase: "dress" }, confidence: "high" }, expect: { gateHandled: false } },
+    ],
+  },
+
+  {
+    name: "Long-7: customer keeps changing condition through chips",
+    turns: [
+      { user: "orthotic", classifier: C({}), expect: { gateHandled: true } },
+      { user: "Women", classifier: C({ attributes: { gender: "Women" } }), expect: { gateHandled: true } },
+      { user: "Casual", classifier: C({ attributes: { gender: "Women", useCase: "casual" } }), expect: { gateHandled: true } },
+      { user: "Heel spurs", classifier: C({ attributes: { gender: "Women", useCase: "casual", condition: "heel_spurs" } }), expect: { gateHandled: true } },
+      { user: "actually no, plantar fasciitis", classifier: C({ attributes: { gender: "Women", useCase: "casual", condition: "plantar_fasciitis" } }), expect: { gateHandled: true } },
+      { user: "actually ball-of-foot pain", classifier: C({ attributes: { gender: "Women", useCase: "casual", condition: "metatarsalgia" } }), expect: { gateHandled: true } },
+      { user: "Final resolve with last condition", expect: { resolveTo: { attrs: { gender: "Women", useCase: "casual", condition: "metatarsalgia", metSupport: true }, masterSkuPattern: /W$|U$/ } } },
+    ],
+  },
+
+  {
+    name: "Long-6: 'kids' selected then realized adult, full pivot",
+    turns: [
+      { user: "I need orthotics", classifier: C({}), expect: { gateHandled: true } },
+      { user: "Kids", classifier: C({ attributes: { gender: "Kids" } }), expect: { gateHandled: true } },
+      { user: "actually never mind kids, for me, women's", classifier: C({ attributes: { gender: "Women" } }), expect: { gateHandled: true } },
+      { user: "Casual", classifier: C({ attributes: { gender: "Women", useCase: "casual" } }), expect: { gateHandled: true } },
+      { user: "None — just want comfort", classifier: C({ attributes: { gender: "Women", useCase: "casual", condition: "none" } }), expect: { gateHandled: true } },
+      { user: "Resolve as Women, not Kids", expect: { resolveTo: { attrs: { gender: "Women", useCase: "casual", condition: "none" }, masterSkuPattern: /W$|U$/ } } },
+    ],
+  },
+
+  {
+    name: "Long-8: customer says 'next' / 'go on' between turns (testing keep-alive prompts)",
+    turns: [
+      { user: "I need orthotics", classifier: C({}), expect: { gateHandled: true } },
+      { user: "ok", classifier: C({}), expect: { gateHandled: true } }, // gate should keep asking gender
+      { user: "Men", classifier: C({ attributes: { gender: "Men" } }), expect: { gateHandled: true } },
+      { user: "go on", classifier: C({ attributes: { gender: "Men" } }), expect: { gateHandled: true } }, // should ask shoe type
+      { user: "Casual", classifier: C({ attributes: { gender: "Men", useCase: "casual" } }), expect: { gateHandled: true } },
+      { user: "next", classifier: C({ attributes: { gender: "Men", useCase: "casual" } }), expect: { gateHandled: true } }, // should ask condition
+      { user: "None — just want comfort", classifier: C({ attributes: { gender: "Men", useCase: "casual", condition: "none" } }), expect: { gateHandled: true } },
+    ],
+  },
+
+  {
+    name: "Long-13: real-world stitched-together — greetings, policy, browsing, orthotic flow + resolve",
+    turns: [
+      { user: "hello", classifier: { isOrthoticRequest: false, isFootwearRequest: false, isRejection: false, attributes: {}, confidence: "high" }, expect: { gateHandled: false }, synthesizedAssistant: "Hi!" },
+      { user: "do you sell shoes?", classifier: { isOrthoticRequest: false, isFootwearRequest: true, isRejection: false, attributes: {}, confidence: "high" }, expect: { gateHandled: false }, synthesizedAssistant: "Yes, men's and women's." },
+      { user: "what's your return policy", classifier: { isOrthoticRequest: false, isFootwearRequest: false, isRejection: false, attributes: {}, confidence: "high" }, expect: { gateHandled: false }, synthesizedAssistant: "30-day." },
+      { user: "ok cool. I have plantar fasciitis", classifier: C({ attributes: { condition: "plantar_fasciitis" } }), expect: { gateHandled: true } },
+      { user: "Women", classifier: C({ attributes: { gender: "Women", condition: "plantar_fasciitis" } }), expect: { gateHandled: true } },
+      { user: "Casual", classifier: C({ attributes: { gender: "Women", useCase: "casual", condition: "plantar_fasciitis" } }), expect: { gateHandled: true } },
+      // Resolve directly (skips the resolve-step gate call which would hit Prisma in eval env)
+      { user: "Resolve check after long history", expect: { resolveTo: { attrs: { gender: "Women", useCase: "casual", condition: "plantar_fasciitis", arch: "Flat / Low Arch", overpronation: "yes", posted: true }, masterSkuPattern: /W$|U$|^PFK/ } } },
+    ],
+  },
+
+  {
+    name: "Long-10: customer types in fragments, system reads accumulated state",
+    turns: [
+      { user: "orthotic", classifier: C({}), expect: { gateHandled: true } },
+      { user: "for me", classifier: C({}), expect: { gateHandled: true } },
+      { user: "men", classifier: C({ attributes: { gender: "Men" } }), expect: { gateHandled: true } },
+      { user: "running", classifier: C({ attributes: { gender: "Men", useCase: "athletic_running" } }), expect: { gateHandled: true } },
+      { user: "shin splints don't matter", classifier: C({ attributes: { gender: "Men", useCase: "athletic_running" } }), expect: { gateHandled: true } },
+      { user: "no specific condition", classifier: C({ attributes: { gender: "Men", useCase: "athletic_running", condition: "none" } }), expect: { gateHandled: true } },
+      { user: "Final resolve", expect: { resolveTo: { attrs: { gender: "Men", useCase: "athletic_running", condition: "none" }, masterSkuPattern: /M$|U$/ } } },
+    ],
+  },
+
+  {
+    name: "Long-8: customer asks '/help' or system command-like inputs",
+    turns: [
+      { user: "/help", classifier: { isOrthoticRequest: false, isFootwearRequest: false, isRejection: false, attributes: {}, confidence: "low" }, expect: { gateHandled: false }, synthesizedAssistant: "I can help you find shoes or orthotics." },
+      { user: "what can you do", classifier: { isOrthoticRequest: false, isFootwearRequest: false, isRejection: false, attributes: {}, confidence: "high" }, expect: { gateHandled: false }, synthesizedAssistant: "I help with shoes and orthotics." },
+      { user: "ok let's start", classifier: { isOrthoticRequest: false, isFootwearRequest: false, isRejection: false, attributes: {}, confidence: "low" }, expect: { gateHandled: false }, synthesizedAssistant: "What are you shopping for?" },
+      { user: "orthotics please", classifier: C({}), expect: { gateHandled: true } },
+      { user: "Men", classifier: C({ attributes: { gender: "Men" } }), expect: { gateHandled: true } },
+    ],
+  },
 ];
 
 // ---------- Run ----------
