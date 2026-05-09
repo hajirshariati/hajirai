@@ -13,6 +13,25 @@ const here = dirname(fileURLToPath(import.meta.url));
 const definition = JSON.parse(readFileSync(resolve(here, "seeds/aetrex-orthotic-tree.json"), "utf8"));
 const tree = { intent: "orthotic", definition };
 
+// Capture console.log lines so tests can detect when the gate
+// attempted to resolve (the resolver either succeeded with a card or
+// failed with shop=null — both leave a log breadcrumb we can assert
+// against). Wraps the original log so the human-readable trace still
+// shows up on stdout.
+function captureConsoleLogs() {
+  const lines = [];
+  const orig = console.log;
+  console.log = (...args) => {
+    const s = args.map((a) => (typeof a === "string" ? a : JSON.stringify(a))).join(" ");
+    lines.push(s);
+    orig.apply(console, args);
+  };
+  return {
+    lines,
+    restore: () => { console.log = orig; },
+  };
+}
+
 function makeMockSse() {
   const events = [];
   const encoder = { encode: (s) => s };
@@ -791,6 +810,184 @@ await test("availability question 'recommend me one' is NOT availability (still 
     out.handled === true || events.length > 0,
     `expected resolve attempt; got handled=${out.handled} events=${events.length}`,
   );
+});
+
+// ===================================================================
+// MESSY-CONVERSATION REGRESSIONS (production trace 2026-05-09 16:03)
+// Reproduces the actual bugs from a real customer chat where a grandma
+// shopped for self → 9-yo grandson → 90-yo dad → 8-yo son. The
+// orthotic-flow accumulated answers from the FIRST subject and kept
+// reusing them for every later subject — every kid resolved with the
+// wife's "Flat / Low Arch + overpronation=yes" because the gate never
+// reset between subjects. Customer kept screaming "he doesn't have
+// flat feet" and the bot kept re-recommending the same Posted SKU.
+// ===================================================================
+
+await test("subject pivot wife → 9yo grandson resets arch/overpronation/condition", async () => {
+  // Wife established Women + casual + none + Medium/High + overpronation=yes,
+  // resolved L220W. Now customer says "how about for my 9 year old?"
+  // Gate sees gender=Kids, accumulated answers from wife (arch=Medium/High,
+  // overpronation=yes, condition=none). Without subject-pivot reset,
+  // gate resolves with wife's leftover attrs.
+  //
+  // Assertion: the gate must NOT enter the resolve path. We detect this
+  // by capturing console.log and checking for "[orthotic-flow] resolved →"
+  // or "[orthotic-flow] resolve failed" (both indicate the gate ran the
+  // resolver — wrong, because attrs aren't actually the kid's).
+  const { events, encoder, controller } = makeMockSse();
+  const cap = captureConsoleLogs();
+  try {
+    await maybeRunOrthoticFlow({
+      messages: [
+        { role: "user", content: "do you have any orthotic for me?" },
+        { role: "assistant", content: "Who are these for? <<Men>><<Women>>" },
+        { role: "user", content: "Women" },
+        { role: "assistant", content: "What kind of shoes? <<Casual>><<Dress>>" },
+        { role: "user", content: "Casual" },
+        { role: "assistant", content: "Any condition? <<None>>" },
+        { role: "user", content: "None" },
+        { role: "assistant", content: "Arch type? <<Flat / Low Arch>><<Medium / High Arch>>" },
+        { role: "user", content: "Medium / High Arch" },
+        { role: "assistant", content: "Roll inward? <<Yes>><<No>>" },
+        { role: "user", content: "Yes" },
+        { role: "assistant", content: "Here's your match." },
+        { role: "user", content: "how about for my 9 year old?" },
+      ],
+      tree,
+      shop: null,
+      controller,
+      encoder,
+      classifiedIntent: { isOrthoticRequest: true, isFootwearRequest: false, isRejection: false, attributes: { gender: "Kids" } },
+    });
+  } finally {
+    cap.restore();
+  }
+  const enteredResolve = cap.lines.some((l) =>
+    /\[orthotic-flow\] resolved →|\[orthotic-flow\] resolve failed/.test(l),
+  );
+  assert.equal(
+    enteredResolve,
+    false,
+    `gate must NOT enter resolve path with wife's accumulated arch/overpronation. Logs: ${cap.lines.filter(l => l.includes("[orthotic-flow]")).join(" | ")}`,
+  );
+});
+
+await test("subject pivot wife → dad (Men) resets accumulated subject attrs", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  const cap = captureConsoleLogs();
+  try {
+    await maybeRunOrthoticFlow({
+      messages: [
+        { role: "user", content: "I need orthotics" },
+        { role: "assistant", content: "Who?" },
+        { role: "user", content: "Women" },
+        { role: "assistant", content: "Shoes?" },
+        { role: "user", content: "casual" },
+        { role: "assistant", content: "Condition?" },
+        { role: "user", content: "none" },
+        { role: "assistant", content: "Arch?" },
+        { role: "user", content: "Flat / Low Arch" },
+        { role: "assistant", content: "Pronation?" },
+        { role: "user", content: "Yes" },
+        { role: "assistant", content: "Done." },
+        { role: "user", content: "okay i need orthotic for my dad now" },
+      ],
+      tree,
+      shop: null,
+      controller,
+      encoder,
+      classifiedIntent: { isOrthoticRequest: true, isFootwearRequest: false, isRejection: false, attributes: { gender: "Men" } },
+    });
+  } finally {
+    cap.restore();
+  }
+  const enteredResolve = cap.lines.some((l) =>
+    /\[orthotic-flow\] resolved →|\[orthotic-flow\] resolve failed/.test(l),
+  );
+  assert.equal(enteredResolve, false,
+    `gate must NOT enter resolve path with wife's accumulated arch=Flat/overpronation=yes`);
+});
+
+await test("chip-context defense: 'Yes' to overpronation chip does NOT inject condition=overpronation_flat_feet", async () => {
+  // Customer answers "Yes" to the overpronation chip question.
+  // Haiku tends to read the chip's wording ("flat-feet symptoms") and
+  // infer condition=overpronation_flat_feet. The gate should drop
+  // that spurious extraction so the resolver doesn't get a fake
+  // condition the customer never named.
+  const { events, encoder, controller } = makeMockSse();
+  const cap = captureConsoleLogs();
+  try {
+    await maybeRunOrthoticFlow({
+      messages: [
+        { role: "user", content: "I need orthotics" },
+        { role: "assistant", content: "Who? <<Men>><<Women>>" },
+        { role: "user", content: "Women" },
+        { role: "assistant", content: "Shoes? <<Casual>>" },
+        { role: "user", content: "Casual" },
+        { role: "assistant", content: "Condition? <<None>>" },
+        { role: "user", content: "None" },
+        { role: "assistant", content: "Arch? <<Flat / Low Arch>><<Medium / High Arch>>" },
+        { role: "user", content: "Medium / High Arch" },
+        { role: "assistant", content: "When you walk or stand, do your ankles roll inward or do you have flat-feet symptoms? <<Yes>><<No>>" },
+        { role: "user", content: "Yes" },
+      ],
+      tree,
+      shop: null,
+      controller,
+      encoder,
+      classifiedIntent: {
+        isOrthoticRequest: true,
+        isFootwearRequest: false,
+        isRejection: false,
+        // Haiku spuriously infers condition from chip text:
+        attributes: { gender: "Women", useCase: "casual", condition: "overpronation_flat_feet" },
+      },
+    });
+  } finally {
+    cap.restore();
+  }
+  const droppedSpurious = cap.lines.some((l) =>
+    /chip-context defense: dropping spurious condition=overpronation_flat_feet/.test(l),
+  );
+  assert.equal(
+    droppedSpurious,
+    true,
+    `gate must drop spurious condition extraction. Logs: ${cap.lines.filter(l => l.includes("[orthotic-flow]")).join(" | ")}`,
+  );
+});
+
+await test("customer correction: 'but he doesn't have flat feet' → invalidates condition", async () => {
+  // Customer says bot was wrong about flat feet for the kid. Gate
+  // should NOT continue resolving the same SKU. Either re-ask the
+  // condition / arch chip OR fall through to LLM. Auto-resolve is
+  // forbidden because customer just contradicted the data.
+  const { events, encoder, controller } = makeMockSse();
+  const cap = captureConsoleLogs();
+  try {
+    await maybeRunOrthoticFlow({
+      messages: [
+        { role: "user", content: "orthotic for my son who has flat feet" },
+        { role: "assistant", content: "Got it. Arch?" },
+        { role: "user", content: "Flat / Low Arch" },
+        { role: "assistant", content: "Roll inward?" },
+        { role: "user", content: "Yes" },
+        { role: "assistant", content: "Here's the Kids Posted Orthotic." },
+        { role: "user", content: "but he doesn't have flat feet" },
+      ],
+      tree,
+      shop: null,
+      controller,
+      encoder,
+      classifiedIntent: { isOrthoticRequest: true, isFootwearRequest: false, isRejection: false, attributes: { gender: "Kids" } },
+    });
+  } finally {
+    cap.restore();
+  }
+  const enteredResolve = cap.lines.some((l) =>
+    /\[orthotic-flow\] resolved →|\[orthotic-flow\] resolve failed/.test(l),
+  );
+  assert.equal(enteredResolve, false,
+    `gate must NOT re-resolve same flat-feet SKU after customer corrected the premise`);
 });
 
 console.log("");

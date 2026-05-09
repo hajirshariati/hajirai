@@ -2243,9 +2243,27 @@ export const action = async ({ request }) => {
     // this" doesn't flip the entire conversation.
     const PIVOT_RE = /\b(men|mens|men['’]?s|women|womens|women['’]?s|male|female|mom|mother|wife|girlfriend|sister|daughter|grandma|grandmother|aunt|niece|dad|father|husband|boyfriend|brother|son|grandpa|grandfather|uncle|nephew|lady|ladies|guy|dude|girl|girls|boy|boys|kid|kids|children)\b/i;
     const latestUserMessage = String(body.message || "");
+    // Rhetorical-question guard. Customer said "do you think my dad
+    // is a women?" — sarcastic, accusing the bot of mis-gendering
+    // their dad. detectLatestGender is positional and would return
+    // "women" (the last gender word in the sentence), flipping the
+    // gender lock from Men to Women — exactly the opposite of the
+    // customer's intent. Skip pivot when the message is a rhetorical
+    // accusation. Patterns: "do you think / are you assuming / are
+    // you saying X is Y", "you think X is Y", "did i say X is Y".
+    const RHETORICAL_RE = /\b(?:do you (?:really )?think|are you (?:assuming|saying|kidding|implying|telling me)|did i (?:say|tell you)|why (?:do|would|are) you (?:think|assume|recommend))\b/i;
+    const isRhetorical = RHETORICAL_RE.test(latestUserMessage);
     const historicalSessionGender = detectGenderFromHistory(messages);
     const latestPivotedGender =
-      PIVOT_RE.test(latestUserMessage) ? detectLatestGender(latestUserMessage) : null;
+      (PIVOT_RE.test(latestUserMessage) && !isRhetorical)
+        ? detectLatestGender(latestUserMessage)
+        : null;
+    if (isRhetorical && PIVOT_RE.test(latestUserMessage)) {
+      console.log(
+        `[chat] gender-pivot suppressed: message is rhetorical/accusing ` +
+          `("${latestUserMessage.slice(0, 60)}")`,
+      );
+    }
     // Pivot wins. When the latest message has a clear pivot signal,
     // that's the source of truth for this turn forward — catalog
     // scoping, ctx.sessionGender, search filters, all flow from this

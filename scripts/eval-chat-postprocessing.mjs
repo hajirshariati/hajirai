@@ -641,6 +641,54 @@ test("no classifier → does not fire", () => {
   assert.equal(r, null);
 });
 
+test("free-text 'how about shoes for my dad' → fires with Footwear", () => {
+  // Production trace: customer says "how about shoes for my dad, he
+  // is 90 years old..." — gender=Men + classifier footwear=true.
+  // Without this path the over-elicitation guard didn't fire and the
+  // LLM asked a clarifying question instead of searching.
+  const r = detectFootwearOverElicitation({
+    classifiedIntent: { isFootwearRequest: true, attributes: { gender: "Men" } },
+    latestUserMessage: "how about shoes for my dad, he is 90 years old",
+    establishedGender: "men",
+    catalogProductTypes: FAKE_TYPES,
+  });
+  assert(r, "guard should fire on 'shoes for my dad' free-text");
+  assert.equal(r.gender, "men");
+  assert.equal(r.category, "footwear");
+});
+
+test("free-text 'I need sandals for my mom' → fires with Sandals (specific match)", () => {
+  const r = detectFootwearOverElicitation({
+    classifiedIntent: { isFootwearRequest: true, attributes: {} },
+    latestUserMessage: "I need sandals for my mom",
+    establishedGender: "women",
+    catalogProductTypes: FAKE_TYPES,
+  });
+  assert(r);
+  assert.equal(r.category, "sandals");
+});
+
+test("free-text 'looking for some boots in size 10' → fires with Boots", () => {
+  const r = detectFootwearOverElicitation({
+    classifiedIntent: { isFootwearRequest: true, attributes: {} },
+    latestUserMessage: "looking for some boots in size 10",
+    establishedGender: "women",
+    catalogProductTypes: FAKE_TYPES,
+  });
+  assert(r);
+  assert.equal(r.category, "boots");
+});
+
+test("free-text 'do you have anything good?' → does NOT fire (no category)", () => {
+  const r = detectFootwearOverElicitation({
+    classifiedIntent: { isFootwearRequest: true, attributes: {} },
+    latestUserMessage: "do you have anything good?",
+    establishedGender: "men",
+    catalogProductTypes: FAKE_TYPES,
+  });
+  assert.equal(r, null);
+});
+
 // =====================================================================
 console.log(`\n${failed === 0 ? "✅" : "❌"}  ${passed} passed, ${failed} failed`);
 if (failed > 0) {

@@ -433,19 +433,48 @@ export function detectFootwearOverElicitation({
   if (g !== "men" && g !== "women" && g !== "kids") return null;
   const u = String(latestUserMessage || "")
     .toLowerCase()
-    .replace(/s$/, "")
     .replace(/\s+/g, " ")
     .trim();
   if (!u || u.length < 3) return null;
+  const uStem = u.replace(/s$/, "");
   const types = Array.isArray(catalogProductTypes) ? catalogProductTypes : [];
-  const catMatch = types.find((cat) => {
+  // Path A — chip-click match: latest message EQUALS a catalog category
+  // (after normalizing plural/whitespace). e.g. customer clicked
+  // "Sneakers" chip → uStem="sneaker" matches category "Sneakers".
+  let catMatch = types.find((cat) => {
     const c = String(cat || "")
       .toLowerCase()
       .replace(/s$/, "")
       .replace(/\s+/g, " ")
       .trim();
-    return c.length >= 3 && c === u;
+    return c.length >= 3 && c === uStem;
   });
+  // Path B — free-text match: latest message CONTAINS a category
+  // word as a whole-token substring. Production trace: customer says
+  // "how about shoes for my dad" — gender=Men + footwear=true but
+  // the message doesn't equal a category. We still want to force a
+  // search this turn, not let the LLM ask a third question. Match
+  // category words as whole tokens (escape category, word-boundary
+  // both sides) and prefer the most specific match (longest first).
+  if (!catMatch) {
+    const sortedTypes = [...types].sort((a, b) => String(b).length - String(a).length);
+    catMatch = sortedTypes.find((cat) => {
+      const c = String(cat || "").toLowerCase().trim();
+      if (c.length < 3) return false;
+      // Build a regex that allows a trailing 's' on the catalog word
+      // (sneaker → sneakers) and respects word boundaries.
+      const escaped = c.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/s$/, "s?");
+      try {
+        return new RegExp(`\\b${escaped}\\b`, "i").test(u);
+      } catch { return false; }
+    });
+    // Path C — generic "shoes / footwear" mention with gender. Even
+    // without a specific category in the message, "shoes for my dad"
+    // is a clear footwear intent — search the full footwear space.
+    if (!catMatch && /\b(?:shoes?|footwear|kicks)\b/i.test(u)) {
+      catMatch = "Footwear";
+    }
+  }
   if (!catMatch) return null;
   const cat = String(catMatch).toLowerCase();
   return {

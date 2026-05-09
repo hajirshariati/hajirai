@@ -319,6 +319,38 @@ export async function maybeRunOrthoticFlow({
     if (a.condition) latestExtracted.condition = a.condition;
   }
 
+  // Chip-context defense for the overpronation chip question.
+  // Production trace: when the assistant's prior message was the
+  // overpronation chip ("...do your ankles roll inward or do you have
+  // flat-feet symptoms?") and the customer answers "Yes", Haiku reads
+  // the chip text + Yes and infers `condition=overpronation_flat_feet`.
+  // That's wrong: the chip's purpose is to set `overpronation=yes`
+  // ONLY, not to inject a clinical condition the customer never named
+  // in free text. Drop the spurious condition extraction when we
+  // detect this combination. Also drop spurious arch extraction in
+  // the same shape ("Flat / Low Arch" Y/N answer is for the arch
+  // chip, not the condition chip).
+  {
+    const priorLastAssistant = [...priorMessages].reverse().find((m) => m.role === "assistant");
+    const priorLastText = priorLastAssistant && typeof priorLastAssistant.content === "string"
+      ? priorLastAssistant.content
+      : "";
+    const priorWasOverpronationChip = /ankles\s+roll\s+inward|flat-feet\s+symptoms/i.test(priorLastText);
+    const latestIsYesNo = /^\s*(?:yes|yeah|yep|yup|sure|absolutely|definitely|no|nope|not\s+(?:really|sure)|maybe|kind\s+of|sort\s+of)[\s.!?]*$/i
+      .test(rawUserText);
+    if (
+      priorWasOverpronationChip &&
+      latestIsYesNo &&
+      latestExtracted.condition === "overpronation_flat_feet"
+    ) {
+      console.log(
+        `[orthotic-flow] chip-context defense: dropping spurious condition=overpronation_flat_feet ` +
+          `from Y/N answer to overpronation chip (prior msg was the chip question)`,
+      );
+      delete latestExtracted.condition;
+    }
+  }
+
   // Kids-sticky: once gender=Kids is established, it CANNOT be silently
   // flipped to Men/Women by a subsequent message. Production trace —
   // customer chose Kids on q_gender, the LLM later asked an unsolicited
@@ -339,6 +371,51 @@ export async function maybeRunOrthoticFlow({
         `(accumulated=${accumulated.gender} → latest=${latestExtracted.gender})`,
     );
     delete latestExtracted.gender;
+  }
+
+  // Subject-pivot reset. When the latest message names a NEW
+  // subject (different gender from accumulated), the prior subject's
+  // arch/overpronation/condition answers don't apply. Production
+  // trace: grandma asked for self (Women + Medium arch + overpronation
+  // yes) — bot resolved L220W. Then "how about for my 9 year old?" —
+  // gate inherited the Medium arch + overpronation=yes and resolved
+  // L1720Y (Kids Posted) using the WIFE'S overpronation answer. Same
+  // for "and for my dad" — inherited wife's flat-feet posted state.
+  // Customer kept screaming "he doesn't have flat feet" because every
+  // subject's recommendation came from the wife's accumulated state.
+  //
+  // Reset condition + arch + overpronation when gender pivots. Keep
+  // useCase (shoe context — "casual" tends to carry across subjects
+  // if the customer didn't say otherwise). The kids-sticky case above
+  // is already handled — if it fired, latestExtracted.gender is now
+  // deleted so this check doesn't trigger.
+  if (
+    latestExtracted.gender &&
+    accumulated.gender &&
+    latestExtracted.gender !== accumulated.gender
+  ) {
+    console.log(
+      `[orthotic-flow] subject pivot: gender ${accumulated.gender} → ${latestExtracted.gender}; ` +
+        `dropping accumulated condition/arch/overpronation (subject-specific attrs)`,
+    );
+    delete accumulated.condition;
+    delete accumulated.arch;
+    delete accumulated.overpronation;
+  }
+
+  // Customer-correction veto. The customer just pushed back on a
+  // prior accumulated answer ("but he doesn't have flat feet" /
+  // "actually she doesn't / no he doesn't"). Whatever we accumulated
+  // is now suspect — fall through to the LLM, which can apologize
+  // and re-elicit cleanly. Auto-resolving the same SKU after the
+  // customer contradicted us is the worst customer-experience bug.
+  const CORRECTION_RE = /^\s*(?:but|actually|no,?\s+(?:he|she|they|i))\b[^.!?]{0,80}?\b(?:doesn'?t|does not|don'?t|do not|isn'?t|is not|aren'?t|are not)\b/i;
+  if (CORRECTION_RE.test(rawUserText)) {
+    console.log(
+      `[orthotic-flow] customer correction detected ("${rawUserText.slice(0, 60)}"); ` +
+        `falling through to LLM`,
+    );
+    return { handled: false };
   }
 
   const answers = { ...accumulated, ...latestExtracted };
