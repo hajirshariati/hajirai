@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   useLoaderData,
   useActionData,
@@ -797,15 +797,35 @@ function DecisionTreesCard({ enabled, trees }) {
                   checked={Boolean(editing.enabled)}
                   onChange={(v) => setEditing((p) => ({ ...p, enabled: v }))}
                 />
-                <TextField
-                  label="Lookup table (JSON)"
-                  value={editing.definition}
-                  onChange={onChange("definition")}
-                  multiline={20}
-                  monospaced
-                  autoComplete="off"
-                  helpText="The resolver.masterIndex array drives the recommendation: each entry maps an attribute set (gender, useCase, condition, etc.) to a master SKU. Validated server-side; bad JSON is rejected. The Aetrex seed is the canonical example."
-                />
+              </FormLayout>
+              {/* CSV editor first — most merchants will use this and never touch the raw JSON. */}
+              {editing.id && (
+                <MappingCsvSection treeId={editing.id} />
+              )}
+              <FormLayout>
+                <Box paddingBlockStart="200">
+                  <Text as="h4" variant="headingSm">Advanced — raw JSON</Text>
+                </Box>
+                <div
+                  style={{
+                    maxHeight: "320px",
+                    overflowY: "auto",
+                    border: "1px solid var(--p-color-border, #e1e3e5)",
+                    borderRadius: "8px",
+                    padding: "0",
+                  }}
+                >
+                  <TextField
+                    label="Lookup table (JSON)"
+                    labelHidden
+                    value={editing.definition}
+                    onChange={onChange("definition")}
+                    multiline={12}
+                    monospaced
+                    autoComplete="off"
+                    helpText="The resolver.masterIndex array drives the recommendation: each entry maps an attribute set (gender, useCase, condition, etc.) to a master SKU. For most edits use the CSV editor above. The JSON view is here for chip questions, derivations, and other advanced fields."
+                  />
+                </div>
               </FormLayout>
               <InlineStack gap="200">
                 <Button onClick={saveEditor} variant="primary"
@@ -820,9 +840,6 @@ function DecisionTreesCard({ enabled, trees }) {
                   </Button>
                 )}
               </InlineStack>
-              {editing.id && (
-                <MappingCsvSection treeId={editing.id} />
-              )}
             </BlockStack>
           </>
         )}
@@ -844,16 +861,54 @@ function DecisionTreesCard({ enabled, trees }) {
 function MappingCsvSection({ treeId }) {
   const previewFetcher = useFetcher();
   const applyFetcher = useFetcher();
+  const fileInputRef = useRef(null);
   const [csvContent, setCsvContent] = useState("");
   const [fileName, setFileName] = useState("");
+  const [downloading, setDownloading] = useState(false);
+  const [downloadError, setDownloadError] = useState(null);
 
-  // Reset preview when content changes (so a stale preview doesn't
-  // appear next to a different upload).
-  useEffect(() => {
-    if (previewFetcher.data?.mappingCsvPreview) {
-      // ok — keep it visible
+  // Download via fetch + blob URL. The earlier form-based approach
+  // submitted to the same Remix route, but Remix intercepts the
+  // navigation and treats the CSV Response as action data — which
+  // closes the editor and never triggers a browser download. Using
+  // fetch bypasses the router entirely; we get the raw Response and
+  // turn it into a download via blob URL + synthetic <a download>.
+  const handleDownload = async () => {
+    setDownloadError(null);
+    setDownloading(true);
+    try {
+      const fd = new FormData();
+      fd.set("intent", "export_mapping_csv");
+      fd.set("id", treeId);
+      const res = await fetch("", { method: "POST", body: fd });
+      if (!res.ok) {
+        // Action returned a JSON error (e.g. tree not found)
+        let msg = `HTTP ${res.status}`;
+        try {
+          const j = await res.json();
+          if (j?.error) msg = j.error;
+        } catch { /* ignore — keep status text */ }
+        throw new Error(msg);
+      }
+      const blob = await res.blob();
+      const cd = res.headers.get("Content-Disposition") || "";
+      const m = cd.match(/filename="?([^";]+)"?/i);
+      const filename = m ? m[1] : `mapping-${treeId.slice(0, 8)}.csv`;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      // Defer revoke so the browser has time to start the download
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (err) {
+      setDownloadError(err?.message || "Download failed");
+    } finally {
+      setDownloading(false);
     }
-  }, [previewFetcher.data]);
+  };
 
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
@@ -861,6 +916,16 @@ function MappingCsvSection({ treeId }) {
     setFileName(file.name);
     const text = await file.text();
     setCsvContent(text);
+  };
+
+  const triggerFilePicker = () => {
+    fileInputRef.current?.click();
+  };
+
+  const clearUpload = () => {
+    setCsvContent("");
+    setFileName("");
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const submitPreview = () => {
@@ -884,48 +949,73 @@ function MappingCsvSection({ treeId }) {
   const applyError = applyFetcher.data?.error;
 
   return (
-    <>
-      <Divider />
+    <Box
+      paddingBlockStart="400"
+      paddingBlockEnd="400"
+    >
       <BlockStack gap="300">
-        <Text as="h4" variant="headingSm">
-          Edit mapping as a spreadsheet (CSV)
-        </Text>
-        <Text as="p" variant="bodySm" tone="subdued">
-          Download the SKU mapping as a CSV file, edit it in Excel or Google Sheets,
-          and upload it back. Only the SKU rows change — chip questions and other
-          tree settings stay the same.
-        </Text>
-
-        {/* Download — regular form so the browser handles the file response */}
-        <form method="post" action="">
-          <input type="hidden" name="intent" value="export_mapping_csv" />
-          <input type="hidden" name="id" value={treeId} />
-          <Button submit variant="secondary">Download CSV</Button>
-        </form>
-
-        {/* Upload */}
-        <BlockStack gap="200">
-          <input
-            type="file"
-            accept=".csv,text/csv"
-            onChange={handleFileChange}
-            aria-label="Upload edited CSV"
-          />
-          {fileName && (
-            <Text as="p" variant="bodySm" tone="subdued">
-              Loaded file: {fileName} ({csvContent.length.toLocaleString()} characters)
-            </Text>
-          )}
-          <InlineStack gap="200">
-            <Button
-              onClick={submitPreview}
-              disabled={!csvContent || previewFetcher.state === "submitting"}
-              loading={previewFetcher.state === "submitting"}
-            >
-              Preview changes
-            </Button>
-          </InlineStack>
+        <BlockStack gap="100">
+          <Text as="h4" variant="headingMd">
+            Edit mapping as a spreadsheet (CSV)
+          </Text>
+          <Text as="p" variant="bodySm" tone="subdued">
+            Download the SKU mapping as a CSV file, edit it in Excel or Google Sheets,
+            and upload it back. Only the SKU rows change — chip questions and other
+            tree settings stay the same.
+          </Text>
         </BlockStack>
+
+        {/* Hidden file input — triggered by the styled Polaris Button below. */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".csv,text/csv"
+          onChange={handleFileChange}
+          style={{ display: "none" }}
+          aria-hidden="true"
+          tabIndex={-1}
+        />
+
+        <InlineStack gap="200" wrap>
+          <Button
+            onClick={handleDownload}
+            loading={downloading}
+            disabled={downloading}
+            variant="secondary"
+          >
+            Download CSV
+          </Button>
+          <Button onClick={triggerFilePicker} variant="secondary">
+            {fileName ? `Replace: ${fileName.length > 24 ? fileName.slice(0, 24) + "…" : fileName}` : "Upload CSV"}
+          </Button>
+          {csvContent && (
+            <>
+              <Button
+                onClick={submitPreview}
+                disabled={previewFetcher.state === "submitting"}
+                loading={previewFetcher.state === "submitting"}
+                variant="primary"
+              >
+                Preview changes
+              </Button>
+              <Button onClick={clearUpload} variant="plain">
+                Clear
+              </Button>
+            </>
+          )}
+        </InlineStack>
+
+        {fileName && !preview && !applied && (
+          <Text as="p" variant="bodySm" tone="subdued">
+            Loaded: {fileName} ({csvContent.length.toLocaleString()} characters). Click <strong>Preview changes</strong> to see the diff.
+          </Text>
+        )}
+
+        {downloadError && (
+          <Banner tone="critical" title="Download failed">
+            <Text as="p" variant="bodySm">{downloadError}</Text>
+          </Banner>
+        )}
 
         {/* Preview result */}
         {preview && !preview.ok && (
@@ -999,7 +1089,7 @@ function MappingCsvSection({ treeId }) {
           </Banner>
         )}
       </BlockStack>
-    </>
+    </Box>
   );
 }
 
