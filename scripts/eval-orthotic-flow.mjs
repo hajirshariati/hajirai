@@ -23,6 +23,8 @@ import {
   detectOrthoticIntent,
   preExtractAnswers,
   accumulateAnswers,
+  looksLikeRecommendationRequest,
+  looksLikeInformationalQuestion,
 } from "../app/lib/orthotic-flow.server.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -474,6 +476,88 @@ test("not off-topic: 'for my mom' on gender (Layer 2 catches)", () => {
 test("not off-topic: empty string", () => {
   const node = findNodeById(tree, "q_gender");
   assert.equal(isOffTopicReply("", node), false);
+});
+
+section("looksLikeRecommendationRequest");
+
+test("'show me an orthotic' → true", () => {
+  assert.equal(looksLikeRecommendationRequest("show me an orthotic"), true);
+});
+test("'recommend one' → true", () => {
+  assert.equal(looksLikeRecommendationRequest("recommend one for me"), true);
+});
+test("'find me one' → true", () => {
+  assert.equal(looksLikeRecommendationRequest("can you find me one"), true);
+});
+test("'pick one' → true", () => {
+  assert.equal(looksLikeRecommendationRequest("just pick one for me"), true);
+});
+test("'I'll take it' → true", () => {
+  assert.equal(looksLikeRecommendationRequest("ok I'll take it"), true);
+});
+test("'go ahead' → true", () => {
+  assert.equal(looksLikeRecommendationRequest("go ahead"), true);
+});
+test("'sounds good' → true", () => {
+  assert.equal(looksLikeRecommendationRequest("sounds good"), true);
+});
+test("'what's the best orthotic for me' → true", () => {
+  assert.equal(looksLikeRecommendationRequest("what's the best orthotic for me"), true);
+});
+test("'what's the best insole for plantar fasciitis' → true", () => {
+  assert.equal(looksLikeRecommendationRequest("what's the best insole for plantar fasciitis"), true);
+});
+test("'what is thinsole' → false (informational)", () => {
+  assert.equal(looksLikeRecommendationRequest("what is thinsole?"), false);
+});
+test("'what brand are these' → false", () => {
+  assert.equal(looksLikeRecommendationRequest("what brand are these?"), false);
+});
+test("plain greeting → false", () => {
+  assert.equal(looksLikeRecommendationRequest("hello there"), false);
+});
+test("empty → false", () => {
+  assert.equal(looksLikeRecommendationRequest(""), false);
+});
+
+section("looksLikeInformationalQuestion");
+
+test("'what is thinsole?' → true", () => {
+  assert.equal(looksLikeInformationalQuestion("what is thinsole?"), true);
+});
+test("'what are Thinsoles?' → true", () => {
+  assert.equal(looksLikeInformationalQuestion("what are Thinsoles?"), true);
+});
+test("'tell me about the L620' → true", () => {
+  assert.equal(looksLikeInformationalQuestion("tell me about the L620"), true);
+});
+test("'how does the foam work?' → true", () => {
+  assert.equal(looksLikeInformationalQuestion("how does the foam work?"), true);
+});
+test("'explain the difference between posted and non-posted' → true", () => {
+  assert.equal(looksLikeInformationalQuestion("explain the difference between posted and non-posted"), true);
+});
+test("'difference between A and B?' → true", () => {
+  assert.equal(looksLikeInformationalQuestion("what's the difference between A and B?"), true);
+});
+test("'show me an orthotic' → false (recommendation, not info)", () => {
+  assert.equal(looksLikeInformationalQuestion("show me an orthotic"), false);
+});
+test("'recommend one' → false", () => {
+  assert.equal(looksLikeInformationalQuestion("recommend one for me"), false);
+});
+test("'I have plantar fasciitis' → false (statement, not question)", () => {
+  assert.equal(looksLikeInformationalQuestion("I have plantar fasciitis"), false);
+});
+test("'what should I get?' → false (recommendation request)", () => {
+  // 'what should i get' starts with 'what' BUT doesn't match the
+  // INFORMATIONAL pattern — no 'is/are/does/exactly' and no
+  // 'what's the X'. So returns false. (This message is captured
+  // by looksLikeRecommendationRequest's "what should I get/buy/wear" rule.)
+  assert.equal(looksLikeInformationalQuestion("what should I get?"), false);
+});
+test("empty → false", () => {
+  assert.equal(looksLikeInformationalQuestion(""), false);
 });
 
 async function run() {

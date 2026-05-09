@@ -361,6 +361,39 @@ export function redirectOrthoticSearchToRecommender(toolCall, ctx) {
   const matchesDomain = ORTHOTIC_DOMAIN_RE.test(latest) || ORTHOTIC_DOMAIN_RE.test(queryStr);
   if (!matchesDomain) return toolCall;
 
+  // Classifier-aware veto. If the upstream Haiku classifier judged
+  // the latest message as NOT a recommendation request (e.g. "what
+  // is thinsole?" — informational/definitional), don't redirect to
+  // recommend_orthotic. The LLM was right to reach for
+  // search_products; let the search find the specific product the
+  // customer asked about. Without this, "what are Thinsoles?" gets
+  // rewritten into a 5-chip flow.
+  if (ctx?.classifiedIntent && ctx.classifiedIntent.isOrthoticRequest === false) {
+    console.log(
+      `[chat] orthotic-routing: skipped redirect — classifier says ortho=false ` +
+        `(latest="${latest.slice(0, 50)}"); letting search_products run.`,
+    );
+    return toolCall;
+  }
+
+  // Informational-question veto. Even if the classifier said
+  // ortho=true (or ran fallback regex), explicit informational
+  // phrasing — "what is X / explain Y / tell me about Z / how does
+  // X work" — means the customer wants to learn, not buy. Search is
+  // the right tool; let it run. Catches cases where the classifier
+  // misclassified an informational question.
+  const INFO_QUESTION_RE = /\b(?:what (?:is|are|does|do|exactly)|what'?s (?:the|a|an|your)|how (?:does|do|is|are)\b[^?!.\n]{0,80}?\b(?:work|made|different)|tell me (?:more )?about|explain (?:how|what|the)|describe (?:the|how|what|your)|details? (?:on|about|of)|info(?:rmation)? (?:on|about)|difference between|made of|specs? (?:on|of|for))\b/i;
+  if (
+    INFO_QUESTION_RE.test(latest) &&
+    (latest.endsWith("?") || /^(?:what|how|tell me|explain|describe)\b/i.test(latest.trim()))
+  ) {
+    console.log(
+      `[chat] orthotic-routing: skipped redirect — latest message is informational/definitional ` +
+        `("${latest.slice(0, 60)}"); letting search_products run.`,
+    );
+    return toolCall;
+  }
+
   // Negation escape hatch: customer said "doesn't like orthotics",
   // "not orthotics", "no orthotics", "without orthotics", "besides
   // orthotics", "other than orthotics". The orthotic-domain word

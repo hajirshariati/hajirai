@@ -545,6 +545,155 @@ await test("unified: chip syntax lost from assistant history — gate still work
   assert.match(events[0].text, /Who are these orthotics for/i);
 });
 
+// ===================================================================
+// Resolve-intent guard regressions (Thinsole bug class)
+// ===================================================================
+
+await test("resolve guard: 'what is thinsole?' mid-flow with full attrs → falls through (informational)", async () => {
+  // Production trace bug. Customer accumulated gender=Men, useCase=casual,
+  // condition=overpronation_flat_feet, arch=Flat/Low. On a NEW turn with
+  // an informational question, the gate used to walk to resolve and
+  // emit a phantom L620M card, bypassing the LLM. Customer asked
+  // "what is thinsole?" — wanted info, got a product. With the
+  // resolve-intent guard, the gate falls through; LLM answers.
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "I need an orthotic" },
+      { role: "assistant", content: "Who are these orthotics for?" },
+      { role: "user", content: "Men" },
+      { role: "assistant", content: "What kind of shoes will the orthotics go in?" },
+      { role: "user", content: "casual" },
+      { role: "assistant", content: "Any specific foot pain or condition?" },
+      { role: "user", content: "flat feet" },
+      { role: "assistant", content: "What's your arch type?" },
+      { role: "user", content: "Flat / Low Arch" },
+      { role: "assistant", content: "Here is your orthotic recommendation." },
+      { role: "user", content: "what is thinsole?" },
+    ],
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+  });
+  assert.equal(out.handled, false, "gate should fall through to LLM on informational question");
+  assert.equal(events.length, 0, "no SSE events should have been emitted");
+});
+
+await test("resolve guard: 'tell me about the L620' mid-flow → falls through", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "I need an orthotic" },
+      { role: "assistant", content: "Who are these orthotics for?" },
+      { role: "user", content: "Men" },
+      { role: "assistant", content: "What shoes?" },
+      { role: "user", content: "casual" },
+      { role: "assistant", content: "Any condition?" },
+      { role: "user", content: "plantar fasciitis" },
+      { role: "assistant", content: "What's your arch type?" },
+      { role: "user", content: "Medium / High Arch" },
+      { role: "assistant", content: "Done — here's your match." },
+      { role: "user", content: "tell me about the L620" },
+    ],
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+  });
+  assert.equal(out.handled, false);
+});
+
+await test("resolve guard: 'how does the foam work?' mid-flow → falls through", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "I need orthotics" },
+      { role: "assistant", content: "Who are these for?" },
+      { role: "user", content: "Women" },
+      { role: "assistant", content: "What shoes?" },
+      { role: "user", content: "casual" },
+      { role: "assistant", content: "Any condition?" },
+      { role: "user", content: "none" },
+      { role: "assistant", content: "What's your arch?" },
+      { role: "user", content: "Medium / High Arch" },
+      { role: "assistant", content: "Got it." },
+      { role: "user", content: "how does the foam work?" },
+    ],
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+  });
+  assert.equal(out.handled, false);
+});
+
+await test("resolve guard: 'show me a recommendation' mid-flow → resolves (explicit request)", async () => {
+  // Happy-path preservation. Same prior state as the above tests, but
+  // the customer now explicitly asks for a recommendation — gate must
+  // resolve and emit a card (or attempt to).
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "I need an orthotic" },
+      { role: "assistant", content: "Who are these for?" },
+      { role: "user", content: "Men" },
+      { role: "assistant", content: "What shoes?" },
+      { role: "user", content: "casual" },
+      { role: "assistant", content: "Any condition?" },
+      { role: "user", content: "plantar fasciitis" },
+      { role: "assistant", content: "What's your arch?" },
+      { role: "user", content: "Medium / High Arch" },
+      { role: "assistant", content: "All set." },
+      { role: "user", content: "show me a recommendation" },
+    ],
+    tree,
+    shop: null, // shop=null → resolver returns missingProduct error path
+    controller,
+    encoder,
+  });
+  // Either handled (resolve attempted, may have emitted error/card) OR
+  // not handled if resolver bailed — what we ASSERT is that the gate
+  // DID enter the resolve path (didn't fall through on the guard).
+  // The "resolve held" log line means the guard kicked in; absence of
+  // it means we tried to resolve. The mock SSE captures emits; if any
+  // emit happened, resolve was attempted.
+  assert.ok(
+    out.handled === true || events.length > 0,
+    `expected resolve attempt; got handled=${out.handled} events=${events.length}`,
+  );
+});
+
+await test("resolve guard: chip-answer turn (Layer 2 mapped) → resolves (happy path)", async () => {
+  // Customer is mid-flow and just answered the FINAL chip ("Medium / High Arch")
+  // for q_arch. fingerprintNode is set + latestExtracted has the new attr.
+  // Gate must resolve without holding.
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "I need orthotics" },
+      { role: "assistant", content: "Who are these for? <<Men>><<Women>><<Kids>>" },
+      { role: "user", content: "Men" },
+      { role: "assistant", content: "What shoes? <<Casual>><<Dress>><<Athletic running>>" },
+      { role: "user", content: "Casual" },
+      { role: "assistant", content: "Any condition? <<None>><<Plantar Fasciitis>>" },
+      { role: "user", content: "None" },
+      { role: "assistant", content: "What's your arch type? <<Flat / Low Arch>><<Medium / High Arch>><<I don't know>>" },
+      { role: "user", content: "Medium / High Arch" },
+    ],
+    tree,
+    shop: null,
+    controller,
+    encoder,
+  });
+  // Either resolves or attempts resolve. The key assertion: gate did
+  // NOT fall through silently (would mean handled=false + no events).
+  assert.ok(
+    out.handled === true || events.length > 0,
+    `expected chip-answer to resolve; got handled=${out.handled} events=${events.length}`,
+  );
+});
+
 console.log("");
 if (failed === 0) {
   console.log(`✅  ${passed} passed, 0 failed\n`);

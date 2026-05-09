@@ -46,6 +46,8 @@ import {
   mentionsNonOrthoticFootwear,
   preExtractAnswers,
   accumulateAnswers,
+  looksLikeRecommendationRequest,
+  looksLikeInformationalQuestion,
 } from "./orthotic-flow.server.js";
 import { executeRecommenderTool } from "./recommender-tools.server.js";
 
@@ -587,6 +589,41 @@ export async function maybeRunOrthoticFlow({
     return { handled: false };
   }
 
+  // Informational-question mid-flow veto. The customer IS engaged in
+  // orthotic flow (intentInHistory or fingerprintNode), but THIS turn
+  // is asking what something IS / how it works / what its specs are
+  // — not answering a chip and not requesting a recommendation. The
+  // LLM (with RAG knowledge) is the right path. Without this veto:
+  //
+  //   - With full attrs already accumulated, gate walks to resolve
+  //     and emits a phantom card on questions like "what is
+  //     thinsole?" — production trace bug.
+  //   - With partial attrs, gate emits the next chip question on
+  //     unrelated info questions like "tell me about the L620" —
+  //     bad UX.
+  //
+  // Bypass conditions (don't fire the veto):
+  //   - Latest message extracted a new attribute → it's a chip
+  //     answer, not an info question.
+  //   - Layer 3 mapped the reply onto the fingerprint chip → also a
+  //     chip answer.
+  //   - Prior assistant message had chip syntax (fingerprintNode is
+  //     set) → customer might be answering the chip question with an
+  //     info-shaped reply ("yes, but how does this work?"). Defer.
+  if (
+    looksLikeInformationalQuestion(rawUserText) &&
+    !looksLikeRecommendationRequest(rawUserText) &&
+    Object.keys(latestExtracted).length === 0 &&
+    !layer3Mapped &&
+    !fingerprintNode
+  ) {
+    console.log(
+      `[orthotic-flow] informational question mid-flow ("${rawUserText.slice(0, 60)}"); ` +
+        `falling through to LLM`,
+    );
+    return { handled: false };
+  }
+
   // Pick the next question node by `requiredAttributes` order rather
   // than following the seed's `next` chain. This guarantees gender
   // is always asked first, then useCase, then condition — regardless
@@ -654,6 +691,54 @@ export async function maybeRunOrthoticFlow({
   }
 
   if (step.type === "resolve") {
+    // Resolve-intent guard. Don't auto-emit a card just because all
+    // required attributes happen to be filled from earlier turns. The
+    // bug this fixes: customer says "what is thinsole?" mid-flow with
+    // gender/useCase/condition already accumulated. Without this
+    // guard, the gate walks straight to resolve and emits the same
+    // phantom SKU card on every ortho-tagged turn — customer asked an
+    // informational question, gets a product card, never learns what
+    // a Thinsole is.
+    //
+    // Only auto-resolve when ONE of these is true:
+    //   (a) The customer just answered a chip — fingerprintNode is
+    //       set AND this turn produced a Layer-1/2/3 mapping. The
+    //       last assistant message offered chip buttons and the
+    //       customer answered them.
+    //   (b) The latest message extracted at least one new attribute.
+    //       Customer is providing the missing piece. (This subsumes
+    //       (a) for most cases, but kept separate for clarity.)
+    //   (c) The latest message is an explicit recommendation request
+    //       ("show me / recommend / find me one / I'll take it / go
+    //       ahead / sounds good / let's do it").
+    //
+    // OVERRIDE: if the message looks like an informational question
+    // ("what is X / explain Y / tell me about Z"), fall through even
+    // if (b) or (c) match. The customer's intent is to learn, not
+    // to buy. A subsequent "yes, recommend one" can re-trigger.
+    //
+    // Otherwise: fall through to LLM. The LLM still has the
+    // recommend_orthotic tool and can call it when it judges that's
+    // what the customer actually wants.
+    const justAnsweredChip =
+      !!fingerprintNode && (Object.keys(latestExtracted).length > 0 || layer3Mapped);
+    const completedAttrThisTurn = Object.keys(latestExtracted).length > 0;
+    const explicitRecRequest = looksLikeRecommendationRequest(rawUserText);
+    const informationalQuestion = looksLikeInformationalQuestion(rawUserText);
+    const hasResolveSignal =
+      (justAnsweredChip || completedAttrThisTurn || explicitRecRequest) &&
+      !informationalQuestion;
+    if (!hasResolveSignal) {
+      console.log(
+        `[orthotic-flow] resolve held: full attrs but no recommendation signal in latest turn ` +
+          `("${rawUserText.slice(0, 60)}"); ` +
+          `informational=${informationalQuestion}, justAnsweredChip=${justAnsweredChip}, ` +
+          `completedAttr=${completedAttrThisTurn}, explicitReq=${explicitRecRequest}; ` +
+          `falling through to LLM`,
+      );
+      return { handled: false };
+    }
+
     const conversationText = messages
       .map((m) => (typeof m.content === "string" ? m.content : ""))
       .join("\n");

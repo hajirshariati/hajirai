@@ -822,6 +822,56 @@ export function detectOrthoticIntent(rawText) {
   return false;
 }
 
+// True when the customer's message is an explicit recommendation
+// request — they want a SKU/card NOW, not just chatting. Used by the
+// gate's resolve-intent guard to decide whether to auto-emit the
+// resolved card or fall through to the LLM.
+//
+// Production scenario this fixes: customer with full attrs from
+// earlier turns asks "what is thinsole?" mid-flow. Without this
+// guard, the gate sees full attrs + ortho-tagged turn and fires the
+// resolve emit. Customer wanted info, gets a phantom card. With the
+// guard, only explicit recommendation phrasings trigger resolve.
+const RECOMMENDATION_REQUEST_RE = /\b(?:recommend|suggest|recommendation|suggestion|show me|find me|find one|find a|pick (?:one|me)|which (?:one|orthotic|insole|should i|do you recommend)|what (?:do you recommend|should i (?:get|buy|wear)|would you (?:recommend|suggest))|what'?s (?:the )?best (?:orthotic|insole|footbed|fit|match|one|option|pick|choice|for me|for my)|i'?ll take|i need (?:an? )?(?:orthotic|insole|footbed|recommendation)|set me up|help me (?:find|pick|choose)|go ahead|proceed|sounds good|let'?s do (?:it|that)|that works|yes please)\b/i;
+
+export function looksLikeRecommendationRequest(rawText) {
+  const t = String(rawText || "")
+    .replace(/[‘’‚‛]/g, "'")
+    .replace(/[“”„‟]/g, '"')
+    .trim();
+  if (!t) return false;
+  return RECOMMENDATION_REQUEST_RE.test(t);
+}
+
+// True when the customer is asking about something — what it is,
+// how it works, what it's made of, what the differences are, etc.
+// Definitional / informational questions need the LLM (with RAG +
+// knowledge), NOT the chip-question gate or the auto-resolve path.
+//
+// Used by:
+//   - the gate's resolve-intent guard (don't auto-emit a card on
+//     "what is thinsole?")
+//   - the chat-tool-rewriter (don't redirect search_products to
+//     recommend_orthotic when the customer is asking a
+//     informational question — even if the topic is orthotic-domain)
+//
+// Examples that match: "what is X?", "what are Thinsoles?", "how
+// does the foam work?", "tell me about the L620", "explain how
+// they're different", "what's the difference between A and B?".
+const INFORMATIONAL_QUESTION_RE = /\b(?:what (?:is|are|does|do|exactly)|what'?s (?:the|a|an|your)|how (?:does|do|is|are)\b[^?!.\n]{0,80}?\b(?:work|made|different)|how (?:thin|thick|big|small|wide|long|tall|durable|soft|firm)|tell me (?:more )?about|explain (?:how|what|the)|describe (?:the|how|what|your)|details? (?:on|about|of)|info(?:rmation)? (?:on|about)|difference between|compared? (?:to|with)|specs? (?:on|of|for)|specification|made of|material|fabric|construction|how (?:long|much) does)\b/i;
+
+export function looksLikeInformationalQuestion(rawText) {
+  const t = String(rawText || "")
+    .replace(/[‘’‚‛]/g, "'")
+    .replace(/[“”„‟]/g, '"')
+    .trim();
+  if (!t) return false;
+  // Narrow: must end with a question mark OR start with "what/how/tell me/explain".
+  // Avoids matching imperatives like "show me what works for me" (recommendation).
+  if (!t.endsWith("?") && !/^(?:what|how|tell me|explain|describe)\b/i.test(t)) return false;
+  return INFORMATIONAL_QUESTION_RE.test(t);
+}
+
 // Returns true when the message ACTIVELY rejects orthotics ("I don't
 // want orthotics", "no insoles, just shoes"). The unified gate uses
 // this as a hard veto — even if Layer 1/2 picks up a chip-shaped

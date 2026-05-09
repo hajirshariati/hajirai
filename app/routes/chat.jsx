@@ -2666,6 +2666,13 @@ export const action = async ({ request }) => {
                 anthropic,
                 shop: session.shop,
               });
+              // Make the classifier verdict available to downstream
+              // consumers (e.g. chat-tool-rewrite's orthotic-routing
+              // redirect, which would otherwise rewrite a search for
+              // a specific product like "Thinsoles" into a
+              // recommend_orthotic call when the customer was just
+              // asking "what is X?").
+              ctx.classifiedIntent = classifiedIntent;
               const gate = await maybeRunOrthoticFlow({
                 messages,
                 tree: orthoticTree,

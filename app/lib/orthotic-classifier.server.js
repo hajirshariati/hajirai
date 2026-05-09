@@ -75,7 +75,18 @@ const CLASSIFIER_TOOL = {
           "'I don't want orthotics, just shoes' or 'no insoles, just sneakers' — set " +
           "isFootwearRequest=true (the 'just X' clause is a positive footwear request), " +
           "isRejection=true (the 'no orthotics' clause), isOrthoticRequest=false. The rejection " +
-          "and the new request are BOTH signals.",
+          "and the new request are BOTH signals. " +
+          "(d) INFORMATIONAL / DEFINITIONAL QUESTIONS: if the latest message is asking what " +
+          "something IS, how it works, what it's made of, what its specs are, or to be told " +
+          "about a specific product — return isOrthoticRequest=false even if the named product " +
+          "or topic is orthotic-related. The customer wants information, not a recommendation. " +
+          "Examples: 'what is a thinsole?', 'what are Thinsoles made of?', 'how does the foam " +
+          "work?', 'tell me about the L620', 'explain the difference between posted and " +
+          "non-posted orthotics', 'what's the difference between A and B?', 'how thin are " +
+          "these?', 'what material is in this?'. The LLM (with knowledge access) should answer. " +
+          "A later explicit recommendation request ('ok recommend me one') can re-engage. " +
+          "Also set isFootwearRequest=false for these unless the message is also a clear " +
+          "footwear-shopping request.",
       },
       isFootwearRequest: {
         type: "boolean",
