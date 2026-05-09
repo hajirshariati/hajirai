@@ -381,3 +381,82 @@ export function looksLikeClarifyingQuestion(text) {
   const lastChunk = trimmed.split(/[.!]\s+/).pop() || "";
   return /\?\s*$/.test(lastChunk.trim());
 }
+
+// =====================================================================
+// Suggestion gender-contradiction filter
+// =====================================================================
+// Production scenario: customer says "find men's shoes" → bot
+// suggests "Do you have these for women?" as a follow-up. The
+// suggestion-generator prompt encourages "pivot to different
+// gender" suggestions in general, but those make zero sense once
+// the customer has explicitly committed to a gender. Drop them.
+
+const OPPOSITE_GENDER_RE_FROM_MEN = /\b(?:women['‘’]?s|womens|women|female|lady|ladies|girls?)\b/i;
+const OPPOSITE_GENDER_RE_FROM_WOMEN = /\b(?:men['‘’]?s|mens|men\b|male|guys?|boys?)\b/i;
+
+export function suggestionContradictsGender(suggestion, establishedGender) {
+  if (typeof suggestion !== "string" || !suggestion) return false;
+  if (!establishedGender) return false;
+  const g = String(establishedGender).toLowerCase();
+  if (g === "men") return OPPOSITE_GENDER_RE_FROM_MEN.test(suggestion);
+  if (g === "women") return OPPOSITE_GENDER_RE_FROM_WOMEN.test(suggestion);
+  return false; // kids / unisex / unknown — no contradiction filter
+}
+
+// =====================================================================
+// Footwear over-elicitation guard
+// =====================================================================
+// Decides whether to inject a turn-scoped force-search directive
+// into the system prompt. Fires when the customer has both gender
+// and category established for a footwear request, so the LLM
+// shouldn't ask a third question. Returns a string directive or
+// null.
+//
+// Match criteria — ALL must hold:
+//   - classifier said footwear=true
+//   - establishedGender is set (men/women/kids)
+//   - latestUserMessage matches one of the catalog categories
+//     (singular/plural normalized) — i.e. customer just clicked or
+//     typed a category like "Sneakers"
+//
+// Returns: { gender, category, directive } or null.
+
+export function detectFootwearOverElicitation({
+  classifiedIntent,
+  latestUserMessage,
+  establishedGender,
+  catalogProductTypes,
+}) {
+  if (!classifiedIntent || classifiedIntent.isFootwearRequest !== true) return null;
+  if (!establishedGender) return null;
+  const g = String(establishedGender).toLowerCase();
+  if (g !== "men" && g !== "women" && g !== "kids") return null;
+  const u = String(latestUserMessage || "")
+    .toLowerCase()
+    .replace(/s$/, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!u || u.length < 3) return null;
+  const types = Array.isArray(catalogProductTypes) ? catalogProductTypes : [];
+  const catMatch = types.find((cat) => {
+    const c = String(cat || "")
+      .toLowerCase()
+      .replace(/s$/, "")
+      .replace(/\s+/g, " ")
+      .trim();
+    return c.length >= 3 && c === u;
+  });
+  if (!catMatch) return null;
+  const cat = String(catMatch).toLowerCase();
+  return {
+    gender: g,
+    category: cat,
+    directive:
+      `\n\n=== URGENT TURN-SCOPED DIRECTIVE — FOOTWEAR SEARCH ===\n` +
+      `THIS TURN ONLY. The customer's gender (${g}) and category (${cat}) are BOTH established. ` +
+      `Your FIRST action this turn MUST be search_products with gender="${g}" and ` +
+      `filters.category="${cat}". Do NOT ask any clarifying question. Show product cards. ` +
+      `If the search returns few results, that is fine — show what you have. ` +
+      `Only AFTER you have called search_products and seen results may you write text.`,
+  };
+}

@@ -36,6 +36,8 @@ import {
   detectBroadNeed,
   detectAiNoMatchPhrasing,
   looksLikeClarifyingQuestion,
+  suggestionContradictsGender,
+  detectFootwearOverElicitation,
 } from "../app/lib/chat-postprocessing.js";
 import {
   isSingularPrescriptive,
@@ -515,6 +517,129 @@ test("ends with '?' → yes", () => assert(looksLikeClarifyingQuestion("What siz
 test("question mid-text + last sentence → yes", () => assert(looksLikeClarifyingQuestion("Got it. So what's your arch type?")));
 test("no '?' → no", () => assert(!looksLikeClarifyingQuestion("Here are some options.")));
 test("empty → no", () => assert(!looksLikeClarifyingQuestion("")));
+
+// =====================================================================
+section("suggestionContradictsGender");
+// =====================================================================
+
+test("established=men + suggestion 'for women' → contradicts", () => {
+  assert(suggestionContradictsGender("Do you have these for women?", "men"));
+});
+test("established=men + suggestion 'women's sneakers' → contradicts", () => {
+  assert(suggestionContradictsGender("Show me women's sneakers", "men"));
+});
+test("established=women + suggestion 'for men' → contradicts", () => {
+  assert(suggestionContradictsGender("Do you have these for men?", "women"));
+});
+test("established=men + suggestion 'in red' → no contradiction", () => {
+  assert(!suggestionContradictsGender("Do you have these in red?", "men"));
+});
+test("established=women + suggestion 'wider widths' → no contradiction", () => {
+  assert(!suggestionContradictsGender("Any wider widths?", "women"));
+});
+test("established=men + same gender suggestion → no contradiction", () => {
+  assert(!suggestionContradictsGender("Show me more men's options", "men"));
+});
+test("no established gender → no contradiction", () => {
+  assert(!suggestionContradictsGender("Do you have these for women?", null));
+});
+test("established=kids → no contradiction (kids isn't binary)", () => {
+  assert(!suggestionContradictsGender("Show me men's", "kids"));
+});
+test("empty suggestion → no contradiction", () => {
+  assert(!suggestionContradictsGender("", "men"));
+});
+
+// =====================================================================
+section("detectFootwearOverElicitation");
+// =====================================================================
+
+const FAKE_TYPES = ["Sneakers", "Sandals", "Boots", "Loafers", "Mary Janes", "Wedges Heels"];
+
+test("footwear=true + gender=Men + 'Sneakers' chip → fires", () => {
+  const r = detectFootwearOverElicitation({
+    classifiedIntent: { isFootwearRequest: true, attributes: { gender: "Men" } },
+    latestUserMessage: "Sneakers",
+    establishedGender: "men",
+    catalogProductTypes: FAKE_TYPES,
+  });
+  assert(r, "expected guard to fire");
+  assert.equal(r.gender, "men");
+  assert.equal(r.category, "sneakers");
+  assert(r.directive.includes("search_products"));
+  assert(r.directive.includes("THIS TURN"));
+});
+
+test("footwear=true + gender=Women + 'Sandals' chip → fires", () => {
+  const r = detectFootwearOverElicitation({
+    classifiedIntent: { isFootwearRequest: true, attributes: {} },
+    latestUserMessage: "Sandals",
+    establishedGender: "women",
+    catalogProductTypes: FAKE_TYPES,
+  });
+  assert(r);
+  assert.equal(r.category, "sandals");
+});
+
+test("footwear=true + gender=Men + 'Mary Janes' chip → fires", () => {
+  const r = detectFootwearOverElicitation({
+    classifiedIntent: { isFootwearRequest: true, attributes: {} },
+    latestUserMessage: "Mary Janes",
+    establishedGender: "men",
+    catalogProductTypes: FAKE_TYPES,
+  });
+  assert(r);
+});
+
+test("footwear=false → does not fire", () => {
+  const r = detectFootwearOverElicitation({
+    classifiedIntent: { isFootwearRequest: false, attributes: {} },
+    latestUserMessage: "Sneakers",
+    establishedGender: "men",
+    catalogProductTypes: FAKE_TYPES,
+  });
+  assert.equal(r, null);
+});
+
+test("no established gender → does not fire", () => {
+  const r = detectFootwearOverElicitation({
+    classifiedIntent: { isFootwearRequest: true, attributes: {} },
+    latestUserMessage: "Sneakers",
+    establishedGender: null,
+    catalogProductTypes: FAKE_TYPES,
+  });
+  assert.equal(r, null);
+});
+
+test("latest message is not a category → does not fire", () => {
+  const r = detectFootwearOverElicitation({
+    classifiedIntent: { isFootwearRequest: true, attributes: {} },
+    latestUserMessage: "what about something cheaper",
+    establishedGender: "men",
+    catalogProductTypes: FAKE_TYPES,
+  });
+  assert.equal(r, null);
+});
+
+test("category not in catalog → does not fire", () => {
+  const r = detectFootwearOverElicitation({
+    classifiedIntent: { isFootwearRequest: true, attributes: {} },
+    latestUserMessage: "Galoshes",
+    establishedGender: "men",
+    catalogProductTypes: FAKE_TYPES,
+  });
+  assert.equal(r, null);
+});
+
+test("no classifier → does not fire", () => {
+  const r = detectFootwearOverElicitation({
+    classifiedIntent: null,
+    latestUserMessage: "Sneakers",
+    establishedGender: "men",
+    catalogProductTypes: FAKE_TYPES,
+  });
+  assert.equal(r, null);
+});
 
 // =====================================================================
 console.log(`\n${failed === 0 ? "✅" : "❌"}  ${passed} passed, ${failed} failed`);

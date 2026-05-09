@@ -49,6 +49,8 @@ import {
   detectBroadNeed,
   detectAiNoMatchPhrasing,
   looksLikeClarifyingQuestion,
+  suggestionContradictsGender,
+  detectFootwearOverElicitation,
 } from "../lib/chat-postprocessing";
 import prisma from "../db.server";
 import { recordChatUsage, getTodayMessageCount } from "../models/ChatUsage.server";
@@ -2514,7 +2516,7 @@ export const action = async ({ request }) => {
       }
     }
 
-    const systemPrompt = buildSystemPrompt({
+    let systemPrompt = buildSystemPrompt({
       config,
       knowledge,
       retrievedChunks,
@@ -2696,6 +2698,38 @@ export const action = async ({ request }) => {
             console.error("[orthotic-flow] gate threw, falling through:", gateErr?.message || gateErr);
           }
 
+          // Footwear over-elicitation guard. When the customer has
+          // established BOTH a gender AND a category (the latest
+          // message matches an allowed catalog category — usually a
+          // chip click like "Sneakers"), the system prompt's
+          // 2-question rule SHOULD trigger an immediate
+          // search_products call. In practice the LLM sometimes
+          // still asks a third question. Inject a turn-scoped
+          // directive to force a search. Belt-and-suspenders
+          // alongside the FOOTWEAR PATH HARD 2-QUESTION CAP rule.
+          // Match logic in chat-postprocessing.detectFootwearOverElicitation
+          // (unit-tested there).
+          {
+            const guard = detectFootwearOverElicitation({
+              classifiedIntent: ctx.classifiedIntent,
+              latestUserMessage: String(body.message || ""),
+              establishedGender:
+                ctx.classifiedIntent?.attributes?.gender ||
+                detectLatestGender(
+                  messages.map((m) => (typeof m.content === "string" ? m.content : "")).join("\n"),
+                ),
+              catalogProductTypes,
+            });
+            if (guard) {
+              systemPrompt = systemPrompt + guard.directive;
+              console.log(
+                `[chat] ${ctx.shop} footwear-over-elicitation guard fired: ` +
+                  `gender=${guard.gender} category=${guard.category} — ` +
+                  `injected force-search directive into system prompt.`,
+              );
+            }
+          }
+
           const result = await runAgenticLoop({
             anthropic,
             model,
@@ -2748,10 +2782,28 @@ export const action = async ({ request }) => {
                 const TECH_NAME_RE = /(?:[™®]|\b[A-Z][A-Za-z]*(?:[A-Z][A-Za-z]+){1,}\b)/;
                 const SPEC_DEEPDIVE_RE = /\b(?:tell me more about|explain|how does .* work|what (?:is|are) the (?:[a-z]+\s+)?(?:technology|system|fabric|foam|material|tech)|details?\s+(?:on|about)\s+the)\b/i;
                 const SPEC_MEASURE_RE = /\b(?:heel\s+height|stack\s+height|toe\s+drop|heel-to-toe\s+drop|stack|gradient|density|grade|weight\s+in\s+(?:oz|grams|g)|dimensions|cm\b|mm\b)\b/i;
+                // Established gender from the conversation. Used to
+                // drop follow-up suggestions that contradict it. Match
+                // logic in chat-postprocessing.suggestionContradictsGender
+                // (unit-tested there).
+                const conversationTextForGender = messages
+                  .map((m) => (typeof m.content === "string" ? m.content : ""))
+                  .join("\n");
+                const establishedGender = detectLatestGender(conversationTextForGender);
                 const filtered = [];
                 const dropped = [];
                 for (const q of questions) {
                   const lower = q.toLowerCase();
+
+                  // Gender-contradiction check. If the conversation has
+                  // established a gender, drop suggestions that name the
+                  // opposite gender. Production scenario: customer asked
+                  // "find men's shoes" → Haiku suggested "Do you have
+                  // sneakers for women?" — confusing, looks broken.
+                  if (suggestionContradictsGender(q, establishedGender)) {
+                    dropped.push({ q, reason: `gender contradicts established=${establishedGender}` });
+                    continue;
+                  }
 
                   // Spec deep-dive pattern check.
                   if (SPEC_DEEPDIVE_RE.test(q)) {
