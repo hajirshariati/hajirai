@@ -872,6 +872,37 @@ export function looksLikeInformationalQuestion(rawText) {
   return INFORMATIONAL_QUESTION_RE.test(t);
 }
 
+// True when the customer is asking whether the merchant CARRIES /
+// has / sells / offers a specific product or category — a yes/no
+// availability question, not a chip-flow answer.
+//
+// Production scenario: customer mid-orthotic-flow asks "do you have
+// kids orthotics?". Without this guard the gate keeps emitting the
+// next chip question ("What's your arch type?") on every turn —
+// because the gate sees engaged + missing-attr and re-emits the
+// question. The customer's actual intent is "tell me yes/no", which
+// the LLM should answer (with cards if yes, honest no if not).
+//
+// Match: phrases like "do you have", "do you carry", "do you sell",
+// "do you offer", "do you ship", "is there a", "are there any",
+// "is X available", "do you stock". Must end with "?" OR be a short
+// sentence (so we don't catch long statements like "I told you do you
+// have something..." rambles).
+const AVAILABILITY_QUESTION_RE = /\b(?:do(?:es)? (?:you|the (?:store|shop)) (?:have|carry|sell|offer|stock|ship|make)|is (?:there|that|this|it) (?:a|an|any|available)|are (?:there|those|these) (?:any|available)|got any|got\s+(?:a|an)\s+\w+\s+(?:option|version|kind))\b/i;
+
+export function looksLikeAvailabilityQuestion(rawText) {
+  const t = String(rawText || "")
+    .replace(/[‘’‚‛]/g, "'")
+    .replace(/[“”„‟]/g, '"')
+    .trim();
+  if (!t) return false;
+  // Must end with question mark OR be short (<= 80 chars). Avoids
+  // catching narrative sentences like "yesterday at the store, do
+  // you have a question?".
+  if (!t.endsWith("?") && t.length > 80) return false;
+  return AVAILABILITY_QUESTION_RE.test(t);
+}
+
 // Returns true when the message ACTIVELY rejects orthotics ("I don't
 // want orthotics", "no insoles, just shoes"). The unified gate uses
 // this as a hard veto — even if Layer 1/2 picks up a chip-shaped

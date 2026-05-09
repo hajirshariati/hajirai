@@ -48,6 +48,7 @@ import {
   accumulateAnswers,
   looksLikeRecommendationRequest,
   looksLikeInformationalQuestion,
+  looksLikeAvailabilityQuestion,
 } from "./orthotic-flow.server.js";
 import { executeRecommenderTool } from "./recommender-tools.server.js";
 
@@ -619,6 +620,34 @@ export async function maybeRunOrthoticFlow({
   ) {
     console.log(
       `[orthotic-flow] informational question mid-flow ("${rawUserText.slice(0, 60)}"); ` +
+        `falling through to LLM`,
+    );
+    return { handled: false };
+  }
+
+  // Availability-question mid-flow veto. Customer asked "do you have
+  // X / do you carry Y / are there any Z" — a yes/no availability
+  // question. Gate would otherwise emit the next chip question
+  // ("What's your arch type?") on every turn, looping. The LLM must
+  // answer yes/no with cards (or honest denial).
+  //
+  // NOTE: unlike the informational-question veto above, this one
+  // does NOT require empty latestExtracted. The phrase "do you have
+  // kids orthotics?" legitimately extracts useCase=kids via the
+  // attribute pre-extractor — but the customer's INTENT is yes/no
+  // availability, not a chip-flow continuation. The chip flow can
+  // resume on the next turn if the customer wants to refine.
+  // The fingerprintNode check still applies — if the prior assistant
+  // message was a chip question, the customer might be answering it
+  // with an info-shaped reply (e.g. "yes, but do you have kids?"),
+  // and we defer to the chip-mapping logic.
+  if (
+    looksLikeAvailabilityQuestion(rawUserText) &&
+    !looksLikeRecommendationRequest(rawUserText) &&
+    !fingerprintNode
+  ) {
+    console.log(
+      `[orthotic-flow] availability question mid-flow ("${rawUserText.slice(0, 60)}"); ` +
         `falling through to LLM`,
     );
     return { handled: false };

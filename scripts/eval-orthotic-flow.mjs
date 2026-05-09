@@ -25,6 +25,7 @@ import {
   accumulateAnswers,
   looksLikeRecommendationRequest,
   looksLikeInformationalQuestion,
+  looksLikeAvailabilityQuestion,
 } from "../app/lib/orthotic-flow.server.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -558,6 +559,43 @@ test("'what should I get?' → false (recommendation request)", () => {
 });
 test("empty → false", () => {
   assert.equal(looksLikeInformationalQuestion(""), false);
+});
+
+section("looksLikeAvailabilityQuestion");
+
+test("'do you have kids orthotics?' → true", () => {
+  assert.equal(looksLikeAvailabilityQuestion("do you have kids orthotics?"), true);
+});
+test("'do you carry mens sneakers?' → true", () => {
+  assert.equal(looksLikeAvailabilityQuestion("do you carry mens sneakers?"), true);
+});
+test("'do you sell sandals?' → true", () => {
+  assert.equal(looksLikeAvailabilityQuestion("do you sell sandals?"), true);
+});
+test("'is there a kids version?' → true", () => {
+  assert.equal(looksLikeAvailabilityQuestion("is there a kids version?"), true);
+});
+test("'are there any in red?' → true", () => {
+  assert.equal(looksLikeAvailabilityQuestion("are there any in red?"), true);
+});
+test("'do you ship internationally?' → true (caught by /do you (ship/)", () => {
+  assert.equal(looksLikeAvailabilityQuestion("do you ship internationally?"), true);
+});
+test("'so you don't have kids orthotics' → false (statement, not Q)", () => {
+  // Note: the prefix 'so you don't have' doesn't match the regex (we
+  // require 'do you have'); the trailing period/no-question-mark also
+  // means it's a statement. Fine — gate's other vetoes catch it via
+  // looksLikeInformationalQuestion if needed.
+  assert.equal(looksLikeAvailabilityQuestion("so you don't have kids orthotics"), false);
+});
+test("'I need orthotics' → false (statement)", () => {
+  assert.equal(looksLikeAvailabilityQuestion("I need orthotics"), false);
+});
+test("'recommend one for me' → false (recommendation request)", () => {
+  assert.equal(looksLikeAvailabilityQuestion("recommend one for me"), false);
+});
+test("empty → false", () => {
+  assert.equal(looksLikeAvailabilityQuestion(""), false);
 });
 
 async function run() {

@@ -349,17 +349,31 @@ export async function executeRecommenderTool({ toolName, input, shop, trees, con
   // wrong product (e.g. L100W Fashion-for-Heels). The chat layer
   // turns this into an honest text reply.
   //
-  // Match: orthotic-recommender-only AND customer's text mentions
-  // sandal/sandals. The intent name is checked so this only fires
-  // for the orthotic recommender, not for any future merchant
+  // SCOPE: only check the LATEST user message, NOT the whole
+  // conversationText. Production trace bug: bot mentioned "sandals"
+  // as an alternative on turn 6, then this guard fired on every
+  // subsequent turn (turns 7–15) because the word "sandals" was
+  // forever in the joined transcript. Customer asked "give me an
+  // insole for sneakers" but kept hitting the sandal guard. With
+  // latest-only scoping, the guard only fires when the customer is
+  // ACTUALLY asking about sandals THIS turn.
+  //
+  // Match: orthotic-recommender-only AND latest user message
+  // mentions sandal/sandals. The intent name is checked so this only
+  // fires for the orthotic recommender, not for any future merchant
   // intents (e.g. "sandal" recommender wouldn't be self-blocking).
+  const sandalScopeText = (typeof latestUserText === "string" && latestUserText.trim())
+    ? latestUserText
+    : (typeof conversationText === "string" ? conversationText : "");
+  const isLatestOnly = sandalScopeText === latestUserText;
   if (
     /orthotic|insole|footbed/i.test(intent) &&
-    typeof conversationText === "string" &&
-    /\bsandals?\b/i.test(conversationText)
+    isLatestOnly &&
+    typeof sandalScopeText === "string" &&
+    /\bsandals?\b/i.test(sandalScopeText)
   ) {
     console.log(
-      `[recommender] sandal-incompatibility guard fired — customer asked for orthotic + sandals; ` +
+      `[recommender] sandal-incompatibility guard fired (latest-only) — customer asked for orthotic + sandals; ` +
         `Aetrex inserts don't fit open sandals. Returning redirect to footwear search.`,
     );
     return {

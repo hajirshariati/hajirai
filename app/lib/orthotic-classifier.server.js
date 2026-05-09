@@ -204,6 +204,17 @@ const CLASSIFIER_TOOL = {
               "any specialty SKU, but a general-support orthotic may still help with biomechanics. " +
               "Use 'none' so the resolver picks the merchant's general-comfort line, and the bot " +
               "can clarify in text that we don't make condition-specific orthotics for non-foot pain. " +
+              "CRITICAL — CHIP-ANSWER SCOPE: do NOT extract a condition from a bare chip-style answer " +
+              "to a different question. If the prior assistant message asked the OVERPRONATION chip " +
+              "question (typically 'When you walk or stand, do your ankles roll inward or do you have " +
+              "flat-feet symptoms?') and the customer's latest message is just 'Yes' / 'Yeah' / 'Sometimes' " +
+              "/ 'Not sure' / 'No', that is the OVERPRONATION attribute being answered, NOT a condition " +
+              "claim. Return condition=null (or whatever the customer previously stated) — do NOT set " +
+              "condition='overpronation_flat_feet' just because the question's text contained the word " +
+              "'flat-feet'. Same rule for ARCH chip answers ('Flat / Low Arch', 'Medium / High Arch', " +
+              "'I don't know') — those are arch values, not condition declarations. Same for GENDER chip " +
+              "answers ('Men', 'Women', 'Kids'). Only set condition when the customer explicitly NAMES a " +
+              "clinical condition in free text. " +
               "null if not stated.",
           },
         },

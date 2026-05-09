@@ -988,7 +988,12 @@ const SCENARIOS = [
   { name: "Typo: 'orthtoics' (transposition)", turns: [{ user: "I need orthtoics for my flat feet", classifier: C({ attributes: { condition: "overpronation_flat_feet" } }), expect: { gateHandled: true } }] },
   { name: "Typo: 'planter facsitis'", turns: [{ user: "I have planter facsitis", classifier: C({ attributes: { condition: "plantar_fasciitis" } }), expect: { gateHandled: true } }] },
   { name: "Informal: 'kid orthotic'", turns: [{ user: "kid orthotic", classifier: C({ attributes: { gender: "Kids" } }), expect: { gateHandled: true } }] },
-  { name: "Informal: 'shoe inserts'", turns: [{ user: "do you sell shoe inserts", classifier: C({}), expect: { gateHandled: true } }] },
+  // 'do you sell shoe inserts' is now caught by the availability-question
+  // veto (added to fix the kids-orthotic Y/N loop bug). Gate falls
+  // through; the LLM answers Yes/No and steers from there. Bare
+  // availability questions deserve a yes/no reply, not an immediate
+  // chip flow without context.
+  { name: "Informal: 'do you sell shoe inserts' → availability-veto fires", turns: [{ user: "do you sell shoe inserts", classifier: C({}), expect: { gateHandled: false } }] },
   { name: "Informal: 'something for my flat feet'", turns: [{ user: "something for my flat feet", classifier: C({ attributes: { condition: "overpronation_flat_feet" } }), expect: { gateHandled: true } }] },
 
   // ========== Day 2: multiple-condition queries ==========

@@ -34,6 +34,11 @@ import {
 } from "../models/DecisionTree.server";
 import { validateDecisionTree } from "../lib/decision-tree-schema.server";
 import {
+  serializeMasterIndexToCsv,
+  parseCsvToMasterIndex,
+  diffMasterIndex,
+} from "../lib/mapping-csv.server";
+import {
   fetchActiveOrthoticProducts,
   discoverDistinctValues,
   buildSuggestedMapping,
@@ -132,6 +137,107 @@ export const action = async ({ request }) => {
       return { saved: true, seeded: true, treeId: saved.id };
     } catch (err) {
       return { error: "Seed failed: " + (err?.message || "unknown") };
+    }
+  }
+
+  // CSV download/upload for the masterIndex (orthotic SKU mapping).
+  // Lets merchants edit SKU rows in Excel/Sheets without touching JSON.
+  // Only the masterIndex array is replaced — chip questions,
+  // derivations, attribute prompts, and other tree fields stay
+  // untouched on upload.
+  if (intent === "export_mapping_csv") {
+    const id = String(formData.get("id") || "").trim();
+    if (!id) return { error: "Tree id required for export." };
+    const tree = await getDecisionTreeById(session.shop, id);
+    if (!tree) return { error: "Tree not found." };
+    const masterIndex = tree.definition?.resolver?.masterIndex || [];
+    const csv = serializeMasterIndexToCsv(masterIndex);
+    const filename = `mapping-${tree.intent || "tree"}-${id.slice(0, 8)}.csv`;
+    return new Response(csv, {
+      status: 200,
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${filename}"`,
+      },
+    });
+  }
+
+  if (intent === "preview_upload_mapping_csv") {
+    const id = String(formData.get("id") || "").trim();
+    const csvText = String(formData.get("csv") || "");
+    if (!id) return { error: "Tree id required." };
+    if (!csvText.trim()) return { error: "CSV content is empty." };
+    const tree = await getDecisionTreeById(session.shop, id);
+    if (!tree) return { error: "Tree not found." };
+    const parsed = parseCsvToMasterIndex(csvText);
+    if (!parsed.ok) {
+      return { mappingCsvPreview: { ok: false, errors: parsed.errors.slice(0, 20) } };
+    }
+    const oldIndex = tree.definition?.resolver?.masterIndex || [];
+    const diff = diffMasterIndex(oldIndex, parsed.masterIndex);
+    return {
+      mappingCsvPreview: {
+        ok: true,
+        diff: {
+          added: diff.added.length,
+          removed: diff.removed.length,
+          modified: diff.modified.length,
+          // Sample first few of each for the UI to show
+          addedSample: diff.added.slice(0, 5).map((r) => r.masterSku),
+          removedSample: diff.removed.slice(0, 5).map((r) => r.masterSku),
+          modifiedSample: diff.modified.slice(0, 5),
+        },
+        rowCount: parsed.masterIndex.length,
+      },
+    };
+  }
+
+  if (intent === "apply_upload_mapping_csv") {
+    const id = String(formData.get("id") || "").trim();
+    const csvText = String(formData.get("csv") || "");
+    if (!id) return { error: "Tree id required." };
+    if (!csvText.trim()) return { error: "CSV content is empty." };
+    const tree = await getDecisionTreeById(session.shop, id);
+    if (!tree) return { error: "Tree not found." };
+    const parsed = parseCsvToMasterIndex(csvText);
+    if (!parsed.ok) {
+      return { error: "CSV validation failed: " + parsed.errors.slice(0, 4).join("; ") };
+    }
+    // Replace ONLY the masterIndex inside resolver — keep everything
+    // else untouched (chip questions, derivations, attribute prompts,
+    // root node id, etc.).
+    const next = JSON.parse(JSON.stringify(tree.definition || {}));
+    if (!next.resolver || typeof next.resolver !== "object") next.resolver = {};
+    next.resolver.masterIndex = parsed.masterIndex;
+    // Re-validate the full tree to make sure the new masterIndex
+    // doesn't break schema invariants (e.g. references nodes need to
+    // exist). validateDecisionTree is the same function used by the
+    // JSON-textarea save path.
+    const v = validateDecisionTree(next);
+    if (!v.ok) {
+      return { error: "Tree validation failed after applying CSV: " + v.errors.slice(0, 4).join("; ") };
+    }
+    try {
+      const triggerPhrasesJson =
+        typeof tree.triggerPhrases === "string"
+          ? tree.triggerPhrases
+          : JSON.stringify(tree.triggerPhrases || []);
+      const saved = await saveDecisionTree(session.shop, {
+        id: tree.id,
+        name: tree.name,
+        intent: tree.intent,
+        triggerPhrases: triggerPhrasesJson,
+        triggerCategoryGroup: tree.triggerCategoryGroup,
+        definition: next,
+        enabled: tree.enabled,
+      });
+      return {
+        mappingCsvApplied: true,
+        treeId: saved.id,
+        rowCount: parsed.masterIndex.length,
+      };
+    } catch (err) {
+      return { error: err?.message || "Could not save tree after CSV apply." };
     }
   }
 
@@ -714,11 +820,186 @@ function DecisionTreesCard({ enabled, trees }) {
                   </Button>
                 )}
               </InlineStack>
+              {editing.id && (
+                <MappingCsvSection treeId={editing.id} />
+              )}
             </BlockStack>
           </>
         )}
       </BlockStack>
     </Card>
+  );
+}
+
+// CSV mapping editor — lets the merchant download the orthotic
+// masterIndex as a spreadsheet, edit it in Excel/Sheets, and upload
+// the result. The upload validates each row server-side, shows a diff
+// summary, and only commits the change after the merchant confirms.
+//
+// Why this exists: the JSON textarea above is unfriendly for non-coders
+// and is the actual source of bugs like "useCase=comfort → L200W
+// (Diabetes-marketed product)" where the SEED MAPPING IS THE BUG, not
+// the runtime. Fixing it via JSON requires care; via CSV requires a
+// row edit.
+function MappingCsvSection({ treeId }) {
+  const previewFetcher = useFetcher();
+  const applyFetcher = useFetcher();
+  const [csvContent, setCsvContent] = useState("");
+  const [fileName, setFileName] = useState("");
+
+  // Reset preview when content changes (so a stale preview doesn't
+  // appear next to a different upload).
+  useEffect(() => {
+    if (previewFetcher.data?.mappingCsvPreview) {
+      // ok — keep it visible
+    }
+  }, [previewFetcher.data]);
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setFileName(file.name);
+    const text = await file.text();
+    setCsvContent(text);
+  };
+
+  const submitPreview = () => {
+    const fd = new FormData();
+    fd.set("intent", "preview_upload_mapping_csv");
+    fd.set("id", treeId);
+    fd.set("csv", csvContent);
+    previewFetcher.submit(fd, { method: "post" });
+  };
+
+  const submitApply = () => {
+    const fd = new FormData();
+    fd.set("intent", "apply_upload_mapping_csv");
+    fd.set("id", treeId);
+    fd.set("csv", csvContent);
+    applyFetcher.submit(fd, { method: "post" });
+  };
+
+  const preview = previewFetcher.data?.mappingCsvPreview;
+  const applied = applyFetcher.data?.mappingCsvApplied;
+  const applyError = applyFetcher.data?.error;
+
+  return (
+    <>
+      <Divider />
+      <BlockStack gap="300">
+        <Text as="h4" variant="headingSm">
+          Edit mapping as a spreadsheet (CSV)
+        </Text>
+        <Text as="p" variant="bodySm" tone="subdued">
+          Download the SKU mapping as a CSV file, edit it in Excel or Google Sheets,
+          and upload it back. Only the SKU rows change — chip questions and other
+          tree settings stay the same.
+        </Text>
+
+        {/* Download — regular form so the browser handles the file response */}
+        <form method="post" action="">
+          <input type="hidden" name="intent" value="export_mapping_csv" />
+          <input type="hidden" name="id" value={treeId} />
+          <Button submit variant="secondary">Download CSV</Button>
+        </form>
+
+        {/* Upload */}
+        <BlockStack gap="200">
+          <input
+            type="file"
+            accept=".csv,text/csv"
+            onChange={handleFileChange}
+            aria-label="Upload edited CSV"
+          />
+          {fileName && (
+            <Text as="p" variant="bodySm" tone="subdued">
+              Loaded file: {fileName} ({csvContent.length.toLocaleString()} characters)
+            </Text>
+          )}
+          <InlineStack gap="200">
+            <Button
+              onClick={submitPreview}
+              disabled={!csvContent || previewFetcher.state === "submitting"}
+              loading={previewFetcher.state === "submitting"}
+            >
+              Preview changes
+            </Button>
+          </InlineStack>
+        </BlockStack>
+
+        {/* Preview result */}
+        {preview && !preview.ok && (
+          <Banner tone="critical" title="CSV validation failed">
+            <BlockStack gap="100">
+              {preview.errors.map((e, i) => (
+                <Text key={i} as="p" variant="bodySm">
+                  • {e}
+                </Text>
+              ))}
+            </BlockStack>
+          </Banner>
+        )}
+
+        {preview && preview.ok && !applied && (
+          <Banner
+            tone={preview.diff.added + preview.diff.removed + preview.diff.modified > 0 ? "info" : "success"}
+            title={`Preview: ${preview.rowCount} rows total`}
+          >
+            <BlockStack gap="200">
+              <Text as="p" variant="bodySm">
+                <strong>+{preview.diff.added}</strong> added,{" "}
+                <strong>-{preview.diff.removed}</strong> removed,{" "}
+                <strong>~{preview.diff.modified}</strong> modified
+              </Text>
+              {preview.diff.addedSample.length > 0 && (
+                <Text as="p" variant="bodySm" tone="subdued">
+                  Added (sample): {preview.diff.addedSample.join(", ")}
+                </Text>
+              )}
+              {preview.diff.removedSample.length > 0 && (
+                <Text as="p" variant="bodySm" tone="subdued">
+                  Removed (sample): {preview.diff.removedSample.join(", ")}
+                </Text>
+              )}
+              {preview.diff.modifiedSample.length > 0 && (
+                <Text as="p" variant="bodySm" tone="subdued">
+                  Modified (sample): {preview.diff.modifiedSample
+                    .map((m) => `${m.masterSku} (${Object.keys(m.changes).join(", ")})`)
+                    .join("; ")}
+                </Text>
+              )}
+              <InlineStack gap="200">
+                <Button
+                  onClick={submitApply}
+                  variant="primary"
+                  loading={applyFetcher.state === "submitting"}
+                >
+                  Apply changes
+                </Button>
+                <Button onClick={() => { setCsvContent(""); setFileName(""); }}>
+                  Cancel
+                </Button>
+              </InlineStack>
+            </BlockStack>
+          </Banner>
+        )}
+
+        {applied && (
+          <Banner tone="success" title="Mapping updated">
+            <Text as="p" variant="bodySm">
+              {applyFetcher.data.rowCount} rows applied. Your chat will use the new mapping
+              on the next conversation. Reload this page to see the updated JSON.
+            </Text>
+          </Banner>
+        )}
+
+        {applyError && (
+          <Banner tone="critical" title="Apply failed">
+            <Text as="p" variant="bodySm">{applyError}</Text>
+          </Banner>
+        )}
+      </BlockStack>
+    </>
   );
 }
 

@@ -694,6 +694,105 @@ await test("resolve guard: chip-answer turn (Layer 2 mapped) → resolves (happy
   );
 });
 
+// ===================================================================
+// Availability-question regression (Bug 4: kids orthotic Y/N loop)
+// ===================================================================
+
+await test("availability question 'do you have kids orthotics?' mid-flow → falls through", async () => {
+  // Production trace: customer mid-orthotic-flow asked 'do you have
+  // kids orthotics?'. Without the availability-question veto, the
+  // gate kept emitting the next chip question ('What's your arch
+  // type?') on every turn, looping forever. With the veto, the gate
+  // falls through to the LLM, which can answer Yes/No with cards.
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "I need an orthotic" },
+      { role: "assistant", content: "Who are these for? <<Men>><<Women>><<Kids>>" },
+      { role: "user", content: "Men" },
+      { role: "assistant", content: "What kind of shoes will the orthotics go in? <<Casual>><<Dress>>" },
+      { role: "user", content: "Casual" },
+      { role: "assistant", content: "Any condition? <<None>><<Plantar Fasciitis>>" },
+      { role: "user", content: "None" },
+      { role: "assistant", content: "What's your arch type? <<Flat / Low Arch>><<Medium / High Arch>>" },
+      { role: "user", content: "do you have kids orthotics?" },
+    ],
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+  });
+  assert.equal(out.handled, false, "gate should fall through on 'do you have X' question");
+  assert.equal(events.length, 0);
+});
+
+await test("availability question 'do you carry running insoles?' mid-flow → falls through", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "I need orthotics" },
+      { role: "assistant", content: "Who are these for?" },
+      { role: "user", content: "Women" },
+      { role: "assistant", content: "What kind of shoes?" },
+      { role: "user", content: "do you carry running insoles?" },
+    ],
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+  });
+  assert.equal(out.handled, false);
+});
+
+await test("availability question 'is there a kids version?' mid-flow → falls through", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "I need orthotics" },
+      { role: "assistant", content: "Who are these for?" },
+      { role: "user", content: "Women" },
+      { role: "assistant", content: "What shoes?" },
+      { role: "user", content: "casual" },
+      { role: "assistant", content: "Any condition?" },
+      { role: "user", content: "is there a kids version?" },
+    ],
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+  });
+  assert.equal(out.handled, false);
+});
+
+await test("availability question 'recommend me one' is NOT availability (still resolves)", async () => {
+  // 'recommend me one' is a recommendation request, not an availability
+  // question — the recommendation-request bypass should fire first.
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "I need orthotics" },
+      { role: "assistant", content: "Who?" },
+      { role: "user", content: "Men" },
+      { role: "assistant", content: "Shoes?" },
+      { role: "user", content: "casual" },
+      { role: "assistant", content: "Condition?" },
+      { role: "user", content: "none" },
+      { role: "assistant", content: "Arch?" },
+      { role: "user", content: "Medium / High Arch" },
+      { role: "assistant", content: "Got it." },
+      { role: "user", content: "recommend me one" },
+    ],
+    tree,
+    shop: null,
+    controller,
+    encoder,
+  });
+  assert.ok(
+    out.handled === true || events.length > 0,
+    `expected resolve attempt; got handled=${out.handled} events=${events.length}`,
+  );
+});
+
 console.log("");
 if (failed === 0) {
   console.log(`✅  ${passed} passed, 0 failed\n`);
