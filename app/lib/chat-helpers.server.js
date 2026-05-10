@@ -7,6 +7,23 @@
 const MALE_PATTERN = /\b(men['‘’]?s|mens|men|male|males|guy|guys|dude|dudes|dad|father|husband|boyfriend|brother|son|grandpa|grandfather|uncle|nephew|man|boy|boys)\b/i;
 const FEMALE_PATTERN = /\b(women['‘’]?s|womens|women|female|females|lady|ladies|mom|mother|wife|girlfriend|sister|daughter|grandma|grandmother|aunt|niece|woman|girl|girls)\b/i;
 
+// Kids-context phrases that must be neutralized BEFORE the MALE/FEMALE
+// scan. Bare \bson\b lives in MALE_PATTERN (real adults: "for my son who
+// is in the army") and \bdaughter\b is in FEMALE_PATTERN — but in kids
+// contexts they're false positives that would latch sessionGender to
+// men's/women's footwear and exclude the actual product the kid needs.
+//
+// Mirrors the Kids-first patterns in orthotic-flow.server.js
+// KEYWORD_PATTERNS.gender (b543bd0). Without this mirror, the gate
+// classified "my son" as Kids while detectGenderFromHistory classified
+// it as Men — sessionGender locked to men's, and the gate's correct
+// Kids state was overridden by the search-time gender filter.
+//
+// Production trace 2026-05-10: "i want pink sandals with arch support
+// and i have bunions" hit gender-lock = Men (from earlier "my son"
+// turn) even though no male signal was anywhere in the latest turn.
+const KIDS_CONTEXT_PATTERN = /\b(?:my\s+(?:son|daughter)|\d+[\s-]*(?:year|yr)s?[\s-]*old\s+(?:son|daughter)|(?:young|little|toddler|teen|teenage|baby|infant)\s+(?:son|daughter)|(?:boys|girls|boy['‘’]?s|girl['‘’]?s))\b/gi;
+
 // ── Negation context detection (shared) ───────────────────────────────
 // Used by gender detection AND color injection. Decides whether a term
 // matched at position `matchIndex` in `text` is preceded by a negation
@@ -108,7 +125,12 @@ function findAffirmedMatch(text, pattern) {
 export function detectGenderFromHistory(messages) {
   for (let i = (messages?.length ?? 0) - 1; i >= 0; i--) {
     if (messages[i]?.role !== "user") continue;
-    const text = typeof messages[i].content === "string" ? messages[i].content : "";
+    const rawText = typeof messages[i].content === "string" ? messages[i].content : "";
+    // Mask kid-context phrases first so "my son" / "9yr old daughter"
+    // don't trip MALE_PATTERN/FEMALE_PATTERN. Replace with spaces so
+    // index positions don't shift catastrophically (negation window
+    // distance is tolerant of extra whitespace).
+    const text = rawText.replace(KIDS_CONTEXT_PATTERN, (m) => " ".repeat(m.length));
     const maleIdx = findAffirmedMatch(text, MALE_PATTERN);
     const femaleIdx = findAffirmedMatch(text, FEMALE_PATTERN);
     // Both affirmed in the same message: the LATER (rightmost) one

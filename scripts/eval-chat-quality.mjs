@@ -116,6 +116,58 @@ cases.push({
   ),
 });
 
+// 2026-05-10 trace — kid signals were latching sessionGender to "men"
+// because MALE_PATTERN includes bare \bson\b, \bboy\b, \bboys\b, mirroring
+// the same bug we hit in orthotic-flow.server.js's KEYWORD_PATTERNS.gender.
+// "my son" / "9yr old son" / "young son" should NOT lock the session to
+// men's products — there's no adult-gender signal there. Returning null
+// lets search run unfiltered by gender (correct: kid's footwear is its
+// own line, not gendered like adult products).
+cases.push({
+  name: "kid context 'my son' does NOT latch sessionGender to men",
+  run: () => assert.equal(
+    detectGenderFromHistory([u("orthotic for my son")]),
+    null,
+  ),
+});
+
+cases.push({
+  name: "kid context '9 year old son' does NOT latch sessionGender to men",
+  run: () => assert.equal(
+    detectGenderFromHistory([u("how about for my 9 year old son")]),
+    null,
+  ),
+});
+
+cases.push({
+  name: "kid context 'young son' does NOT latch sessionGender to men",
+  run: () => assert.equal(
+    detectGenderFromHistory([u("shoes for my young son with flat feet")]),
+    null,
+  ),
+});
+
+cases.push({
+  name: "kid context 'my daughter' does NOT latch sessionGender to women",
+  run: () => assert.equal(
+    detectGenderFromHistory([u("orthotic for my daughter")]),
+    null,
+  ),
+});
+
+cases.push({
+  name: "pivot kid → wife: sessionGender goes to women, NOT men (no son leak)",
+  run: () => assert.equal(
+    detectGenderFromHistory([
+      u("orthotic for my son"),
+      a("OK, kids orthotic."),
+      u("now for my wife"),
+    ]),
+    "women",
+  ),
+});
+
+
 cases.push({
   name: "empty history returns null",
   run: () => assert.equal(detectGenderFromHistory([]), null),

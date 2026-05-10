@@ -1061,6 +1061,20 @@ export function accumulateAnswers(messages, tree) {
     const text = typeof msg.content === "string" ? msg.content : "";
     if (!text) continue;
     const turn = preExtractAnswers(text, tree);
+    // Pivot watermark. When this turn names a NEW subject (different
+    // gender from what we accumulated up to here), the prior subject's
+    // arch / overpronation / condition no longer apply. Without this,
+    // a kid's "Medium / High Arch" chip click on turn 3 silently
+    // becomes the wife's arch on turn 12 (production trace 2026-05-10
+    // 15:08-15:16: gate emitted q_condition with answers=4 for wife
+    // including arch=Medium and overpronation=yes — both inherited
+    // from the kid). useCase tends to carry across subjects ("casual"
+    // for grandma → casual for grandkid is usually right) so leave it.
+    if (turn.gender && out.gender && turn.gender !== out.gender) {
+      delete out.condition;
+      delete out.arch;
+      delete out.overpronation;
+    }
     Object.assign(out, turn);
   }
   return out;

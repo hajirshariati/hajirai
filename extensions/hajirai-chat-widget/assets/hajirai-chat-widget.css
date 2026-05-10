@@ -637,10 +637,10 @@ a.ai-chat-welcome__hint--link:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px; /* WCAG 2.5.5 AAA touch target */
-  padding: 6px 14px;
+  min-height: 32px; /* WCAG 2.2 AA min 24px, comfortably above */
+  padding: 5px 12px;
   border: 1px solid var(--ai-chat-border);
-  border-radius: 22px;
+  border-radius: 16px;
   background: #fff;
   color: var(--ai-chat-text);
   font-size: 12.5px;
@@ -727,9 +727,9 @@ a.ai-chat-welcome__hint--link:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px; /* WCAG 2.5.5 AAA touch target */
-  padding: 8px 16px;
-  border-radius: 22px;
+  min-height: 34px; /* WCAG 2.2 AA min 24px, comfortably above */
+  padding: 6px 14px;
+  border-radius: 18px;
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
@@ -752,8 +752,8 @@ a.ai-chat-welcome__hint--link:hover {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 44px; /* WCAG 2.5.5 AAA touch target */
-  height: 44px;
+  width: 32px; /* WCAG 2.2 AA min 24px, comfortably above */
+  height: 32px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -890,9 +890,9 @@ a.ai-chat-welcome__hint--link:hover {
 .ai-chat-suggest-btn {
   display: flex;
   align-items: center;
-  min-height: 44px; /* WCAG 2.5.5 AAA touch target */
+  min-height: 36px; /* WCAG 2.2 AA min 24px, comfortably above */
   gap: 8px;
-  padding: 10px 14px;
+  padding: 8px 12px;
   border-radius: 10px;
   border: 1.5px solid var(--ai-chat-cta-bg-val, #e8f5ee);
   background: var(--ai-chat-cta-bg-val, #e8f5ee);
@@ -935,10 +935,10 @@ a.ai-chat-welcome__hint--link:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px; /* WCAG 2.5.5 AAA touch target */
+  min-height: 32px; /* WCAG 2.2 AA min 24px, comfortably above */
   gap: 5px;
-  padding: 6px 14px;
-  border-radius: 22px;
+  padding: 5px 12px;
+  border-radius: 16px;
   border: 1.5px solid #ddd;
   background: #fff;
   cursor: pointer;

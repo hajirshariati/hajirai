@@ -990,6 +990,85 @@ await test("customer correction: 'but he doesn't have flat feet' → invalidates
     `gate must NOT re-resolve same flat-feet SKU after customer corrected the premise`);
 });
 
+// ===================================================================
+// 2026-05-10 15:08-15:16 trace — state-spread surviving subject pivot.
+// Customer ran a full kid orthotic flow (Kids + Medium arch + overpro
+// yes), then pivoted to wife (Women, sandals chat), then later asked
+// "I need a casual orthotic". Gate emitted q_condition WITH 4 answers
+// (gender=Women, useCase=casual, arch=Medium, overpronation=yes) —
+// arch and overpronation belonged to the KID, never to the wife.
+//
+// Root cause: subject-pivot reset only fires on the single turn where
+// gender flips. Subsequent turns re-run accumulateAnswers across the
+// whole history and re-extract the kid's chip clicks as the wife's
+// state. Need a pivot WATERMARK so older messages don't pollute the
+// new subject's accumulated state.
+// ===================================================================
+
+await test("pivot watermark: kid's arch/overpronation does NOT leak into wife's later 'casual orthotic' turn", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  const cap = captureConsoleLogs();
+  try {
+    await maybeRunOrthoticFlow({
+      messages: [
+        // Full kid orthotic flow — accumulates Kids + arch=Medium + overpro=yes
+        { role: "user", content: "orthotic for my son" },
+        { role: "assistant", content: "Shoes? <<Casual>>" },
+        { role: "user", content: "Casual" },
+        { role: "assistant", content: "Condition? <<None>>" },
+        { role: "user", content: "None" },
+        { role: "assistant", content: "Arch? <<Flat / Low Arch>><<Medium / High Arch>>" },
+        { role: "user", content: "Medium / High Arch" },
+        { role: "assistant", content: "Roll inward? <<Yes>><<No>>" },
+        { role: "user", content: "Yes" },
+        { role: "assistant", content: "Here's the kid's match." },
+        // Pivot turn — explicit Women signal ("wife"), so accumulated
+        // gender pivots Kids → Women in the walk. Kid's arch/overpro are
+        // STILL in the walk's earlier turns and (without the fix) leak
+        // forward into the wife's accumulated state.
+        { role: "user", content: "now for my wife — pink sandals with arch support, she has bunions" },
+        { role: "assistant", content: "Here are some pink sandals with arch support." },
+        { role: "user", content: "Do you have these in other colors?" },
+        { role: "assistant", content: "Here are color options." },
+        // The bug-trigger turn — wife asks for casual orthotic
+        { role: "user", content: "I need a casual orthotic" },
+      ],
+      tree,
+      shop: null,
+      controller,
+      encoder,
+      classifiedIntent: {
+        isOrthoticRequest: true,
+        isFootwearRequest: false,
+        isRejection: false,
+        attributes: { gender: "Women", useCase: "casual" },
+      },
+    });
+  } finally {
+    cap.restore();
+  }
+  // Two failure modes to guard against:
+  //   1. Gate emitted q_overpronation/q_arch with answers=4 (Kids attrs
+  //      treated as wife's). Look for any log line with arch=Medium or
+  //      overpronation=yes in answers=N.
+  //   2. Gate entered resolve path (resolved → OR resolve failed)
+  //      because all 4 attrs looked filled — this is the same bug, the
+  //      SKU just happens to be missing in the test catalog.
+  const allLogs = cap.lines;
+  const flowLogs = allLogs.filter((l) => l.includes("[orthotic-flow]") || l.includes("[recommender]"));
+  const polluted = flowLogs.some((l) =>
+    /arch=Medium|overpronation=yes|derivations added attribute\(s\): posted/.test(l),
+  );
+  const enteredResolve = flowLogs.some((l) =>
+    /\[orthotic-flow\] resolved →|\[orthotic-flow\] resolve failed/.test(l),
+  );
+  assert.equal(
+    polluted || enteredResolve,
+    false,
+    `gate must NOT carry kid's arch/overpronation into wife's turn. Logs: ${flowLogs.join(" | ")}`,
+  );
+});
+
 console.log("");
 if (failed === 0) {
   console.log(`✅  ${passed} passed, 0 failed\n`);
