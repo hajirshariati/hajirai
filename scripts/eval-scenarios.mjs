@@ -230,6 +230,17 @@ async function runScenario(scenario) {
   const fcgc = filterContradictingGenderChips(text, conversationText, AETREX_CATEGORY_GENDER_MAP);
   text = fcgc.text;
 
+  // Mirror production's empty-text repair (chat.jsx:1345). When all
+  // strips wipe the response to empty/near-empty, production emits a
+  // graceful fallback instead of a blank bubble. Without this, the
+  // eval would show RESPONSE NOW as empty for scenarios where the
+  // LLM's only output was banned narration ("Let me search for X!") —
+  // misleading us into thinking production ships empty when it
+  // actually ships the fallback.
+  if (!text || text.trim().length < 3) {
+    text = "Hmm, nothing's quite hitting that combination — want to widen the budget, try a different color, or look at another style?";
+  }
+
   const checked = checkExpectations(scenario, text);
   if (scenario._source?.isFeedback) {
     checked.isFeedback = true;
