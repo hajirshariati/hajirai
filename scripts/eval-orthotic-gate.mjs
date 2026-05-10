@@ -1069,6 +1069,133 @@ await test("pivot watermark: kid's arch/overpronation does NOT leak into wife's 
   );
 });
 
+// ===================================================================
+// 2026-05-10 15:35-16:02 trace — deaf-loop. Gate emitted q_arch three
+// times in a row while customer typed:
+//   1. "my arch type? i don't need this for me, i need it for my brother"
+//   2. "this is not for me"
+//   3. "are you listening to me?"
+// All three should fall through to LLM, not re-emit the same chip.
+// ===================================================================
+
+await test("subject clarification 'i don't need this for me, i need it for my brother' falls through", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  const cap = captureConsoleLogs();
+  try {
+    await maybeRunOrthoticFlow({
+      messages: [
+        { role: "user", content: "i need orthotic for my brother, he has foot pain when he goes to gym" },
+        { role: "assistant", content: "What's your arch type? <<Flat / Low>><<Medium>><<High>><<I don't know>>" },
+        { role: "user", content: "my arch type? i don't need this for me, i need it for my brother" },
+      ],
+      tree,
+      shop: null,
+      controller,
+      encoder,
+      classifiedIntent: {
+        isOrthoticRequest: true, isFootwearRequest: false, isRejection: false,
+        attributes: { gender: "Men", useCase: "athletic_training", condition: "foot_pain" },
+      },
+    });
+  } finally {
+    cap.restore();
+  }
+  const flowLogs = cap.lines.filter((l) => l.includes("[orthotic-flow]"));
+  const fellThrough = flowLogs.some((l) => /falling through to LLM/.test(l));
+  assert.equal(fellThrough, true,
+    `gate must fall through on subject clarification. Logs: ${flowLogs.join(" | ")}`);
+});
+
+await test("'this is not for me' falls through to LLM", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  const cap = captureConsoleLogs();
+  try {
+    await maybeRunOrthoticFlow({
+      messages: [
+        { role: "user", content: "i need orthotic for my brother, he has foot pain when he goes to gym" },
+        { role: "assistant", content: "What's your arch type?" },
+        { role: "user", content: "this is not for me" },
+      ],
+      tree,
+      shop: null,
+      controller,
+      encoder,
+      classifiedIntent: {
+        isOrthoticRequest: true, isFootwearRequest: false, isRejection: false,
+        attributes: { gender: "Men", useCase: "athletic_training", condition: "foot_pain" },
+      },
+    });
+  } finally {
+    cap.restore();
+  }
+  const fellThrough = cap.lines.some((l) =>
+    /\[orthotic-flow\][^\n]*falling through to LLM/.test(l));
+  assert.equal(fellThrough, true,
+    `gate must fall through on 'this is not for me'. Logs: ${cap.lines.filter(l => l.includes("[orthotic-flow]")).join(" | ")}`);
+});
+
+await test("'are you listening' meta-frustration falls through to LLM", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  const cap = captureConsoleLogs();
+  try {
+    await maybeRunOrthoticFlow({
+      messages: [
+        { role: "user", content: "orthotic for my brother" },
+        { role: "assistant", content: "What's your arch type?" },
+        { role: "user", content: "this is not for me" },
+        { role: "assistant", content: "What's your arch type?" },
+        { role: "user", content: "are you listening to me?" },
+      ],
+      tree,
+      shop: null,
+      controller,
+      encoder,
+      classifiedIntent: {
+        isOrthoticRequest: true, isFootwearRequest: false, isRejection: false,
+        attributes: { gender: "Men", useCase: "athletic_training", condition: "foot_pain" },
+      },
+    });
+  } finally {
+    cap.restore();
+  }
+  const fellThrough = cap.lines.some((l) =>
+    /\[orthotic-flow\][^\n]*falling through to LLM/.test(l));
+  assert.equal(fellThrough, true,
+    `gate must fall through on meta-frustration. Logs: ${cap.lines.filter(l => l.includes("[orthotic-flow]")).join(" | ")}`);
+});
+
+await test("loop guard: same question would be emitted twice → fall through", async () => {
+  // Bot just asked "What's your arch type?". Customer's reply doesn't
+  // pick a chip and isn't a valid arch answer ("hmm idk"). Gate must
+  // not re-emit the literal same question — fall through so the LLM
+  // can rephrase or answer the side question.
+  const { events, encoder, controller } = makeMockSse();
+  const cap = captureConsoleLogs();
+  try {
+    await maybeRunOrthoticFlow({
+      messages: [
+        { role: "user", content: "orthotic for foot pain" },
+        { role: "assistant", content: "What's your arch type? <<Flat / Low>><<Medium>><<High>><<I don't know>>" },
+        { role: "user", content: "what does that mean?" },
+      ],
+      tree,
+      shop: null,
+      controller,
+      encoder,
+      classifiedIntent: {
+        isOrthoticRequest: true, isFootwearRequest: false, isRejection: false,
+        attributes: { gender: "Men", useCase: "casual", condition: "foot_pain" },
+      },
+    });
+  } finally {
+    cap.restore();
+  }
+  const fellThrough = cap.lines.some((l) =>
+    /\[orthotic-flow\][^\n]*falling through to LLM/.test(l));
+  assert.equal(fellThrough, true,
+    `gate must fall through to avoid emitting the same question twice. Logs: ${cap.lines.filter(l => l.includes("[orthotic-flow]")).join(" | ")}`);
+});
+
 console.log("");
 if (failed === 0) {
   console.log(`✅  ${passed} passed, 0 failed\n`);

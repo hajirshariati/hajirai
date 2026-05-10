@@ -418,6 +418,37 @@ export async function maybeRunOrthoticFlow({
     return { handled: false };
   }
 
+  // Subject-clarification veto. Customer is correcting the bot's
+  // assumption that the orthotic is for THEM ("this is not for me",
+  // "it's not for me", "i don't need this for me, i need it for my
+  // brother"). Production trace 2026-05-10 16:01: bot kept emitting
+  // q_arch three turns in a row while customer typed "this is not
+  // for me" twice — the gate didn't recognize the redirect. Fall
+  // through so the LLM can ack the subject and re-ask appropriately.
+  const SUBJECT_CLARIFICATION_RE = /\b(?:(?:this|it|that)['‘’]?s?\s+(?:is\s+)?n[o']?t\s+for\s+me|(?:i'?m|i\s+am)\s+not\s+the\s+(?:one|person)|i\s+don'?t\s+need\s+(?:this|it|one)\s+for\s+me|not\s+for\s+me[,.\s]+(?:for|it'?s|its)\b)/i;
+  if (SUBJECT_CLARIFICATION_RE.test(rawUserText)) {
+    console.log(
+      `[orthotic-flow] subject clarification detected ("${rawUserText.slice(0, 60)}"); ` +
+        `falling through to LLM`,
+    );
+    return { handled: false };
+  }
+
+  // Meta-frustration veto. Customer is questioning whether the bot is
+  // even paying attention ("are you listening?", "did you read what
+  // i said?", "are you listing to me?" — typos welcome). Production
+  // trace 2026-05-10 16:01: bot ignored two prior redirects, customer
+  // typed "are you listeting to me?", bot emitted q_arch a THIRD
+  // time. Fall through so the LLM can apologize and recover.
+  const META_FRUSTRATION_RE = /\b(?:are\s+you\s+(?:list[a-z]*|hear[a-z]*|read[a-z]*|paying\s+attention|even\s+(?:list|read|hear))|did\s+you\s+(?:read|hear|listen|understand|see)\s+(?:what|me|that)|do\s+you\s+(?:even|actually)\s+understand|hello\?+\s*$|are\s+you\s+(?:there|alive|broken|stuck|a\s+(?:bot|robot)))/i;
+  if (META_FRUSTRATION_RE.test(rawUserText)) {
+    console.log(
+      `[orthotic-flow] meta-frustration detected ("${rawUserText.slice(0, 60)}"); ` +
+        `falling through to LLM`,
+    );
+    return { handled: false };
+  }
+
   const answers = { ...accumulated, ...latestExtracted };
 
   // Kids auto-fill for useCase. When gender=Kids, the seed's q_use_case
