@@ -324,7 +324,7 @@ function ConversationRow({
 // duplicated rows: every flagged row was already in customer
 // questions with a critical badge. Now one section, one filter,
 // one export — much shorter page.
-function ConversationsCard({ rows, counts, onExport, exporting }) {
+function ConversationsCard({ rows, onExport, exporting }) {
   const [filter, setFilter] = useState("all");
   const filtered = useMemo(() => {
     if (filter === "all") return rows;
@@ -333,7 +333,21 @@ function ConversationsCard({ rows, counts, onExport, exporting }) {
     if (filter === "unrated") return rows.filter((r) => r.vote !== "up" && r.vote !== "down");
     return rows;
   }, [rows, filter]);
-  const unrated = rows.length - (counts?.up || 0) - (counts?.down || 0);
+  // Derive counts from `rows` itself so the chip numbers match what
+  // each filter actually shows. Earlier we used the aggregate
+  // feedback.up/down summary, but that counts every message-level
+  // vote across all conversations while `rows` is the per-conversation
+  // list capped at 20 — making "Helpful (48)" filter 20 rows and
+  // legitimately show 0. Now the math always adds up.
+  const counts = useMemo(() => {
+    let up = 0, down = 0;
+    for (const r of rows) {
+      if (r.vote === "up") up++;
+      else if (r.vote === "down") down++;
+    }
+    return { up, down, unrated: rows.length - up - down };
+  }, [rows]);
+  const unrated = counts.unrated;
   const FilterChip = ({ value, label, count, tone }) => (
     <Button
       pressed={filter === value}
@@ -608,7 +622,6 @@ export default function Analytics() {
         {recentQuestions.length > 0 && (
           <ConversationsCard
             rows={recentQuestions}
-            counts={{ up: feedback.up, down: feedback.down, total: recentQuestions.length }}
             onExport={handleExport}
             exporting={exporting}
           />
