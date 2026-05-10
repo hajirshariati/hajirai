@@ -46,6 +46,7 @@ import {
   detectUserSignupIntent,
   detectAiSignupMention,
   scrubRoleMarkers,
+  scrubToolCallLeaks,
   detectBroadNeed,
   detectAiNoMatchPhrasing,
   looksLikeClarifyingQuestion,
@@ -1554,6 +1555,19 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // "Human:" / "Assistant:" tokens in its reply (rare but observed
   // when sanitizeHistory missed a leak in a long-running session),
   // remove them before emit. Customers should NEVER see those tokens.
+  // Strip leaked tool-call text (e.g. "<template_name>search_products</template_name>"
+  // or raw "search_products { query: ... }" the LLM occasionally emits when
+  // it gets confused under tool-first prompt rules). Production normally uses
+  // the proper tool_use mechanism, but rare confusion can leak the call as
+  // text. Scrub before emit so the customer never sees raw tool syntax.
+  if (fullResponseText) {
+    const tlk = scrubToolCallLeaks(fullResponseText);
+    if (tlk.changed) {
+      fullResponseText = tlk.text;
+      console.log(`[chat] ${ctx.shop} stripped tool-call text leakage from outbound text`);
+    }
+  }
+
   if (fullResponseText) {
     const r = scrubRoleMarkers(fullResponseText);
     if (r.changed) {

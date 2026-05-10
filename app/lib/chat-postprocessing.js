@@ -312,6 +312,41 @@ export function detectAiSignupMention(text) {
 }
 
 // =====================================================================
+// Tool-call text leak scrub
+// =====================================================================
+// When the LLM gets confused (especially under prompt rules pushing
+// "tool first"), it occasionally writes the tool call as plain text
+// instead of using the proper tool_use mechanism. Patterns observed:
+//   <template_name>search_products</template_name> <template_params>{...}</template_params>
+//   <search_products><query>...</query><filters>...</filters></search_products>
+//   search_products { "query": "...", "filters": {...} }
+// Production with tools registered usually doesn't hit this, but the
+// eval (no tools) and rare production confusion both can. Strip these
+// patterns before they reach the customer.
+
+const TOOL_LEAK_PATTERNS = [
+  // <template_name>X</template_name> <template_params>{...}</template_params> blocks
+  /<template_name>[\s\S]*?<\/template_name>\s*<template_params>[\s\S]*?<\/template_params>/gi,
+  // bare <template_name>...</template_name> or <template_params>...</template_params>
+  /<\/?template_(?:name|params)>[\s\S]*?<\/?template_(?:name|params)>/gi,
+  /<template_(?:name|params)>[\s\S]{0,500}?(?:<\/template_(?:name|params)>|$)/gi,
+  // <search_products><query>...</query><filters>...</filters></search_products> blocks
+  /<(?:search_products|lookup_sku|find_similar_products|get_product_details)>[\s\S]*?<\/(?:search_products|lookup_sku|find_similar_products|get_product_details)>/gi,
+  // bare tool-name { json-ish args } at start of line or sentence
+  /(?:^|\n|\s)(?:search_products|lookup_sku|find_similar_products|get_product_details|get_product_reviews|get_return_insights|get_fit_recommendation|get_customer_orders)\s*\{[\s\S]*?\}(?=\s|$)/gi,
+];
+
+export function scrubToolCallLeaks(text) {
+  if (!text || typeof text !== "string") return { text: text || "", changed: false };
+  let out = text;
+  for (const re of TOOL_LEAK_PATTERNS) {
+    out = out.replace(re, " ");
+  }
+  out = out.replace(/[ \t]{2,}/g, " ").replace(/\n{3,}/g, "\n\n").trim();
+  return { text: out, changed: out !== text.trim() };
+}
+
+// =====================================================================
 // Role-marker scrub
 // =====================================================================
 // If the model literally generates "Human:" / "Assistant:" tokens in

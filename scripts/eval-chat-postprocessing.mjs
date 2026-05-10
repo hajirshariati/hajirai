@@ -33,6 +33,7 @@ import {
   detectUserSignupIntent,
   detectAiSignupMention,
   scrubRoleMarkers,
+  scrubToolCallLeaks,
   detectBroadNeed,
   detectAiNoMatchPhrasing,
   looksLikeClarifyingQuestion,
@@ -487,6 +488,59 @@ test("almost-empty after strip → keeps original", () => {
   const r = scrubRoleMarkers("Human:");
   assert(!r.changed, `should keep original when strip leaves <5 chars`);
   assert.equal(r.text, "Human:");
+});
+
+// =====================================================================
+section("scrubToolCallLeaks");
+// =====================================================================
+
+test("clean text → unchanged", () => {
+  const r = scrubToolCallLeaks("Here are some great women's sandals with arch support.");
+  assert(!r.changed);
+  assert.equal(r.text, "Here are some great women's sandals with arch support.");
+});
+
+test("<template_name> + <template_params> block → stripped", () => {
+  const r = scrubToolCallLeaks(
+    "Got it. <template_name>search_products</template_name> <template_params>{ \"query\": \"women's casual\" }</template_params>"
+  );
+  assert(r.changed);
+  assert(!r.text.includes("template_name"), `should strip template_name: got "${r.text}"`);
+  assert(!r.text.includes("template_params"), `should strip template_params: got "${r.text}"`);
+  assert(r.text.startsWith("Got it"));
+});
+
+test("bare 'search_products { ... }' inline → stripped", () => {
+  const r = scrubToolCallLeaks(
+    `search_products { "query": "men's dress shoes", "filters": { "gender": "men", "category": "oxfords" } }`
+  );
+  assert(r.changed);
+  assert(!r.text.includes("search_products"), `should strip search_products: got "${r.text}"`);
+});
+
+test("<search_products>...</search_products> XML block → stripped", () => {
+  const r = scrubToolCallLeaks(
+    "We don't have pink sandals. <search_products> <query>sandals bunions</query> <filters>{\"category\": \"Sandals\"}</filters> </search_products>"
+  );
+  assert(r.changed);
+  assert(!r.text.includes("<search_products"), `should strip <search_products>: got "${r.text}"`);
+  assert(r.text.includes("We don't have pink sandals"));
+});
+
+test("text + tool leak + more text → preserves real content", () => {
+  const r = scrubToolCallLeaks(
+    "Men's casual shoes range $70-$130. search_products { \"query\": \"men's casual\" } Hope that helps!"
+  );
+  assert(r.changed);
+  assert(r.text.includes("Men's casual shoes range"));
+  assert(r.text.includes("Hope that helps"));
+  assert(!r.text.includes("search_products"));
+});
+
+test("lookup_sku JSON leak → stripped", () => {
+  const r = scrubToolCallLeaks('lookup_sku { "skus": ["L1305", "L720"] }');
+  assert(r.changed);
+  assert(!r.text.includes("lookup_sku"), `got "${r.text}"`);
 });
 
 // =====================================================================

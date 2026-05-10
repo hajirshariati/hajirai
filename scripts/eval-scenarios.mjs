@@ -35,7 +35,7 @@ import {
   filterForbiddenCategoryChips,
   filterContradictingGenderChips,
 } from "../app/lib/chip-filter.server.js";
-import { scrubRoleMarkers } from "../app/lib/chat-postprocessing.js";
+import { scrubRoleMarkers, scrubToolCallLeaks } from "../app/lib/chat-postprocessing.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const argFlag = (name) => process.argv.find((a) => a.startsWith(`--${name}=`))?.slice(`--${name}=`.length);
@@ -213,10 +213,16 @@ async function runScenario(scenario) {
   text = stripBannedNarration(text);
   text = stripMetaNarration(text);
   text = dedupeConsecutiveSentences(text);
+  // Mirror production chat.jsx — strip leaked tool-call text (e.g.
+  // "<template_name>search_products</template_name>" or raw "search_products {...}")
+  // BEFORE role-marker scrub. The LLM occasionally writes tool calls as text
+  // when no tools are registered (eval) or when it gets confused under tool-
+  // first prompt rules (production). Customer-facing output should never
+  // contain raw tool syntax.
+  const toolLeak = scrubToolCallLeaks(text);
+  if (toolLeak.changed) text = toolLeak.text;
   // Mirror production chat.jsx:1558 — scrub leaked "Human:" / "Assistant:"
-  // role-marker tokens the LLM occasionally emits. Production strips them
-  // before the customer sees anything; without the same scrub in eval,
-  // RESPONSE NOW shows raw leakage that production doesn't.
+  // role-marker tokens the LLM occasionally emits.
   const roleScrub = scrubRoleMarkers(text);
   if (roleScrub.changed) text = roleScrub.text;
 
