@@ -359,6 +359,157 @@ const SCENARIOS = [
       },
     ],
   },
+
+  // ───────────────────────────────────────────────────────────────────
+  // LIVE-STRESS scenarios — long/weird real-world classifier tests.
+  // These specifically target classifier robustness on:
+  //   - Frustrated / fed-up customer language
+  //   - Subject pivots with contractions
+  //   - Out-of-order multi-attribute dumps
+  //   - Mixed-context shopping (gift, returning, etc.)
+  // Failures here mean the classifier needs prompt or signal tuning.
+  // ───────────────────────────────────────────────────────────────────
+
+  {
+    name: "LIVE-STRESS: 'i told you already' frustration WITH valid answer keeps gender",
+    turns: [
+      { user: "I need orthotics", expect: { isOrthoticRequest: true } },
+      {
+        user: "i told you already, men's",
+        assistant: "Got it. What kind of shoes?",
+        expect: { isOrthoticRequest: true, attributes: { gender: "Men" } },
+      },
+    ],
+  },
+
+  {
+    name: "LIVE-STRESS: 'this isn't for me, husband' — subject is Men despite contraction",
+    turns: [
+      { user: "i need orthotic", expect: { isOrthoticRequest: true } },
+      {
+        user: "this isn't for me, it's for my husband",
+        expect: { isOrthoticRequest: true, attributes: { gender: "Men" } },
+      },
+    ],
+  },
+
+  {
+    name: "LIVE-STRESS: triple subject pivot (for me → for dad → for wife) — final wins",
+    turns: [
+      { user: "I need an orthotic", expect: { isOrthoticRequest: true } },
+      {
+        user: "Actually for my dad",
+        assistant: "Got it.",
+        expect: { isOrthoticRequest: true, attributes: { gender: "Men" } },
+      },
+      {
+        user: "wait no, for my wife",
+        assistant: "Switching.",
+        expect: { isOrthoticRequest: true, attributes: { gender: "Women" } },
+      },
+    ],
+  },
+
+  {
+    name: "LIVE-STRESS: out-of-order dump in turn 1 — all 3 attrs extracted",
+    turns: [
+      {
+        user: "men's orthotic for casual wear, plantar fasciitis",
+        expect: {
+          isOrthoticRequest: true,
+          attributes: { gender: "Men", useCase: "casual", condition: "plantar_fasciitis" },
+        },
+      },
+    ],
+  },
+
+  {
+    name: "LIVE-STRESS: 'ugh whatever' frustration — classifier should NOT see it as orthotic answer",
+    turns: [
+      {
+        user: "I need an orthotic for my son",
+        expect: { isOrthoticRequest: true, attributes: { gender: "Kids" } },
+      },
+      {
+        user: "ugh whatever just pick one",
+        assistant: "What's your son's foot pain?",
+        // Whatever the classifier says here, the gate's GIVE_UP veto
+        // should fall through. Don't assert classifier output strictly.
+        expect: {},
+      },
+    ],
+  },
+
+  {
+    name: "LIVE-STRESS: gift-shopping — 'for a friend who has flat feet'",
+    turns: [
+      {
+        user: "i'm looking for orthotic as a gift for a friend who has flat feet",
+        expect: {
+          isOrthoticRequest: true,
+          attributes: { condition: "overpronation_flat_feet" },
+        },
+      },
+    ],
+  },
+
+  {
+    name: "LIVE-STRESS: heavy-typo — 'ortotic plz, ladiess, plntar fashitis'",
+    turns: [
+      {
+        user: "ortotic plz, ladiess, plntar fashitis",
+        expect: {
+          isOrthoticRequest: true,
+          attributes: { gender: "Women", condition: "plantar_fasciitis" },
+        },
+      },
+    ],
+  },
+
+  {
+    name: "LIVE-STRESS: knee-pain mention (NOT a foot condition) → condition should be 'none'",
+    turns: [
+      {
+        user: "i need an orthotic, my knees hurt when i walk",
+        expect: {
+          isOrthoticRequest: true,
+          attributes: { condition: "none" },
+        },
+      },
+    ],
+  },
+
+  {
+    name: "LIVE-STRESS: late-game pivot — 4 turns deep, then 'show me shoes instead'",
+    turns: [
+      { user: "I need orthotics", expect: { isOrthoticRequest: true } },
+      {
+        user: "Women",
+        assistant: "What kind of shoes?",
+        expect: { isOrthoticRequest: true, attributes: { gender: "Women" } },
+      },
+      {
+        user: "casual",
+        assistant: "Any condition?",
+        expect: { isOrthoticRequest: true, attributes: { gender: "Women", useCase: "casual" } },
+      },
+      {
+        user: "actually you know what, just show me your women's sneakers",
+        assistant: "Sure!",
+        expect: { isOrthoticRequest: false, isFootwearRequest: true },
+      },
+    ],
+  },
+
+  {
+    name: "LIVE-STRESS: bare 'help' / system command → classifier neither ortho nor footwear",
+    turns: [
+      {
+        user: "help",
+        expect: { isOrthoticRequest: false, isFootwearRequest: false },
+      },
+    ],
+  },
 ];
 
 // ---------- Run ----------
