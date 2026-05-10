@@ -1265,6 +1265,87 @@ const SCENARIOS = [
       { user: "Men", classifier: C({ attributes: { gender: "Men" } }), expect: { gateHandled: true } },
     ],
   },
+
+  // ───────────────────────────────────────────────────────────────────
+  // STRESS scenarios — long/weird real-world edge cases.
+  // Each one targets a specific fragility point. Failures here indicate
+  // a real production bug class.
+  // ───────────────────────────────────────────────────────────────────
+
+  {
+    name: "STRESS-1: triple subject pivot mid-flow (for me → for dad → for wife)",
+    turns: [
+      { user: "I need an orthotic", classifier: C({ attributes: {} }), expect: { questionMatches: /Who/i } },
+      { user: "Actually for my dad", classifier: C({ attributes: { gender: "Men" } }), expect: { questionMatches: /shoe|use case|kind of/i } },
+      { user: "wait no, for my wife", classifier: C({ attributes: { gender: "Women" } }), expect: { questionMatches: /shoe|use case|kind of/i } },
+    ],
+  },
+
+  {
+    name: "STRESS-2: 'i told you already, men's' — meta-frustration but with answer",
+    turns: [
+      { user: "I need an orthotic", classifier: C({ attributes: {} }), expect: { questionMatches: /Who/i } },
+      { user: "i told you already, men's", classifier: C({ attributes: { gender: "Men" } }), expect: { questionMatches: /shoe|use case|kind of/i } },
+    ],
+  },
+
+  {
+    name: "STRESS-3: pure frustration mid-flow ('ugh whatever') with no answer → fall through",
+    turns: [
+      { user: "I need an orthotic for my son", classifier: C({ attributes: { gender: "Kids" } }), expect: { questionMatches: /condition|pain/i } },
+      { user: "ugh whatever just pick one", classifier: C({ attributes: { gender: "Kids" } }), expect: { gateHandled: false } },
+    ],
+  },
+
+  {
+    name: "STRESS-4: out-of-order — customer dumps everything in turn 1",
+    turns: [
+      {
+        user: "men's orthotic for casual wear, plantar fasciitis",
+        classifier: C({ attributes: { gender: "Men", useCase: "casual", condition: "plantar_fasciitis" } }),
+        expect: { questionMatches: /arch type/i },
+      },
+    ],
+  },
+
+  {
+    name: "STRESS-5: 'are you listening?' mid-flow → meta-frustration veto",
+    turns: [
+      { user: "I need an orthotic for my brother", classifier: C({ attributes: { gender: "Men" } }), expect: { questionMatches: /shoe|use case|kind of/i } },
+      { user: "are you listening to me", classifier: C({ attributes: { gender: "Men" } }), expect: { gateHandled: false } },
+    ],
+  },
+
+  {
+    name: "STRESS-6: subject clarification 'this isn't for me, it's for my husband' → fall through",
+    turns: [
+      { user: "i need orthotic", classifier: C({ attributes: {} }), expect: { questionMatches: /Who/i } },
+      { user: "this isn't for me, it's for my husband", classifier: C({ attributes: { gender: "Men" } }), expect: { gateHandled: false } },
+    ],
+  },
+
+  {
+    name: "STRESS-7: bare '?' / system-command mid-flow → fall through",
+    turns: [
+      { user: "i need orthotic", classifier: C({ attributes: {} }), expect: { questionMatches: /Who/i } },
+      {
+        user: "?",
+        classifier: { isOrthoticRequest: false, isFootwearRequest: false, isRejection: false, attributes: { gender: null, useCase: null, condition: null }, confidence: "high" },
+        expect: { gateHandled: false },
+      },
+    ],
+  },
+
+  {
+    name: "STRESS-8: returning customer asks for specific SKU → not gate territory",
+    turns: [
+      {
+        user: "i want another L1305",
+        classifier: { isOrthoticRequest: false, isFootwearRequest: false, isRejection: false, attributes: { gender: null, useCase: null, condition: null }, confidence: "high" },
+        expect: { gateHandled: false },
+      },
+    ],
+  },
 ];
 
 // ---------- Run ----------

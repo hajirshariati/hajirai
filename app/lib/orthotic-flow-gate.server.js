@@ -425,7 +425,10 @@ export async function maybeRunOrthoticFlow({
   // q_arch three turns in a row while customer typed "this is not
   // for me" twice — the gate didn't recognize the redirect. Fall
   // through so the LLM can ack the subject and re-ask appropriately.
-  const SUBJECT_CLARIFICATION_RE = /\b(?:(?:this|it|that)['‘’]?s?\s+(?:is\s+)?n[o']?t\s+for\s+me|(?:i'?m|i\s+am)\s+not\s+the\s+(?:one|person)|i\s+don'?t\s+need\s+(?:this|it|one)\s+for\s+me|not\s+for\s+me[,.\s]+(?:for|it'?s|its)\b)/i;
+  // Match both "this is not for me" AND the contraction "this isn't for me"
+  // (which has no space inside "isn't"). Earlier version required (?:is\s+)?
+  // before "not" — that worked for the spaced form but missed the contraction.
+  const SUBJECT_CLARIFICATION_RE = /\b(?:(?:this|it|that)(?:['‘’]?s)?\s+(?:(?:is|are)\s+not|isn['‘’]?t|aren['‘’]?t|ain['‘’]?t|not)\s+for\s+me|(?:i'?m|i\s+am)\s+not\s+the\s+(?:one|person)|i\s+don'?t\s+need\s+(?:this|it|one)\s+for\s+me|not\s+for\s+me[,.\s]+(?:for|it'?s|its)\b)/i;
   if (SUBJECT_CLARIFICATION_RE.test(rawUserText)) {
     console.log(
       `[orthotic-flow] subject clarification detected ("${rawUserText.slice(0, 60)}"); ` +
@@ -444,6 +447,20 @@ export async function maybeRunOrthoticFlow({
   if (META_FRUSTRATION_RE.test(rawUserText)) {
     console.log(
       `[orthotic-flow] meta-frustration detected ("${rawUserText.slice(0, 60)}"); ` +
+        `falling through to LLM`,
+    );
+    return { handled: false };
+  }
+
+  // Give-up veto. Customer is fed up with the question chain and just
+  // wants a result NOW ("ugh whatever just pick one", "you choose",
+  // "just give me something", "i don't care"). Continuing the chip
+  // chain after this signal feels like the bot ignoring the customer.
+  // Fall through so the LLM can offer a sensible default or short-list.
+  const GIVE_UP_RE = /\b(?:(?:ugh|fine|whatever)\b[^.!?]{0,30}?\b(?:just|pick|choose|give|whatever)|just\s+(?:pick|choose|give\s+me|show\s+me)\s+(?:one|something|anything)|you\s+(?:pick|choose|decide)|surprise\s+me|i\s+don'?t\s+care|doesn'?t\s+matter\s+(?:to\s+me)?|stop\s+asking)/i;
+  if (GIVE_UP_RE.test(rawUserText)) {
+    console.log(
+      `[orthotic-flow] give-up signal detected ("${rawUserText.slice(0, 60)}"); ` +
         `falling through to LLM`,
     );
     return { handled: false };
