@@ -405,6 +405,38 @@ test("extracts gender from 'for my dad'", () => {
   const a = preExtractAnswers("I need orthotics for my dad", tree);
   assert.equal(a.gender, "Men");
 });
+test("extracts gender=Kids from 'for my 9yr old son' (production bug 2026-05-10)", () => {
+  // Bare \bson\b matched the Men pattern, so "9yr old son" was
+  // misclassified as Men and the wife's flow ended up resolving
+  // L220M (Men's Conform Posted) for the kid. The new Kids pattern
+  // catches "9yr old son" / "my son" / "young son" first.
+  const a = preExtractAnswers("how about for my 9yr old son, do you have any insoles for him?", tree);
+  assert.equal(a.gender, "Kids", `expected Kids, got ${a.gender}`);
+});
+test("extracts gender=Kids from 'my son'", () => {
+  const a = preExtractAnswers("orthotic for my son", tree);
+  assert.equal(a.gender, "Kids");
+});
+test("extracts gender=Kids from 'my daughter'", () => {
+  const a = preExtractAnswers("for my daughter", tree);
+  assert.equal(a.gender, "Kids");
+});
+test("extracts gender=Kids from '9-year-old son' (hyphenated age)", () => {
+  const a = preExtractAnswers("9-year-old son needs orthotics", tree);
+  assert.equal(a.gender, "Kids");
+});
+test("extracts gender=Kids from '12 year old daughter'", () => {
+  const a = preExtractAnswers("12 year old daughter has flat feet", tree);
+  assert.equal(a.gender, "Kids");
+});
+test("extracts gender=Kids from 'young son'", () => {
+  const a = preExtractAnswers("orthotic for my young son", tree);
+  assert.equal(a.gender, "Kids");
+});
+test("extracts gender=Kids from 'toddler son'", () => {
+  const a = preExtractAnswers("toddler son", tree);
+  assert.equal(a.gender, "Kids");
+});
 test("extracts useCase + gender + condition from rich message", () => {
   const a = preExtractAnswers("plantar fasciitis running orthotics for my mom", tree);
   assert.equal(a.useCase, "athletic_running");

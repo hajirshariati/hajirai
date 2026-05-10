@@ -394,6 +394,21 @@ const KEYWORD_PATTERNS = {
         // "boy" / "girl" is ambiguous — falls through to Men/
         // Women for adults.
         /\b(boys|girls|boy'?s|girl'?s)\b/i,
+        // Parent-buying-for-kid phrasings. Production trace 2026-05-10:
+        // customer said "how about for my 9yr old son" — without these
+        // patterns "son" matched the Men gender list (bare \bson\b),
+        // accumulateAnswers stamped gender=Men onto the conversation,
+        // and every subsequent turn carried wife/dad/Men forward even
+        // when classifier said Kids. Final resolve emitted L220M
+        // (Men's Conform Posted) for what should have been a kid.
+        //
+        // Match these as Kids so the regex layer matches the
+        // semantic classifier output:
+        //   - "my son", "my daughter"
+        //   - "9-year-old son", "9 year old son", "9yr old son"
+        //   - "young son", "little daughter", "toddler son", "teen son"
+        //   - "baby son", "infant daughter"
+        /\b(?:my\s+(?:son|daughter)|\d+[\s-]*(?:year|yr)s?[\s-]*old\s+(?:son|daughter)|(?:young|little|toddler|teen|teenage|baby|infant)\s+(?:son|daughter))\b/i,
       ],
     },
     {
