@@ -35,6 +35,7 @@ import {
   filterForbiddenCategoryChips,
   filterContradictingGenderChips,
 } from "../app/lib/chip-filter.server.js";
+import { scrubRoleMarkers } from "../app/lib/chat-postprocessing.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const argFlag = (name) => process.argv.find((a) => a.startsWith(`--${name}=`))?.slice(`--${name}=`.length);
@@ -212,6 +213,12 @@ async function runScenario(scenario) {
   text = stripBannedNarration(text);
   text = stripMetaNarration(text);
   text = dedupeConsecutiveSentences(text);
+  // Mirror production chat.jsx:1558 — scrub leaked "Human:" / "Assistant:"
+  // role-marker tokens the LLM occasionally emits. Production strips them
+  // before the customer sees anything; without the same scrub in eval,
+  // RESPONSE NOW shows raw leakage that production doesn't.
+  const roleScrub = scrubRoleMarkers(text);
+  if (roleScrub.changed) text = roleScrub.text;
 
   // Apply the production chip filters so the eval matches what
   // customers actually see (not the raw LLM output).
