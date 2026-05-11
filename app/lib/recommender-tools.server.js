@@ -248,9 +248,13 @@ async function lookupProductByMasterSku(shop, masterSku) {
   if (!m) return null;
   const prisma = await getPrisma();
   // Try variant prefix match first — the most common Aetrex pattern.
+  // Case-insensitive: masterIndex authored as "L1800U" must still match
+  // shop variants like "l1800u-m" (lowercase + suffix). Postgres
+  // `startsWith` defaults to case-sensitive; mode:"insensitive" maps
+  // to ILIKE in the underlying SQL.
   const variant = await prisma.productVariant.findFirst({
     where: {
-      sku: { startsWith: m },
+      sku: { startsWith: m, mode: "insensitive" },
       product: {
         shop,
         NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } },
@@ -297,7 +301,10 @@ async function filterMasterIndexByShop(shop, masterIndex) {
   try {
     rows = await prisma.productVariant.findMany({
       where: {
-        OR: prefixes.map((p) => ({ sku: { startsWith: p } })),
+        // Case-insensitive prefix match — see lookupProductByMasterSku
+        // for the same reasoning. masterIndex casing may not match the
+        // merchant's actual variant SKU casing.
+        OR: prefixes.map((p) => ({ sku: { startsWith: p, mode: "insensitive" } })),
         product: {
           shop,
           NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } },
@@ -311,9 +318,9 @@ async function filterMasterIndexByShop(shop, masterIndex) {
   }
   const presentPrefixes = new Set();
   for (const r of rows) {
-    const sku = String(r.sku || "");
+    const sku = String(r.sku || "").toLowerCase();
     for (const p of prefixes) {
-      if (sku.startsWith(p)) {
+      if (sku.startsWith(String(p).toLowerCase())) {
         presentPrefixes.add(p);
         break;
       }
