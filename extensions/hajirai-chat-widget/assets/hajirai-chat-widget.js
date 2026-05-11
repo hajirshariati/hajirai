@@ -380,12 +380,16 @@ if(CUST_LOGGED_IN){
 h+='</div>';
 msgsEl.innerHTML=h;
 if(GREETCTA)startGreetCtaRotator();
+}
+
 /* Animated gradient-ring intro. Plays for ~3s when the welcome
-   homepage renders, then fades out over 1.6s and removes itself.
-   Pointer-events:none so it never blocks chip clicks. Subtle, runs
-   on the panel's overflow:hidden edges so it reads as an inner
-   border glow rather than a halo. */
+   homepage becomes visible (panel opens), then fades out over 1.6s
+   and removes itself. Called from toggle() so the effect is timed
+   to when the customer can actually see it, not page load. */
+function playWelcomeGlow(){
 try{
+  var welcomeEl=msgsEl&&msgsEl.querySelector('.ai-chat-welcome');
+  if(!welcomeEl)return;
   var existingGlow=panel.querySelector('.ai-chat-welcome-glow');
   if(existingGlow)existingGlow.remove();
   var glow=document.createElement('div');
@@ -407,6 +411,11 @@ if(isOpen){
   setTimeout(function(){inputEl.focus()},400);
   setTimeout(function(){inputEl.focus()},800);
   checkIdleOnOpen();
+  /* Trigger the gradient-ring intro after the panel's open-
+     transition starts (~300ms in widget.css). Fires only when
+     a welcome view is rendered — returning users with history
+     skip the welcome and the glow with it. */
+  setTimeout(playWelcomeGlow,350);
 }else{
   panel.classList.remove('open');
   overlay.classList.remove('visible');
