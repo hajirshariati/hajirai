@@ -342,7 +342,7 @@ export function isSingularPrescriptive(text) {
 // wedges…" rendering 1 card). Catch the framing here so chat.jsx can
 // skip the threshold and render the full pool. Vocabulary-agnostic —
 // works for any catalog vertical.
-const PLURAL_INTRO_FRAMING = /\b(?:here are|here'?s a (?:few|couple|handful)|here'?s what (?:i|we) (?:found|got|recommend)|both of (?:these|them)|these (?:are|two|three|few|options)|some great|several (?:great )?(?:options|picks|choices)|a few (?:options|picks|choices)|check out (?:these|some)|take a look at (?:these|some)|i'?d recommend|i recommend)\b/i;
+const PLURAL_INTRO_FRAMING = /\b(?:here are|here'?s a (?:few|couple|handful)|here'?s (?:a|an|some|our|the|several)?\s*(?:\w+\s+)?(?:lineup|selection|mix|range|variety|collection|assortment|set of|list of|roundup)|here'?s what (?:i|we) (?:found|got|recommend)|both of (?:these|them)|these (?:are|two|three|few|options)|some great|several (?:great )?(?:options|picks|choices)|a few (?:options|picks|choices)|check out (?:these|some)|take a look at (?:these|some)|i'?d recommend|i recommend|i'?ve (?:got|pulled|found))\b/i;
 
 export function hasPluralIntroFraming(text) {
   return Boolean(text) && PLURAL_INTRO_FRAMING.test(text);
