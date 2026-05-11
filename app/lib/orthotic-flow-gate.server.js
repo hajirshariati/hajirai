@@ -490,6 +490,52 @@ export async function maybeRunOrthoticFlow({
     return { handled: false };
   }
 
+  // Domain disambiguation. When the customer mentions a clinical
+  // condition + a generic shopping verb but no product noun ("I have
+  // foot pain, what should I wear?"), the old regex intent stack used
+  // to ask "footwear or orthotic?" before launching the orthotic chip
+  // funnel. The Haiku classifier (4524e94) is more eager to commit to
+  // orthotic on a bare condition, so customers who actually wanted
+  // arch-support footwear get dragged through 5 chip turns and then
+  // shown an orthotic that may or may not be in stock.
+  //
+  // Trigger: latest message has a condition hint AND a generic
+  // shopping verb AND no footwear noun AND no orthotic noun.
+  // Suppress: if the disambiguation has already been asked this
+  // conversation (chip label present in any prior assistant turn).
+  // Footwear nouns. `heels?` and `flats?` are intentionally absent —
+  // they collide with anatomy/condition words ("heel pain", "flat
+  // feet"). The customer who really means high heels says "heels" in
+  // a different shape; if they typed "heel pain, what to wear" they
+  // need the disambig anyway.
+  const FOOTWEAR_NOUN_RE = /\b(shoes?|sandals?|sneakers?|boots?|loafers?|clogs?|slip[- ]ons?|mary[- ]janes?|wedges?|footwear|oxfords?|moccasins?|slippers?|trainers?|pumps?|mules?)\b/i;
+  const ORTHOTIC_NOUN_RE = /\b(orthotics?|insoles?|inserts?|inner[- ]soles?|arch[- ]support[- ]insert|heel[- ]cups?|footbeds?|thinsoles?)\b/i;
+  const SHOPPING_VERB_RE = /\b(wear|wears|wearing|recommend|recommendation|recommends|find|finding|looking[- ]for|want|wants|wanting|need|needs|needing|get|gets|getting|buy|buying|best|good|suitable|right|help\s+(?:me|with))\b/i;
+  const CONDITION_HINT_RE = /\b(pain|aching?|sore|sores|fasciit(?:is|us)|bunions?|hammertoes?|neuroma|flat[- ]feet|high[- ]arch|low[- ]arch|overpronation|underpronation|plantar|metatarsal|heel[- ]spurs?|diabetic|diabetes|arthritis)\b/i;
+  const DISAMBIG_CHIP_RE = /<<\s*Footwear\s+with\s+arch\s+support\s*>>|<<\s*Orthotic\s+insole\s*>>/i;
+  const alreadyAsked = Array.isArray(messages) && messages.slice(0, -1).some((m) => {
+    return m && m.role === "assistant" && typeof m.content === "string" && DISAMBIG_CHIP_RE.test(m.content);
+  });
+  const isConditionOnly = CONDITION_HINT_RE.test(rawUserText) &&
+                          SHOPPING_VERB_RE.test(rawUserText) &&
+                          !FOOTWEAR_NOUN_RE.test(rawUserText) &&
+                          !ORTHOTIC_NOUN_RE.test(rawUserText);
+  if (isConditionOnly && !alreadyAsked) {
+    const text =
+      "Got it — sounds like you're dealing with some foot discomfort. " +
+      "Are you looking for footwear with built-in arch support, or an " +
+      "orthotic insole that goes inside your existing shoes?\n\n" +
+      "<<Footwear with arch support>><<Orthotic insole>>";
+    controller.enqueue(encoder.encode(sseChunk({ type: "text", text })));
+    controller.enqueue(encoder.encode(sseChunk({ type: "products", products: [] })));
+    controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
+    console.log(
+      `[orthotic-flow] domain disambig: condition-only query without product noun ` +
+        `("${rawUserText.slice(0, 60)}"); asked footwear-vs-orthotic`,
+    );
+    return { handled: true };
+  }
+
   const answers = { ...accumulated, ...latestExtracted };
 
   // Kids auto-fill for useCase. When gender=Kids, the seed's q_use_case
