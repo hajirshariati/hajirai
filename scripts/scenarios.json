@@ -840,5 +840,22 @@
       "minSentences": 1,
       "shouldMentionAny": ["Vania", "Tamara", "red", "color", "options", "let me", "show"]
     }
+  },
+  {
+    "name": "PROD-REGRESSION rejection-alternative: wife doesn't like shoes or orthotics, gift idea — must offer accessories not empty fallback",
+    "messages": ["my wife don't like shoes and orthotics, what should i get her for mother day gift?"],
+    "expect": {
+      "shouldMentionAny": ["accessories", "accessory", "heel", "cup", "insert", "gift card", "something else", "non-shoe", "small item"],
+      "mustNotContain": ["Hmm, nothing's quite hitting", "nothing's quite hitting that combination", "widen the budget"],
+      "maxSentences": 5
+    }
+  },
+  {
+    "name": "PROD-REGRESSION rejection-alternative: 'not shoes, what else?' — search the leftover categories",
+    "messages": ["not shoes please, what else do you have?"],
+    "expect": {
+      "shouldMentionAny": ["orthotic", "accessories", "accessory", "insole", "insert", "heel cup", "other"],
+      "mustNotContain": ["Hmm, nothing's quite hitting", "nothing's quite hitting that combination"]
+    }
   }
 ]
