@@ -2138,6 +2138,18 @@ if (collection.cta) {
   const dominantGender = genderCounts.size > 0
     ? [...genderCounts.entries()].sort((a, b) => b[1] - a[1])[0][0]
     : (ctx.sessionGender || "");
+  // When the customer asks broadly ("women's shoes for my needs",
+  // "show me footwear") or the LLM returns a wide style mix (3+
+  // distinct categories, or top style is <60% of cards), don't pin
+  // the CTA to whichever style happened to dominate. Fall back to
+  // "footwear" so the search stays scoped to shoes (not orthotics).
+  const _latest = String(ctx.latestUserMessage || "").toLowerCase();
+  const _hasSpecificStyle = /\b(sneaker|sandal|boot|wedge|heel|loafer|flat|slip[- ]on|clog|mule|oxford|pump|trainer|moccasin|slipper|orthotic)/i.test(_latest);
+  const _isGenericAsk = !_hasSpecificStyle && /\b(shoes?|footwear|anything|something|options|recommend)/i.test(_latest);
+  const _totalCards = [...categoryCounts.values()].reduce((a, b) => a + b, 0);
+  const _topShare = dominantCat && _totalCards > 0 ? (categoryCounts.get(dominantCat) / _totalCards) : 0;
+  const _mixedStyles = categoryCounts.size >= 3 || _topShare < 0.6;
+  const ctaCategory = (_isGenericAsk || _mixedStyles) ? "footwear" : dominantCat;
   // Color: pick the dominant card color IF the customer mentioned one
   // and the merchant carries it. ctx._merchantColors is the catalog's
   // own color values; we don't fabricate colors not in the catalog.
@@ -2160,7 +2172,7 @@ if (collection.cta) {
   const auto = buildStorefrontSearchCTA({
     pattern: ctx.storefrontSearchUrlPattern,
     gender: dominantGender,
-    category: dominantCat,
+    category: ctaCategory,
     color: dominantColor,
     latestUserMessage: ctx.latestUserMessage || "",
   });
