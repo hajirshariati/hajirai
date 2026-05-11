@@ -642,6 +642,35 @@ export async function maybeRunOrthoticFlow({
         looksLikeFootwearCommit(m.content),
     );
   if (footwearCommitInLatest || footwearCommitInPrior) {
+    // BEFORE falling through to the LLM, enforce DISCOVERY ORDER:
+    // gender must be asked before category. The prompt has a rule
+    // for this ("DISCOVERY ORDER — GENDER BEFORE CATEGORY") but in
+    // practice the LLM sometimes jumps straight to category when the
+    // customer's footwear-commit happens via a chip answer to the
+    // "Footwear or orthotic?" disambig — the LLM treats the chip as
+    // a footwear request and skips ahead. Hard-force gender first.
+    const GENDER_CHIP_RE = /<<\s*Men(?:'?s)?\s*>>|<<\s*Women(?:'?s)?\s*>>/i;
+    const alreadyAskedGender = priorMessages.some(
+      (m) =>
+        m &&
+        m.role === "assistant" &&
+        typeof m.content === "string" &&
+        GENDER_CHIP_RE.test(m.content),
+    );
+    if (!answers.gender && !alreadyAskedGender) {
+      const text =
+        "Got it — let me help you find the right fit. " +
+        "Are you shopping for men's or women's?\n\n" +
+        "<<Men's>><<Women's>>";
+      controller.enqueue(encoder.encode(sseChunk({ type: "text", text })));
+      controller.enqueue(encoder.encode(sseChunk({ type: "products", products: [] })));
+      controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
+      console.log(
+        `[orthotic-flow] footwear-path: gender unknown, asking gender first ` +
+          `(prompt's discovery-order rule wasn't enough — hard gate).`,
+      );
+      return { handled: true };
+    }
     console.log(
       `[orthotic-flow] footwear-path veto: customer committed to footwear ` +
         `(${footwearCommitInLatest ? "latest" : "prior"}); falling through to LLM`,
