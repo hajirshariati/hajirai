@@ -2051,17 +2051,24 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
   );
   animation: hajirai-glow-rotate 4s linear infinite;
   opacity: 1;
-  transition: opacity 1.6s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Asymmetric transition: fade in faster (0.8s) than fade out
+     (1.6s). Mounted with .is-entering = opacity:0, JS removes that
+     class one frame after mount so the transition actually plays. */
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.ai-chat-welcome-glow.is-entering {
+  opacity: 0;
 }
 .ai-chat-welcome-glow::after {
   content: "";
   position: absolute;
-  top: 4px; left: 4px; right: 4px; bottom: 4px;
-  border-radius: calc(var(--ai-chat-radius, 16px) - 4px);
+  top: 2px; left: 2px; right: 2px; bottom: 2px;
+  border-radius: calc(var(--ai-chat-radius, 16px) - 2px);
   background: var(--ai-chat-bg, #fff);
 }
 .ai-chat-welcome-glow.is-fading {
   opacity: 0;
+  transition: opacity 1.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* EXTERNAL halo. Rendered as a fixed-position sibling on document.body,
@@ -2078,18 +2085,25 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
   position: fixed;
   pointer-events: none;
   z-index: 999990; /* matches --ai-chat-z (overlay) so it sits above */
-  border-radius: 32px;
+  border-radius: 22px;
   background: conic-gradient(
     from var(--hajirai-glow-angle, 0deg),
     var(--hajirai-glow-colors, #6366f1, #a855f7, #ec4899, #f59e0b, #10b981, #06b6d4, #6366f1)
   );
-  filter: blur(22px);
+  /* Slim ring: low spread on the JS side + small blur here keeps
+     the gradient as a thin visible line around the panel rather
+     than a thick halo. */
+  filter: blur(4px);
   opacity: 1;
-  transition: opacity 1.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   animation: hajirai-glow-rotate 4s linear infinite;
+}
+.ai-chat-welcome-glow-outer.is-entering {
+  opacity: 0;
 }
 .ai-chat-welcome-glow-outer.is-fading {
   opacity: 0;
+  transition: opacity 1.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Fallback for browsers without @property: static angled gradient. */

@@ -417,16 +417,25 @@ try{
        out, so we keep the halo in sync via requestAnimationFrame for
        the full visible lifetime instead of capturing a single rect
        (which was undersized if the welcome was still rendering). */
-    var SPREAD=40;
+    var SPREAD=6;
     var glowE=document.createElement('div');
-    glowE.className='ai-chat-welcome-glow-outer';
+    glowE.className='ai-chat-welcome-glow-outer is-entering';
     /* aria-hidden intentionally NOT set — third-party a11y CSS
        (Userway, certain theme stylesheets) hides aria-hidden elements
        with display:none, which collapsed our halo to 0×0. The element
        is a purely decorative absolutely-positioned div with no text
-       and pointer-events:none — assistive tech won't surface it. */
+       and pointer-events:none — assistive tech won't surface it.
+       .is-entering starts the element at opacity:0; the double rAF
+       below removes it after the browser paints opacity:0 once, so
+       the transition to opacity:1 actually animates instead of
+       snapping. */
     glowE.style.setProperty('--hajirai-glow-colors',colors);
     document.body.appendChild(glowE);
+    requestAnimationFrame(function(){
+      requestAnimationFrame(function(){
+        glowE.classList.remove('is-entering');
+      });
+    });
 
     function syncGlowRect(){
       var rect=panel.getBoundingClientRect();
@@ -460,9 +469,14 @@ try{
   /* Internal ring — inside the panel. aria-hidden intentionally
      not set; see external path comment. */
   var glow=document.createElement('div');
-  glow.className='ai-chat-welcome-glow';
+  glow.className='ai-chat-welcome-glow is-entering';
   glow.style.setProperty('--hajirai-glow-colors',colors);
   panel.appendChild(glow);
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      glow.classList.remove('is-entering');
+    });
+  });
   console.log('[hajirai] welcome glow fired (internal)');
   setTimeout(function(){glow.classList.add('is-fading')},2800);
   setTimeout(function(){if(glow.parentNode)glow.parentNode.removeChild(glow)},4500);
