@@ -2036,6 +2036,10 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
    visible at the edges. z-index lives in the panel's stacking
    context. */
 .ai-chat-welcome-glow {
+  /* display: block !important defends against host-page a11y CSS
+     (Userway, some themes) that sets display:none on elements they
+     interpret as decorative. */
+  display: block !important;
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
   border-radius: var(--ai-chat-radius, 16px);
@@ -2067,6 +2071,10 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
    overlay but appears AFTER it in document order, so it paints on
    top of the dim overlay; the panel (z+1) is still on top. */
 .ai-chat-welcome-glow-outer {
+  /* display: block !important defends against host-page a11y CSS
+     (Userway, some themes) that hides elements they interpret as
+     decorative — this collapsed our halo to 0×0 on aetrex.com. */
+  display: block !important;
   position: fixed;
   pointer-events: none;
   z-index: 999990; /* matches --ai-chat-z (overlay) so it sits above */
@@ -2075,10 +2083,7 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
     from var(--hajirai-glow-angle, 0deg),
     var(--hajirai-glow-colors, #6366f1, #a855f7, #ec4899, #f59e0b, #10b981, #06b6d4, #6366f1)
   );
-  /* Hard fallback: even if conic-gradient or @property fails, a solid
-     bright background renders so the halo is at least visible. */
-  background-color: #ec4899;
-  filter: blur(18px);
+  filter: blur(22px);
   opacity: 1;
   transition: opacity 1.6s cubic-bezier(0.4, 0, 0.2, 1);
   animation: hajirai-glow-rotate 4s linear infinite;

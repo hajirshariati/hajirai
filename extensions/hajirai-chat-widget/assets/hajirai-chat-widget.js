@@ -420,7 +420,11 @@ try{
     var SPREAD=40;
     var glowE=document.createElement('div');
     glowE.className='ai-chat-welcome-glow-outer';
-    glowE.setAttribute('aria-hidden','true');
+    /* aria-hidden intentionally NOT set — third-party a11y CSS
+       (Userway, certain theme stylesheets) hides aria-hidden elements
+       with display:none, which collapsed our halo to 0×0. The element
+       is a purely decorative absolutely-positioned div with no text
+       and pointer-events:none — assistive tech won't surface it. */
     glowE.style.setProperty('--hajirai-glow-colors',colors);
     document.body.appendChild(glowE);
 
@@ -445,21 +449,18 @@ try{
     }
     requestAnimationFrame(tick);
 
-    /* TEMP DEBUG: keep halo visible for 25s so we can inspect why
-       it isn't appearing. Revert to 2800/4500 once we confirm
-       visibility. */
-    setTimeout(function(){glowE.classList.add('is-fading')},23000);
+    setTimeout(function(){glowE.classList.add('is-fading')},2800);
     setTimeout(function(){
       stop=true;
       if(glowE.parentNode)glowE.parentNode.removeChild(glowE);
-    },25000);
+    },4500);
     return;
   }
 
-  /* Internal ring — inside the panel. */
+  /* Internal ring — inside the panel. aria-hidden intentionally
+     not set; see external path comment. */
   var glow=document.createElement('div');
   glow.className='ai-chat-welcome-glow';
-  glow.setAttribute('aria-hidden','true');
   glow.style.setProperty('--hajirai-glow-colors',colors);
   panel.appendChild(glow);
   console.log('[hajirai] welcome glow fired (internal)');
