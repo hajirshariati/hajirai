@@ -2031,20 +2031,18 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
 @keyframes hajirai-glow-rotate {
   to { --hajirai-glow-angle: 360deg; }
 }
-/* INTERNAL ring. Two-layer approach instead of mask-composite (which
-   has spotty support and was rendering invisibly for some users).
-   Layer 1 (.ai-chat-welcome-glow): absolutely-positioned, full
-   conic gradient covering the panel, animated rotation.
-   Layer 2 (::after): inset 4px, matches the panel background to mask
-   the inner area, leaving a 4px gradient ring at the edges. */
+/* INTERNAL ring. Conic gradient covers the panel; ::after sits 4px
+   in with the panel's background color, leaving a 4px gradient ring
+   visible at the edges. z-index lives in the panel's stacking
+   context. */
 .ai-chat-welcome-glow {
   position: absolute;
-  inset: 0;
-  border-radius: inherit;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border-radius: var(--ai-chat-radius, 16px);
   pointer-events: none;
   z-index: 9999;
   background: conic-gradient(
-    from var(--hajirai-glow-angle),
+    from var(--hajirai-glow-angle, 0deg),
     var(--hajirai-glow-colors, #6366f1, #a855f7, #ec4899, #f59e0b, #10b981, #06b6d4, #6366f1)
   );
   animation: hajirai-glow-rotate 4s linear infinite;
@@ -2054,38 +2052,32 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
 .ai-chat-welcome-glow::after {
   content: "";
   position: absolute;
-  inset: 4px;
-  border-radius: inherit;
+  top: 4px; left: 4px; right: 4px; bottom: 4px;
+  border-radius: calc(var(--ai-chat-radius, 16px) - 4px);
   background: var(--ai-chat-bg, #fff);
 }
 .ai-chat-welcome-glow.is-fading {
   opacity: 0;
 }
 
-/* EXTERNAL halo. Rendered as a fixed-position sibling of the panel
-   (NOT a child — panel.overflow:hidden would clip it). Bigger than
-   the panel via negative inset; blurred for a soft halo; sits behind
-   the panel via lower z-index. */
+/* EXTERNAL halo. Rendered as a fixed-position sibling on document.body,
+   sized LARGER than the panel via JS (top/left/width/height already
+   include the spread). Gradient lives directly on the element with a
+   heavy blur for a soft halo. Sits at the same z-index as the
+   overlay but appears AFTER it in document order, so it paints on
+   top of the dim overlay; the panel (z+1) is still on top. */
 .ai-chat-welcome-glow-outer {
   position: fixed;
   pointer-events: none;
-  /* Panel sits at z = calc(var(--ai-chat-z) + 1). Place the halo
-     just under that so the panel's solid bg is on top of the halo. */
-  z-index: calc(var(--ai-chat-z, 9999));
-  border-radius: var(--ai-chat-radius, 16px);
-  opacity: 1;
-  transition: opacity 1.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.ai-chat-welcome-glow-outer::before {
-  content: "";
-  position: absolute;
-  inset: -18px;
-  border-radius: inherit;
+  z-index: 999990; /* matches --ai-chat-z (overlay) so it sits above */
+  border-radius: 32px;
   background: conic-gradient(
-    from var(--hajirai-glow-angle),
+    from var(--hajirai-glow-angle, 0deg),
     var(--hajirai-glow-colors, #6366f1, #a855f7, #ec4899, #f59e0b, #10b981, #06b6d4, #6366f1)
   );
-  filter: blur(22px);
+  filter: blur(28px);
+  opacity: 0.95;
+  transition: opacity 1.6s cubic-bezier(0.4, 0, 0.2, 1);
   animation: hajirai-glow-rotate 4s linear infinite;
 }
 .ai-chat-welcome-glow-outer.is-fading {
@@ -2095,7 +2087,7 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
 /* Fallback for browsers without @property: static angled gradient. */
 @supports not (background: conic-gradient(from var(--hajirai-glow-angle), red, blue)) {
   .ai-chat-welcome-glow,
-  .ai-chat-welcome-glow-outer::before {
+  .ai-chat-welcome-glow-outer {
     background: linear-gradient(135deg, var(--hajirai-glow-colors, #6366f1, #a855f7, #ec4899, #f59e0b, #10b981, #06b6d4));
     animation: none;
   }

@@ -410,20 +410,22 @@ try{
   var oldE=document.querySelector('.ai-chat-welcome-glow-outer');if(oldE)oldE.remove();
 
   if(WELCOME_GLOW_STYLE==='external'){
-    /* Outer halo. Sits as a fixed-position sibling of the panel, sized
-       to match the panel's bounding box plus an outer spread, so the
-       panel's overflow:hidden doesn't clip it. Inserted into body. */
+    /* Outer halo. Fixed-position sibling on document.body, sized
+       LARGER than the panel by SPREAD on every side so the blurred
+       gradient is visible AROUND the panel (the panel's solid bg
+       covers the inner area at higher z-index). */
+    var SPREAD=24;
     var rect=panel.getBoundingClientRect();
     var glowE=document.createElement('div');
     glowE.className='ai-chat-welcome-glow-outer';
     glowE.setAttribute('aria-hidden','true');
     glowE.style.setProperty('--hajirai-glow-colors',colors);
-    glowE.style.top=rect.top+'px';
-    glowE.style.left=rect.left+'px';
-    glowE.style.width=rect.width+'px';
-    glowE.style.height=rect.height+'px';
+    glowE.style.top=(rect.top-SPREAD)+'px';
+    glowE.style.left=(rect.left-SPREAD)+'px';
+    glowE.style.width=(rect.width+SPREAD*2)+'px';
+    glowE.style.height=(rect.height+SPREAD*2)+'px';
     document.body.appendChild(glowE);
-    console.log('[hajirai] welcome glow fired (external)');
+    console.log('[hajirai] welcome glow fired (external)',rect);
     setTimeout(function(){glowE.classList.add('is-fading')},2800);
     setTimeout(function(){if(glowE.parentNode)glowE.parentNode.removeChild(glowE)},4500);
     return;
