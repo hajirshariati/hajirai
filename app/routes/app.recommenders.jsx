@@ -153,13 +153,13 @@ export const action = async ({ request }) => {
     const masterIndex = tree.definition?.resolver?.masterIndex || [];
     const csv = serializeMasterIndexToCsv(masterIndex);
     const filename = `mapping-${tree.intent || "tree"}-${id.slice(0, 8)}.csv`;
-    return new Response(csv, {
-      status: 200,
-      headers: {
-        "Content-Type": "text/csv; charset=utf-8",
-        "Content-Disposition": `attachment; filename="${filename}"`,
-      },
-    });
+    // Return CSV as JSON-wrapped string instead of a raw Response.
+    // Raw POST fetch from the embedded admin iframe doesn't carry the
+    // App Bridge session token, so the auth wrapper redirected to the
+    // OAuth login HTML and the browser saved THAT as the "CSV" file.
+    // Wrapping in JSON lets the client use useFetcher (which handles
+    // session forwarding correctly) then build the Blob client-side.
+    return { mappingCsvExport: { csv, filename } };
   }
 
   if (intent === "preview_upload_mapping_csv") {
@@ -861,10 +861,10 @@ function DecisionTreesCard({ enabled, trees }) {
 function MappingCsvSection({ treeId }) {
   const previewFetcher = useFetcher();
   const applyFetcher = useFetcher();
+  const downloadFetcher = useFetcher();
   const fileInputRef = useRef(null);
   const [csvContent, setCsvContent] = useState("");
   const [fileName, setFileName] = useState("");
-  const [downloading, setDownloading] = useState(false);
   const [downloadError, setDownloadError] = useState(null);
 
   // Download via fetch + blob URL. The earlier form-based approach
@@ -873,42 +873,42 @@ function MappingCsvSection({ treeId }) {
   // closes the editor and never triggers a browser download. Using
   // fetch bypasses the router entirely; we get the raw Response and
   // turn it into a download via blob URL + synthetic <a download>.
-  const handleDownload = async () => {
+  const handleDownload = () => {
     setDownloadError(null);
-    setDownloading(true);
-    try {
-      const fd = new FormData();
-      fd.set("intent", "export_mapping_csv");
-      fd.set("id", treeId);
-      const res = await fetch("", { method: "POST", body: fd });
-      if (!res.ok) {
-        // Action returned a JSON error (e.g. tree not found)
-        let msg = `HTTP ${res.status}`;
-        try {
-          const j = await res.json();
-          if (j?.error) msg = j.error;
-        } catch { /* ignore — keep status text */ }
-        throw new Error(msg);
-      }
-      const blob = await res.blob();
-      const cd = res.headers.get("Content-Disposition") || "";
-      const m = cd.match(/filename="?([^";]+)"?/i);
-      const filename = m ? m[1] : `mapping-${treeId.slice(0, 8)}.csv`;
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      // Defer revoke so the browser has time to start the download
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-    } catch (err) {
-      setDownloadError(err?.message || "Download failed");
-    } finally {
-      setDownloading(false);
-    }
+    const fd = new FormData();
+    fd.set("intent", "export_mapping_csv");
+    fd.set("id", treeId);
+    // useFetcher (vs raw fetch) carries the App Bridge session token
+    // automatically — raw fetch from the embedded admin iframe was
+    // hitting the OAuth redirect and downloading the React app HTML
+    // instead of the CSV.
+    downloadFetcher.submit(fd, { method: "post" });
   };
+
+  // Watch for the action's response and trigger a client-side download
+  // once the CSV string arrives.
+  useEffect(() => {
+    if (downloadFetcher.state !== "idle") return;
+    const data = downloadFetcher.data;
+    if (!data) return;
+    if (data.error) {
+      setDownloadError(data.error);
+      return;
+    }
+    const exp = data.mappingCsvExport;
+    if (!exp || !exp.csv) return;
+    setDownloadError(null);
+    const blob = new Blob([exp.csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = exp.filename || `mapping-${treeId.slice(0, 8)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }, [downloadFetcher.state, downloadFetcher.data, treeId]);
+  const downloading = downloadFetcher.state !== "idle";
 
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
