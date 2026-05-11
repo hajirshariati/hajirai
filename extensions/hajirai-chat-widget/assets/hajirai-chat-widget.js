@@ -419,9 +419,10 @@ try{
        (which was undersized if the welcome was still rendering). */
     /* Two-layer effect:
        SPREAD = thickness of the SHARP border line at the panel edge
-       (kept thin — the soft outer halo is rendered by the ::before
-       pseudo-element in CSS, which extends further out with blur). */
-    var SPREAD=3;
+       (kept moderate — the soft outer halo is rendered by the
+       ::before pseudo-element in CSS, which extends further out
+       with blur). */
+    var SPREAD=6;
     var glowE=document.createElement('div');
     glowE.className='ai-chat-welcome-glow-outer is-entering';
     /* aria-hidden intentionally NOT set — third-party a11y CSS
@@ -462,11 +463,14 @@ try{
     }
     requestAnimationFrame(tick);
 
-    setTimeout(function(){glowE.classList.add('is-fading')},2800);
+    /* Timeline: 1.2s fade-in (via CSS transition), 4s hold,
+       1.6s fade-out. Fade-out starts at 1200+4000=5200ms; element
+       removed at 5200+1600=6800ms. */
+    setTimeout(function(){glowE.classList.add('is-fading')},5200);
     setTimeout(function(){
       stop=true;
       if(glowE.parentNode)glowE.parentNode.removeChild(glowE);
-    },4500);
+    },6800);
     return;
   }
 
@@ -482,8 +486,9 @@ try{
     });
   });
   console.log('[hajirai] welcome glow fired (internal)');
-  setTimeout(function(){glow.classList.add('is-fading')},2800);
-  setTimeout(function(){if(glow.parentNode)glow.parentNode.removeChild(glow)},4500);
+  /* Timeline: 1.2s fade-in, 4s hold, 1.6s fade-out. */
+  setTimeout(function(){glow.classList.add('is-fading')},5200);
+  setTimeout(function(){if(glow.parentNode)glow.parentNode.removeChild(glow)},6800);
 }catch(e){console.warn('[hajirai] glow error',e)}
 }
 

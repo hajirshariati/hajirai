@@ -2054,7 +2054,7 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
   /* Asymmetric transition: fade in faster (0.8s) than fade out
      (1.6s). Mounted with .is-entering = opacity:0, JS removes that
      class one frame after mount so the transition actually plays. */
-  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .ai-chat-welcome-glow.is-entering {
   opacity: 0;
@@ -2094,7 +2094,7 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
     var(--hajirai-glow-colors, #6366f1, #a855f7, #ec4899, #f59e0b, #10b981, #06b6d4, #6366f1)
   );
   opacity: 1;
-  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
   animation: hajirai-glow-rotate 4s linear infinite;
 }
 /* Soft outer halo. Extends the gradient FURTHER outward with a
