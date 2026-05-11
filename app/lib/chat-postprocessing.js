@@ -280,6 +280,12 @@ export function stripStockClaim(text) {
 const YESNO_QUESTION_RE = /^\s*(?:do(?:es)?|did|will|would|can|could|is|are|was|were|has|have|had|should|may|might)\b[^?!.\n]{0,140}\?/i;
 const YESNO_ANSWER_RE = /^\s*(?:yes|yeah|yep|yup|absolutely|definitely|correct|right|exactly|sure|of course|no\b|nope|not really|unfortunately,?\s+no|sadly,?\s+no)/i;
 
+// When the AI's reply, after the yes/no opener, signals it is ABOUT to
+// present products ("here are…", "take a look at…", "check out…"), the
+// customer's yes/no question was actually a request to see options.
+// Don't suppress cards in that case.
+const PRODUCT_PRESENTATION_RE = /\b(here(?:'s| is| are)|take a look|check (?:out|these)|i(?:'ve| have) (?:got|found|pulled)|let me show|below are|the following)\b/i;
+
 export function isYesNoQuestion(text) {
   if (typeof text !== "string") return false;
   const trimmed = text.trim();
@@ -288,7 +294,11 @@ export function isYesNoQuestion(text) {
 
 export function isYesNoAnswer(text) {
   if (typeof text !== "string" || !text) return false;
-  return YESNO_ANSWER_RE.test(text);
+  if (!YESNO_ANSWER_RE.test(text)) return false;
+  // If the reply also signals "here are the products" — it's a product
+  // presentation, not a pure yes/no factual answer. Let the cards through.
+  if (PRODUCT_PRESENTATION_RE.test(text)) return false;
+  return true;
 }
 
 // =====================================================================
