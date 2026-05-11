@@ -445,11 +445,14 @@ try{
     }
     requestAnimationFrame(tick);
 
-    setTimeout(function(){glowE.classList.add('is-fading')},2800);
+    /* TEMP DEBUG: keep halo visible for 25s so we can inspect why
+       it isn't appearing. Revert to 2800/4500 once we confirm
+       visibility. */
+    setTimeout(function(){glowE.classList.add('is-fading')},23000);
     setTimeout(function(){
       stop=true;
       if(glowE.parentNode)glowE.parentNode.removeChild(glowE);
-    },4500);
+    },25000);
     return;
   }
 
