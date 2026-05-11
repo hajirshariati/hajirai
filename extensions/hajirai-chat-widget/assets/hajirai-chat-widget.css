@@ -2075,8 +2075,11 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
     from var(--hajirai-glow-angle, 0deg),
     var(--hajirai-glow-colors, #6366f1, #a855f7, #ec4899, #f59e0b, #10b981, #06b6d4, #6366f1)
   );
-  filter: blur(28px);
-  opacity: 0.95;
+  /* Hard fallback: even if conic-gradient or @property fails, a solid
+     bright background renders so the halo is at least visible. */
+  background-color: #ec4899;
+  filter: blur(18px);
+  opacity: 1;
   transition: opacity 1.6s cubic-bezier(0.4, 0, 0.2, 1);
   animation: hajirai-glow-rotate 4s linear infinite;
 }

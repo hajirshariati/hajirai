@@ -417,7 +417,7 @@ try{
        out, so we keep the halo in sync via requestAnimationFrame for
        the full visible lifetime instead of capturing a single rect
        (which was undersized if the welcome was still rendering). */
-    var SPREAD=24;
+    var SPREAD=40;
     var glowE=document.createElement('div');
     glowE.className='ai-chat-welcome-glow-outer';
     glowE.setAttribute('aria-hidden','true');
