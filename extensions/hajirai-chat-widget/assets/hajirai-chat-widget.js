@@ -469,14 +469,14 @@ try{
     }
     requestAnimationFrame(tick);
 
-    /* Timeline: 0.6s fade-in, 1.4s hold, 1.0s fade-out = 3s total
-       on screen. Fade-out starts at 600+1400=2000ms; element
-       removed at 2000+1000=3000ms. */
-    setTimeout(function(){glowE.classList.add('is-fading')},2000);
+    /* Timeline: 1.5s fade-in, 4s hold, 2s fade-out = 7.5s total
+       on screen. Fade-out starts at 1500+4000=5500ms; element
+       removed at 5500+2000=7500ms. */
+    setTimeout(function(){glowE.classList.add('is-fading')},5500);
     setTimeout(function(){
       stop=true;
       if(glowE.parentNode)glowE.parentNode.removeChild(glowE);
-    },3000);
+    },7500);
     return;
   }
 
@@ -492,9 +492,9 @@ try{
     });
   });
   console.log('[hajirai] welcome glow fired (internal)');
-  /* Timeline: 0.6s fade-in, 1.4s hold, 1.0s fade-out = 3s total. */
-  setTimeout(function(){glow.classList.add('is-fading')},2000);
-  setTimeout(function(){if(glow.parentNode)glow.parentNode.removeChild(glow)},3000);
+  /* Timeline: 1.5s fade-in, 4s hold, 2s fade-out = 7.5s total. */
+  setTimeout(function(){glow.classList.add('is-fading')},5500);
+  setTimeout(function(){if(glow.parentNode)glow.parentNode.removeChild(glow)},7500);
 }catch(e){console.warn('[hajirai] glow error',e)}
 }
 

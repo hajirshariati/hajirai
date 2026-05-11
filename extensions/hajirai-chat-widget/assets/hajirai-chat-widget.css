@@ -2094,14 +2094,14 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
   mask-composite: exclude;
   animation: hajirai-glow-rotate 4s linear infinite;
   opacity: 1;
-  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .ai-chat-welcome-glow.is-entering {
   opacity: 0;
 }
 .ai-chat-welcome-glow.is-fading {
   opacity: 0;
-  transition: opacity 1.0s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 2.0s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* EXTERNAL halo. Rendered as a fixed-position sibling on document.body,
@@ -2126,7 +2126,7 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
      sharp ring thicken and thin (looks broken). All motion lives on
      the pseudo-elements individually. */
   opacity: 1;
-  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 /* Layer 1 — soft outer halo. Two layered animations:
    - hajirai-glow-rotate cycles the conic angle (colors flow around)
@@ -2169,7 +2169,7 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
 }
 .ai-chat-welcome-glow-outer.is-fading {
   opacity: 0;
-  transition: opacity 1.0s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 2.0s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* External halo extends past the panel into the storefront chrome —
