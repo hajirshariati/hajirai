@@ -417,7 +417,11 @@ try{
        out, so we keep the halo in sync via requestAnimationFrame for
        the full visible lifetime instead of capturing a single rect
        (which was undersized if the welcome was still rendering). */
-    var SPREAD=6;
+    /* Two-layer effect:
+       SPREAD = thickness of the SHARP border line at the panel edge
+       (kept thin — the soft outer halo is rendered by the ::before
+       pseudo-element in CSS, which extends further out with blur). */
+    var SPREAD=3;
     var glowE=document.createElement('div');
     glowE.className='ai-chat-welcome-glow-outer is-entering';
     /* aria-hidden intentionally NOT set — third-party a11y CSS

@@ -2085,18 +2085,34 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
   position: fixed;
   pointer-events: none;
   z-index: 999990; /* matches --ai-chat-z (overlay) so it sits above */
-  border-radius: 22px;
+  border-radius: 20px;
+  /* Sharp colored border line: this element is sized SPREAD=3px
+     outside the panel; the panel covers the inner area, leaving
+     only the 3px gradient ring visible. No blur here → crisp line. */
   background: conic-gradient(
     from var(--hajirai-glow-angle, 0deg),
     var(--hajirai-glow-colors, #6366f1, #a855f7, #ec4899, #f59e0b, #10b981, #06b6d4, #6366f1)
   );
-  /* Slim ring: low spread on the JS side + small blur here keeps
-     the gradient as a thin visible line around the panel rather
-     than a thick halo. */
-  filter: blur(4px);
   opacity: 1;
   transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   animation: hajirai-glow-rotate 4s linear infinite;
+}
+/* Soft outer halo. Extends the gradient FURTHER outward with a
+   heavy blur, so the same colors bleed softly into the surrounding
+   area. Sits BEHIND the sharp ring (z-index:-1 inside the same
+   stacking context) so the crisp border line stays visible on top. */
+.ai-chat-welcome-glow-outer::before {
+  content: "";
+  position: absolute;
+  inset: -18px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--hajirai-glow-angle, 0deg),
+    var(--hajirai-glow-colors, #6366f1, #a855f7, #ec4899, #f59e0b, #10b981, #06b6d4, #6366f1)
+  );
+  filter: blur(18px);
+  opacity: 0.7;
+  z-index: -1;
 }
 .ai-chat-welcome-glow-outer.is-entering {
   opacity: 0;
