@@ -2092,21 +2092,19 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
   pointer-events: none;
   z-index: 999990; /* matches --ai-chat-z (overlay) so it sits above */
   border-radius: 20px;
-  /* Sharp colored border line: this element is sized SPREAD=3px
-     outside the panel; the panel covers the inner area, leaving
-     only the 3px gradient ring visible. No blur here → crisp line. */
-  background: conic-gradient(
-    from var(--hajirai-glow-angle, 0deg),
-    var(--hajirai-glow-colors, #6366f1, #a855f7, #ec4899, #f59e0b, #10b981, #06b6d4, #6366f1)
-  );
+  /* No background on the parent — both layers are pseudo-elements
+     so we can control paint order. ::before (soft halo) paints first,
+     ::after (sharp ring) paints second on top. Earlier attempt put
+     the sharp ring as the parent's bg and the halo as a negative-
+     z-index ::before, but CSS paints negative-z descendants ABOVE
+     the parent's own bg, so the blurred halo was overpainting and
+     hiding the sharp ring. */
   opacity: 1;
   transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
   animation: hajirai-glow-rotate 4s linear infinite;
 }
-/* Soft outer halo. Extends the gradient FURTHER outward with a
-   heavy blur, so the same colors bleed softly into the surrounding
-   area. Sits BEHIND the sharp ring (z-index:-1 inside the same
-   stacking context) so the crisp border line stays visible on top. */
+/* Layer 1 — soft outer halo. Bigger via negative inset, heavy blur,
+   semi-transparent. Painted FIRST (below ::after). */
 .ai-chat-welcome-glow-outer::before {
   content: "";
   position: absolute;
@@ -2118,7 +2116,20 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
   );
   filter: blur(18px);
   opacity: 0.7;
-  z-index: -1;
+}
+/* Layer 2 — sharp gradient ring at the panel edge. Same size as the
+   parent; the panel (z-index +1) covers the inner area, leaving only
+   the SPREAD-pixel wide colored ring visible. Painted SECOND so it
+   sits on top of ::before, guaranteeing crisp visibility. */
+.ai-chat-welcome-glow-outer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--hajirai-glow-angle, 0deg),
+    var(--hajirai-glow-colors, #6366f1, #a855f7, #ec4899, #f59e0b, #10b981, #06b6d4, #6366f1)
+  );
 }
 .ai-chat-welcome-glow-outer.is-entering {
   opacity: 0;

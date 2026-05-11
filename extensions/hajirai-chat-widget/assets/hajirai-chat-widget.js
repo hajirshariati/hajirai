@@ -418,11 +418,12 @@ try{
        the full visible lifetime instead of capturing a single rect
        (which was undersized if the welcome was still rendering). */
     /* Two-layer effect:
-       SPREAD = thickness of the SHARP border line at the panel edge
-       (kept moderate — the soft outer halo is rendered by the
-       ::before pseudo-element in CSS, which extends further out
-       with blur). */
-    var SPREAD=6;
+       SPREAD = thickness of the SHARP border line at the panel edge.
+       The soft outer halo is rendered by ::before (further outset
+       with blur). The sharp ring is ::after, sized to match this
+       container exactly — panel covers the interior, leaving only
+       the SPREAD-pixel wide gradient ring visible at the edge. */
+    var SPREAD=4;
     var glowE=document.createElement('div');
     glowE.className='ai-chat-welcome-glow-outer is-entering';
     /* aria-hidden intentionally NOT set — third-party a11y CSS
