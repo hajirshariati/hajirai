@@ -2031,6 +2031,25 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
 @keyframes hajirai-glow-rotate {
   to { --hajirai-glow-angle: 360deg; }
 }
+/* Apple Intelligence-style organic shimmer. Three keyframes layered:
+   - rotate: conic angle sweeps 360° (color positions flow around perimeter)
+   - breathe: container scales 1 ↔ 1.025 with ease-in-out (glow inhales/exhales)
+   - hue-shift: filter:hue-rotate drifts colors through the spectrum so the
+     colors themselves change over time, not just their positions
+   Different periods (4.5s / 3.8s / 12s) intentionally don't divide evenly,
+   so the three motions never re-sync — the effect never visually repeats,
+   making it feel alive rather than mechanical. */
+@keyframes hajirai-glow-breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.025); }
+}
+@keyframes hajirai-glow-halo-breathe {
+  0%, 100% { filter: blur(18px) hue-rotate(0deg);   opacity: 0.65; }
+  50%      { filter: blur(22px) hue-rotate(180deg); opacity: 0.85; }
+}
+@keyframes hajirai-glow-ring-hue {
+  to { filter: hue-rotate(360deg); }
+}
 /* INTERNAL ring. Conic gradient covers the panel; ::after sits 4px
    in with the panel's background color, leaving a 4px gradient ring
    visible at the edges. z-index lives in the panel's stacking
@@ -2094,17 +2113,21 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
   border-radius: 20px;
   /* No background on the parent — both layers are pseudo-elements
      so we can control paint order. ::before (soft halo) paints first,
-     ::after (sharp ring) paints second on top. Earlier attempt put
-     the sharp ring as the parent's bg and the halo as a negative-
-     z-index ::before, but CSS paints negative-z descendants ABOVE
-     the parent's own bg, so the blurred halo was overpainting and
-     hiding the sharp ring. */
+     ::after (sharp ring) paints second on top. */
   opacity: 1;
   transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-  animation: hajirai-glow-rotate 4s linear infinite;
+  /* Container breathes — gentle scale pulse so the whole halo
+     "inhales" and "exhales", giving the effect an organic feel.
+     Rotation lives on the pseudo-elements (different speeds so they
+     don't visually sync). */
+  animation: hajirai-glow-breathe 3.8s ease-in-out infinite;
+  transform-origin: center;
 }
-/* Layer 1 — soft outer halo. Bigger via negative inset, heavy blur,
-   semi-transparent. Painted FIRST (below ::after). */
+/* Layer 1 — soft outer halo. Two layered animations:
+   - hajirai-glow-rotate cycles the conic angle (colors flow around)
+   - hajirai-glow-halo-breathe pulses blur+opacity+hue with a
+     different period (3.5s vs container's 3.8s) so the breath and
+     blur cycles drift in/out of phase, never visually repeating. */
 .ai-chat-welcome-glow-outer::before {
   content: "";
   position: absolute;
@@ -2114,13 +2137,15 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
     from var(--hajirai-glow-angle, 0deg),
     var(--hajirai-glow-colors, #6366f1, #a855f7, #ec4899, #f59e0b, #10b981, #06b6d4, #6366f1)
   );
-  filter: blur(18px);
-  opacity: 0.7;
+  animation:
+    hajirai-glow-rotate 4.5s linear infinite,
+    hajirai-glow-halo-breathe 3.5s ease-in-out infinite;
 }
-/* Layer 2 — sharp gradient ring at the panel edge. Same size as the
-   parent; the panel (z-index +1) covers the inner area, leaving only
-   the SPREAD-pixel wide colored ring visible. Painted SECOND so it
-   sits on top of ::before, guaranteeing crisp visibility. */
+/* Layer 2 — sharp gradient ring at the panel edge. Rotates at a
+   slightly DIFFERENT speed (3.2s vs halo's 4.5s) and a slow
+   hue-rotate drift (12s) so the sharp colors flow independently
+   from the soft halo's colors — net effect: shimmering iridescent
+   border that never quite repeats. */
 .ai-chat-welcome-glow-outer::after {
   content: "";
   position: absolute;
@@ -2130,6 +2155,9 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
     from var(--hajirai-glow-angle, 0deg),
     var(--hajirai-glow-colors, #6366f1, #a855f7, #ec4899, #f59e0b, #10b981, #06b6d4, #6366f1)
   );
+  animation:
+    hajirai-glow-rotate 3.2s linear infinite,
+    hajirai-glow-ring-hue 12s linear infinite;
 }
 .ai-chat-welcome-glow-outer.is-entering {
   opacity: 0;
