@@ -534,6 +534,16 @@ if(isOpen){
   launcher.classList.remove('hidden');
   document.body.classList.remove('ai-chat-blurred');
   menu.style.display='none';
+  /* Tear down any in-flight welcome glow when the chat closes.
+     The element's own setTimeout (fade-out + remove) keeps running
+     after close, so if the customer dismisses the chat mid-animation
+     the halo would linger on the page (position:fixed, locked to the
+     panel's old coords). Cleanup here covers all glow types and
+     internal glow inside the panel. */
+  var glowOuter=document.querySelector('.ai-chat-welcome-glow-outer');
+  if(glowOuter&&glowOuter.parentNode)glowOuter.parentNode.removeChild(glowOuter);
+  var glowInner=panel&&panel.querySelector('.ai-chat-welcome-glow');
+  if(glowInner&&glowInner.parentNode)glowInner.parentNode.removeChild(glowInner);
 }
 }
 
