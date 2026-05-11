@@ -574,6 +574,10 @@ function choiceButtonsHtml(options){
   return choicesWrap(ch);
 }
 
+function ctaHtml(linkCTA){
+return '<a class="ai-chat-cta-btn" style="display:block;margin-top:12px;padding:14px 16px;background:var(--ai-chat-primary,#2d6b4f);color:#fff;border-radius:10px;text-decoration:none;text-align:center;font-size:14px;font-weight:600;line-height:1.3" href="'+esc(linkCTA.url)+'" target="_blank" rel="noopener">'+esc(linkCTA.label||'Visit Support Hub')+' &rarr;</a>';
+}
+
 function appendMsg(role,content,products){
 var isU=role==='user';
 var d=el('div','ai-chat-msg ai-chat-msg--'+role);
@@ -883,7 +887,9 @@ if(choices.length>0)cleanText=cleanText.replace(/\s*<<[^<>]+>>/g,'').trim();
 if(cleanText){
   if(!mDiv)mDiv=appendMsg('assistant',cleanText,prods);
   else{var b=$('.ai-chat-msg-bubble',mDiv);if(b){b.innerHTML='<p>'+md(esc(cleanText))+'</p>';if(prods&&prods.length){var isShowcase2=PRODUCT_CARD_STYLE==='showcase';var styleSuffix2=isShowcase2?' ai-chat-products--showcase':'';var ph='<div class="ai-chat-products'+styleSuffix2+'">';for(var pi=0;pi<prods.length;pi++)ph+=prodCard(prods[pi]);ph+='</div>';b.insertAdjacentHTML('beforeend',isShowcase2?showcaseWrap(ph):ph);if(isShowcase2){var w2=b.querySelector('.ai-chat-products-wrap');if(w2)initShowcaseArrows(w2)}}}}
-  messages.push({role:'assistant',content:cleanText,products:prods||[]});saveH(messages)
+  var _saved={role:'assistant',content:cleanText,products:prods||[]};
+  if(linkCTA&&linkCTA.url)_saved.linkCTA={url:linkCTA.url,label:linkCTA.label||''};
+  messages.push(_saved);saveH(messages)
 }
 if(choices.length>0&&mDiv){
   var cb=$('.ai-chat-msg-bubble',mDiv);
@@ -891,7 +897,7 @@ if(choices.length>0&&mDiv){
 }
 if(linkCTA&&linkCTA.url&&mDiv){
   var lb=$('.ai-chat-msg-bubble',mDiv);
-  if(lb)lb.insertAdjacentHTML('beforeend','<a class="ai-chat-cta-btn" style="display:block;margin-top:12px;padding:14px 16px;background:var(--ai-chat-primary,#2d6b4f);color:#fff;border-radius:10px;text-decoration:none;text-align:center;font-size:14px;font-weight:600;line-height:1.3" href="'+esc(linkCTA.url)+'" target="_blank" rel="noopener">'+esc(linkCTA.label||'Visit Support Hub')+' &rarr;</a>');
+  if(lb)lb.insertAdjacentHTML('beforeend',ctaHtml(linkCTA));
 }
 if(fitReport&&fitReport.size&&mDiv){
   var frb=$('.ai-chat-msg-bubble',mDiv);
@@ -1064,6 +1070,10 @@ if(prodLink){
 
 /* Init */
 if(messages.length===0)buildWelcome();
-else for(var i=0;i<messages.length;i++)appendMsg(messages[i].role,messages[i].content,messages[i].products);
+else for(var i=0;i<messages.length;i++){
+  var _md=appendMsg(messages[i].role,messages[i].content,messages[i].products);
+  var _cta=messages[i].linkCTA;
+  if(_cta&&_cta.url&&_md){var _lb=$('.ai-chat-msg-bubble',_md);if(_lb)_lb.insertAdjacentHTML('beforeend',ctaHtml(_cta))}
+}
 
 })();
