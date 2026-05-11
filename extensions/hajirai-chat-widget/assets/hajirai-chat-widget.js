@@ -412,22 +412,44 @@ try{
   if(WELCOME_GLOW_STYLE==='external'){
     /* Outer halo. Fixed-position sibling on document.body, sized
        LARGER than the panel by SPREAD on every side so the blurred
-       gradient is visible AROUND the panel (the panel's solid bg
-       covers the inner area at higher z-index). */
+       gradient is visible AROUND the panel. The panel grows as the
+       welcome content (avatar → tagline → CTAs → quick picks) lays
+       out, so we keep the halo in sync via requestAnimationFrame for
+       the full visible lifetime instead of capturing a single rect
+       (which was undersized if the welcome was still rendering). */
     var SPREAD=24;
-    var rect=panel.getBoundingClientRect();
     var glowE=document.createElement('div');
     glowE.className='ai-chat-welcome-glow-outer';
     glowE.setAttribute('aria-hidden','true');
     glowE.style.setProperty('--hajirai-glow-colors',colors);
-    glowE.style.top=(rect.top-SPREAD)+'px';
-    glowE.style.left=(rect.left-SPREAD)+'px';
-    glowE.style.width=(rect.width+SPREAD*2)+'px';
-    glowE.style.height=(rect.height+SPREAD*2)+'px';
     document.body.appendChild(glowE);
-    console.log('[hajirai] welcome glow fired (external)',rect);
+
+    function syncGlowRect(){
+      var rect=panel.getBoundingClientRect();
+      glowE.style.top=(rect.top-SPREAD)+'px';
+      glowE.style.left=(rect.left-SPREAD)+'px';
+      glowE.style.width=(rect.width+SPREAD*2)+'px';
+      glowE.style.height=(rect.height+SPREAD*2)+'px';
+    }
+    syncGlowRect();
+    console.log('[hajirai] welcome glow fired (external)',panel.getBoundingClientRect());
+
+    /* Track panel size for as long as the halo is mounted — covers
+       the open-transition (0.3s), late content layout, and any
+       theme-driven resize. */
+    var stop=false;
+    function tick(){
+      if(stop||!glowE.parentNode)return;
+      syncGlowRect();
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
     setTimeout(function(){glowE.classList.add('is-fading')},2800);
-    setTimeout(function(){if(glowE.parentNode)glowE.parentNode.removeChild(glowE)},4500);
+    setTimeout(function(){
+      stop=true;
+      if(glowE.parentNode)glowE.parentNode.removeChild(glowE);
+    },4500);
     return;
   }
 
@@ -453,11 +475,12 @@ if(isOpen){
   setTimeout(function(){inputEl.focus()},400);
   setTimeout(function(){inputEl.focus()},800);
   checkIdleOnOpen();
-  /* Trigger the gradient-ring intro after the panel's open-
-     transition starts (~300ms in widget.css). Fires only when
-     a welcome view is rendered — returning users with history
-     skip the welcome and the glow with it. */
-  setTimeout(playWelcomeGlow,350);
+  /* Trigger the gradient intro AFTER the panel's open-transition
+     finishes (CSS transition is 0.3s; 450ms gives the welcome
+     content a frame or two to settle so getBoundingClientRect()
+     captures the full panel size). The external-halo path also
+     runs a rAF loop to keep size in sync as content lays out. */
+  setTimeout(playWelcomeGlow,450);
 }else{
   panel.classList.remove('open');
   overlay.classList.remove('visible');
