@@ -8,6 +8,7 @@ import { buildSystemPrompt } from "../lib/chat-prompt.server";
 import { retrieveRelevantChunks } from "../lib/knowledge-chunks.server";
 import { filterForbiddenCategoryChips, filterContradictingGenderChips } from "../lib/chip-filter.server";
 import { sanitizeCtaLabel } from "../lib/cta-label.server";
+import { buildStorefrontSearchCTA } from "../lib/storefront-search-cta.server";
 import { analyzeCategoryIntent, cardMatchesActiveGroup, textIntentDivergesFromGroup, matchingGroupsForText } from "../lib/category-intent.server";
 import { extractAnsweredChoices } from "../lib/conversation-memory.server";
 import {
@@ -2127,12 +2128,58 @@ if (collection.cta) {
     url: collection.cta.url,
     label: collection.cta.label,
   })));
+} else if (ctx.storefrontSearchUrlPattern && categoryCounts.size > 0 && !ctx.categoryIntentAmbiguous) {
+  // Auto-generated storefront search CTA. Replaces the older
+  // manually-curated collectionLinks lookup. One CTA per
+  // product-response turn, pointing at the storefront's `?q=…` search
+  // results for the customer's resolved intent (gender + category +
+  // optional color + optional modifier from the latest user message).
+  const dominantCat = [...categoryCounts.entries()].sort((a, b) => b[1] - a[1])[0][0];
+  const dominantGender = genderCounts.size > 0
+    ? [...genderCounts.entries()].sort((a, b) => b[1] - a[1])[0][0]
+    : (ctx.sessionGender || "");
+  // Color: pick the dominant card color IF the customer mentioned one
+  // and the merchant carries it. ctx._merchantColors is the catalog's
+  // own color values; we don't fabricate colors not in the catalog.
+  let dominantColor = null;
+  if (
+    Array.isArray(ctx._merchantColors) &&
+    ctx._merchantColors.length > 0 &&
+    typeof ctx.latestUserMessage === "string"
+  ) {
+    const latest = ctx.latestUserMessage.toLowerCase();
+    // Longest-match-first so multi-word colors (e.g. "hunter green") beat "green"
+    const sorted = [...ctx._merchantColors].sort((a, b) => b.length - a.length);
+    for (const c of sorted) {
+      if (new RegExp(`\\b${c.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")}\\b`, "i").test(latest)) {
+        dominantColor = c;
+        break;
+      }
+    }
+  }
+  const auto = buildStorefrontSearchCTA({
+    pattern: ctx.storefrontSearchUrlPattern,
+    gender: dominantGender,
+    category: dominantCat,
+    color: dominantColor,
+    latestUserMessage: ctx.latestUserMessage || "",
+  });
+  if (auto) {
+    controller.enqueue(encoder.encode(sseChunk({
+      type: "link",
+      url: auto.url,
+      label: auto.label,
+    })));
+  }
 } else if (
   Array.isArray(ctx.collectionLinks) &&
   ctx.collectionLinks.length > 0 &&
   categoryCounts.size > 0 &&
   !ctx.categoryIntentAmbiguous
 ) {
+  // LEGACY collectionLinks fallback. Preserved for back-compat for
+  // shops that haven't set storefrontSearchUrlPattern. No new
+  // merchants should configure this — set the URL pattern instead.
   const dominantCat = [...categoryCounts.entries()].sort((a, b) => b[1] - a[1])[0][0];
   const dominantGender = genderCounts.size > 0
     ? [...genderCounts.entries()].sort((a, b) => b[1] - a[1])[0][0]
@@ -2586,6 +2633,7 @@ export const action = async ({ request }) => {
       querySynonyms,
       similarMatchAttributes,
       collectionLinks,
+      storefrontSearchUrlPattern: String(config.storefrontSearchUrlPattern || ""),
       fitPredictorConfig,
       fitPredictorEnabled: config.fitPredictorEnabled === true,
       conversationText,
@@ -2716,6 +2764,7 @@ export const action = async ({ request }) => {
                 anthropic,
                 haikuModel: HAIKU_MODEL,
                 classifiedIntent,
+                storefrontSearchUrlPattern: String(config.storefrontSearchUrlPattern || ""),
               });
               if (gate?.handled) {
                 // Gate already emitted text, products, and done.

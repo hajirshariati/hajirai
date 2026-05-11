@@ -112,6 +112,15 @@ model ShopConfig {
   categoryExclusions     String   @default("[]")
   categoryGroups         String   @default("[]")
   querySynonyms          String   @default("[]")
+  // Storefront search URL template with a {q} placeholder. When set,
+  // every product-response turn emits a single auto-generated CTA
+  // pointing at the storefront's search results page for the current
+  // intent (gender + category + color + modifier). Replaces the older
+  // per-collection-link table for shops that prefer the simpler model.
+  // Example for Aetrex: "https://www.aetrex.com/collections/shop?q={q}&tab=products"
+  // Empty string disables auto-CTA and falls back to the legacy
+  // collectionLinks JSON. No data is lost when migrating.
+  storefrontSearchUrlPattern String @default("")
   similarMatchAttributes String   @default("[]")
   collectionLinks        String   @default("[]")
   fitPredictorEnabled    Boolean  @default(false)

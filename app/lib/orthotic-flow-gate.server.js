@@ -51,6 +51,7 @@ import {
   looksLikeAvailabilityQuestion,
 } from "./orthotic-flow.server.js";
 import { executeRecommenderTool } from "./recommender-tools.server.js";
+import { buildStorefrontSearchCTA } from "./storefront-search-cta.server.js";
 
 // Format a recommender-returned product the same way chat-tools'
 // extractProductCards does. Inlined (rather than imported) to keep
@@ -267,6 +268,7 @@ export async function maybeRunOrthoticFlow({
   anthropic,
   haikuModel,
   classifiedIntent,
+  storefrontSearchUrlPattern = "",
 }) {
   if (!tree || tree.intent !== ORTHOTIC_INTENT) return { handled: false };
   if (!tree.definition || !Array.isArray(tree.definition.nodes)) {
@@ -961,6 +963,34 @@ export async function maybeRunOrthoticFlow({
       type: "products",
       products: [card],
     })));
+    // Auto-generated storefront search CTA below the resolved orthotic
+    // card. Built from the customer's resolved gender + the implicit
+    // "orthotics" category. Emits nothing if storefrontSearchUrlPattern
+    // is empty (default), preserving back-compat for shops that
+    // haven't opted in.
+    if (storefrontSearchUrlPattern) {
+      const lastUserText = (() => {
+        for (let i = (messages || []).length - 1; i >= 0; i--) {
+          const m = messages[i];
+          if (m?.role === "user" && typeof m.content === "string") return m.content;
+        }
+        return "";
+      })();
+      const auto = buildStorefrontSearchCTA({
+        pattern: storefrontSearchUrlPattern,
+        gender: step.attrs?.gender || answers?.gender || "",
+        category: "orthotics",
+        latestUserMessage: lastUserText,
+        intent: "orthotic",
+      });
+      if (auto) {
+        controller.enqueue(encoder.encode(sseChunk({
+          type: "link",
+          url: auto.url,
+          label: auto.label,
+        })));
+      }
+    }
     controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
     console.log(
       `[orthotic-flow] resolved → ${result.masterSku} (${result.title}); ` +

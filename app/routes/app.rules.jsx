@@ -135,6 +135,7 @@ export const loader = async ({ request }) => {
     querySynonyms: safeParse(config.querySynonyms, []),
     similarMatchAttributes: safeParse(config.similarMatchAttributes, []),
     collectionLinks: safeParse(config.collectionLinks, []),
+    storefrontSearchUrlPattern: String(config.storefrontSearchUrlPattern || ""),
     fitPredictorEnabled: config.fitPredictorEnabled === true,
     fitPredictorConfig: (() => {
       try {
@@ -539,6 +540,20 @@ export const action = async ({ request }) => {
       }
     } catch { /* */ }
     return { error: "Invalid collection links." };
+  }
+
+  if (intent === "save_storefront_search_url") {
+    const raw = String(formData.get("storefrontSearchUrlPattern") || "").trim();
+    // Empty string is valid — disables auto-CTA. If non-empty, must
+    // contain {q} placeholder (otherwise the CTA would be a dead link).
+    if (raw && !raw.includes("{q}")) {
+      return { error: 'URL pattern must contain {q} placeholder. Example: "https://your-store.com/search?q={q}"' };
+    }
+    if (raw && !/^https?:\/\//i.test(raw)) {
+      return { error: "URL pattern must start with http:// or https://" };
+    }
+    await updateShopConfig(session.shop, { storefrontSearchUrlPattern: raw });
+    return { saved: true };
   }
 
   if (intent === "upload") {
@@ -1350,6 +1365,89 @@ const GENDER_OPTIONS = [
   { label: "Kid", value: "kid" },
   { label: "Unisex", value: "unisex" },
 ];
+
+// Single-field replacement for the older per-collection-link table.
+// Merchant enters one URL pattern with a {q} placeholder; the chat
+// then auto-generates the right CTA per response from the customer's
+// resolved intent (gender + category + color + modifier). Empty
+// pattern disables auto-CTA; legacy CollectionLinksCard below remains
+// hidden but in code for back-compat.
+function StorefrontSearchUrlCard({ initial }) {
+  const fetcher = useFetcher();
+  const [pattern, setPattern] = useState(initial || "");
+  const saving = fetcher.state !== "idle";
+  const saved = fetcher.data?.saved === true;
+  const errorMsg = fetcher.data?.error;
+
+  const save = () => {
+    const fd = new FormData();
+    fd.set("intent", "save_storefront_search_url");
+    fd.set("storefrontSearchUrlPattern", pattern.trim());
+    fetcher.submit(fd, { method: "post" });
+  };
+
+  const clear = () => {
+    setPattern("");
+    const fd = new FormData();
+    fd.set("intent", "save_storefront_search_url");
+    fd.set("storefrontSearchUrlPattern", "");
+    fetcher.submit(fd, { method: "post" });
+  };
+
+  return (
+    <Card>
+      <BlockStack gap="400">
+        <BlockStack gap="100">
+          <Text as="h3" variant="headingMd">"View all" CTA below product cards</Text>
+          <Text as="p" tone="subdued">
+            When set, the chat emits one auto-generated "View All …" button below every product-card
+            response, pointing at your storefront's search results page for the customer's resolved
+            intent (gender + category + color + modifier like "new"/"sale"). Leave blank to disable.
+          </Text>
+        </BlockStack>
+
+        <TextField
+          label="Storefront search URL pattern"
+          value={pattern}
+          onChange={setPattern}
+          autoComplete="off"
+          placeholder="https://your-store.com/collections/shop?q={q}&tab=products"
+          helpText={
+            <>
+              Must contain <code>{"{q}"}</code> — the chat substitutes URL-encoded keywords
+              (e.g. <code>women+sandals</code>, <code>men+orthotics</code>,{" "}
+              <code>new+men+sneakers</code>). Words are joined with <code>+</code>. Aetrex example:{" "}
+              <code>https://www.aetrex.com/collections/shop?q={"{q}"}&tab=products</code>
+            </>
+          }
+        />
+
+        {errorMsg && (
+          <Banner tone="critical">
+            <Text as="p">{errorMsg}</Text>
+          </Banner>
+        )}
+
+        {saved && !errorMsg && (
+          <Banner tone="success">
+            <Text as="p">Saved. Auto-CTAs {pattern.trim() ? "enabled" : "disabled"}.</Text>
+          </Banner>
+        )}
+
+        <InlineStack gap="200">
+          <Button onClick={save} loading={saving} variant="primary" disabled={!pattern.trim() && !initial}>
+            Save
+          </Button>
+          {initial && (
+            <Button onClick={clear} loading={saving} tone="critical" variant="plain">
+              Clear / disable auto-CTA
+            </Button>
+          )}
+        </InlineStack>
+      </BlockStack>
+    </Card>
+  );
+}
 
 function CollectionLinksCard({ initial }) {
   const fetcher = useFetcher();
@@ -2815,9 +2913,9 @@ export default function RulesKnowledge() {
           <PlanGate
             plan={data.plan}
             feature="searchRules"
-            summary="Add merchant-defined 'shop all' buttons (collection links) under product recommendations."
+            summary='Auto-generated "View all" CTA below product cards, pointing to your storefront search.'
           >
-            <CollectionLinksCard initial={data.collectionLinks} />
+            <StorefrontSearchUrlCard initial={data.storefrontSearchUrlPattern} />
           </PlanGate>
         </BlockStack>
 
