@@ -2034,29 +2034,25 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
 /* Apple Intelligence-style organic shimmer. All breathing/scale
    motion lives on the soft halo (::before) ONLY — the sharp border
    ring (::after) must stay constant width or the line visibly
-   thickens and thins, which reads as a bug. Three keyframes:
-   - rotate: conic angle sweeps 360° (color positions flow around perimeter)
-   - halo-breathe: blur radius + hue + opacity + scale all pulse on
-     the halo, giving the soft glow an organic inhale/exhale
-   - ring-hue: slow hue-rotate on the sharp ring so its colors drift
-     independently from the halo's hue cycle
-   Different periods (3.2 / 3.5 / 4.5 / 12s) intentionally share no
-   common multiple, so the motions never re-sync — effect never
-   visually repeats, feels alive rather than mechanical. */
+   thickens and thins, which reads as a bug.
+
+   IMPORTANT: hue-rotate is NOT used here. Previous version drifted
+   hues over time, but that re-tinted the merchant's configured
+   colors into unrelated ones (e.g. sage → purple via hue-rotate
+   180°). Customer-picked palettes must be respected. The shimmer
+   comes purely from conic angle rotation + blur radius pulse +
+   opacity pulse + scale pulse — color values stay verbatim. */
 @keyframes hajirai-glow-halo-breathe {
   0%, 100% {
-    filter: blur(var(--hajirai-glow-blur, 18px)) hue-rotate(0deg);
+    filter: blur(var(--hajirai-glow-blur, 18px));
     opacity: 0.65;
     transform: scale(1);
   }
   50% {
-    filter: blur(var(--hajirai-glow-blur-max, 24px)) hue-rotate(180deg);
+    filter: blur(var(--hajirai-glow-blur-max, 24px));
     opacity: 0.9;
     transform: scale(1.04);
   }
-}
-@keyframes hajirai-glow-ring-hue {
-  to { filter: hue-rotate(360deg); }
 }
 /* INTERNAL ring. Conic gradient covers the panel; ::after sits 4px
    in with the panel's background color, leaving a 4px gradient ring
@@ -2128,7 +2124,8 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
     hajirai-glow-halo-breathe calc(7s / var(--hajirai-glow-speed, 1)) ease-in-out infinite;
 }
 /* Layer 2 — sharp gradient ring. Rotates at a different speed than
-   the halo (multiplier preserved) so the two layers never lock-step. */
+   the halo so the two layers never lock-step. No hue-rotate —
+   merchant's configured colors stay exactly as entered. */
 .ai-chat-welcome-glow-outer::after {
   content: "";
   position: absolute;
@@ -2139,8 +2136,7 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
     var(--hajirai-glow-colors, #6366f1, #a855f7, #ec4899, #f59e0b, #10b981, #06b6d4, #6366f1)
   );
   animation:
-    hajirai-glow-rotate calc(6.5s / var(--hajirai-glow-speed, 1)) linear infinite,
-    hajirai-glow-ring-hue calc(20s / var(--hajirai-glow-speed, 1)) linear infinite;
+    hajirai-glow-rotate calc(6.5s / var(--hajirai-glow-speed, 1)) linear infinite;
 }
 .ai-chat-welcome-glow-outer.is-entering {
   opacity: 0;
