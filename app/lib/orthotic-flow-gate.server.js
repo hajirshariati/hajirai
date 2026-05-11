@@ -469,6 +469,27 @@ export async function maybeRunOrthoticFlow({
     return { handled: false };
   }
 
+  // Source-challenge / meta-question detection. When the customer
+  // questions where a prior AI claim came from ("where did you get that
+  // from?", "what's your source?", "you said X — where's that from?"),
+  // the right answer is the LLM defending or retracting the claim — NOT
+  // the gate seeding the next chip question. Customer is contesting,
+  // not progressing through the funnel.
+  //
+  // Production trace 2026-05-11: AI said "customers swear by these
+  // plantar fasciitis kits" → customer asked "you said 'swear by' —
+  // where did you get that from?" → gate saw accumulated condition and
+  // emitted q_gender ("Who are these orthotics for?"), totally
+  // off-topic. Fix: skip the gate on this turn.
+  const META_QUESTION_RE = /\b(?:where\s+(?:did|do)\s+you\s+(?:get|find|hear|read|see)\s+(?:that|this|it)|where\s+(?:does|did)\s+(?:that|this|it)\s+come\s+from|what(?:['‘’]?s| is)\s+your\s+source|how\s+do\s+you\s+know\s+(?:that|this)|who\s+told\s+you|what\s+(?:are|is)\s+you\s+basing\s+(?:that|this|it)\s+on|(?:any|got\s+a|got\s+any|cite\s+a|cite\s+any)\s+sources?|how\s+can\s+you\s+say\s+that|prove\s+it|(?:you|u)\s+(?:just\s+)?said\s+["“'‘]|(?:you|u)\s+(?:just\s+)?said\s+(?:that\s+)?(?:["“'‘]|customers|people|fans|users))/i;
+  if (META_QUESTION_RE.test(rawUserText)) {
+    console.log(
+      `[orthotic-flow] meta-question / source challenge ("${rawUserText.slice(0, 60)}"); ` +
+        `falling through to LLM`,
+    );
+    return { handled: false };
+  }
+
   const answers = { ...accumulated, ...latestExtracted };
 
   // Kids auto-fill for useCase. When gender=Kids, the seed's q_use_case
