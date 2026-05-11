@@ -171,5 +171,96 @@ test("non-Aetrex URL pattern works", () => {
   assert.equal(r.url, "https://other-store.com/search?query=women+sandals");
 });
 
+// ── overrides ──────────────────────────────────────────────────────
+test("override: modifier+gender wins over auto-search", () => {
+  const r = buildStorefrontSearchCTA({
+    pattern: AETREX,
+    gender: "women",
+    category: "footwear",
+    latestUserMessage: "what's currently on sale?",
+    overrides: [
+      { modifier: "sale", gender: "women", url: "https://www.aetrex.com/collections/womens-sale" },
+    ],
+  });
+  assert.equal(r.url, "https://www.aetrex.com/collections/womens-sale");
+  // Blank label → auto-generated label fallback
+  assert.equal(r.label, "View All Sale Women's Footwear");
+});
+
+test("override: custom label is used when provided", () => {
+  const r = buildStorefrontSearchCTA({
+    pattern: AETREX,
+    gender: "men",
+    latestUserMessage: "any deals?",
+    overrides: [
+      { modifier: "sale", gender: "men", url: "https://aetrex.com/collections/mens-sale", label: "Shop Men's Sale" },
+    ],
+  });
+  assert.equal(r.url, "https://aetrex.com/collections/mens-sale");
+  assert.equal(r.label, "Shop Men's Sale");
+});
+
+test("override: most-specific wins (gender+category beats gender-only)", () => {
+  const r = buildStorefrontSearchCTA({
+    pattern: AETREX,
+    gender: "women",
+    category: "orthotics",
+    overrides: [
+      { gender: "women", url: "https://aetrex.com/collections/womens" },
+      { gender: "women", category: "orthotics", url: "https://aetrex.com/collections/womens-orthotics" },
+    ],
+  });
+  assert.equal(r.url, "https://aetrex.com/collections/womens-orthotics");
+});
+
+test("override: no match → falls through to auto-search", () => {
+  const r = buildStorefrontSearchCTA({
+    pattern: AETREX,
+    gender: "women",
+    category: "sandals",
+    overrides: [
+      { modifier: "sale", url: "https://aetrex.com/collections/sale" },
+    ],
+  });
+  assert.equal(r.url, "https://www.aetrex.com/collections/shop?q=women+sandals&tab=products");
+});
+
+test("override: rule with no constraints is ignored (would match everything)", () => {
+  const r = buildStorefrontSearchCTA({
+    pattern: AETREX,
+    gender: "women",
+    category: "sandals",
+    overrides: [
+      { url: "https://aetrex.com/collections/everything" },
+    ],
+  });
+  assert(r.url.includes("?q=women+sandals"), `got ${r.url}`);
+});
+
+test("override: works even when search pattern is empty", () => {
+  const r = buildStorefrontSearchCTA({
+    pattern: "",
+    gender: "women",
+    overrides: [
+      { gender: "women", url: "https://aetrex.com/collections/women" },
+    ],
+  });
+  assert.equal(r.url, "https://aetrex.com/collections/women");
+});
+
+test("override: rule with bad data (no url) is skipped", () => {
+  const r = buildStorefrontSearchCTA({
+    pattern: AETREX,
+    gender: "women",
+    category: "sandals",
+    overrides: [
+      { gender: "women", url: "" },
+      null,
+      "not an object",
+    ],
+  });
+  assert(r.url.includes("?q=women+sandals"), `got ${r.url}`);
+});
+
 console.log(`\n${failed === 0 ? "✅" : "❌"}  ${passed} passed, ${failed} failed\n`);
 if (failed > 0) process.exit(1);

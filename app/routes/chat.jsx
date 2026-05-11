@@ -2128,7 +2128,7 @@ if (collection.cta) {
     url: collection.cta.url,
     label: collection.cta.label,
   })));
-} else if (ctx.storefrontSearchUrlPattern && categoryCounts.size > 0 && !ctx.categoryIntentAmbiguous) {
+} else if ((ctx.storefrontSearchUrlPattern || (Array.isArray(ctx.ctaOverrides) && ctx.ctaOverrides.length > 0)) && categoryCounts.size > 0 && !ctx.categoryIntentAmbiguous) {
   // Auto-generated storefront search CTA. Replaces the older
   // manually-curated collectionLinks lookup. One CTA per
   // product-response turn, pointing at the storefront's `?q=…` search
@@ -2171,6 +2171,7 @@ if (collection.cta) {
   }
   const auto = buildStorefrontSearchCTA({
     pattern: ctx.storefrontSearchUrlPattern,
+    overrides: ctx.ctaOverrides,
     gender: dominantGender,
     category: ctaCategory,
     color: dominantColor,
@@ -2517,6 +2518,21 @@ export const action = async ({ request }) => {
         : [];
     } catch { /* */ }
     let collectionLinks = [];
+    let ctaOverrides = [];
+    try {
+      const raw = JSON.parse(config.ctaOverrides || "[]");
+      ctaOverrides = Array.isArray(raw)
+        ? raw
+            .map((r) => ({
+              modifier: String(r?.modifier || "").trim().toLowerCase(),
+              gender: String(r?.gender || "").trim().toLowerCase(),
+              category: String(r?.category || "").trim().toLowerCase(),
+              url: String(r?.url || "").trim(),
+              label: String(r?.label || "").trim(),
+            }))
+            .filter((r) => r.url && (r.modifier || r.gender || r.category))
+        : [];
+    } catch { /* */ }
     try {
       const raw = JSON.parse(config.collectionLinks || "[]");
       collectionLinks = Array.isArray(raw)
@@ -2646,6 +2662,7 @@ export const action = async ({ request }) => {
       similarMatchAttributes,
       collectionLinks,
       storefrontSearchUrlPattern: String(config.storefrontSearchUrlPattern || ""),
+      ctaOverrides,
       fitPredictorConfig,
       fitPredictorEnabled: config.fitPredictorEnabled === true,
       conversationText,
@@ -2777,6 +2794,7 @@ export const action = async ({ request }) => {
                 haikuModel: HAIKU_MODEL,
                 classifiedIntent,
                 storefrontSearchUrlPattern: String(config.storefrontSearchUrlPattern || ""),
+                ctaOverrides,
               });
               if (gate?.handled) {
                 // Gate already emitted text, products, and done.

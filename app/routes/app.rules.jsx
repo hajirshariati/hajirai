@@ -136,6 +136,7 @@ export const loader = async ({ request }) => {
     similarMatchAttributes: safeParse(config.similarMatchAttributes, []),
     collectionLinks: safeParse(config.collectionLinks, []),
     storefrontSearchUrlPattern: String(config.storefrontSearchUrlPattern || ""),
+    ctaOverrides: safeParse(config.ctaOverrides, []),
     fitPredictorEnabled: config.fitPredictorEnabled === true,
     fitPredictorConfig: (() => {
       try {
@@ -553,6 +554,40 @@ export const action = async ({ request }) => {
       return { error: "URL pattern must start with http:// or https://" };
     }
     await updateShopConfig(session.shop, { storefrontSearchUrlPattern: raw });
+    return { saved: true };
+  }
+
+  if (intent === "save_cta_overrides") {
+    const raw = String(formData.get("ctaOverrides") || "[]");
+    let parsed;
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      return { error: "Invalid CTA override rules JSON." };
+    }
+    if (!Array.isArray(parsed)) {
+      return { error: "CTA override rules must be a JSON array." };
+    }
+    // Validate each rule: must have a URL and at least one of
+    // modifier/gender/category. Strip out anything else.
+    const cleaned = [];
+    for (const r of parsed) {
+      if (!r || typeof r !== "object") continue;
+      const url = String(r.url || "").trim();
+      if (!url) continue;
+      if (!/^https?:\/\//i.test(url) && !url.startsWith("/")) {
+        return { error: `Override URL must start with http://, https://, or "/": ${url}` };
+      }
+      const modifier = String(r.modifier || "").trim().toLowerCase();
+      const gender = String(r.gender || "").trim().toLowerCase();
+      const category = String(r.category || "").trim().toLowerCase();
+      const label = String(r.label || "").trim();
+      if (!modifier && !gender && !category) {
+        return { error: "Each rule must set at least one of modifier, gender, or category." };
+      }
+      cleaned.push({ modifier, gender, category, url, label });
+    }
+    await updateShopConfig(session.shop, { ctaOverrides: JSON.stringify(cleaned) });
     return { saved: true };
   }
 
@@ -1444,6 +1479,134 @@ function StorefrontSearchUrlCard({ initial }) {
             </Button>
           )}
         </InlineStack>
+      </BlockStack>
+    </Card>
+  );
+}
+
+const MODIFIER_OPTIONS = [
+  { label: "— Any modifier —", value: "" },
+  { label: "Sale / clearance / deals", value: "sale" },
+  { label: "New / new arrivals", value: "new" },
+  { label: "Bestseller / top rated", value: "bestseller" },
+];
+
+function CTAOverridesCard({ initial }) {
+  const fetcher = useFetcher();
+  const [rules, setRules] = useState(Array.isArray(initial) ? initial : []);
+  const [modifier, setModifier] = useState("");
+  const [gender, setGender] = useState("");
+  const [category, setCategory] = useState("");
+  const [url, setUrl] = useState("");
+  const [label, setLabel] = useState("");
+  const saving = fetcher.state !== "idle";
+  const errorMsg = fetcher.data?.error;
+  const saved = fetcher.data?.saved === true;
+
+  const save = (list) => {
+    const fd = new FormData();
+    fd.set("intent", "save_cta_overrides");
+    fd.set("ctaOverrides", JSON.stringify(list));
+    fetcher.submit(fd, { method: "post" });
+  };
+
+  const add = () => {
+    const m = modifier.trim().toLowerCase();
+    const g = gender.trim().toLowerCase();
+    const c = category.trim().toLowerCase();
+    const u = url.trim();
+    const l = label.trim();
+    if (!u || (!m && !g && !c)) return;
+    const keyFor = (x) => `${x.modifier || ""}|${x.gender || ""}|${x.category || ""}`;
+    const newEntry = { modifier: m, gender: g, category: c, url: u, label: l };
+    const updated = [...rules.filter((x) => keyFor(x) !== keyFor(newEntry)), newEntry];
+    setRules(updated);
+    setModifier("");
+    setGender("");
+    setCategory("");
+    setUrl("");
+    setLabel("");
+    save(updated);
+  };
+
+  const remove = (idx) => {
+    const updated = rules.filter((_, i) => i !== idx);
+    setRules(updated);
+    save(updated);
+  };
+
+  const describe = (r) => {
+    const parts = [];
+    if (r.modifier) parts.push(r.modifier);
+    if (r.gender) parts.push(r.gender);
+    if (r.category) parts.push(r.category);
+    return parts.join(" + ") || "(empty)";
+  };
+
+  return (
+    <Card>
+      <BlockStack gap="400">
+        <BlockStack gap="100">
+          <InlineStack gap="200" blockAlign="center">
+            <Text as="h2" variant="headingMd">CTA override rules</Text>
+            <Badge tone="info">Overrides auto-search CTA</Badge>
+          </InlineStack>
+          <Text as="p" tone="subdued">
+            When the conversation's resolved intent matches a rule below, the chat uses
+            <em> that rule's URL</em> instead of the auto-generated search CTA. Useful for dedicated
+            landing pages (e.g. <code>/collections/womens-sale</code>) that don't surface well via
+            <code> ?q=</code> search. Match by any combo of modifier / gender / category — blank
+            fields are wildcards. Most-specific rule wins.
+          </Text>
+        </BlockStack>
+
+        {rules.length > 0 && (
+          <BlockStack gap="150">
+            {rules.map((r, i) => (
+              <InlineStack key={i} align="space-between" blockAlign="center">
+                <InlineStack gap="200" blockAlign="center" wrap>
+                  <Text as="span" variant="bodyMd" fontWeight="semibold"><code>{describe(r)}</code></Text>
+                  <Text as="span" tone="subdued" variant="bodySm">→</Text>
+                  <Text as="span" variant="bodySm"><code>{r.url}</code></Text>
+                  {r.label && <Badge>{r.label}</Badge>}
+                </InlineStack>
+                <Button variant="plain" tone="critical" onClick={() => remove(i)}>Remove</Button>
+              </InlineStack>
+            ))}
+          </BlockStack>
+        )}
+
+        {errorMsg && (
+          <Banner tone="critical"><Text as="p">{errorMsg}</Text></Banner>
+        )}
+        {saved && !errorMsg && (
+          <Banner tone="success"><Text as="p">Saved.</Text></Banner>
+        )}
+
+        <Divider />
+
+        <BlockStack gap="200">
+          <Text as="h3" variant="headingSm">Add a rule</Text>
+          <FormLayout>
+            <FormLayout.Group>
+              <Select label="Modifier" options={MODIFIER_OPTIONS} value={modifier} onChange={setModifier}
+                helpText="What the customer is asking for (sale / new / bestseller)." />
+              <Select label="Gender" options={GENDER_OPTIONS} value={gender} onChange={setGender} />
+              <TextField label="Category" value={category} onChange={setCategory}
+                placeholder="sandals" autoComplete="off"
+                helpText="Lowercase. Leave blank for any category." />
+            </FormLayout.Group>
+            <TextField label="Override URL" value={url} onChange={setUrl}
+              placeholder="https://your-store.com/collections/womens-sale" autoComplete="off"
+              helpText="Where the CTA button should link." />
+            <TextField label="Custom label (optional)" value={label} onChange={setLabel}
+              placeholder={`Defaults to "View All Sale Women's …"`} autoComplete="off"
+              helpText="Leave blank to auto-generate from the matched intent." />
+            <Button onClick={add} loading={saving} disabled={!url.trim() || (!modifier && !gender && !category.trim())}>
+              Add rule
+            </Button>
+          </FormLayout>
+        </BlockStack>
       </BlockStack>
     </Card>
   );
@@ -2916,6 +3079,7 @@ export default function RulesKnowledge() {
             summary='Auto-generated "View all" CTA below product cards, pointing to your storefront search.'
           >
             <StorefrontSearchUrlCard initial={data.storefrontSearchUrlPattern} />
+            <CTAOverridesCard initial={data.ctaOverrides} />
           </PlanGate>
         </BlockStack>
 
