@@ -269,6 +269,7 @@ export async function maybeRunOrthoticFlow({
   haikuModel,
   classifiedIntent,
   storefrontSearchUrlPattern = "",
+  ctaOverrides = [],
 }) {
   if (!tree || tree.intent !== ORTHOTIC_INTENT) return { handled: false };
   if (!tree.definition || !Array.isArray(tree.definition.nodes)) {
@@ -968,7 +969,7 @@ export async function maybeRunOrthoticFlow({
     // "orthotics" category. Emits nothing if storefrontSearchUrlPattern
     // is empty (default), preserving back-compat for shops that
     // haven't opted in.
-    if (storefrontSearchUrlPattern) {
+    if (storefrontSearchUrlPattern || (Array.isArray(ctaOverrides) && ctaOverrides.length > 0)) {
       const lastUserText = (() => {
         for (let i = (messages || []).length - 1; i >= 0; i--) {
           const m = messages[i];
@@ -978,6 +979,7 @@ export async function maybeRunOrthoticFlow({
       })();
       const auto = buildStorefrontSearchCTA({
         pattern: storefrontSearchUrlPattern,
+        overrides: ctaOverrides,
         gender: step.attrs?.gender || answers?.gender || "",
         category: "orthotics",
         latestUserMessage: lastUserText,

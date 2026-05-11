@@ -121,6 +121,14 @@ model ShopConfig {
   // Empty string disables auto-CTA and falls back to the legacy
   // collectionLinks JSON. No data is lost when migrating.
   storefrontSearchUrlPattern String @default("")
+  // CTA overrides — JSON array of rules:
+  //   [{ modifier?, gender?, category?, url, label? }, ...]
+  // When the conversation's resolved intent matches a rule (case-
+  // insensitive; blank fields are wildcards), that rule's URL/label
+  // override the auto-generated search CTA. Most-specific (most fields
+  // set) wins. Use for dedicated landing pages like /collections/
+  // womens-sale that don't surface well via ?q= search.
+  ctaOverrides           String   @default("[]")
   similarMatchAttributes String   @default("[]")
   collectionLinks        String   @default("[]")
   fitPredictorEnabled    Boolean  @default(false)
