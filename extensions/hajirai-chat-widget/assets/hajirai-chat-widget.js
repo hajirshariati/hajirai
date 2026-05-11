@@ -389,16 +389,17 @@ if(GREETCTA)startGreetCtaRotator();
 function playWelcomeGlow(){
 try{
   var welcomeEl=msgsEl&&msgsEl.querySelector('.ai-chat-welcome');
-  if(!welcomeEl)return;
+  if(!welcomeEl){console.log('[hajirai] glow skipped: no welcome view (chat history present)');return}
   var existingGlow=panel.querySelector('.ai-chat-welcome-glow');
   if(existingGlow)existingGlow.remove();
   var glow=document.createElement('div');
   glow.className='ai-chat-welcome-glow';
   glow.setAttribute('aria-hidden','true');
   panel.appendChild(glow);
+  console.log('[hajirai] welcome glow fired');
   setTimeout(function(){glow.classList.add('is-fading')},2800);
   setTimeout(function(){if(glow.parentNode)glow.parentNode.removeChild(glow)},4500);
-}catch(e){}
+}catch(e){console.warn('[hajirai] glow error',e)}
 }
 
 function toggle(force){
@@ -974,6 +975,7 @@ scrollMsgTop(mDiv);
 function clearChat(){
 messages=[];localStorage.removeItem(HK);localStorage.removeItem(SK);
 msgsEl.innerHTML='';buildWelcome();
+if(isOpen)setTimeout(playWelcomeGlow,100);
 if(abortCtrl){abortCtrl.abort();abortCtrl=null}
 isStreaming=false;typingEl.classList.remove('visible');
 idleTimedOut=false;clearLastMsg();
