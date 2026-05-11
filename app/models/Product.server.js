@@ -325,7 +325,20 @@ export async function getAllCatalogCategories(shop) {
 
 export async function getCatalogCategories(shop, { gender } = {}) {
   const rows = await prisma.product.findMany({
-    where: { shop },
+    // Exclude products that are draft or archived in Shopify. The catalog
+    // sync stores ALL products (so re-activations don't need a re-sync),
+    // but draft/archived products should never surface as chips or in
+    // the AI's category allow-list. Production case: a merchant moved
+    // their socks line to draft; chatbot still offered "Socks" as a chip
+    // because this query didn't filter on status. Match the same
+    // exclusion pattern used by semantic search (chat-tools.server.js:825).
+    where: {
+      shop,
+      OR: [
+        { status: null },
+        { status: { notIn: ["DRAFT", "draft", "ARCHIVED", "archived"] } },
+      ],
+    },
     select: { handle: true, productType: true, attributesJson: true },
   });
 
@@ -398,7 +411,18 @@ export async function getCatalogCategories(shop, { gender } = {}) {
 // as getCatalogCategories, just keeps the gender info per category.
 export async function getCategoryGenderAvailability(shop) {
   const rows = await prisma.product.findMany({
-    where: { shop },
+    // Same draft/archived exclusion as getCatalogCategories — without
+    // this, the gender-availability map includes categories the merchant
+    // has retired (e.g. Aetrex socks moved to draft). The AI would then
+    // offer "<<Socks>> in Men's" / "<<Socks>> in Women's" chips for
+    // gender pivots on a category they no longer carry.
+    where: {
+      shop,
+      OR: [
+        { status: null },
+        { status: { notIn: ["DRAFT", "draft", "ARCHIVED", "archived"] } },
+      ],
+    },
     select: { handle: true, productType: true, attributesJson: true },
   });
 
