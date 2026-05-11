@@ -401,6 +401,11 @@ try{
   if(WELCOME_GLOW_STYLE==='none'){console.log('[hajirai] glow disabled by config');return}
   var welcomeEl=msgsEl&&msgsEl.querySelector('.ai-chat-welcome');
   if(!welcomeEl){console.log('[hajirai] glow skipped: no welcome view (chat history present)');return}
+  /* On mobile (<768px) the external halo extends past the panel into
+     the storefront chrome — usually clipped or visually noisy on
+     small screens. Force internal style on mobile so the merchant's
+     external selection downgrades cleanly instead of disappearing. */
+  var effectiveStyle=(window.innerWidth<768&&WELCOME_GLOW_STYLE==='external')?'internal':WELCOME_GLOW_STYLE;
   /* Apply colors via CSS custom property so both internal and external
      styles share the same palette. Conic gradient + repeated first
      color = smooth seam at the rotation boundary. */
@@ -409,7 +414,7 @@ try{
   var oldI=panel.querySelector('.ai-chat-welcome-glow');if(oldI)oldI.remove();
   var oldE=document.querySelector('.ai-chat-welcome-glow-outer');if(oldE)oldE.remove();
 
-  if(WELCOME_GLOW_STYLE==='external'){
+  if(effectiveStyle==='external'){
     /* Outer halo. Fixed-position sibling on document.body, sized
        LARGER than the panel by SPREAD on every side so the blurred
        gradient is visible AROUND the panel. The panel grows as the

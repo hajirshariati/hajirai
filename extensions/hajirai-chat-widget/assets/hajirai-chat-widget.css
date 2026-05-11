@@ -2139,6 +2139,17 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
   transition: opacity 1.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* External halo extends past the panel into the storefront chrome —
+   on mobile (<768px) it's either clipped by the viewport or looks
+   visually noisy at small panel sizes. Hide it entirely as a
+   defensive measure; the JS path also force-downgrades external →
+   internal on mobile, so this is belt-and-suspenders. */
+@media (max-width: 767px) {
+  .ai-chat-welcome-glow-outer {
+    display: none !important;
+  }
+}
+
 /* Fallback for browsers without @property: static angled gradient. */
 @supports not (background: conic-gradient(from var(--hajirai-glow-angle), red, blue)) {
   .ai-chat-welcome-glow,
