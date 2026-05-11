@@ -2010,4 +2010,57 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
     transition: none !important;
     animation: none !important;
   }
+  .ai-chat-welcome-glow {
+    display: none !important;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   Welcome gradient-ring intro. Inset animated gradient sweeps the
+   panel border on first open, then fades out smoothly. Lives as an
+   absolutely-positioned overlay inside the panel so the panel's
+   overflow:hidden clips the ring to a clean inner border. The
+   ::before mask blurs the inner area so only a soft gradient strip
+   shows at the edges.
+   ───────────────────────────────────────────────────────────────── */
+@property --hajirai-glow-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes hajirai-glow-rotate {
+  to { --hajirai-glow-angle: 360deg; }
+}
+.ai-chat-welcome-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0.9;
+  background: linear-gradient(
+    var(--hajirai-glow-angle),
+    #6366f1, #a855f7, #ec4899, #f59e0b, #10b981, #06b6d4, #6366f1
+  );
+  animation: hajirai-glow-rotate 4.5s linear infinite;
+  transition: opacity 1.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.ai-chat-welcome-glow::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-radius: inherit;
+  background: var(--ai-chat-bg, #fff);
+  filter: blur(8px);
+}
+.ai-chat-welcome-glow.is-fading {
+  opacity: 0;
+}
+/* Reduced-motion + Safari/Firefox @property fallback: animation stops,
+   gradient stays static, fade still works. */
+@supports not (background: linear-gradient(var(--hajirai-glow-angle), red, blue)) {
+  .ai-chat-welcome-glow {
+    background: linear-gradient(135deg, #6366f1, #ec4899, #f59e0b, #10b981);
+    animation: none;
+  }
 }

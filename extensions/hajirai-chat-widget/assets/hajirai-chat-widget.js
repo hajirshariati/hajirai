@@ -380,6 +380,21 @@ if(CUST_LOGGED_IN){
 h+='</div>';
 msgsEl.innerHTML=h;
 if(GREETCTA)startGreetCtaRotator();
+/* Animated gradient-ring intro. Plays for ~3s when the welcome
+   homepage renders, then fades out over 1.6s and removes itself.
+   Pointer-events:none so it never blocks chip clicks. Subtle, runs
+   on the panel's overflow:hidden edges so it reads as an inner
+   border glow rather than a halo. */
+try{
+  var existingGlow=panel.querySelector('.ai-chat-welcome-glow');
+  if(existingGlow)existingGlow.remove();
+  var glow=document.createElement('div');
+  glow.className='ai-chat-welcome-glow';
+  glow.setAttribute('aria-hidden','true');
+  panel.appendChild(glow);
+  setTimeout(function(){glow.classList.add('is-fading')},2800);
+  setTimeout(function(){if(glow.parentNode)glow.parentNode.removeChild(glow)},4500);
+}catch(e){}
 }
 
 function toggle(force){
