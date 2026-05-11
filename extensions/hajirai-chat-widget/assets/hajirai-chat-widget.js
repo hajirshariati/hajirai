@@ -428,7 +428,7 @@ try{
        with blur). The sharp ring is ::after, sized to match this
        container exactly — panel covers the interior, leaving only
        the SPREAD-pixel wide gradient ring visible at the edge. */
-    var SPREAD=4;
+    var SPREAD=2;
     var glowE=document.createElement('div');
     glowE.className='ai-chat-welcome-glow-outer is-entering';
     /* aria-hidden intentionally NOT set — third-party a11y CSS
@@ -469,14 +469,14 @@ try{
     }
     requestAnimationFrame(tick);
 
-    /* Timeline: 1.2s fade-in (via CSS transition), 4s hold,
-       1.6s fade-out. Fade-out starts at 1200+4000=5200ms; element
-       removed at 5200+1600=6800ms. */
-    setTimeout(function(){glowE.classList.add('is-fading')},5200);
+    /* Timeline: 0.6s fade-in, 1.4s hold, 1.0s fade-out = 3s total
+       on screen. Fade-out starts at 600+1400=2000ms; element
+       removed at 2000+1000=3000ms. */
+    setTimeout(function(){glowE.classList.add('is-fading')},2000);
     setTimeout(function(){
       stop=true;
       if(glowE.parentNode)glowE.parentNode.removeChild(glowE);
-    },6800);
+    },3000);
     return;
   }
 
@@ -492,9 +492,9 @@ try{
     });
   });
   console.log('[hajirai] welcome glow fired (internal)');
-  /* Timeline: 1.2s fade-in, 4s hold, 1.6s fade-out. */
-  setTimeout(function(){glow.classList.add('is-fading')},5200);
-  setTimeout(function(){if(glow.parentNode)glow.parentNode.removeChild(glow)},6800);
+  /* Timeline: 0.6s fade-in, 1.4s hold, 1.0s fade-out = 3s total. */
+  setTimeout(function(){glow.classList.add('is-fading')},2000);
+  setTimeout(function(){if(glow.parentNode)glow.parentNode.removeChild(glow)},3000);
 }catch(e){console.warn('[hajirai] glow error',e)}
 }
 

@@ -2094,14 +2094,14 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
   mask-composite: exclude;
   animation: hajirai-glow-rotate 4s linear infinite;
   opacity: 1;
-  transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .ai-chat-welcome-glow.is-entering {
   opacity: 0;
 }
 .ai-chat-welcome-glow.is-fading {
   opacity: 0;
-  transition: opacity 1.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 1.0s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* EXTERNAL halo. Rendered as a fixed-position sibling on document.body,
@@ -2126,7 +2126,7 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
      sharp ring thicken and thin (looks broken). All motion lives on
      the pseudo-elements individually. */
   opacity: 1;
-  transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 /* Layer 1 — soft outer halo. Two layered animations:
    - hajirai-glow-rotate cycles the conic angle (colors flow around)
@@ -2143,12 +2143,12 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
   );
   transform-origin: center;
   animation:
-    hajirai-glow-rotate 4.5s linear infinite,
-    hajirai-glow-halo-breathe 3.5s ease-in-out infinite;
+    hajirai-glow-rotate 9s linear infinite,
+    hajirai-glow-halo-breathe 7s ease-in-out infinite;
 }
 /* Layer 2 — sharp gradient ring at the panel edge. Rotates at a
-   slightly DIFFERENT speed (3.2s vs halo's 4.5s) and a slow
-   hue-rotate drift (12s) so the sharp colors flow independently
+   slightly DIFFERENT speed (6.5s vs halo's 9s) and a slow
+   hue-rotate drift (20s) so the sharp colors flow independently
    from the soft halo's colors — net effect: shimmering iridescent
    border that never quite repeats. */
 .ai-chat-welcome-glow-outer::after {
@@ -2161,15 +2161,15 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
     var(--hajirai-glow-colors, #6366f1, #a855f7, #ec4899, #f59e0b, #10b981, #06b6d4, #6366f1)
   );
   animation:
-    hajirai-glow-rotate 3.2s linear infinite,
-    hajirai-glow-ring-hue 12s linear infinite;
+    hajirai-glow-rotate 6.5s linear infinite,
+    hajirai-glow-ring-hue 20s linear infinite;
 }
 .ai-chat-welcome-glow-outer.is-entering {
   opacity: 0;
 }
 .ai-chat-welcome-glow-outer.is-fading {
   opacity: 0;
-  transition: opacity 1.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 1.0s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* External halo extends past the panel into the storefront chrome —
