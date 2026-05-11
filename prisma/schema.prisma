@@ -129,6 +129,16 @@ model ShopConfig {
   // set) wins. Use for dedicated landing pages like /collections/
   // womens-sale that don't surface well via ?q= search.
   ctaOverrides           String   @default("[]")
+  // Welcome panel intro effect. One of: "none" | "internal" | "external".
+  // - none: no animated effect on first open.
+  // - internal: rotating gradient ring rendered INSIDE the panel border.
+  // - external: rotating gradient halo OUTSIDE the panel (blurred outer
+  //   shadow effect; rendered as a separate fixed-position element).
+  welcomeGlowStyle       String   @default("internal")
+  // Comma-separated hex colors used by the welcome glow animation.
+  // 3+ colors recommended for a smooth gradient sweep. Empty falls
+  // back to the default palette.
+  welcomeGlowColors      String   @default("#6366f1,#a855f7,#ec4899,#f59e0b,#10b981,#06b6d4")
   similarMatchAttributes String   @default("[]")
   collectionLinks        String   @default("[]")
   fitPredictorEnabled    Boolean  @default(false)

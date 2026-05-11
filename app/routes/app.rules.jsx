@@ -137,6 +137,13 @@ export const loader = async ({ request }) => {
     collectionLinks: safeParse(config.collectionLinks, []),
     storefrontSearchUrlPattern: String(config.storefrontSearchUrlPattern || ""),
     ctaOverrides: safeParse(config.ctaOverrides, []),
+    welcomeGlowStyle: ["none", "internal", "external"].includes(config.welcomeGlowStyle)
+      ? config.welcomeGlowStyle
+      : "internal",
+    welcomeGlowColors: String(config.welcomeGlowColors || "")
+      .split(",")
+      .map((c) => c.trim())
+      .filter((c) => /^#[0-9a-f]{3,8}$/i.test(c)),
     fitPredictorEnabled: config.fitPredictorEnabled === true,
     fitPredictorConfig: (() => {
       try {
@@ -554,6 +561,31 @@ export const action = async ({ request }) => {
       return { error: "URL pattern must start with http:// or https://" };
     }
     await updateShopConfig(session.shop, { storefrontSearchUrlPattern: raw });
+    return { saved: true };
+  }
+
+  if (intent === "save_welcome_glow") {
+    const style = String(formData.get("welcomeGlowStyle") || "");
+    if (!["none", "internal", "external"].includes(style)) {
+      return { error: "Invalid welcome glow style." };
+    }
+    const colorsRaw = String(formData.get("welcomeGlowColors") || "");
+    const colors = colorsRaw
+      .split(",")
+      .map((c) => c.trim())
+      .filter(Boolean);
+    for (const c of colors) {
+      if (!/^#[0-9a-f]{3,8}$/i.test(c)) {
+        return { error: `Invalid hex color: ${c}. Use #rgb, #rrggbb, or #rrggbbaa.` };
+      }
+    }
+    if (style !== "none" && colors.length < 2) {
+      return { error: "Welcome glow needs at least 2 colors for a gradient." };
+    }
+    await updateShopConfig(session.shop, {
+      welcomeGlowStyle: style,
+      welcomeGlowColors: colors.join(","),
+    });
     return { saved: true };
   }
 
@@ -1478,6 +1510,109 @@ function StorefrontSearchUrlCard({ initial }) {
               Clear / disable auto-CTA
             </Button>
           )}
+        </InlineStack>
+      </BlockStack>
+    </Card>
+  );
+}
+
+const WELCOME_GLOW_STYLE_OPTIONS = [
+  { label: "None — no animation", value: "none" },
+  { label: "Internal — gradient ring inside the panel", value: "internal" },
+  { label: "External — blurred halo around the panel", value: "external" },
+];
+
+const DEFAULT_GLOW_COLORS = "#6366f1,#a855f7,#ec4899,#f59e0b,#10b981,#06b6d4";
+
+function WelcomeGlowCard({ initialStyle, initialColors }) {
+  const fetcher = useFetcher();
+  const [style, setStyle] = useState(initialStyle || "internal");
+  const [colors, setColors] = useState(
+    Array.isArray(initialColors) && initialColors.length > 0
+      ? initialColors.join(", ")
+      : DEFAULT_GLOW_COLORS,
+  );
+  const saving = fetcher.state !== "idle";
+  const saved = fetcher.data?.saved === true;
+  const errorMsg = fetcher.data?.error;
+
+  const save = () => {
+    const fd = new FormData();
+    fd.set("intent", "save_welcome_glow");
+    fd.set("welcomeGlowStyle", style);
+    fd.set("welcomeGlowColors", colors.split(",").map((c) => c.trim()).filter(Boolean).join(","));
+    fetcher.submit(fd, { method: "post" });
+  };
+
+  const resetColors = () => setColors(DEFAULT_GLOW_COLORS);
+
+  const swatches = colors
+    .split(",")
+    .map((c) => c.trim())
+    .filter((c) => /^#[0-9a-f]{3,8}$/i.test(c));
+
+  return (
+    <Card>
+      <BlockStack gap="400">
+        <BlockStack gap="100">
+          <InlineStack gap="200" blockAlign="center">
+            <Text as="h2" variant="headingMd">Welcome panel intro effect</Text>
+            <Badge tone="info">First-open animation</Badge>
+          </InlineStack>
+          <Text as="p" tone="subdued">
+            Plays a brief animated gradient effect on the chat panel when a customer first opens it (welcome view only — returning customers with chat history skip it). Picks: no animation, a gradient ring inside the panel, or a blurred halo outside.
+          </Text>
+        </BlockStack>
+
+        <FormLayout>
+          <Select
+            label="Style"
+            options={WELCOME_GLOW_STYLE_OPTIONS}
+            value={style}
+            onChange={setStyle}
+            helpText="None disables the effect entirely. Internal stays inside the panel border. External creates a soft glowing halo around the panel."
+          />
+          <TextField
+            label="Colors"
+            value={colors}
+            onChange={setColors}
+            placeholder={DEFAULT_GLOW_COLORS}
+            autoComplete="off"
+            disabled={style === "none"}
+            helpText="Comma-separated hex codes (3+ recommended for a smooth gradient). The animation rotates through them like a conic gradient."
+          />
+        </FormLayout>
+
+        {swatches.length > 0 && (
+          <InlineStack gap="100" blockAlign="center" wrap>
+            <Text as="span" variant="bodySm" tone="subdued">Preview:</Text>
+            {swatches.map((c, i) => (
+              <span
+                key={i}
+                title={c}
+                style={{
+                  display: "inline-block",
+                  width: 22,
+                  height: 22,
+                  borderRadius: "50%",
+                  background: c,
+                  border: "1px solid rgba(0,0,0,0.1)",
+                }}
+              />
+            ))}
+          </InlineStack>
+        )}
+
+        {errorMsg && (
+          <Banner tone="critical"><Text as="p">{errorMsg}</Text></Banner>
+        )}
+        {saved && !errorMsg && (
+          <Banner tone="success"><Text as="p">Saved. New panel opens will use the updated effect.</Text></Banner>
+        )}
+
+        <InlineStack gap="200">
+          <Button onClick={save} loading={saving} variant="primary">Save</Button>
+          <Button onClick={resetColors} variant="plain">Reset colors to default</Button>
         </InlineStack>
       </BlockStack>
     </Card>
@@ -3080,6 +3215,10 @@ export default function RulesKnowledge() {
           >
             <StorefrontSearchUrlCard initial={data.storefrontSearchUrlPattern} />
             <CTAOverridesCard initial={data.ctaOverrides} />
+            <WelcomeGlowCard
+              initialStyle={data.welcomeGlowStyle}
+              initialColors={data.welcomeGlowColors}
+            />
           </PlanGate>
         </BlockStack>
 

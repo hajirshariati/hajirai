@@ -39,6 +39,8 @@ fetch(CONFIG_URL).then(function(r){return r.json()}).then(function(d){
   if(d.klaviyoCompanyId)KLAVIYO_COMPANY_ID=d.klaviyoCompanyId;
   if(d.klaviyoListId)KLAVIYO_LIST_ID=d.klaviyoListId;
   if(d.productCardStyle==='showcase')PRODUCT_CARD_STYLE='showcase';
+  if(typeof d.welcomeGlowStyle==='string')WELCOME_GLOW_STYLE=d.welcomeGlowStyle;
+  if(Array.isArray(d.welcomeGlowColors)&&d.welcomeGlowColors.length>=2)WELCOME_GLOW_COLORS=d.welcomeGlowColors;
   /* Welcome-CTA translations from server. Theme block toggle wins over
      the server echo (both must agree to enable rotation). When ready,
      append translations to the frames array — the running rotator
@@ -125,6 +127,11 @@ try{var _cachedStyle=localStorage.getItem(PCSK);if(_cachedStyle==='showcase')PRO
 var KLAVIYO_FORM_ID='';
 var KLAVIYO_COMPANY_ID='';
 var KLAVIYO_LIST_ID='';
+/* Welcome-panel intro effect. Overridden by /widget-config response.
+   Style: "none" disables; "internal" renders a gradient ring INSIDE
+   the panel; "external" renders a blurred halo OUTSIDE it. */
+var WELCOME_GLOW_STYLE='internal';
+var WELCOME_GLOW_COLORS=['#6366f1','#a855f7','#ec4899','#f59e0b','#10b981','#06b6d4'];
 var SK='hajirai_chat_session';
 var HK='hajirai_chat_history';
 
@@ -382,21 +389,53 @@ msgsEl.innerHTML=h;
 if(GREETCTA)startGreetCtaRotator();
 }
 
-/* Animated gradient-ring intro. Plays for ~3s when the welcome
-   homepage becomes visible (panel opens), then fades out over 1.6s
-   and removes itself. Called from toggle() so the effect is timed
-   to when the customer can actually see it, not page load. */
+/* Animated gradient intro effect on the welcome panel. Style controlled
+   by merchant config (welcomeGlowStyle):
+     - "none":     no effect
+     - "internal": gradient ring INSIDE the panel border
+     - "external": blurred gradient halo OUTSIDE the panel
+   Colors come from welcomeGlowColors (array of hex). Plays for ~3s on
+   panel open, then fades out over 1.6s and removes itself. */
 function playWelcomeGlow(){
 try{
+  if(WELCOME_GLOW_STYLE==='none'){console.log('[hajirai] glow disabled by config');return}
   var welcomeEl=msgsEl&&msgsEl.querySelector('.ai-chat-welcome');
   if(!welcomeEl){console.log('[hajirai] glow skipped: no welcome view (chat history present)');return}
-  var existingGlow=panel.querySelector('.ai-chat-welcome-glow');
-  if(existingGlow)existingGlow.remove();
+  /* Apply colors via CSS custom property so both internal and external
+     styles share the same palette. Conic gradient + repeated first
+     color = smooth seam at the rotation boundary. */
+  var colors=(WELCOME_GLOW_COLORS||[]).concat([WELCOME_GLOW_COLORS[0]]).join(',');
+  /* Clean up any leftover glows from a prior open. */
+  var oldI=panel.querySelector('.ai-chat-welcome-glow');if(oldI)oldI.remove();
+  var oldE=document.querySelector('.ai-chat-welcome-glow-outer');if(oldE)oldE.remove();
+
+  if(WELCOME_GLOW_STYLE==='external'){
+    /* Outer halo. Sits as a fixed-position sibling of the panel, sized
+       to match the panel's bounding box plus an outer spread, so the
+       panel's overflow:hidden doesn't clip it. Inserted into body. */
+    var rect=panel.getBoundingClientRect();
+    var glowE=document.createElement('div');
+    glowE.className='ai-chat-welcome-glow-outer';
+    glowE.setAttribute('aria-hidden','true');
+    glowE.style.setProperty('--hajirai-glow-colors',colors);
+    glowE.style.top=rect.top+'px';
+    glowE.style.left=rect.left+'px';
+    glowE.style.width=rect.width+'px';
+    glowE.style.height=rect.height+'px';
+    document.body.appendChild(glowE);
+    console.log('[hajirai] welcome glow fired (external)');
+    setTimeout(function(){glowE.classList.add('is-fading')},2800);
+    setTimeout(function(){if(glowE.parentNode)glowE.parentNode.removeChild(glowE)},4500);
+    return;
+  }
+
+  /* Internal ring — inside the panel. */
   var glow=document.createElement('div');
   glow.className='ai-chat-welcome-glow';
   glow.setAttribute('aria-hidden','true');
+  glow.style.setProperty('--hajirai-glow-colors',colors);
   panel.appendChild(glow);
-  console.log('[hajirai] welcome glow fired');
+  console.log('[hajirai] welcome glow fired (internal)');
   setTimeout(function(){glow.classList.add('is-fading')},2800);
   setTimeout(function(){if(glow.parentNode)glow.parentNode.removeChild(glow)},4500);
 }catch(e){console.warn('[hajirai] glow error',e)}

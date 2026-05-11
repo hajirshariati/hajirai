@@ -68,6 +68,13 @@ export const loader = async ({ request }) => {
         productCardStyle: config.productCardStyle === "showcase" ? "showcase" : "horizontal",
         rotateGreetingCta: config.rotateGreetingCta !== false,
         greetingCtaTranslations,
+        welcomeGlowStyle: ["none", "internal", "external"].includes(config.welcomeGlowStyle)
+          ? config.welcomeGlowStyle
+          : "internal",
+        welcomeGlowColors: String(config.welcomeGlowColors || "")
+          .split(",")
+          .map((c) => c.trim())
+          .filter((c) => /^#[0-9a-f]{3,8}$/i.test(c)),
       },
       {
         // 60s keeps the storefront responsive without making merchant config
