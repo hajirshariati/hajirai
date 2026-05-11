@@ -41,6 +41,12 @@ fetch(CONFIG_URL).then(function(r){return r.json()}).then(function(d){
   if(d.productCardStyle==='showcase')PRODUCT_CARD_STYLE='showcase';
   if(typeof d.welcomeGlowStyle==='string')WELCOME_GLOW_STYLE=d.welcomeGlowStyle;
   if(Array.isArray(d.welcomeGlowColors)&&d.welcomeGlowColors.length>=2)WELCOME_GLOW_COLORS=d.welcomeGlowColors;
+  if(Number.isFinite(d.welcomeGlowBorderWidth))WELCOME_GLOW_BORDER_WIDTH=d.welcomeGlowBorderWidth;
+  if(Number.isFinite(d.welcomeGlowSize))WELCOME_GLOW_SIZE=d.welcomeGlowSize;
+  if(Number.isFinite(d.welcomeGlowFadeInMs))WELCOME_GLOW_FADE_IN_MS=d.welcomeGlowFadeInMs;
+  if(Number.isFinite(d.welcomeGlowHoldMs))WELCOME_GLOW_HOLD_MS=d.welcomeGlowHoldMs;
+  if(Number.isFinite(d.welcomeGlowFadeOutMs))WELCOME_GLOW_FADE_OUT_MS=d.welcomeGlowFadeOutMs;
+  if(Number.isFinite(d.welcomeGlowSpeed)&&d.welcomeGlowSpeed>0)WELCOME_GLOW_SPEED=d.welcomeGlowSpeed;
   /* Welcome-CTA translations from server. Theme block toggle wins over
      the server echo (both must agree to enable rotation). When ready,
      append translations to the frames array — the running rotator
@@ -129,9 +135,17 @@ var KLAVIYO_COMPANY_ID='';
 var KLAVIYO_LIST_ID='';
 /* Welcome-panel intro effect. Overridden by /widget-config response.
    Style: "none" disables; "internal" renders a gradient ring INSIDE
-   the panel; "external" renders a blurred halo OUTSIDE it. */
+   the panel; "external" renders a blurred halo OUTSIDE it.
+   Tuning fields control thickness, halo extent, animation speed,
+   and the three timing phases (fade-in / hold / fade-out). */
 var WELCOME_GLOW_STYLE='internal';
 var WELCOME_GLOW_COLORS=['#6366f1','#a855f7','#ec4899','#f59e0b','#10b981','#06b6d4'];
+var WELCOME_GLOW_BORDER_WIDTH=2;
+var WELCOME_GLOW_SIZE=18;
+var WELCOME_GLOW_FADE_IN_MS=1500;
+var WELCOME_GLOW_HOLD_MS=4000;
+var WELCOME_GLOW_FADE_OUT_MS=2000;
+var WELCOME_GLOW_SPEED=1.0;
 var SK='hajirai_chat_session';
 var HK='hajirai_chat_history';
 
@@ -410,37 +424,35 @@ try{
      styles share the same palette. Conic gradient + repeated first
      color = smooth seam at the rotation boundary. */
   var colors=(WELCOME_GLOW_COLORS||[]).concat([WELCOME_GLOW_COLORS[0]]).join(',');
+  /* Tuning values applied via CSS custom properties — keeps the JS
+     side dumb (no per-style branching) and the CSS in charge of how
+     the values are consumed (durations, sizes, etc.). */
+  var fadeInS  = (WELCOME_GLOW_FADE_IN_MS  /1000).toFixed(3)+'s';
+  var fadeOutS = (WELCOME_GLOW_FADE_OUT_MS /1000).toFixed(3)+'s';
+  var holdMs   = Math.max(0, WELCOME_GLOW_HOLD_MS);
+  var startFadeAt = WELCOME_GLOW_FADE_IN_MS + holdMs;
+  var removeAt    = startFadeAt + WELCOME_GLOW_FADE_OUT_MS;
   /* Clean up any leftover glows from a prior open. */
   var oldI=panel.querySelector('.ai-chat-welcome-glow');if(oldI)oldI.remove();
   var oldE=document.querySelector('.ai-chat-welcome-glow-outer');if(oldE)oldE.remove();
 
   if(effectiveStyle==='external'){
-    /* Outer halo. Fixed-position sibling on document.body, sized
-       LARGER than the panel by SPREAD on every side so the blurred
-       gradient is visible AROUND the panel. The panel grows as the
-       welcome content (avatar → tagline → CTAs → quick picks) lays
-       out, so we keep the halo in sync via requestAnimationFrame for
-       the full visible lifetime instead of capturing a single rect
-       (which was undersized if the welcome was still rendering). */
-    /* Two-layer effect:
-       SPREAD = thickness of the SHARP border line at the panel edge.
-       The soft outer halo is rendered by ::before (further outset
-       with blur). The sharp ring is ::after, sized to match this
-       container exactly — panel covers the interior, leaving only
-       the SPREAD-pixel wide gradient ring visible at the edge. */
-    var SPREAD=2;
+    /* Outer halo. Fixed-position sibling on document.body. Two-layer
+       effect: ::after = sharp gradient ring at the panel edge (width
+       = SPREAD); ::before = soft blurred halo extending further out.
+       The panel grows as the welcome content (avatar → tagline →
+       CTAs → quick picks) lays out, so we keep the halo in sync via
+       requestAnimationFrame for the full visible lifetime. */
+    var SPREAD=WELCOME_GLOW_BORDER_WIDTH;
     var glowE=document.createElement('div');
     glowE.className='ai-chat-welcome-glow-outer is-entering';
-    /* aria-hidden intentionally NOT set — third-party a11y CSS
-       (Userway, certain theme stylesheets) hides aria-hidden elements
-       with display:none, which collapsed our halo to 0×0. The element
-       is a purely decorative absolutely-positioned div with no text
-       and pointer-events:none — assistive tech won't surface it.
-       .is-entering starts the element at opacity:0; the double rAF
-       below removes it after the browser paints opacity:0 once, so
-       the transition to opacity:1 actually animates instead of
-       snapping. */
     glowE.style.setProperty('--hajirai-glow-colors',colors);
+    glowE.style.setProperty('--hajirai-glow-halo-inset',(-WELCOME_GLOW_SIZE)+'px');
+    glowE.style.setProperty('--hajirai-glow-blur',Math.round(WELCOME_GLOW_SIZE)+'px');
+    glowE.style.setProperty('--hajirai-glow-blur-max',Math.round(WELCOME_GLOW_SIZE*1.33)+'px');
+    glowE.style.setProperty('--hajirai-glow-speed',String(WELCOME_GLOW_SPEED));
+    glowE.style.setProperty('--hajirai-glow-fade-in',fadeInS);
+    glowE.style.setProperty('--hajirai-glow-fade-out',fadeOutS);
     document.body.appendChild(glowE);
     requestAnimationFrame(function(){
       requestAnimationFrame(function(){
@@ -469,14 +481,13 @@ try{
     }
     requestAnimationFrame(tick);
 
-    /* Timeline: 1.5s fade-in, 4s hold, 2s fade-out = 7.5s total
-       on screen. Fade-out starts at 1500+4000=5500ms; element
-       removed at 5500+2000=7500ms. */
-    setTimeout(function(){glowE.classList.add('is-fading')},5500);
+    /* Timeline driven by merchant config (admin → Settings →
+       Widget visibility → Welcome panel intro effect → Tuning). */
+    setTimeout(function(){glowE.classList.add('is-fading')},startFadeAt);
     setTimeout(function(){
       stop=true;
       if(glowE.parentNode)glowE.parentNode.removeChild(glowE);
-    },7500);
+    },removeAt);
     return;
   }
 
@@ -485,6 +496,10 @@ try{
   var glow=document.createElement('div');
   glow.className='ai-chat-welcome-glow is-entering';
   glow.style.setProperty('--hajirai-glow-colors',colors);
+  glow.style.setProperty('--hajirai-glow-border-width',WELCOME_GLOW_BORDER_WIDTH+'px');
+  glow.style.setProperty('--hajirai-glow-speed',String(WELCOME_GLOW_SPEED));
+  glow.style.setProperty('--hajirai-glow-fade-in',fadeInS);
+  glow.style.setProperty('--hajirai-glow-fade-out',fadeOutS);
   panel.appendChild(glow);
   requestAnimationFrame(function(){
     requestAnimationFrame(function(){
@@ -492,9 +507,8 @@ try{
     });
   });
   console.log('[hajirai] welcome glow fired (internal)');
-  /* Timeline: 1.5s fade-in, 4s hold, 2s fade-out = 7.5s total. */
-  setTimeout(function(){glow.classList.add('is-fading')},5500);
-  setTimeout(function(){if(glow.parentNode)glow.parentNode.removeChild(glow)},7500);
+  setTimeout(function(){glow.classList.add('is-fading')},startFadeAt);
+  setTimeout(function(){if(glow.parentNode)glow.parentNode.removeChild(glow)},removeAt);
 }catch(e){console.warn('[hajirai] glow error',e)}
 }
 

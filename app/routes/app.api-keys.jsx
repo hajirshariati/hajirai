@@ -48,6 +48,12 @@ export const loader = async ({ request }) => {
       .split(",")
       .map((c) => c.trim())
       .filter((c) => /^#[0-9a-f]{3,8}$/i.test(c)),
+    welcomeGlowBorderWidth: Number.isFinite(config.welcomeGlowBorderWidth) ? config.welcomeGlowBorderWidth : 2,
+    welcomeGlowSize:        Number.isFinite(config.welcomeGlowSize)        ? config.welcomeGlowSize        : 18,
+    welcomeGlowFadeInMs:    Number.isFinite(config.welcomeGlowFadeInMs)    ? config.welcomeGlowFadeInMs    : 1500,
+    welcomeGlowHoldMs:      Number.isFinite(config.welcomeGlowHoldMs)      ? config.welcomeGlowHoldMs      : 4000,
+    welcomeGlowFadeOutMs:   Number.isFinite(config.welcomeGlowFadeOutMs)   ? config.welcomeGlowFadeOutMs   : 2000,
+    welcomeGlowSpeed:       Number.isFinite(config.welcomeGlowSpeed)       ? config.welcomeGlowSpeed       : 1.0,
     supportUrl: config.supportUrl || "",
     supportLabel: config.supportLabel || "",
     trackingPageUrl: config.trackingPageUrl || "",
@@ -100,9 +106,33 @@ export const action = async ({ request }) => {
     if (style !== "none" && colors.length < 2) {
       return { error: "Welcome glow needs at least 2 colors for a gradient." };
     }
+    // Parse tuning fields with sensible clamps so a typo can't make the
+    // animation unusable (e.g. 0ms hold or 999999ms fade-out).
+    const clampInt = (raw, def, min, max) => {
+      const n = parseInt(raw, 10);
+      if (!Number.isFinite(n)) return def;
+      return Math.max(min, Math.min(max, n));
+    };
+    const clampFloat = (raw, def, min, max) => {
+      const n = parseFloat(raw);
+      if (!Number.isFinite(n)) return def;
+      return Math.max(min, Math.min(max, n));
+    };
+    const borderWidth = clampInt(formData.get("welcomeGlowBorderWidth"), 2,    1,  20);
+    const size        = clampInt(formData.get("welcomeGlowSize"),        18,   2,  80);
+    const fadeInMs    = clampInt(formData.get("welcomeGlowFadeInMs"),    1500, 100, 8000);
+    const holdMs      = clampInt(formData.get("welcomeGlowHoldMs"),      4000, 0,   30000);
+    const fadeOutMs   = clampInt(formData.get("welcomeGlowFadeOutMs"),   2000, 100, 8000);
+    const speed       = clampFloat(formData.get("welcomeGlowSpeed"),     1.0,  0.2, 5.0);
     await updateShopConfig(session.shop, {
-      welcomeGlowStyle: style,
-      welcomeGlowColors: colors.join(","),
+      welcomeGlowStyle:       style,
+      welcomeGlowColors:      colors.join(","),
+      welcomeGlowBorderWidth: borderWidth,
+      welcomeGlowSize:        size,
+      welcomeGlowFadeInMs:    fadeInMs,
+      welcomeGlowHoldMs:      holdMs,
+      welcomeGlowFadeOutMs:   fadeOutMs,
+      welcomeGlowSpeed:       speed,
     });
     return { saved: true };
   }
@@ -244,7 +274,16 @@ const WELCOME_GLOW_STYLE_OPTIONS = [
 
 const DEFAULT_GLOW_COLORS = "#6366f1,#a855f7,#ec4899,#f59e0b,#10b981,#06b6d4";
 
-function WelcomeGlowCard({ initialStyle, initialColors }) {
+function WelcomeGlowCard({
+  initialStyle,
+  initialColors,
+  initialBorderWidth,
+  initialSize,
+  initialFadeInMs,
+  initialHoldMs,
+  initialFadeOutMs,
+  initialSpeed,
+}) {
   const fetcher = useFetcher();
   const [style, setStyle] = useState(initialStyle || "internal");
   const [colors, setColors] = useState(
@@ -252,6 +291,12 @@ function WelcomeGlowCard({ initialStyle, initialColors }) {
       ? initialColors.join(", ")
       : DEFAULT_GLOW_COLORS,
   );
+  const [borderWidth, setBorderWidth] = useState(String(initialBorderWidth ?? 2));
+  const [size,        setSize]        = useState(String(initialSize        ?? 18));
+  const [fadeInMs,    setFadeInMs]    = useState(String(initialFadeInMs    ?? 1500));
+  const [holdMs,      setHoldMs]      = useState(String(initialHoldMs      ?? 4000));
+  const [fadeOutMs,   setFadeOutMs]   = useState(String(initialFadeOutMs   ?? 2000));
+  const [speed,       setSpeed]       = useState(String(initialSpeed       ?? 1.0));
   const saving = fetcher.state !== "idle";
   const saved = fetcher.data?.saved === true;
   const errorMsg = fetcher.data?.error;
@@ -264,10 +309,24 @@ function WelcomeGlowCard({ initialStyle, initialColors }) {
       "welcomeGlowColors",
       colors.split(",").map((c) => c.trim()).filter(Boolean).join(","),
     );
+    fd.set("welcomeGlowBorderWidth", borderWidth);
+    fd.set("welcomeGlowSize",        size);
+    fd.set("welcomeGlowFadeInMs",    fadeInMs);
+    fd.set("welcomeGlowHoldMs",      holdMs);
+    fd.set("welcomeGlowFadeOutMs",   fadeOutMs);
+    fd.set("welcomeGlowSpeed",       speed);
     fetcher.submit(fd, { method: "post" });
   };
 
   const resetColors = () => setColors(DEFAULT_GLOW_COLORS);
+  const resetTiming = () => {
+    setBorderWidth("2");
+    setSize("18");
+    setFadeInMs("1500");
+    setHoldMs("4000");
+    setFadeOutMs("2000");
+    setSpeed("1.0");
+  };
 
   const swatches = colors
     .split(",")
@@ -333,9 +392,86 @@ function WelcomeGlowCard({ initialStyle, initialColors }) {
           <Banner tone="success"><Text as="p">Saved. New panel opens will use the updated effect.</Text></Banner>
         )}
 
+        <Divider />
+
+        <BlockStack gap="200">
+          <Text as="h3" variant="headingSm">Tuning</Text>
+          <Text as="p" tone="subdued" variant="bodySm">
+            Fine-tune the look and timing of the effect. All durations are in milliseconds (1000 ms = 1 second).
+          </Text>
+          <FormLayout>
+            <FormLayout.Group>
+              <TextField
+                type="number"
+                label="Border thickness (px)"
+                value={borderWidth}
+                onChange={setBorderWidth}
+                min={1}
+                max={20}
+                helpText="Width of the sharp gradient line at the panel edge. 1–20."
+                disabled={style === "none"}
+              />
+              <TextField
+                type="number"
+                label="Glow size (px)"
+                value={size}
+                onChange={setSize}
+                min={2}
+                max={80}
+                helpText="How far the soft halo extends past the panel. 2–80."
+                disabled={style === "none"}
+              />
+              <TextField
+                type="number"
+                label="Animation speed"
+                value={speed}
+                onChange={setSpeed}
+                min={0.2}
+                max={5}
+                step={0.1}
+                helpText="Multiplier. 1.0 = default; 0.5 = half speed; 2.0 = double."
+                disabled={style === "none"}
+              />
+            </FormLayout.Group>
+            <FormLayout.Group>
+              <TextField
+                type="number"
+                label="Fade-in (ms)"
+                value={fadeInMs}
+                onChange={setFadeInMs}
+                min={100}
+                max={8000}
+                helpText="100–8000."
+                disabled={style === "none"}
+              />
+              <TextField
+                type="number"
+                label="Hold (ms)"
+                value={holdMs}
+                onChange={setHoldMs}
+                min={0}
+                max={30000}
+                helpText="Full-opacity hold. 0–30000."
+                disabled={style === "none"}
+              />
+              <TextField
+                type="number"
+                label="Fade-out (ms)"
+                value={fadeOutMs}
+                onChange={setFadeOutMs}
+                min={100}
+                max={8000}
+                helpText="100–8000."
+                disabled={style === "none"}
+              />
+            </FormLayout.Group>
+          </FormLayout>
+        </BlockStack>
+
         <InlineStack gap="200">
           <Button onClick={save} loading={saving} variant="primary">Save</Button>
-          <Button onClick={resetColors} variant="plain">Reset colors to default</Button>
+          <Button onClick={resetColors} variant="plain">Reset colors</Button>
+          <Button onClick={resetTiming} variant="plain">Reset tuning</Button>
         </InlineStack>
       </BlockStack>
     </Card>
@@ -449,7 +585,7 @@ function HideUrlsPanel({ initial }) {
 }
 
 export default function ApiKeys() {
-  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, trackingPageUrl: initTrackingPageUrl, returnsPageUrl: initReturnsPageUrl, referralPageUrl: initReferralPageUrl, promptCaching: initCaching, klaviyoFormId: initKlaviyoFormId, klaviyoCompanyId: initKlaviyoCompanyId, klaviyoListId: initKlaviyoListId, vipModeEnabled: initVipMode, showLoginPill: initShowLoginPill, hasKlaviyoPrivateKey, hasYotpoLoyaltyKey, yotpoLoyaltyGuid: initYotpoLoyaltyGuid, loyaltyDisplay: initLoyaltyDisplay, loyaltyPointsPerDollar: initLoyaltyPointsPerDollar, loyaltyRounding: initLoyaltyRounding, dailyCapEnabled: initDailyCapEnabled, dailyCapMessages: initDailyCapMessages, embeddingProvider: initEmbeddingProvider, hasVoyageKey, hasOpenaiKey, knowledgeRagEnabled, plan, welcomeGlowStyle, welcomeGlowColors } = useLoaderData();
+  const { hasAnthropicKey, anthropicModel, modelStrategy, showFollowUps: initFollowUps, showFeedback: initFeedback, hasYotpoKey, hasAftershipKey, hideOnUrls, supportUrl: initSupportUrl, supportLabel: initSupportLabel, trackingPageUrl: initTrackingPageUrl, returnsPageUrl: initReturnsPageUrl, referralPageUrl: initReferralPageUrl, promptCaching: initCaching, klaviyoFormId: initKlaviyoFormId, klaviyoCompanyId: initKlaviyoCompanyId, klaviyoListId: initKlaviyoListId, vipModeEnabled: initVipMode, showLoginPill: initShowLoginPill, hasKlaviyoPrivateKey, hasYotpoLoyaltyKey, yotpoLoyaltyGuid: initYotpoLoyaltyGuid, loyaltyDisplay: initLoyaltyDisplay, loyaltyPointsPerDollar: initLoyaltyPointsPerDollar, loyaltyRounding: initLoyaltyRounding, dailyCapEnabled: initDailyCapEnabled, dailyCapMessages: initDailyCapMessages, embeddingProvider: initEmbeddingProvider, hasVoyageKey, hasOpenaiKey, knowledgeRagEnabled, plan, welcomeGlowStyle, welcomeGlowColors, welcomeGlowBorderWidth, welcomeGlowSize, welcomeGlowFadeInMs, welcomeGlowHoldMs, welcomeGlowFadeOutMs, welcomeGlowSpeed } = useLoaderData();
   const actionData = useActionData();
   const nav = useNavigation();
   const saving = nav.state === "submitting";
@@ -1143,6 +1279,12 @@ export default function ApiKeys() {
                 <WelcomeGlowCard
                   initialStyle={welcomeGlowStyle}
                   initialColors={welcomeGlowColors}
+                  initialBorderWidth={welcomeGlowBorderWidth}
+                  initialSize={welcomeGlowSize}
+                  initialFadeInMs={welcomeGlowFadeInMs}
+                  initialHoldMs={welcomeGlowHoldMs}
+                  initialFadeOutMs={welcomeGlowFadeOutMs}
+                  initialSpeed={welcomeGlowSpeed}
                 />
               </BlockStack>
             </Layout.AnnotatedSection>

@@ -2045,12 +2045,12 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
    visually repeats, feels alive rather than mechanical. */
 @keyframes hajirai-glow-halo-breathe {
   0%, 100% {
-    filter: blur(18px) hue-rotate(0deg);
+    filter: blur(var(--hajirai-glow-blur, 18px)) hue-rotate(0deg);
     opacity: 0.65;
     transform: scale(1);
   }
   50% {
-    filter: blur(24px) hue-rotate(180deg);
+    filter: blur(var(--hajirai-glow-blur-max, 24px)) hue-rotate(180deg);
     opacity: 0.9;
     transform: scale(1.04);
   }
@@ -2063,23 +2063,15 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
    visible at the edges. z-index lives in the panel's stacking
    context. */
 .ai-chat-welcome-glow {
-  /* display: block !important defends against host-page a11y CSS
-     (Userway, some themes) that sets display:none on elements they
-     interpret as decorative. */
   display: block !important;
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
   border-radius: var(--ai-chat-radius, 16px);
   pointer-events: none;
   z-index: 9999;
-  /* Gradient-border via padding + mask-composite:exclude. The padding
-     defines the ring thickness; two stacked masks (one over the
-     content-box, one over the border-box) composited with `exclude`
-     carve out the inner area so the welcome content underneath stays
-     fully visible. Previous attempt used a solid ::after to "mask"
-     the inner area, but ::after sits ABOVE panel content and covered
-     everything with white. */
-  padding: 3px;
+  /* Gradient-border via padding + mask-composite:exclude.
+     padding = merchant-configurable ring thickness. */
+  padding: var(--hajirai-glow-border-width, 3px);
   background: conic-gradient(
     from var(--hajirai-glow-angle, 0deg),
     var(--hajirai-glow-colors, #6366f1, #a855f7, #ec4899, #f59e0b, #10b981, #06b6d4, #6366f1)
@@ -2092,16 +2084,16 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
   mask-composite: exclude;
-  animation: hajirai-glow-rotate 4s linear infinite;
+  animation: hajirai-glow-rotate calc(4s / var(--hajirai-glow-speed, 1)) linear infinite;
   opacity: 1;
-  transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity var(--hajirai-glow-fade-in, 1.5s) cubic-bezier(0.4, 0, 0.2, 1);
 }
 .ai-chat-welcome-glow.is-entering {
   opacity: 0;
 }
 .ai-chat-welcome-glow.is-fading {
   opacity: 0;
-  transition: opacity 2.0s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity var(--hajirai-glow-fade-out, 2s) cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* EXTERNAL halo. Rendered as a fixed-position sibling on document.body,
@@ -2111,31 +2103,20 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
    overlay but appears AFTER it in document order, so it paints on
    top of the dim overlay; the panel (z+1) is still on top. */
 .ai-chat-welcome-glow-outer {
-  /* display: block !important defends against host-page a11y CSS
-     (Userway, some themes) that hides elements they interpret as
-     decorative — this collapsed our halo to 0×0 on aetrex.com. */
   display: block !important;
   position: fixed;
   pointer-events: none;
-  z-index: 999990; /* matches --ai-chat-z (overlay) so it sits above */
+  z-index: 999990;
   border-radius: 20px;
-  /* No background on the parent — both layers are pseudo-elements
-     so we can control paint order. ::before (soft halo) paints first,
-     ::after (sharp ring) paints second on top. NO animation on the
-     container — scaling here would scale ::after too, making the
-     sharp ring thicken and thin (looks broken). All motion lives on
-     the pseudo-elements individually. */
   opacity: 1;
-  transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity var(--hajirai-glow-fade-in, 1.5s) cubic-bezier(0.4, 0, 0.2, 1);
 }
-/* Layer 1 — soft outer halo. Two layered animations:
-   - hajirai-glow-rotate cycles the conic angle (colors flow around)
-   - hajirai-glow-halo-breathe pulses blur+opacity+hue+scale on
-     the halo only (sharp ring stays constant). */
+/* Layer 1 — soft outer halo. inset (halo size) + animation speeds
+   come from merchant tuning via custom properties. */
 .ai-chat-welcome-glow-outer::before {
   content: "";
   position: absolute;
-  inset: -18px;
+  inset: var(--hajirai-glow-halo-inset, -18px);
   border-radius: inherit;
   background: conic-gradient(
     from var(--hajirai-glow-angle, 0deg),
@@ -2143,14 +2124,11 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
   );
   transform-origin: center;
   animation:
-    hajirai-glow-rotate 9s linear infinite,
-    hajirai-glow-halo-breathe 7s ease-in-out infinite;
+    hajirai-glow-rotate calc(9s / var(--hajirai-glow-speed, 1)) linear infinite,
+    hajirai-glow-halo-breathe calc(7s / var(--hajirai-glow-speed, 1)) ease-in-out infinite;
 }
-/* Layer 2 — sharp gradient ring at the panel edge. Rotates at a
-   slightly DIFFERENT speed (6.5s vs halo's 9s) and a slow
-   hue-rotate drift (20s) so the sharp colors flow independently
-   from the soft halo's colors — net effect: shimmering iridescent
-   border that never quite repeats. */
+/* Layer 2 — sharp gradient ring. Rotates at a different speed than
+   the halo (multiplier preserved) so the two layers never lock-step. */
 .ai-chat-welcome-glow-outer::after {
   content: "";
   position: absolute;
@@ -2161,15 +2139,15 @@ body:has(#CartDrawer:not([hidden])) .ai-chat-overlay {
     var(--hajirai-glow-colors, #6366f1, #a855f7, #ec4899, #f59e0b, #10b981, #06b6d4, #6366f1)
   );
   animation:
-    hajirai-glow-rotate 6.5s linear infinite,
-    hajirai-glow-ring-hue 20s linear infinite;
+    hajirai-glow-rotate calc(6.5s / var(--hajirai-glow-speed, 1)) linear infinite,
+    hajirai-glow-ring-hue calc(20s / var(--hajirai-glow-speed, 1)) linear infinite;
 }
 .ai-chat-welcome-glow-outer.is-entering {
   opacity: 0;
 }
 .ai-chat-welcome-glow-outer.is-fading {
   opacity: 0;
-  transition: opacity 2.0s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity var(--hajirai-glow-fade-out, 2s) cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* External halo extends past the panel into the storefront chrome —
