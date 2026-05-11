@@ -1495,7 +1495,7 @@ a.ai-chat-welcome__hint--link:hover {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 6px 14px;
+  padding: 0px 14px;
   background: #f6f7f9;
   border: 1px solid transparent;
   border-radius: 22px;
