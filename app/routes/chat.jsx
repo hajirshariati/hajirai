@@ -2178,11 +2178,19 @@ if (collection.cta) {
     latestUserMessage: ctx.latestUserMessage || "",
   });
   if (auto) {
+    console.log(
+      `[cta] ${ctx.shop} auto-search url=${auto.url} label=${JSON.stringify(auto.label)} ` +
+      `gender=${dominantGender || "-"} category=${ctaCategory || "-"} color=${dominantColor || "-"}`,
+    );
     controller.enqueue(encoder.encode(sseChunk({
       type: "link",
       url: auto.url,
       label: auto.label,
     })));
+  } else {
+    console.log(
+      `[cta] ${ctx.shop} auto-search NO MATCH gender=${dominantGender || "-"} category=${ctaCategory || "-"} pattern=${ctx.storefrontSearchUrlPattern ? "set" : "unset"} overrides=${(ctx.ctaOverrides || []).length}`,
+    );
   }
 } else if (
   Array.isArray(ctx.collectionLinks) &&

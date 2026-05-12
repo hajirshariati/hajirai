@@ -134,15 +134,22 @@ export function buildStorefrontSearchCTA(opts) {
   const col = color ? String(color).toLowerCase().trim() : "";
   const modifier = detectModifier(latestUserMessage || "");
 
-  // Build the human-friendly label parts up front — both the override
-  // (when label is blank) and the auto-generated path want the same
-  // "View All [Modifier] [Color] [Gender]'s [Category]" shape.
+  // Build the human-friendly label. Modifiers like "sale" and
+  // "bestseller" read awkwardly when placed before the gender
+  // ("Sale Women's Loafers" parses as [Sale Women]'s Loafers).
+  // Put them at the end with a natural connector instead:
+  //   sale       → "View All Women's Loafers on Sale"
+  //   bestseller → "View All Women's Loafers — Bestsellers"
+  //   new        → stays in front because "View All New Women's
+  //                Sneakers" reads cleanly (matches Shopify convention)
   const labelParts = ["View All"];
-  if (modifier) labelParts.push(titleCase(modifier));
+  if (modifier === "new") labelParts.push("New");
   if (col) labelParts.push(titleCase(col));
   if (genderToken) labelParts.push(`${titleCase(genderToken)}'s`);
   if (cat) labelParts.push(titleCase(cat));
-  const autoLabel = labelParts.join(" ").replace(/\s+/g, " ").trim();
+  let autoLabel = labelParts.join(" ").replace(/\s+/g, " ").trim();
+  if (modifier === "sale") autoLabel += " on Sale";
+  else if (modifier === "bestseller") autoLabel += " — Bestsellers";
 
   // Overrides take precedence. Match against the resolved intent
   // (normalized modifier/gender/category). Custom label optional —
