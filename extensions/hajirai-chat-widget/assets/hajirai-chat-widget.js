@@ -727,8 +727,8 @@ return '<a class="ai-chat-cta-btn" style="display:block;margin-top:12px;padding:
 function appendMsg(role,content,products){
 var isU=role==='user';
 var d=el('div','ai-chat-msg ai-chat-msg--'+role);
-var av=isU?'<span>You</span>':assistantBubbleAvatar;
-d.innerHTML='<div class="ai-chat-msg-avatar">'+av+'</div><div class="ai-chat-msg-bubble"><p>'+md(esc(content))+'</p></div>';
+var avatarHtml=isU?'':'<div class="ai-chat-msg-avatar">'+assistantBubbleAvatar+'</div>';
+d.innerHTML=avatarHtml+'<div class="ai-chat-msg-bubble"><p>'+md(esc(content))+'</p></div>';
 if(products&&products.length){
   var b=$('.ai-chat-msg-bubble',d);
   var isShowcase=PRODUCT_CARD_STYLE==='showcase';
