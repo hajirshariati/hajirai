@@ -1618,7 +1618,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // with "Yes —"; the customer's message wouldn't match a yes/no
   // shape. Pool stays untouched.
   if (pool.length > 0 && fullResponseText) {
-    if (isYesNoQuestion(ctx.latestUserMessage) && isYesNoAnswer(fullResponseText)) {
+    if (isYesNoQuestion(ctx.latestUserMessage) && isYesNoAnswer(fullResponseText, pool)) {
       console.log(
         `[chat] ${ctx.shop} yes/no-suppress: customer asked yes/no, AI answered yes/no — ` +
           `suppressing card pool of ${pool.length} (would have been noise under the text answer)`,

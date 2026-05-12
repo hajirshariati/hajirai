@@ -17,6 +17,7 @@ import { fileURLToPath } from "node:url";
 import { maybeRunOrthoticFlow } from "../app/lib/orthotic-flow-gate.server.js";
 import { resolveTree } from "../app/lib/decision-tree-resolver.server.js";
 import { classifyOrthoticTurn } from "../app/lib/orthotic-classifier.server.js";
+import { isYesNoAnswer, isYesNoQuestion } from "../app/lib/chat-postprocessing.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 
@@ -709,6 +710,56 @@ await test("16b — useCase=casual + metatarsalgia must stay in casual line (not
     r.product && r.product.useCase === "casual",
     `expected a SKU with useCase=casual. Got ${r.sku} (${r.title}) useCase=${r.product?.useCase || "?"}. ` +
       `Bug: specialty condition (metatarsalgia) silently discarded customer's explicit useCase choice.`,
+  );
+});
+
+// ──────────────────────────────────────────────────────────────
+// 17. Yes/No card suppression must NOT fire when the AI's reply
+//     names products that exist in the candidate pool. Production
+//     trace (2026-05-12 17:37:10): customer asked "Do you carry
+//     sale styles in other footwear categories like sneakers or
+//     loafers?" → AI replied "Yes! There are sale sneakers — the
+//     Leigh, Gianna, and Elise are all marked down..." → the
+//     yes/no-suppress rule discarded an 8-product pool because
+//     PRODUCT_PRESENTATION_RE doesn't match "there are" / named
+//     product mentions. Customer saw product names in text but
+//     zero clickable cards.
+// ──────────────────────────────────────────────────────────────
+await test("17 — isYesNoAnswer returns false when text names a product from the pool (cards must not be suppressed)", () => {
+  const text =
+    "Yes! There are sale sneakers on offer — the Leigh, Gianna, and Elise are all marked down with arch support and UltraSky™ cushioning. " +
+    "In loafers, the Collette Arch Support Loafer - Tan Suede is currently on sale as well.";
+  const pool = [
+    { title: "Leigh Arch Support Platform Sneaker - Beige", handle: "leigh-beige-lh100w" },
+    { title: "Gianna Arch Support Sneaker - White", handle: "gianna-white-gn200w" },
+    { title: "Elise Active Sneaker - Navy", handle: "elise-navy-el300w" },
+    { title: "Collette Arch Support Loafer - Tan Suede", handle: "collette-tan-cl400w" },
+  ];
+  assert.equal(
+    isYesNoQuestion("Do you carry sale styles in other footwear categories like sneakers or loafers?"),
+    true,
+    "customer's question must match yes/no shape (regression check)",
+  );
+  assert.equal(
+    isYesNoAnswer(text, pool),
+    false,
+    `text names products from pool — must NOT trigger card suppression. ` +
+      `Bug: PRODUCT_PRESENTATION_RE only catches openers like "here are…" / "take a look…", ` +
+      `missing "there are" + named-product mentions.`,
+  );
+});
+
+await test("17b — isYesNoAnswer still returns true for pure yes/no answer with NO product mention (existing behavior)", () => {
+  const text = "Yes, these orthotics work well in athletic shoes with removable insoles.";
+  const pool = [
+    { title: "Leigh Arch Support Platform Sneaker - Beige", handle: "leigh-beige-lh100w" },
+  ];
+  // The text mentions no product from the pool — suppression should
+  // still fire (this is the case the rule was originally added for).
+  assert.equal(
+    isYesNoAnswer(text, pool),
+    true,
+    "pure factual yes/no with no product name from pool should still suppress cards",
   );
 });
 

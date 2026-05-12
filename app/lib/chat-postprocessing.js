@@ -284,7 +284,59 @@ const YESNO_ANSWER_RE = /^\s*(?:yes|yeah|yep|yup|absolutely|definitely|correct|r
 // present products ("here are…", "take a look at…", "check out…"), the
 // customer's yes/no question was actually a request to see options.
 // Don't suppress cards in that case.
-const PRODUCT_PRESENTATION_RE = /\b(here(?:'s| is| are)|take a look|check (?:out|these)|i(?:'ve| have) (?:got|found|pulled)|let me show|below are|the following)\b/i;
+const PRODUCT_PRESENTATION_RE = /\b(here(?:'s| is| are)|there\s+(?:is|are)|take a look|check (?:out|these)|i(?:'ve| have) (?:got|found|pulled)|let me show|below are|the following|we\s+(?:have|carry))\b/i;
+
+// Generic tokens that appear in product titles but are not distinctive
+// product names. If a title's leading token is one of these, it's not
+// reliable as a "did the AI mention this product" signal.
+const GENERIC_TITLE_TOKENS = new Set([
+  "men", "mens", "men's", "women", "womens", "women's", "kids", "kid",
+  "unisex", "the", "a", "an",
+  "black", "white", "navy", "tan", "brown", "grey", "gray", "beige",
+  "red", "blue", "green", "pink", "cream", "ivory", "champagne", "sage",
+  "orthotic", "orthotics", "insole", "insoles", "shoe", "shoes",
+  "sneaker", "sneakers", "sandal", "sandals", "loafer", "loafers",
+  "boot", "boots", "clog", "clogs", "slipper", "slippers",
+]);
+
+function distinctiveTitleTokens(title) {
+  if (typeof title !== "string") return [];
+  // Take everything before the first " - " (color/variant suffix) and
+  // split on whitespace + non-alphanumeric. Keep tokens 3+ chars that
+  // aren't in GENERIC_TITLE_TOKENS.
+  const base = title.split(/\s+-\s+/)[0] || title;
+  return base
+    .toLowerCase()
+    .split(/[^a-z0-9®™]+/)
+    .filter((t) => t.length >= 3 && !GENERIC_TITLE_TOKENS.has(t));
+}
+
+/**
+ * Does the AI's reply text mention any product from the candidate pool
+ * by a distinctive name token? "Distinctive" excludes color words,
+ * gender words, and category nouns (sneaker, loafer, etc) that show
+ * up in every other title.
+ *
+ * This is the ground-truth signal that the AI is presenting products,
+ * independent of the opener phrase ("here are" vs "there are" vs
+ * "we have" vs no opener at all). If the AI named Leigh/Gianna/Elise,
+ * those cards must be shown — phrasing is irrelevant.
+ */
+function mentionsAnyPoolProduct(text, pool) {
+  if (typeof text !== "string" || !text || !Array.isArray(pool) || pool.length === 0) {
+    return false;
+  }
+  const lower = text.toLowerCase();
+  for (const p of pool) {
+    const tokens = distinctiveTitleTokens(p?.title);
+    for (const t of tokens) {
+      // Word-boundary match so "leigh" doesn't match "high".
+      const re = new RegExp(`\\b${t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i");
+      if (re.test(lower)) return true;
+    }
+  }
+  return false;
+}
 
 export function isYesNoQuestion(text) {
   if (typeof text !== "string") return false;
@@ -292,11 +344,16 @@ export function isYesNoQuestion(text) {
   return trimmed.length > 0 && trimmed.length < 200 && YESNO_QUESTION_RE.test(trimmed);
 }
 
-export function isYesNoAnswer(text) {
+export function isYesNoAnswer(text, pool = []) {
   if (typeof text !== "string" || !text) return false;
   if (!YESNO_ANSWER_RE.test(text)) return false;
-  // If the reply also signals "here are the products" — it's a product
-  // presentation, not a pure yes/no factual answer. Let the cards through.
+  // Pool-grounded check (primary signal). If the AI named any
+  // product from the pool, this is a product presentation regardless
+  // of opener phrasing. Cards must go through.
+  if (mentionsAnyPoolProduct(text, pool)) return false;
+  // Legacy opener-shape fallback for cases where pool is empty,
+  // titles share generic tokens, or text doesn't actually mention
+  // pool items but does use a "here are…" preamble.
   if (PRODUCT_PRESENTATION_RE.test(text)) return false;
   return true;
 }
