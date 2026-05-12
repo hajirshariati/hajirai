@@ -1594,42 +1594,6 @@ a.ai-chat-welcome__hint--link:hover {
   text-decoration: underline;
 }
 
-/* Customer-facing autocorrect toggle — looks like an inline text link
-   to keep the footer visually quiet. Aria-pressed drives an opacity
-   dim when the customer has turned it off. */
-.ai-chat-autocorrect-toggle {
-  background: transparent;
-  border: 0;
-  padding: 0;
-  margin: 0;
-  font: inherit;
-  color: inherit;
-  letter-spacing: inherit;
-  cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.ai-chat-autocorrect-toggle[aria-pressed="false"] {
-  opacity: 0.65;
-}
-
-.ai-chat-autocorrect-toggle:hover,
-.ai-chat-autocorrect-toggle:focus-visible {
-  opacity: 1;
-  outline: none;
-}
-
-/* Hide the customer toggle on devices with a precise pointer (desktop
-   with mouse) — silent autocorrect is iOS/Android only, and desktop
-   browsers expose spellcheck through the browser's own settings.
-   Showing the toggle there would just confuse customers. */
-@media (hover: hover) and (pointer: fine) {
-  .ai-chat-autocorrect-wrap {
-    display: none;
-  }
-}
-
 /* ---------- Overlay backdrop ---------- */
 .ai-chat-overlay {
   position: fixed;

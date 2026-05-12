@@ -101,21 +101,6 @@ var PRIVURL=C.privacyUrl||'/pages/privacy-policy';
 var LWIDTH=C.launcherWidth||'500';
 var CWIDTH=C.chatWidth||LWIDTH;
 var HIDE_MOBILE=C.hideOnMobile===true;
-/* Autocorrect/spellcheck on chat input.
-   Resolution order:
-     1. Customer's per-browser preference (localStorage), if set
-     2. Merchant default from theme block setting (C.inputAutocorrect)
-     3. true (best UX for mobile typo correction)
-   Customer toggle in the footer overrides the merchant default both
-   ways and persists across visits. */
-var AUTOCORRECT_K='hajirai_autocorrect';
-var INPUT_AUTOCORRECT;
-try{
-  var _stored=localStorage.getItem(AUTOCORRECT_K);
-  if(_stored==='1')INPUT_AUTOCORRECT=true;
-  else if(_stored==='0')INPUT_AUTOCORRECT=false;
-  else INPUT_AUTOCORRECT=C.inputAutocorrect!==false;
-}catch(e){INPUT_AUTOCORRECT=C.inputAutocorrect!==false}
 var SUPPORT_URL=C.supportUrl||'';
 var SUPPORT_LABEL=C.supportLabel||'Contact customer service';
 var CUST_LOGGED_IN=C.customerLoggedIn===true;
@@ -197,8 +182,8 @@ panel.innerHTML=
 '<div class="ai-chat-header">'+headerAv+'<div class="ai-chat-header__info"><div class="ai-chat-header__name">'+esc(NAME)+'</div></div><div class="ai-chat-header__actions">'+loginPillHtml+'<button class="ai-chat-header__btn ai-chat-menu-btn" aria-label="Menu" title="Options"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button><button class="ai-chat-header__btn ai-chat-close-btn" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div></div>'+
 '<div class="ai-chat-messages" role="log" aria-live="polite"></div>'+
 '<div class="ai-chat-typing"><div class="ai-chat-msg-avatar">'+assistantBubbleAvatar+'</div><div class="ai-chat-typing-dots"><span class="ai-chat-typing-dot"></span><span class="ai-chat-typing-dot"></span><span class="ai-chat-typing-dot"></span></div><span class="ai-chat-typing-text" aria-live="polite"></span></div>'+
-'<div class="ai-chat-input-area"><div class="ai-chat-input-wrap"><div class="ai-chat-input-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><textarea class="ai-chat-input" rows="1" placeholder="'+esc(IPLACE)+'" aria-label="Type your message" autocorrect="'+(INPUT_AUTOCORRECT?'on':'off')+'" autocapitalize="'+(INPUT_AUTOCORRECT?'sentences':'off')+'" spellcheck="'+(INPUT_AUTOCORRECT?'true':'false')+'"></textarea></div><button class="ai-chat-send" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></div>'+
-(DISCL?'<div class="ai-chat-footer">'+esc(DISCL)+' <a href="'+esc(PRIVURL)+'">Privacy Policy</a><span class="ai-chat-autocorrect-wrap"> · <button type="button" class="ai-chat-autocorrect-toggle" aria-pressed="'+(INPUT_AUTOCORRECT?'true':'false')+'" title="Toggle keyboard autocorrect & spellcheck">Autocorrect: <span class="ai-chat-autocorrect-state">'+(INPUT_AUTOCORRECT?'on':'off')+'</span></button></span></div>':'');
+'<div class="ai-chat-input-area"><div class="ai-chat-input-wrap"><div class="ai-chat-input-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><textarea class="ai-chat-input" rows="1" placeholder="'+esc(IPLACE)+'" aria-label="Type your message" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea></div><button class="ai-chat-send" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></div>'+
+(DISCL?'<div class="ai-chat-footer">'+esc(DISCL)+' <a href="'+esc(PRIVURL)+'">Privacy Policy</a></div>':'');
 
 /* Build overlay */
 var overlay=el('div','ai-chat-overlay');
@@ -1123,52 +1108,6 @@ inputEl.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){
 inputEl.addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'});
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&isOpen)toggle(false)});
 menuBtn.addEventListener('click',function(e){e.stopPropagation();menu.style.display=menu.style.display==='none'?'block':'none'});
-/* Customer-facing autocorrect toggle in the footer. Persists per
-   browser, swaps in a fresh textarea so the change actually takes
-   effect on mobile keyboards (iOS Safari/Chrome read the autocorrect/
-   autocapitalize/spellcheck attributes ONCE when the input is created
-   and ignore later setAttribute calls — preserving the original
-   keyboard session). Replacing the node forces a clean re-init while
-   restoring the in-progress message, focus, and selection. */
-function bindInputEvents(el){
-  el.addEventListener('keydown',function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}});
-  el.addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'});
-}
-function rebuildInputForAutocorrect(){
-  var oldEl=inputEl;
-  var wasFocused=document.activeElement===oldEl;
-  var ss=oldEl.selectionStart,se=oldEl.selectionEnd;
-  var newEl=document.createElement('textarea');
-  newEl.className=oldEl.className;
-  newEl.rows=oldEl.rows;
-  newEl.placeholder=oldEl.placeholder;
-  newEl.disabled=oldEl.disabled;
-  newEl.value=oldEl.value;
-  newEl.style.cssText=oldEl.style.cssText;
-  newEl.setAttribute('aria-label',oldEl.getAttribute('aria-label')||'Type your message');
-  newEl.setAttribute('autocorrect',INPUT_AUTOCORRECT?'on':'off');
-  newEl.setAttribute('autocapitalize',INPUT_AUTOCORRECT?'sentences':'off');
-  newEl.setAttribute('spellcheck',INPUT_AUTOCORRECT?'true':'false');
-  oldEl.parentNode.replaceChild(newEl,oldEl);
-  inputEl=newEl;
-  bindInputEvents(newEl);
-  if(wasFocused){
-    newEl.focus();
-    try{newEl.setSelectionRange(ss,se)}catch(err){}
-  }
-}
-var autocorrectBtn=$('.ai-chat-autocorrect-toggle',panel);
-if(autocorrectBtn){
-  autocorrectBtn.addEventListener('click',function(e){
-    e.preventDefault();
-    INPUT_AUTOCORRECT=!INPUT_AUTOCORRECT;
-    try{localStorage.setItem(AUTOCORRECT_K,INPUT_AUTOCORRECT?'1':'0')}catch(err){}
-    rebuildInputForAutocorrect();
-    autocorrectBtn.setAttribute('aria-pressed',INPUT_AUTOCORRECT?'true':'false');
-    var stateEl=$('.ai-chat-autocorrect-state',autocorrectBtn);
-    if(stateEl)stateEl.textContent=INPUT_AUTOCORRECT?'on':'off';
-  });
-}
 menu.addEventListener('click',function(e){var item=e.target.closest('[data-action]');if(!item)return;if(item.dataset.action==='clear')clearChat();menu.style.display='none'});
 document.addEventListener('click',function(){menu.style.display='none'});
 msgsEl.addEventListener('click',function(e){
