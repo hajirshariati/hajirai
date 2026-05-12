@@ -99,6 +99,19 @@ function isKidsGenderValue(v) {
   return KIDS_GENDER_VALUES.has(v.toLowerCase());
 }
 
+// Some merchants tag Kids products as Unisex in Shopify (because the
+// same SKU fits boys + girls). Treat a masterIndex row as Kids-eligible
+// if either gender=Kids OR gender=Unisex with a kid/child/youth title.
+function isKidsMasterIndexEntry(m) {
+  if (!m) return false;
+  if (isKidsGenderValue(m.gender)) return true;
+  if (typeof m.gender === "string" && m.gender.toLowerCase() === "unisex") {
+    const t = String(m.title || "").toLowerCase();
+    if (/\b(kid|kids|child|children|youth|boys?|girls?)\b/.test(t)) return true;
+  }
+  return false;
+}
+
 // Compute the set of useCase values that have at least one Kids
 // SKU in the resolver's masterIndex. Used to filter the q_use_case
 // chips when the customer has selected Kids — we only want to ask
@@ -110,7 +123,7 @@ function kidsAvailableUseCases(tree) {
   if (!Array.isArray(masterIndex)) return null;
   const out = new Set();
   for (const m of masterIndex) {
-    if (isKidsGenderValue(m?.gender) && typeof m?.useCase === "string") {
+    if (isKidsMasterIndexEntry(m) && typeof m?.useCase === "string") {
       out.add(m.useCase);
     }
   }
@@ -141,7 +154,7 @@ function availableConditionsForAnswers(tree, answers) {
   // "none" is always allowed as the catch-all.
   const out = new Set(["none"]);
   for (const m of masterIndex) {
-    if (!isKidsGenderValue(m?.gender)) continue;
+    if (!isKidsMasterIndexEntry(m)) continue;
     if (typeof m?.condition === "string" && m.condition) {
       out.add(m.condition);
     }
@@ -204,7 +217,7 @@ function renderQuestionText(node, answers, tree) {
   if (node.attribute === "gender") {
     const masterIndex = tree?.definition?.resolver?.masterIndex;
     if (Array.isArray(masterIndex)) {
-      const hasKidsItems = masterIndex.some((m) => isKidsGenderValue(m?.gender));
+      const hasKidsItems = masterIndex.some((m) => isKidsMasterIndexEntry(m));
       if (!hasKidsItems) {
         chips = chips.filter((c) => !isKidsGenderValue(c?.value) && !/^(kids?|boys?|girls?|child)\b/i.test(String(c?.label || "")));
       }
@@ -404,6 +417,29 @@ export async function maybeRunOrthoticFlow({
     delete accumulated.condition;
     delete accumulated.arch;
     delete accumulated.overpronation;
+  }
+
+  // Fresh arch claim invalidates stale overpronation. Without this,
+  // a customer who said "flat feet" earlier (which set overpronation=yes)
+  // and now starts a new question with "medium arch" ends up with both
+  // arch=Medium/High AND overpronation=yes — the posted=true derivation
+  // fires and the resolver picks a Flat/Low Arch product instead of
+  // the Medium/High one the customer just named. Same trap in reverse:
+  // a fresh overpronation claim should drop stale arch. The customer's
+  // newest statement wins for the arch/overpronation pair.
+  if (latestExtracted.arch && accumulated.overpronation && !latestExtracted.overpronation) {
+    console.log(
+      `[orthotic-flow] fresh-arch reset: customer stated arch=${latestExtracted.arch}; ` +
+        `dropping accumulated overpronation=${accumulated.overpronation}`,
+    );
+    delete accumulated.overpronation;
+  }
+  if (latestExtracted.overpronation && accumulated.arch && !latestExtracted.arch) {
+    console.log(
+      `[orthotic-flow] fresh-overpronation reset: customer stated overpronation=${latestExtracted.overpronation}; ` +
+        `dropping accumulated arch=${accumulated.arch}`,
+    );
+    delete accumulated.arch;
   }
 
   // Customer-correction veto. The customer just pushed back on a

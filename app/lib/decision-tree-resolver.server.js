@@ -39,18 +39,20 @@ function isKidsGender(g) {
   if (typeof g !== "string") return false;
   return KIDS_GENDERS.has(g.toLowerCase());
 }
-function genderMatch(candidateGender, askedGender) {
+function genderMatch(candidate, askedGender) {
+  const candidateGender = typeof candidate === "string" ? candidate : candidate?.gender;
   if (!askedGender) return true;
   if (candidateGender === askedGender) return true;
-  // Strict Kids: a Kids customer must ONLY get a Kids-tagged
-  // product. Unisex (which means "adult unisex" in this catalog)
-  // is NOT acceptable for a child. The gate hides the Kids chip
-  // from q_gender if the merchant's masterIndex has no Kids items,
-  // so in the golden path this strict guard never fires — but
-  // when it does (e.g. customer says "for my kid" in free text),
-  // returning null is correct: the bot tells them honestly we
-  // don't carry a kids product.
-  if (isKidsGender(askedGender)) return false;
+  if (isKidsGender(askedGender)) {
+    // Strict Kids: a Kids customer must only get a Kids-tagged product
+    // OR a Unisex SKU explicitly titled for kids (some merchants tag
+    // their kids line as Unisex because the same SKU fits boys+girls).
+    if (candidateGender === "Unisex" && typeof candidate === "object") {
+      const t = String(candidate?.title || "").toLowerCase();
+      if (/\b(kid|kids|child|children|youth|boys?|girls?)\b/.test(t)) return true;
+    }
+    return false;
+  }
   if (candidateGender === "Unisex") return true;
   return false;
 }
@@ -135,7 +137,7 @@ export function resolveTree(answers, resolver) {
 
   if (specialtyTest && !SHOE_CONTEXT_LOCKS.has(attrs.useCase)) {
     candidates = resolver.masterIndex.filter(
-      (m) => genderMatch(m.gender, attrs.gender) && specialtyTest(m),
+      (m) => genderMatch(m, attrs.gender) && specialtyTest(m),
     );
     if (candidates.length === 0) {
       // The customer named a specific clinical condition (e.g. heel
@@ -155,7 +157,7 @@ export function resolveTree(answers, resolver) {
     }
   } else {
     candidates = resolver.masterIndex.filter((m) => {
-      if (!genderMatch(m.gender, attrs.gender)) return false;
+      if (!genderMatch(m, attrs.gender)) return false;
       for (const k of HARD_FILTER_ATTRS) {
         if (attrs[k] !== undefined && attrs[k] !== null && attrs[k] !== "" && m[k] !== attrs[k]) {
           return false;
