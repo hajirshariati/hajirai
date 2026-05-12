@@ -267,7 +267,7 @@ export async function classifyOrthoticTurn({ messages, anthropic, shop }) {
           tool_choice: { type: "tool", name: "classify_turn" },
           messages: trimmed,
         }),
-      { label: "orthotic-classifier", maxRetries: 1 },
+      { label: "orthotic-classifier", maxRetries: 2 },
     );
 
     const toolUse = (resp?.content || []).find((b) => b?.type === "tool_use" && b?.name === "classify_turn");

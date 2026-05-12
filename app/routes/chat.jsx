@@ -780,7 +780,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         }
         return await stream.finalMessage();
       },
-      { label: "chat-stream", maxRetries: 2 },
+      { label: "chat-stream", maxRetries: 3 },
     );
     addUsage(totalUsage, final.usage || {});
     console.log(`[chat] hop=${hop} stop=${final.stop_reason} ms=${Date.now() - hopStart} textLen=${fullResponseText.length}`);

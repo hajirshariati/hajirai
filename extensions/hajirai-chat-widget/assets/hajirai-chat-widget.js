@@ -772,7 +772,13 @@ return s;
 
 function isCreditOrCriticalError(t){return /temporarily unavailable|credit balance|insufficient|billing/i.test(t||'')}
 function isRateLimitError(t){return /high traffic|rate limit|getting a lot of/i.test(t||'')}
-function retryRowHtml(){return '<div class="ai-chat-retry-row" style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><button class="ai-chat-retry-btn" data-retry="1" style="padding:8px 14px;border:1px solid currentColor;background:transparent;color:inherit;border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit">↻ Try again</button></div>'}
+function retryRowHtml(){
+var btn='<button class="ai-chat-retry-btn" data-retry="1" style="padding:8px 14px;border:1px solid currentColor;background:transparent;color:inherit;border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit">↻ Try again</button>';
+if(SUPPORT_URL){
+  btn+='<button class="ai-chat-retry-support-btn" data-dead-end="support" style="padding:8px 14px;border:1px solid currentColor;background:transparent;color:inherit;border-radius:8px;cursor:pointer;font-size:13px;font-family:inherit">'+esc(SUPPORT_LABEL)+'</button>';
+}
+return '<div class="ai-chat-retry-row" style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">'+btn+'</div>';
+}
 // Append either retry button or support escalation to an error bubble.
 // 3-strike rule: after 3 errors on the same chain, escalate to support.
 // Critical errors (credit/billing) escalate immediately — retry won't help.
