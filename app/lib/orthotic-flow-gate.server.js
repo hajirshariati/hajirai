@@ -450,16 +450,37 @@ export async function maybeRunOrthoticFlow({
   // arch=Medium/High AND overpronation=yes — the posted=true derivation
   // fires and the resolver picks a Flat/Low Arch product instead of
   // the Medium/High one the customer just named. Same trap in reverse:
-  // a fresh overpronation claim should drop stale arch. The customer's
-  // newest statement wins for the arch/overpronation pair.
-  if (latestExtracted.arch && accumulated.overpronation && !latestExtracted.overpronation) {
+  // a fresh overpronation claim should drop stale arch.
+  //
+  // Skip these resets when the latest message is a bare chip-shaped
+  // answer (≤ 20 chars matching a known chip token: "Yes" / "No" /
+  // "Not sure" / "Flat / Low" / "Medium" / "High" / "I don't know").
+  // A short chip answer to the immediately preceding q_overpronation
+  // question is NOT a topic pivot — it's the customer answering the
+  // current question. Without this guard the reset drops the arch
+  // the customer JUST picked, causing an infinite q_arch loop.
+  const trimmedUser = rawUserText.trim();
+  const isChipShapedReply =
+    trimmedUser.length <= 20 &&
+    /^(?:yes|no|not\s+sure|maybe|flat\s*\/?\s*low(?:\s+arch)?|medium(?:\s+arch)?|high(?:\s+arch)?|i\s+don'?t\s+know|i\s+dunno|unsure)\.?$/i.test(trimmedUser);
+  if (
+    !isChipShapedReply &&
+    latestExtracted.arch &&
+    accumulated.overpronation &&
+    !latestExtracted.overpronation
+  ) {
     console.log(
       `[orthotic-flow] fresh-arch reset: customer stated arch=${latestExtracted.arch}; ` +
         `dropping accumulated overpronation=${accumulated.overpronation}`,
     );
     delete accumulated.overpronation;
   }
-  if (latestExtracted.overpronation && accumulated.arch && !latestExtracted.arch) {
+  if (
+    !isChipShapedReply &&
+    latestExtracted.overpronation &&
+    accumulated.arch &&
+    !latestExtracted.arch
+  ) {
     console.log(
       `[orthotic-flow] fresh-overpronation reset: customer stated overpronation=${latestExtracted.overpronation}; ` +
         `dropping accumulated arch=${accumulated.arch}`,
