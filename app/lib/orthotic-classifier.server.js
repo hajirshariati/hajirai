@@ -289,28 +289,18 @@ export async function classifyOrthoticTurn({ messages, anthropic, shop }) {
     // even when the customer phrased it as a clinical condition only.
     if (!useCase && condition === "diabetic") useCase = "diabetic";
     if (!useCase && condition === "plantar_fasciitis") useCase = "comfort_bundle";
-    // Orthotic-only useCase values: when the model picks one of these
-    // it has to be an orthotic question, even if it also flagged
-    // isFootwearRequest=true. The footwear catalog has no SKU with
-    // these useCases — letting the footwear path win would silently
-    // ship dress shoes when the customer asked for an insole.
-    let isOrtho = Boolean(out.isOrthoticRequest);
-    let isFootwear = Boolean(out.isFootwearRequest);
-    const ORTHOTIC_ONLY_USECASES = new Set([
-      "dress_no_removable", "non_removable",
-      "comfort_walking_everyday", "comfort_memory_foam",
-      "comfort_memory_foam_everyday", "comfort_bundle",
-      "diabetic", "athletic_running", "athletic_training_gym",
-      "athletic_training_sports", "skates", "winter_boots",
-      "boots_construction",
-    ]);
-    if (useCase && ORTHOTIC_ONLY_USECASES.has(useCase) && isFootwear) {
-      isFootwear = false;
-      isOrtho = true;
-    }
+    // Note: we do NOT silently flip isFootwearRequest → false when
+    // useCase happens to be an "orthotic-only" value like
+    // dress_no_removable. That flip used to live here but bypassed
+    // the gate's footwear-path veto in conversation-aware scenarios
+    // (production 2026-05-12: customer in footwear flow said "heels",
+    // classifier extracted useCase=dress_no_removable, the silent
+    // flip put them in the orthotic chip funnel — wrong recommendation).
+    // Path-ambiguity is now handled by the gate, which has conversation
+    // history and can emit a transparent clarifying question instead.
     const result = {
-      isOrthoticRequest: isOrtho,
-      isFootwearRequest: isFootwear,
+      isOrthoticRequest: Boolean(out.isOrthoticRequest),
+      isFootwearRequest: Boolean(out.isFootwearRequest),
       isRejection: Boolean(out.isRejection),
       attributes: {
         gender: norm(attrs.gender),

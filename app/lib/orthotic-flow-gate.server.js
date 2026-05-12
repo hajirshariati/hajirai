@@ -620,6 +620,67 @@ export async function maybeRunOrthoticFlow({
 
   const answers = { ...accumulated, ...latestExtracted };
 
+  // Path-ambiguity disambig. When the customer earlier committed to
+  // FOOTWEAR (picked "Footwear with arch support" from the domain
+  // disambig, or said something like "find me sneakers") and the
+  // current turn's classifier extracted an ortho-shaped useCase
+  // (production trace 2026-05-12: customer said "heels" after
+  // committing to footwear → classifier extracted useCase=
+  // dress_no_removable → silent re-classification put them in the
+  // orthotic flow). Rather than silently switching paths or trying
+  // to override the classifier, ask the customer transparently:
+  // "Just to make sure — are you looking for [X] to wear, or an
+  // orthotic insole?" Their chip click definitively resolves it.
+  //
+  // Trigger: latest classifier output indicates orthotic intent
+  // (isOrtho or ortho-shaped useCase) AND prior assistant turn shows
+  // the customer answered the domain-disambig with "Footwear with
+  // arch support" (or similar footwear commitment) AND latest message
+  // doesn't explicitly contain an orthotic noun.
+  // Suppress: if THIS disambig has already been asked once.
+  const PATH_DISAMBIG_CHIP_RE_GATE = /<<\s*(?:Heels to wear|Just shoes|The shoes themselves|Orthotic insole for these)\s*>>/i;
+  const pathDisambigAlreadyAsked = Array.isArray(messages) &&
+    messages.slice(0, -1).some((m) =>
+      m && m.role === "assistant" && typeof m.content === "string" &&
+      PATH_DISAMBIG_CHIP_RE_GATE.test(m.content),
+    );
+  const ORTHOTIC_NOUN_RE_PATH = /\b(orthotics?|insoles?|inserts?|inner[- ]soles?|footbeds?|thinsoles?|heel[- ]cups?)\b/i;
+  const footwearCommittedInHistory = Array.isArray(messages) && messages.slice(0, -1).some((m) => {
+    if (!m || m.role !== "user" || typeof m.content !== "string") return false;
+    // Customer picked "Footwear with arch support" from the domain
+    // disambig chip — definitive commitment to footwear path.
+    if (/^\s*Footwear with arch support\.?\s*$/i.test(m.content)) return true;
+    // Or said something concrete like "find me sneakers".
+    return looksLikeFootwearCommit(m.content);
+  });
+  const classifierSaysOrthoNow = !!(classifiedIntent && classifiedIntent.isOrthoticRequest);
+  const latestHasOrthoticNoun = ORTHOTIC_NOUN_RE_PATH.test(rawUserText);
+  if (
+    !pathDisambigAlreadyAsked &&
+    footwearCommittedInHistory &&
+    classifierSaysOrthoNow &&
+    !latestHasOrthoticNoun
+  ) {
+    // Use the customer's most recent footwear-shaped noun if it's in
+    // their message; otherwise fall back to "the shoes you mentioned".
+    const FOOTWEAR_NOUN_FOR_LABEL = /\b(heels?|sneakers?|sandals?|boots?|loafers?|clogs?|wedges?|oxfords?|moccasins?|slippers?|trainers?|pumps?|mules?|mary[- ]janes?|slip[- ]ons?)\b/i;
+    const m = rawUserText.match(FOOTWEAR_NOUN_FOR_LABEL);
+    const noun = m ? m[1].toLowerCase() : "those";
+    const text =
+      `Just to make sure I get this right — are you looking for ${noun} ` +
+      `you can wear, or an orthotic insole to put in your ${noun}?\n\n` +
+      `<<The shoes themselves>><<Orthotic insole for these>>`;
+    controller.enqueue(encoder.encode(sseChunk({ type: "text", text })));
+    controller.enqueue(encoder.encode(sseChunk({ type: "products", products: [] })));
+    controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
+    console.log(
+      `[orthotic-flow] path-ambiguity disambig: customer committed to footwear earlier, ` +
+        `current turn extracted ortho-shaped useCase=${classifiedIntent?.attributes?.useCase || "?"}; ` +
+        `asking customer to clarify (transparent, customer-correctable)`,
+    );
+    return { handled: true };
+  }
+
   // Kids auto-fill for useCase. When gender=Kids, the seed's q_use_case
   // chips (Dress shoes, Cleats, Skates, etc.) almost never have a
   // Kids-tagged SKU behind them — the merchant's Kids orthotic line

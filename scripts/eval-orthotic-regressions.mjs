@@ -407,11 +407,19 @@ await test("10 — dress_no_removable + condition=plantar_fasciitis derivation o
   assert.equal(r.derived.useCase, "comfort_bundle", "derivation must override useCase to comfort_bundle");
 });
 
-await test("10b — classifier flips isFootwear=true → isOrtho=true when useCase is orthotic-only", async () => {
-  // Mock the Anthropic SDK so classifyOrthoticTurn returns a
-  // tool_use block we control. The classifier's post-processing
-  // should then flip isFootwear→isOrtho because dress_no_removable
-  // is in the ORTHOTIC_ONLY_USECASES set.
+await test("10b — classifier does NOT silently flip isFootwear → isOrtho (path-ambiguity now handled by gate transparently)", async () => {
+  // Earlier (pre-2026-05-12), the classifier post-process silently
+  // flipped isFootwear=true → isOrtho=true whenever it extracted a
+  // useCase from ORTHOTIC_ONLY_USECASES. That fix solved one bug
+  // (dress + PF → orthotic kit) but introduced another (customer
+  // mid-footwear-flow says "heels" → silently dragged into orthotic
+  // chip funnel). The classifier doesn't have conversation history,
+  // so it can't safely flip — the gate must decide based on context.
+  //
+  // New contract: classifier returns the LLM's flags verbatim
+  // (modulo the diabetic/PF useCase backfill from condition). The
+  // gate is responsible for path-ambiguity resolution via Test 18's
+  // transparent disambig question.
   const fakeAnthropic = {
     messages: {
       create: async () => ({
@@ -441,8 +449,8 @@ await test("10b — classifier flips isFootwear=true → isOrtho=true when useCa
     shop: "test.myshopify.com",
   });
   assert.ok(out, "classifier should return a result");
-  assert.equal(out.isOrthoticRequest, true, "classifier should flip ortho=true for orthotic-only useCase");
-  assert.equal(out.isFootwearRequest, false, "classifier should clear footwear=false");
+  assert.equal(out.isOrthoticRequest, false, "classifier must NOT silently flip — gate handles path-ambiguity");
+  assert.equal(out.isFootwearRequest, true, "classifier must preserve LLM's isFootwearRequest verbatim");
   assert.equal(out.attributes.useCase, "dress_no_removable");
 });
 
@@ -760,6 +768,82 @@ await test("17b — isYesNoAnswer still returns true for pure yes/no answer with
     isYesNoAnswer(text, pool),
     true,
     "pure factual yes/no with no product name from pool should still suppress cards",
+  );
+});
+
+// ──────────────────────────────────────────────────────────────
+// 18. Path-ambiguity disambig. Production trace 2026-05-12 18:02:
+//     customer answered the domain-disambig with "Footwear with
+//     arch support", then "Women's", then "heels". The classifier
+//     extracted useCase=dress_no_removable from "heels" + carried
+//     condition=foot_pain from earlier turns. The
+//     ORTHOTIC_ONLY_USECASES flip in the classifier post-process
+//     silently switched isFootwear=true → isOrtho=true, the gate's
+//     footwear-path veto didn't fire, and the orthotic flow took
+//     over → recommended L220W (Women's Conform Posted Orthotics)
+//     to a customer who explicitly asked for shoes.
+//
+//     Fix: instead of silently re-classifying, the gate should
+//     detect this path-ambiguity and emit a clarifying question
+//     ("Are you looking for heels to wear, or an orthotic insole
+//     to put in your heels?") with chips that let the customer
+//     definitively resolve the ambiguity in one click. Transparent
+//     UX, customer-correctable, no silent misclassification.
+// ──────────────────────────────────────────────────────────────
+await test("18 — customer in footwear path + ambiguous useCase emits path-ambiguity disambig (not silent re-classify)", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  const cap = captureLogs();
+  try {
+    await maybeRunOrthoticFlow({
+      messages: [
+        { role: "user", content: "I have foot pain, what should I wear?" },
+        { role: "assistant", content: "Got it — sounds like you're dealing with some foot discomfort. Are you looking for footwear with built-in arch support, or an orthotic insole that goes inside your existing shoes?\n\n<<Footwear with arch support>><<Orthotic insole>>" },
+        { role: "user", content: "Footwear with arch support" },
+        { role: "assistant", content: "Got it — let me help you find the right fit. Are you shopping for men's or women's?" },
+        { role: "user", content: "Women's" },
+        { role: "assistant", content: "What type of women's footwear are you looking for?" },
+        { role: "user", content: "heels" },
+      ],
+      tree: treeWithDerivations,
+      shop: null,
+      controller,
+      encoder,
+      classifiedIntent: {
+        // What the classifier would now return: ortho=true (after the
+        // silent flip) with useCase=dress_no_removable. Test asserts
+        // the gate DOESN'T blindly enter orthotic chip flow — it
+        // notices the path-ambiguity (footwear committed earlier +
+        // ortho-shaped useCase now) and asks a clarifying question.
+        isOrthoticRequest: true,
+        isFootwearRequest: false,
+        isRejection: false,
+        attributes: {
+          gender: "Women",
+          useCase: "dress_no_removable",
+          condition: "foot_pain",
+        },
+        confidence: "high",
+      },
+    });
+  } finally {
+    cap.restore();
+  }
+  // Either: gate emits a path-ambiguity disambig question (handled=true),
+  // OR: gate detects the conflict and falls through to LLM (handled=false)
+  // with a "path ambiguity" log line. Both are acceptable. What's NOT
+  // acceptable: gate emits q_arch / q_use_case / q_condition (the bug).
+  const flowLogs = cap.lines.filter((l) => l.includes("[orthotic-flow]"));
+  const emittedOrthoticQ = flowLogs.some((l) =>
+    /emitted seed question (q_arch|q_use_case|q_condition|q_overpronation)/.test(l),
+  );
+  assert.equal(
+    emittedOrthoticQ,
+    false,
+    `gate must NOT enter orthotic chip flow when customer is footwear-committed. ` +
+      `Bug from 2026-05-12 production: classifier flipped ortho=true on "heels" because ` +
+      `useCase=dress_no_removable is in ORTHOTIC_ONLY_USECASES, gate trusted the flipped flag, ` +
+      `customer ended up with an orthotic recommendation despite asking for footwear. ` +
+      `Flow logs: ${flowLogs.join(" | ")}`,
   );
 });
 
