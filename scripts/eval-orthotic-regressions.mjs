@@ -146,6 +146,7 @@ function resolveSku(answers, def = treeWithDerivations.definition) {
   return {
     sku: r.resolved?.masterSku || null,
     title: r.resolved?.title || null,
+    product: r.resolved || null,
     reason: r.reason,
     attrs: r.attrs,
     derived,
@@ -651,6 +652,53 @@ await test("15 — long-form fresh-overpronation claim still drops stale arch (c
   assert.ok(
     flowLogs.length > 0 || events.length > 0,
     `gate should have engaged on a clear orthotic-context free-text message. Logs: ${flowLogs.join(" | ")}`,
+  );
+});
+
+// ──────────────────────────────────────────────────────────────
+// 16 / 16b. Specialty condition must NOT silently override customer's
+//           explicit useCase choice. Production trace (2026-05-12
+//           14:00:33 and 14:14:51) showed the resolver discarding
+//           useCase=non_removable / useCase=comfort_walking_everyday
+//           when condition=metatarsalgia, returning an arbitrary
+//           metSupport=true SKU from a different useCase line.
+//           These tests are EXPECTED TO FAIL on current code — they
+//           lock in the bug so the fix gets verified before deploy.
+// ──────────────────────────────────────────────────────────────
+await test("16 — non_removable + metatarsalgia must stay in non_removable line (not jump to comfort_walking_everyday)", () => {
+  const r = resolveSku({
+    gender: "Women",
+    useCase: "non_removable",
+    condition: "metatarsalgia",
+    arch: "Medium / High Arch",
+    overpronation: "yes",
+  });
+  // L1805D is the Unisex Edge W/ Met Support (useCase=non_removable).
+  // L1820D is Unisex Edge Posted (useCase=non_removable, posted=true).
+  // The bug returned L1925W (useCase=comfort_walking_everyday).
+  // Acceptable resolutions: any SKU with useCase=non_removable.
+  assert.ok(
+    r.product && r.product.useCase === "non_removable",
+    `expected a SKU with useCase=non_removable. Got ${r.sku} (${r.title}) useCase=${r.product?.useCase || "?"}. ` +
+      `Bug: specialty condition (metatarsalgia → metSupport=true filter) ignored customer's explicit ` +
+      `useCase=non_removable and pulled a SKU from a different useCase line.`,
+  );
+});
+
+await test("16b — comfort_walking_everyday + metatarsalgia must stay in comfort_walking_everyday line (not jump to dress_no_removable)", () => {
+  const r = resolveSku({
+    gender: "Men",
+    useCase: "comfort_walking_everyday",
+    condition: "metatarsalgia",
+    arch: "Medium / High Arch",
+    overpronation: "no",
+  });
+  // L605M is Men's Casual Comfort W/ Met Support (useCase=comfort_walking_everyday).
+  // The bug returned L105M (useCase=dress_no_removable).
+  assert.ok(
+    r.product && r.product.useCase === "comfort_walking_everyday",
+    `expected a SKU with useCase=comfort_walking_everyday. Got ${r.sku} (${r.title}) useCase=${r.product?.useCase || "?"}. ` +
+      `Bug: specialty condition (metatarsalgia) silently discarded customer's explicit useCase choice.`,
   );
 });
 
