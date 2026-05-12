@@ -298,6 +298,31 @@ export async function maybeRunOrthoticFlow({
   const rawUserText = typeof last.content === "string" ? last.content : "";
   if (!rawUserText.trim()) return { handled: false };
 
+  // Product-info follow-up. The customer is asking about a SPECIFIC
+  // product already in the conversation ("does the X come in other
+  // colors", "is the Y available in size 9", "what's the price of Z").
+  // These look orthotic-shaped to the classifier when the product
+  // name contains "Orthotic" (e.g. Aetrex's "Fiji Orthotic Women's
+  // Flips" sandals) — keyword match wrongly routes the customer into
+  // the question flow. Bail out so the LLM handles the question with
+  // catalog context.
+  const PRODUCT_INFO_RE =
+    /\b(?:do|does|is|are|will|would|can|how|what|when|where|which|why)\b[^?]{0,80}?\b(?:come|comes|available|stock|stocked|sale|sized?|price|cost|color|colour|width|fit|fits|ship|shipping|return)\b/i;
+  if (PRODUCT_INFO_RE.test(rawUserText)) {
+    // Only bail when there's prior assistant context (otherwise this
+    // is a genuine fresh question, not a follow-up). Cheap check:
+    // any prior assistant turn with non-trivial text.
+    const hasPriorAssistant = messages.slice(0, -1).some(
+      (m) => m && m.role === "assistant" && typeof m.content === "string" && m.content.trim().length > 20,
+    );
+    if (hasPriorAssistant) {
+      console.log(
+        `[orthotic-flow] product-info follow-up detected; falling through to LLM (no orthotic question flow)`,
+      );
+      return { handled: false };
+    }
+  }
+
   // Unified gate: accumulate every Layer-1/2 answer signal across
   // the whole conversation, then walk the seed tree from root and
   // emit the next unanswered question. Replaces the old bootstrap-
