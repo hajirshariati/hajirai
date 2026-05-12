@@ -22,19 +22,19 @@
 // returned to the UI. The DB write happens only if every row passes.
 
 const ALLOWED_USE_CASES = new Set([
-  "dress",
   "dress_no_removable",
-  "dress_premium",
-  "casual",
+  "non_removable",
+  "comfort_walking_everyday",
+  "comfort_memory_foam",
+  "comfort_memory_foam_everyday",
+  "comfort_bundle",
+  "diabetic",
   "athletic_running",
-  "athletic_training",
-  "athletic_general",
-  "cleats",
+  "athletic_training_gym",
+  "athletic_training_sports",
   "skates",
   "winter_boots",
-  "work_all_day",
-  "comfort",
-  "kids",
+  "boots_construction",
 ]);
 
 const ALLOWED_GENDERS = new Set(["Men", "Women", "Kids", "Unisex"]);

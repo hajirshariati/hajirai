@@ -248,18 +248,20 @@ function guessUseCaseFor(value) {
   const v = String(value || "").toLowerCase().trim();
   if (!v) return null;
   if (/run/.test(v)) return "athletic_running";
-  if (/train|workout|gym/.test(v)) return "athletic_training";
-  if (/compete|active|sport/.test(v) && !/cleat/.test(v)) return "athletic_general";
-  if (/cleat|soccer|football|baseball|lacrosse/.test(v)) return "cleats";
+  if (/gym|train|workout|lift|crossfit/.test(v)) return "athletic_training_gym";
+  if (/compete|active|sport|tennis|basketball|court|pickle/.test(v)) return "athletic_training_sports";
+  if (/cleat|soccer|football|baseball|lacrosse|rugby/.test(v)) return "athletic_training_sports";
   if (/skate/.test(v)) return "skates";
-  if (/winter|boot/.test(v)) return "winter_boots";
-  if (/dress.*premium|heritage/.test(v)) return "dress_premium";
-  if (/dress.*no.?removable|fashion|heel|pump|flat/.test(v)) return "dress_no_removable";
-  if (/dress/.test(v)) return "dress";
-  if (/work/.test(v)) return "work";
-  if (/casual|everyday|walking|comfort|stand/.test(v)) return "comfort";
-  if (/kid|child|youth/.test(v)) return "kids";
-  return "comfort"; // safe default
+  if (/winter|shearling/.test(v) || /\bsnow.*boot/.test(v)) return "winter_boots";
+  if (/work|construction|warehouse|nursing|stand.*all.*day/.test(v)) return "boots_construction";
+  if (/non.?removable|fixed.?insole|\bedge\b/.test(v)) return "non_removable";
+  if (/dress|fashion|heel|pump|flats?\b/.test(v)) return "dress_no_removable";
+  if (/memory.?foam.*every|cush.*every|extreme.*comfort/.test(v)) return "comfort_memory_foam_everyday";
+  if (/memory.?foam|premium.*memory|extra.?cushion|plush/.test(v)) return "comfort_memory_foam";
+  if (/plantar.?fasc.*kit|pf.?kit|bundle/.test(v)) return "comfort_bundle";
+  if (/diabet|neuropath|conform/.test(v)) return "diabetic";
+  if (/casual|everyday|walking|comfort|kid|child|youth/.test(v)) return "comfort_walking_everyday";
+  return "comfort_walking_everyday"; // safe default
 }
 
 function guessConditionFor(value) {
@@ -310,7 +312,7 @@ if (discoverMode || !fs.existsSync(MAPPING_PATH)) {
 
   const mapping = {
     _help: "Edit any guess that's wrong. Set a value to null to ignore it. Re-run without --discover to generate the masterIndex.",
-    _activityHelp: "Map merchant's activity values to resolver useCase enum: comfort, casual, dress, dress_no_removable, dress_premium, athletic_running, athletic_training, athletic_general, cleats, skates, winter_boots, work, kids.",
+    _activityHelp: "Map merchant's activity values to resolver useCase enum: dress_no_removable, non_removable, comfort_walking_everyday, comfort_memory_foam, comfort_memory_foam_everyday, comfort_bundle, diabetic, athletic_running, athletic_training_gym, athletic_training_sports, skates, winter_boots, boots_construction.",
     _helpsWithHelp: "For each helps_with value, set condition (heel_spurs|mortons_neuroma|metatarsalgia|diabetic|plantar_fasciitis|overpronation_flat_feet|null) and the metSupport/posted flags it implies.",
     _specialtyHelp: "Title-based overrides for products that need explicit handling. Each entry: { titleContains: 'kit', condition: 'plantar_fasciitis' }",
     activity: activityMap,

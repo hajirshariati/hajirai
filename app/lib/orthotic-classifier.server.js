@@ -134,37 +134,39 @@ const CLASSIFIER_TOOL = {
           useCase: {
             type: ["string", "null"],
             enum: [
-              "dress",
               "dress_no_removable",
-              "dress_premium",
-              "casual",
+              "non_removable",
+              "comfort_walking_everyday",
+              "comfort_memory_foam",
+              "comfort_memory_foam_everyday",
+              "comfort_bundle",
+              "diabetic",
               "athletic_running",
-              "athletic_training",
-              "athletic_general",
-              "cleats",
+              "athletic_training_gym",
+              "athletic_training_sports",
               "skates",
               "winter_boots",
-              "work_all_day",
-              "comfort",
-              "kids",
+              "boots_construction",
               null,
             ],
             description:
               "Shoe context the orthotic will go in. " +
               "MAPPING RULES (use these exact enum values for the listed phrases): " +
-              "'soccer' / 'football' / 'baseball' / 'lacrosse' / 'rugby' / 'spike shoes' / 'cleats' → 'cleats'. " +
-              "'hockey' / 'ice skates' / 'skates' → 'skates'. " +
+              "'dress shoes' / 'heels' / 'fashion shoes' / 'pumps' / 'flats' → 'dress_no_removable'. " +
+              "'non-removable insole' / 'fixed insole' / 'inside the shoe' / 'shoe with built-in insole' → 'non_removable'. " +
+              "'casual' / 'everyday' / 'walking' / 'day to day' / 'standing around' → 'comfort_walking_everyday'. " +
+              "'memory foam' / 'extra cushion' / 'soft insole' / 'plush' (no 'everyday' qualifier) → 'comfort_memory_foam'. " +
+              "'memory foam for everyday' / 'cushioned daily wear' → 'comfort_memory_foam_everyday'. " +
+              "'plantar fasciitis kit' / 'PF kit' / 'plantar fasciitis bundle' → 'comfort_bundle'. " +
+              "'diabetic' / 'diabetes' / 'neuropathy' / 'diabetic-friendly' → 'diabetic'. " +
               "'running' / 'jog' / 'jogging' / 'marathon' / '5k' / '10k' → 'athletic_running'. " +
-              "'gym' / 'training' / 'crossfit' / 'weights' / 'lifting' → 'athletic_training'. " +
-              "'tennis' / 'basketball' / 'court shoes' / 'pickleball' / generic 'athletic' → 'athletic_general'. " +
-              "'work boots' / 'standing all day' / 'on my feet all day' / 'warehouse' / 'nursing' → 'work_all_day'. " +
-              "'winter boots' / 'snow boots' / 'cold weather boots' → 'winter_boots'. " +
-              "'dress shoes' (no other detail) → 'dress'. " +
-              "'dress shoes without removable insole' / 'slim dress shoes' → 'dress_no_removable'. " +
-              "'premium dress' / 'leather dress shoes' → 'dress_premium'. " +
-              "'casual' / 'everyday' / 'walking around' / 'day to day' → 'casual'. " +
-              "'comfort' / 'just want comfort' / 'general support' / 'no specific' → 'comfort'. " +
-              "Any kid orthotic request (gender=Kids) → 'kids'. " +
+              "'gym' / 'training' / 'crossfit' / 'weights' / 'lifting' / 'exercise' → 'athletic_training_gym'. " +
+              "'tennis' / 'basketball' / 'court shoes' / 'pickleball' / 'sports' / generic 'athletic' / 'active lifestyle' → 'athletic_training_sports'. " +
+              "'soccer' / 'football' / 'baseball' / 'lacrosse' / 'rugby' / 'spike shoes' / 'cleats' → 'athletic_training_sports'. " +
+              "'hockey' / 'ice skates' / 'skates' → 'skates'. " +
+              "'winter boots' / 'snow boots' / 'cold weather boots' / 'shearling' → 'winter_boots'. " +
+              "'work boots' / 'construction' / 'standing all day' / 'on my feet all day' / 'warehouse' / 'nursing' → 'boots_construction'. " +
+              "If the customer is a Kid: pick the closest match (usually 'comfort_walking_everyday'). " +
               "null if no shoe-context is stated.",
           },
           condition: {
@@ -279,14 +281,22 @@ export async function classifyOrthoticTurn({ messages, anthropic, shop }) {
     // "null" for null fields when the JSON schema accepts both.
     const attrs = out.attributes || {};
     const norm = (v) => (v === "null" || v === "" ? null : v);
+    let useCase = norm(attrs.useCase);
+    const condition = norm(attrs.condition);
+    // The masterIndex CSV format only carries useCase, not condition.
+    // For products whose category IS the condition (diabetic line, PF
+    // kit), backfill useCase from condition so the resolver finds them
+    // even when the customer phrased it as a clinical condition only.
+    if (!useCase && condition === "diabetic") useCase = "diabetic";
+    if (!useCase && condition === "plantar_fasciitis") useCase = "comfort_bundle";
     const result = {
       isOrthoticRequest: Boolean(out.isOrthoticRequest),
       isFootwearRequest: Boolean(out.isFootwearRequest),
       isRejection: Boolean(out.isRejection),
       attributes: {
         gender: norm(attrs.gender),
-        useCase: norm(attrs.useCase),
-        condition: norm(attrs.condition),
+        useCase,
+        condition,
       },
       confidence: out.confidence || "medium",
     };
