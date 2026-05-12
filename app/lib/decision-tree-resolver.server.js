@@ -136,18 +136,34 @@ export function resolveTree(answers, resolver) {
     attrs.condition && attrs.condition !== "none" ? CONDITION_TARGETS[attrs.condition] : null;
 
   if (specialtyTest && !SHOE_CONTEXT_LOCKS.has(attrs.useCase)) {
-    candidates = resolver.masterIndex.filter(
-      (m) => genderMatch(m, attrs.gender) && specialtyTest(m),
-    );
+    // Two-stage filter. The permissive specialty filters
+    // (metatarsalgia / mortons_neuroma → any metSupport=true SKU)
+    // used to silently discard customer's explicit useCase. Production
+    // trace 2026-05-12: customer picked useCase=non_removable +
+    // condition=metatarsalgia and got L1925W (useCase=comfort_walking_
+    // everyday) because that was the lex-smallest metSupport SKU.
+    //
+    // Stage 1: require useCase match AND specialty. Honors the
+    // customer's chip choice.
+    // Stage 2: if zero matches, fall back to specialty without useCase.
+    // This preserves backward compatibility for the merchant's
+    // condition-specific lines (e.g. PF kits — useCase=comfort_bundle
+    // — match in Stage 1 because of the condition→useCase derivation).
+    // Stage 3: if still zero, bail with missingSpecialty so the caller
+    // can tell the customer truthfully (do NOT silently broaden again).
+    if (attrs.useCase) {
+      candidates = resolver.masterIndex.filter(
+        (m) => genderMatch(m, attrs.gender) && m.useCase === attrs.useCase && specialtyTest(m),
+      );
+    } else {
+      candidates = [];
+    }
     if (candidates.length === 0) {
-      // The customer named a specific clinical condition (e.g. heel
-      // spurs) but no specialty SKU exists for that condition+gender
-      // in this shop's catalog (might be missing from the merchant's
-      // recommender data, or not yet synced from Shopify). Returning
-      // a generic comfort SKU here is misleading — the AI's text
-      // would say "for heel spurs" but the card would show a
-      // diabetic / generic comfort orthotic. Bail out with a clear
-      // reason so the caller can tell the customer truthfully.
+      candidates = resolver.masterIndex.filter(
+        (m) => genderMatch(m, attrs.gender) && specialtyTest(m),
+      );
+    }
+    if (candidates.length === 0) {
       return {
         resolved: null,
         reason: `no SKU available for condition=${attrs.condition} and gender=${attrs.gender || "any"}`,

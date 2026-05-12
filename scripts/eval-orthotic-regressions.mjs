@@ -665,39 +665,49 @@ await test("15 — long-form fresh-overpronation claim still drops stale arch (c
 //           These tests are EXPECTED TO FAIL on current code — they
 //           lock in the bug so the fix gets verified before deploy.
 // ──────────────────────────────────────────────────────────────
-await test("16 — non_removable + metatarsalgia must stay in non_removable line (not jump to comfort_walking_everyday)", () => {
+// Tests 16 and 16b use the seed's useCase vocabulary (athletic_general,
+// casual) — not production's (comfort_walking_everyday, non_removable).
+// The bug being tested is structural: the resolver's specialty-condition
+// filter (metatarsalgia → metSupport=true) used to silently override the
+// customer's explicit useCase choice. The seed's vocab is sufficient to
+// reproduce the bug — what matters is that the resolved SKU's useCase
+// matches the customer's input useCase, not which specific value is used.
+await test("16 — useCase=athletic_general + metatarsalgia must stay in athletic_general line (not jump to dress_premium)", () => {
   const r = resolveSku({
     gender: "Women",
-    useCase: "non_removable",
-    condition: "metatarsalgia",
-    arch: "Medium / High Arch",
-    overpronation: "yes",
-  });
-  // L1805D is the Unisex Edge W/ Met Support (useCase=non_removable).
-  // L1820D is Unisex Edge Posted (useCase=non_removable, posted=true).
-  // The bug returned L1925W (useCase=comfort_walking_everyday).
-  // Acceptable resolutions: any SKU with useCase=non_removable.
-  assert.ok(
-    r.product && r.product.useCase === "non_removable",
-    `expected a SKU with useCase=non_removable. Got ${r.sku} (${r.title}) useCase=${r.product?.useCase || "?"}. ` +
-      `Bug: specialty condition (metatarsalgia → metSupport=true filter) ignored customer's explicit ` +
-      `useCase=non_removable and pulled a SKU from a different useCase line.`,
-  );
-});
-
-await test("16b — comfort_walking_everyday + metatarsalgia must stay in comfort_walking_everyday line (not jump to dress_no_removable)", () => {
-  const r = resolveSku({
-    gender: "Men",
-    useCase: "comfort_walking_everyday",
+    useCase: "athletic_general",
     condition: "metatarsalgia",
     arch: "Medium / High Arch",
     overpronation: "no",
   });
-  // L605M is Men's Casual Comfort W/ Met Support (useCase=comfort_walking_everyday).
-  // The bug returned L105M (useCase=dress_no_removable).
+  // L1905W is Women's Active Orthotics W/ Metatarsal Support
+  // (useCase=athletic_general, metSupport=true, Medium / High Arch).
+  // The bug returned L1525W (Women's Heritage Posted W/ Met Support,
+  // useCase=dress_premium) because the specialty filter accepted
+  // ANY metSupport=true SKU regardless of useCase.
   assert.ok(
-    r.product && r.product.useCase === "comfort_walking_everyday",
-    `expected a SKU with useCase=comfort_walking_everyday. Got ${r.sku} (${r.title}) useCase=${r.product?.useCase || "?"}. ` +
+    r.product && r.product.useCase === "athletic_general",
+    `expected a SKU with useCase=athletic_general. Got ${r.sku} (${r.title}) useCase=${r.product?.useCase || "?"}. ` +
+      `Bug: specialty condition (metatarsalgia → metSupport=true filter) ignored customer's explicit ` +
+      `useCase choice and pulled a SKU from a different useCase line.`,
+  );
+});
+
+await test("16b — useCase=casual + metatarsalgia must stay in casual line (not jump to dress)", () => {
+  const r = resolveSku({
+    gender: "Men",
+    useCase: "casual",
+    condition: "metatarsalgia",
+    arch: "Medium / High Arch",
+    overpronation: "no",
+  });
+  // L605M is Men's Casual Comfort Orthotics W/ Metatarsal Support
+  // (useCase=casual, metSupport=true). The bug returned L105M
+  // (Men's In-Style W/ Met Support, useCase=dress) because the
+  // specialty filter accepted any metSupport=true SKU.
+  assert.ok(
+    r.product && r.product.useCase === "casual",
+    `expected a SKU with useCase=casual. Got ${r.sku} (${r.title}) useCase=${r.product?.useCase || "?"}. ` +
       `Bug: specialty condition (metatarsalgia) silently discarded customer's explicit useCase choice.`,
   );
 });
