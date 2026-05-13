@@ -255,6 +255,83 @@ const REASONING_LEAK_RE = new RegExp(
   "gi",
 );
 
+// Filler intensifier strip. The LLM sometimes drops mid-sentence
+// hedges like "Honestly," / "Frankly," / "Truthfully," that read as
+// awkward asides in a customer-facing reply ("For more rugged terrain,
+// Honestly, our boots are more lifestyle..."). Strip them but keep
+// the surrounding sentence intact. Merchant trace 2026-05-13 12:12:40.
+const FILLER_INTENSIFIER_RE =
+  /(?<=^|[\s,;:—–-])(?:Honestly|Frankly|Truthfully|Quite honestly|To be honest|In all honesty)\s*,\s*/gi;
+
+export function stripFillerIntensifiers(text) {
+  if (!text) return text;
+  return text.replace(FILLER_INTENSIFIER_RE, "").replace(/\s{2,}/g, " ").trim();
+}
+
+// Capability-check detector. When the customer asks about prior
+// products with phrasings like "are they good for X?", "do they work
+// for Y?", "can they handle Z?", they're asking about the PREVIOUS
+// turn's cards — not making a new shopping request. The bot should
+// answer textually without re-searching and showing different cards
+// (merchant trace 2026-05-13 12:12:35: customer asked "are they good
+// for mountain climbing?" referring to prior sneakers; bot answered
+// correctly in text but ALSO searched for boots and showed 6 boot
+// cards underneath — text-card mismatch).
+const CAPABILITY_CHECK_RE =
+  /^\s*(?:are\s+(?:they|these|those|it|this)|is\s+(?:it|this|that)|do\s+(?:they|these|those)|does\s+(?:it|this|that)|can\s+(?:they|these|those|it|this)|will\s+(?:they|these|those|it|this)|would\s+(?:they|these|those|it|this)|how\s+(?:do|does|are|is)\s+(?:they|these|those|it|this))\b/i;
+
+export function isCapabilityCheckAboutPriorProducts(text) {
+  if (!text || typeof text !== "string") return false;
+  return CAPABILITY_CHECK_RE.test(text);
+}
+
+// Inline-list formatter. The LLM sometimes packs a multi-item list
+// into a single run-on paragraph using ` - **Label** — ` separators,
+// which the widget renders as one wall of text instead of a bulleted
+// list. Detect the pattern (≥2 inline `- **Label** —` markers in
+// the same response) and rewrite with newlines so the widget can
+// render proper line breaks. Merchant trace 2026-05-13 12:12:48
+// ("tell me more about aetrex" → 1061-char wall).
+const INLINE_LIST_ITEM_RE = /\s+-\s+(\*\*[^*]{2,40}\*\*)\s+[—–-]\s+/g;
+
+export function reflowInlineList(text) {
+  if (!text) return text;
+  // Count how many inline list markers exist. We only reflow when
+  // there are 2+, otherwise a single mid-sentence " - **X** — " is
+  // probably not a list intent.
+  const matches = text.match(INLINE_LIST_ITEM_RE);
+  if (!matches || matches.length < 2) return text;
+  // Insert a newline before each list marker. The widget's markdown
+  // renderer turns `\n- **X** — ...` into a proper bullet line.
+  return text.replace(INLINE_LIST_ITEM_RE, (_m, label) => `\n- ${label} — `).trim();
+}
+
+// Word-boundary truncation. The previous cap could chop mid-word
+// ("casual-wea..." in production trace 2026-05-13 12:12:40). Given
+// the desired soft maximum (e.g., 300 chars), walk back to the
+// nearest sentence-end OR word boundary so the truncated text reads
+// cleanly. Adds an ellipsis only when the cut is mid-thought
+// (no sentence-end found nearby).
+export function truncateAtWordBoundary(text, softCap, lookAhead = 400) {
+  if (!text || text.length <= softCap) return text;
+  // First, look for a sentence-end at or shortly after the cap.
+  const tail = text.slice(softCap, softCap + lookAhead);
+  const sentenceEndRel = tail.search(/[.!?](\s|$)/);
+  if (sentenceEndRel >= 0) {
+    return text.slice(0, softCap + sentenceEndRel + 1).trim();
+  }
+  // No sentence-end nearby. Walk BACK from softCap to the last
+  // space — never split a word in the middle.
+  const head = text.slice(0, softCap);
+  const lastSpace = head.lastIndexOf(" ");
+  if (lastSpace > softCap * 0.6) {
+    return head.slice(0, lastSpace).trim() + "…";
+  }
+  // Fallback: cut at softCap (only when no good word boundary exists,
+  // e.g., text is one huge word — vanishingly rare).
+  return head.trim() + "…";
+}
+
 // When the AI ends a turn without searching but its response implies
 // "we don't have X", that's almost always wrong (the AI hallucinated
 // unavailability from training data). Detect the pattern; the caller

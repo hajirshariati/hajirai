@@ -18,7 +18,15 @@ import { maybeRunOrthoticFlow } from "../app/lib/orthotic-flow-gate.server.js";
 import { resolveTree } from "../app/lib/decision-tree-resolver.server.js";
 import { classifyOrthoticTurn } from "../app/lib/orthotic-classifier.server.js";
 import { isYesNoAnswer, isYesNoQuestion } from "../app/lib/chat-postprocessing.js";
-import { containsAvailabilityDenial, dedupeConsecutiveSentences, stripLineupPromiseSentences } from "../app/lib/chat-helpers.server.js";
+import {
+  containsAvailabilityDenial,
+  dedupeConsecutiveSentences,
+  stripLineupPromiseSentences,
+  stripFillerIntensifiers,
+  isCapabilityCheckAboutPriorProducts,
+  reflowInlineList,
+  truncateAtWordBoundary,
+} from "../app/lib/chat-helpers.server.js";
 import { relaxCategoryOnNamedProduct } from "../app/lib/chat-tool-rewrite.server.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -1117,6 +1125,107 @@ await test("22d — bails if strip would leave nearly nothing", () => {
   const text = "Here's the lineup. They come in three variants.";
   const out = stripLineupPromiseSentences(text);
   assert.equal(out, text, "guard: when strip removes ~all text, return original to avoid empty response");
+});
+
+// ──────────────────────────────────────────────────────────────
+// 23. Capability-check + truncation + filler-strip + inline-list
+//     reflow. Four bugs from the mountain-climbing screenshot
+//     (production trace 2026-05-13 12:12:35 + 12:12:48).
+// ──────────────────────────────────────────────────────────────
+await test("23a — 'are they good for mountain climbing?' is detected as capability check", () => {
+  assert.equal(isCapabilityCheckAboutPriorProducts("are they good for mountain climbing?"), true);
+  assert.equal(isCapabilityCheckAboutPriorProducts("are these good for hiking?"), true);
+  assert.equal(isCapabilityCheckAboutPriorProducts("do they work for plantar fasciitis?"), true);
+  assert.equal(isCapabilityCheckAboutPriorProducts("can these handle wet weather?"), true);
+  assert.equal(isCapabilityCheckAboutPriorProducts("how do they fit?"), true);
+  assert.equal(isCapabilityCheckAboutPriorProducts("will it last on rough terrain?"), true);
+});
+
+await test("23b — capability-check detector does NOT match new shopping requests", () => {
+  assert.equal(isCapabilityCheckAboutPriorProducts("show me boots"), false);
+  assert.equal(isCapabilityCheckAboutPriorProducts("I need sneakers for hiking"), false);
+  assert.equal(isCapabilityCheckAboutPriorProducts("what about sandals"), false);
+  assert.equal(isCapabilityCheckAboutPriorProducts(""), false);
+});
+
+await test("23c — truncateAtWordBoundary never cuts mid-word (screenshot bug)", () => {
+  // Production text that ended "...casual-wea..." because cap chopped
+  // mid-word. With the new helper, the cut must land at a word boundary.
+  const text =
+    "These are athletic sneakers with arch support — great for light hiking and " +
+    "walking trails, but they're not technical mountain-climbing boots which " +
+    "typically need stiff soles, ankle protection, and crampon compatibility. " +
+    "For more rugged terrain, our boots are more lifestyle and casual-wear " +
+    "than serious technical hiking gear, so they wouldn't be my first pick.";
+  const out = truncateAtWordBoundary(text, 300, 400);
+  assert.ok(out.length <= text.length, "must not lengthen the text");
+  // The last character before any ellipsis should be punctuation or letter
+  // (no mid-word cut). A mid-word cut would leave a partial token like
+  // "casual-wea" with nothing after it.
+  const trimmed = out.replace(/…$/, "").trim();
+  // Last word must appear in the original (i.e., not a partial slice).
+  const lastWord = trimmed.split(/\s+/).pop();
+  if (lastWord) {
+    // Strip trailing punctuation for the comparison.
+    const cleanLast = lastWord.replace(/[.,;:!?'")]+$/, "");
+    assert.ok(
+      text.includes(cleanLast),
+      `last word "${cleanLast}" must exist whole in the original. Got truncated: "${out}"`,
+    );
+  }
+});
+
+await test("23d — truncateAtWordBoundary returns text unchanged when under cap", () => {
+  const text = "Short text under the cap.";
+  assert.equal(truncateAtWordBoundary(text, 300, 400), text);
+});
+
+await test("23e — stripFillerIntensifiers removes 'Honestly,' / 'Frankly,' inline asides", () => {
+  // Screenshot bug: "For more rugged terrain, Honestly, our boots are..."
+  const text = "For more rugged terrain, Honestly, our boots are more lifestyle.";
+  const out = stripFillerIntensifiers(text);
+  assert.ok(!/Honestly,/i.test(out), `'Honestly,' must be removed. Got: "${out}"`);
+  assert.ok(/rugged terrain/.test(out), "surrounding text preserved");
+  assert.ok(/our boots/.test(out), "surrounding text preserved");
+
+  // Other intensifiers
+  assert.ok(!/Frankly,/i.test(stripFillerIntensifiers("Frankly, this is fine.")));
+  assert.ok(!/To be honest,/i.test(stripFillerIntensifiers("To be honest, it's great.")));
+});
+
+await test("23f — stripFillerIntensifiers does NOT strip 'honestly' inside a normal word/phrase", () => {
+  // "Honestly" as the START of a normal sentence followed by content
+  // (no comma after it acting as an aside) — leave it. We only target
+  // the parenthetical "Honestly," shape.
+  const out = stripFillerIntensifiers("I cannot honestly say that.");
+  assert.equal(out, "I cannot honestly say that.", "non-aside usage preserved");
+});
+
+await test("23g — reflowInlineList converts ` - **Label** — ...` packed lists into newline bullets", () => {
+  // Screenshot bug 2026-05-13 12:12:48: "tell me more about aetrex" →
+  // bot returned a single paragraph with ` - **Mission** — ... - **HQ** — ...`
+  // Widget rendered it as wall of text.
+  const text =
+    "Aetrex is a premium brand — here are the highlights: " +
+    "- **Mission** — comfort first. " +
+    "- **Headquarters** — Teaneck. " +
+    "- **Tech** — foot scanning since 2002.";
+  const out = reflowInlineList(text);
+  const newlines = (out.match(/\n/g) || []).length;
+  assert.ok(
+    newlines >= 3,
+    `expected ≥3 newlines (one per bullet); got ${newlines}. Output: "${out}"`,
+  );
+  assert.ok(/Mission/.test(out), "Mission preserved");
+  assert.ok(/Headquarters/.test(out), "Headquarters preserved");
+  assert.ok(/Tech/.test(out), "Tech preserved");
+});
+
+await test("23h — reflowInlineList leaves single-mention text untouched", () => {
+  // Only one ` - **Label** — ` in the text → not a list, don't reflow.
+  const text = "We offer the Vania - **Premium** — a comfortable platform sandal.";
+  const out = reflowInlineList(text);
+  assert.equal(out, text, "single inline marker is not a list — don't reflow");
 });
 
 // ──────────────────────────────────────────────────────────────

@@ -24,6 +24,10 @@ import {
   detectConditionOrOccasion,
   containsAvailabilityDenial,
   stripLineupPromiseSentences,
+  stripFillerIntensifiers,
+  isCapabilityCheckAboutPriorProducts,
+  reflowInlineList,
+  truncateAtWordBoundary,
 } from "../lib/chat-helpers.server";
 import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL, FIT_PREDICTOR_TOOL, detectLatestGender } from "../lib/chat-tools.server";
 import { rewriteToolCall } from "../lib/chat-tool-rewrite.server";
@@ -1223,6 +1227,34 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }
   }
 
+  // Strip mid-sentence filler intensifiers ("Honestly,", "Frankly,").
+  // Production trace 2026-05-13 12:12:40: "For more rugged terrain,
+  // Honestly, our boots are more lifestyle..." — the "Honestly,"
+  // reads as a weird internal aside in a customer-facing reply.
+  if (fullResponseText) {
+    const before = fullResponseText;
+    const stripped = stripFillerIntensifiers(fullResponseText);
+    if (stripped !== before) {
+      console.log(`[chat] stripped filler intensifier`);
+      fullResponseText = stripped;
+    }
+  }
+
+  // Reflow inline ` - **Label** — text` lists into proper newline-
+  // separated bullets. Production trace 2026-05-13 12:12:48: "tell
+  // me more about aetrex" → bot returned 1061 chars all in one
+  // paragraph with " - **Mission** — ... - **Headquarters** — ..."
+  // inline. The widget renders it as a wall of text. With newlines,
+  // the markdown renderer turns each "- **X** — ..." into a bullet.
+  if (fullResponseText) {
+    const before = fullResponseText;
+    const reflowed = reflowInlineList(fullResponseText);
+    if (reflowed !== before) {
+      console.log(`[chat] reflowed inline list into bullets`);
+      fullResponseText = reflowed;
+    }
+  }
+
   // Hard cap on response length when product cards will render. The
   // prompt has a "ONE SENTENCE when showing products" rule but the AI
   // ignores it on long customer messages. Code-level enforcement: if
@@ -1250,14 +1282,10 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // "Top picks: - **Danika Arch Support Sneaker - N…" when the AI ignored
     // the no-inline-list rule. The product cards render below; the text only
     // needs the lead-in sentence.
-    const tail = fullResponseText.slice(PRODUCT_REPLY_HARD_CAP, PRODUCT_REPLY_HARD_CAP + 200);
-    const relativeEnd = tail.search(/[.!?](\s|$)/);
-    let truncated;
-    if (relativeEnd >= 0) {
-      truncated = fullResponseText.slice(0, PRODUCT_REPLY_HARD_CAP + relativeEnd + 1).trim();
-    } else {
-      truncated = fullResponseText.slice(0, PRODUCT_REPLY_HARD_CAP).trim() + "…";
-    }
+    // truncateAtWordBoundary looks ahead 400 chars for a sentence-end;
+    // if none found, walks back to the last word boundary instead of
+    // chopping mid-word. Fixes 2026-05-13 12:12:40 "casual-wea..." bug.
+    let truncated = truncateAtWordBoundary(fullResponseText, PRODUCT_REPLY_HARD_CAP, 400);
     // Cut any inline markdown product list that started before the cap —
     // the cards render those names below, and a half-list reads as broken.
     // Detect the first list marker (`- `, `* `, `1. `, `**Name`) and trim
@@ -1623,6 +1651,39 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }
   }
 
+  // Product-noun detector used by both capability-check and policy-
+  // question suppress blocks below. Keep these synced.
+  const PRODUCT_NOUN_IN_USER_RE = /\b(?:sandals?|sneakers?|heels?|wedges?|boots?|loafers?|oxfords?|clogs?|slippers?|mary[- ]?janes?|slip[- ]?ons?|footwear|shoes?|orthotics?|insoles?|inserts?|footbeds?)\b/i;
+
+  // Capability-check suppress (merchant trace 2026-05-13 12:12:35):
+  // Customer asked "are they good for mountain climbing?" about the
+  // sneakers shown on the prior turn. Bot's text correctly explained
+  // "These are athletic sneakers... not technical mountain-climbing
+  // boots" — but ALSO ran a new search ("hiking boots rugged outdoor")
+  // and emitted 6 BOOT cards. Customer sees text describing sneakers +
+  // 6 boot cards below = text-card mismatch.
+  //
+  // Gate: when the latest message is a capability check ("are/do/can/
+  // will they [...] for X?") AND it doesn't mention a NEW product
+  // category, suppress the new pool. The text answer is the right
+  // shape; the prior turn's cards remain visible above. If the
+  // customer wants alternatives, they'll ask directly ("show me
+  // boots then" / "what about boots?").
+  if (pool.length > 0 && fullResponseText && ctx.latestUserMessage) {
+    const userMsg = String(ctx.latestUserMessage);
+    if (
+      isCapabilityCheckAboutPriorProducts(userMsg) &&
+      !PRODUCT_NOUN_IN_USER_RE.test(userMsg)
+    ) {
+      console.log(
+        `[chat] ${ctx.shop} capability-check suppress: customer asked about ` +
+          `prior products ("${userMsg.slice(0, 60)}") without introducing a ` +
+          `new category — dropping card pool of ${pool.length}`,
+      );
+      pool.length = 0;
+    }
+  }
+
   // Policy-question suppress (merchant trace 2026-05-13 11:55:10):
   // Customer asked "How do I contact your support team about teacher
   // discounts?" — a pure policy/support question. The bot answered
@@ -1642,7 +1703,6 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // asks "what's the return policy on the Vania?" (policy + product),
   // the product noun ("Vania") in the message defeats this gate and
   // the cards stay.
-  const PRODUCT_NOUN_IN_USER_RE = /\b(?:sandals?|sneakers?|heels?|wedges?|boots?|loafers?|oxfords?|clogs?|slippers?|mary[- ]?janes?|slip[- ]?ons?|footwear|shoes?|orthotics?|insoles?|inserts?|footbeds?)\b/i;
   if (pool.length > 0 && fullResponseText && ctx.latestUserMessage) {
     const userMsg = String(ctx.latestUserMessage);
     if (
