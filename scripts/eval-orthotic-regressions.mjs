@@ -19,6 +19,7 @@ import { resolveTree } from "../app/lib/decision-tree-resolver.server.js";
 import { classifyOrthoticTurn } from "../app/lib/orthotic-classifier.server.js";
 import { isYesNoAnswer, isYesNoQuestion } from "../app/lib/chat-postprocessing.js";
 import { containsAvailabilityDenial } from "../app/lib/chat-helpers.server.js";
+import { relaxCategoryOnNamedProduct } from "../app/lib/chat-tool-rewrite.server.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 
@@ -909,6 +910,95 @@ await test("19c — denial guard does not over-block neutral messages", () => {
   assert.equal(containsAvailabilityDenial(""), false, "empty text is not a denial");
   assert.equal(containsAvailabilityDenial("Here are some great women's sneakers for plantar fasciitis."), false, "positive recommendation is not a denial");
   assert.equal(containsAvailabilityDenial("Got it — what type of footwear are you looking for?"), false, "clarifying question is not a denial");
+});
+
+// ──────────────────────────────────────────────────────────────
+// 20. Named-product lookup must release the category lock.
+//     Production trace 2026-05-13 11:44: customer was browsing
+//     wedge heels for Morton's neuroma, then asked "show me Vania
+//     in red". The LLM kept the category=Wedges Heels filter from
+//     the previous turn, but Vania is a SANDAL — three searches
+//     returned 0 results, bot fell back to "Hmm, nothing's quite
+//     hitting that combination". The rewrite must detect the
+//     named-product pattern and drop the category filter so the
+//     search can find Vania across categories.
+// ──────────────────────────────────────────────────────────────
+await test("20a — 'show me Vania in red' drops the category filter (named-product detection)", () => {
+  const toolCall = {
+    name: "search_products",
+    input: {
+      query: "Vania",
+      filters: { gender: "Women", category: "Wedges Heels", color: "red" },
+    },
+  };
+  const ctx = { latestUserMessage: "show me vania in red" };
+  const result = relaxCategoryOnNamedProduct(toolCall, ctx);
+  assert.equal(
+    result.input.filters?.category,
+    undefined,
+    "category filter must be dropped when query mentions a named product",
+  );
+  assert.equal(result.input.filters?.gender, "Women", "gender filter must be preserved");
+  assert.equal(result.input.filters?.color, "red", "color filter must be preserved");
+  assert.equal(result.input.query, "Vania", "query string must be preserved");
+});
+
+await test("20b — generic category-only query keeps the category filter (no false positive)", () => {
+  // Customer says "show me heels" — no proper-noun product name.
+  // Category lock must remain in place.
+  const toolCall = {
+    name: "search_products",
+    input: {
+      query: "heels",
+      filters: { gender: "Women", category: "Wedges Heels" },
+    },
+  };
+  const ctx = { latestUserMessage: "show me heels" };
+  const result = relaxCategoryOnNamedProduct(toolCall, ctx);
+  assert.equal(
+    result.input.filters?.category,
+    "Wedges Heels",
+    "category filter must stay when there's no named product in the query",
+  );
+});
+
+await test("20c — color/gender/anatomy words don't trigger named-product detection", () => {
+  // "show me Red wedges" — the LLM might capitalize "Red" but it's a
+  // common color word, not a named product. Category must stay.
+  const toolCall = {
+    name: "search_products",
+    input: {
+      query: "Red wedges",
+      filters: { gender: "Women", category: "Wedges Heels", color: "red" },
+    },
+  };
+  const ctx = { latestUserMessage: "show me red wedges" };
+  const result = relaxCategoryOnNamedProduct(toolCall, ctx);
+  assert.equal(
+    result.input.filters?.category,
+    "Wedges Heels",
+    "capitalized common words like 'Red' must NOT trigger named-product detection",
+  );
+});
+
+await test("20d — named product not in user's literal message is ignored (LLM hallucination guard)", () => {
+  // Defensive: if the LLM invents a product name "Florence" that the
+  // customer never typed, don't drop the category lock — the customer
+  // didn't ask for that product.
+  const toolCall = {
+    name: "search_products",
+    input: {
+      query: "Florence",
+      filters: { gender: "Women", category: "Wedges Heels" },
+    },
+  };
+  const ctx = { latestUserMessage: "show me comfortable heels" };
+  const result = relaxCategoryOnNamedProduct(toolCall, ctx);
+  assert.equal(
+    result.input.filters?.category,
+    "Wedges Heels",
+    "proper noun in query but not in user message must NOT trigger relaxation",
+  );
 });
 
 // ──────────────────────────────────────────────────────────────

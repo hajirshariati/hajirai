@@ -80,6 +80,88 @@ export function stripStaleCategoriesOnScopeReset(toolCall, ctx) {
   return toolCall;
 }
 
+// ── relaxCategoryOnNamedProduct ─────────────────────────────────
+// When the customer asks for a specific named product ("show me Vania
+// in red", "do you have Charli?"), the LLM dutifully passes the
+// currently-locked category as a filter. But the named product may
+// live in a DIFFERENT category than the conversation has been
+// scoped to — e.g., Vania is a SANDAL but the customer was just
+// browsing WEDGES HEELS, so the search comes back empty and the
+// bot falls back to "Hmm, nothing's quite hitting that combination"
+// (production trace 2026-05-13 11:44). The category lock should
+// release for named-product lookups; the product name carries its
+// own implicit category.
+//
+// Detection: extract any capitalized non-common-word token from the
+// query string AND check it also appears in the customer's literal
+// message. That's the named-product signal. Common words (gender
+// tokens, category words, color words, anatomy terms) are excluded.
+//
+// Action: drop the `category` filter. Leave gender + color in place —
+// the search's existing filter-wipeout will further relax them if
+// needed. Combined with the OOS-phrasing prompt rule, the LLM can
+// then say "Vania in red isn't currently in stock — here it is in
+// our other colors, or open the product page to sign up for alerts."
+const PROPER_NOUN_RE = /\b([A-Z][a-z]{2,})\b/g;
+const NAMED_PRODUCT_COMMON_WORDS = new Set([
+  "women", "womens", "men", "mens", "kids", "girls", "boys", "child", "youth", "unisex",
+  "sandal", "sandals", "sneaker", "sneakers", "heel", "heels", "wedge", "wedges",
+  "boot", "boots", "loafer", "loafers", "oxford", "oxfords", "clog", "clogs",
+  "slipper", "slippers", "footwear", "shoe", "shoes", "slip", "slipon", "slipons",
+  "orthotic", "orthotics", "insole", "insoles", "footbed", "footbeds",
+  "red", "blue", "black", "white", "tan", "brown", "navy", "pink", "green", "grey", "gray",
+  "show", "find", "see", "have", "any", "the", "this", "that", "those",
+  "morton", "neuroma", "plantar", "fasciitis", "bunion", "bunions", "arch",
+  "flat", "high", "medium", "low", "ball", "foot", "feet", "metatarsal", "metatarsalgia",
+  "comfort", "casual", "dress", "athletic", "walking", "running", "memory", "foam",
+  "got", "okay", "sure", "yes", "no", "yeah", "hmm", "let", "looking",
+]);
+
+export function relaxCategoryOnNamedProduct(toolCall, ctx) {
+  if (toolCall.name !== "search_products") return toolCall;
+  const filters = toolCall.input?.filters;
+  if (!filters || !filters.category) return toolCall;
+
+  const query = String(toolCall.input?.query || "").trim();
+  if (!query) return toolCall;
+  const latest = String(ctx.latestUserMessage || "").trim();
+  if (!latest) return toolCall;
+
+  const queryTokens = new Set();
+  let m;
+  const re = new RegExp(PROPER_NOUN_RE.source, "g");
+  while ((m = re.exec(query)) !== null) {
+    queryTokens.add(m[1].toLowerCase());
+  }
+  if (queryTokens.size === 0) return toolCall;
+
+  const userLower = latest.toLowerCase();
+  let namedProduct = null;
+  for (const tok of queryTokens) {
+    if (NAMED_PRODUCT_COMMON_WORDS.has(tok)) continue;
+    if (tok.length < 4) continue;
+    if (userLower.includes(tok)) {
+      namedProduct = tok;
+      break;
+    }
+  }
+
+  if (!namedProduct) return toolCall;
+
+  const droppedCategory = filters.category;
+  const { category: _drop, ...remainingFilters } = filters;
+  console.log(
+    `[chat] named-product detected: "${namedProduct}" — dropping category filter "${droppedCategory}" so search can find it across categories`,
+  );
+  return {
+    ...toolCall,
+    input: {
+      ...toolCall.input,
+      filters: Object.keys(remainingFilters).length > 0 ? remainingFilters : undefined,
+    },
+  };
+}
+
 // ── forceComparisonLookup ───────────────────────────────────────────
 // When the customer's latest message contains 2+ SKU-like tokens AND a
 // comparison verb, the AI sometimes combines them into a single
@@ -442,5 +524,9 @@ export function rewriteToolCall(toolCall, ctx) {
   rewritten = injectStructuredColorFilter(rewritten, ctx);
   rewritten = injectLockedGender(rewritten, ctx);
   rewritten = injectOccasionCategory(rewritten, ctx);
+  // Run named-product relaxation LAST: it drops the category filter
+  // for explicit named-product lookups, overriding any category
+  // injection (e.g. injectOccasionCategory) that may have added one.
+  rewritten = relaxCategoryOnNamedProduct(rewritten, ctx);
   return rewritten;
 }
