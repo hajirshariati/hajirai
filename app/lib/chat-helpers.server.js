@@ -255,6 +255,21 @@ const REASONING_LEAK_RE = new RegExp(
   "gi",
 );
 
+// Brand/info question detector. When the customer asks "tell me more
+// about <brand>" / "what is <X>" / "who is <X>" / "where is <X>",
+// the answer is a text-only explanation — NOT a product pitch.
+// Without this guard, the empty-pool repair fires on phrases like
+// "Aetrex is a premium brand — here are the highlights:" (the
+// "here are" matches the product-pitch regex) and wipes the answer.
+// Merchant trace 2026-05-13 12:26:23.
+const BRAND_INFO_QUESTION_RE =
+  /\b(?:tell\s+me\s+(?:more\s+)?about|what(?:'s| is)\s+(?:the\s+)?(?:brand|company|store)|who\s+(?:is|are)\s+(?:you|your\s+(?:company|brand|store)|aetrex|the\s+(?:brand|company))|where\s+(?:is|are)\s+(?:you|your\s+(?:company|brand|store|headquarters|hq))|about\s+(?:the\s+)?(?:brand|company|store|aetrex)|company\s+(?:info|history|background)|brand\s+(?:info|history|story|background))\b/i;
+
+export function isBrandOrInfoQuestion(text) {
+  if (!text || typeof text !== "string") return false;
+  return BRAND_INFO_QUESTION_RE.test(text);
+}
+
 // Filler intensifier strip. The LLM sometimes drops mid-sentence
 // hedges like "Honestly," / "Frankly," / "Truthfully," that read as
 // awkward asides in a customer-facing reply ("For more rugged terrain,

@@ -28,6 +28,7 @@ import {
   isCapabilityCheckAboutPriorProducts,
   reflowInlineList,
   truncateAtWordBoundary,
+  isBrandOrInfoQuestion,
 } from "../lib/chat-helpers.server";
 import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL, FIT_PREDICTOR_TOOL, detectLatestGender } from "../lib/chat-tools.server";
 import { rewriteToolCall } from "../lib/chat-tool-rewrite.server";
@@ -1324,11 +1325,20 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // recommender flow. Detect by: ends with a question mark, OR the
   // text contains a question phrasing followed by a question mark
   // anywhere. Those responses must pass through unedited.
+  // ALSO except when the customer asked a brand/info question
+  // ("tell me about aetrex", "what is X"). Those legitimately produce
+  // text-only answers with phrases like "here are the highlights:"
+  // that look pitchy to the regex but aren't product pitches.
+  // Merchant trace 2026-05-13 12:26:23: bot wrote 747 chars about
+  // Aetrex (with "here are the highlights:"), reflowInlineList
+  // bulleted it correctly, then this repair wiped the answer to a
+  // generic "Hmm, nothing's quite hitting..." fallback.
   if (
     pool.length === 0 &&
     looksLikeProductPitch(fullResponseText) &&
     !looksLikeClarifyingQuestion(fullResponseText) &&
-    !recommenderAskedForMoreInfo
+    !recommenderAskedForMoreInfo &&
+    !isBrandOrInfoQuestion(ctx.latestUserMessage)
   ) {
     console.log(`[chat] empty-pool repair: pitch text without products (searchAttempted=${productSearchAttempted})`);
     fullResponseText = "";

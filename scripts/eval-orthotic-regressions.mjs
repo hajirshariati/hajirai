@@ -26,6 +26,7 @@ import {
   isCapabilityCheckAboutPriorProducts,
   reflowInlineList,
   truncateAtWordBoundary,
+  isBrandOrInfoQuestion,
 } from "../app/lib/chat-helpers.server.js";
 import { relaxCategoryOnNamedProduct } from "../app/lib/chat-tool-rewrite.server.js";
 
@@ -1226,6 +1227,34 @@ await test("23h — reflowInlineList leaves single-mention text untouched", () =
   const text = "We offer the Vania - **Premium** — a comfortable platform sandal.";
   const out = reflowInlineList(text);
   assert.equal(out, text, "single inline marker is not a list — don't reflow");
+});
+
+// ──────────────────────────────────────────────────────────────
+// 24. Brand/info questions must bypass the empty-pool repair.
+//     Production trace 2026-05-13 12:26:23: customer asked "tell me
+//     more about aetrex" → bot wrote a 747-char informational
+//     answer that contained "here are the highlights:" → the
+//     existing empty-pool repair matched "here are" via the
+//     product-pitch regex and replaced the entire answer with the
+//     generic "Hmm, nothing's quite hitting that combination..."
+//     fallback. The fix gates the repair on !isBrandOrInfoQuestion.
+// ──────────────────────────────────────────────────────────────
+await test("24a — isBrandOrInfoQuestion matches the screenshot's exact phrasing", () => {
+  assert.equal(isBrandOrInfoQuestion("tell me more about aetrex"), true);
+  assert.equal(isBrandOrInfoQuestion("tell me about your brand"), true);
+  assert.equal(isBrandOrInfoQuestion("what is the company"), true);
+  assert.equal(isBrandOrInfoQuestion("who is aetrex"), true);
+  assert.equal(isBrandOrInfoQuestion("where is your headquarters"), true);
+  assert.equal(isBrandOrInfoQuestion("about the brand"), true);
+  assert.equal(isBrandOrInfoQuestion("company history"), true);
+});
+
+await test("24b — isBrandOrInfoQuestion does NOT match product searches", () => {
+  assert.equal(isBrandOrInfoQuestion("show me sneakers"), false);
+  assert.equal(isBrandOrInfoQuestion("I need boots for hiking"), false);
+  assert.equal(isBrandOrInfoQuestion("recommend an orthotic"), false);
+  assert.equal(isBrandOrInfoQuestion(""), false);
+  assert.equal(isBrandOrInfoQuestion("are these good for hiking"), false);
 });
 
 // ──────────────────────────────────────────────────────────────
