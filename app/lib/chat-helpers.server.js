@@ -406,12 +406,30 @@ function overlapRatio(setA, setB) {
   return shared / Math.min(setA.size, setB.size);
 }
 
+// URL extractor for the cross-sentence URL-repeat guard. Catches bare
+// domains too (aetrex.com/pages/...) since the AI often pastes URLs
+// without a scheme.
+const URL_RE = /\bhttps?:\/\/\S+|\b(?:[a-z0-9-]+\.)+[a-z]{2,}\/\S*/gi;
+
+function extractUrls(text) {
+  const out = new Set();
+  let m;
+  const re = new RegExp(URL_RE.source, "gi");
+  while ((m = re.exec(text)) !== null) {
+    // Strip trailing punctuation (period, comma, etc.) the regex may
+    // have swept up.
+    out.add(m[0].replace(/[.,;:!?)]+$/, "").toLowerCase());
+  }
+  return out;
+}
+
 export function dedupeConsecutiveSentences(text) {
   if (!text) return text;
   const sentences = text.split(/(?<=[.!?])\s+/);
   if (sentences.length <= 1) return text;
   const kept = [];
-  let lastTrimmed = null;
+  const allKeptWords = []; // every prior kept sentence's significantWords()
+  const seenUrls = new Set();
   let lastOpener = null;
   let lastWords = null;
   for (const s of sentences) {
@@ -421,20 +439,50 @@ export function dedupeConsecutiveSentences(text) {
     const opener = tokens.slice(0, 4).join(" ");
     const words = significantWords(trimmed);
 
-    if (lastTrimmed) {
-      // (a) Echo-opener: same first 4 words.
+    if (kept.length > 0) {
+      // (a) Echo-opener with the IMMEDIATE predecessor: same first 4 words.
       if (opener && opener === lastOpener) continue;
-      // (b) Paraphrase: ≥70% of significant words shared with previous
-      // sentence, AND each side has at least 5 significant words (so
-      // we don't false-trigger on short sentences with overlapping
-      // common words).
+      // (b) Paraphrase with the IMMEDIATE predecessor: ≥70% overlap.
       if (words.size >= 5 && lastWords && lastWords.size >= 5) {
         const ratio = overlapRatio(words, lastWords);
         if (ratio >= 0.7) continue;
       }
+      // (c) URL repeat ACROSS any prior sentence (merchant trace
+      //     2026-05-13 11:55:10: bot repeated the same GovX URL twice
+      //     in different phrasings within the same response — same
+      //     fact restated, looked sloppy). If this sentence introduces
+      //     a URL we've already cited AND shares ≥40% significant
+      //     words with that earlier sentence, drop it.
+      const urls = extractUrls(trimmed);
+      let urlDuplicate = false;
+      for (const u of urls) {
+        if (seenUrls.has(u)) { urlDuplicate = true; break; }
+      }
+      if (urlDuplicate && words.size >= 5) {
+        let maxRatio = 0;
+        for (const prev of allKeptWords) {
+          if (prev.size < 5) continue;
+          const r = overlapRatio(words, prev);
+          if (r > maxRatio) maxRatio = r;
+        }
+        if (maxRatio >= 0.4) continue;
+      }
+      // (d) Cross-sentence paraphrase: ≥70% overlap with ANY prior
+      //     kept sentence (not just the immediate predecessor). The
+      //     LLM sometimes restates the same fact two sentences apart.
+      if (words.size >= 5) {
+        let dup = false;
+        for (const prev of allKeptWords) {
+          if (prev.size < 5) continue;
+          if (overlapRatio(words, prev) >= 0.7) { dup = true; break; }
+        }
+        if (dup) continue;
+      }
     }
+
     kept.push(trimmed);
-    lastTrimmed = trimmed;
+    allKeptWords.push(words);
+    for (const u of extractUrls(trimmed)) seenUrls.add(u);
     lastOpener = opener;
     lastWords = words;
   }

@@ -503,7 +503,7 @@ async function dispatchTool(name, input, ctx) {
 // "I don't have info on bundle discounts" → AVAILABILITY_DENIAL_RE
 // matches "don't have" → recovery forces a product search and
 // shows random orthotic cards under a discount question.
-const POLICY_QUESTION_RE = /\b(discount|coupon|promo(?:tion)?|sale|deal|refund|return|exchange|warranty|guarantee|policy|polic(?:ies|y)|ship(?:ping|ment)?|deliver(?:y|ies)?|bundle|payment|installment|hours|track(?:ing)?|order (?:status|number|history)|account|sign\s*in|log\s*in|coupon)\b/i;
+const POLICY_QUESTION_RE = /\b(discount|coupon|promo(?:tion)?|sale|deal|refund|return|exchange|warranty|guarantee|policy|polic(?:ies|y)|ship(?:ping|ment)?|deliver(?:y|ies)?|bundle|payment|installment|hours|track(?:ing)?|order (?:status|number|history)|account|sign\s*in|log\s*in|coupon|support\s+team|contact\s+(?:you|your|support|us|customer)|customer\s+service|gov\s*x|teacher\s+discount|military\s+discount|first\s+responder|nurse\s+discount|student\s+discount|senior\s+discount)\b/i;
 function isPolicyOrServiceQuestion(text) {
   return Boolean(text) && POLICY_QUESTION_RE.test(text);
 }
@@ -1617,6 +1617,41 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       console.log(
         `[chat] ${ctx.shop} yes/no-suppress: customer asked yes/no, AI answered yes/no — ` +
           `suppressing card pool of ${pool.length} (would have been noise under the text answer)`,
+      );
+      pool.length = 0;
+    }
+  }
+
+  // Policy-question suppress (merchant trace 2026-05-13 11:55:10):
+  // Customer asked "How do I contact your support team about teacher
+  // discounts?" — a pure policy/support question. The bot answered
+  // correctly (text mentions GovX) but ALSO showed 4 men's sneaker
+  // cards because:
+  //   (a) MANDATORY-SEARCH prompt rule fires on history containing
+  //       a medical condition (plantar fasciitis from 2 turns earlier)
+  //   (b) LLM reused the stale "plantar fasciitis trip Italy" query
+  //   (c) Search returned 5 sneakers → emitted as cards
+  // The cards have nothing to do with the customer's actual question.
+  //
+  // Gate: when the customer's latest message is a policy/support
+  // question AND it does NOT also mention a product-shaped noun
+  // (sandals, sneakers, heels, etc.) AND does not name a specific
+  // product, drop the pool. The text answer stays; the support button
+  // CTA is still rendered by the widget when relevant. If the customer
+  // asks "what's the return policy on the Vania?" (policy + product),
+  // the product noun ("Vania") in the message defeats this gate and
+  // the cards stay.
+  const PRODUCT_NOUN_IN_USER_RE = /\b(?:sandals?|sneakers?|heels?|wedges?|boots?|loafers?|oxfords?|clogs?|slippers?|mary[- ]?janes?|slip[- ]?ons?|footwear|shoes?|orthotics?|insoles?|inserts?|footbeds?)\b/i;
+  if (pool.length > 0 && fullResponseText && ctx.latestUserMessage) {
+    const userMsg = String(ctx.latestUserMessage);
+    if (
+      isPolicyOrServiceQuestion(userMsg) &&
+      !PRODUCT_NOUN_IN_USER_RE.test(userMsg)
+    ) {
+      console.log(
+        `[chat] ${ctx.shop} policy-question suppress: customer asked a support/policy ` +
+          `question ("${userMsg.slice(0, 60)}") without naming a product type — ` +
+          `dropping card pool of ${pool.length}`,
       );
       pool.length = 0;
     }

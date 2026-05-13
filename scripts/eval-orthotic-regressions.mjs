@@ -18,7 +18,7 @@ import { maybeRunOrthoticFlow } from "../app/lib/orthotic-flow-gate.server.js";
 import { resolveTree } from "../app/lib/decision-tree-resolver.server.js";
 import { classifyOrthoticTurn } from "../app/lib/orthotic-classifier.server.js";
 import { isYesNoAnswer, isYesNoQuestion } from "../app/lib/chat-postprocessing.js";
-import { containsAvailabilityDenial } from "../app/lib/chat-helpers.server.js";
+import { containsAvailabilityDenial, dedupeConsecutiveSentences } from "../app/lib/chat-helpers.server.js";
 import { relaxCategoryOnNamedProduct } from "../app/lib/chat-tool-rewrite.server.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -999,6 +999,70 @@ await test("20d — named product not in user's literal message is ignored (LLM 
     "Wedges Heels",
     "proper noun in query but not in user message must NOT trigger relaxation",
   );
+});
+
+// ──────────────────────────────────────────────────────────────
+// 21. dedupeConsecutiveSentences must strip cross-sentence URL
+//     repetitions and paraphrases beyond the immediate predecessor.
+//     Production trace 2026-05-13 11:55:10: bot cited the GovX URL
+//     twice in different phrasings within the same response. The
+//     previous dedupe only compared to the immediate predecessor.
+// ──────────────────────────────────────────────────────────────
+await test("21a — strips a URL cited twice in different phrasings (cross-sentence)", () => {
+  const screenshotText =
+    "Our support team is happy to help with teacher discount questions — " +
+    "and just so you know, we do offer up to 15% off for verified teachers " +
+    "through our GovX program at aetrex.com/pages/aetrex-and-govx. " +
+    "You can reach our support team using the button below, and teachers " +
+    "qualify for up to 15% off through our GovX verification program at " +
+    "aetrex.com/pages/aetrex-and-govx.";
+  const out = dedupeConsecutiveSentences(screenshotText);
+  // The URL should appear exactly once in the output.
+  const urlOccurrences = (out.match(/aetrex\.com\/pages\/aetrex-and-govx/gi) || []).length;
+  assert.equal(
+    urlOccurrences,
+    1,
+    `screenshot bug 2026-05-13: GovX URL must appear once, not twice. Output: "${out}"`,
+  );
+});
+
+await test("21b — keeps a URL when it's only cited once (no over-strip)", () => {
+  const text =
+    "Our support team can help with teacher discounts. " +
+    "You can verify your status at aetrex.com/pages/aetrex-and-govx and get 15% off.";
+  const out = dedupeConsecutiveSentences(text);
+  assert.ok(
+    out.includes("aetrex.com/pages/aetrex-and-govx"),
+    "single URL must be preserved",
+  );
+});
+
+await test("21c — strips a cross-sentence paraphrase even without URL", () => {
+  // Two sentences saying essentially the same thing, separated by a
+  // third unrelated sentence. The dedupe must catch this even though
+  // the duplicate isn't immediately adjacent.
+  const text =
+    "These sneakers offer excellent arch support for plantar fasciitis. " +
+    "They run true to size. " +
+    "Sneakers like these provide great arch support for plantar fasciitis sufferers.";
+  const out = dedupeConsecutiveSentences(text);
+  // The middle sentence should survive, one of the two paraphrases dropped.
+  assert.ok(out.includes("They run true to size"), "unrelated middle sentence must survive");
+  const supportMentions = (out.match(/arch support/gi) || []).length;
+  assert.equal(
+    supportMentions,
+    1,
+    `paraphrase across sentences must be deduped. Got "${out}"`,
+  );
+});
+
+await test("21d — does not strip distinct sentences that happen to share a few common words", () => {
+  const text =
+    "These sneakers come in white. " +
+    "They're great for plantar fasciitis.";
+  const out = dedupeConsecutiveSentences(text);
+  assert.ok(out.includes("white"), "first sentence preserved");
+  assert.ok(out.includes("plantar fasciitis"), "second sentence preserved");
 });
 
 // ──────────────────────────────────────────────────────────────
