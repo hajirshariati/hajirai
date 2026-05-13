@@ -23,6 +23,7 @@ import {
   hasPluralIntroFraming,
   detectConditionOrOccasion,
   containsAvailabilityDenial,
+  stripLineupPromiseSentences,
 } from "../lib/chat-helpers.server";
 import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL, FIT_PREDICTOR_TOOL, detectLatestGender } from "../lib/chat-tools.server";
 import { rewriteToolCall } from "../lib/chat-tool-rewrite.server";
@@ -1747,6 +1748,25 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       console.log(`[chat] suppressing ${pool.length} cards: turn has choice buttons + no product presentation in text`);
     } else {
       console.log(`[chat] keeping ${pool.length} cards despite choice buttons: text presents products (pluralIntro=${usesPluralIntro}, namedTitle=${namesPoolProduct}, len=${beforeChips.length})`);
+    }
+  }
+
+  // Lineup-promise strip (merchant trace 2026-05-13 12:02:14):
+  // When chip-suppression fires, the cards go away but the LLM's
+  // promise of products in the text remains — e.g., "Here's the full
+  // women's lineup — they come in standard, posted, and metatarsal
+  // variants, all at $74.95–$79.95." The promise becomes a lie.
+  // Strip those phrases so the response reads as a clean definitional
+  // answer + the chip question. Patterns live in chat-helpers so the
+  // regression suite can test them.
+  if (suppressCardsForChips && fullResponseText) {
+    const before = fullResponseText;
+    const cleaned = stripLineupPromiseSentences(before);
+    if (cleaned !== before) {
+      console.log(
+        `[chat] suppressed-cards: stripped ${before.length - cleaned.length} chars of lineup-promise text (now ${cleaned.length})`,
+      );
+      fullResponseText = cleaned;
     }
   }
 

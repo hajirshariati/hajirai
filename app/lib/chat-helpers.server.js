@@ -150,7 +150,7 @@ export function detectGenderFromHistory(messages) {
 // rule the model intermittently violates. Returns the cleaned string;
 // when nothing matched, returns input.
 // Lookbehind so back-to-back phrases ("Hold on. Let me search.") both
-// match — `(?:^|\s)` would consume the boundary and miss the second.
+// match — `(?<=^|\s)` would consume the boundary and miss the second.
 // Covers:
 //   "let me X" / "i'll X" with a wide verb list (look, find, search,
 //     check, see, pull up, grab, get, look up, look at)
@@ -421,6 +421,36 @@ function extractUrls(text) {
     out.add(m[0].replace(/[.,;:!?)]+$/, "").toLowerCase());
   }
   return out;
+}
+
+// Strip "lineup promise" phrases when cards have been suppressed
+// (chip-question turn). The LLM sometimes writes "Here's the full
+// women's lineup — they come in standard, posted, and metatarsal
+// variants, all at $74.95–$79.95" alongside a clarifying chip
+// question. The chip-suppression strips the cards, so the customer
+// reads a promise of products that never appear. This strip cleans
+// up the orphaned promise so the response reads as a clean
+// definitional answer + the chip question. Merchant trace:
+// 2026-05-13 12:02:14.
+const LINEUP_PROMISE_SENTENCE_RE = new RegExp(
+  [
+    String.raw`(?<=^|\s)Here'?s\s+(?:the|our|a|an|some)?\s*(?:full\s+|entire\s+|complete\s+)?(?:[\w'-]+\s+){0,3}(?:lineup|line[- ]up|selection|range|variety|collection|assortment|list|roundup|options|variants|styles|picks)\b[^.!?\n]*[.!?]\s*`,
+    String.raw`(?<=^|\s)Here\s+are\s+(?:the|our|some|a few|the (?:full|entire|complete))\s+(?:[\w'-]+\s+){0,3}(?:variants?|options?|styles?|picks?|choices?|lineup|line[- ]up|selection)\b[^.!?\n]*[.!?]\s*`,
+    String.raw`(?<=^|\s)(?:They|These|All)\s+come\s+in\s+(?:[\w'-]+,?\s+){1,8}(?:variants?|options?|styles?|sizes?|configurations?)\b[^.!?\n]*[.!?]\s*`,
+    String.raw`(?<=^|\s)(?:all\s+|each\s+|both\s+)?(?:priced\s+(?:at|from)|starting\s+(?:at|from)|ranging\s+from|all\s+at|all\s+for|from)\s+\$\d+(?:\.\d+)?[^.!?\n]*[.!?]\s*`,
+    String.raw`(?<=^|\s)(?:I[''']ll|let me|I[''']m going to)\s+(?:show|pull|grab|fetch|surface|share|display|present)\s+(?:you\s+)?(?:these|those|them|the (?:lineup|line[- ]up|options|picks|matches))\b[^.!?\n]*[.!?]\s*`,
+  ].join("|"),
+  "gi",
+);
+
+export function stripLineupPromiseSentences(text) {
+  if (!text) return text;
+  const cleaned = text
+    .replace(LINEUP_PROMISE_SENTENCE_RE, " ")
+    .replace(/\s{2,}/g, " ")
+    .replace(/^[\s—\-–,;:]+/, "")
+    .trim();
+  return cleaned.length >= 20 ? cleaned : text; // bail if the strip wiped almost everything
 }
 
 export function dedupeConsecutiveSentences(text) {

@@ -18,7 +18,7 @@ import { maybeRunOrthoticFlow } from "../app/lib/orthotic-flow-gate.server.js";
 import { resolveTree } from "../app/lib/decision-tree-resolver.server.js";
 import { classifyOrthoticTurn } from "../app/lib/orthotic-classifier.server.js";
 import { isYesNoAnswer, isYesNoQuestion } from "../app/lib/chat-postprocessing.js";
-import { containsAvailabilityDenial, dedupeConsecutiveSentences } from "../app/lib/chat-helpers.server.js";
+import { containsAvailabilityDenial, dedupeConsecutiveSentences, stripLineupPromiseSentences } from "../app/lib/chat-helpers.server.js";
 import { relaxCategoryOnNamedProduct } from "../app/lib/chat-tool-rewrite.server.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -1063,6 +1063,60 @@ await test("21d — does not strip distinct sentences that happen to share a few
   const out = dedupeConsecutiveSentences(text);
   assert.ok(out.includes("white"), "first sentence preserved");
   assert.ok(out.includes("plantar fasciitis"), "second sentence preserved");
+});
+
+// ──────────────────────────────────────────────────────────────
+// 22. stripLineupPromiseSentences removes "Here's the lineup" /
+//     "they come in X, Y, Z variants" / "all at $X-$Y" when cards
+//     have been suppressed under a chip question. Production trace
+//     2026-05-13 12:02:14: bot wrote "Here's the full women's
+//     lineup — they come in standard, posted, and metatarsal
+//     variants, all at $74.95–$79.95" alongside a chip question;
+//     suppression stripped 6 cards but left the promise, so the
+//     customer saw a promise of products with nothing underneath.
+// ──────────────────────────────────────────────────────────────
+await test("22a — screenshot's exact text: lineup-promise + variants + price-range all stripped", () => {
+  const text =
+    "The Memory Foam line is our most cushioned orthotic — it features " +
+    "extra-thick memory foam in the forefoot to absorb shock and reduce " +
+    "fatigue, great for everyday comfort and walking. Here's the full " +
+    "women's lineup — they come in standard, posted (for arch/heel " +
+    "support), and metatarsal variants, all at $74.95–$79.95. Now, to " +
+    "point you to the exact right one — do you have any specific discomfort?";
+  const out = stripLineupPromiseSentences(text);
+  assert.ok(!/Here'?s the full/i.test(out), `'Here's the full ... lineup' phrase must be stripped. Got: "${out}"`);
+  assert.ok(!/they come in/i.test(out), `'they come in ... variants' phrase must be stripped. Got: "${out}"`);
+  assert.ok(!/\$74\.95/i.test(out), `price range must be stripped. Got: "${out}"`);
+  assert.ok(/Memory Foam line is our most cushioned/i.test(out), `definitional explanation must survive. Got: "${out}"`);
+  assert.ok(/do you have any specific discomfort/i.test(out), `chip question must survive. Got: "${out}"`);
+});
+
+await test("22b — 'let me show you' / 'I'll pull up' framing stripped", () => {
+  const text =
+    "The Memory Foam line is great for shock absorption. " +
+    "Let me show you these options now. " +
+    "What's your arch type?";
+  const out = stripLineupPromiseSentences(text);
+  assert.ok(!/let me show you/i.test(out), `'let me show you' must be stripped. Got: "${out}"`);
+  assert.ok(/Memory Foam line/i.test(out), `explanation preserved`);
+  assert.ok(/arch type/i.test(out), `chip question preserved`);
+});
+
+await test("22c — text without lineup-promise phrasing is unchanged", () => {
+  const text =
+    "The Memory Foam line is our most cushioned orthotic. " +
+    "Do you have any specific discomfort?";
+  const out = stripLineupPromiseSentences(text);
+  assert.equal(out, text, "no promise phrases → text unchanged");
+});
+
+await test("22d — bails if strip would leave nearly nothing", () => {
+  // If the entire text IS a lineup promise (no surrounding context),
+  // returning empty would break the response. Bail out and return
+  // the original.
+  const text = "Here's the lineup. They come in three variants.";
+  const out = stripLineupPromiseSentences(text);
+  assert.equal(out, text, "guard: when strip removes ~all text, return original to avoid empty response");
 });
 
 // ──────────────────────────────────────────────────────────────
