@@ -22,6 +22,7 @@ import {
   isSingularPrescriptive,
   hasPluralIntroFraming,
   detectConditionOrOccasion,
+  containsAvailabilityDenial,
 } from "../lib/chat-helpers.server";
 import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL, FIT_PREDICTOR_TOOL, detectLatestGender } from "../lib/chat-tools.server";
 import { rewriteToolCall } from "../lib/chat-tool-rewrite.server";
@@ -537,14 +538,8 @@ function hasCompetitorBrandMention(text) {
   }
   return false;
 }
-// When the AI ends a turn without searching but its response
-// implies "we don't have X", that's almost always wrong (the
-// AI hallucinated availability from training data). Detect
-// the pattern; the caller can use it to force a search hop.
-const AVAILABILITY_DENIAL_RE = /\b(?:we|i|the (?:store|shop)) (?:don'?t|do not|cannot|can'?t)\s+(?:have|carry|sell|stock|offer|see|find)\b|\b(?:not (?:available|in stock|carried)|out of stock|couldn'?t find|don'?t see (?:any|that|those|it))\b|\bwe don'?t (?:appear to|seem to)/i;
-function containsAvailabilityDenial(text) {
-  return Boolean(text) && AVAILABILITY_DENIAL_RE.test(text);
-}
+// containsAvailabilityDenial lives in app/lib/chat-helpers.server.js so
+// the test suite can import it without dragging the route loader graph.
 
 // Stricter check: did the AI assert the store doesn't carry a
 // category that's actually IN the synced catalog? Catches phrasings

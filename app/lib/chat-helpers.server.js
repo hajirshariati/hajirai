@@ -255,6 +255,26 @@ const REASONING_LEAK_RE = new RegExp(
   "gi",
 );
 
+// When the AI ends a turn without searching but its response implies
+// "we don't have X", that's almost always wrong (the AI hallucinated
+// unavailability from training data). Detect the pattern; the caller
+// can use it to force a search hop OR (production trace 2026-05-13)
+// strip a self-contradicting response.
+//
+// Controlled-OOS exception (merchant rule): when the AI tells the
+// customer a specific named product is "currently out of stock" AND
+// directs them to a back-in-stock signup, that's an INTENTIONAL,
+// useful answer — not a hallucination. We let those through.
+const AVAILABILITY_DENIAL_RE = /\b(?:we|i|the (?:store|shop)) (?:don'?t|do not|cannot|can'?t)\s+(?:have|carry|sell|stock|offer|see|find)\b|\b(?:not (?:available|in stock|carried)|out of stock|couldn'?t find|don'?t see (?:any|that|those|it))\b|\bwe don'?t (?:appear to|seem to)|\bneither\s+\S[^.!?\n]{1,120}?\s+(?:appears?|seems?|is|are)\s+(?:to be\s+)?(?:available|in stock)\b|\bdoesn'?t\s+appear\s+(?:to be\s+)?(?:available|in stock)\b|\bappears? (?:to be\s+)?(?:no longer|currently un|sold out)/i;
+const ALLOWED_OOS_SIGNAL_RE = /\b(?:back[- ]?in[- ]?stock|notify\s+(?:me|you)|sign\s+up\s+for|email\s+alerts?|product\s+page|when\s+(?:it'?s|it\s+is|they(?:'re|\s+are))\s+back)\b/i;
+
+export function containsAvailabilityDenial(text) {
+  if (!text) return false;
+  if (!AVAILABILITY_DENIAL_RE.test(text)) return false;
+  if (ALLOWED_OOS_SIGNAL_RE.test(text)) return false;
+  return true;
+}
+
 export function stripBannedNarration(text) {
   if (!text) return text;
   return text

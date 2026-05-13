@@ -629,12 +629,35 @@ const searchQuery = detected.gender ? detected.query : q;
           price: true,
           compareAtPrice: true,
           attributesJson: true,
+          inventoryQty: true,
         },
       },
     },
     orderBy: { updatedAt: "desc" },
     take: 1200,
   });
+
+  // Hard OOS filter (merchant rule 2026-05-13): exclude any product whose
+  // entire variant set has zero inventory. We define "zero inventory"
+  // strictly — every variant must be tracked (inventoryQty != null) AND
+  // <= 0. If even one variant has stock OR is untracked (Shopify isn't
+  // tracking inventory for that variant — common for made-to-order or
+  // virtual SKUs), the product stays. Prevents the bot from showing
+  // cards for products the customer can't actually add to cart.
+  //
+  // Before this filter the bot was returning Charli-Red (all sizes OOS)
+  // as a card for "red sandals", then claiming "Charli isn't available
+  // in red" two turns later when the customer asked directly — a
+  // self-contradicting trace from 2026-05-13 11:26.
+  const beforeOOS = products.length;
+  products = products.filter((p) => {
+    const vs = p.variants || [];
+    if (vs.length === 0) return true; // no variant data — keep, can't judge
+    return vs.some((v) => v.inventoryQty == null || Number(v.inventoryQty) > 0);
+  });
+  if (products.length !== beforeOOS) {
+    console.log(`[search]   oos filter: ${products.length}/${beforeOOS} (dropped ${beforeOOS - products.length} fully-OOS products)`);
+  }
 
   if (activeCategoryGroup) {
     // Explicit-filter divergence — the AI passed a category filter

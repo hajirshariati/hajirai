@@ -18,6 +18,7 @@ import { maybeRunOrthoticFlow } from "../app/lib/orthotic-flow-gate.server.js";
 import { resolveTree } from "../app/lib/decision-tree-resolver.server.js";
 import { classifyOrthoticTurn } from "../app/lib/orthotic-classifier.server.js";
 import { isYesNoAnswer, isYesNoQuestion } from "../app/lib/chat-postprocessing.js";
+import { containsAvailabilityDenial } from "../app/lib/chat-helpers.server.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 
@@ -845,6 +846,69 @@ await test("18 — customer in footwear path + ambiguous useCase emits path-ambi
       `customer ended up with an orthotic recommendation despite asking for footwear. ` +
       `Flow logs: ${flowLogs.join(" | ")}`,
   );
+});
+
+// ──────────────────────────────────────────────────────────────
+// 19. Out-of-stock phrasing exception. Production trace 2026-05-13
+//     11:26: customer asked "Vania or Charli in red?" and the bot
+//     replied "Neither the Vania nor the Charli currently appears
+//     to be available in red" — a self-contradicting answer because
+//     the bot had just shown both products labeled red in the
+//     previous turn (Charli-Red was fully OOS, Vania-Red had 2
+//     sizes in stock).
+//
+//     Merchant rule (2026-05-13): when a specific named-product +
+//     attribute combo is OOS, the bot must use the controlled
+//     phrasing "currently out of stock + back-in-stock signup on
+//     the product page" — NOT "we don't have" or "doesn't appear
+//     to be available". The new containsAvailabilityDenial guard
+//     in chat-helpers.server.js draws the line.
+// ──────────────────────────────────────────────────────────────
+await test("19a — denial guard catches 'doesn't appear to be available' / 'we don't have' / 'not available'", () => {
+  // Pure denial phrasings — bot is implying the store doesn't carry
+  // the item. Guard must flag these so the route can recover.
+  assert.equal(
+    containsAvailabilityDenial("Neither the Vania nor the Charli currently appears to be available in red — the closest colors are walnut, cognac, ginger, and white."),
+    true,
+    "screenshot bug from 2026-05-13: 'not available' (via 'currently appears to be available') without a back-in-stock signup MUST be flagged as a denial",
+  );
+  assert.equal(
+    containsAvailabilityDenial("We don't carry pink heels in our women's line."),
+    true,
+    "'we don't carry' is a denial",
+  );
+  assert.equal(
+    containsAvailabilityDenial("That product is out of stock right now."),
+    true,
+    "bare 'out of stock' without back-in-stock signup is still a denial — the customer is left with nowhere to go",
+  );
+});
+
+await test("19b — denial guard EXEMPTS the controlled OOS phrasing (currently OOS + back-in-stock signup on PDP)", () => {
+  // Allowed shape: "X in Y isn't currently in stock. Sign up for
+  // back-in-stock alerts on the product page" — that's the helpful,
+  // merchant-approved answer the bot SHOULD give. Guard must NOT flag it.
+  assert.equal(
+    containsAvailabilityDenial("Charli in red isn't currently in stock right now. You can [open the product page](https://www.aetrex.com/products/charli-red) to sign up for back-in-stock email alerts. In the meantime, here are similar styles..."),
+    false,
+    "controlled OOS phrasing with back-in-stock signup + PDP link is the merchant-approved answer — must NOT be flagged as a denial",
+  );
+  assert.equal(
+    containsAvailabilityDenial("The Vania in red is currently out of stock. Visit the product page to be notified when it's back in stock."),
+    false,
+    "'out of stock' + 'notified when back in stock' = allowed exception",
+  );
+  assert.equal(
+    containsAvailabilityDenial("That size isn't in stock right now — sign up for email alerts on the product page and we'll let you know when it's back."),
+    false,
+    "size-level OOS with back-in-stock signup is also allowed",
+  );
+});
+
+await test("19c — denial guard does not over-block neutral messages", () => {
+  assert.equal(containsAvailabilityDenial(""), false, "empty text is not a denial");
+  assert.equal(containsAvailabilityDenial("Here are some great women's sneakers for plantar fasciitis."), false, "positive recommendation is not a denial");
+  assert.equal(containsAvailabilityDenial("Got it — what type of footwear are you looking for?"), false, "clarifying question is not a denial");
 });
 
 // ──────────────────────────────────────────────────────────────
