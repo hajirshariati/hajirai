@@ -328,6 +328,94 @@ await test("R12 — when action is 'ask', candidate_products is empty (no cards 
   assert.equal(out.candidate_products.length, 0, "candidate_products MUST be empty when action is ask");
 });
 
+// Generic constraint-propagation fixture: red+sandals only exists in
+// women's, but "red" alone exists in men's sneakers too. Old code
+// looked at color in isolation and failed to infer gender; the
+// constraint-propagation resolver must intersect the known
+// constraints to compute the possible domain for gender.
+const PROPAGATION_FACET_INDEX = {
+  categoryByGender: { sandals: ["men", "women"], sneakers: ["men"] },
+  colorByGenderCategory: {
+    "men:sandals": ["black", "brown"],
+    "women:sandals": ["red", "tan"],
+    "men:sneakers": ["red"],
+  },
+  conditionByCategory: {},
+  sizeByGenderCategory: {},
+};
+
+await test("R13 — propagation: red+sandals narrows to women's even when red exists in men's sneakers", async () => {
+  const products = [
+    { handle: "kendall", title: "Kendall Red Sandal", category: "sandals", gender: ["women"], colors: ["red"], available: true, conditionTags: [], totalInventory: 8 },
+  ];
+  const out = await resolveCatalogTurn({
+    shop: SHOP,
+    query: "red sandals",
+    userConstraints: { color: "red", category: "sandals" },
+    _testFacetIndex: PROPAGATION_FACET_INDEX,
+    _testFetchCandidates: makeFetcher(products),
+  });
+  assert.equal(out.matched_constraints.color, "red");
+  assert.equal(out.matched_constraints.category, "sandals");
+  assert.equal(
+    out.inferred_constraints.gender?.value,
+    "women",
+    `expected gender=women inferred from {color:red, category:sandals}; got ${JSON.stringify(out.inferred_constraints)}`,
+  );
+  assert.ok(out.do_not_ask.includes("gender"), `do_not_ask must include gender, got ${JSON.stringify(out.do_not_ask)}`);
+  assert.equal(out.recommended_next_action.type, "recommend");
+});
+
+await test("R14 — propagation: men's red sandals → impossible + no_match", async () => {
+  const out = await resolveCatalogTurn({
+    shop: SHOP,
+    query: "men's red sandals",
+    userConstraints: { gender: "men", color: "red", category: "sandals" },
+    _testFacetIndex: PROPAGATION_FACET_INDEX,
+    _testFetchCandidates: makeFetcher([]),
+  });
+  const impColor = out.impossible_constraints.find((c) => c.field === "color");
+  assert.ok(impColor, `expected color in impossible_constraints; got ${JSON.stringify(out.impossible_constraints)}`);
+  assert.equal(out.recommended_next_action.type, "no_match");
+});
+
+await test("R15 — propagation: gender+category → does NOT over-infer when multiple colors exist", async () => {
+  // women:sandals has both red and tan, so with {gender:women,
+  // category:sandals} the color domain should be {red,tan} — NOT a
+  // singleton. Resolver must not invent a color inference here.
+  const out = await resolveCatalogTurn({
+    shop: SHOP,
+    query: "women's sandals",
+    userConstraints: { gender: "women", category: "sandals" },
+    _testFacetIndex: PROPAGATION_FACET_INDEX,
+    _testFetchCandidates: makeFetcher([
+      { handle: "kendall", title: "Kendall Red Sandal", category: "sandals", gender: ["women"], colors: ["red"], available: true, conditionTags: [], totalInventory: 8 },
+      { handle: "jillian", title: "Jillian Tan Sandal", category: "sandals", gender: ["women"], colors: ["tan"], available: true, conditionTags: [], totalInventory: 8 },
+    ]),
+  });
+  assert.equal(out.inferred_constraints.color, undefined, `color should NOT be inferred when domain has >1 value; got ${JSON.stringify(out.inferred_constraints)}`);
+});
+
+await test("R16 — propagation: gender+color → infers category when only one category carries it", async () => {
+  // men's red exists only in sneakers (men:sandals is black/brown).
+  // {gender:men, color:red} should infer category=sneakers.
+  const out = await resolveCatalogTurn({
+    shop: SHOP,
+    query: "men's red",
+    userConstraints: { gender: "men", color: "red" },
+    _testFacetIndex: PROPAGATION_FACET_INDEX,
+    _testFetchCandidates: makeFetcher([
+      { handle: "dash", title: "Dash Red Sneaker", category: "sneakers", gender: ["men"], colors: ["red"], available: true, conditionTags: [], totalInventory: 8 },
+    ]),
+  });
+  assert.equal(
+    out.inferred_constraints.category?.value,
+    "sneakers",
+    `expected category=sneakers inferred from {gender:men, color:red}; got ${JSON.stringify(out.inferred_constraints)}`,
+  );
+  assert.ok(out.do_not_ask.includes("category"), `do_not_ask must include category, got ${JSON.stringify(out.do_not_ask)}`);
+});
+
 await test("buildResolverStatePromptBlock — produces non-empty block for resolver_state output", async () => {
   const facetIndex = {
     categoryByGender: { sandals: ["women"] },

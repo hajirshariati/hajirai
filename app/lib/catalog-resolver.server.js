@@ -62,65 +62,131 @@ function sessionMemoryFromAnsweredChoices(answeredChoices = {}) {
 // covers gender + category (the catalog's structural primary key).
 const REQUIRED_FIELDS = ["gender", "category"];
 
-// For inferred reasoning: when a single color exists in only one
-// gender across all categories, gender is unambiguous.
-function inferGenderFromColor(color, facetIndex) {
-  if (!color || !facetIndex) return null;
-  const colorByGenderCategory = facetIndex.colorByGenderCategory || {};
-  const gendersWithThisColor = new Set();
-  for (const [gck, colors] of Object.entries(colorByGenderCategory)) {
-    if (Array.isArray(colors) && colors.includes(color)) {
-      const [g] = gck.split(":");
-      if (g && g !== "unisex") gendersWithThisColor.add(g);
+// ─── constraint propagation ───────────────────────────────────
+//
+// Generic domain-of-possible-values computation. We flatten the
+// facet index into the set of (gender, category, color) tuples that
+// actually exist in the catalog, then filter that tuple space by
+// the known constraints. Projecting the surviving tuples onto an
+// unresolved field gives that field's possible-value domain.
+//
+//   domain.length === 1 → inferred
+//   domain.length === 0 → impossible (Phase 1 already surfaces the
+//                         pair-wise impossibility before we get here;
+//                         this layer is for inference only)
+//   domain.length  > 1 → remains a valid disambiguator
+//
+// This generalizes the previous one-field-at-a-time helpers
+// (inferGenderFromColor, inferGenderFromCategory) so that any
+// combination of known constraints narrows the others. Example:
+// {color:"red", category:"sandals"} → if the only (gender, sandals,
+// red) tuple has gender="women", gender is inferred even when "red"
+// alone exists in multiple genders.
+
+function buildTupleSpace(facetIndex) {
+  const tuples = [];
+  const cbgc = facetIndex?.colorByGenderCategory || {};
+  for (const [gck, colors] of Object.entries(cbgc)) {
+    const [gender, category] = gck.split(":");
+    if (!gender || !category) continue;
+    const colorList = Array.isArray(colors) && colors.length > 0 ? colors : [null];
+    for (const color of colorList) {
+      tuples.push({ gender, category, color });
     }
   }
-  if (gendersWithThisColor.size === 1) {
-    return Array.from(gendersWithThisColor)[0];
+  // Some (gender, category) combos may have no color data baked into
+  // the index — still record them so gender/category inference works
+  // when color is the unknown.
+  const cbg = facetIndex?.categoryByGender || {};
+  for (const [category, genders] of Object.entries(cbg)) {
+    if (!Array.isArray(genders)) continue;
+    for (const gender of genders) {
+      const has = tuples.some((t) => t.gender === gender && t.category === category);
+      if (!has) tuples.push({ gender, category, color: null });
+    }
   }
-  return null;
+  return tuples;
 }
 
-// When category exists in only one gender, gender is inferred.
-function inferGenderFromCategory(category, facetIndex) {
-  if (!category || !facetIndex) return null;
-  const categoryByGender = facetIndex.categoryByGender || {};
-  const genders = categoryByGender[category];
-  if (Array.isArray(genders)) {
-    const realGenders = genders.filter((g) => g && g !== "unisex");
-    if (realGenders.length === 1) return realGenders[0];
+function tupleMatches(tuple, constraints) {
+  if (constraints.gender && tuple.gender && tuple.gender !== "unisex" && tuple.gender !== constraints.gender) {
+    return false;
   }
-  return null;
+  if (constraints.category && tuple.category && tuple.category !== constraints.category) {
+    return false;
+  }
+  if (constraints.color != null && tuple.color != null && tuple.color !== constraints.color) {
+    return false;
+  }
+  return true;
 }
 
-// Check whether a (gender, category, color) combination exists.
+function projectField(tuples, constraints, field) {
+  const out = new Set();
+  for (const t of tuples) {
+    if (!tupleMatches(t, constraints)) continue;
+    const v = t[field];
+    if (v == null) continue;
+    // "unisex" is a product-tagging convention, not a customer-pickable
+    // gender — drop it from the domain so it's never inferred or
+    // surfaced as a chip option.
+    if (field === "gender" && v === "unisex") continue;
+    out.add(v);
+  }
+  return Array.from(out);
+}
+
+function describeContext(known, exceptField) {
+  const parts = [];
+  if (exceptField !== "color" && known.color) parts.push(known.color);
+  if (exceptField !== "gender" && known.gender) parts.push(`${known.gender}'s`);
+  if (exceptField !== "category" && known.category) parts.push(known.category);
+  return parts.join(" ");
+}
+
+function buildInferenceReason(field, value, known) {
+  const ctx = describeContext(known, field);
+  if (field === "gender") {
+    return ctx ? `${ctx} only exists in ${value}'s products` : `only ${value}'s available`;
+  }
+  if (field === "category") {
+    return ctx ? `${ctx} is only available in ${value}` : `only ${value} available`;
+  }
+  if (field === "color") {
+    return ctx ? `${ctx} only comes in ${value}` : `only ${value} available`;
+  }
+  return `${field} narrows to ${value}`;
+}
+
+// Public: compute possible domains for every unresolved tuple field
+// given the known constraints. Returns:
+//   { gender: { domain: [...], inferred?: <value> }, category: ..., color: ... }
+// Fields that are already known are omitted from the output.
+function computeConstraintDomains(known, facetIndex) {
+  const tuples = buildTupleSpace(facetIndex);
+  const fields = ["gender", "category", "color"];
+  const out = {};
+  for (const field of fields) {
+    if (known[field] != null) continue;
+    const domain = projectField(tuples, known, field);
+    out[field] = { domain };
+    if (domain.length === 1) out[field].inferred = domain[0];
+  }
+  return out;
+}
+
+// Phase-1 helper kept for compatibility: does (color, gender,
+// category) exist anywhere in the catalog? Implemented on top of the
+// tuple space so its semantics stay in sync with inference.
 function colorExistsInScope(color, gender, category, facetIndex) {
   if (!color || !facetIndex) return null;
-  const colorByGenderCategory = facetIndex.colorByGenderCategory || {};
-
-  if (gender && category) {
-    const colors = colorByGenderCategory[`${gender}:${category}`];
-    return Array.isArray(colors) && colors.includes(color);
-  }
-  if (gender) {
-    // Any category in this gender?
-    for (const [gck, colors] of Object.entries(colorByGenderCategory)) {
-      if (gck.startsWith(`${gender}:`) && Array.isArray(colors) && colors.includes(color)) {
-        return true;
-      }
-    }
-    return false;
-  }
-  if (category) {
-    for (const [gck, colors] of Object.entries(colorByGenderCategory)) {
-      if (gck.endsWith(`:${category}`) && Array.isArray(colors) && colors.includes(color)) {
-        return true;
-      }
-    }
-    return false;
-  }
-  // No scope: check if color exists anywhere.
-  for (const colors of Object.values(colorByGenderCategory)) {
-    if (Array.isArray(colors) && colors.includes(color)) return true;
+  const tuples = buildTupleSpace(facetIndex);
+  const constraints = { color };
+  if (gender) constraints.gender = gender;
+  if (category) constraints.category = category;
+  for (const t of tuples) {
+    if (t.color == null) continue;
+    if (tupleMatches(t, constraints) && t.color === color) return true;
   }
   return false;
 }
@@ -259,39 +325,25 @@ export async function resolveCatalogTurn({
     if (merged[k] != null) matched_constraints[k] = merged[k];
   }
 
-  // ── Phase 2: infer constraints from the catalog ──────────────
-
-  // If color is known but gender isn't, try inferring gender from color.
-  if (matched_constraints.color && !matched_constraints.gender) {
-    const inferredGender = inferGenderFromColor(matched_constraints.color, facetIndex);
-    if (inferredGender) {
-      internal_inferred.gender = mkFact(
-        inferredGender,
-        `${matched_constraints.color} exists only in ${inferredGender}'s products`,
-        "color_to_gender",
-        0.95,
-      );
-      inferred_constraints.gender = {
-        value: inferredGender,
-        reason: internal_inferred.gender.reason,
-      };
-    }
-  }
-
-  // If category is known but gender isn't, try inferring.
-  if (matched_constraints.category && !matched_constraints.gender && !inferred_constraints.gender) {
-    const inferredGender = inferGenderFromCategory(matched_constraints.category, facetIndex);
-    if (inferredGender) {
-      internal_inferred.gender = mkFact(
-        inferredGender,
-        `${matched_constraints.category} only exist in ${inferredGender}'s line`,
-        "category_to_gender",
-        0.95,
-      );
-      inferred_constraints.gender = {
-        value: inferredGender,
-        reason: internal_inferred.gender.reason,
-      };
+  // ── Phase 2: constraint propagation ──────────────────────────
+  //
+  // Compute the possible-value domain for every unresolved tuple
+  // field (gender, category, color) under the conjunction of all
+  // matched constraints. A singleton domain is inferred. This
+  // generalizes the previous one-field-at-a-time helpers so that,
+  // e.g., {color:"red", category:"sandals"} narrows gender even
+  // when "red" alone exists in multiple genders.
+  {
+    const known = {};
+    if (matched_constraints.gender) known.gender = matched_constraints.gender;
+    if (matched_constraints.category) known.category = matched_constraints.category;
+    if (matched_constraints.color) known.color = matched_constraints.color;
+    const domains = computeConstraintDomains(known, facetIndex);
+    for (const [field, info] of Object.entries(domains)) {
+      if (info.inferred == null) continue;
+      const reason = buildInferenceReason(field, info.inferred, known);
+      internal_inferred[field] = mkFact(info.inferred, reason, "constraint_propagation", 0.95);
+      inferred_constraints[field] = { value: info.inferred, reason };
     }
   }
 
