@@ -5,6 +5,12 @@ import {
   resolveProductAttributes,
   resolveVariantAttributes,
 } from "./AttributeMapping.server";
+import {
+  rebuildCatalogFactsForProduct,
+  deleteCatalogFactsForProduct,
+  rebuildAllCatalogFacts,
+  rebuildCatalogFacetIndex,
+} from "../lib/catalog-facts.server";
 
 const PRODUCTS_PAGE = 50;
 
@@ -135,6 +141,12 @@ async function upsertProduct(shop, node, mappings = null) {
     });
   }
 
+  try {
+    await rebuildCatalogFactsForProduct(shop, product.id);
+  } catch (err) {
+    console.error(`[catalog-facts] upsert rebuild failed for ${product.id}:`, err?.message || err);
+  }
+
   return product;
 }
 
@@ -166,7 +178,15 @@ export async function deleteProductByShopifyId(shop, shopifyId) {
   const gid = typeof shopifyId === "string" && shopifyId.startsWith("gid://")
     ? shopifyId
     : `gid://shopify/Product/${shopifyId}`;
+  const existing = await prisma.product.findFirst({ where: { shop, shopifyId: gid }, select: { id: true } });
   await prisma.product.deleteMany({ where: { shop, shopifyId: gid } });
+  if (existing?.id) {
+    try {
+      await deleteCatalogFactsForProduct(shop, existing.id);
+    } catch (err) {
+      console.error(`[catalog-facts] delete failed for ${existing.id}:`, err?.message || err);
+    }
+  }
 }
 
 export async function getCatalogSyncState(shop) {
@@ -229,6 +249,13 @@ export async function syncCatalog(admin, shop) {
 
       if (!page.pageInfo.hasNextPage) break;
       cursor = page.pageInfo.endCursor;
+    }
+
+    try {
+      await rebuildAllCatalogFacts(shop);
+      await rebuildCatalogFacetIndex(shop);
+    } catch (err) {
+      console.error(`[catalog-facts] full rebuild failed for ${shop}:`, err?.message || err);
     }
 
     await setSyncState(shop, {

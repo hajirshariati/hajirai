@@ -17,6 +17,8 @@ export const action = async ({ request }) => {
     db.chatUsage.deleteMany({ where: { shop } }),
     db.chatFeedback.deleteMany({ where: { shop } }),
     db.chatProductMention.deleteMany({ where: { shop } }),
+    db.catalogFact.deleteMany({ where: { shop } }),
+    db.catalogFacetIndex.deleteMany({ where: { shop } }),
   ]);
 
   return new Response();
