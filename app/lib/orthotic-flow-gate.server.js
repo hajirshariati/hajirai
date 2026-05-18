@@ -84,6 +84,16 @@ function sseChunk(obj) {
   return `data: ${JSON.stringify(obj)}\n\n`;
 }
 
+const CATALOG_SPECIFIC_FOOTWEAR_RE =
+  /\b(?:sneakers?|trainers?|sandals?|slides?|boots?|booties|loafers?|oxfords?|clogs?|slip[-\s]?ons?|slippers?|mary[-\s]?janes?|wedges?|heels?)\b/i;
+const CATALOG_COLOR_RE =
+  /\b(?:black|brown|navy|blue|red|pink|tan|cognac|white|ivory|cream|gray|grey|charcoal|burgundy|wine|maroon|green|olive|yellow|orange|purple|gold|silver|bronze|taupe)\b/i;
+
+function letsCatalogResolverOwnFootwearRequest(text) {
+  if (!text) return false;
+  return CATALOG_SPECIFIC_FOOTWEAR_RE.test(text) || CATALOG_COLOR_RE.test(text);
+}
+
 /**
  * Format a question node into customer-facing text with chip
  * markers. The widget's existing `<<Label>>` chip syntax is what
@@ -801,6 +811,13 @@ export async function maybeRunOrthoticFlow({
         GENDER_CHIP_RE.test(m.content),
     );
     if (!answers.gender && !alreadyAskedGender) {
+      if (letsCatalogResolverOwnFootwearRequest(rawUserText)) {
+        console.log(
+          `[orthotic-flow] footwear-path: latest names catalog-specific footwear/color; ` +
+            `falling through to catalog resolver before asking gender.`,
+        );
+        return { handled: false };
+      }
       const text =
         "Got it — let me help you find the right fit. " +
         "Are you shopping for men's or women's?\n\n" +

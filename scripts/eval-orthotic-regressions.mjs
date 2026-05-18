@@ -622,6 +622,32 @@ await test("14 — 'sandals with arch support' (footwear request) does NOT emit 
   assert.equal(out.handled, false, "gate must fall through on footwear request when gender is known");
 });
 
+await test("14b — 'red sandals' falls through to catalog resolver instead of hard-asking gender", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "red sandals" },
+    ],
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+    classifiedIntent: {
+      isOrthoticRequest: false,
+      isFootwearRequest: true,
+      isRejection: false,
+      attributes: { gender: null, useCase: null, condition: null },
+    },
+  });
+  const genderQuestionEmitted = events.some(
+    (e) =>
+      e?.type === "text" &&
+      /Are you shopping for men's or women's/i.test(e.text || ""),
+  );
+  assert.equal(genderQuestionEmitted, false, "gate must not ask gender before resolver sees red sandals");
+  assert.equal(out.handled, false, "gate must fall through so resolver can infer gender from color+category");
+});
+
 // ──────────────────────────────────────────────────────────────
 // 15. Free-text "I have flat feet" mid-flow still drops accumulated
 //     arch. Long-form fresh-overpronation claim should NOT be
