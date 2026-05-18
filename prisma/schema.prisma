@@ -491,3 +491,76 @@ model KnowledgeChunk {
   @@index([shop, fileType])
   @@index([sourceFileId])
 }
+
+// ─────────────────────────────────────────────────────────────────
+// Catalog brain (Milestone 1, 2026-05-13). Derived from existing
+// Product / ProductVariant / AttributeMapping rows — not synced
+// directly from Shopify. Rebuilt by app/lib/catalog-facts.server.js
+// on every product upsert/delete + nightly full rebuild.
+//
+// CatalogFact stores normalized facts per product (and optionally
+// per variant). CatalogFacetIndex stores the per-shop matrices the
+// resolver uses to detect impossible / inferable constraints
+// without scanning the full catalog at chat time.
+//
+// Availability rule: a product is `available` if ANY variant has
+// inventoryQty > 0 OR inventoryQty == null (untracked). Matches
+// existing semantics in chat-tools.server.js.
+//
+// Uniqueness: factKey is non-null and unique within shop.
+//   - product rows: factKey = "product:<productId>"
+//   - variant rows: factKey = "variant:<variantId>"
+// Postgres treats multiple NULLs as distinct so variantSku alone
+// would not enforce uniqueness — factKey avoids that trap.
+// ─────────────────────────────────────────────────────────────────
+model CatalogFact {
+  id                 String    @id @default(cuid())
+  shop               String
+  factKey            String
+  productHandle      String
+  productId          String
+  variantId          String?
+  variantSku         String?
+
+  title              String
+  category           String?
+  productType        String?
+  gender             String[]
+
+  colors             String[]
+  sizes              String[]
+  widths             String[]
+
+  conditionTags      String[]
+  useCaseTags        String[]
+  fitTags            String[]
+
+  available          Boolean   @default(true)
+  totalInventory     Int       @default(0)
+  inventoryUntracked Boolean   @default(false)
+
+  priceMin           Decimal?
+  priceMax           Decimal?
+
+  sourceUpdatedAt    DateTime?
+  syncedAt           DateTime  @default(now()) @updatedAt
+
+  @@unique([shop, factKey])
+  @@index([shop])
+  @@index([shop, available])
+  @@index([shop, category, available])
+}
+
+model CatalogFacetIndex {
+  id                       String    @id @default(cuid())
+  shop                     String    @unique
+
+  categoryByGender         Json      // { "sandals": ["women"], "sneakers": ["men","women"], ... }
+  colorByGenderCategory    Json      // { "women:sandals": ["red","tan","black"], ... }
+  conditionByCategory      Json      // { "sandals": ["plantar_fasciitis", ...], ... }
+  sizeByGenderCategory     Json      // { "men:sneakers": ["8","8.5","9",...], ... }
+
+  totalProducts            Int       @default(0)
+  availableProducts        Int       @default(0)
+  syncedAt                 DateTime  @default(now()) @updatedAt
+}

@@ -39,6 +39,7 @@ import { fetchYotpoLoyalty } from "../lib/yotpo-loyalty.server";
 import { buildRecommenderTools } from "../lib/recommender-tools.server";
 import { maybeRunOrthoticFlow } from "../lib/orthotic-flow-gate.server";
 import { classifyOrthoticTurn } from "../lib/orthotic-classifier.server";
+import { resolveCatalogTurn, buildResolverStatePromptBlock, extractUserConstraints } from "../lib/catalog-resolver.server";
 import {
   detectSingularIntent,
   detectComparisonIntent,
@@ -2935,6 +2936,61 @@ export const action = async ({ request }) => {
             // Never let the gate take down the chat. On any error,
             // fall through to the LLM as if the gate hadn't run.
             console.error("[orthotic-flow] gate threw, falling through:", gateErr?.message || gateErr);
+          }
+
+          // Resolver preflight (Milestone 1). For product-shopping
+          // turns, compute resolverState BEFORE the LLM runs so the
+          // model treats catalog facts as ground truth instead of
+          // guessing. Gated narrowly — skip greetings, brand/about,
+          // policy/support, capability checks about prior cards, and
+          // signup paths so the resolver only fires when the customer
+          // is genuinely shopping.
+          try {
+            const latestMsg = String(body.message || "");
+            const skipResolver =
+              !latestMsg.trim() ||
+              isPolicyOrServiceQuestion(latestMsg) ||
+              isBrandOrInfoQuestion(latestMsg) ||
+              isCapabilityCheckAboutPriorProducts(latestMsg) ||
+              detectUserSignupIntent(latestMsg);
+            if (!skipResolver) {
+              const extracted = extractUserConstraints(latestMsg);
+              const classifiedAttrs = ctx.classifiedIntent?.attributes || {};
+              const userConstraints = {
+                ...extracted,
+                ...(classifiedAttrs.gender ? { gender: classifiedAttrs.gender } : {}),
+                ...(classifiedAttrs.condition ? { condition: classifiedAttrs.condition } : {}),
+                ...(classifiedAttrs.useCase ? { useCase: classifiedAttrs.useCase } : {}),
+              };
+              const sessionMemory = { explicit: { ...(answeredChoices || {}) } };
+              if (sessionGender && !sessionMemory.explicit.gender) {
+                sessionMemory.explicit.gender = sessionGender;
+              }
+              const resolverState = await resolveCatalogTurn({
+                shop: session.shop,
+                query: latestMsg,
+                userConstraints,
+                sessionMemory,
+                messages,
+              });
+              if (resolverState && resolverState.type === "resolver_state") {
+                ctx.resolverState = resolverState;
+                const block = buildResolverStatePromptBlock(resolverState);
+                if (block) systemPrompt = systemPrompt + block;
+                console.log(
+                  `[resolver] ${ctx.shop} action=${resolverState.recommended_next_action?.type} ` +
+                    `matched=${Object.keys(resolverState.matched_constraints).join(",") || "-"} ` +
+                    `inferred=${Object.keys(resolverState.inferred_constraints).join(",") || "-"} ` +
+                    `impossible=${resolverState.impossible_constraints.length} ` +
+                    `candidates=${(resolverState.candidate_products || []).length}`,
+                );
+              } else if (resolverState?.type === "skip") {
+                console.log(`[resolver] ${ctx.shop} skip reason=${resolverState.reason}`);
+              }
+            }
+          } catch (resolverErr) {
+            // Never let the resolver take down the chat.
+            console.error("[resolver] preflight threw, falling through:", resolverErr?.message || resolverErr);
           }
 
           // Footwear over-elicitation guard. When the customer has

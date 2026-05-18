@@ -1,0 +1,370 @@
+// Resolver eval suite (Milestone 1).
+//
+// Tests catalog-resolver.server.js against fixture catalog facets
+// via dependency injection (the resolver accepts _testFacetIndex /
+// _testFetchCandidates / _testFindOos params for this purpose).
+// We avoid touching the DB so the suite runs in CI without setup.
+//
+// Covers the 7 scenarios the merchant specified plus regression
+// coverage:
+//   R1  navy → infer men's, no gender ask
+//   R2  pink men's → impossible
+//   R3  flat feet from session memory remembered
+//   R4  Vania + 11W OOS → controlled_oos
+//   R5  too-broad intent → ask with chip_options
+//   R6  facet index missing → resolver skips
+//   R7  capability check helper is correctly exported
+//   R8  red sandals exist only in women's → inferred
+//   R9  orange sandals → impossible + alternatives
+//   R10 multi-turn narrowing
+//   R11 latest explicit constraint overrides stale session memory
+//   R12 no cards while asking
+
+import assert from "node:assert/strict";
+import { resolveCatalogTurn, buildResolverStatePromptBlock } from "../app/lib/catalog-resolver.server.js";
+
+let passed = 0;
+let failed = 0;
+const failures = [];
+
+async function test(name, fn) {
+  try {
+    await fn();
+    console.log(`  ✓ ${name}`);
+    passed++;
+  } catch (err) {
+    console.log(`  ✗ ${name} — ${err.message}`);
+    failures.push({ name, err });
+    failed++;
+  }
+}
+
+// Build a fixture candidate-fetcher that filters in-memory product
+// rows by the where clause shape the resolver passes.
+function makeFetcher(products) {
+  return async function ({ gender, category, color, condition, includeOos = false, limit = 6 }) {
+    let result = products.filter((p) => {
+      if (!includeOos && !p.available) return false;
+      if (category && p.category !== category) return false;
+      if (gender && !(p.gender || []).includes(gender)) return false;
+      if (color && !(p.colors || []).includes(color)) return false;
+      if (condition && !(p.conditionTags || []).includes(condition)) return false;
+      return true;
+    });
+    if (limit) result = result.slice(0, limit);
+    return result.map((p) => ({
+      handle: p.handle,
+      title: p.title,
+      availability: p.available ? (p.totalInventory > 5 ? "in_stock" : "low_stock") : "out_of_stock",
+      why_recommended: [
+        ...(color && (p.colors || []).includes(color) ? [`matches ${color}`] : []),
+        ...(condition && (p.conditionTags || []).includes(condition) ? [`good for ${condition.replace(/_/g, " ")}`] : []),
+        p.available ? "in stock" : "out of stock",
+      ],
+    }));
+  };
+}
+
+const SHOP = "test.myshopify.com";
+
+console.log("Resolver eval (Milestone 1)\n");
+
+await test("R1 — navy color infers men's, gender goes in do_not_ask", async () => {
+  const facetIndex = {
+    categoryByGender: { sneakers: ["men", "women"], sandals: ["women"] },
+    colorByGenderCategory: {
+      "men:sneakers": ["navy", "black"],
+      "women:sneakers": ["white"],
+      "women:sandals": ["red", "tan"],
+    },
+    conditionByCategory: {},
+    sizeByGenderCategory: {},
+  };
+  const products = [
+    { handle: "dash", title: "Dash Navy Sneaker", category: "sneakers", gender: ["men"], colors: ["navy"], available: true, conditionTags: [] },
+  ];
+
+  const out = await resolveCatalogTurn({
+    shop: SHOP,
+    query: "navy sneakers",
+    userConstraints: { color: "navy" },
+    _testFacetIndex: facetIndex,
+    _testFetchCandidates: makeFetcher(products),
+  });
+
+  assert.equal(out.type, "resolver_state");
+  assert.equal(out.matched_constraints.color, "navy");
+  assert.equal(out.inferred_constraints.gender?.value, "men");
+  assert.ok(out.do_not_ask.includes("gender"), `do_not_ask must include gender, got ${JSON.stringify(out.do_not_ask)}`);
+});
+
+await test("R2 — pink men's request → impossible (no pink in men's)", async () => {
+  const facetIndex = {
+    categoryByGender: { sneakers: ["men", "women"] },
+    colorByGenderCategory: {
+      "men:sneakers": ["navy", "black"],
+      "women:sneakers": ["pink", "white"],
+    },
+    conditionByCategory: {},
+    sizeByGenderCategory: {},
+  };
+  const products = [
+    { handle: "ada", title: "Ada Pink Sneaker", category: "sneakers", gender: ["women"], colors: ["pink"], available: true, conditionTags: [] },
+  ];
+
+  const out = await resolveCatalogTurn({
+    shop: SHOP,
+    query: "pink men's shoes",
+    userConstraints: { color: "pink", gender: "men", category: "sneakers" },
+    _testFacetIndex: facetIndex,
+    _testFetchCandidates: makeFetcher(products),
+  });
+
+  const impColors = out.impossible_constraints.filter((c) => c.field === "color");
+  assert.ok(impColors.length > 0, `expected color in impossible_constraints; got ${JSON.stringify(out.impossible_constraints)}`);
+  assert.equal(out.recommended_next_action.type, "no_match");
+});
+
+await test("R3 — flat feet from session memory carries through", async () => {
+  const facetIndex = {
+    categoryByGender: { sneakers: ["men", "women"] },
+    colorByGenderCategory: { "women:sneakers": ["white"] },
+    conditionByCategory: { sneakers: ["flat_feet"] },
+    sizeByGenderCategory: {},
+  };
+  const products = [
+    { handle: "carly", title: "Carly Sneaker", category: "sneakers", gender: ["women"], colors: ["white"], conditionTags: ["flat_feet"], available: true, totalInventory: 8 },
+  ];
+
+  const out = await resolveCatalogTurn({
+    shop: SHOP,
+    query: "show me sneakers",
+    userConstraints: { gender: "women", category: "sneakers" },
+    sessionMemory: { explicit: { condition: "flat_feet" } },
+    _testFacetIndex: facetIndex,
+    _testFetchCandidates: makeFetcher(products),
+  });
+
+  assert.equal(out.matched_constraints.condition, "flat_feet");
+  assert.ok(out.do_not_ask.includes("condition"));
+  assert.equal(out.recommended_next_action.type, "recommend");
+  assert.ok(out.candidate_products.length > 0);
+});
+
+await test("R4 — Vania + 11W OOS → controlled_oos", async () => {
+  const facetIndex = {
+    categoryByGender: { sandals: ["women"] },
+    colorByGenderCategory: { "women:sandals": ["red", "tan"] },
+    conditionByCategory: {},
+    sizeByGenderCategory: { "women:sandals": ["8", "9", "10"] },
+  };
+  const products = [];   // no available sizes match request
+
+  const out = await resolveCatalogTurn({
+    shop: SHOP,
+    query: "show me vania in 11W",
+    userConstraints: { specificProduct: "vania", gender: "women", category: "sandals", size: "11W" },
+    _testFacetIndex: facetIndex,
+    _testFetchCandidates: makeFetcher(products),
+    _testFindOos: async (handle) => ({ productHandle: handle, title: "Vania Platform Sandal" }),
+  });
+
+  assert.equal(out.recommended_next_action.type, "controlled_oos");
+  assert.equal(out.recommended_next_action.product_handle, "vania");
+  assert.ok(out.recommended_next_action.pdp_url.includes("vania"));
+});
+
+await test("R5 — too-broad intent → ask with chip_options", async () => {
+  const facetIndex = {
+    categoryByGender: { sneakers: ["men", "women"], sandals: ["women"], boots: ["women"] },
+    colorByGenderCategory: {},
+    conditionByCategory: {},
+    sizeByGenderCategory: {},
+  };
+
+  const out = await resolveCatalogTurn({
+    shop: SHOP,
+    query: "show me shoes",
+    userConstraints: {},
+    _testFacetIndex: facetIndex,
+    _testFetchCandidates: makeFetcher([]),
+  });
+
+  assert.equal(out.recommended_next_action.type, "ask");
+  assert.equal(out.candidate_products.length, 0);
+  assert.ok(out.recommended_next_action.chip_options.length > 0);
+});
+
+await test("R6 — facet index missing → resolver skips (graceful)", async () => {
+  const out = await resolveCatalogTurn({
+    shop: SHOP,
+    query: "tell me about aetrex",
+    userConstraints: {},
+    _testFacetIndex: null,
+  });
+
+  assert.equal(out.type, "skip");
+  assert.equal(out.reason, "facet_index_not_built");
+});
+
+await test("R7 — capability check helper is correctly exported", async () => {
+  const { isCapabilityCheckAboutPriorProducts } = await import("../app/lib/chat-helpers.server.js");
+  assert.equal(isCapabilityCheckAboutPriorProducts("are they good for hiking?"), true);
+  assert.equal(isCapabilityCheckAboutPriorProducts("show me sneakers"), false);
+});
+
+await test("R8 — red sandals exist only in women's → infer gender", async () => {
+  const facetIndex = {
+    categoryByGender: { sandals: ["women"] },
+    colorByGenderCategory: { "women:sandals": ["red", "tan"] },
+    conditionByCategory: {},
+    sizeByGenderCategory: {},
+  };
+  const products = [
+    { handle: "kendall", title: "Kendall Red Sandal", category: "sandals", gender: ["women"], colors: ["red"], available: true, conditionTags: [], totalInventory: 8 },
+  ];
+
+  const out = await resolveCatalogTurn({
+    shop: SHOP,
+    query: "red sandals",
+    userConstraints: { color: "red", category: "sandals" },
+    _testFacetIndex: facetIndex,
+    _testFetchCandidates: makeFetcher(products),
+  });
+
+  assert.equal(out.matched_constraints.color, "red");
+  assert.equal(out.matched_constraints.category, "sandals");
+  assert.equal(out.inferred_constraints.gender?.value, "women");
+  assert.ok(out.do_not_ask.includes("gender"));
+});
+
+await test("R9 — orange sandals don't exist → impossible + alternatives", async () => {
+  const facetIndex = {
+    categoryByGender: { sandals: ["women"] },
+    colorByGenderCategory: { "women:sandals": ["red", "tan", "black"] },
+    conditionByCategory: {},
+    sizeByGenderCategory: {},
+  };
+  const products = [
+    { handle: "kendall", title: "Kendall Sandal - Red", category: "sandals", gender: ["women"], colors: ["red"], available: true, conditionTags: [], totalInventory: 8 },
+    { handle: "jillian", title: "Jillian Sandal - Tan", category: "sandals", gender: ["women"], colors: ["tan"], available: true, conditionTags: [], totalInventory: 8 },
+  ];
+
+  const out = await resolveCatalogTurn({
+    shop: SHOP,
+    query: "orange sandals",
+    userConstraints: { color: "orange", category: "sandals" },
+    _testFacetIndex: facetIndex,
+    _testFetchCandidates: makeFetcher(products),
+  });
+
+  const impColor = out.impossible_constraints.find((c) => c.field === "color");
+  assert.ok(impColor, "expected color in impossible_constraints");
+  assert.equal(out.recommended_next_action.type, "no_match");
+  assert.ok(out.candidate_products.length > 0, "should still offer alternatives in the same category");
+});
+
+await test("R10 — multi-turn narrowing: do_not_ask grows monotonically", async () => {
+  const facetIndex = {
+    categoryByGender: { sandals: ["women"] },
+    colorByGenderCategory: { "women:sandals": ["red"] },
+    conditionByCategory: {},
+    sizeByGenderCategory: {},
+  };
+  const products = [
+    { handle: "kendall", title: "Kendall Sandal", category: "sandals", gender: ["women"], colors: ["red"], available: true, conditionTags: [], totalInventory: 8 },
+  ];
+  const fetcher = makeFetcher(products);
+
+  const turn1 = await resolveCatalogTurn({ shop: SHOP, query: "show me shoes", userConstraints: {}, _testFacetIndex: facetIndex, _testFetchCandidates: fetcher });
+  const turn2 = await resolveCatalogTurn({ shop: SHOP, query: "sandals", userConstraints: { category: "sandals" }, _testFacetIndex: facetIndex, _testFetchCandidates: fetcher });
+  const turn3 = await resolveCatalogTurn({ shop: SHOP, query: "women's", userConstraints: { category: "sandals", gender: "women" }, _testFacetIndex: facetIndex, _testFetchCandidates: fetcher });
+
+  // turn2 must include category (turn 1 had nothing). turn3 must include category + gender.
+  assert.ok(turn2.do_not_ask.includes("category"), "turn 2 should know category");
+  assert.ok(turn3.do_not_ask.includes("category"), "turn 3 should still know category");
+  assert.ok(turn3.do_not_ask.includes("gender"), "turn 3 should know gender (both matched and inferred)");
+});
+
+await test("R11 — explicit user constraint overrides stale session memory", async () => {
+  const facetIndex = {
+    categoryByGender: { clogs: ["men", "women"] },
+    colorByGenderCategory: {},
+    conditionByCategory: {},
+    sizeByGenderCategory: {},
+  };
+
+  const out = await resolveCatalogTurn({
+    shop: SHOP,
+    query: "show me men's clogs",
+    userConstraints: { gender: "men", category: "clogs" },
+    sessionMemory: { explicit: { gender: "women" } },  // stale
+    _testFacetIndex: facetIndex,
+    _testFetchCandidates: makeFetcher([
+      { handle: "bondi", title: "Bondi Clog", category: "clogs", gender: ["men"], colors: [], available: true, conditionTags: [], totalInventory: 8 },
+    ]),
+  });
+
+  assert.equal(out.matched_constraints.gender, "men");
+});
+
+await test("R12 — when action is 'ask', candidate_products is empty (no cards while asking)", async () => {
+  const facetIndex = {
+    categoryByGender: { sneakers: ["men", "women"], sandals: ["women"] },
+    colorByGenderCategory: {},
+    conditionByCategory: {},
+    sizeByGenderCategory: {},
+  };
+
+  const out = await resolveCatalogTurn({
+    shop: SHOP,
+    query: "show me shoes",
+    userConstraints: {},
+    _testFacetIndex: facetIndex,
+    _testFetchCandidates: makeFetcher([]),
+  });
+
+  assert.equal(out.recommended_next_action.type, "ask");
+  assert.equal(out.candidate_products.length, 0, "candidate_products MUST be empty when action is ask");
+});
+
+await test("buildResolverStatePromptBlock — produces non-empty block for resolver_state output", async () => {
+  const facetIndex = {
+    categoryByGender: { sandals: ["women"] },
+    colorByGenderCategory: { "women:sandals": ["red"] },
+    conditionByCategory: {},
+    sizeByGenderCategory: {},
+  };
+
+  const out = await resolveCatalogTurn({
+    shop: SHOP,
+    query: "red sandals",
+    userConstraints: { color: "red", category: "sandals" },
+    _testFacetIndex: facetIndex,
+    _testFetchCandidates: makeFetcher([
+      { handle: "x", title: "X Sandal", category: "sandals", gender: ["women"], colors: ["red"], available: true, conditionTags: [], totalInventory: 8 },
+    ]),
+  });
+  const block = buildResolverStatePromptBlock(out);
+  assert.ok(block.length > 100, "block should be non-trivial");
+  assert.ok(block.includes("RESOLVER STATE"), "block should contain header");
+  assert.ok(block.includes("do_not_ask"), "block should include do_not_ask line");
+});
+
+await test("buildResolverStatePromptBlock — returns empty string for skip output", () => {
+  const block = buildResolverStatePromptBlock({ type: "skip", reason: "facet_index_not_built" });
+  assert.equal(block, "");
+});
+
+console.log("");
+if (failed === 0) {
+  console.log(`PASS  ${passed} passed, 0 failed`);
+  process.exit(0);
+} else {
+  console.log(`FAIL  ${passed} passed, ${failed} failed`);
+  for (const f of failures) {
+    console.log(`  ${f.name}:`);
+    console.log(`    ${f.err?.stack || f.err}`);
+  }
+  process.exit(1);
+}

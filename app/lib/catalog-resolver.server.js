@@ -1,0 +1,573 @@
+// Catalog resolver (Milestone 1).
+//
+// Constraint-propagation layer that sits between the customer
+// message and Claude. Reads the CatalogFacetIndex (a per-shop
+// pre-computed matrix) and CatalogFact rows to produce structured
+// resolver state:
+//
+//   {
+//     matched_constraints:      { color: "red" }
+//     inferred_constraints:     { gender: { value: "women", reason: "..." } }
+//     impossible_constraints:   [{ field: "color", value: "pink", reason: "..." }]
+//     remaining_disambiguators: ["size"]
+//     do_not_ask:               ["gender", "color"]
+//     candidate_products:       [{ handle, title, why_recommended, availability }]
+//     recommended_next_action:  { type: "recommend" | "ask" | "no_match" | "controlled_oos" | "skip", ... }
+//   }
+//
+// Called from chat.jsx ONLY for product-shopping turns (greetings,
+// brand info, policy, capability checks about prior cards bypass
+// this layer). The resolver itself returns
+// `{ type: "skip", reason: ... }` when it can't add value (e.g., the
+// catalog facet index hasn't been built yet for this shop, or no
+// useful constraints could be extracted from the input).
+//
+// Reuses existing data: getCategoryGenderAvailability already lives
+// in app/models/Product.server.js; we lean on the new
+// CatalogFacetIndex for the rest. We do NOT duplicate the existing
+// search_products logic — the resolver returns a structured
+// constraint state and a candidate-product preview. search_products
+// continues to do the heavy keyword + semantic + filter-wipeout work
+// when needed, but it now also reads ctx.resolverState to skip
+// redundant disambiguation.
+
+import prisma from "../db.server.js";
+import { getCatalogFacetIndex } from "./catalog-facts.server.js";
+
+// ─── helpers ───────────────────────────────────────────────────
+
+// Internal "fact" with confidence + source metadata. The LLM only
+// sees { value, reason } — confidence and source are logged for
+// debugging and used to break ties.
+function mkFact(value, reason, source, confidence = 1.0) {
+  return { value, reason, source, confidence };
+}
+
+// Build sessionMemory facts dictionary from existing
+// conversation-memory output. extractAnsweredChoices returns
+// { gender, useCase, condition, arch, overpronation } shape.
+function sessionMemoryFromAnsweredChoices(answeredChoices = {}) {
+  const out = { explicit: {}, inferred: {} };
+  for (const [k, v] of Object.entries(answeredChoices)) {
+    if (v == null || v === "") continue;
+    out.explicit[k] = String(v).toLowerCase();
+  }
+  return out;
+}
+
+// ─── core resolver ─────────────────────────────────────────────
+
+// Map of which fields are "required" for a recommendation. A turn
+// can recommend only when matched + inferred + session memory
+// covers gender + category (the catalog's structural primary key).
+const REQUIRED_FIELDS = ["gender", "category"];
+
+// For inferred reasoning: when a single color exists in only one
+// gender across all categories, gender is unambiguous.
+function inferGenderFromColor(color, facetIndex) {
+  if (!color || !facetIndex) return null;
+  const colorByGenderCategory = facetIndex.colorByGenderCategory || {};
+  const gendersWithThisColor = new Set();
+  for (const [gck, colors] of Object.entries(colorByGenderCategory)) {
+    if (Array.isArray(colors) && colors.includes(color)) {
+      const [g] = gck.split(":");
+      if (g && g !== "unisex") gendersWithThisColor.add(g);
+    }
+  }
+  if (gendersWithThisColor.size === 1) {
+    return Array.from(gendersWithThisColor)[0];
+  }
+  return null;
+}
+
+// When category exists in only one gender, gender is inferred.
+function inferGenderFromCategory(category, facetIndex) {
+  if (!category || !facetIndex) return null;
+  const categoryByGender = facetIndex.categoryByGender || {};
+  const genders = categoryByGender[category];
+  if (Array.isArray(genders)) {
+    const realGenders = genders.filter((g) => g && g !== "unisex");
+    if (realGenders.length === 1) return realGenders[0];
+  }
+  return null;
+}
+
+// Check whether a (gender, category, color) combination exists.
+function colorExistsInScope(color, gender, category, facetIndex) {
+  if (!color || !facetIndex) return null;
+  const colorByGenderCategory = facetIndex.colorByGenderCategory || {};
+
+  if (gender && category) {
+    const colors = colorByGenderCategory[`${gender}:${category}`];
+    return Array.isArray(colors) && colors.includes(color);
+  }
+  if (gender) {
+    // Any category in this gender?
+    for (const [gck, colors] of Object.entries(colorByGenderCategory)) {
+      if (gck.startsWith(`${gender}:`) && Array.isArray(colors) && colors.includes(color)) {
+        return true;
+      }
+    }
+    return false;
+  }
+  if (category) {
+    for (const [gck, colors] of Object.entries(colorByGenderCategory)) {
+      if (gck.endsWith(`:${category}`) && Array.isArray(colors) && colors.includes(color)) {
+        return true;
+      }
+    }
+    return false;
+  }
+  // No scope: check if color exists anywhere.
+  for (const colors of Object.values(colorByGenderCategory)) {
+    if (Array.isArray(colors) && colors.includes(color)) return true;
+  }
+  return false;
+}
+
+// Look up candidate products from CatalogFact for the resolved
+// scope. Filters OOS unless includeOos=true (used by the controlled-
+// OOS path when a specific variant was requested).
+async function fetchCandidates({ shop, gender, category, color, condition, includeOos = false, limit = 6 }) {
+  const where = { shop };
+  if (!includeOos) where.available = true;
+  if (category) where.category = category;
+  if (gender) where.gender = { has: gender };
+  if (color) where.colors = { has: color };
+  if (condition) where.conditionTags = { has: condition };
+  where.variantId = null; // product-level rows only for candidates
+
+  const facts = await prisma.catalogFact.findMany({
+    where,
+    take: limit,
+    orderBy: { syncedAt: "desc" },
+    select: {
+      productHandle: true, title: true, available: true,
+      gender: true, colors: true, category: true,
+      conditionTags: true, totalInventory: true,
+    },
+  });
+
+  return facts.map((f) => ({
+    handle: f.productHandle,
+    title: f.title,
+    availability: f.available ? (f.totalInventory > 5 ? "in_stock" : "low_stock") : "out_of_stock",
+    why_recommended: [
+      ...(color && f.colors.includes(color) ? [`matches ${color}`] : []),
+      ...(condition && f.conditionTags.includes(condition) ? [`good for ${condition.replace(/_/g, " ")}`] : []),
+      f.available ? "in stock" : "out of stock",
+    ],
+  }));
+}
+
+// ─── public API ────────────────────────────────────────────────
+
+// Main entry. Returns a ResolverOutput or a skip signal.
+//
+// userConstraints is the structured extraction from classifier
+// (gender, category, color, etc). messages is the full conversation
+// history (used to detect "specific product + attribute" requests
+// for the controlled-OOS path). sessionMemory is derived from
+// conversation-memory's answered choices.
+export async function resolveCatalogTurn({
+  shop,
+  query = "",
+  userConstraints = {},
+  sessionMemory = {},
+  messages = [],
+  // Test-only injection points. Production code never passes these.
+  _testFacetIndex,
+  _testFetchCandidates,
+  _testFindOos,
+}) {
+  // Skip early if we have no scope to work with.
+  const facetIndex = _testFacetIndex !== undefined
+    ? _testFacetIndex
+    : await getCatalogFacetIndex(shop);
+  if (!facetIndex) {
+    return {
+      type: "skip",
+      reason: "facet_index_not_built",
+    };
+  }
+
+  // Merge user constraints + session memory. User-provided wins.
+  const merged = { ...sessionMemory.explicit, ...userConstraints };
+  // Strip nulls.
+  for (const k of Object.keys(merged)) if (merged[k] == null || merged[k] === "") delete merged[k];
+
+  // ── Phase 1: separate matched vs impossible ──────────────────
+  const matched_constraints = {};
+  const impossible_constraints = [];
+  const internal_inferred = {};  // with confidence + source metadata
+  const inferred_constraints = {};
+
+  const categoryByGender = facetIndex.categoryByGender || {};
+  const knownCategories = new Set(Object.keys(categoryByGender));
+
+  // Category check
+  if (merged.category) {
+    if (knownCategories.has(merged.category)) {
+      matched_constraints.category = merged.category;
+    } else {
+      impossible_constraints.push({
+        field: "category",
+        value: merged.category,
+        reason: `we don't carry a "${merged.category}" category`,
+      });
+    }
+  }
+
+  // Gender check
+  if (merged.gender) {
+    if (merged.category && categoryByGender[merged.category]) {
+      const validGendersForCat = categoryByGender[merged.category];
+      if (validGendersForCat.includes(merged.gender) || validGendersForCat.includes("unisex")) {
+        matched_constraints.gender = merged.gender;
+      } else {
+        impossible_constraints.push({
+          field: "gender",
+          value: merged.gender,
+          reason: `${merged.category} only exists in ${validGendersForCat.join(" / ")}`,
+        });
+      }
+    } else {
+      matched_constraints.gender = merged.gender;
+    }
+  }
+
+  // Color check (in scope of category + gender if known)
+  if (merged.color) {
+    const scopeGender = matched_constraints.gender;
+    const scopeCategory = matched_constraints.category;
+    const exists = colorExistsInScope(merged.color, scopeGender, scopeCategory, facetIndex);
+    if (exists) {
+      matched_constraints.color = merged.color;
+    } else if (exists === false) {
+      const scopeLabel = [scopeGender, scopeCategory].filter(Boolean).join(" ") || "the catalog";
+      impossible_constraints.push({
+        field: "color",
+        value: merged.color,
+        reason: `no ${merged.color} products in ${scopeLabel}`,
+      });
+    }
+  }
+
+  // Carry through condition / useCase / size as matched if present
+  // (we don't validate condition existence — search will).
+  for (const k of ["condition", "useCase", "size", "width", "priceMax"]) {
+    if (merged[k] != null) matched_constraints[k] = merged[k];
+  }
+
+  // ── Phase 2: infer constraints from the catalog ──────────────
+
+  // If color is known but gender isn't, try inferring gender from color.
+  if (matched_constraints.color && !matched_constraints.gender) {
+    const inferredGender = inferGenderFromColor(matched_constraints.color, facetIndex);
+    if (inferredGender) {
+      internal_inferred.gender = mkFact(
+        inferredGender,
+        `${matched_constraints.color} exists only in ${inferredGender}'s products`,
+        "color_to_gender",
+        0.95,
+      );
+      inferred_constraints.gender = {
+        value: inferredGender,
+        reason: internal_inferred.gender.reason,
+      };
+    }
+  }
+
+  // If category is known but gender isn't, try inferring.
+  if (matched_constraints.category && !matched_constraints.gender && !inferred_constraints.gender) {
+    const inferredGender = inferGenderFromCategory(matched_constraints.category, facetIndex);
+    if (inferredGender) {
+      internal_inferred.gender = mkFact(
+        inferredGender,
+        `${matched_constraints.category} only exist in ${inferredGender}'s line`,
+        "category_to_gender",
+        0.95,
+      );
+      inferred_constraints.gender = {
+        value: inferredGender,
+        reason: internal_inferred.gender.reason,
+      };
+    }
+  }
+
+  // ── Phase 3: compute do_not_ask + remaining_disambiguators ──
+  const resolvedFields = new Set([
+    ...Object.keys(matched_constraints),
+    ...Object.keys(inferred_constraints),
+  ]);
+  const impossibleFields = new Set(impossible_constraints.map((c) => c.field));
+
+  // do_not_ask: resolved fields + fields that are determined-impossible
+  const do_not_ask = Array.from(new Set([
+    ...resolvedFields,
+    ...impossibleFields,
+  ]));
+
+  // remaining_disambiguators: required fields not yet resolved
+  const remaining_disambiguators = REQUIRED_FIELDS.filter(
+    (f) => !resolvedFields.has(f) && !impossibleFields.has(f),
+  );
+
+  // ── Phase 4: pick recommended_next_action ────────────────────
+
+  // If any constraint is impossible, surface that first.
+  if (impossible_constraints.length > 0) {
+    const candidates = await (_testFetchCandidates || fetchCandidates)({
+      shop,
+      // Drop the impossible constraint when fetching alternatives:
+      gender: matched_constraints.gender,
+      category: matched_constraints.category,
+    });
+    return {
+      type: "resolver_state",
+      matched_constraints,
+      inferred_constraints,
+      impossible_constraints,
+      remaining_disambiguators,
+      do_not_ask,
+      candidate_products: candidates,
+      recommended_next_action: {
+        type: "no_match",
+        reason: impossible_constraints.map((c) => c.reason).join("; "),
+        alternatives: candidates.slice(0, 3).map((c) => c.title),
+      },
+      _internal: { inferred_meta: internal_inferred },
+    };
+  }
+
+  // If we have gender + category resolved, recommend.
+  const effectiveGender = matched_constraints.gender || inferred_constraints.gender?.value;
+  const effectiveCategory = matched_constraints.category;
+
+  if (effectiveGender && effectiveCategory) {
+    const candidates = await (_testFetchCandidates || fetchCandidates)({
+      shop,
+      gender: effectiveGender,
+      category: effectiveCategory,
+      color: matched_constraints.color,
+      condition: matched_constraints.condition,
+    });
+
+    // Controlled-OOS path: if the user asked for a specific product
+    // (the query string names a single product) + an OOS attribute,
+    // we want controlled_oos action, not no_match. For M1 we keep
+    // this conservative — only fire when caller marked it via
+    // userConstraints.specificProduct.
+    if (userConstraints.specificProduct && candidates.length === 0) {
+      const oosFacts = _testFindOos
+        ? await _testFindOos(userConstraints.specificProduct)
+        : await prisma.catalogFact.findFirst({
+            where: { shop, productHandle: userConstraints.specificProduct, variantId: null },
+            select: { productHandle: true, title: true },
+          });
+      if (oosFacts) {
+        return {
+          type: "resolver_state",
+          matched_constraints,
+          inferred_constraints,
+          impossible_constraints,
+          remaining_disambiguators,
+          do_not_ask,
+          candidate_products: [],
+          recommended_next_action: {
+            type: "controlled_oos",
+            product_handle: oosFacts.productHandle,
+            product_title: oosFacts.title,
+            pdp_url: `/products/${oosFacts.productHandle}`,
+            oos_attribute: matched_constraints.size || matched_constraints.color || "this variant",
+          },
+          _internal: { inferred_meta: internal_inferred },
+        };
+      }
+    }
+
+    return {
+      type: "resolver_state",
+      matched_constraints,
+      inferred_constraints,
+      impossible_constraints,
+      remaining_disambiguators,
+      do_not_ask,
+      candidate_products: candidates,
+      recommended_next_action: candidates.length > 0
+        ? { type: "recommend", reason: `${candidates.length} products match` }
+        : { type: "no_match", reason: "no products match these constraints", alternatives: [] },
+      _internal: { inferred_meta: internal_inferred },
+    };
+  }
+
+  // Otherwise, ask for the highest-impact missing field.
+  const askField = remaining_disambiguators[0]; // gender first, then category
+  let chipOptions = [];
+  if (askField === "gender") {
+    // Restrict chip options to genders actually present in scope.
+    if (effectiveCategory && categoryByGender[effectiveCategory]) {
+      chipOptions = categoryByGender[effectiveCategory].filter((g) => g !== "unisex");
+    } else {
+      // All genders observed in shop:
+      const all = new Set();
+      for (const genders of Object.values(categoryByGender)) {
+        for (const g of genders) if (g !== "unisex") all.add(g);
+      }
+      chipOptions = Array.from(all).sort();
+    }
+  } else if (askField === "category") {
+    if (effectiveGender) {
+      chipOptions = Object.entries(categoryByGender)
+        .filter(([, genders]) => genders.includes(effectiveGender) || genders.includes("unisex"))
+        .map(([cat]) => cat)
+        .sort();
+    } else {
+      chipOptions = Object.keys(categoryByGender).sort();
+    }
+  }
+
+  return {
+    type: "resolver_state",
+    matched_constraints,
+    inferred_constraints,
+    impossible_constraints,
+    remaining_disambiguators,
+    do_not_ask,
+    candidate_products: [],
+    recommended_next_action: askField
+      ? {
+          type: "ask",
+          field: askField,
+          chip_options: chipOptions,
+          reason: `need ${askField} to narrow recommendations`,
+        }
+      : { type: "skip", reason: "nothing to disambiguate" },
+    _internal: { inferred_meta: internal_inferred },
+  };
+}
+
+// Build the system-prompt block from a resolver state. Returns ""
+// when the resolver returned skip — so the chat route can blindly
+// concatenate the result.
+export function buildResolverStatePromptBlock(resolverState) {
+  if (!resolverState || resolverState.type !== "resolver_state") return "";
+
+  const lines = [
+    "",
+    "=== RESOLVER STATE (ground truth for this turn) ===",
+    "This is precomputed from the live catalog. Treat as truth.",
+    "",
+    `matched_constraints: ${JSON.stringify(resolverState.matched_constraints)}`,
+    `inferred_constraints: ${JSON.stringify(resolverState.inferred_constraints)}`,
+    `impossible_constraints: ${JSON.stringify(resolverState.impossible_constraints)}`,
+    `remaining_disambiguators: ${JSON.stringify(resolverState.remaining_disambiguators)}`,
+    `do_not_ask: ${JSON.stringify(resolverState.do_not_ask)}`,
+    `candidate_products: ${JSON.stringify(
+      (resolverState.candidate_products || []).map(({ handle, title, availability }) => ({ handle, title, availability }))
+    )}`,
+    `recommended_next_action: ${JSON.stringify(resolverState.recommended_next_action)}`,
+    "",
+    "Resolver-state rules:",
+    "1. Treat resolver state as truth. Do NOT search again unless the customer changed scope.",
+    "2. NEVER ask about any field listed in do_not_ask. They are already resolved.",
+    "3. If inferred_constraints contains a field, naturally mention the inference. Example: 'Since red only comes in our women's line — here are the red women's options.'",
+    "4. If impossible_constraints is non-empty, say so plainly before offering alternatives.",
+    "5. recommended_next_action drives your response shape:",
+    "   - recommend → introduce candidate_products in 1 sentence; cards render below.",
+    "   - ask → ask ONLY that one field, using chip_options exactly.",
+    "   - no_match → use the alternatives list to offer next steps.",
+    "   - controlled_oos → use the OOS phrasing: '[Product] in [attribute] isn't currently in stock — visit the product page to sign up for back-in-stock alerts.'",
+    "   - skip → resolver had nothing to add; use normal reasoning.",
+    "6. NEVER invent product names, colors, sizes, or prices. If it's not in candidate_products or search results, it doesn't exist for this turn.",
+    "",
+  ];
+
+  return lines.join("\n");
+}
+
+// Lightweight constraint extractor for the resolver preflight.
+// Scans the latest user message against the facet index and synonym
+// maps. Returns { gender?, category?, color?, condition?, useCase? }.
+// Intentionally narrow — we only extract things the resolver can
+// validate against the catalog. Anything subtler is left to search.
+const RESOLVER_COLOR_LEX = {
+  burgundy: "burgundy", wine: "burgundy", maroon: "burgundy",
+  navy: "navy",
+  cognac: "cognac", tan: "tan", camel: "tan",
+  charcoal: "charcoal", gray: "gray", grey: "gray",
+  white: "white", ivory: "white", cream: "white",
+  black: "black",
+  brown: "brown", chocolate: "brown", walnut: "brown", chestnut: "brown",
+  red: "red",
+  pink: "pink", rose: "pink", coral: "pink",
+  blue: "blue", denim: "blue",
+  green: "green", olive: "green", sage: "green",
+  yellow: "yellow", mustard: "yellow", honey: "yellow",
+  orange: "orange",
+  purple: "purple", violet: "purple",
+  gold: "gold", silver: "silver", bronze: "bronze", taupe: "taupe",
+};
+const RESOLVER_GENDER_LEX = {
+  "men's": "men", mens: "men", men: "men", male: "men", man: "men", guy: "men", guys: "men",
+  "women's": "women", womens: "women", women: "women", female: "women", woman: "women", ladies: "women",
+  kids: "kids", kid: "kids", child: "kids", children: "kids", youth: "kids", boy: "kids", girl: "kids", son: "kids", daughter: "kids",
+  unisex: "unisex",
+};
+const RESOLVER_CATEGORY_LEX = {
+  sneakers: "sneakers", sneaker: "sneakers", trainers: "sneakers", trainer: "sneakers",
+  sandals: "sandals", sandal: "sandals", slides: "sandals",
+  boots: "boots", boot: "boots", booties: "boots",
+  loafers: "loafers", loafer: "loafers",
+  oxfords: "oxfords", oxford: "oxfords",
+  clogs: "clogs", clog: "clogs",
+  "slip-ons": "slip-ons", "slip-on": "slip-ons",
+  slippers: "slippers", slipper: "slippers",
+  "mary janes": "mary-janes", "mary-janes": "mary-janes",
+  heels: "wedges-heels", wedges: "wedges-heels",
+  orthotics: "orthotics", orthotic: "orthotics", insoles: "orthotics", insole: "orthotics",
+  accessories: "accessories", accessory: "accessories",
+};
+const RESOLVER_CONDITION_RE = {
+  plantar_fasciitis: /\bplantar(?:\s+fasciitis)?\b/i,
+  flat_feet: /\b(?:flat\s+feet|low\s+arch|fallen\s+arches?)\b/i,
+  high_arch: /\bhigh\s+arch\b/i,
+  bunions: /\bbunion(?:s|ettes?)?\b/i,
+  diabetic: /\b(?:diabetic|diabetes)\b/i,
+};
+const RESOLVER_USECASE_RE = {
+  walking: /\bwalking\b/i,
+  running: /\brunning\b/i,
+  travel: /\btravel\b/i,
+  dress: /\b(?:dress|formal|wedding)\b/i,
+  athletic: /\b(?:athletic|gym|workout)\b/i,
+  hiking: /\bhiking\b/i,
+};
+
+function matchLex(text, lex) {
+  if (!text) return null;
+  const lc = String(text).toLowerCase();
+  for (const [key, canonical] of Object.entries(lex)) {
+    const re = new RegExp(`(?:^|[^a-z])${key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?:[^a-z]|$)`, "i");
+    if (re.test(lc)) return canonical;
+  }
+  return null;
+}
+
+export function extractUserConstraints(message) {
+  if (!message || typeof message !== "string") return {};
+  const out = {};
+  const gender = matchLex(message, RESOLVER_GENDER_LEX);
+  if (gender) out.gender = gender;
+  const category = matchLex(message, RESOLVER_CATEGORY_LEX);
+  if (category) out.category = category;
+  const color = matchLex(message, RESOLVER_COLOR_LEX);
+  if (color) out.color = color;
+  for (const [tag, re] of Object.entries(RESOLVER_CONDITION_RE)) {
+    if (re.test(message)) { out.condition = tag; break; }
+  }
+  for (const [tag, re] of Object.entries(RESOLVER_USECASE_RE)) {
+    if (re.test(message)) { out.useCase = tag; break; }
+  }
+  return out;
+}

@@ -2290,6 +2290,13 @@ export async function executeTool(name, input, ctx) {
     if (ctx?.shop) {
       logMentions(ctx.shop, mentionsFromResult(name, result)).catch(() => {});
     }
+    // Surface resolverState alongside search_products output so the
+    // LLM sees catalog ground-truth context (Milestone 1). Additive —
+    // no existing field is overwritten, and absent ctx.resolverState
+    // leaves the result unchanged.
+    if (name === "search_products" && ctx?.resolverState && result && typeof result === "object" && !result.error) {
+      return { ...result, resolverState: ctx.resolverState };
+    }
     return result;
   } catch (err) {
     console.error(`[tool ${name}] error:`, err?.message || err);
