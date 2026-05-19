@@ -11,6 +11,7 @@
 
 import assert from "node:assert/strict";
 import { maybeRunOrthoticFlow } from "../app/lib/orthotic-flow-gate.server.js";
+import { resolverPromisedRecommendation } from "../app/lib/chat-postprocessing.js";
 
 let passed = 0;
 let failed = 0;
@@ -141,6 +142,113 @@ await test("Stabilization — denial-recovery predicate stands down on resolver 
     false,
     "recommend action must NOT trip the recovery-stand-down",
   );
+});
+
+// ── Route-level fulfillment regression (M1 stabilization) ─────
+//
+// Production trace: customer pivots from "Find men's shoes for my
+// needs" to "how about women orthotics?". Resolver returns
+// action=recommend with 6 candidates, but the customer saw the
+// empty-pool fallback "Hmm, nothing's quite hitting that
+// combination..." — because the LLM never called search_products
+// (resolverState told it to trust the resolver verdict), the pool
+// stayed empty, and empty-pool repair fired.
+//
+// Fix invariant: when resolverState says recommend with candidates,
+// (a) the gate must yield to the resolver path (Case C), (b) the
+// route must hydrate cards if the LLM didn't, and (c) empty-pool
+// repair / no-match fallbacks must stand down. We can verify (a) +
+// the predicate side of (b/c) here.
+
+await test("Fulfillment — 'how about women orthotics?' after men-shoes pivot: gate yields, predicate promises", async () => {
+  const cap = makeCapturingController();
+  const resolverState = {
+    type: "resolver_state",
+    matched_constraints: { category: "orthotics", gender: "women" },
+    inferred_constraints: {},
+    impossible_constraints: [],
+    remaining_disambiguators: [],
+    do_not_ask: ["category", "gender"],
+    candidate_products: [
+      { handle: "l620w", title: "L620W Women's Casual Posted Orthotics", availability: "in_stock" },
+      { handle: "l800w", title: "L800W Women's Medium Arch Orthotics", availability: "in_stock" },
+      { handle: "l200w", title: "L200W Women's Diabetic Orthotics", availability: "in_stock" },
+    ],
+    recommended_next_action: { type: "recommend", reason: "3 products match" },
+  };
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "Find men's shoes for my needs" },
+      { role: "assistant", content: "(asks gender)" },
+      { role: "user", content: "Men's" },
+      { role: "assistant", content: "(shows men's shoes)" },
+      { role: "user", content: "how about women orthotics?" },
+    ],
+    tree: ORTHOTIC_TREE,
+    shop: SHOP,
+    controller: cap.controller,
+    encoder: cap.encoder,
+    anthropic: null,
+    haikuModel: "haiku",
+    classifiedIntent: { isOrthoticRequest: true, isFootwearRequest: false, attributes: { gender: "Women" } },
+    resolverState,
+  });
+  // (a) Gate must yield via Case C — resolver wins
+  assert.equal(out.handled, false, "gate must yield to resolver");
+  assert.equal(out.case, "C_resolver_strong_action", `expected case=C; got ${out.case}`);
+  // (b)/(c) Predicate must hold so chat.jsx hydrates + suppresses no-match
+  assert.equal(
+    resolverPromisedRecommendation(resolverState),
+    true,
+    "predicate must promise so empty-pool repair stands down and recovery hydration runs",
+  );
+  // The gate itself must not emit any no-match text
+  assert.ok(!/nothing.{0,3}s quite hitting/i.test(cap.text()), "gate must not emit no-match");
+  assert.ok(!/no match/i.test(cap.text()), "gate must not say 'no match'");
+  assert.ok(!/can.{0,2}t find/i.test(cap.text()), "gate must not say 'can't find'");
+  assert.ok(!/combination/i.test(cap.text()), "gate must not mention 'combination'");
+});
+
+await test("Fulfillment — 'how about orthotics?' with gender known but no condition: recommender asks, never no-match", async () => {
+  // When resolver matched gender+category but no condition/useCase
+  // is set, the orthotic recommender flow should drive the next
+  // question (via case A in the gate's tree walking) OR resolver
+  // returns ask. Either way the customer must NOT see no-match.
+  const cap = makeCapturingController();
+  const resolverState = {
+    type: "resolver_state",
+    matched_constraints: { category: "orthotics", gender: "women" },
+    inferred_constraints: {},
+    impossible_constraints: [],
+    remaining_disambiguators: [],
+    do_not_ask: ["category", "gender"],
+    candidate_products: [
+      { handle: "l620w", title: "L620W", availability: "in_stock" },
+    ],
+    recommended_next_action: { type: "recommend", reason: "1 product match" },
+  };
+  await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "Women's" },
+      { role: "assistant", content: "(noted)" },
+      { role: "user", content: "how about orthotics?" },
+    ],
+    tree: ORTHOTIC_TREE,
+    shop: SHOP,
+    controller: cap.controller,
+    encoder: cap.encoder,
+    anthropic: null,
+    haikuModel: "haiku",
+    classifiedIntent: { isOrthoticRequest: true, isFootwearRequest: false, attributes: { gender: "Women" } },
+    resolverState,
+  });
+  // Predicate enforces the no-match suppression in chat.jsx.
+  assert.equal(resolverPromisedRecommendation(resolverState), true);
+  // The gate must not emit no-match text either.
+  assert.ok(!/nothing.{0,3}s quite hitting/i.test(cap.text()));
+  assert.ok(!/no match/i.test(cap.text()));
+  assert.ok(!/can.{0,2}t find/i.test(cap.text()));
+  assert.ok(!/combination/i.test(cap.text()));
 });
 
 // ── Case C: resolver_strong_action yields ─────────────────────

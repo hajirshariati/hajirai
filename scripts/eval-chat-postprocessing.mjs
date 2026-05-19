@@ -41,6 +41,7 @@ import {
   detectFootwearOverElicitation,
   stripInternalLeaks,
   containsInternalLanguageLeak,
+  resolverPromisedRecommendation,
 } from "../app/lib/chat-postprocessing.js";
 import {
   isSingularPrescriptive,
@@ -835,6 +836,128 @@ test("internal-leak — full-pipeline ordering: scrub runs before banned-narrati
   const incoming = "The resolver state indicates there are no men's pink sandals. Let me look that up for you.";
   const afterLeak = stripInternalLeaks(incoming).text;
   assert.equal(containsInternalLanguageLeak(afterLeak), false);
+});
+
+// =====================================================================
+// Resolver fulfillment invariant (M1 stabilization)
+// =====================================================================
+//
+// If resolverState.recommended_next_action.type === "recommend"
+// AND candidate_products.length > 0, the customer MUST see cards.
+// Empty-pool repair and the "nothing's quite hitting" fallback are
+// both gated on !resolverPromisedRecommendation(ctx.resolverState).
+
+test("fulfillment — predicate true when action=recommend with candidates", () => {
+  const state = {
+    type: "resolver_state",
+    matched_constraints: { category: "orthotics", gender: "women" },
+    inferred_constraints: {},
+    impossible_constraints: [],
+    recommended_next_action: { type: "recommend", reason: "match" },
+    candidate_products: [
+      { handle: "l620w", title: "L620W", availability: "in_stock" },
+      { handle: "l800w", title: "L800W", availability: "in_stock" },
+    ],
+  };
+  assert.equal(resolverPromisedRecommendation(state), true);
+});
+
+test("fulfillment — predicate false when action=ask (even with candidates)", () => {
+  assert.equal(
+    resolverPromisedRecommendation({
+      type: "resolver_state",
+      recommended_next_action: { type: "ask", field: "category" },
+      candidate_products: [{ handle: "x", title: "X", availability: "in_stock" }],
+      matched_constraints: {}, inferred_constraints: {}, impossible_constraints: [],
+    }),
+    false,
+    "ask must not trigger the recommend invariant",
+  );
+});
+
+test("fulfillment — predicate false when action=recommend but candidates empty", () => {
+  assert.equal(
+    resolverPromisedRecommendation({
+      type: "resolver_state",
+      recommended_next_action: { type: "recommend", reason: "?" },
+      candidate_products: [],
+      matched_constraints: {}, inferred_constraints: {}, impossible_constraints: [],
+    }),
+    false,
+    "recommend with zero candidates must NOT promise — nothing to render",
+  );
+});
+
+test("fulfillment — predicate false for no_match / controlled_oos / skip", () => {
+  for (const action of ["no_match", "controlled_oos", "skip"]) {
+    assert.equal(
+      resolverPromisedRecommendation({
+        type: "resolver_state",
+        recommended_next_action: { type: action, reason: "x" },
+        candidate_products: [{ handle: "x", title: "X", availability: "in_stock" }],
+        matched_constraints: {}, inferred_constraints: {}, impossible_constraints: [],
+      }),
+      false,
+      `${action} must not trigger the recommend invariant`,
+    );
+  }
+});
+
+test("fulfillment — predicate false for null / undefined / skip-shape resolverState", () => {
+  assert.equal(resolverPromisedRecommendation(null), false);
+  assert.equal(resolverPromisedRecommendation(undefined), false);
+  assert.equal(resolverPromisedRecommendation({ type: "skip", reason: "facet_index_not_built" }), false);
+});
+
+test("fulfillment — empty-pool repair guard: skips when resolver promised recommend", () => {
+  // Mirrors the chat.jsx empty-pool repair condition. The composite
+  // predicate must evaluate to FALSE (do-not-strip) when resolver
+  // promised a recommendation.
+  const ctx = {
+    resolverState: {
+      type: "resolver_state",
+      recommended_next_action: { type: "recommend" },
+      candidate_products: [{ handle: "l620w", title: "L620W", availability: "in_stock" }],
+      matched_constraints: { category: "orthotics", gender: "women" },
+      inferred_constraints: {}, impossible_constraints: [],
+    },
+  };
+  const shouldStripEmptyPool =
+    /* pool.length === 0 */ true &&
+    /* looksLikeProductPitch */ true &&
+    /* !looksLikeClarifyingQuestion */ true &&
+    /* !recommenderAskedForMoreInfo */ true &&
+    /* !isBrandOrInfoQuestion */ true &&
+    !resolverPromisedRecommendation(ctx.resolverState);
+  assert.equal(shouldStripEmptyPool, false, "empty-pool repair MUST stand down when resolver promised recommend");
+});
+
+test("fulfillment — fallback selector: never emits 'nothing's quite hitting' when resolver promised recommend", () => {
+  // Mirrors the chat.jsx fallback selection. With promised recommend
+  // the soft clarification line is used; otherwise the legacy line.
+  const selectFallback = (resolverState) =>
+    resolverPromisedRecommendation(resolverState)
+      ? "Tell me a bit more about what you need — condition, use-case, anything — and I'll narrow it down."
+      : "Hmm, nothing's quite hitting that combination — want to widen the budget, try a different color, or look at another style?";
+
+  const promised = {
+    type: "resolver_state",
+    recommended_next_action: { type: "recommend" },
+    candidate_products: [{ handle: "l620w", title: "L620W", availability: "in_stock" }],
+    matched_constraints: { category: "orthotics", gender: "women" },
+    inferred_constraints: {}, impossible_constraints: [],
+  };
+  const noPromise = null;
+
+  const promisedFallback = selectFallback(promised);
+  assert.ok(
+    !/nothing.{0,3}s quite hitting/i.test(promisedFallback) &&
+      !/no match/i.test(promisedFallback) &&
+      !/can.{0,2}t find/i.test(promisedFallback) &&
+      !/combination/i.test(promisedFallback),
+    `fallback for promised recommend must not contain forbidden no-match phrases: ${promisedFallback}`,
+  );
+  assert.ok(/nothing.{0,3}s quite hitting/i.test(selectFallback(noPromise)), "legacy fallback still fires when no resolver promise");
 });
 
 // =====================================================================

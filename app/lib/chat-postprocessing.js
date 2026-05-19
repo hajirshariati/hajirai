@@ -533,6 +533,24 @@ export function stripInternalLeaks(text, { fallback = INTERNAL_LEAK_FALLBACK } =
 }
 
 // =====================================================================
+// Resolver fulfillment invariant (M1 stabilization)
+// =====================================================================
+//
+// If the resolver returned action=recommend with non-empty
+// candidate_products, the customer MUST see product cards. Empty-pool
+// repair / "nothing's quite hitting" fallbacks must stand down when
+// this predicate is true — those failure messages are wrong when the
+// resolver already confirmed the catalog has matches.
+
+export function resolverPromisedRecommendation(resolverState) {
+  if (!resolverState || resolverState.type !== "resolver_state") return false;
+  const action = resolverState.recommended_next_action?.type;
+  if (action !== "recommend") return false;
+  const candidates = resolverState.candidate_products;
+  return Array.isArray(candidates) && candidates.length > 0;
+}
+
+// =====================================================================
 // Smaller heuristics
 // =====================================================================
 

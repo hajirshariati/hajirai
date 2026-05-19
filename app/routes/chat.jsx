@@ -62,6 +62,7 @@ import {
   suggestionContradictsGender,
   detectFootwearOverElicitation,
   stripInternalLeaks,
+  resolverPromisedRecommendation,
 } from "../lib/chat-postprocessing";
 import prisma from "../db.server";
 import { recordChatUsage, getTodayMessageCount } from "../models/ChatUsage.server";
@@ -1204,6 +1205,49 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }
   }
 
+  // Resolver fulfillment invariant (M1 stabilization). If the
+  // resolver returned action=recommend with non-empty
+  // candidate_products and the LLM didn't surface any cards, force
+  // a deterministic search using the resolver's matched/inferred
+  // scope so the customer never sees a no-match for a resolver-
+  // confirmed recommendation. Runs BEFORE the post-processing strips
+  // and the empty-pool repair so the recovered cards are visible to
+  // every downstream check.
+  if (allProductPool.size === 0 && resolverPromisedRecommendation(ctx.resolverState)) {
+    const matched = ctx.resolverState.matched_constraints || {};
+    const inferred = ctx.resolverState.inferred_constraints || {};
+    const gender = matched.gender || inferred.gender?.value;
+    const category = matched.category || inferred.category?.value;
+    const color = matched.color || inferred.color?.value;
+    const condition = matched.condition;
+    const filters = {};
+    if (gender) filters.gender = gender;
+    if (category) filters.category = category;
+    const queryParts = [color, condition, category].filter(Boolean);
+    const query = queryParts.join(" ").trim() || String(ctx.latestUserMessage || "").slice(0, 120).trim();
+    try {
+      const hydrated = await dispatchTool(
+        "search_products",
+        { query, filters, limit: 6 },
+        ctx,
+      );
+      if (hydrated && Array.isArray(hydrated.products) && hydrated.products.length > 0) {
+        productSearchAttempted = true;
+        for (const p of hydrated.products) {
+          if (p?.handle && !allProductPool.has(p.handle)) allProductPool.set(p.handle, p);
+        }
+        console.log(
+          `[chat] resolver-recovery: hydrated ${hydrated.products.length} card(s) ` +
+            `from resolver scope (gender=${gender || "-"} category=${category || "-"} color=${color || "-"})`,
+        );
+      } else {
+        console.log(`[chat] resolver-recovery: search returned 0 even with resolver scope`);
+      }
+    } catch (err) {
+      console.error("[chat] resolver-recovery failed:", err?.message || err);
+    }
+  }
+
   const pool = Array.from(allProductPool.values());
 
   // Internal-language leak scrub. The resolver-state block in the
@@ -1367,7 +1411,8 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     looksLikeProductPitch(fullResponseText) &&
     !looksLikeClarifyingQuestion(fullResponseText) &&
     !recommenderAskedForMoreInfo &&
-    !isBrandOrInfoQuestion(ctx.latestUserMessage)
+    !isBrandOrInfoQuestion(ctx.latestUserMessage) &&
+    !resolverPromisedRecommendation(ctx.resolverState)
   ) {
     console.log(`[chat] empty-pool repair: pitch text without products (searchAttempted=${productSearchAttempted})`);
     fullResponseText = "";
@@ -1408,7 +1453,16 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   }
 
   if (!fullResponseText && pool.length === 0) {
-    fullResponseText = "Hmm, nothing's quite hitting that combination — want to widen the budget, try a different color, or look at another style?";
+    // Resolver fulfillment invariant: if the resolver had a
+    // recommend verdict with candidates, NEVER claim "nothing's
+    // hitting" — that contradicts the catalog-grounded verdict.
+    // Soften to a clarifying ask instead.
+    if (resolverPromisedRecommendation(ctx.resolverState)) {
+      console.log(`[chat] empty-text repair: resolver had recommend+candidates but hydration failed — using soft clarification`);
+      fullResponseText = "Tell me a bit more about what you need — condition, use-case, anything — and I'll narrow it down.";
+    } else {
+      fullResponseText = "Hmm, nothing's quite hitting that combination — want to widen the budget, try a different color, or look at another style?";
+    }
   } else if (!fullResponseText && pool.length > 0) {
     // Strips wiped the entire text (e.g. AI's only output was
     // "Let me look that up for you!") but a search returned products.
