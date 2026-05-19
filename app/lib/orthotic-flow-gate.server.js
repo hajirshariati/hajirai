@@ -332,9 +332,11 @@ export async function maybeRunOrthoticFlow({
     // come straight from a catalog match. no_match is authoritative
     // ONLY when impossible_constraints is non-empty; an empty
     // candidate preview alone is not catalog truth (M2 invariant).
-    // For an orthotic-scope turn, defer no_match to the orthotic
-    // recommender regardless.
-    if (action === "recommend" || action === "controlled_oos") {
+    // For an orthotic-scope turn, defer ALL resolver actions to the
+    // orthotic recommender flow — the recommender owns clinical
+    // attribute collection (condition / useCase / arch /
+    // overpronation), the resolver only owns catalog scope.
+    if ((action === "recommend" || action === "controlled_oos") && !isOrthoticScope) {
       return { handled: false, case: "C_resolver_strong_action" };
     }
     if (action === "no_match" && impossibleCount > 0 && !isOrthoticScope) {
@@ -730,6 +732,15 @@ export async function maybeRunOrthoticFlow({
   // overpronation / useCase). Distinguishes a true chip-click on an
   // active orthotic question from a keyword that happens to match
   // ("heels" → useCase keyword while still on footwear path).
+  //
+  // Note: an earlier attempt also accepted `latestExtracted.<attr>`
+  // as a chip-exact signal, but that over-suppressed path-ambig when
+  // a classifier hallucinated an orthotic-shaped attribute (e.g.
+  // useCase=dress_no_removable from the customer saying "heels"
+  // while on footwear path). Strict chip-label match is the right
+  // signal here. Tree-label drift between the seed file and the
+  // DB-stored tree (e.g. "Flat feet / Overpronation" with different
+  // spacing/casing/punctuation) is fixed at the data layer.
   const latestIsOrthoticChipExact = (() => {
     if (!rawUserText || !tree?.definition?.nodes) return false;
     const norm = rawUserText.trim().toLowerCase().replace(/[^a-z0-9]+/g, "");

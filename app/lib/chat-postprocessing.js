@@ -158,7 +158,19 @@ export function validateFollowUpSuggestion(suggestion, replyText) {
 // of functions detects rejected categories from the customer's latest
 // message and removes matching <<Label>> chips from the AI reply.
 
-const REJECT_RE = /\b(?:no|not|don'?t|doesn'?t|didn'?t|don't[\s-]?(?:like|want)|doesn't[\s-]?(?:like|want)|hate|hates|dislike|dislikes|avoid|avoids|without|besides|other[\s-]?than|except|instead[\s-]?of|rather[\s-]?than|not[\s-]?into|not[\s-]?a[\s-]?fan)\b[^.!?\n]{0,50}\b((?:shoes?|footwear|orthotics?|insoles?|footbeds?|sandals?|sneakers?|boots?|clogs?|loafers?|slippers?|oxfords?|wedges?|heels?|flats?|mules?|mary[\s-]?janes?|slip[\s-]?ons?))\b/gi;
+// Shopping-rejection phrasing. Bare "not" used to be a trigger and
+// caused production false-positives: "but L2305 is not good for
+// flat feet" used to add "flat" and "orthotic" to
+// rejectedCategories, poisoning every subsequent turn. Fix:
+//   1. Drop bare "not", "don't", "doesn't", "didn't" — require the
+//      shopping verb (like/want/need/care/etc.) to disambiguate
+//      from evaluation phrasing ("not good for X", "doesn't apply").
+//   2. Require category nouns to be plural ("flats" not "flat") to
+//      avoid matching "no, my feet are flat" or "flat arches".
+//   3. Keep "no" but only when not followed by an evaluation cue
+//      (handled by the must-be-followed-by-category constraint —
+//      "no good for X" doesn't have a category noun after "no").
+const REJECT_RE = /\b(?:no|don'?t[\s-]?(?:like|want|need|care\s+for|carry|have|do)|doesn'?t[\s-]?(?:like|want|need|care\s+for|carry|have|do)|didn'?t[\s-]?(?:like|want|need|care\s+for)|hate|hates|dislike|dislikes|avoid|avoids|avoiding|without|besides|other[\s-]?than|except[\s-]?for|except|instead[\s-]?of|rather[\s-]?than|not[\s-]?into|not[\s-]?a[\s-]?fan|not[\s-]?interested[\s-]?in)\b[^.!?\n]{0,50}\b((?:shoes?|footwear|orthotics?|insoles?|footbeds?|sandals?|sneakers?|boots?|clogs?|loafers?|slippers?|oxfords?|wedges?|heels?|flats|mules?|mary[\s-]?janes?|slip[\s-]?ons?))\b/gi;
 
 // Footwear umbrella — "shoes" / "footwear" rejects all member
 // categories. Chip filter expects exact category labels, so we

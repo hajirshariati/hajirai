@@ -262,6 +262,26 @@ test("'something other than sneakers' → {sneakers}", () => {
   assert(r.has("sneakers"));
 });
 
+test("'is not good for flat feet' → empty (evaluation phrase, NOT rejection)", () => {
+  // Production false-positive: "but L2305 is not good for flat feet"
+  // was adding "flat" and "orthotic" to rejectedCategories. Tighten
+  // the regex so bare "not" + evaluation phrasing doesn't count as
+  // a category rejection.
+  const r = detectRejectedCategories("but L2305 is not good for flat feet");
+  assert.equal(r.size, 0, `expected no rejections from evaluation phrasing; got ${[...r].join(",")}`);
+});
+
+test("'this one doesn't fit my orthotic insole' → empty (not a rejection)", () => {
+  // Customer complaining about fit, not rejecting orthotics
+  const r = detectRejectedCategories("this one doesn't fit my orthotic insole");
+  assert.equal(r.size, 0, `expected no rejections; got ${[...r].join(",")}`);
+});
+
+test("'no, my feet are flat' → empty (flat is anatomy, not flats category)", () => {
+  const r = detectRejectedCategories("no, my feet are flat");
+  assert.ok(!r.has("flat") && !r.has("flats"), `'flat' alone must not be parsed as the flats category; got ${[...r].join(",")}`);
+});
+
 test("'avoid heels' → {heels}", () => {
   const r = detectRejectedCategories("avoid heels");
   assert(r.has("heels"));

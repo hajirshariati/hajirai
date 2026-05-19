@@ -52,6 +52,20 @@ const SUBJECT_PIVOT_KEYS = [
   "specificProduct",
 ];
 
+// Scope that is owned by a specific category. When category pivots,
+// these get moved to `stale`. useCase, arch, overpronation, and
+// condition are all clinical/contextual attributes tied to a
+// product type — they shouldn't bleed across category changes (e.g.
+// `useCase=athletic` from an orthotic-shopping turn must not carry
+// into a heels-shopping turn). Color/size/width are also category-
+// specific in catalog terms: the set of valid colors for heels
+// differs from sneakers.
+const CATEGORY_BOUND_KEYS = [
+  "color", "size", "width",
+  "condition", "useCase", "arch", "overpronation",
+  "specificProduct",
+];
+
 // Recipient → gender heuristic. The mapping is deliberately
 // conservative — "partner", "friend", "coworker", "spouse" don't
 // imply a gender, so they reset scope without setting one.
@@ -119,6 +133,15 @@ function moveScopeToStale(memory) {
   }
 }
 
+function moveCategoryScopeToStale(memory) {
+  for (const k of CATEGORY_BOUND_KEYS) {
+    if (memory.explicit[k] != null) {
+      memory.stale[k] = memory.explicit[k];
+      delete memory.explicit[k];
+    }
+  }
+}
+
 export function buildSessionMemory({ messages, classifiedIntent, resolverState } = {}) {
   const memory = {
     explicit: { rejectedCategories: [] },
@@ -162,6 +185,17 @@ export function buildSessionMemory({ messages, classifiedIntent, resolverState }
     ) {
       moveScopeToStale(memory);
     }
+    // 3b. Category pivot: category change clears category-owned
+    //     scope (useCase, color, size, width, condition, etc.).
+    //     Without this, `useCase=athletic` from a sneaker turn bleeds
+    //     into a heels turn where it makes no sense.
+    if (
+      memory.explicit.category &&
+      extracted.category &&
+      extracted.category !== memory.explicit.category
+    ) {
+      moveCategoryScopeToStale(memory);
+    }
     // Recipient pivot without a derived gender (e.g. "for my partner")
     // still resets the gender-owned scope so we don't carry the prior
     // subject's category/size forward.
@@ -204,17 +238,23 @@ export function buildSessionMemory({ messages, classifiedIntent, resolverState }
 
   memory.explicit.rejectedCategories = Array.from(rejectedSet);
 
-  // 7. Layer classifier attrs — they only describe the LATEST turn.
-  //    Only fill gaps; don't overwrite an explicit user statement.
+  // 7. Layer classifier attrs as INFERRED, not explicit. The classifier
+  //    is a Haiku that READS conversation context; its output is a guess
+  //    about what the customer probably means, not what they literally
+  //    said. Filing it as `memory.explicit` lets a hallucination
+  //    ("in white" → useCase=athletic_training_sports) become a hard
+  //    catalog constraint the resolver then enforces — that's wrong.
+  //    Resolver and downstream consumers can read `memory.inferred` to
+  //    break ties, but never treat it as a customer-stated fact.
   if (classifiedIntent?.attributes) {
     const a = classifiedIntent.attributes;
     const lastTurnIndex = messages.length - 1;
     for (const k of ["gender", "condition", "useCase"]) {
-      if (a[k] != null && memory.explicit[k] == null) {
+      if (a[k] != null && memory.explicit[k] == null && memory.inferred[k] == null) {
         // Normalize classifier capitalization (e.g. "Women" → "women")
         const v = typeof a[k] === "string" ? a[k].toLowerCase() : a[k];
-        memory.explicit[k] = v;
-        pushFact(memory, k, v, "classifier", lastTurnIndex, 0.85);
+        memory.inferred[k] = v;
+        pushFact(memory, k, v, "classifier", lastTurnIndex, 0.7);
       }
     }
   }
@@ -234,6 +274,25 @@ export function buildSessionMemory({ messages, classifiedIntent, resolverState }
     if (matched.specificProduct != null && memory.explicit.specificProduct == null) {
       memory.explicit.specificProduct = matched.specificProduct;
       pushFact(memory, "specificProduct", matched.specificProduct, "resolver_matched", messages.length - 1, 0.95);
+    }
+
+    // 9. Catalog-contradiction resolution. When resolver inferred a
+    //    gender that contradicts a stale explicit memory.gender (i.e.
+    //    the user pivoted to a category that doesn't exist for the
+    //    explicit gender), trust the catalog inference and move the
+    //    old explicit to stale. Example: customer was browsing men's
+    //    items, then asks "navy heels" — heels are women's-only in
+    //    the catalog → resolver infers gender=women → here we promote
+    //    that inference so the LLM doesn't say "we don't carry men's
+    //    heels" when the customer never asked about men's heels.
+    if (
+      memory.inferred.gender &&
+      memory.explicit.gender &&
+      memory.inferred.gender !== memory.explicit.gender
+    ) {
+      memory.stale.gender = memory.explicit.gender;
+      memory.explicit.gender = memory.inferred.gender;
+      pushFact(memory, "gender", memory.inferred.gender, "catalog_contradiction_resolution", messages.length - 1, 0.95);
     }
   }
 

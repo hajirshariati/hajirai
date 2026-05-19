@@ -2293,6 +2293,13 @@ export async function executeTool(name, input, ctx) {
         // LLM dropped from a later tool call (e.g. gender=Kids picked
         // on turn 2 but missing from turn 3's args).
         messages: ctx?.messages || [],
+        // M2 keyed session memory. Lets the recommender's required-
+        // attribute gate honor facts the customer already established
+        // this session — even when the LLM calls the tool with empty
+        // args. Without this, the gate kept refusing with
+        // "3 attrs missing" while memory plainly had gender + useCase +
+        // condition all set (the "Fit Concierge" loop).
+        sessionMemoryExplicit: ctx?.sessionMemory?.explicit || null,
       });
       console.log(
         `[recommender] tool=${name} masterSku=${result?.masterSku || "(none)"}` +

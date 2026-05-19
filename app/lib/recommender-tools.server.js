@@ -334,7 +334,7 @@ async function filterMasterIndexByShop(shop, masterIndex) {
 // into a tool_result block. The product card travels back via the
 // dedicated card-extraction path the chat layer already has, so we
 // also surface `product` directly for that side channel.
-export async function executeRecommenderTool({ toolName, input, shop, trees, conversationText, latestUserText, messages }) {
+export async function executeRecommenderTool({ toolName, input, shop, trees, conversationText, latestUserText, messages, sessionMemoryExplicit }) {
   if (!toolName || !toolName.startsWith("recommend_")) {
     return { error: "not a recommender tool" };
   }
@@ -422,8 +422,33 @@ export async function executeRecommenderTool({ toolName, input, shop, trees, con
   const attributePrompts = (tree.definition.attributePrompts && typeof tree.definition.attributePrompts === "object")
     ? tree.definition.attributePrompts
     : {};
+  // Merge session memory's explicit facts under tool-call args so
+  // the LLM doesn't have to re-state attributes the customer already
+  // established. Tool call args (LLM's choice) win on conflict —
+  // gives the LLM a way to override stale memory if the customer
+  // pivoted. Empty/missing args fall back to memory. The merged
+  // result becomes the canonical `input` for the rest of this
+  // function (gate check + derivations + resolver call).
+  const memoryAttrs = (sessionMemoryExplicit && typeof sessionMemoryExplicit === "object")
+    ? sessionMemoryExplicit
+    : {};
+  const callArgs = input && typeof input === "object" ? input : {};
+  const mergedInput = { ...memoryAttrs, ...callArgs };
+  for (const k of Object.keys(callArgs)) {
+    const v = callArgs[k];
+    if (v === undefined || v === null || (typeof v === "string" && !v.trim())) {
+      if (memoryAttrs[k] != null && memoryAttrs[k] !== "") {
+        mergedInput[k] = memoryAttrs[k];
+      }
+    }
+  }
+  // Shadow the function-scoped `input` so all downstream code paths
+  // (derivations, enrichment, resolver) see the merged set without
+  // having to rename them.
+  input = mergedInput;
+
   if (required.length > 0) {
-    const provided = input || {};
+    const provided = mergedInput;
     const missing = required.filter((k) => {
       const v = provided[k];
       return v === undefined || v === null || (typeof v === "string" && !v.trim());

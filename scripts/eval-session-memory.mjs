@@ -260,6 +260,78 @@ await test("S19 — empty memory yields empty prompt block", async () => {
   assert.equal(buildSessionMemoryPromptBlock(mem), "");
 });
 
+// ── Production-bug regressions (2026-05-19 logs) ───────────────
+
+await test("S20 — classifier output lands in memory.inferred, NOT memory.explicit", async () => {
+  // Production trace: customer says "in white" → Haiku classifier
+  // hallucinates useCase=athletic_training_sports → that became a
+  // hard memory.explicit constraint the resolver enforced as
+  // catalog truth. Fix: classifier output is inferred, not explicit.
+  const mem = buildSessionMemory({
+    messages: [u("show me men's sneakers"), a("here you go"), u("in white")],
+    classifiedIntent: {
+      isOrthoticRequest: false,
+      isFootwearRequest: true,
+      attributes: { gender: "Men", useCase: "athletic_training_sports", condition: null },
+    },
+  });
+  // The customer explicitly said men+sneakers+white, so those ARE explicit.
+  assert.equal(mem.explicit.gender, "men", "user-stated gender is explicit");
+  assert.equal(mem.explicit.color, "white", "user-stated color is explicit");
+  // useCase came ONLY from the classifier, NEVER from the customer's text.
+  // It must NOT be in explicit.
+  assert.equal(mem.explicit.useCase, undefined, `classifier-hallucinated useCase must NOT be explicit; got ${JSON.stringify(mem.explicit)}`);
+  assert.equal(mem.inferred.useCase, "athletic_training_sports", "classifier useCase must land in inferred");
+});
+
+await test("S21 — category pivot resets category-bound scope (useCase, color, etc.)", async () => {
+  // Production trace: customer was browsing orthotics with
+  // useCase=athletic; then asked "blue heels" — useCase=athletic
+  // bled into the heels turn where it doesn't apply.
+  const mem = buildSessionMemory({
+    messages: [
+      u("I need men's orthotics for training"),
+      a("Got it. Anything else?"),
+      u("athletic"),
+      a("Here you go"),
+      // Pivot to a different category entirely
+      u("what about navy heels"),
+    ],
+  });
+  assert.equal(mem.explicit.category, "wedges-heels", `category should pivot to heels; got ${mem.explicit.category}`);
+  // useCase=athletic should now be stale, not explicit
+  assert.notEqual(mem.explicit.useCase, "athletic", "useCase must NOT bleed across category pivot");
+  // The prior useCase should be preserved in stale for debugging
+  assert.ok(mem.stale.useCase || mem.explicit.useCase == null, "stale should record prior useCase OR it's cleanly cleared");
+});
+
+await test("S22 — catalog-contradiction: stale explicit gender yields to inferred gender", async () => {
+  // Production trace: customer was browsing men's items, then asked
+  // "navy heels" — heels are women's-only. Resolver inferred
+  // gender=women. But memory still had explicit.gender=men from
+  // earlier turns. Result: AI said "we don't carry men's heels"
+  // even though the customer never asked about men's heels.
+  // Fix: when resolver-inferred gender contradicts a carried-over
+  // explicit gender, promote the inference.
+  const mem = buildSessionMemory({
+    messages: [
+      u("men's sneakers"),
+      a("here you go"),
+      u("how about heels"),
+    ],
+    resolverState: {
+      type: "resolver_state",
+      matched_constraints: { category: "wedges-heels" },
+      inferred_constraints: { gender: { value: "women", reason: "heels women-only" } },
+      impossible_constraints: [],
+      recommended_next_action: { type: "ask" },
+      candidate_products: [],
+    },
+  });
+  assert.equal(mem.explicit.gender, "women", `expected promoted gender=women; got ${mem.explicit.gender}`);
+  assert.equal(mem.stale.gender, "men", `prior explicit gender must move to stale; got ${JSON.stringify(mem.stale)}`);
+});
+
 console.log("");
 if (failed === 0) {
   console.log(`PASS  ${passed} passed, 0 failed`);

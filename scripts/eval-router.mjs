@@ -193,9 +193,12 @@ await test("Fulfillment — 'how about women orthotics?' after men-shoes pivot: 
     classifiedIntent: { isOrthoticRequest: true, isFootwearRequest: false, attributes: { gender: "Women" } },
     resolverState,
   });
-  // (a) Gate must yield via Case C — resolver wins
-  assert.equal(out.handled, false, "gate must yield to resolver");
-  assert.equal(out.case, "C_resolver_strong_action", `expected case=C; got ${out.case}`);
+  // (a) Gate must NOT yield Case C for orthotic-scope `recommend` —
+  //     the orthotic recommender owns clinical attributes. The gate
+  //     either handles the turn deterministically OR falls through
+  //     to LLM (which routes to recommend_orthotic with memory).
+  //     Either way, no Case C yield for orthotic recommend.
+  assert.notEqual(out.case, "C_resolver_strong_action", `orthotic-scope recommend must NOT yield Case C; got case=${out.case}`);
   // (b)/(c) Predicate must hold so chat.jsx hydrates + suppresses no-match
   assert.equal(
     resolverPromisedRecommendation(resolverState),
@@ -599,6 +602,52 @@ await test("Router — after orthotic path-lock, 'show me red sandals' is handle
   assert.equal(out.case, "C_resolver_strong_action");
   assert.ok(!/Just to make sure/i.test(cap.text()), "no path-ambig after lock");
   assert.ok(!/men's or women's/i.test(cap.text()), "no gender ask — resolver inferred it");
+});
+
+// ── Fit Concierge production-bug regression ────────────────────
+//
+// Bug: customer said "how about men orthotics?" — resolver matched
+// gender+category and emitted action=recommend with 6 candidates.
+// Gate's Case C yielded to LLM. LLM wrote "Here are some great
+// men's orthotics" pitch text, then tried to call search_products,
+// chat-tool-rewrite redirected to recommend_orthotic, recommender
+// gate refused (needs condition/useCase), LLM emitted another chip
+// question, no cards rendered. Bait-and-switch.
+//
+// Fix: Case C must NOT yield orthotic-scope `recommend` to LLM.
+// The orthotic recommender owns clinical-attribute collection.
+
+await test("M2 Fit Concierge — orthotic-scope action=recommend does NOT yield Case C", async () => {
+  const cap = makeCapturingController();
+  const resolverState = {
+    type: "resolver_state",
+    matched_constraints: { gender: "men", category: "orthotics" },
+    inferred_constraints: {},
+    impossible_constraints: [],
+    remaining_disambiguators: [],
+    do_not_ask: ["gender", "category"],
+    candidate_products: [
+      { handle: "l1820", title: "L1820", availability: "in_stock" },
+      { handle: "l2305", title: "L2305", availability: "in_stock" },
+    ],
+    recommended_next_action: { type: "recommend", reason: "2 products match" },
+  };
+  const out = await maybeRunOrthoticFlow({
+    messages: [{ role: "user", content: "how about men orthotics?" }],
+    tree: ORTHOTIC_TREE,
+    shop: SHOP,
+    controller: cap.controller,
+    encoder: cap.encoder,
+    anthropic: null,
+    haikuModel: "haiku",
+    classifiedIntent: { isOrthoticRequest: true, isFootwearRequest: false, attributes: { gender: "Men" } },
+    resolverState,
+  });
+  // Case C must NOT fire for orthotic-scope recommend — the gate
+  // OR a downstream orthotic-flow path must own this turn instead.
+  assert.notEqual(out.case, "C_resolver_strong_action", `orthotic-scope recommend must not yield Case C; got case=${out.case}`);
+  // No bait-and-switch pitch text emitted by the gate
+  assert.ok(!/here are some great|here.{0,5}s a great lineup/i.test(cap.text()), "gate must not emit pitch text");
 });
 
 console.log("");
