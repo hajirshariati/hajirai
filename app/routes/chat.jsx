@@ -1462,7 +1462,10 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       console.log(`[chat] empty-text repair: resolver had recommend+candidates but hydration failed — using soft clarification`);
       fullResponseText = "Tell me a bit more about what you need — condition, use-case, anything — and I'll narrow it down.";
     } else {
-      fullResponseText = "Hmm, nothing's quite hitting that combination — want to widen the budget, try a different color, or look at another style?";
+      // Neutral clarification line. Avoid "budget" and "combination"
+      // unless the customer actually said either — false claims about
+      // their own constraints irritate.
+      fullResponseText = "Tell me a bit more — color, style, or what you're using them for — and I'll narrow it down.";
     }
   } else if (!fullResponseText && pool.length > 0) {
     // Strips wiped the entire text (e.g. AI's only output was

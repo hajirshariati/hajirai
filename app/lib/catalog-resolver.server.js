@@ -456,7 +456,25 @@ export async function resolveCatalogTurn({
       candidate_products: candidates,
       recommended_next_action: candidates.length > 0
         ? { type: "recommend", reason: `${candidates.length} products match` }
-        : { type: "no_match", reason: "no products match these constraints", alternatives: [] },
+        : effectiveCategory === "orthotics"
+          // Orthotic-domain ownership (M2 routing correctness):
+          // empty CatalogFact preview for orthotics doesn't mean the
+          // catalog lacks them — orthotic SKUs live in the merchant's
+          // recommender masterIndex and are picked by clinical
+          // attributes (condition / arch / useCase / overpronation),
+          // not by gender+category alone. Defer to the orthotic
+          // recommender flow rather than asserting no_match.
+          ? { type: "skip", reason: "orthotic_recommender_owns_clinical_attrs" }
+          // Empty candidate preview with NO impossible constraint
+          // isn't authoritative — it could be a facet-index lag, an
+          // untracked-inventory shape, or a missing attribute. Ask
+          // for a disambiguator instead of claiming we don't have it.
+          : {
+              type: "ask",
+              field: "more_attributes",
+              chip_options: [],
+              reason: "candidate preview empty without an impossible constraint — need more attributes before claiming no match",
+            },
       _internal: { inferred_meta: internal_inferred },
     };
   }
@@ -536,9 +554,9 @@ export function buildResolverStatePromptBlock(resolverState) {
     "5. recommended_next_action drives your response shape:",
     "   - recommend → introduce candidate_products in 1 sentence; cards render below.",
     "   - ask → ask ONLY that one field, using chip_options exactly.",
-    "   - no_match → use the alternatives list to offer next steps.",
+    "   - no_match → this only fires when impossible_constraints names a specific impossibility (e.g. color in this gender+category). Name THAT specific impossibility honestly (\"no exact red in men's sneakers — closest are navy and black\") and offer the alternatives. NEVER turn this into a blanket stock denial like \"we don't have <category>\" or \"<category> isn't in stock\" — that's catalog-level, not constraint-level.",
     "   - controlled_oos → use the OOS phrasing: '[Product] in [attribute] isn't currently in stock — visit the product page to sign up for back-in-stock alerts.'",
-    "   - skip → resolver had nothing to add; use normal reasoning.",
+    "   - skip → resolver had nothing to add; use normal reasoning. NEVER state or imply that the catalog lacks the requested category just because skip fired.",
     "6. NEVER invent product names, colors, sizes, or prices. If it's not in candidate_products or search results, it doesn't exist for this turn.",
     "",
   ];

@@ -416,6 +416,80 @@ await test("R16 — propagation: gender+color → infers category when only one 
   assert.ok(out.do_not_ask.includes("category"), `do_not_ask must include category, got ${JSON.stringify(out.do_not_ask)}`);
 });
 
+// ── M2 routing-correctness invariants ─────────────────────────
+//
+// Empty candidate_products with impossible_constraints=[] is NOT
+// authoritative. The resolver must NOT emit no_match in that
+// shape — instead it must ask for more attributes or, for
+// orthotic-scope turns, skip and defer to the orthotic
+// recommender.
+
+await test("R17 — orthotics with no preview candidates → skip (defer to recommender), NOT no_match", async () => {
+  const facetIndex = {
+    categoryByGender: { orthotics: ["women", "men"] },
+    colorByGenderCategory: {}, // orthotics often have no color matrix
+    conditionByCategory: {},
+    sizeByGenderCategory: {},
+  };
+  const out = await resolveCatalogTurn({
+    shop: SHOP,
+    query: "how about women orthotics?",
+    userConstraints: { gender: "women", category: "orthotics" },
+    _testFacetIndex: facetIndex,
+    _testFetchCandidates: async () => [], // empty preview
+  });
+  assert.notEqual(out.recommended_next_action.type, "no_match", `must NOT no_match with impossible=0; got ${JSON.stringify(out.recommended_next_action)}`);
+  assert.equal(out.recommended_next_action.type, "skip");
+  assert.equal(out.recommended_next_action.reason, "orthotic_recommender_owns_clinical_attrs");
+  assert.equal(out.impossible_constraints.length, 0);
+});
+
+await test("R18 — non-orthotic empty preview with impossible=0 → ask, NOT no_match", async () => {
+  // gender+category resolved but the facet index returned zero candidates
+  // (could be facet-index lag, untracked inventory, etc.). Resolver must
+  // not claim no_match in this shape.
+  const facetIndex = {
+    categoryByGender: { sneakers: ["women", "men"] },
+    colorByGenderCategory: { "women:sneakers": ["white"] },
+    conditionByCategory: {},
+    sizeByGenderCategory: {},
+  };
+  const out = await resolveCatalogTurn({
+    shop: SHOP,
+    query: "show me women's sneakers",
+    userConstraints: { gender: "women", category: "sneakers" },
+    _testFacetIndex: facetIndex,
+    _testFetchCandidates: async () => [],
+  });
+  assert.notEqual(out.recommended_next_action.type, "no_match", `must NOT no_match with impossible=0; got ${JSON.stringify(out.recommended_next_action)}`);
+  assert.equal(out.recommended_next_action.type, "ask");
+  assert.equal(out.impossible_constraints.length, 0);
+});
+
+await test("R19 — real impossibility still produces no_match (men's red sandals where impossible)", async () => {
+  // men's:sandals exists but not in red. impossible_constraints
+  // names color → no_match is still authoritative.
+  const facetIndex = {
+    categoryByGender: { sandals: ["men", "women"] },
+    colorByGenderCategory: {
+      "men:sandals": ["black", "brown"],
+      "women:sandals": ["red", "tan"],
+    },
+    conditionByCategory: {},
+    sizeByGenderCategory: {},
+  };
+  const out = await resolveCatalogTurn({
+    shop: SHOP,
+    query: "men's red sandals",
+    userConstraints: { gender: "men", color: "red", category: "sandals" },
+    _testFacetIndex: facetIndex,
+    _testFetchCandidates: async () => [],
+  });
+  assert.equal(out.recommended_next_action.type, "no_match", `impossible color must still produce no_match`);
+  assert.ok(out.impossible_constraints.length > 0, "must have impossible_constraints");
+  assert.ok(out.impossible_constraints.some((c) => c.field === "color"));
+});
+
 await test("buildResolverStatePromptBlock — produces non-empty block for resolver_state output", async () => {
   const facetIndex = {
     categoryByGender: { sandals: ["women"] },

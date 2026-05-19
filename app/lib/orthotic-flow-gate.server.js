@@ -320,11 +320,27 @@ export async function maybeRunOrthoticFlow({
     const hasCategoryScope = !!(matched.category || inferred.category?.value);
     const hasColorScope = !!(matched.color || inferred.color?.value);
     const hasSpecificProduct = !!matched.specificProduct;
+    const impossibleCount = Array.isArray(resolverState.impossible_constraints)
+      ? resolverState.impossible_constraints.length
+      : 0;
+    const isOrthoticScope =
+      matched.category === "orthotics" ||
+      inferred.category?.value === "orthotics" ||
+      classifiedIntent?.isOrthoticRequest === true;
 
-    if (action === "recommend" || action === "no_match" || action === "controlled_oos") {
+    // recommend and controlled_oos are always authoritative — they
+    // come straight from a catalog match. no_match is authoritative
+    // ONLY when impossible_constraints is non-empty; an empty
+    // candidate preview alone is not catalog truth (M2 invariant).
+    // For an orthotic-scope turn, defer no_match to the orthotic
+    // recommender regardless.
+    if (action === "recommend" || action === "controlled_oos") {
       return { handled: false, case: "C_resolver_strong_action" };
     }
-    if (action === "ask" && (hasCategoryScope || hasColorScope || hasSpecificProduct)) {
+    if (action === "no_match" && impossibleCount > 0 && !isOrthoticScope) {
+      return { handled: false, case: "C_resolver_strong_action" };
+    }
+    if (action === "ask" && (hasCategoryScope || hasColorScope || hasSpecificProduct) && !isOrthoticScope) {
       return { handled: false, case: "D_resolver_ask_with_scope" };
     }
   }

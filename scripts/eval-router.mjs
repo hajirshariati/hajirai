@@ -251,6 +251,148 @@ await test("Fulfillment — 'how about orthotics?' with gender known but no cond
   assert.ok(!/combination/i.test(cap.text()));
 });
 
+// ── M2 routing-correctness regressions ────────────────────────
+//
+// Production bug: resolver returned action=no_match with
+// impossible_constraints=[] and candidates=[], gate yielded Case
+// C, LLM said "we don't have women's orthotics in stock". The fix
+// is structural — empty preview is not authoritative.
+
+// (A) Full sequence: "men's sneakers" → "in red" → "how about women orthotics?"
+// With the resolver authority fix, this scenario gives action=skip
+// (orthotic recommender owns clinical attrs). Gate must NOT yield
+// Case C (no_match would need impossible>0; recommend/oos don't
+// apply). Gate proceeds to its existing orthotic flow.
+await test("M2-A — 'how about women orthotics?' after men's-sneakers history: gate runs orthotic flow, never emits stock-denial", async () => {
+  const cap = makeCapturingController();
+  const resolverState = {
+    type: "resolver_state",
+    matched_constraints: { gender: "women", category: "orthotics" },
+    inferred_constraints: {},
+    impossible_constraints: [],
+    remaining_disambiguators: [],
+    do_not_ask: ["gender", "category"],
+    candidate_products: [],
+    recommended_next_action: { type: "skip", reason: "orthotic_recommender_owns_clinical_attrs" },
+  };
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "show me men's sneakers" },
+      { role: "assistant", content: "(here you go)" },
+      { role: "user", content: "in red" },
+      { role: "assistant", content: "(here are red men's sneakers)" },
+      { role: "user", content: "how about women orthotics?" },
+    ],
+    tree: ORTHOTIC_TREE,
+    shop: SHOP,
+    controller: cap.controller,
+    encoder: cap.encoder,
+    anthropic: null,
+    haikuModel: "haiku",
+    classifiedIntent: { isOrthoticRequest: true, isFootwearRequest: false, attributes: { gender: "Women" } },
+    resolverState,
+  });
+  // The gate must NOT yield Case C — no_match with impossible=0
+  // OR resolver action=skip both mean "not authoritative".
+  assert.notEqual(out.case, "C_resolver_strong_action", `gate must not treat empty-preview as authoritative; got case=${out.case}`);
+  // Whatever the gate emitted must NOT contain stock-denial language.
+  const t = cap.text();
+  for (const banned of ["don't have", "not in stock", "nothing's quite hitting", "no match", "combination"]) {
+    assert.ok(!new RegExp(banned, "i").test(t), `gate emitted forbidden phrase "${banned}": ${t}`);
+  }
+});
+
+// (B) Fresh "how about women orthotics?" — same invariants
+await test("M2-B — fresh 'how about women orthotics?' never emits stock-denial", async () => {
+  const cap = makeCapturingController();
+  const resolverState = {
+    type: "resolver_state",
+    matched_constraints: { gender: "women", category: "orthotics" },
+    inferred_constraints: {},
+    impossible_constraints: [],
+    remaining_disambiguators: [],
+    do_not_ask: ["gender", "category"],
+    candidate_products: [],
+    recommended_next_action: { type: "skip", reason: "orthotic_recommender_owns_clinical_attrs" },
+  };
+  const out = await maybeRunOrthoticFlow({
+    messages: [{ role: "user", content: "how about women orthotics?" }],
+    tree: ORTHOTIC_TREE,
+    shop: SHOP,
+    controller: cap.controller,
+    encoder: cap.encoder,
+    anthropic: null,
+    haikuModel: "haiku",
+    classifiedIntent: { isOrthoticRequest: true, isFootwearRequest: false, attributes: { gender: "Women" } },
+    resolverState,
+  });
+  assert.notEqual(out.case, "C_resolver_strong_action");
+  const t = cap.text();
+  for (const banned of ["don't have", "not in stock", "nothing's quite hitting", "no match", "combination"]) {
+    assert.ok(!new RegExp(banned, "i").test(t), `forbidden phrase "${banned}": ${t}`);
+  }
+});
+
+// (C) Defense-in-depth: a stale resolverState shape with no_match
+// but impossible=[] must not yield Case C.
+await test("M2-C — gate ignores no_match-with-empty-impossible (defense-in-depth)", async () => {
+  const cap = makeCapturingController();
+  const out = await maybeRunOrthoticFlow({
+    messages: [{ role: "user", content: "how about women orthotics?" }],
+    tree: ORTHOTIC_TREE,
+    shop: SHOP,
+    controller: cap.controller,
+    encoder: cap.encoder,
+    anthropic: null,
+    haikuModel: "haiku",
+    classifiedIntent: { isOrthoticRequest: true, isFootwearRequest: false, attributes: {} },
+    // Stale shape — should be impossible to produce after the resolver
+    // fix, but the gate defends regardless.
+    resolverState: {
+      type: "resolver_state",
+      matched_constraints: { gender: "women", category: "orthotics" },
+      inferred_constraints: {},
+      impossible_constraints: [], // empty
+      remaining_disambiguators: [],
+      do_not_ask: [],
+      candidate_products: [],
+      recommended_next_action: { type: "no_match", reason: "x" },
+    },
+  });
+  assert.notEqual(out.case, "C_resolver_strong_action", `gate must NOT yield Case C on no_match with impossible=0`);
+});
+
+// (D) Real impossibility — Case C must still fire so the LLM relays
+// the honest "no exact red in men's sneakers — closest are X" message.
+await test("M2-D — gate yields Case C on no_match WITH impossible_constraints (real impossibility)", async () => {
+  const cap = makeCapturingController();
+  const out = await maybeRunOrthoticFlow({
+    messages: [{ role: "user", content: "men's red sandals" }],
+    tree: ORTHOTIC_TREE,
+    shop: SHOP,
+    controller: cap.controller,
+    encoder: cap.encoder,
+    anthropic: null,
+    haikuModel: "haiku",
+    classifiedIntent: { isOrthoticRequest: false, isFootwearRequest: true, attributes: {} },
+    resolverState: {
+      type: "resolver_state",
+      matched_constraints: { gender: "men", category: "sandals" },
+      inferred_constraints: {},
+      impossible_constraints: [{ field: "color", value: "red", reason: "no red in men's sandals" }],
+      remaining_disambiguators: [],
+      do_not_ask: ["gender", "category", "color"],
+      candidate_products: [
+        { handle: "x", title: "Black Sandal", availability: "in_stock" },
+        { handle: "y", title: "Brown Sandal", availability: "in_stock" },
+      ],
+      recommended_next_action: { type: "no_match", reason: "no red in men's sandals", alternatives: ["Black Sandal", "Brown Sandal"] },
+    },
+  });
+  assert.equal(out.handled, false);
+  assert.equal(out.case, "C_resolver_strong_action", `real impossibility must yield Case C; got case=${out.case}`);
+});
+
 // ── Case C: resolver_strong_action yields ─────────────────────
 await test("Router C — fresh 'red sandals' yields to resolver (no gender hard-ask)", async () => {
   const cap = makeCapturingController();
