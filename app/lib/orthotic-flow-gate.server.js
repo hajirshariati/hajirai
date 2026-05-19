@@ -319,7 +319,7 @@ export async function maybeRunOrthoticFlow({
     const inferred = resolverState.inferred_constraints || {};
     const hasCategoryScope = !!(matched.category || inferred.category?.value);
     const hasColorScope = !!(matched.color || inferred.color?.value);
-    const hasSpecificProduct = !!(matched.specificProduct || resolverState._internal?.specificProduct);
+    const hasSpecificProduct = !!matched.specificProduct;
 
     if (action === "recommend" || action === "no_match" || action === "controlled_oos") {
       return { handled: false, case: "C_resolver_strong_action" };

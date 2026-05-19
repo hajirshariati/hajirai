@@ -325,6 +325,14 @@ export async function resolveCatalogTurn({
     if (merged[k] != null) matched_constraints[k] = merged[k];
   }
 
+  // Surface a customer-named specific product so the orthotic gate's
+  // Case D yield can detect it. The controlled_oos path also reads
+  // userConstraints.specificProduct directly; this just makes the
+  // value visible in resolverState for downstream consumers.
+  if (userConstraints.specificProduct) {
+    matched_constraints.specificProduct = userConstraints.specificProduct;
+  }
+
   // ── Phase 2: constraint propagation ──────────────────────────
   //
   // Compute the possible-value domain for every unresolved tuple

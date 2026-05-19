@@ -98,6 +98,51 @@ const SHOP = "test.myshopify.com";
 
 console.log("Router / gate integration eval (Milestone 1.3)\n");
 
+// ── Stabilization invariant: denial-recovery defers to resolver no_match ─
+// chat.jsx denial-recovery overwrites the LLM's "we don't carry X"
+// with a generic "Actually, take a look at these…" pitch when it
+// can't see a search call. When the resolver explicitly returned
+// no_match (or impossible_constraints), the LLM's denial is the
+// catalog-grounded TRUTH and recovery MUST stand down.
+await test("Stabilization — denial-recovery predicate stands down on resolver no_match", async () => {
+  // Mirrors the chat.jsx inline check. Kept as a unit-style assertion
+  // so future refactors don't quietly drop the gating.
+  const isResolverNoMatchVerdict = (resolverState) =>
+    resolverState?.recommended_next_action?.type === "no_match" ||
+    (Array.isArray(resolverState?.impossible_constraints) &&
+      resolverState.impossible_constraints.length > 0);
+
+  assert.equal(isResolverNoMatchVerdict(null), false);
+  assert.equal(isResolverNoMatchVerdict({ type: "resolver_state", impossible_constraints: [] }), false);
+  assert.equal(
+    isResolverNoMatchVerdict({
+      type: "resolver_state",
+      impossible_constraints: [{ field: "color", value: "pink", reason: "no pink in men's" }],
+      recommended_next_action: { type: "ask" },
+    }),
+    true,
+    "impossible_constraints alone must trip the recovery-stand-down",
+  );
+  assert.equal(
+    isResolverNoMatchVerdict({
+      type: "resolver_state",
+      impossible_constraints: [],
+      recommended_next_action: { type: "no_match", reason: "no products match these constraints" },
+    }),
+    true,
+    "no_match action must trip the recovery-stand-down",
+  );
+  assert.equal(
+    isResolverNoMatchVerdict({
+      type: "resolver_state",
+      impossible_constraints: [],
+      recommended_next_action: { type: "recommend" },
+    }),
+    false,
+    "recommend action must NOT trip the recovery-stand-down",
+  );
+});
+
 // ── Case C: resolver_strong_action yields ─────────────────────
 await test("Router C — fresh 'red sandals' yields to resolver (no gender hard-ask)", async () => {
   const cap = makeCapturingController();

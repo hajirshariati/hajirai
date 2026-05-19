@@ -1106,13 +1106,25 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // pattern, force a search using the customer's literal latest
   // message, and either replace the denial with real results or
   // (if the search confirms 0 results) keep the denial honest.
+  // Resolver no_match exception (M1.3): when the resolver explicitly
+  // returned recommended_next_action.type === "no_match" (or surfaced
+  // impossible_constraints), the LLM's denial IS the correct answer —
+  // it's relaying the resolver's catalog-grounded verdict. Skip
+  // recovery so we don't overwrite an honest "we don't carry pink
+  // men's sneakers" with the generic "Actually, take a look at these"
+  // bait-and-switch.
+  const resolverDeniedHonestly =
+    ctx.resolverState?.recommended_next_action?.type === "no_match" ||
+    (Array.isArray(ctx.resolverState?.impossible_constraints) &&
+      ctx.resolverState.impossible_constraints.length > 0);
   if (
     !productSearchAttempted &&
     fullResponseText &&
     containsAvailabilityDenial(fullResponseText) &&
     ctx.latestUserMessage &&
     !isPolicyOrServiceQuestion(ctx.latestUserMessage) &&
-    !hasCompetitorBrandMention(ctx.latestUserMessage)
+    !hasCompetitorBrandMention(ctx.latestUserMessage) &&
+    !resolverDeniedHonestly
   ) {
     console.log(`[chat] denial-recovery: AI denied availability without searching; forcing search of latest user message`);
     try {
@@ -2881,20 +2893,17 @@ export const action = async ({ request }) => {
             console.error("[recommender] tool registration failed:", recErr?.message || recErr);
           }
 
-          // Orthotic-flow gate: when a customer is mid-orthotic-Q&A
-          // (the prior assistant turn shows seed-tree chips and the
-          // current reply is a clean chip click or keyword match),
-          // the deterministic state machine answers the turn —
-          // emitting the next seed-authoritative question or the
-          // resolved product card — without an LLM call. Any reply
-          // the state machine can't confidently advance falls
-          // through to the normal agentic loop below.
           // ── M1.3 Resolver-First Chat Orchestration ──────────────
           //
           // Strict stage order per turn:
           //   1. Classifier (Haiku intent + attributes)
           //   2. Resolver preflight (catalog ground truth)
-          //   3. Orthotic gate decision, fed resolverState
+          //   3. Orthotic gate decision (receives resolverState).
+          //      The deterministic state machine answers the turn —
+          //      emitting the next seed-authoritative question or
+          //      the resolved product card — without an LLM call.
+          //      Yields to the LLM when the resolver already has
+          //      catalog scope (Cases C/D in the gate).
           //   4. LLM/tool loop
           //   5. Post-processing (untouched)
           //
