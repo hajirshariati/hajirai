@@ -5,6 +5,11 @@ import { embedText, vectorLiteral, resolveShopEmbedding } from "./embeddings.ser
 import { normalizeGenderChipAnswer } from "./chat-helpers.server";
 import { textIntentDivergesFromGroup } from "./category-intent.server";
 import { TOOLS, FIT_PREDICTOR_TOOL, CUSTOMER_ORDERS_TOOL } from "./chat-tool-schemas.js";
+import {
+  canonicalizeCatalogConstraints,
+  deriveCatalogMatchContract,
+  readAttributeCI,
+} from "./catalog-matcher.server.js";
 
 // Re-export tool schemas so existing imports
 //   import { TOOLS } from "../lib/chat-tools.server"
@@ -441,7 +446,9 @@ async function searchProducts(
   // recommend for plantar fasciitis" would only have one product to
   // render. Default 6, max 10.
   const max = Math.min(Math.max(parseInt(limit, 10) || 6, 5), 10);
-  const attrFilters = filters && typeof filters === "object" ? filters : {};
+  const attrFilters = filters && typeof filters === "object"
+    ? canonicalizeCatalogConstraints(filters)
+    : {};
 
 const detected = detectAndStripGender(q);
 const detectedFromLatest = detectAndStripGender(latestUserMessage || "");
@@ -577,6 +584,14 @@ const searchQuery = detected.gender ? detected.query : q;
         );
         return {
           products: [],
+          matchContract: deriveCatalogMatchContract({
+            constraints: { ...attrFilters, gender: effectiveGender, category: effectiveCategory },
+            impossibleConstraints: [{
+              field: "gender",
+              value: effectiveGender,
+              reason: `${effectiveCategory} is available for ${entry.genders.join(" / ")}, not ${effectiveGender}`,
+            }],
+          }),
           genderCategoryMismatch: {
             category: entry.display || effectiveCategory,
             requestedGender: effectiveGender,
@@ -782,9 +797,9 @@ const isExcludedByRule = (p) => {
 
   const attrs = p.attributesJson || {};
   const categoryText = [
-    attrs.category || "",
-    attrs.category_for_filter || "",
-    attrs.subcategory || "",
+    readAttributeCI(attrs, ["category"]) || "",
+    readAttributeCI(attrs, ["category_for_filter"]) || "",
+    readAttributeCI(attrs, ["subcategory"]) || "",
   ]
     .join(" ")
     .toLowerCase();
@@ -814,7 +829,7 @@ const isExcludedByRule = (p) => {
     if (!want) return true;
 
     const attrs = p.attributesJson || {};
-    const gVal = attrs.gender || attrs.gender_fallback || "";
+    const gVal = readAttributeCI(attrs, ["gender", "gender_fallback", "genders"]) || "";
     const gStr = Array.isArray(gVal) ? gVal.join(" ") : String(gVal);
     const titleStr = p.title || "";
 
@@ -1020,9 +1035,9 @@ const isExcludedByRule = (p) => {
       if (wants.size === 0) return true;
       const attrs = p.attributesJson || {};
       const parts = [
-        attrs.category,
-        attrs.category_for_filter,
-        attrs.subcategory,
+        readAttributeCI(attrs, ["category"]),
+        readAttributeCI(attrs, ["category_for_filter"]),
+        readAttributeCI(attrs, ["subcategory"]),
         p.productType,
       ];
       const haystack = parts
@@ -1051,27 +1066,6 @@ const isExcludedByRule = (p) => {
       return typeof val === "string" && [...wants].some((w) => val.toLowerCase().includes(w));
     };
 
-    // Case-insensitive attribute lookup: merchants store metafields
-    // with arbitrary key capitalization ("Color" / "color" / "COLOR" /
-    // "Colour"). A case-sensitive bag[key] misses real values and
-    // filter-wipes turns that have a perfectly valid match in the
-    // catalog. Phase A fix for "white men's sneakers" regression.
-    const readBagCI = (bag, key) => {
-      if (!bag || typeof bag !== "object") return undefined;
-      const target = String(key).toLowerCase();
-      for (const k of Object.keys(bag)) {
-        if (k.toLowerCase() === target) return bag[k];
-      }
-      // Also accept common alternate spellings.
-      if (target === "color") {
-        for (const k of Object.keys(bag)) {
-          if (k.toLowerCase() === "colour") return bag[k];
-          if (k.toLowerCase() === "color_family") return bag[k];
-        }
-      }
-      return undefined;
-    };
-
     filtered = filtered.filter((p) => {
       const productAttrs = p.attributesJson || {};
       return attrKeys.every((key) => {
@@ -1081,8 +1075,8 @@ const isExcludedByRule = (p) => {
           return matchesCategoryWant(p, want);
         }
         const wants = expandFilterValue(want);
-        if (matchesAttrExpanded(readBagCI(productAttrs, key), wants)) return true;
-        return (p.variants || []).some((v) => matchesAttrExpanded(readBagCI(v.attributesJson, key), wants));
+        if (matchesAttrExpanded(readAttributeCI(productAttrs, key), wants)) return true;
+        return (p.variants || []).some((v) => matchesAttrExpanded(readAttributeCI(v.attributesJson, key), wants));
       });
     });
 
@@ -1223,6 +1217,11 @@ const isExcludedByRule = (p) => {
     count: filtered.length,
     filters: attrKeys.length > 0 ? attrFilters : undefined,
     relaxedFilters: relaxedFilters || undefined,
+    matchContract: deriveCatalogMatchContract({
+      products: filtered,
+      constraints: { ...attrFilters, gender: effectiveGender, category: effectiveCategory },
+      relaxedFilters,
+    }),
     products: filtered.map((p) => ({
       handle: p.handle,
       title: p.title,

@@ -36,6 +36,7 @@
 
 import { extractUserConstraints } from "./catalog-resolver.server.js";
 import { detectRejectedCategories } from "./chat-postprocessing.js";
+import { extractChoiceEvents } from "./choice-events.server.js";
 
 const SCALAR_KEYS = [
   "gender", "category", "color", "size", "width",
@@ -105,45 +106,6 @@ function detectSizeWidth(text) {
   return out;
 }
 
-// Detect chip markup in an assistant message and return [{label, value}].
-const CHIP_RE = /<<\s*([^<>]+?)\s*>>/g;
-function parseAssistantChips(content) {
-  if (typeof content !== "string") return [];
-  const out = [];
-  CHIP_RE.lastIndex = 0;
-  let m;
-  while ((m = CHIP_RE.exec(content)) !== null) {
-    const label = m[1].trim();
-    if (label) out.push({ label, value: label });
-  }
-  return out;
-}
-
-// Map a chip label to its keyed-memory fact. Used when the user's
-// reply EXACTLY matches one of the prior assistant's chip labels.
-// Returns null when the chip doesn't map to a known scalar.
-function mapChipToKey(label) {
-  const lc = String(label).toLowerCase().trim();
-  if (/^men'?s?$/.test(lc) || lc === "male") return { key: "gender", value: "men" };
-  if (/^women'?s?$/.test(lc) || lc === "female") return { key: "gender", value: "women" };
-  if (lc === "kids" || lc === "kid") return { key: "gender", value: "kids" };
-  if (/^(?:low|medium|high)(?:\s+arch)?$/.test(lc)) return { key: "arch", value: lc.replace(/\s+arch$/, "") };
-  if (lc === "yes" || lc === "no") return null; // ambiguous without context
-  if (/plantar/i.test(lc)) return { key: "condition", value: "plantar_fasciitis" };
-  if (/ball[- ]?of[- ]?foot|metatarsalgia/i.test(lc)) return { key: "condition", value: "metatarsalgia" };
-  if (/bunion/i.test(lc)) return { key: "condition", value: "bunions" };
-  if (/flat\s*feet|low\s*arch/i.test(lc)) return { key: "condition", value: "flat_feet" };
-  if (/high\s*arch/i.test(lc)) return { key: "condition", value: "high_arch" };
-  // Path-ambig / domain chips — surface as a category cue
-  if (lc === "the shoes themselves" || lc === "footwear with arch support") {
-    return { key: "category", value: "footwear" };
-  }
-  if (lc === "orthotic insole for these" || lc === "orthotic insole") {
-    return { key: "category", value: "orthotics" };
-  }
-  return null;
-}
-
 function pushFact(memory, key, value, source, turnIndex, confidence) {
   memory.facts.push({ key, value, source, turnIndex, confidence });
 }
@@ -168,14 +130,16 @@ export function buildSessionMemory({ messages, classifiedIntent, resolverState }
   if (!Array.isArray(messages) || messages.length === 0) return memory;
 
   const rejectedSet = new Set();
-  let priorAssistant = null;
+  const choiceEventsByTurn = new Map();
+  for (const event of extractChoiceEvents(messages, { limit: 10_000 })) {
+    const list = choiceEventsByTurn.get(event.userTurnIndex) || [];
+    list.push(event);
+    choiceEventsByTurn.set(event.userTurnIndex, list);
+  }
 
   messages.forEach((msg, i) => {
     if (!msg) return;
-    if (msg.role === "assistant" && typeof msg.content === "string") {
-      priorAssistant = msg;
-      return;
-    }
+    if (msg.role === "assistant" && typeof msg.content === "string") return;
     if (msg.role !== "user" || typeof msg.content !== "string") return;
     const text = msg.content.trim();
     if (!text) return;
@@ -215,22 +179,20 @@ export function buildSessionMemory({ messages, classifiedIntent, resolverState }
       }
     }
 
-    // 5. Chip-answer detection: user's reply EXACTLY matches one of
-    //    the prior assistant's chip labels → mapped chip key. Layered
-    //    AFTER extraction so chip clicks override loose lex matches.
-    if (priorAssistant) {
-      const chips = parseAssistantChips(priorAssistant.content);
-      const normUser = text.toLowerCase().replace(/[^a-z0-9]+/g, "");
-      for (const chip of chips) {
-        const normChip = chip.label.toLowerCase().replace(/[^a-z0-9]+/g, "");
-        if (normChip && normChip === normUser) {
-          const mapped = mapChipToKey(chip.label);
-          if (mapped) {
-            memory.explicit[mapped.key] = mapped.value;
-            pushFact(memory, mapped.key, mapped.value, "chip_click", i, 1.0);
-          }
-          break;
-        }
+    // 5. Structured choice events: user's reply matched a prior chip
+    //    or short yes/no question. Layered AFTER extraction so clicks
+    //    override loose lex matches.
+    for (const event of choiceEventsByTurn.get(i) || []) {
+      if (event.fact) {
+        memory.explicit[event.fact.key] = event.fact.value;
+        pushFact(
+          memory,
+          event.fact.key,
+          event.fact.value,
+          event.type === "chip_answer" ? "chip_click" : "choice_answer",
+          i,
+          event.type === "chip_answer" ? 1.0 : 0.8,
+        );
       }
     }
 
@@ -238,8 +200,6 @@ export function buildSessionMemory({ messages, classifiedIntent, resolverState }
     for (const r of detectRejectedCategories(text)) {
       rejectedSet.add(String(r).toLowerCase());
     }
-
-    priorAssistant = null;
   });
 
   memory.explicit.rejectedCategories = Array.from(rejectedSet);

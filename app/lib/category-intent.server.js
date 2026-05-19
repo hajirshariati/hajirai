@@ -143,7 +143,7 @@ const FOOTWEAR_NOUN_RE = /\b(closed?[\s-]?toe|open[\s-]?toe|shoe|shoes|footwear|
 // "built[-]in X" — feature-attribution patterns where X is an
 // orthotic/footbed/insole/arch support feature. The "X" is a
 // FEATURE of the shoe, not the product itself.
-const SHOE_FEATURE_RE = /\b(?:with|having|featuring|that\s+has|that\s+have|w\/|w\s+\/|including|includes|come(?:s)?\s+with|comes\s+with|built[-\s]?in|integrated|in[-\s]?built)\s+(?:an?\s+|the\s+)?(?:orthotic[\s-]?(?:footbed|insole|insert|support)?|footbed|insole|insert|arch[\s-]?support|cushioned[\s-]?footbed|memory[\s-]?foam|cushioned[\s-]?insole|aetrex[\s-]?(?:orthotic|footbed)|signature[\s-]?(?:arch|orthotic|footbed))\b/i;
+const SHOE_FEATURE_RE = /\b(?:with|having|featuring|that\s+has|that\s+have|w\/|w\s+\/|including|includes|come(?:s)?\s+with|comes\s+with|built[-\s]?in|integrated|in[-\s]?built)\s+(?:an?\s+|the\s+)?(?:orthotic[\s-]?(?:footbed|insole|insert)|footbed|insole|insert|arch[\s-]?support|cushioned[\s-]?footbed|memory[\s-]?foam|cushioned[\s-]?insole|aetrex[\s-]?(?:orthotic[\s-]?(?:footbed|insole|insert)|footbed)|signature[\s-]?(?:arch|orthotic[\s-]?(?:footbed|insole|insert)|footbed))\b/i;
 
 function inferShoeWithFeatureIntent(text, groups) {
   const source = String(text || "");

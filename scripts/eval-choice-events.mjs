@@ -1,0 +1,56 @@
+import assert from "node:assert/strict";
+import { extractChoiceEvents, mapChoiceToMemoryFact } from "../app/lib/choice-events.server.js";
+import { extractAnsweredChoices } from "../app/lib/conversation-memory.server.js";
+
+let passed = 0;
+let failed = 0;
+const failures = [];
+
+function test(name, fn) {
+  try {
+    fn();
+    console.log(`  ✓ ${name}`);
+    passed++;
+  } catch (err) {
+    console.log(`  ✗ ${name} — ${err.message}`);
+    failures.push({ name, err });
+    failed++;
+  }
+}
+
+console.log("Choice events eval\n");
+
+test("C1 — chip answer becomes a structured event with keyed fact", () => {
+  const events = extractChoiceEvents([
+    { role: "assistant", content: "Who are these for? <<Men's>> <<Women's>>" },
+    { role: "user", content: "Women's" },
+  ]);
+  assert.equal(events.length, 1);
+  assert.equal(events[0].answer, "Women's");
+  assert.deepEqual(events[0].fact, { key: "gender", value: "women" });
+});
+
+test("C2 — contextual yes/no maps overpronation instead of generic yes", () => {
+  assert.deepEqual(
+    mapChoiceToMemoryFact("No", "Do your feet roll inward or overpronate?"),
+    { key: "overpronation", value: "no" },
+  );
+});
+
+test("C3 — conversation-memory keeps legacy answered choice shape", () => {
+  const answered = extractAnsweredChoices([
+    { role: "assistant", content: "What arch? <<Flat / Low>> <<Medium / High Arch>>" },
+    { role: "user", content: "Medium / High Arch" },
+  ]);
+  assert.equal(answered.length, 1);
+  assert.equal(answered[0].answer, "Medium / High Arch");
+  assert.deepEqual(answered[0].options, ["Flat / Low", "Medium / High Arch"]);
+});
+
+if (failed > 0) {
+  console.error("\nFailures:");
+  for (const f of failures) console.error(`- ${f.name}: ${f.err.stack || f.err.message}`);
+  process.exit(1);
+}
+
+console.log(`\nChoice events eval: ${passed}/${passed + failed} passed`);

@@ -32,7 +32,12 @@
 // redundant disambiguation.
 
 import prisma from "../db.server.js";
-import { getCatalogFacetIndex, __internals as catalogFactInternals } from "./catalog-facts.server.js";
+import { getCatalogFacetIndex } from "./catalog-facts.server.js";
+import {
+  canonicalizeCatalogConstraints,
+  colorExistsInCatalogScope,
+  computeCatalogConstraintDomains,
+} from "./catalog-matcher.server.js";
 
 // ─── helpers ───────────────────────────────────────────────────
 
@@ -41,38 +46,6 @@ import { getCatalogFacetIndex, __internals as catalogFactInternals } from "./cat
 // debugging and used to break ties.
 function mkFact(value, reason, source, confidence = 1.0) {
   return { value, reason, source, confidence };
-}
-
-const {
-  normalizeColor: normalizeCatalogColor,
-  normalizeCategory: normalizeCatalogCategory,
-  normalizeGender: normalizeCatalogGender,
-} = catalogFactInternals;
-
-function canonicalizeResolverConstraints(input = {}) {
-  const out = { ...input };
-  if (out.gender) {
-    out.gender = normalizeCatalogGender(out.gender) || String(out.gender).toLowerCase().trim();
-  }
-  if (out.category) {
-    out.category = normalizeCatalogCategory(out.category) || String(out.category).toLowerCase().trim().replace(/\s+/g, "-");
-  }
-  if (out.color) {
-    out.color = normalizeCatalogColor(out.color) || String(out.color).toLowerCase().trim();
-  }
-  return out;
-}
-
-// Build sessionMemory facts dictionary from existing
-// conversation-memory output. extractAnsweredChoices returns
-// { gender, useCase, condition, arch, overpronation } shape.
-function sessionMemoryFromAnsweredChoices(answeredChoices = {}) {
-  const out = { explicit: {}, inferred: {} };
-  for (const [k, v] of Object.entries(answeredChoices)) {
-    if (v == null || v === "") continue;
-    out.explicit[k] = String(v).toLowerCase();
-  }
-  return out;
 }
 
 // ─── core resolver ─────────────────────────────────────────────
@@ -103,59 +76,6 @@ const REQUIRED_FIELDS = ["gender", "category"];
 // red) tuple has gender="women", gender is inferred even when "red"
 // alone exists in multiple genders.
 
-function buildTupleSpace(facetIndex) {
-  const tuples = [];
-  const cbgc = facetIndex?.colorByGenderCategory || {};
-  for (const [gck, colors] of Object.entries(cbgc)) {
-    const [gender, category] = gck.split(":");
-    if (!gender || !category) continue;
-    const colorList = Array.isArray(colors) && colors.length > 0 ? colors : [null];
-    for (const color of colorList) {
-      tuples.push({ gender, category, color });
-    }
-  }
-  // Some (gender, category) combos may have no color data baked into
-  // the index — still record them so gender/category inference works
-  // when color is the unknown.
-  const cbg = facetIndex?.categoryByGender || {};
-  for (const [category, genders] of Object.entries(cbg)) {
-    if (!Array.isArray(genders)) continue;
-    for (const gender of genders) {
-      const has = tuples.some((t) => t.gender === gender && t.category === category);
-      if (!has) tuples.push({ gender, category, color: null });
-    }
-  }
-  return tuples;
-}
-
-function tupleMatches(tuple, constraints) {
-  if (constraints.gender && tuple.gender && tuple.gender !== "unisex" && tuple.gender !== constraints.gender) {
-    return false;
-  }
-  if (constraints.category && tuple.category && tuple.category !== constraints.category) {
-    return false;
-  }
-  if (constraints.color != null && tuple.color != null && tuple.color !== constraints.color) {
-    return false;
-  }
-  return true;
-}
-
-function projectField(tuples, constraints, field) {
-  const out = new Set();
-  for (const t of tuples) {
-    if (!tupleMatches(t, constraints)) continue;
-    const v = t[field];
-    if (v == null) continue;
-    // "unisex" is a product-tagging convention, not a customer-pickable
-    // gender — drop it from the domain so it's never inferred or
-    // surfaced as a chip option.
-    if (field === "gender" && v === "unisex") continue;
-    out.add(v);
-  }
-  return Array.from(out);
-}
-
 function describeContext(known, exceptField) {
   const parts = [];
   if (exceptField !== "color" && known.color) parts.push(known.color);
@@ -176,39 +96,6 @@ function buildInferenceReason(field, value, known) {
     return ctx ? `${ctx} only comes in ${value}` : `only ${value} available`;
   }
   return `${field} narrows to ${value}`;
-}
-
-// Public: compute possible domains for every unresolved tuple field
-// given the known constraints. Returns:
-//   { gender: { domain: [...], inferred?: <value> }, category: ..., color: ... }
-// Fields that are already known are omitted from the output.
-function computeConstraintDomains(known, facetIndex) {
-  const tuples = buildTupleSpace(facetIndex);
-  const fields = ["gender", "category", "color"];
-  const out = {};
-  for (const field of fields) {
-    if (known[field] != null) continue;
-    const domain = projectField(tuples, known, field);
-    out[field] = { domain };
-    if (domain.length === 1) out[field].inferred = domain[0];
-  }
-  return out;
-}
-
-// Phase-1 helper kept for compatibility: does (color, gender,
-// category) exist anywhere in the catalog? Implemented on top of the
-// tuple space so its semantics stay in sync with inference.
-function colorExistsInScope(color, gender, category, facetIndex) {
-  if (!color || !facetIndex) return null;
-  const tuples = buildTupleSpace(facetIndex);
-  const constraints = { color };
-  if (gender) constraints.gender = gender;
-  if (category) constraints.category = category;
-  for (const t of tuples) {
-    if (t.color == null) continue;
-    if (tupleMatches(t, constraints) && t.color === color) return true;
-  }
-  return false;
 }
 
 // Look up candidate products from CatalogFact for the resolved
@@ -257,10 +144,8 @@ async function fetchCandidates({ shop, gender, category, color, condition, inclu
 // conversation-memory's answered choices.
 export async function resolveCatalogTurn({
   shop,
-  query = "",
   userConstraints = {},
   sessionMemory = {},
-  messages = [],
   // Test-only injection points. Production code never passes these.
   _testFacetIndex,
   _testFetchCandidates,
@@ -278,7 +163,7 @@ export async function resolveCatalogTurn({
   }
 
   // Merge user constraints + session memory. User-provided wins.
-  const merged = canonicalizeResolverConstraints({ ...sessionMemory.explicit, ...userConstraints });
+  const merged = canonicalizeCatalogConstraints({ ...sessionMemory.explicit, ...userConstraints });
   // Strip nulls.
   for (const k of Object.keys(merged)) if (merged[k] == null || merged[k] === "") delete merged[k];
 
@@ -326,7 +211,7 @@ export async function resolveCatalogTurn({
   if (merged.color) {
     const scopeGender = matched_constraints.gender;
     const scopeCategory = matched_constraints.category;
-    const exists = colorExistsInScope(merged.color, scopeGender, scopeCategory, facetIndex);
+    const exists = colorExistsInCatalogScope(merged.color, scopeGender, scopeCategory, facetIndex);
     if (exists) {
       matched_constraints.color = merged.color;
     } else if (exists === false) {
@@ -366,7 +251,7 @@ export async function resolveCatalogTurn({
     if (matched_constraints.gender) known.gender = matched_constraints.gender;
     if (matched_constraints.category) known.category = matched_constraints.category;
     if (matched_constraints.color) known.color = matched_constraints.color;
-    const domains = computeConstraintDomains(known, facetIndex);
+    const domains = computeCatalogConstraintDomains(known, facetIndex);
     for (const [field, info] of Object.entries(domains)) {
       if (info.inferred == null) continue;
       const reason = buildInferenceReason(field, info.inferred, known);

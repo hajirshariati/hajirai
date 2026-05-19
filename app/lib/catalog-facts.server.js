@@ -38,7 +38,7 @@ const COLOR_SYNONYMS = {
   gold: "gold", silver: "silver", bronze: "bronze", taupe: "taupe",
 };
 
-function normalizeColor(raw) {
+export function normalizeColor(raw) {
   if (!raw) return null;
   const lc = String(raw).toLowerCase().trim().replace(/[_-]+/g, " ");
   if (COLOR_SYNONYMS[lc]) return COLOR_SYNONYMS[lc];
@@ -72,8 +72,7 @@ const CATEGORY_SYNONYMS = {
   "winter boots": "boots", "snow boots": "boots", "work boots": "boots",
   loafers: "loafers", loafer: "loafers",
   oxfords: "oxfords", oxford: "oxfords", "dress shoes": "oxfords", "dress shoe": "oxfords",
-  clogs: "clogs", clog: "clogs", "slip-on": "slip-ons", "slip ons": "slip-ons",
-  "slip ons": "slip-ons", "slip-ons": "slip-ons",
+  clogs: "clogs", clog: "clogs", "slip-on": "slip-ons", "slip ons": "slip-ons", "slip-ons": "slip-ons",
   slippers: "slippers", slipper: "slippers",
   "mary janes": "mary-janes", "mary-janes": "mary-janes",
   "wedges heels": "wedges-heels", wedges: "wedges-heels", heels: "wedges-heels", pumps: "wedges-heels",
@@ -82,7 +81,7 @@ const CATEGORY_SYNONYMS = {
   footwear: "footwear",
 };
 
-function normalizeCategory(raw) {
+export function normalizeCategory(raw) {
   if (!raw) return null;
   const lc = String(raw).toLowerCase().trim();
   return CATEGORY_SYNONYMS[lc] || null;
@@ -95,7 +94,7 @@ const GENDER_SYNONYMS = {
   unisex: "unisex",
 };
 
-function normalizeGender(raw) {
+export function normalizeGender(raw) {
   if (!raw) return null;
   const lc = String(raw).toLowerCase().trim();
   return GENDER_SYNONYMS[lc] || null;
