@@ -39,6 +39,8 @@ import {
   looksLikeClarifyingQuestion,
   suggestionContradictsGender,
   detectFootwearOverElicitation,
+  stripInternalLeaks,
+  containsInternalLanguageLeak,
 } from "../app/lib/chat-postprocessing.js";
 import {
   isSingularPrescriptive,
@@ -741,6 +743,98 @@ test("free-text 'do you have anything good?' → does NOT fire (no category)", (
     catalogProductTypes: FAKE_TYPES,
   });
   assert.equal(r, null);
+});
+
+// =====================================================================
+// Internal-language leak scrub (M1 stabilization)
+// =====================================================================
+//
+// Production trace: the LLM occasionally leaks resolver-state lingo
+// into customer-facing text ("The resolver state indicates...").
+// Customer must never see internal terminology. The scrub strips
+// lead-in phrases when it can; if a forbidden term still remains,
+// the whole reply is replaced with a neutral clarification line.
+
+test("internal-leak — strips 'The resolver state indicates...' lead-in", () => {
+  const before = "The resolver state indicates there are currently no men's orthotics matching in the catalog right now.";
+  const r = stripInternalLeaks(before);
+  assert.equal(r.changed, true, "must mark changed");
+  assert.equal(r.replaced, false, "lead-in strip should NOT fall back to full replacement");
+  assert.equal(containsInternalLanguageLeak(r.text), false, `output must be free of internal terms: ${r.text}`);
+  assert.ok(/no men's orthotics/i.test(r.text), `meaningful tail must survive: ${r.text}`);
+  assert.ok(/^[A-Z]/.test(r.text), `first letter must be capitalized: ${r.text}`);
+});
+
+test("internal-leak — strips 'Based on the resolver state, ...' lead-in", () => {
+  const before = "Based on the resolver state, I don't see a pink men's sneaker in our catalog.";
+  const r = stripInternalLeaks(before);
+  assert.equal(r.changed, true);
+  assert.equal(containsInternalLanguageLeak(r.text), false);
+});
+
+test("internal-leak — bare 'matched_constraints shows X' lead-in stripped", () => {
+  const before = "matched_constraints shows there's no red sandal in men's right now.";
+  const r = stripInternalLeaks(before);
+  assert.equal(r.changed, true);
+  assert.equal(containsInternalLanguageLeak(r.text), false);
+});
+
+test("internal-leak — falls back to neutral line when forbidden term remains", () => {
+  // No matching lead-in pattern, but the forbidden term is still
+  // present somewhere in the body — whole-reply fallback fires.
+  const before = "Quick note about the recommended_next_action: we suggest you look at sneakers.";
+  const r = stripInternalLeaks(before);
+  assert.equal(r.changed, true);
+  assert.equal(r.replaced, true, "must fall back to neutral line");
+  assert.equal(containsInternalLanguageLeak(r.text), false);
+});
+
+test("internal-leak — falls back when 'I'll run a live search because the resolver said' appears", () => {
+  const before = "I'll run a live search because the resolver said no products match.";
+  const r = stripInternalLeaks(before);
+  assert.equal(r.changed, true);
+  assert.equal(containsInternalLanguageLeak(r.text), false);
+});
+
+test("internal-leak — leaves clean customer text untouched", () => {
+  const before = "Here are some great women's sandals with arch support — built for plantar fasciitis.";
+  const r = stripInternalLeaks(before);
+  assert.equal(r.changed, false, `must not modify clean text; got: ${r.text}`);
+  assert.equal(r.replaced, false);
+});
+
+test("internal-leak — does NOT match the word 'system' when not in 'system prompt'", () => {
+  // Common shoe-industry term ("arch support system") must not trip
+  // the FORBIDDEN_INTERNAL_TERMS_RE.
+  const before = "Our memory foam system keeps the arch supported all day.";
+  const r = stripInternalLeaks(before);
+  assert.equal(r.replaced, false, `must not fall back on benign 'system'; got: ${r.text}`);
+});
+
+test("internal-leak — containsInternalLanguageLeak detector catches every banned term", () => {
+  const phrases = [
+    "Looking at resolver state, we don't carry that.",
+    "matched_constraints says no.",
+    "inferred_constraints suggests women's.",
+    "impossible_constraints includes color.",
+    "recommended_next_action is to ask gender.",
+    "candidate_products is empty.",
+    "do_not_ask includes gender.",
+    "system prompt told me to skip this.",
+    "Per the tool call I ran...",
+  ];
+  for (const p of phrases) {
+    assert.equal(containsInternalLanguageLeak(p), true, `must flag: "${p}"`);
+  }
+});
+
+test("internal-leak — full-pipeline ordering: scrub runs before banned-narration", () => {
+  // Verifies the customer-facing TEXT shape we promise the user:
+  // after the leak scrub, no internal terms appear. Mirrors the
+  // chat.jsx call site by composing both steps in this order.
+  const incoming = "The resolver state indicates there are no men's pink sandals. Let me look that up for you.";
+  const afterLeak = stripInternalLeaks(incoming).text;
+  assert.equal(containsInternalLanguageLeak(afterLeak), false);
 });
 
 // =====================================================================

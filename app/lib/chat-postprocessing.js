@@ -446,6 +446,93 @@ export function scrubRoleMarkers(text) {
 }
 
 // =====================================================================
+// Internal-language leak scrub (M1 stabilization)
+// =====================================================================
+//
+// The resolver-state block in the system prompt occasionally bleeds
+// into customer-facing text — the model writes "the resolver state
+// indicates", "based on matched_constraints", "the catalog facts
+// show", etc. These are internal terms the customer must never see.
+//
+// Two-stage scrub:
+//   1. Strip known lead-in phrases ("The resolver state indicates",
+//      "Based on the resolver state", etc.) and lowercase-fix the
+//      next character so the sentence still reads naturally.
+//   2. If a forbidden internal TERM still appears anywhere in the
+//      text, the reply is unsafe to ship — replace the whole reply
+//      with a neutral clarification line.
+
+const RESOLVER_LEAD_IN_RE = new RegExp(
+  // Optional opening connector + a leak phrase, eaten through the
+  // next verb (indicates / shows / says / is / says that …).
+  "(?:^|(?<=[.!?]\\s)|(?<=\\n))" +
+    "(?:" +
+      // resolver-/catalog-state mentions
+      "(?:based\\s+on|according\\s+to|per|looking\\s+at|from)\\s+" +
+        "(?:the\\s+)?(?:resolver(?:_|\\s+)?state|resolver|catalog\\s+facts?|matched(?:_|\\s+)?constraints?|inferred(?:_|\\s+)?constraints?|recommended(?:_|\\s+)?next(?:_|\\s+)?action|candidate(?:_|\\s+)?products?|system\\s+prompt|tool\\s+(?:call|results?))" +
+        "[,:\\s][^.!?\\n]{0,40}?(?:indicates?|shows?|says?|states?|tells?\\s+me|is|are)\\b\\s*(?:that\\s+)?" +
+      "|" +
+      // direct "the resolver state X" / "matched_constraints X"
+      "(?:the\\s+)?(?:resolver(?:_|\\s+)?state|matched(?:_|\\s+)?constraints?|inferred(?:_|\\s+)?constraints?|recommended(?:_|\\s+)?next(?:_|\\s+)?action|candidate(?:_|\\s+)?products?)" +
+        "\\s+(?:indicates?|shows?|says?|states?|tells?\\s+me|is|are)\\b\\s*(?:that\\s+)?" +
+      "|" +
+      // "I'll run a live search because the resolver said"
+      "(?:i'?ll|let\\s+me|i\\s+will)\\s+(?:run|do|trigger)\\s+(?:a\\s+)?(?:live\\s+)?search\\s+(?:because|since)\\s+(?:the\\s+)?resolver[^.!?\\n]{0,40}?[.!?]?" +
+    ")",
+  "gi",
+);
+
+// Forbidden TERMS that must never appear in customer-facing text,
+// even after lead-in phrases are stripped.
+const FORBIDDEN_INTERNAL_TERMS_RE = new RegExp(
+  "\\b(?:" +
+    "resolver(?:_|\\s+)?state" + "|" +
+    "matched(?:_|\\s+)?constraints?" + "|" +
+    "inferred(?:_|\\s+)?constraints?" + "|" +
+    "impossible(?:_|\\s+)?constraints?" + "|" +
+    "remaining(?:_|\\s+)?disambiguators?" + "|" +
+    "recommended(?:_|\\s+)?next(?:_|\\s+)?action" + "|" +
+    "candidate(?:_|\\s+)?products?" + "|" +
+    "do(?:_|\\s+)?not(?:_|\\s+)?ask" + "|" +
+    "system\\s+prompt" + "|" +
+    "tool\\s+call" + "|" +
+    "search\\s+because\\s+resolver" +
+  ")\\b",
+  "i",
+);
+
+const INTERNAL_LEAK_FALLBACK =
+  "I'm not finding a clean match for that exact request right now. Want me to widen the search, or tell me a bit more about what you're after?";
+
+export function containsInternalLanguageLeak(text) {
+  if (!text || typeof text !== "string") return false;
+  return FORBIDDEN_INTERNAL_TERMS_RE.test(text);
+}
+
+export function stripInternalLeaks(text, { fallback = INTERNAL_LEAK_FALLBACK } = {}) {
+  if (!text || typeof text !== "string") return { text: text || "", changed: false, replaced: false };
+  const original = text;
+
+  // Stage 1: strip lead-in phrases, then capitalize the resulting
+  // sentence start so "there are no men's options" → "There are…".
+  let out = text.replace(RESOLVER_LEAD_IN_RE, "").replace(/\s{2,}/g, " ").trim();
+  out = out.replace(/(^|[.!?]\s+|\n)([a-z])/g, (_, lead, ch) => lead + ch.toUpperCase());
+
+  // Stage 2: if any forbidden term still remains, the reply isn't
+  // safe to ship — swap the whole thing for the neutral fallback.
+  if (FORBIDDEN_INTERNAL_TERMS_RE.test(out)) {
+    return { text: fallback, changed: true, replaced: true };
+  }
+
+  // If the lead-in strip emptied the response (the leak WAS the
+  // whole sentence and nothing else), use the fallback too.
+  if (out.length < 8) {
+    return { text: fallback, changed: true, replaced: true };
+  }
+  return { text: out, changed: out !== original.trim(), replaced: false };
+}
+
+// =====================================================================
 // Smaller heuristics
 // =====================================================================
 

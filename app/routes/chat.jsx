@@ -61,6 +61,7 @@ import {
   looksLikeClarifyingQuestion,
   suggestionContradictsGender,
   detectFootwearOverElicitation,
+  stripInternalLeaks,
 } from "../lib/chat-postprocessing";
 import prisma from "../db.server";
 import { recordChatUsage, getTodayMessageCount } from "../models/ChatUsage.server";
@@ -1204,6 +1205,21 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   }
 
   const pool = Array.from(allProductPool.values());
+
+  // Internal-language leak scrub. The resolver-state block in the
+  // system prompt occasionally bleeds into customer-facing text
+  // ("The resolver state indicates...", "Based on matched_constraints
+  // ..."). Strip lead-in phrases when possible; if a forbidden
+  // internal term still remains, replace the whole reply with a
+  // neutral clarification line. Runs FIRST so the downstream strips
+  // don't have to handle these tokens.
+  if (fullResponseText) {
+    const result = stripInternalLeaks(fullResponseText);
+    if (result.changed) {
+      console.log(`[chat] stripped internal language leak${result.replaced ? " (whole-reply fallback)" : ""}`);
+      fullResponseText = result.text;
+    }
+  }
 
   // Compliance backstop for the BANNED NARRATION prompt rule. Strips
   // "let me look that up", "i'll find", "one moment", etc. — phrases
