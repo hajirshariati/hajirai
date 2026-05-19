@@ -39,7 +39,7 @@ import { fetchYotpoLoyalty } from "../lib/yotpo-loyalty.server";
 import { buildRecommenderTools } from "../lib/recommender-tools.server";
 import { maybeRunOrthoticFlow } from "../lib/orthotic-flow-gate.server";
 import { classifyOrthoticTurn } from "../lib/orthotic-classifier.server";
-import { resolveCatalogTurn, buildResolverStatePromptBlock, extractUserConstraints } from "../lib/catalog-resolver.server";
+import { resolveCatalogTurn, buildResolverStatePromptBlock, extractUserConstraints, detectSpecificProduct } from "../lib/catalog-resolver.server";
 import {
   detectSingularIntent,
   detectComparisonIntent,
@@ -2889,62 +2889,45 @@ export const action = async ({ request }) => {
           // resolved product card — without an LLM call. Any reply
           // the state machine can't confidently advance falls
           // through to the normal agentic loop below.
-          try {
-            const orthoticTree = (recommenderTrees || []).find((t) => t?.intent === "orthotic");
-            if (orthoticTree) {
-              // Run the LLM-based intent classifier ONCE per turn
-              // before the gate. Replaces the brittle regex stack
-              // (detectOrthoticIntent / looksLikeFootwearCommit /
-              // GENDER_DETECT) with a single Haiku call that returns
-              // structured intent + extracted attributes. Customer
-              // explicitly chose accuracy over latency. On classifier
-              // failure (network error, schema miss), the gate falls
-              // back to the legacy regex paths so we never go
-              // offline.
-              const classifiedIntent = await classifyOrthoticTurn({
-                messages,
-                anthropic,
-                shop: session.shop,
-              });
-              // Make the classifier verdict available to downstream
-              // consumers (e.g. chat-tool-rewrite's orthotic-routing
-              // redirect, which would otherwise rewrite a search for
-              // a specific product like "Thinsoles" into a
-              // recommend_orthotic call when the customer was just
-              // asking "what is X?").
-              ctx.classifiedIntent = classifiedIntent;
-              const gate = await maybeRunOrthoticFlow({
-                messages,
-                tree: orthoticTree,
-                shop: session.shop,
-                controller,
-                encoder,
-                anthropic,
-                haikuModel: HAIKU_MODEL,
-                classifiedIntent,
-                storefrontSearchUrlPattern: String(config.storefrontSearchUrlPattern || ""),
-                ctaOverrides,
-              });
-              if (gate?.handled) {
-                // Gate already emitted text, products, and done.
-                // Skip the agentic loop, follow-up suggestions, and
-                // usage recording (no LLM tokens consumed).
-                return;
-              }
-            }
-          } catch (gateErr) {
-            // Never let the gate take down the chat. On any error,
-            // fall through to the LLM as if the gate hadn't run.
-            console.error("[orthotic-flow] gate threw, falling through:", gateErr?.message || gateErr);
-          }
+          // ── M1.3 Resolver-First Chat Orchestration ──────────────
+          //
+          // Strict stage order per turn:
+          //   1. Classifier (Haiku intent + attributes)
+          //   2. Resolver preflight (catalog ground truth)
+          //   3. Orthotic gate decision, fed resolverState
+          //   4. LLM/tool loop
+          //   5. Post-processing (untouched)
+          //
+          // The router emits one log block per turn at the end of
+          // this section so the routing decision is auditable.
 
-          // Resolver preflight (Milestone 1). For product-shopping
-          // turns, compute resolverState BEFORE the LLM runs so the
-          // model treats catalog facts as ground truth instead of
-          // guessing. Gated narrowly — skip greetings, brand/about,
-          // policy/support, capability checks about prior cards, and
-          // signup paths so the resolver only fires when the customer
-          // is genuinely shopping.
+          const routerLog = {
+            classifier: null,
+            resolver: null,
+            orthoticGate: null,
+            finalPath: null,
+          };
+
+          // STAGE 1: classifier
+          let classifiedIntent = null;
+          const orthoticTree = (recommenderTrees || []).find((t) => t?.intent === "orthotic");
+          if (orthoticTree) {
+            try {
+              classifiedIntent = await classifyOrthoticTurn({
+                messages,
+                anthropic,
+                shop: session.shop,
+              });
+              ctx.classifiedIntent = classifiedIntent;
+            } catch (clsErr) {
+              console.error("[classifier] threw, falling through:", clsErr?.message || clsErr);
+            }
+          }
+          routerLog.classifier = classifiedIntent
+            ? `isOrthoticRequest=${!!classifiedIntent.isOrthoticRequest} attrs=${JSON.stringify(classifiedIntent.attributes || {})}`
+            : "none";
+
+          // STAGE 2: resolver preflight
           try {
             const latestMsg = String(body.message || "");
             const skipResolver =
@@ -2962,10 +2945,25 @@ export const action = async ({ request }) => {
                 ...(classifiedAttrs.condition ? { condition: classifiedAttrs.condition } : {}),
                 ...(classifiedAttrs.useCase ? { useCase: classifiedAttrs.useCase } : {}),
               };
-              const sessionMemory = { explicit: { ...(answeredChoices || {}) } };
-              if (sessionGender && !sessionMemory.explicit.gender) {
-                sessionMemory.explicit.gender = sessionGender;
+              // Conservative catalog-based specific-product detection.
+              // Populates specificProduct only when the message
+              // unambiguously names a product handle/title — gates
+              // the resolver's controlled_oos path in production.
+              try {
+                const handle = await detectSpecificProduct(session.shop, latestMsg);
+                if (handle) userConstraints.specificProduct = handle;
+              } catch (sErr) {
+                console.error("[resolver] specific-product detection failed:", sErr?.message || sErr);
               }
+              // sessionMemory carries only KEYED facts. answeredChoices
+              // is an array of {question, answer} pairs — spreading it
+              // produces {"0": {...}} which the resolver ignores. The
+              // LLM still sees answeredChoices via the prompt's
+              // "Established Answers" block; resolver does not need
+              // them duplicated until a future milestone adds keyed
+              // session memory.
+              const sessionMemory = { explicit: {} };
+              if (sessionGender) sessionMemory.explicit.gender = sessionGender;
               const resolverState = await resolveCatalogTurn({
                 shop: session.shop,
                 query: latestMsg,
@@ -2977,21 +2975,69 @@ export const action = async ({ request }) => {
                 ctx.resolverState = resolverState;
                 const block = buildResolverStatePromptBlock(resolverState);
                 if (block) systemPrompt = systemPrompt + block;
-                console.log(
-                  `[resolver] ${ctx.shop} action=${resolverState.recommended_next_action?.type} ` +
-                    `matched=${Object.keys(resolverState.matched_constraints).join(",") || "-"} ` +
-                    `inferred=${Object.keys(resolverState.inferred_constraints).join(",") || "-"} ` +
-                    `impossible=${resolverState.impossible_constraints.length} ` +
-                    `candidates=${(resolverState.candidate_products || []).length}`,
-                );
+                routerLog.resolver =
+                  `action=${resolverState.recommended_next_action?.type} ` +
+                  `matched=${Object.keys(resolverState.matched_constraints).join(",") || "-"} ` +
+                  `inferred=${Object.keys(resolverState.inferred_constraints).join(",") || "-"} ` +
+                  `impossible=${resolverState.impossible_constraints.length} ` +
+                  `candidates=${(resolverState.candidate_products || []).length}` +
+                  (userConstraints.specificProduct ? ` specificProduct=${userConstraints.specificProduct}` : "");
               } else if (resolverState?.type === "skip") {
-                console.log(`[resolver] ${ctx.shop} skip reason=${resolverState.reason}`);
+                routerLog.resolver = `skip reason=${resolverState.reason}`;
               }
+            } else {
+              routerLog.resolver = "skip reason=skip_helper_matched";
             }
           } catch (resolverErr) {
-            // Never let the resolver take down the chat.
             console.error("[resolver] preflight threw, falling through:", resolverErr?.message || resolverErr);
+            routerLog.resolver = `error ${resolverErr?.message || "unknown"}`;
           }
+
+          // STAGE 3: orthotic gate decision (now receives resolverState)
+          let gateHandled = false;
+          if (orthoticTree) {
+            try {
+              const gate = await maybeRunOrthoticFlow({
+                messages,
+                tree: orthoticTree,
+                shop: session.shop,
+                controller,
+                encoder,
+                anthropic,
+                haikuModel: HAIKU_MODEL,
+                classifiedIntent,
+                resolverState: ctx.resolverState || null,
+                storefrontSearchUrlPattern: String(config.storefrontSearchUrlPattern || ""),
+                ctaOverrides,
+              });
+              gateHandled = !!gate?.handled;
+              routerLog.orthoticGate = `handled=${gateHandled}` + (gate?.case ? ` case=${gate.case}` : "");
+              if (gateHandled) {
+                routerLog.finalPath = "orthotic_gate";
+                console.log(`[router] ${ctx.shop} ${routerLog.classifier}`);
+                console.log(`[router] ${ctx.shop} ${routerLog.resolver || "resolver=skip"}`);
+                console.log(`[router] ${ctx.shop} ${routerLog.orthoticGate}`);
+                console.log(`[router] ${ctx.shop} final_path=${routerLog.finalPath}`);
+                return;
+              }
+            } catch (gateErr) {
+              console.error("[orthotic-flow] gate threw, falling through:", gateErr?.message || gateErr);
+              routerLog.orthoticGate = `error ${gateErr?.message || "unknown"}`;
+            }
+          }
+          if (!routerLog.orthoticGate) routerLog.orthoticGate = "handled=false case=none";
+
+          // Final path is "resolver" if resolver produced a strong
+          // action that the LLM will simply restate; "llm" otherwise.
+          const resolverAction = ctx.resolverState?.recommended_next_action?.type;
+          routerLog.finalPath =
+            resolverAction && resolverAction !== "skip" && resolverAction !== "ask"
+              ? "resolver"
+              : "llm";
+          console.log(`[router] ${ctx.shop} ${routerLog.classifier}`);
+          console.log(`[router] ${ctx.shop} ${routerLog.resolver || "resolver=skip"}`);
+          console.log(`[router] ${ctx.shop} ${routerLog.orthoticGate}`);
+          console.log(`[router] ${ctx.shop} final_path=${routerLog.finalPath}`);
 
           // Footwear over-elicitation guard. When the customer has
           // established BOTH a gender AND a category (the latest

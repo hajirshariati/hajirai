@@ -623,3 +623,97 @@ export function extractUserConstraints(message) {
   }
   return out;
 }
+
+// Conservative catalog-based product-name detector.
+//
+// Used to populate userConstraints.specificProduct so the resolver
+// can take the controlled_oos path. Avoids LLM/NER — strictly
+// against synced product-level CatalogFact rows. Two-stage match:
+//   1. Exact whole-phrase match on product title (case-insensitive).
+//   2. If no exact match, unique whole-word match on the first
+//      meaningful title token (length ≥ 4) — colors, genders,
+//      categories, sizes, and common words are excluded so a bare
+//      "Red" or "Sandal" never resolves to a product.
+// Returns the matching product handle, or null when zero or
+// multiple candidates survive.
+const SPECIFIC_PRODUCT_STOPWORDS = new Set([
+  // colors
+  ...Object.values(RESOLVER_COLOR_LEX),
+  // genders
+  ...Object.values(RESOLVER_GENDER_LEX),
+  // categories (singular & plural normalized)
+  ...Object.values(RESOLVER_CATEGORY_LEX),
+  // common product-title words
+  "the", "and", "with", "for", "from", "shoe", "shoes", "footwear",
+  "support", "arch", "insole", "insoles", "orthotic", "orthotics",
+  "men", "women", "mens", "womens", "kids", "unisex",
+  "leather", "suede", "fabric", "mesh", "knit", "rubber",
+  "size", "wide", "narrow", "medium", "standard", "regular",
+  "new", "classic", "comfort", "premium", "pro", "edition",
+]);
+
+function firstMeaningfulToken(title) {
+  if (!title) return null;
+  const tokens = String(title).toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+  for (const tok of tokens) {
+    if (tok.length < 4) continue;
+    if (SPECIFIC_PRODUCT_STOPWORDS.has(tok)) continue;
+    if (/^\d+$/.test(tok)) continue;
+    return tok;
+  }
+  return null;
+}
+
+export async function detectSpecificProduct(shop, message, { _testFacts } = {}) {
+  if (!shop || !message || typeof message !== "string") return null;
+  const text = String(message).trim();
+  if (!text) return null;
+  const lcText = text.toLowerCase();
+
+  // Fetch catalog product rows (handle + title), variant rows excluded.
+  // _testFacts lets the eval suite inject a fixture without touching DB.
+  let facts;
+  if (Array.isArray(_testFacts)) {
+    facts = _testFacts;
+  } else {
+    facts = await prisma.catalogFact.findMany({
+      where: { shop, variantId: null },
+      select: { productHandle: true, title: true },
+      take: 1000,
+    });
+  }
+  if (!facts || facts.length === 0) return null;
+
+  // Stage 1: exact whole-title phrase match.
+  for (const f of facts) {
+    const lcTitle = String(f.title || "").toLowerCase().trim();
+    if (lcTitle.length < 3) continue;
+    const re = new RegExp(`\\b${lcTitle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i");
+    if (re.test(lcText)) return f.productHandle;
+  }
+
+  // Stage 2: unique first-meaningful-token match.
+  const tokenToHandles = new Map();
+  for (const f of facts) {
+    const tok = firstMeaningfulToken(f.title);
+    if (!tok) continue;
+    const arr = tokenToHandles.get(tok) || [];
+    arr.push(f.productHandle);
+    tokenToHandles.set(tok, arr);
+  }
+
+  const messageTokens = new Set(
+    lcText.split(/[^a-z0-9]+/).filter((t) => t && t.length >= 4 && !SPECIFIC_PRODUCT_STOPWORDS.has(t)),
+  );
+
+  const candidates = new Set();
+  for (const tok of messageTokens) {
+    const handles = tokenToHandles.get(tok);
+    if (!handles) continue;
+    // Token must map to exactly one product to qualify.
+    if (handles.length !== 1) continue;
+    candidates.add(handles[0]);
+  }
+  if (candidates.size !== 1) return null;
+  return Array.from(candidates)[0];
+}

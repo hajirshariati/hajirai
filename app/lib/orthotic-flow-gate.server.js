@@ -291,6 +291,7 @@ export async function maybeRunOrthoticFlow({
   anthropic,
   haikuModel,
   classifiedIntent,
+  resolverState = null,
   storefrontSearchUrlPattern = "",
   ctaOverrides = [],
 }) {
@@ -299,6 +300,49 @@ export async function maybeRunOrthoticFlow({
     return { handled: false };
   }
   if (!Array.isArray(messages) || messages.length === 0) return { handled: false };
+
+  // ─── M1.3 ROUTER YIELD CASES (run before any gate logic) ────
+  //
+  // CASE C — RESOLVER_STRONG_ACTION: resolver already produced a
+  // catalog-grounded next action (recommend / no_match /
+  // controlled_oos). The LLM will use resolverState to answer; the
+  // gate must not contradict that.
+  //
+  // CASE D — RESOLVER_ASK_WITH_SCOPE: resolver wants to ask, but it
+  // already matched/inferred catalog scope (category, color, or a
+  // specific product). The gate must not hard-ask gender on top.
+  // Condition alone is NOT enough scope — those still flow through
+  // the orthotic/path disambig logic below.
+  if (resolverState && resolverState.type === "resolver_state") {
+    const action = resolverState.recommended_next_action?.type;
+    const matched = resolverState.matched_constraints || {};
+    const inferred = resolverState.inferred_constraints || {};
+    const hasCategoryScope = !!(matched.category || inferred.category?.value);
+    const hasColorScope = !!(matched.color || inferred.color?.value);
+    const hasSpecificProduct = !!(matched.specificProduct || resolverState._internal?.specificProduct);
+
+    if (action === "recommend" || action === "no_match" || action === "controlled_oos") {
+      return { handled: false, case: "C_resolver_strong_action" };
+    }
+    if (action === "ask" && (hasCategoryScope || hasColorScope || hasSpecificProduct)) {
+      return { handled: false, case: "D_resolver_ask_with_scope" };
+    }
+  }
+  // CASE D continued — classifier says footwear request AND latest
+  // message contains a concrete footwear noun. Same yield: this is a
+  // catalog turn, not an orthotic turn.
+  const FOOTWEAR_NOUN_GLOBAL_RE =
+    /\b(?:sneakers?|sandals?|boots?|loafers?|clogs?|wedges?|heels?|oxfords?|slippers?|moccasins?|trainers?|pumps?|mules?|mary[- ]janes?|slip[- ]ons?|flats?)\b/i;
+  const latestText =
+    messages.length > 0 && messages[messages.length - 1]?.role === "user"
+      ? String(messages[messages.length - 1]?.content || "")
+      : "";
+  if (
+    classifiedIntent?.isFootwearRequest === true &&
+    FOOTWEAR_NOUN_GLOBAL_RE.test(latestText)
+  ) {
+    return { handled: false, case: "D_footwear_request_with_noun" };
+  }
 
   // The latest message must be from the user — that's what we're
   // mapping. If the last turn is somehow assistant-tail or empty,
@@ -642,18 +686,51 @@ export async function maybeRunOrthoticFlow({
   // "Just to make sure — are you looking for [X] to wear, or an
   // orthotic insole?" Their chip click definitively resolves it.
   //
-  // Trigger: latest classifier output indicates orthotic intent
-  // (isOrtho or ortho-shaped useCase) AND prior assistant turn shows
-  // the customer answered the domain-disambig with "Footwear with
-  // arch support" (or similar footwear commitment) AND latest message
-  // doesn't explicitly contain an orthotic noun.
-  // Suppress: if THIS disambig has already been asked once.
-  const PATH_DISAMBIG_CHIP_RE_GATE = /<<\s*(?:Heels to wear|Just shoes|The shoes themselves|Orthotic insole for these)\s*>>/i;
-  const pathDisambigAlreadyAsked = Array.isArray(messages) &&
-    messages.slice(0, -1).some((m) =>
-      m && m.role === "assistant" && typeof m.content === "string" &&
-      PATH_DISAMBIG_CHIP_RE_GATE.test(m.content),
-    );
+  // M1.3: the previous "already asked" check scanned ASSISTANT
+  // messages for `<<Orthotic insole for these>>` chip markup, but
+  // the widget round-trip strips chip markers from history, so the
+  // check evaluated to false on every subsequent turn and the
+  // disambig fired repeatedly (Bug: it asked again after the
+  // customer answered condition/arch/overpronation chips). Detect
+  // resolution from the USER's chip ANSWERS instead — those round-
+  // trip intact — and add two further suppressors:
+  //   - LATEST_PATH_LOCK_CHOICE / ORTHOTIC_PATH_LOCKED_FLAG (B1/B2):
+  //     customer already picked "Orthotic insole for these" → never
+  //     ask path-ambig again in this conversation.
+  //   - ACTIVE_ORTHOTIC_CHIP_ANSWER (Case A): the latest user
+  //     message is itself an answer to an active orthotic-flow chip
+  //     question (condition/arch/overpronation/useCase) → not the
+  //     moment to disambiguate.
+  const PATH_RESOLUTION_USER_RE = /^\s*(?:Orthotic insole for these|The shoes themselves|Heels to wear|Just shoes)\.?\s*$/i;
+  const ORTHOTIC_LOCK_USER_RE = /^\s*Orthotic insole for these\.?\s*$/i;
+  // Include the LATEST user message so the customer's path-lock
+  // pick on THIS turn already counts (otherwise the gate would
+  // ask path-ambig once more before noticing the resolution).
+  const allUserMsgs = messages.filter((m) => m && m.role === "user" && typeof m.content === "string");
+  const pathAlreadyResolvedByUser = allUserMsgs.some((m) => PATH_RESOLUTION_USER_RE.test(m.content));
+  const orthoticPathLockedInHistory = allUserMsgs.some((m) => ORTHOTIC_LOCK_USER_RE.test(m.content));
+  // Latest user message is an EXACT chip-label match for one of the
+  // orthotic tree's non-gender questions (condition / arch /
+  // overpronation / useCase). Distinguishes a true chip-click on an
+  // active orthotic question from a keyword that happens to match
+  // ("heels" → useCase keyword while still on footwear path).
+  const latestIsOrthoticChipExact = (() => {
+    if (!rawUserText || !tree?.definition?.nodes) return false;
+    const norm = rawUserText.trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
+    if (!norm) return false;
+    for (const node of tree.definition.nodes) {
+      if (!node || node.type !== "question") continue;
+      if (node.attribute === "gender") continue; // gender clicks are path-neutral
+      if (!Array.isArray(node.chips)) continue;
+      for (const chip of node.chips) {
+        const lbl = String(chip?.label || "").toLowerCase().replace(/[^a-z0-9]+/g, "");
+        const val = String(chip?.value || "").toLowerCase().replace(/[^a-z0-9]+/g, "");
+        if (lbl && norm === lbl) return true;
+        if (val && norm === val) return true;
+      }
+    }
+    return false;
+  })();
   const ORTHOTIC_NOUN_RE_PATH = /\b(orthotics?|insoles?|inserts?|inner[- ]soles?|footbeds?|thinsoles?|heel[- ]cups?)\b/i;
   const footwearCommittedInHistory = Array.isArray(messages) && messages.slice(0, -1).some((m) => {
     if (!m || m.role !== "user" || typeof m.content !== "string") return false;
@@ -666,7 +743,9 @@ export async function maybeRunOrthoticFlow({
   const classifierSaysOrthoNow = !!(classifiedIntent && classifiedIntent.isOrthoticRequest);
   const latestHasOrthoticNoun = ORTHOTIC_NOUN_RE_PATH.test(rawUserText);
   if (
-    !pathDisambigAlreadyAsked &&
+    !pathAlreadyResolvedByUser &&
+    !orthoticPathLockedInHistory &&
+    !latestIsOrthoticChipExact &&
     footwearCommittedInHistory &&
     classifierSaysOrthoNow &&
     !latestHasOrthoticNoun
@@ -688,7 +767,7 @@ export async function maybeRunOrthoticFlow({
         `current turn extracted ortho-shaped useCase=${classifiedIntent?.attributes?.useCase || "?"}; ` +
         `asking customer to clarify (transparent, customer-correctable)`,
     );
-    return { handled: true };
+    return { handled: true, case: "F_path_ambig" };
   }
 
   // Kids auto-fill for useCase. When gender=Kids, the seed's q_use_case
