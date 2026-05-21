@@ -38,6 +38,37 @@ export function answerMatchesOption(answer, option) {
   return containsNormalizedPhrase(a, o);
 }
 
+function optionMatchIsNegated(normalizedAnswer, normalizedOption, index) {
+  if (!normalizedAnswer || !normalizedOption || index < 0) return false;
+  const before = normalizedAnswer.slice(0, index).trim();
+  return /(^| )(?:not|no|dont|don t|do not|does not|doesn t|did not|didn t)$/.test(before);
+}
+
+function findMatchedOption(answer, options) {
+  const normalizedAnswer = normalizeChoice(answer);
+  if (!normalizedAnswer || !Array.isArray(options) || options.length === 0) return null;
+
+  const matches = [];
+  for (const option of options) {
+    const normalizedOption = normalizeChoice(option);
+    if (!normalizedOption) continue;
+    const re = new RegExp(`(^| )${escapeRegExp(normalizedOption)}( |$)`, "g");
+    let m;
+    while ((m = re.exec(normalizedAnswer)) !== null) {
+      if (!optionMatchIsNegated(normalizedAnswer, normalizedOption, m.index)) {
+        matches.push({ option, index: m.index, length: normalizedOption.length });
+      }
+      if (m.index === re.lastIndex) re.lastIndex++;
+    }
+  }
+
+  if (matches.length === 0) return null;
+  // If the customer corrects themselves ("not women's, men's"), the
+  // rightmost non-negated option is the final answer.
+  matches.sort((a, b) => (b.index - a.index) || (b.length - a.length));
+  return matches[0].option;
+}
+
 const AFFIRMATIVE_REPLIES = new Set([
   "yes", "yeah", "yep", "yup", "sure", "ok", "okay", "please",
   "yes please", "sounds good", "do it", "show me", "go ahead",
@@ -121,9 +152,7 @@ export function extractChoiceEvents(messages, { limit = 8 } = {}) {
 
     const options = extractChoiceOptions(assistant.content);
     if (options.length > 0) {
-      const matchedOption = [...options]
-        .sort((a, b) => normalizeChoice(b).length - normalizeChoice(a).length)
-        .find((option) => answerMatchesOption(user.content, option));
+      const matchedOption = findMatchedOption(user.content, options);
       if (!matchedOption) continue;
 
       const question = stripChoiceOptions(assistant.content);

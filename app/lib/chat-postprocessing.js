@@ -170,7 +170,7 @@ export function validateFollowUpSuggestion(suggestion, replyText) {
 //   3. Keep "no" but only when not followed by an evaluation cue
 //      (handled by the must-be-followed-by-category constraint —
 //      "no good for X" doesn't have a category noun after "no").
-const REJECT_RE = /\b(?:no|don'?t[\s-]?(?:like|want|need|care\s+for|carry|have|do)|doesn'?t[\s-]?(?:like|want|need|care\s+for|carry|have|do)|didn'?t[\s-]?(?:like|want|need|care\s+for)|hate|hates|dislike|dislikes|avoid|avoids|avoiding|without|besides|other[\s-]?than|except[\s-]?for|except|instead[\s-]?of|rather[\s-]?than|not[\s-]?into|not[\s-]?a[\s-]?fan|not[\s-]?interested[\s-]?in)\b[^.!?\n]{0,50}\b((?:shoes?|footwear|orthotics?|insoles?|footbeds?|sandals?|sneakers?|boots?|clogs?|loafers?|slippers?|oxfords?|wedges?|heels?|flats|mules?|mary[\s-]?janes?|slip[\s-]?ons?))\b/gi;
+const REJECT_RE = /\b(?:no|don'?t[\s-]?(?:like|want|need|care\s+for|carry|have|do)|do\s+not\s+(?:like|want|need|care\s+for|carry|have|do)|doesn'?t[\s-]?(?:like|want|need|care\s+for|carry|have|do)|does\s+not\s+(?:like|want|need|care\s+for|carry|have|do)|didn'?t[\s-]?(?:like|want|need|care\s+for)|did\s+not\s+(?:like|want|need|care\s+for)|hate|hates|dislike|dislikes|avoid|avoids|avoiding|without|besides|other[\s-]?than|except[\s-]?for|except|instead[\s-]?of|rather[\s-]?than|not[\s-]?into|not[\s-]?a[\s-]?fan|not[\s-]?interested[\s-]?in)\b[^.!?\n]{0,50}\b((?:shoes?|footwear|orthotics?|insoles?|footbeds?|sandals?|sneakers?|boots?|clogs?|loafers?|slippers?|oxfords?|wedges?|heels?|flats|mules?|mary[\s-]?janes?|slip[\s-]?ons?))\b/gi;
 
 // Footwear umbrella — "shoes" / "footwear" rejects all member
 // categories. Chip filter expects exact category labels, so we

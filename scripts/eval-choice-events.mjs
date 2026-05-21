@@ -47,6 +47,34 @@ test("C3 — conversation-memory keeps legacy answered choice shape", () => {
   assert.deepEqual(answered[0].options, ["Flat / Low", "Medium / High Arch"]);
 });
 
+test("C4 — negated chip option is not accepted as the answer", () => {
+  const events = extractChoiceEvents([
+    { role: "assistant", content: "Who are these for? <<Men's>> <<Women's>>" },
+    { role: "user", content: "not women's, men's" },
+  ]);
+  assert.equal(events.length, 1);
+  assert.equal(events[0].answer, "Men's");
+  assert.deepEqual(events[0].fact, { key: "gender", value: "men" });
+});
+
+test("C5 — rightmost correction wins across chip options", () => {
+  const events = extractChoiceEvents([
+    { role: "assistant", content: "Which color? <<Black>> <<Blue>>" },
+    { role: "user", content: "black actually blue" },
+  ]);
+  assert.equal(events.length, 1);
+  assert.equal(events[0].answer, "Blue");
+});
+
+test("C6 — later affirmative mention can override earlier negation of same option", () => {
+  const events = extractChoiceEvents([
+    { role: "assistant", content: "Who are these for? <<Men's>> <<Women's>>" },
+    { role: "user", content: "not women's, actually women's" },
+  ]);
+  assert.equal(events.length, 1);
+  assert.equal(events[0].answer, "Women's");
+});
+
 if (failed > 0) {
   console.error("\nFailures:");
   for (const f of failures) console.error(`- ${f.name}: ${f.err.stack || f.err.message}`);

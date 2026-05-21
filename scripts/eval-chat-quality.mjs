@@ -962,6 +962,41 @@ cases.push({
 });
 
 cases.push({
+  name: "scope-reset: drops stale category filter on broad 'anything'",
+  run: () => {
+    const out = stripStaleCategoriesOnScopeReset(
+      search({ query: "women's red sneakers", filters: { category: "sneakers", color: "red" } }),
+      {
+        latestUserMessage: "anything else?",
+        merchantGroups: [
+          { name: "Footwear", categories: ["Sneakers", "Boots"] },
+        ],
+      },
+    );
+    assert.equal(out.input.query, "women's red");
+    assert.equal(out.input.filters.category, undefined);
+    assert.equal(out.input.filters.color, "red");
+  },
+});
+
+cases.push({
+  name: "scope-reset: 'show me all' is a reset trigger",
+  run: () => {
+    const out = stripStaleCategoriesOnScopeReset(
+      search({ query: "women's sneakers", filters: { category: "sneakers" } }),
+      {
+        latestUserMessage: "show me all",
+        merchantGroups: [
+          { name: "Footwear", categories: ["Sneakers"] },
+        ],
+      },
+    );
+    assert.equal(out.input.query, "women's");
+    assert.equal(out.input.filters.category, undefined);
+  },
+});
+
+cases.push({
   name: "scope-reset: no-op without scope-reset trigger word",
   run: () => {
     const input = search({ query: "women's sneakers pink" });

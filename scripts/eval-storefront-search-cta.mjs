@@ -38,7 +38,7 @@ test("men + sneakers → men+sneakers", () => {
 test("kids + orthotics → kids+orthotics", () => {
   const r = buildStorefrontSearchCTA({ pattern: AETREX, gender: "kids", category: "orthotics" });
   assert.equal(r.url, "https://www.aetrex.com/collections/shop?q=kids+orthotics&tab=products");
-  assert.equal(r.label, "View All Kids's Orthotics");
+  assert.equal(r.label, "View All Kids' Orthotics");
 });
 
 // ── orthotic-gate path: gender + "orthotics" ──────────────────────
@@ -85,7 +85,7 @@ test("sale modifier detected", () => {
     latestUserMessage: "any women's boots on sale?",
   });
   assert(r.url.includes("q=sale+women+boots"), `got ${r.url}`);
-  assert(r.label.startsWith("View All Sale"), `got "${r.label}"`);
+  assert.equal(r.label, "View All Women's Boots on Sale");
 });
 
 // ── gender only (no category) ──────────────────────────────────────
@@ -184,7 +184,7 @@ test("override: modifier+gender wins over auto-search", () => {
   });
   assert.equal(r.url, "https://www.aetrex.com/collections/womens-sale");
   // Blank label → auto-generated label fallback
-  assert.equal(r.label, "View All Sale Women's Footwear");
+  assert.equal(r.label, "View All Women's Footwear on Sale");
 });
 
 test("override: custom label is used when provided", () => {

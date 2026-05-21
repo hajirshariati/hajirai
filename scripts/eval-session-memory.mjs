@@ -332,6 +332,29 @@ await test("S22 — catalog-contradiction: stale explicit gender yields to infer
   assert.equal(mem.stale.gender, "men", `prior explicit gender must move to stale; got ${JSON.stringify(mem.stale)}`);
 });
 
+await test("S23 — later explicit category request clears its prior rejection", async () => {
+  const mem = buildSessionMemory({
+    messages: [
+      u("no sandals"),
+      a("Noted."),
+      u("actually sandals are fine"),
+    ],
+  });
+  assert.equal(mem.explicit.category, "sandals");
+  assert.ok(
+    !mem.explicit.rejectedCategories.includes("sandals"),
+    `sandals should no longer be rejected; got ${JSON.stringify(mem.explicit.rejectedCategories)}`,
+  );
+});
+
+await test("S24 — child recipient words map to kids consistently", async () => {
+  const mem = buildSessionMemory({
+    messages: [u("show me sneakers for my son")],
+  });
+  assert.equal(mem.explicit.gender, "kids", `son should map to kids; got ${JSON.stringify(mem.explicit)}`);
+  assert.equal(mem.explicit.category, "sneakers");
+});
+
 console.log("");
 if (failed === 0) {
   console.log(`PASS  ${passed} passed, 0 failed`);

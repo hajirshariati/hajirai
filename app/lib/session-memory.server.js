@@ -74,12 +74,11 @@ const RECIPIENT_RE =
 
 const RECIPIENT_TO_GENDER = {
   wife: "women", girlfriend: "women", mom: "women", mother: "women",
-  daughter: "women", grandma: "women", grandmother: "women",
-  granddaughter: "women", sister: "women", aunt: "women", niece: "women",
-  husband: "men", boyfriend: "men", dad: "men", father: "men", son: "men",
-  grandpa: "men", grandfather: "men", grandson: "men", brother: "men",
-  uncle: "men", nephew: "men",
-  child: "kids", kid: "kids", kids: "kids",
+  grandma: "women", grandmother: "women", sister: "women", aunt: "women",
+  husband: "men", boyfriend: "men", dad: "men", father: "men",
+  grandpa: "men", grandfather: "men", brother: "men", uncle: "men",
+  son: "kids", daughter: "kids", grandson: "kids", granddaughter: "kids",
+  nephew: "kids", niece: "kids", child: "kids", kid: "kids", kids: "kids",
   // Unknown / ambiguous → null. Caller treats null as "no gender
   // inference but a possible subject reset."
   partner: null, spouse: null, friend: null, coworker: null,
@@ -140,6 +139,29 @@ function moveCategoryScopeToStale(memory) {
       delete memory.explicit[k];
     }
   }
+}
+
+const FOOTWEAR_UMBRELLA_REJECTIONS = [
+  "shoes", "shoe", "footwear",
+  "sandals", "sneakers", "boots", "clogs", "loafers", "slippers",
+  "oxfords", "wedges heels", "wedges", "heels", "flats", "mules",
+  "mary janes", "slip ons",
+];
+
+function normalizeCategoryTerm(value) {
+  return String(value || "").toLowerCase().replace(/-/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function clearAcceptedCategoryRejection(rejectedSet, category) {
+  const cat = normalizeCategoryTerm(category);
+  if (!cat) return;
+  if (cat === "footwear" || cat === "shoes" || cat === "shoe") {
+    for (const term of FOOTWEAR_UMBRELLA_REJECTIONS) rejectedSet.delete(term);
+    return;
+  }
+  rejectedSet.delete(cat);
+  if (cat.endsWith("s")) rejectedSet.delete(cat.slice(0, -1));
+  else rejectedSet.delete(`${cat}s`);
 }
 
 export function buildSessionMemory({ messages, classifiedIntent, resolverState } = {}) {
@@ -230,9 +252,15 @@ export function buildSessionMemory({ messages, classifiedIntent, resolverState }
       }
     }
 
-    // 6. Rejections (additive across all turns).
-    for (const r of detectRejectedCategories(text)) {
+    // 6. Rejections. They persist across turns, but an explicit later
+    // category request overrides the earlier rejection for that exact
+    // category ("no sandals" → "actually sandals are fine").
+    const latestRejections = detectRejectedCategories(text);
+    for (const r of latestRejections) {
       rejectedSet.add(String(r).toLowerCase());
+    }
+    if (extracted.category && latestRejections.size === 0) {
+      clearAcceptedCategoryRejection(rejectedSet, extracted.category);
     }
   });
 

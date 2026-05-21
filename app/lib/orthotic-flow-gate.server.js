@@ -350,7 +350,7 @@ export async function maybeRunOrthoticFlow({
   // message contains a concrete footwear noun. Same yield: this is a
   // catalog turn, not an orthotic turn.
   const FOOTWEAR_NOUN_GLOBAL_RE =
-    /\b(?:sneakers?|sandals?|boots?|loafers?|clogs?|wedges?|heels?|oxfords?|slippers?|moccasins?|trainers?|pumps?|mules?|mary[- ]janes?|slip[- ]ons?|flats?)\b/i;
+    /\b(?:shoes?|footwear|sneakers?|sandals?|boots?|loafers?|clogs?|wedges?|heels?|oxfords?|slippers?|moccasins?|trainers?|pumps?|mules?|mary[- ]janes?|slip[- ]ons?|flats?)\b/i;
   const latestText =
     messages.length > 0 && messages[messages.length - 1]?.role === "user"
       ? String(messages[messages.length - 1]?.content || "")
@@ -663,7 +663,7 @@ export async function maybeRunOrthoticFlow({
   // a different shape; if they typed "heel pain, what to wear" they
   // need the disambig anyway.
   const FOOTWEAR_NOUN_RE = /\b(shoes?|sandals?|sneakers?|boots?|loafers?|clogs?|slip[- ]ons?|mary[- ]janes?|wedges?|footwear|oxfords?|moccasins?|slippers?|trainers?|pumps?|mules?)\b/i;
-  const ORTHOTIC_NOUN_RE = /\b(orthotics?|insoles?|inserts?|inner[- ]soles?|arch[- ]support[- ]insert|heel[- ]cups?|footbeds?|thinsoles?)\b/i;
+  const ORTHOTIC_NOUN_RE = /\b(orthotics?|orhtotics?|orthtoics?|insoles?|inserts?|inner[- ]soles?|arch[- ]support[- ]insert|heel[- ]cups?|footbeds?|thinsoles?)\b/i;
   const SHOPPING_VERB_RE = /\b(wear|wears|wearing|recommend|recommendation|recommends|find|finding|looking[- ]for|want|wants|wanting|need|needs|needing|get|gets|getting|buy|buying|best|good|suitable|right|help\s+(?:me|with))\b/i;
   const CONDITION_HINT_RE = /\b(pain|aching?|sore|sores|fasciit(?:is|us)|bunions?|hammertoes?|neuroma|flat[- ]feet|high[- ]arch|low[- ]arch|overpronation|underpronation|plantar|metatarsal|heel[- ]spurs?|diabetic|diabetes|arthritis)\b/i;
   const DISAMBIG_CHIP_RE = /<<\s*Footwear\s+with\s+arch\s+support\s*>>|<<\s*Orthotic\s+insole\s*>>/i;
@@ -877,6 +877,29 @@ export async function maybeRunOrthoticFlow({
       );
       return { handled: false };
     }
+  }
+
+  const priorAssistantHadChips = priorMessages.some(
+    (m) => m && m.role === "assistant" && typeof m.content === "string" && /<<[^<>]+>>/.test(m.content),
+  );
+
+  // Availability / capability questions are answer requests, not
+  // shopping-flow commitments. Ask/answer turns like "do you sell
+  // shoes?", "do you carry sneakers?", or "do you have sandals?"
+  // should reach the normal catalog/LLM path so it can say yes/no
+  // and optionally show cards. Without this early veto, the
+  // classifier's isFootwearRequest=true path below asks for gender
+  // first, which feels like the bot ignored the question.
+  if (
+    looksLikeAvailabilityQuestion(rawUserText) &&
+    !looksLikeRecommendationRequest(rawUserText) &&
+    !priorAssistantHadChips
+  ) {
+    console.log(
+      `[orthotic-flow] availability question before footwear gate ("${rawUserText.slice(0, 60)}"); ` +
+        `falling through to LLM/catalog`,
+    );
+    return { handled: false };
   }
 
   // Hard veto #1: customer committed to the FOOTWEAR path — either

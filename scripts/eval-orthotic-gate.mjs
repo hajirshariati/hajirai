@@ -717,6 +717,50 @@ await test("resolve guard: chip-answer turn (Layer 2 mapped) → resolves (happy
 // Availability-question regression (Bug 4: kids orthotic Y/N loop)
 // ===================================================================
 
+await test("availability question 'do you sell shoes?' before footwear gate → falls through", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "do you sell shoes?" },
+    ],
+    classifiedIntent: {
+      isOrthoticRequest: false,
+      isFootwearRequest: true,
+      isRejection: false,
+      attributes: {},
+      confidence: "high",
+    },
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+  });
+  assert.equal(out.handled, false, "yes/no catalog availability should not ask gender first");
+  assert.equal(events.length, 0);
+});
+
+await test("availability question 'do you carry sneakers?' before footwear gate → falls through", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "do you carry sneakers?" },
+    ],
+    classifiedIntent: {
+      isOrthoticRequest: false,
+      isFootwearRequest: true,
+      isRejection: false,
+      attributes: {},
+      confidence: "high",
+    },
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+  });
+  assert.equal(out.handled, false);
+  assert.equal(events.length, 0);
+});
+
 await test("availability question 'do you have kids orthotics?' mid-flow → falls through", async () => {
   // Production trace: customer mid-orthotic-flow asked 'do you have
   // kids orthotics?'. Without the availability-question veto, the

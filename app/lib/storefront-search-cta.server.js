@@ -73,6 +73,12 @@ function titleCase(s) {
     .trim();
 }
 
+function genderLabel(token) {
+  if (!token) return "";
+  if (token === "kids") return "Kids'";
+  return `${titleCase(token)}'s`;
+}
+
 // URL-encode while preserving + as the inter-token separator the
 // merchant requested. Inside a token, internal spaces (e.g. "wedges
 // heels") also become +.
@@ -145,7 +151,7 @@ export function buildStorefrontSearchCTA(opts) {
   const labelParts = ["View All"];
   if (modifier === "new") labelParts.push("New");
   if (col) labelParts.push(titleCase(col));
-  if (genderToken) labelParts.push(`${titleCase(genderToken)}'s`);
+  if (genderToken) labelParts.push(genderLabel(genderToken));
   if (cat) labelParts.push(titleCase(cat));
   let autoLabel = labelParts.join(" ").replace(/\s+/g, " ").trim();
   if (modifier === "sale") autoLabel += " on Sale";

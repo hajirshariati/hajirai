@@ -39,7 +39,7 @@ export const SKU_PATTERN = /\b[A-Z]{1,2}\d{3,5}[A-Z]?\b/g;
 // words that ARE in the AI's query but NOT in the customer's literal
 // latest message. Vocabulary comes from the merchant's own
 // categoryGroups.
-const SCOPE_RESET_RE = /\b(anything|everything|any\s+\w+|all\s+(?:of\s+)?your|whatever|all\s+styles|every\s+\w+)\b/i;
+const SCOPE_RESET_RE = /\b(?:show\s+me\s+(?:all|anything|everything|whatever)(?:\s+\w+)?|anything|everything|any\s+\w+|all\s+(?:of\s+)?your|all\s+\w+|whatever|all\s+styles|every\s+\w+)\b/i;
 
 export function stripStaleCategoriesOnScopeReset(toolCall, ctx) {
   if (toolCall.name !== "search_products") return toolCall;
@@ -64,18 +64,30 @@ export function stripStaleCategoriesOnScopeReset(toolCall, ctx) {
   const query = String(toolCall.input?.query || "");
   const userLower = latest.toLowerCase();
   let cleaned = query;
+  let filters = toolCall.input?.filters || null;
+  let filtersChanged = false;
 
   for (const token of categoryTokens) {
     const tokenInUser = new RegExp(`\\b${escapeRe(token)}s?\\b`, "i").test(userLower);
     if (tokenInUser) continue;
     const stripRe = new RegExp(`\\b${escapeRe(token)}s?\\b`, "gi");
     cleaned = cleaned.replace(stripRe, " ");
+    if (filters && typeof filters.category === "string") {
+      const filterCategory = filters.category.toLowerCase().replace(/-/g, " ").trim();
+      if (filterCategory === token || filterCategory.split(/\s+/).includes(token)) {
+        const { category, ...rest } = filters;
+        filters = rest;
+        filtersChanged = true;
+      }
+    }
   }
   cleaned = cleaned.replace(/\s+/g, " ").trim();
 
-  if (cleaned !== query.trim() && cleaned.length > 0) {
+  if ((cleaned !== query.trim() && cleaned.length > 0) || filtersChanged) {
     console.log(`[chat] scope-reset: stripped stale categories — "${query}" → "${cleaned}"`);
-    return { ...toolCall, input: { ...toolCall.input, query: cleaned } };
+    const nextInput = { ...toolCall.input, query: cleaned || query };
+    if (filtersChanged) nextInput.filters = filters;
+    return { ...toolCall, input: nextInput };
   }
   return toolCall;
 }

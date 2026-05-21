@@ -257,6 +257,11 @@ test("'doesn't like shoes' → expands to all footwear members", () => {
     `expected umbrella expansion, got ${[...r].join(",")}`);
 });
 
+test("'do not want boots' → {boots}", () => {
+  const r = detectRejectedCategories("I do not want boots");
+  assert(r.has("boots"), `expected boots, got ${[...r].join(",")}`);
+});
+
 test("'something other than sneakers' → {sneakers}", () => {
   const r = detectRejectedCategories("something other than sneakers");
   assert(r.has("sneakers"));
