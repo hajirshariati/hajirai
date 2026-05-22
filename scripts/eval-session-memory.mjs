@@ -121,6 +121,16 @@ await test("S7 — 'Find women sandals' then 'actually men's' pivots; latest win
   assert.equal(mem.stale.category, "sandals", `stale must record prior category; got ${JSON.stringify(mem.stale)}`);
 });
 
+await test("S7b — 'women black sandals' then 'how about mens?' keeps category/color and pivots gender", async () => {
+  const mem = buildSessionMemory({
+    messages: [u("show me women’s sandals in black"), a("Here are black women's sandals."), u("how about mens?")],
+  });
+  assert.equal(mem.explicit.gender, "men", `gender should pivot to men; got ${JSON.stringify(mem.explicit)}`);
+  assert.equal(mem.explicit.category, "sandals", `category should carry through; got ${JSON.stringify(mem.explicit)}`);
+  assert.equal(mem.explicit.color, "black", `color should carry through; got ${JSON.stringify(mem.explicit)}`);
+  assert.equal(mem.stale.category, undefined, `category should not be stale; got ${JSON.stringify(mem.stale)}`);
+});
+
 await test("S8 — 'Find men's shoes' then 'for my wife' pivots to women via recipient detection", async () => {
   const mem = buildSessionMemory({
     messages: [u("Find men's shoes"), a("Got it."), u("for my wife")],

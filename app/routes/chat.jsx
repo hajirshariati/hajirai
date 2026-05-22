@@ -1831,6 +1831,37 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }
   }
 
+  // Product result turns should not also ask a category-chip question.
+  // Production trace: "how about mens?" after women's black sandals
+  // returned 2 men's sandal cards, but the model also emitted
+  // <<Sandals>><<Sneakers>><<Clogs>><<Accessories>>. The widget then
+  // rendered a confusing "what type?" row and could hide the cards.
+  // If product cards exist and the text is already presenting those
+  // products, strip the choice buttons and keep the product result.
+  if (pool.length > 0 && fullResponseText && hasChoiceButtons(fullResponseText)) {
+    const firstChipIdx = fullResponseText.indexOf("<<");
+    const beforeChips = firstChipIdx >= 0
+      ? fullResponseText.slice(0, firstChipIdx).trim()
+      : fullResponseText.trim();
+    const beforeLower = beforeChips.toLowerCase();
+    const namesPoolProduct = pool.some((card) => {
+      const title = String(card.title || "").trim().toLowerCase();
+      return title.length >= 5 && beforeLower.includes(title);
+    });
+    if (hasPluralIntroFraming(beforeChips) || namesPoolProduct) {
+      const before = fullResponseText;
+      fullResponseText = fullResponseText
+        .replace(/\s*<<[^<>]+>>/g, "")
+        .replace(/^\s*(?:what|which)\s+(?:type|kind|style|category)\s+of\s+[^?]{1,120}\?\s+(?=\b(?:here|take|check|i found|we have)\b)/i, "")
+        .replace(/[ \t]{2,}/g, " ")
+        .trim();
+      console.log(
+        `[chat] ${ctx.shop} stripped product-turn choice chips while cards are present ` +
+          `(${before.length}→${fullResponseText.length} chars, pool=${pool.length})`,
+      );
+    }
+  }
+
   console.log(`[chat] emit textLen=${fullResponseText.length} poolSize=${pool.length} searchAttempted=${productSearchAttempted}`);
 
   // Observability only — no behavior change. Flag long non-product

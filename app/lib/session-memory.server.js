@@ -82,6 +82,15 @@ const RECIPIENT_RE =
 const BROAD_RESET_RE =
   /\b(?:anything|everything(?:\s+you\s+(?:have|carry|sell))?|all\s+(?:of\s+)?your\s+\w+|all\s+your\s+stuff|show\s+me\s+(?:whatever|anything|everything|all)|what\s+else|something\s+else|other\s+(?:options|things|stuff))\b/i;
 
+// Gender-only comparative follow-up. This is NOT a new subject with
+// no context; it means "same thing, other gender" in shopping chat:
+//   "women's black sandals" → "how about mens?"
+// should become men's black sandals, not a fresh "what type?" ask.
+// Keep this narrower than "actually men's", which is a correction and
+// can reasonably clear prior category scope.
+const GENDER_ONLY_CONTINUATION_RE =
+  /\b(?:how|what)\s+about\s+(?:the\s+)?(?:men|mens|men['’]?s|women|womens|women['’]?s|male|female|boys?|girls?|kids?|children)\??\s*$/i;
+
 const RECIPIENT_TO_GENDER = {
   wife: "women", girlfriend: "women", mom: "women", mother: "women",
   grandma: "women", grandmother: "women", sister: "women", aunt: "women",
@@ -174,6 +183,12 @@ function clearAcceptedCategoryRejection(rejectedSet, category) {
   else rejectedSet.delete(`${cat}s`);
 }
 
+function isGenderOnlyContinuation(text, extracted, recipient) {
+  if (!text || !extracted?.gender || recipient?.matched) return false;
+  if (!GENDER_ONLY_CONTINUATION_RE.test(text)) return false;
+  return SUBJECT_PIVOT_KEYS.every((key) => extracted[key] == null);
+}
+
 export function buildSessionMemory({ messages, classifiedIntent, resolverState } = {}) {
   const memory = {
     explicit: { rejectedCategories: [] },
@@ -210,10 +225,12 @@ export function buildSessionMemory({ messages, classifiedIntent, resolverState }
     }
 
     // 3. Subject pivot: gender change clears subject-owned scope.
+    const carryPriorScopeThroughGenderPivot = isGenderOnlyContinuation(text, extracted, recipient);
     if (
       memory.explicit.gender &&
       extracted.gender &&
-      extracted.gender !== memory.explicit.gender
+      extracted.gender !== memory.explicit.gender &&
+      !carryPriorScopeThroughGenderPivot
     ) {
       moveScopeToStale(memory);
     }
