@@ -1398,20 +1398,7 @@ function describeAnswers(answers) {
 
 function buildResolveIntro(result, attrs) {
   const title = String(result?.title || "this orthotic").trim();
-  const reasonBits = [];
-  if (attrs?.condition && attrs.condition !== "none") {
-    reasonBits.push(humanizeCondition(attrs.condition));
-  }
-  if (attrs?.useCase) {
-    reasonBits.push(humanizeUseCase(attrs.useCase));
-  }
-  if (attrs?.arch) {
-    reasonBits.push(`${attrs.arch.toLowerCase()}`);
-  }
-  if (reasonBits.length === 0) {
-    return `Based on what you've shared, **${title}** is the best match.`;
-  }
-  return `Based on what you've shared (${reasonBits.join(", ")}), **${title}** is the best match.`;
+  return `Based on what you've shared, **${title}** is the best match.`;
 }
 
 function humanizeCondition(c) {

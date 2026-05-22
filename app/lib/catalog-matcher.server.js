@@ -144,6 +144,54 @@ function flattenAttributeValues(value) {
   return [String(value)];
 }
 
+function normalizeCategoryForMatch(raw) {
+  const normalized = normalizeCategory(raw);
+  if (normalized) return normalized;
+  return String(raw || "").toLowerCase().trim().replace(/[_\s]+/g, "-");
+}
+
+function rawCategoryValueMatches(raw, targetCategory) {
+  const target = normalizeCategoryForMatch(targetCategory);
+  if (!target) return true;
+  const values = flattenAttributeValues(raw);
+  for (const value of values) {
+    if (normalizeCategoryForMatch(value) === target) return true;
+    const words = String(value || "")
+      .toLowerCase()
+      .split(/[^a-z0-9]+/)
+      .filter(Boolean);
+    for (let size = Math.min(3, words.length); size >= 1; size--) {
+      for (let i = 0; i <= words.length - size; i++) {
+        if (normalizeCategoryForMatch(words.slice(i, i + size).join(" ")) === target) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+export function productMatchesCategoryConstraint(product, category) {
+  const target = normalizeCategoryForMatch(category);
+  if (!target) return true;
+  const attrs = product?.attributesJson || product?.attributes || {};
+  const strongValues = [
+    readAttributeCI(attrs, ["category", "category_for_filter", "subcategory", "product_type", "productType"]),
+    product?.productType,
+    product?.product_type,
+  ];
+  if (strongValues.some((value) => rawCategoryValueMatches(value, target))) return true;
+
+  // Fallback for imperfect catalog rows: use title/tags, but never the
+  // description. Descriptions often mention adjacent categories and would
+  // let a pink sneaker leak into a pink sandals request.
+  const fallbackValues = [
+    product?.title,
+    Array.isArray(product?.tags) ? product.tags.join(" ") : product?.tags,
+  ];
+  return fallbackValues.some((value) => rawCategoryValueMatches(value, target));
+}
+
 export function attributeValueMatches(value, wants, { normalizer = null } = {}) {
   const wantList = Array.from(wants || []).map((w) => String(w || "").toLowerCase().trim()).filter(Boolean);
   if (wantList.length === 0) return true;

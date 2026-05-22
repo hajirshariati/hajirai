@@ -8,6 +8,7 @@ import { TOOLS, FIT_PREDICTOR_TOOL, CUSTOMER_ORDERS_TOOL } from "./chat-tool-sch
 import {
   canonicalizeCatalogConstraints,
   deriveCatalogMatchContract,
+  productMatchesCategoryConstraint,
   readAttributeCI,
 } from "./catalog-matcher.server.js";
 import {
@@ -1059,26 +1060,7 @@ const isExcludedByRule = (p) => {
       return out;
     };
 
-    const matchesCategoryWant = (p, want) => {
-      const wants = expandFilterValue(want);
-      if (wants.size === 0) return true;
-      const attrs = p.attributesJson || {};
-      const parts = [
-        readAttributeCI(attrs, ["category"]),
-        readAttributeCI(attrs, ["category_for_filter"]),
-        readAttributeCI(attrs, ["subcategory"]),
-        p.productType,
-      ];
-      const haystack = parts
-        .flatMap((v) => (Array.isArray(v) ? v : [v]))
-        .filter(Boolean)
-        .map((v) => String(v).toLowerCase())
-        .join(" ");
-      for (const w of wants) {
-        if (haystack.includes(w)) return true;
-      }
-      return false;
-    };
+    const matchesCategoryWant = (p, want) => productMatchesCategoryConstraint(p, want);
 
     // For non-category attribute filters (e.g. color_family=blue), expand
     // the filter value through the merchant's Query Synonyms too. Lets a
@@ -1221,6 +1203,17 @@ const isExcludedByRule = (p) => {
       console.log(`[search]   gender filter ${eg}: WIPED ALL ${beforeGenderFilter} → falling back to unfiltered (no kids products in this category)`);
     } else {
       filtered = afterGender;
+    }
+  }
+
+  if (effectiveCategory) {
+    const beforeCategoryGuard = filtered.length;
+    filtered = filtered.filter((p) => productMatchesCategoryConstraint(p, effectiveCategory));
+    if (filtered.length !== beforeCategoryGuard) {
+      console.log(
+        `[search]   category hard-guard ${effectiveCategory}: ${filtered.length}/${beforeCategoryGuard} ` +
+          `(removed off-category semantic/near matches)`,
+      );
     }
   }
 

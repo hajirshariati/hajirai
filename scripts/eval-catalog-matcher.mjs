@@ -4,6 +4,7 @@ import {
   colorExistsInCatalogScope,
   computeCatalogConstraintDomains,
   deriveCatalogMatchContract,
+  productMatchesCategoryConstraint,
   readAttributeCI,
 } from "../app/lib/catalog-matcher.server.js";
 
@@ -92,6 +93,36 @@ test("M5 — response contract distinguishes exact, near, and true no-match", ()
       impossibleConstraints: [{ field: "color", value: "red" }],
     }).status,
     "true_no_match",
+  );
+});
+
+test("M6 — category constraint rejects adjacent-category semantic matches", () => {
+  assert.equal(
+    productMatchesCategoryConstraint({
+      title: "Danika Arch Support Sneaker - Pink",
+      productType: "Footwear",
+      attributes: { Category: "Sneakers" },
+    }, "sandals"),
+    false,
+  );
+  assert.equal(
+    productMatchesCategoryConstraint({
+      title: "Vicki Braided Thong Sandal - Blush",
+      productType: "Footwear",
+      attributes: { Category: "Sandals" },
+    }, "sandals"),
+    true,
+  );
+});
+
+test("M7 — category constraint can recover from missing category attrs via title", () => {
+  assert.equal(
+    productMatchesCategoryConstraint({
+      title: "Maui Orthotic Men's Slides",
+      productType: "Footwear",
+      attributes: {},
+    }, "sandals"),
+    true,
   );
 });
 

@@ -1225,6 +1225,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     const filters = {};
     if (gender) filters.gender = gender;
     if (category) filters.category = category;
+    if (color) filters.color = color;
     const queryParts = [color, condition, category].filter(Boolean);
     const query = queryParts.join(" ").trim() || String(ctx.latestUserMessage || "").slice(0, 120).trim();
     try {
