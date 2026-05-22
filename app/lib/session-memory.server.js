@@ -72,6 +72,16 @@ const CATEGORY_BOUND_KEYS = [
 const RECIPIENT_RE =
   /\b(?:for|gift\s+for|shopping\s+for|to\s+buy\s+for|my)\s+(wife|husband|partner|girlfriend|boyfriend|spouse|mom|mother|dad|father|son|daughter|child|kid|kids|grandma|grandpa|grandmother|grandfather|grandson|granddaughter|nephew|niece|sister|brother|aunt|uncle|friend|coworker)\b/i;
 
+// Broad scope-reset phrasing. When the customer says "anything",
+// "everything you have", "all your X", "show me whatever", or
+// "what else", they're explicitly widening the search. Carry-over
+// from prior turns (category, color, size, width, condition, etc.)
+// should be cleared so the resolver isn't artificially narrowed.
+// Gender stays — they're widening within a gender, not changing
+// subject.
+const BROAD_RESET_RE =
+  /\b(?:anything|everything(?:\s+you\s+(?:have|carry|sell))?|all\s+(?:of\s+)?your\s+\w+|all\s+your\s+stuff|show\s+me\s+(?:whatever|anything|everything|all)|what\s+else|something\s+else|other\s+(?:options|things|stuff))\b/i;
+
 const RECIPIENT_TO_GENDER = {
   wife: "women", girlfriend: "women", mom: "women", mother: "women",
   grandma: "women", grandmother: "women", sister: "women", aunt: "women",
@@ -225,6 +235,21 @@ export function buildSessionMemory({ messages, classifiedIntent, resolverState }
       moveScopeToStale(memory);
       memory.stale.gender = memory.explicit.gender;
       delete memory.explicit.gender;
+    }
+
+    // 3c. Broad scope-reset phrasing: customer explicitly widens
+    //     the search ("anything", "everything you carry", "show me
+    //     all your shoes", "what else"). Drop category-bound carry-
+    //     over so the resolver is not artificially narrowed by a
+    //     prior turn. Gender stays — the customer is widening
+    //     within a gender, not changing subject. The extractor will
+    //     still apply any NEW constraints from this same message.
+    if (BROAD_RESET_RE.test(text)) {
+      if (memory.explicit.category != null) {
+        memory.stale.category = memory.explicit.category;
+        delete memory.explicit.category;
+      }
+      moveCategoryScopeToStale(memory);
     }
 
     // 4. Apply extracted scalars (latest wins).

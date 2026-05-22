@@ -581,11 +581,55 @@ export function detectBroadNeed(text) {
 // available". Used (with detectAiPivotPhrasing as override) to decide
 // whether to hide the card pool when the AI says no but cards are
 // still attached.
-const AI_NO_MATCH_RE = /\b(don't (?:have|see|carry)|not (?:see|carry|have)|don't appear|we don't|no .{0,20} available)\b/i;
+//
+// Widened to cover production phrasings that slipped through:
+// "unfortunately,"/"sadly,"/"I'm afraid" prefixes, "can't find" /
+// "couldn't find" / "couldn't locate", "no longer carry", and
+// "currently unavailable / sold out".
+const AI_NO_MATCH_RE = new RegExp(
+  [
+    "don'?t\\s+(?:have|see|carry|stock|find|appear)",
+    "not\\s+(?:see|carry|have|find|available|in\\s+stock|carried)",
+    "don'?t\\s+appear",
+    "we\\s+don'?t",
+    "no\\s+.{0,30}\\s+available",
+    "unfortunately[,!]?\\s+(?:no|we|none|i|there|that|this)",
+    "sadly[,!]?\\s+(?:no|we|none|i|there)",
+    "i'?m\\s+afraid\\s+(?:we|i|that|there|this)",
+    "can(?:no|'?)t\\s+(?:find|locate|see)",
+    "couldn'?t\\s+(?:find|locate)",
+    "wasn'?t\\s+able\\s+to\\s+find",
+    "no\\s+longer\\s+(?:carry|stock|sell|available)",
+    "currently\\s+(?:unavailable|sold\\s+out)",
+    "sold\\s+out",
+    "appears?\\s+(?:to\\s+be\\s+)?(?:no\\s+longer|sold\\s+out|unavailable)",
+  ].map((p) => `(?:${p})`).join("|"),
+  "i",
+);
 
 export function detectAiNoMatchPhrasing(text) {
   if (typeof text !== "string" || !text) return false;
   return AI_NO_MATCH_RE.test(text);
+}
+
+const SENTENCE_SPLIT_RE = /(?<=[.!?])\s+(?=[A-Z"'])/;
+
+// Pool-aware denial lead-in stripper. When the pool has cards AND the
+// AI opens with a denial sentence, the denial contradicts the cards
+// beneath. Strip leading denial sentences only, preserving the rest.
+export function stripDenialLeadIn(text, { poolSize = 0 } = {}) {
+  if (!text || typeof text !== "string") return { text: text || "", changed: false };
+  if (poolSize <= 0) return { text, changed: false };
+  const sentences = text.split(SENTENCE_SPLIT_RE);
+  if (sentences.length === 0) return { text, changed: false };
+  let cursor = 0;
+  while (cursor < sentences.length && AI_NO_MATCH_RE.test(sentences[cursor])) {
+    cursor += 1;
+  }
+  if (cursor === 0) return { text, changed: false };
+  const rest = sentences.slice(cursor).join(" ").trim();
+  if (rest.length < 20) return { text, changed: false };
+  return { text: rest, changed: true };
 }
 
 export function stripAvailabilityDenialSentences(text) {

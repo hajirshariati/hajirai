@@ -305,6 +305,66 @@ await test("S21 — category pivot resets category-bound scope (useCase, color, 
   assert.ok(mem.stale.useCase || mem.explicit.useCase == null, "stale should record prior useCase OR it's cleanly cleared");
 });
 
+await test("S22b — 'show me anything' resets category-bound scope + category itself, keeps gender", async () => {
+  // Tier C item 6: broad reset semantics. The prior color, size,
+  // width, condition, useCase, AND category should all go stale.
+  // Gender stays — customer is widening within a gender.
+  const mem = buildSessionMemory({
+    messages: [
+      u("men's red sneakers in size 10 wide"),
+      a("here you go"),
+      u("show me anything"),
+    ],
+  });
+  assert.equal(mem.explicit.gender, "men", "gender should persist across broad reset");
+  assert.equal(mem.explicit.category, undefined, "prior category should be cleared");
+  assert.equal(mem.explicit.color, undefined, "prior color should be cleared");
+  assert.equal(mem.explicit.size, undefined, "prior size should be cleared");
+  assert.equal(mem.explicit.width, undefined, "prior width should be cleared");
+  assert.ok(mem.stale.category || mem.stale.color, "broad-reset moves prior scope to stale");
+});
+
+await test("S22c — 'what else do you have' resets category-bound scope", async () => {
+  const mem = buildSessionMemory({
+    messages: [
+      u("men's running shoes"),
+      a("here you go"),
+      u("what else do you have"),
+    ],
+  });
+  assert.equal(mem.explicit.gender, "men");
+  assert.equal(mem.explicit.category, undefined, "what-else clears category");
+});
+
+await test("S22d — 'everything you carry for men' resets to bare gender", async () => {
+  const mem = buildSessionMemory({
+    messages: [
+      u("women's pink sandals"),
+      a("here you go"),
+      u("everything you carry for men"),
+    ],
+  });
+  // Recipient pivot moves gender to stale; broad reset clears category-bound.
+  // After both, the new gender (men) takes hold via extractor.
+  assert.equal(mem.explicit.gender, "men", "new gender wins");
+  assert.equal(mem.explicit.color, undefined, "old color cleared");
+  assert.equal(mem.explicit.category, undefined, "old category cleared");
+});
+
+await test("S23 — broad reset does NOT fire on benign latest message", async () => {
+  // Make sure benign latest messages (no reset phrase) don't
+  // accidentally wipe prior scope.
+  const mem = buildSessionMemory({
+    messages: [
+      u("men's sneakers"),
+      a("here you go"),
+      u("these are great"),  // no reset phrase, no scope words
+    ],
+  });
+  assert.equal(mem.explicit.gender, "men");
+  assert.equal(mem.explicit.category, "sneakers");
+});
+
 await test("S22 — catalog-contradiction: stale explicit gender yields to inferred gender", async () => {
   // Production trace: customer was browsing men's items, then asked
   // "navy heels" — heels are women's-only. Resolver inferred

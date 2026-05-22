@@ -36,6 +36,7 @@ import {
   scrubToolCallLeaks,
   detectBroadNeed,
   detectAiNoMatchPhrasing,
+  stripDenialLeadIn,
   looksLikeClarifyingQuestion,
   suggestionContradictsGender,
   detectFootwearOverElicitation,
@@ -591,6 +592,47 @@ test("'we don't have' → no-match", () => assert(detectAiNoMatchPhrasing("We do
 test("'don't carry' → no-match", () => assert(detectAiNoMatchPhrasing("We don't carry that brand.")));
 test("'no exact match available' → no-match", () => assert(detectAiNoMatchPhrasing("no exact match available")));
 test("plain reply → no no-match", () => assert(!detectAiNoMatchPhrasing("Here are great options for you.")));
+test("'Unfortunately, no…' → no-match", () => assert(detectAiNoMatchPhrasing("Unfortunately, no exact red sneakers right now.")));
+test("'Sadly, no…' → no-match", () => assert(detectAiNoMatchPhrasing("Sadly, no white men's sneakers in our catalog.")));
+test("'I'm afraid we don't…' → no-match", () => assert(detectAiNoMatchPhrasing("I'm afraid we don't carry that brand.")));
+test("'can't find' → no-match", () => assert(detectAiNoMatchPhrasing("I can't find any in size 11.")));
+test("'couldn't locate' → no-match", () => assert(detectAiNoMatchPhrasing("I couldn't locate that exact style.")));
+test("'no longer carry' → no-match", () => assert(detectAiNoMatchPhrasing("We no longer carry that color.")));
+test("'currently sold out' → no-match", () => assert(detectAiNoMatchPhrasing("The Vania in red is currently sold out.")));
+
+test("stripDenialLeadIn strips leading denial sentence when pool has cards", () => {
+  const before = "Unfortunately, no exact white men's sneakers right now. Here are our closest options: navy and black.";
+  const r = stripDenialLeadIn(before, { poolSize: 2 });
+  assert.equal(r.changed, true);
+  assert.ok(!r.text.toLowerCase().startsWith("unfortunately"), `lead-in must be stripped; got: ${r.text}`);
+  assert.ok(r.text.length > 20);
+});
+
+test("stripDenialLeadIn leaves text untouched when pool is empty", () => {
+  const before = "Unfortunately, we don't carry that brand.";
+  const r = stripDenialLeadIn(before, { poolSize: 0 });
+  assert.equal(r.changed, false);
+  assert.equal(r.text, before);
+});
+
+test("stripDenialLeadIn leaves text untouched when leading sentence is not a denial", () => {
+  const before = "Here are some great options. Check out these styles.";
+  const r = stripDenialLeadIn(before, { poolSize: 2 });
+  assert.equal(r.changed, false);
+});
+
+test("stripDenialLeadIn keeps original when strip would leave <20 chars", () => {
+  const before = "Unfortunately, no.";
+  const r = stripDenialLeadIn(before, { poolSize: 2 });
+  assert.equal(r.changed, false);
+});
+
+test("stripDenialLeadIn strips multiple leading denial sentences in a row", () => {
+  const before = "We don't have that exact color. I'm afraid it's out of stock. But here are 3 close alternatives in stock.";
+  const r = stripDenialLeadIn(before, { poolSize: 3 });
+  assert.equal(r.changed, true);
+  assert.ok(r.text.toLowerCase().startsWith("but here"), `should retain the alternatives sentence; got: ${r.text}`);
+});
 
 test("stripAvailabilityDenialSentences removes false denial lead-in but keeps correction", () => {
   const text = "We don't have any white men's sneakers in stock right now — our closest options are in Black, Grey, Navy, and Light Blue. Good news — we actually do carry white men's sneakers! Here are two styles with arch support.";
