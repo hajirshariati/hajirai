@@ -10,6 +10,21 @@ import {
   deriveCatalogMatchContract,
   readAttributeCI,
 } from "./catalog-matcher.server.js";
+import {
+  canonicalizeVariantConstraints,
+  inStockSizes,
+  inStockWidths,
+  isSizeAvailable,
+  normalizeVariantWidth,
+} from "./variant-matcher.server.js";
+import {
+  availableVariantsForScope,
+  hasVariantScope,
+  normalizedVariantSize,
+  normalizedVariantWidth,
+  productMatchesVariantScope,
+  variantScopedPriceValues,
+} from "./chat-tool-variant-helpers.server.js";
 
 // Re-export tool schemas so existing imports
 //   import { TOOLS } from "../lib/chat-tools.server"
@@ -17,6 +32,20 @@ import {
 // pure-data consumers (eval-e2e harness, future code) can load them
 // without dragging the prisma/Shopify/embeddings import chain.
 export { TOOLS, FIT_PREDICTOR_TOOL, CUSTOMER_ORDERS_TOOL };
+
+const HIDDEN_PRODUCT_STATUSES = ["DRAFT", "draft", "ARCHIVED", "archived"];
+
+function activeProductWhere(shop, extra = {}) {
+  return {
+    ...extra,
+    shop,
+    NOT: { status: { in: HIDDEN_PRODUCT_STATUSES } },
+  };
+}
+
+function variantScopeFromFilters(filters = {}) {
+  return canonicalizeVariantConstraints(filters || {});
+}
 
 
 const flattenValues = (obj) => {
@@ -449,6 +478,7 @@ async function searchProducts(
   const attrFilters = filters && typeof filters === "object"
     ? canonicalizeCatalogConstraints(filters)
     : {};
+  const variantScope = variantScopeFromFilters(attrFilters);
 
 const detected = detectAndStripGender(q);
 const detectedFromLatest = detectAndStripGender(latestUserMessage || "");
@@ -633,16 +663,15 @@ const searchQuery = detected.gender ? detected.query : q;
   // Pull the synced catalog for this shop and do matching in memory.
   // This avoids the brittle Prisma JSON search behavior that has been returning db=0.
   let products = await prisma.product.findMany({
-    where: {
-      shop,
-      NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } },
-    },
+    where: activeProductWhere(shop),
     include: {
       variants: {
         select: {
           sku: true,
+          title: true,
           price: true,
           compareAtPrice: true,
+          optionsJson: true,
           attributesJson: true,
           inventoryQty: true,
         },
@@ -1067,8 +1096,10 @@ const isExcludedByRule = (p) => {
     };
 
     filtered = filtered.filter((p) => {
+      if (!productMatchesVariantScope(p, variantScope)) return false;
       const productAttrs = p.attributesJson || {};
       return attrKeys.every((key) => {
+        if (["size", "width", "sku"].includes(key.toLowerCase())) return true;
         const want = String(attrFilters[key] || "").toLowerCase();
         if (!want) return true;
         if (key.toLowerCase() === "category") {
@@ -1154,9 +1185,11 @@ const isExcludedByRule = (p) => {
   if (priceCeil != null || priceFloor != null) {
     const beforePrice = filtered.length;
     filtered = filtered.filter((p) => {
-      const variantPrices = (p.variants || [])
-        .map((v) => (v.price != null ? Number(v.price) : null))
-        .filter((n) => Number.isFinite(n));
+      const variantPrices = hasVariantScope(variantScope)
+        ? variantScopedPriceValues(p, variantScope)
+        : (p.variants || [])
+            .map((v) => (v.price != null ? Number(v.price) : null))
+            .filter((n) => Number.isFinite(n));
       if (variantPrices.length === 0) return true; // no price data — keep
       const minP = Math.min(...variantPrices);
       const maxP = Math.max(...variantPrices);
@@ -1230,12 +1263,12 @@ const isExcludedByRule = (p) => {
       tags: p.tags?.length ? p.tags : undefined,
       attributes: p.attributesJson || undefined,
       descriptionSnippet: descriptionSnippet(p.description, q, 280),
-      priceRange: priceRange(p.variants || []),
+      priceRange: priceRange(availableVariantsForScope(p, variantScope)),
       variantCount: (p.variants || []).length,
       url: productUrl(shop, p.handle),
       image: p.featuredImageUrl || undefined,
-      price: firstPrice(p.variants || []) || undefined,
-      compareAtPrice: firstCompareAt(p.variants || []) || undefined,
+      price: firstPrice(availableVariantsForScope(p, variantScope)) || undefined,
+      compareAtPrice: firstCompareAt(availableVariantsForScope(p, variantScope)) || undefined,
     })),
   };
 }
@@ -1245,7 +1278,7 @@ async function getProductDetails({ handle }, { shop }) {
   if (!h) return { error: "handle is required" };
 
   const product = await prisma.product.findFirst({
-    where: { shop, handle: h, NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } } },
+    where: activeProductWhere(shop, { handle: h }),
     include: { variants: true },
   });
   if (!product) return { error: `No product found with handle '${h}'.` };
@@ -1256,15 +1289,10 @@ async function getProductDetails({ handle }, { shop }) {
   // Pre-derive in-stock sizes so the AI doesn't have to scan variants[]
   // and risk claiming "size 9 is available" when inventoryQty is 0.
   // The prompt rule for size answers can cite this list directly.
-  const availableSizes = [];
-  for (const v of product.variants) {
-    const qty = v.inventoryQty;
-    const inStock = qty == null ? true : Number(qty) > 0;
-    if (!inStock) continue;
-    const opts = safeParseJson(v.optionsJson) || {};
-    const size = opts.Size || opts.size || opts.SIZE;
-    if (size && !availableSizes.includes(size)) availableSizes.push(size);
-  }
+  const availableSizes = inStockSizes(product);
+  const availableWidths = inStockWidths(product);
+  const displayVariants = availableVariantsForScope(product);
+  const firstAvailable = displayVariants.find((v) => v.price) || product.variants[0];
 
   return {
     handle: product.handle,
@@ -1275,12 +1303,13 @@ async function getProductDetails({ handle }, { shop }) {
     attributes: product.attributesJson || undefined,
     status: product.status || undefined,
     description: truncate(product.description || "", 600),
-    priceRange: priceRange(product.variants),
+    priceRange: priceRange(displayVariants),
     url: productUrl(shop, product.handle),
     image: product.featuredImageUrl || undefined,
-    price: product.variants[0]?.price || undefined,
-    compareAtPrice: product.variants[0]?.compareAtPrice || undefined,
+    price: firstAvailable?.price || undefined,
+    compareAtPrice: firstAvailable?.compareAtPrice || undefined,
     availableSizes: availableSizes.length > 0 ? availableSizes : undefined,
+    availableWidths: availableWidths.length > 0 ? availableWidths : undefined,
     variants: product.variants.map((v) => ({
       sku: v.sku || undefined,
       title: v.title || undefined,
@@ -1288,6 +1317,8 @@ async function getProductDetails({ handle }, { shop }) {
       compareAtPrice: v.compareAtPrice || undefined,
       inventoryQty: v.inventoryQty ?? undefined,
       inStock: v.inventoryQty == null ? undefined : Number(v.inventoryQty) > 0,
+      normalizedSize: normalizedVariantSize(v) || undefined,
+      normalizedWidth: normalizedVariantWidth(v) || undefined,
       options: safeParseJson(v.optionsJson) || undefined,
       attributes: v.attributesJson || undefined,
       enrichment: v.sku ? enrich.get(v.sku) || undefined : undefined,
@@ -1311,10 +1342,10 @@ async function findSimilarProducts({ handle, limit, priceMax, query }, { shop, d
   }
 
   const reference = await prisma.product.findFirst({
-    where: { shop, handle: h, NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } } },
+    where: activeProductWhere(shop, { handle: h }),
     include: {
       variants: {
-        select: { sku: true, price: true, compareAtPrice: true, attributesJson: true },
+        select: { sku: true, price: true, compareAtPrice: true, optionsJson: true, attributesJson: true, inventoryQty: true },
       },
     },
   });
@@ -1401,14 +1432,10 @@ async function findSimilarProducts({ handle, limit, priceMax, query }, { shop, d
   const refFamily = extractStyleFamily(reference.title);
 
   const candidates = await prisma.product.findMany({
-    where: {
-      shop,
-      handle: { not: h },
-      NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } },
-    },
+    where: activeProductWhere(shop, { handle: { not: h } }),
     include: {
       variants: {
-        select: { sku: true, price: true, compareAtPrice: true, attributesJson: true },
+        select: { sku: true, price: true, compareAtPrice: true, optionsJson: true, attributesJson: true, inventoryQty: true },
       },
     },
     orderBy: { updatedAt: "desc" },
@@ -1519,12 +1546,12 @@ async function findSimilarProducts({ handle, limit, priceMax, query }, { shop, d
       productType: p.productType || undefined,
       tags: p.tags?.length ? p.tags : undefined,
       attributes: p.attributesJson || undefined,
-      priceRange: priceRange(p.variants || []),
+      priceRange: priceRange(availableVariantsForScope(p)),
       variantCount: (p.variants || []).length,
       url: productUrl(shop, p.handle),
       image: p.featuredImageUrl || undefined,
-      price: firstPrice(p.variants || []) || undefined,
-      compareAtPrice: firstCompareAt(p.variants || []) || undefined,
+      price: firstPrice(availableVariantsForScope(p)) || undefined,
+      compareAtPrice: firstCompareAt(availableVariantsForScope(p)) || undefined,
     })),
   };
 }
@@ -1542,7 +1569,7 @@ async function lookupSku({ skus }, { shop }) {
   let variants = await prisma.productVariant.findMany({
     where: {
       OR: list.map((s) => ({ sku: { equals: s, mode: "insensitive" } })),
-      product: { shop, NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } } },
+      product: activeProductWhere(shop),
     },
     include: { product: true },
   });
@@ -1562,7 +1589,7 @@ async function lookupSku({ skus }, { shop }) {
     const prefixHits = await prisma.productVariant.findMany({
       where: {
         OR: unmatched.map((s) => ({ sku: { startsWith: s, mode: "insensitive" } })),
-        product: { shop, NOT: { status: { in: ["DRAFT", "draft", "ARCHIVED", "archived"] } } },
+        product: activeProductWhere(shop),
       },
       include: { product: true },
     });
@@ -1637,7 +1664,7 @@ async function getProductReviews({ handle }, { shop, yotpoApiKey }) {
   if (!h) return { error: "handle is required" };
 
   const product = await prisma.product.findFirst({
-    where: { shop, handle: h },
+    where: activeProductWhere(shop, { handle: h }),
     select: { shopifyId: true, title: true },
   });
   if (!product) return { error: `No product found with handle '${h}'.` };
@@ -1705,7 +1732,7 @@ async function getReturnInsights({ handle }, { shop, aftershipApiKey }) {
   if (!h) return { error: "handle is required" };
 
   const product = await prisma.product.findFirst({
-    where: { shop, handle: h },
+    where: activeProductWhere(shop, { handle: h }),
     select: { title: true },
   });
   if (!product) return { error: `No product found with handle '${h}'.` };
@@ -1833,25 +1860,25 @@ async function getFitRecommendation({ handle, customerSizeHint }, ctx) {
   const externalAuthHeader = typeof cfg.externalAuthHeader === "string" ? cfg.externalAuthHeader.trim() : "";
 
   const product = await prisma.product.findFirst({
-    where: { shop: ctx.shop, handle: h },
-    include: { variants: { select: { sku: true, title: true, optionsJson: true, attributesJson: true } } },
+    where: activeProductWhere(ctx.shop, { handle: h }),
+    include: {
+      variants: {
+        select: {
+          sku: true,
+          title: true,
+          price: true,
+          optionsJson: true,
+          attributesJson: true,
+          inventoryQty: true,
+        },
+      },
+    },
   });
   if (!product) return { error: `No product found with handle '${h}'.` };
 
-  const sizesAvailable = Array.from(
-    new Set(
-      (product.variants || [])
-        .flatMap((v) => {
-          const opts = safeParseJson(v.optionsJson);
-          if (opts && typeof opts === "object") {
-            return Object.values(opts).map(String);
-          }
-          return [v.title || ""];
-        })
-        .map((s) => String(s || "").trim())
-        .filter((s) => /\d/.test(s)),
-    ),
-  );
+  const requestedWidth = normalizeVariantWidth(customerSizeHint);
+  const sizesAvailable = inStockSizes(product, { width: requestedWidth });
+  const widthsAvailable = inStockWidths(product);
 
   // Parallel-fetch every signal. Every call is guarded so a failure in one
   // source never takes down the recommendation.
@@ -2047,9 +2074,17 @@ async function getFitRecommendation({ handle, customerSizeHint }, ctx) {
   }
   confidence = Math.max(0, Math.min(95, confidence));
 
-  const shouldDisplay = recommendedSizeNum != null && confidence >= minConfidence;
-
+  const recommendedSize = recommendedSizeNum != null ? formatSize(recommendedSizeNum) : null;
+  const recommendedVariantInStock = recommendedSize
+    ? isSizeAvailable(product, recommendedSize, { width: requestedWidth })
+    : false;
   const reasons = signals.map((s) => s.summary);
+  if (recommendedSize && !recommendedVariantInStock) {
+    const widthText = requestedWidth ? ` ${requestedWidth}` : "";
+    reasons.push(`Size ${recommendedSize}${widthText} is not currently in stock for this product.`);
+  }
+  const shouldDisplay = recommendedSize != null && recommendedVariantInStock && confidence >= minConfidence;
+
   if (adjustment !== 0 && baseSize != null) {
     reasons.push(adjustment > 0
       ? `Applied +0.5 adjustment from your usual size.`
@@ -2071,6 +2106,9 @@ async function getFitRecommendation({ handle, customerSizeHint }, ctx) {
       signals,
       reasons,
       sizesAvailable,
+      widthsAvailable,
+      requestedWidth,
+      recommendedVariantInStock,
       shouldDisplay,
     },
   };

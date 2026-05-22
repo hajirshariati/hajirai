@@ -31,15 +31,24 @@ function safeParseOpts(raw) {
   try { return JSON.parse(raw); } catch { return {}; }
 }
 
+function readBagCI(bag, key) {
+  if (!bag || typeof bag !== "object") return undefined;
+  const target = String(key).toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+  for (const [k, v] of Object.entries(bag)) {
+    const norm = String(k).toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+    if (norm === target) return v;
+  }
+  return undefined;
+}
+
 // Read the variant's options bag case-insensitively under the
 // keys merchants actually use in Shopify.
 function readVariantOption(variant, key) {
   const bag = safeParseOpts(variant?.optionsJson);
-  const target = String(key).toLowerCase();
-  for (const k of Object.keys(bag)) {
-    if (k.toLowerCase() === target) return bag[k];
-  }
-  return undefined;
+  const fromOptions = readBagCI(bag, key);
+  if (fromOptions != null && fromOptions !== "") return fromOptions;
+  const attrs = safeParseOpts(variant?.attributesJson);
+  return readBagCI(attrs, key);
 }
 
 // Normalize a size string. Strips a trailing W/N/M width letter

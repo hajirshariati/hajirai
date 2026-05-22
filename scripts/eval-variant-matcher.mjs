@@ -167,6 +167,15 @@ await test("variantSatisfiesScope — combined '11W' user input matches variant 
   assert.equal(variantSatisfiesScope(variant, { Size: "11W" }), true);
 });
 
+await test("variantSatisfiesScope — reads Size/Width from variant attributesJson when optionsJson is missing", () => {
+  const variant = {
+    sku: "ATTR-11W",
+    inventoryQty: 2,
+    attributesJson: { Size: "11", Width: "Wide" },
+  };
+  assert.equal(variantSatisfiesScope(variant, { size: "11", width: "wide" }), true);
+});
+
 await test("variantSatisfiesScope — SKU match works", () => {
   const variant = v({ sku: "EW732W35", options: { Size: "11" }, inventoryQty: 5 });
   assert.equal(variantSatisfiesScope(variant, { sku: "ew732w35" }), true);
