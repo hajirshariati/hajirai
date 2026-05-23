@@ -43,7 +43,9 @@ const arg = (k, d) => {
 const flag = (k) => args.includes(`--${k}`);
 
 const NUM_CONVOS = parseInt(arg("convos", "50"), 10);
-const CONCURRENCY = parseInt(arg("concurrency", "4"), 10);
+const CONCURRENCY = parseInt(arg("concurrency", "1"), 10);
+const INTER_TURN_DELAY_MS = parseInt(arg("turn-delay-ms", "1500"), 10);
+const MAX_RATE_LIMIT_RETRIES = parseInt(arg("rate-limit-retries", "3"), 10);
 const MIN_TURNS = parseInt(arg("min-turns", "4"), 10);
 const MAX_TURNS = parseInt(arg("max-turns", "7"), 10);
 const OUTPUT = path.resolve(ROOT, arg("output", "reports/broken-convos.json"));
@@ -124,14 +126,32 @@ async function postTurn({ message, history, sessionId }) {
     assistant_name: process.env.CHAT_TRANSCRIPT_ASSISTANT_NAME || "The Fit Concierge",
     history: history.slice(-20).map((m) => ({ role: m.role, content: m.content })),
   };
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Accept: "text/event-stream" },
-    body: JSON.stringify(body),
-  });
-  const raw = await res.text();
-  if (!res.ok) throw new Error(`HTTP ${res.status}: ${raw.slice(0, 400)}`);
-  return visiblePayload(parseSse(raw));
+
+  let attempt = 0;
+  while (true) {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "text/event-stream" },
+      body: JSON.stringify(body),
+    });
+    const raw = await res.text();
+    if (res.ok) return visiblePayload(parseSse(raw));
+
+    if (res.status === 429 && attempt < MAX_RATE_LIMIT_RETRIES) {
+      let waitSec = 35;
+      try {
+        const parsed = JSON.parse(raw);
+        if (parsed?.retryAfter) waitSec = Math.max(5, Math.min(120, Number(parsed.retryAfter) + 2));
+      } catch { /* keep default */ }
+      const headerWait = parseInt(res.headers.get("retry-after") || "", 10);
+      if (Number.isFinite(headerWait) && headerWait > 0) waitSec = Math.max(waitSec, headerWait + 2);
+      attempt++;
+      console.log(`  [rate-limited] sleeping ${waitSec}s (attempt ${attempt}/${MAX_RATE_LIMIT_RETRIES})…`);
+      await new Promise((r) => setTimeout(r, waitSec * 1000));
+      continue;
+    }
+    throw new Error(`HTTP ${res.status}: ${raw.slice(0, 400)}`);
+  }
 }
 
 // ---------- personas ----------
@@ -417,6 +437,10 @@ async function runConversation(persona, convoIndex) {
     if (bugs.length > 0 && firstBugTurn < 0) firstBugTurn = t;
 
     if (VERBOSE) console.log(`  [${persona.name} t${t}] user="${userMessage.slice(0, 80)}" → bugs=${bugs.length}`);
+
+    if (INTER_TURN_DELAY_MS > 0 && t < turns - 1) {
+      await new Promise((r) => setTimeout(r, INTER_TURN_DELAY_MS));
+    }
   }
 
   return { persona: persona.name, sessionId, turnLogs, firstBugTurn };
@@ -520,6 +544,8 @@ async function main() {
   for (let i = 0; i < NUM_CONVOS; i++) jobs.push({ persona: eligiblePersonas[i % eligiblePersonas.length], i });
 
   console.log(`[hunter] Running ${NUM_CONVOS} convos × ${MIN_TURNS}-${MAX_TURNS} turns @ concurrency=${CONCURRENCY}`);
+  console.log(`[hunter] Inter-turn delay: ${INTER_TURN_DELAY_MS}ms · rate-limit retries: ${MAX_RATE_LIMIT_RETRIES}`);
+  console.log(`[hunter] Note: your /chat route limits ~20 req/min per IP+shop. Keep concurrency low (1 is safe).`);
   console.log(`[hunter] Output: ${path.relative(ROOT, OUTPUT)}`);
   console.log(`[hunter] Report: ${path.relative(ROOT, REPORT)}`);
 
