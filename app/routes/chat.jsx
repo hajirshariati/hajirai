@@ -7,8 +7,6 @@ import { getActiveCampaigns, formatCampaignsForCS } from "../models/Campaign.ser
 import { buildSystemPrompt } from "../lib/chat-prompt.server";
 import { retrieveRelevantChunks } from "../lib/knowledge-chunks.server";
 import { filterForbiddenCategoryChips, filterContradictingGenderChips } from "../lib/chip-filter.server";
-import { sanitizeCtaLabel } from "../lib/cta-label.server";
-import { buildStorefrontSearchCTA } from "../lib/storefront-search-cta.server";
 import { analyzeCategoryIntent, cardMatchesActiveGroup, textIntentDivergesFromGroup, matchingGroupsForText } from "../lib/category-intent.server";
 import { extractAnsweredChoices } from "../lib/conversation-memory.server";
 import {
@@ -41,7 +39,25 @@ import { maybeRunOrthoticFlow } from "../lib/orthotic-flow-gate.server";
 import { classifyOrthoticTurn } from "../lib/orthotic-classifier.server";
 import { resolveCatalogTurn, buildResolverStatePromptBlock, extractUserConstraints, detectSpecificProduct } from "../lib/catalog-resolver.server";
 import { buildSessionMemory, memorySummary, buildSessionMemoryPromptBlock } from "../lib/session-memory.server";
-import { createTurnResult, repairProductResponseText, validateTurnResult } from "../lib/response-contract.server";
+import {
+  SKU_PATTERN,
+  createTurnResult,
+  detectFalseCategoryDenial,
+  detectFalseGenderCategoryAffirmation,
+  dropSiblingCards,
+  extractCollectionCTA,
+  extractGenericCTA,
+  extractOrphanSkus,
+  extractSupportCTA,
+  prepareProductCardsForTurn,
+  repairProductResponseText,
+  resolveProductTurnLink,
+  scoreCardAgainstText,
+  skusFromCardText,
+  stripMissingSkus,
+  titleStyleFamily,
+  validateTurnResult,
+} from "../lib/response-contract.server";
 import {
   detectSingularIntent,
   detectComparisonIntent,
@@ -184,257 +200,6 @@ function addUsage(acc, usage) {
   acc.cache_read_input_tokens += usage.cache_read_input_tokens || 0;
 }
 
-const SIBLING_GENERIC_WORDS = new Set([
-  "the", "a", "an", "for", "and", "or", "in", "on", "with", "men", "mens",
-  "women", "womens", "black", "white", "tan", "brown", "red", "blue", "grey",
-  "gray", "pink", "dark", "light", "w", "s",
-]);
-
-function cardTitleTokens(title) {
-  return new Set(
-    (title || "")
-      .toLowerCase()
-      .replace(/[^a-z0-9\s]/g, " ")
-      .split(/\s+/)
-      .filter((w) => w.length > 1 && !SIBLING_GENERIC_WORDS.has(w)),
-  );
-}
-
-// Drop "sibling" cards the AI didn't actually name. Example: the AI names
-// "Speed Orthotics W/ Metatarsal Support" but the near-duplicate "Speed
-// Posted Orthotics W/ Metatarsal Support" scores high purely from overlapping
-// title words, even though the AI never mentioned "Posted". For each
-// lower-scored card that shares >=80% of distinctive title words with a
-// higher-scored, already-kept card AND introduces at least one extra word
-// that does not appear in the AI text, drop it. Pure title-token math, no
-// product terminology.
-function dropSiblingCards(scored, textLower) {
-  const kept = [];
-  for (const candidate of scored) {
-    const candTokens = cardTitleTokens(candidate.card.title);
-    let drop = false;
-    for (const k of kept) {
-      const keptTokens = cardTitleTokens(k.card.title);
-      if (candTokens.size === 0 || keptTokens.size === 0) continue;
-      let shared = 0;
-      for (const w of candTokens) if (keptTokens.has(w)) shared++;
-      const sharedRatio = shared / Math.min(candTokens.size, keptTokens.size);
-      if (sharedRatio < 0.8) continue;
-      let extraUnmentioned = 0;
-      for (const w of candTokens) {
-        if (!keptTokens.has(w) && !textLower.includes(w)) extraUnmentioned++;
-      }
-      if (extraUnmentioned >= 1) {
-        drop = true;
-        break;
-      }
-    }
-    if (!drop) kept.push(candidate);
-  }
-  return kept;
-}
-
-function scoreCardAgainstText(card, textLower, userTextLower) {
-
-  const raw = card.title.toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter((w) => w.length > 1);
-  const generic = new Set(["the", "a", "an", "for", "and", "or", "in", "on", "with", "men", "mens", "women", "womens", "black", "white", "tan", "brown", "red", "blue", "grey", "gray", "pink", "dark", "light"]);
-  const nameWords = raw.filter((w) => !generic.has(w));
-  const titleScore = nameWords.length === 0 ? 0 : nameWords.filter((w) => textLower.includes(w)).length / nameWords.length;
-
-  // If the card came from a search whose query term appears in this card's
-  // description snippet, boost it — it's a direct textual match for what the
-  // user asked about (e.g. "UltraSKY" asked, description contains "UltraSKY").
-  let queryScore = 0;
-  const snippet = (card._descriptionSnippet || "").toLowerCase();
-  const searchQ = (card._searchQuery || "").toLowerCase().trim();
-  if (snippet && userTextLower) {
-    const distinctive = userTextLower
-      .replace(/[^a-z0-9\s]/g, " ")
-      .split(/\s+/)
-      .filter((w) => w.length >= 4 && !generic.has(w) && !["what", "does", "mean", "tell", "about", "show", "find"].includes(w));
-    if (distinctive.length > 0) {
-      const hits = distinctive.filter((w) => snippet.includes(w)).length;
-      queryScore = hits / distinctive.length;
-    }
-  }
-  if (snippet && searchQ && snippet.includes(searchQ)) {
-    queryScore = Math.max(queryScore, 1);
-  }
-
-  return Math.max(titleScore, queryScore);
-}
-
-const SKU_PATTERN = /\b[A-Z]{1,2}\d{3,5}[A-Z]?\b/g;
-
-function skusFromCardText(value) {
-  if (!value) return [];
-  const matches = String(value).toUpperCase().match(SKU_PATTERN) || [];
-  return matches;
-}
-
-function extractOrphanSkus(text, pool) {
-  const mentioned = text.match(SKU_PATTERN) || [];
-  if (mentioned.length === 0) return [];
-  const poolSkuSet = new Set();
-  for (const card of pool) {
-    for (const s of skusFromCardText(card.title)) poolSkuSet.add(s);
-    for (const s of skusFromCardText(card.handle)) poolSkuSet.add(s);
-  }
-  const seen = new Set();
-  const orphans = [];
-  for (const raw of mentioned) {
-    const sku = raw.toUpperCase();
-    if (seen.has(sku)) continue;
-    seen.add(sku);
-    if (!poolSkuSet.has(sku)) orphans.push(sku);
-  }
-  return orphans;
-}
-
-function stripMissingSkus(text, missing) {
-  if (!text || missing.length === 0) return text;
-  let cleaned = text;
-  for (const sku of missing) {
-    const safe = sku.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    cleaned = cleaned.replace(new RegExp(`\\s*\\(\\s*${safe}\\s*\\)`, "gi"), "");
-    cleaned = cleaned.replace(new RegExp(`\\b${safe}\\b`, "gi"), "");
-  }
-  cleaned = cleaned
-    .replace(/\(\s*\)/g, "")
-    // Repair dangling conjunction patterns left behind by SKU removal.
-    // E.g. "the L1305 and  are great picks" → "the L1305 is a great pick".
-    .replace(/\b(and|or|,)\s*(?=(?:and|or|,|are|is|both)\b)/gi, " ")
-    .replace(/\b(both|and)\s+(are|is)\b/gi, "$2")
-    .replace(/\bare\s+(?:both\s+)?great\s+picks\b/gi, "is a great pick")
-    .replace(/\bare\s+(?:both\s+)?(great|excellent|solid|nice)\b/gi, "is $1")
-    .replace(/,\s*,/g, ",")
-    .replace(/\s+,/g, ",")
-    .replace(/\s+([.,!?;:])/g, "$1")
-    .replace(/[ \t]{2,}/g, " ")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
-  return cleaned;
-}
-
-const SUPPORT_ANCHOR_RE = /\b(contact|customer\s+(service|care|support)|support\s+(hub|team|center)|support|care\s+team|help\s+team|reach\s+(out|us)|our\s+team|speak.*(human|agent|rep|person))\b/i;
-
-function normalizeUrl(u) {
-  return String(u || "").trim().toLowerCase().replace(/^https?:\/\//, "").replace(/^www\./, "").replace(/\/+$/, "");
-}
-
-function extractSupportCTA(text, supportUrl, supportLabel) {
-  if (!text) return { text, cta: null };
-
-  const defaultOldLabel = "Contact customer service";
-  const label = supportLabel && supportLabel.trim() && supportLabel.trim() !== defaultOldLabel
-    ? supportLabel.trim()
-    : "Visit Support Hub";
-
-  const normSupport = supportUrl ? normalizeUrl(supportUrl) : "";
-  const mdLinkAny = /\[([^\]]+)\]\(\s*([^)\s]+)\s*\)/g;
-
-  const removals = [];
-  let cta = null;
-  let m;
-  while ((m = mdLinkAny.exec(text)) !== null) {
-    const anchor = m[1];
-    const linkUrl = m[2];
-    const normLink = normalizeUrl(linkUrl);
-    const anchorMatch = SUPPORT_ANCHOR_RE.test(anchor);
-    const urlMatch = normSupport && (normLink === normSupport || normLink.includes(normSupport) || normSupport.includes(normLink));
-    if (anchorMatch || urlMatch) {
-      removals.push({ start: m.index, end: m.index + m[0].length });
-      if (!cta) cta = { url: supportUrl || linkUrl, label };
-    }
-  }
-
-  let cleaned = text;
-  for (let i = removals.length - 1; i >= 0; i--) {
-    cleaned = cleaned.slice(0, removals[i].start) + cleaned.slice(removals[i].end);
-  }
-
-  if (supportUrl) {
-    const safeUrl = supportUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const bareUrl = new RegExp(`(?<![\\w(\\[])${safeUrl}/?(?![\\w)])`, "gi");
-    if (bareUrl.test(cleaned)) {
-      cleaned = cleaned.replace(bareUrl, "");
-      if (!cta) cta = { url: supportUrl, label };
-    }
-  }
-
-  if (!cta) return { text, cta: null };
-
-  cleaned = cleaned
-    .replace(/:\s*$/gm, ".")
-    .replace(/\s+here\s*[.:!]?\s*$/gim, ".")
-    .replace(/\s*\(\s*\)/g, "")
-    .replace(/\s+([.,!?;:])/g, "$1")
-    .replace(/\.{2,}/g, ".")
-    .replace(/[ \t]{2,}/g, " ")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
-
-  return { text: cleaned, cta };
-}
-
-
-function extractCollectionCTA(text) {
-  const match = text.match(/<<(.+?)\|(.+?)>>/);
-  if (!match) return { text, cta: null };
-
-  return {
-    text: text.replace(match[0], "").trim(),
-    cta: {
-      label: sanitizeCtaLabel(match[1], match[2]),
-      url: match[2],
-    },
-  };
-}
-
-
-function extractGenericCTA(text) {
-  const mdLink = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/;
-  const rawLink = /(https?:\/\/[^\s]+)/;
-
-  let match = text.match(mdLink);
-  if (match) {
-    return {
-      text: text.replace(match[0], "").trim(),
-      cta: { url: match[2], label: sanitizeCtaLabel(match[1], match[2]) },
-    };
-  }
-
-  match = text.match(rawLink);
-  if (match) {
-    return {
-      text: text.replace(match[0], "").trim(),
-      cta: { url: match[1], label: sanitizeCtaLabel("", match[1]) },
-    };
-  }
-
-  return { text, cta: null };
-}
-
-
-// Mirror of the backend helper — extracts the first meaningful word of a
-// title as a style-family key. Used to drop the find_similar_products
-// reference (and its siblings) from the display pool so the customer never
-// sees the product they asked to compare against.
-const FAMILY_STOP_WORDS_UI = new Set(["the", "a", "an", "my", "our", "new"]);
-function titleStyleFamily(title) {
-  if (!title) return "";
-  const beforeDash = String(title).split(/\s[-–—]\s/)[0];
-  const words = beforeDash
-    .toLowerCase()
-    .replace(/[^a-z0-9\s']/g, " ")
-    .split(/\s+/)
-    .filter(Boolean);
-  for (const w of words) {
-    if (w.length > 2 && !FAMILY_STOP_WORDS_UI.has(w)) return w;
-  }
-  return "";
-}
-
 // ============================================================
 // TOOL-CALL REWRITE PIPELINE — SUPPORT
 // ----------------------------------------------------------------
@@ -551,152 +316,6 @@ function hasCompetitorBrandMention(text) {
 }
 // containsAvailabilityDenial lives in app/lib/chat-helpers.server.js so
 // the test suite can import it without dragging the route loader graph.
-
-// Stricter check: did the AI assert the store doesn't carry a
-// category that's actually IN the synced catalog? Catches phrasings
-// the AVAILABILITY_DENIAL_RE misses, like "this store carries
-// orthotics (not shoes)" — a parenthetical exclusion that's still
-// a denial. Returns the offending category name if found, or null.
-//
-// `categories` is the full catalog list (allCatalogCategories) —
-// every entry is a category the merchant actually carries, so the
-// AI is never allowed to deny any of them. Both singular and plural
-// forms are checked because the AI might say "we don't carry shoe"
-// or "boot" loosely.
-//
-// Hypernym handling: customers and the AI both use words like
-// "shoes" to refer to the Footwear umbrella. If "shoes/shoe/
-// footwear" is denied AND the catalog has any of {Footwear, Sneakers,
-// Boots, Sandals, Clogs, Loafers, Oxfords, Slip Ons, Wedges Heels,
-// Mary Janes, Slippers}, that's a false denial — call it out as
-// "Footwear" so the recovery message reads naturally.
-const FOOTWEAR_HYPERNYMS = ["shoe", "shoes", "footwear"];
-const FOOTWEAR_CATEGORY_SET = new Set([
-  "footwear", "sneakers", "sneaker", "boots", "boot", "sandals", "sandal",
-  "clogs", "clog", "loafers", "loafer", "oxfords", "oxford", "slip ons", "slip-ons",
-  "wedges heels", "mary janes", "slippers", "slipper", "heels", "flats", "mules",
-]);
-function detectFalseCategoryDenial(text, categories) {
-  if (!text || !Array.isArray(categories) || categories.length === 0) return null;
-  const t = String(text);
-  const lower = t.toLowerCase();
-
-  // Build the effective category set: actual catalog categories plus
-  // hypernyms (shoe/shoes/footwear) when the catalog contains any
-  // footwear-family category. The hypernym entry is mapped back to
-  // "Footwear" in the returned name so recovery copy reads naturally.
-  const hasFootwearFamily = categories.some((cat) => FOOTWEAR_CATEGORY_SET.has(String(cat || "").trim().toLowerCase()));
-  const checks = categories.map((cat) => ({ cat, displayName: cat }));
-  if (hasFootwearFamily) {
-    for (const h of FOOTWEAR_HYPERNYMS) {
-      checks.push({ cat: h, displayName: "Footwear" });
-    }
-  }
-
-  for (const { cat, displayName } of checks) {
-    const c = String(cat || "").trim().toLowerCase();
-    if (!c || c.length < 3) continue;
-    // Build alternation for singular/plural ("sneaker"/"sneakers", "shoe"/"shoes").
-    const stem = c.endsWith("s") ? c.slice(0, -1) : c;
-    const variants = c === stem ? [c] : [c, stem];
-    const alt = variants.map((v) => v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
-    // Patterns:
-    //   "(not <cat>)"            — parenthetical exclusion
-    //   "we don't sell/carry/have <cat>"
-    //   "this store doesn't sell <cat>"
-    //   "<cat> aren't/isn't something we carry"
-    //   "we only carry/sell X (not <cat>)"
-    //   "no <cat> in this store"
-    const denialPatterns = [
-      new RegExp(`\\(\\s*not\\s+(?:${alt})s?\\s*\\)`, "i"),
-      new RegExp(`\\bwe (?:don'?t|do not|cannot|can'?t) (?:have|carry|sell|stock|offer)\\s+(?:any\\s+)?(?:${alt})s?\\b`, "i"),
-      new RegExp(`\\b(?:this|the)\\s+(?:store|shop)\\s+(?:doesn'?t|does not)\\s+(?:have|carry|sell|stock|offer)\\s+(?:any\\s+)?(?:${alt})s?\\b`, "i"),
-      new RegExp(`\\b(?:${alt})s?\\s+(?:are\\s+not|aren'?t|is\\s+not|isn'?t)\\s+(?:something|a category|a product|a line)\\s+(?:we|this store|the store)\\s+(?:carry|carries|sell|sells|stock|stocks|offer|offers)\\b`, "i"),
-      new RegExp(`\\bno\\s+(?:${alt})s?\\s+(?:in|at|from)\\s+(?:this|the|our)\\s+(?:store|shop|catalog)\\b`, "i"),
-    ];
-    for (const re of denialPatterns) {
-      if (re.test(t) || re.test(lower)) return displayName;
-    }
-  }
-  return null;
-}
-
-// Mirror of detectFalseCategoryDenial but for AFFIRMATIONS:
-// did the AI claim "we (absolutely)? have/carry men's slippers"
-// when categoryGenderMap says slippers is women-only? Catches the
-// hallucinations where the AI answers from training memory and
-// never calls searchProducts (so the in-tool genderCategoryMismatch
-// gate never fires). Returns {category, requestedGender,
-// availableGenders} if a false affirmation is detected, else null.
-function detectFalseGenderCategoryAffirmation(text, categoryGenderMap) {
-  if (!text || !categoryGenderMap || typeof categoryGenderMap !== "object") return null;
-  const t = String(text);
-  const lower = t.toLowerCase();
-  const entries = Object.entries(categoryGenderMap);
-  if (entries.length === 0) return null;
-
-  // Process longer category keys first so "wedges heels" wins over
-  // bare "heels" when both could match. Skip < 3 char keys (noise).
-  const sorted = entries
-    .filter(([k]) => k && k.length >= 3)
-    .sort((a, b) => b[0].length - a[0].length);
-
-  // Build a gender-token set the AI might use in prose. Keep tight
-  // — this regex is checked against AI prose, not user text. Bare
-  // pronouns (his/her) are NOT included to avoid stray sentence
-  // matches like "her cousin asked" being treated as gender claims.
-  const genderToTokens = {
-    men: ["men's", "men", "mens", "male", "guy", "guys", "gentleman", "gentlemen", "boys'", "boys"],
-    women: ["women's", "women", "womens", "female", "lady", "ladies", "girls'", "girls"],
-  };
-
-  for (const [catKey, entry] of sorted) {
-    if (!entry || !Array.isArray(entry.genders) || entry.genders.length === 0) continue;
-    if (entry.genders.includes("unisex")) continue; // unisex serves all
-    const supported = new Set(entry.genders.map((g) => String(g).toLowerCase()));
-    // Determine the missing genders. If both men + women are
-    // supported, this category serves everyone — skip.
-    const missingGenders = ["men", "women"].filter((g) => !supported.has(g));
-    if (missingGenders.length === 0) continue;
-
-    // Build singular/plural alternation for the category.
-    const c = String(catKey).toLowerCase().trim();
-    const stem = c.endsWith("s") ? c.slice(0, -1) : c;
-    const variants = c === stem ? [c] : [c, stem];
-    const escapedCats = variants.map((v) => v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
-    const catAlt = escapedCats.map((v) => `${v}s?`).join("|");
-
-    for (const missingGender of missingGenders) {
-      const tokens = genderToTokens[missingGender] || [];
-      const escapedTokens = tokens.map((tok) => tok.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
-      const tokenAlt = escapedTokens.join("|");
-
-      // Affirmation patterns. Each represents a class of false claims:
-      //   "we (absolutely)? carry/have/sell/stock/offer men's slippers"
-      //   "yes, we have men's wedges"
-      //   "(yes,)? we (absolutely)? do (carry|have)? men's loafers"
-      //   "these (are )?men's slippers" / "here are some men's wedges"
-      //   "our men's wedges combine ..."
-      const verbAlt = "have|carry|sell|stock|offer|got";
-      const affirmPatterns = [
-        new RegExp(`\\bwe (?:absolutely\\s+)?(?:do (?:${verbAlt})|${verbAlt})\\s+(?:some\\s+|a\\s+few\\s+)?(?:${tokenAlt})\\s+(?:${catAlt})\\b`, "i"),
-        new RegExp(`\\byes,?\\s+we (?:absolutely\\s+)?(?:do |${verbAlt})\\s+(?:some\\s+|a\\s+few\\s+)?(?:${tokenAlt})\\s+(?:${catAlt})\\b`, "i"),
-        new RegExp(`\\b(?:these|those|here are)\\s+(?:are\\s+)?(?:some\\s+|a\\s+few\\s+|our\\s+)?(?:${tokenAlt})\\s+(?:${catAlt})\\b`, "i"),
-        new RegExp(`\\bour\\s+(?:${tokenAlt})\\s+(?:${catAlt})\\b`, "i"),
-      ];
-      for (const re of affirmPatterns) {
-        if (re.test(t) || re.test(lower)) {
-          return {
-            category: entry.display || catKey,
-            requestedGender: missingGender === "men" ? "men's" : "women's",
-            availableGenders: entry.genders.slice(),
-          };
-        }
-      }
-    }
-  }
-  return null;
-}
 
 async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, controller, encoder, promptCaching, tools }) {
   const totalUsage = { input_tokens: 0, output_tokens: 0, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 };
@@ -2354,23 +1973,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
 
 
     if (cards && cards.length > 0) {
-      const seen = new Set();
-      const deduped = [];
-      const categoryCounts = new Map();
-      const genderCounts = new Map();
-      for (const c of cards) {
-        const key = c.handle || c.title;
-        if (seen.has(key)) continue;
-        seen.add(key);
-        if (c._category) {
-          categoryCounts.set(c._category, (categoryCounts.get(c._category) || 0) + 1);
-        }
-        if (c._gender) {
-          genderCounts.set(c._gender, (genderCounts.get(c._gender) || 0) + 1);
-        }
-        const { _descriptionSnippet, _searchQuery, _category, _gender, _attributes, ...publicCard } = c;
-        deduped.push(publicCard);
-      }
+      const { products: deduped, categoryCounts, genderCounts } = prepareProductCardsForTurn(cards);
       // show product cards
       finalProductCards = deduped;
       controller.enqueue(encoder.encode(sseChunk({
@@ -2391,113 +1994,27 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
           url: collection.cta.url,
           label: collection.cta.label,
         })));
-      } else if ((ctx.storefrontSearchUrlPattern || (Array.isArray(ctx.ctaOverrides) && ctx.ctaOverrides.length > 0)) && categoryCounts.size > 0 && !ctx.categoryIntentAmbiguous) {
-        // Auto-generated storefront search CTA. Replaces the older
-        // manually-curated collectionLinks lookup. One CTA per
-        // product-response turn, pointing at the storefront's `?q=…` search
-        // results for the customer's resolved intent (gender + category +
-        // optional color + optional modifier from the latest user message).
-        const dominantCat = [...categoryCounts.entries()].sort((a, b) => b[1] - a[1])[0][0];
-        const dominantGender = genderCounts.size > 0
-          ? [...genderCounts.entries()].sort((a, b) => b[1] - a[1])[0][0]
-          : (ctx.sessionGender || "");
-  // When the customer asks broadly ("women's shoes for my needs",
-  // "show me footwear") or the LLM returns a wide style mix (3+
-  // distinct categories, or top style is <60% of cards), don't pin
-  // the CTA to whichever style happened to dominate. Fall back to
-  // "footwear" so the search stays scoped to shoes (not orthotics).
-  const _latest = String(ctx.latestUserMessage || "").toLowerCase();
-  const _hasSpecificStyle = /\b(sneaker|sandal|boot|wedge|heel|loafer|flat|slip[- ]on|clog|mule|oxford|pump|trainer|moccasin|slipper|orthotic)/i.test(_latest);
-  const _isGenericAsk = !_hasSpecificStyle && /\b(shoes?|footwear|anything|something|options|recommend)/i.test(_latest);
-  const _totalCards = [...categoryCounts.values()].reduce((a, b) => a + b, 0);
-  const _topShare = dominantCat && _totalCards > 0 ? (categoryCounts.get(dominantCat) / _totalCards) : 0;
-  const _mixedStyles = categoryCounts.size >= 3 || _topShare < 0.6;
-  const ctaCategory = (_isGenericAsk || _mixedStyles) ? "footwear" : dominantCat;
-  // Color: pick the dominant card color IF the customer mentioned one
-  // and the merchant carries it. ctx._merchantColors is the catalog's
-  // own color values; we don't fabricate colors not in the catalog.
-  let dominantColor = null;
-  if (
-    Array.isArray(ctx._merchantColors) &&
-    ctx._merchantColors.length > 0 &&
-    typeof ctx.latestUserMessage === "string"
-  ) {
-    const latest = ctx.latestUserMessage.toLowerCase();
-    // Longest-match-first so multi-word colors (e.g. "hunter green") beat "green"
-    const sorted = [...ctx._merchantColors].sort((a, b) => b.length - a.length);
-    for (const c of sorted) {
-      if (new RegExp(`\\b${c.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")}\\b`, "i").test(latest)) {
-        dominantColor = c;
-        break;
+      } else {
+        const productLink = resolveProductTurnLink({ categoryCounts, genderCounts, ctx });
+        if (productLink.link) {
+          if (productLink.kind === "auto") {
+            console.log(
+              `[cta] ${ctx.shop} auto-search url=${productLink.link.url} label=${JSON.stringify(productLink.link.label)} ` +
+                `gender=${productLink.diagnostics.gender || "-"} category=${productLink.diagnostics.category || "-"} color=${productLink.diagnostics.color || "-"}`,
+            );
+          }
+          outboundLinks.push(productLink.link);
+          controller.enqueue(encoder.encode(sseChunk({
+            type: "link",
+            url: productLink.link.url,
+            label: productLink.link.label,
+          })));
+        } else if (productLink.kind === "auto-miss") {
+          console.log(
+            `[cta] ${ctx.shop} auto-search NO MATCH gender=${productLink.diagnostics.gender || "-"} category=${productLink.diagnostics.category || "-"} pattern=${productLink.diagnostics.patternSet ? "set" : "unset"} overrides=${productLink.diagnostics.overrideCount || 0}`,
+          );
+        }
       }
-    }
-  }
-  const auto = buildStorefrontSearchCTA({
-    pattern: ctx.storefrontSearchUrlPattern,
-    overrides: ctx.ctaOverrides,
-    gender: dominantGender,
-    category: ctaCategory,
-    color: dominantColor,
-    latestUserMessage: ctx.latestUserMessage || "",
-  });
-  if (auto) {
-    console.log(
-      `[cta] ${ctx.shop} auto-search url=${auto.url} label=${JSON.stringify(auto.label)} ` +
-      `gender=${dominantGender || "-"} category=${ctaCategory || "-"} color=${dominantColor || "-"}`,
-    );
-    outboundLinks.push({ url: auto.url, label: auto.label });
-    controller.enqueue(encoder.encode(sseChunk({
-      type: "link",
-      url: auto.url,
-      label: auto.label,
-    })));
-  } else {
-    console.log(
-      `[cta] ${ctx.shop} auto-search NO MATCH gender=${dominantGender || "-"} category=${ctaCategory || "-"} pattern=${ctx.storefrontSearchUrlPattern ? "set" : "unset"} overrides=${(ctx.ctaOverrides || []).length}`,
-    );
-  }
-} else if (
-  Array.isArray(ctx.collectionLinks) &&
-  ctx.collectionLinks.length > 0 &&
-  categoryCounts.size > 0 &&
-  !ctx.categoryIntentAmbiguous
-) {
-  // LEGACY collectionLinks fallback. Preserved for back-compat for
-  // shops that haven't set storefrontSearchUrlPattern. No new
-  // merchants should configure this — set the URL pattern instead.
-  const dominantCat = [...categoryCounts.entries()].sort((a, b) => b[1] - a[1])[0][0];
-  const dominantGender = genderCounts.size > 0
-    ? [...genderCounts.entries()].sort((a, b) => b[1] - a[1])[0][0]
-    : (ctx.sessionGender || "");
-  const normalizedGender = String(dominantGender || "").toLowerCase().trim();
-
-  const catMatches = (linkCat, cat) => {
-    if (!linkCat) return false;
-    return linkCat === cat || cat.includes(linkCat) || linkCat.includes(cat);
-  };
-  const exact = ctx.collectionLinks.find((link) => {
-    const linkCat = String(link?.category || "").toLowerCase().trim();
-    const linkGender = String(link?.gender || "").toLowerCase().trim();
-    if (!linkCat || !link?.url || !linkGender) return false;
-    return catMatches(linkCat, dominantCat) && linkGender === normalizedGender;
-  });
-  const fallback = !exact && ctx.collectionLinks.find((link) => {
-    const linkCat = String(link?.category || "").toLowerCase().trim();
-    const linkGender = String(link?.gender || "").toLowerCase().trim();
-    if (!linkCat || !link?.url || linkGender) return false;
-    return catMatches(linkCat, dominantCat);
-  });
-  const match = exact || fallback;
-  if (match) {
-    const label = `Shop all ${String(match.label || match.category).trim()}`;
-    outboundLinks.push({ url: match.url, label });
-    controller.enqueue(encoder.encode(sseChunk({
-      type: "link",
-      url: match.url,
-      label,
-    })));
-  }
-}
     }
   }
 

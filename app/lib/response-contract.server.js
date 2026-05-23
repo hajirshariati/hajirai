@@ -8,6 +8,330 @@ import {
   detectAiNoMatchPhrasing,
   stripAvailabilityDenialSentences,
 } from "./chat-postprocessing.js";
+import { sanitizeCtaLabel } from "./cta-label.server.js";
+import { buildStorefrontSearchCTA } from "./storefront-search-cta.server.js";
+
+const SIBLING_GENERIC_WORDS = new Set([
+  "the", "a", "an", "for", "and", "or", "in", "on", "with", "men", "mens",
+  "women", "womens", "black", "white", "tan", "brown", "red", "blue", "grey",
+  "gray", "pink", "dark", "light", "w", "s",
+]);
+
+function cardTitleTokens(title) {
+  return new Set(
+    (title || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9\s]/g, " ")
+      .split(/\s+/)
+      .filter((w) => w.length > 1 && !SIBLING_GENERIC_WORDS.has(w)),
+  );
+}
+
+export function dropSiblingCards(scored, textLower) {
+  const kept = [];
+  for (const candidate of scored) {
+    const candTokens = cardTitleTokens(candidate.card.title);
+    let drop = false;
+    for (const k of kept) {
+      const keptTokens = cardTitleTokens(k.card.title);
+      if (candTokens.size === 0 || keptTokens.size === 0) continue;
+      let shared = 0;
+      for (const w of candTokens) if (keptTokens.has(w)) shared++;
+      const sharedRatio = shared / Math.min(candTokens.size, keptTokens.size);
+      if (sharedRatio < 0.8) continue;
+      let extraUnmentioned = 0;
+      for (const w of candTokens) {
+        if (!keptTokens.has(w) && !textLower.includes(w)) extraUnmentioned++;
+      }
+      if (extraUnmentioned >= 1) {
+        drop = true;
+        break;
+      }
+    }
+    if (!drop) kept.push(candidate);
+  }
+  return kept;
+}
+
+export function scoreCardAgainstText(card, textLower, userTextLower) {
+  const raw = card.title.toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter((w) => w.length > 1);
+  const generic = new Set(["the", "a", "an", "for", "and", "or", "in", "on", "with", "men", "mens", "women", "womens", "black", "white", "tan", "brown", "red", "blue", "grey", "gray", "pink", "dark", "light"]);
+  const nameWords = raw.filter((w) => !generic.has(w));
+  const titleScore = nameWords.length === 0 ? 0 : nameWords.filter((w) => textLower.includes(w)).length / nameWords.length;
+
+  let queryScore = 0;
+  const snippet = (card._descriptionSnippet || "").toLowerCase();
+  const searchQ = (card._searchQuery || "").toLowerCase().trim();
+  if (snippet && userTextLower) {
+    const distinctive = userTextLower
+      .replace(/[^a-z0-9\s]/g, " ")
+      .split(/\s+/)
+      .filter((w) => w.length >= 4 && !generic.has(w) && !["what", "does", "mean", "tell", "about", "show", "find"].includes(w));
+    if (distinctive.length > 0) {
+      const hits = distinctive.filter((w) => snippet.includes(w)).length;
+      queryScore = hits / distinctive.length;
+    }
+  }
+  if (snippet && searchQ && snippet.includes(searchQ)) {
+    queryScore = Math.max(queryScore, 1);
+  }
+
+  return Math.max(titleScore, queryScore);
+}
+
+export const SKU_PATTERN = /\b[A-Z]{1,2}\d{3,5}[A-Z]?\b/g;
+
+export function skusFromCardText(value) {
+  if (!value) return [];
+  return String(value).toUpperCase().match(SKU_PATTERN) || [];
+}
+
+export function extractOrphanSkus(text, pool) {
+  const mentioned = text.match(SKU_PATTERN) || [];
+  if (mentioned.length === 0) return [];
+  const poolSkuSet = new Set();
+  for (const card of pool) {
+    for (const s of skusFromCardText(card.title)) poolSkuSet.add(s);
+    for (const s of skusFromCardText(card.handle)) poolSkuSet.add(s);
+  }
+  const seen = new Set();
+  const orphans = [];
+  for (const raw of mentioned) {
+    const sku = raw.toUpperCase();
+    if (seen.has(sku)) continue;
+    seen.add(sku);
+    if (!poolSkuSet.has(sku)) orphans.push(sku);
+  }
+  return orphans;
+}
+
+export function stripMissingSkus(text, missing) {
+  if (!text || missing.length === 0) return text;
+  let cleaned = text;
+  for (const sku of missing) {
+    const safe = sku.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    cleaned = cleaned.replace(new RegExp(`\\s*\\(\\s*${safe}\\s*\\)`, "gi"), "");
+    cleaned = cleaned.replace(new RegExp(`\\b${safe}\\b`, "gi"), "");
+  }
+  return cleaned
+    .replace(/\(\s*\)/g, "")
+    .replace(/\b(and|or|,)\s*(?=(?:and|or|,|are|is|both)\b)/gi, " ")
+    .replace(/\b(both|and)\s+(are|is)\b/gi, "$2")
+    .replace(/\bare\s+(?:both\s+)?great\s+picks\b/gi, "is a great pick")
+    .replace(/\bare\s+(?:both\s+)?(great|excellent|solid|nice)\b/gi, "is $1")
+    .replace(/,\s*,/g, ",")
+    .replace(/\s+,/g, ",")
+    .replace(/\s+([.,!?;:])/g, "$1")
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+const SUPPORT_ANCHOR_RE = /\b(contact|customer\s+(service|care|support)|support\s+(hub|team|center)|support|care\s+team|help\s+team|reach\s+(out|us)|our\s+team|speak.*(human|agent|rep|person))\b/i;
+
+function normalizeUrl(u) {
+  return String(u || "").trim().toLowerCase().replace(/^https?:\/\//, "").replace(/^www\./, "").replace(/\/+$/, "");
+}
+
+export function extractSupportCTA(text, supportUrl, supportLabel) {
+  if (!text) return { text, cta: null };
+
+  const defaultOldLabel = "Contact customer service";
+  const label = supportLabel && supportLabel.trim() && supportLabel.trim() !== defaultOldLabel
+    ? supportLabel.trim()
+    : "Visit Support Hub";
+
+  const normSupport = supportUrl ? normalizeUrl(supportUrl) : "";
+  const mdLinkAny = /\[([^\]]+)\]\(\s*([^)\s]+)\s*\)/g;
+
+  const removals = [];
+  let cta = null;
+  let m;
+  while ((m = mdLinkAny.exec(text)) !== null) {
+    const anchor = m[1];
+    const linkUrl = m[2];
+    const normLink = normalizeUrl(linkUrl);
+    const anchorMatch = SUPPORT_ANCHOR_RE.test(anchor);
+    const urlMatch = normSupport && (normLink === normSupport || normLink.includes(normSupport) || normSupport.includes(normLink));
+    if (anchorMatch || urlMatch) {
+      removals.push({ start: m.index, end: m.index + m[0].length });
+      if (!cta) cta = { url: supportUrl || linkUrl, label };
+    }
+  }
+
+  let cleaned = text;
+  for (let i = removals.length - 1; i >= 0; i--) {
+    cleaned = cleaned.slice(0, removals[i].start) + cleaned.slice(removals[i].end);
+  }
+
+  if (supportUrl) {
+    const safeUrl = supportUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const bareUrl = new RegExp(`(?<![\\w(\\[])${safeUrl}/?(?![\\w)])`, "gi");
+    if (bareUrl.test(cleaned)) {
+      cleaned = cleaned.replace(bareUrl, "");
+      if (!cta) cta = { url: supportUrl, label };
+    }
+  }
+
+  if (!cta) return { text, cta: null };
+
+  cleaned = cleaned
+    .replace(/:\s*$/gm, ".")
+    .replace(/\s+here\s*[.:!]?\s*$/gim, ".")
+    .replace(/\s*\(\s*\)/g, "")
+    .replace(/\s+([.,!?;:])/g, "$1")
+    .replace(/\.{2,}/g, ".")
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+
+  return { text: cleaned, cta };
+}
+
+export function extractCollectionCTA(text) {
+  const match = text.match(/<<(.+?)\|(.+?)>>/);
+  if (!match) return { text, cta: null };
+
+  return {
+    text: text.replace(match[0], "").trim(),
+    cta: {
+      label: sanitizeCtaLabel(match[1], match[2]),
+      url: match[2],
+    },
+  };
+}
+
+export function extractGenericCTA(text) {
+  const mdLink = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/;
+  const rawLink = /(https?:\/\/[^\s]+)/;
+
+  let match = text.match(mdLink);
+  if (match) {
+    return {
+      text: text.replace(match[0], "").trim(),
+      cta: { url: match[2], label: sanitizeCtaLabel(match[1], match[2]) },
+    };
+  }
+
+  match = text.match(rawLink);
+  if (match) {
+    return {
+      text: text.replace(match[0], "").trim(),
+      cta: { url: match[1], label: sanitizeCtaLabel("", match[1]) },
+    };
+  }
+
+  return { text, cta: null };
+}
+
+const FAMILY_STOP_WORDS_UI = new Set(["the", "a", "an", "my", "our", "new"]);
+
+export function titleStyleFamily(title) {
+  if (!title) return "";
+  const beforeDash = String(title).split(/\s[-–—]\s/)[0];
+  const words = beforeDash
+    .toLowerCase()
+    .replace(/[^a-z0-9\s']/g, " ")
+    .split(/\s+/)
+    .filter(Boolean);
+  for (const w of words) {
+    if (w.length > 2 && !FAMILY_STOP_WORDS_UI.has(w)) return w;
+  }
+  return "";
+}
+
+const FOOTWEAR_HYPERNYMS = ["shoe", "shoes", "footwear"];
+const FOOTWEAR_CATEGORY_SET = new Set([
+  "footwear", "sneakers", "sneaker", "boots", "boot", "sandals", "sandal",
+  "clogs", "clog", "loafers", "loafer", "oxfords", "oxford", "slip ons", "slip-ons",
+  "wedges heels", "mary janes", "slippers", "slipper", "heels", "flats", "mules",
+]);
+
+export function detectFalseCategoryDenial(text, categories) {
+  if (!text || !Array.isArray(categories) || categories.length === 0) return null;
+  const t = String(text);
+  const lower = t.toLowerCase();
+  const hasFootwearFamily = categories.some((cat) => FOOTWEAR_CATEGORY_SET.has(String(cat || "").trim().toLowerCase()));
+  const checks = categories.map((cat) => ({ cat, displayName: cat }));
+  if (hasFootwearFamily) {
+    for (const h of FOOTWEAR_HYPERNYMS) {
+      checks.push({ cat: h, displayName: "Footwear" });
+    }
+  }
+
+  for (const { cat, displayName } of checks) {
+    const c = String(cat || "").trim().toLowerCase();
+    if (!c || c.length < 3) continue;
+    const stem = c.endsWith("s") ? c.slice(0, -1) : c;
+    const variants = c === stem ? [c] : [c, stem];
+    const alt = variants.map((v) => v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
+    const denialPatterns = [
+      new RegExp(`\\(\\s*not\\s+(?:${alt})s?\\s*\\)`, "i"),
+      new RegExp(`\\bwe (?:don'?t|do not|cannot|can'?t) (?:have|carry|sell|stock|offer)\\s+(?:any\\s+)?(?:${alt})s?\\b`, "i"),
+      new RegExp(`\\b(?:this|the)\\s+(?:store|shop)\\s+(?:doesn'?t|does not)\\s+(?:have|carry|sell|stock|offer)\\s+(?:any\\s+)?(?:${alt})s?\\b`, "i"),
+      new RegExp(`\\b(?:${alt})s?\\s+(?:are\\s+not|aren'?t|is\\s+not|isn'?t)\\s+(?:something|a category|a product|a line)\\s+(?:we|this store|the store)\\s+(?:carry|carries|sell|sells|stock|stocks|offer|offers)\\b`, "i"),
+      new RegExp(`\\bno\\s+(?:${alt})s?\\s+(?:in|at|from)\\s+(?:this|the|our)\\s+(?:store|shop|catalog)\\b`, "i"),
+    ];
+    for (const re of denialPatterns) {
+      if (re.test(t) || re.test(lower)) return displayName;
+    }
+  }
+  return null;
+}
+
+export function detectFalseGenderCategoryAffirmation(text, categoryGenderMap) {
+  if (!text || !categoryGenderMap || typeof categoryGenderMap !== "object") return null;
+  const t = String(text);
+  const lower = t.toLowerCase();
+  const entries = Object.entries(categoryGenderMap);
+  if (entries.length === 0) return null;
+
+  const sorted = entries
+    .filter(([k]) => k && k.length >= 3)
+    .sort((a, b) => b[0].length - a[0].length);
+
+  const genderToTokens = {
+    men: ["men's", "men", "mens", "male", "guy", "guys", "gentleman", "gentlemen", "boys'", "boys"],
+    women: ["women's", "women", "womens", "female", "lady", "ladies", "girls'", "girls"],
+  };
+
+  for (const [catKey, entry] of sorted) {
+    if (!entry || !Array.isArray(entry.genders) || entry.genders.length === 0) continue;
+    if (entry.genders.includes("unisex")) continue;
+    const supported = new Set(entry.genders.map((g) => String(g).toLowerCase()));
+    const missingGenders = ["men", "women"].filter((g) => !supported.has(g));
+    if (missingGenders.length === 0) continue;
+
+    const c = String(catKey).toLowerCase().trim();
+    const stem = c.endsWith("s") ? c.slice(0, -1) : c;
+    const variants = c === stem ? [c] : [c, stem];
+    const escapedCats = variants.map((v) => v.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    const catAlt = escapedCats.map((v) => `${v}s?`).join("|");
+
+    for (const missingGender of missingGenders) {
+      const tokens = genderToTokens[missingGender] || [];
+      const escapedTokens = tokens.map((tok) => tok.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+      const tokenAlt = escapedTokens.join("|");
+      const verbAlt = "have|carry|sell|stock|offer|got";
+      const affirmPatterns = [
+        new RegExp(`\\bwe (?:absolutely\\s+)?(?:do (?:${verbAlt})|${verbAlt})\\s+(?:some\\s+|a\\s+few\\s+)?(?:${tokenAlt})\\s+(?:${catAlt})\\b`, "i"),
+        new RegExp(`\\byes,?\\s+we (?:absolutely\\s+)?(?:do |${verbAlt})\\s+(?:some\\s+|a\\s+few\\s+)?(?:${tokenAlt})\\s+(?:${catAlt})\\b`, "i"),
+        new RegExp(`\\b(?:these|those|here are)\\s+(?:are\\s+)?(?:some\\s+|a\\s+few\\s+|our\\s+)?(?:${tokenAlt})\\s+(?:${catAlt})\\b`, "i"),
+        new RegExp(`\\bour\\s+(?:${tokenAlt})\\s+(?:${catAlt})\\b`, "i"),
+      ];
+      for (const re of affirmPatterns) {
+        if (re.test(t) || re.test(lower)) {
+          return {
+            category: entry.display || catKey,
+            requestedGender: missingGender === "men" ? "men's" : "women's",
+            availableGenders: entry.genders.slice(),
+          };
+        }
+      }
+    }
+  }
+  return null;
+}
 
 function flattenValues(value) {
   if (value == null) return [];
@@ -163,6 +487,143 @@ export function createTurnResult({
     },
     diagnostics,
   };
+}
+
+export function prepareProductCardsForTurn(cards = []) {
+  const seen = new Set();
+  const products = [];
+  const categoryCounts = new Map();
+  const genderCounts = new Map();
+
+  for (const card of Array.isArray(cards) ? cards : []) {
+    if (!card) continue;
+    const key = card.handle || card.title;
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+
+    if (card._category) {
+      categoryCounts.set(card._category, (categoryCounts.get(card._category) || 0) + 1);
+    }
+    if (card._gender) {
+      genderCounts.set(card._gender, (genderCounts.get(card._gender) || 0) + 1);
+    }
+
+    const { _descriptionSnippet, _searchQuery, _category, _gender, _attributes, ...publicCard } = card;
+    products.push(publicCard);
+  }
+
+  return { products, categoryCounts, genderCounts };
+}
+
+function dominantFromCounts(counts) {
+  if (!(counts instanceof Map) || counts.size === 0) return "";
+  return [...counts.entries()].sort((a, b) => b[1] - a[1])[0][0];
+}
+
+function escapeRegex(s) {
+  return String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function dominantRequestedColor(ctx = {}) {
+  if (
+    !Array.isArray(ctx._merchantColors) ||
+    ctx._merchantColors.length === 0 ||
+    typeof ctx.latestUserMessage !== "string"
+  ) {
+    return null;
+  }
+  const latest = ctx.latestUserMessage.toLowerCase();
+  const sorted = [...ctx._merchantColors].sort((a, b) => b.length - a.length);
+  for (const color of sorted) {
+    if (new RegExp(`\\b${escapeRegex(color)}\\b`, "i").test(latest)) return color;
+  }
+  return null;
+}
+
+export function resolveProductTurnLink({ categoryCounts, genderCounts, ctx = {} } = {}) {
+  const hasCategories = categoryCounts instanceof Map && categoryCounts.size > 0;
+  const dominantCat = dominantFromCounts(categoryCounts);
+  const dominantGender = dominantFromCounts(genderCounts) || ctx.sessionGender || "";
+
+  if (
+    (ctx.storefrontSearchUrlPattern || (Array.isArray(ctx.ctaOverrides) && ctx.ctaOverrides.length > 0)) &&
+    hasCategories &&
+    !ctx.categoryIntentAmbiguous
+  ) {
+    const latest = String(ctx.latestUserMessage || "").toLowerCase();
+    const hasSpecificStyle = /\b(sneaker|sandal|boot|wedge|heel|loafer|flat|slip[- ]on|clog|mule|oxford|pump|trainer|moccasin|slipper|orthotic)/i.test(latest);
+    const isGenericAsk = !hasSpecificStyle && /\b(shoes?|footwear|anything|something|options|recommend)/i.test(latest);
+    const totalCards = [...categoryCounts.values()].reduce((a, b) => a + b, 0);
+    const topShare = dominantCat && totalCards > 0 ? (categoryCounts.get(dominantCat) / totalCards) : 0;
+    const mixedStyles = categoryCounts.size >= 3 || topShare < 0.6;
+    const ctaCategory = (isGenericAsk || mixedStyles) ? "footwear" : dominantCat;
+    const dominantColor = dominantRequestedColor(ctx);
+
+    const auto = buildStorefrontSearchCTA({
+      pattern: ctx.storefrontSearchUrlPattern,
+      overrides: ctx.ctaOverrides,
+      gender: dominantGender,
+      category: ctaCategory,
+      color: dominantColor,
+      latestUserMessage: ctx.latestUserMessage || "",
+    });
+
+    return {
+      link: auto ? { url: auto.url, label: auto.label } : null,
+      kind: auto ? "auto" : "auto-miss",
+      diagnostics: {
+        gender: dominantGender || "",
+        category: ctaCategory || "",
+        color: dominantColor || "",
+        patternSet: !!ctx.storefrontSearchUrlPattern,
+        overrideCount: (ctx.ctaOverrides || []).length,
+      },
+    };
+  }
+
+  if (
+    Array.isArray(ctx.collectionLinks) &&
+    ctx.collectionLinks.length > 0 &&
+    hasCategories &&
+    !ctx.categoryIntentAmbiguous
+  ) {
+    const normalizedGender = String(dominantGender || "").toLowerCase().trim();
+    const catMatches = (linkCat, cat) => {
+      if (!linkCat) return false;
+      return linkCat === cat || cat.includes(linkCat) || linkCat.includes(cat);
+    };
+    const exact = ctx.collectionLinks.find((link) => {
+      const linkCat = String(link?.category || "").toLowerCase().trim();
+      const linkGender = String(link?.gender || "").toLowerCase().trim();
+      if (!linkCat || !link?.url || !linkGender) return false;
+      return catMatches(linkCat, dominantCat) && linkGender === normalizedGender;
+    });
+    const fallback = !exact && ctx.collectionLinks.find((link) => {
+      const linkCat = String(link?.category || "").toLowerCase().trim();
+      const linkGender = String(link?.gender || "").toLowerCase().trim();
+      if (!linkCat || !link?.url || linkGender) return false;
+      return catMatches(linkCat, dominantCat);
+    });
+    const match = exact || fallback;
+    if (match) {
+      return {
+        link: {
+          url: match.url,
+          label: `Shop all ${String(match.label || match.category).trim()}`,
+        },
+        kind: "legacy-collection",
+        diagnostics: {
+          gender: dominantGender || "",
+          category: dominantCat || "",
+          color: "",
+          patternSet: false,
+          overrideCount: 0,
+        },
+      };
+    }
+  }
+
+  return { link: null, kind: "none", diagnostics: {} };
 }
 
 export function validateTurnResult(result = {}) {
