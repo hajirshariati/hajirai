@@ -169,7 +169,7 @@
             "max": 0
           },
           "chips": {
-            "mustIncludeAny": ["New Footwear", "Orthotic Insert", "Footwear", "Orthotic"]
+            "mustIncludeAny": ["Footwear with arch support", "Orthotic insole"]
           }
         }
       }
