@@ -16,6 +16,7 @@ import {
   stripStaleCategoriesOnScopeReset,
   injectStructuredColorFilter,
   injectLockedGender,
+  injectLockedCategory,
   injectOccasionCategory,
   rewriteToolCall,
   isPrecededByNegation,
@@ -24,6 +25,11 @@ import {
   withAnthropicRetry,
   classifyAnthropicError,
 } from "../app/lib/anthropic-resilience.server.js";
+import {
+  createTurnResult,
+  extractTurnChips,
+  validateTurnResult,
+} from "../app/lib/response-contract.server.js";
 
 const u = (content) => ({ role: "user", content });
 const a = (content) => ({ role: "assistant", content });
@@ -932,18 +938,19 @@ cases.push({
 
 // stripStaleCategoriesOnScopeReset ───────────────────────────────────
 cases.push({
-  name: "scope-reset: strips stale 'sneakers' on 'any pink ones'",
+  name: "scope-reset: does NOT strip category on 'any pink ones'",
   run: () => {
-    const out = stripStaleCategoriesOnScopeReset(
-      search({ query: "women's sneakers pink" }),
-      {
-        latestUserMessage: "any pink ones?",
-        merchantGroups: [
-          { name: "Footwear", categories: ["Sneakers", "Boots"] },
-        ],
-      },
-    );
-    assert.equal(out.input.query, "women's pink");
+    const input = search({
+      query: "women's sandals pink",
+      filters: { category: "sandals" },
+    });
+    const out = stripStaleCategoriesOnScopeReset(input, {
+      latestUserMessage: "any pink ones?",
+      merchantGroups: [
+        { name: "Footwear", categories: ["Sandals", "Sneakers", "Boots"] },
+      ],
+    });
+    assert.equal(out, input);
   },
 });
 
@@ -997,6 +1004,23 @@ cases.push({
 });
 
 cases.push({
+  name: "scope-reset: 'show me all pink ones' is a refinement, not reset",
+  run: () => {
+    const input = search({
+      query: "women's sandals pink",
+      filters: { category: "sandals", color: "pink" },
+    });
+    const out = stripStaleCategoriesOnScopeReset(input, {
+      latestUserMessage: "show me all pink ones",
+      merchantGroups: [
+        { name: "Footwear", categories: ["Sandals", "Sneakers"] },
+      ],
+    });
+    assert.equal(out, input);
+  },
+});
+
+cases.push({
   name: "scope-reset: no-op without scope-reset trigger word",
   run: () => {
     const input = search({ query: "women's sneakers pink" });
@@ -1025,6 +1049,27 @@ cases.push({
     );
     assert.equal(out.input.filters.gender, "women");
     assert.equal(out.input.filters.color, "red");
+  },
+});
+
+cases.push({
+  name: "pipeline: gender + category + color stack on refinement",
+  run: () => {
+    const out = rewriteToolCall(
+      search({ query: "pink" }),
+      {
+        sessionGender: "women",
+        sessionMemory: { explicit: { gender: "women", category: "sandals" } },
+        latestUserMessage: "any pink ones?",
+        _merchantColors: ["pink", "black"],
+        merchantGroups: [
+          { name: "Footwear", categories: ["Sandals", "Sneakers"] },
+        ],
+      },
+    );
+    assert.equal(out.input.filters.gender, "women");
+    assert.equal(out.input.filters.category, "sandals");
+    assert.equal(out.input.filters.color, "pink");
   },
 });
 
@@ -1301,6 +1346,59 @@ cases.push({
     detectGenderFromHistory([u("not for men but for women")]),
     "women",
   ),
+});
+
+// ── injectLockedCategory ─────────────────────────────────────────────
+cases.push({
+  name: "category-lock: injects established category on color continuation",
+  run: () => {
+    const out = injectLockedCategory(
+      search({ query: "pink" }),
+      {
+        latestUserMessage: "any pink ones?",
+        sessionMemory: { explicit: { gender: "women", category: "sandals" } },
+      },
+    );
+    assert.equal(out.input.filters.category, "sandals");
+  },
+});
+
+cases.push({
+  name: "category-lock: skips broad reset",
+  run: () => {
+    const input = search({ query: "anything" });
+    const out = injectLockedCategory(input, {
+      latestUserMessage: "what else do you have?",
+      sessionMemory: { explicit: { gender: "women", category: "sandals" } },
+    });
+    assert.equal(out, input);
+  },
+});
+
+cases.push({
+  name: "category-lock: leaves AI-provided category alone",
+  run: () => {
+    const input = search({ query: "pink", filters: { category: "sandals" } });
+    const out = injectLockedCategory(input, {
+      latestUserMessage: "any pink ones?",
+      sessionMemory: { explicit: { gender: "women", category: "sandals" } },
+    });
+    assert.equal(out, input);
+  },
+});
+
+cases.push({
+  name: "category-lock: skips specific-product turns",
+  run: () => {
+    const input = search({ query: "Vania red" });
+    const out = injectLockedCategory(input, {
+      latestUserMessage: "does Vania come in red?",
+      sessionMemory: {
+        explicit: { gender: "women", category: "wedges-heels", specificProduct: "vania-red-cp109w" },
+      },
+    });
+    assert.equal(out, input);
+  },
 });
 
 // ── injectOccasionCategory ────────────────────────────────────────────
@@ -1703,6 +1801,56 @@ cases.push({
     const c = classifyAnthropicError(err);
     assert.equal(c.kind, "network");
     assert.equal(c.retryable, true);
+  },
+});
+
+// ── TurnResult response contract ─────────────────────────────────────
+cases.push({
+  name: "turn-result: extracts visible chips",
+  run: () => {
+    assert.deepEqual(extractTurnChips("Pick one: <<Men>><<Women>>"), ["Men", "Women"]);
+  },
+});
+
+cases.push({
+  name: "turn-result: normalizes text/products/links/scope",
+  run: () => {
+    const result = createTurnResult({
+      text: "  Here are sandals.  ",
+      products: [{ title: "Vicki Braided Thong Sandal", handle: "vicki-light-pink" }],
+      links: [{ url: "https://example.test", label: "View all" }, null],
+      flags: { productSearchAttempted: true },
+      ctx: { sessionMemory: { explicit: { gender: "women", category: "sandals", color: "pink" } } },
+    });
+    assert.equal(result.type, "turn_result");
+    assert.equal(result.text, "Here are sandals.");
+    assert.equal(result.products.length, 1);
+    assert.equal(result.links.length, 1);
+    assert.equal(result.scope.gender, "women");
+    assert.equal(result.scope.category, "sandals");
+    assert.equal(result.scope.color, "pink");
+    assert.equal(result.flags.productSearchAttempted, true);
+  },
+});
+
+cases.push({
+  name: "turn-result: warns when cards and gating chips coexist",
+  run: () => {
+    const result = createTurnResult({
+      text: "What type of footwear do you want? <<Sandals>><<Sneakers>>",
+      products: [{ title: "Maui Orthotic Men's Flips" }],
+    });
+    const warnings = validateTurnResult(result).map((w) => w.code);
+    assert.ok(warnings.includes("cards_with_gating_chips"));
+  },
+});
+
+cases.push({
+  name: "turn-result: warns on pitch without products",
+  run: () => {
+    const result = createTurnResult({ text: "Here are some great options for you." });
+    const warnings = validateTurnResult(result).map((w) => w.code);
+    assert.ok(warnings.includes("pitch_without_products"));
   },
 });
 

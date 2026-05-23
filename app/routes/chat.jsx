@@ -41,7 +41,7 @@ import { maybeRunOrthoticFlow } from "../lib/orthotic-flow-gate.server";
 import { classifyOrthoticTurn } from "../lib/orthotic-classifier.server";
 import { resolveCatalogTurn, buildResolverStatePromptBlock, extractUserConstraints, detectSpecificProduct } from "../lib/catalog-resolver.server";
 import { buildSessionMemory, memorySummary, buildSessionMemoryPromptBlock } from "../lib/session-memory.server";
-import { repairProductResponseText } from "../lib/response-contract.server";
+import { createTurnResult, repairProductResponseText, validateTurnResult } from "../lib/response-contract.server";
 import {
   detectSingularIntent,
   detectComparisonIntent,
@@ -739,6 +739,9 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // the search query on generic words like "arch support sneaker".
   const focusedHandles = new Set();
   let fullResponseText = "";
+  const outboundLinks = [];
+  let finalProductCards = [];
+  let hasKlaviyoForm = false;
 
 
   const system = promptCaching
@@ -1898,6 +1901,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   })));
 
   if (supportCTA) {
+    outboundLinks.push({ url: supportCTA.url, label: supportCTA.label });
     controller.enqueue(encoder.encode(sseChunk({
       type: "link",
       url: supportCTA.url,
@@ -1906,6 +1910,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   }
 
   if (!supportCTA && genericCTA) {
+    outboundLinks.push({ url: genericCTA.url, label: genericCTA.label });
     controller.enqueue(encoder.encode(sseChunk({
       type: "link",
       url: genericCTA.url,
@@ -1914,6 +1919,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   }
 
   if (detectUserSignupIntent(ctx.userText) || detectAiSignupMention(fullResponseText)) {
+    hasKlaviyoForm = true;
     controller.enqueue(encoder.encode(sseChunk({ type: "klaviyo_form" })));
   }
 
@@ -2366,33 +2372,35 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         deduped.push(publicCard);
       }
       // show product cards
-controller.enqueue(encoder.encode(sseChunk({
-  type: "products",
-  products: deduped
-})));
+      finalProductCards = deduped;
+      controller.enqueue(encoder.encode(sseChunk({
+        type: "products",
+        products: deduped
+      })));
 
-// Collection CTA: AI-emitted <<Label|URL>> takes priority; otherwise look up
-// the dominant (category, gender) across the shown cards in the merchant's
-// configured collectionLinks mapping. Matching prefers an exact
-// category+gender rule, then falls back to a gender-agnostic rule for the
-// same category. No mapping → no CTA (avoids 404s).
-const collection = extractCollectionCTA(fullResponseText);
-if (collection.cta) {
-  controller.enqueue(encoder.encode(sseChunk({
-    type: "link",
-    url: collection.cta.url,
-    label: collection.cta.label,
-  })));
-} else if ((ctx.storefrontSearchUrlPattern || (Array.isArray(ctx.ctaOverrides) && ctx.ctaOverrides.length > 0)) && categoryCounts.size > 0 && !ctx.categoryIntentAmbiguous) {
-  // Auto-generated storefront search CTA. Replaces the older
-  // manually-curated collectionLinks lookup. One CTA per
-  // product-response turn, pointing at the storefront's `?q=…` search
-  // results for the customer's resolved intent (gender + category +
-  // optional color + optional modifier from the latest user message).
-  const dominantCat = [...categoryCounts.entries()].sort((a, b) => b[1] - a[1])[0][0];
-  const dominantGender = genderCounts.size > 0
-    ? [...genderCounts.entries()].sort((a, b) => b[1] - a[1])[0][0]
-    : (ctx.sessionGender || "");
+      // Collection CTA: AI-emitted <<Label|URL>> takes priority; otherwise look up
+      // the dominant (category, gender) across the shown cards in the merchant's
+      // configured collectionLinks mapping. Matching prefers an exact
+      // category+gender rule, then falls back to a gender-agnostic rule for the
+      // same category. No mapping → no CTA (avoids 404s).
+      const collection = extractCollectionCTA(fullResponseText);
+      if (collection.cta) {
+        outboundLinks.push({ url: collection.cta.url, label: collection.cta.label });
+        controller.enqueue(encoder.encode(sseChunk({
+          type: "link",
+          url: collection.cta.url,
+          label: collection.cta.label,
+        })));
+      } else if ((ctx.storefrontSearchUrlPattern || (Array.isArray(ctx.ctaOverrides) && ctx.ctaOverrides.length > 0)) && categoryCounts.size > 0 && !ctx.categoryIntentAmbiguous) {
+        // Auto-generated storefront search CTA. Replaces the older
+        // manually-curated collectionLinks lookup. One CTA per
+        // product-response turn, pointing at the storefront's `?q=…` search
+        // results for the customer's resolved intent (gender + category +
+        // optional color + optional modifier from the latest user message).
+        const dominantCat = [...categoryCounts.entries()].sort((a, b) => b[1] - a[1])[0][0];
+        const dominantGender = genderCounts.size > 0
+          ? [...genderCounts.entries()].sort((a, b) => b[1] - a[1])[0][0]
+          : (ctx.sessionGender || "");
   // When the customer asks broadly ("women's shoes for my needs",
   // "show me footwear") or the LLM returns a wide style mix (3+
   // distinct categories, or top style is <60% of cards), don't pin
@@ -2437,6 +2445,7 @@ if (collection.cta) {
       `[cta] ${ctx.shop} auto-search url=${auto.url} label=${JSON.stringify(auto.label)} ` +
       `gender=${dominantGender || "-"} category=${ctaCategory || "-"} color=${dominantColor || "-"}`,
     );
+    outboundLinks.push({ url: auto.url, label: auto.label });
     controller.enqueue(encoder.encode(sseChunk({
       type: "link",
       url: auto.url,
@@ -2481,6 +2490,7 @@ if (collection.cta) {
   const match = exact || fallback;
   if (match) {
     const label = `Shop all ${String(match.label || match.category).trim()}`;
+    outboundLinks.push({ url: match.url, label });
     controller.enqueue(encoder.encode(sseChunk({
       type: "link",
       url: match.url,
@@ -2491,6 +2501,32 @@ if (collection.cta) {
     }
   }
 
+  const turnResult = createTurnResult({
+    text: fullResponseText,
+    products: finalProductCards,
+    links: outboundLinks,
+    flags: {
+      productSearchAttempted,
+      recommenderInvoked: recommenderInvokedThisTurn,
+      hasSupportCTA: !!supportCTA,
+      hasGenericCTA: !!genericCTA,
+      hasKlaviyoForm,
+    },
+    ctx,
+    diagnostics: {
+      model,
+      toolCallCount,
+      searchAttempted: productSearchAttempted,
+    },
+  });
+  const turnWarnings = validateTurnResult(turnResult);
+  if (turnWarnings.length > 0) {
+    console.log(
+      `[turn-result] ${ctx.shop} warnings=` +
+        turnWarnings.map((w) => w.code).join(","),
+    );
+  }
+
   return {
     totalUsage,
     toolCallCount,
@@ -2498,6 +2534,8 @@ if (collection.cta) {
     fullResponseText,
     productSearchAttempted,
     recommenderInvokedThisTurn,
+    turnResult,
+    turnWarnings,
   };
 }
 

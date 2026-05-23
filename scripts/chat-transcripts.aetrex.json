@@ -1,0 +1,250 @@
+[
+  {
+    "name": "shopping gender continuation keeps category and color",
+    "turns": [
+      {
+        "user": "show me women's sandals in black",
+        "expect": {
+          "text": {
+            "mustIncludeAny": ["black", "sandal"],
+            "mustNotInclude": ["what type", "what kind", "accessories"]
+          },
+          "products": {
+            "min": 1,
+            "allTitleOrHandleMustNotMatch": "sneaker|accessor"
+          },
+          "chips": {
+            "mustNotInclude": ["Accessories", "Sneakers", "Clogs"]
+          }
+        }
+      },
+      {
+        "user": "how about mens?",
+        "expect": {
+          "text": {
+            "mustIncludeAny": ["men", "men's", "mens"],
+            "mustNotInclude": ["what type", "what kind", "accessories"]
+          },
+          "products": {
+            "min": 1,
+            "allTitleOrHandleMustMatch": "sandal|slide|maui|milos",
+            "allTitleOrHandleMustNotMatch": "sneaker|accessor"
+          },
+          "chips": {
+            "mustNotInclude": ["Accessories", "Sneakers", "Clogs"]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "color continuation keeps sandal category",
+    "turns": [
+      {
+        "user": "show me women's sandals",
+        "expect": {
+          "products": {
+            "min": 1,
+            "allTitleOrHandleMustNotMatch": "sneaker"
+          }
+        }
+      },
+      {
+        "user": "any pink ones?",
+        "expect": {
+          "text": {
+            "mustIncludeAny": ["pink", "blush", "rose"],
+            "mustNotInclude": ["sneaker", "what type", "what kind"]
+          },
+          "products": {
+            "min": 1,
+            "allTitleOrHandleMustNotMatch": "sneaker"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "color refinement with exact products cannot deny availability",
+    "turns": [
+      {
+        "user": "show me men's sneakers",
+        "expect": {
+          "products": {
+            "min": 1,
+            "allTitleOrHandleMustMatch": "sneaker|dash|graham|chase"
+          }
+        }
+      },
+      {
+        "user": "in white",
+        "expect": {
+          "text": {
+            "mustIncludeAny": ["white"],
+            "mustNotInclude": ["don't have", "do not have", "don't carry", "no white", "not in stock", "can't find", "couldn't find"]
+          },
+          "products": {
+            "min": 1,
+            "allTitleOrHandleMustMatch": "sneaker|dash|chase|white",
+            "atLeastOneTitleOrHandleMustMatch": "white"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "product cards mean no category-chip question",
+    "turns": [
+      {
+        "user": "show me women black sandals",
+        "expect": {
+          "text": {
+            "mustNotInclude": ["what type", "what kind"]
+          },
+          "products": {
+            "min": 1
+          },
+          "chips": {
+            "none": true
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "orthotic resolution never exposes internal enum labels",
+    "turns": [
+      {
+        "user": "I need orthotics for overpronation",
+        "expect": {
+          "text": {
+            "mustIncludeAny": ["men", "women", "who", "orthotic"],
+            "mustNotMatch": "_[a-z]|[a-z]+_[a-z]+"
+          },
+          "products": {
+            "max": 0
+          }
+        }
+      },
+      {
+        "user": "Women's",
+        "expect": {
+          "text": {
+            "mustNotMatch": "_[a-z]|[a-z]+_[a-z]+"
+          }
+        }
+      },
+      {
+        "user": "Walking / everyday",
+        "expect": {
+          "text": {
+            "mustNotMatch": "_[a-z]|[a-z]+_[a-z]+"
+          }
+        }
+      },
+      {
+        "user": "Flat / Low",
+        "expect": {
+          "text": {
+            "mustNotMatch": "_[a-z]|[a-z]+_[a-z]+"
+          },
+          "products": {
+            "min": 1,
+            "allTitleOrHandleMustMatch": "orthotic|l[0-9]"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "foot pain asks domain before showing products",
+    "turns": [
+      {
+        "user": "I have foot pain, what should I wear?",
+        "expect": {
+          "text": {
+            "mustIncludeAny": ["footwear", "orthotic", "insert", "shoes"]
+          },
+          "products": {
+            "max": 0
+          },
+          "chips": {
+            "mustIncludeAny": ["New Footwear", "Orthotic Insert", "Footwear", "Orthotic"]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "return policy is text-only support answer",
+    "turns": [
+      {
+        "user": "What's your return policy?",
+        "expect": {
+          "text": {
+            "mustIncludeAny": ["return", "30", "unworn", "policy"],
+            "mustNotInclude": ["sneaker", "sandals", "orthotic recommendation"]
+          },
+          "products": {
+            "max": 0
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "unknown sku is not hallucinated as a product",
+    "turns": [
+      {
+        "user": "Show me the L9999.",
+        "expect": {
+          "text": {
+            "mustNotMatch": "L9999.{0,80}(perfect|recommend|best|here)",
+            "mustNotInclude": ["view product"]
+          },
+          "products": {
+            "max": 0
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "size stock claim requires product details grounding",
+    "turns": [
+      {
+        "user": "show me men's sneakers",
+        "expect": {
+          "products": {
+            "min": 1
+          }
+        }
+      },
+      {
+        "user": "do these come in size 9 wide?",
+        "expect": {
+          "text": {
+            "mustNotInclude": ["definitely available", "currently available in size 9", "in stock in size 9"]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "support contact does not show unrelated product cards",
+    "turns": [
+      {
+        "user": "How do I contact customer support about my order?",
+        "expect": {
+          "text": {
+            "mustIncludeAny": ["support", "customer", "order", "contact"],
+            "mustNotInclude": ["here are", "take a look"]
+          },
+          "products": {
+            "max": 0
+          }
+        }
+      }
+    ]
+  }
+]

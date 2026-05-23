@@ -24,6 +24,7 @@
     "eval:scenarios": "node scripts/eval-scenarios.mjs",
     "eval:feedback": "node scripts/eval-scenarios.mjs --file=scripts/scenarios.from-feedback.json",
     "eval:e2e": "node scripts/eval-e2e.mjs",
+    "eval:chat-transcripts": "node scripts/eval-chat-transcripts.mjs",
     "feedback:import": "node scripts/import-feedback-scenarios.mjs",
     "audit:hallucinations": "node scripts/audit-hallucinations.mjs",
     "audit:recommender": "node scripts/audit-recommender-vs-catalog.mjs",

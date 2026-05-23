@@ -33,13 +33,20 @@ export function escapeRe(s) {
 export const SKU_PATTERN = /\b[A-Z]{1,2}\d{3,5}[A-Z]?\b/g;
 
 // ── stripStaleCategoriesOnScopeReset ─────────────────────────────────
-// When the customer's latest message is open-ended ("anything",
-// "everything", "any X", "show me whatever"), the AI sometimes carries
-// a category from the prior turn into its search query. Strip category
-// words that ARE in the AI's query but NOT in the customer's literal
-// latest message. Vocabulary comes from the merchant's own
-// categoryGroups.
-const SCOPE_RESET_RE = /\b(?:show\s+me\s+(?:all|anything|everything|whatever)(?:\s+\w+)?|anything|everything|any\s+\w+|all\s+(?:of\s+)?your|all\s+\w+|whatever|all\s+styles|every\s+\w+)\b/i;
+// When the customer's latest message is genuinely open-ended
+// ("anything", "everything", "what else", "show me all"), the AI
+// sometimes carries a category from the prior turn into its search
+// query. Strip category words that ARE in the AI's query but NOT in
+// the customer's literal latest message. Vocabulary comes from the
+// merchant's own categoryGroups.
+//
+// Deliberately do NOT treat "any <attribute> ones?" as a reset:
+// "women's sandals" → "any pink ones?" means same category, new color.
+const SCOPE_RESET_RE = /\b(?:show\s+me\s+(?:anything|everything|whatever)\b|show\s+me\s+all(?:\s+(?:styles|options))?\s*[?.!]*$|anything|everything|all\s+(?:of\s+)?your\b|whatever|all\s+styles|what\s+else|something\s+else|other\s+(?:options|things|stuff))\b/i;
+
+function isBroadScopeResetText(text) {
+  return SCOPE_RESET_RE.test(String(text || ""));
+}
 
 export function stripStaleCategoriesOnScopeReset(toolCall, ctx) {
   if (toolCall.name !== "search_products") return toolCall;
@@ -304,6 +311,62 @@ export function injectLockedGender(toolCall, ctx) {
   };
 }
 
+// ── injectLockedCategory ────────────────────────────────────────────
+// Same-family follow-ups like "any pink ones?" or "what about wide?"
+// should carry the already-established category into the search tool.
+// The LLM often sends only the new attribute ("pink"), which lets
+// semantic search return pink products from sibling categories. Code
+// owns this scope invariant: established category stays locked until
+// the customer explicitly resets/widens, names a different category,
+// or asks for a specific product.
+function readConstraintValue(v) {
+  if (v == null) return null;
+  if (typeof v === "object" && v.value != null) return v.value;
+  return v;
+}
+
+function getLockedCategory(ctx) {
+  const explicit = readConstraintValue(ctx?.sessionMemory?.explicit?.category);
+  if (explicit) return explicit;
+  const matched = readConstraintValue(ctx?.resolverState?.matched_constraints?.category);
+  if (matched) return matched;
+  const inferred = readConstraintValue(ctx?.resolverState?.inferred_constraints?.category);
+  if (inferred) return inferred;
+  return null;
+}
+
+export function injectLockedCategory(toolCall, ctx) {
+  if (toolCall.name !== "search_products") return toolCall;
+
+  const existingFilters = toolCall.input?.filters || {};
+  if (existingFilters.category || existingFilters.Category) return toolCall;
+
+  const locked = getLockedCategory(ctx);
+  if (!locked) return toolCall;
+
+  const latest = String(ctx?.latestUserMessage || "");
+  if (isBroadScopeResetText(latest)) return toolCall;
+
+  // If the customer named a specific product/SKU, product identity
+  // should drive the search. Category filters can hide the product if
+  // it lives outside the current browsing category.
+  if (ctx?.sessionMemory?.explicit?.specificProduct || /\b[A-Z]{1,2}\d{3,5}[A-Z]?\b/.test(latest.toUpperCase())) {
+    return toolCall;
+  }
+
+  const category = String(locked).toLowerCase().trim();
+  if (!category) return toolCall;
+
+  console.log(`[chat] category-lock: injecting category="${category}" into search_products`);
+  return {
+    ...toolCall,
+    input: {
+      ...toolCall.input,
+      filters: { ...existingFilters, category },
+    },
+  };
+}
+
 // ── injectOccasionCategory ──────────────────────────────────────────
 // Semantic search returns embedding-similar products regardless of
 // physical fit — slippers and walking shoes both score high on
@@ -406,7 +469,8 @@ export function injectOccasionCategory(toolCall, ctx) {
 //   2. Scope reset (strips stale category from search query)
 //   3. Color injection (adds structured color filter to search)
 //   4. Gender lock (force-overlay customer-stated gender)
-//   5. Occasion category (constrain to walking/dressy/etc. when AI
+//   5. Category lock (force-overlay established product type)
+//   6. Occasion category (constrain to walking/dressy/etc. when AI
 //      didn't pick a category and the occasion implies one)
 // ── redirectOrthoticSearchToRecommender ────────────────────────────
 // When the LLM calls search_products with an orthotic-shaped query
@@ -535,6 +599,7 @@ export function rewriteToolCall(toolCall, ctx) {
   rewritten = stripStaleCategoriesOnScopeReset(rewritten, ctx);
   rewritten = injectStructuredColorFilter(rewritten, ctx);
   rewritten = injectLockedGender(rewritten, ctx);
+  rewritten = injectLockedCategory(rewritten, ctx);
   rewritten = injectOccasionCategory(rewritten, ctx);
   // Run named-product relaxation LAST: it drops the category filter
   // for explicit named-product lookups, overriding any category
