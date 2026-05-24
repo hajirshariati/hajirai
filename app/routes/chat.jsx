@@ -1743,9 +1743,27 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     console.log(`[chat] WARN long-non-product-reply chars=${fullResponseText.length} sentences~=${sentenceCount}`);
   }
 
+  const finalShouldHydrateProducts = shouldHydrateProductCardsForTurn({
+    text: fullResponseText,
+    ctx,
+    recommenderAskedForMoreInfo,
+  });
+  if (ctx.debugChatEvents) {
+    controller.enqueue(encoder.encode(sseChunk({
+      type: "debug",
+      stage: "before_final_hydrate",
+      poolSize: pool.length,
+      allProductPoolSize: allProductPool.size,
+      shouldHydrateProducts: finalShouldHydrateProducts,
+      resolverPromisedRecommendation: resolverPromisedRecommendation(ctx.resolverState),
+      looksLikeProductPitch: looksLikeProductPitch(fullResponseText),
+      scope: currentCatalogScopeFromContext(ctx),
+    })));
+  }
+
   if (
     pool.length === 0 &&
-    shouldHydrateProductCardsForTurn({ text: fullResponseText, ctx, recommenderAskedForMoreInfo })
+    finalShouldHydrateProducts
   ) {
     try {
       const attached = await hydrateScopedProductCards({
@@ -1764,6 +1782,13 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       }
     } catch (err) {
       console.error("[chat] final product-turn hydrate failed:", err?.message || err);
+      if (ctx.debugChatEvents) {
+        controller.enqueue(encoder.encode(sseChunk({
+          type: "debug",
+          stage: "final_hydrate_error",
+          message: err?.message || String(err),
+        })));
+      }
     }
   }
 
@@ -2810,6 +2835,7 @@ export const action = async ({ request }) => {
       fullCatalogCategories: allCatalogCategories,
       categoryGenderMap,
       latestUserMessage: String(body.message || ""),
+      debugChatEvents: body?.debug === true,
       messages,
     };
     const encoder = new TextEncoder();
