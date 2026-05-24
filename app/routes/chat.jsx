@@ -325,6 +325,55 @@ function scopedProductSearchInput(ctx = {}) {
   };
 }
 
+function shouldHydrateProductCardsForTurn({ text, ctx, recommenderAskedForMoreInfo }) {
+  const latest = ctx?.latestUserMessage || "";
+  const compound = isCompoundPolicyProductQuestion(latest);
+  const latestIsPolicyOnly = isPolicyOrServiceQuestion(latest) && !compound;
+  if (latestIsPolicyOnly || recommenderAskedForMoreInfo) return false;
+  if (compound) return true;
+  if (!text) return false;
+  if (looksLikeClarifyingQuestion(text)) return false;
+  return looksLikeProductPitch(text);
+}
+
+async function hydrateScopedProductCards({ ctx, allProductPool, reason }) {
+  const { input, scope } = scopedProductSearchInput(ctx);
+  console.log(
+    `[chat] product-turn hydrate: ${reason}; forcing scoped search ` +
+      `(gender=${scope.gender || "-"} category=${scope.category || "-"} color=${scope.color || "-"} ` +
+      `query=${JSON.stringify(input.query)})`,
+  );
+  const hydrated = await dispatchTool("search_products", input, ctx);
+  const hydratedCards = extractProductCards("search_products", hydrated);
+  for (const card of hydratedCards) {
+    const key = card.handle || card.title;
+    if (key && !allProductPool.has(key)) allProductPool.set(key, card);
+  }
+  console.log(`[chat] product-turn hydrate: attached ${hydratedCards.length} card(s)`);
+  return hydratedCards.length;
+}
+
+function compoundPolicyFallbackText(latestMessage = "") {
+  const latest = String(latestMessage || "");
+  if (/\b(return|returns|refund|exchange|exchanges)\b/i.test(latest)) {
+    return "For returns, Aetrex accepts unworn items in original packaging within 30 days of delivery.";
+  }
+  if (/\b(ship|shipping|delivery)\b/i.test(latest)) {
+    return "For shipping, the current delivery details are handled through the support and checkout flow.";
+  }
+  if (/\b(warranty|guarantee)\b/i.test(latest)) {
+    return "For warranty questions, Aetrex support can help confirm the policy for your item.";
+  }
+  return "";
+}
+
+function compoundProductFallbackText(ctx = {}) {
+  const { scope } = scopedProductSearchInput(ctx);
+  const category = scope.category ? String(scope.category).replace(/-/g, " ") : "styles";
+  const gender = scope.gender === "men" ? "men's " : scope.gender === "women" ? "women's " : "";
+  return `I also found the closest ${gender}${category} below.`;
+}
+
 function softGenderBrowseSearchInput(latestUserMessage = "") {
   const text = String(latestUserMessage || "");
   const lower = text.toLowerCase();
@@ -954,32 +1003,18 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   // handoff class behind "Here are white sneakers" / "Here are pink
   // sandals" with no cards: hydrate once from the canonical turn scope
   // before any text/card coherence checks run.
-  const latestIsPolicyOnly =
-    isPolicyOrServiceQuestion(ctx.latestUserMessage) &&
-    !isCompoundPolicyProductQuestion(ctx.latestUserMessage);
   if (
     allProductPool.size === 0 &&
-    fullResponseText &&
-    (looksLikeProductPitch(fullResponseText) || isCompoundPolicyProductQuestion(ctx.latestUserMessage)) &&
-    !looksLikeClarifyingQuestion(fullResponseText) &&
-    !recommenderAskedForMoreInfo &&
-    !latestIsPolicyOnly
+    shouldHydrateProductCardsForTurn({ text: fullResponseText, ctx, recommenderAskedForMoreInfo })
   ) {
-    const { input, scope } = scopedProductSearchInput(ctx);
-    console.log(
-      `[chat] product-turn hydrate: forcing scoped search ` +
-        `(gender=${scope.gender || "-"} category=${scope.category || "-"} color=${scope.color || "-"} ` +
-        `query=${JSON.stringify(input.query)})`,
-    );
     try {
-      const hydrated = await dispatchTool("search_products", input, ctx);
+      const attached = await hydrateScopedProductCards({
+        ctx,
+        allProductPool,
+        reason: "empty pool before display",
+      });
       productSearchAttempted = true;
-      const hydratedCards = extractProductCards("search_products", hydrated);
-      for (const card of hydratedCards) {
-        const key = card.handle || card.title;
-        if (key && !allProductPool.has(key)) allProductPool.set(key, card);
-      }
-      console.log(`[chat] product-turn hydrate: attached ${hydratedCards.length} card(s)`);
+      if (attached === 0) console.log("[chat] product-turn hydrate: scoped search returned no cards");
     } catch (err) {
       console.error("[chat] product-turn hydrate failed:", err?.message || err);
     }
@@ -995,6 +1030,33 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
           `color=${scoped.scope.color || "-"} enforcedColor=${scoped.enforcedColor ? "yes" : "no"})`,
       );
       pool = scoped.products;
+    }
+  }
+  if (
+    pool.length === 0 &&
+    allProductPool.size > 0 &&
+    shouldHydrateProductCardsForTurn({ text: fullResponseText, ctx, recommenderAskedForMoreInfo })
+  ) {
+    try {
+      const attached = await hydrateScopedProductCards({
+        ctx,
+        allProductPool,
+        reason: "display scope filtered pool to zero",
+      });
+      productSearchAttempted = true;
+      if (attached > 0) {
+        const rescoped = filterProductCardsToCatalogScope(Array.from(allProductPool.values()), ctx);
+        pool = rescoped.products;
+        if (rescoped.dropped > 0) {
+          console.log(
+            `[chat] response-contract: after hydrate dropped ${rescoped.dropped} off-scope card(s) ` +
+              `(gender=${rescoped.scope.gender || "-"} category=${rescoped.scope.category || "-"} ` +
+              `color=${rescoped.scope.color || "-"} enforcedColor=${rescoped.enforcedColor ? "yes" : "no"})`,
+          );
+        }
+      }
+    } catch (err) {
+      console.error("[chat] product-turn hydrate after scope filter failed:", err?.message || err);
     }
   }
 
@@ -1220,6 +1282,24 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // Without a fallback we'd ship an empty bubble above the cards.
     console.log(`[chat] empty-text repair: text wiped by strips, pool=${pool.length}`);
     fullResponseText = "Take a look — these are the closest matches I've got.";
+  }
+
+  if (isCompoundPolicyProductQuestion(ctx.latestUserMessage) && fullResponseText) {
+    const additions = [];
+    const policyFallback = compoundPolicyFallbackText(ctx.latestUserMessage);
+    if (policyFallback && !/\b(return|returns|refund|exchange|30\s+days?|unworn|shipping|delivery|warranty|guarantee)\b/i.test(fullResponseText)) {
+      additions.push(policyFallback);
+    }
+    if (pool.length > 0 && !PRODUCT_SHOPPING_NOUN_RE.test(fullResponseText)) {
+      additions.push(compoundProductFallbackText(ctx));
+    }
+    if (additions.length > 0) {
+      const genericFallback = /^tell me a bit more\b/i.test(fullResponseText.trim());
+      fullResponseText = genericFallback
+        ? additions.join(" ")
+        : `${additions.join(" ")} ${fullResponseText}`.trim();
+      console.log(`[chat] compound-contract: added missing clause(s) count=${additions.length}`);
+    }
   }
 
   // Strip stray HTML the model sometimes emits (literal <br>, <p>, etc.).
