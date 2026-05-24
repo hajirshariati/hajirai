@@ -231,6 +231,71 @@
     ]
   },
   {
+    "name": "soft gender gate lets unsure shopper browse products",
+    "turns": [
+      {
+        "user": "hi i need new shoes",
+        "expect": {
+          "text": {
+            "mustIncludeAny": ["men", "women", "styles", "browse"]
+          },
+          "products": {
+            "max": 0
+          },
+          "chips": {
+            "mustIncludeAny": ["Men's", "Women's"]
+          }
+        }
+      },
+      {
+        "user": "i don't know, what do you have that's cheap?",
+        "expect": {
+          "text": {
+            "mustIncludeAny": ["styles", "narrow", "price", "browse"],
+            "mustNotInclude": ["which styles would you like to browse", "men's or women's", "are you shopping for"]
+          },
+          "products": {
+            "min": 1,
+            "allTitleOrHandleMustNotMatch": "orthotic|insole|accessor"
+          },
+          "chips": {
+            "mustNotInclude": ["Men's", "Women's"]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "soft gender gate breaks repeated non-answer loop",
+    "turns": [
+      {
+        "user": "i need shoes",
+        "expect": {
+          "chips": {
+            "mustIncludeAny": ["Men's", "Women's"]
+          },
+          "products": {
+            "max": 0
+          }
+        }
+      },
+      {
+        "user": "not sure",
+        "expect": {
+          "text": {
+            "mustNotInclude": ["which styles would you like to browse", "men's or women's", "are you shopping for"]
+          },
+          "products": {
+            "min": 1
+          },
+          "chips": {
+            "mustNotInclude": ["Men's", "Women's"]
+          }
+        }
+      }
+    ]
+  },
+  {
     "name": "support contact does not show unrelated product cards",
     "turns": [
       {

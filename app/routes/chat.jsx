@@ -284,6 +284,40 @@ function isPolicyOrServiceQuestion(text) {
   return Boolean(text) && POLICY_QUESTION_RE.test(text);
 }
 
+function softGenderBrowseSearchInput(latestUserMessage = "") {
+  const text = String(latestUserMessage || "");
+  const lower = text.toLowerCase();
+  const input = { query: "shoes", limit: 6 };
+  const priceMax = lower.match(/\b(?:under|below|less\s+than)\s+\$?\s*(\d{2,4})\b/);
+  if (priceMax) input.priceMax = Number(priceMax[1]);
+  if (/\b(?:cheap|sale|deals?|discount|on\s+sale|under|below|less\s+than)\b/i.test(text)) {
+    input.query = "sale shoes";
+  } else if (/\b(?:best\s*sellers?|bestsellers?|popular|top\s+rated|favorite)\b/i.test(text)) {
+    input.query = "popular shoes";
+  } else if (/\b(?:comfort|arch|support|pain|standing|walking)\b/i.test(text)) {
+    input.query = "arch support shoes";
+  }
+  return input;
+}
+
+async function emitSoftGenderGateBrowse({ ctx, controller, encoder }) {
+  const input = softGenderBrowseSearchInput(ctx?.latestUserMessage || "");
+  const result = await dispatchTool("search_products", input, ctx);
+  const cards = extractProductCards("search_products", result)
+    .slice(0, ctx?.productCardCap || 3);
+  const text = cards.length > 0
+    ? "No problem — here are a few styles to start with. You can narrow by men's, women's, style, color, or price from here."
+    : "No problem — we can browse first and narrow later. Tell me a style, color, or price range and I'll pull options.";
+
+  controller.enqueue(encoder.encode(sseChunk({ type: "text", text })));
+  controller.enqueue(encoder.encode(sseChunk({ type: "products", products: cards })));
+  controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
+  console.log(
+    `[chat] ${ctx.shop} soft-gender-gate browse emitted ` +
+      `query=${JSON.stringify(input.query)} poolSize=${cards.length}`,
+  );
+}
+
 // Generic brand-mention detector. When the customer asks "do you have
 // anything from <Brand>?" / "by <Brand>" / "made by <Brand>" / "the
 // <Brand> brand", the AI's "we don't carry <Brand>" is a legitimate
@@ -2727,6 +2761,15 @@ export const action = async ({ request }) => {
                 console.log(`[router] ${ctx.shop} ${routerLog.resolver || "resolver=skip"}`);
                 console.log(`[router] ${ctx.shop} ${routerLog.orthoticGate}`);
                 console.log(`[router] ${ctx.shop} final_path=${routerLog.finalPath}`);
+                return;
+              }
+              if (gate?.softGenderGateEscape) {
+                routerLog.finalPath = "soft_gender_browse";
+                console.log(`[router] ${ctx.shop} ${routerLog.classifier}`);
+                console.log(`[router] ${ctx.shop} ${routerLog.resolver || "resolver=skip"}`);
+                console.log(`[router] ${ctx.shop} ${routerLog.orthoticGate}`);
+                console.log(`[router] ${ctx.shop} final_path=${routerLog.finalPath}`);
+                await emitSoftGenderGateBrowse({ ctx, controller, encoder });
                 return;
               }
             } catch (gateErr) {

@@ -7,7 +7,11 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { maybeRunOrthoticFlow } from "../app/lib/orthotic-flow-gate.server.js";
+import {
+  countGenderGateAsks,
+  maybeRunOrthoticFlow,
+  shouldSoftEscapeFootwearGenderGate,
+} from "../app/lib/orthotic-flow-gate.server.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const definition = JSON.parse(readFileSync(resolve(here, "seeds/aetrex-orthotic-tree.json"), "utf8"));
@@ -115,6 +119,76 @@ await test("re-asks current question when reply is gibberish but intent is estab
   assert.equal(out.handled, true);
   // Walks required-attrs in order: gender first since it's missing.
   assert.match(events[0].text, /Who are these orthotics for/i);
+});
+
+await test("soft gender-gate escape detects open-browse non-answer after gender ask", async () => {
+  const messages = [
+    { role: "user", content: "hi i need new shoes" },
+    { role: "assistant", content: "Which styles would you like to browse — men's or women's? <<Men's>><<Women's>>" },
+    { role: "user", content: "i don't know, what do you have that's cheap?" },
+  ];
+  assert.equal(countGenderGateAsks(messages), 1);
+  assert.equal(
+    shouldSoftEscapeFootwearGenderGate({
+      messages: messages.slice(0, -1),
+      rawUserText: messages[messages.length - 1].content,
+      answers: {},
+    }),
+    true,
+  );
+});
+
+await test("footwear path uses soft gender-gate escape instead of repeating gender wall", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "hi i need new shoes" },
+      { role: "assistant", content: "Which styles would you like to browse — men's or women's? <<Men's>><<Women's>>" },
+      { role: "user", content: "i don't know, what do you have that's cheap?" },
+    ],
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+    classifiedIntent: {
+      isOrthoticRequest: false,
+      isFootwearRequest: true,
+      isRejection: false,
+      attributes: {},
+      confidence: "high",
+    },
+  });
+  assert.equal(out.handled, false);
+  assert.equal(out.softGenderGateEscape, true);
+  assert.equal(out.case, "soft_gender_gate_escape");
+  assert.equal(events.length, 0);
+});
+
+await test("footwear path soft-escapes after repeated unanswered gender asks", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "i need shoes" },
+      { role: "assistant", content: "Which styles would you like to browse — men's or women's? <<Men's>><<Women's>>" },
+      { role: "user", content: "not sure" },
+      { role: "assistant", content: "Got it — our catalog is organized by men's and women's styles. Which would you like to browse first? <<Men's>><<Women's>>" },
+      { role: "user", content: "ok" },
+    ],
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+    classifiedIntent: {
+      isOrthoticRequest: false,
+      isFootwearRequest: true,
+      isRejection: false,
+      attributes: {},
+      confidence: "high",
+    },
+  });
+  assert.equal(out.handled, false);
+  assert.equal(out.softGenderGateEscape, true);
+  assert.equal(events.length, 0);
 });
 
 await test("emits next seed question on chip click (Layer 1)", async () => {

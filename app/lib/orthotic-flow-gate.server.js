@@ -94,6 +94,28 @@ function letsCatalogResolverOwnFootwearRequest(text) {
   return CATALOG_SPECIFIC_FOOTWEAR_RE.test(text) || CATALOG_COLOR_RE.test(text);
 }
 
+const GENDER_GATE_ASK_RE =
+  /(?:<<\s*Men(?:'?s)?\s*>>[\s\S]{0,80}<<\s*Women(?:'?s)?\s*>>|<<\s*Women(?:'?s)?\s*>>[\s\S]{0,80}<<\s*Men(?:'?s)?\s*>>|\bmen'?s?\s+or\s+women'?s?\b|\bwomen'?s?\s+or\s+men'?s?\b|\bwhich\s+styles?\s+would\s+you\s+like\s+to\s+browse\b)/i;
+
+const OPEN_BROWSE_AFTER_GENDER_GATE_RE =
+  /\b(?:i\s*(?:do\s+not|don['’]?t|dont)\s+know|not\s+sure|unsure|idk|whatever|anything|everything|either|both|no\s+preference|doesn['’]?t\s+matter|doesnt\s+matter|what\s+do\s+you\s+have|what\s+you\s+have|just\s+show\s+me|show\s+me\s+(?:some|anything|everything|whatever)|browse|bestsellers?|best\s+sellers?|popular|cheap|sale|deals?|on\s+sale|under\s+\$?\d+)\b/i;
+
+export function countGenderGateAsks(messages = []) {
+  if (!Array.isArray(messages)) return 0;
+  return messages.reduce((count, m) => {
+    if (!m || m.role !== "assistant" || typeof m.content !== "string") return count;
+    return count + (GENDER_GATE_ASK_RE.test(m.content) ? 1 : 0);
+  }, 0);
+}
+
+export function shouldSoftEscapeFootwearGenderGate({ messages = [], rawUserText = "", answers = {} } = {}) {
+  if (answers?.gender) return false;
+  const askedCount = countGenderGateAsks(messages);
+  if (askedCount <= 0) return false;
+  if (askedCount >= 2) return true;
+  return OPEN_BROWSE_AFTER_GENDER_GATE_RE.test(rawUserText);
+}
+
 /**
  * Format a question node into customer-facing text with chip
  * markers. The widget's existing `<<Label>>` chip syntax is what
@@ -924,6 +946,24 @@ export async function maybeRunOrthoticFlow({
         looksLikeFootwearCommit(m.content),
     );
   if (footwearCommitInLatest || footwearCommitInPrior) {
+    const softGenderGateEscape = shouldSoftEscapeFootwearGenderGate({
+      messages: priorMessages,
+      rawUserText,
+      answers,
+    });
+    if (!answers.gender && softGenderGateEscape) {
+      console.log(
+        `[orthotic-flow] footwear-path gender soft escape: gender was asked ` +
+          `${countGenderGateAsks(priorMessages)} time(s), latest="${rawUserText.slice(0, 60)}"; ` +
+          `falling through to broad catalog browse`,
+      );
+      return {
+        handled: false,
+        case: "soft_gender_gate_escape",
+        softGenderGateEscape: true,
+      };
+    }
+
     // BEFORE falling through to the LLM, enforce DISCOVERY ORDER:
     // gender must be asked before category. The prompt has a rule
     // for this ("DISCOVERY ORDER — GENDER BEFORE CATEGORY") but in
