@@ -311,5 +311,55 @@
         }
       }
     ]
+  },
+  {
+    "name": "compound policy plus product request answers both clauses",
+    "turns": [
+      {
+        "user": "ok cool what about your return policy? and do you have any brown sneakers for men?",
+        "expect": {
+          "text": {
+            "mustIncludeAny": ["return", "policy", "30", "unworn"],
+            "mustInclude": ["sneaker"],
+            "mustNotInclude": ["tell me a bit more", "what type", "what kind"]
+          },
+          "products": {
+            "min": 1,
+            "allTitleOrHandleMustMatch": "sneaker|dash|graham|chase|drew|miles",
+            "allTitleOrHandleMustNotMatch": "sandal|orthotic|accessor"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "pink sandal refinement never leaks sneakers",
+    "turns": [
+      {
+        "user": "show me women's sandals",
+        "expect": {
+          "products": {
+            "min": 1,
+            "allTitleOrHandleMustNotMatch": "sneaker"
+          }
+        }
+      },
+      {
+        "user": "any pink ones?",
+        "expect": {
+          "text": {
+            "mustIncludeAny": ["pink", "blush", "rose"],
+            "mustNotInclude": ["sneaker", "what type", "what kind"]
+          },
+          "products": {
+            "min": 1,
+            "allTitleOrHandleMustNotMatch": "sneaker"
+          },
+          "chips": {
+            "mustNotInclude": ["Sneakers", "Accessories"]
+          }
+        }
+      }
+    ]
   }
 ]

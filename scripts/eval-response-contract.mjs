@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import {
+  filterProductCardsToCatalogScope,
   productPoolSatisfiesCatalogScope,
+  repairProductTurnAssembly,
   repairProductResponseText,
 } from "../app/lib/response-contract.server.js";
 
@@ -60,6 +62,70 @@ test("R3 — unrelated product pool does not erase a true denial", () => {
   });
   assert.equal(out.changed, false);
   assert.equal(out.text, text);
+});
+
+test("R4 — product turn strips clarifying chips instead of showing ask+answer", () => {
+  const text = "What type of men's footwear are you looking for? Here are our men's black sandals — two good options. <<Sandals>><<Sneakers>><<Clogs>><<Accessories>>";
+  const pool = [
+    {
+      title: "Maui Men's Sandal - Black",
+      _gender: "men",
+      _category: "sandals",
+      _attributes: { Color: "Black", Gender: "Men", Category: "Sandals" },
+    },
+  ];
+  const out = repairProductTurnAssembly({ text, pool });
+  assert.equal(out.changed, true);
+  assert.equal(/<</.test(out.text), false);
+  assert.equal(/^what type/i.test(out.text), false);
+  assert.match(out.text, /men's black sandals/i);
+});
+
+test("R5 — scoped card filter drops off-category semantic cards", () => {
+  const mixedPool = [
+    {
+      title: "Danika Arch Support Sneaker - Pink",
+      _gender: "women",
+      _category: "sneakers",
+      _attributes: { Color: "Pink", Gender: "Women", Category: "Sneakers" },
+    },
+    {
+      title: "Vicki Braided Thong Sandal - Light Pink",
+      _gender: "women",
+      _category: "sandals",
+      _attributes: { Color: "Pink", Gender: "Women", Category: "Sandals" },
+    },
+  ];
+  const scoped = filterProductCardsToCatalogScope(mixedPool, {
+    sessionMemory: { explicit: { gender: "women", category: "sandals", color: "pink" } },
+  });
+  assert.equal(scoped.products.length, 1);
+  assert.equal(scoped.products[0].title, "Vicki Braided Thong Sandal - Light Pink");
+  assert.equal(scoped.dropped, 1);
+  assert.equal(scoped.enforcedColor, true);
+});
+
+test("R6 — scoped card filter keeps same-category alternatives when exact color is unavailable", () => {
+  const alternatives = [
+    {
+      title: "Kendall Sandal - Burgundy",
+      _gender: "women",
+      _category: "sandals",
+      _attributes: { Color: "Burgundy", Gender: "Women", Category: "Sandals" },
+    },
+    {
+      title: "Vania Sandal - Wine",
+      _gender: "women",
+      _category: "sandals",
+      _attributes: { Color: "Wine", Gender: "Women", Category: "Sandals" },
+    },
+  ];
+  const scoped = filterProductCardsToCatalogScope(alternatives, {
+    sessionMemory: { explicit: { gender: "women", category: "sandals", color: "red" } },
+  });
+  assert.equal(scoped.products.length, 2);
+  assert.equal(scoped.dropped, 0);
+  assert.equal(scoped.enforcedColor, false);
 });
 
 if (failed > 0) {

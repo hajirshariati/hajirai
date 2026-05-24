@@ -49,8 +49,9 @@ import {
   extractGenericCTA,
   extractOrphanSkus,
   extractSupportCTA,
+  filterProductCardsToCatalogScope,
   prepareProductCardsForTurn,
-  repairProductResponseText,
+  repairProductTurnAssembly,
   resolveProductTurnLink,
   scoreCardAgainstText,
   skusFromCardText,
@@ -282,6 +283,17 @@ async function dispatchTool(name, input, ctx) {
 const POLICY_QUESTION_RE = /\b(discount|coupon|promo(?:tion)?|sale|deal|refund|return|exchange|warranty|guarantee|policy|polic(?:ies|y)|ship(?:ping|ment)?|deliver(?:y|ies)?|bundle|payment|installment|hours|track(?:ing)?|order (?:status|number|history)|account|sign\s*in|log\s*in|coupon|support\s+team|contact\s+(?:you|your|support|us|customer)|customer\s+service|gov\s*x|teacher\s+discount|military\s+discount|first\s+responder|nurse\s+discount|student\s+discount|senior\s+discount)\b/i;
 function isPolicyOrServiceQuestion(text) {
   return Boolean(text) && POLICY_QUESTION_RE.test(text);
+}
+
+const PRODUCT_SHOPPING_NOUN_RE = /\b(shoes?|footwear|sneakers?|sandals?|boots?|loafers?|clogs?|wedges?|heels?|orthotics?|insoles?|footbeds?|inserts?|slippers?|oxfords?|mary\s+janes?|slip[-\s]?ons?|accessor(?:y|ies)|slides?|flats?|mules?|styles?|pairs?)\b/i;
+const SHOPPING_ACTION_RE = /\b(show|find|have|carry|sell|stock|looking\s+for|look\s+for|need|want|recommend|browse|shop|any|options?|styles?)\b/i;
+const COMPOUND_JOINER_RE = /\b(?:and|also|plus|while|then|too|as\s+well)\b|[,;]\s*(?:and|also|plus)?\s*/i;
+
+function isCompoundPolicyProductQuestion(text) {
+  if (!isPolicyOrServiceQuestion(text)) return false;
+  const value = String(text || "");
+  if (!PRODUCT_SHOPPING_NOUN_RE.test(value) || !SHOPPING_ACTION_RE.test(value)) return false;
+  return COMPOUND_JOINER_RE.test(value);
 }
 
 function softGenderBrowseSearchInput(latestUserMessage = "") {
@@ -782,7 +794,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     fullResponseText &&
     containsAvailabilityDenial(fullResponseText) &&
     ctx.latestUserMessage &&
-    !isPolicyOrServiceQuestion(ctx.latestUserMessage) &&
+    (!isPolicyOrServiceQuestion(ctx.latestUserMessage) || isCompoundPolicyProductQuestion(ctx.latestUserMessage)) &&
     !hasCompetitorBrandMention(ctx.latestUserMessage) &&
     !resolverDeniedHonestly
   ) {
@@ -907,7 +919,18 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }
   }
 
-  const pool = Array.from(allProductPool.values());
+  let pool = Array.from(allProductPool.values());
+  if (pool.length > 0) {
+    const scoped = filterProductCardsToCatalogScope(pool, ctx);
+    if (scoped.dropped > 0) {
+      console.log(
+        `[chat] response-contract: dropped ${scoped.dropped} off-scope card(s) ` +
+          `before emit (gender=${scoped.scope.gender || "-"} category=${scoped.scope.category || "-"} ` +
+          `color=${scoped.scope.color || "-"} enforcedColor=${scoped.enforcedColor ? "yes" : "no"})`,
+      );
+      pool = scoped.products;
+    }
+  }
 
   // Internal-language leak scrub. The resolver-state block in the
   // system prompt occasionally bleeds into customer-facing text
@@ -1462,6 +1485,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     const userMsg = String(ctx.latestUserMessage);
     if (
       isPolicyOrServiceQuestion(userMsg) &&
+      !isCompoundPolicyProductQuestion(userMsg) &&
       !PRODUCT_NOUN_IN_USER_RE.test(userMsg)
     ) {
       console.log(
@@ -1473,47 +1497,13 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }
   }
 
-  if (
-    pool.length > 0 &&
-    fullResponseText
-  ) {
+  if (pool.length > 0 && fullResponseText) {
     const before = fullResponseText;
-    const repaired = repairProductResponseText({ text: fullResponseText, pool, ctx });
+    const repaired = repairProductTurnAssembly({ text: fullResponseText, pool, ctx });
     fullResponseText = repaired.text;
     if (repaired.changed) {
       console.log(
-        `[chat] response-contract: stripped contradictory availability denial ` +
-          `while exact-scope products are present (${before.length}→${fullResponseText.length} chars)`,
-      );
-    }
-  }
-
-  // Product result turns should not also ask a category-chip question.
-  // Production trace: "how about mens?" after women's black sandals
-  // returned 2 men's sandal cards, but the model also emitted
-  // <<Sandals>><<Sneakers>><<Clogs>><<Accessories>>. The widget then
-  // rendered a confusing "what type?" row and could hide the cards.
-  // If product cards exist and the text is already presenting those
-  // products, strip the choice buttons and keep the product result.
-  if (pool.length > 0 && fullResponseText && hasChoiceButtons(fullResponseText)) {
-    const firstChipIdx = fullResponseText.indexOf("<<");
-    const beforeChips = firstChipIdx >= 0
-      ? fullResponseText.slice(0, firstChipIdx).trim()
-      : fullResponseText.trim();
-    const beforeLower = beforeChips.toLowerCase();
-    const namesPoolProduct = pool.some((card) => {
-      const title = String(card.title || "").trim().toLowerCase();
-      return title.length >= 5 && beforeLower.includes(title);
-    });
-    if (hasPluralIntroFraming(beforeChips) || namesPoolProduct) {
-      const before = fullResponseText;
-      fullResponseText = fullResponseText
-        .replace(/\s*<<[^<>]+>>/g, "")
-        .replace(/^\s*(?:what|which)\s+(?:type|kind|style|category)\s+of\s+[^?]{1,120}\?\s+(?=\b(?:here|take|check|i found|we have)\b)/i, "")
-        .replace(/[ \t]{2,}/g, " ")
-        .trim();
-      console.log(
-        `[chat] ${ctx.shop} stripped product-turn choice chips while cards are present ` +
+        `[chat] response-contract: repaired product turn (${repaired.logs.join("+")}) ` +
           `(${before.length}→${fullResponseText.length} chars, pool=${pool.length})`,
       );
     }
@@ -2498,6 +2488,13 @@ export const action = async ({ request }) => {
       activeCampaigns,
       merchantGroups,
     });
+    if (isCompoundPolicyProductQuestion(body.message)) {
+      systemPrompt +=
+        "\n\n=== Compound request handling (turn-scoped) ===\n" +
+        "The latest customer message contains both a support/policy question and a product-shopping request. " +
+        "Answer every distinct ask. Briefly answer the support/policy part, and also use search_products for the product-shopping part so product cards can render. " +
+        "Do not treat the whole turn as support-only, and do not drop the product request.\n";
+    }
 
     const model = chooseModel(config, String(body.message), history);
 
@@ -2652,7 +2649,7 @@ export const action = async ({ request }) => {
             const latestMsg = String(body.message || "");
             const skipResolver =
               !latestMsg.trim() ||
-              isPolicyOrServiceQuestion(latestMsg) ||
+              (isPolicyOrServiceQuestion(latestMsg) && !isCompoundPolicyProductQuestion(latestMsg)) ||
               isBrandOrInfoQuestion(latestMsg) ||
               isCapabilityCheckAboutPriorProducts(latestMsg) ||
               detectUserSignupIntent(latestMsg);

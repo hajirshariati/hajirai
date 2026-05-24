@@ -377,6 +377,12 @@ export function currentCatalogScopeFromContext(ctx = {}) {
       classified.color ||
       resolverMatched.color ||
       resolverInferred.color?.value,
+    size:
+      explicit.size ||
+      resolverMatched.size,
+    width:
+      explicit.width ||
+      resolverMatched.width,
   });
 }
 
@@ -404,6 +410,71 @@ export function productPoolSatisfiesCatalogScope(pool, scope = {}) {
   });
 }
 
+function cardMatchesCatalogScope(card, scope = {}, { enforceColor = true } = {}) {
+  const canonical = canonicalizeCatalogConstraints(scope);
+  const gender = normalizeGender(canonical.gender);
+  const category = normalizeCategory(canonical.category);
+  const color = normalizeColor(canonical.color);
+
+  const cardGender =
+    normalizeGender(card?._gender) ||
+    normalizeGender(cardAttr(card, ["gender", "gender_fallback", "genders"]));
+  const cardCategory =
+    normalizeCategory(card?._category) ||
+    normalizeCategory(card?.productType) ||
+    normalizeCategory(cardAttr(card, ["category", "category_for_filter", "subcategory", "product_type"]));
+
+  if (gender && cardGender && cardGender !== gender && cardGender !== "unisex") return false;
+  if (category && cardCategory && cardCategory !== category) return false;
+  if (color && enforceColor && !cardMatchesColor(card, color)) return false;
+  return true;
+}
+
+export function filterProductCardsToCatalogScope(pool = [], ctx = {}) {
+  const products = Array.isArray(pool) ? pool.filter(Boolean) : [];
+  if (products.length === 0) {
+    return { products: [], dropped: 0, scope: currentCatalogScopeFromContext(ctx), enforcedColor: false };
+  }
+
+  const scope = currentCatalogScopeFromContext(ctx);
+  const canonical = canonicalizeCatalogConstraints(scope);
+  const hasStructuralScope = Boolean(canonical.gender || canonical.category);
+  if (!hasStructuralScope && !canonical.color) {
+    return { products, dropped: 0, scope, enforcedColor: false };
+  }
+
+  const structuralMatches = products.filter((card) =>
+    cardMatchesCatalogScope(card, canonical, { enforceColor: false }),
+  );
+  const base = hasStructuralScope ? structuralMatches : products;
+  if (base.length === 0) {
+    return { products: [], dropped: products.length, scope, enforcedColor: false };
+  }
+
+  // Color is a hard display constraint only when at least one product in the
+  // structural scope truly has that color. If the resolver/search deliberately
+  // relaxed color to show alternatives ("no exact red, here are burgundy"),
+  // keep those alternatives and let wording say the exact color was unavailable.
+  let enforcedColor = false;
+  let filtered = base;
+  if (canonical.color) {
+    const exactColor = base.filter((card) =>
+      cardMatchesCatalogScope(card, canonical, { enforceColor: true }),
+    );
+    if (exactColor.length > 0) {
+      filtered = exactColor;
+      enforcedColor = true;
+    }
+  }
+
+  return {
+    products: filtered,
+    dropped: products.length - filtered.length,
+    scope,
+    enforcedColor,
+  };
+}
+
 export function deriveProductResponseContract({ pool = [], ctx = {}, relaxedFilters = null } = {}) {
   const scope = currentCatalogScopeFromContext(ctx);
   const exactScopeSatisfied = productPoolSatisfiesCatalogScope(pool, scope);
@@ -422,6 +493,60 @@ export function deriveProductResponseContract({ pool = [], ctx = {}, relaxedFilt
     }),
     exactScopeSatisfied,
   };
+}
+
+const PRODUCT_INTRO_RE = /\b(?:here (?:are|is)|take a look|check out|i found|we have|these are|this is|good news|great news|closest options|matching styles)\b/i;
+const CLARIFYING_LEAD_RE = /^\s*(?:what|which)\s+(?:type|kind|style|category)\s+of\s+[^?]{1,160}\?\s*/i;
+const GENDER_CLARIFYING_LEAD_RE = /^\s*(?:is this|are these|who (?:is|are) (?:this|these)|would this be)\s+[^?]{0,120}\?\s*/i;
+
+function stripChoiceButtons(text) {
+  return String(text || "")
+    .replace(/\s*<<[^<>]+>>/g, "")
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+export function repairProductTurnAssembly({ text, pool = [], ctx = {}, relaxedFilters = null } = {}) {
+  let nextText = String(text || "").trim();
+  let changed = false;
+  const logs = [];
+
+  const denialRepair = repairProductResponseText({ text: nextText, pool, ctx, relaxedFilters });
+  if (denialRepair.changed) {
+    nextText = denialRepair.text;
+    changed = true;
+    logs.push("stripped_contradictory_denial");
+  }
+
+  if (Array.isArray(pool) && pool.length > 0 && extractTurnChips(nextText).length > 0) {
+    const firstChipIdx = nextText.indexOf("<<");
+    const beforeChips = firstChipIdx >= 0 ? nextText.slice(0, firstChipIdx).trim() : nextText;
+    const chipFree = stripChoiceButtons(nextText);
+    const namesPoolProduct = pool.some((card) => {
+      const title = String(card?.title || "").trim().toLowerCase();
+      return title.length >= 5 && chipFree.toLowerCase().includes(title);
+    });
+    const presentsProducts =
+      PRODUCT_INTRO_RE.test(chipFree) ||
+      PRODUCT_INTRO_RE.test(beforeChips) ||
+      namesPoolProduct;
+
+    if (presentsProducts) {
+      const stripped = stripChoiceButtons(chipFree)
+        .replace(CLARIFYING_LEAD_RE, "")
+        .replace(GENDER_CLARIFYING_LEAD_RE, "")
+        .replace(/[ \t]{2,}/g, " ")
+        .trim();
+      if (stripped !== nextText) {
+        nextText = stripped || "Here are the matching styles I found.";
+        changed = true;
+        logs.push("removed_clarifying_chips_from_product_turn");
+      }
+    }
+  }
+
+  return { text: nextText, changed, logs, contract: denialRepair.contract };
 }
 
 export function repairProductResponseText({ text, pool = [], ctx = {}, relaxedFilters = null } = {}) {
