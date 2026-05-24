@@ -2279,6 +2279,37 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
           );
         }
       }
+    } else if (
+      !effectiveSaysNoMatch &&
+      pool.length > 0 &&
+      shouldHydrateProductCardsForTurn({ text: fullResponseText, ctx, recommenderAskedForMoreInfo })
+    ) {
+      // Last display-boundary invariant: a scoped product pool plus
+      // product-presenting text must never degrade to a text-only turn
+      // because a late scorer/narrower found no confident subset. At
+      // this point the pool has already passed the response contract's
+      // scope filter, so showing the top scoped cards is safer than
+      // leaving the customer with "Here are..." and no cards.
+      const fallbackCards = pool.slice(0, cardCap);
+      const { products: deduped, categoryCounts, genderCounts } = prepareProductCardsForTurn(fallbackCards);
+      if (deduped.length > 0) {
+        console.log(`[chat] display-boundary: scorer produced zero cards; emitting ${deduped.length} scoped fallback card(s)`);
+        finalProductCards = deduped;
+        controller.enqueue(encoder.encode(sseChunk({
+          type: "products",
+          products: deduped,
+        })));
+
+        const productLink = resolveProductTurnLink({ categoryCounts, genderCounts, ctx });
+        if (productLink.link) {
+          outboundLinks.push(productLink.link);
+          controller.enqueue(encoder.encode(sseChunk({
+            type: "link",
+            url: productLink.link.url,
+            label: productLink.link.label,
+          })));
+        }
+      }
     }
   }
 
