@@ -925,6 +925,23 @@ cases.push({
 });
 
 cases.push({
+  name: "color-inject: respects internal color-relaxation searches",
+  run: () => {
+    const input = search({
+      query: "sandals",
+      filters: { gender: "women", category: "sandals" },
+      _suppressColorInjection: true,
+    });
+    const out = injectStructuredColorFilter(input, {
+      latestUserMessage: "any pink ones?",
+      _merchantColors: ["pink", "black"],
+    });
+    assert.equal(out, input);
+    assert.equal(out.input.filters.color, undefined);
+  },
+});
+
+cases.push({
   name: "color-inject: skips when color not in merchant catalog",
   run: () => {
     const input = search({ query: "x" });

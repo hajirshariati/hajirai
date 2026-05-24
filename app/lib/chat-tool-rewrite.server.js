@@ -222,6 +222,7 @@ export function forceComparisonLookup(toolCall, ctx) {
 // cached on ctx._merchantColors). No hardcoded color list.
 export function injectStructuredColorFilter(toolCall, ctx) {
   if (toolCall.name !== "search_products") return toolCall;
+  if (toolCall.input?._suppressColorInjection === true) return toolCall;
   const colors = ctx._merchantColors;
   if (!Array.isArray(colors) || colors.length === 0) return toolCall;
   const existingFilter = toolCall.input?.filters || {};

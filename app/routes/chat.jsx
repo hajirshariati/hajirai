@@ -366,6 +366,7 @@ async function hydrateScopedProductCards({ ctx, allProductPool, reason }) {
       ...input,
       query: relaxedQuery,
       filters: relaxedFilters,
+      _suppressColorInjection: true,
     }, ctx);
     const relaxedCards = extractProductCards("search_products", relaxed);
     for (const card of relaxedCards) {
