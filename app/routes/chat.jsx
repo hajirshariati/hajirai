@@ -330,6 +330,7 @@ function shouldHydrateProductCardsForTurn({ text, ctx, recommenderAskedForMoreIn
   const compound = isCompoundPolicyProductQuestion(latest);
   const latestIsPolicyOnly = isPolicyOrServiceQuestion(latest) && !compound;
   if (latestIsPolicyOnly || recommenderAskedForMoreInfo) return false;
+  if (resolverPromisedRecommendation(ctx?.resolverState)) return true;
   if (compound) return true;
   if (!text) return false;
   if (looksLikeClarifyingQuestion(text)) return false;

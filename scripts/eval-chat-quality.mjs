@@ -230,6 +230,14 @@ cases.push({
 });
 
 cases.push({
+  name: "'here's our lineup' is a pitch",
+  run: () => assert.equal(
+    looksLikeProductPitch("Here's our men's sneaker lineup."),
+    true,
+  ),
+});
+
+cases.push({
   name: "'let me look that up' counts as pitch (placeholder for cards)",
   run: () => assert.equal(
     looksLikeProductPitch("Let me look that up now."),

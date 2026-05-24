@@ -391,7 +391,7 @@ export function stripBannedNarration(text) {
 // hitting" recovery — broke the flow entirely. Stick to phrases
 // that genuinely imply a product pitch ("here are", "top picks",
 // "perfect match" etc).
-const PRODUCT_PITCH_RE = /\b(here are|check out|check these|some great|great options|top picks|picks for you|styles for you|perfect (?:for|match|pick|choice)|the (?:best|ideal|right) (?:match|choice|pick|option)|i (?:recommend|suggest)|points to|cleat-?compatible|look that up)\b/i;
+const PRODUCT_PITCH_RE = /\b(here (?:are|is)|here's|check out|check these|some great|great options|top picks|picks for you|styles for you|perfect (?:for|match|pick|choice)|the (?:best|ideal|right) (?:match|choice|pick|option)|i (?:recommend|suggest)|points to|cleat-?compatible|look that up)\b/i;
 
 export function looksLikeProductPitch(text) {
   return Boolean(text) && PRODUCT_PITCH_RE.test(text);
