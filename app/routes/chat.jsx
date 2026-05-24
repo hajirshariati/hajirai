@@ -1370,7 +1370,10 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     if (policyFallback && !/\b(return|returns|refund|exchange|30\s+days?|unworn|shipping|delivery|warranty|guarantee)\b/i.test(fullResponseText)) {
       additions.push(policyFallback);
     }
-    if (pool.length > 0 && !PRODUCT_SHOPPING_NOUN_RE.test(fullResponseText)) {
+    if (
+      pool.length > 0 &&
+      (!PRODUCT_SHOPPING_NOUN_RE.test(fullResponseText) || detectAiNoMatchPhrasing(fullResponseText))
+    ) {
       additions.push(compoundProductFallbackText(ctx));
     }
     if (additions.length > 0) {
@@ -2317,7 +2320,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         }
       }
     } else if (
-      !effectiveSaysNoMatch &&
+      (!effectiveSaysNoMatch || isCompoundPolicyProductQuestion(ctx.latestUserMessage)) &&
       pool.length > 0 &&
       shouldHydrateProductCardsForTurn({ text: fullResponseText, ctx, recommenderAskedForMoreInfo })
     ) {
