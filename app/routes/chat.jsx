@@ -349,8 +349,35 @@ async function hydrateScopedProductCards({ ctx, allProductPool, reason }) {
     const key = card.handle || card.title;
     if (key && !allProductPool.has(key)) allProductPool.set(key, card);
   }
-  console.log(`[chat] product-turn hydrate: attached ${hydratedCards.length} card(s)`);
-  return hydratedCards.length;
+  let attached = hydratedCards.length;
+
+  if (attached === 0 && Array.isArray(ctx?.resolverState?.candidate_products)) {
+    const handles = ctx.resolverState.candidate_products
+      .map((p) => p?.handle)
+      .filter(Boolean)
+      .slice(0, 6);
+    if (handles.length > 0) {
+      console.log(`[chat] product-turn hydrate: search empty; hydrating ${handles.length} resolver candidate handle(s)`);
+      for (const handle of handles) {
+        try {
+          const details = await dispatchTool("get_product_details", { handle }, ctx);
+          const cards = extractProductCards("get_product_details", details);
+          for (const card of cards) {
+            const key = card.handle || card.title;
+            if (key && !allProductPool.has(key)) {
+              allProductPool.set(key, card);
+              attached += 1;
+            }
+          }
+        } catch (err) {
+          console.error(`[chat] product-turn hydrate: resolver candidate ${handle} failed`, err?.message || err);
+        }
+      }
+    }
+  }
+
+  console.log(`[chat] product-turn hydrate: attached ${attached} card(s)`);
+  return attached;
 }
 
 function compoundPolicyFallbackText(latestMessage = "") {
