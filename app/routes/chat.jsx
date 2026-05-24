@@ -378,32 +378,39 @@ async function hydrateScopedProductCards({ ctx, allProductPool, reason }) {
     }
   }
 
-  if (attached === 0 && Array.isArray(ctx?.resolverState?.candidate_products)) {
-    const handles = ctx.resolverState.candidate_products
-      .map((p) => p?.handle)
-      .filter(Boolean)
-      .slice(0, 6);
-    if (handles.length > 0) {
-      console.log(`[chat] product-turn hydrate: search empty; hydrating ${handles.length} resolver candidate handle(s)`);
-      for (const handle of handles) {
-        try {
-          const details = await dispatchTool("get_product_details", { handle }, ctx);
-          const cards = extractProductCards("get_product_details", details);
-          for (const card of cards) {
-            const key = card.handle || card.title;
-            if (key && !allProductPool.has(key)) {
-              allProductPool.set(key, card);
-              attached += 1;
-            }
-          }
-        } catch (err) {
-          console.error(`[chat] product-turn hydrate: resolver candidate ${handle} failed`, err?.message || err);
-        }
-      }
-    }
+  if (attached === 0) {
+    attached += await hydrateResolverCandidateCards({ ctx, allProductPool, reason: "product-turn hydrate" });
   }
 
   console.log(`[chat] product-turn hydrate: attached ${attached} card(s)`);
+  return attached;
+}
+
+async function hydrateResolverCandidateCards({ ctx, allProductPool, reason }) {
+  if (!Array.isArray(ctx?.resolverState?.candidate_products)) return 0;
+  const handles = ctx.resolverState.candidate_products
+    .map((p) => p?.handle)
+    .filter(Boolean)
+    .slice(0, 6);
+  if (handles.length === 0) return 0;
+
+  let attached = 0;
+  console.log(`[chat] ${reason}: hydrating ${handles.length} resolver candidate handle(s)`);
+  for (const handle of handles) {
+    try {
+      const details = await dispatchTool("get_product_details", { handle }, ctx);
+      const cards = extractProductCards("get_product_details", details);
+      for (const card of cards) {
+        const key = card.handle || card.title;
+        if (key && !allProductPool.has(key)) {
+          allProductPool.set(key, card);
+          attached += 1;
+        }
+      }
+    } catch (err) {
+      console.error(`[chat] ${reason}: resolver candidate ${handle} failed`, err?.message || err);
+    }
+  }
   return attached;
 }
 
@@ -1045,6 +1052,15 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         );
       } else {
         console.log(`[chat] resolver-recovery: search returned 0 even with resolver scope`);
+        const attached = await hydrateResolverCandidateCards({
+          ctx,
+          allProductPool,
+          reason: "resolver-recovery fallback",
+        });
+        if (attached > 0) {
+          productSearchAttempted = true;
+          console.log(`[chat] resolver-recovery: attached ${attached} resolver candidate card(s)`);
+        }
       }
     } catch (err) {
       console.error("[chat] resolver-recovery failed:", err?.message || err);
