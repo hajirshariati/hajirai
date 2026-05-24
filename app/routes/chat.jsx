@@ -1100,7 +1100,14 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
           `before emit (gender=${scoped.scope.gender || "-"} category=${scoped.scope.category || "-"} ` +
           `color=${scoped.scope.color || "-"} enforcedColor=${scoped.enforcedColor ? "yes" : "no"})`,
       );
-      pool = scoped.products;
+      if (scoped.products.length === 0 && resolverPromisedRecommendation(ctx.resolverState)) {
+        console.log(
+          `[chat] response-contract: resolver promised recommendation; keeping ${pool.length} candidate card(s) ` +
+            `after display scope filter wiped all`,
+        );
+      } else {
+        pool = scoped.products;
+      }
     }
   }
   if (
@@ -1117,7 +1124,9 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       productSearchAttempted = true;
       if (attached > 0) {
         const rescoped = filterProductCardsToCatalogScope(Array.from(allProductPool.values()), ctx);
-        pool = rescoped.products;
+        pool = rescoped.products.length === 0 && resolverPromisedRecommendation(ctx.resolverState)
+          ? Array.from(allProductPool.values())
+          : rescoped.products;
         if (rescoped.dropped > 0) {
           console.log(
             `[chat] response-contract: after hydrate dropped ${rescoped.dropped} off-scope card(s) ` +
@@ -1774,7 +1783,9 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       productSearchAttempted = true;
       if (attached > 0) {
         const rescoped = filterProductCardsToCatalogScope(Array.from(allProductPool.values()), ctx);
-        pool = rescoped.products;
+        pool = rescoped.products.length === 0 && resolverPromisedRecommendation(ctx.resolverState)
+          ? Array.from(allProductPool.values())
+          : rescoped.products;
         if (isCompoundPolicyProductQuestion(ctx.latestUserMessage) && !PRODUCT_SHOPPING_NOUN_RE.test(fullResponseText)) {
           fullResponseText = `${fullResponseText} ${compoundProductFallbackText(ctx)}`.trim();
           console.log("[chat] compound-contract: added product clause after final hydration");
