@@ -1672,6 +1672,30 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     console.log(`[chat] WARN long-non-product-reply chars=${fullResponseText.length} sentences~=${sentenceCount}`);
   }
 
+  if (
+    pool.length === 0 &&
+    shouldHydrateProductCardsForTurn({ text: fullResponseText, ctx, recommenderAskedForMoreInfo })
+  ) {
+    try {
+      const attached = await hydrateScopedProductCards({
+        ctx,
+        allProductPool,
+        reason: "final pre-emit zero-card product turn",
+      });
+      productSearchAttempted = true;
+      if (attached > 0) {
+        const rescoped = filterProductCardsToCatalogScope(Array.from(allProductPool.values()), ctx);
+        pool = rescoped.products;
+        if (isCompoundPolicyProductQuestion(ctx.latestUserMessage) && !PRODUCT_SHOPPING_NOUN_RE.test(fullResponseText)) {
+          fullResponseText = `${fullResponseText} ${compoundProductFallbackText(ctx)}`.trim();
+          console.log("[chat] compound-contract: added product clause after final hydration");
+        }
+      }
+    } catch (err) {
+      console.error("[chat] final product-turn hydrate failed:", err?.message || err);
+    }
+  }
+
   controller.enqueue(encoder.encode(sseChunk({
     type: "text",
     text: fullResponseText
