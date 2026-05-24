@@ -49,6 +49,7 @@ import {
   extractGenericCTA,
   extractOrphanSkus,
   extractSupportCTA,
+  currentCatalogScopeFromContext,
   filterProductCardsToCatalogScope,
   prepareProductCardsForTurn,
   repairProductTurnAssembly,
@@ -294,6 +295,34 @@ function isCompoundPolicyProductQuestion(text) {
   const value = String(text || "");
   if (!PRODUCT_SHOPPING_NOUN_RE.test(value) || !SHOPPING_ACTION_RE.test(value)) return false;
   return COMPOUND_JOINER_RE.test(value);
+}
+
+function scopedProductSearchInput(ctx = {}) {
+  const latestMsg = String(ctx.latestUserMessage || "");
+  const scope = currentCatalogScopeFromContext(ctx);
+  const latest = extractUserConstraints(latestMsg);
+  const gender = scope.gender || latest.gender;
+  const category = scope.category || latest.category;
+  const color = scope.color || latest.color;
+  const size = scope.size || latest.size;
+  const width = scope.width || latest.width;
+  const condition = scope.condition || latest.condition;
+  const filters = {};
+  if (gender) filters.gender = gender;
+  if (category) filters.category = category;
+  if (color) filters.color = color;
+  if (size) filters.size = size;
+  if (width) filters.width = width;
+
+  const query = [color, condition, category]
+    .filter(Boolean)
+    .join(" ")
+    .trim() || latestMsg.slice(0, 160).trim() || "shoes";
+
+  return {
+    input: { query, filters, limit: 6 },
+    scope: { gender, category, color, size, width, condition },
+  };
 }
 
 function softGenderBrowseSearchInput(latestUserMessage = "") {
@@ -916,6 +945,43 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       }
     } catch (err) {
       console.error("[chat] resolver-recovery failed:", err?.message || err);
+    }
+  }
+
+  // Product-turn payload invariant. The LLM is allowed to write the
+  // friendly sentence, but it is not allowed to create a product
+  // presentation with zero product payloads. This catches the broad
+  // handoff class behind "Here are white sneakers" / "Here are pink
+  // sandals" with no cards: hydrate once from the canonical turn scope
+  // before any text/card coherence checks run.
+  const latestIsPolicyOnly =
+    isPolicyOrServiceQuestion(ctx.latestUserMessage) &&
+    !isCompoundPolicyProductQuestion(ctx.latestUserMessage);
+  if (
+    allProductPool.size === 0 &&
+    fullResponseText &&
+    (looksLikeProductPitch(fullResponseText) || isCompoundPolicyProductQuestion(ctx.latestUserMessage)) &&
+    !looksLikeClarifyingQuestion(fullResponseText) &&
+    !recommenderAskedForMoreInfo &&
+    !latestIsPolicyOnly
+  ) {
+    const { input, scope } = scopedProductSearchInput(ctx);
+    console.log(
+      `[chat] product-turn hydrate: forcing scoped search ` +
+        `(gender=${scope.gender || "-"} category=${scope.category || "-"} color=${scope.color || "-"} ` +
+        `query=${JSON.stringify(input.query)})`,
+    );
+    try {
+      const hydrated = await dispatchTool("search_products", input, ctx);
+      productSearchAttempted = true;
+      const hydratedCards = extractProductCards("search_products", hydrated);
+      for (const card of hydratedCards) {
+        const key = card.handle || card.title;
+        if (key && !allProductPool.has(key)) allProductPool.set(key, card);
+      }
+      console.log(`[chat] product-turn hydrate: attached ${hydratedCards.length} card(s)`);
+    } catch (err) {
+      console.error("[chat] product-turn hydrate failed:", err?.message || err);
     }
   }
 
