@@ -256,7 +256,7 @@
           },
           "products": {
             "min": 1,
-            "allTitleOrHandleMustNotMatch": "orthotic|insole|accessor"
+            "allTitleOrHandleMustNotMatch": "insole|accessor"
           },
           "chips": {
             "mustNotInclude": ["Men's", "Women's"]

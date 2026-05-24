@@ -429,6 +429,26 @@ function compoundPolicyFallbackText(latestMessage = "") {
   return "";
 }
 
+function policyOnlyFallbackText(latestMessage = "") {
+  const latest = String(latestMessage || "");
+  if (/\b(return|returns|refund|exchange|exchanges)\b/i.test(latest)) {
+    return "Aetrex's return policy accepts unworn items in original packaging within 30 days of delivery. Refunds are issued to the original payment method within 5-7 business days after the return is received.";
+  }
+  if (/\b(ship|shipping|delivery)\b/i.test(latest)) {
+    return "For shipping and delivery questions, the latest order-specific details are available through the support link below or your order tracking email.";
+  }
+  if (/\b(warranty|guarantee)\b/i.test(latest)) {
+    return "For warranty questions, Aetrex support can help confirm coverage for your item. Use the support link below and include your order details if you have them.";
+  }
+  if (/\b(track|tracking|order\s+(?:status|number|history)|where\s+is\s+my\s+order)\b/i.test(latest)) {
+    return "For order status or tracking, use your tracking email or the support link below so Aetrex can look up the order directly.";
+  }
+  if (/\b(contact|support|customer service|account|log\s*in|sign\s*in)\b/i.test(latest)) {
+    return "Aetrex support can help with account and order questions. Use the support link below to contact customer service.";
+  }
+  return "";
+}
+
 function compoundProductFallbackText(ctx = {}) {
   const { scope } = scopedProductSearchInput(ctx);
   const category = scope.category ? String(scope.category).replace(/-/g, " ") : "styles";
@@ -1362,6 +1382,22 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     // Without a fallback we'd ship an empty bubble above the cards.
     console.log(`[chat] empty-text repair: text wiped by strips, pool=${pool.length}`);
     fullResponseText = "Take a look — these are the closest matches I've got.";
+  }
+
+  if (
+    isPolicyOrServiceQuestion(ctx.latestUserMessage) &&
+    !isCompoundPolicyProductQuestion(ctx.latestUserMessage) &&
+    !PRODUCT_SHOPPING_NOUN_RE.test(String(ctx.latestUserMessage || ""))
+  ) {
+    const policyFallback = policyOnlyFallbackText(ctx.latestUserMessage);
+    const genericShoppingFallback = /^tell me a bit more\b/i.test(fullResponseText.trim());
+    const lacksPolicyTerms = policyFallback &&
+      !/\b(return|returns|refund|exchange|30\s+days?|unworn|shipping|delivery|warranty|guarantee|support|customer service|order|tracking)\b/i.test(fullResponseText);
+    if (policyFallback && (genericShoppingFallback || lacksPolicyTerms)) {
+      fullResponseText = policyFallback;
+      pool = [];
+      console.log("[chat] policy-contract: replaced generic/missing policy reply with deterministic support answer");
+    }
   }
 
   if (isCompoundPolicyProductQuestion(ctx.latestUserMessage) && fullResponseText) {
