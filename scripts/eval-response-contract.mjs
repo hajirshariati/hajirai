@@ -7,6 +7,7 @@ import {
   repairProductTurnAssembly,
   repairProductResponseText,
   stripMissingSkus,
+  createTurnResult,
 } from "../app/lib/response-contract.server.js";
 
 let passed = 0;
@@ -269,6 +270,17 @@ test("R16 — generic product fallback is rewritten with scoped facts", () => {
   });
   assert.equal(out.changed, true);
   assert.match(out.text, /pink women's sandals/i);
+});
+
+test("R17 — product pitch without cards is repaired before emit", () => {
+  const out = createTurnResult({
+    text: "Take a look — these are the closest matches I've got.",
+    products: [],
+    flags: { productSearchAttempted: true },
+  });
+  assert.equal(out.products.length, 0);
+  assert.doesNotMatch(out.text, /closest matches|take a look|here are/i);
+  assert.match(out.text, /exact request/i);
 });
 
 if (failed > 0) {

@@ -1071,8 +1071,16 @@ export function createTurnResult({
   ctx = {},
   diagnostics = {},
 } = {}) {
-  const normalizedText = String(text || "").trim();
   const normalizedProducts = Array.isArray(products) ? products.filter(Boolean) : [];
+  let normalizedText = String(text || "").trim();
+  if (
+    normalizedProducts.length === 0 &&
+    /\b(?:here are|take a look|check out|these are|i found|closest matches)\b/i.test(normalizedText)
+  ) {
+    normalizedText = flags.productSearchAttempted
+      ? "I don't have a matching product card to show for that exact request. Try another size, width, color, or style and I'll check again."
+      : "Tell me a bit more about what you're looking for and I'll narrow it down.";
+  }
   const normalizedLinks = Array.isArray(links)
     ? links
         .filter((link) => link && typeof link === "object" && link.url)
