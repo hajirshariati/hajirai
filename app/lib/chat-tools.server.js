@@ -135,7 +135,56 @@ function productColorValues(product) {
   ]);
 }
 
-function productVariantFacts(product) {
+function titleColorValues(product) {
+  const title = String(product?.title || "");
+  const match = title.match(/\s[-–—]\s*([^–—-]{2,48})$/);
+  return match ? uniqueDisplayValues(match[1]) : [];
+}
+
+function productDisplayColorValues(product) {
+  const variantColors = (product?.variants || []).flatMap(variantColorValues);
+  return uniqueDisplayValues([
+    productColorValues(product),
+    titleColorValues(product),
+    variantColors,
+  ]);
+}
+
+function productStyleFamilyKey(product) {
+  return String(product?.title || "")
+    .replace(/\s*[-–—]\s*[^-–—]+$/, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
+function buildStyleColorFacts(products = []) {
+  const families = new Map();
+  for (const product of Array.isArray(products) ? products : []) {
+    const key = productStyleFamilyKey(product);
+    if (!key || key.length < 4) continue;
+    if (!families.has(key)) {
+      families.set(key, {
+        colors: new Map(),
+        products: [],
+      });
+    }
+    const family = families.get(key);
+    const colors = productDisplayColorValues(product);
+    for (const color of colors) {
+      const colorKey = color.toLowerCase();
+      if (!family.colors.has(colorKey)) family.colors.set(colorKey, color);
+      family.products.push({
+        color,
+        handle: product.handle,
+        title: product.title,
+      });
+    }
+  }
+  return families;
+}
+
+function productVariantFacts(product, styleColorFacts = null) {
   const variants = Array.isArray(product?.variants) ? product.variants : [];
   const availableVariants = variants.filter(variantIsAvailableForFacts);
   const byColor = new Map();
@@ -168,11 +217,17 @@ function productVariantFacts(product) {
     }
   }
 
-  const colors = Array.from(byColor.values()).map((entry) => entry.color);
+  const productColors = Array.from(byColor.values()).map((entry) => entry.color);
+  const styleFacts = styleColorFacts?.get(productStyleFamilyKey(product));
+  const styleColors = styleFacts ? Array.from(styleFacts.colors.values()) : [];
+  const colors = uniqueDisplayValues([productColors, styleColors]);
   const summary = {
     variantCount: variants.length,
     inStockVariantCount: availableVariants.length,
     availableColors: colors,
+    productAvailableColors: productColors,
+    styleAvailableColors: styleColors,
+    styleColorProducts: styleFacts?.products || [],
     availableSizes: inStockSizes(product),
     availableWidths: inStockWidths(product),
     byColor: Array.from(byColor.values()).map((entry) => ({
@@ -1334,6 +1389,7 @@ const isExcludedByRule = (p) => {
     const v = (variants || []).find((vv) => vv.compareAtPrice);
     return v ? v.compareAtPrice : null;
   };
+  const styleColorFacts = buildStyleColorFacts(products);
 
   return {
     query: q,
@@ -1355,7 +1411,7 @@ const isExcludedByRule = (p) => {
       descriptionSnippet: descriptionSnippet(p.description, q, 280),
       priceRange: priceRange(availableVariantsForScope(p, variantScope)),
       variantCount: (p.variants || []).length,
-      variantFacts: productVariantFacts(p),
+      variantFacts: productVariantFacts(p, styleColorFacts),
       url: productUrl(shop, p.handle),
       image: p.featuredImageUrl || undefined,
       price: firstPrice(availableVariantsForScope(p, variantScope)) || undefined,
@@ -1384,6 +1440,27 @@ async function getProductDetails({ handle }, { shop }) {
   const availableWidths = inStockWidths(product);
   const displayVariants = availableVariantsForScope(product);
   const firstAvailable = displayVariants.find((v) => v.price) || product.variants[0];
+  const siblingProducts = await prisma.product.findMany({
+    where: activeProductWhere(shop),
+    include: {
+      variants: {
+        select: {
+          sku: true,
+          title: true,
+          price: true,
+          compareAtPrice: true,
+          optionsJson: true,
+          attributesJson: true,
+          inventoryQty: true,
+        },
+      },
+    },
+    take: 1200,
+  });
+  const familyKey = productStyleFamilyKey(product);
+  const styleColorFacts = buildStyleColorFacts(
+    siblingProducts.filter((p) => productStyleFamilyKey(p) === familyKey),
+  );
 
   return {
     handle: product.handle,
@@ -1401,7 +1478,7 @@ async function getProductDetails({ handle }, { shop }) {
     compareAtPrice: firstAvailable?.compareAtPrice || undefined,
     availableSizes: availableSizes.length > 0 ? availableSizes : undefined,
     availableWidths: availableWidths.length > 0 ? availableWidths : undefined,
-    variantFacts: productVariantFacts(product),
+    variantFacts: productVariantFacts(product, styleColorFacts),
     variants: product.variants.map((v) => ({
       sku: v.sku || undefined,
       title: v.title || undefined,
