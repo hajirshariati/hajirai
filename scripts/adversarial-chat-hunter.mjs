@@ -437,6 +437,8 @@ async function runConversation(persona, convoIndex) {
     if (!userMessage) break;
     const norm = (s) => String(s || "").trim().toLowerCase();
     const wasChipTap = lastSuggestions.some((s) => norm(s) === norm(userMessage));
+    const prevUserMsg = [...history].reverse().find((m) => m.role === "user")?.content;
+    const customerRepeatedSelf = prevUserMsg != null && norm(prevUserMsg) === norm(userMessage);
     history.push({ role: "user", content: userMessage });
 
     let payload;
@@ -454,7 +456,11 @@ async function runConversation(persona, convoIndex) {
     let bugs = structuralBugs({ payload, lastUserMessage: userMessage, fullHistory: history });
     if (bugs.length === 0) {
       const judged = await llmJudge({ lastUserMessage: userMessage, payload, fullHistory: history, wasChipTap });
-      if (!judged.ok) bugs = [{ seam: judged.seam, detail: judged.detail, source: "llm-judge" }];
+      // Don't blame the bot for repeating when the CUSTOMER repeated itself verbatim
+      // (test-agent artifact, not a real bot bug).
+      if (!judged.ok && !(judged.seam === "repetitive" && customerRepeatedSelf)) {
+        bugs = [{ seam: judged.seam, detail: judged.detail, source: "llm-judge" }];
+      }
     }
 
     turnLogs.push({ userMessage, payload: { text: payload.text, products: payload.products?.map((p) => ({ title: p.title, handle: p.handle })), suggestions: payload.suggestions, links: payload.links, errors: payload.errors }, bugs });
