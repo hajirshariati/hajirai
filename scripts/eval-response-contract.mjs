@@ -258,6 +258,19 @@ test("R15 — vague color-range promise is completed from variant facts", () => 
   assert.match(out.text, /Silver/i);
 });
 
+test("R16 — generic product fallback is rewritten with scoped facts", () => {
+  const out = reconcileProseToCards({
+    text: "Here are the matching styles I found.",
+    cards: [
+      { title: "Vicki Braided Thong Sandal - Light Pink Gloss", _gender: "women", _category: "sandals", _attributes: { Color: "Pink" } },
+      { title: "Jillian Sport Sandal - Shimmer Blush", _gender: "women", _category: "sandals", _attributes: { Color: "Pink" } },
+    ],
+    ctx: { sessionMemory: { explicit: { gender: "women", category: "sandals", color: "pink" } } },
+  });
+  assert.equal(out.changed, true);
+  assert.match(out.text, /pink women's sandals/i);
+});
+
 if (failed > 0) {
   console.error("\nFailures:");
   for (const f of failures) console.error(`- ${f.name}: ${f.err.stack || f.err.message}`);

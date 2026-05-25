@@ -945,15 +945,47 @@ function repairFeatureClaims(text, cards) {
   return { text: sentences.join(" ").replace(/\s{2,}/g, " ").trim(), changed };
 }
 
-function fallbackProductIntro(ctx = {}) {
+function dominantNormalizedValue(cards = [], extractor) {
+  const counts = new Map();
+  for (const card of Array.isArray(cards) ? cards : []) {
+    const value = extractor(card);
+    if (!value) continue;
+    counts.set(value, (counts.get(value) || 0) + 1);
+  }
+  if (counts.size === 0) return "";
+  return [...counts.entries()].sort((a, b) => b[1] - a[1])[0][0];
+}
+
+function fallbackProductIntro(ctx = {}, cards = []) {
   const scope = currentCatalogScopeFromContext(ctx);
+  const dominantColor = scope.color || dominantNormalizedValue(cards, (card) => {
+    const colors = cardColors(card);
+    return colors.size === 1 ? [...colors][0] : "";
+  });
+  const dominantGender = scope.gender || dominantNormalizedValue(cards, (card) =>
+    normalizeGender(card?._gender) || normalizeGender(cardAttr(card, ["gender", "gender_fallback", "genders"])),
+  );
+  const dominantCategory = scope.category || dominantNormalizedValue(cards, (card) =>
+    normalizeCategory(card?._category) ||
+    normalizeCategory(card?.productType) ||
+    normalizeCategory(cardAttr(card, ["category", "category_for_filter", "subcategory", "product_type"])),
+  );
   const parts = [];
-  if (scope.color) parts.push(scope.color);
-  if (scope.gender) parts.push(scope.gender === "men" ? "men's" : scope.gender === "women" ? "women's" : scope.gender);
-  if (scope.category) parts.push(scope.category);
+  if (dominantColor) parts.push(dominantColor);
+  if (dominantGender) parts.push(dominantGender === "men" ? "men's" : dominantGender === "women" ? "women's" : dominantGender);
+  if (dominantCategory) parts.push(dominantCategory);
   return parts.length > 0
     ? `Here are the ${parts.join(" ")} I found.`
     : "Here are the matching styles I found.";
+}
+
+function repairGenericProductIntro(text, cards, ctx = {}) {
+  if (!text || !Array.isArray(cards) || cards.length === 0) return { text, changed: false };
+  if (!/^\s*here are (?:the )?(?:matching styles|matching options|styles|options|products) i found\.?\s*$/i.test(text)) {
+    return { text, changed: false };
+  }
+  const next = fallbackProductIntro(ctx, cards);
+  return { text: next, changed: next !== text };
 }
 
 export function reconcileProseToCards({ text, cards = [], ctx = {} } = {}) {
@@ -970,11 +1002,12 @@ export function reconcileProseToCards({ text, cards = [], ctx = {} } = {}) {
     ["color_range", (value) => repairColorRangePromises(value, cards, ctx)],
     ["unsupported_promise", removeUngroundedPromises],
     ["feature_claim", (value) => repairFeatureClaims(value, cards)],
+    ["generic_intro", (value) => repairGenericProductIntro(value, cards, ctx)],
   ]) {
     const [label, fn] = step;
     const result = fn(next);
     if (result.changed) {
-      next = result.text || fallbackProductIntro(ctx);
+      next = result.text || fallbackProductIntro(ctx, cards);
       logs.push(label);
     }
   }
