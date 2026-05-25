@@ -249,6 +249,18 @@ const PERSONAS = [
     strategy: "Reply only 1-2 words. 'mens'. 'black'. 'size 10'. 'cheaper'. Test short-input handling.",
   },
   {
+    name: "chip-masher",
+    opening: "show me men's sneakers",
+    goal: "Only ever tap the bot's own quick-reply buttons. Tests whether the chips the bot suggests are actually answerable.",
+    strategy: "EVERY turn, pick one of the quick-reply buttons the bot just offered and reply with its EXACT text. Never type your own question. If no quick replies were offered, reply 'show me more'. Keep tapping whatever it suggests, turn after turn. The whole point is to see if the bot can answer the questions it suggests.",
+  },
+  {
+    name: "chip-masher-orthotic",
+    opening: "i have foot pain",
+    goal: "Tap only quick replies, starting from the orthotic/foot-pain path.",
+    strategy: "EVERY turn, reply with the EXACT text of one of the quick-reply buttons the bot offered. Never invent your own message. If none offered, reply 'what else'. Follow the bot's own suggestions wherever they lead and check it can deliver on each one.",
+  },
+  {
     name: "category-question",
     opening: "what categories do you carry?",
     goal: "Probe catalog truthfulness.",
@@ -281,14 +293,18 @@ const PERSONAS = [
 ];
 
 // ---------- customer agent ----------
-async function nextCustomerMessage(persona, history, turnIndex) {
+async function nextCustomerMessage(persona, history, turnIndex, availableSuggestions = []) {
   if (turnIndex === 0) return persona.opening;
+  const chips = Array.isArray(availableSuggestions) ? availableSuggestions.filter(Boolean) : [];
+  const chipBlock = chips.length
+    ? `\nThe chatbot offered these quick-reply buttons:\n${chips.map((c) => `- ${c}`).join("\n")}\nIf your strategy says to tap a quick reply, reply with the EXACT text of one of these buttons, verbatim.\n`
+    : "";
   const system = `You are roleplaying a real online shopper testing a footwear store's chatbot. Stay in character.
 
 PERSONA: ${persona.name}
 GOAL: ${persona.goal}
 STRATEGY: ${persona.strategy}
-
+${chipBlock}
 Reply with ONLY the next thing the customer would type. No quotes, no explanation. Keep it short (1-2 sentences max). Make it sound like a real lowercase chat message, typos included if your persona has them.
 
 The chatbot just said:
@@ -363,13 +379,16 @@ function structuralBugs({ payload, lastUserMessage, fullHistory }) {
 }
 
 // ---------- judge: subtle bugs (LLM, called only when structural is clean) ----------
-async function llmJudge({ lastUserMessage, payload, fullHistory }) {
+async function llmJudge({ lastUserMessage, payload, fullHistory, wasChipTap = false }) {
   const compactHistory = fullHistory.slice(-6).map((m) => `${m.role === "user" ? "CUSTOMER" : "BOT"}: ${String(m.content).slice(0, 400)}`).join("\n");
   const productsSummary = (payload.products || []).slice(0, 5).map((p) => `- ${p.title || p.handle}`).join("\n") || "(none)";
+  const chipNote = wasChipTap
+    ? `\nIMPORTANT: the customer's message was them TAPPING A QUICK-REPLY BUTTON THE BOT ITSELF SUGGESTED. If the bot now cannot actually answer its own suggested question (vague non-answer, "tell me more", no data, deflection, or unrelated reply), that is a "chip-unanswerable" bug — the bot must never suggest a question it cannot fulfill.\n`
+    : "";
   const system = `You audit a footwear shopping chatbot. Read one exchange and decide if the bot's response has a bug.
 
 OUTPUT FORMAT (strict JSON only, no prose):
-{"ok": true} OR {"ok": false, "seam": "<one of: scope-loss|contradicts-self|ignores-user|wrong-topic|hallucinated-fact|repetitive|confusing|other>", "detail": "<one short sentence>"}
+{"ok": true} OR {"ok": false, "seam": "<one of: scope-loss|contradicts-self|ignores-user|wrong-topic|hallucinated-fact|repetitive|confusing|chip-unanswerable|other>", "detail": "<one short sentence>"}
 
 Be strict but reasonable. If the bot's response makes sense given the customer's message and history, return {"ok": true}. Only flag clear bugs.
 
@@ -380,9 +399,10 @@ Common bugs to look for:
 - wrong-topic: pivoted off the customer's question
 - hallucinated-fact: claimed a feature/policy/product that wasn't established
 - repetitive: same question/answer as a prior turn
-- confusing: response is unclear or self-contradictory`;
+- confusing: response is unclear or self-contradictory
+- chip-unanswerable: bot suggested a quick-reply it then can't actually answer`;
 
-  const user = `RECENT HISTORY:\n${compactHistory}\n\nCUSTOMER JUST SAID: "${lastUserMessage}"\n\nBOT RESPONDED WITH:\nTEXT: ${(payload.text || "(empty)").slice(0, 1500)}\nPRODUCTS SHOWN:\n${productsSummary}\nSUGGESTIONS: ${JSON.stringify(payload.suggestions.slice(0, 5))}\n\nIs the bot's response OK? Reply with only the JSON.`;
+  const user = `RECENT HISTORY:\n${compactHistory}\n${chipNote}\nCUSTOMER JUST SAID: "${lastUserMessage}"\n\nBOT RESPONDED WITH:\nTEXT: ${(payload.text || "(empty)").slice(0, 1500)}\nPRODUCTS SHOWN:\n${productsSummary}\nSUGGESTIONS: ${JSON.stringify(payload.suggestions.slice(0, 5))}\n\nIs the bot's response OK? Reply with only the JSON.`;
 
   try {
     const resp = await anthropic.messages.create({
@@ -408,12 +428,15 @@ async function runConversation(persona, convoIndex) {
   const history = []; // {role, content}
   const turnLogs = []; // each: {userMessage, payload, bugs}
   let firstBugTurn = -1;
+  let lastSuggestions = []; // quick-reply chips the bot offered last turn
 
   for (let t = 0; t < turns; t++) {
     let userMessage;
-    try { userMessage = await nextCustomerMessage(persona, history, t); }
+    try { userMessage = await nextCustomerMessage(persona, history, t, lastSuggestions); }
     catch (e) { return { persona: persona.name, sessionId, turnLogs, fatalError: `customer-agent: ${e.message}` }; }
     if (!userMessage) break;
+    const norm = (s) => String(s || "").trim().toLowerCase();
+    const wasChipTap = lastSuggestions.some((s) => norm(s) === norm(userMessage));
     history.push({ role: "user", content: userMessage });
 
     let payload;
@@ -426,10 +449,11 @@ async function runConversation(persona, convoIndex) {
 
     const botText = payload.text || "";
     history.push({ role: "assistant", content: botText });
+    lastSuggestions = Array.isArray(payload.suggestions) ? payload.suggestions : [];
 
     let bugs = structuralBugs({ payload, lastUserMessage: userMessage, fullHistory: history });
     if (bugs.length === 0) {
-      const judged = await llmJudge({ lastUserMessage: userMessage, payload, fullHistory: history });
+      const judged = await llmJudge({ lastUserMessage: userMessage, payload, fullHistory: history, wasChipTap });
       if (!judged.ok) bugs = [{ seam: judged.seam, detail: judged.detail, source: "llm-judge" }];
     }
 
@@ -488,6 +512,7 @@ function writeClusterReport(allConvos) {
   lines.push(`| Seam | Count | Owner file (best guess) |`);
   lines.push(`|---|---:|---|`);
   const seamOwner = {
+    "chip-unanswerable": "app/lib/chip-filter.server.js + response-contract (suggestions must be answerable from facts)",
     "false-denial-with-pool": "app/lib/response-contract.server.js + app/lib/catalog-resolver.server.js",
     "enum-leak": "app/lib/orthotic-flow.server.js + app/lib/response-contract.server.js",
     "chip-card-contradiction": "app/lib/chip-filter.server.js + chat.jsx turn assembly",
