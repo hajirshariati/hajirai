@@ -238,6 +238,26 @@ test("R14 — color availability denial is repaired from variant facts", () => {
   assert.match(out.text, /Silver/i);
 });
 
+test("R15 — vague color-range promise is completed from variant facts", () => {
+  const out = reconcileProseToCards({
+    text: "Both styles come in quite a range of colors. Here's what's available for each.",
+    cards: [{
+      title: "Chase Arch Support Sneaker - White",
+      handle: "chase-white-am210m",
+      _attributes: { Color: "White", Category: "Sneakers", Gender: "Men" },
+      _variantFacts: {
+        availableColors: ["White", "Black", "Navy", "Silver"],
+        styleAvailableColors: ["White", "Black", "Navy", "Silver"],
+      },
+    }],
+    ctx: { sessionMemory: { explicit: { gender: "men", category: "sneakers", color: "white" } } },
+  });
+  assert.equal(out.changed, true);
+  assert.match(out.text, /Black/i);
+  assert.match(out.text, /Navy/i);
+  assert.match(out.text, /Silver/i);
+});
+
 if (failed > 0) {
   console.error("\nFailures:");
   for (const f of failures) console.error(`- ${f.name}: ${f.err.stack || f.err.message}`);

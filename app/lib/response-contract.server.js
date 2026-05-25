@@ -816,6 +816,34 @@ function repairColorAvailabilityClaims(text, cards, ctx = {}) {
   };
 }
 
+function repairColorRangePromises(text, cards, ctx = {}) {
+  if (!text || !Array.isArray(cards) || cards.length === 0) return { text, changed: false };
+  const correction = colorAvailabilityCorrection(cards, ctx);
+  if (!correction) return { text, changed: false };
+
+  const talksAboutColorRange = /\b(?:colou?rs?|colorways?|colourways?|range of|available for each|what'?s available|comes? in)\b/i.test(text);
+  if (!talksAboutColorRange) return { text, changed: false };
+
+  const requested = normalizeKnownTextColor(currentCatalogScopeFromContext(ctx).color);
+  const nonRequestedColors = new Set();
+  for (const card of cards) {
+    for (const entry of variantColorEntries(card)) {
+      if (!requested || entry.normalized !== requested) {
+        nonRequestedColors.add(entry.display);
+        nonRequestedColors.add(entry.normalized);
+      }
+    }
+  }
+  for (const color of nonRequestedColors) {
+    if (color && new RegExp(`\\b${escapeRegex(color)}\\b`, "i").test(text)) {
+      return { text, changed: false };
+    }
+  }
+
+  const next = `${text.replace(/\s+$/, "")} ${correction}`.replace(/\s{2,}/g, " ").trim();
+  return { text: next, changed: next !== text };
+}
+
 function cardsAllHaveFeature(cards, feature) {
   if (!Array.isArray(cards) || cards.length === 0) return false;
   return cards.every((card) => feature.re.test(cardTextForFacts(card)));
@@ -939,6 +967,7 @@ export function reconcileProseToCards({ text, cards = [], ctx = {} } = {}) {
     ["count", (value) => repairCountClaim(value, cards)],
     ["closest_color", (value) => repairClosestColorClaim(value, cards, ctx)],
     ["color_availability", (value) => repairColorAvailabilityClaims(value, cards, ctx)],
+    ["color_range", (value) => repairColorRangePromises(value, cards, ctx)],
     ["unsupported_promise", removeUngroundedPromises],
     ["feature_claim", (value) => repairFeatureClaims(value, cards)],
   ]) {
