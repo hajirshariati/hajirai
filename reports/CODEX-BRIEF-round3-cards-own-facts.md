@@ -14,26 +14,36 @@ text (counts, sizes, prices, color lists, "all/both/every"), and code tries to v
 them after the fact. The set of false-claim shapes is unbounded, so verification can't
 keep up.
 
-## THE STRUCTURAL RULE
+## THE STRUCTURAL RULE (stricter version — code OWNS the listing line)
 
-**On a product-LISTING turn, the cards own the facts. The summary text describes only
-(a) the scope that was applied and (b) grounded product features. It must not count,
-enumerate, or claim per-item attributes of the result set.**
+**On a product-LISTING turn, CODE generates the summary line deterministically. The LLM
+does not write it.** Do not "prompt the LLM to be careful and strip after" — that still
+lets infinite claim shapes leak. Once the cards are selected, code emits a simple line
+and the cards carry every fact (titles, colors, prices, sizes, count).
 
-The product cards already DISPLAY count, price, color, and sizes. So the text must stop
-restating them. This shrinks the LLM's "can be wrong" surface to almost nothing.
+The deterministic line states ONLY the actual returned scope. It must NOT include feature
+claims unless code verified them across all shown cards — even "these all have arch
+support" is a checkable universal claim and is NOT allowed unless verified. Safest default:
 
-ALLOWED in product-listing text:
-- the applied scope — true by construction because code applied the filter:
-  "Here are women's black sandals…" (gender/category/color the search used)
-- grounded features (Slice 5/6): "…with built-in arch support."
+  "Here are the women's black sandals I found."
+  "Here are the women's black sandals I found. Tap any style to see details."
 
-FORBIDDEN in product-listing text:
-- counts: "6 styles", "three options", any numeral/number-word used as a result count
-- size/stock claims: "all available in size 8", "size 10 across the board"
-- prices in prose: "$159.95" (the card shows price)
+CRITICAL — the line must reflect what was ACTUALLY returned, including relaxations.
+Code knows when a filter was relaxed (e.g. "brown" found nothing → relaxed color). The
+line must not claim the requested scope when the pool doesn't match it:
+  requested brown, relaxed to any color → "I couldn't find brown, but here are men's
+  sneakers in other colors." NOT "Here are the brown sneakers I found."
+
+ANTI-ROBOTIC (still deterministic): code may rotate a small set of FACT-FREE opener
+templates ("Here are the…", "Found these for you —", "Here's what I've got in…") so it
+isn't identical every turn. Variety comes from code-owned templates, never from LLM text.
+
+FORBIDDEN anywhere in the listing line (because they're checkable and the cards show them):
+- counts: "6 styles", "three options"
+- size/stock claims: "all available in size 8"
+- prices in prose: "$159.95"
 - color enumerations of the result set: "in yellow, blue, tan, white, red, black"
-- universal quantifiers about the set: "all of these", "both", "every one of these"
+- universal feature/quantifier claims: "all of these", "both", "every one has arch support"
 
 ## IMPORTANT — do NOT break the fact-ANSWER path
 
@@ -44,26 +54,26 @@ rule applies to the product-LISTING summary, not to a direct attribute answer. T
 already knows which it is (is the customer asking an attribute question, or just being
 shown a result set). Carry that distinction; don't collapse the two.
 
-## IMPLEMENTATION (two levers, and a DELETION)
+## IMPLEMENTATION (code owns the line; guards shrink to leak-catching)
 
-1. **Prompt (`chat-prompt.server.js`) — primary lever.** Rewrite the product-response
-   guidance: when products are shown as a result set, your text is ONE short flavor/
-   benefit line describing the applied scope + features. Do NOT state how many, do NOT
-   list colors, do NOT claim sizes/prices, do NOT say "all/both/every of these." The
-   cards show all of that. This alone removes most of the checkable surface.
+1. **Code-generated listing line (primary change).** On a product-listing turn, after
+   the final card set is locked, CODE emits the summary line from the actual returned
+   scope + relaxation state (see rule above). The LLM's free-written product intro is
+   REPLACED by this deterministic line on listing turns. This is the core of the round —
+   not a prompt tweak.
 
-2. **Backstop (`response-contract.server.js`) — a single checkable-fact stripper for
-   listing turns.** A category detector (NOT a phrase list) that, on a product-listing
-   turn, strips leaked checkable claims: result counts, size/stock claims, prose prices,
-   result-set color enumerations, universal set-quantifiers. If stripping empties the
-   line, fall back to one neutral grounded flavor sentence.
+2. **Keep the fact-ANSWER path for the LLM.** Non-listing turns (clarification,
+   comparison, advice) and direct attribute questions ("what colors/sizes does X come
+   in?") still use LLM text, answered ONLY from supplied/grounded facts (Slice 6). Do
+   NOT make those deterministic — that's where the LLM's value is.
 
-3. **DELETE the now-redundant reconcile functions.** The point of moving facts to the
-   cards is that you no longer need to *reconstruct* truth in prose. Remove the
-   count-reconciliation / color-range-promise / generic-intro-rewrite functions that
-   existed to fix facts the LLM should no longer be writing. **`response-contract.server.js`
-   must SHRINK this round, not grow.** If it grows, the structural change wasn't made —
-   you just added another layer.
+3. **Shrink the guards to leak-catching, don't delete Slice 6.** The reconcile functions
+   that existed to REPAIR free-form sales copy (count reconciliation, color-range
+   promise, generic-intro rewrite) are now redundant for listing turns — remove/shrink
+   them. Their remaining job is "catch a stray leak," not "reconstruct truth." KEEP the
+   Slice 6 variant/sibling-color fact supply — it's needed for the fact-answer path.
+   **`response-contract.server.js` must SHRINK from 1287 lines.** If it grows, the
+   change wasn't made.
 
 ## WHAT THIS TARGETS (set expectations honestly)
 
