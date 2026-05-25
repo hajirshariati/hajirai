@@ -93,6 +93,29 @@
     ]
   },
   {
+    "name": "variant color facts survive color-filtered search",
+    "turns": [
+      {
+        "user": "show me white men's sneakers",
+        "expect": {
+          "products": {
+            "min": 1,
+            "allTitleOrHandleMustMatch": "sneaker|dash|chase|white"
+          }
+        }
+      },
+      {
+        "user": "are there other colors?",
+        "expect": {
+          "text": {
+            "mustInclude": ["black", "navy", "silver"],
+            "mustNotInclude": ["only white", "only available in white", "only comes in white", "no other colors"]
+          }
+        }
+      }
+    ]
+  },
+  {
     "name": "product cards mean no category-chip question",
     "turns": [
       {

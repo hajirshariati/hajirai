@@ -212,6 +212,32 @@ test("R13 — missing SKU strip repairs orphaned article", () => {
   assert.equal(out, "I don't see that in our catalog.");
 });
 
+test("R14 — color availability denial is repaired from variant facts", () => {
+  const out = reconcileProseToCards({
+    text: "These are only available in White.",
+    cards: [{
+      title: "Chase Arch Support Sneaker - White",
+      handle: "chase-white-am210m",
+      _attributes: { Color: "White", Category: "Sneakers", Gender: "Men" },
+      _variantFacts: {
+        availableColors: ["White", "Black", "Navy", "Silver"],
+        byColor: [
+          { color: "White" },
+          { color: "Black" },
+          { color: "Navy" },
+          { color: "Silver" },
+        ],
+      },
+    }],
+    ctx: { sessionMemory: { explicit: { gender: "men", category: "sneakers", color: "white" } } },
+  });
+  assert.equal(out.changed, true);
+  assert.equal(/only available|only white|no other colors/i.test(out.text), false);
+  assert.match(out.text, /Black/i);
+  assert.match(out.text, /Navy/i);
+  assert.match(out.text, /Silver/i);
+});
+
 if (failed > 0) {
   console.error("\nFailures:");
   for (const f of failures) console.error(`- ${f.name}: ${f.err.stack || f.err.message}`);

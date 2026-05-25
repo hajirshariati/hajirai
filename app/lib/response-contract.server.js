@@ -727,6 +727,95 @@ function cardColors(card) {
   return new Set(flattenValues(values).map(normalizeKnownTextColor).filter(Boolean));
 }
 
+function variantColorEntries(card) {
+  const facts = card?._variantFacts || card?.variantFacts || {};
+  const rawColors = [
+    facts.availableColors,
+    facts.colors,
+    ...(Array.isArray(facts.byColor) ? facts.byColor.map((entry) => entry?.color) : []),
+  ];
+  const entries = [];
+  const seen = new Set();
+  for (const raw of flattenValues(rawColors)) {
+    const display = String(raw || "").trim();
+    const normalized = normalizeKnownTextColor(display);
+    if (!display || !normalized || seen.has(normalized)) continue;
+    seen.add(normalized);
+    entries.push({ display, normalized });
+  }
+  return entries;
+}
+
+function formatDisplayList(items) {
+  const values = (Array.isArray(items) ? items : []).filter(Boolean);
+  if (values.length <= 1) return values[0] || "";
+  if (values.length === 2) return `${values[0]} and ${values[1]}`;
+  return `${values.slice(0, -1).join(", ")}, and ${values[values.length - 1]}`;
+}
+
+const NEGATIVE_COLOR_AVAILABILITY_RE =
+  /\b(?:only|just)\s+(?:comes?|available|offered|made|shown|stocked)?(?:\s+\w+){0,4}\s+in\s+[a-z][a-z\s-]{1,30}\b|\b(?:no|not any|none)\s+(?:other|additional|more)?\s*colou?rs?\b|\b(?:doesn'?t|does not|don'?t|do not|can'?t|cannot)\s+(?:come|offer|have|stock|carry|available)[^.!?]{0,100}\b(?:other|additional|more)?\s*colou?rs?\b/i;
+
+function colorAvailabilityCorrection(cards, ctx = {}) {
+  const requested = normalizeKnownTextColor(currentCatalogScopeFromContext(ctx).color);
+  const corrections = [];
+  const seen = new Set();
+
+  for (const card of Array.isArray(cards) ? cards : []) {
+    const colors = variantColorEntries(card);
+    if (colors.length <= 1) continue;
+    const otherColors = requested
+      ? colors.filter((entry) => entry.normalized !== requested)
+      : colors;
+    if (otherColors.length === 0) continue;
+    const key = `${card?.handle || card?.title || ""}:${otherColors.map((entry) => entry.normalized).join(",")}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const title = String(card?.title || "This style").replace(/\s+-\s+[^-]+$/, "").trim();
+    corrections.push(`${title} also comes in ${formatDisplayList(otherColors.map((entry) => entry.display))}.`);
+  }
+
+  return corrections.slice(0, 2).join(" ");
+}
+
+function hasNegativeColorAvailabilityClaim(sentence, cards) {
+  const s = String(sentence || "");
+  if (NEGATIVE_COLOR_AVAILABILITY_RE.test(s)) return true;
+  if (!/\bonly\b/i.test(s)) return false;
+  const colors = new Set();
+  for (const card of Array.isArray(cards) ? cards : []) {
+    for (const entry of variantColorEntries(card)) {
+      colors.add(entry.display);
+      colors.add(entry.normalized);
+    }
+  }
+  for (const color of colors) {
+    if (color && new RegExp(`\\b${escapeRegex(color)}\\b`, "i").test(s)) return true;
+  }
+  return false;
+}
+
+function repairColorAvailabilityClaims(text, cards, ctx = {}) {
+  if (!text || !Array.isArray(cards) || cards.length === 0) return { text, changed: false };
+  const correction = colorAvailabilityCorrection(cards, ctx);
+  if (!correction) return { text, changed: false };
+
+  let changed = false;
+  const sentences = sentenceSplit(text)
+    .map((sentence) => {
+      const s = sentence.trim();
+      if (!hasNegativeColorAvailabilityClaim(s, cards)) return s;
+      changed = true;
+      return correction;
+    })
+    .filter(Boolean);
+
+  return {
+    text: sentences.join(" ").replace(/\s{2,}/g, " ").trim(),
+    changed,
+  };
+}
+
 function cardsAllHaveFeature(cards, feature) {
   if (!Array.isArray(cards) || cards.length === 0) return false;
   return cards.every((card) => feature.re.test(cardTextForFacts(card)));
@@ -849,6 +938,7 @@ export function reconcileProseToCards({ text, cards = [], ctx = {} } = {}) {
   for (const step of [
     ["count", (value) => repairCountClaim(value, cards)],
     ["closest_color", (value) => repairClosestColorClaim(value, cards, ctx)],
+    ["color_availability", (value) => repairColorAvailabilityClaims(value, cards, ctx)],
     ["unsupported_promise", removeUngroundedPromises],
     ["feature_claim", (value) => repairFeatureClaims(value, cards)],
   ]) {
@@ -968,7 +1058,7 @@ export function prepareProductCardsForTurn(cards = []) {
       genderCounts.set(card._gender, (genderCounts.get(card._gender) || 0) + 1);
     }
 
-    const { _descriptionSnippet, _searchQuery, _category, _gender, _attributes, ...publicCard } = card;
+    const { _descriptionSnippet, _searchQuery, _category, _gender, _attributes, _variantFacts, ...publicCard } = card;
     products.push(publicCard);
   }
 

@@ -12,7 +12,7 @@ export const TOOLS = [
   {
     name: "search_products",
     description:
-      "Search the merchant's product catalog by keyword. Returns products matching the query across title, vendor, product type, tags, and description. Use filters to narrow by attributes the merchant has configured (e.g. gender, color, material).",
+      "Search the merchant's product catalog by keyword. Returns products matching the query across title, vendor, product type, tags, and description. Use filters to narrow by attributes the merchant has configured (e.g. gender, color, material). Each product also includes a compact variantFacts summary of all available colors, sizes, and widths for that product; use those facts for variant-range questions instead of assuming the filtered search pool is the full color/size range.",
     input_schema: {
       type: "object",
       properties: {
@@ -46,7 +46,7 @@ export const TOOLS = [
   {
     name: "get_product_details",
     description:
-      "Fetch full details for a single product, including all variants, prices, options, and any CSV-enriched data (materials, care, fit notes, etc.). Use this when the customer asks about a specific product or you want to answer a detail question authoritatively.",
+      "Fetch full details for a single product, including all variants, prices, options, available colors/sizes/widths, and any CSV-enriched data (materials, care, fit notes, etc.). Use this when the customer asks about a specific product or any color, size, width, option, variant, fit, or stock detail question authoritatively.",
     input_schema: {
       type: "object",
       properties: {

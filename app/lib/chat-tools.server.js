@@ -93,6 +93,103 @@ function priceRange(variants) {
   return min === max ? fmt(min) : `${fmt(min)}–${fmt(max)}`;
 }
 
+function displayValues(value) {
+  if (value == null || value === "") return [];
+  if (Array.isArray(value)) return value.flatMap(displayValues);
+  if (typeof value === "object") return Object.values(value).flatMap(displayValues);
+  return String(value)
+    .split(/\s*,\s*/)
+    .map((v) => v.trim())
+    .filter(Boolean);
+}
+
+function uniqueDisplayValues(values) {
+  const seen = new Set();
+  const out = [];
+  for (const value of displayValues(values)) {
+    const key = value.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(value);
+  }
+  return out;
+}
+
+function variantIsAvailableForFacts(variant) {
+  return variant?.inventoryQty == null || Number(variant.inventoryQty) > 0;
+}
+
+function variantColorValues(variant) {
+  const options = safeParseJson(variant?.optionsJson) || {};
+  const attrs = variant?.attributesJson || {};
+  return uniqueDisplayValues([
+    readAttributeCI(options, ["Color", "Colour", "color", "colour", "color_family", "Color Family"]),
+    readAttributeCI(attrs, ["Color", "Colour", "color", "colour", "color_family", "Color Family", "color_fallback"]),
+  ]);
+}
+
+function productColorValues(product) {
+  const attrs = product?.attributesJson || product?.attributes || {};
+  return uniqueDisplayValues([
+    readAttributeCI(attrs, ["Color", "Colour", "color", "colour", "color_family", "Color Family", "color_fallback"]),
+  ]);
+}
+
+function productVariantFacts(product) {
+  const variants = Array.isArray(product?.variants) ? product.variants : [];
+  const availableVariants = variants.filter(variantIsAvailableForFacts);
+  const byColor = new Map();
+
+  for (const variant of availableVariants) {
+    const colors = variantColorValues(variant);
+    for (const color of colors) {
+      const key = color.toLowerCase();
+      if (!byColor.has(key)) {
+        byColor.set(key, {
+          color,
+          sizes: new Set(),
+          widths: new Set(),
+        });
+      }
+      const bucket = byColor.get(key);
+      const size = normalizedVariantSize(variant);
+      const width = normalizedVariantWidth(variant);
+      if (size) bucket.sizes.add(size);
+      if (width) bucket.widths.add(width);
+    }
+  }
+
+  if (byColor.size === 0) {
+    for (const color of productColorValues(product)) {
+      const key = color.toLowerCase();
+      if (!byColor.has(key)) {
+        byColor.set(key, { color, sizes: new Set(), widths: new Set() });
+      }
+    }
+  }
+
+  const colors = Array.from(byColor.values()).map((entry) => entry.color);
+  const summary = {
+    variantCount: variants.length,
+    inStockVariantCount: availableVariants.length,
+    availableColors: colors,
+    availableSizes: inStockSizes(product),
+    availableWidths: inStockWidths(product),
+    byColor: Array.from(byColor.values()).map((entry) => ({
+      color: entry.color,
+      sizes: Array.from(entry.sizes),
+      widths: Array.from(entry.widths),
+    })),
+  };
+
+  return Object.fromEntries(
+    Object.entries(summary).filter(([, value]) => {
+      if (Array.isArray(value)) return value.length > 0;
+      return value != null;
+    }),
+  );
+}
+
 function truncate(s, n) {
   if (!s) return "";
   if (s.length <= n) return s;
@@ -1258,6 +1355,7 @@ const isExcludedByRule = (p) => {
       descriptionSnippet: descriptionSnippet(p.description, q, 280),
       priceRange: priceRange(availableVariantsForScope(p, variantScope)),
       variantCount: (p.variants || []).length,
+      variantFacts: productVariantFacts(p),
       url: productUrl(shop, p.handle),
       image: p.featuredImageUrl || undefined,
       price: firstPrice(availableVariantsForScope(p, variantScope)) || undefined,
@@ -1303,6 +1401,7 @@ async function getProductDetails({ handle }, { shop }) {
     compareAtPrice: firstAvailable?.compareAtPrice || undefined,
     availableSizes: availableSizes.length > 0 ? availableSizes : undefined,
     availableWidths: availableWidths.length > 0 ? availableWidths : undefined,
+    variantFacts: productVariantFacts(product),
     variants: product.variants.map((v) => ({
       sku: v.sku || undefined,
       title: v.title || undefined,
@@ -1541,6 +1640,7 @@ async function findSimilarProducts({ handle, limit, priceMax, query }, { shop, d
       attributes: p.attributesJson || undefined,
       priceRange: priceRange(availableVariantsForScope(p)),
       variantCount: (p.variants || []).length,
+      variantFacts: productVariantFacts(p),
       url: productUrl(shop, p.handle),
       image: p.featuredImageUrl || undefined,
       price: firstPrice(availableVariantsForScope(p)) || undefined,
@@ -2231,6 +2331,7 @@ export function extractProductCards(name, result) {
       _category: categoryFromAttrs(p),
       _gender: genderFromAttrs(p),
       _attributes: p.attributes || {},
+      _variantFacts: p.variantFacts || {},
     }));
   }
   if (name === "find_similar_products" && Array.isArray(result.products)) {
@@ -2247,6 +2348,7 @@ export function extractProductCards(name, result) {
       _category: categoryFromAttrs(p),
       _gender: genderFromAttrs(p),
       _attributes: p.attributes || {},
+      _variantFacts: p.variantFacts || {},
     }));
   }
   if (name === "get_product_details" && result.handle) {
@@ -2259,6 +2361,8 @@ export function extractProductCards(name, result) {
       compare_at_price: result.compareAtPrice ? Math.round(parseFloat(result.compareAtPrice) * 100) : undefined,
       _category: categoryFromAttrs(result),
       _gender: genderFromAttrs(result),
+      _attributes: result.attributes || {},
+      _variantFacts: result.variantFacts || {},
     }];
   }
   if (name === "lookup_sku" && Array.isArray(result.found)) {
