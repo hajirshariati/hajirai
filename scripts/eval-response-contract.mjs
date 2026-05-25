@@ -3,7 +3,7 @@ import {
   filterProductCardsToCatalogScope,
   ensureCompleteCustomerText,
   productPoolSatisfiesCatalogScope,
-  reconcileProseToCards,
+  buildCodeOwnedProductListingText,
   repairProductTurnAssembly,
   repairProductResponseText,
   stripMissingSkus,
@@ -132,43 +132,50 @@ test("R6 — scoped card filter keeps same-category alternatives when exact colo
   assert.equal(scoped.enforcedColor, false);
 });
 
-test("R7 — prose reconciliation corrects card-count claims", () => {
-  const cards = [
-    { title: "Danika Arch Support Sneaker - Pink", _attributes: { Color: "Pink" } },
-    { title: "Kinsley Arch Support Sneaker - Pink", _attributes: { Color: "Pink" } },
-    { title: "Xspress Runner 2 Sneaker - Pink", _attributes: { Color: "Pink" } },
-  ];
-  const out = reconcileProseToCards({
-    text: "Here are four pink women's sneakers to choose from.",
-    cards,
-    ctx: { sessionMemory: { explicit: { gender: "women", category: "sneakers", color: "pink" } } },
-  });
-  assert.equal(out.changed, true);
-  assert.match(out.text, /three pink women's sneakers/i);
-});
-
-test("R8 — prose reconciliation does not call an actual purple card closest-to-purple", () => {
-  const out = reconcileProseToCards({
-    text: "The Dani Arch Support Sneaker - Eggplant is the closest match to purple.",
-    cards: [{ title: "Dani Arch Support Sneaker - Eggplant", _attributes: { Color: "Eggplant" } }],
-    ctx: { sessionMemory: { explicit: { gender: "women", category: "sneakers", color: "purple" } } },
-  });
-  assert.equal(out.changed, true);
-  assert.equal(/closest match to purple/i.test(out.text), false);
-  assert.match(out.text, /purple option/i);
-});
-
-test("R9 — prose reconciliation removes ungrounded universal feature claims", () => {
-  const out = reconcileProseToCards({
-    text: "Here are two pink sandals. They all have waterproof protection.",
+test("R7 — listing text is code-owned and strips checkable claims", () => {
+  const out = buildCodeOwnedProductListingText({
+    text: "Here are six pink women's sandals, all with arch support and under $80.",
     cards: [
-      { title: "Vicki Braided Thong Sandal - Pink", _attributes: { Color: "Pink" } },
-      { title: "Jillian Sport Sandal - Blush", _attributes: { Color: "Pink" } },
+      { title: "Vicki Braided Thong Sandal - Light Pink Gloss", _gender: "women", _category: "sandals", _attributes: { Color: "Pink" } },
+      { title: "Jillian Sport Sandal - Shimmer Blush", _gender: "women", _category: "sandals", _attributes: { Color: "Pink" } },
     ],
-    ctx: { sessionMemory: { explicit: { gender: "women", category: "sandals", color: "pink" } } },
+    ctx: { latestUserMessage: "show me pink sandals", sessionMemory: { explicit: { gender: "women", category: "sandals", color: "pink" } } },
   });
   assert.equal(out.changed, true);
-  assert.equal(/waterproof/i.test(out.text), false);
+  assert.match(out.text, /pink women's sandals/i);
+  assert.doesNotMatch(out.text, /\b(?:six|two|all|both|every|under|\$|arch support|size)\b/i);
+});
+
+test("R8 — relaxed color listing line tells the truth", () => {
+  const out = buildCodeOwnedProductListingText({
+    text: "Here are brown men's sneakers.",
+    cards: [
+      { title: "Chase Arch Support Sneaker - Silver", _gender: "men", _category: "sneakers", _attributes: { Color: "Silver" } },
+      { title: "Dash Arch Support Men's Sneaker - Black", _gender: "men", _category: "sneakers", _attributes: { Color: "Black" } },
+    ],
+    ctx: { latestUserMessage: "do you have brown sneakers for men?", sessionMemory: { explicit: { gender: "men", category: "sneakers", color: "brown" } } },
+  });
+  assert.equal(out.changed, true);
+  assert.match(out.text, /couldn'?t find brown men's sneakers/i);
+  assert.match(out.text, /other colors/i);
+  assert.doesNotMatch(out.text, /^here are (?:the )?brown/i);
+});
+
+test("R9 — direct variant fact questions keep LLM text path", () => {
+  const text = "Chase also comes in black, navy, and silver.";
+  const out = buildCodeOwnedProductListingText({
+    text,
+    cards: [{
+      title: "Chase Arch Support Sneaker - White",
+      _gender: "men",
+      _category: "sneakers",
+      _attributes: { Color: "White" },
+      _variantFacts: { availableColors: ["White", "Black", "Navy", "Silver"] },
+    }],
+    ctx: { latestUserMessage: "are there other colors?", sessionMemory: { explicit: { gender: "men", category: "sneakers", color: "white" } } },
+  });
+  assert.equal(out.changed, false);
+  assert.equal(out.text, text);
 });
 
 test("R10 — coherence guard trims dangling strip-chain fragments", () => {
@@ -180,43 +187,15 @@ test("R10 — coherence guard trims dangling strip-chain fragments", () => {
   assert.match(out.text, /medium width\./i);
 });
 
-test("R11 — feature repair preserves the scoped product intro", () => {
-  const out = reconcileProseToCards({
-    text: "Here are women's black sandals with waterproof protection and arch support.",
-    cards: [
-      { title: "Jess Adjustable Quarter Strap Sandal - Black Sparkle", _attributes: { Color: "Black", Category: "Sandals", Gender: "Women" } },
-      { title: "Charli Thong Sandal - Black", _attributes: { Color: "Black", Category: "Sandals", Gender: "Women" } },
-    ],
-    ctx: { sessionMemory: { explicit: { gender: "women", category: "sandals", color: "black" } } },
-  });
-  assert.equal(out.changed, true);
-  assert.match(out.text, /women's black sandals/i);
-  assert.equal(/waterproof|arch support/i.test(out.text), false);
-});
-
-test("R12 — feature repair does not clip hyphenated color phrasing", () => {
-  const out = reconcileProseToCards({
-    text: "Here are some pink and warm-toned women's sandals with arch support.",
-    cards: [
-      { title: "Vicki Braided Thong Sandal - Light Pink Gloss", _attributes: { Color: "Pink", Category: "Sandals", Gender: "Women" } },
-      { title: "Jillian Sport Sandal - Shimmer Blush", _attributes: { Color: "Pink", Category: "Sandals", Gender: "Women" } },
-    ],
-    ctx: { sessionMemory: { explicit: { gender: "women", category: "sandals", color: "pink" } } },
-  });
-  assert.equal(out.changed, true);
-  assert.match(out.text, /warm-toned women's sandals/i);
-  assert.equal(/arch support/i.test(out.text), false);
-});
-
-test("R13 — missing SKU strip repairs orphaned article", () => {
+test("R11 — missing SKU strip repairs orphaned article", () => {
   const out = stripMissingSkus("I don't see an L9999 in our catalog.", ["L9999"]);
   assert.equal(out, "I don't see that in our catalog.");
 });
 
-test("R14 — color availability denial is repaired from variant facts", () => {
-  const out = reconcileProseToCards({
+test("R12 — color availability denial is repaired from variant facts", () => {
+  const out = repairProductTurnAssembly({
     text: "These are only available in White.",
-    cards: [{
+    pool: [{
       title: "Chase Arch Support Sneaker - White",
       handle: "chase-white-am210m",
       _attributes: { Color: "White", Category: "Sneakers", Gender: "Men" },
@@ -239,10 +218,10 @@ test("R14 — color availability denial is repaired from variant facts", () => {
   assert.match(out.text, /Silver/i);
 });
 
-test("R15 — vague color-range promise is completed from variant facts", () => {
-  const out = reconcileProseToCards({
+test("R13 — direct color-range answer is completed from variant facts", () => {
+  const out = repairProductTurnAssembly({
     text: "Both styles come in quite a range of colors. Here's what's available for each.",
-    cards: [{
+    pool: [{
       title: "Chase Arch Support Sneaker - White",
       handle: "chase-white-am210m",
       _attributes: { Color: "White", Category: "Sneakers", Gender: "Men" },
@@ -251,7 +230,7 @@ test("R15 — vague color-range promise is completed from variant facts", () => 
         styleAvailableColors: ["White", "Black", "Navy", "Silver"],
       },
     }],
-    ctx: { sessionMemory: { explicit: { gender: "men", category: "sneakers", color: "white" } } },
+    ctx: { latestUserMessage: "are there other colors?", sessionMemory: { explicit: { gender: "men", category: "sneakers", color: "white" } } },
   });
   assert.equal(out.changed, true);
   assert.match(out.text, /Black/i);
@@ -259,20 +238,7 @@ test("R15 — vague color-range promise is completed from variant facts", () => 
   assert.match(out.text, /Silver/i);
 });
 
-test("R16 — generic product fallback is rewritten with scoped facts", () => {
-  const out = reconcileProseToCards({
-    text: "Here are the matching styles I found.",
-    cards: [
-      { title: "Vicki Braided Thong Sandal - Light Pink Gloss", _gender: "women", _category: "sandals", _attributes: { Color: "Pink" } },
-      { title: "Jillian Sport Sandal - Shimmer Blush", _gender: "women", _category: "sandals", _attributes: { Color: "Pink" } },
-    ],
-    ctx: { sessionMemory: { explicit: { gender: "women", category: "sandals", color: "pink" } } },
-  });
-  assert.equal(out.changed, true);
-  assert.match(out.text, /pink women's sandals/i);
-});
-
-test("R17 — product pitch without cards is repaired before emit", () => {
+test("R14 — product pitch without cards is repaired before emit", () => {
   const out = createTurnResult({
     text: "Take a look — these are the closest matches I've got.",
     products: [],

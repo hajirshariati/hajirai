@@ -637,17 +637,6 @@ export function deriveProductResponseContract({ pool = [], ctx = {}, relaxedFilt
 const PRODUCT_INTRO_RE = /\b(?:here (?:are|is)|take a look|check out|i found|we have|these are|this is|good news|great news|closest options|matching styles)\b/i;
 const CLARIFYING_LEAD_RE = /^\s*(?:what|which)\s+(?:type|kind|style|category)\s+of\s+[^?]{1,160}\?\s*/i;
 const GENDER_CLARIFYING_LEAD_RE = /^\s*(?:is this|are these|who (?:is|are) (?:this|these)|would this be)\s+[^?]{0,120}\?\s*/i;
-const NUMBER_WORDS = new Map([
-  ["one", 1], ["two", 2], ["three", 3], ["four", 4], ["five", 5],
-  ["six", 6], ["seven", 7], ["eight", 8], ["nine", 9], ["ten", 10],
-]);
-const COUNT_LABELS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
-const FEATURE_ALIASES = [
-  { name: "arch support", re: /\b(?:arch support|orthotic support|built-in support)\b/i },
-  { name: "waterproof", re: /\b(?:waterproof|water-resistant|water resistant)\b/i },
-  { name: "cushioning", re: /\b(?:ultrasky|cushioning|cushioned)\b/i },
-  { name: "memory foam", re: /\bmemory foam\b/i },
-];
 
 function stripChoiceButtons(text) {
   return String(text || "")
@@ -667,6 +656,22 @@ export function repairProductTurnAssembly({ text, pool = [], ctx = {}, relaxedFi
     nextText = denialRepair.text;
     changed = true;
     logs.push("stripped_contradictory_denial");
+  }
+
+  const colorRepair = repairColorAvailabilityClaims(nextText, pool, ctx);
+  if (colorRepair.changed) {
+    nextText = colorRepair.text;
+    changed = true;
+    logs.push("verified_color_availability");
+  }
+
+  if (isDirectProductFactQuestion(ctx?.latestUserMessage)) {
+    const colorRangeRepair = repairColorRangePromises(nextText, pool, ctx);
+    if (colorRangeRepair.changed) {
+      nextText = colorRangeRepair.text;
+      changed = true;
+      logs.push("completed_color_range_from_facts");
+    }
   }
 
   if (Array.isArray(pool) && pool.length > 0 && extractTurnChips(nextText).length > 0) {
@@ -706,17 +711,6 @@ function sentenceSplit(text) {
     .replace(/(\d)\.(\d)/g, `$1${decimalToken}$2`);
   return (protectedText.match(/[^.!?]+[.!?]?/g) || [])
     .map((sentence) => sentence.replaceAll(decimalToken, "."));
-}
-
-function cardTextForFacts(card) {
-  const attrs = flattenValues(card?._attributes || card?.attributes || {});
-  return [
-    card?.title,
-    card?.productType,
-    card?._category,
-    card?._descriptionSnippet,
-    ...attrs,
-  ].filter(Boolean).join(" ").toLowerCase();
 }
 
 function cardColors(card) {
@@ -844,11 +838,6 @@ function repairColorRangePromises(text, cards, ctx = {}) {
   return { text: next, changed: next !== text };
 }
 
-function cardsAllHaveFeature(cards, feature) {
-  if (!Array.isArray(cards) || cards.length === 0) return false;
-  return cards.every((card) => feature.re.test(cardTextForFacts(card)));
-}
-
 function normalizeKnownTextColor(value) {
   const normalized = normalizeColor(value);
   if (normalized) return normalized;
@@ -856,163 +845,128 @@ function normalizeKnownTextColor(value) {
   return null;
 }
 
-function productCountWord(count) {
-  return COUNT_LABELS[count] || String(count);
+const DIRECT_PRODUCT_FACT_RE =
+  /\b(?:what|which)\s+(?:colou?rs?|colorways?|sizes?|widths?|materials?|price|prices)\b|\b(?:other|more|different)\s+colou?rs?\b|\b(?:come|comes)\s+in\b|\b(?:available|in\s+stock)\s+(?:in\s+)?(?:size|width|\d)|\b(?:do|does|can|are|is)\s+(?:it|this|that|they|these|those|the\s+[\w'-]+)[^?]{0,90}\b(?:colou?rs?|colorways?|sizes?|widths?|wide|narrow|available|in\s+stock|waterproof|material|price)\b/i;
+
+export function isDirectProductFactQuestion(message = "") {
+  const text = String(message || "").trim();
+  if (!text) return false;
+  return DIRECT_PRODUCT_FACT_RE.test(text);
 }
 
-function repairCountClaim(text, cards) {
-  const count = Array.isArray(cards) ? cards.length : 0;
-  if (!text || count <= 0) return { text, changed: false };
-  let changed = false;
-  const countRe = /\b(one|two|three|four|five|six|seven|eight|nine|ten|\d{1,2})\b(?=(?:\s+(?:great|lovely|matching|closest|pink|black|white|brown|purple|men'?s|women'?s)){0,4}\s+(?:options?|styles?|pairs?|sneakers?|sandals?|boots?|loafers?|clogs?|wedges?|heels?|orthotics?|slides?))/gi;
-  const next = text.replace(countRe, (raw) => {
-    const stated = /^\d+$/.test(raw) ? Number(raw) : NUMBER_WORDS.get(raw.toLowerCase());
-    if (!stated || stated === count) return raw;
-    changed = true;
-    return productCountWord(count);
-  });
-  return { text: next, changed };
+function cardGender(card) {
+  return normalizeGender(card?._gender) ||
+    normalizeGender(cardAttr(card, ["gender", "gender_fallback", "genders"]));
 }
 
-function repairClosestColorClaim(text, cards, ctx = {}) {
-  const requested = normalizeKnownTextColor(currentCatalogScopeFromContext(ctx).color);
-  if (!text || !requested || !Array.isArray(cards) || cards.length === 0) {
-    return { text, changed: false };
-  }
-  const hasRequested = cards.some((card) => cardColors(card).has(requested));
-  if (!hasRequested) return { text, changed: false };
-  const re = new RegExp(`\\b(?:closest\\s+(?:match|matches|option|options)\\s+(?:to|for)|closest\\s+to)\\s+${escapeRegex(requested)}\\b`, "gi");
-  const next = text.replace(re, `${requested} option`);
-  return { text: next, changed: next !== text };
-}
-
-function removeUngroundedPromises(text) {
-  const sentences = sentenceSplit(text);
-  let changed = false;
-  const kept = sentences.filter((sentence) => {
-    const s = sentence.trim();
-    if (/\b(?:breakdown|stock status|availability status|for each style|for each option)\b/i.test(s)) {
-      changed = true;
-      return false;
-    }
-    if (/\b(?:here are|a couple of|two|several)\s+ways to save\b/i.test(s) && !/discount|sale|clearance|reward|code|promo/i.test(s.replace(/\bways to save\b/i, ""))) {
-      changed = true;
-      return false;
-    }
-    return true;
-  });
-  return { text: kept.join(" ").replace(/\s{2,}/g, " ").trim(), changed };
-}
-
-function cleanSentenceAfterRepair(sentence) {
-  const next = String(sentence || "")
-    .replace(/\s+([,.!?;:])/g, "$1")
-    .replace(/\s{2,}/g, " ")
-    .replace(/\s+[—–-]\s*$/g, "")
-    .replace(/[\s,;:—–-]+$/g, "")
-    .trim();
-  if (!next) return "";
-  return /[.!?]$/.test(next) ? next : `${next}.`;
-}
-
-function stripUnsupportedFeatureFromSentence(sentence, feature) {
-  let next = String(sentence || "").trim();
-  next = next.replace(new RegExp(`\\s*[—–]\\s*[^.!?]*${feature.re.source}[^.!?]*`, "i"), "");
-  next = next.replace(new RegExp(`,\\s*(?:all|both|every|each|these|they|the options|the styles)[^.!?]*${feature.re.source}[^.!?]*`, "i"), "");
-  next = next.replace(new RegExp(`\\s+with\\s+[^,.!?;—–-]*${feature.re.source}[^,.!?;—–-]*`, "i"), "");
-  next = next.replace(new RegExp(`\\s*,?\\s*(?:all|both|every|each|these|they|the options|the styles)\\s+(?:are|have|feature|features|include|includes|come|offer)[^.!?]*${feature.re.source}[^.!?]*`, "i"), "");
-  return cleanSentenceAfterRepair(next);
-}
-
-function repairFeatureClaims(text, cards) {
-  if (!text || !Array.isArray(cards) || cards.length === 0) return { text, changed: false };
-  let changed = false;
-  const sentences = [];
-  for (const sentence of sentenceSplit(text)) {
-    let s = sentence.trim();
-    for (const feature of FEATURE_ALIASES) {
-      if (!feature.re.test(s)) continue;
-      const broadClaim = /\b(?:all|both|every|each|these|they|the options|the styles)\b/i.test(s) ||
-        /\b(?:here are|we have|i found|matching styles|options?)\b/i.test(s);
-      if (broadClaim && !cardsAllHaveFeature(cards, feature)) {
-        const repaired = stripUnsupportedFeatureFromSentence(s, feature);
-        changed = true;
-        s = repaired;
-      }
-    }
-    if (s) sentences.push(s);
-  }
-  return { text: sentences.join(" ").replace(/\s{2,}/g, " ").trim(), changed };
-}
-
-function dominantNormalizedValue(cards = [], extractor) {
-  const counts = new Map();
-  for (const card of Array.isArray(cards) ? cards : []) {
-    const value = extractor(card);
-    if (!value) continue;
-    counts.set(value, (counts.get(value) || 0) + 1);
-  }
-  if (counts.size === 0) return "";
-  return [...counts.entries()].sort((a, b) => b[1] - a[1])[0][0];
-}
-
-function fallbackProductIntro(ctx = {}, cards = []) {
-  const scope = currentCatalogScopeFromContext(ctx);
-  const dominantColor = scope.color || dominantNormalizedValue(cards, (card) => {
-    const colors = cardColors(card);
-    return colors.size === 1 ? [...colors][0] : "";
-  });
-  const dominantGender = scope.gender || dominantNormalizedValue(cards, (card) =>
-    normalizeGender(card?._gender) || normalizeGender(cardAttr(card, ["gender", "gender_fallback", "genders"])),
-  );
-  const dominantCategory = scope.category || dominantNormalizedValue(cards, (card) =>
-    normalizeCategory(card?._category) ||
+function cardCategory(card) {
+  return normalizeCategory(card?._category) ||
     normalizeCategory(card?.productType) ||
-    normalizeCategory(cardAttr(card, ["category", "category_for_filter", "subcategory", "product_type"])),
-  );
-  const parts = [];
-  if (dominantColor) parts.push(dominantColor);
-  if (dominantGender) parts.push(dominantGender === "men" ? "men's" : dominantGender === "women" ? "women's" : dominantGender);
-  if (dominantCategory) parts.push(dominantCategory);
-  return parts.length > 0
-    ? `Here are the ${parts.join(" ")} I found.`
-    : "Here are the matching styles I found.";
+    normalizeCategory(cardAttr(card, ["category", "category_for_filter", "subcategory", "product_type"]));
 }
 
-function repairGenericProductIntro(text, cards, ctx = {}) {
-  if (!text || !Array.isArray(cards) || cards.length === 0) return { text, changed: false };
-  if (!/^\s*here are (?:the )?(?:matching styles|matching options|styles|options|products) i found\.?\s*$/i.test(text)) {
-    return { text, changed: false };
-  }
-  const next = fallbackProductIntro(ctx, cards);
-  return { text: next, changed: next !== text };
+function allCardsMatch(cards = [], predicate) {
+  return Array.isArray(cards) && cards.length > 0 && cards.every(predicate);
 }
 
-export function reconcileProseToCards({ text, cards = [], ctx = {} } = {}) {
-  if (!text || !Array.isArray(cards) || cards.length === 0) {
-    return { text, changed: false, logs: [] };
-  }
-  let next = String(text || "").trim();
-  const logs = [];
+function commonCardValue(cards = [], getter) {
+  const values = (Array.isArray(cards) ? cards : [])
+    .map(getter)
+    .filter(Boolean);
+  if (values.length === 0 || values.length !== cards.length) return "";
+  return values.every((v) => v === values[0]) ? values[0] : "";
+}
 
-  for (const step of [
-    ["count", (value) => repairCountClaim(value, cards)],
-    ["closest_color", (value) => repairClosestColorClaim(value, cards, ctx)],
-    ["color_availability", (value) => repairColorAvailabilityClaims(value, cards, ctx)],
-    ["color_range", (value) => repairColorRangePromises(value, cards, ctx)],
-    ["unsupported_promise", removeUngroundedPromises],
-    ["feature_claim", (value) => repairFeatureClaims(value, cards)],
-    ["generic_intro", (value) => repairGenericProductIntro(value, cards, ctx)],
-  ]) {
-    const [label, fn] = step;
-    const result = fn(next);
-    if (result.changed) {
-      next = result.text || fallbackProductIntro(ctx, cards);
-      logs.push(label);
+function displayGender(value) {
+  const gender = normalizeGender(value);
+  if (gender === "men") return "men's";
+  if (gender === "women") return "women's";
+  if (gender === "unisex") return "unisex";
+  return "";
+}
+
+function displayCategory(value) {
+  const category = normalizeCategory(value);
+  if (!category) return "";
+  if (category === "wedges-heels") return "wedges and heels";
+  if (category === "slip-ons") return "slip-ons";
+  if (category === "mary-janes") return "Mary Janes";
+  return category.replace(/-/g, " ");
+}
+
+function listingBaseLabel({ cards = [], ctx = {} } = {}) {
+  const scope = currentCatalogScopeFromContext(ctx);
+  const scopedGender = normalizeGender(scope.gender);
+  const scopedCategory = normalizeCategory(scope.category);
+  const gender = scopedGender && allCardsMatch(cards, (card) => {
+    const g = cardGender(card);
+    return !g || g === scopedGender || g === "unisex";
+  })
+    ? scopedGender
+    : commonCardValue(cards, cardGender);
+  const category = scopedCategory && allCardsMatch(cards, (card) => {
+    const c = cardCategory(card);
+    return !c || c === scopedCategory;
+  })
+    ? scopedCategory
+    : commonCardValue(cards, cardCategory);
+
+  const parts = [displayGender(gender), displayCategory(category)].filter(Boolean);
+  return parts.length > 0 ? parts.join(" ") : "styles";
+}
+
+function templateIndex(cards = [], base = "") {
+  const seed = `${base}:${cards.map((card) => card?.handle || card?.title || "").join("|")}`;
+  let hash = 0;
+  for (let i = 0; i < seed.length; i += 1) hash = (hash + seed.charCodeAt(i)) % 997;
+  return hash % 3;
+}
+
+function exactRequestedColorMatches(cards = [], requestedColor) {
+  const color = normalizeKnownTextColor(requestedColor);
+  if (!color || !Array.isArray(cards) || cards.length === 0) {
+    return { any: false, all: false };
+  }
+  const matches = cards.filter((card) => cardColors(card).has(color)).length;
+  return { any: matches > 0, all: matches === cards.length };
+}
+
+export function buildCodeOwnedProductListingText({ text = "", cards = [], ctx = {}, recommenderInvoked = false } = {}) {
+  if (!Array.isArray(cards) || cards.length === 0 || recommenderInvoked) {
+    return { text, changed: false, reason: "" };
+  }
+  if (isDirectProductFactQuestion(ctx?.latestUserMessage)) {
+    return { text, changed: false, reason: "direct_product_fact_question" };
+  }
+
+  const scope = currentCatalogScopeFromContext(ctx);
+  const base = listingBaseLabel({ cards, ctx });
+  const requestedColor = normalizeKnownTextColor(scope.color);
+  let next;
+
+  if (requestedColor) {
+    const colorMatch = exactRequestedColorMatches(cards, requestedColor);
+    if (colorMatch.all) {
+      next = `Here are the ${requestedColor} ${base} I found.`;
+    } else if (colorMatch.any) {
+      next = `Here are the ${requestedColor} and similar ${base} I found.`;
+    } else {
+      next = `I couldn't find ${requestedColor} ${base}, but here are ${base} in other colors.`;
     }
+  } else {
+    const templates = [
+      `Here are the ${base} I found.`,
+      `Found these ${base} for you.`,
+      `Here's what I found for ${base}.`,
+    ];
+    next = templates[templateIndex(cards, base)];
   }
 
-  return { text: next, changed: logs.length > 0, logs };
+  return {
+    text: next.replace(/\s{2,}/g, " ").trim(),
+    changed: next.trim() !== String(text || "").trim(),
+    reason: "code_owned_listing",
+  };
 }
 
 export function ensureCompleteCustomerText({ text, fallback = "Here are the matching styles I found." } = {}) {

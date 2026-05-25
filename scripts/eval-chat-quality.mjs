@@ -1871,11 +1871,12 @@ cases.push({
 });
 
 cases.push({
-  name: "turn-result: warns on pitch without products",
+  name: "turn-result: repairs pitch without products",
   run: () => {
     const result = createTurnResult({ text: "Here are some great options for you." });
     const warnings = validateTurnResult(result).map((w) => w.code);
-    assert.ok(warnings.includes("pitch_without_products"));
+    assert.ok(!warnings.includes("pitch_without_products"));
+    assert.ok(!/here are|options/i.test(result.text));
   },
 });
 

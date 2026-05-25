@@ -44,6 +44,7 @@ import {
   detectFalseCategoryDenial,
   detectFalseGenderCategoryAffirmation,
   dropSiblingCards,
+  buildCodeOwnedProductListingText,
   ensureProductTurnCards,
   extractCollectionCTA,
   extractGenericCTA,
@@ -52,7 +53,6 @@ import {
   currentCatalogScopeFromContext,
   ensureCompleteCustomerText,
   prepareProductCardsForTurn,
-  reconcileProseToCards,
   repairProductTurnAssembly,
   resolveProductTurnLink,
   scoreCardAgainstText,
@@ -1448,13 +1448,21 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   }
 
   if (pool.length > 0 && fullResponseText) {
-    const reconciled = reconcileProseToCards({ text: fullResponseText, cards: pool, ctx });
-    if (reconciled.changed) {
+    const listing = buildCodeOwnedProductListingText({
+      text: fullResponseText,
+      cards: pool,
+      ctx,
+      recommenderInvoked: recommenderInvokedThisTurn,
+    });
+    if (listing.changed) {
+      const before = fullResponseText;
+      fullResponseText = isCompoundPolicyProductQuestion(ctx.latestUserMessage)
+        ? `${listing.text} ${compoundPolicyFallbackText(ctx.latestUserMessage)}`
+        : listing.text;
       console.log(
-        `[chat] response-contract: reconciled prose to card facts (${reconciled.logs.join("+")}) ` +
-          `(${fullResponseText.length}→${reconciled.text.length} chars, pool=${pool.length})`,
+        `[chat] response-contract: code-owned product listing ` +
+          `(${before.length}→${fullResponseText.length} chars, pool=${pool.length}, reason=${listing.reason})`,
       );
-      fullResponseText = reconciled.text;
     }
   }
 

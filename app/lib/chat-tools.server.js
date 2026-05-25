@@ -2409,6 +2409,7 @@ export function extractProductCards(name, result) {
       _gender: genderFromAttrs(p),
       _attributes: p.attributes || {},
       _variantFacts: p.variantFacts || {},
+      _relaxedFilters: result.relaxedFilters || undefined,
     }));
   }
   if (name === "find_similar_products" && Array.isArray(result.products)) {
