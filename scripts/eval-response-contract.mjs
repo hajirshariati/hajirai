@@ -300,6 +300,48 @@ test("R14 — product pitch without cards is repaired before emit", () => {
   assert.match(out.text, /exact request/i);
 });
 
+test("R15 — broad browse text does not infer gender from an accidental card skew", () => {
+  const out = buildCodeOwnedProductListingText({
+    text: "Here are some women's shoes.",
+    cards: [
+      { title: "Women's Sandal - Black", _gender: "women", _category: "sandals" },
+      { title: "Women's Sneaker - Navy", _gender: "women", _category: "sneakers" },
+    ],
+    ctx: { latestUserMessage: "idk just show me some shoes", sessionMemory: { explicit: {} } },
+  });
+  assert.equal(out.changed, true);
+  assert.doesNotMatch(out.text, /women/i);
+  assert.match(out.text, /styles/i);
+});
+
+test("R16 — size and width scope require verified variant-matched cards", () => {
+  const cards = [
+    {
+      title: "Wide Verified Sneaker - Black",
+      _gender: "women",
+      _category: "sneakers",
+      _variantScope: { size: "9", width: "wide" },
+      _variantFacts: { availableSizes: ["9"], availableWidths: ["wide"] },
+    },
+    {
+      title: "Unverified Sneaker - Black",
+      _gender: "women",
+      _category: "sneakers",
+      _variantFacts: { availableSizes: ["9"], availableWidths: ["wide"] },
+    },
+  ];
+  const ctx = {
+    latestUserMessage: "do you have women's sneakers in size 9 wide?",
+    sessionMemory: { explicit: { gender: "women", category: "sneakers", size: "9", width: "wide" } },
+  };
+  const scoped = filterProductCardsToCatalogScope(cards, ctx);
+  assert.equal(scoped.products.length, 1);
+  assert.equal(scoped.products[0].title, "Wide Verified Sneaker - Black");
+
+  const out = buildCodeOwnedProductListingText({ text: "Here are women's sneakers.", cards: scoped.products, ctx });
+  assert.match(out.text, /size 9 and wide width available/i);
+});
+
 if (failed > 0) {
   console.error("\nFailures:");
   for (const f of failures) console.error(`- ${f.name}: ${f.err.stack || f.err.message}`);

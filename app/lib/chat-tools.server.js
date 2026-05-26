@@ -1395,6 +1395,7 @@ const isExcludedByRule = (p) => {
     query: q,
     count: filtered.length,
     filters: attrKeys.length > 0 ? attrFilters : undefined,
+    variantScope: hasVariantScope(variantScope) ? variantScope : undefined,
     relaxedFilters: relaxedFilters || undefined,
     matchContract: deriveCatalogMatchContract({
       products: filtered,
@@ -2409,6 +2410,7 @@ export function extractProductCards(name, result) {
       _gender: genderFromAttrs(p),
       _attributes: p.attributes || {},
       _variantFacts: p.variantFacts || {},
+      _variantScope: result.variantScope || undefined,
       _relaxedFilters: result.relaxedFilters || undefined,
     }));
   }

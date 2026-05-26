@@ -11,6 +11,11 @@ import {
 } from "./chat-postprocessing.js";
 import { sanitizeCtaLabel } from "./cta-label.server.js";
 import { buildStorefrontSearchCTA } from "./storefront-search-cta.server.js";
+import {
+  canonicalizeVariantConstraints,
+  normalizeVariantSize,
+  normalizeVariantWidth,
+} from "./variant-matcher.server.js";
 
 const SIBLING_GENERIC_WORDS = new Set([
   "the", "a", "an", "for", "and", "or", "in", "on", "with", "men", "mens",
@@ -415,6 +420,7 @@ export function productPoolSatisfiesCatalogScope(pool, scope = {}) {
     if (gender && cardGender && cardGender !== gender && cardGender !== "unisex") return false;
     if (category && cardCategory && cardCategory !== category) return false;
     if (color && !cardMatchesColor(card, color)) return false;
+    if (!cardVerifiedVariantScope(card, canonical)) return false;
     return true;
   });
 }
@@ -437,6 +443,39 @@ function cardMatchesCatalogScope(card, scope = {}, { enforceColor = true } = {})
   if (category && cardCategory && cardCategory !== category) return false;
   if (color && enforceColor && !cardMatchesColor(card, color)) return false;
   return true;
+}
+
+function cardVerifiedVariantScope(card, scope = {}) {
+  const canonical = canonicalizeVariantConstraints(scope);
+  if (!canonical.size && !canonical.width && !canonical.sku) return true;
+
+  const stamped = canonicalizeVariantConstraints(card?._variantScope || card?._matchedVariantScope || {});
+  if (canonical.sku && stamped.sku === canonical.sku) return true;
+  if (
+    canonical.size &&
+    stamped.size === canonical.size &&
+    (!canonical.width || stamped.width === canonical.width)
+  ) {
+    return true;
+  }
+  if (canonical.width && !canonical.size && stamped.width === canonical.width) return true;
+
+  const facts = card?._variantFacts || card?.variantFacts || {};
+  const sizes = flattenValues([facts.availableSizes, facts.sizes])
+    .map(normalizeVariantSize)
+    .filter(Boolean);
+  const widths = flattenValues([facts.availableWidths, facts.widths])
+    .map(normalizeVariantWidth)
+    .filter(Boolean);
+
+  const sizeOk = !canonical.size || sizes.includes(canonical.size);
+  const widthOk = !canonical.width || widths.includes(canonical.width);
+
+  // A size+width combination is only safe when the search/tool stamped the
+  // exact variant scope on the card. Separate size and width lists do not
+  // prove the same variant carries both.
+  if (canonical.size && canonical.width) return false;
+  return sizeOk && widthOk;
 }
 
 export function filterProductCardsToCatalogScope(pool = [], ctx = {}) {
@@ -478,6 +517,11 @@ export function filterProductCardsToCatalogScope(pool = [], ctx = {}) {
       filtered = semanticColor;
       enforcedColor = true;
     }
+  }
+
+  const variantScope = canonicalizeVariantConstraints(canonical);
+  if (variantScope.size || variantScope.width || variantScope.sku) {
+    filtered = filtered.filter((card) => cardVerifiedVariantScope(card, variantScope));
   }
 
   return {
@@ -913,14 +957,6 @@ function allCardsMatch(cards = [], predicate) {
   return Array.isArray(cards) && cards.length > 0 && cards.every(predicate);
 }
 
-function commonCardValue(cards = [], getter) {
-  const values = (Array.isArray(cards) ? cards : [])
-    .map(getter)
-    .filter(Boolean);
-  if (values.length === 0 || values.length !== cards.length) return "";
-  return values.every((v) => v === values[0]) ? values[0] : "";
-}
-
 function displayGender(value) {
   const gender = normalizeGender(value);
   if (gender === "men") return "men's";
@@ -947,16 +983,25 @@ function listingBaseLabel({ cards = [], ctx = {} } = {}) {
     return !g || g === scopedGender || g === "unisex";
   })
     ? scopedGender
-    : commonCardValue(cards, cardGender);
+    : "";
   const category = scopedCategory && allCardsMatch(cards, (card) => {
     const c = cardCategory(card);
     return !c || c === scopedCategory;
   })
     ? scopedCategory
-    : commonCardValue(cards, cardCategory);
+    : "";
 
   const parts = [displayGender(gender), displayCategory(category)].filter(Boolean);
   return parts.length > 0 ? parts.join(" ") : "styles";
+}
+
+function variantScopeLabel(scope = {}) {
+  const variant = canonicalizeVariantConstraints(scope);
+  const parts = [];
+  if (variant.size) parts.push(`size ${variant.size}`);
+  if (variant.width) parts.push(`${variant.width} width`);
+  if (variant.sku && parts.length === 0) parts.push(`SKU ${variant.sku.toUpperCase()}`);
+  return parts.length > 0 ? ` with ${formatDisplayList(parts)} available` : "";
 }
 
 function templateIndex(cards = [], base = "") {
@@ -994,24 +1039,25 @@ export function buildCodeOwnedProductListingText({ text = "", cards = [], ctx = 
   const scope = currentCatalogScopeFromContext(ctx);
   const base = listingBaseLabel({ cards, ctx });
   const requestedColor = normalizeKnownTextColor(scope.color);
+  const variantText = variantScopeLabel(scope);
   let next;
 
   if (requestedColor) {
     const colorMatch = exactRequestedColorMatches(cards, requestedColor);
     if (colorMatch.all) {
-      next = `Here are the ${requestedColor} ${base} I found.`;
+      next = `Here are the ${requestedColor} ${base}${variantText} I found.`;
     } else if (colorMatch.any) {
-      next = `Here are the ${requestedColor} and similar ${base} I found.`;
+      next = `Here are the ${requestedColor} and similar ${base}${variantText} I found.`;
     } else if (colorMatch.semanticAny) {
-      next = `I couldn't find exact ${requestedColor} ${base}, but here are ${base} in similar colors.`;
+      next = `I couldn't find exact ${requestedColor} ${base}, but here are ${base}${variantText} in similar colors.`;
     } else {
-      next = `I couldn't find ${requestedColor} ${base}, but here are ${base} in other colors.`;
+      next = `I couldn't find ${requestedColor} ${base}, but here are ${base}${variantText} in other colors.`;
     }
   } else {
     const templates = [
-      `Here are the ${base} I found.`,
-      `Found these ${base} for you.`,
-      `Here's what I found for ${base}.`,
+      `Here are the ${base}${variantText} I found.`,
+      `Found these ${base}${variantText} for you.`,
+      `Here's what I found for ${base}${variantText}.`,
     ];
     next = templates[templateIndex(cards, base)];
   }
