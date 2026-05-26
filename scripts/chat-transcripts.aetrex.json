@@ -587,5 +587,26 @@
         }
       }
     ]
+  },
+  {
+    "name": "a products-on-sale request shows products, not a promo-code deflection",
+    "turns": [
+      {
+        "user": "do you have any women's sandals on sale?",
+        "expect": {
+          "text": {
+            "mustNotInclude": [
+              "promo code",
+              "won't invent a code",
+              "current offer shown on",
+              "discount codes"
+            ]
+          },
+          "products": {
+            "min": 1
+          }
+        }
+      }
+    ]
   }
 ]

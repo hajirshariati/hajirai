@@ -283,7 +283,7 @@ async function dispatchTool(name, input, ctx) {
 // "I don't have info on bundle discounts" → AVAILABILITY_DENIAL_RE
 // matches "don't have" → recovery forces a product search and
 // shows random orthotic cards under a discount question.
-const POLICY_QUESTION_RE = /\b(discount|coupon|promo(?:tion)?|sale|deal|refund|return|exchange|warranty|guarantee|policy|polic(?:ies|y)|ship(?:ping|ment)?|deliver(?:y|ies)?|bundle|payment|installment|hours|track(?:ing)?|order (?:status|number|history)|account|sign\s*in|log\s*in|coupon|support\s+team|contact\s+(?:you|your|support|us|customer)|customer\s+service|gov\s*x|teacher\s+discount|military\s+discount|first\s+responder|nurse\s+discount|student\s+discount|senior\s+discount)\b/i;
+const POLICY_QUESTION_RE = /\b(discount|coupon|promo(?:tion)?|refund|return|exchange|warranty|guarantee|policy|polic(?:ies|y)|ship(?:ping|ment)?|deliver(?:y|ies)?|bundle|payment|installment|hours|track(?:ing)?|order (?:status|number|history)|account|sign\s*in|log\s*in|coupon|support\s+team|contact\s+(?:you|your|support|us|customer)|customer\s+service|gov\s*x|teacher\s+discount|military\s+discount|first\s+responder|nurse\s+discount|student\s+discount|senior\s+discount)\b/i;
 function isPolicyOrServiceQuestion(text) {
   return Boolean(text) && POLICY_QUESTION_RE.test(text);
 }
@@ -348,7 +348,7 @@ function shouldAttachProductCardsForTurn({ text, ctx, recommenderAskedForMoreInf
 
 function compoundPolicyFallbackText(latestMessage = "") {
   const latest = String(latestMessage || "");
-  if (/\b(discount|coupon|promo(?:tion)?|code|deal|sale|clearance|markdown|bundle)\b/i.test(latest)) {
+  if (/\b(discount|coupon|promo(?:tion)?\s*code|promo(?:tion)?|coupon\s*code|bundle)\b/i.test(latest)) {
     return "For discounts or promo codes, use the current offer shown on Aetrex.com or at checkout; I won't invent a code if one isn't verified.";
   }
   if (/\b(rewards?|loyalty|points?|vip|referral)\b/i.test(latest)) {
