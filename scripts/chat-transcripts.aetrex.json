@@ -559,19 +559,13 @@
     ]
   },
   {
-    "name": "single unanswered gender ask escapes on a tangential reply",
+    "name": "an unanswered clarifier escapes to products on a tangential reply",
     "turns": [
       {
         "user": "i need new shoes",
         "expect": {
           "products": {
             "max": 0
-          },
-          "chips": {
-            "mustIncludeAny": [
-              "Men's",
-              "Women's"
-            ]
           }
         }
       },
@@ -582,17 +576,13 @@
             "mustNotInclude": [
               "which styles would you like to browse",
               "men's or women's",
-              "are you shopping for"
+              "are you shopping for",
+              "what type of",
+              "what kind of"
             ]
           },
           "products": {
             "min": 1
-          },
-          "chips": {
-            "mustNotInclude": [
-              "Men's",
-              "Women's"
-            ]
           }
         }
       }
