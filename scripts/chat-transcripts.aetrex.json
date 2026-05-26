@@ -356,6 +356,26 @@
     ]
   },
   {
+    "name": "compound discount plus product request answers both clauses",
+    "turns": [
+      {
+        "user": "do you have any discount codes right now? also show me men's sneakers",
+        "expect": {
+          "text": {
+            "mustIncludeAny": ["discount", "promo", "code", "checkout", "offer"],
+            "mustInclude": ["sneaker"],
+            "mustNotInclude": ["tell me a bit more", "what type", "what kind"]
+          },
+          "products": {
+            "min": 1,
+            "allTitleOrHandleMustMatch": "sneaker|dash|graham|chase|drew|miles",
+            "allTitleOrHandleMustNotMatch": "sandal|orthotic|accessor"
+          }
+        }
+      }
+    ]
+  },
+  {
     "name": "pink sandal refinement never leaks sneakers",
     "turns": [
       {

@@ -161,6 +161,35 @@ test("R8 — relaxed color listing line tells the truth", () => {
   assert.doesNotMatch(out.text, /^here are (?:the )?brown/i);
 });
 
+test("R8b — listing line does not call family-color matches exact colors", () => {
+  const out = buildCodeOwnedProductListingText({
+    text: "Here are red women's sneakers.",
+    cards: [
+      { title: "Dani Arch Support Sneaker - Burgundy", _gender: "women", _category: "sneakers", _attributes: { Color: "Burgundy", color_family: "Red" } },
+      { title: "Runner Arch Support Sneaker - Terracotta", _gender: "women", _category: "sneakers", _attributes: { Color: "Terracotta", color_family: "Red" } },
+    ],
+    ctx: { latestUserMessage: "any in red?", sessionMemory: { explicit: { gender: "women", category: "sneakers", color: "red" } } },
+  });
+  assert.equal(out.changed, true);
+  assert.match(out.text, /couldn'?t find exact red women's sneakers/i);
+  assert.match(out.text, /similar colors/i);
+  assert.doesNotMatch(out.text, /^here are (?:the )?red/i);
+});
+
+test("R8c — listing line keeps exact named colors when present", () => {
+  const out = buildCodeOwnedProductListingText({
+    text: "I couldn't find black sandals.",
+    cards: [
+      { title: "Jess Adjustable Quarter Strap Sandal - Black Sparkle", _gender: "women", _category: "sandals", _attributes: { Color: "Black Sparkle" } },
+      { title: "Charli Thong Sandal - Black", _gender: "women", _category: "sandals", _attributes: { Color: "Black" } },
+    ],
+    ctx: { latestUserMessage: "black sandals?", sessionMemory: { explicit: { gender: "women", category: "sandals", color: "black" } } },
+  });
+  assert.equal(out.changed, true);
+  assert.match(out.text, /black women's sandals/i);
+  assert.doesNotMatch(out.text, /couldn'?t find/i);
+});
+
 test("R9 — direct variant fact questions keep LLM text path", () => {
   const text = "Chase also comes in black, navy, and silver.";
   const out = buildCodeOwnedProductListingText({

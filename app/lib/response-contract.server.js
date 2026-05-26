@@ -346,6 +346,13 @@ function cardAttr(card, aliases) {
   return readAttributeCI(card?._attributes || card?.attributes || {}, aliases);
 }
 
+function cardAttrValues(card, aliases) {
+  const bag = card?._attributes || card?.attributes || {};
+  return (Array.isArray(aliases) ? aliases : [])
+    .flatMap((alias) => flattenValues(readAttributeCI(bag, [alias])))
+    .filter(Boolean);
+}
+
 function cardMatchesColor(card, requestedColor) {
   const color = normalizeColor(requestedColor);
   if (!color) return true;
@@ -715,10 +722,35 @@ function sentenceSplit(text) {
 
 function cardColors(card) {
   const values = [
-    cardAttr(card, ["color", "colour", "color_family", "Color Family", "color_fallback"]),
+    cardAttrValues(card, ["color", "colour", "Color", "Colour", "color_family", "Color Family", "color_fallback"]),
     card?.title,
   ];
   return new Set(flattenValues(values).map(normalizeKnownTextColor).filter(Boolean));
+}
+
+function titleSuffixColorName(title) {
+  const match = String(title || "").match(/\s[-–—]\s*([^–—-]{2,48})$/);
+  return match ? match[1].trim() : "";
+}
+
+function cardLiteralColorNames(card) {
+  const facts = card?._variantFacts || card?.variantFacts || {};
+  const values = [
+    cardAttr(card, ["color", "colour", "color_family", "Color Family", "color_fallback"]),
+    facts.productAvailableColors,
+    titleSuffixColorName(card?.title),
+  ];
+  return flattenValues(values)
+    .map((value) => String(value || "").trim())
+    .filter(Boolean);
+}
+
+function literalColorNameMatches(display, requestedColor) {
+  const color = normalizeKnownTextColor(requestedColor);
+  if (!color) return false;
+  const value = String(display || "").toLowerCase().replace(/[_-]+/g, " ");
+  const aliases = color === "gray" ? ["gray", "grey"] : [color];
+  return aliases.some((alias) => new RegExp(`\\b${escapeRegex(alias)}\\b`, "i").test(value));
 }
 
 function variantColorEntries(card) {
@@ -925,10 +957,18 @@ function templateIndex(cards = [], base = "") {
 function exactRequestedColorMatches(cards = [], requestedColor) {
   const color = normalizeKnownTextColor(requestedColor);
   if (!color || !Array.isArray(cards) || cards.length === 0) {
-    return { any: false, all: false };
+    return { any: false, all: false, semanticAny: false, semanticAll: false };
   }
-  const matches = cards.filter((card) => cardColors(card).has(color)).length;
-  return { any: matches > 0, all: matches === cards.length };
+  const exactMatches = cards.filter((card) =>
+    cardLiteralColorNames(card).some((name) => literalColorNameMatches(name, color)),
+  ).length;
+  const semanticMatches = cards.filter((card) => cardColors(card).has(color)).length;
+  return {
+    any: exactMatches > 0,
+    all: exactMatches === cards.length,
+    semanticAny: semanticMatches > 0,
+    semanticAll: semanticMatches === cards.length,
+  };
 }
 
 export function buildCodeOwnedProductListingText({ text = "", cards = [], ctx = {}, recommenderInvoked = false } = {}) {
@@ -950,6 +990,8 @@ export function buildCodeOwnedProductListingText({ text = "", cards = [], ctx = 
       next = `Here are the ${requestedColor} ${base} I found.`;
     } else if (colorMatch.any) {
       next = `Here are the ${requestedColor} and similar ${base} I found.`;
+    } else if (colorMatch.semanticAny) {
+      next = `I couldn't find exact ${requestedColor} ${base}, but here are ${base} in similar colors.`;
     } else {
       next = `I couldn't find ${requestedColor} ${base}, but here are ${base} in other colors.`;
     }

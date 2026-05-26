@@ -291,10 +291,17 @@ const PRODUCT_SHOPPING_NOUN_RE = /\b(shoes?|footwear|sneakers?|sandals?|boots?|l
 const SHOPPING_ACTION_RE = /\b(show|find|have|carry|sell|stock|looking\s+for|look\s+for|need|want|recommend|browse|shop|any|options?|styles?)\b/i;
 const COMPOUND_JOINER_RE = /\b(?:and|also|plus|while|then|too|as\s+well)\b|[,;]\s*(?:and|also|plus)?\s*/i;
 
+function hasCompoundProductAsk(text) {
+  const value = String(text || "");
+  if (!PRODUCT_SHOPPING_NOUN_RE.test(value)) return false;
+  if (SHOPPING_ACTION_RE.test(value)) return true;
+  return /\b(?:and|also|plus|too|as\s+well)\b[^?!.]{0,80}\b(shoes?|footwear|sneakers?|sandals?|boots?|loafers?|clogs?|wedges?|heels?|orthotics?|insoles?|slippers?|styles?|pairs?)\b/i.test(value);
+}
+
 function isCompoundPolicyProductQuestion(text) {
   if (!isPolicyOrServiceQuestion(text)) return false;
   const value = String(text || "");
-  if (!PRODUCT_SHOPPING_NOUN_RE.test(value) || !SHOPPING_ACTION_RE.test(value)) return false;
+  if (!hasCompoundProductAsk(value)) return false;
   return COMPOUND_JOINER_RE.test(value);
 }
 
@@ -340,6 +347,12 @@ function shouldAttachProductCardsForTurn({ text, ctx, recommenderAskedForMoreInf
 
 function compoundPolicyFallbackText(latestMessage = "") {
   const latest = String(latestMessage || "");
+  if (/\b(discount|coupon|promo(?:tion)?|code|deal|sale|clearance|markdown|bundle)\b/i.test(latest)) {
+    return "For discounts or promo codes, use the current offer shown on Aetrex.com or at checkout; I won't invent a code if one isn't verified.";
+  }
+  if (/\b(rewards?|loyalty|points?|vip|referral)\b/i.test(latest)) {
+    return "For rewards, logged-in customers can view their points, VIP perks, and available rewards in their Aetrex account.";
+  }
   if (/\b(return|returns|refund|exchange|exchanges)\b/i.test(latest)) {
     return "For returns, Aetrex accepts unworn items in original packaging within 30 days of delivery.";
   }
@@ -349,11 +362,23 @@ function compoundPolicyFallbackText(latestMessage = "") {
   if (/\b(warranty|guarantee)\b/i.test(latest)) {
     return "For warranty questions, Aetrex support can help confirm the policy for your item.";
   }
-  return "";
+  if (/\b(track|tracking|order\s+(?:status|number|history)|where\s+is\s+my\s+order)\b/i.test(latest)) {
+    return "For order tracking, use your tracking email or the support link so Aetrex can look up the order directly.";
+  }
+  if (/\b(contact|support|customer service|account|log\s*in|sign\s*in)\b/i.test(latest)) {
+    return "For account or support questions, use the support link to contact Aetrex customer service.";
+  }
+  return "For the service question, the support page has the current Aetrex details.";
 }
 
 function policyOnlyFallbackText(latestMessage = "") {
   const latest = String(latestMessage || "");
+  if (/\b(discount|coupon|promo(?:tion)?|code|deal|sale|clearance|markdown|bundle)\b/i.test(latest)) {
+    return "I can't verify a specific active promo code here. Use the current offer shown on Aetrex.com or at checkout, and avoid any code that is not listed by Aetrex.";
+  }
+  if (/\b(rewards?|loyalty|points?|vip|referral)\b/i.test(latest)) {
+    return "Aetrex Rewards details are available in the customer's logged-in account, including points, VIP perks, referrals, and redeemable rewards when configured.";
+  }
   if (/\b(return|returns|refund|exchange|exchanges)\b/i.test(latest)) {
     return "Aetrex's return policy accepts unworn items in original packaging within 30 days of delivery. Refunds are issued to the original payment method within 5-7 business days after the return is received.";
   }
@@ -1114,7 +1139,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     const policyFallback = policyOnlyFallbackText(ctx.latestUserMessage);
     const genericShoppingFallback = /^tell me a bit more\b/i.test(fullResponseText.trim());
     const lacksPolicyTerms = policyFallback &&
-      !/\b(return|returns|refund|exchange|30\s+days?|unworn|shipping|delivery|warranty|guarantee|support|customer service|order|tracking)\b/i.test(fullResponseText);
+      !/\b(return|returns|refund|exchange|30\s+days?|unworn|shipping|delivery|warranty|guarantee|support|customer service|order|tracking|discount|coupon|promo|code|sale|rewards?|loyalty|points?|vip)\b/i.test(fullResponseText);
     if (policyFallback && (genericShoppingFallback || lacksPolicyTerms)) {
       fullResponseText = policyFallback;
       pool = [];
@@ -1125,7 +1150,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   if (isCompoundPolicyProductQuestion(ctx.latestUserMessage) && fullResponseText) {
     const additions = [];
     const policyFallback = compoundPolicyFallbackText(ctx.latestUserMessage);
-    if (policyFallback && !/\b(return|returns|refund|exchange|30\s+days?|unworn|shipping|delivery|warranty|guarantee)\b/i.test(fullResponseText)) {
+    if (policyFallback && !/\b(return|returns|refund|exchange|30\s+days?|unworn|shipping|delivery|warranty|guarantee|discount|coupon|promo|code|sale|rewards?|loyalty|points?|vip|support|customer service|order|tracking)\b/i.test(fullResponseText)) {
       additions.push(policyFallback);
     }
     if (
@@ -1456,8 +1481,11 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     });
     if (listing.changed) {
       const before = fullResponseText;
-      fullResponseText = isCompoundPolicyProductQuestion(ctx.latestUserMessage)
-        ? `${listing.text} ${compoundPolicyFallbackText(ctx.latestUserMessage)}`
+      const serviceAnswer = isCompoundPolicyProductQuestion(ctx.latestUserMessage)
+        ? compoundPolicyFallbackText(ctx.latestUserMessage)
+        : "";
+      fullResponseText = serviceAnswer
+        ? `${serviceAnswer} ${listing.text}`
         : listing.text;
       console.log(
         `[chat] response-contract: code-owned product listing ` +
