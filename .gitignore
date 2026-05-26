@@ -33,3 +33,4 @@ database.sqlite
 # Eval / audit reports (per-merchant data, not for git)
 /scripts/scenarios.from-feedback.json
 /scripts/audit-hallucinations.json
+/reports/

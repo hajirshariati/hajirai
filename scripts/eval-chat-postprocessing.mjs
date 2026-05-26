@@ -42,6 +42,8 @@ import {
   detectFootwearOverElicitation,
   stripInternalLeaks,
   containsInternalLanguageLeak,
+  scrubInternalEnums,
+  friendlyEnumLabel,
   resolverPromisedRecommendation,
   stripAvailabilityDenialSentences,
 } from "../app/lib/chat-postprocessing.js";
@@ -917,6 +919,57 @@ test("internal-leak — full-pipeline ordering: scrub runs before banned-narrati
   const incoming = "The resolver state indicates there are no men's pink sandals. Let me look that up for you.";
   const afterLeak = stripInternalLeaks(incoming).text;
   assert.equal(containsInternalLanguageLeak(afterLeak), false);
+});
+
+// =====================================================================
+// Orthotic internal-enum scrub (R5)
+// =====================================================================
+
+test("enum-scrub — known condition tokens become friendly labels", () => {
+  const r = scrubInternalEnums("Given your overpronation_flat_feet, this insole helps.");
+  assert.equal(r.changed, true);
+  assert.ok(/flat feet or overpronation/i.test(r.text), `got: ${r.text}`);
+  assert.ok(!/overpronation_flat_feet/.test(r.text), `raw enum must not survive: ${r.text}`);
+});
+
+test("enum-scrub — useCase and arch tokens become friendly labels", () => {
+  const r = scrubInternalEnums("Picked for comfort_walking_everyday and your high_arch feet.");
+  assert.ok(/everyday walking/i.test(r.text), `got: ${r.text}`);
+  assert.ok(/high arches/i.test(r.text), `got: ${r.text}`);
+  assert.ok(!/comfort_walking_everyday|high_arch/.test(r.text), `raw enums must not survive: ${r.text}`);
+});
+
+test("enum-scrub — node ids (q_arch / q_use_case) are removed entirely", () => {
+  const r = scrubInternalEnums("Next we ask q_arch then q_use_case to narrow it down.");
+  assert.ok(!/q_arch|q_use_case/.test(r.text), `node ids must not survive: ${r.text}`);
+});
+
+test("enum-scrub — unmapped enum-shaped token is humanized, never raw", () => {
+  assert.equal(friendlyEnumLabel("some_internal_token"), "some internal token");
+  const r = scrubInternalEnums("matched some_internal_token here");
+  assert.ok(!/some_internal_token/.test(r.text), `raw token must not survive: ${r.text}`);
+});
+
+test("enum-scrub — clean customer text is left untouched", () => {
+  const clean = "Here are some women's sandals with arch support for plantar fasciitis.";
+  const r = scrubInternalEnums(clean);
+  assert.equal(r.changed, false, `must not modify clean text; got: ${r.text}`);
+});
+
+test("enum-scrub — every known enum token resolves to an enum-free label", () => {
+  const tokens = [
+    "low_arch","high_arch","medium_arch","plantar_fasciitis","heel_spurs",
+    "metatarsalgia","mortons_neuroma","overpronation_flat_feet","comfort_walking_everyday",
+    "comfort_memory_foam","comfort_memory_foam_everyday","athletic_running",
+    "athletic_training_gym","athletic_training_sports","dress_no_removable","dress_premium",
+    "boots_construction","winter_boots","work_all_day","non_removable","comfort_bundle",
+  ];
+  for (const t of tokens) {
+    const label = friendlyEnumLabel(t);
+    assert.ok(!/_/.test(label), `label for ${t} still contains underscore: "${label}"`);
+    const r = scrubInternalEnums(`recommendation note: ${t}.`);
+    assert.ok(!new RegExp(t).test(r.text), `raw token ${t} survived scrub: ${r.text}`);
+  }
 });
 
 // =====================================================================

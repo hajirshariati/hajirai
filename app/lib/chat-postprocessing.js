@@ -545,6 +545,112 @@ export function stripInternalLeaks(text, { fallback = INTERNAL_LEAK_FALLBACK } =
 }
 
 // =====================================================================
+// Orthotic internal-enum scrub (R5)
+// =====================================================================
+//
+// The orthotic decision tree speaks in internal tokens — node ids
+// (q_arch, q_use_case) and snake_case attribute values
+// (overpronation_flat_feet, comfort_walking_everyday, plantar_fasciitis,
+// …). Those are FACTS the code owns; the customer must never see them.
+//
+// One mapping (token -> friendly label) is the single source of truth,
+// and one scrub applied at the emit boundary guarantees no internal
+// token survives into customer-facing text, even if the model or a code
+// path interpolates one. Node ids are removed outright (they are never
+// customer-facing); known value tokens become their friendly label;
+// any unmapped-but-enum-shaped value is humanized (underscores -> spaces)
+// so a raw enum can never leak.
+const ORTHOTIC_ENUM_LABELS = {
+  // arch
+  low_arch: "low arches",
+  high_arch: "high arches",
+  medium_arch: "medium arches",
+  normal_arch: "neutral arches",
+  neutral_arch: "neutral arches",
+  flat_arch: "flat arches",
+  // condition
+  plantar_fasciitis: "plantar fasciitis",
+  heel_spurs: "heel spurs",
+  metatarsalgia: "ball-of-foot pain",
+  mortons_neuroma: "Morton's neuroma",
+  overpronation_flat_feet: "flat feet or overpronation",
+  arch_pain: "arch pain",
+  heel_pain: "heel pain",
+  foot_pain: "foot pain",
+  diabetic: "diabetic foot care",
+  // useCase
+  comfort_walking_everyday: "everyday walking",
+  comfort_memory_foam_everyday: "everyday memory-foam comfort",
+  comfort_memory_foam: "memory-foam comfort",
+  comfort_bundle: "all-day comfort",
+  athletic_running: "running",
+  athletic_training_sports: "sports training",
+  athletic_training_gym: "gym training",
+  athletic_training: "gym or training",
+  athletic_general: "athletic or court",
+  dress_no_removable: "dress shoes without a removable insole",
+  dress_premium: "premium dress shoes",
+  boots_construction: "work boots",
+  winter_boots: "winter boots",
+  work_all_day: "long days on your feet",
+  non_removable: "shoes without a removable insole",
+};
+
+export function friendlyEnumLabel(token) {
+  if (token == null) return "";
+  const key = String(token).trim().toLowerCase();
+  if (ORTHOTIC_ENUM_LABELS[key]) return ORTHOTIC_ENUM_LABELS[key];
+  // Unmapped but enum-shaped → humanize so a raw snake_case token never
+  // reaches the customer.
+  if (/^[a-z]{2,}(?:_[a-z0-9]+)+$/.test(key)) return key.replace(/_/g, " ");
+  return String(token);
+}
+
+const INTERNAL_NODE_ID_RE = /\bq_[a-z][a-z0-9_]*/gi;
+const ORTHOTIC_ENUM_TOKEN_RE = new RegExp(
+  "\\b(?:" +
+    Object.keys(ORTHOTIC_ENUM_LABELS)
+      .sort((a, b) => b.length - a.length)
+      .map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+      .join("|") +
+    ")\\b",
+  "gi",
+);
+// Any snake_case identifier. In customer-facing prose this is virtually
+// always an internal token leaking through — humanize it. URLs (where
+// underscores are legitimate) are masked out first so links survive.
+const ENUM_SHAPED_TOKEN_RE = /\b[a-z]{2,}(?:_[a-z0-9]+)+\b/gi;
+const URL_SPAN_RE = /https?:\/\/\S+/gi;
+
+export function scrubInternalEnums(text) {
+  if (!text || typeof text !== "string") return { text: text || "", changed: false };
+
+  // Mask URLs so legitimate underscores in link targets are not touched.
+  const urls = [];
+  let masked = text.replace(URL_SPAN_RE, (u) => {
+    urls.push(u);
+    return ` URL${urls.length - 1} `;
+  });
+
+  // 1. Node ids are never customer-facing — remove outright.
+  masked = masked.replace(INTERNAL_NODE_ID_RE, "");
+  // 2. Known value tokens -> their friendly label (nicer than humanizing).
+  masked = masked.replace(ORTHOTIC_ENUM_TOKEN_RE, (m) => friendlyEnumLabel(m));
+  // 3. Any remaining enum-shaped token -> humanized, so no raw snake_case
+  //    enum can ever reach the customer.
+  masked = masked.replace(ENUM_SHAPED_TOKEN_RE, (m) => m.replace(/_/g, " "));
+
+  let out = masked
+    .replace(/ URL(\d+) /g, (_, i) => urls[Number(i)])
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/\s+([.,!?;:])/g, "$1")
+    .replace(/\(\s+/g, "(")
+    .replace(/\s+\)/g, ")")
+    .trim();
+  return { text: out, changed: out !== text };
+}
+
+// =====================================================================
 // Resolver fulfillment invariant (M1 stabilization)
 // =====================================================================
 //

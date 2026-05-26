@@ -6,15 +6,26 @@
         "user": "show me women's sandals in black",
         "expect": {
           "text": {
-            "mustIncludeAny": ["black", "sandal"],
-            "mustNotInclude": ["what type", "what kind", "accessories"]
+            "mustIncludeAny": [
+              "black",
+              "sandal"
+            ],
+            "mustNotInclude": [
+              "what type",
+              "what kind",
+              "accessories"
+            ]
           },
           "products": {
             "min": 1,
             "allTitleOrHandleMustNotMatch": "sneaker|accessor"
           },
           "chips": {
-            "mustNotInclude": ["Accessories", "Sneakers", "Clogs"]
+            "mustNotInclude": [
+              "Accessories",
+              "Sneakers",
+              "Clogs"
+            ]
           }
         }
       },
@@ -22,8 +33,16 @@
         "user": "how about mens?",
         "expect": {
           "text": {
-            "mustIncludeAny": ["men", "men's", "mens"],
-            "mustNotInclude": ["what type", "what kind", "accessories"]
+            "mustIncludeAny": [
+              "men",
+              "men's",
+              "mens"
+            ],
+            "mustNotInclude": [
+              "what type",
+              "what kind",
+              "accessories"
+            ]
           },
           "products": {
             "min": 1,
@@ -31,7 +50,11 @@
             "allTitleOrHandleMustNotMatch": "sneaker|accessor"
           },
           "chips": {
-            "mustNotInclude": ["Accessories", "Sneakers", "Clogs"]
+            "mustNotInclude": [
+              "Accessories",
+              "Sneakers",
+              "Clogs"
+            ]
           }
         }
       }
@@ -53,8 +76,16 @@
         "user": "any pink ones?",
         "expect": {
           "text": {
-            "mustIncludeAny": ["pink", "blush", "rose"],
-            "mustNotInclude": ["sneaker", "what type", "what kind"]
+            "mustIncludeAny": [
+              "pink",
+              "blush",
+              "rose"
+            ],
+            "mustNotInclude": [
+              "sneaker",
+              "what type",
+              "what kind"
+            ]
           },
           "products": {
             "min": 1,
@@ -80,8 +111,18 @@
         "user": "in white",
         "expect": {
           "text": {
-            "mustIncludeAny": ["white"],
-            "mustNotInclude": ["don't have", "do not have", "don't carry", "no white", "not in stock", "can't find", "couldn't find"]
+            "mustIncludeAny": [
+              "white"
+            ],
+            "mustNotInclude": [
+              "don't have",
+              "do not have",
+              "don't carry",
+              "no white",
+              "not in stock",
+              "can't find",
+              "couldn't find"
+            ]
           },
           "products": {
             "min": 1,
@@ -108,8 +149,17 @@
         "user": "are there other colors?",
         "expect": {
           "text": {
-            "mustInclude": ["black", "navy", "silver"],
-            "mustNotInclude": ["only white", "only available in white", "only comes in white", "no other colors"]
+            "mustInclude": [
+              "black",
+              "navy",
+              "silver"
+            ],
+            "mustNotInclude": [
+              "only white",
+              "only available in white",
+              "only comes in white",
+              "no other colors"
+            ]
           }
         }
       }
@@ -122,7 +172,10 @@
         "user": "show me women black sandals",
         "expect": {
           "text": {
-            "mustNotInclude": ["what type", "what kind"]
+            "mustNotInclude": [
+              "what type",
+              "what kind"
+            ]
           },
           "products": {
             "min": 1
@@ -141,7 +194,12 @@
         "user": "I need orthotics for overpronation",
         "expect": {
           "text": {
-            "mustIncludeAny": ["men", "women", "who", "orthotic"],
+            "mustIncludeAny": [
+              "men",
+              "women",
+              "who",
+              "orthotic"
+            ],
             "mustNotMatch": "_[a-z]|[a-z]+_[a-z]+"
           },
           "products": {
@@ -186,13 +244,21 @@
         "user": "I have foot pain, what should I wear?",
         "expect": {
           "text": {
-            "mustIncludeAny": ["footwear", "orthotic", "insert", "shoes"]
+            "mustIncludeAny": [
+              "footwear",
+              "orthotic",
+              "insert",
+              "shoes"
+            ]
           },
           "products": {
             "max": 0
           },
           "chips": {
-            "mustIncludeAny": ["Footwear with arch support", "Orthotic insole"]
+            "mustIncludeAny": [
+              "Footwear with arch support",
+              "Orthotic insole"
+            ]
           }
         }
       }
@@ -205,8 +271,17 @@
         "user": "What's your return policy?",
         "expect": {
           "text": {
-            "mustIncludeAny": ["return", "30", "unworn", "policy"],
-            "mustNotInclude": ["sneaker", "sandals", "orthotic recommendation"]
+            "mustIncludeAny": [
+              "return",
+              "30",
+              "unworn",
+              "policy"
+            ],
+            "mustNotInclude": [
+              "sneaker",
+              "sandals",
+              "orthotic recommendation"
+            ]
           },
           "products": {
             "max": 0
@@ -223,7 +298,9 @@
         "expect": {
           "text": {
             "mustNotMatch": "L9999.{0,80}(perfect|recommend|best|here)",
-            "mustNotInclude": ["view product"]
+            "mustNotInclude": [
+              "view product"
+            ]
           },
           "products": {
             "max": 0
@@ -247,7 +324,11 @@
         "user": "do these come in size 9 wide?",
         "expect": {
           "text": {
-            "mustNotInclude": ["definitely available", "currently available in size 9", "in stock in size 9"]
+            "mustNotInclude": [
+              "definitely available",
+              "currently available in size 9",
+              "in stock in size 9"
+            ]
           }
         }
       }
@@ -260,13 +341,21 @@
         "user": "hi i need new shoes",
         "expect": {
           "text": {
-            "mustIncludeAny": ["men", "women", "styles", "browse"]
+            "mustIncludeAny": [
+              "men",
+              "women",
+              "styles",
+              "browse"
+            ]
           },
           "products": {
             "max": 0
           },
           "chips": {
-            "mustIncludeAny": ["Men's", "Women's"]
+            "mustIncludeAny": [
+              "Men's",
+              "Women's"
+            ]
           }
         }
       },
@@ -274,15 +363,27 @@
         "user": "i don't know, what do you have that's cheap?",
         "expect": {
           "text": {
-            "mustIncludeAny": ["styles", "narrow", "price", "browse"],
-            "mustNotInclude": ["which styles would you like to browse", "men's or women's", "are you shopping for"]
+            "mustIncludeAny": [
+              "styles",
+              "narrow",
+              "price",
+              "browse"
+            ],
+            "mustNotInclude": [
+              "which styles would you like to browse",
+              "men's or women's",
+              "are you shopping for"
+            ]
           },
           "products": {
             "min": 1,
             "allTitleOrHandleMustNotMatch": "insole|accessor"
           },
           "chips": {
-            "mustNotInclude": ["Men's", "Women's"]
+            "mustNotInclude": [
+              "Men's",
+              "Women's"
+            ]
           }
         }
       }
@@ -295,7 +396,10 @@
         "user": "i need shoes",
         "expect": {
           "chips": {
-            "mustIncludeAny": ["Men's", "Women's"]
+            "mustIncludeAny": [
+              "Men's",
+              "Women's"
+            ]
           },
           "products": {
             "max": 0
@@ -306,13 +410,20 @@
         "user": "not sure",
         "expect": {
           "text": {
-            "mustNotInclude": ["which styles would you like to browse", "men's or women's", "are you shopping for"]
+            "mustNotInclude": [
+              "which styles would you like to browse",
+              "men's or women's",
+              "are you shopping for"
+            ]
           },
           "products": {
             "min": 1
           },
           "chips": {
-            "mustNotInclude": ["Men's", "Women's"]
+            "mustNotInclude": [
+              "Men's",
+              "Women's"
+            ]
           }
         }
       }
@@ -325,8 +436,16 @@
         "user": "How do I contact customer support about my order?",
         "expect": {
           "text": {
-            "mustIncludeAny": ["support", "customer", "order", "contact"],
-            "mustNotInclude": ["here are", "take a look"]
+            "mustIncludeAny": [
+              "support",
+              "customer",
+              "order",
+              "contact"
+            ],
+            "mustNotInclude": [
+              "here are",
+              "take a look"
+            ]
           },
           "products": {
             "max": 0
@@ -342,9 +461,20 @@
         "user": "ok cool what about your return policy? and do you have any brown sneakers for men?",
         "expect": {
           "text": {
-            "mustIncludeAny": ["return", "policy", "30", "unworn"],
-            "mustInclude": ["sneaker"],
-            "mustNotInclude": ["tell me a bit more", "what type", "what kind"]
+            "mustIncludeAny": [
+              "return",
+              "policy",
+              "30",
+              "unworn"
+            ],
+            "mustInclude": [
+              "sneaker"
+            ],
+            "mustNotInclude": [
+              "tell me a bit more",
+              "what type",
+              "what kind"
+            ]
           },
           "products": {
             "min": 1,
@@ -362,9 +492,21 @@
         "user": "do you have any discount codes right now? also show me men's sneakers",
         "expect": {
           "text": {
-            "mustIncludeAny": ["discount", "promo", "code", "checkout", "offer"],
-            "mustInclude": ["sneaker"],
-            "mustNotInclude": ["tell me a bit more", "what type", "what kind"]
+            "mustIncludeAny": [
+              "discount",
+              "promo",
+              "code",
+              "checkout",
+              "offer"
+            ],
+            "mustInclude": [
+              "sneaker"
+            ],
+            "mustNotInclude": [
+              "tell me a bit more",
+              "what type",
+              "what kind"
+            ]
           },
           "products": {
             "min": 1,
@@ -391,15 +533,66 @@
         "user": "any pink ones?",
         "expect": {
           "text": {
-            "mustIncludeAny": ["pink", "blush", "rose"],
-            "mustNotInclude": ["sneaker", "what type", "what kind"]
+            "mustIncludeAny": [
+              "pink",
+              "blush",
+              "rose"
+            ],
+            "mustNotInclude": [
+              "sneaker",
+              "what type",
+              "what kind"
+            ]
           },
           "products": {
             "min": 1,
             "allTitleOrHandleMustNotMatch": "sneaker"
           },
           "chips": {
-            "mustNotInclude": ["Sneakers", "Accessories"]
+            "mustNotInclude": [
+              "Sneakers",
+              "Accessories"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  {
+    "name": "single unanswered gender ask escapes on a tangential reply",
+    "turns": [
+      {
+        "user": "i need new shoes",
+        "expect": {
+          "products": {
+            "max": 0
+          },
+          "chips": {
+            "mustIncludeAny": [
+              "Men's",
+              "Women's"
+            ]
+          }
+        }
+      },
+      {
+        "user": "it's a gift for a wedding next month",
+        "expect": {
+          "text": {
+            "mustNotInclude": [
+              "which styles would you like to browse",
+              "men's or women's",
+              "are you shopping for"
+            ]
+          },
+          "products": {
+            "min": 1
+          },
+          "chips": {
+            "mustNotInclude": [
+              "Men's",
+              "Women's"
+            ]
           }
         }
       }

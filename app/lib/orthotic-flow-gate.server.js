@@ -1439,17 +1439,6 @@ function buildResolveIntro(result, attrs) {
   return `Based on what you've shared, **${title}** is the best match.`;
 }
 
-function humanizeCondition(c) {
-  switch (c) {
-    case "plantar_fasciitis": return "plantar fasciitis";
-    case "heel_spurs":        return "heel spurs";
-    case "metatarsalgia":     return "ball-of-foot pain";
-    case "mortons_neuroma":   return "Morton's neuroma";
-    case "diabetic":          return "diabetic foot care";
-    default: return c;
-  }
-}
-
 // Build a Layer 3 LLM hook bound to the given Anthropic client +
 // model id. The hook signature matches what mapAnswerToEnum expects:
 // `async (rawAnswer, node, tree) => { value }`. Returns null on
@@ -1473,22 +1462,4 @@ function makeLayer3Hook(anthropic, model) {
       throw err;
     }
   };
-}
-
-function humanizeUseCase(u) {
-  switch (u) {
-    case "casual":             return "everyday casual shoes";
-    case "comfort":            return "general comfort";
-    case "athletic_running":   return "running";
-    case "athletic_training":  return "gym / training";
-    case "athletic_general":   return "athletic / court";
-    case "cleats":             return "cleats";
-    case "skates":             return "hockey skates";
-    case "winter_boots":       return "winter boots";
-    case "work_all_day":       return "long days on your feet";
-    case "dress":              return "dress shoes";
-    case "dress_no_removable": return "dress shoes (no removable insole)";
-    case "dress_premium":      return "premium dress shoes";
-    default: return u;
-  }
 }

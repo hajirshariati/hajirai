@@ -83,6 +83,7 @@ import {
   suggestionContradictsGender,
   detectFootwearOverElicitation,
   stripInternalLeaks,
+  scrubInternalEnums,
   resolverPromisedRecommendation,
 } from "../lib/chat-postprocessing";
 import prisma from "../db.server";
@@ -1006,6 +1007,14 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     if (result.changed) {
       console.log(`[chat] stripped internal language leak${result.replaced ? " (whole-reply fallback)" : ""}`);
       fullResponseText = result.text;
+    }
+  }
+
+  if (fullResponseText) {
+    const scrubbed = scrubInternalEnums(fullResponseText);
+    if (scrubbed.changed) {
+      console.log(`[chat] scrubbed orthotic internal enum token(s) before emit`);
+      fullResponseText = scrubbed.text;
     }
   }
 
