@@ -467,11 +467,15 @@ export function filterProductCardsToCatalogScope(pool = [], ctx = {}) {
   let enforcedColor = false;
   let filtered = base;
   if (canonical.color) {
-    const exactColor = base.filter((card) =>
+    const literalColor = base.filter((card) => cardMatchesLiteralColor(card, canonical.color));
+    const semanticColor = base.filter((card) =>
       cardMatchesCatalogScope(card, canonical, { enforceColor: true }),
     );
-    if (exactColor.length > 0) {
-      filtered = exactColor;
+    if (literalColor.length > 0) {
+      filtered = literalColor;
+      enforcedColor = true;
+    } else if (semanticColor.length > 0) {
+      filtered = semanticColor;
       enforcedColor = true;
     }
   }
@@ -735,10 +739,14 @@ function titleSuffixColorName(title) {
 
 function cardLiteralColorNames(card) {
   const facts = card?._variantFacts || card?.variantFacts || {};
+  const titleColor = titleSuffixColorName(card?.title);
+  if (titleColor) return [titleColor];
+  const productColors = flattenValues(facts.productAvailableColors)
+    .map((value) => String(value || "").trim())
+    .filter(Boolean);
+  if (productColors.length > 0) return productColors;
   const values = [
     cardAttr(card, ["color", "colour", "color_family", "Color Family", "color_fallback"]),
-    facts.productAvailableColors,
-    titleSuffixColorName(card?.title),
   ];
   return flattenValues(values)
     .map((value) => String(value || "").trim())
@@ -751,6 +759,10 @@ function literalColorNameMatches(display, requestedColor) {
   const value = String(display || "").toLowerCase().replace(/[_-]+/g, " ");
   const aliases = color === "gray" ? ["gray", "grey"] : [color];
   return aliases.some((alias) => new RegExp(`\\b${escapeRegex(alias)}\\b`, "i").test(value));
+}
+
+function cardMatchesLiteralColor(card, requestedColor) {
+  return cardLiteralColorNames(card).some((name) => literalColorNameMatches(name, requestedColor));
 }
 
 function variantColorEntries(card) {

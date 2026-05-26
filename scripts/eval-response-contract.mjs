@@ -142,7 +142,7 @@ test("R7 — listing text is code-owned and strips checkable claims", () => {
     ctx: { latestUserMessage: "show me pink sandals", sessionMemory: { explicit: { gender: "women", category: "sandals", color: "pink" } } },
   });
   assert.equal(out.changed, true);
-  assert.match(out.text, /pink women's sandals/i);
+  assert.match(out.text, /pink and similar women's sandals/i);
   assert.doesNotMatch(out.text, /\b(?:six|two|all|both|every|under|\$|arch support|size)\b/i);
 });
 
@@ -188,6 +188,28 @@ test("R8c — listing line keeps exact named colors when present", () => {
   assert.equal(out.changed, true);
   assert.match(out.text, /black women's sandals/i);
   assert.doesNotMatch(out.text, /couldn'?t find/i);
+});
+
+test("R8d — scoped card filter prefers literal color cards over color-family cards", () => {
+  const scoped = filterProductCardsToCatalogScope([
+    {
+      title: "Danika Arch Support Sneaker - Peach",
+      _gender: "women",
+      _category: "sneakers",
+      _attributes: { Color: "Peach", color_family: "Pink" },
+    },
+    {
+      title: "Kinsley Arch Support Sneaker - Light Pink",
+      _gender: "women",
+      _category: "sneakers",
+      _attributes: { Color: "Light Pink", color_family: "Pink" },
+    },
+  ], {
+    sessionMemory: { explicit: { gender: "women", category: "sneakers", color: "pink" } },
+  });
+  assert.equal(scoped.products.length, 1);
+  assert.match(scoped.products[0].title, /Light Pink/);
+  assert.equal(scoped.enforcedColor, true);
 });
 
 test("R9 — direct variant fact questions keep LLM text path", () => {
