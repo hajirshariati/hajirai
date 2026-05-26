@@ -956,11 +956,19 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }
   }
 
+  // Repeat-clarifier guard: a clarifier for a given slot must never be
+  // emitted twice in a row. If this turn would re-ask the same slot the
+  // previous clarifier already asked (and we have no products to show),
+  // stop asking and show products instead — honoring any scope the
+  // customer already established so we don't regress into a generic browse.
   const currentClarifyingType = detectClarifyingQuestionType(fullResponseText);
   const lastClarifyingType = ctx.sessionMemory?.lastClarifyingQuestion?.type || null;
   if (currentClarifyingType && currentClarifyingType === lastClarifyingType && allProductPool.size === 0) {
     try {
-      const browse = await dispatchTool("search_products", softGenderBrowseSearchInput(ctx.latestUserMessage || ""), ctx);
+      const scoped = scopedProductSearchInput(ctx);
+      const hasScope = !!(scoped.scope.gender || scoped.scope.category || scoped.scope.color);
+      const input = hasScope ? scoped.input : softGenderBrowseSearchInput(ctx.latestUserMessage || "");
+      const browse = await dispatchTool("search_products", input, ctx);
       const cards = extractProductCards("search_products", browse);
       for (const card of cards) {
         const key = card?.handle || card?.title;
@@ -968,7 +976,7 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       }
       if (cards.length > 0) {
         productSearchAttempted = true;
-        fullResponseText = "No problem — here are a few styles to start with. You can narrow by gender, style, color, or price from here.";
+        fullResponseText = "No problem — here are a few styles to start with. You can narrow by men's, women's, style, color, or price from here.";
         console.log(`[chat] repeated-clarifier escape: ${currentClarifyingType} → showing ${cards.length} starter product(s)`);
       }
     } catch (err) {

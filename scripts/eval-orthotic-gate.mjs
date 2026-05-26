@@ -191,6 +191,73 @@ await test("footwear path soft-escapes after repeated unanswered gender asks", a
   assert.equal(events.length, 0);
 });
 
+await test("soft gender-gate escapes after ONE unanswered ask even without an open-browse phrase", async () => {
+  // R4: a clarifier must never repeat. After the gate asks gender once,
+  // any reply that doesn't resolve gender (here a tangential, non-browse
+  // dodge) must escape to browse rather than re-asking.
+  const priorMessages = [
+    { role: "user", content: "i need new shoes" },
+    { role: "assistant", content: "Are you shopping for men's or women's? <<Men's>><<Women's>>" },
+  ];
+  assert.equal(countGenderGateAsks(priorMessages), 1);
+  assert.equal(
+    shouldSoftEscapeFootwearGenderGate({
+      messages: priorMessages,
+      answers: {},
+    }),
+    true,
+  );
+});
+
+await test("soft gender-gate does NOT escape before any gender ask", async () => {
+  assert.equal(
+    shouldSoftEscapeFootwearGenderGate({
+      messages: [{ role: "user", content: "i need new shoes" }],
+      answers: {},
+    }),
+    false,
+  );
+});
+
+await test("soft gender-gate never escapes once gender is known", async () => {
+  assert.equal(
+    shouldSoftEscapeFootwearGenderGate({
+      messages: [
+        { role: "user", content: "i need new shoes" },
+        { role: "assistant", content: "Are you shopping for men's or women's? <<Men's>><<Women's>>" },
+      ],
+      answers: { gender: "women" },
+    }),
+    false,
+  );
+});
+
+await test("footwear path escapes after a single unanswered gender ask + tangential reply", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "hi i need new shoes" },
+      { role: "assistant", content: "Got it — let me help you find the right fit. Are you shopping for men's or women's?\n\n<<Men's>><<Women's>>" },
+      { role: "user", content: "it's for a wedding next month" },
+    ],
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+    classifiedIntent: {
+      isOrthoticRequest: false,
+      isFootwearRequest: true,
+      isRejection: false,
+      attributes: {},
+      confidence: "high",
+    },
+  });
+  assert.equal(out.handled, false);
+  assert.equal(out.softGenderGateEscape, true);
+  assert.equal(out.case, "soft_gender_gate_escape");
+  assert.equal(events.length, 0);
+});
+
 await test("emits next seed question on chip click (Layer 1)", async () => {
   const { events, encoder, controller } = makeMockSse();
   const out = await maybeRunOrthoticFlow({

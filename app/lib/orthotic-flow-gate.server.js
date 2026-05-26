@@ -97,9 +97,6 @@ function letsCatalogResolverOwnFootwearRequest(text) {
 const GENDER_GATE_ASK_RE =
   /(?:<<\s*Men(?:'?s)?\s*>>[\s\S]{0,80}<<\s*Women(?:'?s)?\s*>>|<<\s*Women(?:'?s)?\s*>>[\s\S]{0,80}<<\s*Men(?:'?s)?\s*>>|\bmen'?s?\s+or\s+women'?s?\b|\bwomen'?s?\s+or\s+men'?s?\b|\bwhich\s+styles?\s+would\s+you\s+like\s+to\s+browse\b)/i;
 
-const OPEN_BROWSE_AFTER_GENDER_GATE_RE =
-  /\b(?:i\s*(?:do\s+not|don['’]?t|dont)\s+know|not\s+sure|unsure|idk|whatever|anything|everything|either|both|no\s+preference|doesn['’]?t\s+matter|doesnt\s+matter|what\s+do\s+you\s+have|what\s+you\s+have|just\s+show\s+me|show\s+me\s+(?:some|anything|everything|whatever)|browse|bestsellers?|best\s+sellers?|popular|cheap|sale|deals?|on\s+sale|under\s+\$?\d+)\b/i;
-
 export function countGenderGateAsks(messages = []) {
   if (!Array.isArray(messages)) return 0;
   return messages.reduce((count, m) => {
@@ -108,12 +105,14 @@ export function countGenderGateAsks(messages = []) {
   }, 0);
 }
 
-export function shouldSoftEscapeFootwearGenderGate({ messages = [], rawUserText = "", answers = {} } = {}) {
+// A clarifier may never repeat. The gate asks gender at most once; if it
+// has already been asked and the customer's reply still didn't resolve
+// gender, escape to a broad browse instead of re-asking. The customer can
+// always narrow by men's/women's after seeing products — gender is a
+// preference here, never a wall that can repeat.
+export function shouldSoftEscapeFootwearGenderGate({ messages = [], answers = {} } = {}) {
   if (answers?.gender) return false;
-  const askedCount = countGenderGateAsks(messages);
-  if (askedCount <= 0) return false;
-  if (askedCount >= 2) return true;
-  return OPEN_BROWSE_AFTER_GENDER_GATE_RE.test(rawUserText);
+  return countGenderGateAsks(messages) >= 1;
 }
 
 /**
@@ -948,7 +947,6 @@ export async function maybeRunOrthoticFlow({
   if (footwearCommitInLatest || footwearCommitInPrior) {
     const softGenderGateEscape = shouldSoftEscapeFootwearGenderGate({
       messages: priorMessages,
-      rawUserText,
       answers,
     });
     if (!answers.gender && softGenderGateEscape) {

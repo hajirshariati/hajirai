@@ -19,6 +19,7 @@ import {
   buildSessionMemory,
   memorySummary,
   buildSessionMemoryPromptBlock,
+  detectClarifyingQuestionType,
 } from "../app/lib/session-memory.server.js";
 
 let passed = 0;
@@ -423,6 +424,42 @@ await test("S24 — child recipient words map to kids consistently", async () =>
   });
   assert.equal(mem.explicit.gender, "kids", `son should map to kids; got ${JSON.stringify(mem.explicit)}`);
   assert.equal(mem.explicit.category, "sneakers");
+});
+
+// R4 — clarifier slot detection must recognize the bot's own gender
+// clarifier however it's worded, so the repeat-clarifier guard fires.
+await test("R4 — gender clarifier detected with chips in either order", async () => {
+  assert.equal(detectClarifyingQuestionType("Which would you like? <<Men's>><<Women's>>"), "gender");
+  assert.equal(detectClarifyingQuestionType("Which would you like? <<Women's>><<Men's>>"), "gender");
+});
+
+await test("R4 — gender clarifier detected without chips", async () => {
+  assert.equal(detectClarifyingQuestionType("Are you shopping for men's or women's?"), "gender");
+  assert.equal(detectClarifyingQuestionType("Would you like to browse women's or men's styles?"), "gender");
+  assert.equal(detectClarifyingQuestionType("Which styles would you like to browse?"), "gender");
+});
+
+await test("R4 — budget / category / size clarifiers classified", async () => {
+  assert.equal(detectClarifyingQuestionType("What's your budget?"), "budget");
+  assert.equal(detectClarifyingQuestionType("What type of shoe are you after?"), "category");
+  assert.equal(detectClarifyingQuestionType("What size do you wear?"), "size_width");
+  assert.equal(detectClarifyingQuestionType("Do you need wide or narrow?"), "size_width");
+});
+
+await test("R4 — non-clarifying product text is not a clarifier", async () => {
+  assert.equal(detectClarifyingQuestionType("Here are the men's sneakers I found."), null);
+  assert.equal(detectClarifyingQuestionType(""), null);
+});
+
+await test("R4 — lastClarifyingQuestion tracks the most recent gender ask by slot", async () => {
+  const mem = buildSessionMemory({
+    messages: [
+      u("i need shoes"),
+      a("Are you shopping for men's or women's? <<Men's>><<Women's>>"),
+      u("not sure yet"),
+    ],
+  });
+  assert.equal(mem.lastClarifyingQuestion?.type, "gender");
 });
 
 console.log("");

@@ -189,19 +189,34 @@ function isGenderOnlyContinuation(text, extracted, recipient) {
   return SUBJECT_PIVOT_KEYS.every((key) => extracted[key] == null);
 }
 
+// Classify the bot's OWN outgoing clarifier into the slot it asks about.
+// This inspects our own generated text (not customer intent), so chip +
+// phrasing detection is appropriate. Order-independent and phrasing-tolerant
+// so a clarifier is recognized however the LLM (or a gate) words it — that
+// reliability is what lets the repeat-clarifier guard actually fire.
 export function detectClarifyingQuestionType(text) {
   const value = String(text || "");
   if (!value.trim()) return null;
-  if (/\bmen'?s?,?\s+women'?s?,?\s+or\s+kids'?|\bwho\s+(?:are|is)\s+(?:these|this)\s+for\b|<<\s*Men'?s?\s*>>.*<<\s*Women'?s?\s*>>/is.test(value)) {
+  const hasMenChip = /<<\s*(?:Men|Boys?)(?:'?s)?\s*>>/i.test(value);
+  const hasWomenChip = /<<\s*(?:Women|Girls?)(?:'?s)?\s*>>/i.test(value);
+  if (
+    (hasMenChip && hasWomenChip) ||
+    /\bmen'?s?\s+or\s+women'?s?\b/i.test(value) ||
+    /\bwomen'?s?\s+or\s+men'?s?\b/i.test(value) ||
+    /\bmen'?s?,?\s+women'?s?,?\s+or\s+kids'?/i.test(value) ||
+    /\bwho\s+(?:are|is)\s+(?:these|this)\s+for\b/i.test(value) ||
+    /\bwhich\s+styles?\s+would\s+you\s+like\s+to\s+browse\b/i.test(value) ||
+    /\b(?:shopping|browsing|looking)\s+for\s+(?:men|women)/i.test(value)
+  ) {
     return "gender";
   }
-  if (/\bwhat'?s?\s+your\s+budget\b|<<\s*Under\s+\$\d+/i.test(value)) {
+  if (/\bwhat'?s?\s+your\s+budget\b|\bhow\s+much\b[^?]{0,40}\b(?:spend|budget|looking\s+to\s+pay)\b|<<\s*Under\s+\$\d+/i.test(value)) {
     return "budget";
   }
   if (/\bwhat\s+(?:type|kind|style|category)\s+of\b|\bwhich\s+(?:type|kind|style|category)\b/i.test(value)) {
     return "category";
   }
-  if (/\bwhat\s+size\b|\bwhich\s+size\b|\bwhat\s+width\b|\bwide\s+or\s+regular\b/i.test(value)) {
+  if (/\bwhat\s+size\b|\bwhich\s+size\b|\bwhat\s+width\b|\bwide\s+or\s+regular\b|\bwide\s+or\s+narrow\b/i.test(value)) {
     return "size_width";
   }
   return null;
