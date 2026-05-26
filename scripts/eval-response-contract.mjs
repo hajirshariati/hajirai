@@ -212,6 +212,30 @@ test("R8d — scoped card filter prefers literal color cards over color-family c
   assert.equal(scoped.enforcedColor, true);
 });
 
+test("R8e — Eggplant counts as a literal purple match (shade identity)", () => {
+  const out = buildCodeOwnedProductListingText({
+    text: "I couldn't find purple sneakers, but here are similar colors.",
+    cards: [
+      { title: "Dani Arch Support Sneaker - Eggplant", _gender: "women", _category: "sneakers", _attributes: { Color: "Eggplant", color_family: "Purple" } },
+    ],
+    ctx: { latestUserMessage: "any in purple?", sessionMemory: { explicit: { gender: "women", category: "sneakers", color: "purple" } } },
+  });
+  assert.match(out.text, /purple women's sneakers/i);
+  assert.doesNotMatch(out.text, /couldn'?t find exact purple/i);
+});
+
+test("R8f — Coral stays 'similar', never called literal pink (family adjacency)", () => {
+  const out = buildCodeOwnedProductListingText({
+    text: "Here are pink sandals.",
+    cards: [
+      { title: "Julia Arch Support Sandal - Coral", _gender: "women", _category: "sandals", _attributes: { Color: "Coral", color_family: "Pink" } },
+    ],
+    ctx: { latestUserMessage: "any in pink?", sessionMemory: { explicit: { gender: "women", category: "sandals", color: "pink" } } },
+  });
+  assert.doesNotMatch(out.text, /^here are (?:the )?pink/i);
+  assert.match(out.text, /couldn'?t find exact pink|similar/i);
+});
+
 test("R9 — direct variant fact questions keep LLM text path", () => {
   const text = "Chase also comes in black, navy, and silver.";
   const out = buildCodeOwnedProductListingText({

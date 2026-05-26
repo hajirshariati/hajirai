@@ -797,12 +797,28 @@ function cardLiteralColorNames(card) {
     .filter(Boolean);
 }
 
+// Named shades that ARE the base color, not merely adjacent to it. This is
+// the single source of truth for "this shade name literally IS color X" —
+// deliberately narrow. Family-adjacency (coral→pink, terracotta→red,
+// burgundy→red) is intentionally NOT here: those stay "similar/related" so
+// "any pink?" never calls a Coral card pink. Add a shade here only when a
+// shopper asking for the base color would unambiguously accept it.
+const LITERAL_SHADE_IDENTITY = {
+  purple: ["eggplant", "aubergine", "violet", "plum"],
+};
+
 function literalColorNameMatches(display, requestedColor) {
   const color = normalizeKnownTextColor(requestedColor);
   if (!color) return false;
   const value = String(display || "").toLowerCase().replace(/[_-]+/g, " ");
   const aliases = color === "gray" ? ["gray", "grey"] : [color];
-  return aliases.some((alias) => new RegExp(`\\b${escapeRegex(alias)}\\b`, "i").test(value));
+  if (aliases.some((alias) => new RegExp(`\\b${escapeRegex(alias)}\\b`, "i").test(value))) {
+    return true;
+  }
+  // A named shade that unambiguously IS the requested color (e.g. Eggplant
+  // is purple) counts as a literal match; adjacent family colors do not.
+  const shades = LITERAL_SHADE_IDENTITY[color] || [];
+  return shades.some((shade) => new RegExp(`\\b${escapeRegex(shade)}\\b`, "i").test(value));
 }
 
 function cardMatchesLiteralColor(card, requestedColor) {
