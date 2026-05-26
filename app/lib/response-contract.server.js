@@ -977,6 +977,7 @@ function displayGender(value) {
   const gender = normalizeGender(value);
   if (gender === "men") return "men's";
   if (gender === "women") return "women's";
+  if (gender === "kids") return "kids'";
   if (gender === "unisex") return "unisex";
   return "";
 }
@@ -988,6 +989,48 @@ function displayCategory(value) {
   if (category === "slip-ons") return "slip-ons";
   if (category === "mary-janes") return "Mary Janes";
   return category.replace(/-/g, " ");
+}
+
+function scopedLabel(scope = {}, fallback = "styles") {
+  const parts = [displayGender(scope.gender), displayCategory(scope.category)].filter(Boolean);
+  return parts.length > 0 ? parts.join(" ") : fallback;
+}
+
+function dominantCardValue(cards = [], getter) {
+  const counts = new Map();
+  for (const card of Array.isArray(cards) ? cards : []) {
+    const value = getter(card);
+    if (!value) continue;
+    counts.set(value, (counts.get(value) || 0) + 1);
+  }
+  if (counts.size === 0) return "";
+  return [...counts.entries()].sort((a, b) => b[1] - a[1])[0][0];
+}
+
+function actualCardsLabel(cards = []) {
+  const gender = dominantCardValue(cards, cardGender);
+  const category = dominantCardValue(cards, cardCategory);
+  return scopedLabel({ gender, category }, "styles");
+}
+
+function impossibleScopeListingText(cards = [], ctx = {}) {
+  const impossible = Array.isArray(ctx?.resolverState?.impossible_constraints)
+    ? ctx.resolverState.impossible_constraints
+    : [];
+  const structural = impossible.find((item) => item?.field === "gender" || item?.field === "category");
+  if (!structural) return "";
+
+  const scope = currentCatalogScopeFromContext(ctx);
+  const requested = scopedLabel({
+    gender: structural.field === "gender" ? structural.value : scope.gender,
+    category: structural.field === "category" ? structural.value : scope.category,
+  }, structural.field === "category" ? displayCategory(structural.value) || "that category" : "that style");
+  const alternatives = actualCardsLabel(cards);
+
+  if (cards.length > 0) {
+    return `We don't carry ${requested} right now. Here are ${alternatives} as the closest alternatives.`;
+  }
+  return `We don't carry ${requested} right now. I can help look for another style.`;
 }
 
 function listingBaseLabel({ cards = [], ctx = {} } = {}) {
@@ -1027,6 +1070,57 @@ function templateIndex(cards = [], base = "") {
   return hash % 3;
 }
 
+export function buildSoftBrowseFallbackText({ input = {}, hasProducts = true } = {}) {
+  if (!hasProducts) {
+    return "No problem — we can browse first and narrow later. Tell me a style, color, or price range and I'll pull options.";
+  }
+
+  const query = String(input?.query || "").toLowerCase();
+  const priceMax = Number(input?.priceMax);
+  if (Number.isFinite(priceMax) && priceMax > 0) {
+    return `Here are styles under $${Math.round(priceMax)} to start with. You can narrow by men's, women's, style, or color from here.`;
+  }
+  if (/\bsale|deals?|discount|cheap\b/i.test(query)) {
+    return "Here are sale styles to start with. You can narrow by men's, women's, style, color, or a specific budget from here.";
+  }
+  if (/\bpopular|best\s*sellers?|top\s+rated|favorite\b/i.test(query)) {
+    return "Here are popular styles to start with. You can narrow by men's, women's, style, color, or price from here.";
+  }
+  if (/\barch|support|comfort|pain|standing|walking\b/i.test(query)) {
+    return "Here are comfort-focused styles to start with. You can narrow by men's, women's, style, color, or price from here.";
+  }
+  return "No problem — here are a few styles to start with. You can narrow by men's, women's, style, color, or price from here.";
+}
+
+function publicPrice(card = {}) {
+  return String(card.price_formatted || card.priceRange || card.price || "").trim();
+}
+
+function shortCardDescription(card = {}) {
+  const bits = [];
+  const category = displayCategory(cardCategory(card));
+  const color = cardLiteralColorNames(card)[0] || "";
+  const price = publicPrice(card);
+  if (color) bits.push(color);
+  if (category) bits.push(category);
+  if (price) bits.push(price);
+  return bits.length > 0 ? bits.join(", ") : "shown in the cards";
+}
+
+export function buildCodeOwnedComparisonText({ text = "", cards = [] } = {}) {
+  const list = Array.isArray(cards) ? cards.filter(Boolean).slice(0, 2) : [];
+  if (list.length < 2) return { text, changed: false, reason: "" };
+  const [a, b] = list;
+  const next =
+    `Quick comparison of the first two: **${a.title}** is ${shortCardDescription(a)}; ` +
+    `**${b.title}** is ${shortCardDescription(b)}. Pick the first if that style feels closer, or the second if you prefer its look.`;
+  return {
+    text: next.replace(/\s{2,}/g, " ").trim(),
+    changed: next.trim() !== String(text || "").trim(),
+    reason: "code_owned_comparison",
+  };
+}
+
 function exactRequestedColorMatches(cards = [], requestedColor) {
   const color = normalizeKnownTextColor(requestedColor);
   if (!color || !Array.isArray(cards) || cards.length === 0) {
@@ -1057,6 +1151,15 @@ export function buildCodeOwnedProductListingText({ text = "", cards = [], ctx = 
   const requestedColor = normalizeKnownTextColor(scope.color);
   const variantText = variantScopeLabel(scope);
   let next;
+
+  const impossibleText = impossibleScopeListingText(cards, ctx);
+  if (impossibleText) {
+    return {
+      text: impossibleText.replace(/\s{2,}/g, " ").trim(),
+      changed: impossibleText.trim() !== String(text || "").trim(),
+      reason: "impossible_scope_listing",
+    };
+  }
 
   if (requestedColor) {
     const colorMatch = exactRequestedColorMatches(cards, requestedColor);
@@ -1198,7 +1301,13 @@ export function prepareProductCardsForTurn(cards = []) {
       genderCounts.set(card._gender, (genderCounts.get(card._gender) || 0) + 1);
     }
 
-    const { _descriptionSnippet, _searchQuery, _category, _gender, _attributes, _variantFacts, ...publicCard } = card;
+    const publicCard = { ...card };
+    delete publicCard._descriptionSnippet;
+    delete publicCard._searchQuery;
+    delete publicCard._category;
+    delete publicCard._gender;
+    delete publicCard._attributes;
+    delete publicCard._variantFacts;
     products.push(publicCard);
   }
 

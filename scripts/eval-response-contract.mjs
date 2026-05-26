@@ -4,6 +4,8 @@ import {
   ensureCompleteCustomerText,
   productPoolSatisfiesCatalogScope,
   buildCodeOwnedProductListingText,
+  buildCodeOwnedComparisonText,
+  buildSoftBrowseFallbackText,
   repairProductTurnAssembly,
   repairProductResponseText,
   stripMissingSkus,
@@ -364,6 +366,54 @@ test("R16 — size and width scope require verified variant-matched cards", () =
 
   const out = buildCodeOwnedProductListingText({ text: "Here are women's sneakers.", cards: scoped.products, ctx });
   assert.match(out.text, /size 9 and wide width available/i);
+});
+
+test("R17 — broad-browse fallback reflects price refinement instead of repeating generic copy", () => {
+  const out = buildSoftBrowseFallbackText({
+    input: { query: "sale shoes", priceMax: 50 },
+    hasProducts: true,
+  });
+  assert.match(out, /under \$50/i);
+  assert.doesNotMatch(out, /color, or price from here/i);
+});
+
+test("R18 — impossible gender/category listing is honest about alternatives", () => {
+  const out = buildCodeOwnedProductListingText({
+    text: "Found these women's boots for you.",
+    cards: [
+      { title: "Chrissy Boot - Black", _gender: "women", _category: "boots", _attributes: { Gender: "Women", Category: "Boots" } },
+      { title: "Vera Boot - Brown", _gender: "women", _category: "boots", _attributes: { Gender: "Women", Category: "Boots" } },
+    ],
+    ctx: {
+      latestUserMessage: "boots for my dad",
+      sessionMemory: { explicit: { gender: "men", category: "boots" } },
+      resolverState: {
+        type: "resolver_state",
+        matched_constraints: { category: "boots" },
+        inferred_constraints: {},
+        impossible_constraints: [{ field: "gender", value: "men", reason: "boots only exists in women" }],
+      },
+    },
+  });
+  assert.equal(out.changed, true);
+  assert.match(out.text, /don't carry men's boots/i);
+  assert.match(out.text, /women's boots/i);
+  assert.doesNotMatch(out.text, /^found these women's boots/i);
+});
+
+test("R19 — comparison renderer answers compare-the-first-two without generic relisting", () => {
+  const out = buildCodeOwnedComparisonText({
+    text: "Found these women's sneakers for you.",
+    cards: [
+      { title: "Danika Arch Support Sneaker - Pink", _gender: "women", _category: "sneakers", _attributes: { Color: "Pink" }, price_formatted: "$99.95" },
+      { title: "Kinsley Arch Support Sneaker - Blush", _gender: "women", _category: "sneakers", _attributes: { Color: "Blush" }, price_formatted: "$119.95" },
+    ],
+  });
+  assert.equal(out.changed, true);
+  assert.match(out.text, /Quick comparison/i);
+  assert.match(out.text, /Danika/i);
+  assert.match(out.text, /Kinsley/i);
+  assert.doesNotMatch(out.text, /^Found these/i);
 });
 
 if (failed > 0) {

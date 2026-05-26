@@ -69,6 +69,14 @@ await test("normalizeColor — phrase containing color word still matches", () =
   assert.equal(normalizeColor("red suede"), "red");
 });
 
+await test("normalizeColor — common Spanish color words map to English facets", () => {
+  assert.equal(normalizeColor("rojo"), "red");
+  assert.equal(normalizeColor("color rojo"), "red");
+  assert.equal(normalizeColor("negra"), "black");
+  assert.equal(normalizeColor("azul"), "blue");
+  assert.equal(normalizeColor("morado"), "purple");
+});
+
 // ─── normalizeCategory: compound categories ───────────────────
 await test("normalizeCategory — 'Walking Shoes' → sneakers", () => {
   assert.equal(normalizeCategory("Walking Shoes"), "sneakers");

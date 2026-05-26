@@ -621,6 +621,7 @@ const ORTHOTIC_ENUM_TOKEN_RE = new RegExp(
 // underscores are legitimate) are masked out first so links survive.
 const ENUM_SHAPED_TOKEN_RE = /\b[a-z]{2,}(?:_[a-z0-9]+)+\b/gi;
 const URL_SPAN_RE = /https?:\/\/\S+/gi;
+const URL_MASK_PREFIX = "__HAJIRAI_URL_MASK_";
 
 export function scrubInternalEnums(text) {
   if (!text || typeof text !== "string") return { text: text || "", changed: false };
@@ -629,7 +630,7 @@ export function scrubInternalEnums(text) {
   const urls = [];
   let masked = text.replace(URL_SPAN_RE, (u) => {
     urls.push(u);
-    return ` URL${urls.length - 1} `;
+    return `${URL_MASK_PREFIX}${urls.length - 1}__`;
   });
 
   // 1. Node ids are never customer-facing — remove outright.
@@ -641,7 +642,7 @@ export function scrubInternalEnums(text) {
   masked = masked.replace(ENUM_SHAPED_TOKEN_RE, (m) => m.replace(/_/g, " "));
 
   let out = masked
-    .replace(/ URL(\d+) /g, (_, i) => urls[Number(i)])
+    .replace(/__HAJIRAI_URL_MASK_(\d+)__/g, (_, i) => urls[Number(i)])
     .replace(/[ \t]{2,}/g, " ")
     .replace(/\s+([.,!?;:])/g, "$1")
     .replace(/\(\s+/g, "(")
@@ -686,11 +687,33 @@ const SUGG_TECH_NAME_RE = /(?:[™®]|\b[A-Z][A-Za-z]*(?:[A-Z][A-Za-z]+){1,}\b)/
 // to the live offer, so suggesting the question sets up a non-answer.
 const SUGG_DISCOUNT_MECHANICS_RE = /\b(?:govx|gov\s*x|discount|promo(?:tion)?|coupon|code|loyalty|rewards?|points?)\b/i;
 const SUGG_MECHANICS_QUALIFIER_RE = /\b(?:categor|specific|which|each|certain|appl(?:y|ies|ied)|stack|combine|maximi[sz]e|best way)\b/i;
+const SUGG_TOKEN_STOPWORDS = new Set([
+  "can", "you", "show", "me", "do", "does", "have", "any", "with", "for", "the", "these",
+  "those", "ones", "options", "option", "style", "styles", "different", "more", "other",
+  "about", "would", "like", "please", "pls",
+]);
 
-export function isUnanswerableSuggestion(question, { lastText = "" } = {}) {
+function suggestionTokens(text) {
+  return String(text || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, " ")
+    .split(/\s+/)
+    .filter((token) => token.length >= 4 && !SUGG_TOKEN_STOPWORDS.has(token));
+}
+
+export function isUnanswerableSuggestion(question, { lastText = "", latestUserMessage = "" } = {}) {
   const q = String(question || "");
   if (!q.trim()) return { unanswerable: true, reason: "empty" };
   const lastLower = String(lastText || "").toLowerCase();
+
+  const qTokens = suggestionTokens(q);
+  const latestTokens = new Set(suggestionTokens(latestUserMessage));
+  if (qTokens.length >= 2 && latestTokens.size >= 2) {
+    const overlap = qTokens.filter((token) => latestTokens.has(token)).length;
+    if (overlap >= 2 && overlap / qTokens.length >= 0.6) {
+      return { unanswerable: true, reason: "duplicates the customer's current request" };
+    }
+  }
 
   // Spec deep-dive — allowed only if its subject already appeared in the reply.
   if (SUGG_SPEC_DEEPDIVE_RE.test(q)) {
@@ -718,6 +741,48 @@ export function isUnanswerableSuggestion(question, { lastText = "" } = {}) {
     return { unanswerable: true, reason: "discount mechanics the bot can't verify" };
   }
   return { unanswerable: false, reason: "" };
+}
+
+const INLINE_CHIP_RE = /<<\s*([^<>]+?)\s*>>/g;
+const SAFE_INLINE_CHIP_QUESTION_RE =
+  /\b(?:who\s+are|what\s+(?:kind|type)|which\s+(?:style|styles|category)|what'?s\s+your\s+arch|any\s+specific|are\s+you\s+looking\s+for|would\s+you\s+like|do\s+you\s+want|choose|select|men'?s\s+or\s+women'?s|women'?s\s+or\s+men'?s)\b/i;
+const ANSWER_WITH_MENU_RE =
+  /\b(?:we\s+don'?t\s+(?:carry|have)|only\s+available|alternatives?|instead|closest|not\s+available)\b/i;
+const DOMAIN_DISAMBIG_RE =
+  /\bfootwear\s+with\s+(?:built-in\s+)?arch\s+support\b[\s\S]{0,180}\borthotic\s+insole\b/i;
+
+function stripInlineChipMarkup(text) {
+  return String(text || "")
+    .replace(/\s*<<[^<>]+>>/g, "")
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+export function stripUnsafeInlineChips(text, { hasProducts = false } = {}) {
+  const value = String(text || "");
+  const chips = [...value.matchAll(INLINE_CHIP_RE)].map((m) => String(m[1] || "").trim()).filter(Boolean);
+  if (chips.length === 0) return { text: value, changed: false, reason: "" };
+
+  // Product turns have their own stricter assembly repair because cards
+  // and chips compete for the same visual space.
+  if (hasProducts) return { text: value, changed: false, reason: "" };
+
+  const firstChip = value.indexOf("<<");
+  const before = firstChip >= 0 ? value.slice(0, firstChip).trim() : value.trim();
+  const lastQuestion = before.match(/(?:^|[.!]\s+)([^.!?]{0,240}\?)\s*$/)?.[1] || before.match(/([^.!?]{0,240}\?)\s*$/)?.[1] || "";
+
+  if (DOMAIN_DISAMBIG_RE.test(before)) return { text: value, changed: false, reason: "" };
+  if (lastQuestion && SAFE_INLINE_CHIP_QUESTION_RE.test(lastQuestion) && !ANSWER_WITH_MENU_RE.test(before)) {
+    return { text: value, changed: false, reason: "" };
+  }
+
+  const next = stripInlineChipMarkup(value);
+  return {
+    text: next,
+    changed: next !== value.trim(),
+    reason: "unsafe_inline_chips",
+  };
 }
 
 // =====================================================================

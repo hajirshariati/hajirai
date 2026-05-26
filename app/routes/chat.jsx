@@ -45,6 +45,8 @@ import {
   detectFalseGenderCategoryAffirmation,
   dropSiblingCards,
   buildCodeOwnedProductListingText,
+  buildCodeOwnedComparisonText,
+  buildSoftBrowseFallbackText,
   ensureProductTurnCards,
   extractCollectionCTA,
   extractGenericCTA,
@@ -65,7 +67,6 @@ import {
   detectSingularIntent,
   detectComparisonIntent,
   detectAiPivotPhrasing,
-  validateFollowUpSuggestion,
   detectRejectedCategories,
   stripRejectedCategoryChips,
   stripToolCallSyntax,
@@ -82,6 +83,7 @@ import {
   looksLikeClarifyingQuestion,
   suggestionContradictsGender,
   isUnanswerableSuggestion,
+  stripUnsafeInlineChips,
   detectFootwearOverElicitation,
   stripInternalLeaks,
   scrubInternalEnums,
@@ -422,14 +424,57 @@ function softGenderBrowseSearchInput(latestUserMessage = "") {
   return input;
 }
 
+function interleaveUniqueCards(groups, limit) {
+  const out = [];
+  const seen = new Set();
+  const maxLen = Math.max(0, ...groups.map((g) => g.length));
+  for (let i = 0; i < maxLen; i += 1) {
+    for (const group of groups) {
+      const card = group[i];
+      const key = card?.handle || card?.title;
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      out.push(card);
+      if (out.length >= limit) return out;
+    }
+  }
+  return out;
+}
+
+async function fetchSoftBrowseCards({ ctx, input }) {
+  const cap = ctx?.productCardCap || 3;
+  const searchInput = { ...input, limit: Math.max(cap, input?.limit || 6) };
+  const hasGenderScope = Boolean(ctx?.sessionGender || searchInput?.filters?.gender);
+  if (hasGenderScope) {
+    const result = await dispatchTool("search_products", searchInput, ctx);
+    return extractProductCards("search_products", result).slice(0, cap);
+  }
+
+  const withGender = (gender) => ({
+    ...searchInput,
+    filters: { ...(searchInput.filters || {}), gender },
+  });
+  const [women, men] = await Promise.all([
+    dispatchTool("search_products", withGender("women"), ctx),
+    dispatchTool("search_products", withGender("men"), ctx),
+  ]);
+  const mixed = interleaveUniqueCards(
+    [
+      extractProductCards("search_products", women),
+      extractProductCards("search_products", men),
+    ],
+    cap,
+  );
+  if (mixed.length > 0) return mixed;
+
+  const fallback = await dispatchTool("search_products", searchInput, ctx);
+  return extractProductCards("search_products", fallback).slice(0, cap);
+}
+
 async function emitSoftGenderGateBrowse({ ctx, controller, encoder }) {
   const input = softGenderBrowseSearchInput(ctx?.latestUserMessage || "");
-  const result = await dispatchTool("search_products", input, ctx);
-  const cards = extractProductCards("search_products", result)
-    .slice(0, ctx?.productCardCap || 3);
-  const text = cards.length > 0
-    ? "No problem — here are a few styles to start with. You can narrow by men's, women's, style, color, or price from here."
-    : "No problem — we can browse first and narrow later. Tell me a style, color, or price range and I'll pull options.";
+  const cards = await fetchSoftBrowseCards({ ctx, input });
+  const text = buildSoftBrowseFallbackText({ input, hasProducts: cards.length > 0 });
 
   controller.enqueue(encoder.encode(sseChunk({ type: "text", text })));
   controller.enqueue(encoder.encode(sseChunk({ type: "products", products: cards })));
@@ -970,15 +1015,16 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       const scoped = scopedProductSearchInput(ctx);
       const hasScope = !!(scoped.scope.gender || scoped.scope.category || scoped.scope.color);
       const input = hasScope ? scoped.input : softGenderBrowseSearchInput(ctx.latestUserMessage || "");
-      const browse = await dispatchTool("search_products", input, ctx);
-      const cards = extractProductCards("search_products", browse);
+      const cards = hasScope
+        ? extractProductCards("search_products", await dispatchTool("search_products", input, ctx))
+        : await fetchSoftBrowseCards({ ctx, input });
       for (const card of cards) {
         const key = card?.handle || card?.title;
         if (key && !allProductPool.has(key)) allProductPool.set(key, card);
       }
       if (cards.length > 0) {
         productSearchAttempted = true;
-        fullResponseText = "No problem — here are a few styles to start with. You can narrow by men's, women's, style, color, or price from here.";
+        fullResponseText = buildSoftBrowseFallbackText({ input, hasProducts: true });
         console.log(`[chat] repeated-clarifier escape: ${currentClarifyingType} → showing ${cards.length} starter product(s)`);
       }
     } catch (err) {
@@ -1478,6 +1524,21 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }
   }
 
+  if (pool.length >= 2 && ctx.latestUserMessage && detectComparisonIntent(ctx.latestUserMessage)) {
+    const comparison = buildCodeOwnedComparisonText({
+      text: fullResponseText,
+      cards: pool,
+    });
+    if (comparison.changed) {
+      const before = fullResponseText;
+      fullResponseText = comparison.text;
+      console.log(
+        `[chat] response-contract: code-owned comparison ` +
+          `(${before.length}→${fullResponseText.length} chars, pool=${pool.length}, reason=${comparison.reason})`,
+      );
+    }
+  }
+
   if (pool.length > 0 && fullResponseText) {
     const before = fullResponseText;
     const repaired = repairProductTurnAssembly({ text: fullResponseText, pool, ctx });
@@ -1491,24 +1552,34 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   }
 
   if (pool.length > 0 && fullResponseText) {
-    const listing = buildCodeOwnedProductListingText({
-      text: fullResponseText,
-      cards: pool,
-      ctx,
-      recommenderInvoked: recommenderInvokedThisTurn,
-    });
-    if (listing.changed) {
-      const before = fullResponseText;
-      const serviceAnswer = isCompoundPolicyProductQuestion(ctx.latestUserMessage)
-        ? compoundPolicyFallbackText(ctx.latestUserMessage)
-        : "";
-      fullResponseText = serviceAnswer
-        ? `${serviceAnswer} ${listing.text}`
-        : listing.text;
-      console.log(
-        `[chat] response-contract: code-owned product listing ` +
-          `(${before.length}→${fullResponseText.length} chars, pool=${pool.length}, reason=${listing.reason})`,
-      );
+    if (!detectComparisonIntent(ctx.latestUserMessage)) {
+      const listing = buildCodeOwnedProductListingText({
+        text: fullResponseText,
+        cards: pool,
+        ctx,
+        recommenderInvoked: recommenderInvokedThisTurn,
+      });
+      if (listing.changed) {
+        const before = fullResponseText;
+        const serviceAnswer = isCompoundPolicyProductQuestion(ctx.latestUserMessage)
+          ? compoundPolicyFallbackText(ctx.latestUserMessage)
+          : "";
+        fullResponseText = serviceAnswer
+          ? `${serviceAnswer} ${listing.text}`
+          : listing.text;
+        console.log(
+          `[chat] response-contract: code-owned product listing ` +
+            `(${before.length}→${fullResponseText.length} chars, pool=${pool.length}, reason=${listing.reason})`,
+        );
+      }
+    }
+  }
+
+  if (fullResponseText) {
+    const inlineChips = stripUnsafeInlineChips(fullResponseText, { hasProducts: pool.length > 0 });
+    if (inlineChips.changed) {
+      console.log(`[chat] stripped unsafe inline chip(s) before emit (${inlineChips.reason})`);
+      fullResponseText = inlineChips.text;
     }
   }
 
@@ -1748,11 +1819,6 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       score: scoreCardAgainstText(card, textLower, userTextLower),
     }));
     scored.sort((a, b) => b.score - a.score);
-
-    const matched = dropSiblingCards(
-      scored.filter((s) => s.score >= 0.6),
-      textLower,
-    );
 
     // Per-shop card cap, set in chat action from config.productCardStyle.
     // Horizontal layout = 3 (legacy); showcase layout = 10 (scroll-snap row).
@@ -2629,6 +2695,15 @@ export const action = async ({ request }) => {
                 classifiedIntent,
                 resolverState,
               });
+              if (
+                sessionGender &&
+                (!ctx.sessionMemory.explicit?.gender || latestPivotedGender)
+              ) {
+                ctx.sessionMemory.explicit = {
+                  ...(ctx.sessionMemory.explicit || {}),
+                  gender: sessionGender,
+                };
+              }
               console.log(`[memory] ${ctx.shop} ${memorySummary(ctx.sessionMemory)}`);
               const memBlock = buildSessionMemoryPromptBlock(ctx.sessionMemory);
               if (memBlock) systemPrompt = systemPrompt + memBlock;
@@ -2793,7 +2868,10 @@ export const action = async ({ request }) => {
                   // Single code-owned answerability gate: never suggest a
                   // follow-up the bot can't answer (spec deep-dives, branded
                   // tech names, unverifiable discount mechanics).
-                  const verdict = isUnanswerableSuggestion(q, { lastText });
+                  const verdict = isUnanswerableSuggestion(q, {
+                    lastText,
+                    latestUserMessage: String(body.message || ""),
+                  });
                   if (verdict.unanswerable) {
                     dropped.push({ q, reason: verdict.reason });
                     continue;

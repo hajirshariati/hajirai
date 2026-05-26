@@ -45,6 +45,7 @@ import {
   scrubInternalEnums,
   friendlyEnumLabel,
   isUnanswerableSuggestion,
+  stripUnsafeInlineChips,
   resolverPromisedRecommendation,
   stripAvailabilityDenialSentences,
 } from "../app/lib/chat-postprocessing.js";
@@ -1007,6 +1008,41 @@ test("suggestion-gate — keeps good pivots (gender / width / price)", () => {
     const v = isUnanswerableSuggestion(q, { lastText: "Here are men's sandals." });
     assert.equal(v.unanswerable, false, `must keep "${q}"; got ${JSON.stringify(v)}`);
   }
+});
+
+test("suggestion-gate — drops suggestions that repeat the customer's current filter", () => {
+  const v = isUnanswerableSuggestion("Can you show me strappy sandals options?", {
+    lastText: "Found these women's sandals for you.",
+    latestUserMessage: "can u show me sandals with different styles like strappy or slide sandals",
+  });
+  assert.equal(v.unanswerable, true, `should drop duplicate suggestion; got ${JSON.stringify(v)}`);
+  assert.match(v.reason, /duplicates/i);
+});
+
+test("inline-chip gate — strips answer menus after no-match alternatives", () => {
+  const r = stripUnsafeInlineChips(
+    "We don't carry kids' sneakers. Here are alternatives we carry: <<Accessories>> <<Orthotics>>",
+    { hasProducts: false },
+  );
+  assert.equal(r.changed, true);
+  assert.equal(/<</.test(r.text), false);
+  assert.match(r.text, /kids' sneakers/i);
+});
+
+test("inline-chip gate — keeps real clarifier chips", () => {
+  const r = stripUnsafeInlineChips(
+    "Which styles would you like to browse? <<Sneakers>> <<Sandals>> <<Boots>>",
+    { hasProducts: false },
+  );
+  assert.equal(r.changed, false, `must keep chips; got: ${r.text}`);
+});
+
+test("inline-chip gate — keeps foot-pain domain disambiguation", () => {
+  const r = stripUnsafeInlineChips(
+    "Are you looking for footwear with built-in arch support, or an orthotic insole that goes inside your existing shoes? <<Footwear with arch support>> <<Orthotic insole>>",
+    { hasProducts: false },
+  );
+  assert.equal(r.changed, false, `must keep domain chips; got: ${r.text}`);
 });
 
 // =====================================================================

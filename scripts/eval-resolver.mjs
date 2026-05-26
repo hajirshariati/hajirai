@@ -21,7 +21,7 @@
 //   R12 no cards while asking
 
 import assert from "node:assert/strict";
-import { resolveCatalogTurn, buildResolverStatePromptBlock } from "../app/lib/catalog-resolver.server.js";
+import { resolveCatalogTurn, buildResolverStatePromptBlock, extractUserConstraints } from "../app/lib/catalog-resolver.server.js";
 
 let passed = 0;
 let failed = 0;
@@ -68,6 +68,12 @@ function makeFetcher(products) {
 const SHOP = "test.myshopify.com";
 
 console.log("Resolver eval (Milestone 1)\n");
+
+await test("R0 — extractor maps common Spanish color words", async () => {
+  assert.equal(extractUserConstraints("en color rojo?").color, "red");
+  assert.equal(extractUserConstraints("tienes botas negras?").color, "black");
+  assert.equal(extractUserConstraints("en azul").color, "blue");
+});
 
 await test("R1 — navy color infers men's, gender goes in do_not_ask", async () => {
   const facetIndex = {

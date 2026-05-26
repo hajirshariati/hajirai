@@ -738,7 +738,20 @@ const searchQuery = detected.gender ? detected.query : q;
     return "";
   })();
 
-  const effectiveCategory = explicitCategoryFilter || inferredCategory;
+  let effectiveCategory = explicitCategoryFilter || inferredCategory;
+  if (!effectiveCategory) {
+    const activeUseCase = /\b(?:hiking|trail|outdoor|running|runner|walk(?:ing)?|gym|training|workout|athletic|active)\b/i.test(userIntentText);
+    if (activeUseCase && Array.isArray(merchantGroups)) {
+      const categories = merchantGroups.flatMap((g) => Array.isArray(g?.categories) ? g.categories : []);
+      const sneakerCat = categories.find((c) => /\bsneakers?\b/i.test(String(c || "")));
+      if (sneakerCat) {
+        effectiveCategory = String(sneakerCat).toLowerCase().trim();
+        console.log(
+          `[search]   relevance floor: active/outdoor use-case → category=${effectiveCategory}`,
+        );
+      }
+    }
+  }
 
   // Honest gender×category mismatch detection. categoryGenderMap is
   // built from the live catalog at request time (Product.server.js)

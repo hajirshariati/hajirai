@@ -405,6 +405,23 @@ await test("off-topic reply (shipping policy mid-flow) → falls through", async
   assert.equal(events.length, 0);
 });
 
+await test("product explanation follow-up ('what makes these better') → falls through", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "I need orthotics for heel pain" },
+      { role: "assistant", content: "Based on what you've shared, Women's Active Orthotics is the best match." },
+      { role: "user", content: "what makes these ones better for my heel pain?" },
+    ],
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+  });
+  assert.equal(out.handled, false);
+  assert.equal(events.length, 0);
+});
+
 await test("bootstrap: 'I need orthotics' → emits q_gender (no prior assistant)", async () => {
   const { events, encoder, controller } = makeMockSse();
   const out = await maybeRunOrthoticFlow({
@@ -852,6 +869,9 @@ await test("resolve guard: chip-answer turn (Layer 2 mapped) → resolves (happy
     out.handled === true || events.length > 0,
     `expected chip-answer to resolve; got handled=${out.handled} events=${events.length}`,
   );
+  if (events[0]?.type === "text" && /roll inward/i.test(events[0].text)) {
+    assert.doesNotMatch(events[0].text, /flat-feet symptoms/i);
+  }
 });
 
 // ===================================================================

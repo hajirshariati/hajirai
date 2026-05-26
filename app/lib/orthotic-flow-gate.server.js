@@ -195,7 +195,10 @@ function availableConditionsForAnswers(tree, answers) {
 
 function renderQuestionText(node, answers, tree) {
   if (!node || node.type !== "question") return "";
-  const q = String(node.question || "").trim();
+  let q = String(node.question || "").trim();
+  if (node.id === "q_overpronation" || node.attribute === "overpronation") {
+    q = "Do your ankles tend to roll inward when you walk or stand?";
+  }
   // Defensive Unisex / Other / Either / Both strip — production
   // showed those labels appearing on q_gender despite the canonical
   // seed file having only Men/Women/Kids. The DB-stored tree may
@@ -401,7 +404,9 @@ export async function maybeRunOrthoticFlow({
   // catalog context.
   const PRODUCT_INFO_RE =
     /\b(?:do|does|is|are|will|would|can|how|what|when|where|which|why)\b[^?]{0,80}?\b(?:come|comes|available|stock|stocked|sale|sized?|price|cost|color|colour|width|fit|fits|ship|shipping|return)\b/i;
-  if (PRODUCT_INFO_RE.test(rawUserText)) {
+  const PRODUCT_EXPLANATION_FOLLOWUP_RE =
+    /\b(?:what|why|how)\b[^?]{0,120}\b(?:makes?|better|good|help|work|different)\b/i;
+  if (PRODUCT_INFO_RE.test(rawUserText) || PRODUCT_EXPLANATION_FOLLOWUP_RE.test(rawUserText)) {
     // Only bail when there's prior assistant context (otherwise this
     // is a genuine fresh question, not a follow-up). Cheap check:
     // any prior assistant turn with non-trivial text.
