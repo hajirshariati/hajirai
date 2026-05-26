@@ -86,3 +86,21 @@ export function classifyAnthropicError(err) {
   }
   return { kind: "unknown", retryable: false };
 }
+
+// Customer-facing message for a classified failure. Kept here (not inline
+// in the route) so it is the single, unit-tested source of truth for what
+// the shopper sees when the model call ultimately fails. A "billing"/down
+// failure points the customer to human support rather than dead-ending.
+export function customerFacingFailureMessage(kind) {
+  switch (kind) {
+    case "billing":
+      return "I'm temporarily unavailable right now. Please try again shortly, or reach out to our customer service team and they'll be glad to help.";
+    case "rate_limit":
+      return "I'm getting a lot of questions right now! Please try again in a moment.";
+    case "upstream":
+    case "network":
+      return "I'm having trouble reaching my service right now. Please try again in a moment.";
+    default:
+      return "I'm sorry, I'm having trouble right now. Please try again in a moment.";
+  }
+}

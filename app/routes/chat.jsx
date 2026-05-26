@@ -29,7 +29,7 @@ import {
 } from "../lib/chat-helpers.server";
 import { TOOLS, executeTool, extractProductCards, CUSTOMER_ORDERS_TOOL, FIT_PREDICTOR_TOOL, detectLatestGender } from "../lib/chat-tools.server";
 import { rewriteToolCall } from "../lib/chat-tool-rewrite.server";
-import { withAnthropicRetry, classifyAnthropicError } from "../lib/anthropic-resilience.server";
+import { withAnthropicRetry, classifyAnthropicError, customerFacingFailureMessage } from "../lib/anthropic-resilience.server";
 import { fetchCustomerContext } from "../lib/customer-context.server";
 import { fetchKlaviyoEnrichment } from "../lib/klaviyo-enrichment.server";
 import { fetchYotpoLoyalty } from "../lib/yotpo-loyalty.server";
@@ -2837,22 +2837,10 @@ export const action = async ({ request }) => {
           // got here, retries were exhausted) and gives a stable kind
           // for the customer-facing message.
           const classified = classifyAnthropicError(err);
-          let userMsg;
-          switch (classified.kind) {
-            case "billing":
-              userMsg = "I'm temporarily unavailable. Please try again later or reach out to our customer service team for help.";
-              break;
-            case "rate_limit":
-              userMsg = "I'm getting a lot of questions right now! Please try again in a moment.";
-              incrementRateLimitHits(session.shop).catch(() => {});
-              break;
-            case "upstream":
-            case "network":
-              userMsg = "I'm having trouble reaching my service right now. Please try again in a moment.";
-              break;
-            default:
-              userMsg = "I'm sorry, I'm having trouble right now. Please try again in a moment.";
+          if (classified.kind === "rate_limit") {
+            incrementRateLimitHits(session.shop).catch(() => {});
           }
+          const userMsg = customerFacingFailureMessage(classified.kind);
           controller.enqueue(
             encoder.encode(sseChunk({ type: "error", message: userMsg })),
           );
