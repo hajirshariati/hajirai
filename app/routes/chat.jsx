@@ -2909,17 +2909,65 @@ export const action = async ({ request }) => {
             }
           }
 
-          const result = await runAgenticLoop({
-            anthropic,
-            model,
-            systemPrompt,
-            messages,
-            ctx,
-            controller,
-            encoder,
-            promptCaching: config.promptCaching === true,
-            tools: activeTools,
-          });
+          // Haiku→Sonnet escalation (cost-optimized mode only). On a
+          // low-risk turn routed to Haiku, run it into a BUFFER (nothing
+          // reaches the widget yet). If the result looks weak (empty text,
+          // or searched-but-no-cards), silently re-run the turn on Sonnet
+          // and flush THAT instead. Healthy Haiku turns flush unchanged.
+          // Strictly gated: Smart / always-* modes take the original path
+          // below, byte-for-byte. Each run gets a fresh messages copy
+          // (runAgenticLoop pushes tool turns onto it) and a shallow ctx
+          // clone so the buffered attempt can't pollute a retry.
+          const modelStrategy = config.modelStrategy || "smart";
+          const sonnetModel = (() => {
+            const stored = config.anthropicModel || DEFAULT_MODEL;
+            return DEPRECATED_MODELS.has(stored) ? DEFAULT_MODEL : stored;
+          })();
+          let result;
+          if (modelStrategy === "cost-optimized" && model === HAIKU_MODEL) {
+            const baseOpts = {
+              anthropic, systemPrompt, encoder,
+              promptCaching: config.promptCaching === true,
+              tools: activeTools,
+            };
+            const haikuBuf = [];
+            const haikuResult = await runAgenticLoop({
+              ...baseOpts, model, messages: messages.slice(), ctx: { ...ctx },
+              controller: { enqueue: (c) => haikuBuf.push(c) },
+            });
+            const esc = haikuEscalationSignal({
+              isHaiku: true,
+              productSearchAttempted: haikuResult.productSearchAttempted,
+              poolSize: haikuResult.turnResult?.products?.length ?? 0,
+              textLen: (haikuResult.fullResponseText || "").length,
+            });
+            if (esc.escalate) {
+              console.log(`[model] ${ctx.shop} Haiku→Sonnet escalation reason=${esc.reason}`);
+              const sonnetBuf = [];
+              const sonnetResult = await runAgenticLoop({
+                ...baseOpts, model: sonnetModel, messages: messages.slice(), ctx,
+                controller: { enqueue: (c) => sonnetBuf.push(c) },
+              });
+              for (const c of sonnetBuf) controller.enqueue(c);
+              addUsage(sonnetResult.totalUsage, haikuResult.totalUsage); // bill both attempts
+              result = sonnetResult;
+            } else {
+              for (const c of haikuBuf) controller.enqueue(c);
+              result = haikuResult;
+            }
+          } else {
+            result = await runAgenticLoop({
+              anthropic,
+              model,
+              systemPrompt,
+              messages,
+              ctx,
+              controller,
+              encoder,
+              promptCaching: config.promptCaching === true,
+              tools: activeTools,
+            });
+          }
 
           const lastText = result.fullResponseText || "";
           const hasChoiceButtons = /<<[^<>]+>>/.test(lastText);
