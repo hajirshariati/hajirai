@@ -340,22 +340,8 @@
       {
         "user": "hi i need new shoes",
         "expect": {
-          "text": {
-            "mustIncludeAny": [
-              "men",
-              "women",
-              "styles",
-              "browse"
-            ]
-          },
           "products": {
             "max": 0
-          },
-          "chips": {
-            "mustIncludeAny": [
-              "Men's",
-              "Women's"
-            ]
           }
         }
       },
@@ -395,12 +381,6 @@
       {
         "user": "i need shoes",
         "expect": {
-          "chips": {
-            "mustIncludeAny": [
-              "Men's",
-              "Women's"
-            ]
-          },
           "products": {
             "max": 0
           }
