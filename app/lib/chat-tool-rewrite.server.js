@@ -273,6 +273,33 @@ export function injectStructuredColorFilter(toolCall, ctx) {
 // stated gender always wins over the AI's recollection. The user-only
 // detection in detectGenderFromHistory ensures sessionGender already
 // reflects the customer's actual latest pivot.
+// Resolve a search category to the set of genders the catalog carries
+// it in, using the availability map from getCategoryGenderAvailability.
+// Map keys are raw catalog category names (lowercased); the AI may pass
+// a canonical compound like "wedges-heels" or "slip-ons", so we also
+// probe each hyphen/slash/space-separated token. Returns an array of
+// genders ("men" | "women" | "unisex") or null when the category can't
+// be confidently resolved in the map (caller stays conservative).
+export function lookupCategoryGenders(categoryGenderMap, category) {
+  if (!categoryGenderMap || !category) return null;
+  const norm = String(category).toLowerCase().trim();
+  if (!norm) return null;
+  const genders = new Set();
+  let found = false;
+  const consider = (key) => {
+    const entry = categoryGenderMap[key];
+    if (entry && Array.isArray(entry.genders)) {
+      found = true;
+      for (const g of entry.genders) genders.add(g);
+    }
+  };
+  consider(norm);
+  for (const part of norm.split(/[-/\s]+/)) {
+    if (part) consider(part);
+  }
+  return found ? Array.from(genders) : null;
+}
+
 export function injectLockedGender(toolCall, ctx) {
   const locked = ctx.sessionGender;
   if (!locked) return toolCall;
@@ -295,6 +322,34 @@ export function injectLockedGender(toolCall, ctx) {
   if (KIDS_TOKENS.has(aiGender)) {
     console.log(`[chat] gender-lock: AI passed kids gender="${aiGender}"; respecting (locked="${lockedNorm}")`);
     return toolCall;
+  }
+
+  // Impossible-intersection guard. Forcing the locked gender onto a
+  // category the catalog doesn't carry in that gender — while the AI's
+  // gender IS carried — guarantees an empty search and a customer-
+  // facing "we don't have <lockedGender>" dead-end. Production case:
+  // lock stuck on men while the customer pivoted to their mom and the
+  // AI (correctly) searched women's heels; the override forced men's
+  // heels, which don't exist, so the bot denied stock. When we can
+  // POSITIVELY confirm the locked gender is excluded from this
+  // category and the AI's gender is included, the lock is wrong for
+  // this query — trust the AI. Conservative everywhere else.
+  if (aiGender && aiGender !== lockedNorm && ctx.categoryGenderMap) {
+    const cat = readConstraintValue(existingFilters.category);
+    const avail = lookupCategoryGenders(ctx.categoryGenderMap, cat);
+    if (
+      avail &&
+      avail.length > 0 &&
+      !avail.includes("unisex") &&
+      !avail.includes(lockedNorm) &&
+      avail.includes(aiGender)
+    ) {
+      console.log(
+        `[chat] gender-lock: NOT overriding — locked="${lockedNorm}" doesn't carry ` +
+          `category="${cat}" (carried by ${avail.join("/")}); trusting AI gender="${aiGender}"`,
+      );
+      return toolCall;
+    }
   }
 
   if (aiGender && aiGender !== lockedNorm) {

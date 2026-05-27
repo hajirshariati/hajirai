@@ -66,6 +66,29 @@ const CATEGORY_BOUND_KEYS = [
   "specificProduct",
 ];
 
+// Use-cases that are physically incompatible with certain categories.
+// When a new turn states one of these use-cases and the carried
+// category is in its conflict set, the customer's need has changed —
+// the old category (and its color/size/etc.) is stale and must NOT
+// ride along. Production failure this fixes: "pink sandals" →
+// "hiking shoes for italy" returned pink sandals, because "hiking
+// shoes" extracts useCase=hiking with no category, so sandals+pink
+// silently carried over. You don't hike, run, or work out in
+// sandals/heels/slippers/loafers, and you don't wear sneakers to a
+// formal/wedding occasion. Kept deliberately tight — only clear
+// contradictions, so normal refinements (sneakers + "for running")
+// are untouched.
+const ATHLETIC_INCOMPATIBLE_CATEGORIES = [
+  "sandals", "wedges-heels", "slippers", "mary-janes",
+  "loafers", "oxfords", "clogs",
+];
+const USECASE_CATEGORY_CONFLICTS = {
+  hiking: new Set(ATHLETIC_INCOMPATIBLE_CATEGORIES),
+  running: new Set(ATHLETIC_INCOMPATIBLE_CATEGORIES),
+  athletic: new Set(ATHLETIC_INCOMPATIBLE_CATEGORIES),
+  dress: new Set(["sneakers", "slippers", "clogs", "slip-ons"]),
+};
+
 // Recipient → gender heuristic. The mapping is deliberately
 // conservative — "partner", "friend", "coworker", "spouse" don't
 // imply a gender, so they reset scope without setting one.
@@ -287,6 +310,24 @@ export function buildSessionMemory({ messages, classifiedIntent, resolverState }
       extracted.category &&
       extracted.category !== memory.explicit.category
     ) {
+      moveCategoryScopeToStale(memory);
+    }
+    // 3b-ii. Use-case → category conflict. The customer named a new
+    //        activity/occasion that's incompatible with the carried
+    //        category (e.g. "hiking" while category=sandals). Treat
+    //        like a category pivot: drop the now-stale category AND
+    //        its category-owned scope (color/size/etc.) so the
+    //        resolver re-searches on the new need instead of ANDing
+    //        an impossible combination. Only fires when THIS turn did
+    //        not itself name a category (that case is handled above).
+    if (
+      !extracted.category &&
+      extracted.useCase &&
+      memory.explicit.category &&
+      USECASE_CATEGORY_CONFLICTS[extracted.useCase]?.has(memory.explicit.category)
+    ) {
+      memory.stale.category = memory.explicit.category;
+      delete memory.explicit.category;
       moveCategoryScopeToStale(memory);
     }
     // Recipient pivot without a derived gender (e.g. "for my partner")

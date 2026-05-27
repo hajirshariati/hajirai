@@ -426,6 +426,41 @@ await test("S24 — child recipient words map to kids consistently", async () =>
   assert.equal(mem.explicit.category, "sneakers");
 });
 
+await test("S25 — incompatible use-case clears carried category + color (hiking after pink sandals)", async () => {
+  // Production failure (first-chat screenshot): customer browsed
+  // "pink sandals", then said "hiking shoes for italy". "hiking
+  // shoes" extracts useCase=hiking with NO category (the lexicon has
+  // no bare "shoes"), so the old category=sandals + color=pink
+  // silently rode along and the bot returned pink sandals for a
+  // hiking request. A use-case that's incompatible with the carried
+  // category means the need changed: drop the category-owned scope.
+  const mem = buildSessionMemory({
+    messages: [
+      u("show me pink sandals"),
+      a("Here are some pink sandals"),
+      u("actually I need hiking shoes for italy"),
+    ],
+  });
+  assert.equal(mem.explicit.category, undefined, `stale sandals must be cleared; got ${mem.explicit.category}`);
+  assert.equal(mem.explicit.color, undefined, `stale pink must be cleared; got ${mem.explicit.color}`);
+  assert.equal(mem.explicit.useCase, "hiking", "new use-case takes hold");
+  assert.ok(mem.stale.category === "sandals" || mem.stale.color === "pink", "prior scope preserved in stale for debugging");
+});
+
+await test("S25b — compatible use-case does NOT clear carried category (running after sneakers)", async () => {
+  // Guard against over-clearing: sneakers + running is a normal
+  // refinement, not a need-change. Category must survive.
+  const mem = buildSessionMemory({
+    messages: [
+      u("women's sneakers"),
+      a("here you go"),
+      u("are these good for running?"),
+    ],
+  });
+  assert.equal(mem.explicit.category, "sneakers", `compatible use-case must keep category; got ${mem.explicit.category}`);
+  assert.equal(mem.explicit.useCase, "running", "running use-case still recorded");
+});
+
 // R4 — clarifier slot detection must recognize the bot's own gender
 // clarifier however it's worded, so the repeat-clarifier guard fires.
 await test("R4 — gender clarifier detected with chips in either order", async () => {
