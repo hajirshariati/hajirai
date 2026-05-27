@@ -209,13 +209,17 @@ await test("soft gender-gate escapes after ONE unanswered ask even without an op
   );
 });
 
-await test("gender-ask detection catches chip-less comma-form phrasing (cost-mode/Haiku regression)", async () => {
-  // Regression: in cost-optimized mode Haiku asks gender WITHOUT chips and
-  // comma-separated ("Are you shopping for men's, women's, or kids'?"),
-  // which the old regex missed → repeat-escape never fired → gender loop.
+await test("gender-ask detection is structural — catches every ordering Haiku produces", async () => {
+  // Regression chain: cost-mode Haiku asks gender in endlessly varied word
+  // orders without chips. Enumerating phrasings with a regex was whack-a-mole
+  // ("men's, women's, or kids'" matched but "kids, men's, or women's" didn't).
+  // The structural detector counts ANY gender ask; the escape then fires.
   for (const content of [
     "Are you shopping for men's, women's, or kids' footwear?",
     "Are you shopping for men’s, women’s, or kids’ shoes?",
+    "Are you shopping for kids, men's, or women's shoes?",
+    "Are you shopping for men's or women's?",
+    "Got it — let me help you find the right fit. Are you shopping for men's or women's? <<Men's>><<Women's>>",
   ]) {
     assert.equal(countGenderGateAsks([{ role: "assistant", content }]), 1, `should count: ${content}`);
     assert.equal(
@@ -226,8 +230,14 @@ await test("gender-ask detection catches chip-less comma-form phrasing (cost-mod
       true,
     );
   }
-  // Must NOT false-positive on a plain product listing.
-  assert.equal(countGenderGateAsks([{ role: "assistant", content: "Here are the women's sandals I found." }]), 0);
+  // Must NOT false-positive on listings / pivots that mention both genders.
+  for (const content of [
+    "Here are the women's sandals I found.",
+    "I couldn't find brown men's sneakers, but here are men's sneakers in other colors.",
+    "Found these men's sneakers for you.",
+  ]) {
+    assert.equal(countGenderGateAsks([{ role: "assistant", content }]), 0, `should NOT count: ${content}`);
+  }
 });
 
 await test("soft gender-gate does NOT escape before any gender ask", async () => {

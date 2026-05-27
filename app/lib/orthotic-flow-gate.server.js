@@ -94,14 +94,34 @@ function letsCatalogResolverOwnFootwearRequest(text) {
   return CATALOG_SPECIFIC_FOOTWEAR_RE.test(text) || CATALOG_COLOR_RE.test(text);
 }
 
-const GENDER_GATE_ASK_RE =
-  /(?:<<\s*Men(?:['’]?s)?\s*>>[\s\S]{0,80}<<\s*Women(?:['’]?s)?\s*>>|<<\s*Women(?:['’]?s)?\s*>>[\s\S]{0,80}<<\s*Men(?:['’]?s)?\s*>>|\bmen['’]?s?\s+or\s+women['’]?s?\b|\bwomen['’]?s?\s+or\s+men['’]?s?\b|\bmen['’]?s?\s*,\s*women['’]?s?\b|\bwomen['’]?s?\s*,\s*men['’]?s?\b|\bwhich\s+styles?\s+would\s+you\s+like\s+to\s+browse\b)/i;
+// Detect "this assistant turn is a footwear gender clarifier" STRUCTURALLY,
+// not by enumerating phrasings. The LLM (especially Haiku in cost mode)
+// asks gender in endlessly varied word orders — "men's, women's, or kids'",
+// "kids, men's, or women's", "men's or women's", chip-only, etc. Chasing
+// each ordering with a regex is whack-a-mole. Instead: it's a gender ask if
+// it offers Men+Women chips, OR it mentions BOTH men and women, is framed
+// as a question/choice, and is NOT a product listing.
+const GENDER_GATE_LISTING_RE = /\b(?:here\s+are|here'?s|found\s+these|i\s+found|take\s+a\s+look|check\s+out|these\s+are|comes?\s+in|also\s+comes?\s+in|available\s+in)\b/i;
+const GENDER_GATE_ASK_CUE_RE = /\?|\b(?:shopping\s+for|are\s+you|which|would\s+you\s+like|looking\s+for|browse|for\s+(?:a\s+)?(?:man|woman|men|women|guy|gal|him|her))\b/i;
+
+export function isGenderGateAsk(content) {
+  const t = String(content || "");
+  if (!t.trim()) return false;
+  const menChip = /<<\s*(?:Men|Boys?)(?:['’]?s)?\s*>>/i.test(t);
+  const womenChip = /<<\s*(?:Women|Girls?)(?:['’]?s)?\s*>>/i.test(t);
+  if (menChip && womenChip) return true;
+  const mentionsMen = /\bmen(?:['’]?s)?\b/i.test(t);
+  const mentionsWomen = /\bwomen(?:['’]?s)?\b/i.test(t);
+  if (!mentionsMen || !mentionsWomen) return false;
+  if (GENDER_GATE_LISTING_RE.test(t)) return false; // a listing/pivot, not an ask
+  return GENDER_GATE_ASK_CUE_RE.test(t);
+}
 
 export function countGenderGateAsks(messages = []) {
   if (!Array.isArray(messages)) return 0;
   return messages.reduce((count, m) => {
     if (!m || m.role !== "assistant" || typeof m.content !== "string") return count;
-    return count + (GENDER_GATE_ASK_RE.test(m.content) ? 1 : 0);
+    return count + (isGenderGateAsk(m.content) ? 1 : 0);
   }, 0);
 }
 
