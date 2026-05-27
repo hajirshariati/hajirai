@@ -209,6 +209,27 @@ await test("soft gender-gate escapes after ONE unanswered ask even without an op
   );
 });
 
+await test("gender-ask detection catches chip-less comma-form phrasing (cost-mode/Haiku regression)", async () => {
+  // Regression: in cost-optimized mode Haiku asks gender WITHOUT chips and
+  // comma-separated ("Are you shopping for men's, women's, or kids'?"),
+  // which the old regex missed → repeat-escape never fired → gender loop.
+  for (const content of [
+    "Are you shopping for men's, women's, or kids' footwear?",
+    "Are you shopping for men’s, women’s, or kids’ shoes?",
+  ]) {
+    assert.equal(countGenderGateAsks([{ role: "assistant", content }]), 1, `should count: ${content}`);
+    assert.equal(
+      shouldSoftEscapeFootwearGenderGate({
+        messages: [{ role: "user", content: "i need shoes" }, { role: "assistant", content }],
+        answers: {},
+      }),
+      true,
+    );
+  }
+  // Must NOT false-positive on a plain product listing.
+  assert.equal(countGenderGateAsks([{ role: "assistant", content: "Here are the women's sandals I found." }]), 0);
+});
+
 await test("soft gender-gate does NOT escape before any gender ask", async () => {
   assert.equal(
     shouldSoftEscapeFootwearGenderGate({

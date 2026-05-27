@@ -95,7 +95,7 @@ function letsCatalogResolverOwnFootwearRequest(text) {
 }
 
 const GENDER_GATE_ASK_RE =
-  /(?:<<\s*Men(?:'?s)?\s*>>[\s\S]{0,80}<<\s*Women(?:'?s)?\s*>>|<<\s*Women(?:'?s)?\s*>>[\s\S]{0,80}<<\s*Men(?:'?s)?\s*>>|\bmen'?s?\s+or\s+women'?s?\b|\bwomen'?s?\s+or\s+men'?s?\b|\bwhich\s+styles?\s+would\s+you\s+like\s+to\s+browse\b)/i;
+  /(?:<<\s*Men(?:['’]?s)?\s*>>[\s\S]{0,80}<<\s*Women(?:['’]?s)?\s*>>|<<\s*Women(?:['’]?s)?\s*>>[\s\S]{0,80}<<\s*Men(?:['’]?s)?\s*>>|\bmen['’]?s?\s+or\s+women['’]?s?\b|\bwomen['’]?s?\s+or\s+men['’]?s?\b|\bmen['’]?s?\s*,\s*women['’]?s?\b|\bwomen['’]?s?\s*,\s*men['’]?s?\b|\bwhich\s+styles?\s+would\s+you\s+like\s+to\s+browse\b)/i;
 
 export function countGenderGateAsks(messages = []) {
   if (!Array.isArray(messages)) return 0;
