@@ -876,7 +876,7 @@ streamWatchdog=setTimeout(function(){
     showStreamError('This is taking longer than expected. Please try again.');
   }
 },90000);
-var body={message:msg,session_id:getSess(),shop_domain:SHOP,assistant_name:NAME,history:messages.slice(-20).map(function(m){return{role:m.role,content:m.content}})};
+var body={message:msg,session_id:getSess(),shop_domain:SHOP,assistant_name:NAME,history:messages.slice(-20).map(function(m){var out={role:m.role,content:m.content};if(m.role==='assistant'&&m.products&&m.products.length){out.products=m.products.slice(0,10).map(function(p){return{handle:p.handle||'',title:p.title||'',url:p.url||'',image:p.image||'',price:p.price||'',price_formatted:p.price_formatted||'',compare_at_price:p.compare_at_price||'',category:p.category||p._category||'',gender:p.gender||p._gender||''}})}return out})};
 if(SUPPORT_URL)body.support_url=SUPPORT_URL;
 if(SUPPORT_LABEL)body.support_label=SUPPORT_LABEL;
 fetch(CHAT_URL,{method:'POST',headers:{'Content-Type':'application/json','Accept':'text/event-stream'},body:JSON.stringify(body),signal:abortCtrl.signal}).then(function(r){

@@ -39,6 +39,10 @@ export const TOOLS = [
           type: "number",
           description: "Optional dollar floor on the most-expensive variant. Pass when the customer says 'at least $X' or 'over $Y'. Rare — most customers ask for 'under' not 'over'.",
         },
+        onSale: {
+          type: "boolean",
+          description: "Set true only when the customer specifically asks for sale, deals, discounted, clearance, markdown, or cheaper options. Returns only products with at least one variant where compareAtPrice is greater than price.",
+        },
       },
       required: ["query"],
     },

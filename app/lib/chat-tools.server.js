@@ -614,7 +614,7 @@ function genderFilterClause(gender) {
 }
 
 async function searchProducts(
-  { query, limit, filters, priceMax, priceMin },
+  { query, limit, filters, priceMax, priceMin, onSale },
   { shop, deduplicateColors, sessionGender, categoryExclusions, querySynonyms, conversationText, userText, latestUserMessage, shopConfig, activeCategoryGroup, merchantGroups, categoryGenderMap }
 ) {
   const q = String(query || "").trim();
@@ -1319,6 +1319,18 @@ const isExcludedByRule = (p) => {
     }
   }
 
+  if (onSale === true) {
+    const beforeSale = filtered.length;
+    filtered = filtered.filter((p) => (p.variants || []).some((v) => {
+      const price = Number(v.price);
+      const compare = Number(v.compareAtPrice);
+      return Number.isFinite(price) && Number.isFinite(compare) && compare > price;
+    }));
+    if (filtered.length !== beforeSale) {
+      console.log(`[search]   sale filter: ${filtered.length}/${beforeSale}`);
+    }
+  }
+
   // Optional price ceiling/floor. AI passes `priceMax` and/or
   // `priceMin` when the customer mentions a budget ('under $100',
   // 'less than $50', 'at least $80'). Applied AFTER attribute filters
@@ -1358,14 +1370,25 @@ const isExcludedByRule = (p) => {
     const isKidLike = eg === "kid" || eg === "kids" || eg === "boy" || eg === "boys" || eg === "girl" || eg === "girls" || eg === "child" || eg === "children" || eg === "youth";
 
     if (afterGender.length === 0 && beforeGenderFilter > 0 && isKidLike) {
-      // Catalog rarely tags products with kid/boy/girl gender. matchesGender
-      // fails closed for adult-tagged products under a kids query, which
-      // wipes everything to zero. Customers wait through 3 retries then
-      // get a generic 'no match' message. Better UX: drop the gender
-      // filter for kid-like queries so adult products surface — the AI
-      // can frame them honestly ('we don't carry kids' sandals
-      // specifically, but here are unisex/women's sandals that…').
-      console.log(`[search]   gender filter ${eg}: WIPED ALL ${beforeGenderFilter} → falling back to unfiltered (no kids products in this category)`);
+      console.log(`[search]   gender filter ${eg}: WIPED ALL ${beforeGenderFilter} → returning honest kids no-match, not adult fallback`);
+      return {
+        products: [],
+        matchContract: deriveCatalogMatchContract({
+          constraints: { ...attrFilters, gender: effectiveGender, ...(effectiveCategory ? { category: effectiveCategory } : {}) },
+          impossibleConstraints: [{
+            field: "gender",
+            value: effectiveGender,
+            reason: effectiveCategory
+              ? `${effectiveCategory} has no kids products in this catalog`
+              : "no kids products matched this request",
+          }],
+        }),
+        genderUnavailable: {
+          requestedGender: effectiveGender,
+          category: effectiveCategory || "",
+          reason: "no_kids_products",
+        },
+      };
     } else {
       filtered = afterGender;
     }

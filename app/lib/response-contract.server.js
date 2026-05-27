@@ -1080,7 +1080,7 @@ export function buildSoftBrowseFallbackText({ input = {}, hasProducts = true } =
   if (Number.isFinite(priceMax) && priceMax > 0) {
     return `Here are styles under $${Math.round(priceMax)} to start with. You can narrow by men's, women's, style, or color from here.`;
   }
-  if (/\bsale|deals?|discount|cheap\b/i.test(query)) {
+  if (input?.onSale === true || /\bsale|deals?|discount|cheap\b/i.test(query)) {
     return "Here are sale styles to start with. You can narrow by men's, women's, style, color, or a specific budget from here.";
   }
   if (/\bpopular|best\s*sellers?|top\s+rated|favorite\b/i.test(query)) {

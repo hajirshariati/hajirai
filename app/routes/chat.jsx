@@ -177,11 +177,52 @@ function sanitizeHistory(history) {
   return out;
 }
 
+function compactHistoryProducts(products) {
+  if (!Array.isArray(products)) return [];
+  return products
+    .filter(Boolean)
+    .slice(0, 10)
+    .map((p) => ({
+      handle: String(p.handle || "").trim(),
+      title: String(p.title || "").trim(),
+      url: String(p.url || "").trim(),
+      image: String(p.image || p.image_url || "").trim(),
+      price_formatted: String(p.price_formatted || p.price || "").trim(),
+      price: p.price,
+      compare_at_price: p.compare_at_price,
+      category: p.category || p._category || p.productType || "",
+      _category: p._category || p.category || p.productType || "",
+      gender: p.gender || p._gender || "",
+      _gender: p._gender || p.gender || "",
+    }))
+    .filter((p) => p.handle || p.title);
+}
+
+function extractPriorProductCards(history) {
+  for (let i = (history || []).length - 1; i >= 0; i -= 1) {
+    const turn = history[i];
+    if (turn?.role !== "assistant") continue;
+    const products = compactHistoryProducts(turn.products);
+    if (products.length > 0) return products;
+  }
+  return [];
+}
+
 function sseChunk(obj) {
   return `data: ${JSON.stringify(obj)}\n\n`;
 }
 
 const SIMPLE_PATTERN = /^(hi|hey|hello|thanks|thank you|ok|okay|yes|no|bye|goodbye|cool|great|got it|perfect|sure|nice|awesome|alright|yep|nope|sounds good|that helps|appreciate it)\s*[.!?]*$/i;
+const LOW_RISK_SHOPPING_RE = /\b(?:show|find|browse|shop|looking for|look for|need|want|have|carry|any|in|under|below|less than|cheaper|cheap|sale|deals?|how about|what about)\b/i;
+const PRODUCT_LISTING_TERM_RE = /\b(?:shoes?|footwear|sneakers?|sandals?|boots?|loafers?|clogs?|wedges?|heels?|slippers?|oxfords?|mary janes?|slip[-\s]?ons?|slides?|flats?|styles?|pairs?|men'?s|women'?s|kids?|boys?|girls?|black|white|brown|navy|blue|pink|red|grey|gray|tan|taupe|silver|gold|cream|ivory|beige|purple|green|orange|yellow|\$\s*\d+)\b/i;
+const HIGH_RISK_ROUTING_RE = /\b(?:orthotic|insole|insert|plantar|fasciitis|diabetic|neuropathy|bunion|metatarsalgia|morton's|heel pain|foot pain|arch pain|overpronation|flat feet|high arch|compare|comparison|vs\.?|versus|difference|better|best for|recommend|what should|why|how does|return|refund|exchange|shipping|delivery|warranty|discount code|promo code|loyalty|rewards?|order|tracking|support|contact|waterproof|material|review|run small|run large|size up|size down|wide|narrow|available in size|in stock)\b/i;
+
+function isLowRiskShoppingTurn(message) {
+  const value = String(message || "").trim();
+  if (!value || value.length > 140) return false;
+  if (HIGH_RISK_ROUTING_RE.test(value)) return false;
+  return LOW_RISK_SHOPPING_RE.test(value) && PRODUCT_LISTING_TERM_RE.test(value);
+}
 
 const detectGenderFromHistory = _detectGenderFromHistory;
 
@@ -192,7 +233,10 @@ function chooseModel(config, message, history) {
 
   if (strategy === "always-haiku") return HAIKU_MODEL;
   if (strategy === "always-opus") return OPUS_MODEL;
-  if (strategy !== "smart") return sonnet;
+  if (strategy === "cost-optimized" && isLowRiskShoppingTurn(message)) {
+    return HAIKU_MODEL;
+  }
+  if (strategy !== "smart" && strategy !== "cost-optimized") return sonnet;
 
   if (history.length > 0 && message.length < 80 && SIMPLE_PATTERN.test(message.trim())) {
     return HAIKU_MODEL;
@@ -414,14 +458,33 @@ function softGenderBrowseSearchInput(latestUserMessage = "") {
   const input = { query: "shoes", limit: 6 };
   const priceMax = lower.match(/\b(?:under|below|less\s+than)\s+\$?\s*(\d{2,4})\b/);
   if (priceMax) input.priceMax = Number(priceMax[1]);
-  if (/\b(?:cheap|sale|deals?|discount|on\s+sale|under|below|less\s+than)\b/i.test(text)) {
+  if (/\b(?:cheap|cheaper|sale|deals?|discount|on\s+sale)\b/i.test(text)) {
     input.query = "sale shoes";
+    input.onSale = true;
+  } else if (/\b(?:under|below|less\s+than)\b/i.test(text)) {
+    input.query = "shoes";
   } else if (/\b(?:best\s*sellers?|bestsellers?|popular|top\s+rated|favorite)\b/i.test(text)) {
     input.query = "popular shoes";
   } else if (/\b(?:comfort|arch|support|pain|standing|walking)\b/i.test(text)) {
     input.query = "arch support shoes";
   }
   return input;
+}
+
+function lastAssistantContent(history) {
+  for (let i = (history || []).length - 1; i >= 0; i -= 1) {
+    const turn = history[i];
+    if (turn?.role === "assistant" && turn.content) return String(turn.content);
+  }
+  return "";
+}
+
+function shouldSoftBrowseRefine(latestMessage, history) {
+  const latest = String(latestMessage || "");
+  if (!/\b(?:cheap|cheaper|under|below|less\s+than|sale|deals?|discount)\b/i.test(latest)) return false;
+  const previous = lastAssistantContent(history);
+  return /\bnarrow by men's, women's, style, color, or price\b/i.test(previous) ||
+    /\bhere are (?:a few|popular|sale|comfort-focused|styles under \$\d+)/i.test(previous);
 }
 
 function interleaveUniqueCards(groups, limit) {
@@ -1048,6 +1111,22 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   });
   if (ensuredCards.searchAttempted) productSearchAttempted = true;
   let pool = ensuredCards.products;
+  const latestComparisonUsesPriorCards =
+    detectComparisonIntent(ctx.latestUserMessage) &&
+    /\b(?:first\s+two|1st\s+two|these|those|them|ones|both)\b/i.test(String(ctx.latestUserMessage || ""));
+  if (
+    latestComparisonUsesPriorCards &&
+    Array.isArray(ctx.priorProductCards) &&
+    ctx.priorProductCards.length >= 2
+  ) {
+    pool = ctx.priorProductCards.slice(0, Math.max(2, ctx.productCardCap || 3));
+    allProductPool.clear();
+    for (const card of pool) {
+      const key = card?.handle || card?.title;
+      if (key) allProductPool.set(key, card);
+    }
+    console.log(`[chat] comparison handoff: using ${pool.length} prior displayed card(s)`);
+  }
 
   if (fullResponseText) {
     const result = stripInternalLeaks(fullResponseText);
@@ -2165,6 +2244,7 @@ export const action = async ({ request }) => {
       return Response.json({ error: "message is required" }, { status: 400 });
     }
 
+    const priorProductCards = extractPriorProductCards(body.history);
     const history = sanitizeHistory(body.history);
     const messages = [...history, { role: "user", content: String(body.message) }];
 
@@ -2559,6 +2639,7 @@ export const action = async ({ request }) => {
       fullCatalogCategories: allCatalogCategories,
       categoryGenderMap,
       latestUserMessage: String(body.message || ""),
+      priorProductCards,
       debugChatEvents: body?.debug === true,
       messages,
     };
@@ -2771,6 +2852,16 @@ export const action = async ({ request }) => {
             }
           }
           if (!routerLog.orthoticGate) routerLog.orthoticGate = "handled=false case=none";
+
+          if (shouldSoftBrowseRefine(body.message, history)) {
+            routerLog.finalPath = "soft_browse_refine";
+            console.log(`[router] ${ctx.shop} ${routerLog.classifier}`);
+            console.log(`[router] ${ctx.shop} ${routerLog.resolver || "resolver=skip"}`);
+            console.log(`[router] ${ctx.shop} ${routerLog.orthoticGate}`);
+            console.log(`[router] ${ctx.shop} final_path=${routerLog.finalPath}`);
+            await emitSoftGenderGateBrowse({ ctx, controller, encoder });
+            return;
+          }
 
           const resolverAction = ctx.resolverState?.recommended_next_action?.type;
           routerLog.finalPath =

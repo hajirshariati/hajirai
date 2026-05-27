@@ -96,11 +96,12 @@ export function buildSystemPrompt({ config, knowledge, retrievedChunks, shop, at
       `\n=== STORE FACTS (UNDISPUTABLE) ===\n` +
         `This store's complete catalog spans these product categories: ${fullCats.join(", ")}.\n` +
         `These come straight from the merchant's synced Shopify catalog. The list is the truth.\n` +
-        `ABSOLUTE RULE — NEVER deny availability of any category in the list above. ` +
+        `ABSOLUTE RULE — NEVER deny availability of any parent category in the list above for the whole store. ` +
         `Forbidden phrases (no matter how confident you are or what the conversation context suggests): ` +
         `"we don't sell <X>", "we don't carry <X>", "we don't have <X>", "this store only carries <X>", ` +
         `"we only sell <X>", "<X> isn't something we carry", "(not shoes)", "(not <category>)", or any rephrasing that implies a category in the list above is absent. ` +
         `If the customer asks about a category in the list, your job is to call search_products and SHOW them — not to claim absence.\n` +
+        `Important: this parent-category rule does NOT mean every gender/size/color carries every category. If the scoped category-gender map or a search_products result says a subset is unavailable (for example, no men's boots), say that subset truthfully instead of showing another gender.\n` +
         `If the search returns zero items for a specific subset (e.g. "pink running sneakers" → 0 hits) you may say "I don't see any matching that exact combination" — that's product-level, not category-level — but you must still treat the parent category as carried.\n` +
         `Even if the current turn is scoped (e.g. the conversation is focused on Orthotics), the rest of the catalog is still real and orderable — never deny it.`,
     );

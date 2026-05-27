@@ -544,14 +544,6 @@ export default function Home() {
   const rateDismissed = rateFetcher.state !== "idle" || rateFetcher.data?.dismissed;
   const showRateLimit = rateLimitHits > 0 && !rateDismissed;
 
-  const strategyLabel = modelStrategy === "smart"
-    ? "Smart routing"
-    : modelStrategy === "always-haiku"
-      ? "Always Fast"
-      : modelStrategy === "always-opus"
-        ? "Always Advanced"
-        : "Always Standard";
-
   return (
     <Page>
       <TitleBar title="SEoS Assistant" />

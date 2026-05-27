@@ -492,11 +492,12 @@ function ConnectionStatus({ connected }) {
 const MODEL_OPTIONS = [
   { label: "Standard — recommended", value: "claude-sonnet-4-6" },
   { label: "Fast — lower cost", value: "claude-haiku-4-5-20251001" },
-  { label: "Advanced — most capable", value: "claude-opus-4-20250514" },
+  { label: "Advanced — most capable", value: "claude-opus-4-7" },
 ];
 
 const STRATEGY_OPTIONS = [
   { label: "Smart routing (recommended)", value: "smart" },
+  { label: "Cost optimized smart", value: "cost-optimized" },
   { label: "Always use Standard", value: "always-sonnet" },
   { label: "Always use Fast", value: "always-haiku" },
   { label: "Always use Advanced", value: "always-opus" },
@@ -504,6 +505,7 @@ const STRATEGY_OPTIONS = [
 
 const STRATEGY_HELP = {
   smart: "Uses the Fast model for simple follow-ups like \"thanks\" or \"ok\", and the Standard model for product questions and complex queries. Best balance of cost and quality.",
+  "cost-optimized": "Uses the Fast model for simple product-listing and refinement turns where product truth is code-owned, while keeping the Standard model for medical, comparison, policy, sizing, and complex reasoning turns.",
   "always-sonnet": "Every message uses the Standard model. Consistent quality for all conversations.",
   "always-haiku": "Every message uses the Fast model. Lowest cost, good for high-volume stores with simple products.",
   "always-opus": "Every message uses the Advanced model. Maximum capability for complex product catalogs.",
@@ -761,7 +763,7 @@ export default function ApiKeys() {
                   <Select
                     label="Primary model"
                     options={MODEL_OPTIONS.filter(
-                      (o) => o.value !== "claude-opus-4-20250514" || plan.features?.advancedModel,
+                      (o) => o.value !== "claude-opus-4-7" || plan.features?.advancedModel,
                     )}
                     value={model}
                     onChange={setModel}
@@ -777,7 +779,7 @@ export default function ApiKeys() {
                   <PlanGate
                     plan={plan}
                     feature="smartRouting"
-                    summary="Smart routing automatically swaps in the Fast model for simple follow-ups like 'thanks' or 'ok'. Lower per-message cost on those follow-ups, no impact on product questions."
+                    summary="Smart routing can automatically use the Fast model for safe turns, lowering cost while keeping complex requests on the Standard model."
                   >
                     <BlockStack gap="400">
                       <Select
@@ -794,6 +796,16 @@ export default function ApiKeys() {
                             <strong>How smart routing works:</strong> When a customer sends a simple follow-up
                             like "thanks", "ok", or "bye", SEoS Assistant uses the Fast model.
                             Product questions, first messages, and detailed queries always use your primary model.
+                          </Text>
+                        </Banner>
+                      )}
+                      {strategy === "cost-optimized" && (
+                        <Banner tone="info">
+                          <Text as="p" variant="bodySm">
+                            <strong>How cost optimized smart routing works:</strong> Simple product-listing
+                            requests and refinements use the Fast model because the app code owns product cards
+                            and listing facts. Medical, comparison, policy, sizing, variant-detail, and complex
+                            turns still use your primary model.
                           </Text>
                         </Banner>
                       )}
