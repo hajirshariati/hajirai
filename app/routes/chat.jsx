@@ -490,6 +490,29 @@ function shouldSoftBrowseRefine(latestMessage, history) {
     /\bhere are (?:a few|popular|sale|comfort-focused|styles under \$\d+)/i.test(previous);
 }
 
+// True when the most recent assistant turn was itself a soft-browse
+// starter response. Used to vary the text + rotate products on a repeat
+// browse so the bot doesn't emit the identical "here are a few styles…"
+// line twice (the dominant "repetitive" seam).
+function priorTurnWasSoftBrowse(history) {
+  const previous = lastAssistantContent(history);
+  return /\bnarrow by men's, women's, style, color,? or (?:a specific budget|price|color)\b/i.test(previous) ||
+    /\bhere are (?:a few|popular|sale|comfort-focused|styles under \$\d+|a different set)/i.test(previous) ||
+    /\bhere's a different set\b/i.test(previous);
+}
+
+// Handles already shown to the customer in prior turns — excluded from
+// a repeat soft-browse so a "show me something else" produces a
+// genuinely different set instead of the same cards.
+function priorlyShownHandles(ctx) {
+  const out = new Set();
+  for (const c of Array.isArray(ctx?.priorProductCards) ? ctx.priorProductCards : []) {
+    const key = c?.handle || c?.title;
+    if (key) out.add(String(key));
+  }
+  return out;
+}
+
 function interleaveUniqueCards(groups, limit) {
   const out = [];
   const seen = new Set();
@@ -507,13 +530,24 @@ function interleaveUniqueCards(groups, limit) {
   return out;
 }
 
-async function fetchSoftBrowseCards({ ctx, input }) {
+async function fetchSoftBrowseCards({ ctx, input, excludeHandles = null }) {
   const cap = ctx?.productCardCap || 3;
-  const searchInput = { ...input, limit: Math.max(cap, input?.limit || 6) };
+  // Fetch a wider pool than we display so excluded (already-shown)
+  // cards can be filtered out and still leave a full set to show.
+  const fetchLimit = Math.max(cap * 3, input?.limit || 6);
+  const searchInput = { ...input, limit: fetchLimit };
+  const exclude = excludeHandles instanceof Set ? excludeHandles : null;
+  const filterExcluded = (cards) => {
+    if (!exclude || exclude.size === 0) return cards;
+    const kept = cards.filter((c) => !exclude.has(String(c?.handle || c?.title)));
+    // If excluding everything would leave nothing, fall back to the
+    // unfiltered set — showing repeats beats showing an empty browse.
+    return kept.length > 0 ? kept : cards;
+  };
   const hasGenderScope = Boolean(ctx?.sessionGender || searchInput?.filters?.gender);
   if (hasGenderScope) {
     const result = await dispatchTool("search_products", searchInput, ctx);
-    return extractProductCards("search_products", result).slice(0, cap);
+    return filterExcluded(extractProductCards("search_products", result)).slice(0, cap);
   }
 
   const withGender = (gender) => ({
@@ -526,28 +560,32 @@ async function fetchSoftBrowseCards({ ctx, input }) {
   ]);
   const mixed = interleaveUniqueCards(
     [
-      extractProductCards("search_products", women),
-      extractProductCards("search_products", men),
+      filterExcluded(extractProductCards("search_products", women)),
+      filterExcluded(extractProductCards("search_products", men)),
     ],
     cap,
   );
   if (mixed.length > 0) return mixed;
 
   const fallback = await dispatchTool("search_products", searchInput, ctx);
-  return extractProductCards("search_products", fallback).slice(0, cap);
+  return filterExcluded(extractProductCards("search_products", fallback)).slice(0, cap);
 }
 
 async function emitSoftGenderGateBrowse({ ctx, controller, encoder }) {
   const input = softGenderBrowseSearchInput(ctx?.latestUserMessage || "");
-  const cards = await fetchSoftBrowseCards({ ctx, input });
-  const text = buildSoftBrowseFallbackText({ input, hasProducts: cards.length > 0 });
+  // On a repeat browse, vary the text and rotate past already-shown
+  // cards so "show me something else" doesn't return the same response.
+  const repeated = priorTurnWasSoftBrowse(ctx?.messages);
+  const excludeHandles = repeated ? priorlyShownHandles(ctx) : null;
+  const cards = await fetchSoftBrowseCards({ ctx, input, excludeHandles });
+  const text = buildSoftBrowseFallbackText({ input, hasProducts: cards.length > 0, repeated });
 
   controller.enqueue(encoder.encode(sseChunk({ type: "text", text })));
   controller.enqueue(encoder.encode(sseChunk({ type: "products", products: cards })));
   controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
   console.log(
     `[chat] ${ctx.shop} soft-gender-gate browse emitted ` +
-      `query=${JSON.stringify(input.query)} poolSize=${cards.length}`,
+      `query=${JSON.stringify(input.query)} poolSize=${cards.length} repeated=${repeated}`,
   );
 }
 
@@ -1081,17 +1119,19 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       const scoped = scopedProductSearchInput(ctx);
       const hasScope = !!(scoped.scope.gender || scoped.scope.category || scoped.scope.color);
       const input = hasScope ? scoped.input : softGenderBrowseSearchInput(ctx.latestUserMessage || "");
+      const repeated = priorTurnWasSoftBrowse(ctx.messages);
+      const excludeHandles = repeated && !hasScope ? priorlyShownHandles(ctx) : null;
       const cards = hasScope
         ? extractProductCards("search_products", await dispatchTool("search_products", input, ctx))
-        : await fetchSoftBrowseCards({ ctx, input });
+        : await fetchSoftBrowseCards({ ctx, input, excludeHandles });
       for (const card of cards) {
         const key = card?.handle || card?.title;
         if (key && !allProductPool.has(key)) allProductPool.set(key, card);
       }
       if (cards.length > 0) {
         productSearchAttempted = true;
-        fullResponseText = buildSoftBrowseFallbackText({ input, hasProducts: true });
-        console.log(`[chat] repeated-clarifier escape: ${currentClarifyingType} → showing ${cards.length} starter product(s)`);
+        fullResponseText = buildSoftBrowseFallbackText({ input, hasProducts: true, repeated });
+        console.log(`[chat] repeated-clarifier escape: ${currentClarifyingType} → showing ${cards.length} starter product(s) repeated=${repeated}`);
       }
     } catch (err) {
       console.error("[chat] repeated-clarifier escape failed:", err?.message || err);

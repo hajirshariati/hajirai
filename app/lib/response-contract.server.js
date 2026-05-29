@@ -1174,9 +1174,20 @@ function templateIndex(cards = [], base = "") {
   return hash % 3;
 }
 
-export function buildSoftBrowseFallbackText({ input = {}, hasProducts = true } = {}) {
+export function buildSoftBrowseFallbackText({ input = {}, hasProducts = true, repeated = false } = {}) {
   if (!hasProducts) {
     return "No problem — we can browse first and narrow later. Tell me a style, color, or price range and I'll pull options.";
+  }
+
+  // Repeated browse: the customer asked for something different ("show
+  // me something else", "more") after we already showed a starter mix.
+  // Re-emitting the identical "here are a few styles… you can narrow
+  // by…" line reads as a stuck loop (the dominant adversarial-hunter
+  // "repetitive" seam). Acknowledge the ask and steer toward a concrete
+  // narrowing dimension instead of repeating verbatim. The caller pairs
+  // this with a rotated product set so different cards show too.
+  if (repeated) {
+    return "Here's a different set to look through. To zero in faster, tell me a style (sneakers, sandals, boots, clogs), a color, or a price range — or whether it's men's or women's.";
   }
 
   const query = String(input?.query || "").toLowerCase();

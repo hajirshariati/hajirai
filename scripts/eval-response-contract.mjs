@@ -458,6 +458,20 @@ test("R21 — accurate positive color claim is left untouched", () => {
   assert.match(out.text, /Navy/i);
 });
 
+test("R22 — repeated soft-browse varies the text instead of repeating verbatim", () => {
+  const first = buildSoftBrowseFallbackText({ input: {}, hasProducts: true, repeated: false });
+  const again = buildSoftBrowseFallbackText({ input: {}, hasProducts: true, repeated: true });
+  assert.notEqual(first, again, "repeated browse must not be identical to the first browse");
+  assert.match(again, /different set/i);
+  // Still steers toward a concrete narrowing dimension.
+  assert.match(again, /style|color|price|men's|women's/i);
+});
+
+test("R23 — non-repeated browse keeps the original starter copy", () => {
+  const first = buildSoftBrowseFallbackText({ input: {}, hasProducts: true });
+  assert.match(first, /here are a few styles/i);
+});
+
 if (failed > 0) {
   console.error("\nFailures:");
   for (const f of failures) console.error(`- ${f.name}: ${f.err.stack || f.err.message}`);
