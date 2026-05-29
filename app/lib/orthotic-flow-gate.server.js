@@ -49,6 +49,7 @@ import {
   looksLikeRecommendationRequest,
   looksLikeInformationalQuestion,
   looksLikeAvailabilityQuestion,
+  looksLikeFunctionalQuestion,
 } from "./orthotic-flow.server.js";
 import { executeRecommenderTool } from "./recommender-tools.server.js";
 import { buildStorefrontSearchCTA } from "./storefront-search-cta.server.js";
@@ -1369,16 +1370,18 @@ export async function maybeRunOrthoticFlow({
     const completedAttrThisTurn = Object.keys(latestExtracted).length > 0;
     const explicitRecRequest = looksLikeRecommendationRequest(rawUserText);
     const informationalQuestion = looksLikeInformationalQuestion(rawUserText);
+    const functionalQuestion = looksLikeFunctionalQuestion(rawUserText);
     const hasResolveSignal =
       (justAnsweredChip || completedAttrThisTurn || explicitRecRequest) &&
-      !informationalQuestion;
+      !informationalQuestion &&
+      !functionalQuestion;
     if (!hasResolveSignal) {
       console.log(
         `[orthotic-flow] resolve held: full attrs but no recommendation signal in latest turn ` +
           `("${rawUserText.slice(0, 60)}"); ` +
-          `informational=${informationalQuestion}, justAnsweredChip=${justAnsweredChip}, ` +
-          `completedAttr=${completedAttrThisTurn}, explicitReq=${explicitRecRequest}; ` +
-          `falling through to LLM`,
+          `informational=${informationalQuestion}, functional=${functionalQuestion}, ` +
+          `justAnsweredChip=${justAnsweredChip}, completedAttr=${completedAttrThisTurn}, ` +
+          `explicitReq=${explicitRecRequest}; falling through to LLM`,
       );
       return { handled: false };
     }

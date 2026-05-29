@@ -918,6 +918,32 @@ export function looksLikeAvailabilityQuestion(rawText) {
   return AVAILABILITY_QUESTION_RE.test(t);
 }
 
+// Functional / yes-no questions ABOUT a (likely already-shown)
+// recommendation: "would this work with X?", "do these come with
+// arch support?", "is it removable?", "can I use Z with these?",
+// "do I need special shoes?". Production trace (adversarial hunter,
+// foot-pain-orthotic): after a recommendation, customer asked "would
+// that kit work with regular sneakers or do i need special shoes?" —
+// the gate auto-resolved and re-emitted the same product card. The
+// LLM (with RAG / variant facts) is the right path here. Used in the
+// resolve-hold guard alongside informational + availability vetoes.
+//
+// Conservative: requires a "?" and a verb cue typical of yes/no
+// product questions. Avoids matching imperatives ("show me one that
+// works with sneakers") which are recommendation-shaped.
+const FUNCTIONAL_QUESTION_CUE_RE =
+  /\b(?:would|will|does|do|can|could|should|is\s+(?:it|this|that)|are\s+(?:they|these|those)|work(?:s)?\s+(?:with|in|for)|come(?:s)?\s+with|fit(?:s)?\s+(?:in|with)|use\s+(?:with|in)|need\s+(?:to|a|an|special)|have\s+to)\b/i;
+
+export function looksLikeFunctionalQuestion(rawText) {
+  const t = String(rawText || "")
+    .replace(/[‘’‚‛]/g, "'")
+    .replace(/[“”„‟]/g, '"')
+    .trim();
+  if (!t) return false;
+  if (!t.includes("?")) return false;
+  return FUNCTIONAL_QUESTION_CUE_RE.test(t);
+}
+
 // Returns true when the message ACTIVELY rejects orthotics ("I don't
 // want orthotics", "no insoles, just shoes"). The unified gate uses
 // this as a hard veto — even if Layer 1/2 picks up a chip-shaped

@@ -346,7 +346,14 @@ export function buildSessionMemory({ messages, classifiedIntent, resolverState }
     //     prior turn. Gender stays — the customer is widening
     //     within a gender, not changing subject. The extractor will
     //     still apply any NEW constraints from this same message.
-    if (BROAD_RESET_RE.test(text)) {
+    // "all of them / those / these" / "any of them" is a PRONOUN
+    // back-reference to a previously-shown or previously-mentioned set,
+    // not a "clear my filters" widening. Hunter trace (color-iteration):
+    // customer asked "show me all of them" meaning "all the colors I
+    // just named", and broad-reset wiped the color scope (scope-loss).
+    // Skip the reset in that case.
+    const PRONOUN_BACK_REF_RE = /\b(?:all|any|both)\s+of\s+(?:them|those|these|it)\b/i;
+    if (BROAD_RESET_RE.test(text) && !PRONOUN_BACK_REF_RE.test(text)) {
       if (memory.explicit.category != null) {
         memory.stale.category = memory.explicit.category;
         delete memory.explicit.category;

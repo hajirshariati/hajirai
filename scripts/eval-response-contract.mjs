@@ -458,6 +458,36 @@ test("R21 — accurate positive color claim is left untouched", () => {
   assert.match(out.text, /Navy/i);
 });
 
+test("R20b — long color enumeration on a single-variant card is capped (range-vs-variant)", () => {
+  // Hunter (gender-pivot-shopper, run #2): card displayed Jillian in
+  // Snake, prose said "comes in Navy, Cognac, White, Walnut, Sage,
+  // Leopard, Ivory, Gunmetal, Denim, Champagne, Cork, Butter, Brushed
+  // Silver, and Antique Rose". All colors are real, but the prose
+  // contradicts the single variant shown. Cap to ~4 + include the
+  // displayed variant.
+  const out = repairProductTurnAssembly({
+    text: "Jillian comes in Navy, Cognac, White, Walnut, Sage, Ivory, Gunmetal, Champagne, Cork, Butter, Brushed Silver, and Antique Rose.",
+    pool: [{
+      title: "Jillian Braided Quarter Strap Sandal - Snake",
+      handle: "jillian-snake",
+      _attributes: { Color: "Snake" },
+      _variantFacts: {
+        availableColors: [
+          "Snake", "Navy", "Cognac", "White", "Walnut", "Sage", "Ivory",
+          "Gunmetal", "Champagne", "Cork", "Butter", "Brushed Silver", "Antique Rose",
+        ],
+      },
+    }],
+    ctx: { latestUserMessage: "any other colors?" },
+  });
+  assert.equal(out.changed, true);
+  // The displayed variant must appear in the prose.
+  assert.match(out.text, /Snake/i);
+  // The enumeration must be capped (not >7 colors named).
+  const colorWords = (out.text.match(/\b(?:Snake|Navy|Cognac|White|Walnut|Sage|Ivory|Gunmetal|Champagne|Cork|Butter|Brushed Silver|Antique Rose)\b/gi) || []);
+  assert.ok(colorWords.length <= 7, `expected capped enumeration, got ${colorWords.length} color tokens`);
+});
+
 test("R22 — repeated soft-browse varies the text instead of repeating verbatim", () => {
   const first = buildSoftBrowseFallbackText({ input: {}, hasProducts: true, repeated: false });
   const again = buildSoftBrowseFallbackText({ input: {}, hasProducts: true, repeated: true });

@@ -12,6 +12,7 @@ import {
   maybeRunOrthoticFlow,
   shouldSoftEscapeFootwearGenderGate,
 } from "../app/lib/orthotic-flow-gate.server.js";
+import { looksLikeFunctionalQuestion } from "../app/lib/orthotic-flow.server.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const definition = JSON.parse(readFileSync(resolve(here, "seeds/aetrex-orthotic-tree.json"), "utf8"));
@@ -159,6 +160,25 @@ await test("still advances the flow on a plain chip answer with no question", as
     encoder,
   });
   assert.equal(out.handled, true);
+});
+
+await test("looksLikeFunctionalQuestion catches post-recommendation yes/no product questions", () => {
+  // The exact production failure (hunter, foot-pain-orthotic, run #2):
+  // after a recommendation, "would that kit work with regular sneakers
+  // or do i need special shoes?" was re-emitted as the same card.
+  assert.equal(
+    looksLikeFunctionalQuestion("would that kit work with regular sneakers or do i need special shoes?"),
+    true,
+  );
+  assert.equal(looksLikeFunctionalQuestion("does it come with arch support?"), true);
+  assert.equal(looksLikeFunctionalQuestion("is it removable?"), true);
+  assert.equal(looksLikeFunctionalQuestion("can I use these with sandals?"), true);
+  // Must not match recommendation imperatives or chip answers.
+  assert.equal(looksLikeFunctionalQuestion("show me one"), false);
+  assert.equal(looksLikeFunctionalQuestion("yes"), false);
+  assert.equal(looksLikeFunctionalQuestion("men's"), false);
+  // Must require a question mark — narrative statements don't count.
+  assert.equal(looksLikeFunctionalQuestion("they would work with sneakers"), false);
 });
 
 await test("soft gender-gate escape detects open-browse non-answer after gender ask", async () => {

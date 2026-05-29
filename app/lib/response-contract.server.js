@@ -994,9 +994,16 @@ function repairPositiveColorClaims(text, cards) {
     .map((sentence) => {
       const s = sentence.trim();
       if (!s || !POSITIVE_COLOR_CLAIM_RE.test(s)) return s;
+      const sLower = s.toLowerCase();
       const named = cards.find((c) => {
         const base = cardTitleBase(c).toLowerCase();
-        return base.length >= 5 && s.toLowerCase().includes(base);
+        if (base.length >= 5 && sLower.includes(base)) return true;
+        // Also accept the product's family name (first significant
+        // word of the base, length >= 4 to skip "the", "a", etc.).
+        // Real prose often abbreviates "Jillian Braided Quarter Strap
+        // Sandal" to just "Jillian".
+        const family = base.split(/\s+/)[0] || "";
+        return family.length >= 4 && new RegExp(`\\b${family.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(s);
       });
       if (!named) return s;
       const realNorm = new Set(variantColorEntries(named).map((e) => e.normalized));
@@ -1006,10 +1013,39 @@ function repairPositiveColorClaims(text, cards) {
       const claimed = extractProseColors(s);
       if (claimed.length < 2) return s; // not an enumeration
       const overclaimed = claimed.some((c) => !realNorm.has(c));
-      if (!overclaimed) return s; // accurate → leave it
+      // Two failure modes are both contradicts-self:
+      //   (a) Overclaimed — the LLM named a color the product doesn't
+      //       actually carry (e.g. Charlotte "comes in red" when it's
+      //       terracotta-only).
+      //   (b) Range-vs-variant mismatch — the LLM listed the product's
+      //       full real color range while the displayed card is just
+      //       one specific variant (e.g. Jillian displayed in Snake,
+      //       prose says "comes in Navy, Cognac, White, Ivory, …").
+      //       Real customers see the variant card and the prose
+      //       contradicts it. Cap the enumeration to ~4 colors and
+      //       include the displayed one explicitly so the prose
+      //       matches what they see.
+      const displayedColor = String(named?._attributes?.Color ||
+                                    named?._attributes?.color ||
+                                    titleSuffixColorName(named?.title) || "").trim();
+      const rangeVsVariant = !overclaimed && claimed.length > 4;
+      if (!overclaimed && !rangeVsVariant) return s;
       changed = true;
       const base = cardTitleBase(named) || "This style";
-      return `${base} comes in ${formatDisplayList(realDisplays)}.`;
+      // Surface up to 4 colors; prepend the displayed variant if it's
+      // known and would otherwise be buried/missing.
+      let toShow = realDisplays.slice();
+      if (displayedColor) {
+        const idx = toShow.findIndex((d) => d.toLowerCase() === displayedColor.toLowerCase());
+        if (idx > 0) {
+          toShow = [toShow[idx], ...toShow.slice(0, idx), ...toShow.slice(idx + 1)];
+        } else if (idx < 0) {
+          toShow = [displayedColor, ...toShow];
+        }
+      }
+      const capped = toShow.slice(0, 4);
+      const more = toShow.length > capped.length ? ` and ${toShow.length - capped.length} more` : "";
+      return `${base} comes in ${formatDisplayList(capped)}${more}.`;
     })
     .filter(Boolean);
   return {

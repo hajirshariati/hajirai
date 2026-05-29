@@ -447,6 +447,36 @@ await test("S25 — incompatible use-case clears carried category + color (hikin
   assert.ok(mem.stale.category === "sandals" || mem.stale.color === "pink", "prior scope preserved in stale for debugging");
 });
 
+await test("S25c — 'show me all of them' is a pronoun back-reference, NOT a broad reset (scope-loss fix)", async () => {
+  // Hunter (color-iteration, run #2): customer iterated colors then
+  // asked "show me all of them" — meant "all the colors I just named",
+  // not "clear my filters". Broad-reset was wiping the color scope.
+  const mem = buildSessionMemory({
+    messages: [
+      u("women's purple sneakers"),
+      a("Here you go"),
+      u("show me all of them"),
+    ],
+  });
+  // Color scope must be preserved (the customer was referring back to
+  // the purple sneakers, not asking to widen).
+  assert.equal(mem.explicit.color, "purple", `'all of them' is a back-reference; color must persist; got ${mem.explicit.color}`);
+  assert.equal(mem.explicit.category, "sneakers", "category preserved on pronoun back-reference");
+});
+
+await test("S25d — genuine widening still fires broad reset", async () => {
+  // Guard: "show me everything" / "show me anything" / "what else"
+  // remain widening signals.
+  const mem = buildSessionMemory({
+    messages: [
+      u("women's purple sneakers"),
+      a("Here you go"),
+      u("show me everything you carry"),
+    ],
+  });
+  assert.equal(mem.explicit.category, undefined, "genuine widening still clears category");
+});
+
 await test("S25b — compatible use-case does NOT clear carried category (running after sneakers)", async () => {
   // Guard against over-clearing: sneakers + running is a normal
   // refinement, not a need-change. Category must survive.
