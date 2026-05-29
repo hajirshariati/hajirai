@@ -50,6 +50,7 @@ import {
   looksLikeInformationalQuestion,
   looksLikeAvailabilityQuestion,
   looksLikeFunctionalQuestion,
+  looksLikeTransactionalQuestion,
 } from "./orthotic-flow.server.js";
 import { executeRecommenderTool } from "./recommender-tools.server.js";
 import { buildStorefrontSearchCTA } from "./storefront-search-cta.server.js";
@@ -1371,15 +1372,25 @@ export async function maybeRunOrthoticFlow({
     const explicitRecRequest = looksLikeRecommendationRequest(rawUserText);
     const informationalQuestion = looksLikeInformationalQuestion(rawUserText);
     const functionalQuestion = looksLikeFunctionalQuestion(rawUserText);
+    // Transactional / ordering intent on a follow-up turn must NOT
+    // re-trigger auto-resolve. Customer is past the recommendation
+    // and asking how to buy — the LLM answers that with cart/support
+    // info. UNLESS it IS an explicit recommendation request ("I'll
+    // take it" + "show me one") — in that case the recommendation
+    // path still wins.
+    const transactionalQuestion =
+      looksLikeTransactionalQuestion(rawUserText) && !explicitRecRequest;
     const hasResolveSignal =
       (justAnsweredChip || completedAttrThisTurn || explicitRecRequest) &&
       !informationalQuestion &&
-      !functionalQuestion;
+      !functionalQuestion &&
+      !transactionalQuestion;
     if (!hasResolveSignal) {
       console.log(
         `[orthotic-flow] resolve held: full attrs but no recommendation signal in latest turn ` +
           `("${rawUserText.slice(0, 60)}"); ` +
           `informational=${informationalQuestion}, functional=${functionalQuestion}, ` +
+          `transactional=${transactionalQuestion}, ` +
           `justAnsweredChip=${justAnsweredChip}, completedAttr=${completedAttrThisTurn}, ` +
           `explicitReq=${explicitRecRequest}; falling through to LLM`,
       );

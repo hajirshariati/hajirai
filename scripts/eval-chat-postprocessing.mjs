@@ -1073,6 +1073,36 @@ test("escalation-signal — Haiku empty text flags", () => {
   assert.equal(s.reason, "empty-text");
 });
 
+test("kids-coverage contradiction — follow-up about adult sizes for the same kid is dropped", () => {
+  // Hunter trace (gift-shopper-pivot): main reply said "we don't carry
+  // kids' or teen footwear", then a follow-up chip suggested "Would
+  // adult women's shoes in smaller sizes actually fit her?" — directly
+  // contradicting the honesty note. Drop those follow-ups so the kids
+  // honesty rule and the suggestions don't fight each other.
+  const v = isUnanswerableSuggestion(
+    "Would adult women's shoes in smaller sizes actually fit her?",
+    {
+      lastText: "I should be upfront — we don't carry kids' or teen footwear. If she'd be open to it, our adult women's lines might work depending on her size.",
+      latestUserMessage: "wait actually for my teenage daughter",
+    },
+  );
+  assert.equal(v.unanswerable, true);
+  assert.match(v.reason, /kids/i);
+});
+
+test("kids-coverage contradiction — unrelated follow-up survives when kids-honesty note is present", () => {
+  // Guard against over-blocking: a follow-up about returns or pricing
+  // is fine even if the main reply mentioned the kids-coverage gap.
+  const v = isUnanswerableSuggestion(
+    "What's your return policy?",
+    {
+      lastText: "We don't carry kids' footwear. Our adult lines might help.",
+      latestUserMessage: "for my daughter",
+    },
+  );
+  assert.equal(v.unanswerable, false, `unrelated suggestion should survive; got ${JSON.stringify(v)}`);
+});
+
 test("escalation-signal — Haiku searched-but-no-cards flags", () => {
   const s = haikuEscalationSignal({ isHaiku: true, productSearchAttempted: true, poolSize: 0, textLen: 40 });
   assert.equal(s.escalate, true);

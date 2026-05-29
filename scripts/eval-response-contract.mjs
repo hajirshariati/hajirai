@@ -458,6 +458,26 @@ test("R21 — accurate positive color claim is left untouched", () => {
   assert.match(out.text, /Navy/i);
 });
 
+test("R20c — partial per-product color enumeration is collapsed (mismatch with displayed cards)", () => {
+  // Hunter trace (color-iteration): bot wrote "Danika comes in X.
+  // Carly comes in Y." but cards also included Ivy / Charlotte / Blake.
+  // The prose enumerated only a subset, which reads as contradictory
+  // next to the displayed cards. Collapse to a neutral line.
+  const out = repairProductTurnAssembly({
+    text: "Danika Arch Support Sneaker also comes in black and navy. Carly Arch Support Sneaker also comes in grey and white.",
+    pool: [
+      { title: "Danika Arch Support Sneaker - Navy", handle: "danika-navy", _variantFacts: { availableColors: ["Navy", "Black"] } },
+      { title: "Carly Arch Support Sneaker - Grey", handle: "carly-grey", _variantFacts: { availableColors: ["Grey", "White"] } },
+      { title: "Ivy Arch Support Sneaker - Tan", handle: "ivy-tan", _variantFacts: { availableColors: ["Tan"] } },
+      { title: "Charlotte Lace-Up Sneaker - Terracotta", handle: "charlotte", _variantFacts: { availableColors: ["Terracotta"] } },
+    ],
+    ctx: { latestUserMessage: "what colors are available?" },
+  });
+  assert.equal(out.changed, true);
+  // Per-product enumeration should be gone OR replaced with a neutral line.
+  assert.doesNotMatch(out.text, /Danika .* also comes in/i);
+});
+
 test("R20b — long color enumeration on a single-variant card is capped (range-vs-variant)", () => {
   // Hunter (gender-pivot-shopper, run #2): card displayed Jillian in
   // Snake, prose said "comes in Navy, Cognac, White, Walnut, Sage,
@@ -495,6 +515,18 @@ test("R22 — repeated soft-browse varies the text instead of repeating verbatim
   assert.match(again, /different set/i);
   // Still steers toward a concrete narrowing dimension.
   assert.match(again, /style|color|price|men's|women's/i);
+});
+
+test("R22b — third+ browse rotates through distinct variants, never the same line twice", () => {
+  // Hunter trace (confused-first-timer): customer said "something else"
+  // repeatedly and the bot returned the SAME varied line each time. The
+  // rotation needs distinct phrasings at each index.
+  const v1 = buildSoftBrowseFallbackText({ input: {}, hasProducts: true, repeated: true, repeatIndex: 1 });
+  const v2 = buildSoftBrowseFallbackText({ input: {}, hasProducts: true, repeated: true, repeatIndex: 2 });
+  const v3 = buildSoftBrowseFallbackText({ input: {}, hasProducts: true, repeated: true, repeatIndex: 3 });
+  assert.notEqual(v1, v2, "index 1 and 2 must produce distinct text");
+  assert.notEqual(v2, v3, "index 2 and 3 must produce distinct text");
+  assert.notEqual(v1, v3, "index 1 and 3 must produce distinct text");
 });
 
 test("R23 — non-repeated browse keeps the original starter copy", () => {

@@ -727,6 +727,20 @@ export function repairProductTurnAssembly({ text, pool = [], ctx = {}, relaxedFi
     logs.push("corrected_color_overclaim");
   }
 
+  // Per-product enumeration covering only some of the displayed cards
+  // looks contradictory next to the cards the customer sees. Hunter
+  // trace (color-iteration): bot wrote "Danika comes in… Carly comes
+  // in…" but the cards also included Ivy, Charlotte, and Blake. The
+  // missing names read as the bot hiding or forgetting products.
+  // When this is detected, swap the partial enumeration for a single
+  // honest line — the cards already render the names + colors.
+  const partialEnum = collapsePartialPerProductEnumeration(nextText, pool);
+  if (partialEnum.changed) {
+    nextText = partialEnum.text;
+    changed = true;
+    logs.push("collapsed_partial_per_product_enumeration");
+  }
+
   if (isDirectProductFactQuestion(ctx?.latestUserMessage)) {
     const colorRangeRepair = repairColorRangePromises(nextText, pool, ctx);
     if (colorRangeRepair.changed) {
@@ -1054,6 +1068,57 @@ function repairPositiveColorClaims(text, cards) {
   };
 }
 
+// "Danika comes in X. Carly comes in Y." — but the displayed pool also
+// includes Ivy / Charlotte / Blake. The bot enumerated a SUBSET of the
+// cards, so the prose looks inconsistent with what the customer sees
+// below. When that happens, replace the partial enumeration with a
+// single neutral line — the cards already display each product's name
+// and colors, no enumeration needed.
+//
+// Conservative gating: must be a multi-card pool (≥3) AND the prose
+// must name 2-N-1 distinct cards via the "comes in" pattern AND at
+// least one displayed card must be UNNAMED in the prose. Anything
+// outside that shape is left alone (no false positives on legitimate
+// "X is a great pick" framing).
+function collapsePartialPerProductEnumeration(text, cards) {
+  if (!text || !Array.isArray(cards) || cards.length < 3) return { text, changed: false };
+  const sentences = sentenceSplit(text);
+  const enumSentences = [];
+  const namedSet = new Set();
+  const sLower = (s) => String(s || "").toLowerCase();
+  for (const raw of sentences) {
+    const s = String(raw || "").trim();
+    if (!s || !POSITIVE_COLOR_CLAIM_RE.test(s)) continue;
+    // Which card(s) does this sentence name?
+    for (const c of cards) {
+      const base = cardTitleBase(c).toLowerCase();
+      const family = (base.split(/\s+/)[0] || "");
+      const matchedBase = base.length >= 5 && sLower(s).includes(base);
+      const matchedFamily =
+        family.length >= 4 &&
+        new RegExp(`\\b${family.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(s);
+      if (matchedBase || matchedFamily) {
+        namedSet.add(c.handle || c.title);
+        enumSentences.push(raw);
+      }
+    }
+  }
+  if (namedSet.size < 2) return { text, changed: false };
+  if (namedSet.size >= cards.length) return { text, changed: false }; // covers all → fine
+  // Build replacement: drop all the partial-enum sentences; if nothing
+  // else remains, fall back to a neutral line that points at the cards.
+  const enumSet = new Set(enumSentences);
+  const kept = sentences.filter((s) => !enumSet.has(s)).map((s) => s.trim()).filter(Boolean);
+  let replacement;
+  if (kept.length > 0) {
+    replacement = kept.join(" ").replace(/\s{2,}/g, " ").trim();
+  } else {
+    replacement = `Here are the ${cards.length} styles I found — colors and details are on each card.`;
+  }
+  if (replacement.trim() === String(text).trim()) return { text, changed: false };
+  return { text: replacement, changed: true };
+}
+
 function repairColorRangePromises(text, cards, ctx = {}) {
   if (!text || !Array.isArray(cards) || cards.length === 0) return { text, changed: false };
   const correction = colorAvailabilityCorrection(cards, ctx);
@@ -1210,20 +1275,30 @@ function templateIndex(cards = [], base = "") {
   return hash % 3;
 }
 
-export function buildSoftBrowseFallbackText({ input = {}, hasProducts = true, repeated = false } = {}) {
+export function buildSoftBrowseFallbackText({ input = {}, hasProducts = true, repeated = false, repeatIndex = 0 } = {}) {
   if (!hasProducts) {
     return "No problem — we can browse first and narrow later. Tell me a style, color, or price range and I'll pull options.";
   }
 
   // Repeated browse: the customer asked for something different ("show
   // me something else", "more") after we already showed a starter mix.
-  // Re-emitting the identical "here are a few styles… you can narrow
-  // by…" line reads as a stuck loop (the dominant adversarial-hunter
-  // "repetitive" seam). Acknowledge the ask and steer toward a concrete
-  // narrowing dimension instead of repeating verbatim. The caller pairs
-  // this with a rotated product set so different cards show too.
+  // Re-emitting the identical "here are a few styles…" line reads as a
+  // stuck loop (the dominant adversarial-hunter "repetitive" seam).
+  // Rotate through distinct phrasings so a customer who keeps saying
+  // "something else" gets a different sentence each time, and the tone
+  // moves from invitational to more direct nudging for a constraint.
+  // Pairs with a rotated product set (priorlyShownHandles excludes
+  // already-shown cards) so cards differ too.
   if (repeated) {
-    return "Here's a different set to look through. To zero in faster, tell me a style (sneakers, sandals, boots, clogs), a color, or a price range — or whether it's men's or women's.";
+    // repeatIndex: 1 = first repeat, 2 = second, 3+ = nudge harder.
+    const idx = Math.max(1, Number(repeatIndex) || 1);
+    if (idx === 1) {
+      return "Here's a different set to look through. To zero in faster, tell me a style (sneakers, sandals, boots, clogs), a color, or a price range — or whether it's men's or women's.";
+    }
+    if (idx === 2) {
+      return "Here's another angle — a fresh mix. Anything jumping out? A category, a color, or a budget would help me narrow this down for you.";
+    }
+    return "I'll keep mixing it up, but I'm flying a bit blind. Even a rough hint — sneakers vs sandals, under $100, men's or women's — and I can pull a much tighter set.";
   }
 
   const query = String(input?.query || "").toLowerCase();

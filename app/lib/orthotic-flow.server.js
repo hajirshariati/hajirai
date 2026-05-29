@@ -944,6 +944,36 @@ export function looksLikeFunctionalQuestion(rawText) {
   return FUNCTIONAL_QUESTION_CUE_RE.test(t);
 }
 
+// Transactional / ordering intent — "how do I order it?", "can I buy
+// this?", "where do I checkout?", "I'll take it". Hunter trace
+// (foot-pain-orthotic): after a recommendation, customer said "this
+// mens active posted one sounds good — how do i order it?" and the
+// gate auto-resolved the same recommendation again (ignores-user).
+// Ordering questions are LLM territory: the LLM knows about cart,
+// checkout, support handoff, etc. The resolve-hold uses this alongside
+// functional + informational + availability vetoes.
+//
+// Does NOT require a question mark — "i'll take it" / "let me buy it"
+// are intents without questions. Conservative: requires both a clear
+// verb cue AND a transactional object word so generic "I want X"
+// doesn't trip it.
+// Self-contained transactional verbs that don't need an object word —
+// the verb alone signals the intent ("how do I checkout?", "let me
+// reserve this", "add to cart").
+const TRANSACTIONAL_SELF_CONTAINED_RE = /\b(?:checkout|check\s+out|add\s+to\s+cart)\b/i;
+const TRANSACTIONAL_VERB_RE = /\b(?:order|buy|purchase|get|take|grab|pick\s+up|ship|deliver|reserve)\b/i;
+const TRANSACTIONAL_OBJECT_RE = /\b(?:it|this|that|these|those|one|them|the\s+(?:kit|pair|insoles?|orthotics?|shoes?|product|item))\b/i;
+
+export function looksLikeTransactionalQuestion(rawText) {
+  const t = String(rawText || "")
+    .replace(/[‘’‚‛]/g, "'")
+    .replace(/[“”„‟]/g, '"')
+    .trim();
+  if (!t) return false;
+  if (TRANSACTIONAL_SELF_CONTAINED_RE.test(t)) return true;
+  return TRANSACTIONAL_VERB_RE.test(t) && TRANSACTIONAL_OBJECT_RE.test(t);
+}
+
 // Returns true when the message ACTIVELY rejects orthotics ("I don't
 // want orthotics", "no insoles, just shoes"). The unified gate uses
 // this as a hard veto — even if Layer 1/2 picks up a chip-shaped

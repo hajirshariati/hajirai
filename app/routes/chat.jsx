@@ -212,6 +212,21 @@ function extractPriorProductCards(history) {
   return [];
 }
 
+// All cards shown across the entire conversation (cumulative, not just
+// the most recent turn). Used by the soft-browse rotation so a 3rd
+// "show me something else" doesn't recycle browse #1's cards. Returns
+// a flat array of compact card objects; de-duplication happens at the
+// consumer side (priorlyShownHandles uses a Set).
+function extractAllPriorProductCards(history) {
+  const out = [];
+  for (const turn of history || []) {
+    if (turn?.role !== "assistant") continue;
+    const products = compactHistoryProducts(turn.products);
+    if (products.length > 0) out.push(...products);
+  }
+  return out;
+}
+
 function sseChunk(obj) {
   return `data: ${JSON.stringify(obj)}\n\n`;
 }
@@ -491,26 +506,44 @@ function shouldSoftBrowseRefine(latestMessage, history) {
     /\bhere are (?:a few|popular|sale|comfort-focused|styles under \$\d+)/i.test(previous);
 }
 
-// True when the most recent assistant turn was itself a soft-browse
-// starter response. Used to vary the text + rotate products on a repeat
-// browse so the bot doesn't emit the identical "here are a few styles…"
-// line twice (the dominant "repetitive" seam).
-function priorTurnWasSoftBrowse(history) {
-  const previous = lastAssistantContent(history);
-  return /\bnarrow by men's, women's, style, color,? or (?:a specific budget|price|color)\b/i.test(previous) ||
-    /\bhere are (?:a few|popular|sale|comfort-focused|styles under \$\d+|a different set)/i.test(previous) ||
-    /\bhere's a different set\b/i.test(previous);
+// How many prior assistant turns were soft-browse starter responses.
+// Drives text rotation: 0 = original copy, 1 = "different set", 2 =
+// "another angle", 3+ = "new mix / final nudge". Each variant looks
+// distinct enough that a customer who keeps saying "something else"
+// doesn't see word-for-word repeats — and the text moves from
+// invitational to more directly nudging for a constraint.
+function priorBrowseCount(history) {
+  let n = 0;
+  for (const turn of history || []) {
+    if (turn?.role !== "assistant" || typeof turn.content !== "string") continue;
+    if (
+      /\bnarrow by men's, women's, style, color,? or (?:a specific budget|price|color)\b/i.test(turn.content) ||
+      /\bhere are (?:a few|popular|sale|comfort-focused|styles under \$\d+|a different set)/i.test(turn.content) ||
+      /\bhere's a different set\b/i.test(turn.content) ||
+      /\bdifferent take\b|\banother angle\b|\bnew mix\b/i.test(turn.content)
+    ) {
+      n += 1;
+    }
+  }
+  return n;
 }
 
-// Handles already shown to the customer in prior turns — excluded from
-// a repeat soft-browse so a "show me something else" produces a
-// genuinely different set instead of the same cards.
+// Handles already shown across the entire conversation — excluded from
+// a repeat soft-browse so "show me something else" produces a genuinely
+// different set instead of recycling old cards. Cumulative across all
+// assistant turns (not just the most recent). The old version only
+// checked the last turn, so the 3rd browse silently repeated browse
+// #1's cards — that's the regression the hunter caught.
 function priorlyShownHandles(ctx) {
   const out = new Set();
-  for (const c of Array.isArray(ctx?.priorProductCards) ? ctx.priorProductCards : []) {
-    const key = c?.handle || c?.title;
-    if (key) out.add(String(key));
-  }
+  const harvest = (cards) => {
+    for (const c of Array.isArray(cards) ? cards : []) {
+      const key = c?.handle || c?.title;
+      if (key) out.add(String(key));
+    }
+  };
+  harvest(ctx?.priorProductCards);
+  harvest(ctx?.allPriorProductCards);
   return out;
 }
 
@@ -574,19 +607,21 @@ async function fetchSoftBrowseCards({ ctx, input, excludeHandles = null }) {
 
 async function emitSoftGenderGateBrowse({ ctx, controller, encoder }) {
   const input = softGenderBrowseSearchInput(ctx?.latestUserMessage || "");
-  // On a repeat browse, vary the text and rotate past already-shown
-  // cards so "show me something else" doesn't return the same response.
-  const repeated = priorTurnWasSoftBrowse(ctx?.messages);
+  // On a repeat browse, vary the text AND rotate past already-shown
+  // cards (cumulative across all prior assistant turns, not just the
+  // last one) so "show me something else" doesn't recycle old cards.
+  const repeatIndex = priorBrowseCount(ctx?.messages);
+  const repeated = repeatIndex > 0;
   const excludeHandles = repeated ? priorlyShownHandles(ctx) : null;
   const cards = await fetchSoftBrowseCards({ ctx, input, excludeHandles });
-  const text = buildSoftBrowseFallbackText({ input, hasProducts: cards.length > 0, repeated });
+  const text = buildSoftBrowseFallbackText({ input, hasProducts: cards.length > 0, repeated, repeatIndex });
 
   controller.enqueue(encoder.encode(sseChunk({ type: "text", text })));
   controller.enqueue(encoder.encode(sseChunk({ type: "products", products: cards })));
   controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
   console.log(
     `[chat] ${ctx.shop} soft-gender-gate browse emitted ` +
-      `query=${JSON.stringify(input.query)} poolSize=${cards.length} repeated=${repeated}`,
+      `query=${JSON.stringify(input.query)} poolSize=${cards.length} repeatIndex=${repeatIndex} excluded=${excludeHandles ? excludeHandles.size : 0}`,
   );
 }
 
@@ -1132,7 +1167,8 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       const scoped = scopedProductSearchInput(ctx);
       const hasScope = !!(scoped.scope.gender || scoped.scope.category || scoped.scope.color);
       const input = hasScope ? scoped.input : softGenderBrowseSearchInput(ctx.latestUserMessage || "");
-      const repeated = priorTurnWasSoftBrowse(ctx.messages);
+      const repeatIndex = priorBrowseCount(ctx.messages);
+      const repeated = repeatIndex > 0;
       const excludeHandles = repeated && !hasScope ? priorlyShownHandles(ctx) : null;
       const cards = hasScope
         ? extractProductCards("search_products", await dispatchTool("search_products", input, ctx))
@@ -1143,8 +1179,8 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
       }
       if (cards.length > 0) {
         productSearchAttempted = true;
-        fullResponseText = buildSoftBrowseFallbackText({ input, hasProducts: true, repeated });
-        console.log(`[chat] repeated-clarifier escape: ${currentClarifyingType} → showing ${cards.length} starter product(s) repeated=${repeated}`);
+        fullResponseText = buildSoftBrowseFallbackText({ input, hasProducts: true, repeated, repeatIndex });
+        console.log(`[chat] repeated-clarifier escape: ${currentClarifyingType} → showing ${cards.length} starter product(s) repeatIndex=${repeatIndex}`);
       }
     } catch (err) {
       console.error("[chat] repeated-clarifier escape failed:", err?.message || err);
@@ -2330,6 +2366,7 @@ export const action = async ({ request }) => {
     }
 
     const priorProductCards = extractPriorProductCards(body.history);
+    const allPriorProductCards = extractAllPriorProductCards(body.history);
     const history = sanitizeHistory(body.history);
     const messages = [...history, { role: "user", content: String(body.message) }];
 
@@ -2758,6 +2795,7 @@ export const action = async ({ request }) => {
       categoryGenderMap,
       latestUserMessage: String(body.message || ""),
       priorProductCards,
+      allPriorProductCards,
       debugChatEvents: body?.debug === true,
       messages,
     };

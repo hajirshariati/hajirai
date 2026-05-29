@@ -705,6 +705,23 @@ export function isUnanswerableSuggestion(question, { lastText = "", latestUserMe
   const q = String(question || "");
   if (!q.trim()) return { unanswerable: true, reason: "empty" };
   const lastLower = String(lastText || "").toLowerCase();
+  const qLower = q.toLowerCase();
+
+  // Kids-coverage contradiction. When the main reply just said the
+  // store doesn't carry kids' / teen / children's footwear, a follow-up
+  // chip that re-opens the kids angle ("would adult women's shoes fit
+  // her?", "what about kids' sizes?") directly contradicts the honesty
+  // note the customer just read. Drop those follow-ups so the kids
+  // honesty rule and the suggestions don't fight each other.
+  const repliedNoKidsCoverage =
+    /\b(?:don't|do not|doesn't|does not|no)\s+(?:carry|sell|stock|offer|have)\b[^.!?]{0,80}\b(?:kids?'?s?|teen(?:age|ager)?s?'?s?|children'?s?|youth|boys?'?s?|girls?'?s?|child)\b/i.test(lastLower) ||
+    /\bno\s+(?:kids?'?s?|teen(?:age|ager)?s?'?s?|children'?s?)\s+(?:footwear|shoes?|sizes?)\b/i.test(lastLower);
+  if (repliedNoKidsCoverage) {
+    if (/\b(?:kids?'?s?|teen(?:age|ager)?s?'?s?|children'?s?|youth|boys?'?s?|girls?'?s?|daughter|son|child|her|him)\b/i.test(qLower) &&
+        /\b(?:fit|size|smaller|adult\s+women|adult\s+men|work\s+for|big\s+enough|small\s+enough|youth\s+size)\b/i.test(qLower)) {
+      return { unanswerable: true, reason: "contradicts kids-coverage honesty note in main reply" };
+    }
+  }
 
   const qTokens = suggestionTokens(q);
   const latestTokens = new Set(suggestionTokens(latestUserMessage));

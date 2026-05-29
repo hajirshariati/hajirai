@@ -12,7 +12,7 @@ import {
   maybeRunOrthoticFlow,
   shouldSoftEscapeFootwearGenderGate,
 } from "../app/lib/orthotic-flow-gate.server.js";
-import { looksLikeFunctionalQuestion } from "../app/lib/orthotic-flow.server.js";
+import { looksLikeFunctionalQuestion, looksLikeTransactionalQuestion } from "../app/lib/orthotic-flow.server.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const definition = JSON.parse(readFileSync(resolve(here, "seeds/aetrex-orthotic-tree.json"), "utf8"));
@@ -160,6 +160,23 @@ await test("still advances the flow on a plain chip answer with no question", as
     encoder,
   });
   assert.equal(out.handled, true);
+});
+
+await test("looksLikeTransactionalQuestion catches ordering / buying intent post-recommendation", () => {
+  // Hunter trace (foot-pain-orthotic): after a recommendation, customer
+  // said "this mens active posted one sounds good — how do i order it?"
+  // — the gate auto-resolved the same recommendation again. Ordering
+  // intent must fall through to the LLM.
+  assert.equal(looksLikeTransactionalQuestion("how do i order it?"), true);
+  assert.equal(looksLikeTransactionalQuestion("can I buy this?"), true);
+  assert.equal(looksLikeTransactionalQuestion("where do I checkout?"), true);
+  assert.equal(looksLikeTransactionalQuestion("I'll take it"), true);
+  assert.equal(looksLikeTransactionalQuestion("how do i order the kit?"), true);
+  assert.equal(looksLikeTransactionalQuestion("can you ship this?"), true);
+  // Must NOT match generic intents or chip answers.
+  assert.equal(looksLikeTransactionalQuestion("men's"), false);
+  assert.equal(looksLikeTransactionalQuestion("show me a recommendation"), false);
+  assert.equal(looksLikeTransactionalQuestion("I want orthotics"), false);
 });
 
 await test("looksLikeFunctionalQuestion catches post-recommendation yes/no product questions", () => {
