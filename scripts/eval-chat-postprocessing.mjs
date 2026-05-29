@@ -49,6 +49,7 @@ import {
   stripUnsafeInlineChips,
   resolverPromisedRecommendation,
   stripAvailabilityDenialSentences,
+  dropNonFootwearWhenFootwearIntent,
 } from "../app/lib/chat-postprocessing.js";
 import {
   isSingularPrescriptive,
@@ -80,6 +81,51 @@ function test(name, fn) {
 function section(label) {
   console.log(`\n${label}`);
 }
+
+// =====================================================================
+section("dropNonFootwearWhenFootwearIntent");
+
+test("wrong-topic: drops shoe-care/accessories for a gift request, keeps footwear", () => {
+  const pool = [
+    { handle: "care-kit", _category: "Shoe Care" },
+    { handle: "danika-sneaker", _category: "Sneakers" },
+    { handle: "leather-spray", _category: "Accessories" },
+  ];
+  const out = dropNonFootwearWhenFootwearIntent(pool, "shopping for a gift for my mom");
+  assert.equal(out.cards.length, 1);
+  assert.equal(out.cards[0].handle, "danika-sneaker");
+  assert.deepEqual(out.dropped.sort(), ["care-kit", "leather-spray"]);
+});
+
+test("keeps the pool when the customer explicitly wants accessories", () => {
+  const pool = [
+    { handle: "care-kit", _category: "Shoe Care" },
+    { handle: "danika-sneaker", _category: "Sneakers" },
+  ];
+  const out = dropNonFootwearWhenFootwearIntent(pool, "do you have any shoe care kits?");
+  assert.equal(out.cards.length, 2);
+  assert.deepEqual(out.dropped, []);
+});
+
+test("never empties the pool: all-accessory pool is left intact", () => {
+  const pool = [
+    { handle: "care-kit", _category: "Shoe Care" },
+    { handle: "socks", _category: "Socks" },
+  ];
+  const out = dropNonFootwearWhenFootwearIntent(pool, "gift for my mom");
+  assert.equal(out.cards.length, 2);
+  assert.deepEqual(out.dropped, []);
+});
+
+test("orthotics are NOT dropped (real product line)", () => {
+  const pool = [
+    { handle: "l600-orthotic", _category: "Orthotics" },
+    { handle: "danika-sneaker", _category: "Sneakers" },
+  ];
+  const out = dropNonFootwearWhenFootwearIntent(pool, "gift for my mom");
+  assert.equal(out.cards.length, 2);
+  assert.deepEqual(out.dropped, []);
+});
 
 // =====================================================================
 section("detectSingularIntent");

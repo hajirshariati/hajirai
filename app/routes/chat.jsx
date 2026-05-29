@@ -90,6 +90,7 @@ import {
   stripInternalLeaks,
   scrubInternalEnums,
   resolverPromisedRecommendation,
+  dropNonFootwearWhenFootwearIntent,
 } from "../lib/chat-postprocessing";
 import prisma from "../db.server";
 import { recordChatUsage, getTodayMessageCount } from "../models/ChatUsage.server";
@@ -1113,6 +1114,17 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
   });
   if (ensuredCards.searchAttempted) productSearchAttempted = true;
   let pool = ensuredCards.products;
+  // wrong-topic guard: for a general footwear/gift request, drop
+  // shoe-care/accessories/socks/gift-cards that semantic search may
+  // have surfaced above real shoes. No-op when the customer asked for
+  // accessories or when dropping would empty the pool.
+  {
+    const footwearOnly = dropNonFootwearWhenFootwearIntent(pool, ctx.latestUserMessage);
+    if (footwearOnly.dropped.length > 0) {
+      console.log(`[chat] ${ctx.shop} wrong-topic guard: dropped non-footwear from pool:`, footwearOnly.dropped);
+      pool = footwearOnly.cards;
+    }
+  }
   const latestComparisonUsesPriorCards =
     detectComparisonIntent(ctx.latestUserMessage) &&
     /\b(?:first\s+two|1st\s+two|these|those|them|ones|both)\b/i.test(String(ctx.latestUserMessage || ""));

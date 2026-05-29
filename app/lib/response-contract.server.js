@@ -720,6 +720,13 @@ export function repairProductTurnAssembly({ text, pool = [], ctx = {}, relaxedFi
     logs.push("verified_color_availability");
   }
 
+  const positiveColorRepair = repairPositiveColorClaims(nextText, pool);
+  if (positiveColorRepair.changed) {
+    nextText = positiveColorRepair.text;
+    changed = true;
+    logs.push("corrected_color_overclaim");
+  }
+
   if (isDirectProductFactQuestion(ctx?.latestUserMessage)) {
     const colorRangeRepair = repairColorRangePromises(nextText, pool, ctx);
     if (colorRangeRepair.changed) {
@@ -908,6 +915,103 @@ function repairColorAvailabilityClaims(text, cards, ctx = {}) {
     })
     .filter(Boolean);
 
+  return {
+    text: sentences.join(" ").replace(/\s{2,}/g, " ").trim(),
+    changed,
+  };
+}
+
+// Extract the set of normalized colors a sentence asserts, reusing the
+// shared color vocabulary (single words + adjacent pairs like "navy
+// blue" / "off white"). Used to verify positive availability claims.
+function extractProseColors(sentence) {
+  const words = String(sentence || "").toLowerCase().match(/[a-z]+/g) || [];
+  const found = new Set();
+  for (let i = 0; i < words.length; i++) {
+    const single = normalizeKnownTextColor(words[i]);
+    if (single) found.add(single);
+    if (i + 1 < words.length) {
+      const pair = normalizeKnownTextColor(`${words[i]} ${words[i + 1]}`);
+      if (pair) found.add(pair);
+    }
+  }
+  return [...found];
+}
+
+function cardTitleBase(card) {
+  return String(card?.title || "").replace(/\s+[-–—]\s*[^-–—]+$/, "").trim();
+}
+
+// Raw color display names for a card (case + spelling preserved),
+// including colors that don't map to the normalized vocabulary
+// (e.g. "Terracotta", "Bronze"). variantColorEntries drops those, so
+// it can't be used to RE-STATE a card's real colors — only to compare.
+function cardRawColorDisplays(card) {
+  const facts = card?._variantFacts || card?.variantFacts || {};
+  const raw = [
+    ...flattenValues([facts.availableColors]),
+    ...flattenValues([facts.colors]),
+    ...(Array.isArray(facts.byColor) ? facts.byColor.map((e) => e?.color) : []),
+    ...flattenValues([facts.productAvailableColors]),
+  ];
+  const seen = new Set();
+  const out = [];
+  for (const r of raw) {
+    const display = String(r || "").trim();
+    if (!display) continue;
+    const key = display.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(display);
+  }
+  return out;
+}
+
+// Positive color over-claim verifier. The LLM sometimes free-texts a
+// per-product color list ("Charlotte ... also comes in red, white,
+// tan, blue, yellow, and black") that contradicts the product's actual
+// variants. The negative-claim repair above only catches "only comes
+// in X" denials. This catches the inverse: a sentence that names a
+// specific card and asserts colors that card does NOT carry. We
+// replace the offending sentence with the card's real colors (the same
+// variant facts the rest of the system already trusts).
+//
+// Conservative by design — only fires when ALL of these hold:
+//   - the sentence has a positive "(also) comes/available/offered in"
+//     cue (we never touch non-color prose),
+//   - it names a specific card from the pool (title base match),
+//   - that card has at least one known variant color (facts present),
+//   - the sentence asserts >=2 colors AND at least one is provably
+//     absent from the card's real colors.
+// When facts are missing or the claim is accurate, we leave it alone.
+const POSITIVE_COLOR_CLAIM_RE =
+  /\b(?:also\s+)?(?:comes?|is\s+available|are\s+available|available|offered|come)\s+(?:in|with)\b/i;
+
+function repairPositiveColorClaims(text, cards) {
+  if (!text || !Array.isArray(cards) || cards.length === 0) return { text, changed: false };
+  let changed = false;
+  const sentences = sentenceSplit(text)
+    .map((sentence) => {
+      const s = sentence.trim();
+      if (!s || !POSITIVE_COLOR_CLAIM_RE.test(s)) return s;
+      const named = cards.find((c) => {
+        const base = cardTitleBase(c).toLowerCase();
+        return base.length >= 5 && s.toLowerCase().includes(base);
+      });
+      if (!named) return s;
+      const realNorm = new Set(variantColorEntries(named).map((e) => e.normalized));
+      if (realNorm.size === 0) return s; // no normalizable facts → can't verify
+      const realDisplays = cardRawColorDisplays(named);
+      if (realDisplays.length === 0) return s; // no facts to re-state
+      const claimed = extractProseColors(s);
+      if (claimed.length < 2) return s; // not an enumeration
+      const overclaimed = claimed.some((c) => !realNorm.has(c));
+      if (!overclaimed) return s; // accurate → leave it
+      changed = true;
+      const base = cardTitleBase(named) || "This style";
+      return `${base} comes in ${formatDisplayList(realDisplays)}.`;
+    })
+    .filter(Boolean);
   return {
     text: sentences.join(" ").replace(/\s{2,}/g, " ").trim(),
     changed,

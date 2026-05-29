@@ -121,6 +121,46 @@ await test("re-asks current question when reply is gibberish but intent is estab
   assert.match(events[0].text, /Who are these orthotics for/i);
 });
 
+await test("falls through when mid-flow reply is a question, not a chip answer (ignores-user fix)", async () => {
+  // Hunter (foot-pain-orthotic): after the gender chip, customer asked
+  // "tell me more about those? do they come with arch support?" — the
+  // bot re-asked the diagnostic instead of answering. The reply does
+  // not answer the asked chip (gender) and is clearly a question, so
+  // the gate must fall through to the LLM.
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "I need orthotics for heel pain" },
+      { role: "assistant", content: "Who are these orthotics for? <<Men>><<Women>><<Kids>>" },
+      { role: "user", content: "oh nice, can you tell me more about those? also do they come with any arch support options" },
+    ],
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+  });
+  assert.equal(out.handled, false);
+});
+
+await test("still advances the flow on a plain chip answer with no question", async () => {
+  // Guard against over-fall-through: a plain "women's" chip answer (no
+  // question signal) must advance the flow, not bail. Only QUESTIONS
+  // that don't answer the chip fall through.
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "I need orthotics for heel pain" },
+      { role: "assistant", content: "Who are these orthotics for? <<Men>><<Women>><<Kids>>" },
+      { role: "user", content: "women's" },
+    ],
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+  });
+  assert.equal(out.handled, true);
+});
+
 await test("soft gender-gate escape detects open-browse non-answer after gender ask", async () => {
   const messages = [
     { role: "user", content: "hi i need new shoes" },

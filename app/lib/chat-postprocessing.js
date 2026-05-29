@@ -1001,3 +1001,30 @@ export function detectFootwearOverElicitation({
       `Only AFTER you have called search_products and seen results may you write text.`,
   };
 }
+
+// Non-footwear pool filter. Semantic search for a general footwear /
+// gift request ("shopping for a gift for my mom") can surface shoe-care
+// kits, accessories, socks, or gift cards above actual shoes — the
+// adversarial hunter's "wrong-topic" failure. When the customer did NOT
+// explicitly ask for accessories/care AND the pool still contains real
+// footwear, drop the non-footwear cards so the displayed results match
+// the footwear intent. Orthotics are intentionally NOT dropped — they
+// are a real product line gated by the orthotic flow. Conservative:
+// never empties the pool (only drops when footwear remains).
+const NON_FOOTWEAR_CATEGORY_RE =
+  /\b(?:accessor|shoe[\s-]*care|care[\s-]*kit|cleaner|cleaning|protect|water[\s-]*repel|spray|sock|gift[\s-]*card|shoe[\s-]*lace|\blaces?\b|freshener|deodor|insole[\s-]*cover)/i;
+const ACCESSORY_INTENT_RE =
+  /\b(?:accessor|shoe[\s-]*care|care[\s-]*kit|cleaner|cleaning|protect|spray|socks?|gift[\s-]*card|laces?|freshener|deodor)\b/i;
+
+export function dropNonFootwearWhenFootwearIntent(cards, userMessage) {
+  if (!Array.isArray(cards) || cards.length === 0) return { cards, dropped: [] };
+  // Customer explicitly wants accessories/care → leave the pool as-is.
+  if (ACCESSORY_INTENT_RE.test(String(userMessage || ""))) return { cards, dropped: [] };
+  const catOf = (c) => String(c?._category || c?.category || c?.productType || "");
+  const isNonFootwear = (c) => NON_FOOTWEAR_CATEGORY_RE.test(catOf(c));
+  const footwear = cards.filter((c) => !isNonFootwear(c));
+  const nonFootwear = cards.filter(isNonFootwear);
+  // Only drop when real footwear remains to show.
+  if (footwear.length === 0 || nonFootwear.length === 0) return { cards, dropped: [] };
+  return { cards: footwear, dropped: nonFootwear.map((c) => c?.handle || c?.title || "?") };
+}

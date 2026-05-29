@@ -1166,6 +1166,45 @@ export async function maybeRunOrthoticFlow({
     return { handled: false };
   }
 
+  // Mid-flow question that doesn't answer the asked chip. The prior
+  // assistant turn offered chips (fingerprintNode set), but THIS reply
+  // is a question and did NOT provide the attribute that chip asked
+  // for. Re-emitting the same chip would ignore the customer's actual
+  // question — the dominant "repetitive" / "ignores-user" failure from
+  // the adversarial hunter ("oh nice, can you tell me more about
+  // those? do they come with arch support?" → bot re-asked the
+  // diagnostic). Fall through to the LLM so it can answer, then
+  // re-prompt naturally.
+  //
+  // Precise + safe: gated on (a) the reply NOT answering the asked
+  // attribute (so "women's, but what about arch?" still advances —
+  // gender was answered), and (b) a real question signal ("?" anywhere,
+  // or an info/availability cue) so keep-alives ("ok", "next") and
+  // gibberish still re-ask. Recommendation requests are excluded (they
+  // resolve, not fall through).
+  if (fingerprintNode) {
+    const askedAttr = fingerprintNode.attribute;
+    const answeredAsked =
+      askedAttr &&
+      (latestExtracted[askedAttr] !== undefined ||
+        (layer3Mapped && answers[askedAttr] !== undefined));
+    const looksLikeQuestion =
+      /\?/.test(rawUserText) ||
+      looksLikeInformationalQuestion(rawUserText) ||
+      looksLikeAvailabilityQuestion(rawUserText);
+    if (
+      !answeredAsked &&
+      looksLikeQuestion &&
+      !looksLikeRecommendationRequest(rawUserText)
+    ) {
+      console.log(
+        `[orthotic-flow] mid-flow question doesn't answer asked chip ` +
+          `(${askedAttr || "?"}): "${rawUserText.slice(0, 60)}"; falling through to LLM`,
+      );
+      return { handled: false };
+    }
+  }
+
   // Informational-question mid-flow veto. The customer IS engaged in
   // orthotic flow (intentInHistory or fingerprintNode), but THIS turn
   // is asking what something IS / how it works / what its specs are

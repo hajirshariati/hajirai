@@ -416,6 +416,48 @@ test("R19 — comparison renderer answers compare-the-first-two without generic 
   assert.doesNotMatch(out.text, /^Found these/i);
 });
 
+test("R20 — positive color over-claim is corrected from variant facts (contradicts-self)", () => {
+  // Hunter (color-iteration persona): bot free-texted "Charlotte ...
+  // also comes in red, white, Tan, blue, yellow, and black" while the
+  // actual product only carries Terracotta — a trust-killing
+  // hallucination. The verifier must replace the ungrounded list with
+  // the card's real colors.
+  const out = repairProductTurnAssembly({
+    text: "Charlotte Lace-Up Sneaker also comes in red, white, Tan, blue, yellow, and black.",
+    pool: [{
+      title: "Charlotte Lace-Up Sneaker - Terracotta",
+      handle: "charlotte-terracotta",
+      _attributes: { Color: "Terracotta" },
+      _variantFacts: { availableColors: ["Terracotta", "Black"] },
+    }],
+    ctx: { latestUserMessage: "do you have these in different colors?" },
+  });
+  assert.equal(out.changed, true);
+  // The false colors (red, blue, yellow) must be gone.
+  assert.doesNotMatch(out.text, /\b(?:red|blue|yellow|tan)\b/i);
+  // The real colors must be present.
+  assert.match(out.text, /Terracotta/i);
+  assert.match(out.text, /Black/i);
+});
+
+test("R21 — accurate positive color claim is left untouched", () => {
+  // Guard against over-correction: a TRUE color claim must survive.
+  const out = repairProductTurnAssembly({
+    text: "Chase Arch Support Sneaker also comes in Black and Navy.",
+    pool: [{
+      title: "Chase Arch Support Sneaker - White",
+      handle: "chase-white",
+      _attributes: { Color: "White" },
+      _variantFacts: { availableColors: ["White", "Black", "Navy", "Silver"] },
+    }],
+    ctx: { latestUserMessage: "any other colors?" },
+  });
+  // No false colors claimed → no correction.
+  assert.equal(/red|yellow|pink/i.test(out.text), false);
+  assert.match(out.text, /Black/i);
+  assert.match(out.text, /Navy/i);
+});
+
 if (failed > 0) {
   console.error("\nFailures:");
   for (const f of failures) console.error(`- ${f.name}: ${f.err.stack || f.err.message}`);
