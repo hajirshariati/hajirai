@@ -10,6 +10,7 @@ import {
   repairProductResponseText,
   stripMissingSkus,
   createTurnResult,
+  extractGenericCTA,
 } from "../app/lib/response-contract.server.js";
 
 let passed = 0;
@@ -532,6 +533,23 @@ test("R22b — third+ browse rotates through distinct variants, never the same l
 test("R23 — non-repeated browse keeps the original starter copy", () => {
   const first = buildSoftBrowseFallbackText({ input: {}, hasProducts: true });
   assert.match(first, /here are a few styles/i);
+});
+
+test("R24 — orphan markdown markers around a link are stripped from text", () => {
+  // Production trace (Store Locator** bug): LLM wrote
+  // "check **[Store Locator](https://...)** today" — the link was
+  // extracted but the surrounding ** stayed in the prose, rendering as
+  // visible asterisks to the customer.
+  const out = extractGenericCTA("check **[Store Locator](https://example.com)** today");
+  assert.equal(out.cta.label, "Store Locator");
+  assert.doesNotMatch(out.text, /\*\*/, `orphan ** must be cleaned from text; got "${out.text}"`);
+});
+
+test("R25 — link extraction collapses double spaces and dangling punctuation", () => {
+  const out = extractGenericCTA("pickup info: [Help](https://example.com) Would you like more?");
+  assert.equal(out.cta.label, "Help");
+  assert.doesNotMatch(out.text, /\s{2,}/, "no double spaces");
+  assert.match(out.text, /pickup info: Would you like more\?/);
 });
 
 if (failed > 0) {

@@ -212,10 +212,24 @@ export function extractGenericCTA(text) {
   const mdLink = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/;
   const rawLink = /(https?:\/\/[^\s]+)/;
 
+  // After we strip a markdown link out of the prose, clean up any
+  // orphan formatting markers the LLM bracketed it with — e.g.
+  // "check **[Store Locator](url)** today" leaves "check **** today"
+  // which renders as visible asterisks. Also collapse double spaces
+  // and leading punctuation hangovers like "today: " followed by
+  // nothing.
+  const cleanOrphans = (s) => String(s || "")
+    .replace(/\*{2,}/g, "")              // orphan ** / ****
+    .replace(/(?:^|\s)_{2,}(?=\s|$)/g, " ") // orphan __
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/\s+([.,;:!?])/g, "$1")     // " ," → ","
+    .replace(/([:,;])\s*(?=$|\n)/g, "$1") // dangling "today: "
+    .trim();
+
   let match = text.match(mdLink);
   if (match) {
     return {
-      text: text.replace(match[0], "").trim(),
+      text: cleanOrphans(text.replace(match[0], "")),
       cta: { url: match[2], label: sanitizeCtaLabel(match[1], match[2]) },
     };
   }
@@ -223,7 +237,7 @@ export function extractGenericCTA(text) {
   match = text.match(rawLink);
   if (match) {
     return {
-      text: text.replace(match[0], "").trim(),
+      text: cleanOrphans(text.replace(match[0], "")),
       cta: { url: match[1], label: sanitizeCtaLabel("", match[1]) },
     };
   }
@@ -742,20 +756,6 @@ export function repairProductTurnAssembly({ text, pool = [], ctx = {}, relaxedFi
     logs.push("corrected_color_overclaim");
   }
 
-  // Per-product enumeration covering only some of the displayed cards
-  // looks contradictory next to the cards the customer sees. Hunter
-  // trace (color-iteration): bot wrote "Danika comes in… Carly comes
-  // in…" but the cards also included Ivy, Charlotte, and Blake. The
-  // missing names read as the bot hiding or forgetting products.
-  // When this is detected, swap the partial enumeration for a single
-  // honest line — the cards already render the names + colors.
-  const partialEnum = collapsePartialPerProductEnumeration(nextText, pool);
-  if (partialEnum.changed) {
-    nextText = partialEnum.text;
-    changed = true;
-    logs.push("collapsed_partial_per_product_enumeration");
-  }
-
   if (isDirectProductFactQuestion(ctx?.latestUserMessage)) {
     const colorRangeRepair = repairColorRangePromises(nextText, pool, ctx);
     if (colorRangeRepair.changed) {
@@ -763,6 +763,23 @@ export function repairProductTurnAssembly({ text, pool = [], ctx = {}, relaxedFi
       changed = true;
       logs.push("completed_color_range_from_facts");
     }
+  }
+
+  // Per-product enumeration covering only some of the displayed cards
+  // looks contradictory next to the cards the customer sees. Hunter
+  // trace (color-iteration): bot wrote "Danika comes in… Carly comes
+  // in…" but the cards also included Ivy, Charlotte, and Blake. The
+  // missing names read as the bot hiding or forgetting products.
+  // When this is detected, swap the partial enumeration for a single
+  // honest line — the cards already render the names + colors. Runs
+  // AFTER repairColorRangePromises because that step can ITSELF
+  // introduce a partial enumeration (only cards with multi-color
+  // variants get a "comes in…" sentence), which this cleanup catches.
+  const partialEnum = collapsePartialPerProductEnumeration(nextText, pool);
+  if (partialEnum.changed) {
+    nextText = partialEnum.text;
+    changed = true;
+    logs.push("collapsed_partial_per_product_enumeration");
   }
 
   if (Array.isArray(pool) && pool.length > 0 && extractTurnChips(nextText).length > 0) {
@@ -1422,10 +1439,20 @@ export function buildCodeOwnedProductListingText({ text = "", cards = [], ctx = 
 
   if (requestedColor) {
     const colorMatch = exactRequestedColorMatches(cards, requestedColor);
+    // If the AI's text claims a NEGATIVE result ("couldn't find / no
+    // exact / don't have / not in") for the requested color, but the
+    // pool actually contains literal matches, the AI is wrong — always
+    // replace with the truthful line. Production trace (R8e): cards had
+    // Eggplant (= purple) but AI wrote "couldn't find purple".
+    const aiClaimsNegative = isUseful && new RegExp(
+      `(?:couldn'?t\\s+find|no\\s+exact|don'?t\\s+have|not\\s+in|cannot\\s+find|no\\s+\\w+\\s+(?:in\\s+)?${requestedColor})`,
+      "i",
+    ).test(aiText);
     if (colorMatch.all) {
       // AI's text already names the requested color correctly AND is
-      // substantive → keep it. Otherwise replace with the honest line.
-      if (isUseful && aiClaimsRequestedColor) {
+      // substantive AND doesn't deny the color → keep it. Otherwise
+      // replace with the honest line.
+      if (isUseful && aiClaimsRequestedColor && !aiClaimsNegative) {
         return { text: aiText, changed: false, reason: "ai_text_color_accurate" };
       }
       next = `Here are the ${requestedColor} ${base}${variantText} I found.`;
