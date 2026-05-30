@@ -1509,6 +1509,35 @@ await test("loop guard: same question would be emitted twice → fall through", 
     `gate must fall through to avoid emitting the same question twice. Logs: ${cap.lines.filter(l => l.includes("[orthotic-flow]")).join(" | ")}`);
 });
 
+await test("condition-only disambig is SUPPRESSED when the customer is already mid-orthotic-flow", async () => {
+  // Production trace: customer was on turn 4 of the orthotic flow
+  // (gender + arch + overpronation chips answered), then asked "is
+  // this good for flat feet and ball of foot pain?" — the disambig
+  // fired and asked "footwear or orthotic?" Absurd: they had already
+  // chosen orthotic 3 turns earlier. Mid-flow → skip the disambig.
+  const { events, encoder, controller } = makeMockSse();
+  const out = await maybeRunOrthoticFlow({
+    messages: [
+      { role: "user", content: "I need orthotics for my casual shoes" },
+      { role: "assistant", content: "Who are these orthotics for? <<Men>><<Women>><<Kids>>" },
+      { role: "user", content: "women" },
+      { role: "assistant", content: "What's your arch type? <<Flat / Low>><<Medium>><<High>>" },
+      { role: "user", content: "flat" },
+      { role: "assistant", content: "When you walk or stand, do your ankles roll inward or do you have flat-feet symptoms? <<Yes>><<No>>" },
+      { role: "user", content: "yes" },
+      { role: "assistant", content: "Based on what you've shared, **Women's Train Posted Orthotics** is the best match." },
+      { role: "user", content: "is this good for flat feet and ball of foot pain?" },
+    ],
+    tree,
+    shop: "test.myshopify.com",
+    controller,
+    encoder,
+  });
+  // The gate must NOT emit the "footwear or orthotic?" disambig.
+  const disambigEmitted = events.some((e) => e?.type === "text" && /\bfootwear with arch support\b/i.test(e.text || ""));
+  assert.equal(disambigEmitted, false, "mid-flow disambig must be suppressed once customer is engaged in orthotic flow");
+});
+
 console.log("");
 if (failed === 0) {
   console.log(`✅  ${passed} passed, 0 failed\n`);

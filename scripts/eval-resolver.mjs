@@ -75,6 +75,32 @@ await test("R0 — extractor maps common Spanish color words", async () => {
   assert.equal(extractUserConstraints("en azul").color, "blue");
 });
 
+await test("R0a — color attached to a garment word is NOT a footwear filter", () => {
+  // Production trace: "do you have any wedge that goes well with my
+  // blue dress?" → extractor grabbed color=blue from "blue dress" and
+  // forced a blue-wedge search. The customer's OUTFIT color is not a
+  // filter for the shoes they want.
+  assert.equal(extractUserConstraints("do you have any wedge that goes well with my blue dress?").color, undefined);
+  assert.equal(extractUserConstraints("shoes to match my blue dress").color, undefined);
+  assert.equal(extractUserConstraints("looking for something to wear with a red gown").color, undefined);
+});
+
+await test("R0b — color directly on a footwear noun IS extracted", () => {
+  assert.equal(extractUserConstraints("show me blue sandals").color, "blue");
+  assert.equal(extractUserConstraints("i need pink sandals").color, "pink");
+  assert.equal(extractUserConstraints("do you have jillian in red?").color, "red");
+});
+
+await test("R0c — multi-color sentence picks the footwear color, drops the garment color", () => {
+  const out = extractUserConstraints("red heels for my black dress");
+  assert.equal(out.color, "red", `expected footwear color red; got ${out.color}`);
+});
+
+await test("R0d — 'pink dress shoes' keeps the color because 'dress' is the occasion", () => {
+  // "[color] dress [footwear]" → dress is an occasion modifier here.
+  assert.equal(extractUserConstraints("pink dress shoes").color, "pink");
+});
+
 await test("R1 — navy color infers men's, gender goes in do_not_ask", async () => {
   const facetIndex = {
     categoryByGender: { sneakers: ["men", "women"], sandals: ["women"] },

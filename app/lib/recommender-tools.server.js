@@ -552,9 +552,27 @@ export async function executeRecommenderTool({ toolName, input, shop, trees, con
   // (intentional — that guard is about overall context). Falls
   // back to conversationText if the caller didn't pass latestUserText
   // so existing call sites don't regress.
-  const enrichmentText = (typeof latestUserText === "string" && latestUserText.trim())
+  // Production trace: customer said "i have flat feet with ball of foot
+  // pain" on turn 1, then answered chip questions for 4 turns. On the
+  // resolve turn `latestUserText` is just "Women" (the gender chip) —
+  // it contains no clinical signal at all, so scoping enrichment to it
+  // misses both flat-feet AND ball-of-foot signals from turn 1, and
+  // the resolver picks L820 (Train Posted) instead of L825 (Train
+  // Posted W/ Met Support). When the latest message contains no
+  // clinical vocabulary at all, fall back to the full conversation so
+  // earlier symptom mentions still drive derivations. The "stale
+  // signals leaking across topic switches" production trace this
+  // protects against involved a switch from BoF to PF — that switch
+  // would surface a NEW clinical signal in the latest message, so the
+  // fallback wouldn't trigger.
+  const CLINICAL_VOCAB_RE =
+    /\b(pain|aching?|sore|fasciit|bunion|hammertoes?|neuroma|flat[\s-]?feet|flat[\s-]?foot|high[\s-]?arch|low[\s-]?arch|overpronat|underpronat|plantar|metatars|ball[\s-]?of[\s-]?(?:the[\s-]?)?foot|forefoot|fore[\s-]?foot|heel[\s-]?(?:pain|spurs?)|arch[\s-]?pain|diabet|neuropathy|arthritis|foot[\s-]?(?:pain|discomfort|issue))\b/i;
+  const latestHasClinical = typeof latestUserText === "string" && CLINICAL_VOCAB_RE.test(latestUserText);
+  const enrichmentText = latestHasClinical
     ? latestUserText
-    : (typeof conversationText === "string" ? conversationText : "");
+    : (typeof conversationText === "string" && conversationText.trim()
+        ? conversationText
+        : (typeof latestUserText === "string" ? latestUserText : ""));
   if (enrichmentText && enrichmentText.trim()) {
     const t = enrichmentText.toLowerCase();
     // useCase ← shoe-type vocabulary. The LLM sometimes calls

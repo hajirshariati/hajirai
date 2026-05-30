@@ -537,6 +537,77 @@ function matchLex(text, lex) {
   return null;
 }
 
+// Garment words the customer might wear (and color-describe) WITHOUT
+// asking for footwear in that color. Production trace: "do you have any
+// wedge that goes well with my blue dress?" — the lex extractor grabbed
+// color=blue from "blue dress", which then forced a blue-wedge search.
+// "blue dress" is what they're wearing, not what they want on their
+// feet. When a color appears IMMEDIATELY before one of these words, the
+// color describes the garment — drop it.
+//
+// Special case: "dress" can mean either the garment OR the occasion
+// modifier ("dress shoes", "dress heels"). The garment check below
+// disambiguates by looking one word further: "[color] dress shoes" =
+// dress is an occasion → keep the color; "[color] dress" with no
+// trailing footwear noun = dress is a garment → drop.
+const GARMENT_NOUNS = [
+  "dress", "dresses", "gown", "gowns", "skirt", "skirts", "pants",
+  "trousers", "jeans", "shorts", "leggings", "shirt", "shirts",
+  "blouse", "top", "tops", "sweater", "sweaters", "jacket", "jackets",
+  "coat", "coats", "suit", "suits", "tuxedo", "jumpsuit", "romper",
+  "outfit", "outfits", "bag", "bags", "purse", "handbag", "clutch",
+  "belt", "belts", "scarf", "hat", "tie", "tights", "stockings",
+];
+const GARMENT_NOUNS_RE_SRC = GARMENT_NOUNS.join("|");
+const FOOTWEAR_NOUNS = [
+  ...Object.keys(RESOLVER_CATEGORY_LEX),
+  "shoes", "shoe", "footwear", "pair", "pairs",
+];
+const FOOTWEAR_NOUNS_RE_SRC = FOOTWEAR_NOUNS
+  .map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+  .join("|");
+
+// True when "[colorWord] [garment]" appears in the message AND the
+// garment is NOT immediately followed by a footwear noun (so
+// "pink dress shoes" keeps pink — "dress" is the occasion, not the
+// garment). Returns true → drop this color word's match.
+function colorMatchIsGarmentAttached(message, colorWord) {
+  // "[colorWord] [garment] [footwear-noun]" — keep (dress as occasion).
+  const occasionPattern = new RegExp(
+    `\\b${colorWord}\\b\\s+(?:${GARMENT_NOUNS_RE_SRC})\\s+(?:${FOOTWEAR_NOUNS_RE_SRC})\\b`,
+    "i",
+  );
+  if (occasionPattern.test(message)) return false;
+  // "[colorWord] [garment]" without trailing footwear → drop.
+  const garmentPattern = new RegExp(
+    `\\b${colorWord}\\b\\s+(?:${GARMENT_NOUNS_RE_SRC})\\b`,
+    "i",
+  );
+  return garmentPattern.test(message);
+}
+
+// Pick the color the customer actually wants ON THEIR FEET. Walk every
+// color key, drop ones attached to a garment, prefer ones adjacent to a
+// footwear noun, otherwise return any non-garment match. Returns the
+// canonical color value or null.
+function pickCustomerColor(message) {
+  const messageLower = String(message).toLowerCase();
+  const matches = []; // { key, canonical, index, attachedToFootwear }
+  for (const [key, canonical] of Object.entries(RESOLVER_COLOR_LEX)) {
+    const escaped = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\s+/g, "\\s+");
+    const re = new RegExp(`(?:^|[^a-z])${escaped}(?:[^a-z]|$)`, "i");
+    const m = re.exec(messageLower);
+    if (!m) continue;
+    if (colorMatchIsGarmentAttached(messageLower, key)) continue;
+    const footwearAdj = new RegExp(`\\b${escaped}\\b\\s+(?:${FOOTWEAR_NOUNS_RE_SRC})\\b`, "i").test(messageLower);
+    matches.push({ key, canonical, index: m.index, attachedToFootwear: footwearAdj });
+  }
+  if (matches.length === 0) return null;
+  // Prefer a color directly modifying a footwear noun ("red sandals").
+  const footwearAdj = matches.find((m) => m.attachedToFootwear);
+  return (footwearAdj || matches[0]).canonical;
+}
+
 export function extractUserConstraints(message) {
   if (!message || typeof message !== "string") return {};
   const out = {};
@@ -544,7 +615,7 @@ export function extractUserConstraints(message) {
   if (gender) out.gender = gender;
   const category = matchLex(message, RESOLVER_CATEGORY_LEX);
   if (category) out.category = category;
-  const color = matchLex(message, RESOLVER_COLOR_LEX);
+  const color = pickCustomerColor(message);
   if (color) out.color = color;
   for (const [tag, re] of Object.entries(RESOLVER_CONDITION_RE)) {
     if (re.test(message)) { out.condition = tag; break; }

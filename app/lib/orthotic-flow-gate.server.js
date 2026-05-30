@@ -722,7 +722,24 @@ export async function maybeRunOrthoticFlow({
                           SHOPPING_VERB_RE.test(rawUserText) &&
                           !FOOTWEAR_NOUN_RE.test(rawUserText) &&
                           !ORTHOTIC_NOUN_RE.test(rawUserText);
-  if (isConditionOnly && !alreadyAsked) {
+  // Mid-orthotic-flow suppression. Production trace: customer was on
+  // turn 4 of the orthotic flow (had answered condition + gender +
+  // arch + overpronation chips), then asked "is this good for flat
+  // feet and ball of foot pain?" — the disambig fired and asked
+  // "footwear or orthotic?", which is absurd because they had ALREADY
+  // chosen orthotic three turns earlier and were asking a follow-up
+  // about the recommended product. Skip the disambig when the customer
+  // has accumulated orthotic-flow answers (they've committed) OR the
+  // prior assistant turn was an orthotic recommendation/seed question.
+  const alreadyInOrthoticFlow =
+    Object.keys(accumulated).length > 0 ||
+    (Array.isArray(messages) && messages.slice(0, -1).some((m) => {
+      if (!m || m.role !== "assistant" || typeof m.content !== "string") return false;
+      return /\b(orthotic|insole|posted orthotic|train posted|comfort posted|plantar fasciitis kit)\b/i.test(m.content) ||
+        /<<\s*(?:Flat\s*\/\s*Low|Medium|High)\b/i.test(m.content) ||
+        /<<\s*(?:Walking|Dress|Athletic|Cleats|Winter|Work)\b/i.test(m.content);
+    }));
+  if (isConditionOnly && !alreadyAsked && !alreadyInOrthoticFlow) {
     const text =
       "Got it — sounds like you're dealing with some foot discomfort. " +
       "Are you looking for footwear with built-in arch support, or an " +
