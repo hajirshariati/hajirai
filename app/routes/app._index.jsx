@@ -343,12 +343,109 @@ function formatRevenue(n, currency) {
   }
 }
 
-// System-status panel rendered as its own Card below the hero.
-// Each tile: tone-coded left border + status label + value + small
-// indicator dot + count of any attention-needing items in the
-// section header. Replaces the older inline chip row that lived
-// inside the green hero banner — visual hierarchy was off there
-// because the cluster competed with the page title.
+// HeroStatusCluster — gauge-cluster pattern rendered INSIDE the green
+// hero banner. Every system is always present, but healthy / off
+// states are nearly invisible (low-opacity dot, faded label) so the
+// hero reads as a clean banner at a glance. Only WARNING and CRITICAL
+// pips light up — coloured dot, halo glow, bright label — pulling the
+// eye exactly where action is needed. Click any pip to jump to the
+// page that manages it. This replaces the separate "System status"
+// card that used to live below the hero (now removed as a duplicate).
+function HeroStatusCluster({ items }) {
+  const TONE = {
+    // Healthy / off — barely visible against the green hero.
+    success:  { dot: "rgba(255,255,255,0.55)", label: "rgba(255,255,255,0.6)",  glow: "none" },
+    subdued:  { dot: "rgba(255,255,255,0.30)", label: "rgba(255,255,255,0.45)", glow: "none" },
+    // Attention — glow.
+    warning:  { dot: "#FFC453",                label: "rgba(255,255,255,0.95)", glow: "0 0 0 4px rgba(255,196,83,0.25), 0 0 14px rgba(255,196,83,0.55)" },
+    critical: { dot: "#FF7866",                label: "rgba(255,255,255,0.98)", glow: "0 0 0 4px rgba(255,120,102,0.35), 0 0 16px rgba(255,120,102,0.7)" },
+  };
+  return (
+    <div
+      role="group"
+      aria-label="System status"
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "16px 22px",
+        paddingTop: 4,
+      }}
+    >
+      {items.map((it) => {
+        const t = TONE[it.tone] || TONE.subdued;
+        const isAttention = it.tone === "warning" || it.tone === "critical";
+        const content = (
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "4px 8px",
+              borderRadius: 999,
+              background: isAttention ? "rgba(0,0,0,0.15)" : "transparent",
+              transition: "background 0.15s ease",
+              cursor: it.url ? "pointer" : "default",
+            }}
+            title={`${it.label}: ${it.value}${it.tooltip ? " — " + it.tooltip : ""}`}
+          >
+            <span
+              aria-hidden="true"
+              style={{
+                width: 9,
+                height: 9,
+                borderRadius: "50%",
+                background: t.dot,
+                boxShadow: t.glow,
+                flexShrink: 0,
+                // Subtle pulse on critical, makes it feel alive without
+                // becoming annoying.
+                animation: it.tone === "critical" ? "seos-pulse 1.6s ease-in-out infinite" : "none",
+              }}
+            />
+            <span
+              style={{
+                color: t.label,
+                fontSize: 11,
+                fontWeight: isAttention ? 600 : 500,
+                letterSpacing: 0.4,
+                textTransform: "uppercase",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {it.label}
+              {isAttention ? ` · ${it.value}` : ""}
+            </span>
+          </span>
+        );
+        if (!it.url) return <span key={it.label}>{content}</span>;
+        if (it.external) {
+          return (
+            <a
+              key={it.label}
+              href={it.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ textDecoration: "none" }}
+            >
+              {content}
+            </a>
+          );
+        }
+        return (
+          <Link key={it.label} to={it.url} style={{ textDecoration: "none" }}>
+            {content}
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
+
+// Retained for backward-compat — the old StatusPanel section below the
+// hero is no longer rendered (the gauge cluster inside the hero is
+// the new at-a-glance view). Kept as a no-op so any import elsewhere
+// doesn't break; if nothing imports it, it's dead code we can prune
+// later.
 function StatusPanel({ items }) {
   // "Check-engine light" pattern: tiles stay visually quiet when
   // everything is healthy (small grey dot, minimal accent) so the
@@ -570,6 +667,15 @@ export default function Home() {
   return (
     <Page>
       <TitleBar title="SEoS Assistant" />
+      {/* Keyframes for the critical-state pulse on hero status pips.
+          Inlined once at the page root so they're available wherever
+          HeroStatusCluster renders. */}
+      <style>{`
+        @keyframes seos-pulse {
+          0%, 100% { box-shadow: 0 0 0 4px rgba(255,120,102,0.35), 0 0 16px rgba(255,120,102,0.7); }
+          50%      { box-shadow: 0 0 0 6px rgba(255,120,102,0.20), 0 0 22px rgba(255,120,102,0.85); }
+        }
+      `}</style>
       <BlockStack gap="600">
         <div style={{
           background: "linear-gradient(135deg, #2D6B4F 0%, #3a8a66 100%)",
@@ -598,6 +704,9 @@ export default function Home() {
                     </InlineStack>
                   </Box>
                 )}
+                <Box paddingBlockStart="300">
+                  <HeroStatusCluster items={statusItems} />
+                </Box>
               </BlockStack>
             </div>
             <div style={{ flex: "0 0 auto", marginLeft: "auto", display: "flex", alignItems: "center" }}>
@@ -610,7 +719,10 @@ export default function Home() {
           </InlineStack>
         </div>
 
-        <StatusPanel items={statusItems} />
+        {/* System status now lives inside the hero as a gauge cluster
+            (HeroStatusCluster) — semi-invisible when healthy, glows on
+            issues. The standalone StatusPanel card was removed as a
+            duplicate. */}
 
         {showRateLimit && (
           <Banner
