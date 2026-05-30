@@ -350,11 +350,20 @@ function formatRevenue(n, currency) {
 // inside the green hero banner — visual hierarchy was off there
 // because the cluster competed with the page title.
 function StatusPanel({ items }) {
+  // "Check-engine light" pattern: tiles stay visually quiet when
+  // everything is healthy (small grey dot, minimal accent) so the
+  // dashboard reads calmly at a glance. Only WARNING and CRITICAL
+  // tiles light up — coloured left border, coloured chip, subtle glow
+  // on the dot — drawing the eye exactly where action is needed.
+  // SUBDUED (a feature that's simply off) shares the quiet treatment.
   const TONE = {
-    success:  { dot: "#108043", border: "#108043", chipBg: "#E2F1E8", chipFg: "#0F5132" },
-    warning:  { dot: "#B85C00", border: "#FFC453", chipBg: "#FFF3D6", chipFg: "#7A4100" },
-    critical: { dot: "#D72C0D", border: "#D72C0D", chipBg: "#FFEAE5", chipFg: "#8C1F11" },
-    subdued:  { dot: "#8C9196", border: "#E1E3E5", chipBg: "#F1F2F4", chipFg: "#5C5F62" },
+    // Quiet states — barely there. Healthy is the default; subdued is
+    // for optional features the merchant hasn't enabled.
+    success:  { dot: "#8C9196", border: "#E1E3E5", chipBg: "transparent", chipFg: "#5C5F62", glow: false },
+    subdued:  { dot: "#C9CCCF", border: "#E1E3E5", chipBg: "transparent", chipFg: "#8C9196", glow: false },
+    // Attention states — these glow.
+    warning:  { dot: "#B85C00", border: "#FFC453", chipBg: "#FFF3D6", chipFg: "#7A4100", glow: true },
+    critical: { dot: "#D72C0D", border: "#D72C0D", chipBg: "#FFEAE5", chipFg: "#8C1F11", glow: true },
   };
   const attentionCount = items.filter((it) => it.tone === "critical" || it.tone === "warning").length;
   const allHealthy = attentionCount === 0;
@@ -364,23 +373,28 @@ function StatusPanel({ items }) {
         <InlineStack align="space-between" blockAlign="center" wrap>
           <InlineStack gap="200" blockAlign="center">
             <Text as="h2" variant="headingMd">System status</Text>
-            {allHealthy ? (
-              <Badge tone="success">All systems go</Badge>
-            ) : (
+            {!allHealthy && (
               <Badge tone={items.some((it) => it.tone === "critical") ? "critical" : "warning"}>
                 {`${attentionCount} item${attentionCount > 1 ? "s" : ""} need${attentionCount > 1 ? "" : "s"} attention`}
               </Badge>
             )}
           </InlineStack>
-          <Text as="span" variant="bodySm" tone="subdued">
-            Click any tile to manage.
-          </Text>
+          {allHealthy ? (
+            <Text as="span" variant="bodySm" tone="subdued">
+              All clear · click any tile to manage
+            </Text>
+          ) : (
+            <Text as="span" variant="bodySm" tone="subdued">
+              Click any tile to manage.
+            </Text>
+          )}
         </InlineStack>
       </Box>
       <Box padding="400">
         <InlineGrid columns={{ xs: 1, sm: 2, md: 3 }} gap="300">
           {items.map((it) => {
             const t = TONE[it.tone] || TONE.subdued;
+            const isAttention = it.tone === "warning" || it.tone === "critical";
             const inner = (
               <div
                 style={{
@@ -396,16 +410,24 @@ function StatusPanel({ items }) {
                   transition: "transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease",
                   height: "100%",
                   minHeight: 78,
+                  // Attention tiles get a soft outer glow ring so they
+                  // pull the eye without screaming. Quiet tiles stay
+                  // flat — the check-engine-light pattern.
+                  boxShadow: isAttention ? `0 0 0 1px ${t.border}33, 0 0 12px ${t.dot}1f` : "none",
                 }}
                 onMouseEnter={(e) => {
                   if (!it.url) return;
                   e.currentTarget.style.background = "var(--p-color-bg-surface-secondary)";
-                  e.currentTarget.style.boxShadow = "0 2px 6px rgba(0,0,0,0.06)";
+                  e.currentTarget.style.boxShadow = isAttention
+                    ? `0 0 0 1px ${t.border}55, 0 0 14px ${t.dot}33`
+                    : "0 2px 6px rgba(0,0,0,0.06)";
                 }}
                 onMouseLeave={(e) => {
                   if (!it.url) return;
                   e.currentTarget.style.background = "var(--p-color-bg-surface)";
-                  e.currentTarget.style.boxShadow = "none";
+                  e.currentTarget.style.boxShadow = isAttention
+                    ? `0 0 0 1px ${t.border}33, 0 0 12px ${t.dot}1f`
+                    : "none";
                 }}
                 title={it.tooltip || ""}
               >
@@ -414,7 +436,8 @@ function StatusPanel({ items }) {
                     style={{
                       width: 10, height: 10, borderRadius: "50%",
                       background: t.dot, flexShrink: 0,
-                      boxShadow: it.tone === "success" ? `0 0 0 3px ${t.dot}22` : "none",
+                      // Only attention tiles get the halo (the "glow").
+                      boxShadow: t.glow ? `0 0 0 3px ${t.dot}33` : "none",
                     }}
                     aria-hidden="true"
                   />
@@ -426,12 +449,12 @@ function StatusPanel({ items }) {
                   style={{
                     display: "inline-flex",
                     alignSelf: "flex-start",
-                    padding: "3px 10px",
-                    borderRadius: 999,
+                    padding: t.chipBg === "transparent" ? "0" : "3px 10px",
+                    borderRadius: t.chipBg === "transparent" ? "0" : 999,
                     background: t.chipBg,
                     color: t.chipFg,
                     fontSize: 13,
-                    fontWeight: 600,
+                    fontWeight: t.chipBg === "transparent" ? 500 : 600,
                     lineHeight: 1.3,
                   }}
                 >
@@ -661,55 +684,41 @@ export default function Home() {
           themeEditorUrl={themeEditorUrl}
         />
 
-        {/* Setup guide quick-link — opens the public /onboarding page in a
-            new tab so merchants can revisit the plan-by-plan walkthrough
-            without leaving the embedded admin. */}
-        <div
-          style={{
-            background: "linear-gradient(135deg, #2D6B4F 0%, #3a8a66 100%)",
-            borderRadius: "12px",
-            padding: "20px 24px",
-            color: "#fff",
-            display: "flex",
-            alignItems: "center",
-            gap: "16px",
-            flexWrap: "wrap",
-          }}
-        >
-          <div
-            style={{
-              flexShrink: 0,
-              width: 44,
-              height: 44,
-              borderRadius: 10,
-              background: "rgba(255,255,255,0.18)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 22,
-            }}
-            aria-hidden="true"
-          >
-            {"📘"}
-          </div>
-
-          <div style={{ flex: "1 1 280px", minWidth: 0 }}>
-            <Text as="h2" variant="headingMd">
-              <span style={{ color: "#fff" }}>Setup guide</span>
-            </Text>
-            <Text as="p" variant="bodyMd">
-              <span style={{ color: "rgba(255,255,255,0.92)" }}>
-                Plan-by-plan walkthrough for installing, configuring, and going live. Open it any time to refresh on a step.
-              </span>
-            </Text>
-          </div>
-
-          <div style={{ flexShrink: 0 }}>
-            <Button url="/onboarding" external variant="primary" tone="success">
+        {/* Setup guide quick-link — opens the public /onboarding page
+            in a new tab. Rendered as a calm Card (not a second green
+            gradient) so the page reads professionally: one hero up
+            top, the rest neutral. */}
+        <Card>
+          <InlineStack align="space-between" blockAlign="center" wrap gap="400">
+            <InlineStack gap="300" blockAlign="center" wrap={false}>
+              <div
+                style={{
+                  flexShrink: 0,
+                  width: 40,
+                  height: 40,
+                  borderRadius: 10,
+                  background: "rgba(45,107,79,0.08)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 20,
+                }}
+                aria-hidden="true"
+              >
+                {"📘"}
+              </div>
+              <BlockStack gap="050">
+                <Text as="h2" variant="headingMd">Setup guide</Text>
+                <Text as="p" variant="bodySm" tone="subdued">
+                  Full walkthrough for installing, configuring, and going live.
+                </Text>
+              </BlockStack>
+            </InlineStack>
+            <Button url="/onboarding" external variant="primary">
               Open setup guide
             </Button>
-          </div>
-        </div>
+          </InlineStack>
+        </Card>
 
         <Card>
           <BlockStack gap="300">

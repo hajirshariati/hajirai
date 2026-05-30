@@ -495,21 +495,48 @@ const MODEL_OPTIONS = [
   { label: "Advanced — most capable", value: "claude-opus-4-7" },
 ];
 
+// Three user-facing strategy buckets. The backend still accepts the
+// older 5-value vocabulary (smart, cost-optimized, always-sonnet,
+// always-haiku, always-opus) so stored configs keep working — but the
+// admin only exposes three so the choice stays clear.
+//   • Smart (recommended): best balance — Fast model for trivial
+//     follow-ups, Standard for everything that matters.
+//   • Cost optimized: Fast model for safe product turns, Standard
+//     for medical / comparison / sizing / policy. Lower spend, same
+//     correctness on the hard turns.
+//   • Premium quality: every turn on the Advanced model. Maximum
+//     capability, highest cost. Enterprise plan only.
+// "Always use Standard" and "Always use Fast" were removed: Standard
+// is what Smart picks for substantive turns anyway, and Fast-on-every-
+// turn measurably degrades correctness.
 const STRATEGY_OPTIONS = [
   { label: "Smart routing (recommended)", value: "smart" },
-  { label: "Cost optimized smart", value: "cost-optimized" },
-  { label: "Always use Standard", value: "always-sonnet" },
-  { label: "Always use Fast", value: "always-haiku" },
-  { label: "Always use Advanced", value: "always-opus" },
+  { label: "Cost optimized", value: "cost-optimized" },
+  { label: "Premium quality", value: "always-opus" },
 ];
 
 const STRATEGY_HELP = {
   smart: "Uses the Fast model for simple follow-ups like \"thanks\" or \"ok\", and the Standard model for product questions and complex queries. Best balance of cost and quality.",
   "cost-optimized": "Uses the Fast model for simple product-listing and refinement turns where product truth is code-owned, while keeping the Standard model for medical, comparison, policy, sizing, and complex reasoning turns.",
+  "always-opus": "Every message uses the Advanced model. Maximum capability for complex catalogs and nuanced shopper questions. Highest cost.",
+  // Legacy values still mapped so existing configs render a sensible
+  // helper line; the dropdown auto-normalizes them to 'smart' below.
   "always-sonnet": "Every message uses the Standard model. Consistent quality for all conversations.",
-  "always-haiku": "Every message uses the Fast model. Lowest cost, good for high-volume stores with simple products.",
-  "always-opus": "Every message uses the Advanced model. Maximum capability for complex product catalogs.",
+  "always-haiku": "Every message uses the Fast model. Lowest cost — degrades correctness on complex turns.",
 };
+
+// Map any legacy stored strategy to a value the new 3-option dropdown
+// can display. Saving from this UI overwrites with the normalized
+// value; until then the legacy backend logic keeps working.
+function normalizeStrategyForUi(value) {
+  const valid = new Set(STRATEGY_OPTIONS.map((o) => o.value));
+  if (valid.has(value)) return value;
+  // always-sonnet behaves like smart in practice (smart routes
+  // substantive turns to Sonnet). always-haiku is the option we'd
+  // most like merchants off — map to smart so they get correctness
+  // back the next time they save.
+  return "smart";
+}
 
 function HideUrlsPanel({ initial }) {
   const [rules, setRules] = useState(initial || []);
@@ -594,7 +621,7 @@ export default function ApiKeys() {
 
   const [anthropicKey, setAnthropicKey] = useState("");
   const [model, setModel] = useState(anthropicModel || "claude-sonnet-4-6");
-  const [strategy, setStrategy] = useState(modelStrategy);
+  const [strategy, setStrategy] = useState(normalizeStrategyForUi(modelStrategy));
   const [followUps, setFollowUps] = useState(initFollowUps);
   const [feedbackOn, setFeedbackOn] = useState(initFeedback);
   const [yotpoKey, setYotpoKey] = useState("");
@@ -669,7 +696,7 @@ export default function ApiKeys() {
     const s = initialSnapshot.current;
     setAnthropicKey("");
     setModel(s.model);
-    setStrategy(s.strategy);
+    setStrategy(normalizeStrategyForUi(s.strategy));
     setFollowUps(s.followUps);
     setFeedbackOn(s.feedbackOn);
     setYotpoKey("");
@@ -784,7 +811,9 @@ export default function ApiKeys() {
                     <BlockStack gap="400">
                       <Select
                         label="Routing strategy"
-                        options={STRATEGY_OPTIONS}
+                        options={STRATEGY_OPTIONS.filter(
+                          (o) => o.value !== "always-opus" || plan.features?.advancedModel,
+                        )}
                         value={strategy}
                         onChange={setStrategy}
                         helpText={STRATEGY_HELP[strategy]}

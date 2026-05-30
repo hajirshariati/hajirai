@@ -4,12 +4,12 @@ import { PHASES, STEPS, ATTRIBUTE_MAPPINGS, CADENCE_SECTIONS } from "../lib/onbo
 const SUPPORT_EMAIL = "hajiraiapp@gmail.com";
 
 export const meta = () => [
-  { title: "Aetrex setup guide — SEoS Assistant" },
+  { title: "Setup guide — SEoS Assistant" },
   { name: "robots", content: "noindex, nofollow" },
   {
     name: "description",
     content:
-      "Internal setup guide for the AI shopping assistant powering aetrex.com.",
+      "Setup guide for SEoS Assistant — the AI shopping assistant for Shopify stores.",
   },
   { name: "viewport", content: "width=device-width, initial-scale=1" },
 ];
@@ -624,7 +624,7 @@ export default function Onboarding() {
       "   ___) || |__| (_) | ___) |",
       "  |____(_)_____\\___(_)____(_)",
       "",
-      "  Search Engine on Steroids · Aetrex internal",
+      "  Search Engine on Steroids · SEoS Assistant",
       "  Built with caffeine and a stubborn refusal to ship hallucinations.",
       "  Curious how it works? See app/lib/chat-tools.server.js",
       "",
@@ -694,7 +694,7 @@ export default function Onboarding() {
           <span>{theme === "dark" ? "Light" : "Dark"} mode</span>
         </button>
         <div className="hero-inner">
-          <p className="hero-eyebrow">Aetrex internal · Enterprise plan</p>
+          <p className="hero-eyebrow">SEoS Assistant · Setup guide</p>
           <h1>
             <span
               className={"seos" + (boosted ? " is-boosted" : "")}
@@ -706,9 +706,9 @@ export default function Onboarding() {
             {" Assistant setup guide"}
           </h1>
           <p>
-            Configure the AI shopping assistant for aetrex.com. Pick a phase
-            below — first install takes about an hour, mostly waiting for the
-            catalog sync.
+            Configure the AI shopping assistant for your Shopify store. Pick a
+            phase below — first install takes about an hour, mostly waiting for
+            the catalog sync.
           </p>
         </div>
       </header>
@@ -841,7 +841,7 @@ export default function Onboarding() {
           <a href="/privacy">Privacy</a>
           <a href="/app" target="_blank" rel="noopener noreferrer">Open admin</a>
         </div>
-        <div>© HajirAi · SEoS Assistant for Aetrex</div>
+        <div>© HajirAi · SEoS Assistant</div>
       </footer>
     </>
   );
