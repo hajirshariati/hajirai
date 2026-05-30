@@ -2928,11 +2928,23 @@ export const action = async ({ request }) => {
             if (!skipResolver) {
               const extracted = extractUserConstraints(latestMsg);
               const classifiedAttrs = ctx.classifiedIntent?.attributes || {};
+              // The orthotic classifier's `useCase` enums are
+              // orthotic-specific terminology (dress_no_removable,
+              // comfort_bundle, athletic_running, etc). Production
+              // trace: customer asked "do you have any wedge that goes
+              // with my blue dress?" — non-orthotic — and the
+              // classifier returned useCase=dress_no_removable, which
+              // the resolver then tried to match against the wedges
+              // catalog and found 0, leading to confusing chip choices.
+              // Only forward classifier useCase to the catalog resolver
+              // on ACTUAL orthotic requests. For regular footwear, the
+              // resolver derives use-case naturally from the message.
+              const isOrthoticTurn = ctx.classifiedIntent?.isOrthoticRequest === true;
               const userConstraints = {
                 ...extracted,
                 ...(classifiedAttrs.gender ? { gender: classifiedAttrs.gender } : {}),
                 ...(classifiedAttrs.condition ? { condition: classifiedAttrs.condition } : {}),
-                ...(classifiedAttrs.useCase ? { useCase: classifiedAttrs.useCase } : {}),
+                ...(isOrthoticTurn && classifiedAttrs.useCase ? { useCase: classifiedAttrs.useCase } : {}),
               };
               try {
                 const handle = await detectSpecificProduct(session.shop, latestMsg);

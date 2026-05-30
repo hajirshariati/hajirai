@@ -499,10 +499,16 @@ export function filterProductCardsToCatalogScope(pool = [], ctx = {}) {
     return { products: [], dropped: products.length, scope, enforcedColor: false };
   }
 
-  // Color is a hard display constraint only when at least one product in the
-  // structural scope truly has that color. If the resolver/search deliberately
-  // relaxed color to show alternatives ("no exact red, here are burgundy"),
-  // keep those alternatives and let wording say the exact color was unavailable.
+  // Color is a hard display constraint only when we have ENOUGH literal
+  // matches to satisfy the customer. Production trace: customer asked
+  // "pink sandals", search returned 6 candidates, only 1 was tagged
+  // literally "Pink" (the other 5 were Blush, Coral, Rose, etc — all
+  // shades of pink that real customers would call pink). The old logic
+  // kept just the 1, hiding 5 valid options. New rule: if literal
+  // matches are ≥2, enforce literal (we have a real pink line). If
+  // literal is just 1 AND we have a broader structural pool of ≥3,
+  // show the broader set — the listing line will say "pink and similar"
+  // so the customer knows.
   let enforcedColor = false;
   let filtered = base;
   if (canonical.color) {
@@ -510,9 +516,18 @@ export function filterProductCardsToCatalogScope(pool = [], ctx = {}) {
     const semanticColor = base.filter((card) =>
       cardMatchesCatalogScope(card, canonical, { enforceColor: true }),
     );
-    if (literalColor.length > 0) {
+    if (literalColor.length >= 2) {
       filtered = literalColor;
       enforcedColor = true;
+    } else if (literalColor.length === 1 && base.length < 3) {
+      // Tiny pool — the single literal match is what we have.
+      filtered = literalColor;
+      enforcedColor = true;
+    } else if (literalColor.length >= 1 && base.length >= 3) {
+      // Mixed pool — show literal + closest semantic siblings; the
+      // listing text will frame as "pink and similar".
+      filtered = base;
+      enforcedColor = false;
     } else if (semanticColor.length > 0) {
       filtered = semanticColor;
       enforcedColor = true;
@@ -1387,9 +1402,32 @@ export function buildCodeOwnedProductListingText({ text = "", cards = [], ctx = 
     };
   }
 
+  // Trust the AI's text when it's already clean and helpful. The
+  // listing replacer used to fire on EVERY product turn, gagging the
+  // AI's natural framing ("These red sandals have arch support and
+  // adjustable straps") into a robotic 30-char line ("Here are the red
+  // women's sandals I found"). That's the regression that made the bot
+  // feel dumb. Only replace when the AI's text is:
+  //   (a) very short / empty (no real content), OR
+  //   (b) wrong about a color the customer asked for (color-aware
+  //       framing only), OR
+  //   (c) lying about counts / scopes we can prove from the cards.
+  // Otherwise the AI's prose ships unchanged. The other passes
+  // (false-denial repair, color-claim verifier, narration strips) still
+  // run independently and catch their own specific failures.
+  const aiText = String(text || "").trim();
+  const isUseful = aiText.length >= 60 && !/\b(let me|i'?ll|one moment|hold on)\b/i.test(aiText);
+  const aiClaimsRequestedColor = requestedColor &&
+    new RegExp(`\\b${requestedColor}\\b`, "i").test(aiText);
+
   if (requestedColor) {
     const colorMatch = exactRequestedColorMatches(cards, requestedColor);
     if (colorMatch.all) {
+      // AI's text already names the requested color correctly AND is
+      // substantive → keep it. Otherwise replace with the honest line.
+      if (isUseful && aiClaimsRequestedColor) {
+        return { text: aiText, changed: false, reason: "ai_text_color_accurate" };
+      }
       next = `Here are the ${requestedColor} ${base}${variantText} I found.`;
     } else if (colorMatch.any) {
       next = `Here are the ${requestedColor} and similar ${base}${variantText} I found.`;
@@ -1399,6 +1437,12 @@ export function buildCodeOwnedProductListingText({ text = "", cards = [], ctx = 
       next = `I couldn't find ${requestedColor} ${base}, but here are ${base}${variantText} in other colors.`;
     }
   } else {
+    // No color was requested — if the AI wrote substantive text without
+    // narration leaks, trust it. Only replace empty / narration-only
+    // text with a neutral listing line.
+    if (isUseful) {
+      return { text: aiText, changed: false, reason: "ai_text_kept" };
+    }
     const templates = [
       `Here are the ${base}${variantText} I found.`,
       `Found these ${base}${variantText} for you.`,

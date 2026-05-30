@@ -273,11 +273,15 @@ await test("S19 — empty memory yields empty prompt block", async () => {
 
 // ── Production-bug regressions (2026-05-19 logs) ───────────────
 
-await test("S20 — classifier output lands in memory.inferred, NOT memory.explicit", async () => {
-  // Production trace: customer says "in white" → Haiku classifier
-  // hallucinates useCase=athletic_training_sports → that became a
-  // hard memory.explicit constraint the resolver enforced as
-  // catalog truth. Fix: classifier output is inferred, not explicit.
+await test("S20 — classifier useCase is DROPPED on non-orthotic turns (orthotic terminology can't leak)", async () => {
+  // Production trace (wedge-for-blue-dress bug): customer asked a
+  // plain footwear question and the orthotic classifier returned
+  // useCase=dress_no_removable — orthotic-specific terminology. The
+  // resolver then tried to match wedges with useCase=dress_no_removable
+  // (which doesn't exist for regular footwear), got candidates=0, and
+  // emitted nonsense chips. Fix: classifier useCase is forwarded ONLY
+  // when isOrthoticRequest=true; otherwise the orthotic enum is wrong
+  // terminology that pollutes memory and breaks the resolver.
   const mem = buildSessionMemory({
     messages: [u("show me men's sneakers"), a("here you go"), u("in white")],
     classifiedIntent: {
@@ -286,13 +290,25 @@ await test("S20 — classifier output lands in memory.inferred, NOT memory.expli
       attributes: { gender: "Men", useCase: "athletic_training_sports", condition: null },
     },
   });
-  // The customer explicitly said men+sneakers+white, so those ARE explicit.
   assert.equal(mem.explicit.gender, "men", "user-stated gender is explicit");
   assert.equal(mem.explicit.color, "white", "user-stated color is explicit");
-  // useCase came ONLY from the classifier, NEVER from the customer's text.
-  // It must NOT be in explicit.
-  assert.equal(mem.explicit.useCase, undefined, `classifier-hallucinated useCase must NOT be explicit; got ${JSON.stringify(mem.explicit)}`);
-  assert.equal(mem.inferred.useCase, "athletic_training_sports", "classifier useCase must land in inferred");
+  assert.equal(mem.explicit.useCase, undefined, "classifier useCase must NOT be explicit on a non-orthotic turn");
+  assert.equal(mem.inferred.useCase, undefined, "classifier useCase must NOT leak into inferred either on a non-orthotic turn");
+});
+
+await test("S20b — classifier useCase IS kept on orthotic turns (orthotic flow needs it)", async () => {
+  // Guard against over-restriction: when the customer IS asking for
+  // an orthotic recommendation, the classifier's useCase enum is the
+  // RIGHT terminology and the orthotic resolver depends on it.
+  const mem = buildSessionMemory({
+    messages: [u("I need orthotics for my casual shoes")],
+    classifiedIntent: {
+      isOrthoticRequest: true,
+      isFootwearRequest: false,
+      attributes: { gender: null, useCase: "casual", condition: null },
+    },
+  });
+  assert.equal(mem.inferred.useCase, "casual", "orthotic-turn classifier useCase must be preserved for the orthotic resolver");
 });
 
 await test("S21 — category pivot resets category-bound scope (useCase, color, etc.)", async () => {

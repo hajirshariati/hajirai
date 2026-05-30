@@ -411,7 +411,13 @@ export function buildSessionMemory({ messages, classifiedIntent, resolverState }
   if (classifiedIntent?.attributes) {
     const a = classifiedIntent.attributes;
     const lastTurnIndex = messages.length - 1;
-    for (const k of ["gender", "condition", "useCase"]) {
+    // The classifier's `useCase` enums are orthotic-specific
+    // (dress_no_removable, comfort_bundle, athletic_running). They are
+    // valid memory only on actual orthotic turns; on regular footwear
+    // turns they're wrong terminology and break the catalog resolver.
+    const isOrthoticTurn = classifiedIntent.isOrthoticRequest === true;
+    const keys = isOrthoticTurn ? ["gender", "condition", "useCase"] : ["gender", "condition"];
+    for (const k of keys) {
       if (a[k] != null && memory.explicit[k] == null && memory.inferred[k] == null) {
         // Normalize classifier capitalization (e.g. "Women" → "women")
         const v = typeof a[k] === "string" ? a[k].toLowerCase() : a[k];
