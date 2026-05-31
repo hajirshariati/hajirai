@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useLoaderData, useFetcher, Link } from "react-router";
 import {
   Page,
@@ -354,134 +354,66 @@ function formatRevenue(n, currency) {
 function HeroStatusCluster({ items }) {
   const TONE = {
     // Healthy / off — barely visible against the green hero.
-    success:  { dot: "rgba(255,255,255,0.65)", label: "rgba(255,255,255,0.7)",  glow: "none" },
-    subdued:  { dot: "rgba(255,255,255,0.35)", label: "rgba(255,255,255,0.5)",  glow: "none" },
-    // Attention — glow.
-    warning:  { dot: "#FFC453",                label: "rgba(255,255,255,0.98)", glow: "0 0 0 3px rgba(255,196,83,0.30), 0 0 10px rgba(255,196,83,0.55)" },
-    critical: { dot: "#FF7866",                label: "rgba(255,255,255,1.00)", glow: "0 0 0 3px rgba(255,120,102,0.40), 0 0 12px rgba(255,120,102,0.7)"  },
+    success:  { dot: "rgba(255,255,255,0.7)",  label: "rgba(255,255,255,0.75)", glow: "none" },
+    subdued:  { dot: "rgba(255,255,255,0.4)",  label: "rgba(255,255,255,0.55)", glow: "none" },
+    warning:  { dot: "#FFC453", label: "rgba(255,255,255,0.98)", glow: "0 0 0 3px rgba(255,196,83,0.30), 0 0 10px rgba(255,196,83,0.55)" },
+    critical: { dot: "#FF7866", label: "rgba(255,255,255,1.00)", glow: "0 0 0 3px rgba(255,120,102,0.40), 0 0 12px rgba(255,120,102,0.7)" },
   };
   return (
     <div
       role="group"
       aria-label="System status"
-      style={{
-        // Single-line bar that wraps gracefully only on very narrow
-        // viewports. Tight spacing keeps all six pips on one row at
-        // typical admin widths.
-        display: "flex",
-        flexWrap: "wrap",
-        alignItems: "center",
-        gap: "2px 4px",
-        paddingTop: 4,
-      }}
+      className="seos-status-bar"
     >
       {items.map((it, i) => {
         const t = TONE[it.tone] || TONE.subdued;
         const isAttention = it.tone === "warning" || it.tone === "critical";
-        const content = (
-          <span
-            onMouseEnter={(e) => {
-              if (!it.url) return;
-              e.currentTarget.style.background = "rgba(255,255,255,0.14)";
-              const lbl = e.currentTarget.querySelector("[data-label]");
-              if (lbl) lbl.style.color = "rgba(255,255,255,1)";
-            }}
-            onMouseLeave={(e) => {
-              if (!it.url) return;
-              e.currentTarget.style.background = "transparent";
-              const lbl = e.currentTarget.querySelector("[data-label]");
-              if (lbl) lbl.style.color = t.label;
-            }}
-            style={{
-              // No persistent surface — looks like a clean indicator
-              // at rest, gains a subtle pill background only on hover
-              // to signal interactivity.
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 6,
-              padding: "3px 8px",
-              borderRadius: 999,
-              background: "transparent",
-              transition: "background 0.15s ease, color 0.15s ease",
-              cursor: it.url ? "pointer" : "default",
-              userSelect: "none",
-              lineHeight: 1,
-            }}
-            title={`${it.label}: ${it.value}${it.tooltip ? " — " + it.tooltip : ""}`}
-          >
+        const labelText = `${it.label}${isAttention ? ` · ${it.value}` : ""}`;
+        const tooltip = `${it.label}: ${it.value}${it.tooltip ? " — " + it.tooltip : ""}`;
+        // Inner content is the same regardless of whether the pip
+        // links anywhere — the LINK ELEMENT itself is what hovers,
+        // so we never stack two background layers.
+        const inner = (
+          <>
             <span
               aria-hidden="true"
-              style={{
-                width: 7,
-                height: 7,
-                borderRadius: "50%",
-                background: t.dot,
-                boxShadow: t.glow,
-                flexShrink: 0,
-                animation: it.tone === "critical" ? "seos-pulse 1.6s ease-in-out infinite" : "none",
-              }}
+              className={it.tone === "critical" ? "seos-pip-dot seos-pip-pulse" : "seos-pip-dot"}
+              style={{ background: t.dot, boxShadow: t.glow }}
             />
             <span
-              data-label
-              style={{
-                color: t.label,
-                fontSize: 10.5,
-                fontWeight: isAttention ? 600 : 500,
-                letterSpacing: 0.6,
-                textTransform: "uppercase",
-                whiteSpace: "nowrap",
-                transition: "color 0.15s ease",
-              }}
+              className="seos-pip-label"
+              style={{ color: t.label, fontWeight: isAttention ? 600 : 500 }}
             >
-              {it.label}
-              {isAttention ? ` · ${it.value}` : ""}
+              {labelText}
             </span>
-          </span>
+          </>
         );
-        // Thin vertical separator between pips so they read as one
-        // continuous status bar rather than disconnected chips. No
-        // separator after the last pip.
         const sep = i < items.length - 1 ? (
-          <span
-            aria-hidden="true"
-            style={{
-              width: 1,
-              height: 10,
-              background: "rgba(255,255,255,0.18)",
-              flexShrink: 0,
-            }}
-          />
+          <span aria-hidden="true" className="seos-pip-sep" />
         ) : null;
         if (!it.url) {
           return (
-            <span key={it.label} style={{ display: "inline-flex", alignItems: "center" }}>
-              {content}
+            <React.Fragment key={it.label}>
+              <span className="seos-pip" title={tooltip}>{inner}</span>
               {sep}
-            </span>
+            </React.Fragment>
           );
         }
         if (it.external) {
           return (
-            <span key={it.label} style={{ display: "inline-flex", alignItems: "center" }}>
-              <a
-                href={it.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ textDecoration: "none", display: "inline-flex" }}
-              >
-                {content}
+            <React.Fragment key={it.label}>
+              <a className="seos-pip" href={it.url} target="_blank" rel="noopener noreferrer" title={tooltip}>
+                {inner}
               </a>
               {sep}
-            </span>
+            </React.Fragment>
           );
         }
         return (
-          <span key={it.label} style={{ display: "inline-flex", alignItems: "center" }}>
-            <Link to={it.url} style={{ textDecoration: "none", display: "inline-flex" }}>
-              {content}
-            </Link>
+          <React.Fragment key={it.label}>
+            <Link className="seos-pip" to={it.url} title={tooltip}>{inner}</Link>
             {sep}
-          </span>
+          </React.Fragment>
         );
       })}
     </div>
@@ -714,13 +646,66 @@ export default function Home() {
   return (
     <Page>
       <TitleBar title="SEoS Assistant" />
-      {/* Keyframes for the critical-state pulse on hero status pips.
-          Inlined once at the page root so they're available wherever
-          HeroStatusCluster renders. */}
+      {/* Styles for the hero status cluster. All keyed to .seos-pip
+          and friends so there's exactly ONE element with a background
+          per pip — no stacking, no double-pill artifacts, no Polaris
+          anchor defaults bleeding through. */}
       <style>{`
+        .seos-status-bar {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 2px 0;
+          padding-top: 6px;
+        }
+        .seos-pip {
+          display: inline-flex;
+          align-items: center;
+          gap: 7px;
+          padding: 4px 10px;
+          border-radius: 999px;
+          background: transparent;
+          text-decoration: none !important;
+          color: inherit !important;
+          line-height: 1;
+          user-select: none;
+          cursor: pointer;
+          transition: background 0.15s ease;
+          outline: none;
+        }
+        .seos-pip:hover,
+        .seos-pip:focus-visible {
+          background: rgba(255, 255, 255, 0.13);
+        }
+        .seos-pip:focus-visible {
+          box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.45);
+        }
+        .seos-pip-dot {
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+          flex-shrink: 0;
+        }
+        .seos-pip-label {
+          font-size: 10.5px;
+          letter-spacing: 0.6px;
+          text-transform: uppercase;
+          white-space: nowrap;
+        }
+        .seos-pip-sep {
+          display: inline-block;
+          width: 1px;
+          height: 10px;
+          margin: 0 2px;
+          background: rgba(255, 255, 255, 0.18);
+          flex-shrink: 0;
+        }
+        .seos-pip-pulse {
+          animation: seos-pulse 1.6s ease-in-out infinite;
+        }
         @keyframes seos-pulse {
-          0%, 100% { box-shadow: 0 0 0 4px rgba(255,120,102,0.35), 0 0 16px rgba(255,120,102,0.7); }
-          50%      { box-shadow: 0 0 0 6px rgba(255,120,102,0.20), 0 0 22px rgba(255,120,102,0.85); }
+          0%, 100% { box-shadow: 0 0 0 3px rgba(255,120,102,0.40), 0 0 12px rgba(255,120,102,0.70); }
+          50%      { box-shadow: 0 0 0 5px rgba(255,120,102,0.20), 0 0 18px rgba(255,120,102,0.90); }
         }
       `}</style>
       <BlockStack gap="600">
