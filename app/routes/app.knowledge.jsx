@@ -832,7 +832,21 @@ export function calcCampaignBytes(campaigns) {
   return bytes;
 }
 
-function knowledgeUsageState(totalBytes) {
+function knowledgeUsageState(totalBytes, ragEnabled) {
+  // When RAG is on, total file size doesn't affect chat quality —
+  // only the top-K relevant chunks (~3 KB) reach the AI per turn,
+  // regardless of how many files are uploaded. The pre-RAG warnings
+  // about "heavy" / "too much" are misleading in that mode, so we
+  // surface a neutral, informational message instead. The colour
+  // stays subdued (no yellow / red alarm) so the rest of the page
+  // reads calmly.
+  if (ragEnabled) {
+    return {
+      tone: "subdued",
+      barColor: "#2D6B4F",
+      label: "RAG is on — only the top relevant sections reach the AI per turn. Total size doesn't affect chat quality.",
+    };
+  }
   if (totalBytes >= KNOWLEDGE_SIZE_LIMITS.danger) {
     return {
       tone: "critical",
@@ -854,10 +868,10 @@ function knowledgeUsageState(totalBytes) {
   };
 }
 
-function KnowledgeUsageBar({ files, campaignBytes = 0, campaignCount = 0 }) {
+function KnowledgeUsageBar({ files, campaignBytes = 0, campaignCount = 0, ragEnabled = false }) {
   const fileBytes = files.reduce((sum, f) => sum + (Number(f.fileSize) || 0), 0);
   const totalBytes = fileBytes + campaignBytes;
-  const { barColor, label, tone } = knowledgeUsageState(totalBytes);
+  const { barColor, label, tone } = knowledgeUsageState(totalBytes, ragEnabled);
   const pct = Math.min(100, (totalBytes / KNOWLEDGE_SIZE_LIMITS.danger) * 100);
   const warnPct = (KNOWLEDGE_SIZE_LIMITS.warn / KNOWLEDGE_SIZE_LIMITS.danger) * 100;
   const breakdown = campaignBytes > 0
@@ -867,7 +881,9 @@ function KnowledgeUsageBar({ files, campaignBytes = 0, campaignCount = 0 }) {
     <BlockStack gap="100">
       <InlineStack align="space-between" blockAlign="center" wrap>
         <Text as="span" variant="bodySm" fontWeight="semibold">
-          Prompt context size: {formatSize(totalBytes)} of ~{formatSize(KNOWLEDGE_SIZE_LIMITS.danger)} comfortable budget
+          {ragEnabled
+            ? `Knowledge corpus: ${formatSize(totalBytes)} total stored`
+            : `Prompt context size: ${formatSize(totalBytes)} of ~${formatSize(KNOWLEDGE_SIZE_LIMITS.danger)} comfortable budget`}
         </Text>
         <Text as="span" tone={tone} variant="bodySm">{label}</Text>
       </InlineStack>
@@ -1000,7 +1016,7 @@ function KnowledgeFilesCard({ files, ragEnabled, embeddingProvider, campaignByte
           </Text>
         </BlockStack>
 
-        {(files.length > 0 || campaignBytes > 0) && <KnowledgeUsageBar files={files} campaignBytes={campaignBytes} campaignCount={campaignCount} />}
+        {(files.length > 0 || campaignBytes > 0) && <KnowledgeUsageBar files={files} campaignBytes={campaignBytes} campaignCount={campaignCount} ragEnabled={ragEnabled} />}
 
         <Box padding="300" background="bg-surface-secondary" borderRadius="200">
           <BlockStack gap="150">
