@@ -354,130 +354,134 @@ function formatRevenue(n, currency) {
 function HeroStatusCluster({ items }) {
   const TONE = {
     // Healthy / off — barely visible against the green hero.
-    success:  { dot: "rgba(255,255,255,0.55)", label: "rgba(255,255,255,0.6)",  glow: "none" },
-    subdued:  { dot: "rgba(255,255,255,0.30)", label: "rgba(255,255,255,0.45)", glow: "none" },
+    success:  { dot: "rgba(255,255,255,0.65)", label: "rgba(255,255,255,0.7)",  glow: "none" },
+    subdued:  { dot: "rgba(255,255,255,0.35)", label: "rgba(255,255,255,0.5)",  glow: "none" },
     // Attention — glow.
-    warning:  { dot: "#FFC453",                label: "rgba(255,255,255,0.95)", glow: "0 0 0 4px rgba(255,196,83,0.25), 0 0 14px rgba(255,196,83,0.55)" },
-    critical: { dot: "#FF7866",                label: "rgba(255,255,255,0.98)", glow: "0 0 0 4px rgba(255,120,102,0.35), 0 0 16px rgba(255,120,102,0.7)" },
+    warning:  { dot: "#FFC453",                label: "rgba(255,255,255,0.98)", glow: "0 0 0 3px rgba(255,196,83,0.30), 0 0 10px rgba(255,196,83,0.55)" },
+    critical: { dot: "#FF7866",                label: "rgba(255,255,255,1.00)", glow: "0 0 0 3px rgba(255,120,102,0.40), 0 0 12px rgba(255,120,102,0.7)"  },
   };
   return (
     <div
       role="group"
       aria-label="System status"
       style={{
+        // Single-line bar that wraps gracefully only on very narrow
+        // viewports. Tight spacing keeps all six pips on one row at
+        // typical admin widths.
         display: "flex",
         flexWrap: "wrap",
-        gap: "16px 22px",
+        alignItems: "center",
+        gap: "2px 4px",
         paddingTop: 4,
       }}
     >
-      {items.map((it) => {
+      {items.map((it, i) => {
         const t = TONE[it.tone] || TONE.subdued;
         const isAttention = it.tone === "warning" || it.tone === "critical";
-        // Persistent low-opacity background + 1px border makes each
-        // pip read as a real chip/button — clearly clickable, not just
-        // dimmed text. Hover state strengthens the background, lifts
-        // it ~1px, and shows a "›" chevron. Attention pips already
-        // glow, so their hover boost is the same shape but stronger.
-        const baseBg = isAttention ? "rgba(0,0,0,0.18)" : "rgba(255,255,255,0.08)";
-        const hoverBg = isAttention ? "rgba(0,0,0,0.28)" : "rgba(255,255,255,0.18)";
-        const baseBorder = isAttention ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.18)";
-        const hoverBorder = isAttention ? "rgba(255,255,255,0.45)" : "rgba(255,255,255,0.4)";
         const content = (
           <span
             onMouseEnter={(e) => {
               if (!it.url) return;
-              e.currentTarget.style.background = hoverBg;
-              e.currentTarget.style.borderColor = hoverBorder;
-              e.currentTarget.style.transform = "translateY(-1px)";
-              const chev = e.currentTarget.querySelector("[data-chev]");
-              if (chev) { chev.style.opacity = "0.95"; chev.style.marginLeft = "2px"; }
+              e.currentTarget.style.background = "rgba(255,255,255,0.14)";
+              const lbl = e.currentTarget.querySelector("[data-label]");
+              if (lbl) lbl.style.color = "rgba(255,255,255,1)";
             }}
             onMouseLeave={(e) => {
               if (!it.url) return;
-              e.currentTarget.style.background = baseBg;
-              e.currentTarget.style.borderColor = baseBorder;
-              e.currentTarget.style.transform = "translateY(0)";
-              const chev = e.currentTarget.querySelector("[data-chev]");
-              if (chev) { chev.style.opacity = "0"; chev.style.marginLeft = "0"; }
+              e.currentTarget.style.background = "transparent";
+              const lbl = e.currentTarget.querySelector("[data-label]");
+              if (lbl) lbl.style.color = t.label;
             }}
             style={{
+              // No persistent surface — looks like a clean indicator
+              // at rest, gains a subtle pill background only on hover
+              // to signal interactivity.
               display: "inline-flex",
               alignItems: "center",
-              gap: 8,
-              padding: "6px 12px",
+              gap: 6,
+              padding: "3px 8px",
               borderRadius: 999,
-              background: baseBg,
-              border: `1px solid ${baseBorder}`,
-              transition: "background 0.15s ease, border-color 0.15s ease, transform 0.15s ease",
+              background: "transparent",
+              transition: "background 0.15s ease, color 0.15s ease",
               cursor: it.url ? "pointer" : "default",
               userSelect: "none",
+              lineHeight: 1,
             }}
             title={`${it.label}: ${it.value}${it.tooltip ? " — " + it.tooltip : ""}`}
           >
             <span
               aria-hidden="true"
               style={{
-                width: 9,
-                height: 9,
+                width: 7,
+                height: 7,
                 borderRadius: "50%",
                 background: t.dot,
                 boxShadow: t.glow,
                 flexShrink: 0,
-                // Subtle pulse on critical, makes it feel alive without
-                // becoming annoying.
                 animation: it.tone === "critical" ? "seos-pulse 1.6s ease-in-out infinite" : "none",
               }}
             />
             <span
+              data-label
               style={{
                 color: t.label,
-                fontSize: 11,
+                fontSize: 10.5,
                 fontWeight: isAttention ? 600 : 500,
-                letterSpacing: 0.4,
+                letterSpacing: 0.6,
                 textTransform: "uppercase",
                 whiteSpace: "nowrap",
+                transition: "color 0.15s ease",
               }}
             >
               {it.label}
               {isAttention ? ` · ${it.value}` : ""}
             </span>
-            {it.url && (
-              <span
-                data-chev
-                aria-hidden="true"
-                style={{
-                  color: t.label,
-                  fontSize: 13,
-                  lineHeight: 1,
-                  opacity: 0,
-                  marginLeft: 0,
-                  transition: "opacity 0.15s ease, margin-left 0.15s ease",
-                }}
-              >
-                ›
-              </span>
-            )}
           </span>
         );
-        if (!it.url) return <span key={it.label}>{content}</span>;
+        // Thin vertical separator between pips so they read as one
+        // continuous status bar rather than disconnected chips. No
+        // separator after the last pip.
+        const sep = i < items.length - 1 ? (
+          <span
+            aria-hidden="true"
+            style={{
+              width: 1,
+              height: 10,
+              background: "rgba(255,255,255,0.18)",
+              flexShrink: 0,
+            }}
+          />
+        ) : null;
+        if (!it.url) {
+          return (
+            <span key={it.label} style={{ display: "inline-flex", alignItems: "center" }}>
+              {content}
+              {sep}
+            </span>
+          );
+        }
         if (it.external) {
           return (
-            <a
-              key={it.label}
-              href={it.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ textDecoration: "none" }}
-            >
-              {content}
-            </a>
+            <span key={it.label} style={{ display: "inline-flex", alignItems: "center" }}>
+              <a
+                href={it.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ textDecoration: "none", display: "inline-flex" }}
+              >
+                {content}
+              </a>
+              {sep}
+            </span>
           );
         }
         return (
-          <Link key={it.label} to={it.url} style={{ textDecoration: "none" }}>
-            {content}
-          </Link>
+          <span key={it.label} style={{ display: "inline-flex", alignItems: "center" }}>
+            <Link to={it.url} style={{ textDecoration: "none", display: "inline-flex" }}>
+              {content}
+            </Link>
+            {sep}
+          </span>
         );
       })}
     </div>
