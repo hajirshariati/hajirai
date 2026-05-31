@@ -374,17 +374,44 @@ function HeroStatusCluster({ items }) {
       {items.map((it) => {
         const t = TONE[it.tone] || TONE.subdued;
         const isAttention = it.tone === "warning" || it.tone === "critical";
+        // Persistent low-opacity background + 1px border makes each
+        // pip read as a real chip/button — clearly clickable, not just
+        // dimmed text. Hover state strengthens the background, lifts
+        // it ~1px, and shows a "›" chevron. Attention pips already
+        // glow, so their hover boost is the same shape but stronger.
+        const baseBg = isAttention ? "rgba(0,0,0,0.18)" : "rgba(255,255,255,0.08)";
+        const hoverBg = isAttention ? "rgba(0,0,0,0.28)" : "rgba(255,255,255,0.18)";
+        const baseBorder = isAttention ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.18)";
+        const hoverBorder = isAttention ? "rgba(255,255,255,0.45)" : "rgba(255,255,255,0.4)";
         const content = (
           <span
+            onMouseEnter={(e) => {
+              if (!it.url) return;
+              e.currentTarget.style.background = hoverBg;
+              e.currentTarget.style.borderColor = hoverBorder;
+              e.currentTarget.style.transform = "translateY(-1px)";
+              const chev = e.currentTarget.querySelector("[data-chev]");
+              if (chev) { chev.style.opacity = "0.95"; chev.style.marginLeft = "2px"; }
+            }}
+            onMouseLeave={(e) => {
+              if (!it.url) return;
+              e.currentTarget.style.background = baseBg;
+              e.currentTarget.style.borderColor = baseBorder;
+              e.currentTarget.style.transform = "translateY(0)";
+              const chev = e.currentTarget.querySelector("[data-chev]");
+              if (chev) { chev.style.opacity = "0"; chev.style.marginLeft = "0"; }
+            }}
             style={{
               display: "inline-flex",
               alignItems: "center",
               gap: 8,
-              padding: "4px 8px",
+              padding: "6px 12px",
               borderRadius: 999,
-              background: isAttention ? "rgba(0,0,0,0.15)" : "transparent",
-              transition: "background 0.15s ease",
+              background: baseBg,
+              border: `1px solid ${baseBorder}`,
+              transition: "background 0.15s ease, border-color 0.15s ease, transform 0.15s ease",
               cursor: it.url ? "pointer" : "default",
+              userSelect: "none",
             }}
             title={`${it.label}: ${it.value}${it.tooltip ? " — " + it.tooltip : ""}`}
           >
@@ -415,6 +442,22 @@ function HeroStatusCluster({ items }) {
               {it.label}
               {isAttention ? ` · ${it.value}` : ""}
             </span>
+            {it.url && (
+              <span
+                data-chev
+                aria-hidden="true"
+                style={{
+                  color: t.label,
+                  fontSize: 13,
+                  lineHeight: 1,
+                  opacity: 0,
+                  marginLeft: 0,
+                  transition: "opacity 0.15s ease, margin-left 0.15s ease",
+                }}
+              >
+                ›
+              </span>
+            )}
           </span>
         );
         if (!it.url) return <span key={it.label}>{content}</span>;
