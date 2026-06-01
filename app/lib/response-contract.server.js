@@ -1396,6 +1396,52 @@ function exactRequestedColorMatches(cards = [], requestedColor) {
   };
 }
 
+// Detect a numeric count claim in the AI's prose. Returns the
+// largest plausible count found, or null. We look at three signals:
+//   1. "both" / "both of these / them" → 2
+//   2. "here are <N>" / "here's <N>" → N  (e.g. "Here are two ...")
+//   3. "<N> options|styles|picks|matches|choices|products|pairs" → N
+// Numerics or English number words one..ten count. Anything outside
+// that range we ignore (probably not a card count — could be a year,
+// size, etc.).
+//
+// We deliberately return the MAX because text like "Here are two
+// great options... both currently on sale!" makes two claims and
+// both should agree with the pool. Any disagreement is a mismatch.
+const NUMBER_WORD_TO_INT = {
+  one: 1, two: 2, three: 3, four: 4, five: 5,
+  six: 6, seven: 7, eight: 8, nine: 9, ten: 10,
+};
+function parseCountToken(token) {
+  if (!token) return null;
+  const lower = String(token).toLowerCase();
+  if (lower in NUMBER_WORD_TO_INT) return NUMBER_WORD_TO_INT[lower];
+  const n = Number(lower);
+  if (Number.isInteger(n) && n >= 1 && n <= 10) return n;
+  return null;
+}
+function detectAiCountClaim(text) {
+  const t = String(text || "").toLowerCase();
+  const counts = new Set();
+
+  if (/\bboth\b/.test(t)) counts.add(2);
+
+  const re1 = /\bhere(?:'s|\s+(?:is|are))\s+(\w+)\s+(?:great\s+)?(?:option|options|pick|picks|style|styles|match|matches|choice|choices|product|products|pair|pairs|item|items)/gi;
+  for (const m of t.matchAll(re1)) {
+    const n = parseCountToken(m[1]);
+    if (n !== null) counts.add(n);
+  }
+
+  const re2 = /\b(\w+)\s+(?:great\s+)?(?:option|options|pick|picks|style|styles|match|matches|choice|choices|product|products|pair|pairs|item|items)\b/gi;
+  for (const m of t.matchAll(re2)) {
+    const n = parseCountToken(m[1]);
+    if (n !== null) counts.add(n);
+  }
+
+  if (counts.size === 0) return null;
+  return Math.max(...counts);
+}
+
 export function buildCodeOwnedProductListingText({ text = "", cards = [], ctx = {}, recommenderInvoked = false } = {}) {
   if (!Array.isArray(cards) || cards.length === 0 || recommenderInvoked) {
     return { text, changed: false, reason: "" };
@@ -1437,6 +1483,18 @@ export function buildCodeOwnedProductListingText({ text = "", cards = [], ctx = 
   const aiClaimsRequestedColor = requestedColor &&
     new RegExp(`\\b${requestedColor}\\b`, "i").test(aiText);
 
+  // Count mismatch: AI's prose claims a specific number of products
+  // ("Here are two great options... both currently on sale!") but the
+  // actual card pool after upstream scope/color filtering is a
+  // different size. Trust loses to truth — always override the prose
+  // when the AI is lying about how many things are being shown.
+  // Production trace: customer asked for red wedge heels; AI wrote a
+  // two-product listing; color-enforcement filter dropped one card;
+  // the screenshot landed with ONE card under prose still claiming
+  // "two".
+  const claimedCount = detectAiCountClaim(aiText);
+  const countMismatch = claimedCount !== null && claimedCount !== cards.length;
+
   if (requestedColor) {
     const colorMatch = exactRequestedColorMatches(cards, requestedColor);
     // If the AI's text claims a NEGATIVE result ("couldn't find / no
@@ -1450,9 +1508,9 @@ export function buildCodeOwnedProductListingText({ text = "", cards = [], ctx = 
     ).test(aiText);
     if (colorMatch.all) {
       // AI's text already names the requested color correctly AND is
-      // substantive AND doesn't deny the color → keep it. Otherwise
-      // replace with the honest line.
-      if (isUseful && aiClaimsRequestedColor && !aiClaimsNegative) {
+      // substantive AND doesn't deny the color AND doesn't lie about
+      // the count → keep it. Otherwise replace with the honest line.
+      if (isUseful && aiClaimsRequestedColor && !aiClaimsNegative && !countMismatch) {
         return { text: aiText, changed: false, reason: "ai_text_color_accurate" };
       }
       next = `Here are the ${requestedColor} ${base}${variantText} I found.`;
@@ -1465,9 +1523,10 @@ export function buildCodeOwnedProductListingText({ text = "", cards = [], ctx = 
     }
   } else {
     // No color was requested — if the AI wrote substantive text without
-    // narration leaks, trust it. Only replace empty / narration-only
-    // text with a neutral listing line.
-    if (isUseful) {
+    // narration leaks AND its count claims line up with the pool, trust
+    // it. Otherwise replace empty / narration-only / count-lying text
+    // with a neutral listing line.
+    if (isUseful && !countMismatch) {
       return { text: aiText, changed: false, reason: "ai_text_kept" };
     }
     const templates = [
