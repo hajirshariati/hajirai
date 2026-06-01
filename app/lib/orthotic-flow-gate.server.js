@@ -183,33 +183,86 @@ function kidsAvailableUseCases(tree) {
   return out;
 }
 
-// useCase chip filter for any gender. Returns the set of useCase
-// values for which the merchant has at least one SKU matching the
-// customer's stated gender. Returns null when gender is unknown
-// (no filtering — show all chips) or when masterIndex is missing.
+// Does this masterIndex entry satisfy the customer's accumulated
+// answers? The single source of truth for "could this product be
+// returned given what we know so far?"
 //
-// Why this matters: showing "Work / construction boots" as a chip
-// to a Women customer when the merchant doesn't carry any women's
-// work-boot orthotic dead-ends the customer. The condition-chip
-// filter already does this for the condition step; this is the
-// equivalent for the useCase step.
-function availableUseCasesForAnswers(tree, answers) {
-  const masterIndex = tree?.definition?.resolver?.masterIndex;
-  if (!Array.isArray(masterIndex) || !answers) return null;
-  if (!answers.gender) return null;
-  if (isKidsGenderValue(answers.gender)) {
-    return kidsAvailableUseCases(tree);
-  }
-  const targetGender = String(answers.gender).toLowerCase();
-  const out = new Set();
-  for (const m of masterIndex) {
-    const g = typeof m?.gender === "string" ? m.gender.toLowerCase() : "";
-    if (g !== targetGender && g !== "unisex") continue;
-    if (typeof m?.useCase === "string" && m.useCase) {
-      out.add(m.useCase);
+// gender: strict (Kids uses isKidsMasterIndexEntry; adults match
+//   entry.gender exactly OR Unisex which matches any adult).
+// useCase: strict equality (case-insensitive). useCase is the
+//   primary product family axis — no fuzziness.
+// arch: strict equality on the canonical arch string.
+// overpronation: "yes" forces posted entries; "no" / unset doesn't
+//   constrain (the merchant may not carry posted variants for every
+//   family and a non-posted orthotic is still a valid fallback).
+// condition: lenient — most catalog entries don't tag condition;
+//   the resolver routes condition through specialty matchers and
+//   falls back to family SKUs when no specialty exists. Strict
+//   filtering here would hide every condition chip for catalogs
+//   without per-SKU condition tagging.
+function entrySatisfiesAnswers(entry, answers) {
+  if (!entry) return false;
+  const a = answers || {};
+
+  if (a.gender) {
+    if (isKidsGenderValue(a.gender)) {
+      if (!isKidsMasterIndexEntry(entry)) return false;
+    } else {
+      const eg = String(entry.gender || "").toLowerCase();
+      const ag = String(a.gender).toLowerCase();
+      if (eg !== ag && eg !== "unisex") return false;
     }
   }
-  return out.size > 0 ? out : null;
+
+  if (a.useCase) {
+    const eu = String(entry.useCase || "").toLowerCase();
+    const au = String(a.useCase).toLowerCase();
+    if (eu !== au) return false;
+  }
+
+  if (a.arch) {
+    const ea = String(entry.arch || "").toLowerCase();
+    const aa = String(a.arch).toLowerCase();
+    if (ea !== aa) return false;
+  }
+
+  if (String(a.overpronation || "").toLowerCase() === "yes") {
+    if (!entry.posted) return false;
+  }
+
+  return true;
+}
+
+// Filter a node's chips to only those that lead to at least one
+// real SKU given the customer's already-stated answers. Generic —
+// works for q_gender, q_use_case, q_condition, q_arch,
+// q_overpronation alike. For each chip value V on attribute A:
+//
+//   trial = {...answers, [A]: V}
+//   keep V iff some masterIndex entry satisfies(trial)
+//
+// "none" / null chip values always survive — they're catch-alls
+// the resolver treats as "no constraint". Same for chips with
+// non-string values we don't know how to match against.
+//
+// Returns the original chips array when the masterIndex is missing
+// or empty (no information to filter against) — fail-open so
+// merchants without a populated catalog still see a working flow.
+function chipsAchievableForNode(node, answers, tree) {
+  const chips = Array.isArray(node?.chips) ? node.chips : [];
+  if (chips.length === 0) return chips;
+  const masterIndex = tree?.definition?.resolver?.masterIndex;
+  if (!Array.isArray(masterIndex) || masterIndex.length === 0) return chips;
+  const attr = node?.attribute;
+  if (!attr) return chips;
+
+  return chips.filter((chip) => {
+    const value = chip?.value;
+    if (typeof value === "string" && value.toLowerCase() === "none") return true;
+    if (value === undefined || value === null) return true;
+    const trial = { ...(answers || {}), [attr]: value };
+    return masterIndex.some((m) => entrySatisfiesAnswers(m, trial));
+  });
 }
 
 // A minimal greeting detector. Fires only when the customer's
@@ -378,48 +431,39 @@ function renderQuestionText(node, answers, tree, context = null) {
     return label && !NONSENSE_GENDER.test(label);
   });
 
-  // useCase chip filtering by available SKUs. For any known gender,
-  // hide useCase chips for which the merchant has no matching SKU
-  // (e.g. "Work / construction boots" should not appear for Women
-  // when the catalog only carries men's work-boot orthotics). Returns
-  // null when gender is unknown — in that case show all chips and
-  // let the customer narrow later.
-  if (node.attribute === "useCase" && answers) {
-    const allowed = availableUseCasesForAnswers(tree, answers);
-    if (allowed && allowed.size > 0) {
-      chips = chips.filter((c) => allowed.has(c.value));
-    }
-  }
+  // Dynamic chip availability: for every chip on this node, ask the
+  // catalog "if the customer picked this, would we have a product to
+  // show them?" Drop the chips that would dead-end. One rule covers
+  // gender (no Kids SKUs → drop Kids), useCase (no women's work
+  // boots → drop work for women), arch (no Flat / Low entries for
+  // this gender+useCase → drop the chip), overpronation, and the
+  // Kids-strict condition path — all via the same trial-match
+  // against masterIndex.
+  chips = chipsAchievableForNode({ ...node, chips }, answers, tree);
 
-  // Condition-chip filtering. Hide condition chips that have no
-  // resolvable SKU given the customer's already-answered gender +
-  // useCase. "none" is always kept as a catch-all. Without this,
-  // a Kids customer would see "Heel spurs" / "Plantar fasciitis"
-  // chips and click them, only to dead-end at "no SKU available".
-  if (node.attribute === "condition" && answers) {
+  // Kids-specific condition tightening. For Kids the merchant
+  // usually carries a narrow set of specialty SKUs; dead-ends on
+  // condition chips are real. Adults fall through (the resolver
+  // has condition fallbacks).
+  if (node.attribute === "condition" && answers && isKidsGenderValue(answers.gender)) {
     const allowed = availableConditionsForAnswers(tree, answers);
     if (allowed && allowed.size > 0) {
       chips = chips.filter((c) => allowed.has(c.value));
     }
   }
 
-  // Hide the Kids gender chip if the merchant's masterIndex has zero
-  // Kids-tagged SKUs. Without this, customers can pick Kids and then
-  // either dead-end (strict resolver returns null) or get an
-  // adult-shaped product (legacy fallback). Both are wrong. Removing
-  // the chip is the cleanest fix — if the merchant doesn't carry
-  // kids products, they shouldn't be offered as an option.
-  if (node.attribute === "gender") {
-    const masterIndex = tree?.definition?.resolver?.masterIndex;
-    if (Array.isArray(masterIndex)) {
-      const hasKidsItems = masterIndex.some((m) => isKidsMasterIndexEntry(m));
-      if (!hasKidsItems) {
-        chips = chips.filter((c) => !isKidsGenderValue(c?.value) && !/^(kids?|boys?|girls?|child)\b/i.test(String(c?.label || "")));
-      }
-    }
+  const originalChipCount = Array.isArray(node.chips) ? node.chips.length : 0;
+  const chipLabels = chips.map((c) => String(c.label).trim()).filter(Boolean);
+
+  // Safety: if the node originally had chips but every one was
+  // filtered out, every path forward dead-ends given the customer's
+  // current answers. Don't ask a chip-less question — return empty
+  // so the gate falls through to the LLM, which can say honestly
+  // "we don't carry that combination" and offer alternatives.
+  if (originalChipCount > 0 && chipLabels.length === 0) {
+    return "";
   }
 
-  const chipLabels = chips.map((c) => String(c.label).trim()).filter(Boolean);
   const chipLine = chipLabels.length > 0
     ? chipLabels.map((l) => `<<${l}>>`).join(" ")
     : "";
