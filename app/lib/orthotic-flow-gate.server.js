@@ -557,11 +557,19 @@ export async function maybeRunOrthoticFlow({
   ) {
     console.log(
       `[orthotic-flow] subject pivot: gender ${accumulated.gender} → ${latestExtracted.gender}; ` +
-        `dropping accumulated condition/arch/overpronation (subject-specific attrs)`,
+        `dropping accumulated condition/arch/overpronation/useCase (subject-specific attrs)`,
     );
     delete accumulated.condition;
     delete accumulated.arch;
     delete accumulated.overpronation;
+    // useCase was missed in the original pivot drop. Production trace:
+    // customer browsed pink wedges for women (useCase=dress_no_removable
+    // set), then asked an orthotic question — the gate kept the stale
+    // dress useCase and resolved to the Fashion line instead of asking
+    // what shoes the orthotic actually goes in. useCase is also a
+    // subject-bound attribute: a different recipient is going to wear
+    // their orthotic in different shoes.
+    delete accumulated.useCase;
   }
 
   // Fresh arch claim invalidates stale overpronation. Without this,

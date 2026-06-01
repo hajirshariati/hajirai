@@ -167,7 +167,17 @@ const CLASSIFIER_TOOL = {
               "'winter boots' / 'snow boots' / 'cold weather boots' / 'shearling' → 'winter_boots'. " +
               "'work boots' / 'construction' / 'standing all day' / 'on my feet all day' / 'warehouse' / 'nursing' → 'boots_construction'. " +
               "If the customer is a Kid: pick the closest match (usually 'comfort_walking_everyday'). " +
-              "null if no shoe-context is stated.",
+              "CRITICAL — useCase must come from the CUSTOMER'S CURRENT MESSAGE, not from prior conversation context. " +
+              "If the customer was earlier shopping for a DRESS or a WEDDING outfit or any FOOTWEAR (a different product), " +
+              "do NOT project that occasion onto a new orthotic question. The orthotic's useCase is the SHOE TYPE the orthotic " +
+              "will physically go INSIDE — it is independent of what outfit / occasion the customer mentioned earlier. " +
+              "Concrete rule: if the customer's CURRENT message is a CONDITION/PAIN question ('I have ball of foot pain', " +
+              "'flat feet', 'plantar fasciitis', 'what orthotic for X') and does NOT itself mention a shoe type or activity, " +
+              "useCase MUST be null — even if the conversation history contains words like 'dress', 'wedding', 'running', etc. " +
+              "Those words described a different product (the footwear they were browsing before); they do NOT determine " +
+              "where the new orthotic will go. The gate will ask the customer 'what kind of shoes will the orthotics go in?' " +
+              "and they will answer for THIS orthotic. " +
+              "null if the customer hasn't told us, in the current message, what shoes the orthotic goes in.",
           },
           condition: {
             type: ["string", "null"],
