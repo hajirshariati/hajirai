@@ -183,6 +183,149 @@ function kidsAvailableUseCases(tree) {
   return out;
 }
 
+// useCase chip filter for any gender. Returns the set of useCase
+// values for which the merchant has at least one SKU matching the
+// customer's stated gender. Returns null when gender is unknown
+// (no filtering — show all chips) or when masterIndex is missing.
+//
+// Why this matters: showing "Work / construction boots" as a chip
+// to a Women customer when the merchant doesn't carry any women's
+// work-boot orthotic dead-ends the customer. The condition-chip
+// filter already does this for the condition step; this is the
+// equivalent for the useCase step.
+function availableUseCasesForAnswers(tree, answers) {
+  const masterIndex = tree?.definition?.resolver?.masterIndex;
+  if (!Array.isArray(masterIndex) || !answers) return null;
+  if (!answers.gender) return null;
+  if (isKidsGenderValue(answers.gender)) {
+    return kidsAvailableUseCases(tree);
+  }
+  const targetGender = String(answers.gender).toLowerCase();
+  const out = new Set();
+  for (const m of masterIndex) {
+    const g = typeof m?.gender === "string" ? m.gender.toLowerCase() : "";
+    if (g !== targetGender && g !== "unisex") continue;
+    if (typeof m?.useCase === "string" && m.useCase) {
+      out.add(m.useCase);
+    }
+  }
+  return out.size > 0 ? out : null;
+}
+
+// A minimal greeting detector. Fires only when the customer's
+// message LEADS with a greeting (so "Hi, I have flat feet" qualifies
+// but "Do you have a high-arch option, by the way?" doesn't). The
+// gate normally suppresses pure greetings before reaching here —
+// this is for the mixed case where the customer greets + provides
+// info in one turn.
+const GREETING_LEAD_RE = /^\s*(?:hi|hello|hey|howdy|hiya|good\s+(?:morning|afternoon|evening|day))\b[\s,.!]/i;
+function looksLikeGreetingLead(text) {
+  if (typeof text !== "string") return false;
+  return GREETING_LEAD_RE.test(text);
+}
+
+// Build a short, contextual acknowledgment to prefix the next chip
+// question with. We only acknowledge when the customer JUST provided
+// new info this turn (latestExtracted is non-empty) or led with a
+// greeting — otherwise we'd add filler to every mid-flow chip turn.
+//
+// Phrasing stays plain and short. The goal is warmth, not narration:
+// confirm what we heard, then ask the next question.
+function buildAcknowledgmentPrefix({ latestExtracted, rawUserText, answers }) {
+  const parts = [];
+  const greeted = looksLikeGreetingLead(rawUserText);
+  if (greeted) parts.push("Hi there!");
+
+  const newKeys = latestExtracted ? Object.keys(latestExtracted) : [];
+  if (newKeys.length === 0) {
+    return parts.length ? parts.join(" ") : "";
+  }
+
+  const bits = [];
+  const cond = latestExtracted.condition;
+  if (typeof cond === "string" && cond && cond !== "none") {
+    bits.push(humanizeCondition(cond));
+  }
+  const useCase = latestExtracted.useCase;
+  if (typeof useCase === "string" && useCase) {
+    const phrase = humanizeUseCase(useCase);
+    if (phrase) bits.push(phrase);
+  }
+  const gender = latestExtracted.gender;
+  if (
+    typeof gender === "string" &&
+    gender &&
+    !cond && !useCase
+  ) {
+    // Only acknowledge gender alone if it's the only new info — otherwise
+    // condition/useCase are more conversational signals to reflect.
+    const g = humanizeGender(gender);
+    if (g) bits.push(g);
+  }
+
+  if (bits.length === 0) {
+    return parts.length ? parts.join(" ") : "";
+  }
+
+  const lead = greeted ? "Thanks for sharing —" : "Got it —";
+  const joined = bits.length === 1
+    ? bits[0]
+    : bits.length === 2
+      ? `${bits[0]} and ${bits[1]}`
+      : `${bits.slice(0, -1).join(", ")}, and ${bits[bits.length - 1]}`;
+  parts.push(`${lead} ${joined}. An orthotic can definitely help with that.`);
+  return parts.join(" ");
+}
+
+function humanizeCondition(value) {
+  const map = {
+    plantar_fasciitis: "plantar fasciitis",
+    heel_spurs: "heel spurs",
+    heel_pain: "heel pain",
+    metatarsalgia: "ball-of-foot pain",
+    ball_of_foot_pain: "ball-of-foot pain",
+    flat_feet: "flat feet",
+    fallen_arches: "fallen arches",
+    high_arches: "high arches",
+    overpronation: "overpronation",
+    bunions: "bunions",
+    neuroma: "Morton's neuroma",
+    achilles: "Achilles pain",
+    knee_pain: "knee pain",
+    back_pain: "back pain",
+    diabetes: "diabetic foot care",
+  };
+  const key = String(value || "").toLowerCase();
+  if (map[key]) return map[key];
+  return key.replace(/_/g, " ");
+}
+
+function humanizeUseCase(value) {
+  const map = {
+    athletic: "athletic shoes",
+    running: "running shoes",
+    walking: "walking shoes",
+    casual: "casual shoes",
+    dress: "dress shoes",
+    work: "work boots",
+    boots: "boots",
+    sandals: "sandals",
+    hiking: "hiking boots",
+    kids: "",
+  };
+  const key = String(value || "").toLowerCase();
+  if (key in map) return map[key];
+  return "";
+}
+
+function humanizeGender(value) {
+  const key = String(value || "").toLowerCase();
+  if (key === "men" || key === "male") return "men's";
+  if (key === "women" || key === "female") return "women's";
+  if (KIDS_GENDER_VALUES.has(key)) return "kids'";
+  return "";
+}
+
 // For the condition question: filter chips only for Kids customers
 // (where the dead-end risk is real because the merchant has limited
 // Kids SKUs and the resolver is strict-Kids). For adults, return
@@ -215,7 +358,7 @@ function availableConditionsForAnswers(tree, answers) {
   return out;
 }
 
-function renderQuestionText(node, answers, tree) {
+function renderQuestionText(node, answers, tree, context = null) {
   if (!node || node.type !== "question") return "";
   let q = String(node.question || "").trim();
   if (node.id === "q_overpronation" || node.attribute === "overpronation") {
@@ -235,18 +378,14 @@ function renderQuestionText(node, answers, tree) {
     return label && !NONSENSE_GENDER.test(label);
   });
 
-  // Kids-aware useCase filtering. If the customer chose Kids, only
-  // show chips whose value has at least one Kids SKU in the master
-  // index. The gate's auto-fill step usually skips this question
-  // entirely for Kids (because no chip values match Kids useCases
-  // like "kids"); this filter is here as a defense-in-depth in case
-  // the gate path is ever bypassed.
-  if (
-    node.attribute === "useCase" &&
-    answers &&
-    isKidsGenderValue(answers.gender)
-  ) {
-    const allowed = kidsAvailableUseCases(tree);
+  // useCase chip filtering by available SKUs. For any known gender,
+  // hide useCase chips for which the merchant has no matching SKU
+  // (e.g. "Work / construction boots" should not appear for Women
+  // when the catalog only carries men's work-boot orthotics). Returns
+  // null when gender is unknown — in that case show all chips and
+  // let the customer narrow later.
+  if (node.attribute === "useCase" && answers) {
+    const allowed = availableUseCasesForAnswers(tree, answers);
     if (allowed && allowed.size > 0) {
       chips = chips.filter((c) => allowed.has(c.value));
     }
@@ -281,9 +420,24 @@ function renderQuestionText(node, answers, tree) {
   }
 
   const chipLabels = chips.map((c) => String(c.label).trim()).filter(Boolean);
-  if (chipLabels.length === 0) return q;
-  const chipLine = chipLabels.map((l) => `<<${l}>>`).join(" ");
-  return `${q}\n\n${chipLine}`;
+  const chipLine = chipLabels.length > 0
+    ? chipLabels.map((l) => `<<${l}>>`).join(" ")
+    : "";
+
+  // Acknowledgment prefix: greet the customer back if they led with a
+  // greeting, and reflect any info they just provided this turn so the
+  // chip question doesn't feel like the bot ignored them.
+  let prefix = "";
+  if (context) {
+    prefix = buildAcknowledgmentPrefix({
+      latestExtracted: context.latestExtracted || {},
+      rawUserText: context.rawUserText || "",
+      answers,
+    });
+  }
+
+  const body = chipLine ? `${q}\n\n${chipLine}` : q;
+  return prefix ? `${prefix}\n\n${body}` : body;
 }
 
 /**
@@ -1349,7 +1503,10 @@ export async function maybeRunOrthoticFlow({
     // condition='none' so the resolver picks a general orthotic
     // and the flow advances.
 
-    const text = renderQuestionText(step.node, answers, tree);
+    const text = renderQuestionText(step.node, answers, tree, {
+      latestExtracted,
+      rawUserText,
+    });
     if (!text) return { handled: false };
     controller.enqueue(encoder.encode(sseChunk({ type: "text", text })));
     controller.enqueue(encoder.encode(sseChunk({ type: "products", products: [] })));
