@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useLoaderData, useFetcher, Link } from "react-router";
 import {
   Page,
@@ -352,27 +352,24 @@ function formatRevenue(n, currency) {
 // page that manages it. This replaces the separate "System status"
 // card that used to live below the hero (now removed as a duplicate).
 function HeroStatusCluster({ items }) {
+  // Visual states the pips can be in. Active/healthy pips read bright
+  // and confident; off pips read quiet (gentle white). Attention pips
+  // get a coloured dot + halo glow, with the pill itself rim-coloured
+  // via the .seos-pip-warn / .seos-pip-crit classes.
   const TONE = {
-    // Healthy / off — barely visible against the green hero.
-    success:  { dot: "rgba(255,255,255,0.7)",  label: "rgba(255,255,255,0.75)", glow: "none" },
-    subdued:  { dot: "rgba(255,255,255,0.4)",  label: "rgba(255,255,255,0.55)", glow: "none" },
-    warning:  { dot: "#FFC453", label: "rgba(255,255,255,0.98)", glow: "0 0 0 3px rgba(255,196,83,0.30), 0 0 10px rgba(255,196,83,0.55)" },
-    critical: { dot: "#FF7866", label: "rgba(255,255,255,1.00)", glow: "0 0 0 3px rgba(255,120,102,0.40), 0 0 12px rgba(255,120,102,0.7)" },
+    success:  { dot: "rgba(255,255,255,0.95)", label: "rgba(255,255,255,0.95)", glow: "none",                                            cls: "" },
+    subdued:  { dot: "rgba(255,255,255,0.45)", label: "rgba(255,255,255,0.55)", glow: "none",                                            cls: " seos-pip-off" },
+    warning:  { dot: "#FFD479",                label: "rgba(255,255,255,1.00)", glow: "0 0 0 3px rgba(255,196,83,0.30), 0 0 10px rgba(255,196,83,0.55)", cls: " seos-pip-warn" },
+    critical: { dot: "#FF7866",                label: "rgba(255,255,255,1.00)", glow: "0 0 0 3px rgba(255,120,102,0.40), 0 0 12px rgba(255,120,102,0.70)", cls: " seos-pip-crit" },
   };
   return (
-    <div
-      role="group"
-      aria-label="System status"
-      className="seos-status-bar"
-    >
-      {items.map((it, i) => {
+    <div role="group" aria-label="System status" className="seos-status-bar">
+      {items.map((it) => {
         const t = TONE[it.tone] || TONE.subdued;
         const isAttention = it.tone === "warning" || it.tone === "critical";
         const labelText = `${it.label}${isAttention ? ` · ${it.value}` : ""}`;
         const tooltip = `${it.label}: ${it.value}${it.tooltip ? " — " + it.tooltip : ""}`;
-        // Inner content is the same regardless of whether the pip
-        // links anywhere — the LINK ELEMENT itself is what hovers,
-        // so we never stack two background layers.
+        const className = "seos-pip" + t.cls;
         const inner = (
           <>
             <span
@@ -382,38 +379,24 @@ function HeroStatusCluster({ items }) {
             />
             <span
               className="seos-pip-label"
-              style={{ color: t.label, fontWeight: isAttention ? 600 : 500 }}
+              style={{ color: t.label, fontWeight: isAttention ? 700 : 600 }}
             >
               {labelText}
             </span>
           </>
         );
-        const sep = i < items.length - 1 ? (
-          <span aria-hidden="true" className="seos-pip-sep" />
-        ) : null;
         if (!it.url) {
-          return (
-            <React.Fragment key={it.label}>
-              <span className="seos-pip" title={tooltip}>{inner}</span>
-              {sep}
-            </React.Fragment>
-          );
+          return <span key={it.label} className={className} title={tooltip}>{inner}</span>;
         }
         if (it.external) {
           return (
-            <React.Fragment key={it.label}>
-              <a className="seos-pip" href={it.url} target="_blank" rel="noopener noreferrer" title={tooltip}>
-                {inner}
-              </a>
-              {sep}
-            </React.Fragment>
+            <a key={it.label} className={className} href={it.url} target="_blank" rel="noopener noreferrer" title={tooltip}>
+              {inner}
+            </a>
           );
         }
         return (
-          <React.Fragment key={it.label}>
-            <Link className="seos-pip" to={it.url} title={tooltip}>{inner}</Link>
-            {sep}
-          </React.Fragment>
+          <Link key={it.label} className={className} to={it.url} title={tooltip}>{inner}</Link>
         );
       })}
     </div>
@@ -602,11 +585,18 @@ export default function Home() {
   // most-likely-to-need-attention down to nice-to-have.
   const statusItems = (() => {
     const items = [];
-    items.push(
-      hasApiKey
-        ? { label: "AI", value: "Connected", tone: "success", url: "/app/api-keys", tooltip: "Anthropic API key configured." }
-        : { label: "AI", value: "Missing key", tone: "critical", url: "/app/api-keys", tooltip: "Add your Anthropic API key to enable the chat." }
-    );
+    // AI pip carries the API-key state AND the rate-limit signal.
+    // Errors surface on the pip itself rather than a separate banner
+    // above, per the "everything lives in the cluster" UX rule.
+    if (!hasApiKey) {
+      items.push({ label: "AI", value: "Missing key", tone: "critical", url: "/app/api-keys", tooltip: "Add your Anthropic API key to enable the chat." });
+    } else if (rateLimitHits >= 10) {
+      items.push({ label: "AI", value: `${rateLimitHits} rate-limited`, tone: "critical", url: "https://console.anthropic.com/settings/limits", external: true, tooltip: `${rateLimitHits} requests rate-limited in the last 30 days. Your Anthropic tier is too low — upgrade at console.anthropic.com.` });
+    } else if (rateLimitHits > 0) {
+      items.push({ label: "AI", value: `${rateLimitHits} rate-limited`, tone: "warning", url: "https://console.anthropic.com/settings/limits", external: true, tooltip: `${rateLimitHits} requests rate-limited in the last 30 days. Consider upgrading your Anthropic tier if this keeps growing.` });
+    } else {
+      items.push({ label: "AI", value: "Connected", tone: "success", url: "/app/api-keys", tooltip: "Anthropic API key configured." });
+    }
     items.push(
       widgetEnabled
         ? { label: "Widget", value: "Live", tone: "success", url: themeEditorUrl, external: true, tooltip: "Storefront chat widget is loading on your theme." }
@@ -646,39 +636,68 @@ export default function Home() {
   return (
     <Page>
       <TitleBar title="SEoS Assistant" />
-      {/* Styles for the hero status cluster. All keyed to .seos-pip
-          and friends so there's exactly ONE element with a background
-          per pip — no stacking, no double-pill artifacts, no Polaris
-          anchor defaults bleeding through. */}
+      {/* Styles for the hero status cluster. Each pip is a real
+          pill-shaped button with a persistent subtle background, so
+          it reads as actionable at rest (no separators needed). Hover
+          lifts the background; attention states still glow. */}
       <style>{`
         .seos-status-bar {
           display: flex;
           flex-wrap: wrap;
           align-items: center;
-          gap: 2px 0;
+          gap: 8px;
           padding-top: 6px;
         }
         .seos-pip {
           display: inline-flex;
           align-items: center;
-          gap: 7px;
-          padding: 4px 10px;
+          gap: 8px;
+          padding: 5px 11px;
           border-radius: 999px;
-          background: transparent;
+          background: rgba(255, 255, 255, 0.11);
+          border: 1px solid rgba(255, 255, 255, 0.16);
           text-decoration: none !important;
           color: inherit !important;
           line-height: 1;
           user-select: none;
           cursor: pointer;
-          transition: background 0.15s ease;
+          transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
           outline: none;
         }
-        .seos-pip:hover,
-        .seos-pip:focus-visible {
-          background: rgba(255, 255, 255, 0.13);
+        .seos-pip:hover {
+          background: rgba(255, 255, 255, 0.22);
+          border-color: rgba(255, 255, 255, 0.35);
+          transform: translateY(-1px);
         }
         .seos-pip:focus-visible {
+          background: rgba(255, 255, 255, 0.22);
+          border-color: rgba(255, 255, 255, 0.55);
           box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.45);
+        }
+        /* Off / not configured: same shape, but the background drops
+           so the pip reads "available but inactive" without competing
+           with healthy pills. */
+        .seos-pip-off {
+          background: rgba(255, 255, 255, 0.05);
+          border-color: rgba(255, 255, 255, 0.10);
+        }
+        /* Attention pips get a coloured rim so they pop without the
+           pulse alone carrying the visual weight. */
+        .seos-pip-warn {
+          background: rgba(255, 196, 83, 0.18);
+          border-color: rgba(255, 196, 83, 0.55);
+        }
+        .seos-pip-warn:hover {
+          background: rgba(255, 196, 83, 0.28);
+          border-color: rgba(255, 196, 83, 0.75);
+        }
+        .seos-pip-crit {
+          background: rgba(255, 120, 102, 0.18);
+          border-color: rgba(255, 120, 102, 0.60);
+        }
+        .seos-pip-crit:hover {
+          background: rgba(255, 120, 102, 0.28);
+          border-color: rgba(255, 120, 102, 0.80);
         }
         .seos-pip-dot {
           width: 7px;
@@ -692,20 +711,12 @@ export default function Home() {
           text-transform: uppercase;
           white-space: nowrap;
         }
-        .seos-pip-sep {
-          display: inline-block;
-          width: 1px;
-          height: 10px;
-          margin: 0 2px;
-          background: rgba(255, 255, 255, 0.18);
-          flex-shrink: 0;
-        }
         .seos-pip-pulse {
           animation: seos-pulse 1.6s ease-in-out infinite;
         }
         @keyframes seos-pulse {
-          0%, 100% { box-shadow: 0 0 0 3px rgba(255,120,102,0.40), 0 0 12px rgba(255,120,102,0.70); }
-          50%      { box-shadow: 0 0 0 5px rgba(255,120,102,0.20), 0 0 18px rgba(255,120,102,0.90); }
+          0%, 100% { box-shadow: 0 0 0 3px rgba(255,120,102,0.40), 0 0 10px rgba(255,120,102,0.65); }
+          50%      { box-shadow: 0 0 0 5px rgba(255,120,102,0.20), 0 0 16px rgba(255,120,102,0.85); }
         }
       `}</style>
       <BlockStack gap="600">
@@ -722,20 +733,6 @@ export default function Home() {
                 <Text as="p" variant="bodyMd">
                   <span style={{ color: "rgba(255,255,255,0.85)" }}>Search Engine on Steroids</span>
                 </Text>
-                {(totalMessages > 0 || showRateLimit) && (
-                  <Box paddingBlockStart="100">
-                    <InlineStack align="start" gap="200" wrap>
-                      {totalMessages > 0 && (
-                        <Badge tone="info">{totalMessages} AI requests · last 30 days</Badge>
-                      )}
-                      {showRateLimit && (
-                        <Badge tone={rateLimitHits >= 10 ? "critical" : "attention"}>
-                          {rateLimitHits} rate-limited {rateLimitHits === 1 ? "request" : "requests"}
-                        </Badge>
-                      )}
-                    </InlineStack>
-                  </Box>
-                )}
                 <Box paddingBlockStart="300">
                   <HeroStatusCluster items={statusItems} />
                 </Box>
