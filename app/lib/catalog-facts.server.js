@@ -148,7 +148,8 @@ function extractTagsByKeywords(text, mapping) {
 // The description-corpus regex tagger above is the FALLBACK. Aetrex
 // (and most footwear shops) maintain explicit per-product condition
 // tags ("Bunions", "Plantar Fasciitis", "Heel Pain") and a structured
-// occasion/activity metafield (`attr_activity_shoe_type_for_filter`).
+// occasion/activity metafield mapped through AttributeMapping —
+// stored on the product as `attributes.activity` (the canonical key).
 // Those signals are an order of magnitude cleaner than scanning
 // marketing boilerplate: e.g. Aetrex's standard description includes
 // "Arch support helps to relieve common foot pain & plantar fasciitis"
@@ -226,9 +227,10 @@ function extractMerchantConditionTags(product) {
 }
 
 // Maps the merchant's structured occasion values (e.g. Aetrex's
-// `attr_activity_shoe_type_for_filter` metafield) to canonical
-// use-case tags. Falls back to a slug of the raw label when not in
-// the map (so downstream consumers still get a verifiable value, just
+// activity metaobject display names "Walking", "Beach", "Office
+// Work") to canonical use-case tags. Falls back to a slug of the
+// raw label when not in the map (so downstream consumers still get
+// a verifiable value, just
 // in raw form).
 const MERCHANT_USECASE_TAG_MAP = {
   "walking": "walking",

@@ -698,6 +698,7 @@ const card = ({
   onSale = false,
   removableInsole = null,
   archSupport = false,
+  waterFriendly = false,
   footbed = null,
   badge = null,
   productLine = null,
@@ -708,6 +709,7 @@ const card = ({
   _onSale: onSale,
   _removableInsole: removableInsole,
   _archSupport: archSupport,
+  _waterFriendly: waterFriendly,
   _footbed: footbed,
   _badge: badge,
   _productLine: productLine,
@@ -965,6 +967,71 @@ test("R49 — 'best seller' passes through when NO card has _badge populated", (
     cards,
   });
   assert.equal(out.changed, false);
+});
+
+// ---------------------------------------------------------------------------
+// Lookup_sku-style cards must NOT early-bail the verifier (P0-1 audit fix)
+// ---------------------------------------------------------------------------
+test("R50 — lookup_sku-shaped cards (with fact fields) trip haveAnyFacts; verifier runs", () => {
+  // Lookup_sku synthesizes a claimSource and spreads claimFacts(...)
+  // on each card. As long as the fact fields are populated, the
+  // verifier must NOT take the haveAnyFacts early-bail.
+  const cards = [
+    card({ title: "Maui Charcoal", conditionTags: ["bunions"], archSupport: true }),
+    card({ title: "Susie Black", conditionTags: ["bunions"], archSupport: false }),
+  ];
+  // Mixed pool — universal arch-support claim must be stripped.
+  const out = verifyClaimsAgainstCards({
+    text: "Both have arch support and run wide.",
+    cards,
+  });
+  assert.ok(out.changed, `lookup_sku-shape cards should still be verified; got logs=${out.logs.join(",")}`);
+});
+
+test("R51 — verifier early-bails only when truly no fact fields are present", () => {
+  // Bare cards (legacy/test fixture only) — early-bail expected.
+  const out = verifyClaimsAgainstCards({
+    text: "All of these are tagged for plantar fasciitis.",
+    cards: [{ title: "X" }, { title: "Y" }],
+  });
+  assert.equal(out.changed, false);
+});
+
+// ---------------------------------------------------------------------------
+// Water-friendly verification (P2)
+// ---------------------------------------------------------------------------
+test("R52 — 'water-friendly' claim survives when displayed card has _waterFriendly=true", () => {
+  const cards = [card({ title: "Maui", waterFriendly: true })];
+  const out = verifyClaimsAgainstCards({
+    text: "The Maui features water-friendly construction.",
+    cards,
+  });
+  assert.equal(out.changed, false);
+});
+
+test("R53 — 'water-friendly' claim is stripped when no displayed card has the flag", () => {
+  const cards = [
+    card({ title: "A", waterFriendly: false }),
+    card({ title: "B", waterFriendly: false }),
+  ];
+  const out = verifyClaimsAgainstCards({
+    text: "These are water-friendly for the beach.",
+    cards,
+  });
+  assert.ok(out.changed);
+  assert.doesNotMatch(out.text, /water[\s-]?friendly/i);
+});
+
+test("R54 — 'waterproof' still strips even with _waterFriendly=true cards (distinct claims)", () => {
+  // _waterFriendly does NOT imply waterproof. Verifier must not
+  // accept a "waterproof" claim against a water-friendly card.
+  const cards = [card({ title: "Maui", waterFriendly: true })];
+  const out = verifyClaimsAgainstCards({
+    text: "This is fully waterproof for rainy days.",
+    cards,
+  });
+  assert.ok(out.changed);
+  assert.doesNotMatch(out.text, /waterproof/i);
 });
 
 if (failed > 0) {

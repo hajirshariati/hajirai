@@ -1828,6 +1828,15 @@ async function lookupSku({ skus }, { shop }) {
       productHandle: v.product.handle,
       productTitle: v.product.title,
       productType: v.product.productType || undefined,
+      // Product tags / description are required so verifier facts
+      // (_conditionTags from tags+helps_with, _archSupport from
+      // description scan, _removableInsole from description) can be
+      // derived for cards built off this path. Without these, the
+      // verifier early-bails on `haveAnyFacts === false` and the
+      // entire claim-verification pass is skipped for lookup_sku-
+      // sourced cards (audited 2026-06-02).
+      productTags: Array.isArray(v.product.tags) ? v.product.tags : undefined,
+      productDescription: v.product.description || undefined,
       variantTitle: v.title || undefined,
       price: v.price || undefined,
       compareAtPrice: v.compareAtPrice || undefined,
@@ -2478,6 +2487,17 @@ export function extractProductCards(name, result) {
     if (footbed.includes("arch") || footbed.includes("orthotic")) return true;
     return false;
   };
+  // Water-friendly — true only when the description literally says
+  // so. Aetrex actually uses the phrasing "water-friendly" (53/700
+  // products per the live audit) — a different claim than
+  // "waterproof" (which stays kind:absent because the catalog has
+  // no structured field and only 1 description match). Per-card
+  // boolean lets the verifier allow legitimate "water-friendly
+  // construction" prose against backing cards and strip otherwise.
+  const waterFriendlyFromCard = (p) => {
+    const text = String(p.title || "") + " " + String(p.descriptionSnippet || p.description || "");
+    return /\bwater[\s-]?friendly\b/i.test(text);
+  };
 
   // Simple admin-attribute promotions (single-value, lowercase). null
   // when the merchant hasn't mapped or hasn't populated the field.
@@ -2501,6 +2521,7 @@ export function extractProductCards(name, result) {
     _onSale: onSaleFromCard(p),
     _removableInsole: removableInsoleFromCard(p),
     _archSupport: archSupportFromCard(p),
+    _waterFriendly: waterFriendlyFromCard(p),
     _footbed: footbedFromCard(p),
     _badge: badgeFromCard(p),
     _productLine: productLineFromCard(p),
@@ -2563,16 +2584,33 @@ export function extractProductCards(name, result) {
     const seen = new Set();
     return result.found
       .filter((f) => !seen.has(f.productHandle) && seen.add(f.productHandle))
-      .map((f) => ({
-        title: f.productTitle,
-        url: f.url,
-        handle: f.productHandle,
-        image: f.image || "",
-        price_formatted: f.price ? `$${parseFloat(f.price).toFixed(2)}` : "",
-        compare_at_price: f.compareAtPrice ? Math.round(parseFloat(f.compareAtPrice) * 100) : undefined,
-        _category: categoryFromAttrs({ attributes: f.productAttributes, productType: f.productType }),
-        _gender: genderFromAttrs({ attributes: f.productAttributes }),
-      }));
+      .map((f) => {
+        // Synthesize the shape `claimFacts` expects from the
+        // lookup_sku entry (which uses productTitle / productAttributes
+        // / productTags / productDescription instead of search_products'
+        // title / attributes / tags / description keys).
+        const claimSource = {
+          title: f.productTitle,
+          description: f.productDescription,
+          descriptionSnippet: undefined,
+          tags: f.productTags,
+          attributes: f.productAttributes,
+          price: f.price,
+          compareAtPrice: f.compareAtPrice,
+        };
+        return {
+          title: f.productTitle,
+          url: f.url,
+          handle: f.productHandle,
+          image: f.image || "",
+          price_formatted: f.price ? `$${parseFloat(f.price).toFixed(2)}` : "",
+          compare_at_price: f.compareAtPrice ? Math.round(parseFloat(f.compareAtPrice) * 100) : undefined,
+          _category: categoryFromAttrs({ attributes: f.productAttributes, productType: f.productType }),
+          _gender: genderFromAttrs({ attributes: f.productAttributes }),
+          _attributes: f.productAttributes || {},
+          ...claimFacts(claimSource),
+        };
+      });
   }
   // Smart Recommender result. The recommender returns a single
   // `product` shaped like the variant-lookup output; expose it as a

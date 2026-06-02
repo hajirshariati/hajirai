@@ -1188,6 +1188,13 @@ const CLAIM_FEATURE_TO_FACT = {
   "rocker bottom": { kind: "absent" },
   "orthotic-compatible": { kind: "absent" },
   "orthotic compatible": { kind: "absent" },
+  // Water-friendly — distinct from "waterproof". Aetrex actually
+  // uses this phrasing on ~7.6% of descriptions per the audit.
+  // Verifier requires at least one displayed card to have
+  // _waterFriendly=true (set conservatively from explicit
+  // description match in chat-tools).
+  "water-friendly": { kind: "waterFriendly" },
+  "water friendly": { kind: "waterFriendly" },
   // Removable insole — boolean check
   "removable insole": { kind: "removableInsole" },
   // Arch support — `_archSupport` boolean per card. Aetrex's
@@ -1236,6 +1243,9 @@ function cardHasFeature(card, claim) {
   }
   if (claim.kind === "archSupport") {
     return card._archSupport === true;
+  }
+  if (claim.kind === "waterFriendly") {
+    return card._waterFriendly === true;
   }
   if (claim.kind === "onSale") {
     return card._onSale === true;
@@ -1303,12 +1313,25 @@ export function verifyClaimsAgainstCards({ text, cards } = {}) {
         Array.isArray(c._useCaseTags) ||
         typeof c._onSale === "boolean" ||
         typeof c._archSupport === "boolean" ||
+        typeof c._waterFriendly === "boolean" ||
         typeof c._footbed === "string" ||
         typeof c._badge === "string" ||
         typeof c._productLine === "string"
       ),
   );
-  if (!haveAnyFacts) return { text: input, changed: false, logs: [] };
+  if (!haveAnyFacts) {
+    // Observability — when a non-empty pool reaches the verifier
+    // without fact fields, some upstream card path bypassed
+    // extractProductCards. Surface that as a warning so future
+    // regressions are visible without changing behavior.
+    if (pool.length > 0) {
+      console.warn(
+        `[response-contract] verifier no-op: pool=${pool.length} but no card carries verifier facts ` +
+          `— a card-emit path is bypassing extractProductCards`,
+      );
+    }
+    return { text: input, changed: false, logs: [] };
+  }
 
   const sentences = input.split(/(?<=[.!?])\s+/);
   const out = [];
@@ -1352,6 +1375,22 @@ export function verifyClaimsAgainstCards({ text, cards } = {}) {
   }
 
   const next = out.join(" ").replace(/\s{2,}/g, " ").trim();
+
+  // Observability — over-strip warning. When the verifier removes
+  // ≥50% of the AI's text length, the listing-template fallback
+  // (`ensureCompleteCustomerText`) typically swaps in a generic
+  // line, which hides the issue. Log so future regressions in
+  // sentence-drop aggressiveness are visible.
+  if (next.length > 0 && input.trim().length > 0) {
+    const ratio = next.length / input.trim().length;
+    if (ratio <= 0.5) {
+      console.warn(
+        `[response-contract] verifier over-strip: ${input.trim().length}→${next.length} chars ` +
+          `(${Math.round((1 - ratio) * 100)}% removed) reasons=${logs.join("+")}`,
+      );
+    }
+  }
+
   return {
     text: next,
     changed: next !== input.trim(),
