@@ -1391,6 +1391,17 @@ export function verifyClaimsAgainstCards({ text, cards } = {}) {
     }
   }
 
+  // Zeroed-text warning — the verifier dropped every sentence. The
+  // emit-side fallback (`ensureCompleteCustomerText` with a pool>0
+  // fallback line) must catch this, otherwise the customer sees
+  // textLen=0 with cards. Log so we can correlate against emit logs.
+  if (next.length === 0 && input.trim().length > 0) {
+    console.warn(
+      `[response-contract] verifier zeroed text: input=${input.trim().length} chars ` +
+        `pool=${pool.length} reasons=${logs.join("+")}`,
+    );
+  }
+
   return {
     text: next,
     changed: next !== input.trim(),

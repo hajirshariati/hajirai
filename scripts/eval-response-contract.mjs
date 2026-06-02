@@ -1034,6 +1034,46 @@ test("R54 — 'waterproof' still strips even with _waterFriendly=true cards (dis
   assert.doesNotMatch(out.text, /waterproof/i);
 });
 
+// ---------------------------------------------------------------------------
+// Empty-text-with-pool fallback (production failure: verifier stripped 81→0
+// chars, emit shipped textLen=0 poolSize=6).
+// ---------------------------------------------------------------------------
+test("R55 — verifier zeroing every sentence returns next='' (caller must fallback)", () => {
+  // Single sentence carrying an absent-feature claim — the verifier
+  // drops it, and there is nothing left to keep.
+  const cards = [
+    card({ title: "A", useCaseTags: ["dress"] }),
+    card({ title: "B", useCaseTags: ["dress"] }),
+  ];
+  const out = verifyClaimsAgainstCards({
+    text: "All of these are great for hiking.",
+    cards,
+  });
+  assert.equal(out.changed, true);
+  assert.equal(out.text, "");
+  assert.ok(out.logs.length > 0, `expected reasons for the zeroed text; got ${JSON.stringify(out.logs)}`);
+});
+
+test("R56 — ensureCompleteCustomerText turns empty text into pool fallback line", () => {
+  const out = ensureCompleteCustomerText({
+    text: "",
+    fallback: "Here are the matching styles I found.",
+  });
+  assert.equal(out.changed, true);
+  assert.equal(out.reason, "empty");
+  assert.equal(out.text, "Here are the matching styles I found.");
+});
+
+test("R57 — ensureCompleteCustomerText rescues whitespace-only input via fallback", () => {
+  const out = ensureCompleteCustomerText({
+    text: "   \n  ",
+    fallback: "Here are the matching styles I found.",
+  });
+  assert.equal(out.changed, true);
+  assert.equal(out.reason, "empty");
+  assert.equal(out.text, "Here are the matching styles I found.");
+});
+
 if (failed > 0) {
   console.error("\nFailures:");
   for (const f of failures) console.error(`- ${f.name}: ${f.err.stack || f.err.message}`);

@@ -652,6 +652,18 @@ const SPECIFIC_PRODUCT_STOPWORDS = new Set([
   "leather", "suede", "fabric", "mesh", "knit", "rubber",
   "size", "wide", "narrow", "medium", "standard", "regular",
   "new", "classic", "comfort", "premium", "pro", "edition",
+  // common use-case verbs/nouns the AI mentions alongside an activity
+  "hiking", "walking", "running", "standing", "travel", "traveling",
+  "work", "working", "casual", "dress", "formal", "athletic", "sport", "sports",
+  "indoor", "outdoor", "everyday",
+  // geographic terms — customers say "hiking in Italy", "trip to Paris",
+  // etc. None of these are products in any reasonable footwear catalog.
+  "italy", "france", "spain", "europe", "england", "germany", "japan",
+  "china", "india", "korea", "thailand", "vietnam", "australia", "canada",
+  "mexico", "brazil", "africa", "asia", "america", "states",
+  "paris", "london", "rome", "milan", "berlin", "tokyo", "york", "boston",
+  "chicago", "miami", "vegas", "angeles", "francisco", "seattle", "denver",
+  "atlanta", "dallas", "houston", "phoenix", "disney", "disneyland", "disneyworld",
 ]);
 
 function firstMeaningfulToken(title) {

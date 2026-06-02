@@ -1770,7 +1770,12 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }
   }
 
-  if (fullResponseText) {
+  // Run the coherent-text guard whenever the text is empty OR a pool
+  // exists, so that an empty-text-with-pool state (e.g. response-length
+  // cap + verifyClaimsAgainstCards together stripped to 0 chars) is
+  // always rescued by the code-owned listing fallback. We must NEVER
+  // emit textLen=0 with poolSize>0.
+  if (fullResponseText || pool.length > 0) {
     const fallback = pool.length > 0
       ? "Here are the matching styles I found."
       : (looksLikeClarifyingQuestion(fullResponseText)
@@ -1778,7 +1783,10 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
         : "I can help with that.");
     const coherent = ensureCompleteCustomerText({ text: fullResponseText, fallback });
     if (coherent.changed) {
-      console.log(`[chat] response-contract: repaired incomplete sentence (${coherent.reason})`);
+      const reason = (!fullResponseText && pool.length > 0)
+        ? `${coherent.reason}_with_pool`
+        : coherent.reason;
+      console.log(`[chat] response-contract: repaired incomplete sentence (${reason})`);
       fullResponseText = coherent.text;
     }
   }
