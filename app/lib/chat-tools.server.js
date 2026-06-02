@@ -2437,8 +2437,11 @@ export function extractProductCards(name, result) {
   // single claim verifier can check AI text against catalog data without
   // re-deriving. See catalog-facts.server.js for the merchant-tag-first
   // extraction logic — these helpers mirror it on the card side.
+  // ConditionTags now also reads `attributes.helps_with` (merchant's
+  // details_icons metafield) — see extractMerchantConditionTags.
   const conditionTagsFromCard = (p) => extractMerchantConditionTags({
     tags: Array.isArray(p.tags) ? p.tags : [],
+    attributesJson: p.attributes || null,
   });
   const useCaseTagsFromCard = (p) => extractMerchantUseCaseTags({
     attributesJson: p.attributes || null,
@@ -2459,12 +2462,48 @@ export function extractProductCards(name, result) {
     if (/removable\s+insole\s*[:\-]\s*(?:no|none)\b/i.test(text)) return false;
     return null;
   };
+  // Arch support — conservative: true only when the merchant's
+  // attributes explicitly say so, or "arch support" appears as a
+  // phrase in description/title. Aetrex's whole brand positioning
+  // includes "Built-In Arch Support" in product copy. Setting this
+  // boolean per card lets the verifier accept universal claims like
+  // "all of these have arch support" only when every card actually
+  // has it.
+  const archSupportFromCard = (p) => {
+    const text = String(p.title || "") + " " + String(p.descriptionSnippet || p.description || "");
+    if (/\barch\s+support\b/i.test(text)) return true;
+    // Attribute-side checks — if the merchant explicitly tagged it
+    const attrs = p.attributes || {};
+    const footbed = String(attrs.footbed || "").toLowerCase();
+    if (footbed.includes("arch") || footbed.includes("orthotic")) return true;
+    return false;
+  };
+
+  // Simple admin-attribute promotions (single-value, lowercase). null
+  // when the merchant hasn't mapped or hasn't populated the field.
+  const stringAttr = (p, key) => {
+    const v = (p.attributes || {})[key];
+    if (v == null) return null;
+    if (Array.isArray(v)) {
+      const first = v.find((x) => x != null && x !== "");
+      return first ? String(first).toLowerCase().trim() : null;
+    }
+    const s = String(v).toLowerCase().trim();
+    return s || null;
+  };
+  const footbedFromCard = (p) => stringAttr(p, "footbed");
+  const badgeFromCard = (p) => stringAttr(p, "badge");
+  const productLineFromCard = (p) => stringAttr(p, "orthotic_line");
 
   const claimFacts = (p) => ({
     _conditionTags: conditionTagsFromCard(p),
     _useCaseTags: useCaseTagsFromCard(p),
     _onSale: onSaleFromCard(p),
     _removableInsole: removableInsoleFromCard(p),
+    _archSupport: archSupportFromCard(p),
+    _footbed: footbedFromCard(p),
+    _badge: badgeFromCard(p),
+    _productLine: productLineFromCard(p),
   });
 
   if (name === "search_products" && Array.isArray(result.products)) {

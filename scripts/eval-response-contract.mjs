@@ -697,12 +697,20 @@ const card = ({
   useCaseTags = [],
   onSale = false,
   removableInsole = null,
+  archSupport = false,
+  footbed = null,
+  badge = null,
+  productLine = null,
 } = {}) => ({
   title,
   _conditionTags: conditionTags,
   _useCaseTags: useCaseTags,
   _onSale: onSale,
   _removableInsole: removableInsole,
+  _archSupport: archSupport,
+  _footbed: footbed,
+  _badge: badge,
+  _productLine: productLine,
 });
 
 test("R30 — universal PF claim is softened when not every card is PF-tagged (noisy corpus → safe)", () => {
@@ -820,6 +828,143 @@ test("R38 — per-product 'great for hiking' is still stripped if NO card has hi
     cards,
   });
   assert.ok(out.changed);
+});
+
+// ---------------------------------------------------------------------------
+// Arch support verification (new in this PR)
+// ---------------------------------------------------------------------------
+test("R39 — universal arch-support claim survives when every card has _archSupport", () => {
+  const cards = [
+    card({ title: "A", archSupport: true }),
+    card({ title: "B", archSupport: true }),
+  ];
+  const out = verifyClaimsAgainstCards({
+    text: "All of these have arch support.",
+    cards,
+  });
+  assert.equal(out.changed, false, `arch support claim should survive when every card has it`);
+});
+
+test("R40 — universal arch-support claim is stripped when one card lacks it", () => {
+  const cards = [
+    card({ title: "A", archSupport: true }),
+    card({ title: "B", archSupport: false }),
+  ];
+  const out = verifyClaimsAgainstCards({
+    text: "All of these have arch support.",
+    cards,
+  });
+  assert.ok(out.changed);
+  assert.doesNotMatch(out.text, /all of these have arch support/i);
+});
+
+test("R41 — per-product arch-support claim passes when at least one card has it", () => {
+  const cards = [
+    card({ title: "Maui", archSupport: true }),
+    card({ title: "Vania", archSupport: false }),
+  ];
+  const out = verifyClaimsAgainstCards({
+    text: "The Maui has arch support built in.",
+    cards,
+  });
+  assert.equal(out.changed, false);
+});
+
+// ---------------------------------------------------------------------------
+// Bare per-product sale verification (new in this PR)
+// ---------------------------------------------------------------------------
+test("R42 — bare 'on sale' claim stripped when no card is _onSale", () => {
+  const cards = [
+    card({ title: "Maui", onSale: false }),
+    card({ title: "Vania", onSale: false }),
+  ];
+  const out = verifyClaimsAgainstCards({
+    text: "The Maui is currently on sale.",
+    cards,
+  });
+  assert.ok(out.changed);
+  assert.doesNotMatch(out.text, /on sale/i);
+});
+
+test("R43 — bare 'on sale' claim survives when at least one card is _onSale", () => {
+  const cards = [
+    card({ title: "Maui", onSale: true }),
+    card({ title: "Vania", onSale: false }),
+  ];
+  const out = verifyClaimsAgainstCards({
+    text: "The Maui is on sale right now.",
+    cards,
+  });
+  assert.equal(out.changed, false);
+});
+
+// ---------------------------------------------------------------------------
+// Footbed verification (new in this PR — nullable field, passes when unset)
+// ---------------------------------------------------------------------------
+test("R44 — 'memory foam footbed' claim passes when at least one card._footbed includes 'memory'", () => {
+  const cards = [
+    card({ title: "A", footbed: "memory foam premium" }),
+  ];
+  const out = verifyClaimsAgainstCards({
+    text: "Features a memory foam footbed for all-day comfort.",
+    cards,
+  });
+  assert.equal(out.changed, false);
+});
+
+test("R45 — 'memory foam footbed' claim is stripped when card._footbed contradicts ('cork')", () => {
+  const cards = [
+    card({ title: "A", footbed: "cork natural" }),
+  ];
+  const out = verifyClaimsAgainstCards({
+    text: "Features a memory foam footbed for all-day comfort.",
+    cards,
+  });
+  assert.ok(out.changed, `expected the unsupported footbed claim to be stripped`);
+});
+
+test("R46 — footbed claim is passed through when NO card has _footbed populated", () => {
+  // Merchant doesn't use the footbed field — verifier must not
+  // penalize the AI for talking about footbeds.
+  const cards = [
+    card({ title: "A" }), // footbed: null
+    card({ title: "B" }),
+  ];
+  const out = verifyClaimsAgainstCards({
+    text: "Features a memory foam footbed for all-day comfort.",
+    cards,
+  });
+  assert.equal(out.changed, false);
+});
+
+// ---------------------------------------------------------------------------
+// Badge verification (new in this PR — nullable field, passes when unset)
+// ---------------------------------------------------------------------------
+test("R47 — 'best seller' passes when card._badge includes 'best'", () => {
+  const cards = [card({ title: "A", badge: "best seller" })];
+  const out = verifyClaimsAgainstCards({
+    text: "This style is a best seller in our women's lineup.",
+    cards,
+  });
+  assert.equal(out.changed, false);
+});
+
+test("R48 — 'best seller' is stripped when card._badge is some unrelated value", () => {
+  const cards = [card({ title: "A", badge: "new" })];
+  const out = verifyClaimsAgainstCards({
+    text: "This is a best seller.",
+    cards,
+  });
+  assert.ok(out.changed);
+});
+
+test("R49 — 'best seller' passes through when NO card has _badge populated", () => {
+  const cards = [card({ title: "A" }), card({ title: "B" })];
+  const out = verifyClaimsAgainstCards({
+    text: "This style is a best seller.",
+    cards,
+  });
+  assert.equal(out.changed, false);
 });
 
 if (failed > 0) {

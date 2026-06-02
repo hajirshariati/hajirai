@@ -359,6 +359,65 @@ await test("Merchant tags — products without condition tags return empty list 
   assert.deepEqual(conds, []);
 });
 
+await test("helps_with — single source: details_icons metafield alone (no merchant tags) still yields conditions", () => {
+  // Production case: merchant maintains `details_icons` metaobject
+  // refs ("Bunions", "Plantar Fasciitis", "Diabetic") but didn't
+  // duplicate them to the tags array. Verifier must still see them.
+  const conds = extractMerchantConditionTags({
+    tags: ["YGroup_ALYSSA"],
+    attributesJson: { helps_with: ["Bunions", "Plantar Fasciitis", "Diabetic"] },
+  });
+  assert.ok(conds.includes("bunions"));
+  assert.ok(conds.includes("plantar_fasciitis"));
+  assert.ok(conds.includes("diabetic"));
+});
+
+await test("helps_with — string-encoded array form parses correctly", () => {
+  const conds = extractMerchantConditionTags({
+    tags: [],
+    attributesJson: { helps_with: '["Bunions","Flat Feet"]' },
+  });
+  assert.ok(conds.includes("bunions"));
+  assert.ok(conds.includes("flat_feet"));
+});
+
+await test("helps_with — single-value (string, not array) parses", () => {
+  const conds = extractMerchantConditionTags({
+    tags: [],
+    attributesJson: { helps_with: "Heel Spurs" },
+  });
+  assert.ok(conds.includes("heel_spur"));
+});
+
+await test("helps_with + tags union — duplicates dedup, both contribute", () => {
+  const conds = extractMerchantConditionTags({
+    tags: ["Bunions", "Plantar Fasciitis"],
+    attributesJson: { helps_with: ["Plantar Fasciitis", "Morton's Neuroma"] },
+  });
+  // bunions (tag-only), plantar_fasciitis (both), mortons_neuroma (helps_with-only)
+  assert.ok(conds.includes("bunions"));
+  assert.ok(conds.includes("plantar_fasciitis"));
+  assert.ok(conds.includes("mortons_neuroma"));
+  // No double-count: plantar_fasciitis appears once
+  assert.equal(conds.filter((c) => c === "plantar_fasciitis").length, 1);
+});
+
+await test("Use-case — activity attribute key (merchant's mapping target) is now preferred over attr_activity_shoe_type*", () => {
+  // After the cosmetic fix, the preferred source is `attributes.activity`
+  // because AttributeMapping resolves `activity → custom.attr_activity_shoe_type`
+  // and stores under the merchant attribute name.
+  const uses = extractMerchantUseCaseTags({
+    attributesJson: {
+      activity: ["Walking", "Beach"],
+      // Defensive fallbacks still present but ignored when `activity` wins
+      attr_activity_shoe_type_for_filter: ["Running"],
+    },
+  });
+  assert.ok(uses.includes("walking"));
+  assert.ok(uses.includes("beach"));
+  assert.ok(!uses.includes("running"), `attr_activity_shoe_type_for_filter must NOT override 'activity' key`);
+});
+
 await test("Use-case from attr_activity_shoe_type_for_filter — canonicalizes Aetrex values", () => {
   const uses = extractMerchantUseCaseTags({
     attributesJson: {

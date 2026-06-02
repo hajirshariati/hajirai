@@ -1190,15 +1190,35 @@ const CLAIM_FEATURE_TO_FACT = {
   "orthotic compatible": { kind: "absent" },
   // Removable insole — boolean check
   "removable insole": { kind: "removableInsole" },
+  // Arch support — `_archSupport` boolean per card. Aetrex's
+  // built-in arch support is described as universal but we still
+  // verify per-card so a non-arch-support product (rare) doesn't
+  // get carried by a universal claim.
+  "arch support": { kind: "archSupport" },
+  // Sale — `_onSale` boolean. Bare per-product sale claims ("this
+  // is on sale", "currently discounted") are verified just like
+  // universal ones.
+  "on sale": { kind: "onSale" },
+  "currently discounted": { kind: "onSale" },
+  "marked down": { kind: "onSale" },
+  "discounted": { kind: "onSale" },
+  // Footbed claims — verified against the merchant's `footbed`
+  // attribute when populated. Passes through when no card has data.
+  "memory foam footbed": { kind: "footbedSubstring", substring: "memory" },
+  "memory-foam footbed": { kind: "footbedSubstring", substring: "memory" },
+  "cushioned footbed": { kind: "footbedSubstring", substring: "cushion" },
+  "orthotic footbed": { kind: "footbedSubstring", substring: "orthotic" },
+  // Badge claims — verified against the merchant's `badge` attribute.
+  // Specific phrasings only (not bare "new"); broad words false-
+  // positive on legitimate marketing copy.
+  "best seller": { kind: "badgeSubstring", substring: "best" },
+  "bestseller": { kind: "badgeSubstring", substring: "best" },
+  "best-seller": { kind: "badgeSubstring", substring: "best" },
 };
 
 // Universal quantifier phrasing: "all/every/both/each X have/are <feature>"
 const UNIVERSAL_QUANTIFIER_RE =
   /\b(all|every|both|each)\b\s+(?:of\s+(?:these|those|them)\s+)?(?:\w+\s+){0,4}?(?:are|have|come(?:s)?|feature|features|support|supports|include(?:s)?|offer(?:s)?|tagged|built|made|designed)\b/i;
-
-// Sale phrasing
-const SALE_CLAIM_RE =
-  /\b(?:both|all|every|each)\b[^.!?\n]{0,60}\b(?:on\s+sale|discounted|reduced|marked\s+down|currently\s+(?:on\s+sale|reduced))\b/i;
 
 function cardHasFeature(card, claim) {
   if (!card || !claim) return false;
@@ -1214,12 +1234,39 @@ function cardHasFeature(card, claim) {
   if (claim.kind === "removableInsole") {
     return card._removableInsole === true;
   }
+  if (claim.kind === "archSupport") {
+    return card._archSupport === true;
+  }
+  if (claim.kind === "onSale") {
+    return card._onSale === true;
+  }
+  if (claim.kind === "footbedSubstring") {
+    return typeof card._footbed === "string" && card._footbed.includes(claim.substring);
+  }
+  if (claim.kind === "badgeSubstring") {
+    return typeof card._badge === "string" && card._badge.includes(claim.substring);
+  }
   return false;
 }
 
 function poolSupportsClaim(cards, claim, { universal = false } = {}) {
   if (!Array.isArray(cards) || cards.length === 0) return false;
   if (claim.kind === "absent") return false;
+
+  // For nullable string-field claims (footbed / badge), pass the
+  // claim through when NO card in the pool has that field configured
+  // — we shouldn't penalize a claim against a merchant attribute
+  // that's simply not in use. When ANY card has data, judge only
+  // those cards (the others are unknowns, not denials).
+  if (claim.kind === "footbedSubstring" || claim.kind === "badgeSubstring") {
+    const key = claim.kind === "footbedSubstring" ? "_footbed" : "_badge";
+    const populated = cards.filter((c) => c?.[key] != null);
+    if (populated.length === 0) return true;
+    return universal
+      ? populated.every((c) => cardHasFeature(c, claim))
+      : populated.some((c) => cardHasFeature(c, claim));
+  }
+
   if (universal) {
     return cards.every((c) => cardHasFeature(c, claim));
   }
@@ -1254,8 +1301,11 @@ export function verifyClaimsAgainstCards({ text, cards } = {}) {
       c && (
         Array.isArray(c._conditionTags) ||
         Array.isArray(c._useCaseTags) ||
-        c._onSale === true ||
-        c._onSale === false
+        typeof c._onSale === "boolean" ||
+        typeof c._archSupport === "boolean" ||
+        typeof c._footbed === "string" ||
+        typeof c._badge === "string" ||
+        typeof c._productLine === "string"
       ),
   );
   if (!haveAnyFacts) return { text: input, changed: false, logs: [] };
@@ -1269,18 +1319,11 @@ export function verifyClaimsAgainstCards({ text, cards } = {}) {
     let drop = false;
     let reason = null;
 
-    // 1. Sale claim verification
-    if (SALE_CLAIM_RE.test(s)) {
-      const onSaleCount = pool.filter((c) => c?._onSale === true).length;
-      const universal = /\b(all|every|both|each)\b/i.test(s);
-      if (universal ? onSaleCount < pool.length : onSaleCount === 0) {
-        drop = true;
-        reason = "unverified_sale_claim";
-      }
-    }
-
-    // 2. Feature claim verification
-    if (!drop) {
+    // Feature claim verification — single generic loop. Sale claims
+    // (universal AND per-product), arch support, conditions, use-
+    // cases, footbed, and badge all flow through the same code path
+    // via CLAIM_FEATURE_TO_FACT.
+    {
       const universal = UNIVERSAL_QUANTIFIER_RE.test(s);
       // Find the first feature word present in the sentence.
       for (const [phrase, claim] of Object.entries(CLAIM_FEATURE_TO_FACT)) {

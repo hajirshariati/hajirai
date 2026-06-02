@@ -178,13 +178,50 @@ const MERCHANT_CONDITION_TAG_MAP = {
   "high instep": "high_instep",
 };
 
+// Read structured per-product condition signals from BOTH the
+// merchant's `tags` array AND the `helps_with` attribute (which is
+// the merchant's mapping of the `details_icons` metafield — a
+// metaobject reference list curated by the merchant). Either source
+// alone is sufficient; many shops will only populate one. Same
+// normalization map for both so downstream consumers get a single
+// canonical tag set.
 function extractMerchantConditionTags(product) {
-  const tags = Array.isArray(product?.tags) ? product.tags : [];
   const out = new Set();
+
+  // Source A: merchant tags array (e.g. "Bunions", "Plantar Fasciitis")
+  const tags = Array.isArray(product?.tags) ? product.tags : [];
   for (const raw of tags) {
     const key = String(raw || "").toLowerCase().trim();
     if (MERCHANT_CONDITION_TAG_MAP[key]) out.add(MERCHANT_CONDITION_TAG_MAP[key]);
   }
+
+  // Source B: helps_with attribute (merchant-mapped from
+  // product.details_icons metafield). Value is a string or array of
+  // strings, possibly JSON-encoded depending on metafield resolver.
+  const attrs = (() => {
+    try {
+      const j = product?.attributesJson;
+      if (!j) return null;
+      return typeof j === "string" ? JSON.parse(j) : j;
+    } catch { return null; }
+  })();
+  if (attrs && attrs.helps_with != null) {
+    let helps = attrs.helps_with;
+    if (typeof helps === "string") {
+      const trimmed = helps.trim();
+      if (trimmed.startsWith("[")) {
+        try { helps = JSON.parse(trimmed); } catch { helps = [trimmed]; }
+      } else {
+        helps = [trimmed];
+      }
+    }
+    if (!Array.isArray(helps)) helps = [String(helps)];
+    for (const raw of helps) {
+      const key = String(raw || "").toLowerCase().trim();
+      if (MERCHANT_CONDITION_TAG_MAP[key]) out.add(MERCHANT_CONDITION_TAG_MAP[key]);
+    }
+  }
+
   return Array.from(out);
 }
 
@@ -213,10 +250,17 @@ const MERCHANT_USECASE_TAG_MAP = {
 
 function readActivityMetafield(attributes) {
   if (!attributes || typeof attributes !== "object") return [];
+  // Preferred: `attributes.activity` — this is where AttributeMapping
+  // stores the value after the merchant's admin config resolves
+  // `activity → custom.attr_activity_shoe_type` (or whichever
+  // metafield they pointed it at). The two `attr_activity_shoe_type*`
+  // keys below are defensive fallbacks for shops whose mapping has
+  // an alternate attribute name OR who never mapped the source at
+  // all and we'd otherwise lose the signal.
   const raw =
+    attributes.activity ??
     attributes.attr_activity_shoe_type_for_filter ??
     attributes.attr_activity_shoe_type ??
-    attributes.activity ??
     null;
   if (raw == null) return [];
   let arr;
