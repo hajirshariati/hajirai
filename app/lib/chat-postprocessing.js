@@ -170,7 +170,26 @@ export function validateFollowUpSuggestion(suggestion, replyText) {
 //   3. Keep "no" but only when not followed by an evaluation cue
 //      (handled by the must-be-followed-by-category constraint —
 //      "no good for X" doesn't have a category noun after "no").
-const REJECT_RE = /\b(?:no|don'?t[\s-]?(?:like|want|need|care\s+for|carry|have|do)|do\s+not\s+(?:like|want|need|care\s+for|carry|have|do)|doesn'?t[\s-]?(?:like|want|need|care\s+for|carry|have|do)|does\s+not\s+(?:like|want|need|care\s+for|carry|have|do)|didn'?t[\s-]?(?:like|want|need|care\s+for)|did\s+not\s+(?:like|want|need|care\s+for)|hate|hates|dislike|dislikes|avoid|avoids|avoiding|without|besides|other[\s-]?than|except[\s-]?for|except|instead[\s-]?of|rather[\s-]?than|not[\s-]?into|not[\s-]?a[\s-]?fan|not[\s-]?interested[\s-]?in)\b[^.!?\n]{0,50}\b((?:shoes?|footwear|orthotics?|insoles?|footbeds?|sandals?|sneakers?|boots?|clogs?|loafers?|slippers?|oxfords?|wedges?|heels?|flats|mules?|mary[\s-]?janes?|slip[\s-]?ons?))\b/gi;
+// Match rejection-of-category clauses. The gap between the rejection
+// word and the category noun:
+//   - Excludes ".", "!", "?", ",", "\n" — clauses end at these.
+//     Without the comma stop, "no heels, any type of shoe" would
+//     match "no ... shoe" (a category in a permissive clause that
+//     belongs to a different sentence half).
+//   - Non-greedy (`*?`) so the FIRST category after the rejection
+//     word wins. Without the lazy quantifier, the engine consumes
+//     as much as possible and lands on the latest category in the
+//     window — producing the wrong pairing.
+const REJECT_RE = /\b(?:no|don'?t[\s-]?(?:like|want|need|care\s+for|carry|have|do)|do\s+not\s+(?:like|want|need|care\s+for|carry|have|do)|doesn'?t[\s-]?(?:like|want|need|care\s+for|carry|have|do)|does\s+not\s+(?:like|want|need|care\s+for|carry|have|do)|didn'?t[\s-]?(?:like|want|need|care\s+for)|did\s+not\s+(?:like|want|need|care\s+for)|hate|hates|dislike|dislikes|avoid|avoids|avoiding|without|besides|other[\s-]?than|except[\s-]?for|except|instead[\s-]?of|rather[\s-]?than|not[\s-]?into|not[\s-]?a[\s-]?fan|not[\s-]?interested[\s-]?in)\b[^.!?,\n]{0,50}?\b((?:shoes?|footwear|orthotics?|insoles?|footbeds?|sandals?|sneakers?|boots?|clogs?|loafers?|slippers?|oxfords?|wedges?|heels?|flats|mules?|mary[\s-]?janes?|slip[\s-]?ons?))\b/gi;
+
+// Permissive context — when the captured category is preceded by
+// "any/all/some/every type/kind/sort of", the clause is INCLUDING
+// that category, not rejecting it. Production trace: "no doesn't
+// need to be heel, it can be any type of shoe, show me the
+// cheapest one" — without this guard, "shoe" gets captured and the
+// footwear umbrella expansion rejects every category in the
+// catalog.
+const INCLUSIVE_CONTEXT_BEFORE_CATEGORY_RE = /\b(?:any|all|some|every|all\s+the)\s+(?:type|kind|sort|types|kinds|sorts|variet(?:y|ies))\s+of\s+$/i;
 
 // Footwear umbrella — "shoes" / "footwear" rejects all member
 // categories. Chip filter expects exact category labels, so we
@@ -188,6 +207,13 @@ export function detectRejectedCategories(text) {
   let m;
   while ((m = REJECT_RE.exec(text)) !== null) {
     const term = m[1].toLowerCase().replace(/\s+/g, " ").trim();
+    // Skip when the captured category sits inside an inclusive
+    // context — "any/all type of <category>" is the customer
+    // saying ANY of those is acceptable, not rejecting them.
+    const matchEnd = m.index + m[0].length;
+    const termStart = matchEnd - m[1].length;
+    const before = text.substring(m.index, termStart);
+    if (INCLUSIVE_CONTEXT_BEFORE_CATEGORY_RE.test(before)) continue;
     out.add(term);
     if (term === "shoes" || term === "shoe" || term === "footwear") {
       FOOTWEAR_UMBRELLA_MEMBERS.forEach((c) => out.add(c));
@@ -688,6 +714,12 @@ const SUGG_TECH_NAME_RE = /(?:[™®]|\b[A-Z][A-Za-z]*(?:[A-Z][A-Za-z]+){1,}\b)/
 const SUGG_DISCOUNT_MECHANICS_RE = /\b(?:govx|gov\s*x|discount|promo(?:tion)?|coupon|code|loyalty|rewards?|points?)\b/i;
 const SUGG_MECHANICS_QUALIFIER_RE = /\b(?:categor|specific|which|each|certain|appl(?:y|ies|ied)|stack|combine|maximi[sz]e|best way)\b/i;
 
+// Suggestion-shape: "Do you have these in <color>?" / "in <color>
+// version" / "any <color> ones". Used to detect when a follow-up
+// suggestion is asking for a specific color that the assistant
+// either just denied or already shown. Captures the color word.
+const SUGG_COLOR_REQUEST_RE = /\b(?:in|version\s+in|colou?rway\s+in|do\s+you\s+have\s+(?:these|this|that|it|them|one|a\s+pair)\s+in|any\s+(?:in|other))\s+(red|blue|black|white|pink|navy|tan|brown|gray|grey|beige|olive|cream|nude|gold|silver|bronze|burgundy|cognac|charcoal|ivory|metallic|mocha|taupe|eggplant|purple|orange|yellow|green|rose|wine)\b/i;
+
 // Attribute vocabulary recognized in customer suggestions. Each key
 // is the attribute name as the chat/resolver knows it; the regex
 // captures phrasings the AI typically generates when asking about
@@ -824,6 +856,48 @@ export function isUnanswerableSuggestion(question, { lastText = "", latestUserMe
   // Discount/loyalty mechanics the bot cannot verify.
   if (SUGG_DISCOUNT_MECHANICS_RE.test(q) && SUGG_MECHANICS_QUALIFIER_RE.test(q)) {
     return { unanswerable: true, reason: "discount mechanics the bot can't verify" };
+  }
+
+  // Color-redundancy / color-already-denied. The Haiku that drafts
+  // suggestions often proposes "Do you have these in <color>?" when
+  // the assistant just (a) showed products in that color or (b) said
+  // "I couldn't find exact <color>". Both shapes are non-answers:
+  // the bot can only confirm what's on screen or repeat its denial.
+  //
+  // Detection is generic — pull the color the suggestion is asking
+  // for and check the assistant's last text for either an explicit
+  // denial or a positive mention of the same color (or a common
+  // synonym for white/black/brown/red where merchants name shades
+  // with color-adjacent words like "ivory", "charcoal", "cognac").
+  const sCol = q.match(SUGG_COLOR_REQUEST_RE);
+  if (sCol) {
+    const color = sCol[1].toLowerCase();
+    const COLOR_SYNONYMS = {
+      white: ["ivory", "cream", "off-white", "off white", "eggshell"],
+      black: ["charcoal", "jet", "onyx"],
+      brown: ["cognac", "tan", "chestnut", "mocha", "espresso", "coffee"],
+      red: ["burgundy", "crimson", "wine", "ruby"],
+      blue: ["navy", "cobalt", "indigo"],
+      gray: ["grey", "slate", "charcoal"],
+      grey: ["gray", "slate", "charcoal"],
+      pink: ["rose", "blush", "fuchsia", "magenta"],
+      purple: ["eggplant", "plum", "lavender", "violet"],
+    };
+    const checkWords = [color, ...(COLOR_SYNONYMS[color] || [])];
+    for (const w of checkWords) {
+      const escaped = w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const deniedRe = new RegExp(
+        `(?:couldn'?t\\s+find|no\\s+exact|don'?t\\s+have|can'?t\\s+find|cannot\\s+find|not\\s+available)[^.!?\\n]{0,40}\\b${escaped}\\b`,
+        "i",
+      );
+      if (deniedRe.test(lastLower)) {
+        return { unanswerable: true, reason: `assistant just denied ${color}` };
+      }
+      const shownRe = new RegExp(`\\b${escaped}\\b`, "i");
+      if (shownRe.test(lastLower)) {
+        return { unanswerable: true, reason: `assistant already shown ${color} (or synonym)` };
+      }
+    }
   }
 
   // Catalog-attribute existence check — the generic answer to "would
