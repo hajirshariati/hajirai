@@ -490,14 +490,24 @@ async function runPolicyTurnDispatch({ ctx, controller, encoder, retrievedChunks
   if (!out) return null;
   if (out.decline) return { declined: true, diagnostics: out.diagnostics };
 
-  // Emit text → products(empty) → done. products empty so any
-  // stale cards left over from a prior product turn clear.
-  // Policy answers never carry cards.
+  // Emit text → products(empty) → cta? → suggestions? → done.
+  // products empty so any stale cards left over from a prior
+  // product turn clear. Policy answers never carry cards.
+  //
+  // Follow-up suggestions (quick-reply chips) come from the
+  // policy engine's deterministic per-intent list — no LLM call
+  // for this path. Customer always has an obvious next step.
   const text = String(out.answerText || "").trim();
   controller.enqueue(encoder.encode(sseChunk({ type: "text", text })));
   controller.enqueue(encoder.encode(sseChunk({ type: "products", products: [] })));
   if (out.cta) {
     controller.enqueue(encoder.encode(sseChunk({ type: "cta", cta: out.cta })));
+  }
+  if (Array.isArray(out.followUps) && out.followUps.length > 0) {
+    controller.enqueue(encoder.encode(sseChunk({
+      type: "suggestions",
+      questions: out.followUps,
+    })));
   }
   controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
   return {

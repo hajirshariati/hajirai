@@ -1336,6 +1336,68 @@ await test("25d — empty extracted produces no acknowledgment", () => {
 });
 
 // ──────────────────────────────────────────────────────────────
+// 25e-h — Live 2026-06-03 ack-repeat bug.
+// Haiku re-extracts condition=foot_pain on EVERY gate click after
+// the customer first said "foot pain". buildAcknowledgmentPrefix
+// would then prepend "Got it — foot pain. An orthotic can
+// definitely help with that." to the gender chip, use-case chip,
+// arch chip, etc. — same condolence on every turn. Fix:
+// acknowledge only NEW attributes (not in accumulated answers).
+// ──────────────────────────────────────────────────────────────
+
+await test("25e — re-extracted condition already in answers does NOT re-ack", () => {
+  // Customer first said "foot pain" → answers.condition='foot_pain'.
+  // Next gate turn: customer clicked the "Women" chip. Haiku re-
+  // extracted condition=foot_pain from the same conversation
+  // history. The ack must NOT fire — we already acknowledged this.
+  const out = buildAcknowledgmentPrefix({
+    latestExtracted: { gender: "women", condition: "foot_pain" },
+    rawUserText: "Women",
+    answers: { condition: "foot_pain" }, // ← already known
+  });
+  // Gender is new; condition is not. Ack should reflect only the
+  // new gender, and gender alone doesn't get the orthotic-can-help
+  // tail (test 25a).
+  assert.doesNotMatch(out, /foot pain/i,
+    `must NOT re-ack a condition already in accumulated answers; got "${out}"`);
+  assert.doesNotMatch(out, /orthotic can definitely help/i,
+    `must NOT emit the helpable-problem tail; got "${out}"`);
+});
+
+await test("25f — re-extracted useCase already in answers does NOT re-ack", () => {
+  const out = buildAcknowledgmentPrefix({
+    latestExtracted: { useCase: "dress_no_removable" },
+    rawUserText: "Flat / Low",
+    answers: { useCase: "dress_no_removable" },
+  });
+  assert.equal(out, "", `must NOT re-ack a useCase already known; got "${out}"`);
+});
+
+await test("25g — first-time condition click STILL acks (regression of regression)", () => {
+  // Don't over-correct: a fresh condition click on a turn where it
+  // wasn't yet in accumulated must still produce the friendly ack.
+  const out = buildAcknowledgmentPrefix({
+    latestExtracted: { condition: "plantar_fasciitis" },
+    rawUserText: "Plantar Fasciitis",
+    answers: { gender: "women" }, // no prior condition
+  });
+  assert.match(out, /plantar fasciitis/i);
+  assert.match(out, /orthotic can definitely help with that/i);
+});
+
+await test("25h — value CHANGE counts as new (treat as a fresh ack)", () => {
+  // Customer originally said "foot pain"; later clicked
+  // "Plantar Fasciitis" (more specific). The new VALUE is genuinely
+  // new even though the key has a prior value.
+  const out = buildAcknowledgmentPrefix({
+    latestExtracted: { condition: "plantar_fasciitis" },
+    rawUserText: "Plantar Fasciitis",
+    answers: { condition: "foot_pain" },
+  });
+  assert.match(out, /plantar fasciitis/i);
+});
+
+// ──────────────────────────────────────────────────────────────
 // 26. Live 2026-06-03: classifier-gender contamination on a
 //     CONDITION chip click triggered subject-pivot reset and
 //     re-asked q_arch. Customer walked Men → Dress shoes → Flat/Low

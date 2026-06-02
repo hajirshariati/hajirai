@@ -335,6 +335,104 @@ await test("PE-20 — composePolicyAnswer empty + supportUrl emits link", () => 
 });
 
 // ──────────────────────────────────────────────────────────────
+// PE-21..PE-24 — Live 2026-06-03 missing-CTA / no-quick-replies bug.
+// Policy answers shipped with no Contact-support button and no
+// follow-up chips, so the customer had no obvious next action.
+// ──────────────────────────────────────────────────────────────
+
+await test("PE-21 — runPolicyTurn emits a contact CTA when supportUrl is configured", async () => {
+  const out = await runPolicyTurn(
+    { ...ctxBase, latestUserMessage: "what is your return policy?" },
+    {
+      forceEnable: true,
+      retrievedChunks: [
+        chunk({ similarity: 0.7, fileType: "faqs", sectionTitle: "Returns", content: "30-day return window." }),
+      ],
+    },
+  );
+  assert.ok(out.cta, `expected a CTA when supportUrl is configured; got null`);
+  assert.equal(out.cta.url, ctxBase.supportUrl);
+  assert.match(out.cta.label, /support|customer/i);
+  assert.equal(out.cta.scopeSource, "policy_support_url");
+});
+
+await test("PE-22 — no supportUrl configured → no CTA emitted (we don't invent a URL)", async () => {
+  const out = await runPolicyTurn(
+    { shop: "fixture.myshopify.com", latestUserMessage: "what is your return policy?" },
+    {
+      forceEnable: true,
+      retrievedChunks: [
+        chunk({ similarity: 0.7, fileType: "faqs", sectionTitle: "Returns", content: "30-day return window." }),
+      ],
+    },
+  );
+  assert.equal(out.cta, null,
+    `with no supportUrl configured, CTA must be null (we don't invent URLs); got ${JSON.stringify(out.cta)}`);
+});
+
+await test("PE-23 — runPolicyTurn emits deterministic per-intent follow-up suggestions", async () => {
+  for (const [q, intentKey] of [
+    ["what is your return policy?", "return_policy"],
+    ["how long does shipping take?", "shipping"],
+    ["do you have a warranty?", "warranty"],
+    ["do you offer discounts?", "discounts"],
+  ]) {
+    const out = await runPolicyTurn(
+      { ...ctxBase, latestUserMessage: q },
+      { forceEnable: true, retrievedChunks: [] },
+    );
+    assert.ok(Array.isArray(out.followUps),
+      `${intentKey}: expected followUps array; got ${typeof out.followUps}`);
+    assert.ok(out.followUps.length >= 2,
+      `${intentKey}: expected ≥2 follow-up chips; got ${out.followUps.length}`);
+    for (const chip of out.followUps) {
+      assert.equal(typeof chip, "string");
+      assert.ok(chip.length > 5);
+    }
+  }
+});
+
+await test("PE-24 — follow-up chips are generic, NEVER product-specific or merchant-named", async () => {
+  // Audit the static chip lists for tokens that would lock the
+  // suggestions to a specific shop or product (Aetrex / sneaker /
+  // sandal / Maui / etc.). If a chip slips into that shape, this
+  // test catches it.
+  const FORBIDDEN_TOKENS = [
+    /\baetrex\b/i,
+    /\bsneakers?\b/i, /\bsandals?\b/i, /\bboots?\b/i, /\bwedges?\b/i,
+    /\bmaui\b/i, /\bjillian\b/i, /\bdanika\b/i,
+    /\bplantar\b/i, /\bbunions?\b/i, // medical claims belong in product turns
+  ];
+  const { POLICY_INTENT_PATTERNS } = __internals;
+  for (const intentKey of Object.keys(POLICY_INTENT_PATTERNS)) {
+    const out = await runPolicyTurn(
+      { ...ctxBase, latestUserMessage: synthMessage(intentKey) },
+      { forceEnable: true, retrievedChunks: [] },
+    );
+    for (const chip of out.followUps || []) {
+      for (const re of FORBIDDEN_TOKENS) {
+        assert.doesNotMatch(chip, re,
+          `intent=${intentKey} chip="${chip}" must not contain merchant/product-specific token ${re}`);
+      }
+    }
+  }
+});
+
+function synthMessage(intentKey) {
+  return {
+    return_policy: "what's your return policy?",
+    return_fee:    "is there a return fee?",
+    shipping:      "how long does shipping take?",
+    warranty:      "do you have a warranty?",
+    exchanges:     "can I exchange?",
+    tracking:      "where's my order?",
+    discounts:     "do you offer any discounts?",
+    services:      "do you offer fittings?",
+    terms:         "what are your terms of service?",
+  }[intentKey] || intentKey;
+}
+
+// ──────────────────────────────────────────────────────────────
 console.log("");
 if (failed === 0) {
   console.log(`PASS  ${passed} passed, 0 failed\n`);

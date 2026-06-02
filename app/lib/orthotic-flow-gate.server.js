@@ -294,15 +294,34 @@ export function buildAcknowledgmentPrefix({ latestExtracted, rawUserText, answer
     return parts.length ? parts.join(" ") : "";
   }
 
+  // 2026-06-03 fix: only acknowledge attributes that are NEW to this
+  // turn — i.e. NOT already in accumulated `answers`. Haiku re-
+  // extracts long-lived signals on every gate click ("foot pain"
+  // surfaces on EVERY turn after the customer first said it), and
+  // without this guard the bot prepends "Got it — foot pain. An
+  // orthotic can definitely help with that." to the gender chip,
+  // the use-case chip, the arch chip, and so on. The customer reads
+  // the same condolence three times in a row and the bot looks
+  // broken. Acknowledge ONLY on the click that introduced the
+  // attribute.
+  const isNew = (key, value) => {
+    if (value == null || value === "") return false;
+    const prior = answers ? answers[key] : undefined;
+    if (prior == null) return true;
+    // Same value already known → not new (suppress re-ack).
+    if (String(prior).toLowerCase() === String(value).toLowerCase()) return false;
+    return true;
+  };
+
   const bits = [];
   let mentionedHelpableProblem = false;
   const cond = latestExtracted.condition;
-  if (typeof cond === "string" && cond && cond !== "none") {
+  if (typeof cond === "string" && cond && cond !== "none" && isNew("condition", cond)) {
     bits.push(humanizeCondition(cond));
     mentionedHelpableProblem = true;
   }
   const useCase = latestExtracted.useCase;
-  if (typeof useCase === "string" && useCase) {
+  if (typeof useCase === "string" && useCase && isNew("useCase", useCase)) {
     const phrase = humanizeUseCase(useCase);
     if (phrase) {
       bits.push(phrase);
@@ -313,7 +332,8 @@ export function buildAcknowledgmentPrefix({ latestExtracted, rawUserText, answer
   if (
     typeof gender === "string" &&
     gender &&
-    !cond && !useCase
+    !cond && !useCase &&
+    isNew("gender", gender)
   ) {
     // Only acknowledge gender alone if it's the only new info — otherwise
     // condition/useCase are more conversational signals to reflect.

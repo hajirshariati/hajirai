@@ -122,6 +122,13 @@ export async function runPolicyTurn(ctx = {}, options = {}) {
   });
   diagnostics.composer = composed.reason;
 
+  // Deterministic per-intent follow-up suggestions. These are
+  // shaped like the LLM follow-up generator's output so the SSE
+  // contract is identical — widget renders them as quick-reply
+  // chips. NEVER product-specific. NEVER medical advice.
+  const followUps = buildPolicyFollowUps(intent.primary);
+  diagnostics.followUps = followUps.length;
+
   // Policy turns NEVER emit product cards. Always set products=[]
   // so the SSE stream clears any stale carded state.
   return {
@@ -130,8 +137,69 @@ export async function runPolicyTurn(ctx = {}, options = {}) {
     products: [],
     answerText: composed.text,
     cta: composed.cta || null,
+    followUps,
     diagnostics,
   };
+}
+
+// Per-intent generic next-question chips. Code-owned (deterministic),
+// merchant-agnostic, and NEVER reference specific products. They give
+// the customer a natural next step after a policy answer without
+// requiring an LLM call.
+//
+// Intent shapes are organized so the next likely customer move is
+// covered. Add more here if a merchant flags a pattern as missing.
+const POLICY_FOLLOW_UPS = {
+  return_policy: [
+    "Is there a return fee?",
+    "Can I exchange instead?",
+    "How do I start a return?",
+  ],
+  return_fee: [
+    "What's your return window?",
+    "Do you offer free returns on defective items?",
+    "How do I start a return?",
+  ],
+  shipping: [
+    "Do you offer expedited shipping?",
+    "Can I track my order?",
+    "Do you ship internationally?",
+  ],
+  warranty: [
+    "What does the warranty cover?",
+    "How do I file a warranty claim?",
+    "Is there a guarantee on fit?",
+  ],
+  exchanges: [
+    "How long do I have to exchange?",
+    "Is there an exchange fee?",
+    "What's your return policy?",
+  ],
+  tracking: [
+    "When will my order arrive?",
+    "Can I change my delivery address?",
+    "What if my package is lost?",
+  ],
+  discounts: [
+    "Do you have a first-time customer discount?",
+    "Is there a sale or clearance section?",
+    "Do you offer free shipping?",
+  ],
+  services: [
+    "Do you offer fitting consultations?",
+    "Where are your stores located?",
+    "What's your warranty policy?",
+  ],
+  terms: [
+    "What's your return policy?",
+    "What's your privacy policy?",
+    "How do I contact support?",
+  ],
+};
+
+function buildPolicyFollowUps(intentKey) {
+  const list = POLICY_FOLLOW_UPS[intentKey];
+  return Array.isArray(list) ? list.slice(0, 3) : [];
 }
 
 export function selectRelevantChunks(chunks = [], intent) {
@@ -179,6 +247,18 @@ function intentMatchesTitle(intentKey, lowerTitle) {
 export function composePolicyAnswer({
   intent, relevant, supportUrl = "", supportLabel = "",
 }) {
+  // Contact-support CTA (rendered as a button by the widget).
+  // ONLY when supportUrl is configured — we NEVER invent a URL.
+  // Live failure 2026-06-03: policy answers shipped with no CTA
+  // at all; customer had no obvious next action.
+  const contactCta = supportUrl
+    ? {
+        label: `Contact ${supportLabel || "customer support"}`,
+        url: supportUrl,
+        scopeSource: "policy_support_url",
+      }
+    : null;
+
   // No relevant chunks → honest "I don't have that specific
   // detail" line + a pointer to support if a URL is configured.
   // NEVER invent fees, windows, or covered defects.
@@ -192,7 +272,7 @@ export function composePolicyAnswer({
         `I don't have the specific ${topic} detail in my notes.` +
         supportSuffix,
       reason: "no_relevant_knowledge",
-      cta: null,
+      cta: contactCta,
     };
   }
 
@@ -215,7 +295,7 @@ export function composePolicyAnswer({
   return {
     text,
     reason: confident ? "knowledge_confident" : "knowledge_weak_match",
-    cta: null,
+    cta: contactCta,
   };
 }
 
