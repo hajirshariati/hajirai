@@ -2448,9 +2448,17 @@ export function extractProductCards(name, result, ctx = null) {
   // Canonical claim-facts builder — single source of truth for the
   // verifier-side per-card facts. Every emit path below must funnel
   // through attachClaimFactsToCard so the verifier never sees an
-  // ad-hoc subset. shopContext.shop drives brand-rules (e.g. Aetrex's
-  // archSupportFromFootwearCategory). See app/lib/product-claim-facts.server.js.
-  const shopContext = { shop: ctx?.shop || null };
+  // ad-hoc subset.
+  //
+  // shopContext.claimConfig carries the merchant's DB-backed
+  // ClaimRule / CategoryGroup / ColorFamily rows (loaded once per
+  // chat request in chat.jsx and parked on ctx). Without it, the
+  // archSupport builder degrades to title/description/footbed scan
+  // only — never falls back to a hardcoded shop allowlist.
+  const shopContext = {
+    shop: ctx?.shop || null,
+    claimConfig: ctx?.claimConfig || null,
+  };
   const facts = (canonical) => attachClaimFactsToCard(canonical, shopContext);
 
   if (name === "search_products" && Array.isArray(result.products)) {

@@ -340,6 +340,89 @@ async function dispatchTool(name, input, ctx) {
   return await executeTool(rewritten.name, rewritten.input, ctx);
 }
 
+// Phase 1 dispatcher for the Product Turn Engine. Returns:
+//   { handled: true, ... }   — engine emitted text/products/done; caller returns.
+//   { declined: true, ... }  — engine declined (named-product, compare, no
+//                              category). Caller falls through to the
+//                              existing agent path unchanged.
+//   null                     — engine flag is OFF or could not run; caller
+//                              proceeds with the existing path.
+//
+// searchFn translates the engine's scope into a single
+// search_products call via the existing dispatchTool — we do NOT
+// build a second search system. Color-family expansion is honored:
+// when scope.colorFamily is present we widen the search by passing
+// the family color list into the existing filters.color shape that
+// search_products already supports (single canonical color), and
+// the engine's selection layer then prefers exact-color matches.
+async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig }) {
+  const enabled = String(process.env.PRODUCT_TURN_ENGINE_ENABLED || "").toLowerCase() === "true";
+  if (!enabled) return null;
+
+  // Dynamic import keeps RR's client bundler from following the
+  // prisma-touching module chain into the client build.
+  const { runProductTurn } = await import("../lib/product-turn-engine.server");
+
+  const searchFn = async (scope) => {
+    const limit = ctx?.productCardCap || 6;
+    const filters = {};
+    if (scope.gender) filters.gender = scope.gender;
+    if (scope.category) filters.category = scope.category;
+    if (scope.color) filters.color = scope.color;
+    const queryParts = [
+      scope.condition,
+      scope.color,
+      scope.category,
+      scope.useCase,
+    ].filter(Boolean);
+    const query = queryParts.length > 0
+      ? queryParts.join(" ").trim()
+      : (scope.rawMessage || "").slice(0, 160);
+    const input = { query, filters, limit };
+    let result;
+    try {
+      result = await dispatchTool("search_products", input, ctx);
+    } catch (err) {
+      console.warn(`[product-turn-engine] searchFn failed: ${err?.message || err}`);
+      return [];
+    }
+    if (!result || result.error || !Array.isArray(result.products)) return [];
+    // Engine consumes the canonical Shopify-shaped product objects
+    // (title, handle, productType, description, tags, attributes,
+    // price, compareAtPrice). search_products already returns this
+    // shape — pass through unmodified so attachClaimFactsToCard
+    // sees the same input it would in the existing path.
+    return result.products;
+  };
+
+  let out;
+  try {
+    out = await runProductTurn(ctx, { searchFn, claimConfig });
+  } catch (err) {
+    console.error(`[product-turn-engine] runProductTurn threw: ${err?.stack || err?.message || err}`);
+    return null;
+  }
+  if (!out) return null;
+  if (out.decline) return { declined: true, diagnostics: out.diagnostics };
+
+  // Emit text → products → done. Engine output is true-by-
+  // construction — bypass postprocessors that could zero it out.
+  const text = String(out.answerText || "").trim();
+  const products = Array.isArray(out.products) ? out.products : [];
+  controller.enqueue(encoder.encode(sseChunk({ type: "text", text })));
+  controller.enqueue(encoder.encode(sseChunk({ type: "products", products })));
+  if (out.cta) {
+    controller.enqueue(encoder.encode(sseChunk({ type: "cta", cta: out.cta })));
+  }
+  controller.enqueue(encoder.encode(sseChunk({ type: "done" })));
+  return {
+    handled: true,
+    answerText: text,
+    products,
+    diagnostics: out.diagnostics,
+  };
+}
+
 // Guard against denial-recovery firing on policy/discount/return
 // questions where the AI's "we don't have/offer X" is a legitimate
 // answer about merchant policy, NOT a hallucinated product
@@ -2498,7 +2581,7 @@ export const action = async ({ request }) => {
       }
     }
 
-    let [knowledge, attrMappings, catalogProductTypes, allCatalogCategories, categoryGenderMap, categoryAttributeCoverage, activeCampaigns] = await Promise.all([
+    let [knowledge, attrMappings, catalogProductTypes, allCatalogCategories, categoryGenderMap, categoryAttributeCoverage, activeCampaigns, claimConfig] = await Promise.all([
       getKnowledgeFilesWithContent(session.shop),
       getAttributeMappings(session.shop),
       getCatalogCategories(session.shop, { gender: sessionGender }),
@@ -2506,6 +2589,20 @@ export const action = async ({ request }) => {
       getCategoryGenderAvailability(session.shop),
       getCategoryAttributeCoverage(session.shop),
       getActiveCampaigns(session.shop),
+      // Merchant-data-driven claim rules / category groups / color
+      // families. Loaded once per request and parked on ctx so every
+      // emit path (extractProductCards, the Product Turn Engine, the
+      // composer) sees the same merchant config. First request per
+      // shop auto-seeds DEFAULT_SEED_* rows; subsequent requests are
+      // a cache hit. Dynamic import keeps RR's client bundler from
+      // trying to follow the prisma-touching module chain into the
+      // client build.
+      import("../lib/merchant-claim-config.server")
+        .then((m) => m.getMerchantClaimConfig(session.shop))
+        .catch((err) => {
+          console.warn(`[chat] claim-config load failed for ${session.shop}: ${err?.message || err}`);
+          return null;
+        }),
     ]);
 
     // Aetrex-specific suppressed categories. These exist in the live
@@ -2831,6 +2928,12 @@ export const action = async ({ request }) => {
       shopConfig: config,
       fullCatalogCategories: allCatalogCategories,
       categoryGenderMap,
+      // Merchant-data-driven claim rules / category groups / color
+      // families. Parked on ctx so extractProductCards, the Product
+      // Turn Engine, and the composer all see the same merchant
+      // config without re-querying. May be null if the DB call
+      // failed; downstream paths degrade to scan-only.
+      claimConfig,
       latestUserMessage: String(body.message || ""),
       priorProductCards,
       allPriorProductCards,
@@ -3135,6 +3238,45 @@ export const action = async ({ request }) => {
                   `injected force-search directive into system prompt.`,
               );
             }
+          }
+
+          // ──────────────────────────────────────────────────────────
+          // Phase 1 — Product Turn Engine dispatch
+          //
+          // For clear claim-carrying product retrieval turns, the
+          // engine OWNS the answer: scope → retrieve → attach facts
+          // → group variants → select by proof → compose seller-
+          // spirit copy. No LLM agent loop, no verifier round-trip.
+          // The engine declines (returns null/decline=true) for
+          // named-product, compare-shape, and category-less turns —
+          // those fall through to the existing agent path below
+          // unchanged.
+          //
+          // Default OFF: requires PRODUCT_TURN_ENGINE_ENABLED=true.
+          // Engine searchFn reuses dispatchTool("search_products",
+          // …) so we don't build a second search system.
+          //
+          // ──────────────────────────────────────────────────────────
+          const engineResult = await runProductTurnDispatch({
+            ctx, controller, encoder, claimConfig,
+          });
+          if (engineResult && engineResult.handled) {
+            console.log(
+              `[product-turn-engine] handled shop=${ctx.shop} ` +
+                `families=${engineResult.diagnostics?.rungs?.join("|") || "-"} ` +
+                `selection=${engineResult.diagnostics?.selectionReason || "-"} ` +
+                `composer=${engineResult.diagnostics?.composer || "-"} ` +
+                `textLen=${engineResult.answerText?.length || 0} ` +
+                `cards=${engineResult.products?.length || 0}`,
+            );
+            return; // engine emitted text+products+done; no agent loop.
+          }
+          if (engineResult && engineResult.declined) {
+            console.log(
+              `[product-turn-engine] declined shop=${ctx.shop} ` +
+                `rungs=${(engineResult.diagnostics?.rungs || []).join("|") || "-"} — ` +
+                `falling through to agent path`,
+            );
           }
 
           // Haiku→Sonnet escalation (cost-optimized mode only). On a

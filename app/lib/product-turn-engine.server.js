@@ -91,10 +91,17 @@ export async function runProductTurn(ctx = {}, options = {}) {
 
   // 3. Attach facts. Cards without _claimFacts after this step are
   // a regression — log and drop.
+  //
+  // attachClaimFactsToCard returns ONLY the projected fact fields
+  // (_conditionTags / _archSupport / _claimFacts / etc), not the
+  // original UI fields (title, handle, image, url, price). The
+  // engine output goes straight to the SSE emit and needs those
+  // fields to render product cards — spread the candidate first,
+  // then layer the fact fields on top.
   const cardsWithFacts = [];
   const droppedNoFacts = [];
   for (const cand of rawCandidates) {
-    const card = attachClaimFactsToCard(cand, { shop: ctx.shop, claimConfig });
+    const card = { ...cand, ...attachClaimFactsToCard(cand, { shop: ctx.shop, claimConfig }) };
     if (!card._claimFacts) {
       droppedNoFacts.push(cand?.handle || cand?.title || "?");
       continue;
