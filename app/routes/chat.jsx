@@ -1791,6 +1791,33 @@ async function runAgenticLoop({ anthropic, model, systemPrompt, messages, ctx, c
     }
   }
 
+  // Last-resort guard — runs AFTER every response-contract repair
+  // (repairProductTurnAssembly, verifyClaimsAgainstCards,
+  // buildCodeOwnedProductListingText, stripUnsafeInlineChips,
+  // ensureCompleteCustomerText) and is the LAST text mutation before
+  // the SSE emit. If any of those guards regress or a future repair
+  // is inserted upstream that drops text to zero, this catches it
+  // so the customer never sees empty prose under a card pool.
+  //
+  // Production trace (2026-06-02 14:21:18 UTC): repairProductTurnAssembly
+  // reduced 149 → 0 chars via verified_claims(unverified_universal:
+  // arch support), and the emit shipped textLen=0 poolSize=6. This
+  // guard is the final invariant: poolSize>0 ⟹ textLen>0.
+  if (pool.length > 0 && !String(fullResponseText || "").trim()) {
+    const listing = buildCodeOwnedProductListingText({
+      text: "",
+      cards: pool,
+      ctx,
+      recommenderInvoked: false,
+    });
+    fullResponseText = (listing.text && listing.text.trim())
+      || "Here are the closest styles I found.";
+    console.warn(
+      `[chat] empty-text final guard recovered after response-contract pool=${pool.length} ` +
+        `len=${fullResponseText.length} reason=${listing.reason || "static_fallback"}`,
+    );
+  }
+
   console.log(`[chat] emit textLen=${fullResponseText.length} poolSize=${pool.length} searchAttempted=${productSearchAttempted}`);
 
   // Cost-mode observability (no behavior change): which model handled the

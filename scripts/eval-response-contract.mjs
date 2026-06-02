@@ -1074,6 +1074,54 @@ test("R57 — ensureCompleteCustomerText rescues whitespace-only input via fallb
   assert.equal(out.text, "Here are the matching styles I found.");
 });
 
+// ---------------------------------------------------------------------------
+// Production ordering: repairProductTurnAssembly internally invokes
+// verifyClaimsAgainstCards and can leave text="" with a non-empty pool.
+// The last-resort guard in chat.jsx then calls buildCodeOwnedProductListingText
+// with text="" and must produce a non-empty string from the pool alone.
+// R58 reproduces that exact call so the next defender can write the
+// invariant `pool>0 ⟹ textLen>0` without re-reading the chain.
+// ---------------------------------------------------------------------------
+test("R58 — repairProductTurnAssembly + verifier can zero text under pool>0 (matches live failure)", () => {
+  // Live trace: "Both have arch support and run wide." → 149→0 chars
+  // under unverified_universal:arch support against a mixed pool.
+  const cards = [
+    card({ title: "A", archSupport: true }),
+    card({ title: "B", archSupport: false }),
+    card({ title: "C", archSupport: true }),
+    card({ title: "D", archSupport: false }),
+    card({ title: "E", archSupport: true }),
+    card({ title: "F", archSupport: false }),
+  ];
+  const repair = repairProductTurnAssembly({
+    text: "All of these have arch support.",
+    pool: cards,
+    ctx: { sessionMemory: {} },
+  });
+  // Verifier strips the only sentence → text is empty.
+  assert.equal(String(repair.text || "").trim(), "");
+});
+
+test("R59 — buildCodeOwnedProductListingText('', pool) produces a non-empty listing line", () => {
+  // Mirrors the last-resort guard in chat.jsx after the verifier has
+  // zeroed text. With no AI prose AND no requested color, it must
+  // fall through to the neutral listing templates (NOT return text:'').
+  const cards = [
+    card({ title: "A" }),
+    card({ title: "B" }),
+    card({ title: "C" }),
+  ];
+  const out = buildCodeOwnedProductListingText({
+    text: "",
+    cards,
+    ctx: { sessionMemory: {} },
+    recommenderInvoked: false,
+  });
+  assert.ok(out.text && out.text.trim().length > 0,
+    `expected non-empty listing line; got text="${out.text}" reason=${out.reason}`);
+  assert.equal(out.changed, true);
+});
+
 if (failed > 0) {
   console.error("\nFailures:");
   for (const f of failures) console.error(`- ${f.name}: ${f.err.stack || f.err.message}`);
