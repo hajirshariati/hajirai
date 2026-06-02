@@ -225,6 +225,98 @@ await test("T15 — meta detection still fires when previous scope has color (no
 });
 
 // ---------------------------------------------------------------------------
+// Resolver bug #1 — category pivot must drop `condition` too. Orthotic
+// shopping established condition=plantar_fasciitis; pivoting to sneakers
+// must not leave the clinical condition tied to the new category.
+// ---------------------------------------------------------------------------
+await test("T16 — category pivot drops condition (orthotics+PF → sneakers must not carry PF)", () => {
+  const intent = resolveTurnIntent({
+    latestUserText: "show me sneakers instead",
+    previousScope: {
+      gender: "women",
+      category: "orthotics",
+      condition: "plantar_fasciitis",
+      arch: "low",
+    },
+  });
+  // 'instead' triggers the hard-pivot path (also acceptable);
+  // EITHER way, condition must end up in staleKeysToDrop.
+  assert.ok(intent.label === L.PIVOT_FULL || intent.label === L.PIVOT_CATEGORY);
+  assert.ok(
+    intent.staleKeysToDrop.includes("condition"),
+    `expected staleKeysToDrop to include 'condition'; got ${JSON.stringify(intent.staleKeysToDrop)}`,
+  );
+});
+
+await test("T16b — plain category pivot (no 'instead') still drops condition", () => {
+  // No HARD_PIVOT_RE / INSTEAD_PIVOT_RE keywords here — must take the
+  // category_pivot branch (rule 9), which now drops condition too.
+  const intent = resolveTurnIntent({
+    latestUserText: "what about clogs",
+    previousScope: {
+      gender: "women",
+      category: "orthotics",
+      condition: "plantar_fasciitis",
+    },
+  });
+  assert.equal(intent.label, L.PIVOT_CATEGORY);
+  assert.ok(intent.staleKeysToDrop.includes("condition"));
+});
+
+// ---------------------------------------------------------------------------
+// Resolver bug #2 — prior scope has only gender, customer names a new
+// category. This is a normal category request (REFINE / first mention),
+// NOT ambiguous, and there's nothing stale to drop.
+// ---------------------------------------------------------------------------
+await test("T17 — gender-only prior + new category mention is REFINE with no drops", () => {
+  const intent = resolveTurnIntent({
+    latestUserText: "show me clogs",
+    previousScope: { gender: "women" },
+  });
+  assert.notEqual(intent.label, L.AMBIGUOUS);
+  // Acceptable labels: REFINE (no prior category to invalidate) or
+  // PIVOT_CATEGORY (if the function chose to call it a pivot). Both
+  // must have empty staleKeysToDrop.
+  assert.ok(
+    intent.label === L.REFINE || intent.label === L.PIVOT_CATEGORY,
+    `expected REFINE or PIVOT_CATEGORY, got ${intent.label}`,
+  );
+  assert.deepEqual(intent.staleKeysToDrop, []);
+});
+
+// ---------------------------------------------------------------------------
+// Use-case / category conflict (preserves the prior session-memory rule).
+// ---------------------------------------------------------------------------
+await test("T18 — 'hiking shoes' after 'pink sandals' drops sandals+color (usecase conflict)", () => {
+  const intent = resolveTurnIntent({
+    latestUserText: "I need hiking shoes for italy",
+    previousScope: { gender: "women", category: "sandals", color: "pink" },
+  });
+  assert.equal(intent.label, L.PIVOT_FULL);
+  assert.equal(intent.reason, "usecase_category_conflict");
+  assert.ok(intent.staleKeysToDrop.includes("category"));
+  assert.ok(intent.staleKeysToDrop.includes("color"));
+});
+
+// ---------------------------------------------------------------------------
+// Gender pivot (not gender-only continuation) drops subject-bound scope.
+// ---------------------------------------------------------------------------
+await test("T19 — 'actually for my husband' is gender pivot; drops category/color", () => {
+  // Note: this test exercises the direct gender-extraction case;
+  // recipient handling stays in session-memory but the gender pivot
+  // detection here is the deeper signal.
+  const intent = resolveTurnIntent({
+    latestUserText: "actually men's please",
+    previousScope: { gender: "women", category: "sandals", color: "black" },
+    extractedUserConstraints: { gender: "men" },
+  });
+  assert.equal(intent.label, L.PIVOT_FULL);
+  assert.ok(intent.staleKeysToDrop.includes("category"));
+  assert.ok(intent.staleKeysToDrop.includes("color"));
+  assert.ok(!intent.staleKeysToDrop.includes("gender"));
+});
+
+// ---------------------------------------------------------------------------
 // Summary
 // ---------------------------------------------------------------------------
 console.log(`\n${passed} passed, ${failed} failed`);

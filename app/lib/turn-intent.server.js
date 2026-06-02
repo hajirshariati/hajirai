@@ -110,9 +110,13 @@ const LABEL = Object.freeze({
 });
 
 // Keys that belong to "the current category bucket" — if the
-// category changes, these are stale.
+// category changes, these are stale. `condition` is here too: a
+// clinical condition was named relative to the prior category
+// (e.g. "plantar fasciitis sneakers" → category=sneakers,
+// condition=plantar_fasciitis), so when the customer pivots to a
+// new category the condition pairing is no longer guaranteed.
 const CATEGORY_BOUND_KEYS = [
-  "color", "size", "width", "useCase", "arch", "overpronation", "specificProduct",
+  "color", "size", "width", "condition", "useCase", "arch", "overpronation", "specificProduct",
 ];
 
 // Keys that belong to "the current subject (gender)" — if the
@@ -122,6 +126,23 @@ const SUBJECT_BOUND_KEYS = [
   "category", "color", "size", "width",
   "condition", "useCase", "arch", "overpronation", "specificProduct",
 ];
+
+// Use-cases that are physically incompatible with certain
+// categories. When a new turn names a use-case in this map AND the
+// carried category is in its conflict set, the customer's need has
+// changed — the old category and its bound facts must NOT ride
+// along. Kept tight: only clear contradictions, so normal
+// refinements ("sneakers" + "for running") are untouched.
+const ATHLETIC_INCOMPATIBLE_CATEGORIES = [
+  "sandals", "wedges-heels", "slippers", "mary-janes",
+  "loafers", "oxfords", "clogs",
+];
+const USECASE_CATEGORY_CONFLICTS = {
+  hiking: new Set(ATHLETIC_INCOMPATIBLE_CATEGORIES),
+  running: new Set(ATHLETIC_INCOMPATIBLE_CATEGORIES),
+  athletic: new Set(ATHLETIC_INCOMPATIBLE_CATEGORIES),
+  dress: new Set(["sneakers", "slippers", "clogs", "slip-ons"]),
+};
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -308,9 +329,20 @@ export function resolveTurnIntent({
 
   // -----------------------------------------------------------------------
   // 6. Gender-only continuation ("how about mens?"). Carry category
-  //    and color through; only gender changes.
+  //    and color through; only gender changes. Requires extracted
+  //    gender and no other category-bound facts extracted (otherwise
+  //    it's not "gender-only").
   // -----------------------------------------------------------------------
-  if (GENDER_ONLY_CONTINUATION_RE.test(text)) {
+  const prevGender = normStr(prev.gender);
+  const newGender = normStr(extracted.gender);
+  if (
+    GENDER_ONLY_CONTINUATION_RE.test(text) &&
+    newGender &&
+    !extracted.category &&
+    !extracted.color &&
+    !extracted.size &&
+    !extracted.width
+  ) {
     return {
       label: LABEL.CONTINUE,
       confidence: 0.9,
@@ -320,11 +352,48 @@ export function resolveTurnIntent({
   }
 
   // -----------------------------------------------------------------------
-  // 7. Category pivot: customer named a category that differs from
-  //    the carried one. Drop category-bound facts.
+  // 7. Gender pivot (not gender-only continuation). The customer
+  //    named a new gender after one was already established. Drop
+  //    subject-bound scope (category, color, size, condition, etc.).
+  // -----------------------------------------------------------------------
+  if (newGender && prevGender && newGender !== prevGender) {
+    const drop = SUBJECT_BOUND_KEYS.filter((k) => prev[k] != null);
+    return {
+      label: LABEL.PIVOT_FULL,
+      confidence: 0.85,
+      reason: "gender_pivot",
+      staleKeysToDrop: drop,
+    };
+  }
+
+  // -----------------------------------------------------------------------
+  // 8. Use-case conflict with carried category. Customer named an
+  //    activity/occasion incompatible with the current category but
+  //    did NOT name a new category this turn ("hiking" while
+  //    category=sandals). Treat as implicit category pivot.
   // -----------------------------------------------------------------------
   const prevCategory = normStr(prev.category);
   const newCategory = normStr(extracted.category);
+  const newUseCase = normStr(extracted.useCase);
+  if (
+    !newCategory &&
+    newUseCase &&
+    prevCategory &&
+    USECASE_CATEGORY_CONFLICTS[newUseCase]?.has(prevCategory)
+  ) {
+    const drop = ["category", ...CATEGORY_BOUND_KEYS].filter((k) => prev[k] != null);
+    return {
+      label: LABEL.PIVOT_FULL,
+      confidence: 0.85,
+      reason: "usecase_category_conflict",
+      staleKeysToDrop: drop,
+    };
+  }
+
+  // -----------------------------------------------------------------------
+  // 9. Category pivot: customer named a category that differs from
+  //    the carried one. Drop category-bound facts.
+  // -----------------------------------------------------------------------
   if (newCategory && prevCategory && newCategory !== prevCategory) {
     const proposed = { ...prev, category: newCategory };
     for (const k of CATEGORY_BOUND_KEYS) delete proposed[k];
@@ -337,6 +406,20 @@ export function resolveTurnIntent({
       confidence: valid === false ? 0.55 : 0.9,
       reason: valid === false ? "category_pivot_unverified" : "category_pivot",
       staleKeysToDrop: drop,
+    };
+  }
+
+  // -----------------------------------------------------------------------
+  // 9b. Category first mention — customer named a category and there
+  //     was none before. Refine on top of existing subject scope.
+  //     No drops (there's no prior category-bound scope to invalidate).
+  // -----------------------------------------------------------------------
+  if (newCategory && !prevCategory) {
+    return {
+      label: LABEL.REFINE,
+      confidence: 0.9,
+      reason: "category_first_mention",
+      staleKeysToDrop: [],
     };
   }
 

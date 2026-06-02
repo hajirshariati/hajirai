@@ -37,6 +37,7 @@
 import { extractUserConstraints } from "./catalog-resolver.server.js";
 import { detectRejectedCategories } from "./chat-postprocessing.js";
 import { extractChoiceEvents } from "./choice-events.server.js";
+import { resolveTurnIntent } from "./turn-intent.server.js";
 
 const SCALAR_KEYS = [
   "gender", "category", "color", "size", "width",
@@ -44,75 +45,21 @@ const SCALAR_KEYS = [
   "specificProduct",
 ];
 
-// Scope that is owned by a specific gender. When the gender pivots,
-// these get moved to `stale`.
+// Scope that is owned by a specific gender. Kept for recipient-
+// without-gender handling (e.g. "for my partner") which is a
+// separate signal from the linguistic pivot detection in
+// turn-intent and reads off this list to stale-move subject scope.
 const SUBJECT_PIVOT_KEYS = [
   "category", "color", "size", "width",
   "condition", "useCase", "arch", "overpronation",
   "specificProduct",
 ];
 
-// Scope that is owned by a specific category. When category pivots,
-// these get moved to `stale`. useCase, arch, overpronation, and
-// condition are all clinical/contextual attributes tied to a
-// product type — they shouldn't bleed across category changes (e.g.
-// `useCase=athletic` from an orthotic-shopping turn must not carry
-// into a heels-shopping turn). Color/size/width are also category-
-// specific in catalog terms: the set of valid colors for heels
-// differs from sneakers.
-const CATEGORY_BOUND_KEYS = [
-  "color", "size", "width",
-  "condition", "useCase", "arch", "overpronation",
-  "specificProduct",
-];
-
-// Use-cases that are physically incompatible with certain categories.
-// When a new turn states one of these use-cases and the carried
-// category is in its conflict set, the customer's need has changed —
-// the old category (and its color/size/etc.) is stale and must NOT
-// ride along. Production failure this fixes: "pink sandals" →
-// "hiking shoes for italy" returned pink sandals, because "hiking
-// shoes" extracts useCase=hiking with no category, so sandals+pink
-// silently carried over. You don't hike, run, or work out in
-// sandals/heels/slippers/loafers, and you don't wear sneakers to a
-// formal/wedding occasion. Kept deliberately tight — only clear
-// contradictions, so normal refinements (sneakers + "for running")
-// are untouched.
-const ATHLETIC_INCOMPATIBLE_CATEGORIES = [
-  "sandals", "wedges-heels", "slippers", "mary-janes",
-  "loafers", "oxfords", "clogs",
-];
-const USECASE_CATEGORY_CONFLICTS = {
-  hiking: new Set(ATHLETIC_INCOMPATIBLE_CATEGORIES),
-  running: new Set(ATHLETIC_INCOMPATIBLE_CATEGORIES),
-  athletic: new Set(ATHLETIC_INCOMPATIBLE_CATEGORIES),
-  dress: new Set(["sneakers", "slippers", "clogs", "slip-ons"]),
-};
-
 // Recipient → gender heuristic. The mapping is deliberately
 // conservative — "partner", "friend", "coworker", "spouse" don't
 // imply a gender, so they reset scope without setting one.
 const RECIPIENT_RE =
   /\b(?:for|gift\s+for|shopping\s+for|to\s+buy\s+for|my)\s+(wife|husband|partner|girlfriend|boyfriend|spouse|mom|mother|dad|father|son|daughter|child|kid|kids|grandma|grandpa|grandmother|grandfather|grandson|granddaughter|nephew|niece|sister|brother|aunt|uncle|friend|coworker)\b/i;
-
-// Broad scope-reset phrasing. When the customer says "anything",
-// "everything you have", "all your X", "show me whatever", or
-// "what else", they're explicitly widening the search. Carry-over
-// from prior turns (category, color, size, width, condition, etc.)
-// should be cleared so the resolver isn't artificially narrowed.
-// Gender stays — they're widening within a gender, not changing
-// subject.
-const BROAD_RESET_RE =
-  /\b(?:anything|everything(?:\s+you\s+(?:have|carry|sell))?|all\s+(?:of\s+)?your\s+\w+|all\s+your\s+stuff|show\s+me\s+(?:whatever|anything|everything|all)|what\s+else|something\s+else|other\s+(?:options|things|stuff))\b/i;
-
-// Gender-only comparative follow-up. This is NOT a new subject with
-// no context; it means "same thing, other gender" in shopping chat:
-//   "women's black sandals" → "how about mens?"
-// should become men's black sandals, not a fresh "what type?" ask.
-// Keep this narrower than "actually men's", which is a correction and
-// can reasonably clear prior category scope.
-const GENDER_ONLY_CONTINUATION_RE =
-  /\b(?:how|what)\s+about\s+(?:the\s+)?(?:men|mens|men['’]?s|women|womens|women['’]?s|male|female|boys?|girls?|kids?|children)\??\s*$/i;
 
 const RECIPIENT_TO_GENDER = {
   wife: "women", girlfriend: "women", mom: "women", mother: "women",
@@ -165,8 +112,13 @@ function pushFact(memory, key, value, source, turnIndex, confidence) {
   memory.facts.push({ key, value, source, turnIndex, confidence });
 }
 
-function moveScopeToStale(memory) {
-  for (const k of SUBJECT_PIVOT_KEYS) {
+// Apply the intent resolver's `staleKeysToDrop` decision: each
+// listed key is moved from explicit → stale so downstream consumers
+// see the cleaned scope and the diagnostic log retains the
+// invalidated value. Empty drop list is a no-op.
+function applyStaleDrops(memory, keys) {
+  if (!Array.isArray(keys) || keys.length === 0) return;
+  for (const k of keys) {
     if (memory.explicit[k] != null) {
       memory.stale[k] = memory.explicit[k];
       delete memory.explicit[k];
@@ -174,8 +126,12 @@ function moveScopeToStale(memory) {
   }
 }
 
-function moveCategoryScopeToStale(memory) {
-  for (const k of CATEGORY_BOUND_KEYS) {
+// Move every subject-bound key to stale. Used for the recipient-
+// without-gender path ("for my partner"), which still implies a
+// subject switch even though the recipient word doesn't disambiguate
+// gender. Resolved separately from the linguistic intent path.
+function staleAllSubjectBound(memory) {
+  for (const k of SUBJECT_PIVOT_KEYS) {
     if (memory.explicit[k] != null) {
       memory.stale[k] = memory.explicit[k];
       delete memory.explicit[k];
@@ -204,12 +160,6 @@ function clearAcceptedCategoryRejection(rejectedSet, category) {
   rejectedSet.delete(cat);
   if (cat.endsWith("s")) rejectedSet.delete(cat.slice(0, -1));
   else rejectedSet.delete(`${cat}s`);
-}
-
-function isGenderOnlyContinuation(text, extracted, recipient) {
-  if (!text || !extracted?.gender || recipient?.matched) return false;
-  if (!GENDER_ONLY_CONTINUATION_RE.test(text)) return false;
-  return SUBJECT_PIVOT_KEYS.every((key) => extracted[key] == null);
 }
 
 // Classify the bot's OWN outgoing clarifier into the slot it asks about.
@@ -291,74 +241,35 @@ export function buildSessionMemory({ messages, classifiedIntent, resolverState }
       extracted.gender = recipient.gender;
     }
 
-    // 3. Subject pivot: gender change clears subject-owned scope.
-    const carryPriorScopeThroughGenderPivot = isGenderOnlyContinuation(text, extracted, recipient);
-    if (
-      memory.explicit.gender &&
-      extracted.gender &&
-      extracted.gender !== memory.explicit.gender &&
-      !carryPriorScopeThroughGenderPivot
-    ) {
-      moveScopeToStale(memory);
-    }
-    // 3b. Category pivot: category change clears category-owned
-    //     scope (useCase, color, size, width, condition, etc.).
-    //     Without this, `useCase=athletic` from a sneaker turn bleeds
-    //     into a heels turn where it makes no sense.
-    if (
-      memory.explicit.category &&
-      extracted.category &&
-      extracted.category !== memory.explicit.category
-    ) {
-      moveCategoryScopeToStale(memory);
-    }
-    // 3b-ii. Use-case → category conflict. The customer named a new
-    //        activity/occasion that's incompatible with the carried
-    //        category (e.g. "hiking" while category=sandals). Treat
-    //        like a category pivot: drop the now-stale category AND
-    //        its category-owned scope (color/size/etc.) so the
-    //        resolver re-searches on the new need instead of ANDing
-    //        an impossible combination. Only fires when THIS turn did
-    //        not itself name a category (that case is handled above).
-    if (
-      !extracted.category &&
-      extracted.useCase &&
-      memory.explicit.category &&
-      USECASE_CATEGORY_CONFLICTS[extracted.useCase]?.has(memory.explicit.category)
-    ) {
-      memory.stale.category = memory.explicit.category;
-      delete memory.explicit.category;
-      moveCategoryScopeToStale(memory);
-    }
-    // Recipient pivot without a derived gender (e.g. "for my partner")
-    // still resets the gender-owned scope so we don't carry the prior
-    // subject's category/size forward.
+    // 3. ONE authority for what this turn does to the prior scope.
+    //    resolveTurnIntent classifies the turn (pivot_full /
+    //    pivot_category / pivot_color / refine / continue / meta /
+    //    ambiguous) and returns the keys that the customer just
+    //    invalidated. Old per-trigger blocks (gender-only
+    //    continuation, category pivot, broad reset, use-case
+    //    conflict, pronoun back-reference) all live inside that
+    //    function now. The session-memory loop just applies the
+    //    decision.
+    const previousScope = { ...memory.explicit };
+    delete previousScope.rejectedCategories;
+    const intent = resolveTurnIntent({
+      latestUserText: text,
+      previousScope,
+      extractedUserConstraints: extracted,
+      choiceEvents: choiceEventsByTurn.get(i) || [],
+      turnIndex: i,
+    });
+    applyStaleDrops(memory, intent.staleKeysToDrop);
+
+    // 3b. Recipient pivot without a derived gender ("for my
+    //     partner"). This is a recipient-specific signal — the
+    //     intent resolver can't see it from text alone, so it stays
+    //     here as a separate step. Drops the entire subject-bound
+    //     scope plus gender.
     if (recipient.matched && !recipient.gender && memory.explicit.gender) {
-      moveScopeToStale(memory);
+      staleAllSubjectBound(memory);
       memory.stale.gender = memory.explicit.gender;
       delete memory.explicit.gender;
-    }
-
-    // 3c. Broad scope-reset phrasing: customer explicitly widens
-    //     the search ("anything", "everything you carry", "show me
-    //     all your shoes", "what else"). Drop category-bound carry-
-    //     over so the resolver is not artificially narrowed by a
-    //     prior turn. Gender stays — the customer is widening
-    //     within a gender, not changing subject. The extractor will
-    //     still apply any NEW constraints from this same message.
-    // "all of them / those / these" / "any of them" is a PRONOUN
-    // back-reference to a previously-shown or previously-mentioned set,
-    // not a "clear my filters" widening. Hunter trace (color-iteration):
-    // customer asked "show me all of them" meaning "all the colors I
-    // just named", and broad-reset wiped the color scope (scope-loss).
-    // Skip the reset in that case.
-    const PRONOUN_BACK_REF_RE = /\b(?:all|any|both)\s+of\s+(?:them|those|these|it)\b/i;
-    if (BROAD_RESET_RE.test(text) && !PRONOUN_BACK_REF_RE.test(text)) {
-      if (memory.explicit.category != null) {
-        memory.stale.category = memory.explicit.category;
-        delete memory.explicit.category;
-      }
-      moveCategoryScopeToStale(memory);
     }
 
     // 4. Apply extracted scalars (latest wins).
