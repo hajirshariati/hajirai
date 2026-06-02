@@ -13,74 +13,22 @@
 // backwards compatibility with the existing claim verifier, plus a
 // `_claimFacts` envelope for richer access (used by the missing-
 // proof log and path-parity tests).
+//
+// Merchant-data-driven brand rules:
+// archSupport/etc. live in `ClaimRule` rows resolved per-shop by
+// `merchant-claim-config.server.js`. The caller passes the resolved
+// config in via `shopContext.claimConfig` (loaded once per request
+// in chat.jsx). Without claimConfig, the builder degrades to
+// title/description/footbed scans only — never falls back to a
+// hardcoded shop-key dict.
 
+import { isCategoryInGroup, isCategoryInAnyGroup, findRule } from "./merchant-claim-config.server.js";
 import { __internals as catalogFactInternals, normalizeCategory } from "./catalog-facts.server.js";
 
 const {
   extractMerchantConditionTags,
   extractMerchantUseCaseTags,
 } = catalogFactInternals;
-
-// Brand-rules registry. Keyed by exact shop domain so a rule is
-// opt-in per shop. Currently hard-coded — when a multi-brand layer
-// ships, lift these into ShopSettings rows.
-//
-// archSupportFromFootwearCategory: when set, any product whose
-// canonical category is in FOOTWEAR_CATEGORIES carries
-// _archSupport=true even when the title/description didn't
-// literally name "arch support". Aetrex's brand positioning
-// guarantees built-in arch support on every footwear product, but
-// older catalog rows have sparse descriptions and lose the proof.
-//
-// Aetrex installs use multiple myshopify domains across prod and
-// staging (e.g. "f031fc-3.myshopify.com" surfaced in the 2026-06-02
-// Railway logs). The static keys below cover the known ones; new
-// shops can be added without a deploy via the env var
-// PRODUCT_CLAIM_FACTS_ARCH_SUPPORT_SHOPS (comma-separated).
-const STATIC_BRAND_RULES = {
-  "aetrex.myshopify.com":   { archSupportFromFootwearCategory: true },
-  "f031fc-3.myshopify.com": { archSupportFromFootwearCategory: true },
-};
-
-function envArchSupportShops() {
-  const raw = String(process.env.PRODUCT_CLAIM_FACTS_ARCH_SUPPORT_SHOPS || "").trim();
-  if (!raw) return [];
-  return raw.split(",").map((s) => s.toLowerCase().trim()).filter(Boolean);
-}
-
-function effectiveBrandRules() {
-  const map = { ...STATIC_BRAND_RULES };
-  for (const shop of envArchSupportShops()) {
-    map[shop] = { ...(map[shop] || {}), archSupportFromFootwearCategory: true };
-  }
-  return map;
-}
-
-const BRAND_RULES = effectiveBrandRules();
-
-const FOOTWEAR_CATEGORIES = new Set([
-  "sneakers",
-  "sandals",
-  "boots",
-  "loafers",
-  "oxfords",
-  "clogs",
-  "slip-ons",
-  "slippers",
-  "mary-janes",
-  "wedges-heels",
-]);
-
-const NON_FOOTWEAR_CATEGORIES = new Set(["orthotics", "accessories"]);
-
-function brandRule(shopContext) {
-  const shop = String(shopContext?.shop || "").toLowerCase();
-  // Re-read at call time so an env-var change is picked up without
-  // a process restart (also lets tests set PRODUCT_CLAIM_FACTS_…
-  // and call buildProductClaimFacts directly).
-  const rules = effectiveBrandRules();
-  return rules[shop] || {};
-}
 
 // Canonical product shape expected by the builder:
 //   {
@@ -254,13 +202,15 @@ function buildRemovableInsole(p) {
   return { value: null, source: "none", evidence: {} };
 }
 
-// Three-tier arch-support proof: explicit title/description scan,
-// merchant footbed attribute, brand-rule category fallback. The
-// last tier exists because Aetrex's "Built-In Arch Support" copy
-// got stripped from some product descriptions during a Shopify
-// import — the claim is true by brand positioning but the card-
-// level evidence vanished. Brand rule fires only when scoped to a
-// shop that opted in (BRAND_RULES).
+// Three-tier arch-support proof:
+//   1. explicit title/description scan,
+//   2. merchant footbed attribute,
+//   3. merchant-configured ClaimRule (category_group → applies/excludes).
+// Tier 3 is data-driven: it fires only when the shop has a
+// ClaimRule(claim='archSupport') row AND the product's category is
+// in the applies-to group (and not in an exclude group). No
+// hardcoded "Aetrex footwear categories" set anywhere — the
+// merchant's CategoryGroup rows are the source of truth.
 function buildArchSupport(p, shopContext, categoryFact) {
   const text = String(p.title || "") + " " + String(p.descriptionSnippet || p.description || "");
   if (/\barch\s+support\b/i.test(text)) {
@@ -275,22 +225,26 @@ function buildArchSupport(p, shopContext, categoryFact) {
   if (footbed.includes("arch") || footbed.includes("orthotic")) {
     return { value: true, source: "footbed_attribute", evidence: { footbed } };
   }
-  const rules = brandRule(shopContext);
-  if (rules.archSupportFromFootwearCategory) {
+  const config = shopContext?.claimConfig || null;
+  const rule = config ? findRule(config, "archSupport") : null;
+  if (rule && rule.ruleType === "category_group") {
     const category = categoryFact?.value || null;
-    if (category && FOOTWEAR_CATEGORIES.has(category)) {
-      return {
-        value: true,
-        source: "brand_rule_footwear_category",
-        evidence: { category, shop: shopContext?.shop || null },
-      };
-    }
-    if (category && NON_FOOTWEAR_CATEGORIES.has(category)) {
-      return {
-        value: false,
-        source: "brand_rule_non_footwear_category",
-        evidence: { category },
-      };
+    if (category && rule.appliesToGroup) {
+      const inExcluded = isCategoryInAnyGroup(config, category, rule.excludeGroups || []);
+      if (inExcluded) {
+        return {
+          value: false,
+          source: "claim_rule_exclude_group",
+          evidence: { category, excludeGroups: rule.excludeGroups || [] },
+        };
+      }
+      if (isCategoryInGroup(config, category, rule.appliesToGroup)) {
+        return {
+          value: true,
+          source: "claim_rule_category_group",
+          evidence: { category, group: rule.appliesToGroup, shop: shopContext?.shop || null },
+        };
+      }
     }
   }
   return { value: false, source: "none", evidence: {} };
@@ -342,7 +296,7 @@ export function claimSourcesChecked(claimKind, card) {
       return [
         "title_description_scan",
         "footbed_attribute",
-        "brand_rule_footwear_category",
+        "claim_rule_category_group",
       ];
     case "waterFriendly":
       return ["title_description_scan"];
@@ -359,10 +313,7 @@ export function claimSourcesChecked(claimKind, card) {
   }
 }
 
-// Exported for the audit script + tests.
-export const __internals = {
-  BRAND_RULES,
-  FOOTWEAR_CATEGORIES,
-  NON_FOOTWEAR_CATEGORIES,
-  brandRule,
-};
+// Exported for the audit script + tests. Claim rules / category
+// groups / color families are all merchant-data — there's nothing
+// shop-keyed to export from this module anymore.
+export const __internals = {};

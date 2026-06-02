@@ -1133,7 +1133,34 @@ test("R59 — buildCodeOwnedProductListingText('', pool) produces a non-empty li
 // verifier-side per-card facts. Every emit path funnels through this.
 // ---------------------------------------------------------------------------
 
-const aetrexShop = { shop: "aetrex.myshopify.com" };
+// Synthetic merchant claim config — equivalent of what the
+// auto-seed produces on first request, used here to test the
+// data-driven brand rule. NOT a code constant in production —
+// production reads identical-shaped rows from the ClaimRule /
+// CategoryGroup / ColorFamily tables.
+const SYNTHETIC_CLAIM_CONFIG = {
+  rules: [
+    {
+      claim: "archSupport",
+      ruleType: "category_group",
+      appliesToGroup: "Footwear",
+      excludeGroups: ["Orthotics", "Accessories"],
+    },
+  ],
+  categoryGroups: [
+    {
+      name: "Footwear",
+      categories: [
+        "sneakers", "sandals", "boots", "loafers", "oxfords",
+        "clogs", "slip-ons", "slippers", "mary-janes", "wedges-heels",
+      ],
+    },
+    { name: "Accessories", categories: ["accessories"] },
+    { name: "Orthotics",   categories: ["orthotics"] },
+  ],
+  colorFamilies: [],
+};
+const aetrexShop = { shop: "aetrex.myshopify.com", claimConfig: SYNTHETIC_CLAIM_CONFIG };
 
 // Helper: a Shopify-shaped product fixture as it would arrive on
 // search_products / get_product_details / find_similar_products /
@@ -1173,25 +1200,25 @@ test("R60 — buildProductClaimFacts returns value+source+evidence per fact", ()
   assert.equal(facts.category.value, "sandals");
 });
 
-test("R61 — Aetrex brand rule: footwear category proves archSupport when description omits it", () => {
-  // Card with NO "arch support" in description and NO footbed attribute —
-  // legacy logic would mark _archSupport=false. Brand rule (Aetrex shop +
-  // footwear category) must promote it to true.
+test("R61 — claim rule fires when category is in the configured Footwear group", () => {
+  // Card with NO "arch support" in description and NO footbed attribute.
+  // The merchant config has a ClaimRule(archSupport, group=Footwear)
+  // and Footwear contains "sandals". Brand rule promotes to true via
+  // the data-driven claim_rule_category_group source.
   const p = product({
     description: "Comfortable sandal with cushioned sole.",
     attributes: { category: "Sandals", gender: "Women", activity: ["Walking"] },
   });
   const facts = buildProductClaimFacts(p, aetrexShop);
   assert.equal(facts.archSupport.value, true);
-  assert.equal(facts.archSupport.source, "brand_rule_footwear_category");
+  assert.equal(facts.archSupport.source, "claim_rule_category_group");
   assert.equal(facts.archSupport.evidence.category, "sandals");
+  assert.equal(facts.archSupport.evidence.group, "Footwear");
 });
 
-test("R62 — Aetrex brand rule: Wedges Heels category proves archSupport", () => {
-  // Spec callout: "For Aetrex, footwear categories including Wedges Heels
-  // should prove archSupport=true from a global/category rule".
+test("R62 — claim rule fires for Wedges Heels (configured Footwear category)", () => {
   const p = product({
-    title: "Aetrex Finley Heels",
+    title: "Finley Heels",
     handle: "finley",
     description: "Stylish wedge heel.",
     productType: "Wedges Heels",
@@ -1199,13 +1226,15 @@ test("R62 — Aetrex brand rule: Wedges Heels category proves archSupport", () =
   });
   const facts = buildProductClaimFacts(p, aetrexShop);
   assert.equal(facts.archSupport.value, true);
-  assert.equal(facts.archSupport.source, "brand_rule_footwear_category");
+  assert.equal(facts.archSupport.source, "claim_rule_category_group");
   assert.equal(facts.archSupport.evidence.category, "wedges-heels");
 });
 
-test("R63 — non-Aetrex shop: brand rule does NOT fire (no inheritance)", () => {
-  // Spec: brand rule must be opt-in per shop. A non-Aetrex shop's
-  // sandal with no description proof must NOT be promoted to archSupport=true.
+test("R63 — shop without a claim config does NOT inherit the rule", () => {
+  // Per spec: rules are merchant-data, no inheritance. A shop with no
+  // ClaimRule rows (and therefore no claimConfig handed to the
+  // builder) gets archSupport=false via the title/desc/footbed
+  // fallback only.
   const p = product({
     description: "Comfortable sandal.",
     attributes: { category: "Sandals", gender: "Women" },
@@ -1215,8 +1244,7 @@ test("R63 — non-Aetrex shop: brand rule does NOT fire (no inheritance)", () =>
   assert.equal(facts.archSupport.source, "none");
 });
 
-test("R64 — orthotics category does NOT inherit footwear brand archSupport", () => {
-  // The product IS an orthotic insole — not a shoe. Brand rule excludes it.
+test("R64 — claim rule respects exclude groups (Orthotics excluded from archSupport)", () => {
   const p = product({
     title: "L1 Orthotic",
     handle: "l1-orthotic",
@@ -1226,7 +1254,7 @@ test("R64 — orthotics category does NOT inherit footwear brand archSupport", (
   });
   const facts = buildProductClaimFacts(p, aetrexShop);
   assert.equal(facts.archSupport.value, false);
-  assert.equal(facts.archSupport.source, "brand_rule_non_footwear_category");
+  assert.equal(facts.archSupport.source, "claim_rule_exclude_group");
 });
 
 test("R65 — helps_with attribute contributes condition tags alongside tags array", () => {
@@ -1385,10 +1413,13 @@ test("R70 — attachClaimFactsToCard projects facts onto legacy _field keys", ()
 // brand_rule_footwear_category.
 // ---------------------------------------------------------------------------
 
-test("R71 — Aetrex staging shop f031fc-3.myshopify.com triggers brand rule (Jillian Sport Sandal)", () => {
-  // Live failure: Jillian Sport Sandal - Black, cat=sandals, no
-  // "arch support" in title/description, no footbed attribute.
-  // Brand rule must promote archSupport to true.
+test("R71 — Any shop with the seeded claim config (incl. f031fc-3 from the live log) gets the rule via DB", () => {
+  // The old test exercised a shop-keyed dict. The new architecture
+  // means EVERY shop that has the seeded ClaimRule rows gets the
+  // rule — no shop allowlist anywhere in code. Live shop
+  // f031fc-3.myshopify.com gets it for the same reason aetrex
+  // does: it has a ClaimRule(archSupport) row pointing at the
+  // Footwear group (auto-seeded on first request).
   const p = product({
     title: "Jillian Sport Sandal - Black",
     handle: "jillian-sport-black-l8000w",
@@ -1397,30 +1428,32 @@ test("R71 — Aetrex staging shop f031fc-3.myshopify.com triggers brand rule (Ji
     tags: ["Plantar Fasciitis"],
     attributes: { category: "Sandals", gender: "Women" },
   });
-  const facts = buildProductClaimFacts(p, { shop: "f031fc-3.myshopify.com" });
-  assert.equal(facts.archSupport.value, true,
-    `staging shop must inherit Aetrex brand rule; got source=${facts.archSupport.source}`);
-  assert.equal(facts.archSupport.source, "brand_rule_footwear_category");
+  const ctx = { shop: "f031fc-3.myshopify.com", claimConfig: SYNTHETIC_CLAIM_CONFIG };
+  const facts = buildProductClaimFacts(p, ctx);
+  assert.equal(facts.archSupport.value, true);
+  assert.equal(facts.archSupport.source, "claim_rule_category_group");
   assert.equal(facts.archSupport.evidence.category, "sandals");
+  assert.equal(facts.archSupport.evidence.group, "Footwear");
 });
 
-test("R72 — env var PRODUCT_CLAIM_FACTS_ARCH_SUPPORT_SHOPS extends the rule list", () => {
-  // Set env var on the fly. brandRule() re-reads at call time so
-  // this doesn't require module reload.
-  const prev = process.env.PRODUCT_CLAIM_FACTS_ARCH_SUPPORT_SHOPS;
-  process.env.PRODUCT_CLAIM_FACTS_ARCH_SUPPORT_SHOPS = "extra-shop.myshopify.com";
-  try {
-    const p = product({
-      description: "Plain sandal.",
-      attributes: { category: "Sandals", gender: "Women" },
-    });
-    const facts = buildProductClaimFacts(p, { shop: "extra-shop.myshopify.com" });
-    assert.equal(facts.archSupport.value, true);
-    assert.equal(facts.archSupport.source, "brand_rule_footwear_category");
-  } finally {
-    if (prev === undefined) delete process.env.PRODUCT_CLAIM_FACTS_ARCH_SUPPORT_SHOPS;
-    else process.env.PRODUCT_CLAIM_FACTS_ARCH_SUPPORT_SHOPS = prev;
-  }
+test("R72 — Merchant adds a new category to the Footwear group → claim rule covers it without code change", () => {
+  // The whole point of moving rules out of code: a merchant can add
+  // "espadrilles" to their Footwear CategoryGroup and the very next
+  // request picks it up. No deploy, no code list.
+  const extendedConfig = JSON.parse(JSON.stringify(SYNTHETIC_CLAIM_CONFIG));
+  extendedConfig.categoryGroups
+    .find((g) => g.name === "Footwear").categories.push("espadrilles");
+  const p = product({
+    title: "Sun Espadrille - Natural",
+    handle: "sun-espadrille",
+    description: "Casual espadrille.",
+    productType: "Espadrilles",
+    attributes: { category: "Espadrilles", gender: "Women" },
+  });
+  const ctx = { shop: "fixture.myshopify.com", claimConfig: extendedConfig };
+  const facts = buildProductClaimFacts(p, ctx);
+  assert.equal(facts.archSupport.value, true);
+  assert.equal(facts.archSupport.source, "claim_rule_category_group");
 });
 
 // ---------------------------------------------------------------------------

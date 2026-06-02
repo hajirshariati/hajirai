@@ -564,3 +564,59 @@ model CatalogFacetIndex {
   availableProducts        Int       @default(0)
   syncedAt                 DateTime  @default(now()) @updatedAt
 }
+
+// Merchant-data-driven claim rules. A ClaimRule says "for THIS shop,
+// this verifier claim (e.g. archSupport, waterFriendly) is proven
+// when a product belongs to category-group GROUP and not in EXCLUSIONS."
+// Replaces the previous hardcoded BRAND_RULES + FOOTWEAR_CATEGORIES
+// constants. Default seed runs on first request per shop —
+// idempotent, mirrors the prior code defaults so existing installs
+// inherit the same behavior without an admin action.
+model ClaimRule {
+  id              String   @id @default(cuid())
+  shop            String
+  claim           String   // canonical claim key: archSupport | waterFriendly | ...
+  ruleType        String   // category_group | tag_match | metafield_match
+  appliesToGroup  String?  // CategoryGroup.name when ruleType=category_group
+  excludeGroups   String[] @default([])
+  ruleConfig      Json?    // extensible per-ruleType payload
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([shop, claim])
+  @@index([shop])
+}
+
+// Named groups of canonical categories. A merchant declares
+// "Footwear = sneakers, sandals, boots, …" once; ClaimRule and the
+// product turn engine reference the group name. New categories
+// added to the catalog automatically flow into the group when the
+// merchant updates it.
+model CategoryGroup {
+  id          String   @id @default(cuid())
+  shop        String
+  name        String   // e.g. "Footwear", "Accessories", "Orthotics"
+  categories  String[] @default([])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([shop, name])
+  @@index([shop])
+}
+
+// Named color families for "X or Y / neutral / earth tones" style
+// queries. Resolver consults these before falling back to a
+// single-color filter. No code list of "neutral colors" anywhere —
+// the merchant defines what neutral means for their catalog.
+model ColorFamily {
+  id          String   @id @default(cuid())
+  shop        String
+  name        String   // e.g. "neutral", "earth-tones", "brights"
+  members     String[] @default([])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([shop, name])
+  @@index([shop])
+}
