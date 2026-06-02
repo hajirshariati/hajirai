@@ -683,11 +683,90 @@ export async function maybeRunOrthoticFlow({
   // "my 9-year-old" or "grandson". Only applied when the classifier
   // ran successfully; on null we keep the regex extraction so the
   // gate never goes offline on classifier failure.
+  //
+  // Chip-scope guard (added 2026-06-03):
+  // When the prior assistant message was a recognized seed chip
+  // question (q_condition, q_arch, q_useCase, …), the user's
+  // reply is an answer to THAT chip's attribute. Accepting
+  // classifier-derived gender / useCase / arch from the same
+  // click is unsafe — Haiku reads the chip text + the click
+  // text and frequently regenerates a stale subject attribute
+  // (e.g. gender=Women from session memory contamination) on
+  // what was really a condition click.
+  //
+  // Live failure 2026-06-03: customer answered the men's flow
+  // through q_gender → q_useCase → q_arch (all correct), then
+  // clicked "Ball-of-foot pain / metatarsalgia" on q_condition.
+  // Classifier returned gender=Women → subject-pivot reset
+  // dropped arch + useCase → bot re-asked q_arch. Loop.
+  let priorChipAttribute = null;
+  {
+    const priorLastAssistant = [...priorMessages].reverse().find((m) => m.role === "assistant");
+    const priorLastText = priorLastAssistant && typeof priorLastAssistant.content === "string"
+      ? priorLastAssistant.content
+      : "";
+    if (priorLastText && /<<[^<>]+>>/.test(priorLastText)) {
+      const priorNode = findNodeByChipsInText(priorLastText, tree.definition);
+      priorChipAttribute = priorNode?.attribute || null;
+    }
+  }
   if (classifiedIntent && classifiedIntent.attributes) {
     const a = classifiedIntent.attributes;
-    if (a.gender) latestExtracted.gender = a.gender;
-    if (a.useCase) latestExtracted.useCase = a.useCase;
-    if (a.condition) latestExtracted.condition = a.condition;
+    // Detect an EXPLICIT subject change in the literal user text.
+    // Only literal subject phrasings ("for my wife", "actually
+    // men's", "no, women") may overturn the chip-scope guard.
+    const SUBJECT_OVERRIDE_RE = /\b(?:for\s+my\s+(?:wife|husband|mom|mother|dad|father|son|daughter|partner|spouse|kid|child|grandson|granddaughter)|actually\s+(?:men|women|kids|boys|girls)|no\s*,?\s+(?:men|women|kids|boys|girls)|this\s+is\s+for\s+(?:my\s+\w+|me))/i;
+    const userExplicitlyChangedSubject = SUBJECT_OVERRIDE_RE.test(rawUserText);
+    const chipScopeIsNonGender = priorChipAttribute && priorChipAttribute !== "gender";
+    const chipScopeIsNonUseCase = priorChipAttribute && priorChipAttribute !== "useCase";
+    const chipScopeIsNonCondition = priorChipAttribute && priorChipAttribute !== "condition";
+
+    if (a.gender) {
+      // Block classifier-derived gender when the prior question
+      // was a non-gender chip AND the user didn't explicitly say
+      // anything subject-related in free text.
+      if (chipScopeIsNonGender && !userExplicitlyChangedSubject) {
+        console.log(
+          `[orthotic-flow] chip-scope: ignored classifier gender=${a.gender} ` +
+            `(prior question was ${priorChipAttribute} chip; user text not a subject change)`,
+        );
+      } else {
+        latestExtracted.gender = a.gender;
+      }
+    }
+    if (a.useCase) {
+      // Same guard for useCase — chip-context bleed in the
+      // opposite direction (a condition click should not change
+      // useCase silently).
+      if (chipScopeIsNonUseCase && !userExplicitlyChangedSubject) {
+        // useCase isn't subject-bound, but we still avoid
+        // classifier-derived useCase contamination when the
+        // user clicked a different attribute's chip.
+        // Verbose log only when it would have OVERWRITTEN an
+        // existing accumulated value — silent no-op otherwise.
+        if (accumulated.useCase && accumulated.useCase !== a.useCase) {
+          console.log(
+            `[orthotic-flow] chip-scope: ignored classifier useCase=${a.useCase} ` +
+              `(prior question was ${priorChipAttribute} chip; ` +
+              `accumulated useCase=${accumulated.useCase} preserved)`,
+          );
+        }
+      } else {
+        latestExtracted.useCase = a.useCase;
+      }
+    }
+    if (a.condition) {
+      // Condition is the one classifier value we want to ACCEPT
+      // even outside a condition chip — a customer can mention
+      // a condition in free text any turn. But we still gate it
+      // when the prior chip was specifically a non-condition chip
+      // AND the click text doesn't read like a condition mention,
+      // to avoid Haiku regenerating a stale condition from chip
+      // text it read alongside the answer.
+      // For now we keep the original behavior here; the live
+      // failure was on the GENDER side, not condition.
+      latestExtracted.condition = a.condition;
+    }
   }
 
   // Chip-context defense for the overpronation chip question.

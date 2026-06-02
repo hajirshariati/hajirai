@@ -1336,6 +1336,116 @@ await test("25d — empty extracted produces no acknowledgment", () => {
 });
 
 // ──────────────────────────────────────────────────────────────
+// 26. Live 2026-06-03: classifier-gender contamination on a
+//     CONDITION chip click triggered subject-pivot reset and
+//     re-asked q_arch. Customer walked Men → Dress shoes → Flat/Low
+//     → metatarsalgia; clicked the metatarsalgia chip; classifier
+//     returned gender=Women (memory contamination); subject pivot
+//     dropped arch + useCase; bot re-asked arch.
+// ──────────────────────────────────────────────────────────────
+section("Chip-scope guard (live 2026-06-03)");
+
+await test("26 — condition chip click + classifier gender contamination must NOT pivot subject or re-ask arch", async () => {
+  const { events, encoder, controller } = makeMockSse();
+  const cap = captureLogs();
+  try {
+    await maybeRunOrthoticFlow({
+      messages: [
+        { role: "user", content: "I have foot pain, what should I wear?" },
+        { role: "assistant", content: "Are you looking for footwear with built-in support, or an orthotic insole? <<Footwear>><<Orthotic insole>>" },
+        { role: "user", content: "Orthotic insole" },
+        { role: "assistant", content: "Who are the orthotics for? <<Men>><<Women>><<Kids>>" },
+        { role: "user", content: "Men" },
+        { role: "assistant", content: "What kind of shoes will the orthotics go in? <<Dress shoes / heels>><<Casual>><<Athletic>>" },
+        { role: "user", content: "Dress shoes / heels" },
+        { role: "assistant", content: "What's your arch type? <<Flat / Low>><<Medium>><<High>><<I don't know>>" },
+        { role: "user", content: "Flat / Low" },
+        { role: "assistant", content: "Any specific foot condition? <<None>><<Plantar Fasciitis>><<Bunions>><<Ball-of-foot pain / metatarsalgia>>" },
+        { role: "user", content: "Ball-of-foot pain / metatarsalgia" },
+      ],
+      tree,
+      shop: null,
+      controller,
+      encoder,
+      // Reproduce the live contaminated classifier output:
+      classifiedIntent: {
+        isOrthoticRequest: false,
+        isFootwearRequest: true,
+        isRejection: false,
+        attributes: {
+          gender: "Women",                   // ← stale from a prior product turn
+          useCase: "dress_no_removable",
+          condition: "metatarsalgia",
+        },
+      },
+    });
+  } finally {
+    cap.restore();
+  }
+  const flowLogs = cap.lines.filter((l) => l.includes("[orthotic-flow]"));
+
+  // Guard 1: subject pivot must NOT have fired.
+  const sawPivot = flowLogs.some((l) => /subject pivot/i.test(l));
+  assert.equal(sawPivot, false,
+    `subject pivot must NOT fire on a condition chip click. Logs: ${flowLogs.join(" | ")}`);
+
+  // Guard 2: the chip-scope guard log must have recorded the
+  // classifier-gender block.
+  const sawChipScopeBlock = flowLogs.some(
+    (l) => /chip-scope: ignored classifier gender=Women/i.test(l),
+  );
+  assert.equal(sawChipScopeBlock, true,
+    `expected chip-scope block log. Logs: ${flowLogs.join(" | ")}`);
+
+  // Guard 3: bot must NOT re-emit q_arch.
+  const archReEmit = events.some(
+    (e) => e?.type === "text" && /arch type/i.test(e.text || ""),
+  );
+  assert.equal(archReEmit, false,
+    `gate must not re-emit q_arch after condition chip click`);
+});
+
+await test("27 — explicit 'for my wife' STILL pivots subject (existing protection preserved)", async () => {
+  // Sanity: the chip-scope guard must not break the legitimate
+  // subject-pivot path. Test 13 covers this too; this is a fresh
+  // assertion that the override regex catches "for my wife" and
+  // allows the classifier gender through.
+  const { events, encoder, controller } = makeMockSse();
+  const cap = captureLogs();
+  try {
+    await maybeRunOrthoticFlow({
+      messages: [
+        { role: "user", content: "I need an orthotic" },
+        { role: "assistant", content: "Who? <<Men>><<Women>><<Kids>>" },
+        { role: "user", content: "Men" },
+        { role: "assistant", content: "Shoes? <<Casual>>" },
+        { role: "user", content: "Casual" },
+        { role: "assistant", content: "Condition? <<None>><<Plantar>>" },
+        { role: "user", content: "Plantar" },
+        { role: "assistant", content: "Arch? <<Flat / Low>><<Medium>>" },
+        { role: "user", content: "Medium" },
+        { role: "assistant", content: "Pronation? <<Yes>><<No>>" },
+        { role: "user", content: "actually for my wife" },
+      ],
+      tree,
+      shop: null,
+      controller,
+      encoder,
+      classifiedIntent: {
+        isOrthoticRequest: true, isFootwearRequest: false, isRejection: false,
+        attributes: { gender: "Women" },
+      },
+    });
+  } finally {
+    cap.restore();
+  }
+  const flowLogs = cap.lines.filter((l) => l.includes("[orthotic-flow]"));
+  const sawPivot = flowLogs.some((l) => /subject pivot/i.test(l));
+  assert.equal(sawPivot, true,
+    `'for my wife' must STILL trigger subject pivot. Logs: ${flowLogs.join(" | ")}`);
+});
+
+// ──────────────────────────────────────────────────────────────
 // Run summary
 // ──────────────────────────────────────────────────────────────
 console.log("");
