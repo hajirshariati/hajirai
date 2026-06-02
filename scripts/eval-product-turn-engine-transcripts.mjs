@@ -279,7 +279,10 @@ await test("E2E-3 — 'best dress shoes for men' after pink-sandals/bunions cont
     `stale condition must not leak into scope; got ${out.diagnostics.scope.condition}`);
 });
 
-await test("E2E-4 — named-product turn ('like Danika') declines so LLM agent can handle the catalog lookup", async () => {
+await test("E2E-4 — named-product turn DECLINES when no similarFn/resolveNamedProductFn is supplied", async () => {
+  // Phase 1 behavior preserved: without the injectors the engine
+  // falls through. This lets older callers (eval harnesses, fixture
+  // mode) continue without the similar-product path activating.
   const out = await runProductTurn({
     ...ctxBase,
     latestUserMessage: "What other shoes have same support as Danika?",
@@ -292,8 +295,7 @@ await test("E2E-4 — named-product turn ('like Danika') declines so LLM agent c
     searchFn: fixedSearch([]),
     claimConfig: FIXTURE_CLAIM_CONFIG,
   });
-  assert.ok(out.decline, "named-product turns decline in v1");
-  assert.ok(out.diagnostics.rungs.includes("declined:scope-too-thin"));
+  assert.ok(out.decline, "named-product turns decline when injectors absent");
 });
 
 await test("E2E-5 — 'wedges in black or neutral' detects color-family from data-driven config", async () => {

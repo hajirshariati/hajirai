@@ -55,6 +55,16 @@ export function productTurnEngineEnabled() {
 //   options.searchFn     — async (scope) => productCandidates[] (canonical
 //                          product shape). Injected so eval mode can
 //                          supply fixtures without a DB / Shopify call.
+//   options.similarFn    — async ({handle, refTitle, limit}) =>
+//                          { products[], reference, error?, missingAttrs? }.
+//                          Injected. In production this MUST wrap the
+//                          existing find_similar_products handler so we
+//                          reuse the merchant's admin-configured
+//                          similarMatchAttributes — no parallel rule set.
+//   options.resolveNamedProductFn — async (message) => productHandle | null.
+//                          Injected. Wraps catalog-resolver.detectSpecificProduct
+//                          so the engine doesn't re-implement named-anchor
+//                          matching.
 //   options.claimConfig  — pre-resolved merchant claim config. If absent,
 //                          loaded via getMerchantClaimConfig(ctx.shop).
 //   options.forceEnable  — bypass the env flag (eval mode only).
@@ -79,6 +89,22 @@ export async function runProductTurn(ctx = {}, options = {}) {
     claimConfig,
   });
   diagnostics.scope = scope;
+
+  // Phase 2 — named-product / similar-to / same-support-as path.
+  // When the turn carries a named-product anchor, route to the
+  // similar-product flow which REUSES the existing merchant-
+  // configured find_similar_products handler. No parallel rule
+  // engine. Skips when the merchant hasn't provided similarFn
+  // (older callers / fixture mode without the wrapper).
+  const similarIntent = detectSimilarProductIntent(scope, ctx);
+  if (similarIntent && typeof options.similarFn === "function" && typeof options.resolveNamedProductFn === "function") {
+    diagnostics.rungs.push("entered:similar_product_path");
+    return await runSimilarProductTurn({
+      ctx, scope, similarIntent, claimConfig, diagnostics,
+      similarFn: options.similarFn,
+      resolveNamedProductFn: options.resolveNamedProductFn,
+    });
+  }
 
   if (!engineWantsThisTurn(scope)) {
     diagnostics.rungs.push("declined:scope-too-thin");
@@ -480,10 +506,197 @@ function escapeRegex(s) {
   return String(s || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+// ─── Phase 2: named-product / similar-product path ──────────────
+//
+// Detects intent shapes like:
+//   "similar to Jillian" / "like the Maui" / "same support as Danika"
+//   "what other shoes have the same support?" (anchor from sessionMemory)
+//
+// Does NOT decide similarity — just classifies the turn. The actual
+// matching is delegated to the merchant's admin-configured
+// find_similar_products handler via options.similarFn.
+
+const SIMILAR_ANCHOR_RE =
+  /\b(?:similar\s+to|like(?:\s+the)?|same\s+(?:as|support\s+as|cushioning\s+as|fit\s+as|feel\s+as)|comparable\s+to|other(?:\s+shoes)?\s+(?:like|with\s+the\s+same))\b/i;
+
+const SAME_AS_PRIOR_RE =
+  /\bsame\s+(?:support|cushioning|fit|feel|style)\b/i;
+
+// Generic ranking phrasing — used by the composer to decide
+// whether to honestly admit "we can't rank exactly" when the
+// requested ranking criterion isn't in the merchant's configured
+// similarity attributes.
+const RANKING_RE =
+  /\b(?:most|best|highest|top|maximum|greater?)\s+(\w[\w-]*)\b/i;
+
+export function detectSimilarProductIntent(scope, ctx) {
+  const rawMessage = String(scope?.rawMessage || ctx?.latestUserMessage || "");
+  if (!rawMessage) return null;
+
+  // Two flavors:
+  //  a) The message names an anchor product directly ("similar to
+  //     Jillian", "like the Maui"). detectSpecificProduct (the
+  //     resolveNamedProductFn injected) will resolve the handle.
+  //  b) The message references "the same X" without a fresh anchor
+  //     ("what other shoes have the same support?"). The anchor
+  //     comes from sessionMemory.explicit.specificProduct or the
+  //     last shown product.
+  const hasAnchorWord = SIMILAR_ANCHOR_RE.test(rawMessage);
+  const hasSameAs = SAME_AS_PRIOR_RE.test(rawMessage);
+  if (!hasAnchorWord && !hasSameAs) return null;
+
+  // Ranking criterion (if any) — composer uses this to decide
+  // whether to admit "we don't have data to rank exactly."
+  const rankMatch = rawMessage.match(RANKING_RE);
+  const rankingCriterion = rankMatch ? rankMatch[1].toLowerCase() : null;
+
+  return {
+    rawMessage,
+    anchorInMessage: hasAnchorWord,
+    rankingCriterion,
+    priorAnchorHandle:
+      ctx?.sessionMemory?.explicit?.specificProduct || null,
+  };
+}
+
+async function runSimilarProductTurn({
+  ctx, scope, similarIntent, claimConfig, diagnostics,
+  similarFn, resolveNamedProductFn,
+}) {
+  // Resolve the named-product anchor. Try the latest message
+  // first; fall back to sessionMemory.specificProduct if the
+  // current message uses "same as" referring to a prior turn.
+  let anchorHandle = null;
+  if (similarIntent.anchorInMessage) {
+    try {
+      anchorHandle = await resolveNamedProductFn(similarIntent.rawMessage);
+    } catch (err) {
+      console.warn(`[product-turn-engine] anchor resolve failed: ${err?.message || err}`);
+    }
+  }
+  if (!anchorHandle && similarIntent.priorAnchorHandle) {
+    anchorHandle = similarIntent.priorAnchorHandle;
+  }
+  if (!anchorHandle) {
+    diagnostics.rungs.push("similar:declined_no_anchor");
+    return { decline: true, diagnostics };
+  }
+  diagnostics.anchorHandle = anchorHandle;
+
+  // Delegate matching to the existing merchant-configured
+  // find_similar_products handler. Engine does not re-implement
+  // similarity rules.
+  let similarResult;
+  try {
+    similarResult = await similarFn({
+      handle: anchorHandle,
+      limit: ctx?.productCardCap || 6,
+    });
+  } catch (err) {
+    console.warn(`[product-turn-engine] similarFn failed: ${err?.message || err}`);
+    diagnostics.rungs.push("similar:errored");
+    return { decline: true, diagnostics };
+  }
+
+  // Configuration-missing surface from find_similar_products:
+  //   error="Similar-product matching is not configured…" / "no value
+  //   for the configured similarity attribute(s): X". Decline so the
+  //   agent path can either admit it or run a different shape.
+  if (!similarResult || similarResult.error) {
+    diagnostics.rungs.push(`similar:config_or_data_missing:${similarResult?.error?.slice(0, 80) || "unknown"}`);
+    return { decline: true, diagnostics };
+  }
+
+  const rawCandidates = Array.isArray(similarResult.products) ? similarResult.products : [];
+  diagnostics.rungs.push(`similar:retrieved:${rawCandidates.length}`);
+
+  // Fact-attach + base-style group (same as the retrieval path).
+  const cardsWithFacts = [];
+  for (const cand of rawCandidates) {
+    const card = { ...cand, ...attachClaimFactsToCard(cand, { shop: ctx.shop, claimConfig }) };
+    if (!card._claimFacts) continue;
+    cardsWithFacts.push(card);
+  }
+  const families = groupVariantsByBaseStyle(cardsWithFacts);
+  diagnostics.rungs.push(`similar:families:${families.length}`);
+
+  // Compose. Composer honors the ranking criterion: if the
+  // customer asked "which has the most cushioning" and that token
+  // isn't in the merchant's configured similarity attributes, we
+  // admit the limit instead of inventing a ranking.
+  const configuredAttrs = Array.isArray(ctx?.similarMatchAttributes)
+    ? ctx.similarMatchAttributes.map((s) => String(s || "").toLowerCase().trim()).filter(Boolean)
+    : [];
+  const composed = composeSimilarAnswer({
+    scope, similarIntent, anchorHandle, anchorTitle: similarResult.reference?.title || anchorHandle,
+    families, configuredAttrs,
+  });
+
+  const displayCards = familiesToCards(families);
+  return {
+    decline: false,
+    scope,
+    products: displayCards,
+    facts: displayCards.map((c) => c._claimFacts),
+    answerText: composed.text,
+    cta: composed.cta || null,
+    diagnostics: { ...diagnostics, composer: composed.reason },
+  };
+}
+
+export function composeSimilarAnswer({
+  scope, similarIntent, anchorHandle, anchorTitle, families, configuredAttrs,
+}) {
+  if (families.length === 0) {
+    return {
+      text: `I couldn't find other styles that match ${anchorTitle} on the configured similarity criteria. Try widening the search?`,
+      reason: "similar_empty",
+      cta: null,
+    };
+  }
+  const n = families.length;
+  const total = familiesToCards(families).length;
+
+  // Honesty about ranking. If the customer asked "most X" and X
+  // isn't a configured similarity attribute (merchant-data-driven,
+  // NO hardcoded list of "cushioning"/"support" anywhere), say so.
+  let rankingCaveat = "";
+  if (similarIntent.rankingCriterion) {
+    const c = similarIntent.rankingCriterion;
+    const isConfigured = configuredAttrs.some((a) => a.includes(c) || c.includes(a));
+    if (!isConfigured) {
+      rankingCaveat =
+        ` I don't have catalog data to rank these by ${c} specifically — they share ${anchorTitle}'s configured similarity attributes` +
+        (configuredAttrs.length > 0 ? ` (${configuredAttrs.join(", ")})` : "") +
+        ` plus category and gender.`;
+    }
+  }
+
+  const lead = n === 1
+    ? `I found one style similar to ${anchorTitle}.`
+    : `I found ${n} styles similar to ${anchorTitle}.`;
+
+  const why = configuredAttrs.length > 0 && !rankingCaveat
+    ? ` They share the configured similarity attributes (${configuredAttrs.join(", ")}) plus category and gender, and exclude the ${anchorTitle} family.`
+    : (rankingCaveat ? "" : ` They share the merchant's configured similarity attributes plus category and gender.`);
+
+  const cta = total === 1
+    ? ` Open the card to check size and color availability.`
+    : ` Open a card to check size and color${total > 3 ? `, or start with the first if you want the closest match` : ""}.`;
+
+  const text = `${lead}${rankingCaveat || why}${cta}`.replace(/\s{2,}/g, " ").trim();
+  return { text, reason: rankingCaveat ? "similar_ranking_caveat" : "similar_matched", cta: null };
+}
+
 // Exported for tests + the offline transcript harness.
 export const __internals = {
   engineWantsThisTurn,
   familyKey,
   familySupportsClaim,
   scopeLabel,
+  detectSimilarProductIntent,
+  composeSimilarAnswer,
+  SIMILAR_ANCHOR_RE,
+  SAME_AS_PRIOR_RE,
+  RANKING_RE,
 };

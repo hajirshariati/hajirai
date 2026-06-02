@@ -395,9 +395,41 @@ async function runProductTurnDispatch({ ctx, controller, encoder, claimConfig })
     return result.products;
   };
 
+  // similarFn — Phase 2. REUSE the existing find_similar_products
+  // handler so the engine inherits the merchant's admin-configured
+  // similarMatchAttributes + category/gender filters + same-style-
+  // family exclusion. No parallel similarity engine.
+  const similarFn = async ({ handle, limit }) => {
+    try {
+      return await dispatchTool("find_similar_products", { handle, limit }, ctx);
+    } catch (err) {
+      console.warn(`[product-turn-engine] similarFn failed: ${err?.message || err}`);
+      return { error: err?.message || "similar lookup failed", products: [] };
+    }
+  };
+
+  // resolveNamedProductFn — REUSE catalog-resolver.detectSpecificProduct
+  // so the engine doesn't re-implement named-anchor matching.
+  // Dynamic import for the same RR-client-bundler reason as the
+  // engine module itself.
+  const { detectSpecificProduct } = await import("../lib/catalog-resolver.server");
+  const resolveNamedProductFn = async (message) => {
+    try {
+      return await detectSpecificProduct(ctx.shop, message);
+    } catch (err) {
+      console.warn(`[product-turn-engine] anchor resolver failed: ${err?.message || err}`);
+      return null;
+    }
+  };
+
   let out;
   try {
-    out = await runProductTurn(ctx, { searchFn, claimConfig });
+    out = await runProductTurn(ctx, {
+      searchFn,
+      similarFn,
+      resolveNamedProductFn,
+      claimConfig,
+    });
   } catch (err) {
     console.error(`[product-turn-engine] runProductTurn threw: ${err?.stack || err?.message || err}`);
     return null;
